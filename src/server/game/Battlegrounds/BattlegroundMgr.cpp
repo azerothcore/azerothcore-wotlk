@@ -1102,7 +1102,7 @@ std::unordered_map<int, bgTypeRef> BattlegroundMgr::getBgFromTypeID = {
     },
     {
         BATTLEGROUND_AV,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* bg) {
+        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* /* bg */) {
             *data << uint32(0x00000005);                    // count of next fields
             *data << uint32(((BattlegroundAVScore*)itr2->second)->GraveyardsAssaulted); // GraveyardsAssaulted
             *data << uint32(((BattlegroundAVScore*)itr2->second)->GraveyardsDefended);  // GraveyardsDefended
@@ -1113,7 +1113,7 @@ std::unordered_map<int, bgTypeRef> BattlegroundMgr::getBgFromTypeID = {
     },
     {
         BATTLEGROUND_WS,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* bg) {
+        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* /* bg */) {
             *data << uint32(0x00000002);                    // count of next fields
             *data << uint32(((BattlegroundWGScore*)itr2->second)->FlagCaptures);        // flag captures
             *data << uint32(((BattlegroundWGScore*)itr2->second)->FlagReturns);         // flag returns
@@ -1121,7 +1121,7 @@ std::unordered_map<int, bgTypeRef> BattlegroundMgr::getBgFromTypeID = {
     },
     {
         BATTLEGROUND_AB,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* bg) {
+        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* /* bg */) {
             *data << uint32(0x00000002);                    // count of next fields
             *data << uint32(((BattlegroundABScore*)itr2->second)->BasesAssaulted);      // bases asssulted
             *data << uint32(((BattlegroundABScore*)itr2->second)->BasesDefended);       // bases defended
@@ -1129,14 +1129,14 @@ std::unordered_map<int, bgTypeRef> BattlegroundMgr::getBgFromTypeID = {
     },
     {
         BATTLEGROUND_EY,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* bg) {
+        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* /* bg */) {
             *data << uint32(0x00000001);                    // count of next fields
             *data << uint32(((BattlegroundEYScore*)itr2->second)->FlagCaptures);        // flag captures
         }
     },
     {
         BATTLEGROUND_SA,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* bg) {
+        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* /* bg */) {
             *data << uint32(0x00000002);                    // count of next fields
             *data << uint32(((BattlegroundSAScore*)itr2->second)->demolishers_destroyed);
             *data << uint32(((BattlegroundSAScore*)itr2->second)->gates_destroyed);
@@ -1144,7 +1144,7 @@ std::unordered_map<int, bgTypeRef> BattlegroundMgr::getBgFromTypeID = {
     },
     {
         BATTLEGROUND_IC,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* bg) {
+        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* /* bg */) {
             *data << uint32(0x00000002);                // count of next fields
             *data << uint32(((BattlegroundICScore*)itr2->second)->BasesAssaulted);       // bases assaulted
             *data << uint32(((BattlegroundICScore*)itr2->second)->BasesDefended);        // bases defended
