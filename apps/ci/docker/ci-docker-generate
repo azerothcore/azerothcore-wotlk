@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-cp -r /home/travis/.ccache .ccache
-
 cp src/server/worldserver/worldserver.conf.dist docker/worldserver/etc/worldserver.conf.dist
 cp src/server/authserver/authserver.conf.dist docker/authserver/etc/authserver.conf.dist
 
