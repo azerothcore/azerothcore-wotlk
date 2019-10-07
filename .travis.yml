@@ -79,6 +79,6 @@ jobs:
     - stage: docker
       env: TRAVIS_BUILD_ID="2"
       script:
-        - ./bin/acore-docker-generate-etc
-        - ./apps/ci/acore-docker-build
+        - ./apps/ci/docker/ci-docker-generate
+        - ./apps/ci/docker/ci-docker-build
         - docker-compose up
