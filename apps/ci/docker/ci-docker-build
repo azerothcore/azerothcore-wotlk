@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-docker build -t acbuild -f apps/ci/Dockerfile .
+docker build -t acbuild -f apps/ci/docker/Dockerfile .
 
 docker run \
     -v /$(pwd)/docker/build/cache:/azerothcore/build \
