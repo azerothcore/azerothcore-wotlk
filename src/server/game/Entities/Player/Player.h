@@ -2161,6 +2161,8 @@ public:
     void UpdateSkillsToMaxSkillsForLevel();             // for .levelup
     void ModifySkillBonus(uint32 skillid, int32 val, bool talent);
 
+    void RewardOtherBonusTalentPoints(uint32 bonusTalentPoints);
+
     /*********************************************************/
     /***                  PVP SYSTEM                       ***/
     /*********************************************************/
@@ -2909,6 +2911,7 @@ protected:
     time_t m_resetTalentsTime;
     uint32 m_usedTalentCount;
     uint32 m_questRewardTalentCount;
+    uint32 m_otherBonusTalentCount;
 
     // Social
     PlayerSocial* m_social;
