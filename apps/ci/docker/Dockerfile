@@ -1,5 +1,9 @@
 FROM ubuntu:bionic
 
+# ccache environment variables
+ENV CCACHE_CPP2=true
+ENV CCACHE_DIR=/azerothcore/.ccache
+
 # install the required dependencies to compile AzerothCore
 RUN apt update && apt install -y git ccache cmake make gcc g++ clang libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev libace-6.* libace-dev
 
@@ -14,8 +18,6 @@ ADD .ccache /azerothcore/.ccache
 
 ENTRYPOINT  cd azerothcore/build && \
             # run cmake
-            export CCACHE_CPP2=true
-            export CCACHE_DIR=/azerothcore/.ccache
             cmake ../ -DCMAKE_INSTALL_PREFIX=/azeroth-server -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DTOOLS=0 -DSCRIPTS=1 && \
             # calculate the optimal number of threads
             MTHREADS=`grep -c ^processor /proc/cpuinfo`; MTHREADS=$(($MTHREADS + 2)) && \
