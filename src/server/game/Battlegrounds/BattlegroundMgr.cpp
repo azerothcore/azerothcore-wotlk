@@ -267,24 +267,26 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         *data << uint32(itr2->second->HealingDone);             // healing done
 
        // battleground specific things
-       if (bg->GetBgTypeID() == BATTLEGROUND_NA ||
-            bg->GetBgTypeID() == BATTLEGROUND_BE ||
-            bg->GetBgTypeID() == BATTLEGROUND_AA ||
-            bg->GetBgTypeID() == BATTLEGROUND_RL ||
-            bg->GetBgTypeID() == BATTLEGROUND_DS ||
-            bg->GetBgTypeID() == BATTLEGROUND_RV ||
-            BattlegroundMgr::getBgFromTypeID.find(bg->GetBgTypeID()) == BattlegroundMgr::getBgFromTypeID.end()
+       int bgTypeID = bg->GetBgTypeID();
+
+       if (bgTypeID == BATTLEGROUND_NA ||
+           bgTypeID == BATTLEGROUND_BE ||
+           bgTypeID == BATTLEGROUND_AA ||
+           bgTypeID == BATTLEGROUND_RL ||
+           bgTypeID == BATTLEGROUND_DS ||
+           bgTypeID == BATTLEGROUND_RV ||
+           BattlegroundMgr::getBgFromTypeID.find(bgTypeID) == BattlegroundMgr::getBgFromTypeID.end()
         ) {
             *data << uint32(0);
         }
         else {
-            BattlegroundMgr::getBgFromTypeID[bg->GetBgTypeID()](data, itr2, bg);
+            BattlegroundMgr::getBgFromTypeID[bgTypeID](data, itr2, bg);
         }
 
         // should never happen
         if (++scoreCount >= bg->GetMaxPlayersPerTeam()*2 && itr != bg->GetPlayerScoresEnd())
         {
-            sLog->outMisc("Battleground %u scoreboard has more entries (%u) than allowed players in this bg (%u)", bg->GetBgTypeID(), bg->GetPlayerScoresSize(), bg->GetMaxPlayersPerTeam()*2);
+            sLog->outMisc("Battleground %u scoreboard has more entries (%u) than allowed players in this bg (%u)", bgTypeID, bg->GetPlayerScoresSize(), bg->GetMaxPlayersPerTeam()*2);
             break;
         }
     }
