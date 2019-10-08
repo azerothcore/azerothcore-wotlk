@@ -6969,7 +6969,7 @@ SpellCastResult Spell::CheckItems()
                 // do not allow adding usable enchantments to items that have use effect already
                 if (enchantEntry)
                 {
-                    for (uint8 s = 0; s < MAX_ITEM_ENCHANTMENT_EFFECTS; ++s)
+                    for (uint8 s = 0; s < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++s)
                     {
                         switch (enchantEntry->type[s])
                         {
