@@ -266,21 +266,104 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         *data << uint32(itr2->second->DamageDone);              // damage done
         *data << uint32(itr2->second->HealingDone);             // healing done
 
-       // battleground specific things
-       int bgTypeID = bg->GetBgTypeID();
 
-       if (bgTypeID == BATTLEGROUND_NA ||
-           bgTypeID == BATTLEGROUND_BE ||
-           bgTypeID == BATTLEGROUND_AA ||
-           bgTypeID == BATTLEGROUND_RL ||
-           bgTypeID == BATTLEGROUND_DS ||
-           bgTypeID == BATTLEGROUND_RV ||
-           BattlegroundMgr::getBgFromTypeID.find(bgTypeID) == BattlegroundMgr::getBgFromTypeID.end()
+        // battleground specific things
+        int bgTypeID = bg->GetBgTypeID();
+
+        // if there is a key in the getBgFromType hashmap OR a key in the getBgFromMap hashmap (with bgTypeID == BATTLEGROUND_RB)
+        // -> use hashmap code
+        // else -> use switch case
+        if (BattlegroundMgr::getBgFromTypeID.find(bgTypeID) != BattlegroundMgr::getBgFromTypeID.end() ||
+          (bgTypeID == BATTLEGROUND_RB && BattlegroundMgr::getBgFromMap.find(bg->GetMapId()) != BattlegroundMgr::getBgFromMap.end())
         ) {
-            *data << uint32(0);
+          BattlegroundMgr::getBgFromTypeID[bgTypeID](data, itr2, bg);
         }
         else {
-            BattlegroundMgr::getBgFromTypeID[bgTypeID](data, itr2, bg);
+          switch (bgTypeID)
+          {
+              case BATTLEGROUND_RB:
+                  switch (bg->GetMapId())
+                  {
+                      case 489:
+                          *data << uint32(0x00000002);            // count of next fields
+                          *data << uint32(((BattlegroundWGScore*)itr2->second)->FlagCaptures);        // flag captures
+                          *data << uint32(((BattlegroundWGScore*)itr2->second)->FlagReturns);         // flag returns
+                          break;
+                      case 566:
+                          *data << uint32(0x00000001);            // count of next fields
+                          *data << uint32(((BattlegroundEYScore*)itr2->second)->FlagCaptures);        // flag captures
+                          break;
+                      case 529:
+                          *data << uint32(0x00000002);            // count of next fields
+                          *data << uint32(((BattlegroundABScore*)itr2->second)->BasesAssaulted);      // bases asssulted
+                          *data << uint32(((BattlegroundABScore*)itr2->second)->BasesDefended);       // bases defended
+                          break;
+                      case 30:
+                          *data << uint32(0x00000005);            // count of next fields
+                          *data << uint32(((BattlegroundAVScore*)itr2->second)->GraveyardsAssaulted); // GraveyardsAssaulted
+                          *data << uint32(((BattlegroundAVScore*)itr2->second)->GraveyardsDefended);  // GraveyardsDefended
+                          *data << uint32(((BattlegroundAVScore*)itr2->second)->TowersAssaulted);     // TowersAssaulted
+                          *data << uint32(((BattlegroundAVScore*)itr2->second)->TowersDefended);      // TowersDefended
+                          *data << uint32(((BattlegroundAVScore*)itr2->second)->MinesCaptured);       // MinesCaptured
+                          break;
+                      case 607:
+                          *data << uint32(0x00000002);            // count of next fields
+                          *data << uint32(((BattlegroundSAScore*)itr2->second)->demolishers_destroyed);
+                          *data << uint32(((BattlegroundSAScore*)itr2->second)->gates_destroyed);
+                          break;
+                      case 628:                                   // IC
+                          *data << uint32(0x00000002);            // count of next fields
+                          *data << uint32(((BattlegroundICScore*)itr2->second)->BasesAssaulted);       // bases asssulted
+                          *data << uint32(((BattlegroundICScore*)itr2->second)->BasesDefended);        // bases defended
+                      default:
+                          *data << uint32(0);
+                          break;
+                  }
+                  break;
+              case BATTLEGROUND_AV:
+                  *data << uint32(0x00000005);                    // count of next fields
+                  *data << uint32(((BattlegroundAVScore*)itr2->second)->GraveyardsAssaulted); // GraveyardsAssaulted
+                  *data << uint32(((BattlegroundAVScore*)itr2->second)->GraveyardsDefended);  // GraveyardsDefended
+                  *data << uint32(((BattlegroundAVScore*)itr2->second)->TowersAssaulted);     // TowersAssaulted
+                  *data << uint32(((BattlegroundAVScore*)itr2->second)->TowersDefended);      // TowersDefended
+                  *data << uint32(((BattlegroundAVScore*)itr2->second)->MinesCaptured);       // MinesCaptured
+                  break;
+              case BATTLEGROUND_WS:
+                  *data << uint32(0x00000002);                    // count of next fields
+                  *data << uint32(((BattlegroundWGScore*)itr2->second)->FlagCaptures);        // flag captures
+                  *data << uint32(((BattlegroundWGScore*)itr2->second)->FlagReturns);         // flag returns
+                  break;
+              case BATTLEGROUND_AB:
+                  *data << uint32(0x00000002);                    // count of next fields
+                  *data << uint32(((BattlegroundABScore*)itr2->second)->BasesAssaulted);      // bases asssulted
+                  *data << uint32(((BattlegroundABScore*)itr2->second)->BasesDefended);       // bases defended
+                  break;
+              case BATTLEGROUND_EY:
+                  *data << uint32(0x00000001);                    // count of next fields
+                  *data << uint32(((BattlegroundEYScore*)itr2->second)->FlagCaptures);        // flag captures
+                  break;
+              case BATTLEGROUND_SA:
+                  *data << uint32(0x00000002);                    // count of next fields
+                  *data << uint32(((BattlegroundSAScore*)itr2->second)->demolishers_destroyed);
+                  *data << uint32(((BattlegroundSAScore*)itr2->second)->gates_destroyed);
+                  break;
+              case BATTLEGROUND_IC:
+                  *data << uint32(0x00000002);                // count of next fields
+                  *data << uint32(((BattlegroundICScore*)itr2->second)->BasesAssaulted);       // bases assaulted
+                  *data << uint32(((BattlegroundICScore*)itr2->second)->BasesDefended);        // bases defended
+                  break;
+              case BATTLEGROUND_NA:
+              case BATTLEGROUND_BE:
+              case BATTLEGROUND_AA:
+              case BATTLEGROUND_RL:
+              case BATTLEGROUND_DS:
+              case BATTLEGROUND_RV:
+                  *data << uint32(0);
+                  break;
+              default:
+                  *data << uint32(0);
+                  break;
+          }
         }
 
         // should never happen
@@ -370,11 +453,54 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId bgTypeId
 
     Battleground* bg = NULL;
     // create a copy of the BG template
-    if (BattlegroundMgr::bgTypeToTemplate.find(bgTypeId) == BattlegroundMgr::bgTypeToTemplate.end()) {
-        return NULL;
+    if (BattlegroundMgr::bgTypeToTemplate.find(bgTypeId) != BattlegroundMgr::bgTypeToTemplate.end()) {
+        bg = BattlegroundMgr::bgTypeToTemplate[bgTypeId](bg_template);
     }
-
-    bg = BattlegroundMgr::bgTypeToTemplate[bgTypeId](bg_template);
+    else {
+        switch (bgTypeId)
+        {
+          case BATTLEGROUND_AV:
+              bg = new BattlegroundAV(*(BattlegroundAV*)bg_template);
+              break;
+          case BATTLEGROUND_WS:
+              bg = new BattlegroundWS(*(BattlegroundWS*)bg_template);
+              break;
+          case BATTLEGROUND_AB:
+              bg = new BattlegroundAB(*(BattlegroundAB*)bg_template);
+              break;
+          case BATTLEGROUND_NA:
+              bg = new BattlegroundNA(*(BattlegroundNA*)bg_template);
+              break;
+          case BATTLEGROUND_BE:
+              bg = new BattlegroundBE(*(BattlegroundBE*)bg_template);
+              break;
+          case BATTLEGROUND_EY:
+              bg = new BattlegroundEY(*(BattlegroundEY*)bg_template);
+              break;
+          case BATTLEGROUND_RL:
+              bg = new BattlegroundRL(*(BattlegroundRL*)bg_template);
+              break;
+          case BATTLEGROUND_SA:
+              bg = new BattlegroundSA(*(BattlegroundSA*)bg_template);
+              break;
+          case BATTLEGROUND_DS:
+              bg = new BattlegroundDS(*(BattlegroundDS*)bg_template);
+              break;
+          case BATTLEGROUND_RV:
+              bg = new BattlegroundRV(*(BattlegroundRV*)bg_template);
+              break;
+          case BATTLEGROUND_IC:
+              bg = new BattlegroundIC(*(BattlegroundIC*)bg_template);
+              break;
+          case BATTLEGROUND_RB:
+          case BATTLEGROUND_AA:
+              bg = new Battleground(*bg_template);
+              break;
+          default:
+              return NULL;
+        }
+    }
+    
 
     bg->SetLevelRange(minLevel, maxLevel);
     bg->SetInstanceID(sMapMgr->GenerateInstanceId());
@@ -413,7 +539,56 @@ bool BattlegroundMgr::CreateBattleground(CreateBattlegroundData& data)
 {
     // Create the BG
     Battleground* bg = NULL;
-    bg = BattlegroundMgr::bgtypeToBattleground[data.bgTypeId];
+
+    if (BattlegroundMgr::bgtypeToBattleground.find(data.bgTypeId) != BattlegroundMgr::bgtypeToBattleground.end()) {
+        bg = BattlegroundMgr::bgtypeToBattleground[data.bgTypeId];
+    }
+    else {
+        switch (data.bgTypeId)
+        {
+            case BATTLEGROUND_AV:
+                bg = new BattlegroundAV;
+                break;
+            case BATTLEGROUND_WS:
+                bg = new BattlegroundWS;
+                break;
+            case BATTLEGROUND_AB:
+                bg = new BattlegroundAB;
+                break;
+            case BATTLEGROUND_NA:
+                bg = new BattlegroundNA;
+                break;
+            case BATTLEGROUND_BE:
+                bg = new BattlegroundBE;
+                break;
+            case BATTLEGROUND_EY:
+                bg = new BattlegroundEY;
+                break;
+            case BATTLEGROUND_RL:
+                bg = new BattlegroundRL;
+                break;
+            case BATTLEGROUND_SA:
+                bg = new BattlegroundSA;
+                break;
+            case BATTLEGROUND_DS:
+                bg = new BattlegroundDS;
+                break;
+            case BATTLEGROUND_RV:
+                bg = new BattlegroundRV;
+                break;
+            case BATTLEGROUND_IC:
+                bg = new BattlegroundIC;
+                break;
+            case BATTLEGROUND_AA:
+                bg = new Battleground;
+                break;
+            case BATTLEGROUND_RB:
+                bg = new Battleground;
+                break;
+            default:
+                return false;
+        }
+    }
 
     if (bg == NULL)
         return false;
@@ -655,33 +830,77 @@ bool BattlegroundMgr::IsArenaType(BattlegroundTypeId bgTypeId)
 
 BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgTypeId, uint8 arenaType)
 {
-    if (arenaType) {
-        switch (arenaType) {
-            case ARENA_TYPE_2v2:
-                return BATTLEGROUND_QUEUE_2v2;
-            case ARENA_TYPE_3v3:
-                return BATTLEGROUND_QUEUE_3v3;
-            case ARENA_TYPE_5v5:
-                return BATTLEGROUND_QUEUE_5v5;
-            default:
-                return BATTLEGROUND_QUEUE_NONE;
-        }
+    if (BattlegroundMgr::bgToQueue.find(bgTypeId) != BattlegroundMgr::bgToQueue.end()) {
+        return BattlegroundMgr::bgToQueue[bgTypeId];
     }
 
-    if (BattlegroundMgr::bgToQueue.find(bgTypeId) == BattlegroundMgr::bgToQueue.end()) {
-        return BATTLEGROUND_QUEUE_NONE;
+    switch (bgTypeId)
+    {
+        case BATTLEGROUND_AB:
+            return BATTLEGROUND_QUEUE_AB;
+        case BATTLEGROUND_AV:
+            return BATTLEGROUND_QUEUE_AV;
+        case BATTLEGROUND_EY:
+            return BATTLEGROUND_QUEUE_EY;
+        case BATTLEGROUND_IC:
+            return BATTLEGROUND_QUEUE_IC;
+        case BATTLEGROUND_RB:
+            return BATTLEGROUND_QUEUE_RB;
+        case BATTLEGROUND_SA:
+            return BATTLEGROUND_QUEUE_SA;
+        case BATTLEGROUND_WS:
+            return BATTLEGROUND_QUEUE_WS;
+        case BATTLEGROUND_AA:
+        case BATTLEGROUND_BE:
+        case BATTLEGROUND_DS:
+        case BATTLEGROUND_NA:
+        case BATTLEGROUND_RL:
+        case BATTLEGROUND_RV:
+            switch (arenaType)
+            {
+                case ARENA_TYPE_2v2:
+                    return BATTLEGROUND_QUEUE_2v2;
+                case ARENA_TYPE_3v3:
+                    return BATTLEGROUND_QUEUE_3v3;
+                case ARENA_TYPE_5v5:
+                    return BATTLEGROUND_QUEUE_5v5;
+                default:
+                    return BATTLEGROUND_QUEUE_NONE;
+            }
+        default:
+            return BATTLEGROUND_QUEUE_NONE;
     }
-
-    return BattlegroundMgr::bgToQueue[bgTypeId];
 }
 
 BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueueTypeId)
 {
-    if (BattlegroundMgr::queueToBg.find(bgQueueTypeId) == BattlegroundMgr::queueToBg.end()) {
-        return BattlegroundTypeId(0);
+    if (BattlegroundMgr::queueToBg.find(bgQueueTypeId) != BattlegroundMgr::queueToBg.end()) {
+        return BattlegroundMgr::queueToBg[bgQueueTypeId];
     }
 
-    return BattlegroundMgr::queueToBg[bgQueueTypeId];
+    switch (bgQueueTypeId)
+    {
+        case BATTLEGROUND_QUEUE_WS:
+            return BATTLEGROUND_WS;
+        case BATTLEGROUND_QUEUE_AB:
+            return BATTLEGROUND_AB;
+        case BATTLEGROUND_QUEUE_AV:
+            return BATTLEGROUND_AV;
+        case BATTLEGROUND_QUEUE_EY:
+            return BATTLEGROUND_EY;
+        case BATTLEGROUND_QUEUE_SA:
+            return BATTLEGROUND_SA;
+        case BATTLEGROUND_QUEUE_IC:
+            return BATTLEGROUND_IC;
+        case BATTLEGROUND_QUEUE_RB:
+            return BATTLEGROUND_RB;
+        case BATTLEGROUND_QUEUE_2v2:
+        case BATTLEGROUND_QUEUE_3v3:
+        case BATTLEGROUND_QUEUE_5v5:
+            return BATTLEGROUND_AA;
+        default:
+            return BattlegroundTypeId(0);                   // used for unknown template (it existed and do nothing)
+    }
 }
 
 uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
@@ -971,185 +1190,22 @@ void RandomBattlegroundSystem::BattlegroundCreated(BattlegroundTypeId bgTypeId)
         Update(0xffffffff);
 }
 
-// init/update unordered_map
-// Battlegrounds
-std::unordered_map<int, BattlegroundQueueTypeId> BattlegroundMgr::bgToQueue = {
-    { BATTLEGROUND_AV, BATTLEGROUND_QUEUE_AV},
-    { BATTLEGROUND_WS, BATTLEGROUND_QUEUE_WS},
-    { BATTLEGROUND_AB, BATTLEGROUND_QUEUE_AB},
-    { BATTLEGROUND_EY, BATTLEGROUND_QUEUE_EY},
-    { BATTLEGROUND_SA, BATTLEGROUND_QUEUE_SA},
-    { BATTLEGROUND_IC, BATTLEGROUND_QUEUE_IC},
-    { BATTLEGROUND_RB, BATTLEGROUND_QUEUE_RB},
-    // Arena Battlegrounds
-    { BATTLEGROUND_NA, BattlegroundQueueTypeId(0)},        // Nagrand Arena
-    { BATTLEGROUND_BE, BattlegroundQueueTypeId(0)},        // Blade's Edge Arena
-    { BATTLEGROUND_AA, BattlegroundQueueTypeId(0)},        // All Arena
-    { BATTLEGROUND_RL, BattlegroundQueueTypeId(0)},        // Ruins of Lordaernon
-    { BATTLEGROUND_DS, BattlegroundQueueTypeId(0)},        // Dalaran Sewer
-    { BATTLEGROUND_RV, BattlegroundQueueTypeId(0)},        // Ring of Valor
-};
-
-std::unordered_map<int, BattlegroundTypeId> BattlegroundMgr::queueToBg = {
-    { BATTLEGROUND_QUEUE_NONE,  BATTLEGROUND_TYPE_NONE },
-    { BATTLEGROUND_QUEUE_AV,    BATTLEGROUND_AV },
-    { BATTLEGROUND_QUEUE_WS,    BATTLEGROUND_WS },
-    { BATTLEGROUND_QUEUE_AB,    BATTLEGROUND_AB },
-    { BATTLEGROUND_QUEUE_EY,    BATTLEGROUND_EY },
-    { BATTLEGROUND_QUEUE_SA,    BATTLEGROUND_SA },
-    { BATTLEGROUND_QUEUE_IC,    BATTLEGROUND_IC },
-    { BATTLEGROUND_QUEUE_RB,    BATTLEGROUND_RB },
-    { BATTLEGROUND_QUEUE_2v2,   BATTLEGROUND_AA },
-    { BATTLEGROUND_QUEUE_3v3,   BATTLEGROUND_AA },
-    { BATTLEGROUND_QUEUE_5v5,   BATTLEGROUND_AA },
-};
-
-std::unordered_map<int, Battleground*> BattlegroundMgr::bgtypeToBattleground = {
-    { BATTLEGROUND_AV, new BattlegroundAV },
-    { BATTLEGROUND_WS, new BattlegroundWS },
-    { BATTLEGROUND_AB, new BattlegroundAB },
-    { BATTLEGROUND_NA, new BattlegroundNA },
-    { BATTLEGROUND_BE, new BattlegroundBE },
-    { BATTLEGROUND_EY, new BattlegroundEY },
-    { BATTLEGROUND_RL, new BattlegroundRL },
-    { BATTLEGROUND_SA, new BattlegroundSA },
-    { BATTLEGROUND_DS, new BattlegroundDS },
-    { BATTLEGROUND_RV, new BattlegroundRV },
-    { BATTLEGROUND_IC, new BattlegroundIC },
-    { BATTLEGROUND_AA, new Battleground },
-    { BATTLEGROUND_RB, new Battleground },
-};
-
-std::unordered_map<int, bgRef> BattlegroundMgr::bgTypeToTemplate = {
-    { BATTLEGROUND_AV, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundAV(*(BattlegroundAV*)bg_t); } },
-    { BATTLEGROUND_WS, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundWS(*(BattlegroundWS*)bg_t); } },
-    { BATTLEGROUND_AB, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundAB(*(BattlegroundAB*)bg_t); } },
-    { BATTLEGROUND_NA, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundNA(*(BattlegroundNA*)bg_t); } },
-    { BATTLEGROUND_BE, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundBE(*(BattlegroundBE*)bg_t); } },
-    { BATTLEGROUND_EY, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundEY(*(BattlegroundEY*)bg_t); } },
-    { BATTLEGROUND_RL, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundRL(*(BattlegroundRL*)bg_t); } },
-    { BATTLEGROUND_SA, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundSA(*(BattlegroundSA*)bg_t); } },
-    { BATTLEGROUND_DS, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundDS(*(BattlegroundDS*)bg_t); } },
-    { BATTLEGROUND_RV, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundRV(*(BattlegroundRV*)bg_t); } },
-    { BATTLEGROUND_IC, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundIC(*(BattlegroundIC*)bg_t); } },
-
-    { BATTLEGROUND_RB, [](Battleground *bg_t) -> Battleground*{ return new Battleground(*bg_t); }, },
-    { BATTLEGROUND_AA, [](Battleground *bg_t) -> Battleground*{ return new Battleground(*bg_t); }, },
-};
-
-std::unordered_map<int, bgMapRef> BattlegroundMgr::getBgFromMap = {
-    {
-        BATTLEGROUND_WS,    // Warsong Gulch
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2) {
-            *data << uint32(0x00000002);            // count of next fields
-            *data << uint32(((BattlegroundWGScore*)itr2->second)->FlagCaptures);        // flag captures
-            *data << uint32(((BattlegroundWGScore*)itr2->second)->FlagReturns);         // flag returns
-        }
-    },
-    {
-        BATTLEGROUND_EY,    // Eye of the Storm
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2) {
-            *data << uint32(0x00000001);            // count of next fields
-            *data << uint32(((BattlegroundEYScore*)itr2->second)->FlagCaptures);        // flag captures
-        }
-    },
-    {
-        BATTLEGROUND_AB,    // Arathi Basin
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2) {
-            *data << uint32(0x00000002);            // count of next fields
-            *data << uint32(((BattlegroundABScore*)itr2->second)->BasesAssaulted);      // bases asssulted
-            *data << uint32(((BattlegroundABScore*)itr2->second)->BasesDefended);       // bases defended
-        }
-    },
-    {
-        BATTLEGROUND_AV,     // Alterac Valley
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2) {
-            *data << uint32(0x00000005);            // count of next fields
-            *data << uint32(((BattlegroundAVScore*)itr2->second)->GraveyardsAssaulted); // GraveyardsAssaulted
-            *data << uint32(((BattlegroundAVScore*)itr2->second)->GraveyardsDefended);  // GraveyardsDefended
-            *data << uint32(((BattlegroundAVScore*)itr2->second)->TowersAssaulted);     // TowersAssaulted
-            *data << uint32(((BattlegroundAVScore*)itr2->second)->TowersDefended);      // TowersDefended
-            *data << uint32(((BattlegroundAVScore*)itr2->second)->MinesCaptured);       // MinesCaptured
-        }
-    },
-    {
-        BATTLEGROUND_SA,    // Strand of the Ancients
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2) {
-            *data << uint32(0x00000002);            // count of next fields
-            *data << uint32(((BattlegroundSAScore*)itr2->second)->demolishers_destroyed);
-            *data << uint32(((BattlegroundSAScore*)itr2->second)->gates_destroyed);
-        }
-    },
-    {
-        BATTLEGROUND_IC,    // Isle of Conquest
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2) {
-            *data << uint32(0x00000002);            // count of next fields
-            *data << uint32(((BattlegroundICScore*)itr2->second)->BasesAssaulted);       // bases asssulted
-            *data << uint32(((BattlegroundICScore*)itr2->second)->BasesDefended);        // bases defended
-        }
-    }
-};
-
+// init/update unordered_map battlegrounds
+std::unordered_map<int, BattlegroundQueueTypeId> BattlegroundMgr::bgToQueue   = {};
+std::unordered_map<int, BattlegroundTypeId> BattlegroundMgr::queueToBg        = {};
+std::unordered_map<int, Battleground*> BattlegroundMgr::bgtypeToBattleground  = {};
+std::unordered_map<int, bgRef> BattlegroundMgr::bgTypeToTemplate              = {};
+std::unordered_map<int, bgMapRef> BattlegroundMgr::getBgFromMap               = {};
 std::unordered_map<int, bgTypeRef> BattlegroundMgr::getBgFromTypeID = {
     {
         BATTLEGROUND_RB,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* bg) {        
-            if (BattlegroundMgr::getBgFromMap.find(bg->GetMapId()) == BattlegroundMgr::getBgFromMap.end()) {
+        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* bg) {
+            if (BattlegroundMgr::getBgFromMap.find(bg->GetMapId()) != BattlegroundMgr::getBgFromMap.end()) { // this should not happen
                 *data << uint32(0);
             }
             else {
                 BattlegroundMgr::getBgFromMap[bg->GetMapId()](data, itr2);
             }
-        }
-    },
-    {
-        BATTLEGROUND_AV,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* /* bg */) {
-            *data << uint32(0x00000005);                    // count of next fields
-            *data << uint32(((BattlegroundAVScore*)itr2->second)->GraveyardsAssaulted); // GraveyardsAssaulted
-            *data << uint32(((BattlegroundAVScore*)itr2->second)->GraveyardsDefended);  // GraveyardsDefended
-            *data << uint32(((BattlegroundAVScore*)itr2->second)->TowersAssaulted);     // TowersAssaulted
-            *data << uint32(((BattlegroundAVScore*)itr2->second)->TowersDefended);      // TowersDefended
-            *data << uint32(((BattlegroundAVScore*)itr2->second)->MinesCaptured);       // MinesCaptured
-        }
-    },
-    {
-        BATTLEGROUND_WS,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* /* bg */) {
-            *data << uint32(0x00000002);                    // count of next fields
-            *data << uint32(((BattlegroundWGScore*)itr2->second)->FlagCaptures);        // flag captures
-            *data << uint32(((BattlegroundWGScore*)itr2->second)->FlagReturns);         // flag returns
-        }
-    },
-    {
-        BATTLEGROUND_AB,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* /* bg */) {
-            *data << uint32(0x00000002);                    // count of next fields
-            *data << uint32(((BattlegroundABScore*)itr2->second)->BasesAssaulted);      // bases asssulted
-            *data << uint32(((BattlegroundABScore*)itr2->second)->BasesDefended);       // bases defended
-        }
-    },
-    {
-        BATTLEGROUND_EY,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* /* bg */) {
-            *data << uint32(0x00000001);                    // count of next fields
-            *data << uint32(((BattlegroundEYScore*)itr2->second)->FlagCaptures);        // flag captures
-        }
-    },
-    {
-        BATTLEGROUND_SA,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* /* bg */) {
-            *data << uint32(0x00000002);                    // count of next fields
-            *data << uint32(((BattlegroundSAScore*)itr2->second)->demolishers_destroyed);
-            *data << uint32(((BattlegroundSAScore*)itr2->second)->gates_destroyed);
-        }
-    },
-    {
-        BATTLEGROUND_IC,
-        [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* /* bg */) {
-            *data << uint32(0x00000002);                // count of next fields
-            *data << uint32(((BattlegroundICScore*)itr2->second)->BasesAssaulted);       // bases assaulted
-            *data << uint32(((BattlegroundICScore*)itr2->second)->BasesDefended);        // bases defended
         }
     }
 };
