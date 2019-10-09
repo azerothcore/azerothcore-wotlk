@@ -19,12 +19,7 @@
 #include "ScriptMgr.h"
 #include <unordered_map>
 
-struct BGSpamProtectionS
-{
-    uint32 last_queue = 0; // CHAT DISABLED BY DEFAULT
-};
-
-std::unordered_map<uint32, BGSpamProtectionS> BGSpamProtection;
+std::unordered_map<uint64, uint32> BGSpamProtection;
 
 /*********************************************************/
 /***            BATTLEGROUND QUEUE SYSTEM              ***/
@@ -1031,17 +1026,15 @@ void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDi
     }
     else if (!bg->isArena()) // Show queue status to server (when joining battleground queue)
     {
-        if (BGSpamProtection[leader->GetGUID()].last_queue == 0)
+        auto searchGUID = BGSpamProtection.find(leader->GetGUID());
+
+        if (searchGUID == BGSpamProtection.end())
+            BGSpamProtection[leader->GetGUID()] = 0; // Leader GUID not found, initialize with 0
+
+        if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] >= 30)
         {
-            BGSpamProtection[leader->GetGUID()].last_queue = sWorld->GetGameTime();
-            sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level,
-                qAlliance + qHorde, MaxPlayers);
-        }
-        else if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()].last_queue >= 30)
-        {
-            BGSpamProtection[leader->GetGUID()].last_queue = 0;
-            sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level,
-                qAlliance + qHorde, MaxPlayers);
+            BGSpamProtection[leader->GetGUID()] = sWorld->GetGameTime();
+            sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
         }
     }
 }

@@ -204,15 +204,6 @@ SaveRespawnTimeImmediately = 1
 MaxOverspeedPings = 2
 
 #
-#    GridUnload
-#        Description: Unload grids to save memory. Can be disabled if enough memory is available
-#                     to speed up moving players to new grids.
-#        Default:     1 - (enable, Unload grids)
-#                     0 - (disable, Do not unload grids)
-
-GridUnload = 1
-
-#
 #    CloseIdleConnections
 #        Description: Automatically close idle connections.
 #                     SocketTimeOutTime and SocketTimeOutTimeActive determine when a connection is considered as idle.
@@ -245,13 +236,6 @@ SocketTimeOutTimeActive = 60000
 #        Default:     10000 - (10 milliseconds, 0.01 second)
 
 SessionAddDelay = 10000
-
-#
-#    GridCleanUpDelay
-#        Description: Time (in milliseconds) grid clean up delay.
-#        Default:     300000 - (5 minutes)
-
-GridCleanUpDelay = 300000
 
 #
 #    MapUpdateInterval
@@ -415,6 +399,18 @@ CleanCharacterDB = 0
 #        Default:     0  - (All cleanup methods will be disabled after the next cleanup)
 
 PersistentCharacterCleanFlags = 0
+
+#
+#    PreloadAllNonInstancedMapGrids
+#        Description: Preload all grids on all non-instanced maps. This will take a great amount
+#                     of additional RAM (ca. 9 GB) and causes the server to take longer to start,
+#                     but can increase performance if used on a server with a high amount of players.
+#                     It will also activate all creatures which are set active (e.g. the Fel Reavers
+#                     in Hellfire Peninsula) on server start.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+PreloadAllNonInstancedMapGrids = 0
 
 #
 ###################################################################################################
@@ -1642,6 +1638,14 @@ AllowTwoSide.Interaction.Calendar = 0
 #                     1 - (Enabled)
 
 AllowTwoSide.Interaction.Chat = 0
+
+#
+#    AllowTwoSide.Interaction.Emote
+#        Description: Allow emote messages between factions (e.g. "/e looks into the sky")
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+AllowTwoSide.Interaction.Emote = 0
 
 #
 #    AllowTwoSide.Interaction.Channel

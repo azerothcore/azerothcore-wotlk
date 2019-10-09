@@ -736,6 +736,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ALLOW_TWO_SIDE_WHO_LIST]            = sConfigMgr->GetBoolDefault("AllowTwoSide.WhoList", false);
     m_bool_configs[CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND]          = sConfigMgr->GetBoolDefault("AllowTwoSide.AddFriend", false);
     m_bool_configs[CONFIG_ALLOW_TWO_SIDE_TRADE]               = sConfigMgr->GetBoolDefault("AllowTwoSide.trade", false);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE]   = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Emote", false);
    
     m_int_configs[CONFIG_MIN_PLAYER_NAME]                     = sConfigMgr->GetIntDefault ("MinPlayerName",  2);
     if (m_int_configs[CONFIG_MIN_PLAYER_NAME] < 1 || m_int_configs[CONFIG_MIN_PLAYER_NAME] > MAX_PLAYER_NAME)
@@ -1325,6 +1326,9 @@ void World::LoadConfigSettings(bool reload)
 
     // Prevent players AFK from being logged out
     m_int_configs[CONFIG_AFK_PREVENT_LOGOUT] = sConfigMgr->GetIntDefault("PreventAFKLogout", 0);
+
+    // Preload all grids of all non-instanced maps
+    m_bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] = sConfigMgr->GetIntDefault("PreloadAllNonInstancedMapGrids", false);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -1958,6 +1962,27 @@ void World::SetInitialWorldSettings()
     sEluna->RunScripts();
     sEluna->OnConfigLoad(false,false); // Must be done after Eluna is initialized and scripts have run.
 #endif
+
+    if (sWorld->getBoolConfig(CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS))
+    {
+        sLog->outString("Loading all grids for all non-instanced maps...");
+
+        for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
+        {
+            MapEntry const* mapEntry = sMapStore.LookupEntry(i);
+
+            if (mapEntry && !mapEntry->Instanceable())
+            {
+                Map* map = sMapMgr->CreateBaseMap(mapEntry->MapID);
+
+                if (map)
+                {
+                    sLog->outString(">> Loading all grids for map %u", map->GetId());
+                    map->LoadAllCells();
+                }
+            }
+        }
+    }
     
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
     sLog->outString();
