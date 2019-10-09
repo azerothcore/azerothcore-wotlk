@@ -1200,7 +1200,7 @@ std::unordered_map<int, bgTypeRef> BattlegroundMgr::getBgFromTypeID = {
     {
         BATTLEGROUND_RB,
         [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2, Battleground* bg) {
-            if (BattlegroundMgr::getBgFromMap.find(bg->GetMapId()) != BattlegroundMgr::getBgFromMap.end()) { // this should not happen
+            if (BattlegroundMgr::getBgFromMap.find(bg->GetMapId()) == BattlegroundMgr::getBgFromMap.end()) { // this should not happen
                 *data << uint32(0);
             }
             else {
