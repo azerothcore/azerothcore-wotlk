@@ -250,7 +250,7 @@ public:
             unit = player;
 
         std::ifstream ifs("opcode.txt");
-        if (ifs.bad())
+        if (!ifs.is_open())
             return false;
 
         // remove comments from file
