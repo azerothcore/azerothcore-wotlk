@@ -3283,6 +3283,7 @@ LFG.Location.All = 0
 #
 #    ICC Buff
 #       Description: Specify ICC buff
+#                    (It is necessary to restart the server after changing the values!)
 #       Default:     ICC.Buff.Horde    = 73822
 #                    ICC.Buff.Alliance = 73828
 #
