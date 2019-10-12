@@ -11,6 +11,7 @@ addons:
 
 services:
   - mysql
+  - docker
 
 git:
   depth: 10
@@ -18,6 +19,7 @@ git:
 stages:
   - prepare_cache
   - run
+  - docker
 
 jobs:
   include:
@@ -73,3 +75,11 @@ jobs:
         - source ./apps/ci/ci-install-modules.sh
       script:
         - source ./apps/ci/ci-compile.sh
+
+    - stage: docker
+      env: TRAVIS_BUILD_ID="1"
+      script:
+        - ./apps/ci/docker/ci-docker-config.sh
+        - ./bin/acore-docker-generate-etc
+        - ./bin/acore-docker-build-no-scripts
+        - docker-compose up
