@@ -82,4 +82,3 @@ jobs:
         - ./apps/ci/docker/ci-docker-config.sh
         - ./bin/acore-docker-generate-etc
         - ./bin/acore-docker-build-no-scripts
-        - docker-compose up
