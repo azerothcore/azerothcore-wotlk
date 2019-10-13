@@ -75,7 +75,7 @@ jobs:
       script:
         - source ./apps/ci/ci-compile.sh
 
-    - stage: prepare_cache
+    - stage: run
       env: TRAVIS_BUILD_ID="3"
       script:
         - ./apps/ci/docker/ci-docker-config.sh
