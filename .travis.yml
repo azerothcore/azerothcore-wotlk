@@ -75,10 +75,7 @@ jobs:
       script:
         - source ./apps/ci/ci-compile.sh
 
-    - stage: docker
-      env: TRAVIS_BUILD_ID="3"
-      install: skip
-      script:
+    - script:
         - ./apps/ci/docker/ci-docker-config.sh
         - ./bin/acore-docker-generate-etc
         - ./bin/acore-docker-build-no-scripts
