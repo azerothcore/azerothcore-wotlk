@@ -19,7 +19,6 @@ git:
 stages:
   - prepare_cache
   - run
-  - docker
 
 jobs:
   include:
