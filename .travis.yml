@@ -20,14 +20,14 @@ stages:
   - prepare_cache
   - run
 
+script:
+  - ./apps/ci/docker/ci-docker-config.sh
+  - ./bin/acore-docker-generate-etc
+  - ./bin/acore-docker-build-no-scripts
+  - docker-compose up -d ac-database
+
 jobs:
   include:
-    - script:
-        - ./apps/ci/docker/ci-docker-config.sh
-        - ./bin/acore-docker-generate-etc
-        - ./bin/acore-docker-build-no-scripts
-        - docker-compose up -d ac-database
-
     - stage: prepare_cache
       env: TRAVIS_BUILD_ID="1"
       before_install:
