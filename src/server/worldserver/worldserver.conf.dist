@@ -3281,4 +3281,28 @@ Calculate.Gameoject.Zone.Area.Data = 0
 LFG.Location.All = 0
 
 #
+#    ICC Buff
+#       Description: Specify ICC buff
+#                    (It is necessary to restart the server after changing the values!)
+#       Default:     ICC.Buff.Horde    = 73822
+#                    ICC.Buff.Alliance = 73828
+#
+#                    Spell IDs for the auras:
+#                    73816 -  5% buff Horde
+#                    73818 - 10% buff Horde
+#                    73819 - 15% buff Horde
+#                    73820 - 20% buff Horde
+#                    73821 - 25% buff Horde
+#                    73822 - 30% buff Horde
+#                    73762 -  5% buff Alliance
+#                    73824 - 10% buff Alliance
+#                    73825 - 15% buff Alliance
+#                    73826 - 20% buff Alliance
+#                    73827 - 25% buff Alliance
+#                    73828 - 30% buff Alliance
+
+ICC.Buff.Horde    = 73822
+ICC.Buff.Alliance = 73828
+
+#
 ###################################################################################################
