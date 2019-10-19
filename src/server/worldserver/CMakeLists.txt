@@ -16,12 +16,12 @@ CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
 if( WIN32 )
-  list(APPEND PRIVATE_SOURCES ${sources_windows})
+  list(APPEND PRIVATE_SOURCES ${winDebugging})
   if ( MSVC )
     list(APPEND PRIVATE_SOURCES worldserver.rc)
   endif()
 endif()
-
+ 
 if (USE_COREPCH)
   set(PRIVATE_PCH_HEADER PrecompiledHeaders/worldPCH.h)
 endif()
