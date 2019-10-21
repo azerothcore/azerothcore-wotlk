@@ -1,3 +1,19 @@
+-- DB update 2019_10_20_00 -> 2019_10_21_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_10_20_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_10_20_00 2019_10_21_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1570629525711769801'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1570629525711769801');
 
 -- Summoned Drostan: Prepared ranged weapon
@@ -277,3 +293,12 @@ VALUES
 (28857,8,1,'Number 54! No way I''m gonna let you beat me!',12,0,100,5,0,0,29124,0,'Drostan'),
 (28857,8,2,'54! Surely an insurmountable lead!',12,0,100,5,0,0,29125,0,'Drostan'),
 (28857,8,3,'That was 54! Soon you''ll be congratulating me!',12,0,100,5,0,0,29126,0,'Drostan');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
