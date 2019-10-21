@@ -361,6 +361,19 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                 condMeets = unit->IsInWater();
             break;
         }
+        case CONDITION_QUEST_OBJECTIVE_PROGRESS:
+        {
+            if (Player* player = object->ToPlayer())
+            {
+                const Quest* quest = ASSERT_NOTNULL(sObjectMgr->GetQuestTemplate(ConditionValue1));
+                uint16 log_slot = player->FindQuestSlot(quest->GetQuestId());
+                if (log_slot >= MAX_QUEST_LOG_SIZE)
+                    break;
+                if (player->GetQuestSlotCounter(log_slot, ConditionValue2) == ConditionValue3)
+                    condMeets = true;
+            }
+            break;
+        }
         case CONDITION_HAS_AURA_TYPE:
         {
             if (Unit* unit = object->ToUnit())
@@ -539,6 +552,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
             break;
         case CONDITION_IN_WATER:
             mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
+            break;
+        case CONDITION_QUEST_OBJECTIVE_PROGRESS:
+            mask |= GRID_MAP_TYPE_MASK_PLAYER;
             break;
         case CONDITION_HAS_AURA_TYPE:
             mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
@@ -1607,7 +1623,6 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     }
     switch (cond->ConditionType) {
         case CONDITION_TERRAIN_SWAP:
-        case CONDITION_QUEST_OBJECTIVE_COMPLETE:
         case CONDITION_DIFFICULTY_ID:
             sLog->outErrorDb("SourceEntry %u in `condition` table has a ConditionType that is not supported on 3.3.5a (%u), ignoring.",
                              cond->SourceEntry, uint32(cond->ConditionType));
@@ -2155,6 +2170,34 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         }
         case CONDITION_IN_WATER:
         {
+            break;
+        }
+        case CONDITION_QUEST_OBJECTIVE_PROGRESS:
+        {
+            const Quest* quest = sObjectMgr->GetQuestTemplate(cond->ConditionValue1);
+            if (!quest)
+            {
+                sLog->outErrorDb("CONDITION_QUEST_OBJECTIVE_PROGRESS points to non-existing quest (%u), skipped.", cond->ConditionValue1);
+                return false;
+            }
+
+            if (cond->ConditionValue2 > 3)
+            {
+                sLog->outErrorDb("CONDITION_QUEST_OBJECTIVE_PROGRESS has out-of-range quest objective index specified (%u), it must be a number between 0 and 3. skipped.", cond->ConditionValue2);
+                return false;
+            }
+
+            if (quest->RequiredNpcOrGo[cond->ConditionValue2] == 0)
+            {
+                sLog->outErrorDb("CONDITION_QUEST_OBJECTIVE_PROGRESS has quest objective %u for quest %u, but the field RequiredNPCOrGo%u is 0, skipped.", cond->ConditionValue2, cond->ConditionValue1, cond->ConditionValue2);
+                return false;
+            }
+
+            if (cond->ConditionValue3 > quest->RequiredNpcOrGoCount[cond->ConditionValue2])
+            {
+                sLog->outErrorDb("CONDITION_QUEST_OBJECTIVE_PROGRESS has quest objective count %u in value3, but quest %u has a maximum objective count of %u in RequiredNPCOrGOCount%u, skipped.", cond->ConditionValue3, cond->ConditionValue2, quest->RequiredNpcOrGoCount[cond->ConditionValue2], cond->ConditionValue2);
+                return false;
+            }
             break;
         }
         case CONDITION_HAS_AURA_TYPE:

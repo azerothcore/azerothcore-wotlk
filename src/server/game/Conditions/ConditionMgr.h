@@ -69,7 +69,7 @@ enum ConditionTypes
     CONDITION_PET_TYPE              = 45,                   // TODO: NOT SUPPORTED YET
     CONDITION_TAXI                  = 46,                   // TODO: NOT SUPPORTED YET
     CONDITION_QUESTSTATE            = 47,                   // TODO: NOT SUPPORTED YET
-    CONDITION_QUEST_OBJECTIVE_COMPLETE = 48,                // don't use on 3.3.5a
+    CONDITION_QUEST_OBJECTIVE_PROGRESS = 48,                // quest_id         objectiveIndex objectiveCount     true if player has reached the specified objectiveCount quest progress for the objectiveIndex for the specified quest
     CONDITION_DIFFICULTY_ID            = 49,                // don't use on 3.3.5a
     CONDITION_TC_END                   = 50,                // placeholder
 
