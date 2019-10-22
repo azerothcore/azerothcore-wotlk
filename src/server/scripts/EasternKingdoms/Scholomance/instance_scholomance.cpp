@@ -22,19 +22,18 @@ class instance_scholomance : public InstanceMapScript
 
         struct instance_scholomance_InstanceMapScript : public InstanceScript
         {
-            instance_scholomance_InstanceMapScript(Map* map) : InstanceScript(map)
-            {
-                GateKirtonosGUID        = 0;
-                GateMiliciaGUID         = 0;
-                GateTheolenGUID         = 0;
-                GatePolkeltGUID         = 0;
-                GateRavenianGUID        = 0;
-                GateBarovGUID           = 0;
-                GateIlluciaGUID         = 0;
-                _kirtonosState          = 0;
-                _miniBosses             = 0;
-                _rasHuman               = 0;
-            }
+            instance_scholomance_InstanceMapScript(Map* map) : InstanceScript(map),
+                GateKirtonosGUID { 0 },
+                GateMiliciaGUID  { 0 },
+                GateTheolenGUID  { 0 },
+                GatePolkeltGUID  { 0 },
+                GateRavenianGUID { 0 },
+                GateBarovGUID    { 0 },
+                GateIlluciaGUID  { 0 },
+                _kirtonosState   { 0 },
+                _miniBosses      { 0 },
+                _rasHuman        { 0 }
+            { }
 
             void OnGameObjectCreate(GameObject* go)
             {
