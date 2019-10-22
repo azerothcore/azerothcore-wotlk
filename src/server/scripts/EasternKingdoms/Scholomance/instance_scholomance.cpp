@@ -8,6 +8,7 @@
 #include "scholomance.h"
 #include "GameObjectAI.h"
 #include "SpellScript.h"
+#include "SpellAuras.h"
 
 class instance_scholomance : public InstanceMapScript
 {
@@ -30,8 +31,9 @@ class instance_scholomance : public InstanceMapScript
                 GateRavenianGUID        = 0;
                 GateBarovGUID           = 0;
                 GateIlluciaGUID         = 0;
-                _kirtonosState = 0;
-                _miniBosses = 0;
+                _kirtonosState          = 0;
+                _miniBosses             = 0;
+                _rasHuman               = 0;
             }
 
             void OnGameObjectCreate(GameObject* go)
@@ -95,6 +97,9 @@ class instance_scholomance : public InstanceMapScript
                     case DATA_MINI_BOSSES:
                         ++_miniBosses;
                         break;
+                    case DATA_RAS_HUMAN:
+                        _rasHuman = data;
+                        break;
                 }
 
                 SaveToDB();
@@ -108,6 +113,8 @@ class instance_scholomance : public InstanceMapScript
                         return _kirtonosState;
                     case DATA_MINI_BOSSES:
                         return _miniBosses;
+                    case DATA_RAS_HUMAN:
+                        return _rasHuman;
                 }
                 return 0;
             }
@@ -149,6 +156,7 @@ class instance_scholomance : public InstanceMapScript
 
             uint32 _kirtonosState;
             uint32 _miniBosses;
+            uint32 _rasHuman;
         };
 };
 
@@ -455,6 +463,51 @@ class spell_scholomance_shadow_portal_rooms : public SpellScriptLoader
         }
 };
 
+class spell_scholomance_boon_of_life : public SpellScriptLoader
+{
+    public:
+        spell_scholomance_boon_of_life() : SpellScriptLoader("spell_scholomance_boon_of_life") { }
+
+        class spell_scholomance_boon_of_life_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_scholomance_boon_of_life_AuraScript);
+
+            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Unit* caster = GetCaster())
+                    if (Unit* target = GetTarget())
+                        if (Creature* creature = target->ToCreature())
+                        {
+                            creature->AI()->AttackStart(caster);
+                            creature->AddThreat(caster, 10000.0f);
+                        }
+            }
+
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Unit* target = GetTarget())
+                    if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_CANCEL)
+                    {
+                        target->SetDisplayId(MODEL_RAS_HUMAN);
+                        target->SetHealth(target->GetMaxHealth());
+                        if (InstanceScript* instance = target->GetInstanceScript())
+                            instance->SetData(DATA_RAS_HUMAN,1);
+                    }
+            }
+
+            void Register()
+            {
+                OnEffectRemove += AuraEffectRemoveFn(spell_scholomance_boon_of_life_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectApply += AuraEffectApplyFn(spell_scholomance_boon_of_life_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_scholomance_boon_of_life_AuraScript();
+        }
+};
+
 void AddSC_instance_scholomance()
 {
     new instance_scholomance();
@@ -463,4 +516,5 @@ void AddSC_instance_scholomance()
     new spell_kormok_summon_bone_minions();
     new spell_scholomance_shadow_portal();
     new spell_scholomance_shadow_portal_rooms();
+    new spell_scholomance_boon_of_life();
 }
