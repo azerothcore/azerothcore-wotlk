@@ -17,6 +17,11 @@ enum ModelIds
     MODEL_RAS_HUMAN                     = 3975
 };
 
+enum TalkGroupIds
+{
+    TALK_RAS_HUMAN                      = 0
+};
+
 enum CreatureIds
 {
     NPC_RISEN_GUARDIAN                  = 11598

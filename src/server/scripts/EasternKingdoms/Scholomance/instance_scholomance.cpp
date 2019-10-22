@@ -485,12 +485,14 @@ class spell_scholomance_boon_of_life : public SpellScriptLoader
             void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* target = GetTarget())
-                    if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_CANCEL)
-                    {
-                        target->SetDisplayId(MODEL_RAS_HUMAN);
-                        target->SetHealth(target->GetMaxHealth());
-                        if (InstanceScript* instance = target->GetInstanceScript())
-                            instance->SetData(DATA_RAS_HUMAN,1);
+                    if (Creature* creature = target->ToCreature())
+                        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_CANCEL)
+                        {
+                            creature->AI()->Talk(TALK_RAS_HUMAN);
+                            creature->SetDisplayId(MODEL_RAS_HUMAN);
+                            creature->SetHealth(target->GetMaxHealth());
+                            if (InstanceScript* instance = creature->GetInstanceScript())
+                                instance->SetData(DATA_RAS_HUMAN,1);
                     }
             }
 

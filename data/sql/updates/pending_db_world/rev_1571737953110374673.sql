@@ -9,3 +9,8 @@ DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 1 AND `SourceGroup` =
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`)
 VALUES
 (1,10508,13626,0,0,13,0,2,1,0,0,0,0,'','Instance - Get Data - Can only loot ''Human Head of Ras Frostwhisper'' if Ras is in human form');
+
+DELETE FROM `creature_text` WHERE `CreatureID` = 10508;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`)
+VALUES
+(10508,0,0,'THIS CANNOT BE!!',14,0,100,0,0,0,6371,0,'Ras Frostwhisper');
