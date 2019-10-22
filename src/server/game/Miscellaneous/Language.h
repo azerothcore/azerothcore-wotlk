@@ -1312,6 +1312,8 @@ enum TrinityStrings
     // Instant Flight
     LANG_TOGGLE_INSTANT_FLIGHT                    = 30077,
     LANG_INSTANT_FLIGHT_ON                        = 30078,
-    LANG_INSTANT_FLIGHT_OFF                       = 30079
+    LANG_INSTANT_FLIGHT_OFF                       = 30079,
+
+    LANG_DEBUG_OPCODE_FILE_MISSING                = 30080
 };
 #endif
