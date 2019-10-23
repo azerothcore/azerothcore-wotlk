@@ -1,5 +1,8 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1571672933681916812');
 
+ALTER TABLE `game_event` ALTER COLUMN `start_time` SET DEFAULT '1970-01-01 08:00:00',
+                         ALTER COLUMN `end_time`   SET DEFAULT '1970-01-01 08:00:00';
+
 UPDATE `game_event` SET `start_time` = '1970-01-01 08:00:00', `end_time` = '1970-01-01 08:00:00' WHERE `eventEntry` IN
 (13, 17, 22, 31, 48, 49, 55, 56, 57, 58, 59, 60, 65, 66);
 
