@@ -234,7 +234,7 @@ struct GossipMenuItemsLocale
 
 struct PointOfInterestLocale
 {
-    StringVector IconName;
+    StringVector Name;
 };
 
 #define MAX_EQUIPMENT_ITEMS 3
