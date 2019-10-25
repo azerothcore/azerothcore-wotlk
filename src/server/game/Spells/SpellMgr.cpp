@@ -4363,6 +4363,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectRadiusIndex[EFFECT_0] = 19; // 18yd
             break;
 <<<<<<< HEAD
+<<<<<<< HEAD
          //This spells should interrupts npc spell casting(SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER)
          case 47476: // Deathknight - Strangulate
          case 15487: // Priest - Silence
@@ -4376,6 +4377,8 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
 >>>>>>> upstream/master
             break;
+=======
+>>>>>>> parent of 5e21ad54... Core/Spells: Implement SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER
 
         /////////////////////////////////
         ///// Generic NPC Spells
