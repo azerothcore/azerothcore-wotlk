@@ -19032,9 +19032,12 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
                     //active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
                 }
 
-                Trinity::PlayerRelocationNotifier relocate(*player);
-                viewPoint->VisitNearbyObject(player->GetSightRange()+VISIBILITY_INC_FOR_GOBJECTS, relocate);
-                relocate.SendToSelf();
+                Trinity::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
+                viewPoint->VisitNearbyObject(player->GetSightRange()+VISIBILITY_INC_FOR_GOBJECTS, relocateNoLarge);
+                relocateNoLarge.SendToSelf();
+                Trinity::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
+                viewPoint->VisitNearbyObject(MAX_VISIBILITY_DISTANCE, relocateLarge);
+                relocateLarge.SendToSelf();
             }
 
     if (Player* player = this->ToPlayer())
@@ -19063,9 +19066,12 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
             active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
         }
 
-        Trinity::PlayerRelocationNotifier relocate(*player);
-        viewPoint->VisitNearbyObject(player->GetSightRange()+VISIBILITY_INC_FOR_GOBJECTS, relocate);
-        relocate.SendToSelf();
+        Trinity::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
+        viewPoint->VisitNearbyObject(player->GetSightRange()+VISIBILITY_INC_FOR_GOBJECTS, relocateNoLarge);
+        relocateNoLarge.SendToSelf();
+        Trinity::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
+        viewPoint->VisitNearbyObject(MAX_VISIBILITY_DISTANCE, relocateLarge);
+        relocateLarge.SendToSelf();
 
         this->AddToNotify(NOTIFY_AI_RELOCATION);
     }
@@ -19085,7 +19091,7 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
         unit->m_last_notify_position.Relocate(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ());
 
         Trinity::CreatureRelocationNotifier relocate(*unit);
-        unit->VisitNearbyObject(unit->GetMap()->GetVisibilityRange(), relocate);
+        unit->VisitNearbyObject(unit->GetVisibilityRange()+VISIBILITY_COMPENSATION, relocate);
 
         this->AddToNotify(NOTIFY_AI_RELOCATION);
     }
