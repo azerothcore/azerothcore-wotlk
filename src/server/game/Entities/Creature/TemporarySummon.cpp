@@ -389,7 +389,7 @@ void Puppet::InitSummon()
         else
         {
             sLog->outMisc("Puppet::InitSummon (B1)");
-            //ASSERT(false); // ZOMG!
+            //ABORT(); // ZOMG!
         }
     }
 }

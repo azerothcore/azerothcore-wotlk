@@ -204,15 +204,6 @@ SaveRespawnTimeImmediately = 1
 MaxOverspeedPings = 2
 
 #
-#    GridUnload
-#        Description: Unload grids to save memory. Can be disabled if enough memory is available
-#                     to speed up moving players to new grids.
-#        Default:     1 - (enable, Unload grids)
-#                     0 - (disable, Do not unload grids)
-
-GridUnload = 1
-
-#
 #    CloseIdleConnections
 #        Description: Automatically close idle connections.
 #                     SocketTimeOutTime and SocketTimeOutTimeActive determine when a connection is considered as idle.
@@ -245,13 +236,6 @@ SocketTimeOutTimeActive = 60000
 #        Default:     10000 - (10 milliseconds, 0.01 second)
 
 SessionAddDelay = 10000
-
-#
-#    GridCleanUpDelay
-#        Description: Time (in milliseconds) grid clean up delay.
-#        Default:     300000 - (5 minutes)
-
-GridCleanUpDelay = 300000
 
 #
 #    MapUpdateInterval
@@ -415,6 +399,18 @@ CleanCharacterDB = 0
 #        Default:     0  - (All cleanup methods will be disabled after the next cleanup)
 
 PersistentCharacterCleanFlags = 0
+
+#
+#    PreloadAllNonInstancedMapGrids
+#        Description: Preload all grids on all non-instanced maps. This will take a great amount
+#                     of additional RAM (ca. 9 GB) and causes the server to take longer to start,
+#                     but can increase performance if used on a server with a high amount of players.
+#                     It will also activate all creatures which are set active (e.g. the Fel Reavers
+#                     in Hellfire Peninsula) on server start.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+PreloadAllNonInstancedMapGrids = 0
 
 #
 ###################################################################################################
@@ -1163,6 +1159,15 @@ RecruitAFriend.MaxDifference = 4
 InstantLogout = 1
 
 #
+#    PreventAFKLogout
+#        Description: Prevent players AFK from being logged out
+#        Default:     0  - (Disabled)
+#                     1  - (Enabled, prevent players AFK from being logged out in Sanctuary zones)
+#                     2  - (Enabled, prevent players AFK from being logged out in all zones)
+
+PreventAFKLogout = 0
+
+#
 #    DisableWaterBreath
 #        Description: Required security level for water breathing.
 #        Default:     4  - (Disabled)
@@ -1438,7 +1443,7 @@ Motd = "Welcome to an AzerothCore server."
 #    PLEASE NOTE: another (hardcoded) text will appear below the MOTD:
 #
 #        "This server runs on AzerothCore www.azerothcore.org"
-#    
+#
 #    All the AzerothCore contributors, as well as its father projects (MaNGOS, TrinityCore, etc..),
 #    have worked for free to provide you this software. Please do not remove the credits.
 #
@@ -1633,6 +1638,14 @@ AllowTwoSide.Interaction.Calendar = 0
 #                     1 - (Enabled)
 
 AllowTwoSide.Interaction.Chat = 0
+
+#
+#    AllowTwoSide.Interaction.Emote
+#        Description: Allow emote messages between factions (e.g. "/e looks into the sky")
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+AllowTwoSide.Interaction.Emote = 0
 
 #
 #    AllowTwoSide.Interaction.Channel
@@ -3266,6 +3279,30 @@ Calculate.Gameoject.Zone.Area.Data = 0
 #                 1 - Enable  
 
 LFG.Location.All = 0
+
+#
+#    ICC Buff
+#       Description: Specify ICC buff
+#                    (It is necessary to restart the server after changing the values!)
+#       Default:     ICC.Buff.Horde    = 73822
+#                    ICC.Buff.Alliance = 73828
+#
+#                    Spell IDs for the auras:
+#                    73816 -  5% buff Horde
+#                    73818 - 10% buff Horde
+#                    73819 - 15% buff Horde
+#                    73820 - 20% buff Horde
+#                    73821 - 25% buff Horde
+#                    73822 - 30% buff Horde
+#                    73762 -  5% buff Alliance
+#                    73824 - 10% buff Alliance
+#                    73825 - 15% buff Alliance
+#                    73826 - 20% buff Alliance
+#                    73827 - 25% buff Alliance
+#                    73828 - 30% buff Alliance
+
+ICC.Buff.Horde    = 73822
+ICC.Buff.Alliance = 73828
 
 #
 ###################################################################################################

@@ -469,6 +469,13 @@ void Map::LoadGrid(float x, float y)
     EnsureGridLoaded(Cell(x, y));
 }
 
+void Map::LoadAllCells()
+{
+    for (uint32 cellX = 0; cellX < TOTAL_NUMBER_OF_CELLS_PER_MAP; cellX++)
+        for (uint32 cellY = 0; cellY < TOTAL_NUMBER_OF_CELLS_PER_MAP; cellY++)
+            LoadGrid((cellX + 0.5f - CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL, (cellY + 0.5f - CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL);
+}
+
 bool Map::AddPlayerToMap(Player* player)
 { 
     CellCoord cellCoord = Trinity::ComputeCellCoord(player->GetPositionX(), player->GetPositionY());
@@ -620,7 +627,41 @@ bool Map::IsGridLoaded(const GridCoord &p) const
     return (getNGrid(p.x_coord, p.y_coord) && isGridObjectDataLoaded(p.x_coord, p.y_coord));
 }
 
-void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor, TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor)
+void Map::VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
+    TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
+    TypeContainerVisitor<Trinity::LargeObjectUpdater, GridTypeMapContainer> &largeObjectVisitor)
+{
+    // check for valid position
+    if (!player->IsPositionValid())
+        return;
+
+    // check normal grid activation range of the player
+    VisitNearbyCellsOf(player, gridVisitor, worldVisitor);
+
+    // check maximum visibility distance for large creatures (cells already visited by the normal check won't be visited again)
+    CellArea area = Cell::CalculateCellArea(player->GetPositionX(), player->GetPositionY(), MAX_VISIBILITY_DISTANCE);
+
+    for (uint32 x = area.low_bound.x_coord; x <= area.high_bound.x_coord; ++x)
+    {
+        for (uint32 y = area.low_bound.y_coord; y <= area.high_bound.y_coord; ++y)
+        {
+            // marked cells are those that have been visited
+            // don't visit the same cell twice
+            uint32 cell_id = (y * TOTAL_NUMBER_OF_CELLS_PER_MAP) + x;
+            if (isCellMarked(cell_id))
+                continue;
+
+            markCell(cell_id);
+            CellCoord pair(x, y);
+            Cell cell(pair);
+
+            Visit(cell, largeObjectVisitor);
+        }
+    }
+}
+
+void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
+    TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor)
 { 
     // Check for valid position
     if (!obj->IsPositionValid())
@@ -699,8 +740,24 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     // for pets
     TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer > world_object_update(updater);
 
+    // for large creatures
+    Trinity::LargeObjectUpdater largeObjectUpdater(t_diff);
+    TypeContainerVisitor<Trinity::LargeObjectUpdater, GridTypeMapContainer  > grid_large_object_update(largeObjectUpdater);
+
     // pussywizard: container for far creatures in combat with players
     std::vector<Creature*> updateList; updateList.reserve(10);
+
+    // non-player active objects, increasing iterator in the loop in case of object removal
+    for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end();)
+    {
+        WorldObject* obj = *m_activeNonPlayersIter;
+        ++m_activeNonPlayersIter;
+
+        if (!obj || !obj->IsInWorld())
+            continue;
+
+        VisitNearbyCellsOf(obj, grid_object_update, world_object_update);
+    }
 
     // the player iterator is stored in the map object
     // to make sure calls to Map::Remove don't invalidate it
@@ -714,7 +771,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         // update players at tick
         player->Update(s_diff);
 
-        VisitNearbyCellsOf(player, grid_object_update, world_object_update);
+        VisitNearbyCellsOfPlayer(player, grid_object_update, world_object_update, grid_large_object_update);
 
         // handle updates for creatures in combat with player and are more than X yards away
         if (player->IsInCombat())
@@ -733,18 +790,6 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
             for (std::vector<Creature*>::const_iterator itr = updateList.begin(); itr != updateList.end(); ++itr)
                 VisitNearbyCellsOf(*itr, grid_object_update, world_object_update);
         }
-    }
-
-    // non-player active objects, increasing iterator in the loop in case of object removal
-    for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end();)
-    {
-        WorldObject* obj = *m_activeNonPlayersIter;
-        ++m_activeNonPlayersIter;
-
-        if (!obj || !obj->IsInWorld())
-            continue;
-
-        VisitNearbyCellsOf(obj, grid_object_update, world_object_update);
     }
 
     for (_transportsUpdateIter = _transports.begin(); _transportsUpdateIter != _transports.end();) // pussywizard: transports updated after VisitNearbyCellsOf, grids around are loaded, everything ok
@@ -2283,7 +2328,7 @@ inline void Map::setNGrid(NGridType *grid, uint32 x, uint32 y)
     if (x >= MAX_NUMBER_OF_GRIDS || y >= MAX_NUMBER_OF_GRIDS)
     {
         sLog->outError("map::setNGrid() Invalid grid coordinates found: %d, %d!", x, y);
-        ASSERT(false);
+        ABORT();
     }
     i_grids[x][y] = grid;
 }
@@ -2328,7 +2373,7 @@ void Map::AddObjectToSwitchList(WorldObject* obj, bool on)
     else if (itr->second != on)
         i_objectsToSwitch.erase(itr);
     else
-        ASSERT(false);
+        ABORT();
 }
 
 void Map::RemoveAllObjectsInRemoveList()
@@ -2539,7 +2584,7 @@ bool InstanceMap::CanEnter(Player* player, bool loginCheck)
     if (!loginCheck && player->GetMapRef().getTarget() == this)
     {
         sLog->outError("InstanceMap::CanEnter - player %s(%u) already in map %d, %d, %d!", player->GetName().c_str(), player->GetGUIDLow(), GetId(), GetInstanceId(), GetSpawnMode());
-        ASSERT(false);
+        ABORT();
         return false;
     }
 
@@ -2893,7 +2938,7 @@ bool BattlegroundMap::CanEnter(Player* player, bool loginCheck)
     if (!loginCheck && player->GetMapRef().getTarget() == this)
     {
         sLog->outError("BGMap::CanEnter - player %u is already in map!", player->GetGUIDLow());
-        ASSERT(false);
+        ABORT();
         return false;
     }
 

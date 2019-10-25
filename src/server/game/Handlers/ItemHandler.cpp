@@ -941,7 +941,7 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
                 if (!sConditionMgr->IsObjectMeetToConditions(_player, vendor, conditions))
                 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug("SendListInventory: conditions not met for creature entry %u item %u", vendor->GetEntry(), item->item);
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SendListInventory: conditions not met for creature entry %u item %u", vendor->GetEntry(), item->item);
 #endif
                     continue;
                 }

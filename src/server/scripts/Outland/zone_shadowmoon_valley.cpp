@@ -348,7 +348,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->InitDefault();
         }
 
         void UpdateAI(uint32 diff) override

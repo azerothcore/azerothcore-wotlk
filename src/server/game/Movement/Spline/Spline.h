@@ -71,7 +71,7 @@ protected:
     typedef void (SplineBase::*InitMethtod)(const Vector3*, index_type, bool, index_type);
     static InitMethtod initializers[ModesEnd];
 
-    void UninitializedSpline() const { ASSERT(false);}
+    void UninitializedSpline() const { ABORT();}
 
 public:
 
