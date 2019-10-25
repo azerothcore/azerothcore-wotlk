@@ -563,7 +563,8 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
         if (chase)
         {
-            me->GetMotionMaster()->MoveChase(target, !_canMeleeAttack() ? 20.0f: 0.0f, me->GetAngle(target));
+            if(_canMeleeAttack())
+                me->GetMotionMaster()->MoveChase(target, 20.0f, float(M_PI));
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
         {
