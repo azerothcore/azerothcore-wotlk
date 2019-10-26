@@ -95,7 +95,6 @@ bool PetAI::_canMeleeAttack() const
         case 416:   /*ENTRY_IMP*/
         case 510:   /*ENTRY_WATER_ELEMENTAL*/
         case 37994: /*ENTRY_WATER_ELEMENTAL_PERM*/
-        {
             canAttack = false;
             for (uint8 i = 0; i < me->GetPetAutoSpellSize(); ++i)
             {
@@ -106,7 +105,6 @@ bool PetAI::_canMeleeAttack() const
                     canAttack = true;
             }
             break;
-        }
         default:
             break;
     }
@@ -584,7 +582,7 @@ void PetAI::DoAttack(Unit* target, bool chase)
         if (chase)
         {
             if (_canMeleeAttack())
-                me->GetMotionMaster()->MoveChase(target, 20.0f, float(M_PI));
+                me->GetMotionMaster()->MoveChase(target, 0.0f, float(M_PI));
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
         {
