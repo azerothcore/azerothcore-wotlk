@@ -234,7 +234,7 @@ struct GossipMenuItemsLocale
 
 struct PointOfInterestLocale
 {
-    StringVector IconName;
+    StringVector Name;
 };
 
 #define MAX_EQUIPMENT_ITEMS 3
@@ -325,6 +325,7 @@ struct CreatureAddon
     uint32 bytes1;
     uint32 bytes2;
     uint32 emote;
+    bool isLarge;
     std::vector<uint32> auras;
 };
 

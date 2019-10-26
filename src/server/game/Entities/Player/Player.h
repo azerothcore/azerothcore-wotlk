@@ -914,6 +914,11 @@ enum InstantFlightGossipAction
     GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT = 500
 };
 
+enum EmoteBroadcastTextID
+{
+    EMOTE_BROADCAST_TEXT_ID_STRANGE_GESTURES = 91243
+};
+
 class PlayerTaxi
 {
     public:

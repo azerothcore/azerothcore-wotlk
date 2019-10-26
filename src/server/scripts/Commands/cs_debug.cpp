@@ -250,8 +250,12 @@ public:
             unit = player;
 
         std::ifstream ifs("opcode.txt");
-        if (ifs.bad())
+        if (!ifs.is_open())
+        {
+            handler->SendSysMessage(LANG_DEBUG_OPCODE_FILE_MISSING);
+            handler->SetSentErrorMessage(true);
             return false;
+        }
 
         // remove comments from file
         std::stringstream parsedStream;
