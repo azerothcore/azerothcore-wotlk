@@ -89,9 +89,29 @@ void PetAI::_doMeleeAttack()
 
 bool PetAI::_canMeleeAttack() const
 {
-    return me->GetEntry() != 416 /*ENTRY_IMP*/ &&
-        me->GetEntry() != 510 /*ENTRY_WATER_ELEMENTAL*/ &&
-        me->GetEntry() != 37994 /*ENTRY_WATER_ELEMENTAL_PERM*/; 
+    bool canAttack = true;
+    switch (me->GetEntry())
+    {
+        case 416:   /*ENTRY_IMP*/
+        case 510:   /*ENTRY_WATER_ELEMENTAL*/
+        case 37994: /*ENTRY_WATER_ELEMENTAL_PERM*/
+        {
+            canAttack = false;
+            for (uint8 i = 0; i < me->GetPetAutoSpellSize(); ++i)
+            {
+                uint32 spellID = me->GetPetAutoSpellOnPos(i);
+                if (spellID && ((me->GetEntry() == 416 && (spellID == 3110 || spellID != 7799 || spellID != 7800 || spellID != 7801 || spellID != 7802 ||
+                    spellID != 11762 || spellID != 11763 || spellID != 27267 || spellID != 47964)) || (me->GetEntry() == 510 && spellID == 31707) ||
+                    (me->GetEntry() == 37994 && spellID == 72898)))
+                    canAttack = true;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+
+    return canAttack;
 }
 
 void PetAI::UpdateAI(uint32 diff)
