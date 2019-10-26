@@ -95,16 +95,32 @@ bool PetAI::_canMeleeAttack() const
         case 416:   /*ENTRY_IMP*/
         case 510:   /*ENTRY_WATER_ELEMENTAL*/
         case 37994: /*ENTRY_WATER_ELEMENTAL_PERM*/
+        {
             canAttack = false;
             for (uint8 i = 0; i < me->GetPetAutoSpellSize(); ++i)
             {
                 uint32 spellID = me->GetPetAutoSpellOnPos(i);
-                if (spellID && ((me->GetEntry() == 416 && (spellID == 3110 || spellID != 7799 || spellID != 7800 || spellID != 7801 || spellID != 7802 ||
-                    spellID != 11762 || spellID != 11763 || spellID != 27267 || spellID != 47964)) || (me->GetEntry() == 510 && spellID == 31707) ||
-                    (me->GetEntry() == 37994 && spellID == 72898)))
-                    canAttack = true;
+                switch (spellID)
+                {
+                    case 3110:   // Firebolt Rank 1
+                    case 7799:   // Firebolt Rank 2
+                    case 7800:   // Firebolt Rank 3
+                    case 7801:   // Firebolt Rank 4
+                    case 7802:   // Firebolt Rank 5
+                    case 11762:  // Firebolt Rank 6
+                    case 11763:  // Firebolt Rank 7
+                    case 27267:  // Firebolt Rank 8
+                    case 47964:  // Firebolt Rank 9
+                    case 31707:  // Waterbolt
+                    case 72898:  // Waterbolt
+                        canAttack = true;
+                        break;
+                    default:
+                        break;
+                }
             }
             break;
+        }
         default:
             break;
     }
