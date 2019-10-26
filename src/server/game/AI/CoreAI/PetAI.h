@@ -13,6 +13,25 @@
 class Creature;
 class Spell;
 
+enum SpecialPets
+{
+    ENTRY_IMP                   =   416,
+    ENTRY_WATER_ELEMENTAL       =   510,
+    ENTRY_WATER_ELEMENTAL_PERM  = 37994,
+
+    IMP_FIREBOLT_RANK_1         =  3110,
+    IMP_FIREBOLT_RANK_2         =  7799,
+    IMP_FIREBOLT_RANK_3         =  7800,
+    IMP_FIREBOLT_RANK_4         =  7801,
+    IMP_FIREBOLT_RANK_5         =  7802,
+    IMP_FIREBOLT_RANK_6         = 11762,
+    IMP_FIREBOLT_RANK_7         = 11763,
+    IMP_FIREBOLT_RANK_8         = 27267,
+    IMP_FIREBOLT_RANK_9         = 47964,
+    WATER_ELEMENTAL_WATERBOLT_1 = 31707,
+    WATER_ELEMENTAL_WATERBOLT_2 = 72898
+};
+
 class PetAI : public CreatureAI
 {
     public:

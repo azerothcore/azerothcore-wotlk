@@ -92,9 +92,9 @@ bool PetAI::_canMeleeAttack() const
     bool canAttack = true;
     switch (me->GetEntry())
     {
-        case 416:   /*ENTRY_IMP*/
-        case 510:   /*ENTRY_WATER_ELEMENTAL*/
-        case 37994: /*ENTRY_WATER_ELEMENTAL_PERM*/
+        case ENTRY_IMP:
+        case ENTRY_WATER_ELEMENTAL:
+        case ENTRY_WATER_ELEMENTAL_PERM:
         {
             canAttack = false;
             for (uint8 i = 0; i < me->GetPetAutoSpellSize(); ++i)
@@ -102,17 +102,17 @@ bool PetAI::_canMeleeAttack() const
                 uint32 spellID = me->GetPetAutoSpellOnPos(i);
                 switch (spellID)
                 {
-                    case 3110:   // Firebolt Rank 1
-                    case 7799:   // Firebolt Rank 2
-                    case 7800:   // Firebolt Rank 3
-                    case 7801:   // Firebolt Rank 4
-                    case 7802:   // Firebolt Rank 5
-                    case 11762:  // Firebolt Rank 6
-                    case 11763:  // Firebolt Rank 7
-                    case 27267:  // Firebolt Rank 8
-                    case 47964:  // Firebolt Rank 9
-                    case 31707:  // Waterbolt
-                    case 72898:  // Waterbolt
+                    case IMP_FIREBOLT_RANK_1:
+                    case IMP_FIREBOLT_RANK_2:
+                    case IMP_FIREBOLT_RANK_3:
+                    case IMP_FIREBOLT_RANK_4:
+                    case IMP_FIREBOLT_RANK_5:
+                    case IMP_FIREBOLT_RANK_6:
+                    case IMP_FIREBOLT_RANK_7:
+                    case IMP_FIREBOLT_RANK_8:
+                    case IMP_FIREBOLT_RANK_9:
+                    case WATER_ELEMENTAL_WATERBOLT_1:
+                    case WATER_ELEMENTAL_WATERBOLT_2:
                         canAttack = true;
                         break;
                     default:
