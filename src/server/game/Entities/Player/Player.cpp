@@ -27620,7 +27620,7 @@ bool Player::IsPetDismissed()
     return false;
 }
 
-bool Player::IsSecondarySkill(SkillType Skill)
+bool Player::IsSecondarySkill(SkillType Skill) const
 {
     return Skill == SKILL_COOKING || Skill == SKILL_FIRST_AID || Skill == SKILL_FISHING;
 }
