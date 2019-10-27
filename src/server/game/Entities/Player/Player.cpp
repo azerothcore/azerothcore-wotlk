@@ -27660,10 +27660,7 @@ bool Player::HasTwoProfessions(SkillType Skill)
             SkillCount++;
     }
 
-    if (SkillCount >= 2)
-        return true;
-
-    return false;
+    return SkillCount >= 2;
 }
 
 void Player::LearnProfession(SkillType Skill)
