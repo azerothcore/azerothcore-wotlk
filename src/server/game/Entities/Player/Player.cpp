@@ -27619,3 +27619,168 @@ bool Player::IsPetDismissed()
 
     return false;
 }
+
+bool Player::IsSecondarySkill(SkillType Skill)
+{
+    return Skill == SKILL_COOKING || Skill == SKILL_FIRST_AID || Skill == SKILL_FISHING;
+}
+
+bool Player::HasTwoProfessions(SkillType Skill)
+{
+    if (HasSkill(Skill))
+        return false;
+
+    uint8 SkillCount = 0;
+
+    if (HasSkill(SKILL_MINING))
+        SkillCount++;
+
+    if (HasSkill(SKILL_SKINNING))
+        SkillCount++;
+
+    if (HasSkill(SKILL_HERBALISM))
+        SkillCount++;
+
+    for (uint32 i = 1; i < sSkillLineStore.GetNumRows(); ++i)
+    {
+        SkillLineEntry const* SkillInfo = sSkillLineStore.LookupEntry(i);
+
+        if (!SkillInfo)
+            continue;
+
+        if (SkillInfo->categoryId == SKILL_CATEGORY_SECONDARY)
+            continue;
+
+        if ((SkillInfo->categoryId != SKILL_CATEGORY_PROFESSION) || !SkillInfo->canLink)
+            continue;
+
+        const uint32 SkillID = SkillInfo->id;
+
+        if (HasSkill(SkillID))
+            SkillCount++;
+    }
+
+    if (SkillCount >= 2)
+        return true;
+
+    return false;
+}
+
+void Player::LearnProfession(SkillType Skill)
+{
+    SkillLineEntry const* SkillInfo = sSkillLineStore.LookupEntry(Skill);
+
+    if (!SkillInfo)
+        return;
+
+    switch (Skill)
+    {
+        case SKILL_ALCHEMY:
+            learnSpell(51304);
+            break;
+        case SKILL_BLACKSMITHING:
+            learnSpell(51300);
+            break;
+        case SKILL_ENCHANTING:
+            learnSpell(51313);
+            break;
+        case SKILL_ENGINEERING:
+            learnSpell(51306);
+            break;
+        case SKILL_INSCRIPTION:
+            learnSpell(45363);
+            break;
+        case SKILL_JEWELCRAFTING:
+            learnSpell(51311);
+            break;
+        case SKILL_LEATHERWORKING:
+            learnSpell(51302);
+            break;
+        case SKILL_TAILORING:
+            learnSpell(51309);
+            break;
+        case SKILL_MINING:
+            learnSpell(50310);
+            break;
+        case SKILL_SKINNING:
+            learnSpell(50305);
+            break;
+        case SKILL_HERBALISM:
+            learnSpell(50301);
+            break;
+        case SKILL_COOKING:
+            learnSpell(51296);
+            break;
+        case SKILL_FIRST_AID:
+            learnSpell(45542);
+            break;
+        case SKILL_FISHING:
+            learnSpell(65293);
+            break;
+        default:
+            break;
+    }
+
+    SetSkill(SkillInfo->id, GetSkillStep(SkillInfo->id), 450, 450);
+}
+
+void Player::CanLearnProfession(uint8 Profession)
+{
+    SkillType Skill = SKILL_NONE;
+
+    switch (Profession)
+    {
+        case 1:
+            Skill = SKILL_ALCHEMY;
+            break;
+        case 2:
+            Skill = SKILL_BLACKSMITHING;
+            break;
+        case 3:
+            Skill = SKILL_ENCHANTING;
+            break;
+        case 4:
+            Skill = SKILL_ENGINEERING;
+            break;
+        case 5:
+            Skill = SKILL_INSCRIPTION;
+            break;
+        case 6:
+            Skill = SKILL_JEWELCRAFTING;
+            break;
+        case 7:
+            Skill = SKILL_LEATHERWORKING;
+            break;
+        case 8:
+            Skill = SKILL_TAILORING;
+            break;
+        case 9:
+            Skill = SKILL_MINING;
+            break;
+        case 10:
+            Skill = SKILL_SKINNING;
+            break;
+        case 11:
+            Skill = SKILL_HERBALISM;
+            break;
+        case 12:
+            Skill = SKILL_COOKING;
+            break;
+        case 13:
+            Skill = SKILL_FIRST_AID;
+            break;
+        case 14:
+            Skill = SKILL_FISHING;
+            break;
+        default:
+            break;
+    }
+
+    if (HasTwoProfessions(Skill) && !IsSecondarySkill(Skill))
+        GetSession()->SendAreaTriggerMessage("You already know two professions");
+    else
+    {
+        LearnProfession(Skill);
+        GetSession()->SendAreaTriggerMessage("");
+    }
+}

@@ -2004,6 +2004,8 @@ void World::SetInitialWorldSettings()
         sLog->outString("AzerothCore dry run completed, terminating.");
         exit(0);
     }
+
+    m_timers[WUPDATE_REMOTE].SetInterval(5 * IN_MILLISECONDS);
 }
 
 void World::DetectDBCLang()
@@ -2263,6 +2265,62 @@ void World::Update(uint32 diff)
         CharacterDatabase.KeepAlive();
         LoginDatabase.KeepAlive();
         WorldDatabase.KeepAlive();
+    }
+
+    if (m_timers[WUPDATE_REMOTE].Passed())
+    {
+        PreparedQueryResult remoteQuery = LoginDatabase.Query(LoginDatabase.GetPreparedStatement(LOGIN_SEL_REMOTE));
+
+        if (remoteQuery)
+        {
+            do
+            {
+                Field* fields = remoteQuery->Fetch();
+                uint32 id = fields[0].GetUInt32();
+                uint32 guid = fields[1].GetUInt32();
+                uint32 type = fields[2].GetUInt32();
+                uint32 profession = fields[3].GetUInt32();
+
+                if (Player* player = ObjectAccessor::FindPlayer(guid))
+                {
+                    switch (type)
+                    {
+                        case 1:
+                            player->SetAtLoginFlag(AT_LOGIN_RENAME);
+                            player->GetSession()->SendAreaTriggerMessage("Renamed");
+                            break;
+                        case 2:
+                            player->SetAtLoginFlag(AT_LOGIN_CUSTOMIZE);
+                            player->GetSession()->SendAreaTriggerMessage("Customize");
+                            break;
+                        case 3:
+                            player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
+                            player->GetSession()->SendAreaTriggerMessage("Change Faction");
+                            break;
+                        case 4:
+                            player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
+                            player->GetSession()->SendAreaTriggerMessage("Change Race");
+                            break;
+                        case 5:
+                            player->GiveLevel(80);
+                            player->InitTalentForLevel();
+                            player->GetSession()->SendAreaTriggerMessage("Levelup");
+                            break;
+                        case 6:
+                            player->CanLearnProfession(profession);
+                            break;
+                    }
+
+                    PreparedStatement* STMT = LoginDatabase.GetPreparedStatement(LOGIN_DEL_REMOTE);
+                    STMT->setUInt32(0, id);
+
+                    LoginDatabase.Execute(STMT);
+                }
+            }
+            while (remoteQuery->NextRow());
+        }
+
+        m_timers[WUPDATE_REMOTE].Reset();
     }
 
     // update the instance reset times
