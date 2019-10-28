@@ -118,7 +118,6 @@ bool PetAI::_canMeleeAttack() const
                 }
             }
             return false;
-            break;
         }
         default:
             break;
