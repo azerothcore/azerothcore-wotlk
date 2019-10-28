@@ -89,14 +89,12 @@ void PetAI::_doMeleeAttack()
 
 bool PetAI::_canMeleeAttack() const
 {
-    bool canAttack = true;
     switch (me->GetEntry())
     {
         case ENTRY_IMP:
         case ENTRY_WATER_ELEMENTAL:
         case ENTRY_WATER_ELEMENTAL_PERM:
         {
-            canAttack = false;
             for (uint8 i = 0; i < me->GetPetAutoSpellSize(); ++i)
             {
                 uint32 spellID = me->GetPetAutoSpellOnPos(i);
@@ -113,19 +111,20 @@ bool PetAI::_canMeleeAttack() const
                     case IMP_FIREBOLT_RANK_9:
                     case WATER_ELEMENTAL_WATERBOLT_1:
                     case WATER_ELEMENTAL_WATERBOLT_2:
-                        canAttack = true;
+                        return true;
                         break;
                     default:
                         break;
                 }
             }
+            return false;
             break;
         }
         default:
             break;
     }
 
-    return canAttack;
+    return true;
 }
 
 void PetAI::UpdateAI(uint32 diff)
