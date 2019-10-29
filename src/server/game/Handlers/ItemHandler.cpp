@@ -283,6 +283,24 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket & recvData)
         return;
     }
 
+    if (pItem->GetTemplate()->Quality >= 3)
+    {
+        uint32 guid = pItem->GetOwnerGUID();
+
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RECOVERY_ITEM);
+
+        stmt->setUInt32(0, guid);
+        stmt->setUInt32(1, pItem->GetTemplate()->ItemId);
+        stmt->setString(2, pItem->GetTemplate()->Name1);
+        stmt->setUInt32(3, pItem->GetTemplate()->ItemLevel);
+        stmt->setUInt32(4, pItem->GetTemplate()->DisplayInfoID);
+        stmt->setUInt32(5, pItem->GetTemplate()->Quality);
+        stmt->setUInt32(6, pItem->GetTemplate()->InventoryType);
+        stmt->setInt32(7, pItem->GetTemplate()->Material);
+
+        CharacterDatabase.Query(stmt);
+    }
+
     if (count)
     {
         uint32 i_count = count;
