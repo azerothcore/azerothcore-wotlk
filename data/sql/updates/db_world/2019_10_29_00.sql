@@ -1,3 +1,19 @@
+-- DB update 2019_10_27_00 -> 2019_10_29_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_10_27_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_10_27_00 2019_10_29_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1571293310924626365'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1571293310924626365');
 
 -- Astor Hadren: Use "root" instead of pause waypoint movement
@@ -52,3 +68,12 @@ DELETE FROM `smart_scripts` WHERE `entryorguid` = 27299 AND `source_type` = 0 AN
 
 -- Apprentice Trotter: Pause waypoint on "Gossip Hello" not necessary, as this NPC does not have gossip options
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 27301 AND `source_type` = 0 AND `id` = 1;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
