@@ -111,8 +111,13 @@ bool PetAI::_canMeleeAttack() const
                     case IMP_FIREBOLT_RANK_9:
                     case WATER_ELEMENTAL_WATERBOLT_1:
                     case WATER_ELEMENTAL_WATERBOLT_2:
-                        return true;
-                        break;
+                    {
+                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+                        int32 mana = me->GetPower(POWER_MANA);
+
+                        if (mana >= spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
+                            return true;
+                    }
                     default:
                         break;
                 }
