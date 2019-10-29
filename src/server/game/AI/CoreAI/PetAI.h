@@ -62,13 +62,14 @@ class PetAI : public CreatureAI
         bool _needToStop(void);
         void _stopAttack(void);
         void _doMeleeAttack();
-        bool _canMeleeAttack() const;
+        bool _canMeleeAttack();
 
         void UpdateAllies();
 
         TimeTracker i_tracker;
         std::set<uint64> m_AllySet;
         uint32 m_updateAlliesTimer;
+        float combatRange;
 
         Unit* SelectNextTarget(bool allowAutoSelect) const;
         void HandleReturnMovement();
