@@ -87,8 +87,9 @@ void PetAI::_doMeleeAttack()
     DoMeleeAttackIfReady();
 }
 
-bool PetAI::_canMeleeAttack() const
+bool PetAI::_canMeleeAttack()
 {
+    combatRange = 0.f;
     switch (me->GetEntry())
     {
         case ENTRY_IMP:
@@ -116,7 +117,10 @@ bool PetAI::_canMeleeAttack() const
                         int32 mana = me->GetPower(POWER_MANA);
 
                         if (mana >= spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
+                        {
+                            combatRange = spellInfo->GetMaxRange();
                             return true;
+                        }
                     }
                     default:
                         break;
@@ -601,7 +605,7 @@ void PetAI::DoAttack(Unit* target, bool chase)
         if (chase)
         {
             if (_canMeleeAttack())
-                me->GetMotionMaster()->MoveChase(target, 0.0f, float(M_PI));
+                me->GetMotionMaster()->MoveChase(target, combatRange, float(M_PI));
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
         {
