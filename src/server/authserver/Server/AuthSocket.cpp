@@ -208,6 +208,10 @@ void AuthSocket::OnRead()
 {
     #define MAX_AUTH_LOGON_CHALLENGES_IN_A_ROW 3
     uint32 challengesInARow = 0;
+
+    #define MAX_AUTH_GET_REALM_LIST 10
+    uint32 challengesInARowRealmList = 0;
+
     uint8 _cmd;
     while (1)
     {
@@ -223,6 +227,15 @@ void AuthSocket::OnRead()
                 socket().shutdown();
                 return;
             }
+        }
+        else if (_cmd == REALM_LIST) {
+          challengesInARowRealmList++;
+          if (challengesInARowRealmList == MAX_AUTH_GET_REALM_LIST)
+          {
+              sLog->outString("Got %u REALM_LIST in a row from '%s', possible ongoing DoS", challengesInARowRealmList, socket().getRemoteAddress().c_str());
+              socket().shutdown();
+              return;
+          }
         }
 
         size_t i;
