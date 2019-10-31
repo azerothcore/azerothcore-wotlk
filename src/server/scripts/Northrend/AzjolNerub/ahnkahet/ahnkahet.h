@@ -5,6 +5,7 @@
 #define MAX_ENCOUNTER           5
 
 #include "SpellScript.h"
+#include "MapRefManager.h"
 
 enum Data64
 {
