@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `recovery_item` (
   `ItemEntry` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `Name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `ItemLevel` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `displayid` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `DisplayId` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `Quality` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `InventoryType` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `Material` tinyint(4) unsigned NOT NULL DEFAULT 0,
