@@ -3,6 +3,9 @@
 #define DEF_AHNKAHET_H
 
 #define MAX_ENCOUNTER           5
+
+#include "SpellScript.h"
+
 enum Data64
 {
     DATA_ELDER_NADOX,
