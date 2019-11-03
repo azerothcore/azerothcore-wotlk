@@ -36,6 +36,8 @@
 #include "BattlegroundQueue.h"
 #include "GameGraveyard.h"
 #include <unordered_map>
+#include <random>
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -146,7 +148,7 @@ void BattlegroundMgr::Update(uint32 diff)
 void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battleground* bg, uint8 QueueSlot, uint8 StatusID, uint32 Time1, uint32 Time2, uint8 arenatype, TeamId teamId, bool isRated, BattlegroundTypeId forceBgTypeId)
 {
     // pussywizard:
-    ASSERT(QueueSlot < PLAYER_MAX_BATTLEGROUND_QUEUES);
+    //ASSERT(QueueSlot < PLAYER_MAX_BATTLEGROUND_QUEUES);
 
     if (StatusID == STATUS_NONE || !bg)
     {
@@ -923,7 +925,8 @@ void BattlegroundMgr::RemoveBattleground(BattlegroundTypeId bgTypeId, uint32 ins
 
 void BattlegroundMgr::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, TeamId teamId)
 {
-    ASSERT(!ginfo->IsInvitedToBGInstanceGUID);
+    if (ginfo->IsInvitedToBGInstanceGUID)
+        return;
 
     // set side if needed
     if (teamId != TEAM_NEUTRAL)
@@ -942,13 +945,12 @@ void BattlegroundMgr::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, T
     ginfo->RemoveInviteTime = World::GetGameTimeMS() + INVITE_ACCEPT_WAIT_TIME;
 
     // loop through the players
-    for (std::set<uint64>::iterator itr = ginfo->Players.begin(); itr != ginfo->Players.end(); ++itr)
+    for (auto itr : ginfo->Players)
     {
         // get the player
-        Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(*itr);
-
-        // player is removed from queue when logging out
-        ASSERT(player);
+        Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(itr);
+        if (!player)
+            continue;
 
         // update average wait time
         bgQueue.PlayerInvitedToBGUpdateAverageWaitTime(ginfo);
@@ -963,12 +965,12 @@ void BattlegroundMgr::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, T
         BGQueueRemoveEvent* removeEvent = new BGQueueRemoveEvent(player->GetGUID(), ginfo->IsInvitedToBGInstanceGUID, bgQueueTypeId, ginfo->RemoveInviteTime);
         bgQueue.AddEvent(removeEvent, INVITE_ACCEPT_WAIT_TIME);
 
-        WorldPacket data;
-
+        // Check queueSlot
         uint32 queueSlot = player->GetBattlegroundQueueIndex(bgQueueTypeId);
         ASSERT(queueSlot < PLAYER_MAX_BATTLEGROUND_QUEUES);
 
         // send status packet
+        WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_WAIT_JOIN, INVITE_ACCEPT_WAIT_TIME, 0, ginfo->ArenaType, TEAM_NEUTRAL, bg->isRated(), ginfo->BgTypeId);
         player->GetSession()->SendPacket(&data);
 
@@ -998,8 +1000,10 @@ void RandomBattlegroundSystem::Update(uint32 diff)
             small.push_back(BATTLEGROUND_AB);
             small.push_back(BATTLEGROUND_SA);
 
-            std::random_shuffle(big.begin(), big.end());
-            std::random_shuffle(small.begin(), small.end());
+            auto rng = std::default_random_engine{};
+
+            std::shuffle(big.begin(), big.end(), rng);
+            std::shuffle(small.begin(), small.end(), rng);
 
             m_BgOrder.push_back(small.back()); small.pop_back();
             m_BgOrder.push_back(small.back()); small.pop_back();
@@ -1020,7 +1024,7 @@ void RandomBattlegroundSystem::Update(uint32 diff)
             case BATTLEGROUND_EY: m_SwitchTimer = 40*IN_MILLISECONDS; break; // max 15 per team
             case BATTLEGROUND_AB: m_SwitchTimer = 40*IN_MILLISECONDS; break; // max 15 per team
             case BATTLEGROUND_SA: m_SwitchTimer = 40*IN_MILLISECONDS; break; // max 15 per team
-            default: ASSERT(false); break;
+            default: ABORT(); break;
         }
     }
     else

@@ -892,7 +892,7 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
         m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
     }
-    else if (cinfo->type_flags & CREATURE_TYPEFLAGS_GHOST) // Xinef: Add ghost visibility for ghost units
+    else if (cinfo->type_flags & CREATURE_TYPE_FLAG_GHOST_VISIBLE) // Xinef: Add ghost visibility for ghost units
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
 
     if (Entry == VISUAL_WAYPOINT)
@@ -2207,6 +2207,10 @@ bool Creature::LoadCreaturesAddon(bool reload)
         //SetByteValue(UNIT_FIELD_BYTES_2, 3, uint8((cainfo->bytes2 >> 24) & 0xFF));
         SetByteValue(UNIT_FIELD_BYTES_2, 3, 0);
     }
+
+    // Check if Creature is Large
+    if (cainfo->isLarge)
+        SetVisibilityDistanceOverride(true);
 
     if (cainfo->emote != 0)
         SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote);

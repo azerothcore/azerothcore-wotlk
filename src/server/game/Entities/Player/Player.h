@@ -909,6 +909,16 @@ enum PlayerCommandStates
     CHEAT_WATERWALK = 0x10
 };
 
+enum InstantFlightGossipAction
+{
+    GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT = 500
+};
+
+enum EmoteBroadcastTextID
+{
+    EMOTE_BROADCAST_TEXT_ID_STRANGE_GESTURES = 91243
+};
+
 class PlayerTaxi
 {
     public:
@@ -1209,6 +1219,7 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetInnTriggerId() const { return _innTriggerId; }
 
         Pet* GetPet() const;
+        bool IsPetDismissed();
         void SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, uint32 createdBySpell, uint64 casterGUID, uint8 asynchLoadType);
         void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
         uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
@@ -1394,6 +1405,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetGossipTextId(uint32 menuId, WorldObject* source);
         uint32 GetGossipTextId(WorldObject* source);
         static uint32 GetDefaultGossipMenuForSource(WorldObject* source);
+
+        void ToggleInstantFlight();
 
         /*********************************************************/
         /***                    QUEST SYSTEM                   ***/
@@ -2217,6 +2230,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetCurrentBattlegroundQueueSlot() const { return m_bgData.bgQueueSlot; }
         bool IsInvitedForBattlegroundInstance() const { return m_bgData.isInvited; }
         bool IsCurrentBattlegroundRandom() const { return m_bgData.bgIsRandom; }
+        BGData& GetBGData() { return m_bgData; }
+        void SetBGData(BGData& bgdata) { m_bgData = bgdata; }
         Battleground* GetBattleground(bool create = false) const;
 
         bool InBattlegroundQueue() const
@@ -2959,6 +2974,8 @@ class Player : public Unit, public GridObject<Player>
         // duel health and mana reset attributes
         uint32 healthBeforeDuel;
         uint32 manaBeforeDuel;
+
+        bool m_isInstantFlightOn;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

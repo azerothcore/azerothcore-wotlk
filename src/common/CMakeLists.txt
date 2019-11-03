@@ -30,8 +30,7 @@ endif()
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(common
-  ${PRIVATE_SOURCES}
-)
+  ${PRIVATE_SOURCES})
 
 CollectIncludeDirectories(
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -51,6 +50,7 @@ target_link_libraries(common
   PRIVATE
     game-interface
   PUBLIC
+    acore-core-interface
     ace
     mysql
     g3dlib
@@ -59,7 +59,8 @@ target_link_libraries(common
     utf8cpp
     openssl
     threads
-    jemalloc)
+    jemalloc
+    fmt)
 
 set_target_properties(common
   PROPERTIES
