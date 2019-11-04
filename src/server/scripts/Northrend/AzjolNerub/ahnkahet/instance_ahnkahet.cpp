@@ -4,6 +4,8 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "Player.h"
 #include "ahnkahet.h"
 
 class instance_ahnkahet : public InstanceMapScript

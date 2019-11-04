@@ -4,9 +4,6 @@
 
 #define MAX_ENCOUNTER           5
 
-#include "SpellScript.h"
-#include "MapRefManager.h"
-
 enum Data64
 {
     DATA_ELDER_NADOX,
