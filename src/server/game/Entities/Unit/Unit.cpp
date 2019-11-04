@@ -10564,6 +10564,14 @@ float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, Da
                     if (victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x100000, 0, 0, GetGUID()))
                         AddPct(DoneTotalMod, aurEff->GetAmount());
             }
+            // Shadow Word: Death
+            else if (spellProto->SpellFamilyFlags[1] & 0x2)
+            {
+                // Glyph of Shadow Word: Death
+                if (AuraEffect* aurEff = GetAuraEffect(55682, 1))
+                    if (victim->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT))
+                        AddPct(DoneTotalMod, aurEff->GetAmount());
+            }
 
             break;
         case SPELLFAMILY_PALADIN:
