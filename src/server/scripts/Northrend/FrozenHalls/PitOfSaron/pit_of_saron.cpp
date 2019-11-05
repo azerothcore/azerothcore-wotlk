@@ -1408,16 +1408,15 @@ public:
                         {
                             p->RewardPlayerAndGroupAtEvent(36764, caster); // alliance
                             p->RewardPlayerAndGroupAtEvent(36770, caster); // horde
+                            
+                            target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+                            if (Creature* c = target->ToCreature())
+                            {
+                                c->DespawnOrUnsummon(7000);
+                                c->AI()->Talk(0, p);
+                                c->m_Events.AddEvent(new SlaveRunEvent(*c), c->m_Events.CalculateTime(3000));
+                            }
                         }
-                    target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                    Unit* caster = GetCaster();
-                    Player * p = caster->ToPlayer();
-                    if (Creature* c = target->ToCreature())
-                    {
-                        c->DespawnOrUnsummon(7000);
-                        c->AI()->Talk(0, p);
-                        c->m_Events.AddEvent(new SlaveRunEvent(*c), c->m_Events.CalculateTime(3000));
-                    }
                 }
         }
 
