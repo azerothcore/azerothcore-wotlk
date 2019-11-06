@@ -333,17 +333,14 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
 
 bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr)
 {
+    wstr.clear();
     try
     {
-        if (size_t len = utf8::distance(utf8str.c_str(), utf8str.c_str()+utf8str.size()))
-        {
-            wstr.resize(len);
-            utf8::utf8to16(utf8str.c_str(), utf8str.c_str()+utf8str.size(), &wstr[0]);
-        }
+        utf8::utf8to16(utf8str.c_str(), utf8str.c_str()+utf8str.size(), std::back_inserter(wstr));
     }
-    catch(std::exception)
+    catch(std::exception const&)
     {
-        wstr = L"";
+        wstr.clear();
         return false;
     }
 
