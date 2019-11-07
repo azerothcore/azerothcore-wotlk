@@ -4,6 +4,8 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "Player.h"
 #include "ahnkahet.h"
 
 class instance_ahnkahet : public InstanceMapScript
@@ -248,7 +250,50 @@ public:
     }
 };
 
+class spell_shadow_sickle_periodic_damage : public SpellScriptLoader
+{
+    public:
+        spell_shadow_sickle_periodic_damage() : SpellScriptLoader("spell_shadow_sickle_periodic_damage") { }
+
+        class spell_shadow_sickle_periodic_damage_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_shadow_sickle_periodic_damage_AuraScript);
+
+            void HandlePeriodic(AuraEffect const*  /*aurEff*/)
+            {
+                PreventDefaultAction();
+
+                if (Unit* caster = GetCaster())
+                {
+                    std::list<Player*> PlayerList;
+                    PlayerList.clear();
+
+                    Map::PlayerList const &players = caster->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                        if (Player* player = itr->GetSource()->ToPlayer())
+                            if (player->IsWithinDist(caster, 40.0f) && player->IsAlive()) // SPELL_SHADOW_SICKLE_H & SPELL_SHADOW_SICKLE range is 40 yards
+                                PlayerList.push_back(player);
+
+                    if (!PlayerList.empty())
+                        caster->CastSpell(Trinity::Containers::SelectRandomContainerElement(PlayerList), caster->GetMap()->IsHeroic() ? SPELL_SHADOW_SICKLE_H : SPELL_SHADOW_SICKLE, true);
+
+                }
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadow_sickle_periodic_damage_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_shadow_sickle_periodic_damage_AuraScript();
+        }
+};
+
 void AddSC_instance_ahnkahet()
 {
    new instance_ahnkahet;
+   new spell_shadow_sickle_periodic_damage();
 }

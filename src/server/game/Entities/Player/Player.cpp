@@ -1249,7 +1249,7 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
     InventoryResult msg = CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, titem_id, titem_amount);
     if (msg == EQUIP_ERR_OK)
     {
-        StoreNewItem(sDest, titem_id, true, Item::GenerateItemRandomPropertyId(titem_id));
+        StoreNewItem(sDest, titem_id, true);
         return true;                                        // stored
     }
 
@@ -12527,7 +12527,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
     for (ItemPosCountVec::const_iterator itr = dest.begin(); itr != dest.end(); ++itr)
         count += itr->count;
 
-    Item* pItem = Item::CreateItem(item, count, this);
+    Item* pItem = Item::CreateItem(item, count, this, false, randomPropertyId);
     if (pItem)
     {
         // pussywizard: obtaining blue or better items saves to db
@@ -12538,8 +12538,6 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
         ItemAddedQuestCheck(item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
-        if (randomPropertyId)
-            pItem->SetItemRandomProperties(randomPropertyId);
         pItem = StoreItem(dest, pItem, update);
 
 
@@ -15879,7 +15877,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
             ItemPosCountVec dest;
             if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardChoiceItemCount[reward]) == EQUIP_ERR_OK)
             {
-                Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+                Item* item = StoreNewItem(dest, itemId, true);
                 SendNewItem(item, quest->RewardChoiceItemCount[reward], true, false, false, false);
                 
                 sScriptMgr->OnQuestRewardItem(this, item, quest->RewardChoiceItemCount[reward]);
@@ -15898,7 +15896,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                 ItemPosCountVec dest;
                 if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardItemIdCount[i]) == EQUIP_ERR_OK)
                 {
-                    Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+                    Item* item = StoreNewItem(dest, itemId, true);
                     SendNewItem(item, quest->RewardItemIdCount[i], true, false, false, false);
                     
                     sScriptMgr->OnQuestRewardItem(this, item, quest->RewardItemIdCount[i]);
@@ -27227,7 +27225,7 @@ bool Player::AddItem(uint32 itemId, uint32 count)
         return false;
     }
 
-    Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+    Item* item = StoreNewItem(dest, itemId, true);
     if (item)
         SendNewItem(item, count, true, false);
     else
