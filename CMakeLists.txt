@@ -46,10 +46,11 @@ if(EXISTS "conf/config.cmake")
   include(conf/config.cmake)
 endif()
 
-#
-# Loading dyn modules
-#
-include(modules/config.cmake)
+# modules can be disabled
+if(EXISTS ${CMAKE_SOURCE_DIR}/modules/config.cmake)
+  include(modules/config.cmake)
+endif()
+
 # add modules and dependencies
 CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
 FOREACH(subdir ${sub_DIRS})

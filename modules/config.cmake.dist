@@ -1,0 +1,50 @@
+#DISABLED ALL MODULES
+#Default: 0
+#         1 - disable all module.
+set (DISABLED_ALL_MODULES 0)
+
+#Displays the on/off option for the module in the cmake-gui.only win.
+#Default: 0
+#         1 - display option
+if( WIN32 )
+  set (DISPLAY_CMAKE_GUI_OPTION 0)
+endif()
+
+#Sets which modules need to be disabled.
+#It looks like the following example.you need to remove the '#'
+set(DISABLED_MODULES
+  #mod-transmog
+  #your-module
+)
+
+
+####################################################################
+set(DISABLED_AC_MODULES ${DISABLED_AC_MODULES} ${DISABLED_MODULES})
+
+CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
+FOREACH(subdir ${sub_DIRS})
+  get_filename_component(MODULENAME ${subdir} NAME)
+
+  if ( ${MODULENAME} IN_LIST DISABLED_MODULES )
+    message("DISABLED ------> MODULE: ${MODULENAME}")
+  endif()
+
+  if( WIN32 )
+    if ( DISPLAY_CMAKE_GUI_OPTION )
+      option(MODULE_${MODULENAME} "Enable module:${MODULENAME}" 1)
+    endif()
+
+    if ( DISPLAY_CMAKE_GUI_OPTION AND NOT MODULE_${MODULENAME} )
+      set(DISABLED_AC_MODULES ${DISABLED_AC_MODULES} ${MODULENAME})
+    endif()
+  endif()
+
+  if ( DISABLED_ALL_MODULES )
+    set(DISABLED_AC_MODULES ${DISABLED_AC_MODULES} ${MODULENAME})
+    message("DISABLED ------> MODULE: ${MODULENAME}")
+  endif()
+ENDFOREACH()
+
+if ( DISABLED_ALL_MODULES )
+  message("DISABLED ------> ALL MODULES.")
+endif()

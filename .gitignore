@@ -67,9 +67,9 @@ local.properties
 # ==================
 #
 #  CUSTOM
-#  
+#
 #  put below your custom ignore rules
-#  for example , if you want to include a 
+#  for example , if you want to include a
 #  module directly in repositoryyou can do:
 #
 #  !modules/yourmodule
