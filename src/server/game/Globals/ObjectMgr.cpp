@@ -118,23 +118,24 @@ std::string ScriptInfo::GetDebugInfo() const
     return std::string(sz);
 }
 
-bool normalizePlayerName(std::string& name)
+bool normalizePlayerName(std::string& name, size_t max_len)
 {
     if (name.empty())
         return false;
 
-    std::wstring tmp;
-    if (!Utf8toWStr(name, tmp))
+    std::wstring wstr_buf;
+    if (!Utf8toWStr(name, wstr_buf))
         return false;
 
-    wstrToLower(tmp);
-    if (!tmp.empty())
-        tmp[0] = wcharToUpper(tmp[0]);
-
-    if (!WStrToUtf8(tmp, name))
+    size_t len = wstr_buf.size();
+    if (len > max_len)
         return false;
 
-    return true;
+    wstr_buf[0] = wcharToUpper(wstr_buf[0]);
+    for (size_t i = 1; i < len; ++i)
+        wstr_buf[i] = wcharToLower(wstr_buf[i]);
+
+    return WStrToUtf8(wstr_buf, name);
 }
 
 LanguageDesc lang_description[LANGUAGES_COUNT] =
