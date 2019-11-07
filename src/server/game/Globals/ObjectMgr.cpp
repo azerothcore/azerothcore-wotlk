@@ -375,7 +375,7 @@ void ObjectMgr::LoadPointOfInterestLocales()
         if (locale == LOCALE_enUS)
             continue;
 
-        AddLocaleString(Name, locale, data.IconName);
+        AddLocaleString(Name, locale, data.Name);
 
     } while (result->NextRow());
 
@@ -526,8 +526,8 @@ void ObjectMgr::LoadCreatureTemplateAddons()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                0       1       2      3       4       5      6
-    QueryResult result = WorldDatabase.Query("SELECT entry, path_id, mount, bytes1, bytes2, emote, auras FROM creature_template_addon");
+    //                                                0       1       2      3       4       5      6         7
+    QueryResult result = WorldDatabase.Query("SELECT entry, path_id, mount, bytes1, bytes2, emote, isLarge, auras FROM creature_template_addon");
 
     if (!result)
     {
@@ -556,8 +556,9 @@ void ObjectMgr::LoadCreatureTemplateAddons()
         creatureAddon.bytes1  = fields[3].GetUInt32();
         creatureAddon.bytes2  = fields[4].GetUInt32();
         creatureAddon.emote   = fields[5].GetUInt32();
+        creatureAddon.isLarge = fields[6].GetBool();
 
-        Tokenizer tokens(fields[6].GetString(), ' ');
+        Tokenizer tokens(fields[7].GetString(), ' ');
         uint8 i = 0;
         creatureAddon.auras.resize(tokens.size());
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
@@ -938,8 +939,8 @@ void ObjectMgr::LoadCreatureAddons()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                0       1       2      3       4       5      6
-    QueryResult result = WorldDatabase.Query("SELECT guid, path_id, mount, bytes1, bytes2, emote, auras FROM creature_addon");
+    //                                                0       1       2      3       4       5      6        7
+    QueryResult result = WorldDatabase.Query("SELECT guid, path_id, mount, bytes1, bytes2, emote, isLarge, auras FROM creature_addon");
 
     if (!result)
     {
@@ -975,8 +976,9 @@ void ObjectMgr::LoadCreatureAddons()
         creatureAddon.bytes1  = fields[3].GetUInt32();
         creatureAddon.bytes2  = fields[4].GetUInt32();
         creatureAddon.emote   = fields[5].GetUInt32();
+        creatureAddon.isLarge = fields[6].GetBool();
 
-        Tokenizer tokens(fields[6].GetString(), ' ');
+        Tokenizer tokens(fields[7].GetString(), ' ');
         uint8 i = 0;
         creatureAddon.auras.resize(tokens.size());
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
@@ -7147,7 +7149,7 @@ void ObjectMgr::LoadPointsOfInterest()
     uint32 count = 0;
 
     //                                               0       1          2        3     4      5    6
-    QueryResult result = WorldDatabase.Query("SELECT ID, PositionX, PositionY, Icon, Flags, Data, Name FROM points_of_interest");
+    QueryResult result = WorldDatabase.Query("SELECT ID, PositionX, PositionY, Icon, Flags, Importance, Name FROM points_of_interest");
 
     if (!result)
     {
@@ -7163,17 +7165,17 @@ void ObjectMgr::LoadPointsOfInterest()
         uint32 point_id = fields[0].GetUInt32();
 
         PointOfInterest POI;
-        POI.entry = point_id;
-        POI.x = fields[1].GetFloat();
-        POI.y = fields[2].GetFloat();
-        POI.icon = fields[3].GetUInt32();
-        POI.flags = fields[4].GetUInt32();
-        POI.data = fields[5].GetUInt32();
-        POI.icon_name = fields[6].GetString();
+        POI.ID          = point_id;
+        POI.PositionX   = fields[1].GetFloat();
+        POI.PositionY   = fields[2].GetFloat();
+        POI.Icon        = fields[3].GetUInt32();
+        POI.Flags       = fields[4].GetUInt32();
+        POI.Importance  = fields[5].GetUInt32();
+        POI.Name        = fields[6].GetString();
 
-        if (!Trinity::IsValidMapCoord(POI.x, POI.y))
+        if (!Trinity::IsValidMapCoord(POI.PositionX, POI.PositionY))
         {
-            sLog->outErrorDb("Table `points_of_interest` (Entry: %u) have invalid coordinates (X: %f Y: %f), ignored.", point_id, POI.x, POI.y);
+            sLog->outErrorDb("Table `points_of_interest` (ID: %u) have invalid coordinates (X: %f Y: %f), ignored.", point_id, POI.PositionX, POI.PositionY);
             continue;
         }
 

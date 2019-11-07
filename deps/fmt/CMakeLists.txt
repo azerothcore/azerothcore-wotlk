@@ -67,6 +67,10 @@ target_include_directories(fmt
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR})
 
+target_link_libraries(fmt
+  PRIVATE
+    acore-dependency-interface)
+
 set_target_properties(fmt
   PROPERTIES
     FOLDER

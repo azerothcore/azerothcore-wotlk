@@ -63,6 +63,7 @@ class Pet : public Guardian
         bool CreateBaseAtCreature(Creature* creature);
         bool CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner);
         bool CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask);
+        static SpellCastResult TryLoadFromDB(Player* owner, bool current = false, PetType mandatoryPetType = MAX_PET_TYPE);
         static bool LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry = 0, uint32 petnumber = 0, bool current = false, AsynchPetSummon* info = NULL);
         bool isBeingLoaded() const { return m_loading;}
         void SavePetToDB(PetSaveMode mode, bool logout);
@@ -179,11 +180,11 @@ class Pet : public Guardian
     private:
         void SaveToDB(uint32, uint8, uint32)                // override of Creature::SaveToDB     - must not be called
         {
-            ASSERT(false);
+            ABORT();
         }
         void DeleteFromDB()                                 // override of Creature::DeleteFromDB - must not be called
         {
-            ASSERT(false);
+            ABORT();
         }
 };
 #endif

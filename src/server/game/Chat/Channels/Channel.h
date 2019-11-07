@@ -150,6 +150,8 @@ class Channel
             if (state) flags |= MEMBER_FLAG_OWNER;
             else flags &= ~MEMBER_FLAG_OWNER;
         }
+        bool IsOwnerGM() const { return _gmStatus; }
+        void SetOwnerGM(bool on) { _gmStatus = on; }
         bool IsModerator() const { return flags & MEMBER_FLAG_MODERATOR; }
         void SetModerator(bool state)
         {
@@ -172,6 +174,8 @@ class Channel
             else
                 return false;
         }
+    private:
+        bool _gmStatus = false;
     };
 
     public:
@@ -315,6 +319,7 @@ class Channel
         bool _announce;
         bool _ownership;
         bool _IsSaved;
+        bool _isOwnerGM;
         uint8 _flags;
         uint32 _channelId;
         uint32 _channelDBId;

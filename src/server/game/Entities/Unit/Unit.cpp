@@ -4052,7 +4052,7 @@ void Unit::_UnapplyAura(AuraApplication * aurApp, AuraRemoveMode removeMode)
         else
             ++iter;
     }
-    ASSERT(false);
+    ABORT();
 }
 
 void Unit::_RemoveNoStackAurasDueToAura(Aura* aura)
@@ -4145,7 +4145,7 @@ void Unit::RemoveOwnedAura(Aura* aura, AuraRemoveMode removeMode)
         }
     }
 
-    ASSERT(false);
+    ABORT();
 }
 
 Aura* Unit::GetOwnedAura(uint32 spellId, uint64 casterGUID, uint64 itemCasterGUID, uint8 reqEffMask, Aura* except) const
@@ -9895,7 +9895,7 @@ void Unit::SetMinion(Minion *minion, bool apply)
                     {
                         OutDebugInfo();
                         (*itr)->OutDebugInfo();
-                        ASSERT(false);
+                        ABORT();
                     }
                     ASSERT((*itr)->GetTypeId() == TYPEID_UNIT);
 
@@ -10562,6 +10562,14 @@ float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, Da
                 // Glyph of Smite
                 if (AuraEffect* aurEff = GetAuraEffect(55692, 0))
                     if (victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x100000, 0, 0, GetGUID()))
+                        AddPct(DoneTotalMod, aurEff->GetAmount());
+            }
+            // Shadow Word: Death
+            else if (spellProto->SpellFamilyFlags[1] & 0x2)
+            {
+                // Glyph of Shadow Word: Death
+                if (AuraEffect* aurEff = GetAuraEffect(55682, 1))
+                    if (victim->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT))
                         AddPct(DoneTotalMod, aurEff->GetAmount());
             }
 
@@ -14377,7 +14385,7 @@ void Unit::RemoveFromWorld()
         if (GetCharmerGUID())
         {
             sLog->outCrash("Unit %u has charmer guid when removed from world", GetEntry());
-            ASSERT(false);
+            ABORT();
         }
 
         if (Unit* owner = GetOwner())
@@ -14387,7 +14395,7 @@ void Unit::RemoveFromWorld()
                 if (HasUnitTypeMask(UNIT_MASK_MINION|UNIT_MASK_GUARDIAN))
                     owner->SetMinion((Minion*)this, false);
                 sLog->outString("Unit %u is in controlled list of %u when removed from world", GetEntry(), owner->GetEntry());
-                //ASSERT(false);
+                //ABORT();
             }
         }
 
@@ -17151,7 +17159,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     {
 //        sLog->outCrash("Unit::RemoveCharmedBy: this: " UI64FMTD " true charmer: " UI64FMTD " false charmer: " UI64FMTD,
 //            GetGUID(), GetCharmerGUID(), charmer->GetGUID());
-//        ASSERT(false);
+//        ABORT();
         return;
     }
 
@@ -18260,7 +18268,7 @@ void Unit::ChangeSeat(int8 seatId, bool next)
 
     m_vehicle->RemovePassenger(this);
     if (!m_vehicle->AddPassenger(this, seatId))
-        ASSERT(false);
+        ABORT();
 }
 
 void Unit::ExitVehicle(Position const* /*exitPosition*/)
@@ -18482,6 +18490,13 @@ void Unit::NearTeleportTo(float x, float y, float z, float orientation, bool cas
         UpdateObjectVisibility();
         GetMotionMaster()->ReinitializeMovement();
     }
+}
+
+void Unit::SendTameFailure(uint8 result)
+{
+    WorldPacket data(SMSG_PET_TAME_FAILURE, 1);
+    data << uint8(result);
+    ToPlayer()->SendDirectMessage(&data);
 }
 
 void Unit::SendTeleportPacket(Position& pos)

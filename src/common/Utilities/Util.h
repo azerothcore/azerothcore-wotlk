@@ -534,7 +534,7 @@ bool CompareValues(ComparisionType type, T val1, T val2)
             return val1 <= val2;
         default:
             // incorrect parameter
-            ASSERT(false);
+            ABORT();
             return false;
     }
 }

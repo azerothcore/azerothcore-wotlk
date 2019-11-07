@@ -1249,7 +1249,7 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
     InventoryResult msg = CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, titem_id, titem_amount);
     if (msg == EQUIP_ERR_OK)
     {
-        StoreNewItem(sDest, titem_id, true, Item::GenerateItemRandomPropertyId(titem_id));
+        StoreNewItem(sDest, titem_id, true);
         return true;                                        // stored
     }
 
@@ -3890,7 +3890,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary)
                 {
                     sLog->outString("TRYING TO LEARN SPELL WITH EFFECT LEARN: %u, PLAYER: %u", spellId, GetGUIDLow());
                     return false;
-                    //ASSERT(false);
+                    //ABORT();
                 }
                 else if (const SpellInfo* learnSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell))
                     _addSpell(learnSpell->Id, SPEC_MASK_ALL, true);
@@ -3943,7 +3943,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary)
         sLog->outString("TRYING TO LEARN SPELL WITH EFFECT LEARN 2: %u, PLAYER: %u", spellId, GetGUIDLow());
         m_spells.erase(spellInfo->Id); // mem leak, but should never happen
         return false;
-        //ASSERT(false);
+        //ABORT();
     }
     // pussywizard: cast passive spells (including all talents without SPELL_EFFECT_LEARN_SPELL) with additional checks
     else if (spellInfo->IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_HIDDEN_CLIENTSIDE) && spellInfo->Stances))
@@ -12522,7 +12522,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
     for (ItemPosCountVec::const_iterator itr = dest.begin(); itr != dest.end(); ++itr)
         count += itr->count;
 
-    Item* pItem = Item::CreateItem(item, count, this);
+    Item* pItem = Item::CreateItem(item, count, this, false, randomPropertyId);
     if (pItem)
     {
         // pussywizard: obtaining blue or better items saves to db
@@ -12533,8 +12533,6 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
         ItemAddedQuestCheck(item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
-        if (randomPropertyId)
-            pItem->SetItemRandomProperties(randomPropertyId);
         pItem = StoreItem(dest, pItem, update);
 
 
@@ -15874,7 +15872,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
             ItemPosCountVec dest;
             if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardChoiceItemCount[reward]) == EQUIP_ERR_OK)
             {
-                Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+                Item* item = StoreNewItem(dest, itemId, true);
                 SendNewItem(item, quest->RewardChoiceItemCount[reward], true, false, false, false);
                 
                 sScriptMgr->OnQuestRewardItem(this, item, quest->RewardChoiceItemCount[reward]);
@@ -15893,7 +15891,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                 ItemPosCountVec dest;
                 if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardItemIdCount[i]) == EQUIP_ERR_OK)
                 {
-                    Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+                    Item* item = StoreNewItem(dest, itemId, true);
                     SendNewItem(item, quest->RewardItemIdCount[i], true, false, false, false);
                     
                     sScriptMgr->OnQuestRewardItem(this, item, quest->RewardItemIdCount[i]);
@@ -20815,7 +20813,10 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
     {
         // xinef: dont save dead pet as current, save him not in slot
         if (!pet->IsAlive() && mode == PET_SAVE_AS_CURRENT && pet->getPetType() == HUNTER_PET)
+        {
             mode = PET_SAVE_NOT_IN_SLOT;
+            m_temporaryUnsummonedPetNumber = 0;
+        }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_PETS, "RemovePet %u, %u, %u", pet->GetEntry(), mode, returnreagent);
@@ -20902,7 +20903,7 @@ void Player::StopCastingCharm()
         if (charm->GetCharmerGUID())
         {
             sLog->outCrash("Charmed unit has charmer guid " UI64FMTD, charm->GetCharmerGUID());
-            ASSERT(false);
+            ABORT();
         }
         else
             SetCharm(charm, false);
@@ -20945,9 +20946,30 @@ void Player::TextEmote(const std::string& text)
     if (!sEluna->OnChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
         return;
 #endif
+
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true, !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT));
+    std::list<Player*> players;
+    Trinity::AnyPlayerInObjectRangeCheck checker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
+    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, players, checker);
+    this->VisitNearbyWorldObject(sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), searcher);
+
+    for (auto const& itr : players)
+    {
+        if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE) && this->GetTeamId() != itr->GetTeamId())
+        {
+            LocaleConstant loc_idx = itr->GetSession()->GetSessionDbLocaleIndex();
+            if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(EMOTE_BROADCAST_TEXT_ID_STRANGE_GESTURES))
+            {
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, bct->GetText(loc_idx, this->getGender()));
+                itr->SendDirectMessage(&data);
+            }
+        }
+        else
+        {
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
+            itr->SendDirectMessage(&data);
+        }
+    }
 }
 
 void Player::Whisper(const std::string& text, uint32 language, uint64 receiver)
@@ -24518,7 +24540,7 @@ void Player::SetBattlegroundOrBattlefieldRaid(Group *group, int8 subgroup)
     if (GetGroup() && (GetGroup()->isBGGroup() || GetGroup()->isBFGroup()))
     {
         sLog->outMisc("Player::SetBattlegroundOrBattlefieldRaid - current group is %s group!", (GetGroup()->isBGGroup() ? "BG" : "BF"));
-        //ASSERT(false); // pussywizard: origanal group can never be bf/bg group
+        //ABORT(); // pussywizard: origanal group can never be bf/bg group
     }
 
     SetOriginalGroup(GetGroup(), GetSubGroup());
@@ -27198,7 +27220,7 @@ bool Player::AddItem(uint32 itemId, uint32 count)
         return false;
     }
 
-    Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+    Item* item = StoreNewItem(dest, itemId, true);
     if (item)
         SendNewItem(item, count, true, false);
     else
@@ -27578,4 +27600,20 @@ void Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 
     AsynchPetSummon* asynchPetInfo = new AsynchPetSummon(entry, pos, petType, duration, createdBySpell, casterGUID);
     Pet::LoadPetFromDB(this, asynchLoadType, entry, 0, false, asynchPetInfo);
+}
+
+bool Player::IsPetDismissed()
+{
+    /*
+    * Check PET_SAVE_NOT_IN_SLOT means the pet is dismissed. If someone ever
+    * Changes the slot flag, they will break this validation.
+    */
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT);
+    stmt->setUInt32(0, GetGUIDLow());
+    stmt->setUInt8(1, uint8(PET_SAVE_NOT_IN_SLOT));
+
+    if (PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt))
+        return true;
+
+    return false;
 }

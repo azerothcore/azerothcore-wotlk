@@ -2621,6 +2621,28 @@ void SpellMgr::LoadSpellAreas()
         ++count;
     } while (result->NextRow());
 
+    if (sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE) > 0)
+    {
+        sLog->outString(">> Using ICC buff Horde: %u", sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE));
+        SpellArea spellAreaICCBuffHorde = { sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE),ICC_AREA,0,0,0,ICC_RACEMASK_HORDE,Gender(2),64,11,1 };
+        SpellArea const* saICCBuffHorde = &mSpellAreaMap.insert(SpellAreaMap::value_type(sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE), spellAreaICCBuffHorde))->second;
+        mSpellAreaForAreaMap.insert(SpellAreaForAreaMap::value_type(ICC_AREA, saICCBuffHorde));
+        ++count;
+    }
+    else
+        sLog->outString(">> ICC buff Horde: disabled");
+
+    if (sWorld->getIntConfig(CONFIG_ICC_BUFF_ALLIANCE) > 0)
+    {
+        sLog->outString(">> Using ICC buff Alliance: %u", sWorld->getIntConfig(CONFIG_ICC_BUFF_ALLIANCE));
+        SpellArea spellAreaICCBuffAlliance = { sWorld->getIntConfig(CONFIG_ICC_BUFF_ALLIANCE),ICC_AREA,0,0,0,ICC_RACEMASK_ALLIANCE,Gender(2),64,11,1 };
+        SpellArea const* saICCBuffAlliance = &mSpellAreaMap.insert(SpellAreaMap::value_type(sWorld->getIntConfig(CONFIG_ICC_BUFF_ALLIANCE), spellAreaICCBuffAlliance))->second;
+        mSpellAreaForAreaMap.insert(SpellAreaForAreaMap::value_type(ICC_AREA, saICCBuffAlliance));
+        ++count;
+    }
+    else
+        sLog->outString(">> ICC buff Alliance: disabled");
+
     sLog->outString(">> Loaded %u spell area requirements in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
@@ -4339,6 +4361,10 @@ void SpellMgr::LoadDbcDataCorrections()
             break;
         case 50990: // Flame Breath (Catapult)
             spellInfo->EffectRadiusIndex[EFFECT_0] = 19; // 18yd
+            break;
+        case 56103: // Jormungar Bite
+            spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_UNIT_TARGET_ENEMY;
+            spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
             break;
 
         /////////////////////////////////
