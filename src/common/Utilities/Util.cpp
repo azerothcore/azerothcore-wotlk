@@ -277,7 +277,7 @@ size_t utf8length(std::string& utf8str)
     }
     catch(std::exception)
     {
-        utf8str = "";
+        utf8str.clear();
         return 0;
     }
 }
@@ -310,9 +310,9 @@ bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr, size_t max_len)
             wstr.resize(max_len);
         }
     }
-    catch (const std::exception&)
+    catch (std::exception)
     {
-        wstr = L"";
+        wstr.clear();
         return false;
     }
 
@@ -323,13 +323,20 @@ void utf8truncate(std::string& utf8str, size_t len)
 {
     try
     {
+        size_t wlen = utf8::distance(utf8str.c_str(), utf8str.c_str()+utf8str.size());
+        if (wlen <= len)
+            return;
+
         std::wstring wstr;
-        Utf8toWStr(utf8str, wstr, len);
-        WStrToUtf8(wstr, utf8str);
+        wstr.resize(wlen);
+        utf8::utf8to16(utf8str.c_str(), utf8str.c_str()+utf8str.size(), &wstr[0]);
+        wstr.resize(len);
+        char* oend = utf8::utf16to8(wstr.c_str(), wstr.c_str()+wstr.size(), &utf8str[0]);
+        utf8str.resize(oend-(&utf8str[0]));                 // remove unused tail
     }
-    catch (std::exception)
+    catch(std::exception)
     {
-        utf8str = "";
+        utf8str.clear();
     }
 }
 
@@ -346,9 +353,9 @@ bool WStrToUtf8(const std::wstring& wstr, std::string& utf8str)
 
         utf8str = utf8str2;
     }
-    catch (const std::exception&)
+    catch (std::exception)
     {
-        utf8str = "";
+        utf8str.clear();
         return false;
     }
 
@@ -484,6 +491,17 @@ void vutf8printf(FILE* out, const char *str, va_list* ap)
 #else
     vfprintf(out, str, *ap);
 #endif
+}
+
+bool Utf8ToUpperOnlyLatin(std::string& utf8String)
+{
+    std::wstring wstr;
+    if (!Utf8toWStr(utf8String, wstr))
+        return false;
+
+    std::transform(wstr.begin(), wstr.end(), wstr.begin(), wcharToUpperOnlyLatin);
+
+    return WStrToUtf8(wstr, utf8String);
 }
 
 std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse /* = false */)

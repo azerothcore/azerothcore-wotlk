@@ -117,23 +117,22 @@ void PlayerSocial::RemoveFromSocialList(uint32 friendGuid, bool ignore)
     }
 }
 
-void PlayerSocial::SetFriendNote(uint32 friendGuid, std::string note)
+void PlayerSocial::SetFriendNote(uint32 friendGuid, std::string const& note)
 {
-    PlayerSocialMap::const_iterator itr = m_playerSocialMap.find(friendGuid);
-    if (itr == m_playerSocialMap.end())                     // not exist
+    PlayerSocialMap::iterator itr = m_playerSocialMap.find(friendGuid);
+    if (itr == m_playerSocialMap.end())                  // not exist
         return;
 
-    utf8truncate(note, 48);                                  // DB and client size limitation
+    itr->second.Note = note;
+    utf8truncate(itr->second.Note, 48);                 // DB and client size limitation
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_SOCIAL_NOTE);
 
-    stmt->setString(0, note);
+    stmt->setString(0, itr->second.Note);
     stmt->setUInt32(1, GetPlayerGUID());
     stmt->setUInt32(2, friendGuid);
 
     CharacterDatabase.Execute(stmt);
-
-    m_playerSocialMap[friendGuid].Note = note;
 }
 
 void PlayerSocial::SendSocialList(Player* player)

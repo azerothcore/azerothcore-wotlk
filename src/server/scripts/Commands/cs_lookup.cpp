@@ -1296,7 +1296,7 @@ public:
         char* limitStr = strtok(nullptr, " ");
         int32 limit = limitStr ? atoi(limitStr) : -1;
 
-        if (!AccountMgr::normalizeString
+        if (!Utf8ToUpperOnlyLatin
             (account))
             return false;
 

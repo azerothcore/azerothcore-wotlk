@@ -24,8 +24,8 @@ namespace AccountMgr
         if (utf8length(password) > MAX_PASS_STR)
             return AOR_PASS_TOO_LONG;                           // password's too long
 
-        normalizeString(username);
-        normalizeString(password);
+        Utf8ToUpperOnlyLatin(username);
+        Utf8ToUpperOnlyLatin(password);
 
         if (GetId(username))
             return AOR_NAME_ALREDY_EXIST;                       // username does already exist
@@ -134,8 +134,8 @@ namespace AccountMgr
         if (utf8length(newPassword) > MAX_PASS_STR)
             return AOR_PASS_TOO_LONG;                           // password's too long
 
-        normalizeString(newUsername);
-        normalizeString(newPassword);
+        Utf8ToUpperOnlyLatin(newUsername);
+        Utf8ToUpperOnlyLatin(newPassword);
 
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_USERNAME);
 
@@ -164,8 +164,8 @@ namespace AccountMgr
             return AOR_PASS_TOO_LONG;                           // password's too long
         }
 
-        normalizeString(username);
-        normalizeString(newPassword);
+        Utf8ToUpperOnlyLatin(username);
+        Utf8ToUpperOnlyLatin(newPassword);
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_PASSWORD);
 
@@ -228,8 +228,8 @@ namespace AccountMgr
         if (!GetName(accountId, username))
             return false;
 
-        normalizeString(username);
-        normalizeString(password);
+        Utf8ToUpperOnlyLatin(username);
+        Utf8ToUpperOnlyLatin(password);
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_CHECK_PASSWORD);
         stmt->setUInt32(0, accountId);
@@ -247,21 +247,6 @@ namespace AccountMgr
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
         return (result) ? (*result)[0].GetUInt64() : 0;
-    }
-
-    bool normalizeString(std::string& utf8String)
-    {
-        std::wstring wstr_buf;
-        if (!Utf8toWStr(utf8str, wstr_buf))
-            return false;
-
-        //if (!Utf8toWStr(utf8String, buffer, maxLength))
-        if (wstr_buf.size() > MAX_ACCOUNT_STR)
-            return false;
-
-        std::transform(wstr_buf.begin(), wstr_buf.end(), wstr_buf.begin(), wcharToUpperOnlyLatin);
-
-        return WStrToUtf8(wstr_buf, utf8str);
     }
 
     std::string CalculateShaPassHash(std::string const& name, std::string const& password)
