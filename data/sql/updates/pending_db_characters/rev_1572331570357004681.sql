@@ -12,3 +12,14 @@ CREATE TABLE IF NOT EXISTS `recovery_item` (
   PRIMARY KEY (`ItemEntry`),
   KEY `idx_guid` (`Guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `azeroth_mail` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `guid` int(10) unsigned NOT NULL DEFAULT 0,
+  `subject` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `body` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `money` int(10) unsigned NOT NULL DEFAULT 0,
+  `entry` int(10) unsigned NOT NULL DEFAULT 0,
+  `count` int(10) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
