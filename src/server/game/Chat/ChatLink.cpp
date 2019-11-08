@@ -661,7 +661,6 @@ bool LinkExtractor::IsValidMessage()
             break;
 
         char commandChar;
-        _iss >> commandChar;
         _iss.get(commandChar);
 
         // | in normal messages is escaped by ||
