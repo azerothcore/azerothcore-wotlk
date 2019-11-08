@@ -2628,10 +2628,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetNextSave() const { return m_nextSave; }
         SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
 
-        bool IsSecondarySkill(SkillType Skill) const;
-        bool HasTwoProfessions(SkillType Skill);
-        void CanLearnProfession(uint8 Profession);
-        void LearnProfession(SkillType Skill);
+        void LearnProfession(uint8 profession);
+        bool HasTwoProfessions(SkillType skill);
 
     protected:
         // Gamemaster whisper whitelist

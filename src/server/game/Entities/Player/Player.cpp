@@ -27620,14 +27620,79 @@ bool Player::IsPetDismissed()
     return false;
 }
 
-bool Player::IsSecondarySkill(SkillType Skill) const
+void Player::LearnProfession(uint8 profession)
 {
-    return Skill == SKILL_COOKING || Skill == SKILL_FIRST_AID || Skill == SKILL_FISHING;
+    uint32 coin = 0;
+    SkillType skill = SKILL_NONE;
+
+    switch (profession)
+    {
+        case 1:  skill = SKILL_ALCHEMY;        coin = 10; break;
+        case 2:  skill = SKILL_BLACKSMITHING;  coin = 10; break;
+        case 3:  skill = SKILL_ENCHANTING;     coin = 10; break;
+        case 4:  skill = SKILL_ENGINEERING;    coin = 10; break;
+        case 5:  skill = SKILL_INSCRIPTION;    coin = 10; break;
+        case 6:  skill = SKILL_JEWELCRAFTING;  coin = 10; break;
+        case 7:  skill = SKILL_LEATHERWORKING; coin = 10; break;
+        case 8:  skill = SKILL_TAILORING;      coin = 10; break;
+        case 9:  skill = SKILL_MINING;         coin = 10; break;
+        case 10: skill = SKILL_SKINNING;       coin = 10; break;
+        case 11: skill = SKILL_HERBALISM;      coin = 10; break;
+        case 12: skill = SKILL_COOKING;        coin = 5;  break;
+        case 13: skill = SKILL_FIRST_AID;      coin = 5;  break;
+        case 14: skill = SKILL_FISHING;        coin = 5;  break;
+        default: break;
+    }
+
+    if (!HasTwoProfessions(skill))
+    {
+        switch (skill)
+        {
+            case SKILL_ALCHEMY:        learnSpell(51304); break;
+            case SKILL_BLACKSMITHING:  learnSpell(51300); break;
+            case SKILL_ENCHANTING:     learnSpell(51313); break;
+            case SKILL_ENGINEERING:    learnSpell(51306); break;
+            case SKILL_INSCRIPTION:    learnSpell(45363); break;
+            case SKILL_JEWELCRAFTING:  learnSpell(51311); break;
+            case SKILL_LEATHERWORKING: learnSpell(51302); break;
+            case SKILL_TAILORING:      learnSpell(51309); break;
+            case SKILL_MINING:         learnSpell(50310); break;
+            case SKILL_SKINNING:       learnSpell(50305); break;
+            case SKILL_HERBALISM:      learnSpell(50300); break;
+            case SKILL_COOKING:        learnSpell(51296); break;
+            case SKILL_FIRST_AID:      learnSpell(45542); break;
+            case SKILL_FISHING:        learnSpell(65293); break;
+            default: break;
+        }
+
+        if (SkillLineEntry const* SkillInfo = sSkillLineStore.LookupEntry(skill))
+        {
+            if (!SkillInfo)
+                return;
+
+            SetSkill(SkillInfo->id, GetSkillStep(SkillInfo->id), 450, 450);
+        }
+
+        ChatHandler(GetSession()).PSendSysMessage("|cffffffff---------------------------");
+        ChatHandler(GetSession()).PSendSysMessage("|cff00ffffNew profession has been learned");
+        ChatHandler(GetSession()).PSendSysMessage("|cffffffff---------------------------");
+        return;
+    }
+
+    ChatHandler(GetSession()).PSendSysMessage("|cffffffff---------------------------");
+    ChatHandler(GetSession()).PSendSysMessage("|cff00ffffYou don't have free slot for new profession");
+    ChatHandler(GetSession()).PSendSysMessage("|cff00ffffYour coin has been returned");
+    ChatHandler(GetSession()).PSendSysMessage("|cffffffff---------------------------");
+
+    LoginDatabase.PExecute(("UPDATE `account_information` SET `coins` = `coins` + " + std::to_string(coin) + " WHERE `id` = " + std::to_string(GetSession()->GetAccountId())).c_str());
 }
 
-bool Player::HasTwoProfessions(SkillType Skill)
+bool Player::HasTwoProfessions(SkillType skill)
 {
-    if (HasSkill(Skill))
+    if (skill == SKILL_FISHING || skill == SKILL_COOKING || skill == SKILL_FIRST_AID)
+        return true;
+
+    if (HasSkill(skill))
         return false;
 
     uint8 SkillCount = 0;
@@ -27654,130 +27719,9 @@ bool Player::HasTwoProfessions(SkillType Skill)
         if ((SkillInfo->categoryId != SKILL_CATEGORY_PROFESSION) || !SkillInfo->canLink)
             continue;
 
-        const uint32 SkillID = SkillInfo->id;
-
-        if (HasSkill(SkillID))
+        if (HasSkill(SkillInfo->id))
             SkillCount++;
     }
 
     return SkillCount >= 2;
-}
-
-void Player::LearnProfession(SkillType Skill)
-{
-    SkillLineEntry const* SkillInfo = sSkillLineStore.LookupEntry(Skill);
-
-    if (!SkillInfo)
-        return;
-
-    switch (Skill)
-    {
-        case SKILL_ALCHEMY:
-            learnSpell(51304);
-            break;
-        case SKILL_BLACKSMITHING:
-            learnSpell(51300);
-            break;
-        case SKILL_ENCHANTING:
-            learnSpell(51313);
-            break;
-        case SKILL_ENGINEERING:
-            learnSpell(51306);
-            break;
-        case SKILL_INSCRIPTION:
-            learnSpell(45363);
-            break;
-        case SKILL_JEWELCRAFTING:
-            learnSpell(51311);
-            break;
-        case SKILL_LEATHERWORKING:
-            learnSpell(51302);
-            break;
-        case SKILL_TAILORING:
-            learnSpell(51309);
-            break;
-        case SKILL_MINING:
-            learnSpell(50310);
-            break;
-        case SKILL_SKINNING:
-            learnSpell(50305);
-            break;
-        case SKILL_HERBALISM:
-            learnSpell(50301);
-            break;
-        case SKILL_COOKING:
-            learnSpell(51296);
-            break;
-        case SKILL_FIRST_AID:
-            learnSpell(45542);
-            break;
-        case SKILL_FISHING:
-            learnSpell(65293);
-            break;
-        default:
-            break;
-    }
-
-    SetSkill(SkillInfo->id, GetSkillStep(SkillInfo->id), 450, 450);
-}
-
-void Player::CanLearnProfession(uint8 Profession)
-{
-    SkillType Skill = SKILL_NONE;
-
-    switch (Profession)
-    {
-        case 1:
-            Skill = SKILL_ALCHEMY;
-            break;
-        case 2:
-            Skill = SKILL_BLACKSMITHING;
-            break;
-        case 3:
-            Skill = SKILL_ENCHANTING;
-            break;
-        case 4:
-            Skill = SKILL_ENGINEERING;
-            break;
-        case 5:
-            Skill = SKILL_INSCRIPTION;
-            break;
-        case 6:
-            Skill = SKILL_JEWELCRAFTING;
-            break;
-        case 7:
-            Skill = SKILL_LEATHERWORKING;
-            break;
-        case 8:
-            Skill = SKILL_TAILORING;
-            break;
-        case 9:
-            Skill = SKILL_MINING;
-            break;
-        case 10:
-            Skill = SKILL_SKINNING;
-            break;
-        case 11:
-            Skill = SKILL_HERBALISM;
-            break;
-        case 12:
-            Skill = SKILL_COOKING;
-            break;
-        case 13:
-            Skill = SKILL_FIRST_AID;
-            break;
-        case 14:
-            Skill = SKILL_FISHING;
-            break;
-        default:
-            break;
-    }
-
-    if (HasTwoProfessions(Skill) && !IsSecondarySkill(Skill))
-        GetSession()->SendAreaTriggerMessage("You already know two professions");
-    else
-    {
-        LearnProfession(Skill);
-        GetSession()->SendAreaTriggerMessage("");
-    }
 }

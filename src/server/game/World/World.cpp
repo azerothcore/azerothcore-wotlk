@@ -2287,27 +2287,37 @@ void World::Update(uint32 diff)
                     {
                         case 1:
                             player->SetAtLoginFlag(AT_LOGIN_RENAME);
-                            player->GetSession()->SendAreaTriggerMessage("Renamed");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cffffffff---------------------------");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cff00ffffChange name has been applied");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cffffffff---------------------------");
                             break;
                         case 2:
                             player->SetAtLoginFlag(AT_LOGIN_CUSTOMIZE);
-                            player->GetSession()->SendAreaTriggerMessage("Customize");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cffffffff---------------------------");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cff00ffffChange customize has been applied");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cffffffff---------------------------");
                             break;
                         case 3:
                             player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
-                            player->GetSession()->SendAreaTriggerMessage("Change Faction");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cffffffff---------------------------");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cff00ffffChange faction has been applied");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cffffffff---------------------------");
                             break;
                         case 4:
                             player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
-                            player->GetSession()->SendAreaTriggerMessage("Change Race");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cffffffff---------------------------");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cff00ffffChange race has been applied");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cffffffff---------------------------");
                             break;
                         case 5:
                             player->GiveLevel(80);
                             player->InitTalentForLevel();
-                            player->GetSession()->SendAreaTriggerMessage("Levelup");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cffffffff---------------------------");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cff00ffffYou have reached level 80!");
+                            ChatHandler(player->GetSession()).PSendSysMessage("|cffffffff---------------------------");
                             break;
                         case 6:
-                            player->CanLearnProfession(profession);
+                            player->LearnProfession(profession);
                             break;
                     }
 
