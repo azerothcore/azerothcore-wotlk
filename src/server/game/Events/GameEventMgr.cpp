@@ -235,6 +235,8 @@ void GameEventMgr::LoadFromDB()
             uint64 starttime        = fields[1].GetUInt64();
             pGameEvent.start        = time_t(starttime);
             uint64 endtime          = fields[2].GetUInt64();
+            if (fields[2].IsNull())
+                endtime             = time(nullptr) + 63072000; // add 2 years to current date
             pGameEvent.end          = time_t(endtime);
             pGameEvent.occurence    = fields[3].GetUInt64();
             pGameEvent.length       = fields[4].GetUInt64();
