@@ -12,8 +12,8 @@
 
 namespace Trinity
 {
-    DECLSPEC_NORETURN void Assert(char const* file, int line, char const* function, std::string debugInfo, char const* message) ATTR_NORETURN;
-    DECLSPEC_NORETURN void Assert(char const* file, int line, char const* function, std::string debugInfo, char const* message, char const* format, ...) ATTR_NORETURN ATTR_PRINTF(6, 7);
+    DECLSPEC_NORETURN void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message) ATTR_NORETURN;
+    DECLSPEC_NORETURN void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message, char const* format, ...) ATTR_NORETURN ATTR_PRINTF(6, 7);
 
     DECLSPEC_NORETURN void Fatal(char const* file, int line, char const* function, char const* message, ...) ATTR_NORETURN ATTR_PRINTF(4, 5);
 
