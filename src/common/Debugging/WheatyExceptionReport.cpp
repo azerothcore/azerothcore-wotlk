@@ -1406,16 +1406,13 @@ int __cdecl WheatyExceptionReport::Log(const TCHAR * format, ...)
     int retValue;
     va_list argptr;
     va_start(argptr, format);
+    
     if (stackOverflowException)
-    {
         retValue = HeapLog(format, argptr);
-        va_end(argptr);
-    }
     else
-    {
         retValue = StackLog(format, argptr);
-        va_end(argptr);
-    }
+
+    va_end(argptr);
 
     return retValue;
 }

@@ -57,7 +57,7 @@ namespace
 namespace Trinity
 {
 
-void Assert(char const* file, int line, char const* function, std::string debugInfo, char const* message)
+void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message)
 {
     std::string formattedMessage = ACORE::StringFormat("\n%s:%i in %s ASSERTION FAILED:\n  %s\n", file, line, function, message) + debugInfo + '\n';
     fprintf(stderr, "%s", formattedMessage.c_str());
@@ -65,7 +65,7 @@ void Assert(char const* file, int line, char const* function, std::string debugI
     Crash(formattedMessage.c_str());
 }
 
-void Assert(char const* file, int line, char const* function, std::string debugInfo, char const* message, char const* format, ...)
+void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message, char const* format, ...)
 {
     va_list args;
     va_start(args, format);
