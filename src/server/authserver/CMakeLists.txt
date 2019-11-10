@@ -31,18 +31,6 @@ endif()
 # Group sources
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(authserver-interface INTERFACE)
-
-CollectIncludeDirectories(
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  PUBLIC_INCLUDES
-  # Exclude
-  ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
-
-target_include_directories(authserver-interface
-  INTERFACE
-    ${PUBLIC_INCLUDES})
-
 add_executable(authserver
   ${PRIVATE_SOURCES})
 
@@ -54,18 +42,24 @@ if(NOT WIN32)
 endif()
 
 target_link_libraries(authserver
-  PRIVATE
-    authserver-interface
   PUBLIC
-    common)
+    shared)
+
+CollectIncludeDirectories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  PUBLIC_INCLUDES
+  # Exclude
+  ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
 target_include_directories(authserver
+  PUBLIC
+    ${PUBLIC_INCLUDES}
   PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR})
 
 set_target_properties(authserver
   PROPERTIES
-      FOLDER
+    FOLDER
       "server")
 
 if( WIN32 )
