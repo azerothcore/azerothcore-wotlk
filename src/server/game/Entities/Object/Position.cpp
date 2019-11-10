@@ -5,6 +5,7 @@
 
 #include "Position.h"
 #include "ByteBuffer.h"
+#include "Util.h"
 #include <G3D/g3dmath.h>
 #include <sstream>
 
