@@ -21,7 +21,7 @@ if( WIN32 )
     list(APPEND PRIVATE_SOURCES worldserver.rc)
   endif()
 endif()
- 
+
 if (USE_COREPCH)
   set(PRIVATE_PCH_HEADER PrecompiledHeaders/worldPCH.h)
 endif()
@@ -46,7 +46,7 @@ add_executable(worldserver
 
 if(NOT WIN32)
   set_target_properties(worldserver PROPERTIES
-    COMPILE_DEFINITIONS _TRINITY_CORE_CONFIG="${CONF_DIR}/worldserver.conf")
+    COMPILE_DEFINITIONS _WORLDSERVER_CONFIG="${CONF_DIR}/worldserver.conf")
 endif()
 
 add_dependencies(worldserver revision.h)
