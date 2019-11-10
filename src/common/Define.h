@@ -33,7 +33,7 @@
 #  endif //ACE_BYTE_ORDER
 #endif //TRINITY_ENDIAN
 
-#if PLATFORM == PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #  define TRINITY_PATH_MAX MAX_PATH
 #  ifndef DECLSPEC_NORETURN
 #    define DECLSPEC_NORETURN __declspec(noreturn)
@@ -41,11 +41,11 @@
 #  ifndef DECLSPEC_DEPRECATED
 #    define DECLSPEC_DEPRECATED __declspec(deprecated)
 #  endif //DECLSPEC_DEPRECATED
-#else //PLATFORM != PLATFORM_WINDOWS
+#else //AC_PLATFORM != AC_PLATFORM_WINDOWS
 #  define TRINITY_PATH_MAX PATH_MAX
 #  define DECLSPEC_NORETURN
 #  define DECLSPEC_DEPRECATED
-#endif //PLATFORM
+#endif //AC_PLATFORM
 
 #if !defined(COREDEBUG)
 #  define TRINITY_INLINE inline
@@ -56,15 +56,15 @@
 #  define TRINITY_INLINE
 #endif //!COREDEBUG
 
-#if COMPILER == COMPILER_GNU
+#if AC_COMPILER == AC_COMPILER_GNU
 #  define ATTR_NORETURN __attribute__((noreturn))
 #  define ATTR_PRINTF(F, V) __attribute__ ((format (printf, F, V)))
 #  define ATTR_DEPRECATED __attribute__((deprecated))
-#else //COMPILER != COMPILER_GNU
+#else //AC_COMPILER != AC_COMPILER_GNU
 #  define ATTR_NORETURN
 #  define ATTR_PRINTF(F, V)
 #  define ATTR_DEPRECATED
-#endif //COMPILER == COMPILER_GNU
+#endif //AC_COMPILER == AC_COMPILER_GNU
 
 #define UI64FMTD ACE_UINT64_FORMAT_SPECIFIER
 #define UI64LIT(N) ACE_UINT64_LITERAL(N)
