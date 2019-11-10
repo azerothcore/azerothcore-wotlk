@@ -366,7 +366,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 if (source->GetMap()->Is25ManRaid() != ((difficulty.difficulty & RAID_DIFFICULTY_MASK_25MAN) != 0))
                     return false;
 
-            AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(criteria_id); 
+            AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(criteria_id);
             uint8 spawnMode = source->GetMap()->GetSpawnMode();
             // Dungeons completed on heroic mode count towards both in general achievement, but not in statistics.
             return sAchievementMgr->IsStatisticCriteria(criteria) ? spawnMode == difficulty.difficulty : spawnMode >= difficulty.difficulty;
@@ -662,7 +662,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     if (achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
         return;
 
-    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(TRINITY_DEBUG) 
+    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(CORE_DEBUG)
         sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
     #endif
 
@@ -763,7 +763,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
         sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "UpdateAchievementCriteria: Wrong criteria type %u", type);
         return;
     }
-    
+
     sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::UpdateAchievementCriteria(%u, %u, %u)", type, miscValue1, miscValue2);
 #endif
 
@@ -2150,7 +2150,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     if (m_player->IsGameMaster())
     {
         sLog->outString("Not available in GM mode.");
-        ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");        
+        ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");
         return;
     }
 
@@ -2215,7 +2215,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
     // mail
     if (reward->sender)
-    {        
+    {
         MailDraft draft(reward->mailTemplate);
 
         if (!reward->mailTemplate)

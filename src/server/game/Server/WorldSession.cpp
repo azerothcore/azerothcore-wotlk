@@ -96,7 +96,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     m_Socket(sock),
     _security(sec),
     _skipQueue(skipQueue),
-    _accountId(id),    
+    _accountId(id),
     m_expansion(expansion),
     m_total_time(TotalTime),
     _logoutTime(0),
@@ -109,7 +109,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     m_latency(0),
     m_clientTimeDelay(0),
     m_TutorialsChanged(false),
-    recruiterId(recruiter),    
+    recruiterId(recruiter),
     isRecruiter(isARecruiter),
     m_currentBankerGUID(0),
     timeWhoCommandAllowed(0)
@@ -192,7 +192,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     if (!m_Socket)
         return;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(TRINITY_DEBUG)
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(CORE_DEBUG)
     // Code for network use statistic
     static uint64 sendPacketCount = 0;
     static uint64 sendPacketBytes = 0;
@@ -226,7 +226,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         sendLastPacketCount = 1;
         sendLastPacketBytes = packet->wpos();               // wpos is real written size
     }
-#endif                                                      // !TRINITY_DEBUG
+#endif                                                      // !CORE_DEBUG
 
     sScriptMgr->OnPacketSend(this, *packet);
 
@@ -251,7 +251,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     if (updater.ProcessLogout())
     {
         UpdateTimeOutTime(diff);
-        
+
         /// If necessary, kick the player because the client didn't send anything for too long
         /// (or they've been idling in character select)
         if (sWorld->getBoolConfig(CONFIG_CLOSE_IDLE_CONNECTIONS) && IsConnectionIdle())
@@ -570,7 +570,7 @@ void WorldSession::LogoutPlayer(bool save)
         {
             _player->GetGroup()->SendUpdate();
             _player->GetGroup()->ResetMaxEnchantingLevel();
-			
+
             Map::PlayerList const &playerList = _player->GetMap()->GetPlayers();
 
             if (_player->GetMap()->IsDungeon() || _player->GetMap()->IsRaidOrHeroicDungeon())
@@ -865,7 +865,7 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo* mi)
 
     //! Anti-cheat checks. Please keep them in seperate if() blocks to maintain a clear overview.
     //! Might be subject to latency, so just remove improper flags.
-    #ifdef TRINITY_DEBUG
+    #ifdef CORE_DEBUG
     #define REMOVE_VIOLATING_FLAGS(check, maskToRemove) \
     { \
         if (check) \

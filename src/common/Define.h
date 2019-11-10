@@ -50,9 +50,9 @@
 #if !defined(COREDEBUG)
 #  define TRINITY_INLINE inline
 #else //COREDEBUG
-#  if !defined(TRINITY_DEBUG)
-#    define TRINITY_DEBUG
-#  endif //TRINITY_DEBUG
+#  if !defined(CORE_DEBUG)
+#    define CORE_DEBUG
+#  endif //CORE_DEBUG
 #  define TRINITY_INLINE
 #endif //!COREDEBUG
 
