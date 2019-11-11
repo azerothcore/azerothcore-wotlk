@@ -330,13 +330,13 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
-    recvData.rfinish();                         // prevent warnings spam
-
     if (!movementInfo.pos.IsPositionValid())
     {
         recvData.rfinish();                     // prevent warnings spam
         return;
     }
+
+    recvData.rfinish();                         // prevent warnings spam
 
     if (movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT)
     {
