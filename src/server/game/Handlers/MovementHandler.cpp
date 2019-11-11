@@ -317,28 +317,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     /* extract packet */
     uint64 guid;
 
-    try {
-      recvData.readPackGUID(guid);
-    }
-    catch (ByteBufferException const&)
-    {
-        sLog->outError("Malformed packet received, opcode: %u", opcode);
-        recvData.rfinish();                     // prevent warnings spam
-        return;
-    }
+    recvData.readPackGUID(guid);
 
     MovementInfo movementInfo;
     movementInfo.guid = guid;
-
-    try {
-        ReadMovementInfo(recvData, &movementInfo);
-    }
-    catch (ByteBufferException const&)
-    {
-        sLog->outError("Malformed packet received, opcode: %u", opcode);
-        recvData.rfinish();                     // prevent warnings spam
-        return;
-    }
+    ReadMovementInfo(recvData, &movementInfo);
 
     recvData.rfinish();                         // prevent warnings spam
 
