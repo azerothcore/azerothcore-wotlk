@@ -60,6 +60,7 @@ bool DatabaseWorkerPool<T>::Open(const std::string& infoString, uint8 async_thre
     else
         sLog->outError("DatabasePool %s NOT opened. There were errors opening the MySQL connections. Check your SQLDriverLogFile "
             "for specific errors.", GetDatabaseName());
+    
     return res;
 }
 
@@ -110,21 +111,6 @@ void DatabaseWorkerPool<T>::Execute(const char* sql)
 }
 
 template <class T>
-void DatabaseWorkerPool<T>::PExecute(const char* sql, ...)
-{
-    if (!sql)
-        return;
-
-    va_list ap;
-    char szQuery[MAX_QUERY_LEN];
-    va_start(ap, sql);
-    vsnprintf(szQuery, MAX_QUERY_LEN, sql, ap);
-    va_end(ap);
-
-    Execute(szQuery);
-}
-
-template <class T>
 void DatabaseWorkerPool<T>::Execute(PreparedStatement* stmt)
 {
     PreparedStatementTask* task = new PreparedStatementTask(stmt);
@@ -140,21 +126,6 @@ void DatabaseWorkerPool<T>::DirectExecute(const char* sql)
     T* t = GetFreeConnection();
     t->Execute(sql);
     t->Unlock();
-}
-
-template <class T>
-void DatabaseWorkerPool<T>::DirectPExecute(const char* sql, ...)
-{
-    if (!sql)
-        return;
-
-    va_list ap;
-    char szQuery[MAX_QUERY_LEN];
-    va_start(ap, sql);
-    vsnprintf(szQuery, MAX_QUERY_LEN, sql, ap);
-    va_end(ap);
-
-    return DirectExecute(szQuery);
 }
 
 template <class T>
@@ -187,36 +158,6 @@ QueryResult DatabaseWorkerPool<T>::Query(const char* sql, T* conn /* = nullptr*/
 }
 
 template <class T>
-QueryResult DatabaseWorkerPool<T>::PQuery(const char* sql, T* conn, ...)
-{
-    if (!sql)
-        return QueryResult(NULL);
-
-    va_list ap;
-    char szQuery[MAX_QUERY_LEN];
-    va_start(ap, conn);
-    vsnprintf(szQuery, MAX_QUERY_LEN, sql, ap);
-    va_end(ap);
-
-    return Query(szQuery, conn);
-}
-
-template <class T>
-QueryResult DatabaseWorkerPool<T>::PQuery(const char* sql, ...)
-{
-    if (!sql)
-        return QueryResult(NULL);
-
-    va_list ap;
-    char szQuery[MAX_QUERY_LEN];
-    va_start(ap, sql);
-    vsnprintf(szQuery, MAX_QUERY_LEN, sql, ap);
-    va_end(ap);
-
-    return Query(szQuery);
-}
-
-template <class T>
 PreparedQueryResult DatabaseWorkerPool<T>::Query(PreparedStatement* stmt)
 {
     T* t = GetFreeConnection();
@@ -242,18 +183,6 @@ QueryResultFuture DatabaseWorkerPool<T>::AsyncQuery(const char* sql)
     BasicStatementTask* task = new BasicStatementTask(sql, res);
     Enqueue(task);
     return res;         //! Actual return value has no use yet
-}
-
-template <class T>
-QueryResultFuture DatabaseWorkerPool<T>::AsyncPQuery(const char* sql, ...)
-{
-    va_list ap;
-    char szQuery[MAX_QUERY_LEN];
-    va_start(ap, sql);
-    vsnprintf(szQuery, MAX_QUERY_LEN, sql, ap);
-    va_end(ap);
-
-    return AsyncQuery(szQuery);
 }
 
 template <class T>
@@ -381,7 +310,8 @@ T* DatabaseWorkerPool<T>::GetFreeConnection()
 {
     uint8 i = 0;
     size_t num_cons = _connectionCount[IDX_SYNCH];
-    T* t = NULL;
+    T* t = nullptr;
+    
     //! Block forever until a connection is free
     for (;;)
     {
