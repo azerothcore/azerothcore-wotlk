@@ -321,6 +321,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
     // prevent tampered movement data
     if (!guid || guid != mover->GetGUID()) {
+        recvData.rfinish();                     // prevent warnings spam
         return;
     }
 
