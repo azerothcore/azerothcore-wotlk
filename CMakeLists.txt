@@ -90,6 +90,7 @@ include(ConfigureBaseTargets)
 include(CheckPlatform)
 include(GroupSources)
 include(AutoCollect)
+include(PocoMacros)
 
 CU_RUN_HOOK("AFTER_LOAD_CMAKE_MODULES")
 
