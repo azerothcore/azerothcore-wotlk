@@ -1000,7 +1000,8 @@ void RandomBattlegroundSystem::Update(uint32 diff)
             small.push_back(BATTLEGROUND_AB);
             small.push_back(BATTLEGROUND_SA);
 
-            auto rng = std::default_random_engine{};
+            std::random_device rd;
+            auto rng = std::default_random_engine{rd()};
 
             std::shuffle(big.begin(), big.end(), rng);
             std::shuffle(small.begin(), small.end(), rng);
