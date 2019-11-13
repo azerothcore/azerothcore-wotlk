@@ -166,6 +166,7 @@ void GossipMenu::ClearMenu()
 
 PlayerMenu::PlayerMenu(WorldSession* session) : _session(session)
 {
+	_gossipMenu.SetLocale(session->GetSessionDbLocaleIndex());
 }
 
 PlayerMenu::~PlayerMenu()
