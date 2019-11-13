@@ -234,8 +234,6 @@ struct ChannelTargetData
     SpellDestination spellDst;
 };
 
-static const uint32 SPELL_INTERRUPT_NONPLAYER = 32747;
-
 class Spell
 {
     friend void Unit::SetCurrentCastedSpell(Spell* pSpell);
