@@ -111,9 +111,6 @@
 #define snprintf _snprintf
 #define atoll _atoi64
 #define vsnprintf _vsnprintf
-#ifndef isfinite
-#define isfinite(X) _finite(X)
-#endif
 #define llabs _abs64
 
 #else
@@ -211,5 +208,15 @@ typedef std::vector<std::string> StringVector;
 # define TRINITY_READ_GUARD(MUTEX, LOCK) \
   ACE_Read_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
     if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
+
+namespace ACORE
+{
+    template<class ArgumentType, class ResultType>
+    struct unary_function
+    {
+        typedef ArgumentType argument_type;
+        typedef ResultType result_type;
+    };
+}
 
 #endif

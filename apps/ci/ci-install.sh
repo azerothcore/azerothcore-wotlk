@@ -7,8 +7,8 @@ bash ./acore.sh "install-deps"
 
 if [ "$TRAVIS_BUILD_ID" = "1" ]
 then
-  echo "install clang-3.8"
-  sudo apt-get install clang-3.8
+  echo "install clang-6.0"
+  sudo apt-get install clang-6.0
 elif [ "$TRAVIS_BUILD_ID" = "2" ]
 then
   echo "install clang-7"

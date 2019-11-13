@@ -126,7 +126,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
         m_Address = sock->GetRemoteAddress();
         sock->AddReference();
         ResetTimeOutTime(false);
-        LoginDatabase.PExecute("UPDATE account SET online = %u WHERE id = %u;", realmID, GetAccountId());
+        LoginDatabase.PExecute("UPDATE account SET online = 1 WHERE id = %u;", GetAccountId());
     }
 
     InitializeQueryCallbackParameters();
@@ -161,7 +161,7 @@ WorldSession::~WorldSession()
         delete packet;
 
     if (GetShouldSetOfflineInDB())
-        LoginDatabase.PExecute("UPDATE account SET online = %u WHERE id = %u;", realmID, GetAccountId());     // One-time query
+        LoginDatabase.PExecute("UPDATE account SET online = 0 WHERE id = %u;", GetAccountId());     // One-time query
 }
 
 std::string const & WorldSession::GetPlayerName() const
@@ -269,7 +269,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     while (m_Socket && !m_Socket->IsClosed() && !_recvQueue.empty() && _recvQueue.peek(true) != firstDelayedPacket && _recvQueue.next(packet, updater))
     {
-        if (packet->GetOpcode() < NUM_MSG_TYPES)
+        if (packet->GetOpcode() >= NUM_MSG_TYPES)
+        {
+            sLog->outError("WorldSession Packet filter: received non-existent opcode %s (0x%.4X)",LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode());
+        }
+        else
         {
             OpcodeHandler &opHandle = opcodeTable[packet->GetOpcode()];
             try
@@ -566,6 +570,12 @@ void WorldSession::LogoutPlayer(bool save)
         {
             _player->GetGroup()->SendUpdate();
             _player->GetGroup()->ResetMaxEnchantingLevel();
+			
+            Map::PlayerList const &playerList = _player->GetMap()->GetPlayers();
+
+            if (_player->GetMap()->IsDungeon() || _player->GetMap()->IsRaidOrHeroicDungeon())
+                if (playerList.isEmpty())
+                    _player->TeleportToEntryPoint();
         }
 
         //! Broadcast a logout message to the player's friends

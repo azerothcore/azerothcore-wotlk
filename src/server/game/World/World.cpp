@@ -78,6 +78,7 @@
 #include "ServerMotd.h"
 #include "GameGraveyard.h"
 #include <VMapManager2.h>
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -735,6 +736,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ALLOW_TWO_SIDE_WHO_LIST]            = sConfigMgr->GetBoolDefault("AllowTwoSide.WhoList", false);
     m_bool_configs[CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND]          = sConfigMgr->GetBoolDefault("AllowTwoSide.AddFriend", false);
     m_bool_configs[CONFIG_ALLOW_TWO_SIDE_TRADE]               = sConfigMgr->GetBoolDefault("AllowTwoSide.trade", false);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE]   = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Emote", false);
    
     m_int_configs[CONFIG_MIN_PLAYER_NAME]                     = sConfigMgr->GetIntDefault ("MinPlayerName",  2);
     if (m_int_configs[CONFIG_MIN_PLAYER_NAME] < 1 || m_int_configs[CONFIG_MIN_PLAYER_NAME] > MAX_PLAYER_NAME)
@@ -900,7 +902,7 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL_DIFFERENCE] = sConfigMgr->GetIntDefault("RecruitAFriend.MaxDifference", 4);
     m_bool_configs[CONFIG_ALL_TAXI_PATHS] = sConfigMgr->GetBoolDefault("AllFlightPaths", false);
-    m_bool_configs[CONFIG_INSTANT_TAXI] = sConfigMgr->GetBoolDefault("InstantFlightPaths", false);
+    m_int_configs[CONFIG_INSTANT_TAXI] = sConfigMgr->GetIntDefault("InstantFlightPaths", 0);
 
     m_bool_configs[CONFIG_INSTANCE_IGNORE_LEVEL] = sConfigMgr->GetBoolDefault("Instance.IgnoreLevel", false);
     m_bool_configs[CONFIG_INSTANCE_IGNORE_RAID]  = sConfigMgr->GetBoolDefault("Instance.IgnoreRaid", false);
@@ -1105,6 +1107,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE]      = sConfigMgr->GetBoolDefault("Battleground.StoreStatistics.Enable", false);
     m_bool_configs[CONFIG_BATTLEGROUND_TRACK_DESERTERS]              = sConfigMgr->GetBoolDefault("Battleground.TrackDeserters.Enable", false);
     m_int_configs[CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER]        = sConfigMgr->GetIntDefault ("Battleground.PrematureFinishTimer", 5 * MINUTE * IN_MILLISECONDS);
+    m_int_configs[CONFIG_BATTLEGROUND_INVITATION_TYPE]               = sConfigMgr->GetIntDefault("Battleground.InvitationType", 0);
     m_int_configs[CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH]  = sConfigMgr->GetIntDefault ("Battleground.PremadeGroupWaitForMatch", 30 * MINUTE * IN_MILLISECONDS);
     m_bool_configs[CONFIG_BG_XP_FOR_KILL]                            = sConfigMgr->GetBoolDefault("Battleground.GiveXPForKills", false);
     m_int_configs[CONFIG_ARENA_MAX_RATING_DIFFERENCE]                = sConfigMgr->GetIntDefault ("Arena.MaxRatingDifference", 150);
@@ -1320,6 +1323,16 @@ void World::LoadConfigSettings(bool reload)
 
     // Player can join LFG anywhere
     m_bool_configs[CONFIG_LFG_LOCATION_ALL] = sConfigMgr->GetBoolDefault("LFG.Location.All", false);
+
+    // Prevent players AFK from being logged out
+    m_int_configs[CONFIG_AFK_PREVENT_LOGOUT] = sConfigMgr->GetIntDefault("PreventAFKLogout", 0);
+
+    // Preload all grids of all non-instanced maps
+    m_bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] = sConfigMgr->GetBoolDefault("PreloadAllNonInstancedMapGrids", false);
+
+    // ICC buff override
+    m_int_configs[CONFIG_ICC_BUFF_HORDE] = sConfigMgr->GetIntDefault("ICC.Buff.Horde", 73822);
+    m_int_configs[CONFIG_ICC_BUFF_ALLIANCE] = sConfigMgr->GetIntDefault("ICC.Buff.Alliance", 73828);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -1953,6 +1966,27 @@ void World::SetInitialWorldSettings()
     sEluna->RunScripts();
     sEluna->OnConfigLoad(false,false); // Must be done after Eluna is initialized and scripts have run.
 #endif
+
+    if (sWorld->getBoolConfig(CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS))
+    {
+        sLog->outString("Loading all grids for all non-instanced maps...");
+
+        for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
+        {
+            MapEntry const* mapEntry = sMapStore.LookupEntry(i);
+
+            if (mapEntry && !mapEntry->Instanceable())
+            {
+                Map* map = sMapMgr->CreateBaseMap(mapEntry->MapID);
+
+                if (map)
+                {
+                    sLog->outString(">> Loading all grids for map %u", map->GetId());
+                    map->LoadAllCells();
+                }
+            }
+        }
+    }
     
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
     sLog->outString();

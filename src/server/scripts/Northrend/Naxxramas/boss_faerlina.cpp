@@ -9,10 +9,13 @@
 
 enum Yells
 {
-    SAY_GREET       = 0,
-    SAY_AGGRO       = 1,
-    SAY_SLAY        = 2,
-    SAY_DEATH       = 3
+    SAY_GREET            = 0,
+    SAY_AGGRO            = 1,
+    SAY_SLAY             = 2,
+    SAY_DEATH            = 3,
+    EMOTE_WIDOWS_EMBRACE = 4,
+    EMOTE_FRENZY         = 5,
+    SAY_FRENZY           = 6
 };
 
 enum Spells
@@ -44,7 +47,7 @@ class boss_faerlina : public CreatureScript
 public:
     boss_faerlina() : CreatureScript("boss_faerlina") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_faerlinaAI (pCreature);
     }
@@ -77,9 +80,9 @@ public:
             }
         }
 
-        void JustSummoned(Creature* cr) { summons.Summon(cr); }
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events.Reset();
@@ -87,9 +90,10 @@ public:
             SummonHelpers();
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * who) override
         {
             BossAI::EnterCombat(who);
+            me->CallForHelp(VISIBLE_RANGE);
             summons.DoZoneInCombat();
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_POISON_BOLT, urand(12000,15000));
@@ -98,7 +102,7 @@ public:
             events.SetPhase(1);
         }
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit *who) override
         {
             if (!sayGreet && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -109,7 +113,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -121,13 +125,13 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  killer)
+        void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -149,30 +153,33 @@ public:
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_SPELL_FRENZY:
-                    me->MonsterTextEmote("%s goes into a frenzy!", 0, true);
-                    me->CastSpell(me, RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25), true);
-                    events.RepeatEvent(70000);
+                    if (!me->HasAura(RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25)))
+                    {
+                        Talk(SAY_FRENZY);
+                        Talk(EMOTE_FRENZY);
+                        me->CastSpell(me, RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25), true);
+                        events.RepeatEvent(60000);
+                    }
+                    else
+                        events.RepeatEvent(30000);
                     break;
             }
 
             DoMeleeAttackIfReady();
         }
         
-        void SpellHit(Unit*  /*caster*/, const SpellInfo *spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo *spell) override
         {
             if (spell->Id == SPELL_WIDOWS_EMBRACE)
             {
-                me->MonsterTextEmote("%s is affected by Widow's Embrace!", 0, true);
+                Talk(EMOTE_WIDOWS_EMBRACE);
                 if (me->HasAura(RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25)))
                 {
                     me->RemoveAurasDueToSpell(RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25));
-                    events.DelayEvents(60000, 1);
+                    events.RescheduleEvent(EVENT_SPELL_FRENZY, 60000);
                 }
-                else
-                    events.DelayEvents(30000, 1);
 
-                if (pInstance)
-                    pInstance->SetData(DATA_FRENZY_REMOVED, 0);
+                pInstance->SetData(DATA_FRENZY_REMOVED, 0);
             }
         }
     };

@@ -93,7 +93,7 @@ void Vehicle::InstallAllAccessories(bool evading)
 void Vehicle::Uninstall()
 {
     /// @Prevent recursive uninstall call. (Bad script in OnUninstall/OnRemovePassenger/PassengerBoarded hook.)
-    if (_status == STATUS_UNINSTALLING)
+    if (_status == STATUS_UNINSTALLING && !GetBase()->HasUnitTypeMask(UNIT_MASK_MINION))
     {
         sLog->outError("Vehicle GuidLow: %u, Entry: %u attempts to uninstall, but already has STATUS_UNINSTALLING! "
             "Check Uninstall/PassengerBoarded script hooks for errors.", _me->GetGUIDLow(), _me->GetEntry());
@@ -390,7 +390,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         try
         {
         if (!_me->SetCharmedBy(unit, CHARM_TYPE_VEHICLE))
-            ASSERT(false);
+            ABORT();
         }
         catch (...)
         {
@@ -498,19 +498,25 @@ void Vehicle::RelocatePassengers()
 {
     ASSERT(_me->GetMap());
 
+    std::vector<std::pair<Unit*, Position>> seatRelocation;
+    seatRelocation.reserve(Seats.size());
+
     // not sure that absolute position calculation is correct, it must depend on vehicle pitch angle
-    for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
+    for (auto const& itr : Seats)
     {
-        if (Unit* passenger = ObjectAccessor::GetUnit(*GetBase(), itr->second.Passenger.Guid))
+        if (Unit* passenger = ObjectAccessor::GetUnit(*GetBase(), itr.second.Passenger.Guid))
         {
             ASSERT(passenger->IsInWorld());
 
             float px, py, pz, po;
             passenger->m_movementInfo.transport.pos.GetPosition(px, py, pz, po);
             CalculatePassengerPosition(px, py, pz, &po);
-            passenger->UpdatePosition(px, py, pz, po);
+            seatRelocation.emplace_back(passenger, Position(px, py, pz, po));
         }
     }
+
+    for (auto const& pair : seatRelocation)
+        pair.first->UpdatePosition(pair.second);
 }
 
 void Vehicle::Dismiss()

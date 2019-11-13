@@ -22,6 +22,7 @@ static void lockingCallback(int mode, int type, const char* /*file*/, int /*line
 
 static void threadIdCallback(CRYPTO_THREADID * id)
 {
+    (void)id;
 /// ACE_thread_t turns out to be a struct under Mac OS.
 #ifndef __APPLE__
     CRYPTO_THREADID_set_numeric(id, ACE_Thread::self());
@@ -37,7 +38,10 @@ void OpenSSLCrypto::threadsSetup()
     {
         cryptoLocks[i] = new ACE_Thread_Mutex();
     }
+    (void)&threadIdCallback;
     CRYPTO_THREADID_set_callback(threadIdCallback);
+
+    (void)&lockingCallback;
     CRYPTO_set_locking_callback(lockingCallback);
 }
 
