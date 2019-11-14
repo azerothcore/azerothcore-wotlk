@@ -25,6 +25,8 @@ inline void Trinity::VisibleNotifier::Visit(GridRefManager<T> &m)
 
     for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
+        if (i_largeOnly != iter->GetSource()->IsVisibilityOverridden())
+            continue;
         vis_guids.erase(iter->GetSource()->GetGUID());
         i_player.UpdateVisibilityOf(iter->GetSource(), i_data, i_visibleNow);
     }
