@@ -13,13 +13,13 @@
 typedef ACE_TSS<SFMTRand> SFMTRandTSS;
 static SFMTRandTSS sfmtRand;
 
-static SFMTRand* GetRng()
+static SFMTRandTSS* GetRng()
 {
-    SFMTRand* rand = sfmtRand.get();
+    SFMTRandTSS* rand = sfmtRand.get();
 
     if (!rand)
     {
-        rand = new SFMTRand();
+        rand = new SFMTRandTSS();
         sfmtRand.reset(rand);
     }
 
