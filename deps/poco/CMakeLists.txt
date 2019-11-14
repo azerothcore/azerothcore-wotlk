@@ -80,7 +80,7 @@ POCO_SOURCES( SRCS zlib
 
 # Create static Library
 add_library(Poco STATIC 
-${SRCS})
+  ${SRCS})
 
 target_link_libraries(Poco
 PRIVATE
@@ -168,3 +168,5 @@ if (MINGW)
       ODBCVER=0x0300
       POCO_THREAD_STACK_SIZE)
 endif()
+
+set_target_properties(Poco PROPERTIES LINKER_LANGUAGE CXX)
