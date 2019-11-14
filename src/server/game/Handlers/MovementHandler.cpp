@@ -322,7 +322,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     // pussywizard: typical check for incomming movement packets
     if (!mover || !mover->IsInWorld() || mover->IsDuringRemoveFromWorld() || guid != mover->GetGUID())
     {
-        recvData.rfinish();
+        recvData.rfinish();                     // prevent warnings spam
         return;
     }
 
@@ -330,13 +330,19 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
+    recvData.rfinish();                         // prevent warnings spam
+
     if (!movementInfo.pos.IsPositionValid())
     {
         recvData.rfinish();                     // prevent warnings spam
         return;
     }
 
-    recvData.rfinish();                         // prevent warnings spam
+    if (!mover->movespline->Finalized())
+    {
+        recvData.rfinish();                     // prevent warnings spam
+        return;
+    }
 
     if (movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT)
     {
