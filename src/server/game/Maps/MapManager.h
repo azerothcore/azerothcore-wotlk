@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_MAPMANAGER_H
-#define TRINITY_MAPMANAGER_H
+#ifndef ACORE_MAPMANAGER_H
+#define ACORE_MAPMANAGER_H
 
 #include "Define.h"
 #include <ace/Singleton.h>

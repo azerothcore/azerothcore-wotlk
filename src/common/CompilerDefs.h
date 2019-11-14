@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_COMPILERDEFS_H
-#define TRINITY_COMPILERDEFS_H
+#ifndef ACORE_COMPILERDEFS_H
+#define ACORE_COMPILERDEFS_H
 
 #define PLATFORM_WINDOWS 0
 #define PLATFORM_UNIX    1

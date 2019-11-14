@@ -5697,7 +5697,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
 { 
     // pussywizard: mutex needed (tc changed opcode to THREAD UNSAFE)
     static ACE_Thread_Mutex channelsLock;
-    TRINITY_GUARD(ACE_Thread_Mutex, channelsLock);
+    ACORE_GUARD(ACE_Thread_Mutex, channelsLock);
 
     if (GetSession()->PlayerLoading() && !IsBeingTeleportedFar())
         return;                                              // The client handles it automatically after loading, but not after teleporting
@@ -14112,7 +14112,7 @@ void Player::TradeCancel(bool sendback)
 
 void Player::UpdateSoulboundTradeItems()
 {  
-    TRINITY_GUARD(ACE_Thread_Mutex, m_soulboundTradableLock);
+    ACORE_GUARD(ACE_Thread_Mutex, m_soulboundTradableLock);
     if (m_itemSoulboundTradeable.empty())
         return;
 
@@ -14136,14 +14136,14 @@ void Player::UpdateSoulboundTradeItems()
 
 void Player::AddTradeableItem(Item* item)
 {  
-    TRINITY_GUARD(ACE_Thread_Mutex, m_soulboundTradableLock);
+    ACORE_GUARD(ACE_Thread_Mutex, m_soulboundTradableLock);
     m_itemSoulboundTradeable.push_back(item);
 }
 
 //TODO: should never allow an item to be added to m_itemSoulboundTradeable twice
 void Player::RemoveTradeableItem(Item* item)
 {  
-    TRINITY_GUARD(ACE_Thread_Mutex, m_soulboundTradableLock);
+    ACORE_GUARD(ACE_Thread_Mutex, m_soulboundTradableLock);
     m_itemSoulboundTradeable.remove(item);
 }
 

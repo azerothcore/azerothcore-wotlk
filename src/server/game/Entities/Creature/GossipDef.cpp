@@ -25,7 +25,7 @@ GossipMenu::~GossipMenu()
 
 void GossipMenu::AddMenuItem(int32 menuItemId, uint8 icon, std::string const& message, uint32 sender, uint32 action, std::string const& boxMessage, uint32 boxMoney, bool coded /*= false*/)
 {
-    //TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
     ASSERT(_menuItems.size() <= GOSSIP_MAX_MENU_ITEMS);
 
     // Find a free new id - script case
@@ -120,7 +120,7 @@ void GossipMenu::AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, ui
 
 void GossipMenu::AddGossipMenuItemData(uint32 menuItemId, uint32 gossipActionMenuId, uint32 gossipActionPoi)
 {
-    //TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
     GossipMenuItemData& itemData = _menuItemData[menuItemId];
 
     itemData.GossipActionMenuId  = gossipActionMenuId;
@@ -129,7 +129,7 @@ void GossipMenu::AddGossipMenuItemData(uint32 menuItemId, uint32 gossipActionMen
 
 uint32 GossipMenu::GetMenuItemSender(uint32 menuItemId) const
 {
-    //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //ACORE_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
     GossipMenuItemContainer::const_iterator itr = _menuItems.find(menuItemId);
     if (itr == _menuItems.end())
         return 0;
@@ -139,7 +139,7 @@ uint32 GossipMenu::GetMenuItemSender(uint32 menuItemId) const
 
 uint32 GossipMenu::GetMenuItemAction(uint32 menuItemId) const
 {
-    //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //ACORE_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
     GossipMenuItemContainer::const_iterator itr = _menuItems.find(menuItemId);
     if (itr == _menuItems.end())
         return 0;
@@ -149,7 +149,7 @@ uint32 GossipMenu::GetMenuItemAction(uint32 menuItemId) const
 
 bool GossipMenu::IsMenuItemCoded(uint32 menuItemId) const
 {
-    //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //ACORE_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
     GossipMenuItemContainer::const_iterator itr = _menuItems.find(menuItemId);
     if (itr == _menuItems.end())
         return false;
@@ -159,7 +159,7 @@ bool GossipMenu::IsMenuItemCoded(uint32 menuItemId) const
 
 void GossipMenu::ClearMenu()
 {
-    //TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
     _menuItems.clear();
     _menuItemData.clear();
 }
@@ -281,7 +281,7 @@ void QuestMenu::AddMenuItem(uint32 QuestId, uint8 Icon)
     if (!sObjectMgr->GetQuestTemplate(QuestId))
         return;
 
-    //TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
 
     ASSERT(_questMenuItems.size() <= GOSSIP_MAX_MENU_ITEMS);
 
@@ -295,7 +295,7 @@ void QuestMenu::AddMenuItem(uint32 QuestId, uint8 Icon)
 
 bool QuestMenu::HasItem(uint32 questId) const
 {
-    //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //ACORE_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
     for (QuestMenuItemList::const_iterator i = _questMenuItems.begin(); i != _questMenuItems.end(); ++i)
         if (i->QuestId == questId)
             return true;
@@ -305,7 +305,7 @@ bool QuestMenu::HasItem(uint32 questId) const
 
 void QuestMenu::ClearMenu()
 {
-    //TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
     _questMenuItems.clear();
 }
 

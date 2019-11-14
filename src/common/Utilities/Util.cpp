@@ -12,46 +12,8 @@
 #include "SQLOperation.h"
 #include "Errors.h"
 #include "TypeList.h"
-#include "SFMT.h"
 #include "Errors.h" // for ASSERT
-#include <ace/TSS_T.h>
 #include <array>
-
-typedef ACE_TSS<SFMTRand> SFMTRandTSS;
-static SFMTRandTSS sfmtRand;
-
-int32 irand(int32 min, int32 max)
-{
-    ASSERT(max >= min);
-    return int32(sfmtRand->IRandom(min, max));
-}
-
-uint32 urand(uint32 min, uint32 max)
-{
-    ASSERT(max >= min);
-    return sfmtRand->URandom(min, max);
-}
-
-float frand(float min, float max)
-{
-    ASSERT(max >= min);
-    return float(sfmtRand->Random() * (max - min) + min);
-}
-
-uint32 rand32()
-{
-    return int32(sfmtRand->BRandom());
-}
-
-double rand_norm()
-{
-    return sfmtRand->Random();
-}
-
-double rand_chance()
-{
-    return sfmtRand->Random() * 100.0;
-}
 
 Tokenizer::Tokenizer(const std::string &src, const char sep, uint32 vectorReserve /*= 0*/, bool keepEmptyStrings /*= true*/)
 {

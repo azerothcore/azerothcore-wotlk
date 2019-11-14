@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_PETAI_H
-#define TRINITY_PETAI_H
+#ifndef ACORE_PETAI_H
+#define ACORE_PETAI_H
 
 #include "CreatureAI.h"
 #include "Timer.h"

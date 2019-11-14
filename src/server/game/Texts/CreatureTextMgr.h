@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_CREATURE_TEXT_MGR_H
-#define TRINITY_CREATURE_TEXT_MGR_H
+#ifndef ACORE_CREATURE_TEXT_MGR_H
+#define ACORE_CREATURE_TEXT_MGR_H
 
 #include "Creature.h"
 #include "GridNotifiers.h"

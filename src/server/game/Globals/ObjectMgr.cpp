@@ -6277,7 +6277,7 @@ uint32 ObjectMgr::GenerateMailID()
         sLog->outError("Mail ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
-    TRINITY_GUARD(ACE_Thread_Mutex, _mailIdMutex);
+    ACORE_GUARD(ACE_Thread_Mutex, _mailIdMutex);
     return _mailId++;
 }
 
@@ -6288,25 +6288,25 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
         case HIGHGUID_ITEM:
         {
             ASSERT(_hiItemGuid < 0xFFFFFFFE && "Item guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiItemGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiItemGuidMutex);
             return _hiItemGuid++;
         }
         case HIGHGUID_UNIT:
         {
             ASSERT(_hiCreatureGuid < 0x00FFFFFE && "Creature guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiCreatureGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiCreatureGuidMutex);
             return _hiCreatureGuid++;
         }
         case HIGHGUID_PET:
         {
             ASSERT(_hiPetGuid < 0x00FFFFFE && "Pet guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiPetGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiPetGuidMutex);
             return _hiPetGuid++;
         }
         case HIGHGUID_VEHICLE:
         {
             ASSERT(_hiVehicleGuid < 0x00FFFFFF && "Vehicle guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiVehicleGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiVehicleGuidMutex);
             return _hiVehicleGuid++;
         }
         case HIGHGUID_PLAYER:
@@ -6317,25 +6317,25 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
         case HIGHGUID_GAMEOBJECT:
         {
             ASSERT(_hiGoGuid < 0x00FFFFFE && "Gameobject guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiGoGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiGoGuidMutex);
             return _hiGoGuid++;
         }
         case HIGHGUID_CORPSE:
         {
             ASSERT(_hiCorpseGuid < 0xFFFFFFFE && "Corpse guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiCorpseGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiCorpseGuidMutex);
             return _hiCorpseGuid++;
         }
         case HIGHGUID_DYNAMICOBJECT:
         {
             ASSERT(_hiDoGuid < 0xFFFFFFFE && "DynamicObject guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiDoGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiDoGuidMutex);
             return _hiDoGuid++;
         }
         case HIGHGUID_MO_TRANSPORT:
         {
             ASSERT(_hiMoTransGuid < 0xFFFFFFFE && "MO Transport guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiMoTransGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiMoTransGuidMutex);
             return _hiMoTransGuid++;
         }
         default:
@@ -6821,7 +6821,7 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
 
 uint32 ObjectMgr::GeneratePetNumber()
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, _hiPetNumberMutex);
+    ACORE_GUARD(ACE_Thread_Mutex, _hiPetNumberMutex);
     return ++_hiPetNumber;
 }
 
@@ -8134,7 +8134,7 @@ void ObjectMgr::LoadMailLevelRewards()
 
 void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel)
 {
-    if (entry >= TRINITY_TRAINER_START_REF)
+    if (entry >= ACORE_TRAINER_START_REF)
         return;
 
     CreatureTemplate const* cInfo = GetCreatureTemplate(entry);

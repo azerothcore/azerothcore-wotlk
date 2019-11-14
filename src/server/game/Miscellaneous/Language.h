@@ -5,8 +5,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef __TRINITY_LANGUAGE_H
-#define __TRINITY_LANGUAGE_H
+#ifndef __ACORE_LANGUAGE_H
+#define __ACORE_LANGUAGE_H
 
 enum TrinityStrings
 {

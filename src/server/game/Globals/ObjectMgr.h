@@ -475,13 +475,13 @@ typedef std::unordered_map<uint32/*cell_id*/, CellObjectGuids> CellObjectGuidsMa
 typedef std::unordered_map<uint32/*(mapid, spawnMode) pair*/, CellObjectGuidsMap> MapObjectGuids;
 
 // Trinity string ranges
-#define MIN_TRINITY_STRING_ID           1                    // 'trinity_string'
-#define MAX_TRINITY_STRING_ID           2000000000
+#define MIN_ACORE_STRING_ID           1                    // 'trinity_string'
+#define MAX_ACORE_STRING_ID           2000000000
 #define MIN_CREATURE_AI_TEXT_STRING_ID (-1)                 // 'creature_ai_texts'
 #define MAX_CREATURE_AI_TEXT_STRING_ID (-1000000)
 
 // Trinity Trainer Reference start range
-#define TRINITY_TRAINER_START_REF      200000
+#define ACORE_TRAINER_START_REF      200000
 
 struct TrinityString
 {

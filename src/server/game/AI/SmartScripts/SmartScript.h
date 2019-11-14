@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_SMARTSCRIPT_H
-#define TRINITY_SMARTSCRIPT_H
+#ifndef ACORE_SMARTSCRIPT_H
+#define ACORE_SMARTSCRIPT_H
 
 #include "Common.h"
 #include "Creature.h"

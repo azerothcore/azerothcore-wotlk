@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_PACKETLOG_H
-#define TRINITY_PACKETLOG_H
+#ifndef ACORE_PACKETLOG_H
+#define ACORE_PACKETLOG_H
 
 #include "Common.h"
 #include <ace/Singleton.h>

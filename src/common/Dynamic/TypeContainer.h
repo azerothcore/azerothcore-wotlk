@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_TYPECONTAINER_H
-#define TRINITY_TYPECONTAINER_H
+#ifndef ACORE_TYPECONTAINER_H
+#define ACORE_TYPECONTAINER_H
 
 /*
  * Here, you'll find a series of containers that allow you to hold multiple

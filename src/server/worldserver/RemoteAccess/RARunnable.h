@@ -8,8 +8,8 @@
 /// @{
 /// \file
 
-#ifndef _TRINITY_RARUNNABLE_H_
-#define _TRINITY_RARUNNABLE_H_
+#ifndef _ACORE_RARUNNABLE_H_
+#define _ACORE_RARUNNABLE_H_
 
 #include "Common.h"
 
@@ -27,6 +27,6 @@ private:
 
 };
 
-#endif /* _TRINITY_RARUNNABLE_H_ */
+#endif /* _ACORE_RARUNNABLE_H_ */
 
 /// @}

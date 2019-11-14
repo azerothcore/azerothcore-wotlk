@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_CELLIMPL_H
-#define TRINITY_CELLIMPL_H
+#ifndef ACORE_CELLIMPL_H
+#define ACORE_CELLIMPL_H
 
 #include <cmath>
 

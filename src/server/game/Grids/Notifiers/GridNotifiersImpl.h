@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_GRIDNOTIFIERSIMPL_H
-#define TRINITY_GRIDNOTIFIERSIMPL_H
+#ifndef ACORE_GRIDNOTIFIERSIMPL_H
+#define ACORE_GRIDNOTIFIERSIMPL_H
 
 #include "GridNotifiers.h"
 #include "WorldPacket.h"
@@ -573,4 +573,4 @@ void ACORE::LocalizedPacketListDo<Builder>::operator()(Player* p)
         p->SendDirectMessage((*data_list)[i]);
 }
 
-#endif                                                      // TRINITY_GRIDNOTIFIERSIMPL_H
+#endif                                                      // ACORE_GRIDNOTIFIERSIMPL_H

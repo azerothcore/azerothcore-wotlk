@@ -35,8 +35,8 @@
 #define PROCESS_HIGH_PRIORITY -15 // [-20, 19], default is 0
 #endif
 
-#ifndef _TRINITY_REALM_CONFIG
-# define _TRINITY_REALM_CONFIG  "authserver.conf"
+#ifndef _ACORE_REALM_CONFIG
+# define _ACORE_REALM_CONFIG  "authserver.conf"
 #endif
 
 bool StartDB();
@@ -74,7 +74,7 @@ void usage(const char* prog)
 extern int main(int argc, char** argv)
 {
     // Command line parsing to get the configuration file name
-    char const* configFile = _TRINITY_REALM_CONFIG;
+    char const* configFile = _ACORE_REALM_CONFIG;
     int count = 1;
     while (count < argc)
     {
@@ -92,7 +92,7 @@ extern int main(int argc, char** argv)
         ++count;
     }
 
-    std::string cfg_def_file=_TRINITY_REALM_CONFIG;
+    std::string cfg_def_file=_ACORE_REALM_CONFIG;
     cfg_def_file += ".dist";
 
     if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {

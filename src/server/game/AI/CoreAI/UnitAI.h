@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_UNITAI_H
-#define TRINITY_UNITAI_H
+#ifndef ACORE_UNITAI_H
+#define ACORE_UNITAI_H
 
 #include "Define.h"
 #include "Unit.h"
