@@ -624,7 +624,7 @@ class boss_lady_deathwhisper : public CreatureScript
                     return;
 
                 // select random cultist
-                Creature* cultist = Trinity::Containers::SelectRandomContainerElement(temp);
+                Creature* cultist = ACORE::Containers::SelectRandomContainerElement(temp);
                 if (!cultist)
                     return;
 

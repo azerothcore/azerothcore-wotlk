@@ -62,7 +62,7 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
     else
         _sourceUnit->GetPosition(x, y, z);
 
-    if (!Trinity::IsValidMapCoord(destX, destY, destZ) || !Trinity::IsValidMapCoord(x, y, z))
+    if (!ACORE::IsValidMapCoord(destX, destY, destZ) || !ACORE::IsValidMapCoord(x, y, z))
         return false;
 
     G3D::Vector3 dest(destX, destY, destZ);

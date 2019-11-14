@@ -9,7 +9,7 @@
 
 #include <ace/Bound_Ptr.h>
 
-namespace Trinity
+namespace ACORE
 {
 
 template <class Pointer, class Lock>
@@ -37,6 +37,6 @@ public:
     }
 };
 
-} // namespace Trinity
+} // namespace ACORE
 
 #endif

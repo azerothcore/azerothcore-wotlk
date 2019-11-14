@@ -16,7 +16,7 @@
 #include "CellImpl.h"
 #include "SpellInfo.h"
 
-using namespace Trinity;
+using namespace ACORE;
 
 
 void VisibleNotifier::Visit(GameObjectMapType &m)

@@ -13,7 +13,7 @@
 #include "Player.h"
 #include "Creature.h"
 
-namespace Trinity
+namespace ACORE
 {
     namespace Honor
     {

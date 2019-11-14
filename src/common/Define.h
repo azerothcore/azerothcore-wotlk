@@ -65,6 +65,11 @@
 #  define ATTR_NORETURN
 #  define ATTR_PRINTF(F, V)
 #  define ATTR_DEPRECATED
+#if _MSC_VER >= 1900
+#  define ACORE_CONSTEXPR constexpr
+#else
+#  define ACORE_CONSTEXPR
+#endif
 #endif //COMPILER == COMPILER_GNU
 
 #define UI64FMTD ACE_UINT64_FORMAT_SPECIFIER

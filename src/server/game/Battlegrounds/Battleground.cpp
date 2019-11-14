@@ -36,7 +36,7 @@
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
-namespace Trinity
+namespace ACORE
 {
     class BattlegroundChatBuilder
     {
@@ -100,7 +100,7 @@ namespace Trinity
             uint32 _arg1;
             uint32 _arg2;
     };
-}                                                           // namespace Trinity
+}                                                           // namespace ACORE
 
 template<class Do>
 void Battleground::BroadcastWorker(Do& _do)
@@ -1064,7 +1064,7 @@ uint32 Battleground::GetBonusHonorFromKill(uint32 kills) const
 {
     //variable kills means how many honorable kills you scored (so we need kills * honor_for_one_kill)
     uint32 maxLevel = std::min<uint32>(GetMaxLevel(), 80U);
-    return Trinity::Honor::hk_honor_at_level(maxLevel, float(kills));
+    return ACORE::Honor::hk_honor_at_level(maxLevel, float(kills));
 }
 
 void Battleground::BlockMovement(Player* player)
@@ -1745,8 +1745,8 @@ void Battleground::SendMessageToAll(uint32 entry, ChatMsg type, Player const* so
     if (!entry)
         return;
 
-    Trinity::BattlegroundChatBuilder bg_builder(type, entry, source);
-    Trinity::LocalizedPacketDo<Trinity::BattlegroundChatBuilder> bg_do(bg_builder);
+    ACORE::BattlegroundChatBuilder bg_builder(type, entry, source);
+    ACORE::LocalizedPacketDo<ACORE::BattlegroundChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 }
 
@@ -1758,8 +1758,8 @@ void Battleground::PSendMessageToAll(uint32 entry, ChatMsg type, Player const* s
     va_list ap;
     va_start(ap, source);
 
-    Trinity::BattlegroundChatBuilder bg_builder(type, entry, source, &ap);
-    Trinity::LocalizedPacketDo<Trinity::BattlegroundChatBuilder> bg_do(bg_builder);
+    ACORE::BattlegroundChatBuilder bg_builder(type, entry, source, &ap);
+    ACORE::LocalizedPacketDo<ACORE::BattlegroundChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 
     va_end(ap);
@@ -1792,8 +1792,8 @@ void Battleground::SendWarningToAll(uint32 entry, ...)
 
 void Battleground::SendMessage2ToAll(uint32 entry, ChatMsg type, Player const* source, uint32 arg1, uint32 arg2)
 {
-    Trinity::Battleground2ChatBuilder bg_builder(type, entry, source, arg1, arg2);
-    Trinity::LocalizedPacketDo<Trinity::Battleground2ChatBuilder> bg_do(bg_builder);
+    ACORE::Battleground2ChatBuilder bg_builder(type, entry, source, arg1, arg2);
+    ACORE::LocalizedPacketDo<ACORE::Battleground2ChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 }
 

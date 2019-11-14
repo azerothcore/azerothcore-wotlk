@@ -200,7 +200,7 @@ class spell_morogrim_tidewalker_water_globule_new_target : public SpellScriptLoa
 
             void FilterTargets(std::list<WorldObject*>& unitList)
             {
-                Trinity::Containers::RandomResizeList(unitList, 1);
+                ACORE::Containers::RandomResizeList(unitList, 1);
             }
 
             void HandleDummy(SpellEffIndex effIndex)

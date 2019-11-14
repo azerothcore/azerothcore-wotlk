@@ -54,7 +54,7 @@ namespace
     }
 }
 
-namespace Trinity
+namespace ACORE
 {
 
 void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message)
@@ -125,7 +125,7 @@ void AbortHandler(int sigval)
     Crash(formattedMessage.c_str());
 }
 
-} // namespace Trinity
+} // namespace ACORE
 
 std::string GetDebugInfo()
 {

@@ -24,7 +24,7 @@
 class Player;
 //class Map;
 
-namespace Trinity
+namespace ACORE
 {
     struct VisibleNotifier
     {

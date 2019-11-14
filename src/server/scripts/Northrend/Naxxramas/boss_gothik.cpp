@@ -673,7 +673,7 @@ class spell_gothik_shadow_bolt_volley : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::UnitAuraCheck(false, SPELL_SHADOW_MARK));
+                targets.remove_if(ACORE::UnitAuraCheck(false, SPELL_SHADOW_MARK));
             }
 
             void Register() override

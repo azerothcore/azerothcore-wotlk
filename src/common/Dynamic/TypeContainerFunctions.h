@@ -17,7 +17,7 @@
 #include "Dynamic/TypeList.h"
 #include <map>
 
-namespace Trinity
+namespace ACORE
 {
     /* ContainerMapList Helpers */
     // count functions

@@ -9,11 +9,9 @@
 
 #include "Define.h"
 #include <list>
+#include <vector>
 
-//! Because circular includes are bad
-extern uint32 urand(uint32 min, uint32 max);
-
-namespace Trinity
+namespace ACORE
 {
     namespace Containers
     {
@@ -56,6 +54,6 @@ namespace Trinity
     }
     //! namespace Containers
 }
-//! namespace Trinity
+//! namespace ACORE
 
 #endif //! #ifdef TRINITY_CONTAINERS_H
