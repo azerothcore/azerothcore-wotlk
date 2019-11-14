@@ -333,7 +333,14 @@ bool SpellChatLink::ValidateName(char* buffer, const char* context)
             {
                 // found the prefix, remove it to perform spellname validation below
                 // -2 = strlen(": ")
-                uint32 spellNameLength = strlen(buffer) - skillLineNameLength - 2;
+                uint32 spellNameLength;
+
+                if (strlen(buffer) <= skillLineNameLength + 2) {
+                    spellNameLength = 0;
+                } else {
+                    spellNameLength = strlen(buffer) - skillLineNameLength - 2;
+                }
+
                 memmove(buffer, buffer + skillLineNameLength + 2, spellNameLength + 1);
                 break;
             }
