@@ -23040,9 +23040,12 @@ void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 
 void Player::UpdateVisibilityForPlayer(bool mapChange)
 { 
-    Trinity::VisibleNotifier notifier(*this, mapChange);
-    m_seer->VisitNearbyObject(GetSightRange()+VISIBILITY_INC_FOR_GOBJECTS, notifier);
-    notifier.SendToSelf();
+    Trinity::VisibleNotifier notifierNoLarge(*this, mapChange, false); // visit only objects which are not large; default distance
+    m_seer->VisitNearbyObject(GetSightRange()+VISIBILITY_INC_FOR_GOBJECTS, notifierNoLarge);
+    notifierNoLarge.SendToSelf();
+    Trinity::VisibleNotifier notifierLarge(*this, mapChange, true);    // visit only large objects; maximum distance
+    m_seer->VisitNearbyObject(MAX_VISIBILITY_DISTANCE, notifierLarge);
+    notifierLarge.SendToSelf();
 
     if (mapChange)
         m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
