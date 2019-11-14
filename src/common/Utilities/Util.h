@@ -39,7 +39,7 @@ public:
     typedef StorageType::const_reference const_reference;
 
 public:
-    Tokenizer(const std::string &src, char const sep, uint32 vectorReserve = 0);
+    Tokenizer(const std::string &src, char const sep, uint32 vectorReserve = 0, bool keepEmptyStrings = true);
     ~Tokenizer() { delete[] m_str; }
 
     const_iterator begin() const { return m_storage.begin(); }
@@ -129,6 +129,7 @@ inline T RoundToInterval(T& num, T floor, T ceil)
 bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr);
 // in wsize==max size of buffer, out wsize==real string size
 bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize);
+
 inline bool Utf8toWStr(const std::string& utf8str, wchar_t* wstr, size_t& wsize)
 {
     return Utf8toWStr(utf8str.c_str(), utf8str.size(), wstr, wsize);
@@ -308,15 +309,8 @@ inline wchar_t wcharToLower(wchar_t wchar)
     return wchar;
 }
 
-inline void wstrToUpper(std::wstring& str)
-{
-    std::transform( str.begin(), str.end(), str.begin(), wcharToUpper );
-}
-
-inline void wstrToLower(std::wstring& str)
-{
-    std::transform( str.begin(), str.end(), str.begin(), wcharToLower );
-}
+void wstrToUpper(std::wstring& str);
+void wstrToLower(std::wstring& str);
 
 std::wstring GetMainPartOfName(std::wstring wname, uint32 declension);
 
@@ -325,6 +319,7 @@ bool consoleToUtf8(const std::string& conStr, std::string& utf8str);
 bool Utf8FitTo(const std::string& str, std::wstring search);
 void utf8printf(FILE* out, const char *str, ...);
 void vutf8printf(FILE* out, const char *str, va_list* ap);
+bool Utf8ToUpperOnlyLatin(std::string& utf8String);
 
 bool IsIPAddress(char const* ipaddress);
 
@@ -337,6 +332,15 @@ std::string GetAddressString(ACE_INET_Addr const& addr);
 uint32 CreatePIDFile(const std::string& filename);
 
 std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
+void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
+bool StringToBool(std::string const& str);
+
+bool StringContainsStringI(std::string const& haystack, std::string const& needle);
+template <typename T>
+inline bool ValueContainsStringI(std::pair<T, std::string> const& haystack, std::string const& needle)
+{
+    return StringContainsStringI(haystack.second, needle);
+}
 #endif
 
 //handler for operations on large flags
@@ -345,33 +349,35 @@ std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = 
 
 // simple class for not-modifyable list
 template <typename T>
-class HookList
+class HookList final
 {
-    typedef typename std::list<T>::iterator ListIterator;
     private:
-        typename std::list<T> m_list;
+        typedef std::vector<T> ContainerType;
+
+        ContainerType _container;
+
     public:
-        HookList<T> & operator+=(T t)
+        typedef typename ContainerType::iterator iterator;
+
+        HookList<T>& operator+=(T&& t)
         {
-            m_list.push_back(t);
+            _container.push_back(std::move(t));
             return *this;
         }
-        HookList<T> & operator-=(T t)
+
+        size_t size() const
         {
-            m_list.remove(t);
-            return *this;
+            return _container.size();
         }
-        size_t size()
+
+        iterator begin()
         {
-            return m_list.size();
+            return _container.begin();
         }
-        ListIterator begin()
+
+        iterator end()
         {
-            return m_list.begin();
-        }
-        ListIterator end()
-        {
-            return m_list.end();
+            return _container.end();
         }
 };
 
@@ -889,5 +895,12 @@ class EventMap
 
         EventStore _eventMap;
 };
+
+template<typename E>
+typename std::underlying_type<E>::type AsUnderlyingType(E enumValue)
+{
+    static_assert(std::is_enum<E>::value, "AsUnderlyingType can only be used with enums");
+    return static_cast<typename std::underlying_type<E>::type>(enumValue);
+}
 
 #endif
