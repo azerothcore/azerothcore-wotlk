@@ -16,6 +16,7 @@ set(winDebugging
   ${CMAKE_SOURCE_DIR}/src/common/Debugging/WheatyExceptionReport.h)
 endif()
 
+add_subdirectory(shared)
 add_subdirectory(game)
 add_subdirectory(authserver)
 add_subdirectory(scripts)
