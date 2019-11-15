@@ -83,8 +83,8 @@ add_library(Poco STATIC
   ${SRCS})
 
 target_link_libraries(Poco
-PRIVATE
-  acore-dependency-interface)
+  PRIVATE
+    acore-dependency-interface)
 
 target_compile_definitions(Poco
   PUBLIC
@@ -92,13 +92,11 @@ target_compile_definitions(Poco
 
 target_compile_features(Poco
   PUBLIC
-    cxx_defaulted_move_initializers
-    # cxx_std_14
-    )
+    cxx_defaulted_move_initializers)
   
 if(WIN32)
-	target_compile_definitions(Poco PUBLIC POCO_OS_FAMILY_WINDOWS UNICODE _UNICODE)
-	target_link_libraries(Poco PUBLIC iphlpapi)
+  target_compile_definitions(Poco PRIVATE POCO_OS_FAMILY_WINDOWS UNICODE _UNICODE)
+  target_link_libraries(Poco PRIVATE iphlpapi)
 endif()
 
 # if (UNIX )
@@ -168,5 +166,3 @@ if (MINGW)
       ODBCVER=0x0300
       POCO_THREAD_STACK_SIZE)
 endif()
-
-set_target_properties(Poco PROPERTIES LINKER_LANGUAGE CXX)
