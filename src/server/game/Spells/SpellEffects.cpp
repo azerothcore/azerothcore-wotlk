@@ -1758,7 +1758,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
     if (addNumber)
     {
         // create the new item and store it
-        Item* pItem = player->StoreNewItem(dest, newitemid, true, Item::GenerateItemRandomPropertyId(newitemid));
+        Item* pItem = player->StoreNewItem(dest, newitemid, true);
 
         // was it successful? return error if not
         if (!pItem)

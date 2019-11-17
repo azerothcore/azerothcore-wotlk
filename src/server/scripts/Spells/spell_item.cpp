@@ -1429,6 +1429,74 @@ class spell_item_direbrew_remote : public SpellScriptLoader
         }
 };
 
+enum EyeOfGruul
+{
+    SPELL_DRUID_ITEM_HEALING_TRANCE   = 37721,
+    SPELL_PALADIN_ITEM_HEALING_TRANCE = 37723,
+    SPELL_PRIEST_ITEM_HEALING_TRANCE  = 37706,
+    SPELL_SHAMAN_ITEM_HEALING_TRANCE  = 37722
+};
+
+// 37705 - Healing Discount
+class spell_item_eye_of_gruul_healing_discount : public SpellScriptLoader
+{
+    public:
+        spell_item_eye_of_gruul_healing_discount() : SpellScriptLoader("spell_item_eye_of_gruul_healing_discount") { }
+
+        class spell_item_eye_of_gruul_healing_discount_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_item_eye_of_gruul_healing_discount_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_ITEM_HEALING_TRANCE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_PALADIN_ITEM_HEALING_TRANCE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_PRIEST_ITEM_HEALING_TRANCE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_SHAMAN_ITEM_HEALING_TRANCE))
+                    return false;
+                return true;
+            }
+
+            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+            {
+                PreventDefaultAction();
+                if (Unit* unitTarget = GetTarget())
+                {
+                    uint32 spell_id = 0;
+                    switch (unitTarget->getClass())
+                    {
+                        case CLASS_DRUID:
+                            spell_id = SPELL_DRUID_ITEM_HEALING_TRANCE;
+                            break;
+                        case CLASS_PALADIN:
+                            spell_id = SPELL_PALADIN_ITEM_HEALING_TRANCE;
+                            break;
+                        case CLASS_PRIEST:
+                            spell_id = SPELL_PRIEST_ITEM_HEALING_TRANCE;
+                            break;
+                        case CLASS_SHAMAN:
+                            spell_id = SPELL_SHAMAN_ITEM_HEALING_TRANCE;
+                            break;
+                        default:
+                            return; // ignore for non-healing classes
+                    }
+
+                    unitTarget->CastSpell(unitTarget, spell_id, true, NULL, aurEff);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectProc += AuraEffectProcFn(spell_item_eye_of_gruul_healing_discount_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_item_eye_of_gruul_healing_discount_AuraScript();
+        }
+};
+
 enum eArgentKnight
 {
     SPELL_SUMMON_ARGENT_KNIGHT_ALLIANCE = 54296
@@ -1471,7 +1539,6 @@ class spell_item_summon_argent_knight :  public SpellScriptLoader
             return new spell_item_summon_argent_knight_SpellScript();
         }
 };
-
 
 // Theirs
 // Generic script for handling item dummy effects which trigger another spell.
@@ -4046,6 +4113,7 @@ void AddSC_item_spell_scripts()
     new spell_item_summon_or_dismiss();
     new spell_item_draenic_pale_ale();
     new spell_item_direbrew_remote();
+    new spell_item_eye_of_gruul_healing_discount();
     new spell_item_summon_argent_knight();
 
     // Theirs

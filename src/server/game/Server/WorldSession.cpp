@@ -269,7 +269,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     while (m_Socket && !m_Socket->IsClosed() && !_recvQueue.empty() && _recvQueue.peek(true) != firstDelayedPacket && _recvQueue.next(packet, updater))
     {
-        if (packet->GetOpcode() < NUM_MSG_TYPES)
+        if (packet->GetOpcode() >= NUM_MSG_TYPES)
+        {
+            sLog->outError("WorldSession Packet filter: received non-existent opcode %s (0x%.4X)",LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode());
+        }
+        else
         {
             OpcodeHandler &opHandle = opcodeTable[packet->GetOpcode()];
             try
@@ -297,28 +301,18 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         }
                         else
                         {
-                            if (opHandle.isGrouppedMovementOpcode)
-                            {
-                                if (movementPacket)
-                                    delete movementPacket;
-                                movementPacket = new WorldPacket(packet->GetOpcode(), 0);
-                                movementPacket->append(*((ByteBuffer*)packet));
-                            }
-                            else
-                            {
-                                if (movementPacket)
-                                {
-                                    HandleMovementOpcodes(*movementPacket);
-                                    delete movementPacket;
-                                    movementPacket = NULL;
-                                }
-                                sScriptMgr->OnPacketReceive(this, *packet);
+                          if (movementPacket)
+                          {
+                              HandleMovementOpcodes(*movementPacket);
+                              delete movementPacket;
+                              movementPacket = NULL;
+                          }
+                          sScriptMgr->OnPacketReceive(this, *packet);
 #ifdef ELUNA
-                                if (!sEluna->OnPacketReceive(this, *packet))
-                                    break;
+                          if (!sEluna->OnPacketReceive(this, *packet))
+                              break;
 #endif
-                                (this->*opHandle.handler)(*packet);
-                            }
+                          (this->*opHandle.handler)(*packet);
                         }
                         break;
                     case STATUS_TRANSFER:
@@ -354,7 +348,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         break;
                 }
             }
-            catch(ByteBufferException &)
+            catch(ByteBufferException const&)
             {
                 sLog->outError("WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.", packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
                 if (sLog->IsOutDebug())
