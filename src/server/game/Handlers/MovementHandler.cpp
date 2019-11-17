@@ -303,7 +303,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
     Unit* mover = _player->m_mover;
 
-    ASSERT(mover != NULL);                      // there must always be a mover
+    ASSERT(mover != nullptr);                      // there must always be a mover
 
     Player* plrMover = mover->ToPlayer();
 
@@ -319,21 +319,29 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
     recvData.readPackGUID(guid);
 
-    MovementInfo movementInfo;
-    movementInfo.guid = guid;
-    ReadMovementInfo(recvData, &movementInfo);
-
-    recvData.rfinish();                         // prevent warnings spam
+    // prevent tampered movement data
+    if (!guid || guid != mover->GetGUID()) {
+        recvData.rfinish();                     // prevent warnings spam
+        return;
+    }
 
     // pussywizard: typical check for incomming movement packets
-    if (!mover || !mover->IsInWorld() || mover->IsDuringRemoveFromWorld() || guid != mover->GetGUID())
-        return;
-
-    if (!movementInfo.pos.IsPositionValid())
+    if (!mover || !(mover->IsInWorld()) || mover->IsDuringRemoveFromWorld() || !(mover->movespline->Finalized()))
     {
         recvData.rfinish();                     // prevent warnings spam
         return;
     }
+
+    MovementInfo movementInfo;
+    movementInfo.guid = guid;
+    ReadMovementInfo(recvData, &movementInfo);
+
+    if (!movementInfo.pos.IsPositionValid()) {
+        recvData.rfinish();                     // prevent warnings spam
+        return;
+    }
+
+    recvData.rfinish();                         // prevent warnings spam
 
     if (movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT)
     {

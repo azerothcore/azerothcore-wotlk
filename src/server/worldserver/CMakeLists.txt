@@ -16,30 +16,18 @@ CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
 if( WIN32 )
-  list(APPEND PRIVATE_SOURCES ${sources_windows})
+  list(APPEND PRIVATE_SOURCES ${winDebugging})
   if ( MSVC )
     list(APPEND PRIVATE_SOURCES worldserver.rc)
   endif()
 endif()
-
+ 
 if (USE_COREPCH)
   set(PRIVATE_PCH_HEADER PrecompiledHeaders/worldPCH.h)
 endif()
 
 # Group sources
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
-
-add_library(worldserver-interface INTERFACE)
-
-CollectIncludeDirectories(
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  PUBLIC_INCLUDES
-  # Exclude
-  ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
-
-target_include_directories(worldserver-interface
-  INTERFACE
-    ${PUBLIC_INCLUDES})
 
 add_executable(worldserver
   ${PRIVATE_SOURCES})
@@ -57,19 +45,25 @@ endif()
 
 set_target_properties(worldserver PROPERTIES LINK_FLAGS "${worldserver_LINK_FLAGS}")
 
+CollectIncludeDirectories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  PUBLIC_INCLUDES
+  # Exclude
+  ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
+
 target_include_directories(worldserver
+  PUBLIC
+    ${PUBLIC_INCLUDES}
   PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(worldserver
   PRIVATE
-    worldserver-interface
-    authserver-interface
     game-interface
     scripts-interface
   PUBLIC
     game
-    common
+    shared
     scripts
     gsoap
     readline
