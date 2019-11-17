@@ -112,8 +112,5 @@ else()
   # Provide a dummy target for jemalloc which is used when jemalloc
   # is disabled or not supported.
   add_library(jemalloc INTERFACE)
-  target_link_libraries(jemalloc
-    INTERFACE
-      valgrind)
 
 endif()
