@@ -60,7 +60,7 @@
 #include <signal.h>
 #include <assert.h>
 
-#if PLATFORM == PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #define STRCASECMP stricmp
 #else
 #define STRCASECMP strcasecmp
@@ -86,7 +86,7 @@
 #include <ace/OS_NS_time.h>
 #include <ace/Stack_Trace.h>
 
-#if PLATFORM == PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #  include <ace/config-all.h>
 // XP winver - needed to compile with standard leak check in MemoryLeaks.h
 // uncomment later if needed
@@ -102,7 +102,7 @@
 #  include <netdb.h>
 #endif
 
-#if COMPILER == COMPILER_MICROSOFT
+#if AC_COMPILER == AC_COMPILER_MICROSOFT
 
 #include <float.h>
 

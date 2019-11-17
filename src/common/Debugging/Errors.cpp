@@ -22,7 +22,7 @@
     terminates the application.
  */
 
-#if PLATFORM == PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include <Windows.h>
 #define Crash(message) \
     ULONG_PTR execeptionArgs[] = { reinterpret_cast<ULONG_PTR>(strdup(message)), reinterpret_cast<ULONG_PTR>(_ReturnAddress()) }; \

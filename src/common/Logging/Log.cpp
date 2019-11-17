@@ -248,7 +248,7 @@ void Log::InitColors(const std::string& str)
 
 void Log::SetColor(bool stdout_stream, ColorTypes color)
 {
-    #if PLATFORM == PLATFORM_WINDOWS
+    #if AC_PLATFORM == AC_PLATFORM_WINDOWS
     static WORD WinColorFG[Colors] =
     {
         0,                                                  // BLACK
@@ -322,7 +322,7 @@ void Log::SetColor(bool stdout_stream, ColorTypes color)
 
 void Log::ResetColor(bool stdout_stream)
 {
-    #if PLATFORM == PLATFORM_WINDOWS
+    #if AC_PLATFORM == AC_PLATFORM_WINDOWS
     HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE );
     SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED );
     #else
