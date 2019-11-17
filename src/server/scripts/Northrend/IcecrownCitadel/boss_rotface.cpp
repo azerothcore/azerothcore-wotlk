@@ -502,12 +502,12 @@ class spell_rotface_mutated_infection : public SpellScriptLoader
             {
                 // remove targets with this aura already
                 // tank is not on this list
-                targets.remove_if(ACORE::UnitAuraCheck(true, GetSpellInfo()->Id));
+                targets.remove_if(acore::UnitAuraCheck(true, GetSpellInfo()->Id));
                 targets.remove(GetCaster()->GetVictim());
                 if (targets.empty())
                     return;
 
-                WorldObject* target = ACORE::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
                 _target = target;

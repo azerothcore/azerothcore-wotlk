@@ -1835,7 +1835,7 @@ void Unit::CalcAbsorbResist(Unit* attacker, Unit* victim, SpellSchoolMask school
     // We're going to call functions which can modify content of the list during iteration over it's elements
     // Let's copy the list so we can prevent iterator invalidation
     AuraEffectList vSchoolAbsorbCopy(victim->GetAuraEffectsByType(SPELL_AURA_SCHOOL_ABSORB));
-    vSchoolAbsorbCopy.sort(ACORE::AbsorbAuraOrderPred());
+    vSchoolAbsorbCopy.sort(acore::AbsorbAuraOrderPred());
 
     // absorb without mana cost
     for (AuraEffectList::iterator itr = vSchoolAbsorbCopy.begin(); (itr != vSchoolAbsorbCopy.end()) && (dmgInfo.GetDamage() > 0); ++itr)
@@ -15672,8 +15672,8 @@ void Unit::UpdateReactives(uint32 p_time)
 Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
 {
     std::list<Unit*> targets;
-    ACORE::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, dist);
-    ACORE::UnitListSearcher<ACORE::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
+    acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, dist);
+    acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
     VisitNearbyObject(dist, searcher);
 
     // remove current target
@@ -15701,14 +15701,14 @@ Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
         return NULL;
 
     // select random
-    return ACORE::Containers::SelectRandomContainerElement(targets);
+    return acore::Containers::SelectRandomContainerElement(targets);
 }
 
 Unit* Unit::SelectNearbyNoTotemTarget(Unit* exclude, float dist) const
 {
     std::list<Unit*> targets;
-    ACORE::AnyUnfriendlyNoTotemUnitInObjectRangeCheck u_check(this, this, dist);
-    ACORE::UnitListSearcher<ACORE::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, targets, u_check);
+    acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck u_check(this, this, dist);
+    acore::UnitListSearcher<acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, targets, u_check);
     VisitNearbyObject(dist, searcher);
 
     // remove current target
@@ -15736,7 +15736,7 @@ Unit* Unit::SelectNearbyNoTotemTarget(Unit* exclude, float dist) const
         return NULL;
 
     // select random
-    return ACORE::Containers::SelectRandomContainerElement(targets);
+    return acore::Containers::SelectRandomContainerElement(targets);
 }
 
 void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply)
@@ -16282,7 +16282,7 @@ bool Unit::HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura)
 
                 if (!nearMembers.empty())
                 {
-                    nearMembers.sort(ACORE::HealthPctOrderPred());
+                    nearMembers.sort(acore::HealthPctOrderPred());
                     if (Unit* target = nearMembers.front())
                     {
                         CastSpell(target, 41637 /*Dummy visual effect triggered by main spell cast*/, true);
@@ -17706,7 +17706,7 @@ void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)
         // pussywizard: generally this is not needed here, delayed notifier will handle this, call only for pets
         if ((IsGuardian() || IsPet()) && IS_PLAYER_GUID(GetOwnerGUID()))
         {
-            ACORE::AIRelocationNotifier notifier(*this);
+            acore::AIRelocationNotifier notifier(*this);
             float radius = 60.0f;
             VisitNearbyObject(radius, notifier);
         }
@@ -18517,7 +18517,7 @@ void Unit::SendTeleportPacket(Position& pos)
 
 bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool teleport)
 {
-    if (!ACORE::IsValidMapCoord(x, y, z, orientation))
+    if (!acore::IsValidMapCoord(x, y, z, orientation))
         return false;
 
     float old_orientation = GetOrientation();
@@ -19040,10 +19040,10 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
                     //active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
                 }
 
-                ACORE::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
+                acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
                 viewPoint->VisitNearbyObject(player->GetSightRange()+VISIBILITY_INC_FOR_GOBJECTS, relocateNoLarge);
                 relocateNoLarge.SendToSelf();
-                ACORE::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
+                acore::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
                 viewPoint->VisitNearbyObject(MAX_VISIBILITY_DISTANCE, relocateLarge);
                 relocateLarge.SendToSelf();
             }
@@ -19074,10 +19074,10 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
             active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
         }
 
-        ACORE::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
+        acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
         viewPoint->VisitNearbyObject(player->GetSightRange()+VISIBILITY_INC_FOR_GOBJECTS, relocateNoLarge);
         relocateNoLarge.SendToSelf();
-        ACORE::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
+        acore::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
         viewPoint->VisitNearbyObject(MAX_VISIBILITY_DISTANCE, relocateLarge);
         relocateLarge.SendToSelf();
 
@@ -19098,7 +19098,7 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
 
         unit->m_last_notify_position.Relocate(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ());
 
-        ACORE::CreatureRelocationNotifier relocate(*unit);
+        acore::CreatureRelocationNotifier relocate(*unit);
         unit->VisitNearbyObject(unit->GetVisibilityRange()+VISIBILITY_COMPENSATION, relocate);
 
         this->AddToNotify(NOTIFY_AI_RELOCATION);
@@ -19111,7 +19111,7 @@ void Unit::ExecuteDelayedUnitAINotifyEvent()
     if (!this->IsInWorld() || this->IsDuringRemoveFromWorld())
         return;
 
-    ACORE::AIRelocationNotifier notifier(*this);
+    acore::AIRelocationNotifier notifier(*this);
     float radius = 60.0f;
     this->VisitNearbyObject(radius, notifier);
 }

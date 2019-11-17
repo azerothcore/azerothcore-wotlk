@@ -22,7 +22,7 @@ namespace WeatherMgr
 
 namespace
 {
-    typedef std::unordered_map<uint32, ACORE::AutoPtr<Weather, ACE_Null_Mutex> > WeatherMap;
+    typedef std::unordered_map<uint32, acore::AutoPtr<Weather, ACE_Null_Mutex> > WeatherMap;
     typedef std::unordered_map<uint32, WeatherData> WeatherZoneMap;
 
     WeatherMap m_weathers;

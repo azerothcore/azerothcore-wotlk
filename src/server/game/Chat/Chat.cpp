@@ -886,8 +886,8 @@ GameObject* ChatHandler::GetNearbyGameObject()
 
     Player* pl = m_session->GetPlayer();
     GameObject* obj = NULL;
-    ACORE::NearestGameObjectCheck check(*pl);
-    ACORE::GameObjectLastSearcher<ACORE::NearestGameObjectCheck> searcher(pl, obj, check);
+    acore::NearestGameObjectCheck check(*pl);
+    acore::GameObjectLastSearcher<acore::NearestGameObjectCheck> searcher(pl, obj, check);
     pl->VisitNearbyGridObject(SIZE_OF_GRIDS, searcher);
     return obj;
 }
@@ -904,13 +904,13 @@ GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid
     if (!obj && sObjectMgr->GetGOData(lowguid))                   // guid is DB guid of object
     {
         // search near player then
-        CellCoord p(ACORE::ComputeCellCoord(pl->GetPositionX(), pl->GetPositionY()));
+        CellCoord p(acore::ComputeCellCoord(pl->GetPositionX(), pl->GetPositionY()));
         Cell cell(p);
 
-        ACORE::GameObjectWithDbGUIDCheck go_check(lowguid);
-        ACORE::GameObjectSearcher<ACORE::GameObjectWithDbGUIDCheck> checker(pl, obj, go_check);
+        acore::GameObjectWithDbGUIDCheck go_check(lowguid);
+        acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck> checker(pl, obj, go_check);
 
-        TypeContainerVisitor<ACORE::GameObjectSearcher<ACORE::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > object_checker(checker);
+        TypeContainerVisitor<acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > object_checker(checker);
         cell.Visit(p, object_checker, *pl->GetMap(), *pl, pl->GetGridActivationRange());
     }
 

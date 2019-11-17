@@ -9,7 +9,7 @@
 
 #include <ace/Bound_Ptr.h>
 
-namespace ACORE
+namespace acore
 {
 
 template <class Pointer, class Lock>
@@ -37,6 +37,6 @@ public:
     }
 };
 
-} // namespace ACORE
+} // namespace acore
 
 #endif

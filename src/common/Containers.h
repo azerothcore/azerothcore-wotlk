@@ -11,7 +11,7 @@
 #include <list>
 #include <vector>
 
-namespace ACORE
+namespace acore
 {
     namespace Containers
     {
@@ -68,7 +68,7 @@ namespace ACORE
         template <class C>
         typename C::const_iterator SelectRandomWeightedContainerElement(C const& container, std::vector<double> weights)
         {
-            ACORE::discrete_distribution_param<uint32> ddParam(weights.begin(), weights.end());
+            acore::discrete_distribution_param<uint32> ddParam(weights.begin(), weights.end());
             std::discrete_distribution<uint32> dd(ddParam);
             typename C::const_iterator it = container.begin();
             std::advance(it, dd(SFMTEngine::Instance()));
@@ -102,7 +102,7 @@ namespace ACORE
         }
 
         /**
-        * @fn bool ACORE::Containers::Intersects(Iterator first1, Iterator last1, Iterator first2, Iterator last2)
+        * @fn bool acore::Containers::Intersects(Iterator first1, Iterator last1, Iterator first2, Iterator last2)
         *
         * @brief Checks if two SORTED containers have a common element
         *
@@ -142,6 +142,6 @@ namespace ACORE
     }
     //! namespace Containers
 }
-//! namespace ACORE
+//! namespace acore
 
 #endif //! #ifdef ACORE_CONTAINERS_H

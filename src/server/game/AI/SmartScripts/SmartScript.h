@@ -162,13 +162,13 @@ class SmartScript
         {
             GameObject* gameObject = NULL;
 
-            CellCoord p(ACORE::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
+            CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
             Cell cell(p);
 
-            ACORE::GameObjectWithDbGUIDCheck goCheck(guid);
-            ACORE::GameObjectSearcher<ACORE::GameObjectWithDbGUIDCheck> checker(searchObject, gameObject, goCheck);
+            acore::GameObjectWithDbGUIDCheck goCheck(guid);
+            acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck> checker(searchObject, gameObject, goCheck);
 
-            TypeContainerVisitor<ACORE::GameObjectSearcher<ACORE::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > objectChecker(checker);
+            TypeContainerVisitor<acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > objectChecker(checker);
             cell.Visit(p, objectChecker, *searchObject->GetMap(), *searchObject, searchObject->GetVisibilityRange());
 
             return gameObject;
@@ -177,13 +177,13 @@ class SmartScript
         Creature* FindCreatureNear(WorldObject* searchObject, uint32 guid) const
         {
             Creature* creature = NULL;
-            CellCoord p(ACORE::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
+            CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
             Cell cell(p);
 
-            ACORE::CreatureWithDbGUIDCheck target_check(guid);
-            ACORE::CreatureSearcher<ACORE::CreatureWithDbGUIDCheck> checker(searchObject, creature, target_check);
+            acore::CreatureWithDbGUIDCheck target_check(guid);
+            acore::CreatureSearcher<acore::CreatureWithDbGUIDCheck> checker(searchObject, creature, target_check);
 
-            TypeContainerVisitor<ACORE::CreatureSearcher <ACORE::CreatureWithDbGUIDCheck>, GridTypeMapContainer > unit_checker(checker);
+            TypeContainerVisitor<acore::CreatureSearcher <acore::CreatureWithDbGUIDCheck>, GridTypeMapContainer > unit_checker(checker);
             cell.Visit(p, unit_checker, *searchObject->GetMap(), *searchObject, searchObject->GetVisibilityRange());
 
             return creature;

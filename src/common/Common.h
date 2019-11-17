@@ -209,7 +209,7 @@ typedef std::vector<std::string> StringVector;
   ACE_Read_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
     if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
-namespace ACORE
+namespace acore
 {
     template<class ArgumentType, class ResultType>
     struct unary_function

@@ -143,14 +143,14 @@ class boss_nalorakk : public CreatureScript
                 me->GetPosition(x, y, z);
 
                 {
-                    CellCoord pair(ACORE::ComputeCellCoord(x, y));
+                    CellCoord pair(acore::ComputeCellCoord(x, y));
                     Cell cell(pair);
                     cell.SetNoCreate();
 
-                    ACORE::AllFriendlyCreaturesInGrid check(me);
-                    ACORE::CreatureListSearcher<ACORE::AllFriendlyCreaturesInGrid> searcher(me, templist, check);
+                    acore::AllFriendlyCreaturesInGrid check(me);
+                    acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid> searcher(me, templist, check);
 
-                    TypeContainerVisitor<ACORE::CreatureListSearcher<ACORE::AllFriendlyCreaturesInGrid>, GridTypeMapContainer> cSearcher(searcher);
+                    TypeContainerVisitor<acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid>, GridTypeMapContainer> cSearcher(searcher);
 
                     cell.Visit(pair, cSearcher, *(me->GetMap()), *me, me->GetGridActivationRange());
                 }
@@ -170,14 +170,14 @@ class boss_nalorakk : public CreatureScript
                 me->GetPosition(x, y, z);
 
                 {
-                    CellCoord pair(ACORE::ComputeCellCoord(x, y));
+                    CellCoord pair(acore::ComputeCellCoord(x, y));
                     Cell cell(pair);
                     cell.SetNoCreate();
 
-                    ACORE::AllFriendlyCreaturesInGrid check(me);
-                    ACORE::CreatureListSearcher<ACORE::AllFriendlyCreaturesInGrid> searcher(me, templist, check);
+                    acore::AllFriendlyCreaturesInGrid check(me);
+                    acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid> searcher(me, templist, check);
 
-                    TypeContainerVisitor<ACORE::CreatureListSearcher<ACORE::AllFriendlyCreaturesInGrid>, GridTypeMapContainer> cSearcher(searcher);
+                    TypeContainerVisitor<acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid>, GridTypeMapContainer> cSearcher(searcher);
 
                     cell.Visit(pair, cSearcher, *(me->GetMap()), *me, me->GetGridActivationRange());
                 }

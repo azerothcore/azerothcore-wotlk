@@ -225,14 +225,14 @@ class boss_janalai : public CreatureScript
                 me->GetPosition(x, y, z);
 
                 {
-                    CellCoord pair(ACORE::ComputeCellCoord(x, y));
+                    CellCoord pair(acore::ComputeCellCoord(x, y));
                     Cell cell(pair);
                     cell.SetNoCreate();
 
-                    ACORE::AllCreaturesOfEntryInRange check(me, NPC_EGG, 100);
-                    ACORE::CreatureListSearcher<ACORE::AllCreaturesOfEntryInRange> searcher(me, templist, check);
+                    acore::AllCreaturesOfEntryInRange check(me, NPC_EGG, 100);
+                    acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
 
-                    TypeContainerVisitor<ACORE::CreatureListSearcher<ACORE::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
+                    TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
 
                     cell.Visit(pair, cSearcher, *me->GetMap(), *me, me->GetGridActivationRange());
                 }
@@ -258,14 +258,14 @@ class boss_janalai : public CreatureScript
                 me->GetPosition(x, y, z);
 
                 {
-                    CellCoord pair(ACORE::ComputeCellCoord(x, y));
+                    CellCoord pair(acore::ComputeCellCoord(x, y));
                     Cell cell(pair);
                     cell.SetNoCreate();
 
-                    ACORE::AllCreaturesOfEntryInRange check(me, NPC_FIRE_BOMB, 100);
-                    ACORE::CreatureListSearcher<ACORE::AllCreaturesOfEntryInRange> searcher(me, templist, check);
+                    acore::AllCreaturesOfEntryInRange check(me, NPC_FIRE_BOMB, 100);
+                    acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
 
-                    TypeContainerVisitor<ACORE::CreatureListSearcher<ACORE::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
+                    TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
 
                     cell.Visit(pair, cSearcher, *me->GetMap(), *me, me->GetGridActivationRange());
                 }
@@ -517,14 +517,14 @@ class npc_janalai_hatcher : public CreatureScript
                 me->GetPosition(x, y, z);
 
                 {
-                    CellCoord pair(ACORE::ComputeCellCoord(x, y));
+                    CellCoord pair(acore::ComputeCellCoord(x, y));
                     Cell cell(pair);
                     cell.SetNoCreate();
 
-                    ACORE::AllCreaturesOfEntryInRange check(me, 23817, 50);
-                    ACORE::CreatureListSearcher<ACORE::AllCreaturesOfEntryInRange> searcher(me, templist, check);
+                    acore::AllCreaturesOfEntryInRange check(me, 23817, 50);
+                    acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
 
-                    TypeContainerVisitor<ACORE::CreatureListSearcher<ACORE::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
+                    TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
 
                     cell.Visit(pair, cSearcher, *(me->GetMap()), *me, me->GetGridActivationRange());
                 }

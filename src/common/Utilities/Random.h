@@ -9,6 +9,7 @@
 
 #include "Define.h"
 #include "Duration.h"
+#include "Threading.h"
 #include <limits>
 
 /* Return a random number in the range min..max. */

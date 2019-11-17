@@ -10,8 +10,7 @@
 #include "SFMTRand.h"
 #include <ace/TSS_T.h>
 
-typedef ACE_TSS<SFMTRand> SFMTRandTSS;
-static SFMTRandTSS sfmtRand;
+static acore::thread_specific_ptr<SFMTRand> sfmtRand;
 static RandomEngine engine;
 
 static SFMTRand* GetRng()

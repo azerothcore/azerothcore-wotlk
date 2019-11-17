@@ -1097,7 +1097,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         }
         case SMART_ACTION_LOAD_GRID:
         {
-            if (!ACORE::IsValidMapCoord(e.target.x, e.target.y))
+            if (!acore::IsValidMapCoord(e.target.x, e.target.y))
             {
                 sLog->outError("SmartScript: SMART_ACTION_LOAD_GRID uses invalid map coords: %u, skipped.", e.entryOrGuid);
                 return false;

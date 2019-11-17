@@ -17,7 +17,7 @@
 #include "Opcodes.h"
 
 template<class T>
-inline void ACORE::VisibleNotifier::Visit(GridRefManager<T> &m)
+inline void acore::VisibleNotifier::Visit(GridRefManager<T> &m)
 {
     // Xinef: Update gameobjects only
     if (i_gobjOnly)
@@ -37,7 +37,7 @@ inline void ACORE::VisibleNotifier::Visit(GridRefManager<T> &m)
 // WorldObject searchers & workers
 
 template<class Check>
-void ACORE::WorldObjectSearcher<Check>::Visit(GameObjectMapType &m)
+void acore::WorldObjectSearcher<Check>::Visit(GameObjectMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_GAMEOBJECT))
         return;
@@ -60,7 +60,7 @@ void ACORE::WorldObjectSearcher<Check>::Visit(GameObjectMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectSearcher<Check>::Visit(PlayerMapType &m)
+void acore::WorldObjectSearcher<Check>::Visit(PlayerMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_PLAYER))
         return;
@@ -83,7 +83,7 @@ void ACORE::WorldObjectSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectSearcher<Check>::Visit(CreatureMapType &m)
+void acore::WorldObjectSearcher<Check>::Visit(CreatureMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CREATURE))
         return;
@@ -106,7 +106,7 @@ void ACORE::WorldObjectSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectSearcher<Check>::Visit(CorpseMapType &m)
+void acore::WorldObjectSearcher<Check>::Visit(CorpseMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CORPSE))
         return;
@@ -129,7 +129,7 @@ void ACORE::WorldObjectSearcher<Check>::Visit(CorpseMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectSearcher<Check>::Visit(DynamicObjectMapType &m)
+void acore::WorldObjectSearcher<Check>::Visit(DynamicObjectMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_DYNAMICOBJECT))
         return;
@@ -153,7 +153,7 @@ void ACORE::WorldObjectSearcher<Check>::Visit(DynamicObjectMapType &m)
 
 
 template<class Check>
-void ACORE::WorldObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
+void acore::WorldObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_GAMEOBJECT))
         return;
@@ -169,7 +169,7 @@ void ACORE::WorldObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectLastSearcher<Check>::Visit(PlayerMapType &m)
+void acore::WorldObjectLastSearcher<Check>::Visit(PlayerMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_PLAYER))
         return;
@@ -185,7 +185,7 @@ void ACORE::WorldObjectLastSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectLastSearcher<Check>::Visit(CreatureMapType &m)
+void acore::WorldObjectLastSearcher<Check>::Visit(CreatureMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CREATURE))
         return;
@@ -201,7 +201,7 @@ void ACORE::WorldObjectLastSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectLastSearcher<Check>::Visit(CorpseMapType &m)
+void acore::WorldObjectLastSearcher<Check>::Visit(CorpseMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CORPSE))
         return;
@@ -217,7 +217,7 @@ void ACORE::WorldObjectLastSearcher<Check>::Visit(CorpseMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectLastSearcher<Check>::Visit(DynamicObjectMapType &m)
+void acore::WorldObjectLastSearcher<Check>::Visit(DynamicObjectMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_DYNAMICOBJECT))
         return;
@@ -233,7 +233,7 @@ void ACORE::WorldObjectLastSearcher<Check>::Visit(DynamicObjectMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectListSearcher<Check>::Visit(PlayerMapType &m)
+void acore::WorldObjectListSearcher<Check>::Visit(PlayerMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_PLAYER))
         return;
@@ -244,7 +244,7 @@ void ACORE::WorldObjectListSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectListSearcher<Check>::Visit(CreatureMapType &m)
+void acore::WorldObjectListSearcher<Check>::Visit(CreatureMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CREATURE))
         return;
@@ -255,7 +255,7 @@ void ACORE::WorldObjectListSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectListSearcher<Check>::Visit(CorpseMapType &m)
+void acore::WorldObjectListSearcher<Check>::Visit(CorpseMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CORPSE))
         return;
@@ -266,7 +266,7 @@ void ACORE::WorldObjectListSearcher<Check>::Visit(CorpseMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectListSearcher<Check>::Visit(GameObjectMapType &m)
+void acore::WorldObjectListSearcher<Check>::Visit(GameObjectMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_GAMEOBJECT))
         return;
@@ -277,7 +277,7 @@ void ACORE::WorldObjectListSearcher<Check>::Visit(GameObjectMapType &m)
 }
 
 template<class Check>
-void ACORE::WorldObjectListSearcher<Check>::Visit(DynamicObjectMapType &m)
+void acore::WorldObjectListSearcher<Check>::Visit(DynamicObjectMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_DYNAMICOBJECT))
         return;
@@ -290,7 +290,7 @@ void ACORE::WorldObjectListSearcher<Check>::Visit(DynamicObjectMapType &m)
 // Gameobject searchers
 
 template<class Check>
-void ACORE::GameObjectSearcher<Check>::Visit(GameObjectMapType &m)
+void acore::GameObjectSearcher<Check>::Visit(GameObjectMapType &m)
 {
     // already found
     if (i_object)
@@ -310,7 +310,7 @@ void ACORE::GameObjectSearcher<Check>::Visit(GameObjectMapType &m)
 }
 
 template<class Check>
-void ACORE::GameObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
+void acore::GameObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
 {
     for (GameObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
     {
@@ -323,7 +323,7 @@ void ACORE::GameObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
 }
 
 template<class Check>
-void ACORE::GameObjectListSearcher<Check>::Visit(GameObjectMapType &m)
+void acore::GameObjectListSearcher<Check>::Visit(GameObjectMapType &m)
 {
     for (GameObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
@@ -334,7 +334,7 @@ void ACORE::GameObjectListSearcher<Check>::Visit(GameObjectMapType &m)
 // Unit searchers
 
 template<class Check>
-void ACORE::UnitSearcher<Check>::Visit(CreatureMapType &m)
+void acore::UnitSearcher<Check>::Visit(CreatureMapType &m)
 {
     // already found
     if (i_object)
@@ -354,7 +354,7 @@ void ACORE::UnitSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void ACORE::UnitSearcher<Check>::Visit(PlayerMapType &m)
+void acore::UnitSearcher<Check>::Visit(PlayerMapType &m)
 {
     // already found
     if (i_object)
@@ -374,7 +374,7 @@ void ACORE::UnitSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void ACORE::UnitLastSearcher<Check>::Visit(CreatureMapType &m)
+void acore::UnitLastSearcher<Check>::Visit(CreatureMapType &m)
 {
     for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
     {
@@ -387,7 +387,7 @@ void ACORE::UnitLastSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void ACORE::UnitLastSearcher<Check>::Visit(PlayerMapType &m)
+void acore::UnitLastSearcher<Check>::Visit(PlayerMapType &m)
 {
     for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
     {
@@ -400,7 +400,7 @@ void ACORE::UnitLastSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void ACORE::UnitListSearcher<Check>::Visit(PlayerMapType &m)
+void acore::UnitListSearcher<Check>::Visit(PlayerMapType &m)
 {
     for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
@@ -409,7 +409,7 @@ void ACORE::UnitListSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void ACORE::UnitListSearcher<Check>::Visit(CreatureMapType &m)
+void acore::UnitListSearcher<Check>::Visit(CreatureMapType &m)
 {
     for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
@@ -420,7 +420,7 @@ void ACORE::UnitListSearcher<Check>::Visit(CreatureMapType &m)
 // Creature searchers
 
 template<class Check>
-void ACORE::CreatureSearcher<Check>::Visit(CreatureMapType &m)
+void acore::CreatureSearcher<Check>::Visit(CreatureMapType &m)
 {
     // already found
     if (i_object)
@@ -440,7 +440,7 @@ void ACORE::CreatureSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void ACORE::CreatureLastSearcher<Check>::Visit(CreatureMapType &m)
+void acore::CreatureLastSearcher<Check>::Visit(CreatureMapType &m)
 {
     for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
     {
@@ -453,7 +453,7 @@ void ACORE::CreatureLastSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void ACORE::CreatureListSearcher<Check>::Visit(CreatureMapType &m)
+void acore::CreatureListSearcher<Check>::Visit(CreatureMapType &m)
 {
     for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
@@ -462,7 +462,7 @@ void ACORE::CreatureListSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void ACORE::PlayerListSearcher<Check>::Visit(PlayerMapType &m)
+void acore::PlayerListSearcher<Check>::Visit(PlayerMapType &m)
 {
     for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
@@ -471,7 +471,7 @@ void ACORE::PlayerListSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void ACORE::PlayerListSearcherWithSharedVision<Check>::Visit(PlayerMapType &m)
+void acore::PlayerListSearcherWithSharedVision<Check>::Visit(PlayerMapType &m)
 {
     for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
@@ -480,7 +480,7 @@ void ACORE::PlayerListSearcherWithSharedVision<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void ACORE::PlayerListSearcherWithSharedVision<Check>::Visit(CreatureMapType &m)
+void acore::PlayerListSearcherWithSharedVision<Check>::Visit(CreatureMapType &m)
 {
     for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask) && itr->GetSource()->HasSharedVision())
@@ -490,7 +490,7 @@ void ACORE::PlayerListSearcherWithSharedVision<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void ACORE::PlayerSearcher<Check>::Visit(PlayerMapType &m)
+void acore::PlayerSearcher<Check>::Visit(PlayerMapType &m)
 {
     // already found
     if (i_object)
@@ -510,7 +510,7 @@ void ACORE::PlayerSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void ACORE::PlayerLastSearcher<Check>::Visit(PlayerMapType& m)
+void acore::PlayerLastSearcher<Check>::Visit(PlayerMapType& m)
 {
     for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
     {
@@ -523,7 +523,7 @@ void ACORE::PlayerLastSearcher<Check>::Visit(PlayerMapType& m)
 }
 
 template<class Builder>
-void ACORE::LocalizedPacketDo<Builder>::operator()(Player* p)
+void acore::LocalizedPacketDo<Builder>::operator()(Player* p)
 {
     LocaleConstant loc_idx = p->GetSession()->GetSessionDbLocaleIndex();
     uint32 cache_idx = loc_idx+1;
@@ -550,7 +550,7 @@ void ACORE::LocalizedPacketDo<Builder>::operator()(Player* p)
 }
 
 template<class Builder>
-void ACORE::LocalizedPacketListDo<Builder>::operator()(Player* p)
+void acore::LocalizedPacketListDo<Builder>::operator()(Player* p)
 {
     LocaleConstant loc_idx = p->GetSession()->GetSessionDbLocaleIndex();
     uint32 cache_idx = loc_idx+1;

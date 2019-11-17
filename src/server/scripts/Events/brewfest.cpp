@@ -1114,8 +1114,8 @@ public:
             {
                 timer = 0;
                 Player* player = NULL;
-                ACORE::AnyPlayerInObjectRangeCheck checker(me, 2.0f);
-                ACORE::PlayerSearcher<ACORE::AnyPlayerInObjectRangeCheck> searcher(me, player, checker);
+                acore::AnyPlayerInObjectRangeCheck checker(me, 2.0f);
+                acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, player, checker);
                 me->VisitNearbyWorldObject(2.0f, searcher);
                 if (player)
                 {

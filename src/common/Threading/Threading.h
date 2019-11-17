@@ -13,7 +13,7 @@
 #include <thread>
 #include <atomic>
 
-namespace ACORE
+namespace acore
 {
     class Runnable
     {
@@ -67,5 +67,21 @@ namespace ACORE
             std::thread::id m_iThreadId;
             std::thread m_ThreadImp;
     };
+
+    template <typename T>
+    class thread_specific_ptr : private acore::noncopyable // Exposition only.
+        // Class thread_specific_ptr meets the NonCopyable requirement.
+    {
+    public:
+        thread_specific_ptr();
+        ~thread_specific_ptr();
+
+        T* get() const;
+        T* operator->() const;
+        T& operator*() const;
+        T* release();
+        void reset(T* p=0);
+    };
+
 }
 #endif

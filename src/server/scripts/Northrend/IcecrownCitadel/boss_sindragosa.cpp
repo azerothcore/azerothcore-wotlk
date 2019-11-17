@@ -227,7 +227,7 @@ class IceTombSummonEvent : public BasicEvent
         uint64 _sindragosaGUID;
 };
 
-struct LastPhaseIceTombTargetSelector : public ACORE::unary_function<Unit*, bool>
+struct LastPhaseIceTombTargetSelector : public acore::unary_function<Unit*, bool>
 {
     public:
         LastPhaseIceTombTargetSelector(Creature* source) : _source(source) { }
@@ -914,10 +914,10 @@ class spell_sindragosa_unchained_magic : public SpellScriptLoader
                 uint32 maxSize = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 3 : 1);
                 healList.remove_if(UnchainedMagicTargetSelector(false));
                 if (healList.size() > maxSize)
-                    ACORE::Containers::RandomResizeList(healList, maxSize);
+                    acore::Containers::RandomResizeList(healList, maxSize);
                 dpsList.remove_if(UnchainedMagicTargetSelector(true));
                 if (dpsList.size() > maxSize)
-                    ACORE::Containers::RandomResizeList(dpsList, maxSize);
+                    acore::Containers::RandomResizeList(dpsList, maxSize);
                 unitList.splice(unitList.begin(), healList);
                 unitList.splice(unitList.begin(), dpsList);
             }
@@ -1214,7 +1214,7 @@ class spell_sindragosa_ice_tomb : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& unitList)
             {
-                unitList.remove_if(ACORE::UnitAuraCheck(true, GetSpellInfo()->Id));
+                unitList.remove_if(acore::UnitAuraCheck(true, GetSpellInfo()->Id));
                 targetList.clear();
                 targetList = unitList;
             }
@@ -1933,11 +1933,11 @@ class spell_frostwarden_handler_order_whelp : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(ACORE::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+                targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
                 if (targets.empty())
                     return;
 
-                WorldObject* target = ACORE::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -1954,7 +1954,7 @@ class spell_frostwarden_handler_order_whelp : public SpellScriptLoader
                 if (unitList.empty())
                     return;
 
-                ACORE::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+                acore::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
             }
 
             void Register()

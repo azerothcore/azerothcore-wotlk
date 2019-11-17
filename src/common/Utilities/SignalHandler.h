@@ -9,7 +9,7 @@
 
 #include <ace/Event_Handler.h>
 
-namespace ACORE
+namespace acore
 {
 
 /// Handle termination signals

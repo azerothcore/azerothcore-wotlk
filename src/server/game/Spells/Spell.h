@@ -730,7 +730,7 @@ class Spell
 #endif
 };
 
-namespace ACORE
+namespace acore
 {
     struct WorldObjectSpellTargetCheck
     {

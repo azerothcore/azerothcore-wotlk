@@ -47,7 +47,7 @@ bool stopEvent = false;                                     // Setting it to tru
 LoginDatabaseWorkerPool LoginDatabase;                      // Accessor to the authserver database
 
 /// Handle authserver's termination signals
-class AuthServerSignalHandler : public ACORE::SignalHandler
+class AuthServerSignalHandler : public acore::SignalHandler
 {
 public:
     virtual void HandleSignal(int sigNum)

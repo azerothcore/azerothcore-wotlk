@@ -10,7 +10,7 @@
 #include "Define.h"
 #include <string>
 
-namespace ACORE
+namespace acore
 {
     DECLSPEC_NORETURN void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message) ATTR_NORETURN;
     DECLSPEC_NORETURN void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message, char const* format, ...) ATTR_NORETURN ATTR_PRINTF(6, 7);
@@ -25,7 +25,7 @@ namespace ACORE
 
     DECLSPEC_NORETURN void AbortHandler(int sigval) ATTR_NORETURN;
 
-} // namespace ACORE
+} // namespace acore
 
 std::string GetDebugInfo();
 
@@ -41,12 +41,12 @@ std::string GetDebugInfo();
 #define EXCEPTION_ASSERTION_FAILURE 0xC0000420L
 #endif
 
-#define WPAssert(cond, ...) ASSERT_BEGIN do { if (!(cond)) ACORE::Assert(__FILE__, __LINE__, __FUNCTION__, GetDebugInfo(), #cond, ##__VA_ARGS__); } while(0) ASSERT_END
-#define WPAssert_NODEBUGINFO(cond, ...) ASSERT_BEGIN do { if (!(cond)) ACORE::Assert(__FILE__, __LINE__, __FUNCTION__, "", #cond, ##__VA_ARGS__); } while(0) ASSERT_END
-#define WPFatal(cond, ...) ASSERT_BEGIN do { if (!(cond)) ACORE::Fatal(__FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); } while(0) ASSERT_END
-#define WPError(cond, msg) ASSERT_BEGIN do { if (!(cond)) ACORE::Error(__FILE__, __LINE__, __FUNCTION__, (msg)); } while(0) ASSERT_END
-#define WPWarning(cond, msg) ASSERT_BEGIN do { if (!(cond)) ACORE::Warning(__FILE__, __LINE__, __FUNCTION__, (msg)); } while(0) ASSERT_END
-#define WPAbort() ASSERT_BEGIN do { ACORE::Abort(__FILE__, __LINE__, __FUNCTION__); } while(0) ASSERT_END
+#define WPAssert(cond, ...) ASSERT_BEGIN do { if (!(cond)) acore::Assert(__FILE__, __LINE__, __FUNCTION__, GetDebugInfo(), #cond, ##__VA_ARGS__); } while(0) ASSERT_END
+#define WPAssert_NODEBUGINFO(cond, ...) ASSERT_BEGIN do { if (!(cond)) acore::Assert(__FILE__, __LINE__, __FUNCTION__, "", #cond, ##__VA_ARGS__); } while(0) ASSERT_END
+#define WPFatal(cond, ...) ASSERT_BEGIN do { if (!(cond)) acore::Fatal(__FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); } while(0) ASSERT_END
+#define WPError(cond, msg) ASSERT_BEGIN do { if (!(cond)) acore::Error(__FILE__, __LINE__, __FUNCTION__, (msg)); } while(0) ASSERT_END
+#define WPWarning(cond, msg) ASSERT_BEGIN do { if (!(cond)) acore::Warning(__FILE__, __LINE__, __FUNCTION__, (msg)); } while(0) ASSERT_END
+#define WPAbort() ASSERT_BEGIN do { acore::Abort(__FILE__, __LINE__, __FUNCTION__); } while(0) ASSERT_END
 
 #ifdef PERFORMANCE_PROFILING
 #define ASSERT(cond, ...) ((void)0)

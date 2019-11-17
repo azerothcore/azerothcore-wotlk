@@ -1421,8 +1421,8 @@ void WorldObject::GetRandomPoint(const Position &pos, float distance, float &ran
     rand_y = pos.m_positionY + new_dist * sin(angle);
     rand_z = pos.m_positionZ;
 
-    ACORE::NormalizeMapCoord(rand_x);
-    ACORE::NormalizeMapCoord(rand_y);
+    acore::NormalizeMapCoord(rand_x);
+    acore::NormalizeMapCoord(rand_y);
     UpdateGroundPositionZ(rand_x, rand_y, rand_z);            // update to LOS height if available
 }
 
@@ -1503,7 +1503,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
 
 bool Position::IsPositionValid() const
 {
-    return ACORE::IsValidMapCoord(m_positionX, m_positionY, m_positionZ, m_orientation);
+    return acore::IsValidMapCoord(m_positionX, m_positionY, m_positionZ, m_orientation);
 }
 
 float WorldObject::GetGridActivationRange() const
@@ -1871,7 +1871,7 @@ void Object::ForceValuesUpdateAtIndex(uint32 i)
     }
 }
 
-namespace ACORE
+namespace acore
 {
         class MonsterChatBuilder
     {
@@ -1919,61 +1919,61 @@ namespace ACORE
             Language i_language;
             WorldObject const* i_target;
     };
-}                                                           // namespace ACORE
+}                                                           // namespace acore
 
 void WorldObject::MonsterSay(const char* text, uint32 language, WorldObject const* target)
 { 
-    CellCoord p = ACORE::ComputeCellCoord(GetPositionX(), GetPositionY());
+    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    ACORE::MonsterCustomChatBuilder say_build(this, CHAT_MSG_MONSTER_SAY, text, language, target);
-    ACORE::LocalizedPacketDo<ACORE::MonsterCustomChatBuilder> say_do(say_build);
-    ACORE::PlayerDistWorker<ACORE::LocalizedPacketDo<ACORE::MonsterCustomChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
-    TypeContainerVisitor<ACORE::PlayerDistWorker<ACORE::LocalizedPacketDo<ACORE::MonsterCustomChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+    acore::MonsterCustomChatBuilder say_build(this, CHAT_MSG_MONSTER_SAY, text, language, target);
+    acore::LocalizedPacketDo<acore::MonsterCustomChatBuilder> say_do(say_build);
+    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterCustomChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
+    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterCustomChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
 }
 
 void WorldObject::MonsterSay(int32 textId, uint32 language, WorldObject const* target)
 { 
-    CellCoord p = ACORE::ComputeCellCoord(GetPositionX(), GetPositionY());
+    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    ACORE::MonsterChatBuilder say_build(this, CHAT_MSG_MONSTER_SAY, textId, language, target);
-    ACORE::LocalizedPacketDo<ACORE::MonsterChatBuilder> say_do(say_build);
-    ACORE::PlayerDistWorker<ACORE::LocalizedPacketDo<ACORE::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
-    TypeContainerVisitor<ACORE::PlayerDistWorker<ACORE::LocalizedPacketDo<ACORE::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+    acore::MonsterChatBuilder say_build(this, CHAT_MSG_MONSTER_SAY, textId, language, target);
+    acore::LocalizedPacketDo<acore::MonsterChatBuilder> say_do(say_build);
+    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
+    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
 }
 
 void WorldObject::MonsterYell(const char* text, uint32 language, WorldObject const* target)
 { 
-    CellCoord p = ACORE::ComputeCellCoord(GetPositionX(), GetPositionY());
+    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    ACORE::MonsterCustomChatBuilder say_build(this, CHAT_MSG_MONSTER_YELL, text, language, target);
-    ACORE::LocalizedPacketDo<ACORE::MonsterCustomChatBuilder> say_do(say_build);
-    ACORE::PlayerDistWorker<ACORE::LocalizedPacketDo<ACORE::MonsterCustomChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), say_do);
-    TypeContainerVisitor<ACORE::PlayerDistWorker<ACORE::LocalizedPacketDo<ACORE::MonsterCustomChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+    acore::MonsterCustomChatBuilder say_build(this, CHAT_MSG_MONSTER_YELL, text, language, target);
+    acore::LocalizedPacketDo<acore::MonsterCustomChatBuilder> say_do(say_build);
+    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterCustomChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), say_do);
+    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterCustomChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL));
 }
 
 void WorldObject::MonsterYell(int32 textId, uint32 language, WorldObject const* target)
 { 
-    CellCoord p = ACORE::ComputeCellCoord(GetPositionX(), GetPositionY());
+    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    ACORE::MonsterChatBuilder say_build(this, CHAT_MSG_MONSTER_YELL, textId, language, target);
-    ACORE::LocalizedPacketDo<ACORE::MonsterChatBuilder> say_do(say_build);
-    ACORE::PlayerDistWorker<ACORE::LocalizedPacketDo<ACORE::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), say_do);
-    TypeContainerVisitor<ACORE::PlayerDistWorker<ACORE::LocalizedPacketDo<ACORE::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+    acore::MonsterChatBuilder say_build(this, CHAT_MSG_MONSTER_YELL, textId, language, target);
+    acore::LocalizedPacketDo<acore::MonsterChatBuilder> say_do(say_build);
+    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), say_do);
+    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL));
 }
 
@@ -1987,15 +1987,15 @@ void WorldObject::MonsterTextEmote(const char* text, WorldObject const* target, 
 
 void WorldObject::MonsterTextEmote(int32 textId, WorldObject const* target, bool IsBossEmote)
 { 
-    CellCoord p = ACORE::ComputeCellCoord(GetPositionX(), GetPositionY());
+    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    ACORE::MonsterChatBuilder say_build(this, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, textId, LANG_UNIVERSAL, target);
-    ACORE::LocalizedPacketDo<ACORE::MonsterChatBuilder> say_do(say_build);
-    ACORE::PlayerDistWorker<ACORE::LocalizedPacketDo<ACORE::MonsterChatBuilder> > say_worker(this, (IsBossEmote ? 200.0f : sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE)), say_do);
-    TypeContainerVisitor<ACORE::PlayerDistWorker<ACORE::LocalizedPacketDo<ACORE::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+    acore::MonsterChatBuilder say_build(this, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, textId, LANG_UNIVERSAL, target);
+    acore::LocalizedPacketDo<acore::MonsterChatBuilder> say_do(say_build);
+    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterChatBuilder> > say_worker(this, (IsBossEmote ? 200.0f : sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE)), say_do);
+    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, (IsBossEmote ? 200.0f : sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE)));
 }
 
@@ -2043,7 +2043,7 @@ void WorldObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*
     dist += GetObjectSize();
     if (includeMargin)
         dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
-    ACORE::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
+    acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
     VisitNearbyWorldObject(dist, notifier);
 }
 
@@ -2370,8 +2370,8 @@ void WorldObject::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list 
 Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive) const
 { 
     Creature* creature = NULL;
-    ACORE::NearestCreatureEntryWithLiveStateInObjectRangeCheck checker(*this, entry, alive, range);
-    ACORE::CreatureLastSearcher<ACORE::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(this, creature, checker);
+    acore::NearestCreatureEntryWithLiveStateInObjectRangeCheck checker(*this, entry, alive, range);
+    acore::CreatureLastSearcher<acore::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(this, creature, checker);
     VisitNearbyObject(range, searcher);
     return creature;
 }
@@ -2379,8 +2379,8 @@ Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive
 GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
 { 
     GameObject* go = NULL;
-    ACORE::NearestGameObjectEntryInObjectRangeCheck checker(*this, entry, range);
-    ACORE::GameObjectLastSearcher<ACORE::NearestGameObjectEntryInObjectRangeCheck> searcher(this, go, checker);
+    acore::NearestGameObjectEntryInObjectRangeCheck checker(*this, entry, range);
+    acore::GameObjectLastSearcher<acore::NearestGameObjectEntryInObjectRangeCheck> searcher(this, go, checker);
     VisitNearbyGridObject(range, searcher);
     return go;
 }
@@ -2388,8 +2388,8 @@ GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
 GameObject* WorldObject::FindNearestGameObjectOfType(GameobjectTypes type, float range) const
 { 
     GameObject* go = NULL;
-    ACORE::NearestGameObjectTypeInObjectRangeCheck checker(*this, type, range);
-    ACORE::GameObjectLastSearcher<ACORE::NearestGameObjectTypeInObjectRangeCheck> searcher(this, go, checker);
+    acore::NearestGameObjectTypeInObjectRangeCheck checker(*this, type, range);
+    acore::GameObjectLastSearcher<acore::NearestGameObjectTypeInObjectRangeCheck> searcher(this, go, checker);
     VisitNearbyGridObject(range, searcher);
     return go;
 }
@@ -2398,8 +2398,8 @@ Player* WorldObject::SelectNearestPlayer(float distance) const
 { 
     Player* target = NULL;
 
-    ACORE::NearestPlayerInObjectRangeCheck checker(this, distance);
-    ACORE::PlayerLastSearcher<ACORE::NearestPlayerInObjectRangeCheck> searcher(this, target, checker);
+    acore::NearestPlayerInObjectRangeCheck checker(this, distance);
+    acore::PlayerLastSearcher<acore::NearestPlayerInObjectRangeCheck> searcher(this, target, checker);
     VisitNearbyObject(distance, searcher);
 
     return target;
@@ -2407,32 +2407,32 @@ Player* WorldObject::SelectNearestPlayer(float distance) const
 
 void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, uint32 entry, float maxSearchRange) const
 { 
-    CellCoord pair(ACORE::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
+    CellCoord pair(acore::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
     Cell cell(pair);
     cell.SetNoCreate();
 
-    ACORE::AllGameObjectsWithEntryInRange check(this, entry, maxSearchRange);
-    ACORE::GameObjectListSearcher<ACORE::AllGameObjectsWithEntryInRange> searcher(this, gameobjectList, check);
-    TypeContainerVisitor<ACORE::GameObjectListSearcher<ACORE::AllGameObjectsWithEntryInRange>, GridTypeMapContainer> visitor(searcher);
+    acore::AllGameObjectsWithEntryInRange check(this, entry, maxSearchRange);
+    acore::GameObjectListSearcher<acore::AllGameObjectsWithEntryInRange> searcher(this, gameobjectList, check);
+    TypeContainerVisitor<acore::GameObjectListSearcher<acore::AllGameObjectsWithEntryInRange>, GridTypeMapContainer> visitor(searcher);
 
     cell.Visit(pair, visitor, *(this->GetMap()), *this, maxSearchRange);
 }
 
 void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureList, uint32 entry, float maxSearchRange) const
 { 
-    CellCoord pair(ACORE::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
+    CellCoord pair(acore::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
     Cell cell(pair);
     cell.SetNoCreate();
 
-    ACORE::AllCreaturesOfEntryInRange check(this, entry, maxSearchRange);
-    ACORE::CreatureListSearcher<ACORE::AllCreaturesOfEntryInRange> searcher(this, creatureList, check);
-    TypeContainerVisitor<ACORE::CreatureListSearcher<ACORE::AllCreaturesOfEntryInRange>, GridTypeMapContainer> visitor(searcher);
+    acore::AllCreaturesOfEntryInRange check(this, entry, maxSearchRange);
+    acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(this, creatureList, check);
+    TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> visitor(searcher);
 
     cell.Visit(pair, visitor, *(this->GetMap()), *this, maxSearchRange);
 }
 
 /*
-namespace ACORE
+namespace acore
 {
     class NearUsedPosDo
     {
@@ -2501,7 +2501,7 @@ namespace ACORE
             float              i_angle;
             ObjectPosSelector& i_selector;
     };
-}                                                           // namespace ACORE
+}                                                           // namespace acore
 */
 
 //===================================================================================================
@@ -2511,8 +2511,8 @@ void WorldObject::GetNearPoint2D(float &x, float &y, float distance2d, float abs
     x = GetPositionX() + (GetObjectSize() + distance2d) * cos(absAngle);
     y = GetPositionY() + (GetObjectSize() + distance2d) * sin(absAngle);
 
-    ACORE::NormalizeMapCoord(x);
-    ACORE::NormalizeMapCoord(y);
+    acore::NormalizeMapCoord(x);
+    acore::NormalizeMapCoord(y);
 }
 
 void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_size, float distance2d, float absAngle) const
@@ -2619,7 +2619,7 @@ void WorldObject::MovePosition(Position &pos, float dist, float angle)
     desty = pos.m_positionY + dist * sin(angle);
 
     // Prevent invalid coordinates here, position is unchanged
-    if (!ACORE::IsValidMapCoord(destx, desty))
+    if (!acore::IsValidMapCoord(destx, desty))
     {
         sLog->outCrash("WorldObject::MovePosition invalid coordinates X: %f and Y: %f were passed!", destx, desty);
         return;
@@ -2649,8 +2649,8 @@ void WorldObject::MovePosition(Position &pos, float dist, float angle)
 
     pos.Relocate(destx, desty, destz);
 
-    ACORE::NormalizeMapCoord(pos.m_positionX);
-    ACORE::NormalizeMapCoord(pos.m_positionY);
+    acore::NormalizeMapCoord(pos.m_positionX);
+    acore::NormalizeMapCoord(pos.m_positionY);
     UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
     pos.m_orientation = m_orientation;
 }
@@ -2666,7 +2666,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         destz += 2.0f;
 
     // Prevent invalid coordinates here, position is unchanged
-    if (!ACORE::IsValidMapCoord(destx, desty))
+    if (!acore::IsValidMapCoord(destx, desty))
     {
         sLog->outCrash("WorldObject::MovePositionToFirstCollision invalid coordinates X: %f and Y: %f were passed!", destx, desty);
         return;
@@ -2731,8 +2731,8 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
             break;
     }
 
-    ACORE::NormalizeMapCoord(destx);
-    ACORE::NormalizeMapCoord(desty);
+    acore::NormalizeMapCoord(destx);
+    acore::NormalizeMapCoord(desty);
     UpdateAllowedPositionZ(destx, desty, destz);
 
     float ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
@@ -2766,7 +2766,7 @@ void WorldObject::MovePositionToFirstCollisionForTotem(Position &pos, float dist
     destz = pos.GetPositionZ();
 
     // Prevent invalid coordinates here, position is unchanged
-    if (!ACORE::IsValidMapCoord(destx, desty))
+    if (!acore::IsValidMapCoord(destx, desty))
     {
         sLog->outCrash("WorldObject::MovePositionToFirstCollision invalid coordinates X: %f and Y: %f were passed!", destx, desty);
         return;
@@ -2842,8 +2842,8 @@ void WorldObject::MovePositionToFirstCollisionForTotem(Position &pos, float dist
         destz = prevdz;
     }
 
-    ACORE::NormalizeMapCoord(destx);
-    ACORE::NormalizeMapCoord(desty);
+    acore::NormalizeMapCoord(destx);
+    acore::NormalizeMapCoord(desty);
 
     pos.Relocate(destx, desty, destz);
     pos.m_orientation = m_orientation;
@@ -2884,8 +2884,8 @@ void WorldObject::DestroyForNearbyPlayers()
         return;
 
     std::list<Player*> targets;
-    ACORE::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange()+VISIBILITY_COMPENSATION, false);
-    ACORE::PlayerListSearcherWithSharedVision<ACORE::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    acore::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange()+VISIBILITY_COMPENSATION, false);
+    acore::PlayerListSearcherWithSharedVision<acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
     VisitNearbyWorldObject(GetVisibilityRange()+VISIBILITY_COMPENSATION, searcher);
     for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
     {
@@ -2908,7 +2908,7 @@ void WorldObject::DestroyForNearbyPlayers()
 void WorldObject::UpdateObjectVisibility(bool /*forced*/, bool /*fromUpdate*/)
 { 
     //updates object's visibility for nearby players
-    ACORE::VisibleChangesNotifier notifier(*this);
+    acore::VisibleChangesNotifier notifier(*this);
     VisitNearbyWorldObject(GetVisibilityRange()+VISIBILITY_COMPENSATION, notifier);
 }
 
@@ -3013,7 +3013,7 @@ struct WorldObjectChangeAccumulator
 
 void WorldObject::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set)
 { 
-    CellCoord p = ACORE::ComputeCellCoord(GetPositionX(), GetPositionY());
+    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
     Cell cell(p);
     cell.SetNoCreate();
     WorldObjectChangeAccumulator notifier(*this, data_map, player_set);
@@ -3027,17 +3027,17 @@ void WorldObject::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& play
 
 void WorldObject::GetCreaturesWithEntryInRange(std::list<Creature*> &creatureList, float radius, uint32 entry)
 { 
-    CellCoord pair(ACORE::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
+    CellCoord pair(acore::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
     Cell cell(pair);
     cell.SetNoCreate();
 
-    ACORE::AllCreaturesOfEntryInRange check(this, entry, radius);
-    ACORE::CreatureListSearcher<ACORE::AllCreaturesOfEntryInRange> searcher(this, creatureList, check);
+    acore::AllCreaturesOfEntryInRange check(this, entry, radius);
+    acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(this, creatureList, check);
 
-    TypeContainerVisitor<ACORE::CreatureListSearcher<ACORE::AllCreaturesOfEntryInRange>, WorldTypeMapContainer> world_visitor(searcher);
+    TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, WorldTypeMapContainer> world_visitor(searcher);
     cell.Visit(pair, world_visitor, *(this->GetMap()), *this, radius);
 
-    TypeContainerVisitor<ACORE::CreatureListSearcher<ACORE::AllCreaturesOfEntryInRange>, GridTypeMapContainer> grid_visitor(searcher);
+    TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> grid_visitor(searcher);
     cell.Visit(pair, grid_visitor, *(this->GetMap()), *this, radius);
 }
 

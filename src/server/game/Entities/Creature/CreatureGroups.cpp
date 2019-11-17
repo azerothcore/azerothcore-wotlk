@@ -258,8 +258,8 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         float dy = y + sin(followAngle + pathAngle) * followDist;
         float dz = z;
 
-        ACORE::NormalizeMapCoord(dx);
-        ACORE::NormalizeMapCoord(dy);
+        acore::NormalizeMapCoord(dx);
+        acore::NormalizeMapCoord(dy);
 
         member->UpdateGroundPositionZ(dx, dy, dz);
 

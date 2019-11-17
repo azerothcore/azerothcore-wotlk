@@ -245,7 +245,7 @@ class spell_tsh_shoot_flame_arrow : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& unitList)
             {
-                ACORE::Containers::RandomResizeList(unitList, 1);
+                acore::Containers::RandomResizeList(unitList, 1);
             }
 
             void HandleScriptEffect(SpellEffIndex effIndex)

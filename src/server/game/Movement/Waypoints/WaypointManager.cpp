@@ -56,8 +56,8 @@ void WaypointMgr::Load()
         float z = fields[4].GetFloat();
         float o = fields[5].GetFloat();
 
-        ACORE::NormalizeMapCoord(x);
-        ACORE::NormalizeMapCoord(y);
+        acore::NormalizeMapCoord(x);
+        acore::NormalizeMapCoord(y);
 
         wp->id = fields[1].GetUInt32();
         wp->x = x;
@@ -118,8 +118,8 @@ void WaypointMgr::ReloadPath(uint32 id)
         float z = fields[3].GetFloat();
         float o = fields[4].GetFloat();
 
-        ACORE::NormalizeMapCoord(x);
-        ACORE::NormalizeMapCoord(y);
+        acore::NormalizeMapCoord(x);
+        acore::NormalizeMapCoord(y);
 
         wp->id = fields[0].GetUInt32();
         wp->x = x;
