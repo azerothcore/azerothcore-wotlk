@@ -463,34 +463,34 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId bgTypeId
               bg = new BattlegroundAV(*(static_cast<BattlegroundAV*>(bg_template)));
               break;
           case BATTLEGROUND_WS:
-              bg = new BattlegroundWS(*(BattlegroundWS*)bg_template);
+              bg = new BattlegroundWS(*(static_cast<BattlegroundWS*>(bg_template)));
               break;
           case BATTLEGROUND_AB:
-              bg = new BattlegroundAB(*(BattlegroundAB*)bg_template);
+              bg = new BattlegroundAB(*(static_cast<BattlegroundAB*>(bg_template)));
               break;
           case BATTLEGROUND_NA:
-              bg = new BattlegroundNA(*(BattlegroundNA*)bg_template);
+              bg = new BattlegroundNA(*(static_cast<BattlegroundNA*>(bg_template)));
               break;
           case BATTLEGROUND_BE:
-              bg = new BattlegroundBE(*(BattlegroundBE*)bg_template);
+              bg = new BattlegroundBE(*(static_cast<BattlegroundBE*>(bg_template)));
               break;
           case BATTLEGROUND_EY:
-              bg = new BattlegroundEY(*(BattlegroundEY*)bg_template);
+              bg = new BattlegroundEY(*(static_cast<BattlegroundEY*>(bg_template)));
               break;
           case BATTLEGROUND_RL:
-              bg = new BattlegroundRL(*(BattlegroundRL*)bg_template);
+              bg = new BattlegroundRL(*(static_cast<BattlegroundRL*>(bg_template)));
               break;
           case BATTLEGROUND_SA:
-              bg = new BattlegroundSA(*(BattlegroundSA*)bg_template);
+              bg = new BattlegroundSA(*(static_cast<BattlegroundSA*>(bg_template)));
               break;
           case BATTLEGROUND_DS:
-              bg = new BattlegroundDS(*(BattlegroundDS*)bg_template);
+              bg = new BattlegroundDS(*(static_cast<BattlegroundDS*>(bg_template)));
               break;
           case BATTLEGROUND_RV:
-              bg = new BattlegroundRV(*(BattlegroundRV*)bg_template);
+              bg = new BattlegroundRV(*(static_cast<BattlegroundRV*>(bg_template)));
               break;
           case BATTLEGROUND_IC:
-              bg = new BattlegroundIC(*(BattlegroundIC*)bg_template);
+              bg = new BattlegroundIC(*(static_cast<BattlegroundIC*>(bg_template)));
               break;
           case BATTLEGROUND_RB:
           case BATTLEGROUND_AA:
