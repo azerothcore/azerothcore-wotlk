@@ -460,7 +460,7 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId bgTypeId
         switch (bgTypeId)
         {
           case BATTLEGROUND_AV:
-              bg = new BattlegroundAV(*(BattlegroundAV*)bg_template);
+              bg = new BattlegroundAV(*(static_cast<BattlegroundAV*>(bg_template)));
               break;
           case BATTLEGROUND_WS:
               bg = new BattlegroundWS(*(BattlegroundWS*)bg_template);
