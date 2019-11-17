@@ -64,8 +64,9 @@ void VisibleNotifier::SendToSelf()
 
     for (Player::ClientGUIDs::const_iterator it = vis_guids.begin();it != vis_guids.end(); ++it)
     {
-        if (i_largeOnly != ObjectAccessor::GetWorldObject(i_player, *it)->IsVisibilityOverridden())
-            continue;
+        if (WorldObject* obj = ObjectAccessor::GetWorldObject(i_player, *it))
+            if (i_largeOnly != obj->IsVisibilityOverridden())
+                continue;
 
         // pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)
         if (IS_TRANSPORT_GUID(*it))
