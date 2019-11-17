@@ -25,6 +25,7 @@
 #    NETWORK CONFIG
 #    CONSOLE AND REMOTE ACCESS
 #    CHARACTER DELETE OPTIONS
+#    ITEM DELETE OPTIONS
 #    CUSTOM SERVER OPTIONS
 #
 ###################################################################################################
@@ -2953,6 +2954,35 @@ CharDelete.MinLevel = 0
 #                     0  - (Disabled, Don't delete any characters)
 
 CharDelete.KeepDays = 30
+
+#
+###################################################################################################
+
+###################################################################################################
+# ITEM DELETE OPTIONS
+#
+#    ItemDelete.Method
+#        Description: Item deletion behavior.
+#        Default:     0 - (Completely remove item from the database)
+#                     1 - (Save Item to database)
+
+ItemDelete.Method = 0
+
+#
+#    ItemDelete.Quality
+#        Description:
+#        Default:     3
+#
+
+ItemDelete.Quality = 3
+
+#
+#    ItemDelete.ItemLevel
+#        Description:
+#        Default:     80
+#
+
+ItemDelete.ItemLevel = 80
 
 #
 ###################################################################################################

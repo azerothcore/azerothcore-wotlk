@@ -1192,6 +1192,11 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_CHARDELETE_MIN_LEVEL] = sConfigMgr->GetIntDefault("CharDelete.MinLevel", 0);
     m_int_configs[CONFIG_CHARDELETE_KEEP_DAYS] = sConfigMgr->GetIntDefault("CharDelete.KeepDays", 30);
 
+    ///- Load the ItemDelete related config options
+    m_int_configs[CONFIG_ITEMDELETE_METHOD] = sConfigMgr->GetIntDefault("ItemDelete.Method", 0);
+    m_int_configs[CONFIG_ITEMELETE_QUALITY] = sConfigMgr->GetIntDefault("ItemDelete.Quality", 3);
+    m_int_configs[CONFIG_ITEMELETE_ITEM_LEVEL] = sConfigMgr->GetIntDefault("ItemDelete.ItemLevel", 80);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetStringDefault("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length()-1) != '/' && dataPath.at(dataPath.length()-1) != '\\'))
