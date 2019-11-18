@@ -1248,23 +1248,6 @@ namespace Trinity
             bool _disallowGM;
     };
 
-    class AnyPlayerExactPositionInGameObjectRangeCheck
-    {
-        public:
-            AnyPlayerExactPositionInGameObjectRangeCheck(GameObject const* go, float range) : _go(go), _range(range) {}
-            bool operator()(Player* u)
-            {
-                if (!_go->IsInRange(u->GetPositionX(), u->GetPositionY(), u->GetPositionZ(), _range))
-                    return false;
-
-                return true;
-            }
-
-        private:
-            GameObject const* _go;
-            float _range;
-    };
-
     class NearestPlayerInObjectRangeCheck
     {
         public:
