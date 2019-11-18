@@ -14,15 +14,7 @@
 /*
 * C++ Wrapper for SFMT
 */
-
-template <typename T>
-class SFMTRand
-{
-};
-
-template <>
 class SFMTRand {
-    friend class ACE_TSS<SFMTRand>;
 public:
     SFMTRand();
     uint32 RandomUInt32(); // Output random bits

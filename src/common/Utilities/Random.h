@@ -9,8 +9,9 @@
 
 #include "Define.h"
 #include "Duration.h"
-#include "Threading.h"
+#include "Tss.h"
 #include <limits>
+#include <random>
 
 /* Return a random number in the range min..max. */
 int32 irand(int32 min, int32 max);

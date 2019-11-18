@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL2 v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -31,7 +31,7 @@
 #endif //ACORE_ENDIAN
 
 
-#if PLATFORM == AC_PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #  define ACORE_PATH_MAX MAX_PATH
 #  ifndef DECLSPEC_NORETURN
 #    define DECLSPEC_NORETURN __declspec(noreturn)
@@ -39,10 +39,13 @@
 #  ifndef DECLSPEC_DEPRECATED
 #    define DECLSPEC_DEPRECATED __declspec(deprecated)
 #  endif //DECLSPEC_DEPRECATED
+#  define ACORE_THREAD_DECL __declspec(dllexport)
+#  define ACORE_THREAD_DECL __declspec(dllimport)
 #else //AC_PLATFORM != AC_PLATFORM_WINDOWS
 #  define ACORE_PATH_MAX PATH_MAX
 #  define DECLSPEC_NORETURN
 #  define DECLSPEC_DEPRECATED
+#  define ACORE_THREAD_DECL
 #endif //AC_PLATFORM
 
 #if !defined(COREDEBUG)
@@ -58,16 +61,10 @@
 #  define ATTR_NORETURN __attribute__((noreturn))
 #  define ATTR_PRINTF(F, V) __attribute__ ((format (printf, F, V)))
 #  define ATTR_DEPRECATED __attribute__((deprecated))
-#  define ACORE_CONSTEXPR constexpr
-#else AC_COMPILER != AC_COMPILER_GNU
+#else //AC_COMPILER != AC_COMPILER_GNU
 #  define ATTR_NORETURN
 #  define ATTR_PRINTF(F, V)
 #  define ATTR_DEPRECATED
-#if _MSC_VER >= 1900
-#  define ACORE_CONSTEXPR constexpr
-#else
-#  define ACORE_CONSTEXPR
-#endif
 #endif //AC_COMPILER == AC_COMPILER_GNU
 
 #define UI64FMTD ACE_UINT64_FORMAT_SPECIFIER

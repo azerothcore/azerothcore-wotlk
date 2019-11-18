@@ -8,11 +8,56 @@
 #define ACORE_CONTAINERS_H
 
 #include "Define.h"
+#include "Random.h"
+#include <algorithm>
+#include <exception>
+#include <iterator>
+#include <utility>
 #include <list>
 #include <vector>
 
 namespace acore
 {
+    template<class T>
+    constexpr inline T* AddressOrSelf(T* ptr)
+    {
+        return ptr;
+    }
+
+    template<class T>
+    constexpr inline T* AddressOrSelf(T& not_ptr)
+    {
+        return std::addressof(not_ptr);
+    }
+
+    template <class T>
+    class CheckedBufferOutputIterator
+    {
+        public:
+            using iterator_category = std::output_iterator_tag;
+            using value_type = void;
+            using pointer = T*;
+            using reference = T&;
+            using difference_type = std::ptrdiff_t;
+
+            CheckedBufferOutputIterator(T* buf, size_t n) : _buf(buf), _end(buf+n) {}
+
+            T& operator*() const { check(); return *_buf; }
+            CheckedBufferOutputIterator& operator++() { check(); ++_buf; return *this; }
+            CheckedBufferOutputIterator operator++(int) { CheckedBufferOutputIterator v = *this; operator++(); return v; }
+
+            size_t remaining() const { return (_end - _buf); }
+
+        private:
+            T* _buf;
+            T* _end;
+            void check() const
+            {
+                if (!(_buf < _end))
+                    throw std::out_of_range("index");
+            }
+    };
+
     namespace Containers
     {
         template<class T>
@@ -44,6 +89,32 @@ namespace acore
             list = listCopy;
         }
 
+        // resizes <container> to have at most <requestedSize> elements
+        // if it has more than <requestedSize> elements, the elements to keep are selected randomly
+        template<class C>
+        void RandomResize(C& container, std::size_t requestedSize)
+        {
+            static_assert(std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<typename C::iterator>::iterator_category>::value, "Invalid container passed to Trinity::Containers::RandomResize");
+            if (std::size(container) <= requestedSize)
+                return;
+            auto keepIt = std::begin(container), curIt = std::begin(container);
+            uint32 elementsToKeep = requestedSize, elementsToProcess = std::size(container);
+            while (elementsToProcess)
+            {
+                // this element has chance (elementsToKeep / elementsToProcess) of being kept
+                if (urand(1, elementsToProcess) <= elementsToKeep)
+                {
+                    if (keepIt != curIt)
+                        *keepIt = std::move(*curIt);
+                    ++keepIt;
+                    --elementsToKeep;
+                }
+                ++curIt;
+                --elementsToProcess;
+            }
+            container.erase(keepIt, std::end(container));
+        }
+
         /*
          * Select a random element from a container.
          *
@@ -56,6 +127,7 @@ namespace acore
             std::advance(it, urand(0, container.size() - 1));
             return *it;
         }
+
         /*
          * Select a random element from a container where each element has a different chance to be selected.
          *
@@ -65,13 +137,11 @@ namespace acore
          *
          * Note: container cannot be empty
          */
-        template <class C>
-        typename C::const_iterator SelectRandomWeightedContainerElement(C const& container, std::vector<double> weights)
+        template<class C>
+        inline auto SelectRandomWeightedContainerElement(C const& container, std::vector<double> weights) -> decltype(std::begin(container))
         {
-            acore::discrete_distribution_param<uint32> ddParam(weights.begin(), weights.end());
-            std::discrete_distribution<uint32> dd(ddParam);
-            typename C::const_iterator it = container.begin();
-            std::advance(it, dd(SFMTEngine::Instance()));
+            auto it = std::begin(container);
+            std::advance(it, urandweighted(weights.size(), weights.data()));
             return it;
         }
 
@@ -83,35 +153,48 @@ namespace acore
          *
          * Note: container cannot be empty
          */
-        template <class C, class Fn>
-        typename C::const_iterator SelectRandomWeightedContainerElement(C const& container, Fn weightExtractor)
+        template<class C, class Fn>
+        auto SelectRandomWeightedContainerElement(C const& container, Fn weightExtractor) -> decltype(std::begin(container))
         {
             std::vector<double> weights;
-            weights.reserve(container.size());
+            weights.reserve(std::size(container));
             double weightSum = 0.0;
-            for (auto itr = container.begin(); itr != container.end(); ++itr)
+            for (auto& val : container)
             {
-                double weight = weightExtractor(*itr);
+                double weight = weightExtractor(val);
                 weights.push_back(weight);
                 weightSum += weight;
             }
             if (weightSum <= 0.0)
-                weights.assign(container.size(), 1.0);
+                weights.assign(std::size(container), 1.0);
 
             return SelectRandomWeightedContainerElement(container, weights);
         }
 
         /**
-        * @fn bool acore::Containers::Intersects(Iterator first1, Iterator last1, Iterator first2, Iterator last2)
-        *
-        * @brief Checks if two SORTED containers have a common element
-        *
-        * @param first1 Iterator pointing to start of the first container
-        * @param last1 Iterator pointing to end of the first container
-        * @param first2 Iterator pointing to start of the second container
-        * @param last2 Iterator pointing to end of the second container
-        *
-        * @return true if containers have a common element, false otherwise.
+         * @fn void acore::Containers::RandomShuffle(C& container)
+         *
+         * @brief Reorder the elements of the container randomly.
+         *
+         * @param container Container to reorder
+         */
+        template<class C>
+        inline void RandomShuffle(C& container)
+        {
+            std::shuffle(std::begin(container), std::end(container), RandomEngine::Instance());
+        }
+
+        /**
+         * @fn bool acore::Containers::Intersects(Iterator first1, Iterator last1, Iterator first2, Iterator last2)
+         *
+         * @brief Checks if two SORTED containers have a common element
+         *
+         * @param first1 Iterator pointing to start of the first container
+         * @param last1 Iterator pointing to end of the first container
+         * @param first2 Iterator pointing to start of the second container
+         * @param last2 Iterator pointing to end of the second container
+         *
+         * @return true if containers have a common element, false otherwise.
         */
         template<class Iterator1, class Iterator2>
         bool Intersects(Iterator1 first1, Iterator1 last1, Iterator2 first2, Iterator2 last2)
@@ -125,8 +208,20 @@ namespace acore
                 else
                     return true;
             }
+
             return false;
         }
+
+        /**
+         * Returns a pointer to mapped value (or the value itself if map stores pointers)
+         */
+        template<class M>
+        inline auto MapGetValuePtr(M& map, typename M::key_type const& key) -> decltype(AddressOrSelf(map.find(key)->second))
+        {
+            auto itr = map.find(key);
+            return itr != map.end() ? AddressOrSelf(itr->second) : nullptr;
+        }
+
         template<class K, class V, template<class, class, class...> class M, class... Rest>
         void MultimapErasePair(M<K, V, Rest...>& multimap, K const& key, V const& value)
         {

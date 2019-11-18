@@ -15,12 +15,12 @@ static RandomEngine engine;
 
 static SFMTRand* GetRng()
 {
-    SFMTRand* rand = sfmtRand.ts_get();
+    SFMTRand* rand = sfmtRand.get();
 
     if (!rand)
     {
         rand = new SFMTRand();
-        sfmtRand.ts_init(rand);
+        sfmtRand.reset(rand);
     }
 
     return rand;
