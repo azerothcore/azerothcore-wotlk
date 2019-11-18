@@ -141,19 +141,10 @@ namespace Trinity
     struct ObjectUpdater
     {
         uint32 i_timeDiff;
-        explicit ObjectUpdater(const uint32 diff) : i_timeDiff(diff) {}
+        bool i_largeOnly;
+        explicit ObjectUpdater(const uint32 diff, bool largeOnly) : i_timeDiff(diff), i_largeOnly(largeOnly) {}
         template<class T> void Visit(GridRefManager<T> &m);
         void Visit(PlayerMapType &) {}
-        void Visit(CorpseMapType &) {}
-    };
-
-    struct LargeObjectUpdater
-    {
-        uint32 i_timeDiff;
-        explicit LargeObjectUpdater(const uint32 diff) : i_timeDiff(diff) {}
-        template<class T> void Visit(GridRefManager<T> &m);
-        void Visit(GameObjectMapType &) {}
-        void Visit(DynamicObjectMapType &) {}
         void Visit(CorpseMapType &) {}
     };
 
@@ -1255,6 +1246,23 @@ namespace Trinity
             float _range;
             bool _reqAlive;
             bool _disallowGM;
+    };
+
+    class AnyPlayerExactPositionInGameObjectRangeCheck
+    {
+        public:
+            AnyPlayerExactPositionInGameObjectRangeCheck(GameObject const* go, float range) : _go(go), _range(range) {}
+            bool operator()(Player* u)
+            {
+                if (!_go->IsInRange(u->GetPositionX(), u->GetPositionY(), u->GetPositionZ(), _range))
+                    return false;
+
+                return true;
+            }
+
+        private:
+            GameObject const* _go;
+            float _range;
     };
 
     class NearestPlayerInObjectRangeCheck
