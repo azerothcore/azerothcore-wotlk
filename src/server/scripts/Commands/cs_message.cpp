@@ -69,7 +69,7 @@ public:
             return false;
 
         char buff[2048];
-        sprintf(buff, handler->GetTrinityString(LANG_SYSTEMMESSAGE), args);
+        sprintf(buff, handler->GetAcoreString(LANG_SYSTEMMESSAGE), args);
         sWorld->SendServerMessage(SERVER_MSG_STRING, buff);
         return true;
     }
@@ -88,7 +88,7 @@ public:
         if (!*args)
             return false;
 
-        std::string str = handler->GetTrinityString(LANG_GLOBAL_NOTIFY);
+        std::string str = handler->GetAcoreString(LANG_GLOBAL_NOTIFY);
         str += args;
 
         WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
@@ -103,7 +103,7 @@ public:
         if (!*args)
             return false;
 
-        std::string str = handler->GetTrinityString(LANG_GM_NOTIFY);
+        std::string str = handler->GetAcoreString(LANG_GM_NOTIFY);
         str += args;
 
         WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
@@ -117,7 +117,7 @@ public:
     {
         if (!*args)
         {
-            handler->PSendSysMessage(LANG_COMMAND_WHISPERACCEPTING, handler->GetSession()->GetPlayer()->isAcceptWhispers() ?  handler->GetTrinityString(LANG_ON) : handler->GetTrinityString(LANG_OFF));
+            handler->PSendSysMessage(LANG_COMMAND_WHISPERACCEPTING, handler->GetSession()->GetPlayer()->isAcceptWhispers() ?  handler->GetAcoreString(LANG_ON) : handler->GetAcoreString(LANG_OFF));
             return true;
         }
 

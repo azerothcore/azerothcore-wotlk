@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_GRIDNOTIFIERS_H
-#define TRINITY_GRIDNOTIFIERS_H
+#ifndef ACORE_GRIDNOTIFIERS_H
+#define ACORE_GRIDNOTIFIERS_H
 
 #include "ObjectGridLoader.h"
 #include "UpdateData.h"
@@ -24,7 +24,7 @@
 class Player;
 //class Map;
 
-namespace Trinity
+namespace acore
 {
     struct VisibleNotifier
     {

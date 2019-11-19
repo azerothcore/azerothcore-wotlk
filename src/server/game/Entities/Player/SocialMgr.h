@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef __TRINITY_SOCIALMGR_H
-#define __TRINITY_SOCIALMGR_H
+#ifndef __ACORE_SOCIALMGR_H
+#define __ACORE_SOCIALMGR_H
 
 #include <ace/Singleton.h>
 #include "DatabaseEnv.h"

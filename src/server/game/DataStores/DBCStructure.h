@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_DBCSTRUCTURE_H
-#define TRINITY_DBCSTRUCTURE_H
+#ifndef ACORE_DBCSTRUCTURE_H
+#define ACORE_DBCSTRUCTURE_H
 
 #include "Common.h"
 #include "DBCEnums.h"

@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_WAYPOINTMANAGER_H
-#define TRINITY_WAYPOINTMANAGER_H
+#ifndef ACORE_WAYPOINTMANAGER_H
+#define ACORE_WAYPOINTMANAGER_H
 
 #include <ace/Singleton.h>
 #include <ace/Null_Mutex.h>

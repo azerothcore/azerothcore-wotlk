@@ -308,7 +308,7 @@ template<>
 void Map::SwitchGridContainers(Creature* obj, bool on)
 { 
     ASSERT(!obj->IsPermanentWorldObject());
-    CellCoord p = Trinity::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
+    CellCoord p = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     if (!p.IsCoordValid())
     {
         sLog->outError("Map::SwitchGridContainers: Object " UI64FMTD " has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUID(), obj->GetPositionX(), obj->GetPositionY(), p.x_coord, p.y_coord);
@@ -347,7 +347,7 @@ template<>
 void Map::SwitchGridContainers(GameObject* obj, bool on)
 { 
     ASSERT(!obj->IsPermanentWorldObject());
-    CellCoord p = Trinity::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
+    CellCoord p = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     if (!p.IsCoordValid())
     {
         sLog->outError("Map::SwitchGridContainers: Object " UI64FMTD " has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUID(), obj->GetPositionX(), obj->GetPositionY(), p.x_coord, p.y_coord);
@@ -404,7 +404,7 @@ void Map::EnsureGridCreated(const GridCoord &p)
 { 
     if (getNGrid(p.x_coord, p.y_coord)) // pussywizard
         return;
-    TRINITY_GUARD(ACE_Thread_Mutex, GridLock);
+    ACORE_GUARD(ACE_Thread_Mutex, GridLock);
     EnsureGridCreated_i(p);
 }
 
@@ -478,7 +478,7 @@ void Map::LoadAllCells()
 
 bool Map::AddPlayerToMap(Player* player)
 { 
-    CellCoord cellCoord = Trinity::ComputeCellCoord(player->GetPositionX(), player->GetPositionY());
+    CellCoord cellCoord = acore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY());
     if (!cellCoord.IsCoordValid())
     {
         sLog->outError("Map::Add: Player (GUID: %u) has invalid coordinates X:%f Y:%f grid cell [%u:%u]", player->GetGUIDLow(), player->GetPositionX(), player->GetPositionY(), cellCoord.x_coord, cellCoord.y_coord);
@@ -533,7 +533,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
         return true;
     }
 
-    CellCoord cellCoord = Trinity::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
+    CellCoord cellCoord = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     //It will create many problems (including crashes) if an object is not added to grid after creation
     //The correct way to fix it is to make AddToMap return false and delete the object if it is not added to grid
     //But now AddToMap is used in too many places, I will just see how many ASSERT failures it will cause
@@ -585,7 +585,7 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
     if (obj->IsInWorld())
         return true;
 
-    CellCoord cellCoord = Trinity::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
+    CellCoord cellCoord = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     if (!cellCoord.IsCoordValid())
     {
         sLog->outError("Map::Add: Object " UI64FMTD " has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUID(), obj->GetPositionX(), obj->GetPositionY(), cellCoord.x_coord, cellCoord.y_coord);
@@ -627,9 +627,9 @@ bool Map::IsGridLoaded(const GridCoord &p) const
     return (getNGrid(p.x_coord, p.y_coord) && isGridObjectDataLoaded(p.x_coord, p.y_coord));
 }
 
-void Map::VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
-    TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
-    TypeContainerVisitor<Trinity::LargeObjectUpdater, GridTypeMapContainer> &largeObjectVisitor)
+void Map::VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
+    TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
+    TypeContainerVisitor<acore::LargeObjectUpdater, GridTypeMapContainer> &largeObjectVisitor)
 {
     // check for valid position
     if (!player->IsPositionValid())
@@ -660,8 +660,8 @@ void Map::VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Trinity:
     }
 }
 
-void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
-    TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor)
+void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
+    TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &worldVisitor)
 { 
     // Check for valid position
     if (!obj->IsPositionValid())
@@ -734,15 +734,15 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     /// update active cells around players and active objects
     resetMarkedCells();
 
-    Trinity::ObjectUpdater updater(t_diff);
+    acore::ObjectUpdater updater(t_diff);
     // for creature
-    TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer  > grid_object_update(updater);
+    TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer  > grid_object_update(updater);
     // for pets
-    TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer > world_object_update(updater);
+    TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer > world_object_update(updater);
 
     // for large creatures
-    Trinity::LargeObjectUpdater largeObjectUpdater(t_diff);
-    TypeContainerVisitor<Trinity::LargeObjectUpdater, GridTypeMapContainer  > grid_large_object_update(largeObjectUpdater);
+    acore::LargeObjectUpdater largeObjectUpdater(t_diff);
+    TypeContainerVisitor<acore::LargeObjectUpdater, GridTypeMapContainer  > grid_large_object_update(largeObjectUpdater);
 
     // pussywizard: container for far creatures in combat with players
     std::vector<Creature*> updateList; updateList.reserve(10);
