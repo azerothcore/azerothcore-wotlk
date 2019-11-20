@@ -1,3 +1,19 @@
+-- DB update 2019_11_11_00 -> 2019_11_20_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_11_11_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_11_11_00 2019_11_20_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1572025265971877031'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1572025265971877031');
 
 -- achievement_reward_locale
@@ -14017,3 +14033,12 @@ UPDATE trinity_string SET content_loc3='¦ Registrations Email: %s - Email: %s' 
 -- quest_template_locale
 DELETE FROM `quest_template_locale` WHERE `ID` IN (24911) AND `locale`="deDE";
 INSERT INTO `quest_template_locale` (`ID`,`locale`,`Title`,`Details`,`Objectives`,`EndText`,`CompletedText`,`ObjectiveText1`,`ObjectiveText2`,`ObjectiveText3`,`ObjectiveText4`,`VerifiedBuild`) VALUES (24911,'deDE','Mit Macht erfÃ¼llen','','','','','','','','',18019);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
