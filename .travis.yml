@@ -39,7 +39,6 @@ jobs:
           - source ./apps/ci/ci-before_install.sh
       install:
         - source ./apps/ci/ci-install.sh OFF
-        - source ./apps/ci/ci-install-modules.sh
       script:
         - source ./apps/ci/ci-compile.sh
 
