@@ -2009,8 +2009,6 @@ void World::SetInitialWorldSettings()
         sLog->outString("AzerothCore dry run completed, terminating.");
         exit(0);
     }
-
-    m_timers[WUPDATE_REMOTE].SetInterval(5 * IN_MILLISECONDS);
 }
 
 void World::DetectDBCLang()
@@ -2270,41 +2268,6 @@ void World::Update(uint32 diff)
         CharacterDatabase.KeepAlive();
         LoginDatabase.KeepAlive();
         WorldDatabase.KeepAlive();
-    }
-
-    if (m_timers[WUPDATE_REMOTE].Passed())
-    {
-        PreparedQueryResult remoteQuery = LoginDatabase.Query(LoginDatabase.GetPreparedStatement(LOGIN_SEL_REMOTE));
-
-        if (remoteQuery)
-        {
-            do
-            {
-                Field* fields = remoteQuery->Fetch();
-                uint32 id = fields[0].GetUInt32();
-                uint32 guid = fields[1].GetUInt32();
-                uint32 type = fields[2].GetUInt32();
-                uint32 profession = fields[3].GetUInt32();
-
-                if (Player* player = ObjectAccessor::FindPlayer(guid))
-                {
-                    switch (type)
-                    {
-                        case 6:
-                            player->LearnProfession(profession);
-                            break;
-                    }
-
-                    PreparedStatement* STMT = LoginDatabase.GetPreparedStatement(LOGIN_DEL_REMOTE);
-                    STMT->setUInt32(0, id);
-
-                    LoginDatabase.Execute(STMT);
-                }
-            }
-            while (remoteQuery->NextRow());
-        }
-
-        m_timers[WUPDATE_REMOTE].Reset();
     }
 
     // update the instance reset times
