@@ -7,10 +7,11 @@
 #ifndef TRINITY_DEFINE_H
 #define TRINITY_DEFINE_H
 
-#include "CompilerDefs.h"
 #include <cstddef>
 #include <cinttypes>
 #include <climits>
+#include <cstring>
+#include "CompilerDefs.h"
 
 #if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
 #define OS_WIN
