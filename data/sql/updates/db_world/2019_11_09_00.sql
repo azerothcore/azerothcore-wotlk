@@ -16,10 +16,10 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '157167293368191681
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1571672933681916812');
 
-ALTER TABLE `game_event` ALTER COLUMN `start_time` SET DEFAULT '1970-01-01 08:00:00',
-                         ALTER COLUMN `end_time`   SET DEFAULT '1970-01-01 08:00:00';
+ALTER TABLE `game_event` ALTER COLUMN `start_time` SET DEFAULT '2000-01-01 08:00:00',
+                         ALTER COLUMN `end_time`   SET DEFAULT '2000-01-01 08:00:00';
 
-UPDATE `game_event` SET `start_time` = '1970-01-01 08:00:00', `end_time` = '1970-01-01 08:00:00' WHERE `eventEntry` IN
+UPDATE `game_event` SET `start_time` = '2000-01-01 08:00:00', `end_time` = '2000-01-01 08:00:00' WHERE `eventEntry` IN
 (13, 17, 22, 31, 48, 49, 55, 56, 57, 58, 59, 60, 65, 66);
 
 UPDATE `game_event` SET `end_time` = NULL WHERE `eventEntry` IN
