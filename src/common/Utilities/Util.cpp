@@ -16,6 +16,8 @@
 #include "Errors.h" // for ASSERT
 #include <ace/TSS_T.h>
 #include <array>
+#include <cwchar>
+#include <string>
 
 typedef ACE_TSS<SFMTRand> SFMTRandTSS;
 static SFMTRandTSS sfmtRand;
@@ -323,12 +325,12 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
     {
         // Replace the converted string with an error message if there is enough space
         // Otherwise just return an empty string
-        wchar_t const* errorMessage = L"An error occurred converting string from UTF-8 to WStr";
-        size_t errorMessageLength = wcslen(errorMessage);
+        const wchar_t* errorMessage = L"An error occurred converting string from UTF-8 to WStr";
+        std::size_t errorMessageLength = std::char_traits<wchar_t>::length(errorMessage);
         if (wsize >= errorMessageLength)
         {
-            wcscpy(wstr, errorMessage);
-            wsize = wcslen(wstr);
+            std::wcscpy(wstr, errorMessage);
+            wsize = std::char_traits<wchar_t>::length(wstr);
         }
         else if (wsize > 0)
         {
