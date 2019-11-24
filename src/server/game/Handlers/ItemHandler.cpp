@@ -284,8 +284,8 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket & recvData)
     }
 
     if (sWorld->getIntConfig(CONFIG_ITEMDELETE_METHOD)
-        && pItem->GetTemplate()->Quality >= sWorld->getIntConfig(CONFIG_ITEMELETE_QUALITY)
-        && pItem->GetTemplate()->ItemLevel >= sWorld->getIntConfig(CONFIG_ITEMELETE_ITEM_LEVEL))
+        && pItem->GetTemplate()->Quality >= sWorld->getIntConfig(CONFIG_ITEMDELETE_QUALITY)
+        && pItem->GetTemplate()->ItemLevel >= sWorld->getIntConfig(CONFIG_ITEMDELETE_ITEM_LEVEL))
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RECOVERY_ITEM);
 
