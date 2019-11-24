@@ -1628,7 +1628,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                     break;
                                 }
                                 case POWER_RAGE:   triggeredSpellId = 63653; break;
-                                case POWER_ENERGY: triggeredSpellId = 63655; break;
+                                case POWER_ENERGY: triggeredSpellId = (!target->HasAura(70405) ? 63655 : 0);  break;
                                 case POWER_RUNIC_POWER: triggeredSpellId = 63652; break;
                                 default:
                                     break;
