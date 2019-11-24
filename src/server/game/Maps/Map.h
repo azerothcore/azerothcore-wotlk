@@ -298,10 +298,12 @@ class Map : public GridRefManager<NGridType>
 
         void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
             TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
-            TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &largeObjectVisitor);
+            TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
+            TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor);
         void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
             TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
-            TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &largeObjectVisitor);
+            TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
+            TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor);
         virtual void Update(const uint32, const uint32, bool thread = true);
 
         float GetVisibilityRange() const { return m_VisibleDistance; }

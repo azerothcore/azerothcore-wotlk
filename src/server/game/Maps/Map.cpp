@@ -629,14 +629,15 @@ bool Map::IsGridLoaded(const GridCoord &p) const
 
 void Map::VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
     TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
-    TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &largeObjectVisitor)
+    TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
+    TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor)
 {
     // check for valid position
     if (!player->IsPositionValid())
         return;
 
     // check normal grid activation range of the player
-    VisitNearbyCellsOf(player, gridVisitor, worldVisitor, largeObjectVisitor);
+    VisitNearbyCellsOf(player, gridVisitor, worldVisitor, largeGridVisitor, largeWorldVisitor);
 
     // check maximum visibility distance for large creatures
     CellArea area = Cell::CalculateCellArea(player->GetPositionX(), player->GetPositionY(), MAX_VISIBILITY_DISTANCE);
@@ -655,14 +656,16 @@ void Map::VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Trinity:
             CellCoord pair(x, y);
             Cell cell(pair);
 
-            Visit(cell, largeObjectVisitor);
+            Visit(cell, largeGridVisitor);
+            Visit(cell, largeWorldVisitor);
         }
     }
 }
 
 void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
     TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
-    TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &largeObjectVisitor)
+    TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
+    TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor)
 { 
     // Check for valid position
     if (!obj->IsPositionValid())
@@ -695,7 +698,8 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::Obj
             if (!isCellMarkedLarge(cell_id))
             {
                 markCellLarge(cell_id);
-                Visit(cell, largeObjectVisitor);
+                Visit(cell, largeGridVisitor);
+                Visit(cell, largeWorldVisitor);
             }
         }
     }
@@ -751,6 +755,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     // for large creatures
     Trinity::ObjectUpdater largeObjectUpdater(t_diff, true);
     TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer  > grid_large_object_update(largeObjectUpdater);
+    TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer  > world_large_object_update(largeObjectUpdater);
 
     // pussywizard: container for far creatures in combat with players
     std::vector<Creature*> updateList; updateList.reserve(10);
@@ -764,7 +769,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         if (!obj || !obj->IsInWorld())
             continue;
 
-        VisitNearbyCellsOf(obj, grid_object_update, world_object_update, grid_large_object_update);
+        VisitNearbyCellsOf(obj, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
     }
 
     // the player iterator is stored in the map object
@@ -779,7 +784,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         // update players at tick
         player->Update(s_diff);
 
-        VisitNearbyCellsOfPlayer(player, grid_object_update, world_object_update, grid_large_object_update);
+        VisitNearbyCellsOfPlayer(player, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
 
         // handle updates for creatures in combat with player and are more than X yards away
         if (player->IsInCombat())
@@ -796,7 +801,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
                 ref = ref->next();
             }
             for (std::vector<Creature*>::const_iterator itr = updateList.begin(); itr != updateList.end(); ++itr)
-                VisitNearbyCellsOf(*itr, grid_object_update, world_object_update, grid_large_object_update);
+                VisitNearbyCellsOf(*itr, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
         }
     }
 
