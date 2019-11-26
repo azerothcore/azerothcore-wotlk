@@ -283,18 +283,7 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket & recvData)
         return;
     }
 
-    if (sWorld->getIntConfig(CONFIG_ITEMDELETE_METHOD)
-        && pItem->GetTemplate()->Quality >= sWorld->getIntConfig(CONFIG_ITEMDELETE_QUALITY)
-        && pItem->GetTemplate()->ItemLevel >= sWorld->getIntConfig(CONFIG_ITEMDELETE_ITEM_LEVEL))
-    {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RECOVERY_ITEM);
-
-        stmt->setUInt32(0, pItem->GetOwnerGUID());
-        stmt->setUInt32(1, pItem->GetTemplate()->ItemId);
-        stmt->setUInt32(2, pItem->GetCount());
-
-        CharacterDatabase.Query(stmt);
-    }
+    recoveryItem(pItem);
 
     if (count)
     {
@@ -691,6 +680,9 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recvData)
         // CMSG_SELL_ITEM and CMSG_REFUND_ITEM (unverified)
         if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
             return; // Therefore, no feedback to client
+
+        if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
+            recoveryItem(pItem);
 
         // special case at auto sell (sell all)
         if (count == 0)
@@ -1699,4 +1691,26 @@ bool WorldSession::CanUseBank(uint64 bankerGUID) const
     }
 
     return true;
+}
+
+bool WorldSession::recoveryItem(Item* pItem)
+{
+    bool method = sWorld->getBoolConfig(CONFIG_ITEMDELETE_METHOD);
+    uint32 quality = sWorld->getIntConfig(CONFIG_ITEMDELETE_QUALITY);
+    uint32 itemLevel = sWorld->getIntConfig(CONFIG_ITEMDELETE_ITEM_LEVEL);
+
+    if (method && pItem->GetTemplate()->Quality >= quality && pItem->GetTemplate()->ItemLevel >= itemLevel)
+    {
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RECOVERY_ITEM);
+
+        stmt->setUInt32(0, pItem->GetOwnerGUID());
+        stmt->setUInt32(1, pItem->GetTemplate()->ItemId);
+        stmt->setUInt32(2, pItem->GetCount());
+
+        CharacterDatabase.Query(stmt);
+
+        return true;
+    }
+
+    return false;
 }

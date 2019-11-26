@@ -2969,6 +2969,14 @@ CharDelete.KeepDays = 30
 ItemDelete.Method = 0
 
 #
+#    ItemDelete.Vendor
+#        Description:
+#        Default:     0
+#
+
+ItemDelete.Vendor = 0
+
+#
 #    ItemDelete.Quality
 #        Description:
 #        Default:     3

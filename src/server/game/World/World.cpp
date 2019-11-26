@@ -1193,7 +1193,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_CHARDELETE_KEEP_DAYS] = sConfigMgr->GetIntDefault("CharDelete.KeepDays", 30);
 
     ///- Load the ItemDelete related config options
-    m_int_configs[CONFIG_ITEMDELETE_METHOD] = sConfigMgr->GetIntDefault("ItemDelete.Method", 0);
+    m_bool_configs[CONFIG_ITEMDELETE_METHOD] = sConfigMgr->GetBoolDefault("ItemDelete.Method", 0);
+    m_bool_configs[CONFIG_ITEMDELETE_VENDOR] = sConfigMgr->GetBoolDefault("ItemDelete.Vendor", 0);
     m_int_configs[CONFIG_ITEMDELETE_QUALITY] = sConfigMgr->GetIntDefault("ItemDelete.Quality", 3);
     m_int_configs[CONFIG_ITEMDELETE_ITEM_LEVEL] = sConfigMgr->GetIntDefault("ItemDelete.ItemLevel", 80);
 
