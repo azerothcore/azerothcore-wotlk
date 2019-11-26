@@ -1,7 +1,7 @@
 ﻿/*
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
-
+// Learning how to create PR
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "deadmines.h"
@@ -47,8 +47,10 @@ class instance_deadmines : public InstanceMapScript
                         break;
                 }
 
-                if (data == DONE)
+                if (data == DONE) {
                     SaveToDB();
+					sLog->IsOutDebug("test");
+				}
             }
 
             std::string GetSaveData()
