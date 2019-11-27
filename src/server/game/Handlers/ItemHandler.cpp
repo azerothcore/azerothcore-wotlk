@@ -681,9 +681,6 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recvData)
         if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
             return; // Therefore, no feedback to client
 
-        if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
-            recoveryItem(pItem);
-
         // special case at auto sell (sell all)
         if (count == 0)
         {
@@ -704,6 +701,9 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recvData)
         {
             if (pProto->SellPrice > 0)
             {
+                if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
+                    recoveryItem(pItem);
+
                 if (count < pItem->GetCount())               // need split items
                 {
                     Item* pNewItem = pItem->CloneItem(count, _player);
@@ -789,6 +789,14 @@ void WorldSession::HandleBuybackItem(WorldPacket & recvData)
             _player->ItemAddedQuestCheck(pItem->GetEntry(), pItem->GetCount());
             _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, pItem->GetEntry(), pItem->GetCount());
             _player->StoreItem(dest, pItem, true);
+
+            if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
+            {
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM);
+                stmt->setUInt32(0, _player->GetGUID());
+                stmt->setUInt32(1, pItem->GetEntry());
+                CharacterDatabase.Execute(stmt);
+            }
         }
         else
             _player->SendEquipError(msg, pItem, NULL);
