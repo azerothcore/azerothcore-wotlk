@@ -5848,7 +5848,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             return SPELL_FAILED_BAD_TARGETS;
                 // Xinef: Pass only explicit unit target spells
                 // pussywizard:
-                if (MMAP::MMapFactory::IsPathfindingEnabled(m_caster->FindMap()) && m_spellInfo->NeedsExplicitUnitTarget())
+                if (DisableMgr::IsPathfindingEnabled(m_caster->FindMap()) && m_spellInfo->NeedsExplicitUnitTarget())
                 {
                     Unit* target = m_targets.GetUnitTarget();
                     if (!target)
@@ -7502,7 +7502,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             }
             break;
         /*case SPELL_EFFECT_CHARGE:
-            if (MMAP::MMapFactory::IsPathfindingEnabled(m_caster->FindMap()))
+            if (DisableMgr::IsPathfindingEnabled(m_caster->FindMap()))
                 break;*/
             // else no break intended
 

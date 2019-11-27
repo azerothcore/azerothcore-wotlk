@@ -5,8 +5,6 @@
  */
 
 #include "DynamicTree.h"
-//#include "QuadTree.h"
-//#include "RegularGrid.h"
 #include "BoundingIntervalHierarchyWrapper.h"
 
 #include "Log.h"
@@ -40,15 +38,9 @@ template<> struct BoundsTrait< GameObjectModel> {
     static void getBounds2(const GameObjectModel* g, G3D::AABox& out) { out = g->getBounds();}
 };
 
-/*
-static bool operator == (const GameObjectModel& mdl, const GameObjectModel& mdl2){
-    return &mdl == &mdl2;
-}
-*/
-
 typedef RegularGrid2D<GameObjectModel, BIHWrap<GameObjectModel> > ParentTree;
 
-struct DynTreeImpl : public ParentTree/*, public Intersectable*/
+struct DynTreeImpl : public ParentTree
 {
     typedef GameObjectModel Model;
     typedef ParentTree base;

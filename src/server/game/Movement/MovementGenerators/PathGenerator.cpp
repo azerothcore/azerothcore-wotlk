@@ -21,7 +21,6 @@
 #include "Log.h"
 #include "CellImpl.h"
 #include "Cell.h"
-
 #include "DetourCommon.h"
 #include "DetourNavMeshQuery.h"
 
@@ -35,11 +34,9 @@ PathGenerator::PathGenerator(const Unit* owner) :
     memset(_pathPolyRefs, 0, sizeof(_pathPolyRefs));
 
     uint32 mapId = _sourceUnit->GetMapId();
-    //if (MMAP::MMapFactory::IsPathfindingEnabled(_sourceUnit->FindMap())) // pussywizard: checked before creating new PathGenerator
+    //if (DisableMgr::IsPathfindingEnabled(_sourceUnit->FindMap())) // pussywizard: checked before creating new PathGenerator
     {
         MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
-
-        TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, mmap->GetManagerLock());
         _navMesh = mmap->GetNavMesh(mapId);
         _navMeshQuery = mmap->GetNavMeshQuery(mapId, _sourceUnit->GetInstanceId());
     }
@@ -83,11 +80,6 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
 
     UpdateFilter(); // no mmap operations inside, no mutex needed
 
-    // pussywizard: mutex with new that can be release at any moment, DON'T FORGET TO RELEASE ON EVERY RETURN !!!
-    const Map* base = _sourceUnit->GetBaseMap();
-    ACE_RW_Thread_Mutex& mmapLock = (base ? base->GetMMapLock() : MMAP::MMapFactory::createOrGetMMapManager()->GetMMapGeneralLock());
-    mmapLock.acquire_read();
-
     // make sure navMesh works - we can run on map w/o mmap
     // check if the start and end point have a .mmtile loaded (can we pass via not loaded tile on the way?)
     if (!_navMesh || !_navMeshQuery || _sourceUnit->HasUnitState(UNIT_STATE_IGNORE_PATHFINDING) ||
@@ -96,11 +88,11 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
     {
         BuildShortcut();
         _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
-        mmapLock.release();
+        //mmapLock.release();
         return true;
     }
 
-    BuildPolyPath(start, dest, mmapLock);
+    BuildPolyPath(start, dest);
     return true;
 }
 
@@ -183,23 +175,12 @@ G3D::Vector3 ClosestPointOnLine(const G3D::Vector3 & a, const G3D::Vector3 & b, 
     return a + v;
 }
 
-template <class MUTEX_TYPE>
-class MutexReleaser
-{
-public:
-    MutexReleaser(MUTEX_TYPE& mutex) : _mutex(mutex) {}
-    ~MutexReleaser() { _mutex.release(); }
-private:
-    MUTEX_TYPE& _mutex;
-};
-
-void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 const& endPos, ACE_RW_Thread_Mutex& mmapLock)
+void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 const& endPos)
 {
     bool endInWaterFar = false;
     bool cutToFirstHigher = false;
 
     {
-    MutexReleaser<ACE_RW_Thread_Mutex> mutexReleaser(mmapLock);
 
     // *** getting start/end poly logic ***
 

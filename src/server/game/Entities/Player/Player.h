@@ -2567,7 +2567,7 @@ class Player : public Unit, public GridObject<Player>
                 CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
                 ASSERT(modelData);
 
-                float scaleMod = GetFloatValue(OBJECT_FIELD_SCALE_X); // 99% sure about this
+                float scaleMod = GetObjectScale(); // 99% sure about this
 
                 return scaleMod * mountModelData->MountHeight + modelData->CollisionHeight * 0.5f;
             }

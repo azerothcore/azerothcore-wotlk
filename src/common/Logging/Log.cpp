@@ -7,13 +7,10 @@
 #include "Common.h"
 #include "Log.h"
 #include "WorldPacket.h"
-#include "Configuration/Config.h"
+#include "Config.h"
 #include "Util.h"
 #include "SHA1.h"
-
-#include "Implementation/LoginDatabase.h" // For logging
-extern LoginDatabaseWorkerPool LoginDatabase;
-
+#include "DatabaseEnv.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <ace/Stack_Trace.h>

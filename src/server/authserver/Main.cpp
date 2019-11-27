@@ -20,8 +20,8 @@
 #include <openssl/crypto.h>
 
 #include "Common.h"
-#include "Database/DatabaseEnv.h"
-#include "Configuration/Config.h"
+#include "DatabaseEnv.h"
+#include "Config.h"
 #include "Log.h"
 #include "GitRevision.h"
 #include "Util.h"
@@ -36,15 +36,13 @@
 #endif
 
 #ifndef _TRINITY_REALM_CONFIG
-# define _TRINITY_REALM_CONFIG  "authserver.conf"
+#define _TRINITY_REALM_CONFIG  "authserver.conf"
 #endif
 
 bool StartDB();
 void StopDB();
 
 bool stopEvent = false;                                     // Setting it to true stops the server
-
-LoginDatabaseWorkerPool LoginDatabase;                      // Accessor to the authserver database
 
 /// Handle authserver's termination signals
 class AuthServerSignalHandler : public Trinity::SignalHandler

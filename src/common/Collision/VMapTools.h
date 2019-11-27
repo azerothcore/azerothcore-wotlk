@@ -38,7 +38,6 @@ namespace VMAP
 
     class MyCollisionDetection
     {
-    private:
     public:
 
         static bool collisionLocationForMovingPointFixedAABox(

@@ -1169,7 +1169,7 @@ class spell_gen_mod_radius_by_caster_scale : public SpellScriptLoader
 
             bool Load()
             {
-                GetSpell()->SetSpellValue(SPELLVALUE_RADIUS_MOD, 10000.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X));
+                GetSpell()->SetSpellValue(SPELLVALUE_RADIUS_MOD, 10000.0f * GetCaster()->GetObjectScale());
                 return true;
             }
 

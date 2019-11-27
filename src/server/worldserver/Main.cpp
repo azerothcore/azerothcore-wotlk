@@ -11,16 +11,14 @@
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 #include <ace/Version.h>
-
 #include "Common.h"
-#include "Database/DatabaseEnv.h"
-#include "Configuration/Config.h"
-
+#include "DatabaseEnv.h"
+#include "Config.h"
 #include "Log.h"
 #include "Master.h"
 
 #ifndef _TRINITY_CORE_CONFIG
-# define _TRINITY_CORE_CONFIG  "worldserver.conf"
+#define _TRINITY_CORE_CONFIG  "worldserver.conf"
 #endif
 
 #ifdef _WIN32
@@ -36,10 +34,6 @@ char serviceDescription[] = "AzerothCore World of Warcraft emulator world servic
  */
 int m_ServiceStatus = -1;
 #endif
-
-WorldDatabaseWorkerPool WorldDatabase;                      ///< Accessor to the world database
-CharacterDatabaseWorkerPool CharacterDatabase;              ///< Accessor to the character database
-LoginDatabaseWorkerPool LoginDatabase;                      ///< Accessor to the realm/login database
 
 uint32 realmID;                                             ///< Id of the realm
 

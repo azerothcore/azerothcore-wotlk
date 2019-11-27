@@ -13,13 +13,6 @@
 #include <DetourNavMesh.h>
 #include <DetourNavMeshBuilder.h>
 
-#include "DisableMgr.h"
-
-namespace DisableMgr
-{
-    bool IsDisabledFor(DisableType /*type*/, uint32 /*entry*/, Unit const* /*unit*/, uint8 /*flags*/ /*= 0*/) { return false; }
-}
-
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
 #define MMAP_VERSION 10
 

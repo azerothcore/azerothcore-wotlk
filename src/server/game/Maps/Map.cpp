@@ -7,6 +7,7 @@
 #include "Map.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "DisableMgr.h"
 #include "DynamicTree.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -24,6 +25,7 @@
 #include "VMapFactory.h"
 #include "LFGMgr.h"
 #include "Chat.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -110,7 +112,7 @@ bool Map::ExistVMap(uint32 mapid, int gx, int gy)
 
 void Map::LoadMMap(int gx, int gy)
 { 
-    if (!MMAP::MMapFactory::IsPathfindingEnabled(this)) // pussywizard
+    if (!DisableMgr::IsPathfindingEnabled(this)) // pussywizard
         return;
 
     int mmapLoadResult = MMAP::MMapFactory::createOrGetMMapManager()->loadMap(GetId(), gx, gy);

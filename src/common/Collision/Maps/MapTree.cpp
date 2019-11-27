@@ -20,7 +20,6 @@ using G3D::Vector3;
 
 namespace VMAP
 {
-
     class MapRayCallback
     {
         public:
@@ -461,5 +460,11 @@ namespace VMAP
             }
         }
         iLoadedTiles.erase(tile);
+    }
+
+    void StaticMapTree::getModelInstances(ModelInstance*& models, uint32& count)
+    {
+        models = iTreeValues;
+        count = iNTreeValues;
     }
 }
