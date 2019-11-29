@@ -97,6 +97,12 @@ class boss_ragnaros : public CreatureScript
                 events.ScheduleEvent(EVENT_MAGMA_BLAST, 2000);
                 events.ScheduleEvent(EVENT_SUBMERGE, 180000);
             }
+            
+            void JustDied(Unit* killer) override
+            {
+                BossAI::JustDied(killer);
+                me->SetFacingTo(DEATH_ORIENTATION);
+            }
 
             void KilledUnit(Unit* /*victim*/) override
             {
