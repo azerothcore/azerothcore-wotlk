@@ -517,10 +517,8 @@ void BossAI::_JustDied()
     {
         instance->SetBossState(_bossId, DONE);
         instance->SaveToDB();
-        if (me->GetGUID() == 11121) {	//Boss Ragnaross
-            // Make Sulfuras fall in his correct position
-            me->SetFacingTo(4.0f);  
-        }
+        if (me->GetGUID() == 11121) //Boss Ragnaross
+            me->SetFacingTo(4.0f);  // Make Sulfuras fall in his correct position
     }
 }
 
