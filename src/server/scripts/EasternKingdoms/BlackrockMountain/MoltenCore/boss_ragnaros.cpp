@@ -86,9 +86,6 @@ class boss_ragnaros : public CreatureScript
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             }
 
-            // Make Sulfuras fall in his correct position
-            void JustDied(Unit* /*killer*/) override { me->SetFacingTo(DEATH_ORIENTATION); }
-
             void EnterCombat(Unit* victim) override
             {
                 BossAI::EnterCombat(victim);
