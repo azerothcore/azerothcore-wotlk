@@ -1,3 +1,19 @@
+-- DB update 2019_11_28_00 -> 2019_11_30_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_11_28_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_11_28_00 2019_11_30_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1572680805604667000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1572680805604667000');
 
 -- Prevent triggering the event while another event is running
@@ -73,3 +89,12 @@ VALUES
 (2827901,9,1,0,0,0,100,0,0,0,0,0,0,11,33344,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sholazar Witch Light - On Just Summoned - Cast Spell ''Blue Banish State'''),
 (2827902,9,2,0,0,0,100,0,0,0,0,0,0,11,32566,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sholazar Witch Light - On Just Summoned - Cast Spell ''Purple Banish State'''),
 (2827903,9,3,0,0,0,100,0,0,0,0,0,0,11,35709,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Sholazar Witch Light - On Just Summoned - Cast Spell ''White Banish State''');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
