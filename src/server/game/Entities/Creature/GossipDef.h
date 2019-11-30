@@ -200,9 +200,6 @@ class GossipMenu
             return _menuItems;
         }
 
-        //ACE_RW_Thread_Mutex& GetLock() const { return *(const_cast<ACE_RW_Thread_Mutex*>(&_menuLock)); }
-        //ACE_RW_Thread_Mutex _menuLock; // pussywizard
-
     private:
         GossipMenuItemContainer _menuItems;
         GossipMenuItemDataContainer _menuItemData;
