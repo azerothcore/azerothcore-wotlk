@@ -8,3 +8,7 @@ UPDATE `creature_template_locale` SET `Title` = 'Auktionatorin' WHERE `locale` =
 
 DELETE FROM `creature_template_locale` WHERE `entry`=13476 AND `locale`='deDE';
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (13476, 'deDE', 'Balai Lok\'Wein', 'Tränke, Schriftrollen & Reagenzien', 18019);
+
+/*deDE creature_template_locales*/
+UPDATE `item_template_locale` SET Description = 'Zählt als Luft-, Erd-, Feuer- und Wassertotem.' WHERE ID = 23199 AND locale = 'deDE';
+UPDATE `item_template_locale` SET Description = 'Die Inschrift des Totems zeichnet den Träger als Verbündeten des Wasserelementars Naias aus.' WHERE ID = 23680 AND locale = 'deDE';
