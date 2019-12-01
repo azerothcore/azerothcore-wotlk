@@ -1,3 +1,19 @@
+-- DB update 2019_11_30_00 -> 2019_12_01_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_11_30_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_11_30_00 2019_12_01_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1572823869348028411'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1572823869348028411');
 
 -- Freed Crusader SAI: Use last invoker (the player) as target for the talk action
@@ -20,3 +36,12 @@ VALUES
 (30274,0,1,'Glory and strength to you, $c. I bless you with all the strength left in me. May this nightmare soon end!',12,0,100,0,0,0,30977,0,'Freed Crusader'),
 (30274,0,2,'Wisdom of the ages upon you, noble $c.',12,0,100,0,0,0,30978,0,'Freed Crusader'),
 (30274,0,3,'Thank you and farewell, friend. I must return to the Argent Vanguard.',12,0,100,0,0,0,30980,0,'Freed Crusader');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
