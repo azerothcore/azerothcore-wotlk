@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_OBJECTREGISTRY_H
-#define TRINITY_OBJECTREGISTRY_H
+#ifndef ACORE_OBJECTREGISTRY_H
+#define ACORE_OBJECTREGISTRY_H
 
 #include "Define.h"
 #include <ace/Singleton.h>

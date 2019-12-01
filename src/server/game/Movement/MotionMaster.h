@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_MOTIONMASTER_H
-#define TRINITY_MOTIONMASTER_H
+#ifndef ACORE_MOTIONMASTER_H
+#define ACORE_MOTIONMASTER_H
 
 #include "Common.h"
 #include <vector>

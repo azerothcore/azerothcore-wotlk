@@ -8,14 +8,14 @@
 /// @{
 /// \file
 
-#ifndef _TRINITY_RARUNNABLE_H_
-#define _TRINITY_RARUNNABLE_H_
+#ifndef _ACORE_RARUNNABLE_H_
+#define _ACORE_RARUNNABLE_H_
 
 #include "Common.h"
 
 #include <ace/Reactor.h>
 
-class RARunnable : public ACORE::Runnable
+class RARunnable : public acore::Runnable
 {
 public:
     RARunnable();
@@ -27,6 +27,6 @@ private:
 
 };
 
-#endif /* _TRINITY_RARUNNABLE_H_ */
+#endif /* _ACORE_RARUNNABLE_H_ */
 
 /// @}

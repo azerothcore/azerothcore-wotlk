@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_SMARTAI_H
-#define TRINITY_SMARTAI_H
+#ifndef ACORE_SMARTAI_H
+#define ACORE_SMARTAI_H
 
 #include "Common.h"
 #include "Creature.h"

@@ -193,8 +193,8 @@ class spell_murmur_thundering_storm : public SpellScriptLoader
 
             void SelectTarget(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::AllWorldObjectsInExactRange(GetCaster(), 100.0f, true));
-                targets.remove_if(Trinity::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
+                targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 100.0f, true));
+                targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
             }
 
             void Register()
