@@ -356,7 +356,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
                                         myList.push_back(p);
                             if (!myList.empty())
                             {
-                                myList.sort(Trinity::ObjectDistanceOrderPred(me->GetVictim()));
+                                myList.sort(acore::ObjectDistanceOrderPred(me->GetVictim()));
                                 Player* target = myList.front();
                                 if (me->GetVictim()->GetGUID() != _tankGUID || target->GetGUID() != _offtankGUID)
                                 {
@@ -424,7 +424,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
                                 if (Player* p = itr->GetSource())
                                     if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && p->GetDistance(me) < 100.0f && !p->HasAura(SPELL_UNCONTROLLABLE_FRENZY))
                                         myList.push_back(p);
-                            Trinity::Containers::RandomResizeList(myList, Is25ManRaid() ? 3 : 2);
+                            acore::Containers::RandomResizeList(myList, Is25ManRaid() ? 3 : 2);
                             if (myList.size() > 1)
                             {
                                 Talk(SAY_PACT_OF_THE_DARKFALLEN);
@@ -450,7 +450,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
 
                             if (!myList.empty())
                             {
-                                Trinity::Containers::RandomResizeList(myList, 1);
+                                acore::Containers::RandomResizeList(myList, 1);
                                 Player* target = myList.front();
                                 Talk(EMOTE_SWARMING_SHADOWS, target);
                                 Talk(SAY_SWARMING_SHADOWS);
@@ -472,7 +472,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
                                     if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && !p->HasAura(SPELL_PACT_OF_THE_DARKFALLEN) && !p->HasAura(SPELL_UNCONTROLLABLE_FRENZY))
                                         myList.push_back(p);
 
-                            Trinity::Containers::RandomResizeList<Player*>(myList, uint32(Is25ManRaid() ? 4 : 2));
+                            acore::Containers::RandomResizeList<Player*>(myList, uint32(Is25ManRaid() ? 4 : 2));
                             for (std::list<Player*>::iterator itr = myList.begin(); itr != myList.end(); ++itr)
                                 me->CastSpell(*itr, SPELL_TWILIGHT_BLOODBOLT, false);
                             me->CastSpell(me, SPELL_TWILIGHT_BLOODBOLT_TARGET, false);
@@ -632,7 +632,7 @@ class spell_blood_queen_pact_of_the_darkfallen : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::UnitAuraCheck(false, SPELL_PACT_OF_THE_DARKFALLEN));
+                targets.remove_if(acore::UnitAuraCheck(false, SPELL_PACT_OF_THE_DARKFALLEN));
 
                 bool remove = true;
                 std::list<WorldObject*>::const_iterator itr, itr2, itrEnd = targets.end();
@@ -677,7 +677,7 @@ class spell_blood_queen_pact_of_the_darkfallen_dmg_target : public SpellScriptLo
 
             void FilterTargets(std::list<WorldObject*>& unitList)
             {
-                unitList.remove_if(Trinity::UnitAuraCheck(true, SPELL_PACT_OF_THE_DARKFALLEN));
+                unitList.remove_if(acore::UnitAuraCheck(true, SPELL_PACT_OF_THE_DARKFALLEN));
                 unitList.push_back(GetCaster());
             }
 
@@ -732,7 +732,7 @@ class spell_blood_queen_bloodbolt : public SpellScriptLoader
             {
                 uint32 targetCount = (targets.size() + 2) / 3;
                 targets.remove_if(BloodboltHitCheck(static_cast<LanaThelAI*>(GetCaster()->GetAI())));
-                Trinity::Containers::RandomResizeList(targets, targetCount);
+                acore::Containers::RandomResizeList(targets, targetCount);
                 // mark targets now, effect hook has missile travel time delay (might cast next in that time)
                 for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                     GetCaster()->GetAI()->SetGUID((*itr)->GetGUID(), GUID_BLOODBOLT);
@@ -933,7 +933,7 @@ class spell_blood_queen_swarming_shadows_floor_dmg : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::AllWorldObjectsInExactRange(GetCaster(), GetSpellInfo()->Effects[0].CalcRadius(), true));
+                targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), GetSpellInfo()->Effects[0].CalcRadius(), true));
             }
 
             void Register()

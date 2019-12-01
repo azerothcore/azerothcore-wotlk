@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_WAYPOINTMOVEMENTGENERATOR_H
-#define TRINITY_WAYPOINTMOVEMENTGENERATOR_H
+#ifndef ACORE_WAYPOINTMOVEMENTGENERATOR_H
+#define ACORE_WAYPOINTMOVEMENTGENERATOR_H
 
 /** @page PathMovementGenerator is used to generate movements
  * of waypoints and flight paths.  Each serves the purpose

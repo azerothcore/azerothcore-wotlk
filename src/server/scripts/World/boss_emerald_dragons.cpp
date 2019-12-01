@@ -671,7 +671,7 @@ class spell_dream_fog_sleep : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_SLEEP));
+                targets.remove_if(acore::UnitAuraCheck(true, SPELL_SLEEP));
             }
 
             void Register()

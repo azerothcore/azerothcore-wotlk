@@ -3,8 +3,8 @@
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
-#ifndef TRINITY_CREATUREAIFACTORY_H
-#define TRINITY_CREATUREAIFACTORY_H
+#ifndef ACORE_CREATUREAIFACTORY_H
+#define ACORE_CREATUREAIFACTORY_H
 
 //#include "Policies/Singleton.h"
 #include "ObjectRegistry.h"

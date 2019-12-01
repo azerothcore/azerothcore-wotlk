@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_CONTAINERS_H
-#define TRINITY_CONTAINERS_H
+#ifndef ACORE_CONTAINERS_H
+#define ACORE_CONTAINERS_H
 
 #include "Define.h"
 #include <algorithm>
@@ -17,7 +17,7 @@
 //! Because circular includes are bad
 extern uint32 urand(uint32 min, uint32 max);
 
-namespace Trinity
+namespace acore
 {
     template<class T>
     constexpr inline T* AddressOrSelf(T* ptr)
@@ -100,6 +100,6 @@ namespace Trinity
     }
     //! namespace Containers
 }
-//! namespace Trinity
+//! namespace acore
 
-#endif //! #ifdef TRINITY_CONTAINERS_H
+#endif //! #ifdef ACORE_CONTAINERS_H
