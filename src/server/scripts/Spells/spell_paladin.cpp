@@ -662,7 +662,7 @@ class spell_pal_divine_storm_dummy : public SpellScriptLoader
 
             void CountTargets(std::list<WorldObject*>& targetList)
             {
-                Trinity::Containers::RandomResizeList(targetList, GetSpellValue()->MaxAffectedTargets);
+                acore::Containers::RandomResizeList(targetList, GetSpellValue()->MaxAffectedTargets);
                 _targetCount = targetList.size();
             }
 
@@ -779,7 +779,7 @@ class spell_pal_glyph_of_holy_light : public SpellScriptLoader
 
                 if (targets.size() > maxTargets)
                 {
-                    targets.sort(Trinity::HealthPctOrderPred());
+                    targets.sort(acore::HealthPctOrderPred());
                     targets.resize(maxTargets);
                 }
             }

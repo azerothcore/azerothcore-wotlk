@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_OBJECTGRIDLOADER_H
-#define TRINITY_OBJECTGRIDLOADER_H
+#ifndef ACORE_OBJECTGRIDLOADER_H
+#define ACORE_OBJECTGRIDLOADER_H
 
 #include "TypeList.h"
 #include "Define.h"

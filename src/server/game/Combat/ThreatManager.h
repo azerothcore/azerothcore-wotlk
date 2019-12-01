@@ -259,7 +259,7 @@ class ThreatManager
 
 //=================================================
 
-namespace Trinity
+namespace acore
 {
     // Binary predicate for sorting HostileReferences based on threat value
     class ThreatOrderPred

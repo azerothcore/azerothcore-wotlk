@@ -39,7 +39,7 @@ class Transaction
         bool _cleanedUp;
 
 };
-typedef Trinity::AutoPtr<Transaction, ACE_Thread_Mutex> SQLTransaction;
+typedef acore::AutoPtr<Transaction, ACE_Thread_Mutex> SQLTransaction;
 
 /*! Low level class*/
 class TransactionTask : public SQLOperation

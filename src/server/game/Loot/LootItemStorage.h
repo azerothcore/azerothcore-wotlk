@@ -2,8 +2,8 @@
 Xinef
  */
 
-#ifndef TRINITY_LOOTITEMSTORAGE_H
-#define TRINITY_LOOTITEMSTORAGE_H
+#ifndef ACORE_LOOTITEMSTORAGE_H
+#define ACORE_LOOTITEMSTORAGE_H
 
 #include "Common.h"
 #include <map>
