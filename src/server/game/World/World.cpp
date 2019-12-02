@@ -1395,7 +1395,7 @@ void World::SetInitialWorldSettings()
 
     ///- Loading strings. Getting no records means core load has to be canceled because no error message can be output.
     sLog->outString();
-    sLog->outString("Loading Trinity strings...");
+    sLog->outString("Loading acore strings...");
     if (!sObjectMgr->LoadAcoreStrings())
         exit(1);                                            // Error message displayed in function already
 
