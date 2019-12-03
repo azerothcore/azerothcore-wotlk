@@ -29,32 +29,34 @@ public:
     {
         static std::vector<ChatCommand> learnAllMyCommandTable =
         {
-            { "class",          SEC_GAMEMASTER,  false, &HandleLearnAllMyClassCommand,       "" },
-            { "pettalents",     SEC_GAMEMASTER,  false, &HandleLearnAllMyPetTalentsCommand,  "" },
-            { "spells",         SEC_GAMEMASTER,  false, &HandleLearnAllMySpellsCommand,      "" },
-            { "talents",        SEC_GAMEMASTER,  false, &HandleLearnAllMyTalentsCommand,     "" }
+            { "class",              SEC_GAMEMASTER,  false, &HandleLearnAllMyClassCommand,       "" },
+            { "pettalents",         SEC_GAMEMASTER,  false, &HandleLearnAllMyPetTalentsCommand,  "" },
+            { "spells",             SEC_GAMEMASTER,  false, &HandleLearnAllMySpellsCommand,      "" },
+            { "talents",            SEC_GAMEMASTER,  false, &HandleLearnAllMyTalentsCommand,     "" }
         };
 
         static std::vector<ChatCommand> learnAllCommandTable =
         {
-            { "my",             SEC_GAMEMASTER,  false, nullptr,                                "",  learnAllMyCommandTable },
-            { "gm",             SEC_GAMEMASTER,  false, &HandleLearnAllGMCommand,            "" },
-            { "crafts",         SEC_GAMEMASTER,  false, &HandleLearnAllCraftsCommand,        "" },
-            { "default",        SEC_GAMEMASTER,  false, &HandleLearnAllDefaultCommand,       "" },
-            { "lang",           SEC_GAMEMASTER,  false, &HandleLearnAllLangCommand,          "" },
-            { "recipes",        SEC_GAMEMASTER,  false, &HandleLearnAllRecipesCommand,       "" }
+            { "my",                 SEC_GAMEMASTER,  false, nullptr,                             "", learnAllMyCommandTable },
+            { "gm",                 SEC_GAMEMASTER,  false, &HandleLearnAllGMCommand,            "" },
+            { "crafts",             SEC_GAMEMASTER,  false, &HandleLearnAllCraftsCommand,        "" },
+            { "default",            SEC_GAMEMASTER,  false, &HandleLearnAllDefaultCommand,       "" },
+            { "lang",               SEC_GAMEMASTER,  false, &HandleLearnAllLangCommand,          "" },
+            { "recipes",            SEC_GAMEMASTER,  false, &HandleLearnAllRecipesCommand,       "" }
         };
 
         static std::vector<ChatCommand> learnCommandTable =
         {
-            { "all",            SEC_GAMEMASTER,  false, nullptr,                                "",  learnAllCommandTable },
-            { "",               SEC_GAMEMASTER,  false, &HandleLearnCommand,                 "" }
+            { "all",                SEC_GAMEMASTER,  false, nullptr,                             "", learnAllCommandTable },
+            { "",                   SEC_GAMEMASTER,  false, &HandleLearnCommand,                 "" }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "learn",          SEC_GAMEMASTER,  false, nullptr,                                "", learnCommandTable },
-            { "unlearn",        SEC_GAMEMASTER,  false, &HandleUnLearnCommand,               "" }
+            { "learn",              SEC_GAMEMASTER,  false, nullptr,                             "", learnCommandTable },
+            { "unlearn",            SEC_GAMEMASTER,  false, &HandleUnLearnCommand,               "" },
+            { "playerlearnspell",   SEC_GAMEMASTER,  true,  &HandlePlayerLearnCommand,           "" },
+            { "playerunlearnspell", SEC_GAMEMASTER,  true,  &HandlePlayerUnLearnCommand,         "" }
         };
         return commandTable;
     }
@@ -108,6 +110,72 @@ public:
                 handler->SendSysMessage(LANG_YOU_KNOWN_SPELL);
             else
                 handler->PSendSysMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(targetPlayer).c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (allRanks)
+            targetPlayer->learnSpellHighRank(spell);
+        else
+            targetPlayer->learnSpell(spell);
+
+        uint32 firstSpell = sSpellMgr->GetFirstSpellInChain(spell);
+        if (GetTalentSpellCost(firstSpell))
+            targetPlayer->SendTalentsInfoData(false);
+
+        return true;
+    }
+
+    static bool HandlePlayerLearnCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* playerName = strtok((char*)args, " ");
+        char* spellid = strtok(nullptr, " ");
+        char* all = strtok(nullptr, " ");
+        if (!playerName)
+            return false;
+
+        Player* targetPlayer;
+        uint64 targetGuid;
+        if (!handler->extractPlayerTarget(playerName, &targetPlayer, &targetGuid))
+            return false;
+
+        if (!targetPlayer)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!spellid)
+            return false;
+
+        uint32 spell = handler->extractSpellIdFromLink(spellid);
+        if (!spell)
+            return false;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell);
+        if (!spellInfo)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!SpellMgr::IsSpellValid(spellInfo))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        bool allRanks = all ? (strncmp(all, "all", strlen(all)) == 0) : false;
+
+        if (!allRanks && targetPlayer->HasSpell(spell))
+        {
+            handler->PSendSysMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(targetPlayer).c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -502,6 +570,52 @@ public:
 
         if (GetTalentSpellCost(spellId))
             target->SendTalentsInfoData(false);
+
+        return true;
+    }
+
+    static bool HandlePlayerUnLearnCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* playerName = strtok((char*)args, " ");
+        char* spellid = strtok(nullptr, " ");
+        char* all = strtok(nullptr, " ");
+        if (!playerName)
+            return false;
+
+        Player* targetPlayer;
+        uint64 targetGuid;
+        if (!handler->extractPlayerTarget(playerName, &targetPlayer, &targetGuid))
+            return false;
+
+        if (!targetPlayer)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!spellid)
+            return false;
+
+        uint32 spell = handler->extractSpellIdFromLink(spellid);
+        if (!spell)
+            return false;
+
+        bool allRanks = all ? (strncmp(all, "all", strlen(all)) == 0) : false;
+
+        if (allRanks)
+            spell = sSpellMgr->GetFirstSpellInChain (spell);
+
+        if (targetPlayer->HasSpell(spell))
+            targetPlayer->removeSpell(spell, SPEC_MASK_ALL, false);
+        else
+            handler->SendSysMessage(LANG_FORGET_SPELL);
+
+        if (GetTalentSpellCost(spell))
+            targetPlayer->SendTalentsInfoData(false);
 
         return true;
     }
