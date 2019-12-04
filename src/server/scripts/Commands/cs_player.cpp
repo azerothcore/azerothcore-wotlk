@@ -97,7 +97,7 @@ public:
         if (!spell)
             return false;
 
-        bool allRanks = all ? (strncmp(all, "all", strlen(all)) == 0) : false;
+        bool allRanks = all ? (strncmp(all, "all", 3) == 0) : false;
 
         if (allRanks)
             spell = sSpellMgr->GetFirstSpellInChain (spell);
