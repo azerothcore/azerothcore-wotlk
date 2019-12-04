@@ -2979,7 +2979,7 @@ ItemDelete.Vendor = 0
 
 #
 #    ItemDelete.Quality
-#        Description: Saving items into database that are Qualities greater than 3
+#        Description: Saving items into database that have quality greater or equal to ItemDelete.Quality
 #
 #        ID | Color | Quality
 #        0  | Grey  | Poor
@@ -2998,7 +2998,7 @@ ItemDelete.Quality = 3
 
 #
 #    ItemDelete.ItemLevel
-#        Description: Saving items into database that are Item Levels greater than 80
+#        Description: Saving items into database that are Item Levels greater or equal to ItemDelete.ItemLevel
 #        Default:     80
 #
 
