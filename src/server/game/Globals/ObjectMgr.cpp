@@ -7753,7 +7753,7 @@ bool ObjectMgr::LoadAcoreStrings()
     QueryResult result = WorldDatabase.PQuery("SELECT entry, content_default, content_loc1, content_loc2, content_loc3, content_loc4, content_loc5, content_loc6, content_loc7, content_loc8 FROM acore_string");
     if (!result)
     {
-        sLog->outString(">> Loaded 0 trinity strings. DB table `acore_strings` is empty.");
+        sLog->outString(">> Loaded 0 acore strings. DB table `acore_strings` is empty.");
         sLog->outString();
         return false;
     }
@@ -7773,7 +7773,7 @@ bool ObjectMgr::LoadAcoreStrings()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u trinity strings in %u ms", (uint32)_acoreStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u acore strings in %u ms", (uint32)_acoreStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 
     return true;
