@@ -100,7 +100,7 @@ public:
         bool allRanks = all ? (strncmp(all, "all", 3) == 0) : false;
 
         if (allRanks)
-            spell = sSpellMgr->GetFirstSpellInChain (spell);
+            spell = sSpellMgr->GetFirstSpellInChain(spell);
 
         if (targetPlayer->HasSpell(spell))
             targetPlayer->removeSpell(spell, SPEC_MASK_ALL, false);
