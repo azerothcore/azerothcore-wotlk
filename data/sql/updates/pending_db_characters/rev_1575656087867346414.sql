@@ -1,4 +1,4 @@
-INSERT INTO `version_db_characters` (`sql_rev`) VALUES ('1572331570357004681');
+INSERT INTO `version_db_characters` (`sql_rev`) VALUES ('1575656087867346414');
 
 CREATE TABLE IF NOT EXISTS `recovery_item` (
   `Id` int(11) unsigned NOT NULL AUTO_INCREMENT,
