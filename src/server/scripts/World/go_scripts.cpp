@@ -337,8 +337,8 @@ public:
             {
                 timer = 0;
                 std::list<Player*> players;
-                Trinity::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
-                Trinity::PlayerListSearcher<Trinity::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
+                acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
+                acore::PlayerListSearcher<acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
                 go->VisitNearbyWorldObject(0.3f, searcher);
 
                 if (players.size() > 0)
@@ -384,8 +384,8 @@ public:
             {
                 timer = 0;
                 std::list<Player*> players;
-                Trinity::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
-                Trinity::PlayerListSearcher<Trinity::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
+                acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
+                acore::PlayerListSearcher<acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
                 go->VisitNearbyWorldObject(0.3f, searcher);
 
                 if (players.size() > 0)
