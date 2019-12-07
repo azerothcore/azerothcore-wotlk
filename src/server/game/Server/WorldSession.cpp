@@ -192,7 +192,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     if (!m_Socket)
         return;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(TRINITY_DEBUG)
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(ACORE_DEBUG)
     // Code for network use statistic
     static uint64 sendPacketCount = 0;
     static uint64 sendPacketBytes = 0;
@@ -226,7 +226,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         sendLastPacketCount = 1;
         sendLastPacketBytes = packet->wpos();               // wpos is real written size
     }
-#endif                                                      // !TRINITY_DEBUG
+#endif                                                      // !ACORE_DEBUG
 
     sScriptMgr->OnPacketSend(this, *packet);
 
@@ -301,28 +301,18 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         }
                         else
                         {
-                            if (opHandle.isGrouppedMovementOpcode)
-                            {
-                                if (movementPacket)
-                                    delete movementPacket;
-                                movementPacket = new WorldPacket(packet->GetOpcode(), 0);
-                                movementPacket->append(*((ByteBuffer*)packet));
-                            }
-                            else
-                            {
-                                if (movementPacket)
-                                {
-                                    HandleMovementOpcodes(*movementPacket);
-                                    delete movementPacket;
-                                    movementPacket = NULL;
-                                }
-                                sScriptMgr->OnPacketReceive(this, *packet);
+                          if (movementPacket)
+                          {
+                              HandleMovementOpcodes(*movementPacket);
+                              delete movementPacket;
+                              movementPacket = NULL;
+                          }
+                          sScriptMgr->OnPacketReceive(this, *packet);
 #ifdef ELUNA
-                                if (!sEluna->OnPacketReceive(this, *packet))
-                                    break;
+                          if (!sEluna->OnPacketReceive(this, *packet))
+                              break;
 #endif
-                                (this->*opHandle.handler)(*packet);
-                            }
+                          (this->*opHandle.handler)(*packet);
                         }
                         break;
                     case STATUS_TRANSFER:
@@ -358,7 +348,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         break;
                 }
             }
-            catch(ByteBufferException &)
+            catch(ByteBufferException const&)
             {
                 sLog->outError("WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.", packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
                 if (sLog->IsOutDebug())
@@ -649,7 +639,7 @@ void WorldSession::SendNotification(const char *format, ...)
 
 void WorldSession::SendNotification(uint32 string_id, ...)
 {
-    char const* format = GetTrinityString(string_id);
+    char const* format = GetAcoreString(string_id);
     if (format)
     {
         va_list ap;
@@ -665,9 +655,9 @@ void WorldSession::SendNotification(uint32 string_id, ...)
     }
 }
 
-char const* WorldSession::GetTrinityString(uint32 entry) const
+char const* WorldSession::GetAcoreString(uint32 entry) const
 {
-    return sObjectMgr->GetTrinityString(entry, GetSessionDbLocaleIndex());
+    return sObjectMgr->GetAcoreString(entry, GetSessionDbLocaleIndex());
 }
 
 void WorldSession::Handle_NULL(WorldPacket& recvPacket)
@@ -865,7 +855,7 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo* mi)
 
     //! Anti-cheat checks. Please keep them in seperate if() blocks to maintain a clear overview.
     //! Might be subject to latency, so just remove improper flags.
-    #ifdef TRINITY_DEBUG
+    #ifdef ACORE_DEBUG
     #define REMOVE_VIOLATING_FLAGS(check, maskToRemove) \
     { \
         if (check) \

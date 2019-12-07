@@ -22,7 +22,7 @@
     terminates the application.
  */
 
-#if PLATFORM == PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include <Windows.h>
 #define Crash(message) \
     ULONG_PTR execeptionArgs[] = { reinterpret_cast<ULONG_PTR>(strdup(message)), reinterpret_cast<ULONG_PTR>(_ReturnAddress()) }; \
@@ -54,12 +54,12 @@ namespace
     }
 }
 
-namespace Trinity
+namespace acore
 {
 
 void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message)
 {
-    std::string formattedMessage = ACORE::StringFormat("\n%s:%i in %s ASSERTION FAILED:\n  %s\n", file, line, function, message) + debugInfo + '\n';
+    std::string formattedMessage = acore::StringFormat("\n%s:%i in %s ASSERTION FAILED:\n  %s\n", file, line, function, message) + debugInfo + '\n';
     fprintf(stderr, "%s", formattedMessage.c_str());
     fflush(stderr);
     Crash(formattedMessage.c_str());
@@ -70,7 +70,7 @@ void Assert(char const* file, int line, char const* function, std::string const&
     va_list args;
     va_start(args, format);
 
-    std::string formattedMessage = ACORE::StringFormat("\n%s:%i in %s ASSERTION FAILED:\n  %s\n", file, line, function, message) + FormatAssertionMessage(format, args) + '\n' + debugInfo + '\n';
+    std::string formattedMessage = acore::StringFormat("\n%s:%i in %s ASSERTION FAILED:\n  %s\n", file, line, function, message) + FormatAssertionMessage(format, args) + '\n' + debugInfo + '\n';
     va_end(args);
 
     fprintf(stderr, "%s", formattedMessage.c_str());
@@ -84,7 +84,7 @@ void Fatal(char const* file, int line, char const* function, char const* message
     va_list args;
     va_start(args, message);
 
-    std::string formattedMessage = ACORE::StringFormat("\n%s:%i in %s FATAL ERROR:\n", file, line, function) + FormatAssertionMessage(message, args) + '\n';
+    std::string formattedMessage = acore::StringFormat("\n%s:%i in %s FATAL ERROR:\n", file, line, function) + FormatAssertionMessage(message, args) + '\n';
     va_end(args);
 
     fprintf(stderr, "%s", formattedMessage.c_str());
@@ -96,7 +96,7 @@ void Fatal(char const* file, int line, char const* function, char const* message
 
 void Error(char const* file, int line, char const* function, char const* message)
 {
-    std::string formattedMessage = ACORE::StringFormat("\n%s:%i in %s ERROR:\n  %s\n", file, line, function, message);
+    std::string formattedMessage = acore::StringFormat("\n%s:%i in %s ERROR:\n  %s\n", file, line, function, message);
     fprintf(stderr, "%s", formattedMessage.c_str());
     fflush(stderr);
     Crash(formattedMessage.c_str());
@@ -110,7 +110,7 @@ void Warning(char const* file, int line, char const* function, char const* messa
 
 void Abort(char const* file, int line, char const* function)
 {
-    std::string formattedMessage = ACORE::StringFormat("\n%s:%i in %s ABORTED.\n", file, line, function);
+    std::string formattedMessage = acore::StringFormat("\n%s:%i in %s ABORTED.\n", file, line, function);
     fprintf(stderr, "%s", formattedMessage.c_str());
     fflush(stderr);
     Crash(formattedMessage.c_str());
@@ -119,13 +119,13 @@ void Abort(char const* file, int line, char const* function)
 void AbortHandler(int sigval)
 {
     // nothing useful to log here, no way to pass args
-    std::string formattedMessage = ACORE::StringFormat("Caught signal %i\n", sigval);
+    std::string formattedMessage = acore::StringFormat("Caught signal %i\n", sigval);
     fprintf(stderr, "%s", formattedMessage.c_str());
     fflush(stderr);
     Crash(formattedMessage.c_str());
 }
 
-} // namespace Trinity
+} // namespace acore
 
 std::string GetDebugInfo()
 {

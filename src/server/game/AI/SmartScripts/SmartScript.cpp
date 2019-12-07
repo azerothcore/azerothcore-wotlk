@@ -27,17 +27,17 @@
 #include "SpellMgr.h"
 #include "Vehicle.h"
 
-class TrinityStringTextBuilder
+class AcoreStringTextBuilder
 {
 public:
-    TrinityStringTextBuilder(WorldObject* obj, ChatMsg msgtype, int32 id, uint32 language, WorldObject* target)
+    AcoreStringTextBuilder(WorldObject* obj, ChatMsg msgtype, int32 id, uint32 language, WorldObject* target)
         : _source(obj), _msgType(msgtype), _textId(id), _language(language), _target(target)
     {
     }
 
     size_t operator()(WorldPacket* data, LocaleConstant locale) const
     {
-        std::string text = sObjectMgr->GetTrinityString(_textId, locale);
+        std::string text = sObjectMgr->GetAcoreString(_textId, locale);
         return ChatHandler::BuildChatPacket(*data, _msgType, Language(_language), _source, _target, text, 0, "", locale);
     }
 
@@ -741,7 +741,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             caster = unit->SummonTrigger(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetOrientation(), 5000);
 
         if (e.action.cast.targetsLimit > 0 && targets->size() > e.action.cast.targetsLimit)
-            Trinity::Containers::RandomResizeList(*targets, e.action.cast.targetsLimit);
+            acore::Containers::RandomResizeList(*targets, e.action.cast.targetsLimit);
 
         for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
         {
@@ -797,7 +797,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             break;
 
         if (e.action.cast.targetsLimit > 0 && targets->size() > e.action.cast.targetsLimit)
-            Trinity::Containers::RandomResizeList(*targets, e.action.cast.targetsLimit);
+            acore::Containers::RandomResizeList(*targets, e.action.cast.targetsLimit);
 
         for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
         {
@@ -1042,7 +1042,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         me->DoFleeToGetAssistance();
         if (e.action.flee.withEmote)
         {
-            TrinityStringTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, LANG_FLEE, LANG_UNIVERSAL, NULL);
+            AcoreStringTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, LANG_FLEE, LANG_UNIVERSAL, NULL);
             sCreatureTextMgr->SendChatPacket(me, builder, CHAT_MSG_MONSTER_EMOTE);
         }
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -1340,7 +1340,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 (*itr)->ToCreature()->CallForHelp((float)e.action.callHelp.range);
                 if (e.action.callHelp.withEmote)
                 {
-                    TrinityStringTextBuilder builder(*itr, CHAT_MSG_MONSTER_EMOTE, LANG_CALL_FOR_HELP, LANG_UNIVERSAL, NULL);
+                    AcoreStringTextBuilder builder(*itr, CHAT_MSG_MONSTER_EMOTE, LANG_CALL_FOR_HELP, LANG_UNIVERSAL, NULL);
                     sCreatureTextMgr->SendChatPacket(*itr, builder, CHAT_MSG_MONSTER_EMOTE);
                 }
             }
@@ -1516,7 +1516,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             break;
 
         // xinef: attack random target
-        if (Unit* target = Trinity::Containers::SelectRandomContainerElement(*targets)->ToUnit())
+        if (Unit* target = acore::Containers::SelectRandomContainerElement(*targets)->ToUnit())
             me->AI()->AttackStart(target);
 
         delete targets;
@@ -1880,7 +1880,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (ObjectList* targets = GetTargets(e, unit))
             {
                 // xinef: we want to move to random element
-                target = Trinity::Containers::SelectRandomContainerElement(*targets);
+                target = acore::Containers::SelectRandomContainerElement(*targets);
                 delete targets;
             }
         }
@@ -2436,7 +2436,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         // xinef: my implementation
         if (e.action.jump.selfJump)
         {
-            if (WorldObject* target = Trinity::Containers::SelectRandomContainerElement(*targets))
+            if (WorldObject* target = acore::Containers::SelectRandomContainerElement(*targets))
                 if (me)
                     me->GetMotionMaster()->MoveJump(target->GetPositionX() + e.target.x, target->GetPositionY() + e.target.y, target->GetPositionZ() + e.target.z, (float)e.action.jump.speedxy, (float)e.action.jump.speedz);
         }
@@ -3554,8 +3554,8 @@ ObjectList* SmartScript::GetWorldObjectsInDist(float dist)
     WorldObject* obj = GetBaseObject();
     if (obj)
     {
-        Trinity::AllWorldObjectsInRange u_check(obj, dist);
-        Trinity::WorldObjectListSearcher<Trinity::AllWorldObjectsInRange> searcher(obj, *targets, u_check);
+        acore::AllWorldObjectsInRange u_check(obj, dist);
+        acore::WorldObjectListSearcher<acore::AllWorldObjectsInRange> searcher(obj, *targets, u_check);
         obj->VisitNearbyObject(dist, searcher);
     }
     return targets;
@@ -3685,7 +3685,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             RecalcTimer(e, 1000, 3000);
             return;
         }
-        ProcessTimedAction(e, e.event.friendlyCC.repeatMin, e.event.friendlyCC.repeatMax, Trinity::Containers::SelectRandomContainerElement(pList));
+        ProcessTimedAction(e, e.event.friendlyCC.repeatMin, e.event.friendlyCC.repeatMax, acore::Containers::SelectRandomContainerElement(pList));
         break;
     }
     case SMART_EVENT_FRIENDLY_MISSING_BUFF:
@@ -3696,7 +3696,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         if (pList.empty())
             return;
 
-        ProcessTimedAction(e, e.event.missingBuff.repeatMin, e.event.missingBuff.repeatMax, Trinity::Containers::SelectRandomContainerElement(pList));
+        ProcessTimedAction(e, e.event.missingBuff.repeatMin, e.event.missingBuff.repeatMax, acore::Containers::SelectRandomContainerElement(pList));
         break;
     }
     case SMART_EVENT_HAS_AURA:
@@ -4321,7 +4321,7 @@ void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger c
     }
     for (SmartAIEventList::iterator i = e.begin(); i != e.end(); ++i)
     {
-#ifndef TRINITY_DEBUG
+#ifndef ACORE_DEBUG
         if ((*i).event.event_flags & SMART_EVENT_FLAG_DEBUG_ONLY)
             continue;
 #endif
@@ -4503,8 +4503,8 @@ Unit* SmartScript::DoSelectLowestHpFriendly(float range, uint32 MinHPDiff)
 
     Unit* unit = NULL;
 
-    Trinity::MostHPMissingInRange u_check(me, range, MinHPDiff);
-    Trinity::UnitLastSearcher<Trinity::MostHPMissingInRange> searcher(me, unit, u_check);
+    acore::MostHPMissingInRange u_check(me, range, MinHPDiff);
+    acore::UnitLastSearcher<acore::MostHPMissingInRange> searcher(me, unit, u_check);
     me->VisitNearbyObject(range, searcher);
     return unit;
 }
@@ -4514,8 +4514,8 @@ void SmartScript::DoFindFriendlyCC(std::list<Creature*>& _list, float range)
     if (!me)
         return;
 
-    Trinity::FriendlyCCedInRange u_check(me, range);
-    Trinity::CreatureListSearcher<Trinity::FriendlyCCedInRange> searcher(me, _list, u_check);
+    acore::FriendlyCCedInRange u_check(me, range);
+    acore::CreatureListSearcher<acore::FriendlyCCedInRange> searcher(me, _list, u_check);
     me->VisitNearbyObject(range, searcher);
 }
 
@@ -4524,8 +4524,8 @@ void SmartScript::DoFindFriendlyMissingBuff(std::list<Creature*>& list, float ra
     if (!me)
         return;
 
-    Trinity::FriendlyMissingBuffInRange u_check(me, range, spellid);
-    Trinity::CreatureListSearcher<Trinity::FriendlyMissingBuffInRange> searcher(me, list, u_check);
+    acore::FriendlyMissingBuffInRange u_check(me, range, spellid);
+    acore::CreatureListSearcher<acore::FriendlyMissingBuffInRange> searcher(me, list, u_check);
     me->VisitNearbyObject(range, searcher);
 }
 
@@ -4535,8 +4535,8 @@ Unit* SmartScript::DoFindClosestFriendlyInRange(float range, bool playerOnly)
         return NULL;
 
     Unit* unit = NULL;
-    Trinity::AnyFriendlyNotSelfUnitInObjectRangeCheck u_check(me, me, range, playerOnly);
-    Trinity::UnitLastSearcher<Trinity::AnyFriendlyNotSelfUnitInObjectRangeCheck> searcher(me, unit, u_check);
+    acore::AnyFriendlyNotSelfUnitInObjectRangeCheck u_check(me, me, range, playerOnly);
+    acore::UnitLastSearcher<acore::AnyFriendlyNotSelfUnitInObjectRangeCheck> searcher(me, unit, u_check);
     me->VisitNearbyObject(range, searcher);
     return unit;
 }

@@ -144,7 +144,7 @@ class RisenArchmageCheck
         }
 };
 
-struct ManaVoidSelector : public ACORE::unary_function<Unit*, bool>
+struct ManaVoidSelector : public acore::unary_function<Unit*, bool>
 {
         explicit ManaVoidSelector(WorldObject const* source) : _source(source) { }
 
@@ -205,7 +205,7 @@ class ValithriaDespawner : public BasicEvent
 
         bool Execute(uint64 /*currTime*/, uint32 /*diff*/)
         {
-            Trinity::CreatureWorker<ValithriaDespawner> worker(_creature, *this);
+            acore::CreatureWorker<ValithriaDespawner> worker(_creature, *this);
             _creature->VisitNearbyGridObject(333.0f, worker);
             _creature->AI()->Reset();
             _creature->setActive(false);
@@ -525,7 +525,7 @@ class npc_green_dragon_combat_trigger : public CreatureScript
 
                 std::list<Creature*> archmages;
                 RisenArchmageCheck check;
-                Trinity::CreatureListSearcher<RisenArchmageCheck> searcher(me, archmages, check);
+                acore::CreatureListSearcher<RisenArchmageCheck> searcher(me, archmages, check);
                 me->VisitNearbyGridObject(100.0f, searcher);
                 for (std::list<Creature*>::iterator itr = archmages.begin(); itr != archmages.end(); ++itr)
                     (*itr)->AI()->DoAction(ACTION_ENTER_COMBAT);
@@ -1305,9 +1305,9 @@ class spell_dreamwalker_summoner : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::AllWorldObjectsInExactRange(GetCaster(), 250.0f, true));
+                targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 250.0f, true));
                 std::list<WorldObject*> list_copy = targets;
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
+                targets.remove_if(acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
                 if (targets.empty())
                 {
                     if (list_copy.empty())
@@ -1315,7 +1315,7 @@ class spell_dreamwalker_summoner : public SpellScriptLoader
                     targets = list_copy;
                 }
 
-                WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -1361,14 +1361,14 @@ class spell_dreamwalker_summon_suppresser : public SpellScriptLoader
                 std::list<Creature*> summoners;
                 caster->GetCreaturesWithEntryInRange(summoners, 200.0f, NPC_WORLD_TRIGGER);
                 std::list<Creature*> list_copy = summoners;
-                summoners.remove_if(Trinity::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
+                summoners.remove_if(acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
                 if (summoners.empty())
                 {
                     if (list_copy.empty())
                         return;
                     summoners = list_copy;
                 }
-                Trinity::Containers::RandomResizeList(summoners, 2);
+                acore::Containers::RandomResizeList(summoners, 2);
 
                 for (uint32 i = 0; i < 3; ++i)
                     caster->CastSpell(summoners.front(), SPELL_SUMMON_SUPPRESSER, true);

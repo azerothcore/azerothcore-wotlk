@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_DBCSTORES_H
-#define TRINITY_DBCSTORES_H
+#ifndef ACORE_DBCSTORES_H
+#define ACORE_DBCSTORES_H
 
 #include "Common.h"
 #include "DBCStore.h"

@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_GRIDNOTIFIERS_H
-#define TRINITY_GRIDNOTIFIERS_H
+#ifndef ACORE_GRIDNOTIFIERS_H
+#define ACORE_GRIDNOTIFIERS_H
 
 #include "ObjectGridLoader.h"
 #include "UpdateData.h"
@@ -24,7 +24,7 @@
 class Player;
 //class Map;
 
-namespace Trinity
+namespace acore
 {
     struct VisibleNotifier
     {
@@ -141,19 +141,10 @@ namespace Trinity
     struct ObjectUpdater
     {
         uint32 i_timeDiff;
-        explicit ObjectUpdater(const uint32 diff) : i_timeDiff(diff) {}
+        bool i_largeOnly;
+        explicit ObjectUpdater(const uint32 diff, bool largeOnly) : i_timeDiff(diff), i_largeOnly(largeOnly) {}
         template<class T> void Visit(GridRefManager<T> &m);
         void Visit(PlayerMapType &) {}
-        void Visit(CorpseMapType &) {}
-    };
-
-    struct LargeObjectUpdater
-    {
-        uint32 i_timeDiff;
-        explicit LargeObjectUpdater(const uint32 diff) : i_timeDiff(diff) {}
-        template<class T> void Visit(GridRefManager<T> &m);
-        void Visit(GameObjectMapType &) {}
-        void Visit(DynamicObjectMapType &) {}
         void Visit(CorpseMapType &) {}
     };
 

@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_SHAREDDEFINES_H
-#define TRINITY_SHAREDDEFINES_H
+#ifndef ACORE_SHAREDDEFINES_H
+#define ACORE_SHAREDDEFINES_H
 
 #include "Define.h"
 #include "DetourNavMesh.h"

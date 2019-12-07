@@ -16,7 +16,7 @@
 #include "CellImpl.h"
 #include "SpellInfo.h"
 
-using namespace Trinity;
+using namespace acore;
 
 
 void VisibleNotifier::Visit(GameObjectMapType &m)
@@ -64,8 +64,9 @@ void VisibleNotifier::SendToSelf()
 
     for (Player::ClientGUIDs::const_iterator it = vis_guids.begin();it != vis_guids.end(); ++it)
     {
-        if (i_largeOnly != ObjectAccessor::GetWorldObject(i_player, *it)->IsVisibilityOverridden())
-            continue;
+        if (WorldObject* obj = ObjectAccessor::GetWorldObject(i_player, *it))
+            if (i_largeOnly != obj->IsVisibilityOverridden())
+                continue;
 
         // pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)
         if (IS_TRANSPORT_GUID(*it))
@@ -332,20 +333,7 @@ void ObjectUpdater::Visit(GridRefManager<T> &m)
     {
         obj = iter->GetSource();
         ++iter;
-        if (obj->IsInWorld())
-            obj->Update(i_timeDiff);
-    }
-}
-
-template<class T>
-void LargeObjectUpdater::Visit(GridRefManager<T> &m)
-{
-    T* obj;
-    for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); )
-    {
-        obj = iter->GetSource();
-        ++iter;
-        if (obj->IsInWorld() && obj->IsVisibilityOverridden())
+        if (obj->IsInWorld() && (i_largeOnly == obj->IsVisibilityOverridden()))
             obj->Update(i_timeDiff);
     }
 }
@@ -383,4 +371,3 @@ bool AnyDeadUnitSpellTargetInRangeCheck::operator()(Creature* u)
 template void ObjectUpdater::Visit<Creature>(CreatureMapType&);
 template void ObjectUpdater::Visit<GameObject>(GameObjectMapType&);
 template void ObjectUpdater::Visit<DynamicObject>(DynamicObjectMapType&);
-template void LargeObjectUpdater::Visit<Creature>(CreatureMapType&);

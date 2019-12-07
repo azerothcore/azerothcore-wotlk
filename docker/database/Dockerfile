@@ -16,6 +16,8 @@ RUN ./azerothcore/bin/acore-db-asm 1
 
 FROM mysql:5.7
 
+ENV LANG C.UTF-8
+
 # copy files from the previous build stage - see: https://docs.docker.com/develop/develop-images/multistage-build/
 COPY --from=builder /azerothcore/env/dist/sql /sql
 

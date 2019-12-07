@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_FACTORY_HOLDER
-#define TRINITY_FACTORY_HOLDER
+#ifndef ACORE_FACTORY_HOLDER
+#define ACORE_FACTORY_HOLDER
 
 #include "Define.h"
 #include "Dynamic/TypeList.h"

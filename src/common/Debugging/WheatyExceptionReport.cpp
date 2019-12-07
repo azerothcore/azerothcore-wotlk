@@ -5,7 +5,7 @@
 //==========================================
 #include "CompilerDefs.h"
 
-#if PLATFORM == PLATFORM_WINDOWS && !defined(__MINGW32__)
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS && !defined(__MINGW32__)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
