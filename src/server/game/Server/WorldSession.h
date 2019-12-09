@@ -952,6 +952,8 @@ class WorldSession
 
         bool CanUseBank(uint64 bankerGUID = 0) const;
 
+        bool recoveryItem(Item* pItem);
+
         // EnumData helpers
         bool IsLegitCharacterForAccount(uint32 lowGUID)
         {
