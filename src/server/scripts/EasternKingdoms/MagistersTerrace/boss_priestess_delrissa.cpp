@@ -104,7 +104,7 @@ public:
             std::list<uint32> helpersList;
             for (uint8 i = 0; i < MAX_HELPERS_COUNT; ++i)
                 helpersList.push_back(helpersEntries[i]);
-            Trinity::Containers::RandomResizeList(helpersList, MAX_ACTIVE_HELPERS);
+            acore::Containers::RandomResizeList(helpersList, MAX_ACTIVE_HELPERS);
 
             uint8 j = 0;
             for (std::list<uint32>::const_iterator itr = helpersList.begin(); itr != helpersList.end(); ++itr, ++j)
@@ -199,7 +199,7 @@ public:
                 case EVENT_SPELL_PW_SHIELD:
                 {
                     std::list<Creature*> cList = DoFindFriendlyMissingBuff(40.0f, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H));
-                    if (Unit* target = Trinity::Containers::SelectRandomContainerElement(cList))
+                    if (Unit* target = acore::Containers::SelectRandomContainerElement(cList))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H), false);
                     events.ScheduleEvent(EVENT_SPELL_PW_SHIELD, 10000);
                     break;
@@ -211,7 +211,7 @@ public:
                     {
                         case 0: target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true); break;
                         case 1: target = me; break;
-                        case 2: target = ObjectAccessor::GetCreature(*me, Trinity::Containers::SelectRandomContainerElement(summons)); break;
+                        case 2: target = ObjectAccessor::GetCreature(*me, acore::Containers::SelectRandomContainerElement(summons)); break;
                     }
 
                     if (target)

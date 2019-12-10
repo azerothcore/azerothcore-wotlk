@@ -1910,7 +1910,7 @@ class spell_item_echoes_of_light : public SpellScriptLoader
                 if (targets.size() < 2)
                     return;
 
-                targets.sort(Trinity::HealthPctOrderPred());
+                targets.sort(acore::HealthPctOrderPred());
 
                 WorldObject* target = targets.front();
                 targets.clear();

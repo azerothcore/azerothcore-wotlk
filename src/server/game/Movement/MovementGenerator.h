@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_MOVEMENTGENERATOR_H
-#define TRINITY_MOVEMENTGENERATOR_H
+#ifndef ACORE_MOVEMENTGENERATOR_H
+#define ACORE_MOVEMENTGENERATOR_H
 
 #include "Define.h"
 #include <ace/Singleton.h>

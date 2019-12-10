@@ -212,7 +212,7 @@ SQLTransaction DatabaseWorkerPool<T>::BeginTransaction()
 template <class T>
 void DatabaseWorkerPool<T>::CommitTransaction(SQLTransaction transaction)
 {
-    #ifdef TRINITY_DEBUG
+    #ifdef ACORE_DEBUG
     //! Only analyze transaction weaknesses in Debug mode.
     //! Ideally we catch the faults in Debug mode and then correct them,
     //! so there's no need to waste these CPU cycles in Release mode.
@@ -227,7 +227,7 @@ void DatabaseWorkerPool<T>::CommitTransaction(SQLTransaction transaction)
         default:
             break;
     }
-    #endif // TRINITY_DEBUG
+    #endif // ACORE_DEBUG
 
     Enqueue(new TransactionTask(transaction));
 }

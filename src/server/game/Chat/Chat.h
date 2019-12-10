@@ -56,7 +56,7 @@ class ChatHandler
         static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = NULL; return start; }
 
         // function with different implementation for chat/console
-        virtual char const* GetTrinityString(uint32 entry) const;
+        virtual char const* GetAcoreString(uint32 entry) const;
         virtual void SendSysMessage(char const* str);
 
         void SendSysMessage(uint32 entry);
@@ -139,7 +139,7 @@ class CliHandler : public ChatHandler
         explicit CliHandler(void* callbackArg, Print* zprint) : m_callbackArg(callbackArg), m_print(zprint) {}
 
         // overwrite functions
-        char const* GetTrinityString(uint32 entry) const override;
+        char const* GetAcoreString(uint32 entry) const override;
         bool isAvailable(ChatCommand const& cmd) const override;
         void SendSysMessage(const char *str) override;
         std::string GetNameLink() const override;

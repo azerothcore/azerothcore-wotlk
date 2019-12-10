@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_MAP_H
-#define TRINITY_MAP_H
+#ifndef ACORE_MAP_H
+#define ACORE_MAP_H
 
 // Pathfinding
 #include "DetourAlloc.h"
@@ -51,7 +51,7 @@ class BattlegroundMap;
 class Transport;
 class StaticTransport;
 class MotionTransport;
-namespace Trinity
+namespace acore
 {
     struct ObjectUpdater;
     struct LargeObjectUpdater;
@@ -296,14 +296,15 @@ class Map : public GridRefManager<NGridType>
         template<class T> bool AddToMap(T *, bool checkTransport = false);
         template<class T> void RemoveFromMap(T *, bool);
 
-        void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
-            TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
-            TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
-            TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor);
-        void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
-            TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
-            TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
-            TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor);
+        void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor);
+        void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor);
+            
         virtual void Update(const uint32, const uint32, bool thread = true);
 
         float GetVisibilityRange() const { return m_VisibleDistance; }
@@ -320,13 +321,13 @@ class Map : public GridRefManager<NGridType>
 
         bool IsRemovalGrid(float x, float y) const
         {
-            GridCoord p = Trinity::ComputeGridCoord(x, y);
+            GridCoord p = acore::ComputeGridCoord(x, y);
             return !getNGrid(p.x_coord, p.y_coord);
         }
 
         bool IsGridLoaded(float x, float y) const
         {
-            return IsGridLoaded(Trinity::ComputeGridCoord(x, y));
+            return IsGridLoaded(acore::ComputeGridCoord(x, y));
         }
 
         void LoadGrid(float x, float y);
@@ -737,7 +738,7 @@ inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& vis
 template<class NOTIFIER>
 inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER& notifier)
 { 
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
 
@@ -751,7 +752,7 @@ inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER
 template<class NOTIFIER>
 inline void Map::VisitFirstFound(const float &x, const float &y, float radius, NOTIFIER &notifier)
 { 
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
 
@@ -767,7 +768,7 @@ inline void Map::VisitFirstFound(const float &x, const float &y, float radius, N
 template<class NOTIFIER>
 inline void Map::VisitWorld(const float &x, const float &y, float radius, NOTIFIER &notifier)
 { 
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
 
@@ -778,7 +779,7 @@ inline void Map::VisitWorld(const float &x, const float &y, float radius, NOTIFI
 template<class NOTIFIER>
 inline void Map::VisitGrid(const float &x, const float &y, float radius, NOTIFIER &notifier)
 { 
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
 

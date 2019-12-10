@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_GRIDNOTIFIERS_H
-#define TRINITY_GRIDNOTIFIERS_H
+#ifndef ACORE_GRIDNOTIFIERS_H
+#define ACORE_GRIDNOTIFIERS_H
 
 #include "ObjectGridLoader.h"
 #include "UpdateData.h"
@@ -24,7 +24,7 @@
 class Player;
 //class Map;
 
-namespace Trinity
+namespace acore
 {
     struct VisibleNotifier
     {
@@ -1246,6 +1246,23 @@ namespace Trinity
             float _range;
             bool _reqAlive;
             bool _disallowGM;
+    };
+
+    class AnyPlayerExactPositionInGameObjectRangeCheck
+    {
+        public:
+            AnyPlayerExactPositionInGameObjectRangeCheck(GameObject const* go, float range) : _go(go), _range(range) {}
+            bool operator()(Player* u)
+            {
+                if (!_go->IsInRange(u->GetPositionX(), u->GetPositionY(), u->GetPositionZ(), _range))
+                    return false;
+
+                return true;
+            }
+
+        private:
+            GameObject const* _go;
+            float _range;
     };
 
     class NearestPlayerInObjectRangeCheck

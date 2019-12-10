@@ -3,8 +3,8 @@
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
-#ifndef __TRINITY_CHANNELMGR_H
-#define __TRINITY_CHANNELMGR_H
+#ifndef __ACORE_CHANNELMGR_H
+#define __ACORE_CHANNELMGR_H
 
 #include "Common.h"
 #include "Channel.h"
