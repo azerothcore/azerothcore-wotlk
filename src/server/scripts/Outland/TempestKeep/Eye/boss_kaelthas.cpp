@@ -835,7 +835,7 @@ class spell_kaelthas_mind_control : public SpellScriptLoader
             void SelectTarget(std::list<WorldObject*>& targets)
             {
                 if (Unit* victim = GetCaster()->GetVictim())
-                    targets.remove_if(Trinity::ObjectGUIDCheck(victim->GetGUID(), true));
+                    targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
             }
 
             void Register()
@@ -995,7 +995,7 @@ class spell_kaelthas_nether_beam : public SpellScriptLoader
                         targetList.push_back(target);
                 }
 
-                Trinity::Containers::RandomResizeList(targetList, 5);
+                acore::Containers::RandomResizeList(targetList, 5);
                 for (std::list<Unit*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                     GetCaster()->CastSpell(*itr, SPELL_NETHER_BEAM_DAMAGE, true);
             }

@@ -4,14 +4,33 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_PETAI_H
-#define TRINITY_PETAI_H
+#ifndef ACORE_PETAI_H
+#define ACORE_PETAI_H
 
 #include "CreatureAI.h"
 #include "Timer.h"
 
 class Creature;
 class Spell;
+
+enum SpecialPets
+{
+    ENTRY_IMP                   =   416,
+    ENTRY_WATER_ELEMENTAL       =   510,
+    ENTRY_WATER_ELEMENTAL_PERM  = 37994,
+
+    IMP_FIREBOLT_RANK_1         =  3110,
+    IMP_FIREBOLT_RANK_2         =  7799,
+    IMP_FIREBOLT_RANK_3         =  7800,
+    IMP_FIREBOLT_RANK_4         =  7801,
+    IMP_FIREBOLT_RANK_5         =  7802,
+    IMP_FIREBOLT_RANK_6         = 11762,
+    IMP_FIREBOLT_RANK_7         = 11763,
+    IMP_FIREBOLT_RANK_8         = 27267,
+    IMP_FIREBOLT_RANK_9         = 47964,
+    WATER_ELEMENTAL_WATERBOLT_1 = 31707,
+    WATER_ELEMENTAL_WATERBOLT_2 = 72898
+};
 
 class PetAI : public CreatureAI
 {
@@ -43,13 +62,14 @@ class PetAI : public CreatureAI
         bool _needToStop(void);
         void _stopAttack(void);
         void _doMeleeAttack();
-        bool _canMeleeAttack() const;
+        bool _canMeleeAttack();
 
         void UpdateAllies();
 
         TimeTracker i_tracker;
         std::set<uint64> m_AllySet;
         uint32 m_updateAlliesTimer;
+        float combatRange;
 
         Unit* SelectNextTarget(bool allowAutoSelect) const;
         void HandleReturnMovement();

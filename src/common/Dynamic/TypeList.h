@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_TYPELIST_H
-#define TRINITY_TYPELIST_H
+#ifndef ACORE_TYPELIST_H
+#define ACORE_TYPELIST_H
 
 /*
   @struct TypeList

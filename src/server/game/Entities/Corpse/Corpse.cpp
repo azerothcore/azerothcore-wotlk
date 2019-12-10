@@ -79,7 +79,7 @@ bool Corpse::Create(uint32 guidlow, Player* owner)
     SetObjectScale(1);
     SetUInt64Value(CORPSE_FIELD_OWNER, owner->GetGUID());
 
-    _gridCoord = Trinity::ComputeGridCoord(GetPositionX(), GetPositionY());
+    _gridCoord = acore::ComputeGridCoord(GetPositionX(), GetPositionY());
 
     return true;
 }
@@ -173,7 +173,7 @@ bool Corpse::LoadCorpseFromDB(uint32 guid, Field* fields)
         return false;
     }
 
-    _gridCoord = Trinity::ComputeGridCoord(GetPositionX(), GetPositionY());
+    _gridCoord = acore::ComputeGridCoord(GetPositionX(), GetPositionY());
     return true;
 }
 

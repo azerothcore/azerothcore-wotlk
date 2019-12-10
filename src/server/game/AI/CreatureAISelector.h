@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_CREATUREAISELECTOR_H
-#define TRINITY_CREATUREAISELECTOR_H
+#ifndef ACORE_CREATUREAISELECTOR_H
+#define ACORE_CREATUREAISELECTOR_H
 
 class CreatureAI;
 class Creature;

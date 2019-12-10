@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_CALENDARMGR_H
-#define TRINITY_CALENDARMGR_H
+#ifndef ACORE_CALENDARMGR_H
+#define ACORE_CALENDARMGR_H
 
 #include <ace/Singleton.h>
 #include "Common.h"

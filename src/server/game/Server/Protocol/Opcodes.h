@@ -1361,7 +1361,6 @@ struct OpcodeHandler
     SessionStatus status;
     PacketProcessing packetProcessing;
     void (WorldSession::*handler)(WorldPacket& recvPacket);
-    bool isGrouppedMovementOpcode; // pussywizard
 };
 
 extern OpcodeHandler opcodeTable[NUM_MSG_TYPES];
