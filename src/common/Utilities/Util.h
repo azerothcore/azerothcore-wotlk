@@ -9,8 +9,9 @@
 
 #include "Define.h"
 #include "Errors.h"
-
+#include "Containers.h"
 #include <algorithm>
+#include <cctype>
 #include <string>
 #include <vector>
 #include <list>
@@ -127,18 +128,21 @@ inline T RoundToInterval(T& num, T floor, T ceil)
 
 // UTF8 handling
 bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr);
+
 // in wsize==max size of buffer, out wsize==real string size
 bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize);
+
 inline bool Utf8toWStr(const std::string& utf8str, wchar_t* wstr, size_t& wsize)
 {
     return Utf8toWStr(utf8str.c_str(), utf8str.size(), wstr, wsize);
 }
 
-bool WStrToUtf8(std::wstring wstr, std::string& utf8str);
+bool WStrToUtf8(std::wstring const& wstr, std::string& utf8str);
 // size==real string size
 bool WStrToUtf8(wchar_t* wstr, size_t size, std::string& utf8str);
 
-size_t utf8length(std::string& utf8str);                    // set string to "" if invalid utf8 sequence
+// set string to "" if invalid utf8 sequence
+size_t utf8length(std::string& utf8str);
 void utf8truncate(std::string& utf8str, size_t len);
 
 inline bool isBasicLatinCharacter(wchar_t wchar)
@@ -308,23 +312,17 @@ inline wchar_t wcharToLower(wchar_t wchar)
     return wchar;
 }
 
-inline void wstrToUpper(std::wstring& str)
-{
-    std::transform( str.begin(), str.end(), str.begin(), wcharToUpper );
-}
+void wstrToUpper(std::wstring& str);
+void wstrToLower(std::wstring& str);
 
-inline void wstrToLower(std::wstring& str)
-{
-    std::transform( str.begin(), str.end(), str.begin(), wcharToLower );
-}
-
-std::wstring GetMainPartOfName(std::wstring wname, uint32 declension);
+std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension);
 
 bool utf8ToConsole(const std::string& utf8str, std::string& conStr);
 bool consoleToUtf8(const std::string& conStr, std::string& utf8str);
-bool Utf8FitTo(const std::string& str, std::wstring search);
+bool Utf8FitTo(const std::string& str, std::wstring const& search);
 void utf8printf(FILE* out, const char *str, ...);
 void vutf8printf(FILE* out, const char *str, va_list* ap);
+bool Utf8ToUpperOnlyLatin(std::string& utf8String);
 
 bool IsIPAddress(char const* ipaddress);
 
@@ -335,8 +333,18 @@ bool IsIPAddrInNetwork(ACE_INET_Addr const& net, ACE_INET_Addr const& addr, ACE_
 std::string GetAddressString(ACE_INET_Addr const& addr);
 
 uint32 CreatePIDFile(const std::string& filename);
+uint32 GetPID();
 
 std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
+void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
+bool StringToBool(std::string const& str);
+
+bool StringContainsStringI(std::string const& haystack, std::string const& needle);
+template <typename T>
+inline bool ValueContainsStringI(std::pair<T, std::string> const& haystack, std::string const& needle)
+{
+    return StringContainsStringI(haystack.second, needle);
+}
 #endif
 
 //handler for operations on large flags
@@ -542,7 +550,7 @@ bool CompareValues(ComparisionType type, T val1, T val2)
             return val1 <= val2;
         default:
             // incorrect parameter
-            ASSERT(false);
+            ABORT();
             return false;
     }
 }

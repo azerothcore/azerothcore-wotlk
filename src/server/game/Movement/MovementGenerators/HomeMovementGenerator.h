@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_HOMEMOVEMENTGENERATOR_H
-#define TRINITY_HOMEMOVEMENTGENERATOR_H
+#ifndef ACORE_HOMEMOVEMENTGENERATOR_H
+#define ACORE_HOMEMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
 

@@ -28,7 +28,6 @@
 #include "TCSoap.h"
 #include "Timer.h"
 #include "Util.h"
-#include "AuthSocket.h"
 #include "RealmList.h"
 #include "ScriptMgr.h"
 
@@ -47,7 +46,7 @@ extern int m_ServiceStatus;
 #endif
 
 /// Handle worldservers's termination signals
-class WorldServerSignalHandler : public Trinity::SignalHandler
+class WorldServerSignalHandler : public acore::SignalHandler
 {
     public:
         virtual void HandleSignal(int sigNum)
@@ -72,7 +71,7 @@ class WorldServerSignalHandler : public Trinity::SignalHandler
         }
 };
 
-class FreezeDetectorRunnable : public ACORE::Runnable
+class FreezeDetectorRunnable : public acore::Runnable
 {
 private:
     uint32 _loops;
@@ -99,10 +98,10 @@ public:
             else if (getMSTimeDiff(_lastChange, curtime) > _delayTime)
             {
                 sLog->outString("World Thread hangs, kicking out server!");
-                ASSERT(false);
+                ABORT();
             }
 
-            ACORE::Thread::Sleep(1000);
+            acore::Thread::Sleep(1000);
         }
         sLog->outString("Anti-freeze thread exiting without problems.");
     }
@@ -177,10 +176,10 @@ int Master::Run()
     //handle.register_handler(SIGSEGV, &signalSEGV);
 
     ///- Launch WorldRunnable thread
-    ACORE::Thread worldThread(new WorldRunnable);
-    worldThread.setPriority(ACORE::Priority_Highest);
+    acore::Thread worldThread(new WorldRunnable);
+    worldThread.setPriority(acore::Priority_Highest);
 
-    ACORE::Thread* cliThread = NULL;
+    acore::Thread* cliThread = NULL;
 
 #ifdef _WIN32
     if (sConfigMgr->GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -189,14 +188,14 @@ int Master::Run()
 #endif
     {
         ///- Launch CliRunnable thread
-        cliThread = new ACORE::Thread(new CliRunnable);
+        cliThread = new acore::Thread(new CliRunnable);
     }
 
-    ACORE::Thread rarThread(new RARunnable);
+    acore::Thread rarThread(new RARunnable);
 
     // pussywizard:
-    ACORE::Thread auctionLising_thread(new AuctionListingRunnable);
-    auctionLising_thread.setPriority(ACORE::Priority_High);
+    acore::Thread auctionLising_thread(new AuctionListingRunnable);
+    auctionLising_thread.setPriority(acore::Priority_High);
 
 #if defined(_WIN32) || defined(__linux__)
     
@@ -268,21 +267,21 @@ int Master::Run()
 #endif
 
     // Start soap serving thread
-    ACORE::Thread* soapThread = NULL;
+    acore::Thread* soapThread = NULL;
     if (sConfigMgr->GetBoolDefault("SOAP.Enabled", false))
     {
         TCSoapRunnable* runnable = new TCSoapRunnable();
         runnable->SetListenArguments(sConfigMgr->GetStringDefault("SOAP.IP", "127.0.0.1"), uint16(sConfigMgr->GetIntDefault("SOAP.Port", 7878)));
-        soapThread = new ACORE::Thread(runnable);
+        soapThread = new acore::Thread(runnable);
     }
 
     // Start up freeze catcher thread
-    ACORE::Thread* freezeThread = NULL;
+    acore::Thread* freezeThread = NULL;
     if (uint32 freezeDelay = sConfigMgr->GetIntDefault("MaxCoreStuckTime", 0))
     {
         FreezeDetectorRunnable* runnable = new FreezeDetectorRunnable(freezeDelay*1000);
-        freezeThread = new ACORE::Thread(runnable);
-        freezeThread->setPriority(ACORE::Priority_Highest);
+        freezeThread = new acore::Thread(runnable);
+        freezeThread->setPriority(acore::Priority_Highest);
     }
 
     ///- Launch the world listener socket

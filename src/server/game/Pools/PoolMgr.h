@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_POOLHANDLER_H
-#define TRINITY_POOLHANDLER_H
+#ifndef ACORE_POOLHANDLER_H
+#define ACORE_POOLHANDLER_H
 
 #include "Define.h"
 #include <ace/Singleton.h>

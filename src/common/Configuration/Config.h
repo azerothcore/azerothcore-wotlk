@@ -15,7 +15,7 @@
 #include <ace/Thread_Mutex.h>
 #include <AutoPtr.h>
 
-typedef Trinity::AutoPtr<ACE_Configuration_Heap, ACE_Null_Mutex> Config;
+typedef acore::AutoPtr<ACE_Configuration_Heap, ACE_Null_Mutex> Config;
 
 class ConfigMgr
 {
