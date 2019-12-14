@@ -2564,7 +2564,7 @@ class Unit : public WorldObject
         bool m_petCatchUp;
 };
 
-namespace Trinity
+namespace acore
 {
     // Binary predicate for sorting Units based on percent value of a power
     class PowerPctOrderPred

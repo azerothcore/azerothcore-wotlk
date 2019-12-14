@@ -16,13 +16,15 @@
 #include "CellImpl.h"
 #include "SpellInfo.h"
 
-using namespace Trinity;
+using namespace acore;
 
 
 void VisibleNotifier::Visit(GameObjectMapType &m)
 {
     for (GameObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
+        if (i_largeOnly != iter->GetSource()->IsVisibilityOverridden())
+            continue;
         vis_guids.erase(iter->GetSource()->GetGUID());
         i_player.UpdateVisibilityOf(iter->GetSource(), i_data, i_visibleNow);
     }
@@ -35,6 +37,9 @@ void VisibleNotifier::SendToSelf()
     if (Transport* transport = i_player.GetTransport())
         for (Transport::PassengerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end();++itr)
         {
+            if (i_largeOnly != (*itr)->IsVisibilityOverridden())
+                continue;
+
             if (vis_guids.find((*itr)->GetGUID()) != vis_guids.end())
             {
                 vis_guids.erase((*itr)->GetGUID());
@@ -59,6 +64,10 @@ void VisibleNotifier::SendToSelf()
 
     for (Player::ClientGUIDs::const_iterator it = vis_guids.begin();it != vis_guids.end(); ++it)
     {
+        if (WorldObject* obj = ObjectAccessor::GetWorldObject(i_player, *it))
+            if (i_largeOnly != obj->IsVisibilityOverridden())
+                continue;
+
         // pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)
         if (IS_TRANSPORT_GUID(*it))
             if (GameObject* staticTrans = i_player.GetMap()->GetGameObject(*it))
@@ -84,7 +93,11 @@ void VisibleNotifier::SendToSelf()
     i_player.GetSession()->SendPacket(&packet);
 
     for (std::vector<Unit*>::const_iterator it = i_visibleNow.begin(); it != i_visibleNow.end(); ++it)
+    {
+        if (i_largeOnly != (*it)->IsVisibilityOverridden())
+            continue;
         i_player.GetInitialVisiblePackets(*it);
+    }
 }
 
 void VisibleChangesNotifier::Visit(PlayerMapType &m)
@@ -320,20 +333,7 @@ void ObjectUpdater::Visit(GridRefManager<T> &m)
     {
         obj = iter->GetSource();
         ++iter;
-        if (obj->IsInWorld())
-            obj->Update(i_timeDiff);
-    }
-}
-
-template<class T>
-void LargeObjectUpdater::Visit(GridRefManager<T> &m)
-{
-    T* obj;
-    for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); )
-    {
-        obj = iter->GetSource();
-        ++iter;
-        if (obj->IsInWorld() && obj->IsVisibilityOverridden())
+        if (obj->IsInWorld() && (i_largeOnly == obj->IsVisibilityOverridden()))
             obj->Update(i_timeDiff);
     }
 }
@@ -371,4 +371,3 @@ bool AnyDeadUnitSpellTargetInRangeCheck::operator()(Creature* u)
 template void ObjectUpdater::Visit<Creature>(CreatureMapType&);
 template void ObjectUpdater::Visit<GameObject>(GameObjectMapType&);
 template void ObjectUpdater::Visit<DynamicObject>(DynamicObjectMapType&);
-template void LargeObjectUpdater::Visit<Creature>(CreatureMapType&);

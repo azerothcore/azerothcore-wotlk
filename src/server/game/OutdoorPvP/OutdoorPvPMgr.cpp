@@ -110,7 +110,7 @@ void OutdoorPvPMgr::HandlePlayerEnterZone(Player* player, uint32 zoneid)
     if (itr == m_OutdoorPvPMap.end())
         return;
 
-    TRINITY_GUARD(ACE_Thread_Mutex, _lock); // pussywizard
+    ACORE_GUARD(ACE_Thread_Mutex, _lock); // pussywizard
 
     if (itr->second->HasPlayer(player))
         return;
@@ -127,7 +127,7 @@ void OutdoorPvPMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneid)
     if (itr == m_OutdoorPvPMap.end())
         return;
 
-    TRINITY_GUARD(ACE_Thread_Mutex, _lock); // pussywizard
+    ACORE_GUARD(ACE_Thread_Mutex, _lock); // pussywizard
 
     // teleport: remove once in removefromworld, once in updatezone
     if (!itr->second->HasPlayer(player))
@@ -183,7 +183,7 @@ ZoneScript* OutdoorPvPMgr::GetZoneScript(uint32 zoneId)
 
 bool OutdoorPvPMgr::HandleOpenGo(Player* player, uint64 guid)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, _lock); // pussywizard
+    ACORE_GUARD(ACE_Thread_Mutex, _lock); // pussywizard
     for (OutdoorPvPSet::iterator itr = m_OutdoorPvPSet.begin(); itr != m_OutdoorPvPSet.end(); ++itr)
     {
         if ((*itr)->HandleOpenGo(player, guid))
@@ -194,7 +194,7 @@ bool OutdoorPvPMgr::HandleOpenGo(Player* player, uint64 guid)
 
 void OutdoorPvPMgr::HandleGossipOption(Player* player, uint64 guid, uint32 gossipid)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, _lock); // pussywizard
+    ACORE_GUARD(ACE_Thread_Mutex, _lock); // pussywizard
     for (OutdoorPvPSet::iterator itr = m_OutdoorPvPSet.begin(); itr != m_OutdoorPvPSet.end(); ++itr)
     {
         if ((*itr)->HandleGossipOption(player, guid, gossipid))

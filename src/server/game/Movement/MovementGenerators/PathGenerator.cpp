@@ -39,7 +39,7 @@ PathGenerator::PathGenerator(const Unit* owner) :
     {
         MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
 
-        TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, mmap->GetManagerLock());
+        ACORE_READ_GUARD(ACE_RW_Thread_Mutex, mmap->GetManagerLock());
         _navMesh = mmap->GetNavMesh(mapId);
         _navMeshQuery = mmap->GetNavMeshQuery(mapId, _sourceUnit->GetInstanceId());
     }
@@ -62,7 +62,7 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
     else
         _sourceUnit->GetPosition(x, y, z);
 
-    if (!Trinity::IsValidMapCoord(destX, destY, destZ) || !Trinity::IsValidMapCoord(x, y, z))
+    if (!acore::IsValidMapCoord(destX, destY, destZ) || !acore::IsValidMapCoord(x, y, z))
         return false;
 
     G3D::Vector3 dest(destX, destY, destZ);

@@ -342,7 +342,7 @@ class WorldSession
         // Locales
         LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }
         LocaleConstant GetSessionDbLocaleIndex() const { return m_sessionDbLocaleIndex; }
-        char const* GetTrinityString(uint32 entry) const;
+        char const* GetAcoreString(uint32 entry) const;
 
         uint32 GetLatency() const { return m_latency; }
         void SetLatency(uint32 latency) { m_latency = latency; }
@@ -951,6 +951,8 @@ class WorldSession
         void moveItems(Item* myItems[], Item* hisItems[]);
 
         bool CanUseBank(uint64 bankerGUID = 0) const;
+
+        bool recoveryItem(Item* pItem);
 
         // EnumData helpers
         bool IsLegitCharacterForAccount(uint32 lowGUID)

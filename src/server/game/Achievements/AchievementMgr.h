@@ -3,8 +3,8 @@
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
-#ifndef __TRINITY_ACHIEVEMENTMGR_H
-#define __TRINITY_ACHIEVEMENTMGR_H
+#ifndef __ACORE_ACHIEVEMENTMGR_H
+#define __ACORE_ACHIEVEMENTMGR_H
 
 #include <map>
 #include <string>

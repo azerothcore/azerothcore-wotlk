@@ -359,7 +359,7 @@ void SendPacketToPlayers(WorldPacket const* data, Unit* source)
 }
 
 
-struct NonTankLKTargetSelector : public ACORE::unary_function<Unit*, bool>
+struct NonTankLKTargetSelector : public acore::unary_function<Unit*, bool>
 {
 public:
     NonTankLKTargetSelector(Creature* source, bool playerOnly = true, bool reqLOS = false, float maxDist = 0.0f, uint32 exclude1 = 0, uint32 exclude2 = 0) : _source(source), _playerOnly(playerOnly), _reqLOS(reqLOS), _maxDist(maxDist), _exclude1(exclude1), _exclude2(exclude2) { }
@@ -394,7 +394,7 @@ private:
 };
 
 
-struct DefileTargetSelector : public ACORE::unary_function<Unit*, bool>
+struct DefileTargetSelector : public acore::unary_function<Unit*, bool>
 {
 public:
     DefileTargetSelector(Creature* source) : _source(source) { }
@@ -551,7 +551,7 @@ private:
     Creature& _owner;
 };
 
-class NecroticPlagueTargetCheck : public ACORE::unary_function<Unit*, bool>
+class NecroticPlagueTargetCheck : public acore::unary_function<Unit*, bool>
 {
     public:
         NecroticPlagueTargetCheck(Unit const* obj, uint32 notAura1, uint32 notAura2) : _sourceObj(obj), _notAura1(notAura1), _notAura2(notAura2) {}
@@ -664,7 +664,7 @@ class boss_the_lich_king : public CreatureScript
 
                 // Reset The Frozen Throne gameobjects
                 FrozenThroneResetWorker reset;
-                Trinity::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
+                acore::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
                 me->VisitNearbyGridObject(333.0f, worker);
 
                 me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
@@ -1950,7 +1950,7 @@ class spell_the_lich_king_necrotic_plague_jump : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
+                targets.sort(acore::ObjectDistanceOrderPred(GetCaster()));
                 if (targets.size() <= 1)
                     return;
 
@@ -2418,9 +2418,9 @@ class spell_the_lich_king_defile : public SpellScriptLoader
             void CorrectRange(std::list<WorldObject*>& targets)
             {
                 targets.remove_if(VehicleCheck());
-                targets.remove_if(Trinity::AllWorldObjectsInExactRange(GetCaster(), 10.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
+                targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
                 uint32 strangulatedAura[4] = {68980, 74325, 74296, 74297};
-                targets.remove_if(Trinity::UnitAuraCheck(true, strangulatedAura[GetCaster()->GetMap()->GetDifficulty()]));
+                targets.remove_if(acore::UnitAuraCheck(true, strangulatedAura[GetCaster()->GetMap()->GetDifficulty()]));
             }
 
             void ChangeDamageAndGrow()
@@ -2562,7 +2562,7 @@ class npc_valkyr_shadowguard : public CreatureScript
                                     if (!triggers.empty())
                                     {
                                         valid = true;
-                                        triggers.sort(Trinity::ObjectDistanceOrderPred(me));
+                                        triggers.sort(acore::ObjectDistanceOrderPred(me));
 
                                         target->GetMotionMaster()->Clear();
                                         target->UpdatePosition(*me, true);
@@ -2785,9 +2785,9 @@ class spell_the_lich_king_valkyr_target_search : public SpellScriptLoader
                     targets.clear();
                     return;
                 }
-                targets.remove_if(Trinity::UnitAuraCheck(true, GetSpellInfo()->Id));
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_BOSS_HITTIN_YA_AURA)); // done in dbc, but just to be sure xd
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_HARVEST_SOUL_VALKYR));
+                targets.remove_if(acore::UnitAuraCheck(true, GetSpellInfo()->Id));
+                targets.remove_if(acore::UnitAuraCheck(true, SPELL_BOSS_HITTIN_YA_AURA)); // done in dbc, but just to be sure xd
+                targets.remove_if(acore::UnitAuraCheck(true, SPELL_HARVEST_SOUL_VALKYR));
                 if (InstanceScript* _instance = caster->GetInstanceScript())
                     if (Creature* lichKing = ObjectAccessor::GetCreature(*caster, _instance->GetData64(DATA_THE_LICH_KING)))
                         if (Spell* s = lichKing->GetCurrentSpell(CURRENT_GENERIC_SPELL))
@@ -2797,7 +2797,7 @@ class spell_the_lich_king_valkyr_target_search : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                _target = Trinity::Containers::SelectRandomContainerElement(targets);
+                _target = acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(_target);
                 if (Creature* caster = GetCaster()->ToCreature())
@@ -2976,7 +2976,7 @@ class spell_the_lich_king_vile_spirit_move_target_search : public SpellScriptLoa
                 if (targets.empty())
                     return;
 
-                _target = Trinity::Containers::SelectRandomContainerElement(targets);
+                _target = acore::Containers::SelectRandomContainerElement(targets);
             }
 
             void HandleScript(SpellEffIndex effIndex)

@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_CONDITIONMGR_H
-#define TRINITY_CONDITIONMGR_H
+#ifndef ACORE_CONDITIONMGR_H
+#define ACORE_CONDITIONMGR_H
 
 #include "Define.h"
 #include "Errors.h"
