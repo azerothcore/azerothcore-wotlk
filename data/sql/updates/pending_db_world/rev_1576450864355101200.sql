@@ -8,7 +8,7 @@ VALUES
 (17083,0,2,0,61,0,100,0,0,0,0,0,0,45,1,1,0,0,0,0,12,1,0,0,0,0,0,0,0,'Fel Orc Convert - Linked - Set Data'),
 (17083,0,3,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,12,1,0,0,0,0,0,0,0,'Fel Orc Convert - On Death - Set Data');
 
-DELETE FROM `spell_script_names` WHERE `spell_id` = 30505 AND `ScriptName` = 'spell_tsh_shadow_bolt';
+DELETE FROM `spell_script_names` WHERE `spell_id` = 30505;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`)
 VALUES
 (30505, 'spell_tsh_shadow_bolt');
