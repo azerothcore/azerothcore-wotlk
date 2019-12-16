@@ -1,3 +1,19 @@
+-- DB update 2019_12_15_00 -> 2019_12_16_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_12_15_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_12_15_00 2019_12_16_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1574980316492398478'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1574980316492398478');
 
 -- Citizen of New Avalon: Delete redundant creature text entries
@@ -17,3 +33,12 @@ UPDATE `creature` SET `position_x` = 1579.9, `position_y` = -5750.36, `position_
 UPDATE `creature` SET `position_x` = 1575.3, `position_y` = -5747.62, `position_z` = 120.62, `orientation` = 0.94174 WHERE `guid` = 129767;
 UPDATE `creature` SET `position_x` = 1570.77, `position_y` = -5749.48, `position_z` = 120.949, `orientation` = 0.68647 WHERE `guid` = 129783;
 UPDATE `creature` SET `position_x` = 1578.68, `position_y` = -5754.74, `position_z` = 120.208, `orientation` = 1.04776 WHERE `guid` = 129750;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
