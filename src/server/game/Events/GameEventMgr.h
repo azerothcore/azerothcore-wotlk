@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_GAMEEVENT_MGR_H
-#define TRINITY_GAMEEVENT_MGR_H
+#ifndef ACORE_GAMEEVENT_MGR_H
+#define ACORE_GAMEEVENT_MGR_H
 
 #include "Common.h"
 #include "SharedDefines.h"
