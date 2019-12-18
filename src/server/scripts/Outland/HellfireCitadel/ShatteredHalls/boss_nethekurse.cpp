@@ -284,7 +284,6 @@ class spell_tsh_shadow_bolt : public SpellScriptLoader
                 if (Creature* caster = GetCaster()->ToCreature())
                 {
                     std::list<Player*> playerList;
-                    playerList.clear();
                     Map::PlayerList const &players = caster->GetMap()->GetPlayers();
                     for (auto itr = players.begin(); itr != players.end(); ++itr)
                         if (Player* player = itr->GetSource()->ToPlayer())
