@@ -20,9 +20,6 @@ class ConfigMgr
 {
     friend class ConfigLoader;
 
-    ConfigMgr() { }
-    ~ConfigMgr() { }
-
 public:
 
     static ConfigMgr* instance();
