@@ -43,8 +43,8 @@ public:
 
         static std::vector<ChatCommand> characterCheckCommandTable =
         {
-            { "bag",        SEC_GAMEMASTER,         true,  &HandleCharacterCheckBagCommand,  "" },
-            { "work",       SEC_GAMEMASTER,         true,  &HandleCharacterCheckWorkCommand, "" },
+            { "bag",        SEC_GAMEMASTER,         false,  &HandleCharacterCheckBagCommand,  "" },
+            { "work",       SEC_GAMEMASTER,         false,  &HandleCharacterCheckWorkCommand, "" },
         };
 
         static std::vector<ChatCommand> characterCommandTable =
@@ -52,7 +52,7 @@ public:
             { "customize",      SEC_GAMEMASTER,     true,  &HandleCharacterCustomizeCommand,       "" },
             { "changefaction",  SEC_GAMEMASTER,     true,  &HandleCharacterChangeFactionCommand,   "" },
             { "changerace",     SEC_GAMEMASTER,     true,  &HandleCharacterChangeRaceCommand,      "" },
-            { "check",          SEC_GAMEMASTER,     true,  nullptr,                                "", characterCheckCommandTable },
+            { "check",          SEC_GAMEMASTER,     false,  nullptr,                               "", characterCheckCommandTable },
             { "erase",          SEC_CONSOLE,        true,  &HandleCharacterEraseCommand,           "" },
             { "deleted",        SEC_ADMINISTRATOR,  true,  nullptr,                                "", characterDeletedCommandTable },
             { "level",          SEC_GAMEMASTER,     true,  &HandleCharacterLevelCommand,           "" },
