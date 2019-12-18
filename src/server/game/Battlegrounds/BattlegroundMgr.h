@@ -12,13 +12,11 @@
 #include "Battleground.h"
 #include "BattlegroundQueue.h"
 #include "CreatureAIImpl.h"
-#include <ace/Singleton.h>
 #include <unordered_map>
 
 typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef std::unordered_map<uint32, BattlegroundTypeId> BattleMastersMap;
 typedef Battleground*(*bgRef)(Battleground*);
-
 
 #define BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY 86400 // how many seconds in day
 
@@ -62,13 +60,13 @@ class RandomBattlegroundSystem
 
 class BattlegroundMgr
 {
-    friend class ACE_Singleton<BattlegroundMgr, ACE_Null_Mutex>;
-
     private:
         BattlegroundMgr();
         ~BattlegroundMgr();
 
     public:
+        static BattlegroundMgr* instance();
+
         void Update(uint32 diff);
 
         /* Packet Building */
@@ -161,5 +159,6 @@ class BattlegroundMgr
         BattleMastersMap mBattleMastersMap;
 };
 
-#define sBattlegroundMgr ACE_Singleton<BattlegroundMgr, ACE_Null_Mutex>::instance()
+#define sBattlegroundMgr BattlegroundMgr::instance()
+
 #endif

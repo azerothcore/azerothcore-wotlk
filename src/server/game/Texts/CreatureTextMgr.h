@@ -72,10 +72,11 @@ typedef std::unordered_map<uint64, CreatureTextRepeatGroup> CreatureTextRepeatMa
 
 class CreatureTextMgr
 {
-    friend class ACE_Singleton<CreatureTextMgr, ACE_Null_Mutex>;
     CreatureTextMgr() { }
 
     public:
+        static CreatureTextMgr* instance();
+
         ~CreatureTextMgr() { }
         void LoadCreatureTexts();
         void LoadCreatureTextLocales();
@@ -103,7 +104,7 @@ class CreatureTextMgr
         LocaleCreatureTextMap mLocaleTextMap;
 };
 
-#define sCreatureTextMgr ACE_Singleton<CreatureTextMgr, ACE_Null_Mutex>::instance()
+#define sCreatureTextMgr CreatureTextMgr::instance()
 
 template<class Builder>
 class CreatureTextLocalizer
