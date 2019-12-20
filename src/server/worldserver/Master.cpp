@@ -8,8 +8,6 @@
     \ingroup Trinityd
 */
 
-#include <ace/Sig_Handler.h>
-
 #include "Common.h"
 #include "GitRevision.h"
 #include "SignalHandler.h"
@@ -17,9 +15,9 @@
 #include "WorldRunnable.h"
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
-#include "Configuration/Config.h"
-#include "Database/DatabaseEnv.h"
-#include "Database/DatabaseWorkerPool.h"
+#include "Config.h"
+#include "DatabaseEnv.h"
+#include "DatabaseWorkerPool.h"
 
 #include "CliRunnable.h"
 #include "Log.h"
@@ -30,9 +28,9 @@
 #include "Util.h"
 #include "RealmList.h"
 #include "ScriptMgr.h"
-
 #include "BigNumber.h"
 #include "OpenSSLCrypto.h"
+#include <ace/Sig_Handler.h>
 
 #ifdef _WIN32
 #include "ServiceWin32.h"
@@ -106,6 +104,12 @@ public:
         sLog->outString("Anti-freeze thread exiting without problems.");
     }
 };
+
+Master* Master::instance()
+{
+    static Master instance;
+    return &instance;
+}
 
 /// Main function
 int Master::Run()

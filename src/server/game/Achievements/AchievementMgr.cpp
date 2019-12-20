@@ -2333,6 +2333,12 @@ bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria,
     return true;
 }
 
+AchievementGlobalMgr* AchievementGlobalMgr::instance()
+{
+    static AchievementGlobalMgr instance;
+    return &instance;
+}
+
 bool AchievementGlobalMgr::IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const
 {
     return isStatisticAchievement(sAchievementStore.LookupEntry(achievementCriteria->referredAchievement));

@@ -11,13 +11,13 @@
 
 class GuildMgr
 {
-    friend class ACE_Singleton<GuildMgr, ACE_Null_Mutex>;
-
 private:
     GuildMgr();
     ~GuildMgr();
 
 public:
+    static GuildMgr* instance();
+
     Guild* GetGuildByLeader(uint64 guid) const;
     Guild* GetGuildById(uint32 guildId) const;
     Guild* GetGuildByName(std::string const& guildName) const;
@@ -37,6 +37,6 @@ protected:
     GuildContainer GuildStore;
 };
 
-#define sGuildMgr ACE_Singleton<GuildMgr, ACE_Null_Mutex>::instance()
+#define sGuildMgr GuildMgr::instance()
 
 #endif

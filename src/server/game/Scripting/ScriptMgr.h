@@ -8,9 +8,6 @@
 #define SC_SCRIPTMGR_H
 
 #include "Common.h"
-#include <ace/Singleton.h>
-#include <atomic>
-
 #include "ObjectMgr.h"
 #include "DBCStores.h"
 #include "QuestDef.h"
@@ -21,6 +18,7 @@
 #include "DynamicObject.h"
 #include "ArenaTeam.h"
 #include "GameEventMgr.h"
+#include <atomic>
 
 class AuctionHouseObject;
 class AuraScript;
@@ -1171,13 +1169,9 @@ public:
     virtual void OnStop(uint16 /*EventID*/) { }
 };
 
-// Placed here due to ScriptRegistry::AddScript dependency.
-#define sScriptMgr ACE_Singleton<ScriptMgr, ACE_Null_Mutex>::instance()
-
 // Manages registration, loading, and execution of scripts.
 class ScriptMgr
 {
-    friend class ACE_Singleton<ScriptMgr, ACE_Null_Mutex>;
     friend class ScriptObject;
 
     private:
@@ -1187,6 +1181,7 @@ class ScriptMgr
 
     public: /* Initialization */
 
+        static ScriptMgr* instance();
         void Initialize();
         void LoadDatabase();
         void FillSpellSummary();
@@ -1528,6 +1523,8 @@ class ScriptMgr
         //atomic op counter for active scripts amount
         std::atomic<long> _scheduledScripts;
 };
+
+#define sScriptMgr ScriptMgr::instance()
 
 template<class TScript>
 class ScriptRegistry

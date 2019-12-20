@@ -22,6 +22,12 @@ BattlefieldMgr::~BattlefieldMgr()
         delete *itr;
 }
 
+BattlefieldMgr* BattlefieldMgr::instance()
+{
+    static BattlefieldMgr instance;
+    return &instance;
+}
+
 void BattlefieldMgr::InitBattlefield()
 {
     Battlefield* pBf = new BattlefieldWG;
