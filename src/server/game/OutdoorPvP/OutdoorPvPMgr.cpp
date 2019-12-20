@@ -16,6 +16,12 @@ OutdoorPvPMgr::OutdoorPvPMgr()
     //sLog->outDebug(LOG_FILTER_OUTDOORPVP, "Instantiating OutdoorPvPMgr");
 }
 
+OutdoorPvPMgr* OutdoorPvPMgr::instance()
+{
+    static OutdoorPvPMgr instance;
+    return &instance;
+}
+
 void OutdoorPvPMgr::Die()
 {
     //sLog->outDebug(LOG_FILTER_OUTDOORPVP, "Deleting OutdoorPvPMgr");

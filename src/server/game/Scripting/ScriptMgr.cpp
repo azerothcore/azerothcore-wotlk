@@ -172,6 +172,12 @@ ScriptMgr::~ScriptMgr()
 {
 }
 
+ScriptMgr* ScriptMgr::instance()
+{
+    static ScriptMgr instance;
+    return &instance;
+}
+
 void ScriptMgr::Initialize()
 {
     AddScripts();
