@@ -16,6 +16,7 @@
 
 //! Because circular includes are bad
 extern uint32 urand(uint32 min, uint32 max);
+extern uint32 urandweighted(size_t count, double const* chances);
 
 namespace acore
 {
@@ -99,7 +100,7 @@ namespace acore
         }
 
         /*  Select a random element from a container where each element has a different chance to be selected. */
-        template<class C> typename C::value_type const& SelectRandomWeightedContainerElement(C const& container, std::vector<double> const& weights)
+        template <class C> typename C::value_type const& SelectRandomWeightedContainerElement(C const& container, std::vector<double> const& weights)
         {
             typename C::const_iterator it = container.begin();
             std::advance(it, urandweighted(weights.size(), weights.data()));
