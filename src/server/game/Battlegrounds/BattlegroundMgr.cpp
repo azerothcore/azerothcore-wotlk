@@ -938,7 +938,7 @@ BattlegroundTypeId BattlegroundMgr::GetRandomBG(BattlegroundTypeId bgTypeId)
             }
         }
 
-        return *acore::Containers::SelectRandomWeightedContainerElement(ids, weights);
+        return acore::Containers::SelectRandomWeightedContainerElement(ids, weights);
     }
 
     return BATTLEGROUND_TYPE_NONE;

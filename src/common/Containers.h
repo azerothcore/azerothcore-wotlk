@@ -99,12 +99,11 @@ namespace acore
         }
 
         /*  Select a random element from a container where each element has a different chance to be selected. */
-        template<class C>
-        inline auto SelectRandomWeightedContainerElement(C const& container, std::vector<double> const& weights) -> decltype(std::begin(container))
+        template<class C> typename C::value_type const& SelectRandomWeightedContainerElement(C const& container, std::vector<double> const& weights)
         {
-            auto it = std::begin(container);
+            typename C::const_iterator it = container.begin();
             std::advance(it, urandweighted(weights.size(), weights.data()));
-            return it;
+            return *it;
         }
     }
     //! namespace Containers
