@@ -17,6 +17,12 @@ FormationMgr::~FormationMgr()
         delete itr->second;
 }
 
+FormationMgr* FormationMgr::instance()
+{
+    static FormationMgr instance;
+    return &instance;
+}
+
 void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
 {
     Map* map = member->FindMap();

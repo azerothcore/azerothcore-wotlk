@@ -597,6 +597,12 @@ ConditionMgr::~ConditionMgr()
     Clean();
 }
 
+ConditionMgr* ConditionMgr::instance()
+{
+    static ConditionMgr instance;
+    return &instance;
+}
+
 ConditionList ConditionMgr::GetConditionReferences(uint32 refId)
 {
     ConditionList conditions;

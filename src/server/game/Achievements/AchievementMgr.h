@@ -11,7 +11,6 @@
 #include <chrono>
 
 #include "Common.h"
-#include <ace/Singleton.h>
 #include "DatabaseEnv.h"
 #include "DBCEnums.h"
 #include "DBCStores.h"
@@ -295,11 +294,12 @@ class AchievementMgr
 
 class AchievementGlobalMgr
 {
-        friend class ACE_Singleton<AchievementGlobalMgr, ACE_Null_Mutex>;
         AchievementGlobalMgr() {}
         ~AchievementGlobalMgr() {}
 
     public:
+        static AchievementGlobalMgr* instance();
+
         bool IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const;
         bool isStatisticAchievement(AchievementEntry const* achievement) const;
         
@@ -388,6 +388,6 @@ class AchievementGlobalMgr
         std::map<uint32, AchievementCriteriaEntryList> m_AchievementCriteriasByCondition[ACHIEVEMENT_CRITERIA_CONDITION_TOTAL];
 };
 
-#define sAchievementMgr ACE_Singleton<AchievementGlobalMgr, ACE_Null_Mutex>::instance()
+#define sAchievementMgr AchievementGlobalMgr::instance()
 
 #endif
