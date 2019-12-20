@@ -13,6 +13,7 @@
 #include <iterator>
 #include <utility>
 #include <list>
+#include <vector>
 
 //! Because circular includes are bad
 extern uint32 urand(uint32 min, uint32 max);
