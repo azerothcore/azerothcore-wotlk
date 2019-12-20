@@ -9034,7 +9034,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
             //TODO: fix this big hack
             if ((go->GetEntry() == BG_AV_OBJECTID_MINE_N || go->GetEntry() == BG_AV_OBJECTID_MINE_S))
                 if (Battleground* bg = GetBattleground())
-                    if (bg->GetBgTypeID() == BATTLEGROUND_AV)
+                    if (bg->GetBgTypeID(true) == BATTLEGROUND_AV)
                         if (!bg->ToBattlegroundAV()->PlayerCanDoMineQuest(go->GetEntry(), GetTeamId()))
                         {
                             go->ForceValuesUpdateAtIndex(GAMEOBJECT_BYTES_1);
@@ -9182,7 +9182,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
             // Xinef: For AV Achievement
             if (Battleground* bg = GetBattleground())
             {
-                if (bg->GetBgTypeID() == BATTLEGROUND_AV)
+                if (bg->GetBgTypeID(true) == BATTLEGROUND_AV)
                     loot->FillLoot(1, LootTemplates_Creature, this, true);
             }
             // Xinef: For wintergrasp Quests
@@ -9508,7 +9508,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             data << uint32(2325) << uint32(0x0); // 13 sandworm E
             break;
         case 2597:                                          // Alterac Valley
-            if (bg && bg->GetBgTypeID() == BATTLEGROUND_AV)
+            if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_AV)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -9590,7 +9590,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3277:                                          // Warsong Gulch
-            if (bg && bg->GetBgTypeID() == BATTLEGROUND_WS)
+            if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -9605,7 +9605,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3358:                                          // Arathi Basin
-            if (bg && bg->GetBgTypeID() == BATTLEGROUND_AB)
+            if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_AB)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -9644,7 +9644,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3820:                                          // Eye of the Storm
-            if (bg && bg->GetBgTypeID() == BATTLEGROUND_EY)
+            if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_EY)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -9817,7 +9817,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3698:                                          // Nagrand Arena
-            if (bg && bg->GetBgTypeID() == BATTLEGROUND_NA)
+            if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_NA)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -9827,7 +9827,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3702:                                          // Blade's Edge Arena
-            if (bg && bg->GetBgTypeID() == BATTLEGROUND_BE)
+            if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_BE)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -9837,7 +9837,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3968:                                          // Ruins of Lordaeron
-            if (bg && bg->GetBgTypeID() == BATTLEGROUND_RL)
+            if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_RL)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -9847,7 +9847,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 4378:                                          // Dalaran Sewers
-            if (bg && bg->GetBgTypeID() == BATTLEGROUND_DS)
+            if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_DS)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -9857,7 +9857,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 4384:                                          // Strand of the Ancients
-            if (bg && bg->GetBgTypeID() == BATTLEGROUND_SA)
+            if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_SA)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -9892,7 +9892,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 4406:                                          // Ring of Valor
-            if (bg && bg->GetBgTypeID() == BATTLEGROUND_RV)
+            if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_RV)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -9901,8 +9901,8 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
                 data << uint32(0xe1a) << uint32(0x0);           // 9 show
             }
             break;
-        case 4710:
-            if (bg && bg->GetBgTypeID() == BATTLEGROUND_IC)
+        case 4710:                                          // Isle of Conquest
+            if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_IC)
                 bg->FillInitialWorldStates(data);
             else
             {

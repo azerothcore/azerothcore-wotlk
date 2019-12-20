@@ -18,9 +18,11 @@
 #include <array>
 #include <cwchar>
 #include <string>
+#include <random>
 
 typedef ACE_TSS<SFMTRand> SFMTRandTSS;
 static SFMTRandTSS sfmtRand;
+static SFMTEngine engine;
 
 int32 irand(int32 min, int32 max)
 {
@@ -53,6 +55,17 @@ double rand_norm()
 double rand_chance()
 {
     return sfmtRand->Random() * 100.0;
+}
+
+uint32 urandweighted(size_t count, double const* chances)
+{
+    std::discrete_distribution<uint32> dd(chances, chances + count);
+    return dd(SFMTEngine::Instance());
+}
+
+SFMTEngine& SFMTEngine::Instance()
+{
+    return engine;
 }
 
 Tokenizer::Tokenizer(const std::string &src, const char sep, uint32 vectorReserve)

@@ -97,6 +97,15 @@ namespace acore
             std::advance(it, urand(0, container.size() - 1));
             return *it;
         }
+
+        /*  Select a random element from a container where each element has a different chance to be selected. */
+        template<class C>
+        inline auto SelectRandomWeightedContainerElement(C const& container, std::vector<double> const& weights) -> decltype(std::begin(container))
+        {
+            auto it = std::begin(container);
+            std::advance(it, urandweighted(weights.size(), weights.data()));
+            return it;
+        }
     }
     //! namespace Containers
 }
