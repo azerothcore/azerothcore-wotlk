@@ -243,6 +243,12 @@ TicketMgr::~TicketMgr()
         delete itr->second;
 }
 
+TicketMgr* TicketMgr::instance()
+{
+    static TicketMgr instance;
+    return &instance;
+}
+
 void TicketMgr::Initialize() { SetStatus(sWorld->getBoolConfig(CONFIG_ALLOW_TICKETS)); }
 
 void TicketMgr::ResetTickets()

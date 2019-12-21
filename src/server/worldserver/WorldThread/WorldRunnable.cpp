@@ -53,7 +53,7 @@ void WorldRunnable::run()
         avgDiffTracker.Update(executionTimeDiff > WORLD_SLEEP_CONST ? executionTimeDiff : WORLD_SLEEP_CONST);
 
         if (executionTimeDiff < WORLD_SLEEP_CONST)
-            ACORE::Thread::Sleep(WORLD_SLEEP_CONST-executionTimeDiff);
+            acore::Thread::Sleep(WORLD_SLEEP_CONST-executionTimeDiff);
 
         #ifdef _WIN32
             if (m_ServiceStatus == 0)
@@ -97,10 +97,10 @@ void AuctionListingRunnable::run()
 
             if (AsyncAuctionListingMgr::GetTempList().size() || AsyncAuctionListingMgr::GetList().size())
             {
-                TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock());
+                ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock());
 
                 {
-                    TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
+                    ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
                     for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetTempList().begin(); itr != AsyncAuctionListingMgr::GetTempList().end(); ++itr)
                         AsyncAuctionListingMgr::GetList().push_back( (*itr) );
                     AsyncAuctionListingMgr::GetTempList().clear();
@@ -123,7 +123,7 @@ void AuctionListingRunnable::run()
                     }
             }
         }
-        ACORE::Thread::Sleep(1);
+        acore::Thread::Sleep(1);
     }
     sLog->outString("Auction House Listing thread exiting without problems.");
 }

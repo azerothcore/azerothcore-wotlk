@@ -13,7 +13,7 @@
 #include <thread>
 #include <atomic>
 
-namespace ACORE
+namespace acore
 {
     class Runnable
     {

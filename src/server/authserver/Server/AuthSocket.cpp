@@ -129,7 +129,7 @@ typedef struct AuthHandler
 #endif
 
 // Launch a thread to transfer a patch to the client
-class PatcherRunnable: public ACORE::Runnable
+class PatcherRunnable: public acore::Runnable
 {
 public:
     PatcherRunnable(class AuthSocket*);
@@ -329,7 +329,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
     // pussywizard: logon flood protection:
     {
-        TRINITY_GUARD(ACE_Thread_Mutex, LastLoginAttemptMutex);
+        ACORE_GUARD(ACE_Thread_Mutex, LastLoginAttemptMutex);
         std::string ipaddr = socket().getRemoteAddress();
         uint32 currTime = time(NULL);
         std::map<std::string, uint32>::iterator itr = LastLoginAttemptTimeForIP.find(ipaddr);
@@ -1145,7 +1145,7 @@ bool AuthSocket::_HandleXferResume()
     socket().recv((char*)&start, sizeof(start));
     fseek(pPatch, long(start), 0);
 
-    ACORE::Thread u(new PatcherRunnable(this));
+    acore::Thread u(new PatcherRunnable(this));
     return true;
 }
 
@@ -1181,7 +1181,7 @@ bool AuthSocket::_HandleXferAccept()
     socket().recv_skip(1);                                         // clear input buffer
     fseek(pPatch, 0, 0);
 
-    ACORE::Thread u(new PatcherRunnable(this));
+    acore::Thread u(new PatcherRunnable(this));
     return true;
 }
 

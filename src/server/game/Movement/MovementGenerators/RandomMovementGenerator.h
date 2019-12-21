@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#ifndef TRINITY_RANDOMMOTIONGENERATOR_H
-#define TRINITY_RANDOMMOTIONGENERATOR_H
+#ifndef ACORE_RANDOMMOTIONGENERATOR_H
+#define ACORE_RANDOMMOTIONGENERATOR_H
 
 #include "MovementGenerator.h"
 #include "PathGenerator.h"

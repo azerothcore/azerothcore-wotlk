@@ -4,12 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef __TRINITY_SOCIALMGR_H
-#define __TRINITY_SOCIALMGR_H
+#ifndef __ACORE_SOCIALMGR_H
+#define __ACORE_SOCIALMGR_H
 
-#include <ace/Singleton.h>
-#include "DatabaseEnv.h"
 #include "Common.h"
+#include "DatabaseEnv.h"
 
 class SocialMgr;
 class PlayerSocial;
@@ -112,13 +111,13 @@ class PlayerSocial
 
 class SocialMgr
 {
-    friend class ACE_Singleton<SocialMgr, ACE_Null_Mutex>;
-
     private:
         SocialMgr();
         ~SocialMgr();
 
     public:
+        static SocialMgr* instance();
+
         // Misc
         void RemovePlayerSocial(uint32 guid) { m_socialMap.erase(guid); }
 
@@ -133,6 +132,6 @@ class SocialMgr
         SocialMap m_socialMap;
 };
 
-#define sSocialMgr ACE_Singleton<SocialMgr, ACE_Null_Mutex>::instance()
-#endif
+#define sSocialMgr SocialMgr::instance()
 
+#endif

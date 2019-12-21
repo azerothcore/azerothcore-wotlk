@@ -17,6 +17,12 @@ FormationMgr::~FormationMgr()
         delete itr->second;
 }
 
+FormationMgr* FormationMgr::instance()
+{
+    static FormationMgr instance;
+    return &instance;
+}
+
 void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
 {
     Map* map = member->FindMap();
@@ -258,8 +264,8 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         float dy = y + sin(followAngle + pathAngle) * followDist;
         float dz = z;
 
-        Trinity::NormalizeMapCoord(dx);
-        Trinity::NormalizeMapCoord(dy);
+        acore::NormalizeMapCoord(dx);
+        acore::NormalizeMapCoord(dy);
 
         member->UpdateGroundPositionZ(dx, dy, dz);
 

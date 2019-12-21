@@ -283,6 +283,8 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket & recvData)
         return;
     }
 
+    recoveryItem(pItem);
+
     if (count)
     {
         uint32 i_count = count;
@@ -437,7 +439,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recvData)
     {
      std::string Name = pProto->Name1;
      std::string Description = pProto->Description;
-    
+
      int loc_idx = GetSessionDbLocaleIndex();
      if (loc_idx >= 0)
      {
@@ -492,7 +494,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recvData)
          queryData << pProto->Damage[i].DamageMax;
          queryData << pProto->Damage[i].DamageType;
      }
-    
+
      // resistances (7)
      queryData << pProto->Armor;
      queryData << pProto->HolyRes;
@@ -501,11 +503,11 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recvData)
      queryData << pProto->FrostRes;
      queryData << pProto->ShadowRes;
      queryData << pProto->ArcaneRes;
-     
+
      queryData << pProto->Delay;
      queryData << pProto->AmmoType;
      queryData << pProto->RangedModRange;
-    
+
      for (int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)
      {
          // send DBC data for cooldowns in same way as it used in Spell::SendSpellCooldown
@@ -514,11 +516,11 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recvData)
          if (spell)
          {
              bool db_data = pProto->Spells[s].SpellCooldown >= 0 || pProto->Spells[s].SpellCategoryCooldown >= 0;
-    
+
              queryData << pProto->Spells[s].SpellId;
              queryData << pProto->Spells[s].SpellTrigger;
              queryData << uint32(-abs(pProto->Spells[s].SpellCharges));
-    
+
              if (db_data)
              {
                  queryData << uint32(pProto->Spells[s].SpellCooldown);
@@ -699,6 +701,9 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recvData)
         {
             if (pProto->SellPrice > 0)
             {
+                if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
+                    recoveryItem(pItem);
+
                 if (count < pItem->GetCount())               // need split items
                 {
                     Item* pNewItem = pItem->CloneItem(count, _player);
@@ -779,6 +784,15 @@ void WorldSession::HandleBuybackItem(WorldPacket & recvData)
         InventoryResult msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, pItem, false);
         if (msg == EQUIP_ERR_OK)
         {
+            if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
+            {
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM);
+                stmt->setUInt32(0, _player->GetGUID());
+                stmt->setUInt32(1, pItem->GetEntry());
+                stmt->setUInt32(2, pItem->GetCount());
+                CharacterDatabase.Execute(stmt);
+            }
+
             _player->ModifyMoney(-(int32)price);
             _player->RemoveItemFromBuyBackSlot(slot, false);
             _player->ItemAddedQuestCheck(pItem->GetEntry(), pItem->GetCount());
@@ -1241,7 +1255,7 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket & recvData)
         if (loc_idx >= 0)
             if (ItemSetNameLocale const* isnl = sObjectMgr->GetItemSetNameLocale(itemid))
                 ObjectMgr::GetLocaleString(isnl->Name, loc_idx, Name);
-        
+
         WorldPacket data(SMSG_ITEM_NAME_QUERY_RESPONSE, (4+Name.size()+1+4));
         data << uint32(itemid);
         data << Name;
@@ -1632,7 +1646,7 @@ void WorldSession::HandleItemRefund(WorldPacket &recvData)
 #endif
         return;
     }
-  
+
     // Don't try to refund item currently being disenchanted
     if (_player->GetLootGUID() == guid)
         return;
@@ -1686,4 +1700,24 @@ bool WorldSession::CanUseBank(uint64 bankerGUID) const
     }
 
     return true;
+}
+
+bool WorldSession::recoveryItem(Item* pItem)
+{
+    if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_METHOD)
+        && pItem->GetTemplate()->Quality >= sWorld->getIntConfig(CONFIG_ITEMDELETE_QUALITY)
+        && pItem->GetTemplate()->ItemLevel >= sWorld->getIntConfig(CONFIG_ITEMDELETE_ITEM_LEVEL))
+    {
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RECOVERY_ITEM);
+
+        stmt->setUInt32(0, pItem->GetOwnerGUID());
+        stmt->setUInt32(1, pItem->GetTemplate()->ItemId);
+        stmt->setUInt32(2, pItem->GetCount());
+
+        CharacterDatabase.Query(stmt);
+
+        return true;
+    }
+
+    return false;
 }
