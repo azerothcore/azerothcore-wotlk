@@ -8,6 +8,7 @@
 #include "MapTree.h"
 #include "ModelInstance.h"
 #include "PathCommon.h"
+#include <limits.h>
 
 #include <DetourCommon.h>
 #include <DetourNavMesh.h>
@@ -172,41 +173,33 @@ namespace MMAP
     }
 
     /**************************************************************************/
+
+    void MapBuilder::WorkerThread()
+    {
+        while (1)
+        {
+            uint32 mapId;
+
+            _queue.WaitAndPop(mapId);
+
+            if (_cancelationToken)
+                return;
+
+            buildMap(mapId);
+        }
+    }
+
     void MapBuilder::buildAllMaps(int threads)
     {
-        std::vector<BuilderThread*> _threads;
-
-        BuilderThreadPool* pool = threads > 0 ? new BuilderThreadPool() : NULL;
+        for (size_t i = 0; i < threads; ++i)
+        {
+            _workerThreads.push_back(std::thread(&MapBuilder::WorkerThread, this));
+        }
 
         m_tiles.sort([](MapTiles a, MapTiles b)
         {
             return a.m_tiles->size() > b.m_tiles->size();
         });
-
-        for (TileList::iterator it = m_tiles.begin(); it != m_tiles.end(); ++it)
-        {
-            uint32 mapID = it->m_mapId;
-            if (!shouldSkipMap(mapID))
-            {
-                if (threads > 0)
-                    pool->Enqueue(new MapBuildRequest(mapID));
-                else
-                    buildMap(mapID);
-            }
-        }
-
-        for (int i = 0; i < threads; ++i)
-            _threads.push_back(new BuilderThread(this, pool->Queue()));
-
-        // Free memory
-        for (std::vector<BuilderThread*>::iterator _th = _threads.begin(); _th != _threads.end(); ++_th)
-        {
-            (*_th)->wait();
-            delete *_th;
-        }
-
-        delete pool;
-    }
 
     /**************************************************************************/
     void MapBuilder::getGridBounds(uint32 mapID, uint32 &minX, uint32 &minY, uint32 &maxX, uint32 &maxY) const

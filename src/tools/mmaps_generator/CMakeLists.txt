@@ -8,20 +8,24 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+
 CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE_SOURCES)
 
+if (WIN32)
+  list(APPEND PRIVATE_SOURCES ${sources_windows})
+endif()
+
 add_executable(mmaps_generator ${PRIVATE_SOURCES})
 
 target_link_libraries(mmaps_generator
+  PRIVATE
+    acore-core-interface
   PUBLIC
     common
     Recast
     mpq)
-
-# Group sources
-GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
 CollectIncludeDirectories(
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -31,13 +35,12 @@ target_include_directories(mmaps_generator
   PUBLIC
     ${PUBLIC_INCLUDES}
   PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_SOURCE_DIR}/src/server/game/Conditions)
+    ${CMAKE_CURRENT_BINARY_DIR})
 
 set_target_properties(mmaps_generator
-  PROPERTIES
-    FOLDER
-      "tools")
+    PROPERTIES
+      FOLDER
+        "tools")
 
 if( UNIX )
   install(TARGETS mmaps_generator DESTINATION bin)
