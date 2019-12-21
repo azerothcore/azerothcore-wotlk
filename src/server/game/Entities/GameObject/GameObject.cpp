@@ -1780,17 +1780,22 @@ void GameObject::Use(Unit* user)
                 GameObjectTemplate const* info = GetGOInfo();
                 if (info)
                 {
-                    switch (info->entry)
-                    {
-                        case 179785:                        // Silverwing Flag
-                        case 179786:                        // Warsong Flag
-                            if (bg->GetBgTypeID() == BATTLEGROUND_WS)
-                                bg->EventPlayerClickedOnFlag(player, this);
-                            break;
-                        case 184142:                        // Netherstorm Flag
-                            if (bg->GetBgTypeID() == BATTLEGROUND_EY)
-                                bg->EventPlayerClickedOnFlag(player, this);
-                            break;
+                    if (GameObject::gameObjectToEventFlag.find(info->entry) != GameObject::gameObjectToEventFlag.end()) {
+                        GameObject::gameObjectToEventFlag[info->entry](player, this, bg);
+                    }
+                    else {
+                        switch (info->entry)
+                        {
+                            case 179785:                        // Silverwing Flag
+                            case 179786:                        // Warsong Flag
+                                if (bg->GetBgTypeID() == BATTLEGROUND_WS)
+                                    bg->EventPlayerClickedOnFlag(player, this);
+                                break;
+                            case 184142:                        // Netherstorm Flag
+                                if (bg->GetBgTypeID() == BATTLEGROUND_EY)
+                                    bg->EventPlayerClickedOnFlag(player, this);
+                                break;
+                        }
                     }
                 }
                 //this cause to call return, all flags must be deleted here!!
@@ -2490,3 +2495,5 @@ void GameObject::UpdateModelPosition()
         GetMap()->InsertGameObjectModel(*m_model);
     }
 }
+
+std::unordered_map<int, goEventFlag> GameObject::gameObjectToEventFlag = {};

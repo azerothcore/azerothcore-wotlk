@@ -20,6 +20,8 @@ class Transport;
 class StaticTransport;
 class MotionTransport;
 
+typedef void(*goEventFlag)(Player*, GameObject*, Battleground*);
+
 #define MAX_GAMEOBJECT_QUEST_ITEMS 6
 
 // from `gameobject_template`
@@ -878,6 +880,8 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         float GetInteractionDistance();
   
         void UpdateModelPosition();
+
+        static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
     protected:
         bool AIM_Initialize();

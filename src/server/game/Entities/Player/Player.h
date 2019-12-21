@@ -45,6 +45,7 @@ class SpellCastTargets;
 class UpdateMask;
 
 typedef std::deque<Mail*> PlayerMails;
+typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
 
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_MAX_DAILY_QUESTS     25
@@ -2627,6 +2628,8 @@ class Player : public Unit, public GridObject<Player>
         const PlayerTalentMap& GetTalentMap() const { return m_talents; }
         uint32 GetNextSave() const { return m_nextSave; }
         SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
+
+        static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
 
     protected:
         // Gamemaster whisper whitelist
