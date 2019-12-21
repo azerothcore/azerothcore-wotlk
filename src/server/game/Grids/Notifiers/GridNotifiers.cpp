@@ -16,7 +16,7 @@
 #include "CellImpl.h"
 #include "SpellInfo.h"
 
-using namespace Trinity;
+using namespace acore;
 
 
 void VisibleNotifier::Visit(GameObjectMapType &m)
@@ -333,20 +333,7 @@ void ObjectUpdater::Visit(GridRefManager<T> &m)
     {
         obj = iter->GetSource();
         ++iter;
-        if (obj->IsInWorld())
-            obj->Update(i_timeDiff);
-    }
-}
-
-template<class T>
-void LargeObjectUpdater::Visit(GridRefManager<T> &m)
-{
-    T* obj;
-    for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); )
-    {
-        obj = iter->GetSource();
-        ++iter;
-        if (obj->IsInWorld() && obj->IsVisibilityOverridden())
+        if (obj->IsInWorld() && (i_largeOnly == obj->IsVisibilityOverridden()))
             obj->Update(i_timeDiff);
     }
 }
@@ -384,4 +371,3 @@ bool AnyDeadUnitSpellTargetInRangeCheck::operator()(Creature* u)
 template void ObjectUpdater::Visit<Creature>(CreatureMapType&);
 template void ObjectUpdater::Visit<GameObject>(GameObjectMapType&);
 template void ObjectUpdater::Visit<DynamicObject>(DynamicObjectMapType&);
-template void LargeObjectUpdater::Visit<Creature>(CreatureMapType&);

@@ -59,7 +59,7 @@ enum Events
 
 uint32 const boneSpikeSummonId[3] = {69062, 72669, 72670};
 
-struct BoneStormMoveTargetSelector : public ACORE::unary_function<Unit*, bool>
+struct BoneStormMoveTargetSelector : public acore::unary_function<Unit*, bool>
 {
     public:
         BoneStormMoveTargetSelector(Creature* source) : _source(source) { }
@@ -550,7 +550,9 @@ public:
                                     validPlayers.push_back(plr);
 
                 std::vector<Player*>::iterator begin=validPlayers.begin(), end=validPlayers.end();
-                std::shuffle(begin, end, std::default_random_engine{});
+
+                std::random_device rd;
+                std::shuffle(begin, end, std::default_random_engine{rd()});
 
                 for (uint8 i = 0; i < boneSpikeCount && i < validPlayers.size(); ++i)
                 {

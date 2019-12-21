@@ -9,7 +9,6 @@
 
 // For static or at-server-startup loaded spell data
 
-#include <ace/Singleton.h>
 #include "Common.h"
 #include "SharedDefines.h"
 #include "Unit.h"
@@ -354,8 +353,6 @@ struct SpellStackInfo
 typedef std::map<uint32, SpellStackInfo> SpellGroupMap;
 typedef std::map<uint32, SpellGroupStackFlags> SpellGroupStackMap;
 
-
-
 struct SpellThreatEntry
 {
     int32       flatMod;                                    // flat threat-value for this Spell  - default: 0
@@ -603,7 +600,6 @@ typedef std::set<uint32> TalentAdditionalSet;
 
 class SpellMgr
 {
-    friend class ACE_Singleton<SpellMgr, ACE_Null_Mutex>;
     // Constructors
     private:
         SpellMgr();
@@ -611,6 +607,8 @@ class SpellMgr
 
     // Accessors (const or static functions)
     public:
+        static SpellMgr* instance();
+
         // Spell correctness for client using
         static bool ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg = true);
         static bool IsSpellValid(SpellInfo const* spellInfo);
@@ -755,6 +753,6 @@ class SpellMgr
         TalentAdditionalSet        mTalentSpellAdditionalSet;
 };
 
-#define sSpellMgr ACE_Singleton<SpellMgr, ACE_Null_Mutex>::instance()
+#define sSpellMgr SpellMgr::instance()
 
 #endif

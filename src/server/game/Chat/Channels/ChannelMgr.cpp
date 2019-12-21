@@ -18,18 +18,20 @@ ChannelMgr::~ChannelMgr()
 
 ChannelMgr* ChannelMgr::forTeam(TeamId teamId)
 {
+    static ChannelMgr allianceChannelMgr(TEAM_ALLIANCE);
+    static ChannelMgr hordeChannelMgr(TEAM_HORDE);
+
     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
-        return ACE_Singleton<AllianceChannelMgr, ACE_Null_Mutex>::instance();        // cross-faction
+        return &allianceChannelMgr;        // cross-faction
 
     if (teamId == TEAM_ALLIANCE)
-        return ACE_Singleton<AllianceChannelMgr, ACE_Null_Mutex>::instance();
+        return &allianceChannelMgr;
 
     if (teamId == TEAM_HORDE)
-        return ACE_Singleton<HordeChannelMgr, ACE_Null_Mutex>::instance();
+        return &hordeChannelMgr;
 
-    return NULL;
+    return nullptr;
 }
-
 
 void ChannelMgr::LoadChannels()
 {
