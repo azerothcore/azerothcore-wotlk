@@ -11,6 +11,7 @@
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
 #include "StringFormat.h"
+#include "Config.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
