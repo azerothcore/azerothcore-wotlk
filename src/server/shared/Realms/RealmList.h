@@ -8,7 +8,6 @@
 #define _REALMLIST_H
 
 #include "Common.h"
-#include <ace/INET_Addr.h>
 
 enum RealmFlags
 {

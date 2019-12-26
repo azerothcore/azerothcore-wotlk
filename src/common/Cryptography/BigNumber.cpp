@@ -4,13 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include <ace/Guard_T.h>
 
 #include "Cryptography/BigNumber.h"
 #include <openssl/bn.h>
 #include <openssl/crypto.h>
 #include <algorithm>
-#include <ace/Auto_Ptr.h>
 
 BigNumber::BigNumber()
     : _bn(BN_new())

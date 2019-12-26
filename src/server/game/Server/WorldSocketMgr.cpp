@@ -8,24 +8,10 @@
 *  \ingroup u2w
 *  \author Derex <derex101@gmail.com>
 */
-
-#include "WorldSocketMgr.h"
-
-#include <ace/ACE.h>
-#include <ace/Log_Msg.h>
-#include <ace/Reactor.h>
-#include <ace/Reactor_Impl.h>
-#include <ace/TP_Reactor.h>
-#include <ace/Dev_Poll_Reactor.h>
-#include <ace/Guard_T.h>
 #include <atomic>
-#include <ace/os_include/arpa/os_inet.h>
-#include <ace/os_include/netinet/os_tcp.h>
-#include <ace/os_include/sys/os_types.h>
-#include <ace/os_include/sys/os_socket.h>
-
 #include <set>
 
+#include "WorldSocketMgr.h"
 #include "Log.h"
 #include "Common.h"
 #include "Config.h"
@@ -39,7 +25,7 @@
 * network threads, and assigning connections from acceptor thread
 * to other network threads
 */
-class ReactorRunnable : protected ACE_Task_Base
+class ReactorRunnable : protected
 {
     public:
 

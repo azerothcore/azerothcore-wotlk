@@ -9,8 +9,6 @@
 #include <string>
 #include <map>
 #include "Define.h"
-#include <ace/Guard_T.h>
-#include <ace/Synch.h>
 #include "WorldModelRoot.h"
 #include "Model.h"
 

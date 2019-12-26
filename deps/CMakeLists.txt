@@ -17,7 +17,6 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 endif()
 
 add_subdirectory(threads)
-add_subdirectory(acelite)
 add_subdirectory(fmt)
 
 if(SERVERS OR TOOLS)

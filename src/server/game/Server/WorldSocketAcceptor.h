@@ -14,9 +14,6 @@
 
 #include "Common.h"
 
-#include <ace/Acceptor.h>
-#include <ace/SOCK_Acceptor.h>
-
 #include "WorldSocket.h"
 
 class WorldSocketAcceptor : public ACE_Acceptor<WorldSocket, ACE_SOCK_Acceptor>

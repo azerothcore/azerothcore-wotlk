@@ -30,7 +30,6 @@
 #include "ScriptMgr.h"
 #include "BigNumber.h"
 #include "OpenSSLCrypto.h"
-#include <ace/Sig_Handler.h>
 
 #ifdef _WIN32
 #include "ServiceWin32.h"

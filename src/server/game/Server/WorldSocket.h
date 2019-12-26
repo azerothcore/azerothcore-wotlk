@@ -13,14 +13,6 @@
 #ifndef _WORLDSOCKET_H
 #define _WORLDSOCKET_H
 
-#include <ace/Basic_Types.h>
-#include <ace/Synch_Traits.h>
-#include <ace/Svc_Handler.h>
-#include <ace/SOCK_Stream.h>
-#include <ace/Thread_Mutex.h>
-#include <ace/Guard_T.h>
-#include <ace/Unbounded_Queue.h>
-#include <ace/Message_Block.h>
 
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
 #pragma once

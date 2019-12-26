@@ -13,8 +13,6 @@
 
 #include "Common.h"
 
-#include <ace/Reactor.h>
-
 class RARunnable : public acore::Runnable
 {
 public:

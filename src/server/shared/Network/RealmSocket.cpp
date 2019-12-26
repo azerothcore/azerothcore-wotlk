@@ -4,10 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include <ace/OS_NS_string.h>
-#include <ace/INET_Addr.h>
-#include <ace/SString.h>
-
 #include "RealmSocket.h"
 #include "Log.h"
 

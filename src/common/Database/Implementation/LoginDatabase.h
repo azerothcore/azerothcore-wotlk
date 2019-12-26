@@ -9,20 +9,6 @@
 
 #include "MySQLConnection.h"
 
-class LoginDatabaseConnection : public MySQLConnection
-{
-public:
-    typedef LoginDatabaseStatements Statements;
-
-    //- Constructors for sync and async connections
-    LoginDatabaseConnection(MySQLConnectionInfo& connInfo);
-    LoginDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
-    ~LoginDatabaseConnection();
-
-    //- Loads database type specific prepared statements
-    void DoPrepareStatements() override;
-};
-
 enum LoginDatabaseStatements : uint32
 {
     /*  Naming standard for defines:
@@ -112,6 +98,20 @@ enum LoginDatabaseStatements : uint32
     LOGIN_SEL_ACCOUNT_MUTE_INFO,
 
     MAX_LOGINDATABASE_STATEMENTS
+};
+
+class LoginDatabaseConnection : public MySQLConnection
+{
+public:
+    typedef LoginDatabaseStatements Statements;
+
+    //- Constructors for sync and async connections
+    LoginDatabaseConnection(MySQLConnectionInfo& connInfo);
+    LoginDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
+    ~LoginDatabaseConnection();
+
+    //- Loads database type specific prepared statements
+    void DoPrepareStatements() override;
 };
 
 #endif

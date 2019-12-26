@@ -8,7 +8,6 @@
 #define _AUTH_BIGNUMBER_H
 
 #include "Define.h"
-#include <ace/Auto_Ptr.h>
 
 struct bignum_st;
 

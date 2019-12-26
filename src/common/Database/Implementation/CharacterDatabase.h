@@ -9,20 +9,6 @@
 
 #include "MySQLConnection.h"
 
-class CharacterDatabaseConnection : public MySQLConnection
-{
-public:
-    typedef CharacterDatabaseStatements Statements;
-
-    //- Constructors for sync and async connections
-    CharacterDatabaseConnection(MySQLConnectionInfo& connInfo);
-    CharacterDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
-    ~CharacterDatabaseConnection();
-
-    //- Loads database type specific prepared statements
-    void DoPrepareStatements() override;
-};
-
 enum CharacterDatabaseStatements : uint32
 {
     /*  Naming standard for defines:
@@ -504,6 +490,20 @@ enum CharacterDatabaseStatements : uint32
     CHAR_DEL_RECOVERY_ITEM,
 
     MAX_CHARACTERDATABASE_STATEMENTS
+};
+
+class CharacterDatabaseConnection : public MySQLConnection
+{
+public:
+    typedef CharacterDatabaseStatements Statements;
+
+    //- Constructors for sync and async connections
+    CharacterDatabaseConnection(MySQLConnectionInfo& connInfo);
+    CharacterDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
+    ~CharacterDatabaseConnection();
+
+    //- Loads database type specific prepared statements
+    void DoPrepareStatements() override;
 };
 
 #endif

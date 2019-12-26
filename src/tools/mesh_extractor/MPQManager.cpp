@@ -8,7 +8,6 @@
 #include "MPQ.h"
 #include "DBC.h"
 #include "Utils.h"
-#include <ace/Guard_T.h>
 
 char const* MPQManager::Files[] = {
     "common.MPQ",

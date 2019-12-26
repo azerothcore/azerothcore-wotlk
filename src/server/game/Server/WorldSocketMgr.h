@@ -14,12 +14,9 @@
 #define __WORLDSOCKETMGR_H
 
 #include "Common.h"
-#include <ace/Basic_Types.h>
-#include <ace/Thread_Mutex.h>
 
 class WorldSocket;
 class ReactorRunnable;
-class ACE_Event_Handler;
 
 /// Manages all sockets connected to peers and network threads
 class WorldSocketMgr

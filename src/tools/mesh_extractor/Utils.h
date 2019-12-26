@@ -16,8 +16,6 @@
 #include "Define.h"
 #include "Constants.h"
 
-#include <ace/Stack_Trace.h>
-
 struct WorldModelDefinition;
 class DoodadDefinition;
 class DoodadInstance;

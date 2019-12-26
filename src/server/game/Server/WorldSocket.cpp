@@ -4,17 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include <ace/Message_Block.h>
-#include <ace/OS_NS_string.h>
-#include <ace/OS_NS_unistd.h>
-#include <ace/os_include/arpa/os_inet.h>
-#include <ace/os_include/netinet/os_tcp.h>
-#include <ace/os_include/sys/os_types.h>
-#include <ace/os_include/sys/os_socket.h>
-#include <ace/OS_NS_string.h>
-#include <ace/Reactor.h>
-#include <ace/Auto_Ptr.h>
-
 #include "WorldSocket.h"
 #include "Common.h"
 #include "Player.h"

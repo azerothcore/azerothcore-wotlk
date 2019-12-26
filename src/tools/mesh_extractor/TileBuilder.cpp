@@ -17,8 +17,6 @@
 #include "RecastAlloc.h"
 #include "DetourNavMeshBuilder.h"
 
-#include <ace/Synch.h>
-
 TileBuilder::TileBuilder(ContinentBuilder* _cBuilder, std::string world, int x, int y, uint32 mapId) :
     World(world), X(x), Y(y), MapId(mapId), _Geometry(NULL), DataSize(0), cBuilder(_cBuilder)
 {

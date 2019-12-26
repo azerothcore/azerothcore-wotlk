@@ -8,7 +8,6 @@
 #define ACORE_MAPMANAGER_H
 
 #include "Define.h"
-#include <ace/Thread_Mutex.h>
 #include "Common.h"
 #include "Map.h"
 #include "Object.h"

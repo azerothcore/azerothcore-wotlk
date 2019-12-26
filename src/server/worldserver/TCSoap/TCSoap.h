@@ -10,8 +10,6 @@
 #include "Define.h"
 #include "AccountMgr.h"
 
-#include <ace/Semaphore.h>
-#include <ace/Task.h>
 #include <Threading.h>
 
 class TCSoapRunnable : public acore::Runnable

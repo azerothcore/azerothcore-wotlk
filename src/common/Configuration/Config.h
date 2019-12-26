@@ -10,9 +10,6 @@
 #include <string>
 #include <list>
 #include <vector>
-#include <ace/Configuration_Import_Export.h>
-#include <ace/Thread_Mutex.h>
-#include <AutoPtr.h>
 
 typedef acore::AutoPtr<ACE_Configuration_Heap, ACE_Null_Mutex> Config;
 

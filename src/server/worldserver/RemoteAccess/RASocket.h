@@ -13,11 +13,6 @@
 
 #include "Common.h"
 
-#include <ace/Synch_Traits.h>
-#include <ace/Svc_Handler.h>
-#include <ace/SOCK_Stream.h>
-#include <ace/SOCK_Acceptor.h>
-
 /// Remote Administration socket
 class RASocket : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 {

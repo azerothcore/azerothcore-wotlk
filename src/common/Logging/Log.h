@@ -8,7 +8,6 @@
 #define AZEROTHCORE_LOG_H
 
 #include "Common.h"
-#include <ace/Task.h>
 
 class WorldPacket;
 

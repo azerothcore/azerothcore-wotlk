@@ -14,7 +14,6 @@
 #include "TypeList.h"
 #include "SFMT.h"
 #include "Errors.h" // for ASSERT
-#include <ace/TSS_T.h>
 #include <array>
 #include <cwchar>
 #include <string>

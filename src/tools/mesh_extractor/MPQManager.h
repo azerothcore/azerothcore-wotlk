@@ -8,7 +8,6 @@
 #define MPQ_MANAGER_H
 
 #include "MPQ.h"
-#include <ace/Synch.h>
 #include <set>
 #include <map>
 

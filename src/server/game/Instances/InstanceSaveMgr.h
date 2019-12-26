@@ -12,8 +12,6 @@
 #include "DBCEnums.h"
 #include "ObjectDefines.h"
 
-#include <ace/Null_Mutex.h>
-#include <ace/Thread_Mutex.h>
 #include <list>
 #include <map>
 #include <unordered_map>
