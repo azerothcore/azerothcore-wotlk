@@ -709,7 +709,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recvData)
 #endif
 
     std::string searchedname;
-    uint8 levelmin, levelmax, usable;
+    uint8 levelmin, levelmax, usable, getAll;
     uint32 listfrom, auctionSlotID, auctionMainCategory, auctionSubCategory, quality;
     uint64 guid;
 
@@ -721,8 +721,6 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recvData)
     recvData >> auctionSlotID >> auctionMainCategory >> auctionSubCategory;
     recvData >> quality >> usable;
 
-    //recvData.read_skip<uint8>(); // pussywizard: this is the getAll option
-    uint8 getAll;
     recvData >> getAll;
 
     // this block looks like it uses some lame byte packing or similar...
@@ -734,19 +732,43 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recvData)
         recvData.read_skip<uint8>();
     }
 
+    Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
+    if (!creature)
+    {
+        sLog->outError("WORLD: HandleAuctionListItems - %s not found or you can't interact with him.", guid.ToString().c_str());
+        return;
+    }
+
     // remove fake death
     if (_player->HasUnitState(UNIT_STATE_DIED))
         _player->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    // pussywizard:
-    const uint32 delay = 2000;
-    const uint32 now = World::GetGameTimeMS();
-    uint32 diff = getMSTimeDiff(_lastAuctionListItemsMSTime, now);
-    if (diff > delay)
-        diff = delay;
-    _lastAuctionListItemsMSTime = now + delay - diff;
-    ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
-    AsyncAuctionListingMgr::GetTempList().push_back( AuctionListItemsDelayEvent(delay-diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, getAll) );
+    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->GetFaction());
+
+    sLog->outError("Auctionhouse search (%s) list from: %u, searchedname: %s, levelmin: %u, levelmax: %u, auctionSlotID: %u, auctionMainCategory: %u, auctionSubCategory: %u, quality: %u, usable: %u",
+        guid.ToString().c_str(), listfrom, searchedname.c_str(), levelmin, levelmax, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, usable);
+
+    WorldPacket data(SMSG_AUCTION_LIST_RESULT, (4+4+4));
+    uint32 count = 0;
+    uint32 totalcount = 0;
+    data << (uint32) 0;
+
+    // converting string that we try to find to lower case
+    std::wstring wsearchedname;
+    if (!Utf8toWStr(searchedname, wsearchedname))
+        return;
+
+    wstrToLower(wsearchedname);
+
+    auctionHouse->BuildListAuctionItems(data, _player,
+        wsearchedname, listfrom, levelmin, levelmax, usable,
+        auctionSlotID, auctionMainCategory, auctionSubCategory, quality,
+        count, totalcount, (getAll != 0 && sWorld->getIntConfig(CONFIG_AUCTION_GETALL_DELAY) != 0));
+
+    data.put<uint32>(0, count);
+    data << (uint32) totalcount;
+    data << (uint32) sWorld->getIntConfig(CONFIG_AUCTION_SEARCH_DELAY);
+    SendPacket(&data);
 }
 
 void WorldSession::HandleAuctionListPendingSales(WorldPacket & recvData)

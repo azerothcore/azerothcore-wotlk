@@ -11,7 +11,6 @@
 #include "Errors.h"
 #include "ByteConverter.h"
 
-#include <ace/OS_NS_time.h>
 #include <exception>
 #include <list>
 #include <map>
@@ -19,6 +18,7 @@
 #include <vector>
 #include <cstring>
 #include <time.h>
+#include "Util.h"
 
 // Root of ByteBuffer exception hierarchy
 class ByteBufferException : public std::exception
@@ -352,21 +352,7 @@ class ByteBuffer
             }
         }
 
-        uint32 ReadPackedTime()
-        {
-            uint32 packedDate = read<uint32>();
-            tm lt = tm();
-
-            lt.tm_min = packedDate & 0x3F;
-            lt.tm_hour = (packedDate >> 6) & 0x1F;
-            //lt.tm_wday = (packedDate >> 11) & 7;
-            lt.tm_mday = ((packedDate >> 14) & 0x3F) + 1;
-            lt.tm_mon = (packedDate >> 20) & 0xF;
-            lt.tm_year = ((packedDate >> 24) & 0x1F) + 100;
-
-            return uint32(mktime(&lt));
-
-        }
+        uint32 ReadPackedTime();
 
         ByteBuffer& ReadPackedTime(uint32& time)
         {
@@ -414,36 +400,7 @@ class ByteBuffer
             return append((const uint8 *)src, cnt * sizeof(T));
         }
 
-        void append(const uint8 *src, size_t cnt)
-        {
-            if (!cnt)
-                throw ByteBufferSourceException(_wpos, size(), cnt);
-
-            if (!src)
-                throw ByteBufferSourceException(_wpos, size(), cnt);
-
-            ASSERT(size() < 10000000);
-
-            size_t newsize = _wpos + cnt;
-
-            if (_storage.capacity() < newsize) // pussywizard
-            {
-                if (newsize < 100)
-                    _storage.reserve(300);
-                else if (newsize < 750)
-                    _storage.reserve(2500);
-                else if (newsize < 6000)
-                    _storage.reserve(10000);
-                else
-                    _storage.reserve(400000);
-            }
-
-            if (_storage.size() < newsize)
-                _storage.resize(newsize);
-
-            memcpy(&_storage[_wpos], src, cnt);
-            _wpos = newsize;
-        }
+        void append(uint8 const* src, size_t cnt);
 
         void append(const ByteBuffer& buffer)
         {
@@ -480,23 +437,9 @@ class ByteBuffer
             append(packGUID, size);
         }
 
-        void AppendPackedTime(time_t time)
-        {
-            tm lt;
-            ACE_OS::localtime_r(&time, &lt);
-            append<uint32>((lt.tm_year - 100) << 24 | lt.tm_mon  << 20 | (lt.tm_mday - 1) << 14 | lt.tm_wday << 11 | lt.tm_hour << 6 | lt.tm_min);
-        }
+        void AppendPackedTime(time_t time);
 
-        void put(size_t pos, const uint8 *src, size_t cnt)
-        {
-            if (pos + cnt > size())
-                throw ByteBufferPositionException(true, pos, cnt, size());
-
-            if (!src)
-                throw ByteBufferSourceException(_wpos, size(), cnt);
-
-            std::memcpy(&_storage[pos], src, cnt);
-        }
+        void put(size_t pos, const uint8 *src, size_t cnt);
 
         void hexlike(bool outString = false) const;
 

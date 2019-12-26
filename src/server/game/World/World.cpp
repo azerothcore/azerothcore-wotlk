@@ -83,7 +83,7 @@
 #include "LuaEngine.h"
 #endif
 
-ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
+std::atomic<bool> World::m_stopEvent(false);
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
 uint32 World::m_gameMSTime = 0;
@@ -2155,35 +2155,6 @@ void World::Update(uint32 diff)
     if (m_gameTime > m_NextGuildReset)
         ResetGuildCap();
 
-    // pussywizard:
-    // acquire mutex now, this is kind of waiting for listing thread to finish it's work (since it can't process next packet)
-    // so we don't have to do it in every packet that modifies auctions
-    AsyncAuctionListingMgr::SetAuctionListingAllowed(false);
-    {
-        ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock()); 
-
-        // pussywizard: handle auctions when the timer has passed
-        if (m_timers[WUPDATE_AUCTIONS].Passed())
-        {
-            m_timers[WUPDATE_AUCTIONS].Reset();
-
-            // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
-            sAuctionMgr->Update();
-        }
-
-        AsyncAuctionListingMgr::Update(diff);
-
-        if (m_gameTime > mail_expire_check_timer)
-        {
-            sObjectMgr->ReturnOrDeleteOldMails(true);
-            mail_expire_check_timer = m_gameTime + 6*3600;
-        }
-
-        UpdateSessions(diff);
-    } 
-    // end of section with mutex
-    AsyncAuctionListingMgr::SetAuctionListingAllowed(true);
-
     /// <li> Handle weather updates when the timer has passed
     if (m_timers[WUPDATE_WEATHERS].Passed())
     {
@@ -2799,7 +2770,7 @@ time_t World::GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour)
         hour = 0;
     time_t curr = time(NULL);
     tm localTm;
-    ACE_OS::localtime_r(&curr, &localTm);
+    localtime_r(&curr, &localTm);
     localTm.tm_hour = hour;
     localTm.tm_min  = 0;
     localTm.tm_sec  = 0;
@@ -2820,7 +2791,7 @@ time_t World::GetNextTimeWithMonthAndHour(int8 month, int8 hour)
         hour = 0;
     time_t curr = time(NULL);
     tm localTm;
-    ACE_OS::localtime_r(&curr, &localTm);
+    localtime_r(&curr, &localTm);
     localTm.tm_mday = 1;
     localTm.tm_hour = hour;
     localTm.tm_min  = 0;
@@ -3075,22 +3046,7 @@ uint64 World::getWorldState(uint32 index) const
 
 void World::ProcessQueryCallbacks()
 {
-    PreparedQueryResult result;
-
-    while (!m_realmCharCallbacks.is_empty())
-    {
-        ACE_Future<PreparedQueryResult> lResult;
-        ACE_Time_Value timeout = ACE_Time_Value::zero;
-        if (m_realmCharCallbacks.next_readable(lResult, &timeout) != 1)
-            break;
-
-        if (lResult.ready())
-        {
-            lResult.get(result);
-            _UpdateRealmCharCount(result);
-            lResult.cancel();
-        }
-    }
+    _queryProcessor.ProcessReadyQueries();
 }
 
 void World::LoadGlobalPlayerDataStore()
