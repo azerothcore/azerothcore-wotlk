@@ -8,7 +8,7 @@
 #include "SQLOperation.h"
 #include "ProducerConsumerQueue.h"
 
-DatabaseWorker::DatabaseWorker(ProducerConsumerQueue<SQLOperation*>* newQueue, MySQLConnection* connection)
+DatabaseWorker::DatabaseWorker(ProducerConsumerQueue<SQLOperation*>* newQueue, MySQLConnection* connection) : _cancelationToken(false)
 {
     _connection = connection;
     _queue = newQueue;
