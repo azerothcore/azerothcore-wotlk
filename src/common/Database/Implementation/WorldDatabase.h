@@ -7,23 +7,23 @@
 #ifndef _WORLDDATABASE_H
 #define _WORLDDATABASE_H
 
-#include "DatabaseWorkerPool.h"
 #include "MySQLConnection.h"
 
 class WorldDatabaseConnection : public MySQLConnection
 {
-    public:
-        //- Constructors for sync and async connections
-        WorldDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) { }
-        WorldDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) { }
+public:
+    typedef WorldDatabaseStatements Statements;
 
-        //- Loads database type specific prepared statements
-        void DoPrepareStatements();
+    //- Constructors for sync and async connections
+    WorldDatabaseConnection(MySQLConnectionInfo& connInfo);
+    WorldDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
+    ~WorldDatabaseConnection();
+
+    //- Loads database type specific prepared statements
+    void DoPrepareStatements() override;
 };
 
-typedef DatabaseWorkerPool<WorldDatabaseConnection> WorldDatabaseWorkerPool;
-
-enum WorldDatabaseStatements
+enum WorldDatabaseStatements : uint32
 {
     /*  Naming standard for defines:
         {DB}_{SEL/INS/UPD/DEL/REP}_{Summary of data changed}

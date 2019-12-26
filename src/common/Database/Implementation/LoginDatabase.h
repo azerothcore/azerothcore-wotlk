@@ -7,23 +7,23 @@
 #ifndef _LOGINDATABASE_H
 #define _LOGINDATABASE_H
 
-#include "DatabaseWorkerPool.h"
 #include "MySQLConnection.h"
 
 class LoginDatabaseConnection : public MySQLConnection
 {
-    public:
-        //- Constructors for sync and async connections
-        LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) { }
-        LoginDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) { }
+public:
+    typedef LoginDatabaseStatements Statements;
 
-        //- Loads database type specific prepared statements
-        void DoPrepareStatements();
+    //- Constructors for sync and async connections
+    LoginDatabaseConnection(MySQLConnectionInfo& connInfo);
+    LoginDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
+    ~LoginDatabaseConnection();
+
+    //- Loads database type specific prepared statements
+    void DoPrepareStatements() override;
 };
 
-typedef DatabaseWorkerPool<LoginDatabaseConnection> LoginDatabaseWorkerPool;
-
-enum LoginDatabaseStatements
+enum LoginDatabaseStatements : uint32
 {
     /*  Naming standard for defines:
         {DB}_{SEL/INS/UPD/DEL/REP}_{Summary of data changed}
