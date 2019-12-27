@@ -10,57 +10,37 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <mutex>
+#include <unordered_map>
 
-typedef acore::AutoPtr<ACE_Configuration_Heap, ACE_Null_Mutex> Config;
 
 class ConfigMgr
 {
     friend class ConfigLoader;
 
-public:
-
-    static ConfigMgr* instance();
-    
-    /// Method used only for loading main configuration files (authserver.conf and worldserver.conf)
-    bool LoadInitial(char const* file);
-
-    /**
-     * This method loads additional configuration files
-     * It is recommended to use this method in WorldScript::OnConfigLoad hooks
-     *
-     * @return true if loading was successful
-     */
-    bool LoadMore(char const* file);
-
-    bool Reload();
-
-    std::string GetStringDefault(const char* name, const std::string& def, bool logUnused = true);
-    bool GetBoolDefault(const char* name, bool def, bool logUnused = true);
-    int GetIntDefault(const char* name, int def, bool logUnused = true);
-    float GetFloatDefault(const char* name, float def, bool logUnused = true);
-
-    std::list<std::string> GetKeysByString(std::string const& name);
-
-    bool isDryRun() { return this->dryRun; }
-    void setDryRun(bool mode) { this->dryRun = mode; }
-
-private:
-    bool dryRun = false;
-
-    bool GetValueHelper(const char* name, ACE_TString &result);
-    bool LoadData(char const* file);
-
-    typedef ACE_Thread_Mutex LockType;
-    typedef ACE_Guard<LockType> GuardType;
-
-    std::vector<std::string> _confFiles;
-    Config _config;
-    LockType _configLock;
+    private:
+        std::string m_filename;
+        std::unordered_map<std::string, std::string> m_entries; // keys are converted to lower case.  values cannot be.
 
     ConfigMgr() = default;
     ConfigMgr(ConfigMgr const&) = delete;
     ConfigMgr& operator=(ConfigMgr const&) = delete;
     ~ConfigMgr() = default;
+
+    public:
+        bool SetSource(const std::string& file);
+        bool Reload();
+
+        bool IsSet(const std::string& name) const;
+
+        const std::string GetStringDefault(const std::string& name, const std::string& def = "") const;
+        bool GetBoolDefault(const std::string& name, bool def) const;
+        int32 GetIntDefault(const std::string& name, int32 def) const;
+        float GetFloatDefault(const std::string& name, float def) const;
+
+        const std::string& GetFilename() const { return m_filename; }
+        std::mutex _configLock;
+
 };
 
 #define sConfigMgr ConfigMgr::instance()

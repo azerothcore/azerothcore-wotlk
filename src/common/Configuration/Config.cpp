@@ -8,173 +8,97 @@
 #include "Errors.h"
 #include "Log.h"
 
+#include <unordered_map>
+#include <string>
+#include <fstream>
+
 ConfigMgr* ConfigMgr::instance()
 {
     static ConfigMgr instance;
     return &instance;
 }
 
-// Defined here as it must not be exposed to end-users.
-bool ConfigMgr::GetValueHelper(const char* name, ACE_TString &result)
+bool ConfigMgr::SetSource(const std::string& file)
 {
-    GuardType guard(_configLock);
+    m_filename = file;
 
-    if (_config.get() == 0)
-        return false;
-
-    ACE_TString section_name;
-    ACE_Configuration_Section_Key section_key;
-    const ACE_Configuration_Section_Key &root_key = _config->root_section();
-
-    int i = 0;
-    while (_config->enumerate_sections(root_key, i, section_name) == 0)
-    {
-        _config->open_section(root_key, section_name.c_str(), 0, section_key);
-        if (_config->get_string_value(section_key, name, result) == 0)
-            return true;
-        ++i;
-    }
-
-    return false;
-}
-
-bool ConfigMgr::LoadInitial(char const* file)
-{
-    ASSERT(file);
-
-    GuardType guard(_configLock);
-
-    _config.reset(new ACE_Configuration_Heap());
-    if (_config->open() == 0)
-        if (LoadData(file))
-            return true;
-
-    _config.reset();
-    return false;
-}
-
-bool ConfigMgr::LoadMore(char const* file)
-{
-    ASSERT(file);
-    ASSERT(_config);
-
-    GuardType guard(_configLock);
-
-    return LoadData(file);
+    return Reload();
 }
 
 bool ConfigMgr::Reload()
 {
-    for(std::vector<std::string>::iterator it = _confFiles.begin(); it != _confFiles.end(); ++it) {
-        if (it==_confFiles.begin()) {
-            if (!LoadInitial((*it).c_str()))
-                return false;
-        } else {
-            LoadMore((*it).c_str());
-        }
+    std::ifstream in(m_filename, std::ifstream::in);
+
+    if (in.fail())
+        return false;
+
+    std::unordered_map<std::string, std::string> newEntries;
+    std::lock_guard<std::mutex> lock(_configLock);
+
+    do
+    {
+        std::string line;
+        std::getline(in, line);
+
+        acore::ltrim(line);
+
+        if (!line.length())
+            continue;
+
+        if (line[0] == '#' || line[0] == '[')
+            continue;
+
+        auto const equals = line.find('=');
+        if (equals == std::string::npos)
+            return false;
+
+        auto const entry = acore::trim_copy(acore::toLower(line.substr(0, equals)));
+        auto const value = /*boost::algorithm::trim_copy_if*/(acore::trim_copy(line.substr(equals + 1)), /*boost::algorithm::is_any_of("\"")*/);
+
+        newEntries[entry] = value;
     }
+    while (in.good());
+
+    m_entries = std::move(newEntries);
 
     return true;
 }
 
-bool ConfigMgr::LoadData(char const* file)
+bool ConfigMgr::IsSet(const std::string& name) const
 {
-    if(std::find(_confFiles.begin(), _confFiles.end(), file) == _confFiles.end()) {
-        _confFiles.push_back(file);
-    }
-
-    ACE_Ini_ImpExp config_importer(*_config.get());
-    if (config_importer.import_config(file) == 0)
-        return true;
-
-    return false;
+    auto const nameLower = acore::toLower(name);
+    return m_entries.find(nameLower) != m_entries.cend();
 }
 
-std::string ConfigMgr::GetStringDefault(const char* name, const std::string &def, bool logUnused /*= true*/)
+const std::string ConfigMgr::GetStringDefault(const std::string& name, const std::string& def) const
 {
-    ACE_TString val;
+    auto const nameLower = acore::toLower(name);
 
-    if (GetValueHelper(name, val))
-        return val.c_str();
-    else
-    {
-        if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%s)", name, def.c_str());
-        return def;
-    }
+    auto const entry = m_entries.find(nameLower);
+
+    return entry == m_entries.cend() ? def : entry->second;
 }
 
-bool ConfigMgr::GetBoolDefault(const char* name, bool def, bool logUnused /*= true*/)
+bool ConfigMgr::GetBoolDefault(const std::string& name, bool def) const
 {
-    ACE_TString val;
+    auto const value = GetStringDefault(name, def ? "true" : "false");
 
-    if (!GetValueHelper(name, val))
-    {
-        if (logUnused)
-            def ? sLog->outError("-> Not found option '%s'. The default value is used (Yes)", name) : sLog->outError("-> Not found option '%s'. The default value is used (No)", name);
-        return def;
-    }
+    std::string valueLower;
+    std::transform(value.cbegin(), value.cend(), std::back_inserter(valueLower), ::tolower);
 
-    return (val == "true" || val == "TRUE" || val == "yes" || val == "YES" ||
-        val == "1");
+    return valueLower == "true" || valueLower == "1" || valueLower == "yes";
 }
 
-int ConfigMgr::GetIntDefault(const char* name, int def, bool logUnused /*= true*/)
+int32 ConfigMgr::GetIntDefault(const std::string& name, int32 def) const
 {
-    ACE_TString val;
+    auto const value = GetStringDefault(name, std::to_string(def));
 
-    if (GetValueHelper(name, val))
-        return atoi(val.c_str());
-    else
-    {
-        if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%i)", name, def);
-        return def;
-    }
+    return std::stoi(value);
 }
 
-float ConfigMgr::GetFloatDefault(const char* name, float def, bool logUnused /*= true*/)
+float ConfigMgr::GetFloatDefault(const std::string& name, float def) const
 {
-    ACE_TString val;
+    auto const value = GetStringDefault(name, std::to_string(def));
 
-    if (GetValueHelper(name, val))
-        return (float)atof(val.c_str());
-    else
-    {
-        if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%f)", name, def);
-        return def;
-    }
-}
-
-std::list<std::string> ConfigMgr::GetKeysByString(std::string const& name)
-{
-    GuardType guard(_configLock);
-
-    std::list<std::string> keys;
-    if (_config.get() == 0)
-        return keys;
-
-    ACE_TString section_name;
-    ACE_Configuration_Section_Key section_key;
-    const ACE_Configuration_Section_Key &root_key = _config->root_section();
-
-    int i = 0;
-    while (_config->enumerate_sections(root_key, i++, section_name) == 0)
-    {
-        _config->open_section(root_key, section_name.c_str(), 0, section_key);
-
-        ACE_TString key_name;
-        ACE_Configuration::VALUETYPE type;
-        int j = 0;
-        while (_config->enumerate_values(section_key, j++, key_name, type) == 0)
-        {
-            std::string temp = key_name.c_str();
-
-            if (!temp.find(name))
-                keys.push_back(temp);
-        }
-    }
-
-    return keys;
+    return std::stof(value);
 }
