@@ -1131,7 +1131,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 return false;
 
             Battleground* bg = player->GetBattleground();
-            if (!bg || bg->GetBgTypeID() != BATTLEGROUND_IC)
+            if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_IC)
                 return false;
 
             uint8 nodeType = spellId == 68719 ? NODE_TYPE_REFINERY : NODE_TYPE_QUARRY;

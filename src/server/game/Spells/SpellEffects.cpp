@@ -2119,7 +2119,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
             // in battleground check
             if (Battleground* bg = player->GetBattleground())
             {
-                if (bg->GetBgTypeID() == BATTLEGROUND_EY)
+                if (bg->GetBgTypeID(true) == BATTLEGROUND_EY)
                     bg->EventPlayerClickedOnFlag(player, gameObjTarget);
                 return;
             }
@@ -3868,7 +3868,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 case 54640:
                 {
                     if (Player* player = unitTarget->ToPlayer())
-                        if (player->GetBattleground() && player->GetBattleground()->GetBgTypeID() == BATTLEGROUND_SA)
+                        if (player->GetBattleground() && player->GetBattleground()->GetBgTypeID(true) == BATTLEGROUND_SA)
                         {
                             if (GameObject* dportal = player->FindNearestGameObject(192819, 10.0f))
                             {
