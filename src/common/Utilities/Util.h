@@ -82,6 +82,8 @@ double rand_norm();
 /* Return a random double from 0.0 to 100.0 (exclusive). */
 double rand_chance();
 
+uint32 urandweighted(size_t count, double const* chances);
+
 /* Return true if a random roll fits in the specified chance (range 0-100). */
 inline bool roll_chance_f(float chance)
 {
@@ -554,6 +556,21 @@ bool CompareValues(ComparisionType type, T val1, T val2)
             return false;
     }
 }
+
+/*
+* SFMT wrapper satisfying UniformRandomNumberGenerator concept for use in <random> algorithms
+*/
+class SFMTEngine
+{
+public:
+    typedef uint32 result_type;
+
+    static constexpr result_type min() { return std::numeric_limits<result_type>::min(); }
+    static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
+    result_type operator()() const { return rand32(); }
+
+    static SFMTEngine& Instance();
+};
 
 class EventMap
 {

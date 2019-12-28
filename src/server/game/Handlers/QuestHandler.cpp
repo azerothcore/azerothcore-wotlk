@@ -512,7 +512,7 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
         }
 
         if (Battleground* bg = _player->GetBattleground())
-            if (bg->GetBgTypeID() == BATTLEGROUND_AV)
+            if (bg->GetBgTypeID(true) == BATTLEGROUND_AV)
                 bg->ToBattlegroundAV()->HandleQuestComplete(questId, _player);
 
         if (_player->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE)

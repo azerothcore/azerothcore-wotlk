@@ -1827,6 +1827,8 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
     uint32 arenaTeamId = reference->GetArenaTeamId(arenaSlot);
     TeamId teamId = reference->GetTeamId();
 
+    BattlegroundQueueTypeId bgQueueTypeIdRandom = BattlegroundMgr::BGQueueTypeId(BATTLEGROUND_RB, 0);
+
     // check every member of the group to be able to join
     uint32 memberscount = 0;
     for (GroupReference* itr = GetFirstMember(); itr != NULL; itr = itr->next(), ++memberscount)
@@ -1865,6 +1867,14 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         // pussywizard: check for free slot, this is actually ensured before calling this function, but just in case
         if (!member->HasFreeBattlegroundQueueId())
             return ERR_BATTLEGROUND_TOO_MANY_QUEUES;
+
+        // don't let join if someone from the group is in bg queue random
+        if (member->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom))
+            return ERR_IN_RANDOM_BG;
+
+        // don't let join to bg queue random if someone from the group is already in bg queue
+        if (bgTemplate->GetBgTypeID() == BATTLEGROUND_RB && member->InBattlegroundQueue())
+            return ERR_IN_NON_RANDOM_BG;
     }
 
     // for arenas: check party size is proper

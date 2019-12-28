@@ -590,53 +590,25 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground * bgTemplate, Battleground
 
     minPlayers = minPlayers * Coef;
 
-    // if current queue is BATTLEGROUND_QUEUE_RB, then we are trying to create bg using players from 2 queues
-    if (bgTemplate->GetBgTypeID() == BATTLEGROUND_RB)
+    FillPlayersToBG(bgTemplate, maxPlayers, maxPlayers, bracket_id);
+
+    //allow 1v0 if debug bg
+    if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
+        return true;
+
+    switch (sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE))
     {
-        // specific template
-        Battleground* specificTemplate = sBattlegroundMgr->GetBattlegroundTemplate(sBattlegroundMgr->RandomSystem.GetCurrentRandomBg());
-        if (!specificTemplate)
-            return false;
+    case BG_QUEUE_INVITATION_TYPE_NO_BALANCE: // in this case, as soon as both teams have > mincount, start
+        return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
 
-        // specific bracket id
-        PvPDifficultyEntry const* specificBracket = GetBattlegroundBracketByLevel(specificTemplate->GetMapId(), sBattlegroundMgr->randomBgDifficultyEntry.minLevel);
-        if (!specificBracket || specificBracket->maxLevel < sBattlegroundMgr->randomBgDifficultyEntry.maxLevel)
-            return false;
+    case BG_QUEUE_INVITATION_TYPE_BALANCED: // check difference between selection pools - if = 1 or less start.
+        return abs(static_cast<int32>(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount()) - static_cast<int32>(m_SelectionPools[TEAM_HORDE].GetPlayerCount())) <= 1 && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
 
-        // specific queue
-        BattlegroundQueue& specificQueue = sBattlegroundMgr->GetBattlegroundQueue(BattlegroundMgr::BGQueueTypeId(sBattlegroundMgr->RandomSystem.GetCurrentRandomBg(), 0));
+    case BG_QUEUE_INVITATION_TYPE_EVEN: // if both counts are same then it's an even match
+        return (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() == m_SelectionPools[TEAM_HORDE].GetPlayerCount()) && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
 
-        FillPlayersToBGWithSpecific(specificTemplate, specificTemplate->GetMaxPlayersPerTeam(), specificTemplate->GetMaxPlayersPerTeam(), bracket_id, &specificQueue, BattlegroundBracketId(specificBracket->bracketId));
-
-        //allow 1v0 if debug bg
-        if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
-            return true;
-
-        return (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() + m_SelectionPools[TEAM_HORDE].GetPlayerCount()) >= 2 * (std::min<uint32>(specificTemplate->GetMinPlayersPerTeam(), 15));
-    }
-    // if this is not random bg queue - use players only from this queue
-    else
-    {
-        FillPlayersToBG(bgTemplate, maxPlayers, maxPlayers, bracket_id);
-
-        //allow 1v0 if debug bg
-        if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
-            return true;
-
-        switch (sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE))
-        {
-        case BG_QUEUE_INVITATION_TYPE_NO_BALANCE: // in this case, as soon as both teams have > mincount, start
-            return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
-
-        case BG_QUEUE_INVITATION_TYPE_BALANCED: // check difference between selection pools - if = 1 or less start.
-            return abs(static_cast<int32>(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount()) - static_cast<int32>(m_SelectionPools[TEAM_HORDE].GetPlayerCount())) <= 1 && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
-
-        case BG_QUEUE_INVITATION_TYPE_EVEN: // if both counts are same then it's an even match
-            return (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() == m_SelectionPools[TEAM_HORDE].GetPlayerCount()) && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
-
-        default: // same as unbalanced (in case wrong setting is entered...)
-            return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
-        }
+    default: // same as unbalanced (in case wrong setting is entered...)
+        return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
     }
 }
 
@@ -722,7 +694,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
         for (BattlegroundContainer::const_iterator itr = bgList.begin(); itr != bgList.end(); ++itr)
         {
             Battleground* bg = itr->second;
-            if (!BattlegroundMgr::IsArenaType(bg->GetBgTypeID()) && (bg->GetBgTypeID() == m_bgTypeId || m_bgTypeId == BATTLEGROUND_RB) &&
+            if (!BattlegroundMgr::IsArenaType(bg->GetBgTypeID()) && (bg->GetBgTypeID(true) == m_bgTypeId || m_bgTypeId == BATTLEGROUND_RB) &&
                 bg->HasFreeSlots() && bg->GetMinLevel() <= bracketEntry->minLevel && bg->GetMaxLevel() >= bracketEntry->maxLevel)
                 bgsToCheck.insert(bg);
         }
@@ -794,22 +766,6 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
             BattlegroundTypeId newBgTypeId = m_bgTypeId;
             uint32 minLvl = bracketEntry->minLevel;
             uint32 maxLvl = bracketEntry->maxLevel;
-
-            // for random bg use values from specific
-            if (m_bgTypeId == BATTLEGROUND_RB)
-            {
-                newBgTypeId = sBattlegroundMgr->RandomSystem.GetCurrentRandomBg();
-                Battleground* specificTemplate = sBattlegroundMgr->GetBattlegroundTemplate(newBgTypeId);
-                if (!specificTemplate)
-                    return;
-                PvPDifficultyEntry const* specificBracket = GetBattlegroundBracketByLevel(specificTemplate->GetMapId(), sBattlegroundMgr->randomBgDifficultyEntry.minLevel);
-                if (!specificBracket)
-                    return;
-                minLvl = specificBracket->minLevel;
-                maxLvl = specificBracket->maxLevel;
-
-                sBattlegroundMgr->RandomSystem.BattlegroundCreated(newBgTypeId);
-            }
 
             // create new battleground
             Battleground* bg = sBattlegroundMgr->CreateNewBattleground(newBgTypeId, minLvl, maxLvl, m_arenaType, false);
