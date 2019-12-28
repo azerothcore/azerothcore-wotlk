@@ -398,13 +398,6 @@ public:
         part[2] = p3;
     }
 
-    flag96(uint64 p1, uint32 p2)
-    {
-        part[0] = (uint32)(p1 & UI64LIT(0x00000000FFFFFFFF));
-        part[1] = (uint32)((p1 >> 32) & UI64LIT(0x00000000FFFFFFFF));
-        part[2] = p2;
-    }
-
     inline bool IsEqual(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
     {
         return (part[0] == p1 && part[1] == p2 && part[2] == p3);
@@ -422,7 +415,7 @@ public:
         part[2] = p3;
     }
 
-    inline bool operator <(const flag96 &right) const
+    inline bool operator<(flag96 const& right) const
     {
         for (uint8 i = 3; i > 0; --i)
         {
@@ -434,7 +427,7 @@ public:
         return false;
     }
 
-    inline bool operator ==(const flag96 &right) const
+    inline bool operator==(flag96 const& right) const
     {
         return
         (
@@ -444,12 +437,12 @@ public:
         );
     }
 
-    inline bool operator !=(const flag96 &right) const
+    inline bool operator!=(flag96 const& right) const
     {
-        return !this->operator ==(right);
+        return !(*this == right);
     }
 
-    inline flag96 & operator =(const flag96 &right)
+    inline flag96& operator=(flag96 const& right)
     {
         part[0] = right.part[0];
         part[1] = right.part[1];
@@ -457,13 +450,12 @@ public:
         return *this;
     }
 
-    inline flag96 operator &(const flag96 &right) const
+    inline flag96 operator&(flag96 const& right) const
     {
-        return flag96(part[0] & right.part[0], part[1] & right.part[1],
-            part[2] & right.part[2]);
+        return flag96(part[0] & right.part[0], part[1] & right.part[1], part[2] & right.part[2]);
     }
 
-    inline flag96 & operator &=(const flag96 &right)
+    inline flag96& operator&=(flag96 const& right)
     {
         part[0] &= right.part[0];
         part[1] &= right.part[1];
@@ -471,13 +463,12 @@ public:
         return *this;
     }
 
-    inline flag96 operator |(const flag96 &right) const
+    inline flag96 operator|(flag96 const& right) const
     {
-        return flag96(part[0] | right.part[0], part[1] | right.part[1],
-            part[2] | right.part[2]);
+        return flag96(part[0] | right.part[0], part[1] | right.part[1], part[2] | right.part[2]);
     }
 
-    inline flag96 & operator |=(const flag96 &right)
+    inline flag96& operator |=(flag96 const& right)
     {
         part[0] |= right.part[0];
         part[1] |= right.part[1];
@@ -485,18 +476,17 @@ public:
         return *this;
     }
 
-    inline flag96 operator ~() const
+    inline flag96 operator~() const
     {
         return flag96(~part[0], ~part[1], ~part[2]);
     }
 
-    inline flag96 operator ^(const flag96 &right) const
+    inline flag96 operator^(flag96 const& right) const
     {
-        return flag96(part[0] ^ right.part[0], part[1] ^ right.part[1],
-            part[2] ^ right.part[2]);
+        return flag96(part[0] ^ right.part[0], part[1] ^ right.part[1], part[2] ^ right.part[2]);
     }
 
-    inline flag96 & operator ^=(const flag96 &right)
+    inline flag96& operator^=(flag96 const& right)
     {
         part[0] ^= right.part[0];
         part[1] ^= right.part[1];
@@ -511,15 +501,15 @@ public:
 
     inline bool operator !() const
     {
-        return !this->operator bool();
+        return !(bool(*this));
     }
 
-    inline uint32 & operator [](uint8 el)
+    inline uint32& operator[](uint8 el)
     {
         return part[el];
     }
 
-    inline const uint32 & operator [](uint8 el) const
+    inline uint32 const& operator [](uint8 el) const
     {
         return part[el];
     }
