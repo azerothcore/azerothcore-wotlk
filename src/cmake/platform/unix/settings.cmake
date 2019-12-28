@@ -6,11 +6,6 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   endif()
 endif()
 
-# set default configuration directory
-if( NOT CONF_DIR )
-  set(CONF_DIR ${CMAKE_INSTALL_PREFIX}/etc)
-  message(STATUS "UNIX: Using default configuration directory")
-endif()
 
 # set default library directory
 if( NOT LIBSDIR )

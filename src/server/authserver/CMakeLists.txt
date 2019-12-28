@@ -50,7 +50,7 @@ add_dependencies(authserver revision.h)
 
 if(NOT WIN32)
   set_target_properties(authserver PROPERTIES
-    COMPILE_DEFINITIONS _TRINITY_REALM_CONFIG="${CONF_DIR}/authserver.conf")
+    COMPILE_DEFINITIONS _TRINITY_REALM_CONFIG="${AUTHSERVER_PATH}/authserver.conf")
 endif()
 
 target_link_libraries(authserver
@@ -82,13 +82,10 @@ if( WIN32 )
   endif()
 endif()
 
-if( UNIX )
-  install(TARGETS authserver DESTINATION bin)
-elseif( WIN32 )
-  install(TARGETS authserver DESTINATION "${CMAKE_INSTALL_PREFIX}")
-endif()
 
-install(FILES  authserver.conf.dist DESTINATION ${CONF_DIR})
+install(TARGETS authserver DESTINATION "${AUTHSERVER_PATH}")
+install(FILES  authserver.conf.dist DESTINATION "${AUTHSERVER_CONF_PATH}")
+
 
 # Generate precompiled header
 if (USE_COREPCH)

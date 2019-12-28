@@ -46,7 +46,7 @@ add_executable(worldserver
 
 if(NOT WIN32)
   set_target_properties(worldserver PROPERTIES
-    COMPILE_DEFINITIONS _TRINITY_CORE_CONFIG="${CONF_DIR}/worldserver.conf")
+    COMPILE_DEFINITIONS _TRINITY_CORE_CONFIG="${WORLDSERVER_PATH}/worldserver.conf")
 endif()
 
 add_dependencies(worldserver revision.h)
@@ -94,44 +94,43 @@ if( WIN32 )
   endif()
 endif()
 
-if( UNIX )
-  install(TARGETS worldserver DESTINATION bin)
-elseif( WIN32 )
-  install(TARGETS worldserver DESTINATION "${CMAKE_INSTALL_PREFIX}")
-endif()
 
-install(FILES worldserver.conf.dist DESTINATION ${CONF_DIR})
+install(TARGETS worldserver DESTINATION "${WORLDSERVER_PATH}")
+install(FILES worldserver.conf.dist DESTINATION "${WORLDSERVER_CONF_PATH}")
+
 
 # Generate precompiled header
 if( USE_COREPCH )
   add_cxx_pch(worldserver ${PRIVATE_PCH_HEADER})
 endif()
 
-# handle config file
+# START - MODULES CONFIG FILES
 CU_GET_GLOBAL("MODULE_CONFIG_FILE_LIST")
 FOREACH(configFile ${MODULE_CONFIG_FILE_LIST})
-if( WIN32 )
-  if ( MSVC )
-    add_custom_command(TARGET worldserver
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy "${configFile}" ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
-    )
-  elseif ( MINGW )
-    add_custom_command(TARGET worldserver
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy "${configFile}" ${CMAKE_BINARY_DIR}/bin/
-    )
+  if( WIN32 )
+    if ( MSVC )
+      add_custom_command(TARGET worldserver
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${configFile}" ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
+      )
+    elseif ( MINGW )
+      add_custom_command(TARGET worldserver
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${configFile}" ${CMAKE_BINARY_DIR}/bin/
+      )
+    endif()
   endif()
-endif()
-install(FILES "${configFile}" DESTINATION ${CONF_DIR})
+
+  install(FILES "${configFile}" DESTINATION ${MODULES_CONF_PATH})
+
 ENDFOREACH()
 
 CU_GET_GLOBAL("MODULE_CONFIG_FILE_LIST")
 FOREACH(configFile ${MODULE_CONFIG_FILE_LIST})
-    get_filename_component(file_name ${configFile} NAME_WE)
-    set(CONFIG_LIST ${CONFIG_LIST}${file_name},)
+  get_filename_component(file_name ${configFile} NAME_WE)
+  set(CONFIG_LIST ${CONFIG_LIST}${file_name},)
 ENDFOREACH()
 add_definitions(-DCONFIG_FILE_LIST=$<1:"${CONFIG_LIST}">)
-# end handle config file
+# END - MODULES CONFIG FILES
 
 CU_RUN_HOOK("AFTER_WORLDSERVER_CMAKE")

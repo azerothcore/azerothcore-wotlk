@@ -13,7 +13,9 @@ if( UNIX )
   message("* Install libraries to            : ${LIBSDIR}")
 endif()
 
-message("* Install configs to              : ${CONF_DIR}")
+message("* Install module configs to       : ${MODULES_CONF_PATH}")
+add_definitions(-D_MODULES_CONF_PATH=$<1:"${MODULES_CONF_PATH}">)
+## COMPATIBILITY WITH BADLY CODED (AND OLD) MODULES
 add_definitions(-D_CONF_DIR=$<1:"${CONF_DIR}">)
 
 message("")
