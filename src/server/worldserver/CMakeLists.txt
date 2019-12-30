@@ -46,7 +46,7 @@ add_executable(worldserver
 
 if(NOT WIN32)
   set_target_properties(worldserver PROPERTIES
-    COMPILE_DEFINITIONS _TRINITY_CORE_CONFIG="${WORLDSERVER_PATH}/worldserver.conf")
+    COMPILE_DEFINITIONS _TRINITY_CORE_CONFIG="${WORLDSERVER_BIN_PATH}/worldserver.conf")
 endif()
 
 add_dependencies(worldserver revision.h)
@@ -95,7 +95,7 @@ if( WIN32 )
 endif()
 
 
-install(TARGETS worldserver DESTINATION "${WORLDSERVER_PATH}")
+install(TARGETS worldserver DESTINATION "${WORLDSERVER_BIN_PATH}")
 install(FILES worldserver.conf.dist DESTINATION "${WORLDSERVER_CONF_PATH}")
 
 
