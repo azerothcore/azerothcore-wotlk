@@ -20,6 +20,12 @@
 
 #include "SmartScriptMgr.h"
 
+SmartWaypointMgr* SmartWaypointMgr::instance()
+{
+    static SmartWaypointMgr instance;
+    return &instance;
+}
+
 void SmartWaypointMgr::LoadFromDB()
 {
     uint32 oldMSTime = getMSTime();
@@ -90,6 +96,12 @@ SmartWaypointMgr::~SmartWaypointMgr()
 
         delete itr->second;
     }
+}
+
+SmartAIMgr* SmartAIMgr::instance()
+{
+    static SmartAIMgr instance;
+    return &instance;
 }
 
 void SmartAIMgr::LoadSmartAIFromDB()
@@ -1097,7 +1109,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         }
         case SMART_ACTION_LOAD_GRID:
         {
-            if (!Trinity::IsValidMapCoord(e.target.x, e.target.y))
+            if (!acore::IsValidMapCoord(e.target.x, e.target.y))
             {
                 sLog->outError("SmartScript: SMART_ACTION_LOAD_GRID uses invalid map coords: %u, skipped.", e.entryOrGuid);
                 return false;

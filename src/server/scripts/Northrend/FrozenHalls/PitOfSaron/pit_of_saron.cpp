@@ -1354,32 +1354,6 @@ public:
     }
 };
 
-const char* slaveTexts[23] = {
-"I owe you a long night of drinking, my friend.",
-"Don't let a single one of them live.",
-"I can barely feel my arms, but I'll stand with you once I find some weapons.",
-"I can hardly believe my eyes. Thank you. Really, thank you.",
-"I owe you my life.",
-"I thought I might die in this pit. Thank you!",
-"I will find a way to repay you someday, hero.",
-"I'd almost given up hope.",
-"I'd lost all track of time in this forsaken place. You're a sight for sore eyes, friend.",
-"I'll fight by your side. Offer them no mercy.",
-"I'll join you as soon as I catch my breath, heroes. Thank you.",
-"I'm going to return to help free the rest of the slaves. Thank you again, hero.",
-"I'm going to return to the front of the quarry. Kill a few extra for me.",
-"I'm so glad you're here. I wouldn't have made it much longer.",
-"I'm with you, hero.",
-"If by life or death I can repay you, I will.",
-"Now is the time for revenge.",
-"Please, carry out our vengeance on the Scourgelord.",
-"Too many of us died in this pit. Far too many.",
-"When you kill the Pit Master, spit on his corpse for me, will you?",
-"You're a beautiful sight... you have no idea.",
-"Have my babies.",
-"I could just kiss you!"
-};
-
 const Position slaveFreePos[4] = {
     {699.82f, -82.68f, 512.6f, 0.0f},
     {643.51f, 79.20f, 511.57f, 0.0f},
@@ -1434,15 +1408,15 @@ public:
                         {
                             p->RewardPlayerAndGroupAtEvent(36764, caster); // alliance
                             p->RewardPlayerAndGroupAtEvent(36770, caster); // horde
+                            
+                            target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+                            if (Creature* c = target->ToCreature())
+                            {
+                                c->DespawnOrUnsummon(7000);
+                                c->AI()->Talk(0, p);
+                                c->m_Events.AddEvent(new SlaveRunEvent(*c), c->m_Events.CalculateTime(3000));
+                            }
                         }
-                    target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                    if (Creature* c = target->ToCreature())
-                    {
-                        c->DespawnOrUnsummon(7000);
-                        uint32 maxIndex = (c->getGender() == GENDER_FEMALE ? 22 : 20);
-                        c->MonsterSay(slaveTexts[urand(0, maxIndex)], LANG_UNIVERSAL, 0);
-                        c->m_Events.AddEvent(new SlaveRunEvent(*c), c->m_Events.CalculateTime(3000));
-                    }
                 }
         }
 

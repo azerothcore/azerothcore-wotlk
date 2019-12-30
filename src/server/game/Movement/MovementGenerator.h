@@ -4,11 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_MOVEMENTGENERATOR_H
-#define TRINITY_MOVEMENTGENERATOR_H
+#ifndef ACORE_MOVEMENTGENERATOR_H
+#define ACORE_MOVEMENTGENERATOR_H
 
 #include "Define.h"
-#include <ace/Singleton.h>
 #include "ObjectRegistry.h"
 #include "FactoryHolder.h"
 #include "Common.h"
@@ -82,5 +81,4 @@ struct MovementGeneratorFactory : public SelectableMovement
 
 typedef FactoryHolder<MovementGenerator, MovementGeneratorType> MovementGeneratorCreator;
 typedef FactoryHolder<MovementGenerator, MovementGeneratorType>::FactoryHolderRegistry MovementGeneratorRegistry;
-typedef FactoryHolder<MovementGenerator, MovementGeneratorType>::FactoryHolderRepository MovementGeneratorRepository;
 #endif

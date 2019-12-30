@@ -929,7 +929,18 @@ void WorldSession::SendPetNameQuery(uint64 petguid, uint32 petnumber)
         return;
     }
 
-    std::string name = pet->GetName();
+    std::string name;
+    if (pet->GetEntry() == NPC_WATER_ELEMENTAL_PERM)
+    {
+        // Use localized creature name for the mage pet
+        LocaleConstant loc_idx = GetSessionDbLocaleIndex();
+        if (loc_idx != DEFAULT_LOCALE)
+            name = pet->GetNameForLocaleIdx(loc_idx);
+        else
+            name = pet->GetCreatureTemplate()->Name;
+    }
+    else
+        name = pet->GetName();
 
     WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+4+name.size()+1));
     data << uint32(petnumber);
