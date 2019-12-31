@@ -268,6 +268,9 @@ class WorldScript : public ScriptObject
 
         // Called when the world is actually shut down.
         virtual void OnShutdown() { }
+
+        // Called at End of SetInitialWorldSettings.
+        virtual void SetInitialWorldSettings() override { }
 };
 
 class FormulaScript : public ScriptObject
@@ -1196,6 +1199,10 @@ class ScriptMgr
 
         void Unload();
 
+    public: /* AutoBalance Script Hooks */
+
+        float AB_Script_Hooks();
+
     public: /* SpellScriptLoader */
 
         void CreateSpellScripts(uint32 spellId, std::list<SpellScript*>& scriptVector);
@@ -1223,6 +1230,7 @@ class ScriptMgr
         void OnWorldUpdate(uint32 diff);
         void OnStartup();
         void OnShutdown();
+        void SetInitialWorldSettings(); 
 
     public: /* FormulaScript */
 
@@ -1234,6 +1242,11 @@ class ScriptMgr
         void OnGainCalculation(uint32& gain, Player* player, Unit* unit);
         void OnGroupRateCalculation(float& rate, uint32 count, bool isRaid);
         void OnAfterArenaRatingCalculation(Battleground *const bg, int32 &winnerMatchmakerChange, int32 &loserMatchmakerChange, int32 &winnerChange, int32 &loserChange);
+
+    public: /* AllMapScript */
+
+        void OnPlayerEnterMapAll(Map* map, Player* player);
+        void OnPlayerLeaveMapAll(Map* map, Player* player);
 
     public: /* MapScript */
 
@@ -1258,6 +1271,11 @@ class ScriptMgr
         void OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action);
         void OnGossipSelectCode(Player* player, Item* item, uint32 sender, uint32 action, const char* code);
 
+    public: /* AllCreatureScript */
+
+        //listener function (OnAllCreatureUpdate) is called by OnCreatureUpdate
+        void OnAllCreatureUpdate(Creature* creature, uint32 diff);
+        void Creature_SelectLevel(const CreatureTemplate *cinfo, Creature* creature);
 
     public: /* CreatureScript */
 
@@ -1479,18 +1497,6 @@ class ScriptMgr
     public: /* MovementHandlerScript */
         
         void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
-        
-    public: /* AllCreatureScript */
-
-        //listener function (OnAllCreatureUpdate) is called by OnCreatureUpdate
-        //void OnAllCreatureUpdate(Creature* creature, uint32 diff);
-        void Creature_SelectLevel(const CreatureTemplate *cinfo, Creature* creature);
-
-    public: /* AllMapScript */
-
-        //listener functions are called by OnPlayerEnterMap and OnPlayerLeaveMap
-        //void OnPlayerEnterAll(Map* map, Player* player);
-        //void OnPlayerLeaveAll(Map* map, Player* player);
 
     public: /* BGScript */
 

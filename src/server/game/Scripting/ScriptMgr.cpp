@@ -582,6 +582,27 @@ void ScriptMgr::OnGroupRateCalculation(float& rate, uint32 count, bool isRaid)
     FOREACH_SCRIPT(FormulaScript)->OnGroupRateCalculation(rate, count, isRaid);
 }
 
+void ScriptMgr::Creature_SelectLevel(const CreatureTemplate *cinfo, Creature* creature)
+{
+    FOREACH_SCRIPT(AllCreatureScript)->Creature_SelectLevel(cinfo, creature);
+}
+
+void ScriptMgr::SetInitialWorldSettings()
+{
+    FOREACH_SCRIPT(WorldScript)->SetInitialWorldSettings();
+}
+
+float ScriptMgr::AB_Script_Hooks()
+{
+    float AB_Script_Hook_Version = 2.0f;
+
+    sLog->outString("------------------------------------------------------------");
+    sLog->outString("  Powered by AutoBalance Script Hooks v%4.2f : Updated by Viste", AB_Script_Hook_Version);
+    sLog->outString("--------------------------------------------------------------");
+
+    return AB_Script_Hook_Version;
+}
+
 #define SCR_MAP_BGN(M, V, I, E, C, T) \
     if (V->GetEntry() && V->GetEntry()->T()) \
     { \
@@ -966,15 +987,18 @@ CreatureAI* ScriptMgr::GetCreatureAI(Creature* creature)
     return tmpscript->GetAI(creature);
 }
 
-void ScriptMgr::OnCreatureUpdate(Creature* creature, uint32 diff)
-{
-    ASSERT(creature);
-
-    FOREACH_SCRIPT(AllCreatureScript)->OnAllCreatureUpdate(creature, diff);
-
-    GET_SCRIPT(CreatureScript, creature->GetScriptId(), tmpscript);
-    tmpscript->OnUpdate(creature, diff);
-}
++/* Needs Fixed
++void ScriptMgr::OnCreatureUpdate(Creature* creature, uint32 diff)
++{
++    ASSERT(creature);
++
++
++    FOREACH_SCRIPT(AllCreatureScript)->OnAllCreatureUpdate(creature, diff);
+ 
++    GET_SCRIPT(CreatureScript, creature->GetScriptId(), tmpscript);
++    tmpscript->OnUpdate(creature, diff);
++}
++*/
 
 bool ScriptMgr::OnGossipHello(Player* player, GameObject* go)
 {
@@ -1970,10 +1994,7 @@ uint32 ScriptMgr::DealDamage(Unit* AttackerUnit, Unit *pVictim, uint32 damage, D
         damage = itr->second->DealDamage(AttackerUnit, pVictim, damage, damagetype);
     return damage;
 }
-void ScriptMgr::Creature_SelectLevel(const CreatureTemplate *cinfo, Creature* creature)
-{
-    FOREACH_SCRIPT(AllCreatureScript)->Creature_SelectLevel(cinfo, creature);
-}
+
 void ScriptMgr::OnHeal(Unit* healer, Unit* reciever, uint32& gain)
 {
     FOREACH_SCRIPT(UnitScript)->OnHeal(healer, reciever, gain);

@@ -10293,6 +10293,8 @@ int32 Unit::HealBySpell(Unit* victim, SpellInfo const* spellInfo, uint32 addHeal
 {
     uint32 absorb = 0;
     // calculate heal absorb and reduce healing
+    victim = spellInfo->GetHeal();
+    addhealth = spellInfo->GetHeal();
     CalcHealAbsorb(victim, spellInfo, addHealth, absorb);
 
     sScriptMgr->ModifyHealRecieved(this, victim, addHealth);
