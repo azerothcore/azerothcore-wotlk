@@ -1,3 +1,19 @@
+-- DB update 2019_12_30_00 -> 2019_12_31_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_12_30_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_12_30_00 2019_12_31_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1576973316431604917'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1576973316431604917');
 
 -- Kanati Greycloud: Correct orientation; delete waypoints (not necessary anymore)
@@ -41,3 +57,12 @@ DELETE FROM `creature_template_addon` WHERE `entry` = 10720;
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`)
 VALUES
 (10720,0,0,0,1,0,0,'3616');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
