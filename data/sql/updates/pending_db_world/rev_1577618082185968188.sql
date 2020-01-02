@@ -47,7 +47,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 VALUES
 (8668,0,0,0,11,0,100,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Felhound Tracker - On Respawn - Set Phase 1'),
 (8668,0,1,2,22,1,100,0,75,500,500,0,0,80,866800,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Felhound Tracker - On Receive Emote ''ROAR'' (Phase 1) - Call Action List'),
-(8668,0,2,0,61,0,100,0,0,0,0,0,0,67,1,2000,2000,0,0,0,1,0,0,0,0,0,0,0,0,'Felhound Tracker - Linked - Create Timed Event 1'),
+(8668,0,2,0,61,0,100,0,0,0,0,0,0,67,1,3000,3000,0,0,0,1,0,0,0,0,0,0,0,0,'Felhound Tracker - Linked - Create Timed Event 1'),
 (8668,0,3,4,59,4,100,0,1,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Felhound Tracker - On Timed Event 1 (Phase 3) - Set Phase 1'),
 (8668,0,4,0,61,0,100,0,1,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Felhound Tracker - Linked - Say Line 1'),
 (8668,0,5,6,38,4,100,0,1,1,500,500,0,29,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Felhound Tracker - On Data Set 1 1 (Phase 3) - Stop Following'),
