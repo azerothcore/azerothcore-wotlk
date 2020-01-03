@@ -36,38 +36,8 @@ UPDATE `quest_template_locale` SET `Title` = 'Kriegstreiber der Trümmergratoger
 UPDATE `quest_template_locale` SET `Title` = 'Auftragsmörder des Syndikats' WHERE `ID` = 505 AND `locale` = 'deDE';
 UPDATE `quest_template_locale` SET `Title` = 'Der schwarze Schild' WHERE `ID` = 1276 AND `locale` = 'deDE';
 
-/*deDE - quests included in disables table*/
---UPDATE `quest_template_locale` SET `Title` = 'Die Flamme niederhalten' WHERE `ID` = 9745 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Ein bisschen Hilfe hier?' WHERE `ID` = 12087 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = '' WHERE `ID` = 12103 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = '' WHERE `ID` = 12108 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = '' WHERE `ID` = 12426 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Unerforschtes Gebiet' WHERE `ID` = 12682 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = '' WHERE `ID` = 24227 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = '' WHERE `ID` = 11461 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Navigationskarten' WHERE `ID` = 11992 AND `locale` = 'deDE';
-
-/*deDE - quests ingame completed with my char (table character_queststatus_rewarded*/
---UPDATE `quest_template_locale` SET `Title` = 'Frostrachen' WHERE `ID` = 1136 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Oberanführer Mok''Morokks Sorgen' WHERE `ID` = 1166 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Die Brut identifizieren' WHERE `ID` = 1169 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Die Brut von Onyxia' WHERE `ID` = 1172 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Fordert Oberanführer Mok''Morokk heraus' WHERE `ID` = 1173 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Der schwarze Schild' WHERE `ID` = 1251 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Der schwarze Schild' WHERE `ID` = 1276 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Der schwarze Schild' WHERE `ID` = 1321 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Der schwarze Schild' WHERE `ID` = 1322 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Der schwarze Schild' WHERE `ID` = 1323 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Tränenteich' WHERE `ID` = 1424 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Toxinschrecken' WHERE `ID` = 5086 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Räuber des Grollhornpostens' WHERE `ID` = 11156 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Der Reagenziendieb' WHERE `ID` = 11173 AND `locale` = 'deDE';
---UPDATE `quest_template_locale` SET `Title` = 'Kein bloßer Zufall' WHERE `ID` = 11200 AND `locale` = 'deDE';
-
 /*creature_template_locale - remove title 'PH MODEL WIP'*/
 UPDATE `creature_template_locale` SET `Title` = '' WHERE `entry` = 2694;
 
 /*creature_equip_template - fix weapon*/
 UPDATE `creature_equip_template` SET `ItemID2` = 1899, `ItemID3` = 0 WHERE `CreatureID` = 2694;
-
-
