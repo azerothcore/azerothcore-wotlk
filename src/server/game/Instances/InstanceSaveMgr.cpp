@@ -43,6 +43,12 @@ InstanceSaveManager::~InstanceSaveManager()
     }*/
 }
 
+InstanceSaveManager* InstanceSaveManager::instance()
+{
+    static InstanceSaveManager instance;
+    return &instance;
+}
+
 /*
 - adding instance into manager
 */

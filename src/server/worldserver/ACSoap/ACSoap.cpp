@@ -4,13 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "TCSoap.h"
+#include "ACSoap.h"
 #include "soapH.h"
 #include "soapStub.h"
 #include "Log.h"
 #include "World.h"
 
-void TCSoapRunnable::run()
+void ACSoapRunnable::run()
 {
     struct soap soap;
     soap_init(&soap);
@@ -23,11 +23,11 @@ void TCSoapRunnable::run()
     soap.send_timeout = 5;
     if (!soap_valid_socket(soap_bind(&soap, _host.c_str(), _port, 100)))
     {
-        sLog->outError("TCSoap: couldn't bind to %s:%d", _host.c_str(), _port);
+        sLog->outError("ACSoap: couldn't bind to %s:%d", _host.c_str(), _port);
         exit(-1);
     }
 
-    sLog->outString("TCSoap: bound to http://%s:%d", _host.c_str(), _port);
+    sLog->outString("ACSoap: bound to http://%s:%d", _host.c_str(), _port);
 
     while (!World::IsStopped())
     {
@@ -35,7 +35,7 @@ void TCSoapRunnable::run()
             continue;   // ran into an accept timeout
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "TCSoap: accepted connection from IP=%d.%d.%d.%d", (int)(soap.ip>>24)&0xFF, (int)(soap.ip>>16)&0xFF, (int)(soap.ip>>8)&0xFF, (int)soap.ip&0xFF);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: accepted connection from IP=%d.%d.%d.%d", (int)(soap.ip>>24)&0xFF, (int)(soap.ip>>16)&0xFF, (int)(soap.ip>>8)&0xFF, (int)soap.ip&0xFF);
 #endif
         struct soap* thread_soap = soap_copy(&soap);// make a safe copy
 
@@ -47,7 +47,7 @@ void TCSoapRunnable::run()
     soap_done(&soap);
 }
 
-void TCSoapRunnable::process_message(ACE_Message_Block* mb)
+void ACSoapRunnable::process_message(ACE_Message_Block* mb)
 {
     ACE_TRACE (ACE_TEXT ("SOAPWorkingThread::process_message"));
 
@@ -72,7 +72,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     if (!soap->userid || !soap->passwd)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "TCSoap: Client didn't provide login information");
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: Client didn't provide login information");
 #endif
         return 401;
     }
@@ -81,7 +81,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     if (!accountId)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "TCSoap: Client used invalid username '%s'", soap->userid);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: Client used invalid username '%s'", soap->userid);
 #endif
         return 401;
     }
@@ -89,7 +89,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     if (!AccountMgr::CheckPassword(accountId, soap->passwd))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "TCSoap: invalid password for account '%s'", soap->userid);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: invalid password for account '%s'", soap->userid);
 #endif
         return 401;
     }
@@ -97,7 +97,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     if (AccountMgr::GetSecurity(accountId) < SEC_ADMINISTRATOR)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "TCSoap: %s's gmlevel is too low", soap->userid);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: %s's gmlevel is too low", soap->userid);
 #endif
         return 403;
     }
@@ -106,7 +106,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
         return soap_sender_fault(soap, "Command can not be empty", "The supplied command was an empty string");
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "TCSoap: got command '%s'", command);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: got command '%s'", command);
 #endif
     SOAPCommand connection;
 
@@ -122,7 +122,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     int acc = connection.pendingCommands.acquire();
     if (acc)
     {
-        sLog->outError("TCSoap: Error while acquiring lock, acc = %i, errno = %u", acc, errno);
+        sLog->outError("ACSoap: Error while acquiring lock, acc = %i, errno = %u", acc, errno);
     }
 
     // alright, command finished
@@ -155,6 +155,6 @@ struct Namespace namespaces[] =
     { "SOAP-ENC", "http://schemas.xmlsoap.org/soap/encoding/", NULL, NULL }, // must be second
     { "xsi", "http://www.w3.org/1999/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL },
     { "xsd", "http://www.w3.org/1999/XMLSchema",          "http://www.w3.org/*/XMLSchema", NULL },
-    { "ns1", "urn:TC", NULL, NULL },     // "ns1" namespace prefix
+    { "ns1", "urn:AC", NULL, NULL },     // "ns1" namespace prefix
     { NULL, NULL, NULL, NULL }
 };
