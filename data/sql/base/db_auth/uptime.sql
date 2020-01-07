@@ -18,13 +18,6 @@ CREATE TABLE `uptime`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Uptime system';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-LOCK TABLES `uptime` WRITE;
-/*!40000 ALTER TABLE `uptime` DISABLE KEYS */;
-INSERT INTO `uptime` VALUES 
-(1,1550400304,121,0,'AzerothCore rev. 2bcedc2859e7 2019-02-17 10:04:09 +0100 (master branch) (Unix, Debug)'),
-(1,1550400454,1440,0,'AzerothCore rev. 2bcedc2859e7 2019-02-17 10:04:09 +0100 (master branch) (Unix, Debug)');
-/*!40000 ALTER TABLE `uptime` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
