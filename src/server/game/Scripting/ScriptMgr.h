@@ -270,7 +270,7 @@ class WorldScript : public ScriptObject
         virtual void OnShutdown() { }
 
         // Called at End of SetInitialWorldSettings.
-        virtual void SetInitialWorldSettings() override { }
+        virtual void SetInitialWorldSettings() { }
 };
 
 class FormulaScript : public ScriptObject
@@ -1190,7 +1190,7 @@ class ScriptMgr
         void FillSpellSummary();
         void CheckIfScriptsInDatabaseExist();
 
-        const char* ScriptsVersion() const { return "Integrated Trinity Scripts"; }
+        const char* ScriptsVersion() const { return "Integrated Azeroth Core Scripts"; }
 
         void IncrementScriptCount() { ++_scriptCount; }
         uint32 GetScriptCount() const { return _scriptCount; }
@@ -1230,7 +1230,7 @@ class ScriptMgr
         void OnWorldUpdate(uint32 diff);
         void OnStartup();
         void OnShutdown();
-        void SetInitialWorldSettings(); 
+        void SetInitialWorldSettings() override; 
 
     public: /* FormulaScript */
 
