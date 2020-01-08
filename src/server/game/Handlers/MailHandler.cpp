@@ -91,7 +91,7 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
 
     if (player->getLevel() < sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ))
     {
-        SendNotification(GetTrinityString(LANG_MAIL_SENDER_REQ), sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
+        SendNotification(GetAcoreString(LANG_MAIL_SENDER_REQ), sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
         return;
     }
 
@@ -169,7 +169,7 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
         if (item)
         {
             ItemTemplate const* itemProto = item->GetTemplate();
-            if (!itemProto || !(itemProto->Flags & ITEM_PROTO_FLAG_BIND_TO_ACCOUNT))
+            if (!itemProto || !(itemProto->Flags & ITEM_FLAG_IS_BOUND_TO_ACCOUNT))
             {
                 accountBound = false;
                 break;
@@ -218,13 +218,13 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
             return;
         }
 
-        if (item->GetTemplate()->Flags & ITEM_PROTO_FLAG_CONJURED || item->GetUInt32Value(ITEM_FIELD_DURATION))
+        if (item->GetTemplate()->Flags & ITEM_FLAG_CONJURED || item->GetUInt32Value(ITEM_FIELD_DURATION))
         {
             player->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_MAIL_BOUND_ITEM);
             return;
         }
 
-        if (COD && item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))
+        if (COD && item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
         {
             player->SendMailResult(0, MAIL_SEND, MAIL_ERR_CANT_SEND_WRAPPED_COD);
             return;
@@ -488,7 +488,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recvData)
                 {
                     std::string senderName;
                     if (!sObjectMgr->GetPlayerNameByGUID(sender_guid, senderName))
-                        senderName = sObjectMgr->GetTrinityStringForDBCLocale(LANG_UNKNOWN);
+                        senderName = sObjectMgr->GetAcoreStringForDBCLocale(LANG_UNKNOWN);
                     std::string subj = m->subject;
                     CleanStringForMysqlQuery(subj);
                     CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<COD> %s\", NOW())", GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), player->GetSession()->GetRemoteAddress().c_str(), sender_accId, senderName.c_str(), m->COD, subj.c_str());

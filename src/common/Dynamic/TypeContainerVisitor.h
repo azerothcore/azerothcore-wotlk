@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_TYPECONTAINERVISITOR_H
-#define TRINITY_TYPECONTAINERVISITOR_H
+#ifndef ACORE_TYPECONTAINERVISITOR_H
+#define ACORE_TYPECONTAINERVISITOR_H
 
 /*
  * @class TypeContainerVisitor is implemented as a visitor pattern.  It is

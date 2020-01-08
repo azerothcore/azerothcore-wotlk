@@ -205,6 +205,45 @@ void ScriptedAI::DoPlaySoundToSet(WorldObject* source, uint32 soundId)
     source->PlayDirectSound(soundId);
 }
 
+void ScriptedAI::DoPlayMusic(uint32 soundId, bool zone)
+{
+    ObjectList* targets = NULL;
+
+    if (me && me->FindMap())
+    {
+        Map::PlayerList const &players = me->GetMap()->GetPlayers();
+        targets = new ObjectList();
+
+        if (!players.isEmpty())
+        {
+            for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                if (Player* player = i->GetSource())
+                {
+                    if (player->GetZoneId() == me->GetZoneId())
+                    {
+                        if (!zone)
+                        {
+                            if (player->GetAreaId() == me->GetAreaId())
+                                targets->push_back(player);
+                        }
+                        else
+                            targets->push_back(player);
+                    }
+                }
+        }
+    }
+
+    if (targets)
+    {
+        for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+        {
+            (*itr)->SendPlayMusic(soundId, true);
+        }
+
+        delete targets;
+    }
+}
+
 Creature* ScriptedAI::DoSpawnCreature(uint32 entry, float offsetX, float offsetY, float offsetZ, float angle, uint32 type, uint32 despawntime)
 {
     return me->SummonCreature(entry, me->GetPositionX() + offsetX, me->GetPositionY() + offsetY, me->GetPositionZ() + offsetZ, angle, TempSummonType(type), despawntime);
@@ -339,8 +378,8 @@ void ScriptedAI::DoTeleportAll(float x, float y, float z, float o)
 Unit* ScriptedAI::DoSelectLowestHpFriendly(float range, uint32 minHPDiff)
 {
     Unit* unit = NULL;
-    Trinity::MostHPMissingInRange u_check(me, range, minHPDiff);
-    Trinity::UnitLastSearcher<Trinity::MostHPMissingInRange> searcher(me, unit, u_check);
+    acore::MostHPMissingInRange u_check(me, range, minHPDiff);
+    acore::UnitLastSearcher<acore::MostHPMissingInRange> searcher(me, unit, u_check);
     me->VisitNearbyObject(range, searcher);
 
     return unit;
@@ -349,8 +388,8 @@ Unit* ScriptedAI::DoSelectLowestHpFriendly(float range, uint32 minHPDiff)
 std::list<Creature*> ScriptedAI::DoFindFriendlyCC(float range)
 {
     std::list<Creature*> list;
-    Trinity::FriendlyCCedInRange u_check(me, range);
-    Trinity::CreatureListSearcher<Trinity::FriendlyCCedInRange> searcher(me, list, u_check);
+    acore::FriendlyCCedInRange u_check(me, range);
+    acore::CreatureListSearcher<acore::FriendlyCCedInRange> searcher(me, list, u_check);
     me->VisitNearbyObject(range, searcher);
     return list;
 }
@@ -358,8 +397,8 @@ std::list<Creature*> ScriptedAI::DoFindFriendlyCC(float range)
 std::list<Creature*> ScriptedAI::DoFindFriendlyMissingBuff(float range, uint32 uiSpellid)
 {
     std::list<Creature*> list;
-    Trinity::FriendlyMissingBuffInRange u_check(me, range, uiSpellid);
-    Trinity::CreatureListSearcher<Trinity::FriendlyMissingBuffInRange> searcher(me, list, u_check);
+    acore::FriendlyMissingBuffInRange u_check(me, range, uiSpellid);
+    acore::CreatureListSearcher<acore::FriendlyMissingBuffInRange> searcher(me, list, u_check);
     me->VisitNearbyObject(range, searcher);
     return list;
 }
@@ -368,13 +407,13 @@ Player* ScriptedAI::GetPlayerAtMinimumRange(float minimumRange)
 {
     Player* player = NULL;
 
-    CellCoord pair(Trinity::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
+    CellCoord pair(acore::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
     Cell cell(pair);
     cell.SetNoCreate();
 
-    Trinity::PlayerAtMinimumRangeAway check(me, minimumRange);
-    Trinity::PlayerSearcher<Trinity::PlayerAtMinimumRangeAway> searcher(me, player, check);
-    TypeContainerVisitor<Trinity::PlayerSearcher<Trinity::PlayerAtMinimumRangeAway>, GridTypeMapContainer> visitor(searcher);
+    acore::PlayerAtMinimumRangeAway check(me, minimumRange);
+    acore::PlayerSearcher<acore::PlayerAtMinimumRangeAway> searcher(me, player, check);
+    TypeContainerVisitor<acore::PlayerSearcher<acore::PlayerAtMinimumRangeAway>, GridTypeMapContainer> visitor(searcher);
 
     cell.Visit(pair, visitor, *me->GetMap(), *me, minimumRange);
 

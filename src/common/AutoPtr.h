@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef _TRINITY_AUTO_PTR_H
-#define _TRINITY_AUTO_PTR_H
+#ifndef _ACORE_AUTO_PTR_H
+#define _ACORE_AUTO_PTR_H
 
 #include <ace/Bound_Ptr.h>
 
-namespace Trinity
+namespace acore
 {
 
 template <class Pointer, class Lock>
@@ -37,6 +37,6 @@ public:
     }
 };
 
-} // namespace Trinity
+} // namespace acore
 
 #endif

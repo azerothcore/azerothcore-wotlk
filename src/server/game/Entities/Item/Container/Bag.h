@@ -4,14 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_BAG_H
-#define TRINITY_BAG_H
+#ifndef ACORE_BAG_H
+#define ACORE_BAG_H
 
 // Maximum 36 Slots ((CONTAINER_END - CONTAINER_FIELD_SLOT_1)/2
 #define MAX_BAG_SIZE 36                                     // 2.0.12
 
 #include "Item.h"
-#include "ItemPrototype.h"
+#include "ItemTemplate.h"
 
 class Bag : public Item
 {

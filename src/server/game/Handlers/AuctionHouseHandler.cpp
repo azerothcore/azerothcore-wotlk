@@ -47,7 +47,7 @@ void WorldSession::SendAuctionHello(uint64 guid, Creature* unit)
 {
     if (GetPlayer()->getLevel() < sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ))
     {
-        SendNotification(GetTrinityString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
+        SendNotification(GetAcoreString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
         return;
     }
 
@@ -202,7 +202,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recvData)
             itemEntry = item->GetTemplate()->ItemId;
 
         if (sAuctionMgr->GetAItem(item->GetGUIDLow()) || !item->CanBeTraded() || item->IsNotEmptyBag() ||
-            item->GetTemplate()->Flags & ITEM_PROTO_FLAG_CONJURED || item->GetUInt32Value(ITEM_FIELD_DURATION) ||
+            item->GetTemplate()->Flags & ITEM_FLAG_CONJURED || item->GetUInt32Value(ITEM_FIELD_DURATION) ||
             item->GetCount() < count[i] || itemEntry != item->GetTemplate()->ItemId)
         {
             SendAuctionCommandResult(0, AUCTION_SELL_ITEM, ERR_AUCTION_DATABASE_ERROR);
@@ -745,7 +745,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recvData)
     if (diff > delay)
         diff = delay;
     _lastAuctionListItemsMSTime = now + delay - diff;
-    TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
+    ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
     AsyncAuctionListingMgr::GetTempList().push_back( AuctionListItemsDelayEvent(delay-diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, getAll) );
 }
 

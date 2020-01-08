@@ -129,7 +129,7 @@ typedef struct AuthHandler
 #endif
 
 // Launch a thread to transfer a patch to the client
-class PatcherRunnable: public ACORE::Runnable
+class PatcherRunnable: public acore::Runnable
 {
 public:
     PatcherRunnable(class AuthSocket*);
@@ -208,6 +208,10 @@ void AuthSocket::OnRead()
 {
     #define MAX_AUTH_LOGON_CHALLENGES_IN_A_ROW 3
     uint32 challengesInARow = 0;
+
+    #define MAX_AUTH_GET_REALM_LIST 10
+    uint32 challengesInARowRealmList = 0;
+
     uint8 _cmd;
     while (1)
     {
@@ -223,6 +227,15 @@ void AuthSocket::OnRead()
                 socket().shutdown();
                 return;
             }
+        }
+        else if (_cmd == REALM_LIST) {
+          challengesInARowRealmList++;
+          if (challengesInARowRealmList == MAX_AUTH_GET_REALM_LIST)
+          {
+              sLog->outString("Got %u REALM_LIST in a row from '%s', possible ongoing DoS", challengesInARowRealmList, socket().getRemoteAddress().c_str());
+              socket().shutdown();
+              return;
+          }
         }
 
         size_t i;
@@ -316,7 +329,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
     // pussywizard: logon flood protection:
     {
-        TRINITY_GUARD(ACE_Thread_Mutex, LastLoginAttemptMutex);
+        ACORE_GUARD(ACE_Thread_Mutex, LastLoginAttemptMutex);
         std::string ipaddr = socket().getRemoteAddress();
         uint32 currTime = time(NULL);
         std::map<std::string, uint32>::iterator itr = LastLoginAttemptTimeForIP.find(ipaddr);
@@ -1132,7 +1145,7 @@ bool AuthSocket::_HandleXferResume()
     socket().recv((char*)&start, sizeof(start));
     fseek(pPatch, long(start), 0);
 
-    ACORE::Thread u(new PatcherRunnable(this));
+    acore::Thread u(new PatcherRunnable(this));
     return true;
 }
 
@@ -1168,7 +1181,7 @@ bool AuthSocket::_HandleXferAccept()
     socket().recv_skip(1);                                         // clear input buffer
     fseek(pPatch, 0, 0);
 
-    ACORE::Thread u(new PatcherRunnable(this));
+    acore::Thread u(new PatcherRunnable(this));
     return true;
 }
 

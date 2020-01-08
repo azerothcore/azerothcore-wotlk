@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_SPELLAURAEFFECTS_H
-#define TRINITY_SPELLAURAEFFECTS_H
+#ifndef ACORE_SPELLAURAEFFECTS_H
+#define ACORE_SPELLAURAEFFECTS_H
 
 class Unit;
 class AuraEffect;
@@ -321,7 +321,7 @@ class AuraEffect
         void HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
 };
 
-namespace Trinity
+namespace acore
 {
     // Binary predicate for sorting the priority of absorption aura effects
     class AbsorbAuraOrderPred

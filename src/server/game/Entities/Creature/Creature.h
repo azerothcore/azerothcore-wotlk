@@ -10,7 +10,7 @@
 #include "Common.h"
 #include "Unit.h"
 #include "UpdateMask.h"
-#include "ItemPrototype.h"
+#include "ItemTemplate.h"
 #include "LootMgr.h"
 #include "DatabaseEnv.h"
 #include "Cell.h"
@@ -27,24 +27,24 @@ class CreatureGroup;
 
 enum CreatureFlagsExtra
 {
-    CREATURE_FLAG_EXTRA_INSTANCE_BIND   = 0x00000001,       // creature kill bind instance with killer and killer's group
-    CREATURE_FLAG_EXTRA_CIVILIAN        = 0x00000002,       // not aggro (ignore faction/reputation hostility)
-    CREATURE_FLAG_EXTRA_NO_PARRY        = 0x00000004,       // creature can't parry
-    CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN = 0x00000008,       // creature can't counter-attack at parry
-    CREATURE_FLAG_EXTRA_NO_BLOCK        = 0x00000010,       // creature can't block
-    CREATURE_FLAG_EXTRA_NO_CRUSH        = 0x00000020,       // creature can't do crush attacks
-    CREATURE_FLAG_EXTRA_NO_XP_AT_KILL   = 0x00000040,       // creature kill not provide XP
-    CREATURE_FLAG_EXTRA_TRIGGER         = 0x00000080,       // trigger creature
-    CREATURE_FLAG_EXTRA_NO_TAUNT        = 0x00000100,       // creature is immune to taunt auras and effect attack me
-    CREATURE_FLAG_EXTRA_WORLDEVENT      = 0x00004000,       // custom flag for world event creatures (left room for merging)
-    CREATURE_FLAG_EXTRA_GUARD           = 0x00008000,       // Creature is guard
-    CREATURE_FLAG_EXTRA_NO_CRIT         = 0x00020000,       // creature can't do critical strikes
-    CREATURE_FLAG_EXTRA_NO_SKILLGAIN    = 0x00040000,       // creature won't increase weapon skills
-    CREATURE_FLAG_EXTRA_TAUNT_DIMINISH  = 0x00080000,       // Taunt is a subject to diminishing returns on this creautre
-    CREATURE_FLAG_EXTRA_ALL_DIMINISH    = 0x00100000,       // Creature is subject to all diminishing returns as player are
-    CREATURE_FLAG_EXTRA_KNOCKBACK_IMMUNE= 0x00200000,       // pussywizard: set mostly for dungeon bosses and their summons
-    CREATURE_FLAG_EXTRA_AVOID_AOE       = 0x00400000,       // pussywizard: ignored by aoe attacks (for icc blood prince council npc - Dark Nucleus)
-    CREATURE_FLAG_EXTRA_NO_DODGE        = 0x00800000,       // xinef: target cannot dodge
+    CREATURE_FLAG_EXTRA_INSTANCE_BIND       = 0x00000001,   // creature kill bind instance with killer and killer's group
+    CREATURE_FLAG_EXTRA_CIVILIAN            = 0x00000002,   // not aggro (ignore faction/reputation hostility)
+    CREATURE_FLAG_EXTRA_NO_PARRY            = 0x00000004,   // creature can't parry
+    CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN     = 0x00000008,   // creature can't counter-attack at parry
+    CREATURE_FLAG_EXTRA_NO_BLOCK            = 0x00000010,   // creature can't block
+    CREATURE_FLAG_EXTRA_NO_CRUSH            = 0x00000020,   // creature can't do crush attacks
+    CREATURE_FLAG_EXTRA_NO_XP_AT_KILL       = 0x00000040,   // creature kill not provide XP
+    CREATURE_FLAG_EXTRA_TRIGGER             = 0x00000080,   // trigger creature
+    CREATURE_FLAG_EXTRA_NO_TAUNT            = 0x00000100,   // creature is immune to taunt auras and effect attack me
+    CREATURE_FLAG_EXTRA_WORLDEVENT          = 0x00004000,   // custom flag for world event creatures (left room for merging)
+    CREATURE_FLAG_EXTRA_GUARD               = 0x00008000,   // Creature is guard
+    CREATURE_FLAG_EXTRA_NO_CRIT             = 0x00020000,   // creature can't do critical strikes
+    CREATURE_FLAG_EXTRA_NO_SKILLGAIN        = 0x00040000,   // creature won't increase weapon skills
+    CREATURE_FLAG_EXTRA_TAUNT_DIMINISH      = 0x00080000,   // Taunt is a subject to diminishing returns on this creautre
+    CREATURE_FLAG_EXTRA_ALL_DIMINISH        = 0x00100000,   // Creature is subject to all diminishing returns as player are
+    CREATURE_FLAG_EXTRA_KNOCKBACK_IMMUNE    = 0x00200000,   // pussywizard: set mostly for dungeon bosses and their summons
+    CREATURE_FLAG_EXTRA_AVOID_AOE           = 0x00400000,   // pussywizard: ignored by aoe attacks (for icc blood prince council npc - Dark Nucleus)
+    CREATURE_FLAG_EXTRA_NO_DODGE            = 0x00800000,   // xinef: target cannot dodge
     CREATURE_FLAG_EXTRA_DUNGEON_BOSS        = 0x10000000,   // creature is a dungeon boss (SET DYNAMICALLY, DO NOT ADD IN DB)
     CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING  = 0x20000000    // creature ignore pathfinding
 };
@@ -139,23 +139,28 @@ struct CreatureTemplate
     // helpers
     SkillType GetRequiredLootSkill() const
     {
-        if (type_flags & CREATURE_TYPEFLAGS_HERBLOOT)
+        if (type_flags & CREATURE_TYPE_FLAG_HERB_SKINNING_SKILL)
             return SKILL_HERBALISM;
-        else if (type_flags & CREATURE_TYPEFLAGS_MININGLOOT)
+        else if (type_flags & CREATURE_TYPE_FLAG_MINING_SKINNING_SKILL)
             return SKILL_MINING;
-        else if (type_flags & CREATURE_TYPEFLAGS_ENGINEERLOOT)
+        else if (type_flags & CREATURE_TYPE_FLAG_ENGINEERING_SKINNING_SKILL)
             return SKILL_ENGINEERING;
         else
             return SKILL_SKINNING;                          // normal case
     }
 
+    bool IsExotic() const
+    {
+        return (type_flags & CREATURE_TYPE_FLAG_EXOTIC_PET) != 0;
+    }
+    
     bool IsTameable(bool exotic) const
     {
-        if (type != CREATURE_TYPE_BEAST || family == 0 || (type_flags & CREATURE_TYPEFLAGS_TAMEABLE) == 0)
+        if (type != CREATURE_TYPE_BEAST || family == 0 || (type_flags & CREATURE_TYPE_FLAG_TAMEABLE_PET) == 0)
             return false;
 
-        // if can tame exotic then can tame any temable
-        return exotic || (type_flags & CREATURE_TYPEFLAGS_EXOTIC) == 0;
+        // if can tame exotic then can tame any tameable
+        return exotic || (type_flags & CREATURE_TYPE_FLAG_EXOTIC_PET) == 0;
     }
 
     void InitializeQueryData();
@@ -229,7 +234,7 @@ struct GossipMenuItemsLocale
 
 struct PointOfInterestLocale
 {
-    StringVector IconName;
+    StringVector Name;
 };
 
 #define MAX_EQUIPMENT_ITEMS 3
@@ -320,6 +325,7 @@ struct CreatureAddon
     uint32 bytes1;
     uint32 bytes2;
     uint32 emote;
+    bool isLarge;
     std::vector<uint32> auras;
 };
 
@@ -483,7 +489,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
             if (IsPet())
                 return false;
 
-            return GetCreatureTemplate()->type_flags & CREATURE_TYPEFLAGS_BOSS;
+            return GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_BOSS_MOB;
         }
 
         bool IsDungeonBoss() const;

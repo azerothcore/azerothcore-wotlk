@@ -310,7 +310,7 @@ public:
         uint32 EatTimer;
         uint32 CastTimer;
 
-        void Reset()
+        void Reset() override
         {
             uiPlayerGUID = 0;
 
@@ -321,7 +321,7 @@ public:
             CastTimer = 5000;
         }
 
-        void SpellHit(Unit* pCaster, SpellInfo const* spell)
+        void SpellHit(Unit* pCaster, SpellInfo const* spell) override
         {
             if (bCanEat || bIsEating)
                 return;
@@ -333,7 +333,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -346,7 +346,12 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void JustReachedHome() override
+        {
+            me->GetMotionMaster()->InitDefault();
+        }
+
+        void UpdateAI(uint32 diff) override
         {
             if (bCanEat || bIsEating)
             {
@@ -383,7 +388,7 @@ public:
                         }
 
                         Reset();
-                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MoveTargetedHome();
                     }
                 }
                 else
@@ -746,7 +751,7 @@ public:
             uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30658, 1, NULL);
             if (msg == EQUIP_ERR_OK)
             {
-                player->StoreNewItem(dest, 30658, 1, true);
+                player->StoreNewItem(dest, 30658, true);
                 ClearGossipMenuFor(player);
             }
         }
@@ -756,7 +761,7 @@ public:
             uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30659, 1, NULL);
             if (msg == EQUIP_ERR_OK)
             {
-                player->StoreNewItem(dest, 30659, 1, true);
+                player->StoreNewItem(dest, 30659, true);
                 ClearGossipMenuFor(player);
             }
         }

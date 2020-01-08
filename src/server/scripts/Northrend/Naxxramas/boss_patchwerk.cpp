@@ -42,14 +42,14 @@ class boss_patchwerk : public CreatureScript
 public:
     boss_patchwerk() : CreatureScript("boss_patchwerk") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_patchwerkAI (pCreature);
     }
 
     struct boss_patchwerkAI : public BossAI
     {
-        boss_patchwerkAI(Creature *c) : BossAI(c, BOSS_PATCHWERK) 
+        explicit boss_patchwerkAI(Creature *c) : BossAI(c, BOSS_PATCHWERK)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -57,13 +57,13 @@ public:
         EventMap events;
         InstanceScript* pInstance;
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events.Reset();
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -75,13 +75,13 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  killer)
+        void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -97,7 +97,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -113,10 +113,10 @@ public:
                     //Cast Hateful strike on the player with the highest
                     //amount of HP within melee distance, and second threat amount
                     std::list<Unit*> meleeRangeTargets;
-                    Unit* finalTarget = NULL;
+                    Unit* finalTarget = nullptr;
                     uint8 counter = 0;
                     
-                    ThreatContainer::StorageType::const_iterator i = me->getThreatManager().getThreatList().begin();
+                    auto i = me->getThreatManager().getThreatList().begin();
                     for (; i != me->getThreatManager().getThreatList().end(); ++i, ++counter)
                     {
                         // Gather all units with melee range
@@ -130,15 +130,16 @@ public:
                     }
 
                     counter = 0;
-                    for (std::list<Unit*>::const_iterator i = meleeRangeTargets.begin(); i != meleeRangeTargets.end(); ++i, ++counter)
+                    list<Unit *, std::allocator<Unit *>>::iterator itr;
+                    for (itr = meleeRangeTargets.begin(); itr != meleeRangeTargets.end(); ++itr, ++counter)
                     {
                         // if there is only one target available
                         if (meleeRangeTargets.size() == 1)
-                            finalTarget = (*i);
+                            finalTarget = (*itr);
                         else if (counter > 0) // skip first target
                         {
-                            if (!finalTarget || (*i)->GetHealth() > finalTarget->GetHealth())
-                                finalTarget = (*i);
+                            if (!finalTarget || (*itr)->GetHealth() > finalTarget->GetHealth())
+                                finalTarget = (*itr);
 
                             // third loop
                             if (counter >= 2)

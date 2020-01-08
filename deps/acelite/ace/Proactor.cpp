@@ -243,7 +243,7 @@ ACE_Proactor_Handle_Timeout_Upcall::timeout (ACE_Proactor_Timer_Queue &,
                        ACE_TEXT ("create_asynch_timer failed")),
                       -1);
 
-  auto_ptr<ACE_Asynch_Result_Impl> safe_asynch_timer (asynch_timer);
+  std::unique_ptr<ACE_Asynch_Result_Impl> safe_asynch_timer (asynch_timer);
 
   // Post a completion.
   if (-1 == safe_asynch_timer->post_completion
