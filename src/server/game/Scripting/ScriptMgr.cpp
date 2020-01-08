@@ -1750,9 +1750,9 @@ bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGu
     return ret;
 }
 
-void ScriptMgr::OnPetSpellInitialize(Pet* pet)
+void ScriptMgr::OnPetInitStatsForLevel(Pet* pet)
 {
-    FOREACH_SCRIPT(PlayerScript)->OnPetSpellInitialize(pet);
+    FOREACH_SCRIPT(PlayerScript)->OnPetInitStatsForLevel(pet);
 }
 
 // Account
