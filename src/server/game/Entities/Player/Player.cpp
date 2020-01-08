@@ -21019,6 +21019,8 @@ void Player::PetSpellInitialize()
     if (!pet)
         return;
 
+    sScriptMgr->OnPetSpellInitialize(pet);
+
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_PETS, "Pet Spells Groups");
 #endif
