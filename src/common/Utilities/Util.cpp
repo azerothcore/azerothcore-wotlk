@@ -16,9 +16,13 @@
 #include "Errors.h" // for ASSERT
 #include <ace/TSS_T.h>
 #include <array>
+#include <cwchar>
+#include <string>
+#include <random>
 
 typedef ACE_TSS<SFMTRand> SFMTRandTSS;
 static SFMTRandTSS sfmtRand;
+static SFMTEngine engine;
 
 int32 irand(int32 min, int32 max)
 {
@@ -51,6 +55,17 @@ double rand_norm()
 double rand_chance()
 {
     return sfmtRand->Random() * 100.0;
+}
+
+uint32 urandweighted(size_t count, double const* chances)
+{
+    std::discrete_distribution<uint32> dd(chances, chances + count);
+    return dd(SFMTEngine::Instance());
+}
+
+SFMTEngine& SFMTEngine::Instance()
+{
+    return engine;
 }
 
 Tokenizer::Tokenizer(const std::string &src, const char sep, uint32 vectorReserve)
@@ -251,22 +266,29 @@ bool IsIPAddrInNetwork(ACE_INET_Addr const& net, ACE_INET_Addr const& addr, ACE_
 }
 
 /// create PID file
-uint32 CreatePIDFile(const std::string& filename)
+uint32 CreatePIDFile(std::string const& filename)
 {
-    FILE* pid_file = fopen (filename.c_str(), "w" );
-    if (pid_file == NULL)
+    FILE* pid_file = fopen(filename.c_str(), "w");
+    if (pid_file == nullptr)
         return 0;
 
+    uint32 pid = GetPID();
+
+    fprintf(pid_file, "%u", pid);
+    fclose(pid_file);
+
+    return pid;
+}
+
+uint32 GetPID()
+{
 #ifdef _WIN32
     DWORD pid = GetCurrentProcessId();
 #else
     pid_t pid = getpid();
 #endif
 
-    fprintf(pid_file, "%u", pid );
-    fclose(pid_file);
-
-    return (uint32)pid;
+    return uint32(pid);
 }
 
 size_t utf8length(std::string& utf8str)
@@ -275,9 +297,9 @@ size_t utf8length(std::string& utf8str)
     {
         return utf8::distance(utf8str.c_str(), utf8str.c_str()+utf8str.size());
     }
-    catch(std::exception)
+    catch(std::exception const&)
     {
-        utf8str = "";
+        utf8str.clear();
         return 0;
     }
 }
@@ -297,9 +319,9 @@ void utf8truncate(std::string& utf8str, size_t len)
         char* oend = utf8::utf16to8(wstr.c_str(), wstr.c_str()+wstr.size(), &utf8str[0]);
         utf8str.resize(oend-(&utf8str[0]));                 // remove unused tail
     }
-    catch(std::exception)
+    catch(std::exception const&)
     {
-        utf8str = "";
+        utf8str.clear();
     }
 }
 
@@ -307,24 +329,30 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
 {
     try
     {
-        size_t len = utf8::distance(utf8str, utf8str+csize);
-        if (len > wsize)
-        {
-            if (wsize > 0)
-                wstr[0] = L'\0';
-            wsize = 0;
-            return false;
-        }
-
-        wsize = len;
-        utf8::utf8to16(utf8str, utf8str+csize, wstr);
-        wstr[len] = L'\0';
+        acore::CheckedBufferOutputIterator<wchar_t> out(wstr, wsize);
+        out = utf8::utf8to16(utf8str, utf8str+csize, out);
+        wsize -= out.remaining(); // remaining unused space
+        wstr[wsize] = L'\0';
     }
-    catch(std::exception)
+    catch(std::exception const&)
     {
-        if (wsize > 0)
+        // Replace the converted string with an error message if there is enough space
+        // Otherwise just return an empty string
+        const wchar_t* errorMessage = L"An error occurred converting string from UTF-8 to WStr";
+        std::size_t errorMessageLength = std::char_traits<wchar_t>::length(errorMessage);
+        if (wsize >= errorMessageLength)
+        {
+            std::wcscpy(wstr, errorMessage);
+            wsize = std::char_traits<wchar_t>::length(wstr);
+        }
+        else if (wsize > 0)
+        {
             wstr[0] = L'\0';
-        wsize = 0;
+            wsize = 0;
+        }
+        else
+            wsize = 0;
+
         return false;
     }
 
@@ -361,16 +389,16 @@ bool WStrToUtf8(wchar_t* wstr, size_t size, std::string& utf8str)
         }
         utf8str = utf8str2;
     }
-    catch(std::exception)
+    catch(std::exception const&)
     {
-        utf8str = "";
+        utf8str.clear();
         return false;
     }
 
     return true;
 }
 
-bool WStrToUtf8(std::wstring wstr, std::string& utf8str)
+bool WStrToUtf8(std::wstring const& wstr, std::string& utf8str)
 {
     try
     {
@@ -384,9 +412,9 @@ bool WStrToUtf8(std::wstring wstr, std::string& utf8str)
         }
         utf8str = utf8str2;
     }
-    catch(std::exception)
+    catch(std::exception const&)
     {
-        utf8str = "";
+        utf8str.clear();
         return false;
     }
 
@@ -395,14 +423,23 @@ bool WStrToUtf8(std::wstring wstr, std::string& utf8str)
 
 typedef wchar_t const* const* wstrlist;
 
-std::wstring GetMainPartOfName(std::wstring wname, uint32 declension)
+void wstrToUpper(std::wstring& str)
+{
+    std::transform(str.begin(), str.end(), str.begin(), wcharToUpper);
+}
+
+void wstrToLower(std::wstring& str)
+{
+    std::transform(str.begin(), str.end(), str.begin(), wcharToLower);
+}
+
+std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
 {
     // supported only Cyrillic cases
     if (wname.empty() || !isCyrillicCharacter(wname[0]) || declension > 5)
         return wname;
 
     // Important: end length must be <= MAX_INTERNAL_PLAYER_NAME-MAX_PLAYER_NAME (3 currently)
-
     static std::wstring const a_End    = { wchar_t(0x0430), wchar_t(0x0000) };
     static std::wstring const o_End    = { wchar_t(0x043E), wchar_t(0x0000) };
     static std::wstring const ya_End   = { wchar_t(0x044F), wchar_t(0x0000) };
@@ -447,7 +484,7 @@ std::wstring GetMainPartOfName(std::wstring wname, uint32 declension)
 
 bool utf8ToConsole(const std::string& utf8str, std::string& conStr)
 {
-#if PLATFORM == PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
     std::wstring wstr;
     if (!Utf8toWStr(utf8str, wstr))
         return false;
@@ -464,10 +501,10 @@ bool utf8ToConsole(const std::string& utf8str, std::string& conStr)
 
 bool consoleToUtf8(const std::string& conStr, std::string& utf8str)
 {
-#if PLATFORM == PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
     std::wstring wstr;
     wstr.resize(conStr.size());
-    OemToCharBuffW(&conStr[0], &wstr[0], conStr.size());
+    OemToCharBuffW(&conStr[0], &wstr[0], uint32(conStr.size()));
 
     return WStrToUtf8(wstr, utf8str);
 #else
@@ -477,7 +514,7 @@ bool consoleToUtf8(const std::string& conStr, std::string& utf8str)
 #endif
 }
 
-bool Utf8FitTo(const std::string& str, std::wstring search)
+bool Utf8FitTo(const std::string& str, std::wstring const& search)
 {
     std::wstring temp;
 
@@ -485,7 +522,7 @@ bool Utf8FitTo(const std::string& str, std::wstring search)
         return false;
 
     // converting to lower case
-    wstrToLower( temp );
+    wstrToLower(temp);
 
     if (temp.find(search) == std::wstring::npos)
         return false;
@@ -503,11 +540,11 @@ void utf8printf(FILE* out, const char *str, ...)
 
 void vutf8printf(FILE* out, const char *str, va_list* ap)
 {
-#if PLATFORM == PLATFORM_WINDOWS
-    char temp_buf[32*1024];
-    wchar_t wtemp_buf[32*1024];
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
+    char temp_buf[32 * 1024];
+    wchar_t wtemp_buf[32 * 1024];
 
-    size_t temp_len = vsnprintf(temp_buf, 32*1024, str, *ap);
+    size_t temp_len = vsnprintf(temp_buf, 32 * 1024, str, *ap);
     //vsnprintf returns -1 if the buffer is too small
     if (temp_len == size_t(-1))
         temp_len = 32*1024-1;
@@ -515,11 +552,22 @@ void vutf8printf(FILE* out, const char *str, va_list* ap)
     size_t wtemp_len = 32*1024-1;
     Utf8toWStr(temp_buf, temp_len, wtemp_buf, wtemp_len);
 
-    CharToOemBuffW(&wtemp_buf[0], &temp_buf[0], wtemp_len+1);
+    CharToOemBuffW(&wtemp_buf[0], &temp_buf[0], uint32(wtemp_len + 1));
     fprintf(out, "%s", temp_buf);
 #else
     vfprintf(out, str, *ap);
 #endif
+}
+
+bool Utf8ToUpperOnlyLatin(std::string& utf8String)
+{
+    std::wstring wstr;
+    if (!Utf8toWStr(utf8String, wstr))
+        return false;
+
+    std::transform(wstr.begin(), wstr.end(), wstr.begin(), wcharToUpperOnlyLatin);
+
+    return WStrToUtf8(wstr, utf8String);
 }
 
 std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse /* = false */)
@@ -544,4 +592,42 @@ std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse 
     }
 
     return ss.str();
+}
+
+void HexStrToByteArray(std::string const& str, uint8* out, bool reverse /*= false*/)
+{
+    // string must have even number of characters
+    if (str.length() & 1)
+        return;
+
+    int32 init = 0;
+    int32 end = int32(str.length());
+    int8 op = 1;
+
+    if (reverse)
+    {
+        init = int32(str.length() - 2);
+        end = -2;
+        op = -1;
+    }
+
+    uint32 j = 0;
+    for (int32 i = init; i != end; i += 2 * op)
+    {
+        char buffer[3] = { str[i], str[i + 1], '\0' };
+        out[j++] = uint8(strtoul(buffer, nullptr, 16));
+    }
+}
+
+bool StringToBool(std::string const& str)
+{
+    std::string lowerStr = str;
+    std::transform(str.begin(), str.end(), lowerStr.begin(), ::tolower);
+    return lowerStr == "1" || lowerStr == "true" || lowerStr == "yes";
+}
+
+bool StringContainsStringI(std::string const& haystack, std::string const& needle)
+{
+    return haystack.end() !=
+        std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), [](char c1, char c2) { return std::toupper(c1) == std::toupper(c2); });
 }

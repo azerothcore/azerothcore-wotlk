@@ -49,7 +49,7 @@ enum Misc
     EVENT_TALK_KILL                 = 10
 };
 
-struct ShadowOfDeathSelector : public ACORE::unary_function<Unit*, bool>
+struct ShadowOfDeathSelector : public acore::unary_function<Unit*, bool>
 {
     bool operator()(Unit const* target) const
     {
