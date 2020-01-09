@@ -141,7 +141,7 @@ int Master::Run()
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            sLog->outError("Daemon PID: %u\n", pid); // outError for red color
+            sLog->outError("Daemon PID: %u\n", pid); // outError for red color in console
         else
         {
             sLog->outError("Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
