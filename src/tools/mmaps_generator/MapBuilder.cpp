@@ -872,16 +872,8 @@ namespace MMAP
             return static_cast<uint32>(m_mapid) != mapID;
 
         if (m_skipContinents)
-            switch (mapID)
-            {
-                case 0:
-                case 1:
-                case 530:
-                case 571:
-                    return true;
-                default:
-                    break;
-            }
+            if (isContinentMap(mapID))
+                return true;
 
         if (m_skipJunkMaps)
             switch (mapID)
@@ -955,6 +947,20 @@ namespace MMAP
             case 712:
             case 713:
             case 718:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    bool MapBuilder::isContinentMap(uint32 mapID)
+    {
+        switch (mapID)
+        {
+            case 0:
+            case 1:
+            case 530:
+            case 571:
                 return true;
             default:
                 return false;
