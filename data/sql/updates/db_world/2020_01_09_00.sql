@@ -1,3 +1,19 @@
+-- DB update 2020_01_02_00 -> 2020_01_09_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_01_02_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_01_02_00 2020_01_09_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1576771426837915100'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1576771426837915100');
 
 /*quest_template_locale - removed [DEPRECATED] deDE quest titles (NOT included in disables table)*/
@@ -41,3 +57,12 @@ UPDATE `creature_template_locale` SET `Title` = '' WHERE `entry` = 2694;
 
 /*creature_equip_template - fix weapon*/
 UPDATE `creature_equip_template` SET `ItemID2` = 1899, `ItemID3` = 0 WHERE `CreatureID` = 2694;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
