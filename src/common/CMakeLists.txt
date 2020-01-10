@@ -61,7 +61,8 @@ target_link_libraries(common
     openssl
     threads
     jemalloc
-    fmt)
+    fmt
+    Foundation)
 
 set_target_properties(common
   PROPERTIES
