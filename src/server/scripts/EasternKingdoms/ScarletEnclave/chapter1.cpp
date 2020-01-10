@@ -1026,7 +1026,8 @@ public:
                 AddWaypoint(14, 2172.516602f, -6146.752441f, 1.074235f);
                 AddWaypoint(15, 2138.918457f, -6158.920898f, 1.342926f);
                 AddWaypoint(16, 2129.866699f, -6174.107910f, 4.380779f);
-                AddWaypoint(17, 2117.709473f, -6193.830078f, 13.3542f, 10000);
+                AddWaypoint(17, 2125.250001f, -6181.230001f, 9.91997f);
+                AddWaypoint(18, 2117.709473f, -6193.830078f, 13.3542f, 10000);
             }
             else
             {
@@ -1034,7 +1035,8 @@ public:
                 AddWaypoint(14, 2234.265625f, -6163.741211f, 0.916021f);
                 AddWaypoint(15, 2268.071777f, -6158.750977f, 1.822252f);
                 AddWaypoint(16, 2270.028320f, -6176.505859f, 6.340538f);
-                AddWaypoint(17, 2271.739014f, -6195.401855f, 13.3542f, 10000);
+                AddWaypoint(17, 2270.350001f, -6182.410001f, 10.42431f);
+                AddWaypoint(18, 2271.739014f, -6195.401855f, 13.3542f, 10000);
             }
         }
 
@@ -1063,7 +1065,7 @@ public:
                     IntroTimer = 4000;
                     IntroPhase = 1;
                     break;
-                case 17:
+                case 18:
                     if (Creature* car = ObjectAccessor::GetCreature(*me, carGUID))
                     {
                         car->SetPosition(car->GetPositionX(), car->GetPositionY(), me->GetPositionZ() + 1, car->GetOrientation());
