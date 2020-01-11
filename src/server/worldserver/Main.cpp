@@ -132,6 +132,9 @@ extern int main(int argc, char** argv)
         printf("Verify that the file exists and has \'[worldserver]' written in the top of the file!\n");
     }
 
+    // Init all logs
+    sLog->Initialize();
+
     sLog->outString("Using configuration file %s.", cfg_file);
 
     sLog->outString("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));

@@ -106,6 +106,9 @@ extern int main(int argc, char** argv)
         printf("Verify that the file exists and has \'[authserver]\' written in the top of the file!\n");
     }
 
+    // Init all logs
+    sLog->Initialize();
+
     sLog->outString("%s (authserver)", GitRevision::GetFullVersion());
     sLog->outString("<Ctrl-C> to stop.\n");
 
@@ -152,10 +155,6 @@ extern int main(int argc, char** argv)
     // Initialize the database connection
     if (!StartDB())
         return 1;
-
-    // Initialize the log database
-    sLog->SetLogDB(false);
-    sLog->SetRealmID(0);                                               // ensure we've set realm to 0 (authserver realmid)
 
     // Get the list of realms for the server
     sRealmList->Initialize(sConfigMgr->GetIntDefault("RealmsStateUpdateDelay", 20));
@@ -270,8 +269,8 @@ extern int main(int argc, char** argv)
     // possibly enable db logging; avoid massive startup spam by doing it here.
     if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
     {
-        sLog->outString("Enabling database logging...");
-        sLog->SetLogDB(true);
+        LOG_INFO("server.authserver", "Enabling database logging...");
+        sLog->SetRealmID(0, false);
     }
 
     // Wait for termination signal
