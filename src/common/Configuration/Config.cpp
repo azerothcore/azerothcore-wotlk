@@ -88,8 +88,8 @@ bool ConfigMgr::LoadData(std::string const& file, std::string applicationName /*
         return true;
 
     sLog->outString("");
-    sLog->outError("Load config error. Invalid or missing configuration file: %s", file.c_str());
-    sLog->outError("Verify that the file exists and has \'[%s]' written in the top of the file!", applicationName.c_str());
+    sLog->outString("Load config error. Invalid or missing configuration file: %s", file.c_str());
+    sLog->outString("Verify that the file exists and has \'[%s]' written in the top of the file!", applicationName.c_str());
 
     return false;
 }
