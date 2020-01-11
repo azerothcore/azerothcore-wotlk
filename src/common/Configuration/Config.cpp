@@ -42,7 +42,7 @@ bool ConfigMgr::GetValueHelper(const char* name, ACE_TString& result)
     return false;
 }
 
-bool ConfigMgr::LoadInitial(std::string const& file, std::string const& applicationName /*= "worldserver"*/)
+bool ConfigMgr::LoadInitial(std::string const& file)
 {
     ASSERT(file.c_str());
 
@@ -50,21 +50,21 @@ bool ConfigMgr::LoadInitial(std::string const& file, std::string const& applicat
 
     _config.reset(new ACE_Configuration_Heap());
     if (!_config->open())
-        if (LoadData(file, applicationName))
+        if (LoadData(file))
             return true;
 
     _config.reset();
     return false;
 }
 
-bool ConfigMgr::LoadMore(std::string const& file, std::string const& applicationName /*= "worldserver"*/)
+bool ConfigMgr::LoadMore(std::string const& file)
 {
     ASSERT(file.c_str());
     ASSERT(_config);
 
     GuardType guard(_configLock);
 
-    return LoadData(file, applicationName);
+    return LoadData(file);
 }
 
 bool ConfigMgr::Reload()
@@ -77,7 +77,7 @@ bool ConfigMgr::Reload()
     return true;
 }
 
-bool ConfigMgr::LoadData(std::string const& file, std::string const& applicationName /*= "worldserver"*/)
+bool ConfigMgr::LoadData(std::string const& file)
 {
     ACE_Ini_ImpExp config_importer(*_config.get());
     if (!config_importer.import_config(file.c_str()))
@@ -199,7 +199,7 @@ void ConfigMgr::SetConfigList(std::string const& fileName, std::string const& mo
 bool ConfigMgr::LoadAppConfigs(std::string const& applicationName /*= "worldserver"*/)
 {
     // #1 - Load init config file .conf.dist
-    if (!sConfigMgr->LoadInitial(_initConfigFile + ".dist", applicationName))
+    if (!sConfigMgr->LoadInitial(_initConfigFile + ".dist"))
     {
         printf("Load config error. Invalid or missing dist configuration file: %s", std::string(_initConfigFile + ".dist").c_str());
         printf("Verify that the file exists and has \'[%s]' written in the top of the file!", applicationName.c_str());
@@ -208,7 +208,7 @@ bool ConfigMgr::LoadAppConfigs(std::string const& applicationName /*= "worldserv
     }
 
     // #2 - Load .conf file
-    if (!sConfigMgr->LoadMore(_initConfigFile, applicationName))
+    if (!sConfigMgr->LoadMore(_initConfigFile))
     {
         sLog->outString("");
         sLog->outString("Load config error. Invalid or missing configuration file: %s", _initConfigFile.c_str());

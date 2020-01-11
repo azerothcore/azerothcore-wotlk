@@ -24,7 +24,7 @@ public:
     static ConfigMgr* instance();
 
     /// Method used only for loading main configuration files (authserver.conf and worldserver.conf)
-    bool LoadInitial(std::string const& file, std::string const& applicationName = "worldserver");
+    bool LoadInitial(std::string const& file);
 
     /**
      * This method loads additional configuration files
@@ -32,7 +32,7 @@ public:
      *
      * @return true if loading was successful
      */
-    bool LoadMore(std::string const& file, std::string const& applicationName = "worldserver");
+    bool LoadMore(std::string const& file);
 
     bool Reload();
 
@@ -55,7 +55,7 @@ private:
     bool dryRun = false;
 
     bool GetValueHelper(const char* name, ACE_TString& result);
-    bool LoadData(std::string const&, std::string const& applicationName = "worldserver");
+    bool LoadData(std::string const& file);
 
     typedef ACE_Thread_Mutex LockType;
     typedef ACE_Guard<LockType> GuardType;
