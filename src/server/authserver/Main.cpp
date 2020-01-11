@@ -36,7 +36,7 @@
 #endif
 
 #ifndef _ACORE_REALM_CONFIG
-# define _ACORE_REALM_CONFIG  "authserver.conf"
+#define _ACORE_REALM_CONFIG "authserver.conf"
 #endif
 
 bool StartDB();
@@ -92,19 +92,10 @@ extern int main(int argc, char** argv)
         ++count;
     }
 
-    std::string cfg_def_file=_ACORE_REALM_CONFIG;
-    cfg_def_file += ".dist";
+    sConfigMgr->SetConfigList(std::string(configFile));
 
-    if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {
-        printf("ERROR: Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
+    if (!sConfigMgr->LoadAppConfigs("authserver"))
         return 1;
-    }
-
-    if (!sConfigMgr->LoadMore(configFile))
-    {
-        printf("WARNING: Invalid or missing configuration file : %s\n", configFile);
-        printf("Verify that the file exists and has \'[authserver]\' written in the top of the file!\n");
-    }
 
     sLog->outString("%s (authserver)", GitRevision::GetFullVersion());
     sLog->outString("<Ctrl-C> to stop.\n");

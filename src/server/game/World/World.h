@@ -796,9 +796,6 @@ class World
         std::string const& GetRealmName() const { return _realmName; } // pussywizard
         void SetRealmName(std::string name) { _realmName = name; } // pussywizard
 
-        std::string GetConfigFileList() { return m_configFileList; }
-        void SetConfigFileList(std::string list) { m_configFileList = list; }
-
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters

@@ -20,7 +20,7 @@
 #include "Master.h"
 
 #ifndef _ACORE_CORE_CONFIG
-# define _ACORE_CORE_CONFIG  "worldserver.conf"
+#define _ACORE_CORE_CONFIG "worldserver.conf"
 #endif
 
 #ifdef _WIN32
@@ -61,7 +61,7 @@ void usage(const char* prog)
 extern int main(int argc, char** argv)
 {
     ///- Command line parsing to get the configuration file name
-    char const* cfg_file = _ACORE_CORE_CONFIG;
+    char const* configFile = _ACORE_CORE_CONFIG;
     int c = 1;
     while (c < argc)
     {
@@ -79,7 +79,7 @@ extern int main(int argc, char** argv)
                 return 1;
             }
             else
-                cfg_file = argv[c];
+                configFile = argv[c];
         }
 
         #ifdef _WIN32
@@ -118,22 +118,12 @@ extern int main(int argc, char** argv)
         ++c;
     }
 
-    std::string cfg_def_file=_ACORE_CORE_CONFIG;
-    cfg_def_file += ".dist";
+    sConfigMgr->SetConfigList(std::string(configFile), std::string(CONFIG_FILE_LIST));
 
-    if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {
-        printf("ERROR: Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
+    if (!sConfigMgr->LoadAppConfigs())
         return 1;
-    }
 
-    if (!sConfigMgr->LoadMore(cfg_file))
-    {
-        printf("WARNING: Invalid or missing configuration file : %s\n", cfg_file);
-        printf("Verify that the file exists and has \'[worldserver]' written in the top of the file!\n");
-    }
-
-    sLog->outString("Using configuration file %s.", cfg_file);
-
+    sLog->outString("Using configuration file %s.", configFile);
     sLog->outString("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
     sLog->outString("Using ACE version: %s", ACE_VERSION);
 
