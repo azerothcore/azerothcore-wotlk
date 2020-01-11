@@ -230,7 +230,8 @@ bool ConfigMgr::LoadModulesConfigs()
 
     for (auto const& itr : _modulesConfigFiles)
     {
-        bool IsExistDefaultConfig, IsExistDistConfig = true;
+        bool IsExistDefaultConfig = true;
+        bool IsExistDistConfig = true;
 
         std::string moduleName = itr;
         std::string configFile = std::string(itr) + std::string(".conf");
