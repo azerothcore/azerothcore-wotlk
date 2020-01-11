@@ -55,7 +55,7 @@ private:
     bool dryRun = false;
 
     bool GetValueHelper(const char* name, ACE_TString& result);
-    bool LoadData(std::string const&, std::string applicationName = "worldserver");
+    bool LoadData(std::string const&, std::string const& applicationName = "worldserver");
 
     typedef ACE_Thread_Mutex LockType;
     typedef ACE_Guard<LockType> GuardType;

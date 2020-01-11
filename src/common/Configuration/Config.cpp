@@ -77,7 +77,7 @@ bool ConfigMgr::Reload()
     return true;
 }
 
-bool ConfigMgr::LoadData(std::string const& file, std::string applicationName /*= "worldserver"*/)
+bool ConfigMgr::LoadData(std::string const& file, std::string const& applicationName /*= "worldserver"*/)
 {
     ACE_Ini_ImpExp config_importer(*_config.get());
     if (!config_importer.import_config(file.c_str()))
