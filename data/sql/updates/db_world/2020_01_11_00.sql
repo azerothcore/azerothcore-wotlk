@@ -1,3 +1,19 @@
+-- DB update 2020_01_09_00 -> 2020_01_11_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_01_09_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_01_09_00 2020_01_11_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1577618082185968188'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1577618082185968188');
 
 -- Loramus Thalipedes: Add SAI and gossip menus as replacement for the CreatureScript "npc_loramus_thalipedes"
@@ -98,3 +114,12 @@ VALUES
 
 (15262000,9,0,0,0,0,100,0,0,0,0,0,0,22,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Azsharite Formation - On Script - Set Phase 2'),
 (15262000,9,1,0,0,0,100,0,180000,180000,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Azsharite Formation - On Script - Set Phase 1');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
