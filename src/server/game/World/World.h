@@ -892,8 +892,6 @@ class World
 
         void ProcessQueryCallbacks();
         ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
-
-        std::string m_configFileList;
 };
  
 #define sWorld World::instance()
