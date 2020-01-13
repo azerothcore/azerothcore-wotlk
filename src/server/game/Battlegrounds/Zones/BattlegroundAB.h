@@ -234,7 +234,7 @@ class BattlegroundAB : public Battleground
         void HandleAreaTrigger(Player* player, uint32 trigger) override;
         bool SetupBattleground() override;
         void Init() override;
-        void EndBattleground(TeamId winnerTeamId);
+        void EndBattleground(TeamId winnerTeamId) override;
         GraveyardStruct const* GetClosestGraveyard(Player* player) override;
 
         void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
