@@ -265,7 +265,7 @@ bool ConfigMgr::LoadModulesConfigs()
             IsExistDefaultConfig = false;
 
             sLog->outString("");
-            sLog->outString("Load config error. Invalid or missing configuration file: %s", _initConfigFile.c_str());
+            sLog->outString("Load config error. Invalid or missing configuration file: %s", defaultConfig.c_str());
             sLog->outString("Verify that the file exists and has \'[%s]' written in the top of the file!", applicationName.c_str());
         } 
 
