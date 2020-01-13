@@ -662,7 +662,6 @@ class World
 
         void SetInitialWorldSettings();
         void LoadConfigSettings(bool reload = false);
-        void LoadModuleConfigSettings();
 
         void SendWorldText(uint32 string_id, ...);
         void SendGlobalText(const char* text, WorldSession* self);
