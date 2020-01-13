@@ -124,7 +124,7 @@ class ScriptRegistry
                     else
                     {
                         // If the script is already assigned -> delete it!
-                        sLog->outError("Script '%s' already assigned with the same script name, so the script can't work.",
+                        sLog->outError("Script named '%s' is already assigned (two or more scripts have the same name), so the script can't work, aborting...",
                             script->GetName().c_str());
 
                         ABORT(); // Error that should be fixed ASAP.
@@ -134,7 +134,7 @@ class ScriptRegistry
                 {
                     // The script uses a script name from database, but isn't assigned to anything.
                     if (script->GetName().find("example") == std::string::npos && script->GetName().find("Smart") == std::string::npos)
-                        sLog->outErrorDb("Script named '%s' does not have a script name assigned in database.",
+                        sLog->outErrorDb("Script named '%s' is not assigned in the database.",
                             script->GetName().c_str());
                 }
             }
@@ -294,7 +294,7 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<BGScript>::GetScriptById(sid) &&
                 !ScriptRegistry<SpellSC>::GetScriptById(sid) &&
                 !ScriptRegistry<GroupScript>::GetScriptById(sid))
-                sLog->outErrorDb("Script named '%s' is assigned in database, but has no code!", (*itr).c_str());
+                sLog->outErrorDb("Script named '%s' is assigned in the database, but has no code!", (*itr).c_str());
         }
 }
 
@@ -714,7 +714,7 @@ void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
 #endif
 
     FOREACH_SCRIPT(AllMapScript)->OnPlayerLeaveAll(map, player);
-    
+
     SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
         itr->second->OnPlayerLeave(map, player);
     SCR_MAP_END;
@@ -1959,7 +1959,7 @@ void ScriptMgr::OnAfterInitializeLockedDungeons(Player* player)
     FOREACH_SCRIPT(GlobalScript)->OnAfterInitializeLockedDungeons(player);
 }
 
-void ScriptMgr::OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated) 
+void ScriptMgr::OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated)
 {
     FOREACH_SCRIPT(GlobalScript)->OnAfterUpdateEncounterState(map, type, creditEntry, source, difficulty_fixed, encounters, dungeonCompleted, updated);
 }
@@ -2019,7 +2019,7 @@ void ScriptMgr::OnBeforeBuyItemFromVendor(Player* player, uint64 vendorguid, uin
     FOREACH_SCRIPT(PlayerScript)->OnBeforeBuyItemFromVendor(player, vendorguid, vendorslot, item, count, bag, slot);
 }
 
-void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32 &item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore) 
+void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32 &item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAfterStoreOrEquipNewItem(player, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore);
 }
