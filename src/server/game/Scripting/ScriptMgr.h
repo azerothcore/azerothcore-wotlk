@@ -961,6 +961,9 @@ class PlayerScript : public ScriptObject
         virtual void OnFirstLogin(Player* /*player*/) { }
 
         virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, uint64 /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
+
+        // Called after the player's pet has been loaded and initialized
+        virtual void OnPetInitStatsForLevel(Pet* /*pet*/) { }
 };
 
 class AccountScript : public ScriptObject
@@ -1412,6 +1415,7 @@ class ScriptMgr
         void OnFirstLogin(Player* player);
         void OnPlayerCompleteQuest(Player* player, Quest const* quest);
         bool CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
+        void OnPetInitStatsForLevel(Pet* pet);
 
     public: /* AccountScript */
 
