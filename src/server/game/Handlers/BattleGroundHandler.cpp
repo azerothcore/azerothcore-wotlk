@@ -158,6 +158,8 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
                  _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3) ||
                  _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5)) // can't be already queued for arenas
             err = ERR_BATTLEGROUND_QUEUED_FOR_RATED;
+        else if (_player->getClass() == CLASS_DEATH_KNIGHT && _player->GetMapId() == 609 && !_player->IsGameMaster() && !_player->HasSpell(50977)) // don't allow starter dk to queue
+            err = ERR_BATTLEGROUND_NONE;
 
         if (err <= 0)
         {

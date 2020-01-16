@@ -1875,6 +1875,10 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         // don't let join to bg queue random if someone from the group is already in bg queue
         if (bgTemplate->GetBgTypeID() == BATTLEGROUND_RB && member->InBattlegroundQueue())
             return ERR_IN_NON_RANDOM_BG;
+
+        // don't let join starter dk when they're not allowed to get teleported
+        if (member->getClass() == CLASS_DEATH_KNIGHT && member->GetMapId() == 609 && !member->IsGameMaster() && !member->HasSpell(50977))
+            return ERR_BATTLEGROUND_JOIN_TIMED_OUT;
     }
 
     // for arenas: check party size is proper
