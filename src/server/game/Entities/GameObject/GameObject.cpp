@@ -1780,10 +1780,12 @@ void GameObject::Use(Unit* user)
                 GameObjectTemplate const* info = GetGOInfo();
                 if (info)
                 {
-                    if (GameObject::gameObjectToEventFlag.find(info->entry) != GameObject::gameObjectToEventFlag.end()) {
+                    if (GameObject::gameObjectToEventFlag.find(info->entry) != GameObject::gameObjectToEventFlag.end())
+                    {
                         GameObject::gameObjectToEventFlag[info->entry](player, this, bg);
                     }
-                    else {
+                    else
+                    {
                         switch (info->entry)
                         {
                             case 179785:                        // Silverwing Flag
