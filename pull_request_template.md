@@ -5,48 +5,47 @@
 
 <!-- WRITE A RELEVANT TITLE -->
 
-##### CHANGES PROPOSED:
+## CHANGES PROPOSED:
 -  
 -  
 
 
-##### ISSUES ADDRESSED:
-- Closes
+## ISSUES ADDRESSED:
+- Closes 
 <!-- If the issue doesn't exist, describe it and how to reproduce it, please. If the issue already exists, just paste the link to the issue you close, like this: Closes https://github.com/azerothcore/azerothcore-wotlk/issues/967 -->
 
-##### TESTS PERFORMED:
+
+## TESTS PERFORMED:
 -
 -
 <!-- Does it build without errors? Did you test in-game? What did you test? Did you do all these tests on Linux, Mac or Windows? Other tests performed -->
 
-##### HOW TO TEST THE CHANGES:
-<!-- We need to confirm the changes first, so try to make the work easy for testers, please:
+
+## HOW TO TEST THE CHANGES:
+<!-- We need to confirm the changes first, so try to make the work easy for testers (who are not necessarily coders), please:
  - Which commands to use? Which NPC to teleport to?
  - Do we need to enable debug flags on Cmake?
  - Do we need to look at the console? etc...
  - Other steps
-
-***** IMPORTANT: *****
-The people who are going to test PRs are not necessarily coders,
-so they might have no idea about what the code changes can affect.
-For this reason the developer should at least explain what aspects 
-of the game can be affected by the changes, especially when doing 
-C++ changes on generic parts of the code. 
 -->
 
-##### KNOWN ISSUES AND TODO LIST:
+
+## KNOWN ISSUES AND TODO LIST:
 <!-- This is a TODO list with checkboxes to tick -->
 - [ ]
 - [ ] 
 
-##### Target branch(es):
+
+## Target branch(es):
 - [x] Master
 
-<!-- NOTE: You no longer need to squash your commits, on merge we will squash them for you (when there are too many commits we merge them into one big commit for a cleaner and easy to read history). -->
+
+<!-- NOTE: You do not need to squash your commits, on merge we will squash them for you (when there are too many commits we merge them into one big commit for a cleaner and easy to read history). -->
 
 <!-- NOTE2: If you intend to contribute more than once, you should really join us on our discord channel!
  The link is on our site http://azerothcore.org/ We set cosmetic ranks for our contributors and may give access to special resources/knowledge to them! -->
- 
+
+
 <!-- Do not remove the instructions below about testing, they will help users to test your PR -->
  
 ## How to test AzerothCore PRs
