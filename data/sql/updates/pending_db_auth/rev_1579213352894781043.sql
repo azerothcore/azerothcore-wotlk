@@ -1,7 +1,7 @@
 INSERT INTO `version_db_auth` (`sql_rev`) VALUES ('1579213352894781043');
 
 -- ADD NEW COLUMN
-ALTER TABLE `account_access` ADD COLUMN `comment` VARCHAR(255) DEFAULT '' AFTER `RealmID`;
+ALTER TABLE `account_access` ADD COLUMN `comment` VARCHAR(255) DEFAULT '';
 
 -- UPDATE ACCOUNTS
 LOCK TABLES `account_access` WRITE;
