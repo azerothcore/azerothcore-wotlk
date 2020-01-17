@@ -4,8 +4,9 @@ INSERT INTO `version_db_auth` (`sql_rev`) VALUES ('1579213352894781043');
 ALTER TABLE `account_access` ADD COLUMN `comment` VARCHAR(255) DEFAULT '';
 
 -- UPDATE ACCOUNTS
-LOCK TABLES `account_access` WRITE;
+LOCK TABLES `account_access` WRITE, `account` WRITE;
 /*!40000 ALTER TABLE `account_access` DISABLE KEYS */;
+/*!40000 ALTER TABLE `account` DISABLE KEYS */;
 
 -- UPDATE ACCOUNTS test1 test2
 UPDATE `account`
@@ -35,9 +36,9 @@ WHERE (`account`.`username` = 'test5' AND `account`.`sha_pass_hash` = 'dddeac4ff
 UPDATE `account`
 INNER JOIN `account_access`
 ON `account`.`id` = `account_access`.`id`
+SET `account_access`.`comment` = 1, `account_access`.`comment` = 'Test account - Minor Game Master'
 WHERE (`account`.`username` = 'test7' AND `account`.`sha_pass_hash` = '6fcd35c35b127be1d9ca040b2b478eb366506ce2') OR
-(`account`.`username` = 'test8' AND `account`.`sha_pass_hash` = '484332ccb02e284e4e0a04573c3fa417f4745fdf')
-SET `account_access`.`comment` = 1, `account_access`.`comment` = 'Test account - Minor Game Master';
+(`account`.`username` = 'test8' AND `account`.`sha_pass_hash` = '484332ccb02e284e4e0a04573c3fa417f4745fdf');
 
 -- UPDATE ACCOUNTS test9 test10
 UPDATE `account`
@@ -47,5 +48,7 @@ SET `account_access`.`comment` = 0, `account_access`.`comment` = 'Test account -
 WHERE (`account`.`username` = 'test9' AND `account`.`sha_pass_hash` = '4fce15ed251721f02754d5381ae9d0137b6a6a30') OR
 (`account`.`username` = 'test10' AND `account`.`sha_pass_hash` = 'b22d249228e84ab493b39a2bd765bee9b7c0b350');
 
+
 /*!40000 ALTER TABLE `account_access` ENABLE KEYS */;
+/*!40000 ALTER TABLE `account` ENABLE KEYS */;
 UNLOCK TABLES;
