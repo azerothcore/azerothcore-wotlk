@@ -26648,6 +26648,8 @@ void Player::_SaveGlyphs(SQLTransaction& trans)
 
         trans->Append(stmt);
     }
+
+    SetNeedToSaveGlyphs(false);
 }
 
 void Player::_LoadTalents(PreparedQueryResult result)
