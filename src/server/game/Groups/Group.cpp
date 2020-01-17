@@ -1878,7 +1878,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
 
         // don't let Death Knights join BG queues when they are not allowed to be teleported yet
         if (member->getClass() == CLASS_DEATH_KNIGHT && member->GetMapId() == 609 && !member->IsGameMaster() && !member->HasSpell(50977))
-            return ERR_BATTLEGROUND_JOIN_TIMED_OUT;
+            return ERR_GROUP_JOIN_BATTLEGROUND_FAIL;
     }
 
     // for arenas: check party size is proper
@@ -2339,4 +2339,3 @@ void Group::ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply)
     else
         slot->flags &= ~flag;
 }
-
