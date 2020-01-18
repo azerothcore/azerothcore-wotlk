@@ -1,39 +1,60 @@
 #!/bin/bash
+
+## TODO:
+# - replace module name directly in the README.md (but must work on windows too) and MAYBE in include.sh and conf/ files, ( sed -i 's/MY_NEW_MODULE/$MODULE_NAME/gI'  README.md )
+# - prompt for user name
+# - prompt for keeping or removing other language README_X.md
+
 ## Just run it with bash or `git bash` on windows, and it will ask for the module's name and tada!
-## By Barbz
 
 ##------------------------------- VARIABLES ---------------------------------##
 
 MODULE_TEMPLATE_URL="https://github.com/azerothcore/skeleton-module/"
+
 GIT_COMMIT_MSG_SETUP="setup_git_commit_template.sh"
 
 ##------------------------------- CODE ---------------------------------##
 
-read -p "Enter the name of your future module: " "MODULE_NAME"
+read -p "--- Enter the name of your future module: " "MODULE_NAME"
 echo $MODULE_NAME | fgrep -q ' '
 
 while [ $? -eq 0 ]
 do
-  echo 'Blanks are not allowed!'
-  read -p "Enter the name of your future module: " MODULE_NAME
+  echo -e "\n--- Blanks are not allowed!"
+  read -p "--- Enter the name of your future module: " MODULE_NAME
   echo $MODULE_NAME | fgrep -q ' '
 done
 
 if test -n "$MODULE_NAME"
 then
-    echo "--- Cloning 'skeleton-module' as $MODULE_NAME/"
-    git clone --depth 1 -b master $MODULE_TEMPLATE_URL $MODULE_NAME
+    echo -e "\n--- Cloning 'skeleton-module' master branch as $MODULE_NAME/"
+    git clone --depth 1 -b master "$MODULE_TEMPLATE_URL" $MODULE_NAME
 
-    echo "--- Removing 'skeleton-module/.git/' history"
+    echo -e "\n--- Removing 'skeleton-module/.git/' history"
     cd $MODULE_NAME && rm -rf .git/
 
-    echo "--- Init new git repository"
-    git init && git add -A && git commit -m "Initial commit - $MODULE_NAME"
+    echo -e "\n--- Removing 'skeleton-module' original README.md and preparing the new README.md"
+    rm README.md README_ES.md
+    mv README_example.md README.md
+    mv README_example_ES.md README_ES.md
 
-    echo "--- Configure git for nice commit messages"
-    source $GIT_COMMIT_MSG_SETUP || bash $GIT_COMMIT_MSG_SETUP
+    echo -e "\n--- Initiating new git repository"
+    git init
+    git add -A
+    ## DO NOT COMMIT FILES THAT REQUIRE MODIFICATION OR ARE NOT NEEDED
+    git reset README* sql/README* include.sh
+    git commit -m "init: Initial commit - $MODULE_NAME"
 
-    echo "--- Ready to code"
+    echo -e "\n--- Configuring git for nice commit messages"
+    source "$GIT_COMMIT_MSG_SETUP" || bash "$GIT_COMMIT_MSG_SETUP"
+
+    echo -e "\n--- Recap"
+    git log
+    echo ""
+    ls -la
+
+    echo -e "\n--- You can remove the file \"sql/README.md\" if you have read it."
+    echo -e "\n--- Ready to code!"
 fi
 
 
