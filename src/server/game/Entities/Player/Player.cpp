@@ -9437,10 +9437,12 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
         data << uint32(0x9bb) << uint32(0xF);               // 9
     }
 
-    if (Player::bgZoneIdToFillWorldStates.find(zoneid) != Player::bgZoneIdToFillWorldStates.end()) {
+    if (Player::bgZoneIdToFillWorldStates.find(zoneid) != Player::bgZoneIdToFillWorldStates.end())
+    {
         Player::bgZoneIdToFillWorldStates[zoneid](bg, data);
     }
-    else {
+    else
+    {
         // insert <field> <value>
         switch (zoneid)
         {
