@@ -18,6 +18,7 @@
 #include "DynamicObject.h"
 #include "ArenaTeam.h"
 #include "GameEventMgr.h"
+#include "PetDefines.h"
 #include <atomic>
 
 class AuctionHouseObject;
@@ -964,6 +965,10 @@ class PlayerScript : public ScriptObject
 
         // Called after the player's pet has been loaded and initialized
         virtual void OnPetInitStatsForLevel(Pet* /*pet*/) { }
+
+        virtual bool CustomPetAllowedForDeathKnight(Player* /*player*/) { return false; }
+
+        virtual uint8 OverridePetType(Player* /*player*/, CreatureTemplate const* /*cinfo*/) { return MAX_PET_TYPE; }
 };
 
 class AccountScript : public ScriptObject
@@ -1416,6 +1421,8 @@ class ScriptMgr
         void OnPlayerCompleteQuest(Player* player, Quest const* quest);
         bool CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
         void OnPetInitStatsForLevel(Pet* pet);
+        bool CustomPetAllowedForDeathKnight(Player* /*player*/);
+        uint8 OverridePetType(Player* /*player*/, CreatureTemplate const* /*cinfo*/);
 
     public: /* AccountScript */
 

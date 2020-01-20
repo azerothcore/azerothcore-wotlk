@@ -154,7 +154,12 @@ bool Pet::LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry, ui
 
     // DK Pet exception
     if (owner->getClass() == CLASS_DEATH_KNIGHT && !owner->CanSeeDKPet())
-        return false;
+    {
+        if (!sScriptMgr->CustomPetAllowedForDeathKnight(owner))
+        {
+            return false;
+        }
+    }
 
     uint32 ownerid = owner->GetGUIDLow();
     PreparedStatement* stmt;
@@ -732,7 +737,19 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             petType = HUNTER_PET;
             m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
         }
-        else
+
+        switch (sScriptMgr->OverridePetType(m_owner->ToPlayer(), cinfo))
+        {
+            case SUMMON_PET:
+                petType = SUMMON_PET;
+                break;
+            case HUNTER_PET:
+                petType = HUNTER_PET;
+                m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
+                break;
+        }
+
+        if (petType != SUMMON_PET && petType != HUNTER_PET)
             sLog->outError("Unknown type pet %u is summoned by player class %u", GetEntry(), m_owner->getClass());
     }
 
