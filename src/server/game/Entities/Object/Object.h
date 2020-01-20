@@ -747,7 +747,8 @@ class WorldObject : public Object, public WorldLocation
 #endif
 
         void GetNearPoint2D(float &x, float &y, float distance, float absAngle) const;
-        void GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_size, float distance2d, float absAngle) const;
+        void GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_size, float distance2d, float absAngle, float controlZ = 0) const;
+        void GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float relAngle = 0, float controlZ = 0) const;
         bool GetClosePoint(float &x, float &y, float &z, float size, float distance2d = 0, float angle = 0, const WorldObject* forWho = NULL, bool force = false) const;
         void MovePosition(Position &pos, float dist, float angle);
         void GetNearPosition(Position &pos, float dist, float angle)
@@ -780,6 +781,8 @@ class WorldObject : public Object, public WorldLocation
         {
             return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? m_floatValues[UNIT_FIELD_COMBATREACH] : DEFAULT_WORLD_OBJECT_SIZE;
         }
+
+        virtual float GetCombatReach() const { return 0.0f; } // overridden (only) in Unit
         void UpdateGroundPositionZ(float x, float y, float &z) const;
         void UpdateAllowedPositionZ(float x, float y, float &z) const;
 
