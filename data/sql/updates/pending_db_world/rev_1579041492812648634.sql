@@ -7,6 +7,9 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 6499;
 DELETE FROM `creature` WHERE `guid` = 23744;
 DELETE FROM `creature_addon` WHERE `guid` = 23744;
 
+-- All Devilsaurs: Set large in order to increase their visibility distance
+UPDATE `creature_addon` SET `isLarge` = 1 WHERE `guid` IN (23741,23743,23745,24437);
+
 -- All Devilsaurs: Set active in order to enable them walking around on their own
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 6499 AND `source_type` = 0;
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (6498,6500) AND `source_type` = 0 AND `id` = 1;
