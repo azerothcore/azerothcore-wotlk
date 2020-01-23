@@ -1757,28 +1757,24 @@ void ScriptMgr::OnPetInitStatsForLevel(Pet* pet)
 
 bool ScriptMgr::CustomPetAllowedForDeathKnight(Player* player)
 {
-    bool ret = false;
-
-    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return false as default
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, false) // return false as default
         if (itr->second->CustomPetAllowedForDeathKnight(player))
-            ret = true; // change ret value only if at least one script returns true
+            return true; // change ret value only if at least one script returns true
 
-    return ret;
+    return false;
 }
 
 uint8 ScriptMgr::OverridePetType(Player* player, CreatureTemplate const* cinfo)
 {
-    uint8 ret = MAX_PET_TYPE;
-
-    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return MAX_PET_TYPE as default
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, MAX_PET_TYPE) // return MAX_PET_TYPE as default
     {
         uint8 petType = itr->second->OverridePetType(player, cinfo);
 
         if (petType != MAX_PET_TYPE)
-            ret = petType;
+            return petType;
     }
 
-    return ret;
+    return MAX_PET_TYPE;
 }
 
 // Account
