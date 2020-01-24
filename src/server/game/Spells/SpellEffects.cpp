@@ -3141,8 +3141,9 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
 
     uint32 petentry = m_spellInfo->Effects[effIndex].MiscValue;
     int32 duration = m_spellInfo->GetDuration();
-    if(Player* modOwner = m_originalCaster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+    if (m_originalCaster)
+        if(Player* modOwner = m_originalCaster->GetSpellModOwner())
+            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
     if (!owner)
     {
@@ -4644,21 +4645,20 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
         default: return;
     }
 
-    uint64 guid = m_caster->m_ObjectSlot[slot];
-    if (guid != 0)
+    if (m_caster)
     {
-        GameObject* gameObject = NULL;
-        if (m_caster)
-            gameObject = m_caster->GetMap()->GetGameObject(guid);
-
-        if (gameObject)
+        uint64 guid = m_caster->m_ObjectSlot[slot];
+        if (guid != 0)
         {
-            // Recast case - null spell id to make auras not be removed on object remove from world
-            if (m_spellInfo->Id == gameObject->GetSpellId())
-                gameObject->SetSpellId(0);
-            m_caster->RemoveGameObject(gameObject, true);
+            if (GameObject* gameObject = m_caster->GetMap()->GetGameObject(guid))
+            {
+                // Recast case - null spell id to make auras not be removed on object remove from world
+                if (m_spellInfo->Id == gameObject->GetSpellId())
+                    gameObject->SetSpellId(0);
+                m_caster->RemoveGameObject(gameObject, true);
+            }
+            m_caster->m_ObjectSlot[slot] = 0;
         }
-        m_caster->m_ObjectSlot[slot] = 0;
     }
 
     GameObject* pGameObj = sObjectMgr->IsGameObjectStaticTransport(gameobjectId) ? new StaticTransport() : new GameObject();
