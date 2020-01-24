@@ -432,9 +432,14 @@ void World::LoadModuleConfigSettings()
         if (!sConfigMgr->LoadMore(cfg_def_file.c_str()))
         {
             sLog->outString();
-            sLog->outError("Module config: Invalid or missing configuration dist file : %s", cfg_def_file.c_str());
-            sLog->outError("Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
-            sLog->outError("Module config: Use default settings!");
+            sLog->outError("Module config: Invalid or missing configuration (*.conf.dist) file : %s", cfg_def_file.c_str());
+            sLog->outError("Module config: Verify that this file exists and has \'[worldserver]' written at the top of the file!");
+
+            // If .conf exists, it will load it so it will NOT use the default hardcoded settings
+            if (!sConfigMgr->LoadMore(cfg_file.c_str()))
+            {
+                sLog->outError("Module config: Using default hardcoded settings.");
+            }
             sLog->outString();
         }
 
@@ -442,9 +447,7 @@ void World::LoadModuleConfigSettings()
         if (!sConfigMgr->LoadMore(cfg_file.c_str()))
         {
             sLog->outString();
-            sLog->outError("Module config: Invalid or missing configuration file : %s", cfg_file.c_str());
-            sLog->outError("Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
-            sLog->outError("Module config: Use default settings!");
+            sLog->outString("Module config: %s not found (or invalid), using default settings from %s", cfg_file.c_str(), cfg_def_file.c_str());
             sLog->outString();
         }
     }
