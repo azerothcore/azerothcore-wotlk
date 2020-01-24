@@ -402,7 +402,7 @@ class spell_leotheras_insidious_whisper : public SpellScriptLoader
             void FilterTargets(std::list<WorldObject*>& unitList)
             {
                 if (Unit* victim = GetCaster()->GetVictim())
-                    unitList.remove_if(Trinity::ObjectGUIDCheck(victim->GetGUID(), true));
+                    unitList.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
             }
 
             void Register()

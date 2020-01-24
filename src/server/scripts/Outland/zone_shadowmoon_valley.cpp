@@ -348,7 +348,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->InitDefault();
         }
 
         void UpdateAI(uint32 diff) override
@@ -751,7 +751,7 @@ public:
             uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30658, 1, NULL);
             if (msg == EQUIP_ERR_OK)
             {
-                player->StoreNewItem(dest, 30658, 1, true);
+                player->StoreNewItem(dest, 30658, true);
                 ClearGossipMenuFor(player);
             }
         }
@@ -761,7 +761,7 @@ public:
             uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30659, 1, NULL);
             if (msg == EQUIP_ERR_OK)
             {
-                player->StoreNewItem(dest, 30659, 1, true);
+                player->StoreNewItem(dest, 30659, true);
                 ClearGossipMenuFor(player);
             }
         }

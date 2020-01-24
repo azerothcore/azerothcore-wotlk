@@ -685,89 +685,6 @@ public:
 
 
 // Theirs
-/////////////////////
-///npc_injured_goblin
-/////////////////////
-
-enum InjuredGoblinMiner
-{
-    QUEST_BITTER_DEPARTURE     = 12832,
-    SAY_QUEST_ACCEPT           = 0,
-    SAY_END_WP_REACHED         = 1,
-    GOSSIP_ID                  = 9859,
-    GOSSIP_OPTION_ID           = 0
-};
-
-class npc_injured_goblin : public CreatureScript
-{
-public:
-    npc_injured_goblin() : CreatureScript("npc_injured_goblin") { }
-
-    struct npc_injured_goblinAI : public npc_escortAI
-    {
-        npc_injured_goblinAI(Creature* creature) : npc_escortAI(creature) { }
-
-        void WaypointReached(uint32 waypointId)
-        {
-            Player* player = GetPlayerForEscort();
-            if (!player)
-                return;
-
-            switch (waypointId)
-            {
-                case 26:
-                    Talk(SAY_END_WP_REACHED, player);
-                    break;
-                case 27:
-                    player->GroupEventHappens(QUEST_BITTER_DEPARTURE, me);
-                    break;
-            }
-        }
-
-        void EnterCombat(Unit* /*who*/) { }
-
-        void Reset() { }
-
-        void JustDied(Unit* /*killer*/)
-        {
-            Player* player = GetPlayerForEscort();
-            if (HasEscortState(STATE_ESCORT_ESCORTING) && player)
-                player->FailQuest(QUEST_BITTER_DEPARTURE);
-        }
-
-       void UpdateAI(uint32 uiDiff)
-        {
-            npc_escortAI::UpdateAI(uiDiff);
-            if (!UpdateVictim())
-                return;
-            DoMeleeAttackIfReady();
-        }
-
-        void sGossipSelect(Player* player, uint32 sender, uint32 action)
-        {
-            if (sender == GOSSIP_ID && action == GOSSIP_OPTION_ID)
-            {
-                CloseGossipMenuFor(player);
-                me->setFaction(113);
-                npc_escortAI::Start(true, true, player->GetGUID());
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_injured_goblinAI(creature);
-    }
-
-    bool OnQuestAccept(Player* /*player*/, Creature* creature, Quest const* quest)
-    {
-        if (quest->GetQuestId() == QUEST_BITTER_DEPARTURE)
-            creature->AI()->Talk(SAY_QUEST_ACCEPT);
-
-        return false;
-    }
-};
-
 /*######
 ## npc_roxi_ramrocket
 ######*/
@@ -1132,7 +1049,6 @@ void AddSC_storm_peaks()
     new spell_q13007_iron_colossus();
 
     // Theirs
-    new npc_injured_goblin();
     new npc_roxi_ramrocket();
     new npc_brunnhildar_prisoner();
     new npc_freed_protodrake();

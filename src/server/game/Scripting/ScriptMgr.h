@@ -8,9 +8,6 @@
 #define SC_SCRIPTMGR_H
 
 #include "Common.h"
-#include <ace/Singleton.h>
-#include <atomic>
-
 #include "ObjectMgr.h"
 #include "DBCStores.h"
 #include "QuestDef.h"
@@ -21,11 +18,13 @@
 #include "DynamicObject.h"
 #include "ArenaTeam.h"
 #include "GameEventMgr.h"
+#include <atomic>
 
 class AuctionHouseObject;
 class AuraScript;
 class Battleground;
 class BattlegroundMap;
+class BattlegroundQueue;
 class Channel;
 class ChatCommand;
 class Creature;
@@ -62,9 +61,9 @@ struct ConditionSourceInfo;
 struct Condition;
 struct ItemTemplate;
 struct OutdoorPvPData;
+struct GroupQueueInfo;
 
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
-
 
 /*
     TODO: Add more script type classes.
@@ -836,6 +835,8 @@ class PlayerScript : public ScriptObject
         // The following methods are called when a player sends a chat message.
         virtual void OnChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/) { }
 
+        virtual void OnBeforeSendChatMessage(Player* /*player*/, uint32& /*type*/, uint32& /*lang*/, std::string& /*msg*/) { }
+
         virtual void OnChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/, Player* /*receiver*/) { }
 
         virtual void OnChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/, Group* /*group*/) { }
@@ -958,6 +959,11 @@ class PlayerScript : public ScriptObject
         virtual void OnBeforeInitTalentForLevel(Player* /*player*/, uint8& /*level*/, uint32& /*talentPointsForLevel*/) { }
 
         virtual void OnFirstLogin(Player* /*player*/) { }
+
+        virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, uint64 /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
+
+        // Called after the player's pet has been loaded and initialized
+        virtual void OnPetInitStatsForLevel(Pet* /*pet*/) { }
 };
 
 class AccountScript : public ScriptObject
@@ -1116,6 +1122,17 @@ public:
 
     // Remove player at leave BG
     virtual void OnBattlegroundRemovePlayerAtLeave(Battleground* /*bg*/, Player* /*player*/) { }
+
+    virtual void OnAddGroup(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/, uint32& /*index*/, Player* /*leader*/, Group* /*grp*/, PvPDifficultyEntry const* /*bracketEntry*/, bool /*isPremade*/) { }
+
+    virtual bool CanFillPlayersToBG(BattlegroundQueue* /*queue*/, Battleground* /*bg*/, const int32 /*aliFree*/, const int32 /*hordeFree*/, BattlegroundBracketId /*bracket_id*/) { return true; }
+
+    virtual bool CanFillPlayersToBGWithSpecific(BattlegroundQueue* /*queue*/, Battleground* /*bg*/, const int32 /*aliFree*/, const int32 /*hordeFree*/,
+        BattlegroundBracketId /*thisBracketId*/, BattlegroundQueue* /*specificQueue*/, BattlegroundBracketId /*specificBracketId*/) { return true; }
+
+    virtual void OnCheckNormalMatch(BattlegroundQueue* /*queue*/, uint32& /*Coef*/, Battleground* /*bgTemplate*/, BattlegroundBracketId /*bracket_id*/, uint32& /*minPlayers*/, uint32& /*maxPlayers*/) { }
+
+    virtual bool CanSendMessageQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, Battleground* /*bg*/, PvPDifficultyEntry const* /*bracketEntry*/) { return true; }
 };
 
 class SpellSC : public ScriptObject
@@ -1155,13 +1172,9 @@ public:
     virtual void OnStop(uint16 /*EventID*/) { }
 };
 
-// Placed here due to ScriptRegistry::AddScript dependency.
-#define sScriptMgr ACE_Singleton<ScriptMgr, ACE_Null_Mutex>::instance()
-
 // Manages registration, loading, and execution of scripts.
 class ScriptMgr
 {
-    friend class ACE_Singleton<ScriptMgr, ACE_Null_Mutex>;
     friend class ScriptObject;
 
     private:
@@ -1171,6 +1184,7 @@ class ScriptMgr
 
     public: /* Initialization */
 
+        static ScriptMgr* instance();
         void Initialize();
         void LoadDatabase();
         void FillSpellSummary();
@@ -1335,7 +1349,6 @@ class ScriptMgr
 
     public: /* PlayerScript */
 
-
         void OnBeforePlayerUpdate(Player* player, uint32 p_time);
         void OnPlayerReleasedGhost(Player* player);
         void OnPVPKill(Player* killer, Player* killed);
@@ -1355,6 +1368,7 @@ class ScriptMgr
         void OnPlayerDuelStart(Player* player1, Player* player2);
         void OnPlayerDuelEnd(Player* winner, Player* loser, DuelCompleteType type);
         void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg);
+        void OnBeforeSendChatMessage(Player* player, uint32& type, uint32& lang, std::string& msg);
         void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver);
         void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Group* group);
         void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild);
@@ -1400,6 +1414,8 @@ class ScriptMgr
         void OnBeforeInitTalentForLevel(Player* player, uint8& level, uint32& talentPointsForLevel);
         void OnFirstLogin(Player* player);
         void OnPlayerCompleteQuest(Player* player, Quest const* quest);
+        bool CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
+        void OnPetInitStatsForLevel(Pet* pet);
 
     public: /* AccountScript */
 
@@ -1488,8 +1504,14 @@ class ScriptMgr
         void OnBattlegroundAddPlayer(Battleground* bg, Player* player);
         void OnBattlegroundBeforeAddPlayer(Battleground* bg, Player* player);
         void OnBattlegroundRemovePlayerAtLeave(Battleground* bg, Player* player);
+        void OnAddGroup(BattlegroundQueue* queue, GroupQueueInfo* ginfo, uint32& index, Player* leader, Group* grp, PvPDifficultyEntry const* bracketEntry, bool isPremade);
+        bool CanFillPlayersToBG(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId bracket_id);
+        bool CanFillPlayersToBGWithSpecific(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree,
+            BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId);
+        void OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32& minPlayers, uint32& maxPlayers);
+        bool CanSendMessageQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
 
-    public: /* SpellSC */ 
+    public: /* SpellSC */
  
         void OnCalcMaxDuration(Aura const* aura, int32& maxDuration);
 
@@ -1505,6 +1527,8 @@ class ScriptMgr
         //atomic op counter for active scripts amount
         std::atomic<long> _scheduledScripts;
 };
+
+#define sScriptMgr ScriptMgr::instance()
 
 template<class TScript>
 class ScriptRegistry
@@ -1585,7 +1609,7 @@ class ScriptRegistry
                             sLog->outError("Script '%s' already assigned with the same script name, so the script can't work.",
                                 script->GetName().c_str());
 
-                            ASSERT(false); // Error that should be fixed ASAP.
+                            ABORT(); // Error that should be fixed ASAP.
                         }
                     }
                     else

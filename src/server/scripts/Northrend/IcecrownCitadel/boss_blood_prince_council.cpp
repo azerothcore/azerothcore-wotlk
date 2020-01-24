@@ -798,7 +798,7 @@ class boss_prince_valanar_icc : public CreatureScript
                 DoAction(ACTION_CAST_INVOCATION);
                 currentInvocationIndex = 0;
                 invocationOrder[0] = DATA_PRINCE_VALANAR_GUID;
-                invocationOrder[1] = RAND<uint32>(DATA_PRINCE_KELESETH_GUID, DATA_PRINCE_TALDARAM_GUID);
+                invocationOrder[1] = RAND(DATA_PRINCE_KELESETH_GUID, DATA_PRINCE_TALDARAM_GUID);
                 invocationOrder[2] = DATA_PRINCE_KELESETH_GUID + DATA_PRINCE_TALDARAM_GUID - invocationOrder[1];
 
                 events.ScheduleEvent(EVENT_BERSERK, 600000);

@@ -166,10 +166,10 @@ const Position PosPlatform         = {2640.5f, -3360.6f, 285.26f, 0.0f};
 #define IN_LIVE_SIDE(who) (who->GetPositionY() < POS_Y_GATE)
 
 // Predicate function to check that the r   efzr unit is NOT on the same side as the source.
-struct NotOnSameSide : public std::unary_function<Unit *, bool>
+struct NotOnSameSide : public acore::unary_function<Unit *, bool>
 {
     bool m_inLiveSide;
-    NotOnSameSide(Unit *pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) {}
+    explicit NotOnSameSide(Unit *pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) {}
     
     bool operator() (const Unit *pTarget)
     {
@@ -189,7 +189,7 @@ public:
 
     struct boss_gothikAI : public BossAI
     {
-        boss_gothikAI(Creature *c) : BossAI(c, BOSS_GOTHIK), summons(me)
+        explicit boss_gothikAI(Creature *c) : BossAI(c, BOSS_GOTHIK), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -197,9 +197,9 @@ public:
         EventMap events;
         SummonList summons;
         InstanceScript* pInstance;
-        bool secondPhase;
-        bool gateOpened;
-        uint8 waveCount;
+        bool secondPhase{};
+        bool gateOpened{};
+        uint8 waveCount{};
 
         bool IsInRoom()
         {
@@ -324,9 +324,9 @@ public:
             {
                 bool checklife = false;
                 bool checkdead = false;
-                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                for (const auto & i : PlayerList)
                 {
-                    Player* player = i->GetSource();
+                    Player* player = i.GetSource();
                     if (player->IsAlive() &&
                         player->GetPositionX() <= POS_X_NORTH &&
                         player->GetPositionX() >= POS_X_SOUTH &&
@@ -492,7 +492,7 @@ public:
 
     struct npc_boss_gothik_minionAI : public CombatAI
     {
-        npc_boss_gothik_minionAI(Creature *c) : CombatAI(c)
+        explicit npc_boss_gothik_minionAI(Creature *c) : CombatAI(c)
         {
             livingSide = IN_LIVE_SIDE(me);
             gateOpened = false;
@@ -673,7 +673,7 @@ class spell_gothik_shadow_bolt_volley : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::UnitAuraCheck(false, SPELL_SHADOW_MARK));
+                targets.remove_if(acore::UnitAuraCheck(false, SPELL_SHADOW_MARK));
             }
 
             void Register() override

@@ -587,6 +587,12 @@ public:
             ResetEvent();
             if(pInstance)
             {
+                if (Creature *brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                {
+                    brann->setDeathState(JUST_DIED);
+                    brann->Respawn();
+                    brann->AI()->DoAction(5);
+                }
                 if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) != DONE)
                     pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, NOT_STARTED);
             }

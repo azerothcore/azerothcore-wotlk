@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_SMARTSCRIPTMGR_H
-#define TRINITY_SMARTSCRIPTMGR_H
+#ifndef ACORE_SMARTSCRIPTMGR_H
+#define ACORE_SMARTSCRIPTMGR_H
 
 #include "Common.h"
 #include "Creature.h"
@@ -466,7 +466,7 @@ enum SMART_ACTION
     SMART_ACTION_CALL_KILLEDMONSTER                 = 33,     // CreatureId,
     SMART_ACTION_SET_INST_DATA                      = 34,     // Field, Data
     SMART_ACTION_SET_INST_DATA64                    = 35,     // Field,
-    SMART_ACTION_UPDATE_TEMPLATE                    = 36,     // Entry, Team, doNotChangeLevel
+    SMART_ACTION_UPDATE_TEMPLATE                    = 36,     // Entry, UpdateLevel
     SMART_ACTION_DIE                                = 37,     // No Params
     SMART_ACTION_SET_IN_COMBAT_WITH_ZONE            = 38,     // No Params
     SMART_ACTION_CALL_FOR_HELP                      = 39,     // Radius, With Emote
@@ -810,8 +810,7 @@ struct SmartAction
         struct
         {
             uint32 creature;
-            uint32 team;
-            uint32 doNotChangeLevel;
+            uint32 updateLevel;
         } updateTemplate;
 
         struct
@@ -1570,6 +1569,7 @@ typedef std::unordered_map<uint32, WayPoint*> WPPath;
 
 typedef std::list<WorldObject*> ObjectList;
 typedef std::list<uint64> GuidList;
+
 class ObjectGuidList
 {
     ObjectList* m_objectList;
@@ -1620,14 +1620,16 @@ public:
         delete m_guidList;
     }
 };
+
 typedef std::unordered_map<uint32, ObjectGuidList*> ObjectListMap;
 
 class SmartWaypointMgr
 {
-    friend class ACE_Singleton<SmartWaypointMgr, ACE_Null_Mutex>;
     SmartWaypointMgr() {}
     public:
         ~SmartWaypointMgr();
+
+        static SmartWaypointMgr* instance();
 
         void LoadFromDB();
 
@@ -1651,10 +1653,11 @@ typedef std::unordered_map<int32, SmartAIEventList> SmartAIEventMap;
 
 class SmartAIMgr
 {
-    friend class ACE_Singleton<SmartAIMgr, ACE_Null_Mutex>;
     SmartAIMgr(){};
     public:
         ~SmartAIMgr(){};
+
+        static SmartAIMgr* instance();
 
         void LoadSmartAIFromDB();
 
@@ -1813,6 +1816,7 @@ class SmartAIMgr
         //bool IsTextValid(SmartScriptHolder const& e, uint32 id);
 };
 
-#define sSmartScriptMgr ACE_Singleton<SmartAIMgr, ACE_Null_Mutex>::instance()
-#define sSmartWaypointMgr ACE_Singleton<SmartWaypointMgr, ACE_Null_Mutex>::instance()
+#define sSmartScriptMgr SmartAIMgr::instance()
+#define sSmartWaypointMgr SmartWaypointMgr::instance()
+
 #endif

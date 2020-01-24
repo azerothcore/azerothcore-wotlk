@@ -53,7 +53,7 @@ public:
 
     struct boss_grobbulusAI : public BossAI
     {
-        boss_grobbulusAI(Creature *c) : BossAI(c, BOSS_GROBBULUS), summons(me)
+        explicit boss_grobbulusAI(Creature *c) : BossAI(c, BOSS_GROBBULUS), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -61,7 +61,7 @@ public:
         EventMap events;
         SummonList summons;
         InstanceScript* pInstance;
-        uint32 dropSludgeTimer;
+        uint32 dropSludgeTimer{};
 
         void Reset() override
         {
@@ -180,12 +180,10 @@ public:
 
     struct boss_grobbulus_poison_cloudAI : public NullCreatureAI
     {
-        boss_grobbulus_poison_cloudAI(Creature* pCreature) : NullCreatureAI(pCreature)
-        {
-        }
+        explicit boss_grobbulus_poison_cloudAI(Creature* pCreature) : NullCreatureAI(pCreature) { }
 
-        uint32 sizeTimer;
-        uint32 auraVisualTimer;
+        uint32 sizeTimer{};
+        uint32 auraVisualTimer{};
 
         void Reset() override
         {
@@ -234,13 +232,13 @@ class spell_grobbulus_poison : public SpellScriptLoader
             void FilterTargets(std::list<WorldObject*>& targets)
             {
                 std::list<WorldObject*> tmplist;
-                for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                    if (GetCaster()->IsWithinDist3d((*itr), 0.0f))
-                        tmplist.push_back(*itr);
+                for (auto & target : targets)
+                    if (GetCaster()->IsWithinDist3d(target, 0.0f))
+                        tmplist.push_back(target);
 
                  targets.clear();
-                 for( std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr )
-                     targets.push_back(*itr);
+                 for (auto & itr : tmplist)
+                     targets.push_back(itr);
             }
 
             void Register() override

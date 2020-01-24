@@ -13,7 +13,6 @@
 
 #include "Common.h"
 #include "Timer.h"
-#include <ace/Singleton.h>
 #include <ace/Atomic_Op.h>
 #include "SharedDefines.h"
 #include "QueryResult.h"
@@ -91,7 +90,6 @@ enum WorldBoolConfigs
     CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND,
     CONFIG_ALLOW_TWO_SIDE_TRADE,
     CONFIG_ALL_TAXI_PATHS,
-    CONFIG_INSTANT_TAXI,
     CONFIG_INSTANCE_IGNORE_LEVEL,
     CONFIG_INSTANCE_IGNORE_RAID,
     CONFIG_INSTANCE_GMSUMMON_PLAYER,
@@ -170,6 +168,10 @@ enum WorldBoolConfigs
     CONFIG_CHECK_GOBJECT_LOS,
     CONFIG_CLOSE_IDLE_CONNECTIONS,
     CONFIG_LFG_LOCATION_ALL, // Player can join LFG anywhere
+    CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS,
+    CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE,
+    CONFIG_ITEMDELETE_METHOD,
+    CONFIG_ITEMDELETE_VENDOR,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -270,7 +272,7 @@ enum WorldIntConfigs
     CONFIG_CHAT_CHANNEL_LEVEL_REQ,
     CONFIG_CHAT_WHISPER_LEVEL_REQ,
     CONFIG_CHAT_SAY_LEVEL_REQ,
-	CONFIG_PARTY_LEVEL_REQ,
+    CONFIG_PARTY_LEVEL_REQ,
     CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN,
     CONFIG_TRADE_LEVEL_REQ,
     CONFIG_TICKET_LEVEL_REQ,
@@ -286,6 +288,7 @@ enum WorldIntConfigs
     CONFIG_DISABLE_BREATHING,
     CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER,
     CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH,
+    CONFIG_BATTLEGROUND_INVITATION_TYPE,
     CONFIG_ARENA_MAX_RATING_DIFFERENCE,
     CONFIG_ARENA_RATING_DISCARD_TIMER,
     CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,
@@ -338,6 +341,12 @@ enum WorldIntConfigs
     CONFIG_WARDEN_NUM_OTHER_CHECKS,
     CONFIG_BIRTHDAY_TIME,
     CONFIG_SOCKET_TIMEOUTTIME_ACTIVE,
+    CONFIG_INSTANT_TAXI,
+    CONFIG_AFK_PREVENT_LOGOUT,
+    CONFIG_ICC_BUFF_HORDE,
+    CONFIG_ICC_BUFF_ALLIANCE,
+    CONFIG_ITEMDELETE_QUALITY,
+    CONFIG_ITEMDELETE_ITEM_LEVEL,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -553,10 +562,12 @@ struct PetitionData
 class World
 {
     public:
-        static uint32 m_worldLoopCounter;
-
         World();
         ~World();
+
+        static World* instance();
+
+        static uint32 m_worldLoopCounter;
 
         WorldSession* FindSession(uint32 id) const;
         WorldSession* FindOfflineSession(uint32 id) const;
@@ -887,7 +898,7 @@ class World
 
         std::string m_configFileList;
 };
-
-#define sWorld ACE_Singleton<World, ACE_Null_Mutex>::instance()
+ 
+#define sWorld World::instance()
 #endif
 /// @}

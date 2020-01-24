@@ -54,7 +54,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         Map* map = creature->GetMap();
         float x = _destinationPoints[newPoint].x, y = _destinationPoints[newPoint].y, z = _destinationPoints[newPoint].z;
         // invalid coordinates
-        if (!Trinity::IsValidMapCoord(x, y))
+        if (!acore::IsValidMapCoord(x, y))
         {
             _validPointsVector[_currentPoint].erase(randomIter);
             _preComputedPaths.erase(pathIdx);
@@ -62,7 +62,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         }
 
         float ground = INVALID_HEIGHT;
-        float levelZ = map->GetWaterOrGroundLevel(x, y, z+4.0f, &ground);
+        float levelZ = map->GetWaterOrGroundLevel(creature->GetPhaseMask(), x, y, z+4.0f, &ground);
         float newZ = INVALID_HEIGHT;
 
         // flying creature

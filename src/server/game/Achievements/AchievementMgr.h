@@ -3,15 +3,14 @@
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
-#ifndef __TRINITY_ACHIEVEMENTMGR_H
-#define __TRINITY_ACHIEVEMENTMGR_H
+#ifndef __ACORE_ACHIEVEMENTMGR_H
+#define __ACORE_ACHIEVEMENTMGR_H
 
 #include <map>
 #include <string>
 #include <chrono>
 
 #include "Common.h"
-#include <ace/Singleton.h>
 #include "DatabaseEnv.h"
 #include "DBCEnums.h"
 #include "DBCStores.h"
@@ -295,11 +294,12 @@ class AchievementMgr
 
 class AchievementGlobalMgr
 {
-        friend class ACE_Singleton<AchievementGlobalMgr, ACE_Null_Mutex>;
         AchievementGlobalMgr() {}
         ~AchievementGlobalMgr() {}
 
     public:
+        static AchievementGlobalMgr* instance();
+
         bool IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const;
         bool isStatisticAchievement(AchievementEntry const* achievement) const;
         
@@ -388,6 +388,6 @@ class AchievementGlobalMgr
         std::map<uint32, AchievementCriteriaEntryList> m_AchievementCriteriasByCondition[ACHIEVEMENT_CRITERIA_CONDITION_TOTAL];
 };
 
-#define sAchievementMgr ACE_Singleton<AchievementGlobalMgr, ACE_Null_Mutex>::instance()
+#define sAchievementMgr AchievementGlobalMgr::instance()
 
 #endif

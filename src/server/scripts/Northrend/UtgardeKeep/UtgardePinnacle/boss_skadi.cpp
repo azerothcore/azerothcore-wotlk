@@ -17,8 +17,7 @@ enum Misc
     SAY_KILL                            = 1,
     EMOTE_RANGE                         = 2,
     SAY_DEATH                           = 3,
-    SAY_DRAKE_DEATH                     = 4,
-    EMOTE_BREATH                        = 5,
+    SAY_DRAKE_DEATH                     = 5,
     SAY_DRAKE_BREATH                    = 6,
 
     // SPELLS
@@ -297,7 +296,9 @@ public:
             }
             else if (param == ACTION_REMOVE_SKADI)
             {
-                Talk(SAY_DRAKE_DEATH);
+                if (Unit *passenger = me->GetVehicleKit()->GetPassenger(0))
+                    if (Creature *skadi = passenger->ToCreature())
+                        skadi->AI()->Talk(SAY_DRAKE_DEATH);
                 me->GetMotionMaster()->MovePoint(10, 480.0f, -513.0f, 108.0f);
                 events.ScheduleEvent(EVENT_GRAUF_REMOVE_SKADI, 2000);
             }

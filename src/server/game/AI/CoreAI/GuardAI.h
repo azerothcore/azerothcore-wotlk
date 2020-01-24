@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_GUARDAI_H
-#define TRINITY_GUARDAI_H
+#ifndef ACORE_GUARDAI_H
+#define ACORE_GUARDAI_H
 
 #include "ScriptedCreature.h"
 
