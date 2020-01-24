@@ -152,7 +152,6 @@ enum Texts
     EMOTE_SURGE_OF_POWER_WARNING_P3,
     EMOTE_BERSERK,
 
-
     EMOTE_POWER_SPARK     = 0,
 
     SAY_ALEXSTRASZA_ONE   = 0,
@@ -1371,8 +1370,8 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void AttackStart(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void AttackStart(Unit*  /*who*/) override {}
     };
 };
 
