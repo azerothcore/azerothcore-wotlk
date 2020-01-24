@@ -154,12 +154,8 @@ bool Pet::LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry, ui
 
     // DK Pet exception
     if (owner->getClass() == CLASS_DEATH_KNIGHT && !owner->CanSeeDKPet())
-    {
         if (!sScriptMgr->CustomPetAllowedForDeathKnight(owner))
-        {
             return false;
-        }
-    }
 
     uint32 ownerid = owner->GetGUIDLow();
     PreparedStatement* stmt;
