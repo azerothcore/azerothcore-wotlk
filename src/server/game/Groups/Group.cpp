@@ -379,7 +379,7 @@ bool Group::AddMember(Player* player)
 
     SubGroupCounterIncrease(subGroup);
 
-    //if (player)
+    if (player)
     {
         player->SetGroupInvite(NULL);
         if (player->GetGroup())

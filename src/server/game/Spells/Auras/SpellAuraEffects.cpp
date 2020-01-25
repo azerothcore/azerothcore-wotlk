@@ -3267,7 +3267,7 @@ void AuraEffect::HandleModStateImmunityMask(AuraApplication const* aurApp, uint8
         {
             if (!GetAmount())
             {
-                mechanic_immunity_list = (1 << MECHANIC_CHARM) | (1 << MECHANIC_SNARE) | (1 << MECHANIC_ROOT)
+                mechanic_immunity_list = (1 << MECHANIC_SNARE) | (1 << MECHANIC_ROOT)
                     | (1 << MECHANIC_FEAR) | (1 << MECHANIC_STUN)
                     | (1 << MECHANIC_SLEEP) | (1 << MECHANIC_CHARM)
                     | (1 << MECHANIC_SAPPED) | (1 << MECHANIC_HORROR)
@@ -6095,7 +6095,7 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
     {
         // xinef: leave only target depending bonuses, rest is handled in calculate amount
-        if (GetBase()->GetType() == DYNOBJ_AURA_TYPE)
+        if (GetBase()->GetType() == DYNOBJ_AURA_TYPE && caster)
             damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, DOT, 0.0f, GetBase()->GetStackAmount());
         damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
 

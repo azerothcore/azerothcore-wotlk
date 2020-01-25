@@ -603,10 +603,11 @@ public:
     static bool HandleNpcSetOriginalFaction(ChatHandler* handler, const char* /*args*/)
     {
         Player* me = handler->GetSession()->GetPlayer();
-        Creature* creature = me->GetSelectedUnit()->ToCreature();
 
         if (!me)
             return false;
+
+        Creature* creature = me->GetSelectedUnit()->ToCreature();
 
         if (!creature)
             return false;
