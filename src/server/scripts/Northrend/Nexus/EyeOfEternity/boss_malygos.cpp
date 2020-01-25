@@ -876,7 +876,8 @@ public:
                 despawnTimer = 0;
                 me->UpdatePosition(CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ()+18.0f, 0.0f, true);
                 me->StopMovingOnCurrentPos();
-                me->GetVehicleKit()->RemoveAllPassengers();
+                if (Vehicle* vehicle = me->GetVehicleKit())
+                    vehicle->RemoveAllPassengers();
                 me->DespawnOrUnsummon();
                 return;
             }
