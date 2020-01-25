@@ -1504,7 +1504,7 @@ class spell_eoe_ph3_surge_of_power : public SpellScriptLoader
 
             uint64 DrakeGUID[3];
 
-            bool Load()
+            bool Load() override
             {
                 memset(&DrakeGUID, 0, sizeof(DrakeGUID));
                 if (Unit* caster = GetCaster())
