@@ -1247,7 +1247,8 @@ bool ConditionMgr::addToSpellImplicitTargetConditions(Condition* cond)
                 if (!assigned)
                     delete sharedList;
             }
-            sharedList->push_back(cond);
+            if (sharedList)
+                sharedList->push_back(cond);
             break;
         }
     }
