@@ -254,7 +254,7 @@ public:
             return false;
 
         Player* target;
-        if (!handler->extractPlayerTarget((char*)args, &target))
+        if (!target || !handler->extractPlayerTarget((char*)args, &target))
             return false;
 
         LocaleConstant loc = handler->GetSessionDbcLocale();
