@@ -104,25 +104,25 @@ void Totem::UnSummon(uint32 msTime)
     CombatStop();
     RemoveAurasDueToSpell(GetSpell(), GetGUID());
 
-    Unit *m_owner = GetOwner();
+    Unit *owner = GetOwner();
     // clear owner's totem slot
     for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
     {
-        if (m_owner->m_SummonSlot[i] == GetGUID())
+        if (owner->m_SummonSlot[i] == GetGUID())
         {
-            m_owner->m_SummonSlot[i] = 0;
+            owner->m_SummonSlot[i] = 0;
             break;
         }
     }
 
-    m_owner->RemoveAurasDueToSpell(GetSpell(), GetGUID());
+    owner->RemoveAurasDueToSpell(GetSpell(), GetGUID());
 
     // Remove Sentry Totem Aura
     if (GetEntry() == SENTRY_TOTEM_ENTRY)
-        m_owner->RemoveAurasDueToSpell(SENTRY_TOTEM_SPELLID);
+        owner->RemoveAurasDueToSpell(SENTRY_TOTEM_SPELLID);
 
     //remove aura all party members too
-    if (Player* owner = m_owner->ToPlayer())
+    if (Player* owner = owner->ToPlayer())
     {
         owner->SendAutoRepeatCancel(this);
 
