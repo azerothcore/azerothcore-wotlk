@@ -6780,7 +6780,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 70664:
                 {
                     // xinef: proc only from normal Rejuvenation, and proc rejuvenation
-                    if (!victim || procSpell->SpellIconID != 64)
+                    if (!victim || !procSpell || procSpell->SpellIconID != 64)
                         return false;
 
                     Player* caster = ToPlayer();
@@ -7569,6 +7569,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             // Improved Water Shield
             if (dummySpell->SpellIconID == 2287)
             {
+                if (!procSpell)
+                    return false;
+
                 // Default chance for Healing Wave and Riptide
                 float chance = (float)triggeredByAura->GetAmount();
 
@@ -8627,6 +8630,9 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         case 15337: // Improved Spirit Tap (Rank 1)
         case 15338: // Improved Spirit Tap (Rank 2)
         {
+            if (!procSpell)
+                return false;
+
             if (procSpell->SpellFamilyFlags[0] & 0x800000)
                 if ((procSpell->Id != 58381) || !roll_chance_i(50))
                     return false;
