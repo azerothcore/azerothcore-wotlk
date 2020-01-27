@@ -18127,7 +18127,7 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
         {
             uint8 i = 0;
             bool valid = false;
-            while (i < MAX_SPELL_EFFECTS && !valid)
+            while (i < MAX_SPELL_EFFECTS)
             {
                 if (spellEntry->Effects[i].ApplyAuraName == SPELL_AURA_CONTROL_VEHICLE)
                 {
