@@ -8089,10 +8089,6 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 ApplyRatingMod(CR_HIT_TAKEN_SPELL, int32(val), apply);
                 break;
             case ITEM_MOD_CRIT_TAKEN_RATING:
-                ApplyRatingMod(CR_CRIT_TAKEN_MELEE, int32(val), apply);
-                ApplyRatingMod(CR_CRIT_TAKEN_RANGED, int32(val), apply);
-                ApplyRatingMod(CR_CRIT_TAKEN_SPELL, int32(val), apply);
-                break;
             case ITEM_MOD_RESILIENCE_RATING:
                 ApplyRatingMod(CR_CRIT_TAKEN_MELEE, int32(val), apply);
                 ApplyRatingMod(CR_CRIT_TAKEN_RANGED, int32(val), apply);
