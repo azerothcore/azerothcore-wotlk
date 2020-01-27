@@ -1297,8 +1297,6 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
        damageInfo->TargetState    = VICTIMSTATE_IS_IMMUNE;
 
        damageInfo->procEx        |= PROC_EX_IMMUNE;
-       damageInfo->damage         = 0;
-       damageInfo->cleanDamage    = 0;
        return;
     }
 
@@ -3448,7 +3446,7 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
         // special handling for ICC (map 631), for non-flying pets in Gunship Battle, for trash npcs this is done via CanAIAttack
         if (IS_PLAYER_GUID(c->GetOwnerGUID()) && !c->CanFly())
         {
-            if ((c->GetTransport() && !this->GetTransport()) || (!c->GetTransport() && this->GetTransport()))
+            if (c->GetTransport() != this->GetTransport())
                 return false;
             if (this->GetTransport())
             {
