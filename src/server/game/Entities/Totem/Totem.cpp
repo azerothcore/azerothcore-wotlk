@@ -122,19 +122,19 @@ void Totem::UnSummon(uint32 msTime)
         owner->RemoveAurasDueToSpell(SENTRY_TOTEM_SPELLID);
 
     //remove aura all party members too
-    if (Player* owner = owner->ToPlayer())
+    if (Player* player = owner->ToPlayer())
     {
-        owner->SendAutoRepeatCancel(this);
+        player->SendAutoRepeatCancel(this);
 
         if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
-            owner->SendCooldownEvent(spell, 0, NULL, false);
+            player->SendCooldownEvent(spell, 0, NULL, false);
 
-        if (Group* group = owner->GetGroup())
+        if (Group* group = player->GetGroup())
         {
             for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
             {
                 Player* target = itr->GetSource();
-                if (target && target->IsInMap(owner) && group->SameSubGroup(owner, target))
+                if (target && target->IsInMap(player) && group->SameSubGroup(player, target))
                     target->RemoveAurasDueToSpell(GetSpell(), GetGUID());
             }
         }
