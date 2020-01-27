@@ -443,7 +443,7 @@ void Pet::Update(uint32 diff)
 
                     if (IsWithinLOSInMap(tempspellTarget) && GetDistance(tempspellTarget) < max_range)
                     {
-                        if (tempspellTarget && !GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo) && !HasSpellCooldown(tempspell))
+                        if (!GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo) && !HasSpellCooldown(tempspell))
                         {
                             StopMoving();
                             GetMotionMaster()->Clear(false);
