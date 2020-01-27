@@ -17259,7 +17259,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     if (Creature* creature = ToCreature())
     {
         // Vehicle should not attack its passenger after he exists the seat
-        if (type != CHARM_TYPE_VEHICLE && charmer && charmer->IsAlive() && !charmer->IsFriendlyTo(creature))
+        if (type != CHARM_TYPE_VEHICLE && charmer->IsAlive() && !charmer->IsFriendlyTo(creature))
             if (Attack(charmer, true))
                 GetMotionMaster()->MoveChase(charmer);
 
