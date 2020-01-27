@@ -10196,8 +10196,6 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
             slots[0] = EQUIPMENT_SLOT_BODY;
             break;
         case INVTYPE_CHEST:
-            slots[0] = EQUIPMENT_SLOT_CHEST;
-            break;
         case INVTYPE_ROBE:
             slots[0] = EQUIPMENT_SLOT_CHEST;
             break;
