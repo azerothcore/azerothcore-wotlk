@@ -876,9 +876,9 @@ void Map::RemovePlayerFromMap(Player* player, bool remove)
     else
         ASSERT(remove); //maybe deleted in logoutplayer when player is not in a map
 
+    sScriptMgr->OnPlayerLeaveMap(this, player);
     if (remove)
     {
-        sScriptMgr->OnPlayerLeaveMap(this, player);
         DeleteFromWorld(player);
     }
 }
