@@ -1,3 +1,19 @@
+-- DB update 2020_01_30_00 -> 2020_01_31_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_01_30_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_01_30_00 2020_01_31_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1579128650269731381'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1579128650269731381');
 
 UPDATE `creature` SET `MovementType` = 1, `spawndist` = 20 WHERE `id` = 36173;
@@ -13,3 +29,12 @@ VALUES
 (3617300,9,1,0,0,0,100,0,2000,2000,0,0,0,28,56422,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Innocuous Scarab - On Script - Remove Aura ''Nerubian Submerge'''),
 (3617300,9,2,0,0,0,100,0,5000,30000,0,0,0,11,56422,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Innocuous Scarab - On Script - Cast Spell ''Nerubian Submerge'''),
 (3617300,9,3,0,0,0,100,0,2000,2000,0,0,0,3,0,11686,0,0,0,0,1,0,0,0,0,0,0,0,0,'Innocuous Scarab - On Script - Morph Invisible Model');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
