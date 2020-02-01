@@ -7794,7 +7794,7 @@ bool Player::IsOutdoorPvPActive()
 void Player::DuelComplete(DuelCompleteType type)
 { 
     // duel not requested
-    if (!duel || duel->opponent || duel->initiator)
+    if (!duel || !duel->opponent || !duel->initiator)
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
