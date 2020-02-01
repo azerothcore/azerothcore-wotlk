@@ -129,7 +129,7 @@ public:
                                 n2->GetMotionMaster()->MovePoint(1, NecrolytePos2);
                                 n2->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                             }
-                            // TODO This spell check ins invalid
+                            // TODO This spell check is invalid
                             if (SPELL_NECROLYTE_CHANNELING)
                             {
                                 n1->RemoveAura(SPELL_NECROLYTE_CHANNELING);
@@ -400,7 +400,7 @@ public:
                 {
                     isInvincible = true;
 
-                    // TODO This spell check ins invalid
+                    // TODO This spell check is invalid
                     if (SPELL_NECROLYTE_CHANNELING)
                         me->CastSpell(me, SPELL_NECROLYTE_CHANNELING, false);
 
@@ -420,7 +420,7 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            // TODO This spell check ins invalid
+            // TODO This spell check is invalid
             if (SPELL_NECROLYTE_CHANNELING)
                 me->RemoveAura(SPELL_NECROLYTE_CHANNELING);
             events.Reset();
