@@ -16,7 +16,9 @@
 #include <ace/Atomic_Op.h>
 #include "SharedDefines.h"
 #include "QueryResult.h"
-#include "Callback.h"
+#include "QueryCallback.h"
+#include "QueryCallbackProcessor.h"
+#include "DatabaseEnvFwd.h"
 
 #include <map>
 #include <set>
@@ -894,7 +896,7 @@ class World
         AutobroadcastsWeightMap m_AutobroadcastsWeights;
 
         void ProcessQueryCallbacks();
-        ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
+        QueryCallbackProcessor _queryProcessor;
 
         std::string m_configFileList;
 };

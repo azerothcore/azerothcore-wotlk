@@ -4,16 +4,7 @@
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
 
-#ifndef _MYSQLTHREADING_H
-#define _MYSQLTHREADING_H
-
-#include "Define.h"
-
-namespace MySQL
-{
-    void Library_Init();
-    void Library_End();
-    char const* GetLibraryVersion();
-}
-
+#ifdef _WIN32 // hack for broken mysql.h not including the correct winsock header for SOCKET definition, fixed in 5.7
+#include <winsock2.h>
 #endif
+#include <mysql.h>
