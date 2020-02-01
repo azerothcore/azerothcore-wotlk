@@ -20,7 +20,7 @@ WHERE (`account`.`username` = 'test1' AND `account`.`sha_pass_hash` = '047ce2264
 UPDATE `account`
 INNER JOIN `account_access`
 ON `account`.`id` = `account_access`.`id`
-SET `account_access`.`comment` = 3, `account_access`.`comment` = 'Test account - Ingame Admin'
+SET `account_access`.`gmlevel` = 3, `account_access`.`comment` = 'Test account - Ingame Admin'
 WHERE (`account`.`username` = 'test3' AND `account`.`sha_pass_hash` = 'e546bbf9ca93ae5291f0b441bb9ea2fa0c466176') OR
 (`account`.`username` = 'test4' AND `account`.`sha_pass_hash` = '61015d83b456a9c6a7defdff07f55265f24097af');
 
@@ -28,7 +28,7 @@ WHERE (`account`.`username` = 'test3' AND `account`.`sha_pass_hash` = 'e546bbf9c
 UPDATE `account`
 INNER JOIN `account_access`
 ON `account`.`id` = `account_access`.`id`
-SET `account_access`.`comment` = 2, `account_access`.`comment` = 'Test account - Major Game Master'
+SET `account_access`.`gmlevel` = 2, `account_access`.`comment` = 'Test account - Major Game Master'
 WHERE (`account`.`username` = 'test5' AND `account`.`sha_pass_hash` = 'dddeac4ffe5f286ec57b7a1ed63bf3a859debe1e') OR
 (`account`.`username` = 'test6' AND `account`.`sha_pass_hash` = 'f1f94cdffd83c8c4182d66689077f92c807ab579');
 
@@ -36,7 +36,7 @@ WHERE (`account`.`username` = 'test5' AND `account`.`sha_pass_hash` = 'dddeac4ff
 UPDATE `account`
 INNER JOIN `account_access`
 ON `account`.`id` = `account_access`.`id`
-SET `account_access`.`comment` = 1, `account_access`.`comment` = 'Test account - Minor Game Master'
+SET `account_access`.`gmlevel` = 1, `account_access`.`comment` = 'Test account - Minor Game Master'
 WHERE (`account`.`username` = 'test7' AND `account`.`sha_pass_hash` = '6fcd35c35b127be1d9ca040b2b478eb366506ce2') OR
 (`account`.`username` = 'test8' AND `account`.`sha_pass_hash` = '484332ccb02e284e4e0a04573c3fa417f4745fdf');
 
@@ -44,7 +44,7 @@ WHERE (`account`.`username` = 'test7' AND `account`.`sha_pass_hash` = '6fcd35c35
 UPDATE `account`
 INNER JOIN `account_access`
 ON `account`.`id` = `account_access`.`id`
-SET `account_access`.`comment` = 0, `account_access`.`comment` = 'Test account - Player'
+SET `account_access`.`gmlevel` = 0, `account_access`.`comment` = 'Test account - Player'
 WHERE (`account`.`username` = 'test9' AND `account`.`sha_pass_hash` = '4fce15ed251721f02754d5381ae9d0137b6a6a30') OR
 (`account`.`username` = 'test10' AND `account`.`sha_pass_hash` = 'b22d249228e84ab493b39a2bd765bee9b7c0b350');
 
