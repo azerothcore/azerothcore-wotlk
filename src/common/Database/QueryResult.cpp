@@ -4,8 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "DatabaseEnv.h"
+#include "QueryResult.h"
+#include "Errors.h"
+#include "Field.h"
 #include "Log.h"
+#include "MySQLHacks.h"
+#include "MySQLWorkaround.h"
 
 static uint32 SizeForType(MYSQL_FIELD* field)
 {
@@ -108,7 +112,6 @@ _result(result),
 _fields(fields)
 {
     _currentRow = new Field[_fieldCount];
-    ASSERT(_currentRow);
 }
 
 PreparedResultSet::PreparedResultSet(MySQLStmt* stmt, MySQLResult* result, uint64 rowCount, uint32 fieldCount) :
@@ -128,7 +131,11 @@ m_metadataResult(result)
         delete[] m_stmt->bind->is_null;
     }
 
-    m_rBind = new MYSQL_BIND[m_fieldCount];
+    m_rBind = new MySQLBind[m_fieldCount];
+
+    //- for future readers wondering where the fuck this is freed - mysql_stmt_bind_result moves pointers to these
+    // from m_rBind to m_stmt->bind and it is later freed by the `if (m_stmt->bind_result_done)` block just above here
+    // MYSQL_STMT lifetime is equal to connection lifetime
     MySQLBool* m_isNull = new MySQLBool[m_fieldCount];
     unsigned long* m_length = new unsigned long[m_fieldCount];
 
@@ -260,8 +267,16 @@ bool ResultSet::NextRow()
         return false;
     }
 
+    unsigned long* lengths = mysql_fetch_lengths(_result);
+    if (!lengths)
+    {
+        sLog->outSQLDriver("%s:mysql_fetch_lengths, cannot retrieve value lengths. Error %s.", __FUNCTION__, mysql_error(_result->handle));
+        CleanUp();
+        return false;
+    }
+
     for (uint32 i = 0; i < _fieldCount; i++)
-        _currentRow[i].SetStructuredValue(row[i], _fields[i].type);
+        _currentRow[i].SetStructuredValue(row[i], MysqlTypeToFieldType(_fields[i].type), lengths[i]);
 
     return true;
 }
@@ -283,54 +298,53 @@ bool PreparedResultSet::_NextRow()
     if (m_rowPosition >= m_rowCount)
         return false;
 
-    int retval = mysql_stmt_fetch( m_stmt );
-
-    if (!retval || retval == MYSQL_DATA_TRUNCATED)
-        retval = true;
-
-    if (retval == MYSQL_NO_DATA)
-        retval = false;
-
-    return retval;
+    int retval = mysql_stmt_fetch(m_stmt);
+    return retval == 0 || retval == MYSQL_DATA_TRUNCATED;
 }
-
-#ifdef ELUNA
-char* ResultSet::GetFieldName(uint32 index) const
-{
-    ASSERT(index < _fieldCount);
-    return _fields[index].name;
-}
-#endif
 
 void ResultSet::CleanUp()
 {
     if (_currentRow)
     {
         delete [] _currentRow;
-        _currentRow = NULL;
+        _currentRow = nullptr;
     }
 
     if (_result)
     {
         mysql_free_result(_result);
-        _result = NULL;
+        _result = nullptr;
     }
+}
+
+Field const& ResultSet::operator[](std::size_t index) const
+{
+    ASSERT(index < _fieldCount);
+    return _currentRow[index];
+}
+
+Field* PreparedResultSet::Fetch() const
+{
+    ASSERT(m_rowPosition < m_rowCount);
+    return const_cast<Field*>(&m_rows[uint32(m_rowPosition) * m_fieldCount]);
+}
+
+Field const& PreparedResultSet::operator[](std::size_t index) const
+{
+    ASSERT(m_rowPosition < m_rowCount);
+    ASSERT(index < m_fieldCount);
+    return m_rows[uint32(m_rowPosition) * m_fieldCount + index];
 }
 
 void PreparedResultSet::CleanUp()
 {
-    /// More of the in our code allocated sources are deallocated by the poorly documented mysql c api
-    if (m_res)
-        mysql_free_result(m_res);
+    if (m_metadataResult)
+        mysql_free_result(m_metadataResult);
 
-    FreeBindBuffer();
-    mysql_stmt_free_result(m_stmt);
-
-    delete[] m_rBind;
-}
-
-void PreparedResultSet::FreeBindBuffer()
-{
-    for (uint32 i = 0; i < m_fieldCount; ++i)
-        free (m_rBind[i].buffer);
+    if (m_rBind)
+    {
+        delete[](char*)m_rBind->buffer;
+        delete[] m_rBind;
+        m_rBind = nullptr;
+    }
 }

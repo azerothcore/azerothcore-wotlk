@@ -178,7 +178,7 @@ void CleanStringForMysqlQuery(std::string& str);
 
 typedef std::vector<std::string> StringVector;
 
-// we always use stdlibc++ std::max/std::min, undefine some not C++ standard defines (Win API and some other platforms)
+// we always use stdlib std::max/std::min, undefine some not C++ standard defines (Win API and some other platforms)
 #ifdef max
 #undef max
 #endif
@@ -188,7 +188,11 @@ typedef std::vector<std::string> StringVector;
 #endif
 
 #ifndef M_PI
-#define M_PI            3.14159265358979323846f
+#define M_PI 3.14159265358979323846
+#endif
+
+#ifndef M_PI_4
+#define M_PI_4 0.785398163397448309616
 #endif
 
 #define MAX_QUERY_LEN 32*1024
@@ -217,6 +221,8 @@ namespace acore
         typedef ArgumentType argument_type;
         typedef ResultType result_type;
     };
+
+    using std::make_unique;
 }
 
 #endif

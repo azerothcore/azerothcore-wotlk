@@ -7,18 +7,9 @@
 #ifndef QUERYRESULT_H
 #define QUERYRESULT_H
 
-#include "AutoPtr.h"
-#include <ace/Thread_Mutex.h>
-
-#include "Errors.h"
-#include "Field.h"
+#include "Define.h"
 #include "DatabaseEnvFwd.h"
 #include <vector>
-
-#ifdef _WIN32
-  #include <winsock2.h>
-#endif
-#include <mysql.h>
 
 class ResultSet
 {
@@ -29,9 +20,6 @@ class ResultSet
         bool NextRow();
         uint64 GetRowCount() const { return _rowCount; }
         uint32 GetFieldCount() const { return _fieldCount; }
-#ifdef ELUNA
-        char* GetFieldName(uint32 index) const;
-#endif
 
         Field* Fetch() const { return _currentRow; }
         Field const& operator[](std::size_t index) const;
@@ -82,4 +70,3 @@ class PreparedResultSet
 };
 
 #endif
-

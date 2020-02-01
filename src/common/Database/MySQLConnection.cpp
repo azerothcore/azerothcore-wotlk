@@ -376,7 +376,7 @@ int MySQLConnection::ExecuteTransaction(SQLTransaction& transaction)
                 ASSERT(stmt);
                 if (!Execute(stmt))
                 {
-                    TC_LOG_WARN("sql.sql", "Transaction aborted. %u queries not executed.", (uint32)queries.size());
+                    sLog->outSQLDriver("Transaction aborted. %u queries not executed.", (uint32)queries.size());
                     int errorCode = GetLastError();
                     RollbackTransaction();
                     return errorCode;
@@ -389,7 +389,7 @@ int MySQLConnection::ExecuteTransaction(SQLTransaction& transaction)
                 ASSERT(sql);
                 if (!Execute(sql))
                 {
-                    TC_LOG_WARN("sql.sql", "Transaction aborted. %u queries not executed.", (uint32)queries.size());
+                    sLog->outSQLDriver("Transaction aborted. %u queries not executed.", (uint32)queries.size());
                     int errorCode = GetLastError();
                     RollbackTransaction();
                     return errorCode;
