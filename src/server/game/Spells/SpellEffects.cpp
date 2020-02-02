@@ -2119,7 +2119,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
             // in battleground check
             if (Battleground* bg = player->GetBattleground())
             {
-                if (bg->GetBgTypeID() == BATTLEGROUND_EY)
+                if (bg->GetBgTypeID(true) == BATTLEGROUND_EY)
                     bg->EventPlayerClickedOnFlag(player, gameObjTarget);
                 return;
             }
@@ -2914,7 +2914,7 @@ void Spell::EffectEnchantItemPrismatic(SpellEffIndex effIndex)
     // support only enchantings with add socket in this slot
     {
         bool add_socket = false;
-        for (uint8 i = 0; i < MAX_ITEM_ENCHANTMENT_EFFECTS; ++i)
+        for (uint8 i = 0; i < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++i)
         {
             if (pEnchant->type[i] == ITEM_ENCHANTMENT_TYPE_PRISMATIC_SOCKET)
             {
@@ -3141,8 +3141,9 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
 
     uint32 petentry = m_spellInfo->Effects[effIndex].MiscValue;
     int32 duration = m_spellInfo->GetDuration();
-    if(Player* modOwner = m_originalCaster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+    if (m_originalCaster)
+        if(Player* modOwner = m_originalCaster->GetSpellModOwner())
+            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
     if (!owner)
     {
@@ -3868,7 +3869,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 case 54640:
                 {
                     if (Player* player = unitTarget->ToPlayer())
-                        if (player->GetBattleground() && player->GetBattleground()->GetBgTypeID() == BATTLEGROUND_SA)
+                        if (player->GetBattleground() && player->GetBattleground()->GetBgTypeID(true) == BATTLEGROUND_SA)
                         {
                             if (GameObject* dportal = player->FindNearestGameObject(192819, 10.0f))
                             {
@@ -4644,21 +4645,20 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
         default: return;
     }
 
-    uint64 guid = m_caster->m_ObjectSlot[slot];
-    if (guid != 0)
+    if (m_caster)
     {
-        GameObject* gameObject = NULL;
-        if (m_caster)
-            gameObject = m_caster->GetMap()->GetGameObject(guid);
-
-        if (gameObject)
+        uint64 guid = m_caster->m_ObjectSlot[slot];
+        if (guid != 0)
         {
-            // Recast case - null spell id to make auras not be removed on object remove from world
-            if (m_spellInfo->Id == gameObject->GetSpellId())
-                gameObject->SetSpellId(0);
-            m_caster->RemoveGameObject(gameObject, true);
+            if (GameObject* gameObject = m_caster->GetMap()->GetGameObject(guid))
+            {
+                // Recast case - null spell id to make auras not be removed on object remove from world
+                if (m_spellInfo->Id == gameObject->GetSpellId())
+                    gameObject->SetSpellId(0);
+                m_caster->RemoveGameObject(gameObject, true);
+            }
+            m_caster->m_ObjectSlot[slot] = 0;
         }
-        m_caster->m_ObjectSlot[slot] = 0;
     }
 
     GameObject* pGameObj = sObjectMgr->IsGameObjectStaticTransport(gameobjectId) ? new StaticTransport() : new GameObject();

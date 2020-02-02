@@ -293,7 +293,7 @@ class spell_sha_feral_spirit_scaling : public SpellScriptLoader
 
             void Register()
             {
-                if (m_scriptSpellId == 35675 || m_scriptSpellId == 35675)
+                if (m_scriptSpellId == 35675)
                     DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_feral_spirit_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
 
                 if (m_scriptSpellId == 35674)

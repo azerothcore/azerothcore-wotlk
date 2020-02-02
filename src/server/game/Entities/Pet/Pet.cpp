@@ -1065,6 +1065,10 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     SetFullHealth();
     SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+
+    if (Pet* pet = ToPet())
+        sScriptMgr->OnPetInitStatsForLevel(pet);
+
     return true;
 }
 

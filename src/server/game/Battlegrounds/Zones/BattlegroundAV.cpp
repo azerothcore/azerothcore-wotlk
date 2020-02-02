@@ -290,7 +290,7 @@ void BattlegroundAV::UpdateScore(TeamId teamId, int16 points)
 Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
 {
     bool isStatic = false;
-    Creature* creature = NULL;
+    Creature* creature = nullptr;
     ASSERT(type <= AV_CPLACE_MAX + AV_STATICCPLACE_MAX);
     if (type >= AV_CPLACE_MAX) //static
     {
@@ -314,7 +314,7 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
                                BG_AV_CreaturePos[type][3]);
     }
     if (!creature)
-        return NULL;
+        return nullptr;
     if (creature->GetEntry() == BG_AV_CreatureInfo[AV_NPC_A_CAPTAIN] || creature->GetEntry() == BG_AV_CreatureInfo[AV_NPC_H_CAPTAIN])
         creature->SetRespawnDelay(RESPAWN_ONE_DAY); // TODO: look if this can be done by database + also add this for the wingcommanders
 
@@ -550,12 +550,14 @@ void BattlegroundAV::HandleAreaTrigger(Player* player, uint32 trigger)
         case 3331:
             //player->Unmount();
             break;
+        default:
+            break;
     }
 }
 
 void BattlegroundAV::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
 {
-    BattlegroundScoreMap::iterator itr = PlayerScores.find(player->GetGUID());
+    auto itr = PlayerScores.find(player->GetGUID());
     if (itr == PlayerScores.end())
         return;
 
@@ -744,7 +746,6 @@ void BattlegroundAV::ChangeMineOwner(uint8 mine, TeamId teamId, bool initial)
                 YellToAll(creature, LANG_BG_AV_S_MINE_BOSS_CLAIMS, LANG_UNIVERSAL);
         }
     }
-    return;
 }
 
 bool BattlegroundAV::PlayerCanDoMineQuest(int32 GOId, TeamId teamId)
@@ -1180,15 +1181,14 @@ void BattlegroundAV::SendMineWorldStates(uint32 mine)
 
 GraveyardStruct const* BattlegroundAV::GetClosestGraveyard(Player* player)
 {
-    GraveyardStruct const* pGraveyard = NULL;
-    GraveyardStruct const* entry = NULL;
+    GraveyardStruct const* entry = nullptr;
     float dist = 0;
     float minDist = 0;
     float x, y;
 
     player->GetPosition(x, y);
 
-    pGraveyard = sGraveyard->GetGraveyard(BG_AV_GraveyardIds[player->GetTeamId()+7]);
+    GraveyardStruct const* pGraveyard = sGraveyard->GetGraveyard(BG_AV_GraveyardIds[player->GetTeamId()+7]);
     minDist = (pGraveyard->x - x)*(pGraveyard->x - x)+(pGraveyard->y - y)*(pGraveyard->y - y);
 
     for (uint8 i = BG_AV_NODES_FIRSTAID_STATION; i <= BG_AV_NODES_FROSTWOLF_HUT; ++i)
@@ -1556,8 +1556,8 @@ void BattlegroundAV::ResetBGSubclass()
 
 bool BattlegroundAV::IsBothMinesControlledByTeam(TeamId teamId) const
 {
-    for (uint8 mine = 0; mine < 2; mine++)
-        if (m_Mine_Owner[mine] != teamId)
+    for (auto mine : m_Mine_Owner)
+        if (mine != teamId)
             return false;
 
     return true;
@@ -1582,10 +1582,7 @@ bool BattlegroundAV::IsAllTowersControlledAndCaptainAlive(TeamId teamId) const
             if (m_Nodes[i].State != POINT_DESTROYED)
                 return false;
 
-        if (!m_CaptainAlive[0])
-            return false;
-
-        return true;
+        return m_CaptainAlive[0];
     }
     else if (teamId == TEAM_HORDE)
     {
@@ -1604,10 +1601,7 @@ bool BattlegroundAV::IsAllTowersControlledAndCaptainAlive(TeamId teamId) const
             if (m_Nodes[i].State != POINT_DESTROYED)
                 return false;
 
-        if (!m_CaptainAlive[1])
-            return false;
-
-        return true;
+        return m_CaptainAlive[1];
     }
 
     return false;

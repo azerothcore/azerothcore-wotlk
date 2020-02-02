@@ -1120,7 +1120,7 @@ bool GameObject::ActivateToQuest(Player* target) const
                 //look for battlegroundAV for some objects which are only activated after mine gots captured by own team
                 if (GetEntry() == BG_AV_OBJECTID_MINE_N || GetEntry() == BG_AV_OBJECTID_MINE_S)
                     if (Battleground* bg = target->GetBattleground())
-                        if (bg->GetBgTypeID() == BATTLEGROUND_AV && !bg->ToBattlegroundAV()->PlayerCanDoMineQuest(GetEntry(), target->GetTeamId()))
+                        if (bg->GetBgTypeID(true) == BATTLEGROUND_AV && !bg->ToBattlegroundAV()->PlayerCanDoMineQuest(GetEntry(), target->GetTeamId()))
                             return false;
                 return true;
             }
@@ -1780,17 +1780,24 @@ void GameObject::Use(Unit* user)
                 GameObjectTemplate const* info = GetGOInfo();
                 if (info)
                 {
-                    switch (info->entry)
+                    if (GameObject::gameObjectToEventFlag.find(info->entry) != GameObject::gameObjectToEventFlag.end())
                     {
-                        case 179785:                        // Silverwing Flag
-                        case 179786:                        // Warsong Flag
-                            if (bg->GetBgTypeID() == BATTLEGROUND_WS)
-                                bg->EventPlayerClickedOnFlag(player, this);
-                            break;
-                        case 184142:                        // Netherstorm Flag
-                            if (bg->GetBgTypeID() == BATTLEGROUND_EY)
-                                bg->EventPlayerClickedOnFlag(player, this);
-                            break;
+                        GameObject::gameObjectToEventFlag[info->entry](player, this, bg);
+                    }
+                    else
+                    {
+                        switch (info->entry)
+                        {
+                            case 179785:                        // Silverwing Flag
+                            case 179786:                        // Warsong Flag
+                                if (bg->GetBgTypeID(true) == BATTLEGROUND_WS)
+                                    bg->EventPlayerClickedOnFlag(player, this);
+                                break;
+                            case 184142:                        // Netherstorm Flag
+                                if (bg->GetBgTypeID(true) == BATTLEGROUND_EY)
+                                    bg->EventPlayerClickedOnFlag(player, this);
+                                break;
+                        }
                     }
                 }
                 //this cause to call return, all flags must be deleted here!!
@@ -2490,3 +2497,5 @@ void GameObject::UpdateModelPosition()
         GetMap()->InsertGameObjectModel(*m_model);
     }
 }
+
+std::unordered_map<int, goEventFlag> GameObject::gameObjectToEventFlag = {};
