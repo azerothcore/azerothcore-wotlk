@@ -20077,7 +20077,7 @@ void Player::_SaveMail(SQLTransaction& trans)
 
 void Player::_SaveQuestStatus(SQLTransaction& trans)
 { 
-    bool isTransaction = !trans.null();
+    bool isInTransaction = bool(trans);
     if (!isTransaction)
         trans = CharacterDatabase.BeginTransaction();
 
@@ -26859,7 +26859,7 @@ void Player::ActivateSpec(uint8 spec)
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ACTIONS_SPEC);
     stmt->setUInt32(0, GetGUIDLow());
     stmt->setUInt8(1, m_activeSpec);
-    GetSession()->_loadActionsSwitchSpecCallback = CharacterDatabase.AsyncQuery(stmt); // FutureResult
+    GetSession()->_loadActionsSwitchSpecCallback = CharacterDatabase.Query(stmt); // FutureResult
 
     // xinef: reset power
     Powers pw = getPowerType();

@@ -11,8 +11,7 @@
 #include "Util.h"
 #include "SHA1.h"
 
-#include "Implementation/LoginDatabase.h" // For logging
-extern LoginDatabaseWorkerPool LoginDatabase;
+#include "DatabaseEnv.h"
 
 #include <stdarg.h>
 #include <stdio.h>

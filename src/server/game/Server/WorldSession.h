@@ -14,7 +14,8 @@
 #include "Common.h"
 #include "SharedDefines.h"
 #include "AddonMgr.h"
-#include "DatabaseEnv.h"
+#include "DatabaseEnvFwd.h"
+#include "QueryCallbackProcessor.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "GossipDef.h"
@@ -899,8 +900,7 @@ class WorldSession
         void HandleEnterPlayerVehicle(WorldPacket& data);
         void HandleUpdateProjectilePosition(WorldPacket& recvPacket);
 
-        // _loadPetFromDBFirstCallback helpers
-        //QueryCallback<PreparedQueryResult, uint64> GetLoadPetFromDBFirstCallback() { return _loadPetFromDBFirstCallback; }
+        QueryCallbackProcessor& GetQueryProcessor() { return _queryProcessor; }
 
         uint32 _lastAuctionListItemsMSTime;
         uint32 _lastAuctionListOwnerItemsMSTime;
@@ -918,30 +918,12 @@ class WorldSession
     CALLBACKS
     ***/
     private:
-        void InitializeQueryCallbackParameters();
         void ProcessQueryCallbacks();
-        void ProcessQueryCallbackPlayer();
-        void ProcessQueryCallbackPet();
-        void ProcessQueryCallbackLogin();
 
-        PreparedQueryResultFuture _charEnumCallback;
-        PreparedQueryResultFuture _stablePetCallback;
-        QueryCallback<PreparedQueryResult, std::string> _charRenameCallback;
-        QueryCallback<PreparedQueryResult, uint32> _unstablePetCallback;
-        QueryCallback<PreparedQueryResult, uint32> _stableSwapCallback;
-        QueryCallback<PreparedQueryResult, uint64> _sendStabledPetCallback;
-        QueryCallback<PreparedQueryResult, CharacterCreateInfo*, true> _charCreateCallback;
-
+        QueryResultHolderFuture _realmAccountLoginCallback;
         QueryResultHolderFuture _charLoginCallback;
 
-        QueryResultHolderFuture _loadPetFromDBSecondCallback;
-        QueryCallback_3<PreparedQueryResult, uint8, uint8, uint32> _openWrappedItemCallback;
-
-    public:
-        // xinef: those must be public, requires calls out of worldsession :(
-        QueryCallback_2<PreparedQueryResult, uint32, AsynchPetSummon*> _loadPetFromDBFirstCallback;
-        PreparedQueryResultFuture _loadActionsSwitchSpecCallback;
-        PreparedQueryResultFuture _CharacterAuraFrozenCallback;
+        QueryCallbackProcessor _queryProcessor;
 
     /***
     END OF CALLBACKS

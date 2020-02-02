@@ -243,7 +243,7 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket & /*recvData*/)
     stmt->setUInt8(0, PET_SAVE_AS_CURRENT);
     stmt->setUInt32(1, GetAccountId());
 
-    _charEnumCallback = CharacterDatabase.AsyncQuery(stmt);
+    _charEnumCallback = CharacterDatabase.Query(stmt);
 }
 
 void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)

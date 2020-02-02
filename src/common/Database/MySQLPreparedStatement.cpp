@@ -12,10 +12,9 @@
 #include <sstream>
 
 MySQLPreparedStatement::MySQLPreparedStatement(MySQLStmt* stmt, std::string queryString) :
-    m_stmt(nullptr), m_Mstmt(stmt), m_bind(nullptr), m_queryString(std::move(queryString))
+    m_stmt(nullptr), m_Mstmt(stmt), m_bind(nullptr), m_paramCount(mysql_stmt_param_count(stmt)), m_queryString(std::move(queryString))
 {
     /// Initialize variable parameters
-    m_paramCount = mysql_stmt_param_count(stmt);
     m_paramsSet.assign(m_paramCount, false);
     m_bind = new MySQLBind[m_paramCount];
     memset(m_bind, 0, sizeof(MySQLBind) * m_paramCount);

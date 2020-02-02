@@ -129,7 +129,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
         LoginDatabase.PExecute("UPDATE account SET online = 1 WHERE id = %u;", GetAccountId());
     }
 
-    InitializeQueryCallbackParameters();
+    ProcessQueryCallbacks();
 }
 
 /// WorldSession destructor
@@ -1143,178 +1143,16 @@ void WorldSession::SetPlayer(Player* player)
         m_GUIDLow = _player->GetGUIDLow();
 }
 
-void WorldSession::InitializeQueryCallbackParameters()
-{
-    // Callback parameters that have pointers in them should be properly
-    // initialized to NULL here.
-    _charCreateCallback.SetParam(nullptr);
-    _loadPetFromDBFirstCallback.SetFirstParam(0);
-    _loadPetFromDBFirstCallback.SetSecondParam(nullptr);
-}
-
 void WorldSession::ProcessQueryCallbacks()
 {
-    ProcessQueryCallbackPlayer();
-    ProcessQueryCallbackPet();
-    ProcessQueryCallbackLogin();
-}
+    _queryProcessor.ProcessReadyQueries();
 
-void WorldSession::ProcessQueryCallbackPlayer()
-{
-    PreparedQueryResult result;
-
-    //- HandleCharRenameOpcode
-    if (_charRenameCallback.IsReady())
-    {
-        std::string param = _charRenameCallback.GetParam();
-        _charRenameCallback.GetResult(result);
-        HandleChangePlayerNameOpcodeCallBack(result, param);
-        _charRenameCallback.FreeResult();
-    }
-
-    //- HandleOpenItemOpcode
-    if (_openWrappedItemCallback.IsReady())
-    {
-        uint8 bagIndex = _openWrappedItemCallback.GetFirstParam();
-        uint8 slot = _openWrappedItemCallback.GetSecondParam();
-        uint32 itemLowGUID = _openWrappedItemCallback.GetThirdParam();
-        _openWrappedItemCallback.GetResult(result);
-        HandleOpenWrappedItemCallback(result, bagIndex, slot, itemLowGUID);
-        _openWrappedItemCallback.FreeResult();
-    }
-
-    //- Player - ActivateSpec
-    if (_loadActionsSwitchSpecCallback.ready())
-    {
-        _loadActionsSwitchSpecCallback.get(result);
-        HandleLoadActionsSwitchSpec(result);
-        _loadActionsSwitchSpecCallback.cancel();
-    }
-}
-
-void WorldSession::ProcessQueryCallbackPet()
-{
-    PreparedQueryResult result;
-
-    //- SendStabledPet
-    if (_sendStabledPetCallback.IsReady())
-    {
-        uint64 param = _sendStabledPetCallback.GetParam();
-        _sendStabledPetCallback.GetResult(result);
-        SendStablePetCallback(result, param);
-        _sendStabledPetCallback.FreeResult();
-        return;
-    }
-
-    //- HandleStablePet
-    if (_stablePetCallback.ready())
-    {
-        _stablePetCallback.get(result);
-        HandleStablePetCallback(result);
-        _stablePetCallback.cancel();
-        return;
-    }
-
-    //- HandleUnstablePet
-    if (_unstablePetCallback.IsReady())
-    {
-        uint32 param = _unstablePetCallback.GetParam();
-        _unstablePetCallback.GetResult(result);
-        HandleUnstablePetCallback(result, param);
-        _unstablePetCallback.FreeResult();
-        return;
-    }
-
-    //- HandleStableSwapPet
-    if (_stableSwapCallback.IsReady())
-    {
-        uint32 param = _stableSwapCallback.GetParam();
-        _stableSwapCallback.GetResult(result);
-        HandleStableSwapPetCallback(result, param);
-        _stableSwapCallback.FreeResult();
-        return;
-    }
-
-    //- LoadPetFromDB first part
-    if (_loadPetFromDBFirstCallback.IsReady())
-    {
-        Player* player = GetPlayer();
-        if (!player)
-        {
-            if (AsynchPetSummon* info = _loadPetFromDBFirstCallback.GetSecondParam())
-                delete info;
-            _loadPetFromDBFirstCallback.Reset();
-            return;
-        }
-        // process only if player is in world (teleport crashes?)
-        // otherwise wait with result till he logs in
-        if (player->IsInWorld())
-        {
-            uint8 asynchLoadType = _loadPetFromDBFirstCallback.GetFirstParam();
-            _loadPetFromDBFirstCallback.GetResult(result);
-
-            uint8 loadResult = HandleLoadPetFromDBFirstCallback(result, asynchLoadType);
-            if (loadResult != PET_LOAD_OK)
-                Pet::HandleAsynchLoadFailed(_loadPetFromDBFirstCallback.GetSecondParam(), player, asynchLoadType, loadResult);
-
-            if (AsynchPetSummon* info = _loadPetFromDBFirstCallback.GetSecondParam())
-                delete info;
-            _loadPetFromDBFirstCallback.Reset();
-        }
-        return;
-    }
-
-    //- LoadPetFromDB second part
-    if (_loadPetFromDBSecondCallback.ready())
-    {
-        Player* player = GetPlayer();
-        if (!player)
-        {
-            _loadPetFromDBSecondCallback.cancel();
-        }
-        else if (!player->IsInWorld())
-        {
-            // wait
-        }
-        else
-        {
-            SQLQueryHolder* param;
-            _loadPetFromDBSecondCallback.get(param);
-            HandleLoadPetFromDBSecondCallback((LoadPetFromDBQueryHolder*)param);
-            delete param;
-           _loadPetFromDBSecondCallback.cancel();
-        }
-        return;
-    }
-}
-
-void WorldSession::ProcessQueryCallbackLogin()
-{
-    PreparedQueryResult result;
-
-    //! HandleCharEnumOpcode
-    if (_charEnumCallback.ready())
-    {
-        _charEnumCallback.get(result);
-        HandleCharEnum(result);
-        _charEnumCallback.cancel();
-    }
-
-    if (_charCreateCallback.IsReady())
-    {
-        _charCreateCallback.GetResult(result);
-        HandleCharCreateCallback(result, _charCreateCallback.GetParam());
-        // Don't call FreeResult() here, the callback handler will do that depending on the events in the callback chain
-    }
+    if (_realmAccountLoginCallback.valid() && _realmAccountLoginCallback.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+        InitializeSessionCallback(_realmAccountLoginCallback.get());
 
     //! HandlePlayerLoginOpcode
-    if (_charLoginCallback.ready())
-    {
-        SQLQueryHolder* param;
-        _charLoginCallback.get(param);
-        HandlePlayerLoginFromDB((LoginQueryHolder*)param);
-        _charLoginCallback.cancel();
-    }
+    if (_charLoginCallback.valid() && _charLoginCallback.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+        HandlePlayerLogin(reinterpret_cast<LoginQueryHolder*>(_charLoginCallback.get()));
 }
 
 void WorldSession::InitWarden(BigNumber* k, std::string const& os)
