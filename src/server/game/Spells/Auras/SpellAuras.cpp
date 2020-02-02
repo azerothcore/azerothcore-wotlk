@@ -25,6 +25,9 @@
 #include "Vehicle.h"
 #include "ArenaSpectator.h"
 
+// update aura target map every 500 ms instead of every update - reduce amount of grid searcher calls
+static constexpr int32 UPDATE_TARGET_MAP_INTERVAL = 500;
+
 AuraApplication::AuraApplication(Unit* target, Unit* caster, Aura* aura, uint8 effMask):
 _target(target), _base(aura), _removeMode(AURA_REMOVE_NONE), _slot(MAX_AURAS),
 _flags(AFLAG_NONE), _effectsToApply(effMask), _needClientUpdate(false), _disableMask(0)
@@ -448,6 +451,11 @@ Aura::~Aura()
 
     ASSERT(m_applications.empty());
     _DeleteRemovedApplications();
+}
+
+uint32 Aura::GetId() const
+{
+    return GetSpellInfo()->Id;
 }
 
 Unit* Aura::GetCaster() const
@@ -1006,6 +1014,11 @@ bool Aura::IsPassive() const
 bool Aura::IsDeathPersistent() const
 {
     return GetSpellInfo()->IsDeathPersistent();
+}
+
+bool Aura::IsRemovedOnShapeLost(Unit *target) const
+{
+    return (GetCasterGUID() == target->GetGUID() && m_spellInfo->Stances && !m_spellInfo->HasAttribute(SPELL_ATTR2_NOT_NEED_SHAPESHIFT) && !m_spellInfo->HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFT));
 }
 
 bool Aura::CanBeSaved() const

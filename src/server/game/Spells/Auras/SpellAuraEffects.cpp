@@ -416,6 +416,26 @@ void AuraEffect::GetApplicationList(std::list<AuraApplication*> & applicationLis
     }
 }
 
+uint32 AuraEffect::GetId() const
+{
+    return m_spellInfo->Id;
+}
+
+int32 AuraEffect::GetMiscValueB() const
+{
+    return m_spellInfo->Effects[m_effIndex].MiscValueB;
+}
+
+int32 AuraEffect::GetMiscValue() const
+{
+    return m_spellInfo->Effects[m_effIndex].MiscValue;
+}
+
+AuraType AuraEffect::GetAuraType() const
+{
+    return (AuraType)m_spellInfo->Effects[m_effIndex].ApplyAuraName;
+}
+
 int32 AuraEffect::CalculateAmount(Unit* caster)
 {
     int32 amount;
@@ -1050,6 +1070,11 @@ bool AuraEffect::IsAffectedOnSpell(SpellInfo const* spell) const
     if (m_spellInfo->Effects[m_effIndex].SpellClassMask & spell->SpellFamilyFlags)
         return true;
     return false;
+}
+
+bool AuraEffect::HasSpellClassMask() const
+{
+    return m_spellInfo->Effects[m_effIndex].SpellClassMask;
 }
 
 void AuraEffect::SendTickImmune(Unit* target, Unit* caster) const
