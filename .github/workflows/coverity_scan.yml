@@ -8,6 +8,12 @@ jobs:
   latest:
     runs-on: ubuntu-18.04
     steps:
+      - name: Clone AzerothCore
+        run: git clone --depth=1 --branch=coverity_scan https://github.com/azerothcore/azerothcore-wotlk .
+  
+      - name: Install deps
+        run: bash ./acore.sh install-deps
+    
       - name: Download Coverity Build Tool
         run: |
           set -x
@@ -16,12 +22,6 @@ jobs:
           tar xzf cov-analysis-linux64.tar.gz --strip 1 -C cov-analysis-linux64
         env:
           TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
-
-      - name: Clone AzerothCore
-        run: git clone --depth=1 --branch=coverity_scan https://github.com/azerothcore/azerothcore-wotlk .
-  
-      - name: Install deps
-        run: bash ./acore.sh install-deps
 
       - name: Build with cov-build
         run: |
