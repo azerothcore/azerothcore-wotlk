@@ -152,9 +152,12 @@ bool Pet::LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry, ui
     if (owner->IsSpectator() || owner->GetPet() || !owner->IsInWorld() || !owner->FindMap())
         return false;
 
-    // DK Pet exception
-    if (owner->getClass() == CLASS_DEATH_KNIGHT && !owner->CanSeeDKPet())
-        return false;
+    bool forceLoadFromDB = false;
+    sScriptMgr->OnBeforeLoadPetFromDB(owner, petentry, petnumber, current, forceLoadFromDB);
+
+    if (!forceLoadFromDB)
+        if (owner->getClass() == CLASS_DEATH_KNIGHT && !owner->CanSeeDKPet()) // DK Pet exception
+            return false;
 
     uint32 ownerid = owner->GetGUIDLow();
     PreparedStatement* stmt;
@@ -720,20 +723,30 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     //Determine pet type
     PetType petType = MAX_PET_TYPE;
-    if (IsPet() && owner->GetTypeId() == TYPEID_PLAYER)
+    if (owner->GetTypeId() == TYPEID_PLAYER)
     {
-        if (owner->getClass() == CLASS_WARLOCK ||
-            owner->getClass() == CLASS_SHAMAN ||          // Fire Elemental
-            owner->getClass() == CLASS_DEATH_KNIGHT ||    // Risen Ghoul
-            owner->getClass() == CLASS_MAGE)              // Water Elemental with glyph
-            petType = SUMMON_PET;
-        else if (owner->getClass() == CLASS_HUNTER)
+        sScriptMgr->OnBeforeGuardianInitStatsForLevel(owner->ToPlayer(), this, cinfo, petType);
+
+        if (IsPet())
         {
-            petType = HUNTER_PET;
-            m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
+            if (petType == MAX_PET_TYPE)
+            {
+                if (owner->getClass() == CLASS_WARLOCK ||
+                    owner->getClass() == CLASS_SHAMAN ||          // Fire Elemental
+                    owner->getClass() == CLASS_DEATH_KNIGHT ||    // Risen Ghoul
+                    owner->getClass() == CLASS_MAGE)              // Water Elemental with glyph
+                    petType = SUMMON_PET;
+                else if (owner->getClass() == CLASS_HUNTER)
+                {
+                    petType = HUNTER_PET;
+                }
+            }
+
+            if (petType == HUNTER_PET)
+                m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
+            else if (petType != SUMMON_PET)
+                sLog->outError("Unknown type pet %u is summoned by player class %u", GetEntry(), owner->getClass());
         }
-        else
-            sLog->outError("Unknown type pet %u is summoned by player class %u", GetEntry(), owner->getClass());
     }
 
     uint32 creature_ID = (petType == HUNTER_PET) ? 1 : cinfo->Entry;
@@ -1066,8 +1079,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     SetFullHealth();
     SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
 
-    if (Pet* pet = ToPet())
-        sScriptMgr->OnPetInitStatsForLevel(pet);
+    if (owner->GetTypeId() == TYPEID_PLAYER)
+        sScriptMgr->OnAfterGuardianInitStatsForLevel(owner->ToPlayer(), this);
 
     return true;
 }
