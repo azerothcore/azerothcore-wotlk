@@ -8,6 +8,8 @@ jobs:
   latest:
     runs-on: ubuntu-18.04
     steps:
+      - name: Clone AzerothCore
+        run: git clone --depth=1 --branch=coverity_scan https://github.com/azerothcore/azerothcore-wotlk
       - name: Install deps
         run: |
           bash ./apps/ci/ci-before_install.sh
