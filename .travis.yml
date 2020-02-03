@@ -19,6 +19,24 @@ git:
 stages:
   - prepare_cache
   - run
+  
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "XVzKZ6XaceZme9zDbVhXvS7+dxNFlcDY89EJugJaWJbj/0V9CS9zo1BGFduUMQBjuCjQSJkbJn0n6Bodt2YVvztirutSl6Iv6c7guzWZCJxd6OHBNpCsgipABYT468GRzbti5YA+FeG34d3COaBCCr/Pugt4sHa+5jevVFlHv8LWCBaDcWViSAng0vlk8X0iLz4HGxM8SSvtUPqTEEElT996ZLL9TgS00e/yDPcEHnz6DG6x6BVQdlHt+C8TD+gOo0b/sLfaXh9ReCChBj1asMA6Yv4gx8OlaWS4HXLxTbIfxfHntT/heMsO8gK2aRtwGsv80VSmB6BOqWnt6CxXOGjNMeUZJE+krJUAHr7VTP8Iz0ccPT1MsEaav5yw0jZiWXt5RLCJ8P2QvORd4LPv009aDU396uSgU+iOH6L77mAO7YugCwQs6NXU47Zj6vShOCKRdZlEXYyW9isi3Q/QTa/MqaLM2T/wFtcEenv3y4kHpwKlnIAZ99ToNdG0oaQUgq8yWo6O1WARAfD1qQ6Jyn8bd96LXi/SamHgV5oaKteQ5LvW2vgdB0UUbdNkD6D3FvaHjoQrRylsTKs9TOrDylewJUL0Z5qsLsm7/prylvwLcRhqQahprPTkIUdauT9snkocBxd+VGDLEql7ICx84J3pt5JPg3QXHytuxUe/ak0="
+
+before_install:
+  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
+addons:
+  coverity_scan:
+    project:
+      name: "azerothcore/azerothcore-wotlk"
+      description: "AzerothCore Coverity"
+    notification_email: "yehonal.azeroth@gmail.com"
+    build_command: "./acore.sh 'compiler' 'all'"
+    branch_pattern: coverity_scan
 
 jobs:
   include:
