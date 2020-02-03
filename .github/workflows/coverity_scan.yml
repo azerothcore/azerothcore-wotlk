@@ -15,7 +15,7 @@ jobs:
           bash ./apps/ci/ci-before_install.sh
       - name: Download Coverity Build Tool
         run: |
-          wget -q https://scan.coverity.com/download/cxx/linux64 --post-data "token=$TOKEN&project=azerothcore/azerothcore-wotlk" -O cov-analysis-linux64.tar.gz
+          wget -q https://scan.coverity.com/download/cxx/linux64 --post-data "token=$TOKEN&project=azerothcore-azerothcore-wotlk" -O cov-analysis-linux64.tar.gz
           mkdir cov-analysis-linux64
           tar xzf cov-analysis-linux64.tar.gz --strip 1 -C cov-analysis-linux64
         env:
@@ -30,12 +30,12 @@ jobs:
         run: |
           tar czvf acore.tgz cov-int
           curl \
-            --form project=azerothcore/azerothcore-wotlk \
+            --form project=azerothcore-azerothcore-wotlk \
             --form token=$TOKEN \
             --form email=yehonal.azeroth@gmail.com \
             --form file=@acore.tgz \
             --form version=trunk \
             --form description="Coverity scan for azerothcore" \
-            https://scan.coverity.com/builds?project=azerothcore/azerothcore-wotlk
+            https://scan.coverity.com/builds?project=azerothcore-azerothcore-wotlk
         env:
           TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
