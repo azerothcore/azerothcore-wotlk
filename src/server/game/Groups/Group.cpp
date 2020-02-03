@@ -349,6 +349,9 @@ Player* Group::GetInvited(const std::string& name) const
 
 bool Group::AddMember(Player* player)
 {
+    if (!player)
+        return false;
+
     // Get first not-full group
     uint8 subGroup = 0;
     if (m_subGroupsCounts)
@@ -379,22 +382,19 @@ bool Group::AddMember(Player* player)
 
     SubGroupCounterIncrease(subGroup);
 
-    if (player)
+    player->SetGroupInvite(NULL);
+    if (player->GetGroup())
     {
-        player->SetGroupInvite(NULL);
-        if (player->GetGroup())
-        {
-            if (isBGGroup() || isBFGroup()) // if player is in group and he is being added to BG raid group, then call SetBattlegroundRaid()
-                player->SetBattlegroundOrBattlefieldRaid(this, subGroup);
-            else //if player is in bg raid and we are adding him to normal group, then call SetOriginalGroup()
-                player->SetOriginalGroup(this, subGroup);
-        }
-        else //if player is not in group, then call set group
-            player->SetGroup(this, subGroup);
-
-        // if the same group invites the player back, cancel the homebind timer
-        _cancelHomebindIfInstance(player);
+        if (isBGGroup() || isBFGroup()) // if player is in group and he is being added to BG raid group, then call SetBattlegroundRaid()
+            player->SetBattlegroundOrBattlefieldRaid(this, subGroup);
+        else //if player is in bg raid and we are adding him to normal group, then call SetOriginalGroup()
+            player->SetOriginalGroup(this, subGroup);
     }
+    else //if player is not in group, then call set group
+        player->SetGroup(this, subGroup);
+
+    // if the same group invites the player back, cancel the homebind timer
+    _cancelHomebindIfInstance(player);
 
     if (!isRaidGroup())                                      // reset targetIcons for non-raid-groups
     {
@@ -414,10 +414,11 @@ bool Group::AddMember(Player* player)
     }
 
     SendUpdate();
-    sScriptMgr->OnGroupAddMember(this, player->GetGUID());
 
     if (player)
     {
+        sScriptMgr->OnGroupAddMember(this, player->GetGUID());
+
         if (!IsLeader(player->GetGUID()) && !isBGGroup() && !isBFGroup())
         {
             Player::ResetInstances(player->GetGUIDLow(), INSTANCE_RESET_GROUP_JOIN, false);
@@ -554,7 +555,7 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
         }
 
         // Reevaluate group enchanter if the leaving player had enchanting skill or the player is offline
-        if ((player && player->GetSkillValue(SKILL_ENCHANTING)) || !player)
+        if (!player || player->GetSkillValue(SKILL_ENCHANTING))
             ResetMaxEnchantingLevel();
 
         // Remove player from loot rolls

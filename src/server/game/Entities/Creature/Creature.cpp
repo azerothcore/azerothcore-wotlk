@@ -365,7 +365,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     // Load creature equipment
     if (!data || data->equipmentId == 0)                    // use default from the template
         LoadEquipment();
-    else if (data && data->equipmentId != 0)                // override, 0 means no equipment
+    else
     {
         m_originalEquipmentId = data->equipmentId;
         LoadEquipment(data->equipmentId);
