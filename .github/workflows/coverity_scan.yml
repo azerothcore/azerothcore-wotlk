@@ -10,9 +10,10 @@ jobs:
     steps:
       - name: Clone AzerothCore
         run: git clone --depth=1 --branch=coverity_scan https://github.com/azerothcore/azerothcore-wotlk .
+  
       - name: Install deps
-        run: |
-          bash ./apps/ci/ci-before_install.sh
+        run: source ./apps/ci/ci-before_install.sh
+  
       - name: Download Coverity Build Tool
         run: |
           wget -q https://scan.coverity.com/download/cxx/linux64 --post-data "token=$TOKEN&project=azerothcore-azerothcore-wotlk" -O cov-analysis-linux64.tar.gz
@@ -26,6 +27,7 @@ jobs:
           export PATH=`pwd`/cov-analysis-linux64/bin:$PATH
           cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=1 -DUSE_SCRIPTPCH=1 -DTOOLS=1 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=1 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=check_install
           cov-build --dir cov-int make -j 8 -k
+  
       - name: Submit the result to Coverity Scan
         run: |
           tar czvf acore.tgz cov-int
