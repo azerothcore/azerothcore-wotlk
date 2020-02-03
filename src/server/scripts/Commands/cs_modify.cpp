@@ -1259,7 +1259,6 @@ public:
             return false;
 
         uint32 display_id = (uint32)atoi((char*)args);
-
         Unit* target = handler->getSelectedUnit();
         if (!target)
             target = handler->GetSession()->GetPlayer();
@@ -1274,7 +1273,7 @@ public:
     }
 
     //morph creature or player
-    static bool HandleMorphResetCommand(ChatHandler* handler, const char* args)
+    static bool HandleMorphResetCommand(ChatHandler* handler, const char* /*args*/)
     {
         Unit* target = handler->getSelectedUnit();
         if (!target)
