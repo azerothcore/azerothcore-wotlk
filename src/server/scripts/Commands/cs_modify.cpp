@@ -63,7 +63,6 @@ public:
         static std::vector<ChatCommand> commandTable =
         {
             { "morph",          SEC_MODERATOR,      false, &HandleModifyMorphCommand,          "" },
-            { "demorph",        SEC_MODERATOR,      false, &HandleDeMorphCommand,              "" },
             { "modify",         SEC_GAMEMASTER,     false, nullptr,                            "", modifyCommandTable }
         };
         return commandTable;
@@ -1254,6 +1253,22 @@ public:
         if (!*args)
             return false;
 
+        string reset;
+        reset.push_back(*args);
+        if (reset == "r" || reset == "R")
+        {
+            Unit* target = handler->getSelectedUnit();
+            if (!target)
+                target = handler->GetSession()->GetPlayer();
+
+            // check online security
+            else if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer(), 0))
+                return false;
+
+            target->DeMorph();
+            return true;
+        }
+
         uint32 display_id = (uint32)atoi((char*)args);
 
         Unit* target = handler->getSelectedUnit();
@@ -1382,21 +1397,6 @@ public:
         if (handler->needReportToTarget(target))
             (ChatHandler(target->GetSession())).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full, handler->GetNameLink().c_str());
 
-        return true;
-    }
-
-    //demorph player or unit
-    static bool HandleDeMorphCommand(ChatHandler* handler, const char* /*args*/)
-    {
-        Unit* target = handler->getSelectedUnit();
-        if (!target)
-            target = handler->GetSession()->GetPlayer();
-
-        // check online security
-        else if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer(), 0))
-            return false;
-
-        target->DeMorph();
         return true;
     }
 };
