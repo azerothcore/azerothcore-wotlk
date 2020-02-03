@@ -12,7 +12,7 @@ jobs:
         run: git clone --depth=1 --branch=coverity_scan https://github.com/azerothcore/azerothcore-wotlk .
   
       - name: Install deps
-        run: source ./apps/ci/ci-before_install.sh
+        run: bash ./acore.sh install-deps
   
       - name: Download Coverity Build Tool
         run: |
