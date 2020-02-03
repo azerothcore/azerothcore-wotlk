@@ -16,7 +16,7 @@
 #include "AddonMgr.h"
 #include "DatabaseEnv.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "Packet.h"
 #include "GossipDef.h"
 #include "Cryptography/BigNumber.h"
 
@@ -51,6 +51,10 @@ struct LfgQueueStatusData;
 struct LfgPlayerRewardData;
 struct LfgRoleCheck;
 struct LfgUpdateData;
+}
+
+namespace WorldPackets
+{
 }
 
 enum AccountDataType
@@ -487,7 +491,7 @@ class WorldSession
         void HandleGameObjectQueryOpcode(WorldPacket& recvPacket);
 
         void HandleMoveWorldportAckOpcode(WorldPacket& recvPacket);
-        void HandleMoveWorldportAckOpcode();                // for server-side calls
+        void HandleMoveWorldportAck();                // for server-side calls
 
         void HandleMovementOpcodes(WorldPacket& recvPacket);
         void HandleSetActiveMoverOpcode(WorldPacket& recvData);

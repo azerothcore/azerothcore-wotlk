@@ -33,6 +33,7 @@
 #include "Transport.h"
 #include "WardenWin.h"
 #include "WardenMac.h"
+#include "PacketUtilities.h"
 #include "SavingSystem.h"
 #include "AccountMgr.h"
 #ifdef ELUNA
@@ -47,15 +48,15 @@ std::string const DefaultPlayerName = "<none>";
 
 bool MapSessionFilter::Process(WorldPacket* packet)
 {
-    if (packet->GetOpcode() >= NUM_MSG_TYPES)
+    if (static_cast<OpcodeServer>(packet->GetOpcode()) >= NUM_MSG_TYPES)
         return true;
 
-    OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
+    ClientOpcodeHandler const* opHandle = opcodeTable[static_cast<OpcodeClient>(packet->GetOpcode())];
 
-    if (opHandle.packetProcessing == PROCESS_INPLACE)
+    if (opHandle->ProcessingPlace == PROCESS_INPLACE)
         return true;
 
-    if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
+    if (opHandle->ProcessingPlace == PROCESS_THREADUNSAFE)
         return false;
 
     Player* player = m_pSession->GetPlayer();
@@ -67,15 +68,15 @@ bool MapSessionFilter::Process(WorldPacket* packet)
 
 bool WorldSessionFilter::Process(WorldPacket* packet)
 {
-    if (packet->GetOpcode() >= NUM_MSG_TYPES)
+    if (static_cast<OpcodeServer>(packet->GetOpcode()) >= NUM_MSG_TYPES)
         return true;
 
-    OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
+    ClientOpcodeHandler const* opHandle = opcodeTable[static_cast<OpcodeClient>(packet->GetOpcode())];
 
-    if (opHandle.packetProcessing == PROCESS_INPLACE)
+    if (opHandle->ProcessingPlace == PROCESS_INPLACE)
         return true;
 
-    if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
+    if (opHandle->ProcessingPlace == PROCESS_THREADUNSAFE)
         return true;
 
     Player* player = m_pSession->GetPlayer();
@@ -189,6 +190,9 @@ uint32 WorldSession::GetGuidLow() const
 /// Send a packet to the client
 void WorldSession::SendPacket(WorldPacket const* packet)
 {
+
+    ASSERT(packet->GetOpcode() != NULL_OPCODE);
+
     if (!m_Socket)
         return;
 
@@ -269,16 +273,16 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     while (m_Socket && !m_Socket->IsClosed() && !_recvQueue.empty() && _recvQueue.peek(true) != firstDelayedPacket && _recvQueue.next(packet, updater))
     {
-        if (packet->GetOpcode() >= NUM_MSG_TYPES)
+        if (static_cast<OpcodeClient>(packet->GetOpcode()) >= NUM_MSG_TYPES)
         {
-            sLog->outError("WorldSession Packet filter: received non-existent opcode %s (0x%.4X)",LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode());
+            sLog->outError("WorldSession Packet filter: received non-existent opcode %s (0x%.4X)",LookupOpcodeName(static_cast<OpcodeClient>(packet->GetOpcode()), static_cast<OpcodeClient>(packet->GetOpcode()));
         }
         else
         {
-            OpcodeHandler &opHandle = opcodeTable[packet->GetOpcode()];
+            ClientOpcodeHandler const* opHandle = opcodeTable[static_cast<OpcodeClient>(packet->GetOpcode())];
             try
             {
-                switch (opHandle.status)
+                switch (opHandle->status)
                 {
                     case STATUS_LOGGEDIN:
                         if (!_player)
@@ -291,7 +295,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                             // pussywizard: previously such were skipped, so leave it as it is xD proper code below if we wish to change that
 
                             // pussywizard: requeue only important packets not related to maps (PROCESS_THREADUNSAFE)
-                            /*if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
+                            /*if (opHandle->ProcessingPlace == PROCESS_THREADUNSAFE)
                             {
                                 if (!firstDelayedPacket)
                                     firstDelayedPacket = packet;
@@ -312,7 +316,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                           if (!sEluna->OnPacketReceive(this, *packet))
                               break;
 #endif
-                          (this->*opHandle.handler)(*packet);
+                          opHandle->Call(this, *packet);
                         }
                         break;
                     case STATUS_TRANSFER:
@@ -328,7 +332,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                             if (!sEluna->OnPacketReceive(this, *packet))
                                 break;
 #endif
-                            (this->*opHandle.handler)(*packet);
+                            opHandle->Call(this, *packet);
                         }
                         break;
                     case STATUS_AUTHED:
@@ -340,7 +344,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         if (!sEluna->OnPacketReceive(this, *packet))
                             break;
 #endif
-                        (this->*opHandle.handler)(*packet);
+                        opHandle->Call(this, *packet);
                         break;
                     case STATUS_NEVER:
                         break;
@@ -348,9 +352,13 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         break;
                 }
             }
+            catch (WorldPackets::PacketArrayMaxCapacityException const& pamce)
+            {
+                sLog->outError("PacketArrayMaxCapacityException: %s while parsing %s from %s.", pamce.what(), GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str(), GetPlayerInfo().c_str());
+            }
             catch(ByteBufferException const&)
             {
-                sLog->outError("WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.", packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
+                sLog->outError("WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.", static_cast<OpcodeClient>(packet->GetOpcode()), GetRemoteAddress().c_str(), GetAccountId());
                 if (sLog->IsOutDebug())
                 {
                     sLog->outDebug(LOG_FILTER_NETWORKIO, "Dumping error causing packet:");
@@ -450,7 +458,7 @@ void WorldSession::LogoutPlayer(bool save)
 {
     // finish pending transfers before starting the logout
     while (_player && _player->IsBeingTeleportedFar())
-        HandleMoveWorldportAckOpcode();
+        HandleMoveWorldportAck();
 
     m_playerLogout = true;
     m_playerSave = save;
@@ -534,7 +542,7 @@ void WorldSession::LogoutPlayer(bool save)
         // Repop at GraveYard or other player far teleport will prevent saving player because of not present map
         // Teleport player immediately for correct player save
         while (_player && _player->IsBeingTeleportedFar())
-            HandleMoveWorldportAckOpcode();
+            HandleMoveWorldportAck();
 
         ///- empty buyback items and save the player in the database
         // some save parts only correctly work in case player present in map/player_lists (pets, etc)
@@ -660,24 +668,24 @@ char const* WorldSession::GetAcoreString(uint32 entry) const
     return sObjectMgr->GetAcoreString(entry, GetSessionDbLocaleIndex());
 }
 
-void WorldSession::Handle_NULL(WorldPacket& recvPacket)
+void WorldSession::Handle_NULL(WorldPacket& null)
 {
-    sLog->outError("SESSION: received unhandled opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
+    sLog->outError("SESSION: received unhandled opcode %s (0x%.4X)", GetOpcodeNameForLogging(static_cast<OpcodeClient>(null.GetOpcode())).c_str(), GetPlayerInfo().c_str());
 }
 
 void WorldSession::Handle_EarlyProccess(WorldPacket& recvPacket)
 {
-    sLog->outError("SESSION: received opcode %s (0x%.4X) that must be processed in WorldSocket::OnRead", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
+    sLog->outError("SESSION: received opcode %s (0x%.4X) that must be processed in WorldSocket::OnRead", GetOpcodeNameForLogging(static_cast<OpcodeClient>(recvPacket.GetOpcode())).c_str(), GetPlayerInfo().c_str());
 }
 
 void WorldSession::Handle_ServerSide(WorldPacket& recvPacket)
 {
-    sLog->outError("SESSION: received server-side opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
+    sLog->outError("SESSION: received server-side opcode %s (0x%.4X)", GetOpcodeNameForLogging(static_cast<OpcodeClient>(recvPacket.GetOpcode())).c_str(), GetPlayerInfo().c_str());
 }
 
 void WorldSession::Handle_Deprecated(WorldPacket& recvPacket)
 {
-    sLog->outError("SESSION: received deprecated opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
+    sLog->outError("SESSION: received deprecated opcode %s (0x%.4X)", GetOpcodeNameForLogging(static_cast<OpcodeClient>(recvPacket.GetOpcode())).c_str(), GetPlayerInfo().c_str());
 }
 
 void WorldSession::SendAuthWaitQue(uint32 position)
