@@ -2189,8 +2189,11 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
 
         if (info->m_petType == SUMMON_PET)
         {
-            // this enables pet details window (Shift+P)
-            pet->GetCharmInfo()->SetPetNumber(pet_number, true);
+            if (pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON)
+                pet->GetCharmInfo()->SetPetNumber(pet_number, true); // Show pet details tab (Shift+P) only for demons
+            else
+                pet->GetCharmInfo()->SetPetNumber(pet_number, false);
+
             pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
             pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
