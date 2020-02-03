@@ -731,6 +731,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         {
             if (petType == MAX_PET_TYPE)
             {
+                // The petType was not overwritten by the hook, continue with default initialization
                 if (owner->getClass() == CLASS_WARLOCK ||
                     owner->getClass() == CLASS_SHAMAN ||          // Fire Elemental
                     owner->getClass() == CLASS_DEATH_KNIGHT ||    // Risen Ghoul
