@@ -1653,9 +1653,24 @@ bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGu
     return ret;
 }
 
-void ScriptMgr::OnPetInitStatsForLevel(Pet* pet)
+void ScriptMgr::OnBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration)
 {
-    FOREACH_SCRIPT(PlayerScript)->OnPetInitStatsForLevel(pet);
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeTempSummonInitStats(player, tempSummon, duration);
+}
+
+void ScriptMgr::OnBeforeGuardianInitStatsForLevel(Player* player, Guardian* guardian, CreatureTemplate const* cinfo, PetType& petType)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeGuardianInitStatsForLevel(player, guardian, cinfo, petType);
+}
+
+void ScriptMgr::OnAfterGuardianInitStatsForLevel(Player* player, Guardian* guardian)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnAfterGuardianInitStatsForLevel(player, guardian);
+}
+
+void ScriptMgr::OnBeforeLoadPetFromDB(Player* player, uint32& petentry, uint32& petnumber, bool& current, bool& forceLoadFromDB)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeLoadPetFromDB(player, petentry, petnumber, current, forceLoadFromDB);
 }
 
 // Account
