@@ -12712,6 +12712,9 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
             Player const* player = target->GetTypeId() == TYPEID_PLAYER ? target->ToPlayer() : thisUnit->ToPlayer();
             Unit const* creature = target->GetTypeId() == TYPEID_UNIT ? target : thisUnit;
 
+            if (creature->IsContestedGuard() && player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP))
+                return true;
+
             if (FactionTemplateEntry const* factionTemplate = creature->GetFactionTemplateEntry())
             {
                 if (!(player->GetReputationMgr().GetForcedRankIfAny(factionTemplate)))
