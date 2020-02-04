@@ -3534,7 +3534,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
         break;
     }
 
-    case SMART_TARGET_VEHICLE_ACCESSORY:
+    case SMART_TARGET_VEHICLE_PASSENGER:
     {
         if (me && me->IsVehicle())
         {
