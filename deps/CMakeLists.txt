@@ -18,6 +18,7 @@ endif()
 
 add_subdirectory(threads)
 add_subdirectory(acelite)
+add_subdirectory(asio)
 add_subdirectory(fmt)
 
 if(SERVERS OR TOOLS)

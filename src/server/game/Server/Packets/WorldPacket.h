@@ -22,10 +22,23 @@ class WorldPacket : public ByteBuffer
         WorldPacket(uint16 opcode, size_t res = 200) : ByteBuffer(res),
             m_opcode(opcode) { }
 
-        WorldPacket(const WorldPacket &packet)              : ByteBuffer(packet), m_opcode(packet.m_opcode)
+        WorldPacket(WorldPacket&& packet) : ByteBuffer(std::move(packet)), m_opcode(packet.m_opcode)
         {
         }
 
+        WorldPacket(WorldPacket const& right) : ByteBuffer(right), m_opcode(right.m_opcode)
+        {
+        }
+
+        WorldPacket& operator=(WorldPacket const& right)
+        {
+            if (this != &right)
+            {
+                m_opcode = right.m_opcode;
+                ByteBuffer::operator =(right);
+            }
+            return *this;
+        }
 
         WorldPacket& operator=(WorldPacket&& right)
         {

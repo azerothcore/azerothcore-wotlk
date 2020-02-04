@@ -1,0 +1,58 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>windows::overlapped_handle::get_io_service</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../../index.html" title="Asio">
+<link rel="up" href="../windows__overlapped_handle.html" title="windows::overlapped_handle">
+<link rel="prev" href="get_io_context.html" title="windows::overlapped_handle::get_io_context">
+<link rel="next" href="is_open.html" title="windows::overlapped_handle::is_open">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="get_io_context.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../windows__overlapped_handle.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="is_open.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="asio.reference.windows__overlapped_handle.get_io_service"></a><a class="link" href="get_io_service.html" title="windows::overlapped_handle::get_io_service">windows::overlapped_handle::get_io_service</a>
+</h4></div></div></div>
+<p>
+          <a class="indexterm" name="asio.indexterm.windows__overlapped_handle.get_io_service"></a> 
+(Deprecated:
+          Use <code class="computeroutput">get_executor()</code>.) Get the <a class="link" href="../io_context.html" title="io_context"><code class="computeroutput">io_context</code></a>
+          associated with the object.
+        </p>
+<pre class="programlisting">asio::io_context &amp; get_io_service();
+</pre>
+<p>
+          This function may be used to obtain the <a class="link" href="../io_context.html" title="io_context"><code class="computeroutput">io_context</code></a>
+          object that the I/O object uses to dispatch handlers for asynchronous operations.
+        </p>
+<h6>
+<a name="asio.reference.windows__overlapped_handle.get_io_service.h0"></a>
+          <span><a name="asio.reference.windows__overlapped_handle.get_io_service.return_value"></a></span><a class="link" href="get_io_service.html#asio.reference.windows__overlapped_handle.get_io_service.return_value">Return
+          Value</a>
+        </h6>
+<p>
+          A reference to the <a class="link" href="../io_context.html" title="io_context"><code class="computeroutput">io_context</code></a>
+          object that the I/O object will use to dispatch handlers. Ownership is
+          not transferred to the caller.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="get_io_context.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../windows__overlapped_handle.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="is_open.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

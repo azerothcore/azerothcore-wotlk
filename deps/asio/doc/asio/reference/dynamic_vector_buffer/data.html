@@ -1,0 +1,61 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>dynamic_vector_buffer::data</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../../index.html" title="Asio">
+<link rel="up" href="../dynamic_vector_buffer.html" title="dynamic_vector_buffer">
+<link rel="prev" href="consume.html" title="dynamic_vector_buffer::consume">
+<link rel="next" href="dynamic_vector_buffer.html" title="dynamic_vector_buffer::dynamic_vector_buffer">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="consume.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../dynamic_vector_buffer.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="dynamic_vector_buffer.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="asio.reference.dynamic_vector_buffer.data"></a><a class="link" href="data.html" title="dynamic_vector_buffer::data">dynamic_vector_buffer::data</a>
+</h4></div></div></div>
+<p>
+          <a class="indexterm" name="asio.indexterm.dynamic_vector_buffer.data"></a> 
+Get a
+          list of buffers that represents the input sequence.
+        </p>
+<pre class="programlisting">const_buffers_type data() const;
+</pre>
+<h6>
+<a name="asio.reference.dynamic_vector_buffer.data.h0"></a>
+          <span><a name="asio.reference.dynamic_vector_buffer.data.return_value"></a></span><a class="link" href="data.html#asio.reference.dynamic_vector_buffer.data.return_value">Return
+          Value</a>
+        </h6>
+<p>
+          An object of type <code class="computeroutput">const_buffers_type</code> that satisfies ConstBufferSequence
+          requirements, representing the basic_string memory in input sequence.
+        </p>
+<h6>
+<a name="asio.reference.dynamic_vector_buffer.data.h1"></a>
+          <span><a name="asio.reference.dynamic_vector_buffer.data.remarks"></a></span><a class="link" href="data.html#asio.reference.dynamic_vector_buffer.data.remarks">Remarks</a>
+        </h6>
+<p>
+          The returned object is invalidated by any <code class="computeroutput">dynamic_vector_buffer</code>
+          or <code class="computeroutput">basic_string</code> member function that modifies the input sequence
+          or output sequence.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="consume.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../dynamic_vector_buffer.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="dynamic_vector_buffer.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

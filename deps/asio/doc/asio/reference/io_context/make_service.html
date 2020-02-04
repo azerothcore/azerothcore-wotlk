@@ -1,0 +1,96 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>io_context::make_service</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../../index.html" title="Asio">
+<link rel="up" href="../io_context.html" title="io_context">
+<link rel="prev" href="io_context/overload2.html" title="io_context::io_context (2 of 2 overloads)">
+<link rel="next" href="notify_fork.html" title="io_context::notify_fork">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="io_context/overload2.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../io_context.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="notify_fork.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="asio.reference.io_context.make_service"></a><a class="link" href="make_service.html" title="io_context::make_service">io_context::make_service</a>
+</h4></div></div></div>
+<p>
+          <span class="emphasis"><em>Inherited from execution_context.</em></span>
+        </p>
+<p>
+          <a class="indexterm" name="asio.indexterm.io_context.make_service"></a> 
+Creates a service
+          object and adds it to the <a class="link" href="../execution_context.html" title="execution_context"><code class="computeroutput">execution_context</code></a>.
+        </p>
+<pre class="programlisting">template&lt;
+    typename <a class="link" href="../Service.html" title="Service requirements">Service</a>,
+    typename... Args&gt;
+friend Service &amp; make_service(
+    execution_context &amp; e,
+    Args &amp;&amp;... args);
+</pre>
+<p>
+          This function is used to add a service to the <a class="link" href="../execution_context.html" title="execution_context"><code class="computeroutput">execution_context</code></a>.
+        </p>
+<h6>
+<a name="asio.reference.io_context.make_service.h0"></a>
+          <span><a name="asio.reference.io_context.make_service.parameters"></a></span><a class="link" href="make_service.html#asio.reference.io_context.make_service.parameters">Parameters</a>
+        </h6>
+<div class="variablelist">
+<p class="title"><b></b></p>
+<dl>
+<dt><span class="term">e</span></dt>
+<dd><p>
+                The <a class="link" href="../execution_context.html" title="execution_context"><code class="computeroutput">execution_context</code></a>
+                object that owns the service.
+              </p></dd>
+<dt><span class="term">args</span></dt>
+<dd><p>
+                Zero or more arguments to be passed to the service constructor.
+              </p></dd>
+</dl>
+</div>
+<h6>
+<a name="asio.reference.io_context.make_service.h1"></a>
+          <span><a name="asio.reference.io_context.make_service.exceptions"></a></span><a class="link" href="make_service.html#asio.reference.io_context.make_service.exceptions">Exceptions</a>
+        </h6>
+<div class="variablelist">
+<p class="title"><b></b></p>
+<dl>
+<dt><span class="term">asio::service_already_exists</span></dt>
+<dd><p>
+                Thrown if a service of the given type is already present in the
+                <a class="link" href="../execution_context.html" title="execution_context"><code class="computeroutput">execution_context</code></a>.
+              </p></dd>
+</dl>
+</div>
+<h6>
+<a name="asio.reference.io_context.make_service.h2"></a>
+          <span><a name="asio.reference.io_context.make_service.requirements"></a></span><a class="link" href="make_service.html#asio.reference.io_context.make_service.requirements">Requirements</a>
+        </h6>
+<p>
+          <span class="emphasis"><em>Header: </em></span><code class="literal">asio/io_context.hpp</code>
+        </p>
+<p>
+          <span class="emphasis"><em>Convenience header: </em></span><code class="literal">asio.hpp</code>
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="io_context/overload2.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../io_context.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="notify_fork.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

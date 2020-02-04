@@ -1,0 +1,319 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>system_context</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../index.html" title="Asio">
+<link rel="up" href="../reference.html" title="Reference">
+<link rel="prev" href="system_category.html" title="system_category">
+<link rel="next" href="system_context/add_service.html" title="system_context::add_service">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="system_category.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="system_context/add_service.html"><img src="../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="asio.reference.system_context"></a><a class="link" href="system_context.html" title="system_context">system_context</a>
+</h3></div></div></div>
+<p>
+        The executor context for the system executor.
+      </p>
+<pre class="programlisting">class system_context :
+  public execution_context
+</pre>
+<h5>
+<a name="asio.reference.system_context.h0"></a>
+        <span><a name="asio.reference.system_context.types"></a></span><a class="link" href="system_context.html#asio.reference.system_context.types">Types</a>
+      </h5>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Name
+                </p>
+              </th>
+<th>
+                <p>
+                  Description
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/executor_type.html" title="system_context::executor_type"><span class="bold"><strong>executor_type</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  The executor type associated with the context.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/fork_event.html" title="system_context::fork_event"><span class="bold"><strong>fork_event</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Fork-related event notifications.
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+<h5>
+<a name="asio.reference.system_context.h1"></a>
+        <span><a name="asio.reference.system_context.member_functions"></a></span><a class="link" href="system_context.html#asio.reference.system_context.member_functions">Member
+        Functions</a>
+      </h5>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Name
+                </p>
+              </th>
+<th>
+                <p>
+                  Description
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/get_executor.html" title="system_context::get_executor"><span class="bold"><strong>get_executor</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Obtain an executor for the context.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/join.html" title="system_context::join"><span class="bold"><strong>join</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Join all threads in the system thread pool.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/notify_fork.html" title="system_context::notify_fork"><span class="bold"><strong>notify_fork</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Notify the execution_context of a fork-related event.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/stop.html" title="system_context::stop"><span class="bold"><strong>stop</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Signal all threads in the system thread pool to stop.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/stopped.html" title="system_context::stopped"><span class="bold"><strong>stopped</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Determine whether the system thread pool has been stopped.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/_system_context.html" title="system_context::~system_context"><span class="bold"><strong>~system_context</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Destructor shuts down all threads in the system thread pool.
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+<h5>
+<a name="asio.reference.system_context.h2"></a>
+        <span><a name="asio.reference.system_context.protected_member_functions"></a></span><a class="link" href="system_context.html#asio.reference.system_context.protected_member_functions">Protected
+        Member Functions</a>
+      </h5>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Name
+                </p>
+              </th>
+<th>
+                <p>
+                  Description
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/destroy.html" title="system_context::destroy"><span class="bold"><strong>destroy</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Destroys all services in the context.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/shutdown.html" title="system_context::shutdown"><span class="bold"><strong>shutdown</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Shuts down all services in the context.
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+<h5>
+<a name="asio.reference.system_context.h3"></a>
+        <span><a name="asio.reference.system_context.friends"></a></span><a class="link" href="system_context.html#asio.reference.system_context.friends">Friends</a>
+      </h5>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Name
+                </p>
+              </th>
+<th>
+                <p>
+                  Description
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/add_service.html" title="system_context::add_service"><span class="bold"><strong>add_service</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  (Deprecated: Use make_service().) Add a service object to the execution_context.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/has_service.html" title="system_context::has_service"><span class="bold"><strong>has_service</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Determine if an execution_context contains a specified service
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/make_service.html" title="system_context::make_service"><span class="bold"><strong>make_service</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Creates a service object and adds it to the execution_context.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_context/use_service.html" title="system_context::use_service"><span class="bold"><strong>use_service</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Obtain the service object corresponding to the given type.
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+<h5>
+<a name="asio.reference.system_context.h4"></a>
+        <span><a name="asio.reference.system_context.requirements"></a></span><a class="link" href="system_context.html#asio.reference.system_context.requirements">Requirements</a>
+      </h5>
+<p>
+        <span class="emphasis"><em>Header: </em></span><code class="literal">asio/system_context.hpp</code>
+      </p>
+<p>
+        <span class="emphasis"><em>Convenience header: </em></span><code class="literal">asio.hpp</code>
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="system_category.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="system_context/add_service.html"><img src="../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

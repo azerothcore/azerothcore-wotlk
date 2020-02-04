@@ -1,0 +1,140 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>system_error</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../index.html" title="Asio">
+<link rel="up" href="../reference.html" title="Reference">
+<link rel="prev" href="system_context/_system_context.html" title="system_context::~system_context">
+<link rel="next" href="system_error/code.html" title="system_error::code">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="system_context/_system_context.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="system_error/code.html"><img src="../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="asio.reference.system_error"></a><a class="link" href="system_error.html" title="system_error">system_error</a>
+</h3></div></div></div>
+<p>
+        The <a class="link" href="system_error.html" title="system_error"><code class="computeroutput">system_error</code></a>
+        class is used to represent system conditions that prevent the library from
+        operating correctly.
+      </p>
+<pre class="programlisting">class system_error :
+  public std::exception
+</pre>
+<h5>
+<a name="asio.reference.system_error.h0"></a>
+        <span><a name="asio.reference.system_error.member_functions"></a></span><a class="link" href="system_error.html#asio.reference.system_error.member_functions">Member
+        Functions</a>
+      </h5>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Name
+                </p>
+              </th>
+<th>
+                <p>
+                  Description
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_error/code.html" title="system_error::code"><span class="bold"><strong>code</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Get the error code associated with the exception.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_error/operator_eq_.html" title="system_error::operator="><span class="bold"><strong>operator=</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Assignment operator.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_error/system_error.html" title="system_error::system_error"><span class="bold"><strong>system_error</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Construct with an error code. <br> <span class="silver"> &#8212;</span><br> Construct with an error
+                  code and context. <br> <span class="silver"> &#8212;</span><br> Copy constructor.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_error/what.html" title="system_error::what"><span class="bold"><strong>what</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Get a string representation of the exception.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="system_error/_system_error.html" title="system_error::~system_error"><span class="bold"><strong>~system_error</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Destructor.
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+<h5>
+<a name="asio.reference.system_error.h1"></a>
+        <span><a name="asio.reference.system_error.requirements"></a></span><a class="link" href="system_error.html#asio.reference.system_error.requirements">Requirements</a>
+      </h5>
+<p>
+        <span class="emphasis"><em>Header: </em></span><code class="literal">asio/system_error.hpp</code>
+      </p>
+<p>
+        <span class="emphasis"><em>Convenience header: </em></span><code class="literal">asio.hpp</code>
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="system_context/_system_context.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="system_error/code.html"><img src="../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>basic_socket::debug</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../../index.html" title="Asio">
+<link rel="up" href="../basic_socket.html" title="basic_socket">
+<link rel="prev" href="connect/overload2.html" title="basic_socket::connect (2 of 2 overloads)">
+<link rel="next" href="do_not_route.html" title="basic_socket::do_not_route">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="connect/overload2.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../basic_socket.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="do_not_route.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="asio.reference.basic_socket.debug"></a><a class="link" href="debug.html" title="basic_socket::debug">basic_socket::debug</a>
+</h4></div></div></div>
+<p>
+          <span class="emphasis"><em>Inherited from socket_base.</em></span>
+        </p>
+<p>
+          <a class="indexterm" name="asio.indexterm.basic_socket.debug"></a> 
+Socket option to enable
+          socket-level debugging.
+        </p>
+<pre class="programlisting">typedef implementation_defined debug;
+</pre>
+<p>
+          Implements the SOL_SOCKET/SO_DEBUG socket option.
+        </p>
+<h6>
+<a name="asio.reference.basic_socket.debug.h0"></a>
+          <span><a name="asio.reference.basic_socket.debug.examples"></a></span><a class="link" href="debug.html#asio.reference.basic_socket.debug.examples">Examples</a>
+        </h6>
+<p>
+          Setting the option:
+        </p>
+<pre class="programlisting">asio::ip::tcp::socket socket(io_context);
+...
+asio::socket_base::debug option(true);
+socket.set_option(option);
+</pre>
+<p>
+          Getting the current option value:
+        </p>
+<pre class="programlisting">asio::ip::tcp::socket socket(io_context);
+...
+asio::socket_base::debug option;
+socket.get_option(option);
+bool is_set = option.value();
+</pre>
+<h6>
+<a name="asio.reference.basic_socket.debug.h1"></a>
+          <span><a name="asio.reference.basic_socket.debug.requirements"></a></span><a class="link" href="debug.html#asio.reference.basic_socket.debug.requirements">Requirements</a>
+        </h6>
+<p>
+          <span class="emphasis"><em>Header: </em></span><code class="literal">asio/basic_socket.hpp</code>
+        </p>
+<p>
+          <span class="emphasis"><em>Convenience header: </em></span><code class="literal">asio.hpp</code>
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="connect/overload2.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../basic_socket.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="do_not_route.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

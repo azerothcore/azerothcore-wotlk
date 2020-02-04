@@ -1,0 +1,98 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>io_context::strand::wrap</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../../index.html" title="Asio">
+<link rel="up" href="../io_context__strand.html" title="io_context::strand">
+<link rel="prev" href="strand.html" title="io_context::strand::strand">
+<link rel="next" href="_strand.html" title="io_context::strand::~strand">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="strand.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../io_context__strand.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="_strand.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="asio.reference.io_context__strand.wrap"></a><a class="link" href="wrap.html" title="io_context::strand::wrap">io_context::strand::wrap</a>
+</h4></div></div></div>
+<p>
+          <a class="indexterm" name="asio.indexterm.io_context__strand.wrap"></a> 
+(Deprecated:
+          Use <a class="link" href="../bind_executor.html" title="bind_executor"><code class="computeroutput">bind_executor</code></a>.)
+          Create a new handler that automatically dispatches the wrapped handler
+          on the strand.
+        </p>
+<pre class="programlisting">template&lt;
+    typename <a class="link" href="../Handler.html" title="Handlers">Handler</a>&gt;
+unspecified wrap(
+    Handler handler);
+</pre>
+<p>
+          This function is used to create a new handler function object that, when
+          invoked, will automatically pass the wrapped handler to the strand's dispatch
+          function.
+        </p>
+<h6>
+<a name="asio.reference.io_context__strand.wrap.h0"></a>
+          <span><a name="asio.reference.io_context__strand.wrap.parameters"></a></span><a class="link" href="wrap.html#asio.reference.io_context__strand.wrap.parameters">Parameters</a>
+        </h6>
+<div class="variablelist">
+<p class="title"><b></b></p>
+<dl>
+<dt><span class="term">handler</span></dt>
+<dd>
+<p>
+                The handler to be wrapped. The strand will make a copy of the handler
+                object as required. The function signature of the handler must be:
+</p>
+<pre class="programlisting">void handler(A1 a1, ... An an);
+</pre>
+<p>
+              </p>
+</dd>
+</dl>
+</div>
+<h6>
+<a name="asio.reference.io_context__strand.wrap.h1"></a>
+          <span><a name="asio.reference.io_context__strand.wrap.return_value"></a></span><a class="link" href="wrap.html#asio.reference.io_context__strand.wrap.return_value">Return Value</a>
+        </h6>
+<p>
+          A function object that, when invoked, passes the wrapped handler to the
+          strand's dispatch function. Given a function object with the signature:
+        </p>
+<pre class="programlisting">R f(A1 a1, ... An an);
+</pre>
+<p>
+          If this function object is passed to the wrap function like so:
+        </p>
+<pre class="programlisting">strand.wrap(f);
+</pre>
+<p>
+          then the return value is a function object with the signature
+        </p>
+<pre class="programlisting">void g(A1 a1, ... An an);
+</pre>
+<p>
+          that, when invoked, executes code equivalent to:
+        </p>
+<pre class="programlisting">strand.dispatch(boost::bind(f, a1, ... an));
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="strand.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../io_context__strand.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="_strand.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

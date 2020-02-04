@@ -1,0 +1,185 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>null_buffers::value_type</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../../index.html" title="Asio">
+<link rel="up" href="../null_buffers.html" title="null_buffers">
+<link rel="prev" href="end.html" title="null_buffers::end">
+<link rel="next" href="../operator_lt__lt_.html" title="operator&lt;&lt;">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="end.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../null_buffers.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="../operator_lt__lt_.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="asio.reference.null_buffers.value_type"></a><a class="link" href="value_type.html" title="null_buffers::value_type">null_buffers::value_type</a>
+</h4></div></div></div>
+<p>
+          <a class="indexterm" name="asio.indexterm.null_buffers.value_type"></a> 
+The type for
+          each element in the list of buffers.
+        </p>
+<pre class="programlisting">typedef mutable_buffer value_type;
+</pre>
+<h6>
+<a name="asio.reference.null_buffers.value_type.h0"></a>
+          <span><a name="asio.reference.null_buffers.value_type.member_functions"></a></span><a class="link" href="value_type.html#asio.reference.null_buffers.value_type.member_functions">Member
+          Functions</a>
+        </h6>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Name
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <a class="link" href="../mutable_buffer/data.html" title="mutable_buffer::data"><span class="bold"><strong>data</strong></span></a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Get a pointer to the beginning of the memory range.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a class="link" href="../mutable_buffer/mutable_buffer.html" title="mutable_buffer::mutable_buffer"><span class="bold"><strong>mutable_buffer</strong></span></a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Construct an empty buffer. <br> <span class="silver"> &#8212;</span><br> Construct a buffer to
+                    represent a given memory range.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a class="link" href="../mutable_buffer/operator_plus__eq_.html" title="mutable_buffer::operator+="><span class="bold"><strong>operator+=</strong></span></a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Move the start of the buffer by the specified number of bytes.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a class="link" href="../mutable_buffer/size.html" title="mutable_buffer::size"><span class="bold"><strong>size</strong></span></a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Get the size of the memory range.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+<h6>
+<a name="asio.reference.null_buffers.value_type.h1"></a>
+          <span><a name="asio.reference.null_buffers.value_type.related_functions"></a></span><a class="link" href="value_type.html#asio.reference.null_buffers.value_type.related_functions">Related
+          Functions</a>
+        </h6>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Name
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody><tr>
+<td>
+                  <p>
+                    <a class="link" href="../mutable_buffer/operator_plus_.html" title="mutable_buffer::operator+"><span class="bold"><strong>operator+</strong></span></a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Create a new modifiable buffer that is offset from the start
+                    of another.
+                  </p>
+                </td>
+</tr></tbody>
+</table></div>
+<p>
+          The <a class="link" href="../mutable_buffer.html" title="mutable_buffer"><code class="computeroutput">mutable_buffer</code></a>
+          class provides a safe representation of a buffer that can be modified.
+          It does not own the underlying data, and so is cheap to copy or assign.
+        </p>
+<h6>
+<a name="asio.reference.null_buffers.value_type.h2"></a>
+          <span><a name="asio.reference.null_buffers.value_type.accessing_buffer_contents"></a></span><a class="link" href="value_type.html#asio.reference.null_buffers.value_type.accessing_buffer_contents">Accessing
+          Buffer Contents</a>
+        </h6>
+<p>
+          The contents of a buffer may be accessed using the <code class="computeroutput">data()</code>
+          and <code class="computeroutput">size()</code> member functions:
+        </p>
+<pre class="programlisting">asio::mutable_buffer b1 = ...;
+std::size_t s1 = b1.size();
+unsigned char* p1 = static_cast&lt;unsigned char*&gt;(b1.data());
+</pre>
+<p>
+          The <code class="computeroutput">data()</code> member function permits violations of type safety,
+          so uses of it in application code should be carefully considered.
+        </p>
+<h6>
+<a name="asio.reference.null_buffers.value_type.h3"></a>
+          <span><a name="asio.reference.null_buffers.value_type.requirements"></a></span><a class="link" href="value_type.html#asio.reference.null_buffers.value_type.requirements">Requirements</a>
+        </h6>
+<p>
+          <span class="emphasis"><em>Header: </em></span><code class="literal">asio/buffer.hpp</code>
+        </p>
+<p>
+          <span class="emphasis"><em>Convenience header: </em></span><code class="literal">asio.hpp</code>
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="end.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../null_buffers.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="../operator_lt__lt_.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

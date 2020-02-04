@@ -1,0 +1,117 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Range connect handler requirements</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../index.html" title="Asio">
+<link rel="up" href="../reference.html" title="Reference">
+<link rel="prev" href="Protocol.html" title="Protocol requirements">
+<link rel="next" href="ReadHandler.html" title="Read handler requirements">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="Protocol.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="ReadHandler.html"><img src="../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="asio.reference.RangeConnectHandler"></a><a class="link" href="RangeConnectHandler.html" title="Range connect handler requirements">Range connect handler
+      requirements</a>
+</h3></div></div></div>
+<p>
+        A range connect handler must meet the requirements for a <a class="link" href="Handler.html" title="Handlers">handler</a>.
+        A value <code class="computeroutput">h</code> of a range connect handler class should work correctly
+        in the expression <code class="computeroutput">h(ec, ep)</code>, where <code class="computeroutput">ec</code> is an lvalue
+        of type <code class="computeroutput">const error_code</code> and <code class="computeroutput">ep</code> is an lvalue of
+        the type <code class="computeroutput">Protocol::endpoint</code> for the <code class="computeroutput">Protocol</code> type
+        in the corresponding <code class="computeroutput">connect()</code> or async_connect()` function.
+      </p>
+<h5>
+<a name="asio.reference.RangeConnectHandler.h0"></a>
+        <span><a name="asio.reference.RangeConnectHandler.examples"></a></span><a class="link" href="RangeConnectHandler.html#asio.reference.RangeConnectHandler.examples">Examples</a>
+      </h5>
+<p>
+        A free function as a range connect handler:
+      </p>
+<pre class="programlisting">void connect_handler(
+    const asio::error_code&amp; ec,
+    const asio::ip::tcp::endpoint&amp; endpoint)
+{
+  ...
+}
+</pre>
+<p>
+        A range connect handler function object:
+      </p>
+<pre class="programlisting">struct connect_handler
+{
+  ...
+  template &lt;typename Range&gt;
+  void operator()(
+      const asio::error_code&amp; ec,
+      const asio::ip::tcp::endpoint&amp; endpoint)
+  {
+    ...
+  }
+  ...
+};
+</pre>
+<p>
+        A lambda as a range connect handler:
+      </p>
+<pre class="programlisting">asio::async_connect(...,
+    [](const asio::error_code&amp; ec,
+      const asio::ip::tcp::endpoint&amp; endpoint)
+    {
+      ...
+    });
+</pre>
+<p>
+        A non-static class member function adapted to a range connect handler using
+        <code class="computeroutput">std::bind()</code>:
+      </p>
+<pre class="programlisting">void my_class::connect_handler(
+    const asio::error_code&amp; ec,
+    const asio::ip::tcp::endpoint&amp; endpoint)
+{
+  ...
+}
+...
+asio::async_connect(...,
+    std::bind(&amp;my_class::connect_handler,
+      this, std::placeholders::_1,
+      std::placeholders::_2));
+</pre>
+<p>
+        A non-static class member function adapted to a range connect handler using
+        <code class="computeroutput">boost::bind()</code>:
+      </p>
+<pre class="programlisting">void my_class::connect_handler(
+    const asio::error_code&amp; ec,
+    const asio::ip::tcp::endpoint&amp; endpoint)
+{
+  ...
+}
+...
+asio::async_connect(...,
+    boost::bind(&amp;my_class::connect_handler,
+      this, asio::placeholders::error,
+      asio::placeholders::endpoint));
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="Protocol.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="ReadHandler.html"><img src="../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

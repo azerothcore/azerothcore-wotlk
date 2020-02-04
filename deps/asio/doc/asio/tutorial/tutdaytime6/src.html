@@ -1,0 +1,130 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Source listing for Daytime.6</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../../index.html" title="Asio">
+<link rel="up" href="../tutdaytime6.html" title="Daytime.6 - An asynchronous UDP daytime server">
+<link rel="prev" href="../tutdaytime6.html" title="Daytime.6 - An asynchronous UDP daytime server">
+<link rel="next" href="../tutdaytime7.html" title="Daytime.7 - A combined TCP/UDP asynchronous server">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../tutdaytime6.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../tutdaytime6.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="../tutdaytime7.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="asio.tutorial.tutdaytime6.src"></a><a class="link" href="src.html" title="Source listing for Daytime.6">Source listing for Daytime.6</a>
+</h4></div></div></div>
+<pre class="programlisting">//
+// server.cpp
+// ~~~~~~~~~~
+//
+// Copyright (c) 2003-2018 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+
+#include &lt;ctime&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;boost/array.hpp&gt;
+#include &lt;boost/bind.hpp&gt;
+#include &lt;boost/shared_ptr.hpp&gt;
+#include &lt;asio.hpp&gt;
+
+using asio::ip::udp;
+
+std::string make_daytime_string()
+{
+  using namespace std; // For time_t, time and ctime;
+  time_t now = time(0);
+  return ctime(&amp;now);
+}
+
+class udp_server
+{
+public:
+  udp_server(asio::io_context&amp; io_context)
+    : socket_(io_context, udp::endpoint(udp::v4(), 13))
+  {
+    start_receive();
+  }
+
+private:
+  void start_receive()
+  {
+    socket_.async_receive_from(
+        asio::buffer(recv_buffer_), remote_endpoint_,
+        boost::bind(&amp;udp_server::handle_receive, this,
+          asio::placeholders::error,
+          asio::placeholders::bytes_transferred));
+  }
+
+  void handle_receive(const asio::error_code&amp; error,
+      std::size_t /*bytes_transferred*/)
+  {
+    if (!error)
+    {
+      boost::shared_ptr&lt;std::string&gt; message(
+          new std::string(make_daytime_string()));
+
+      socket_.async_send_to(asio::buffer(*message), remote_endpoint_,
+          boost::bind(&amp;udp_server::handle_send, this, message,
+            asio::placeholders::error,
+            asio::placeholders::bytes_transferred));
+
+      start_receive();
+    }
+  }
+
+  void handle_send(boost::shared_ptr&lt;std::string&gt; /*message*/,
+      const asio::error_code&amp; /*error*/,
+      std::size_t /*bytes_transferred*/)
+  {
+  }
+
+  udp::socket socket_;
+  udp::endpoint remote_endpoint_;
+  boost::array&lt;char, 1&gt; recv_buffer_;
+};
+
+int main()
+{
+  try
+  {
+    asio::io_context io_context;
+    udp_server server(io_context);
+    io_context.run();
+  }
+  catch (std::exception&amp; e)
+  {
+    std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;
+  }
+
+  return 0;
+}
+</pre>
+<p>
+          Return to <a class="link" href="../tutdaytime6.html" title="Daytime.6 - An asynchronous UDP daytime server">Daytime.6 - An asynchronous
+          UDP daytime server</a>
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../tutdaytime6.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../tutdaytime6.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="../tutdaytime7.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

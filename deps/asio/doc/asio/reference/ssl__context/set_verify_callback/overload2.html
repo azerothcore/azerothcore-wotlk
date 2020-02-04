@@ -1,0 +1,86 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>ssl::context::set_verify_callback (2 of 2 overloads)</title>
+<link rel="stylesheet" href="../../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../../../index.html" title="Asio">
+<link rel="up" href="../set_verify_callback.html" title="ssl::context::set_verify_callback">
+<link rel="prev" href="overload1.html" title="ssl::context::set_verify_callback (1 of 2 overloads)">
+<link rel="next" href="../set_verify_depth.html" title="ssl::context::set_verify_depth">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="overload1.html"><img src="../../../../prev.png" alt="Prev"></a><a accesskey="u" href="../set_verify_callback.html"><img src="../../../../up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../home.png" alt="Home"></a><a accesskey="n" href="../set_verify_depth.html"><img src="../../../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="asio.reference.ssl__context.set_verify_callback.overload2"></a><a class="link" href="overload2.html" title="ssl::context::set_verify_callback (2 of 2 overloads)">ssl::context::set_verify_callback
+          (2 of 2 overloads)</a>
+</h5></div></div></div>
+<p>
+            Set the callback used to verify peer certificates.
+          </p>
+<pre class="programlisting">template&lt;
+    typename VerifyCallback&gt;
+void set_verify_callback(
+    VerifyCallback callback,
+    asio::error_code &amp; ec);
+</pre>
+<p>
+            This function is used to specify a callback function that will be called
+            by the implementation when it needs to verify a peer certificate.
+          </p>
+<h6>
+<a name="asio.reference.ssl__context.set_verify_callback.overload2.h0"></a>
+            <span><a name="asio.reference.ssl__context.set_verify_callback.overload2.parameters"></a></span><a class="link" href="overload2.html#asio.reference.ssl__context.set_verify_callback.overload2.parameters">Parameters</a>
+          </h6>
+<div class="variablelist">
+<p class="title"><b></b></p>
+<dl>
+<dt><span class="term">callback</span></dt>
+<dd>
+<p>
+                  The function object to be used for verifying a certificate. The
+                  function signature of the handler must be:
+</p>
+<pre class="programlisting">bool verify_callback(
+  bool preverified, // True if the certificate passed pre-verification.
+  verify_context&amp; ctx // The peer certificate and other context.
+);
+</pre>
+<p>
+                  The return value of the callback is true if the certificate has
+                  passed verification, false otherwise.
+                </p>
+</dd>
+<dt><span class="term">ec</span></dt>
+<dd><p>
+                  Set to indicate what error occurred, if any.
+                </p></dd>
+</dl>
+</div>
+<h6>
+<a name="asio.reference.ssl__context.set_verify_callback.overload2.h1"></a>
+            <span><a name="asio.reference.ssl__context.set_verify_callback.overload2.remarks"></a></span><a class="link" href="overload2.html#asio.reference.ssl__context.set_verify_callback.overload2.remarks">Remarks</a>
+          </h6>
+<p>
+            Calls <code class="computeroutput">SSL_CTX_set_verify</code>.
+          </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="overload1.html"><img src="../../../../prev.png" alt="Prev"></a><a accesskey="u" href="../set_verify_callback.html"><img src="../../../../up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../home.png" alt="Home"></a><a accesskey="n" href="../set_verify_depth.html"><img src="../../../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

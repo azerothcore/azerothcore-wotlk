@@ -1,0 +1,75 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>defer</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../index.html" title="Asio">
+<link rel="up" href="../reference.html" title="Reference">
+<link rel="prev" href="deadline_timer.html" title="deadline_timer">
+<link rel="next" href="defer/overload1.html" title="defer (1 of 3 overloads)">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="deadline_timer.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="defer/overload1.html"><img src="../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="asio.reference.defer"></a><a class="link" href="defer.html" title="defer">defer</a>
+</h3></div></div></div>
+<p>
+        <a class="indexterm" name="asio.indexterm.defer"></a> 
+Submits a completion token or function object for
+        execution.
+      </p>
+<pre class="programlisting">template&lt;
+    typename CompletionToken&gt;
+<a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.automatic_deduction_of_initiating_function_return_type"><span class="emphasis"><em>DEDUCED</em></span></a> <a class="link" href="defer/overload1.html" title="defer (1 of 3 overloads)">defer</a>(
+    CompletionToken &amp;&amp; token);
+  <span class="emphasis"><em>&#187; <a class="link" href="defer/overload1.html" title="defer (1 of 3 overloads)">more...</a></em></span>
+
+template&lt;
+    typename <a class="link" href="Executor1.html" title="Executor requirements">Executor</a>,
+    typename CompletionToken&gt;
+<a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.automatic_deduction_of_initiating_function_return_type"><span class="emphasis"><em>DEDUCED</em></span></a> <a class="link" href="defer/overload2.html" title="defer (2 of 3 overloads)">defer</a>(
+    const Executor &amp; ex,
+    CompletionToken &amp;&amp; token,
+    typename enable_if&lt; is_executor&lt; Executor &gt;::value &gt;::type *  = 0);
+  <span class="emphasis"><em>&#187; <a class="link" href="defer/overload2.html" title="defer (2 of 3 overloads)">more...</a></em></span>
+
+template&lt;
+    typename ExecutionContext,
+    typename CompletionToken&gt;
+<a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.automatic_deduction_of_initiating_function_return_type"><span class="emphasis"><em>DEDUCED</em></span></a> <a class="link" href="defer/overload3.html" title="defer (3 of 3 overloads)">defer</a>(
+    ExecutionContext &amp; ctx,
+    CompletionToken &amp;&amp; token,
+    typename enable_if&lt; is_convertible&lt; ExecutionContext &amp;, execution_context &amp; &gt;::value &gt;::type *  = 0);
+  <span class="emphasis"><em>&#187; <a class="link" href="defer/overload3.html" title="defer (3 of 3 overloads)">more...</a></em></span>
+</pre>
+<h5>
+<a name="asio.reference.defer.h0"></a>
+        <span><a name="asio.reference.defer.requirements"></a></span><a class="link" href="defer.html#asio.reference.defer.requirements">Requirements</a>
+      </h5>
+<p>
+        <span class="emphasis"><em>Header: </em></span><code class="literal">asio/defer.hpp</code>
+      </p>
+<p>
+        <span class="emphasis"><em>Convenience header: </em></span><code class="literal">asio.hpp</code>
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="deadline_timer.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="defer/overload1.html"><img src="../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

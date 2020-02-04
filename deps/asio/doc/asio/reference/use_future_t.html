@@ -1,0 +1,191 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>use_future_t</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../index.html" title="Asio">
+<link rel="up" href="../reference.html" title="Reference">
+<link rel="prev" href="use_future.html" title="use_future">
+<link rel="next" href="use_future_t/allocator_type.html" title="use_future_t::allocator_type">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="use_future.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="use_future_t/allocator_type.html"><img src="../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="asio.reference.use_future_t"></a><a class="link" href="use_future_t.html" title="use_future_t">use_future_t</a>
+</h3></div></div></div>
+<p>
+        Class used to specify that an asynchronous operation should return a future.
+      </p>
+<pre class="programlisting">template&lt;
+    typename Allocator = std::allocator&lt;void&gt;&gt;
+class use_future_t
+</pre>
+<h5>
+<a name="asio.reference.use_future_t.h0"></a>
+        <span><a name="asio.reference.use_future_t.types"></a></span><a class="link" href="use_future_t.html#asio.reference.use_future_t.types">Types</a>
+      </h5>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Name
+                </p>
+              </th>
+<th>
+                <p>
+                  Description
+                </p>
+              </th>
+</tr></thead>
+<tbody><tr>
+<td>
+                <p>
+                  <a class="link" href="use_future_t/allocator_type.html" title="use_future_t::allocator_type"><span class="bold"><strong>allocator_type</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  The allocator type. The allocator is used when constructing the
+                  std::promise object for a given asynchronous operation.
+                </p>
+              </td>
+</tr></tbody>
+</table></div>
+<h5>
+<a name="asio.reference.use_future_t.h1"></a>
+        <span><a name="asio.reference.use_future_t.member_functions"></a></span><a class="link" href="use_future_t.html#asio.reference.use_future_t.member_functions">Member
+        Functions</a>
+      </h5>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Name
+                </p>
+              </th>
+<th>
+                <p>
+                  Description
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="use_future_t/get_allocator.html" title="use_future_t::get_allocator"><span class="bold"><strong>get_allocator</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Obtain allocator.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="use_future_t/operator_lp__rp_.html" title="use_future_t::operator()"><span class="bold"><strong>operator()</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Wrap a function object in a packaged task.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="use_future_t/operator_lb__rb_.html" title="use_future_t::operator[]"><span class="bold"><strong>operator[]</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  (Deprecated: Use rebind().) Specify an alternate allocator.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="use_future_t/rebind.html" title="use_future_t::rebind"><span class="bold"><strong>rebind</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Specify an alternate allocator.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="use_future_t/use_future_t.html" title="use_future_t::use_future_t"><span class="bold"><strong>use_future_t</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Construct using default-constructed allocator. <br> <span class="silver"> &#8212;</span><br> Construct
+                  using specified allocator.
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+<p>
+        The <a class="link" href="use_future_t.html" title="use_future_t"><code class="computeroutput">use_future_t</code></a>
+        class is used to indicate that an asynchronous operation should return a
+        std::future object. A <a class="link" href="use_future_t.html" title="use_future_t"><code class="computeroutput">use_future_t</code></a>
+        object may be passed as a handler to an asynchronous operation, typically
+        using the special value <code class="computeroutput">asio::use_future</code>. For example:
+      </p>
+<pre class="programlisting">std::future&lt;std::size_t&gt; my_future
+  = my_socket.async_read_some(my_buffer, asio::use_future);
+</pre>
+<p>
+        The initiating function (async_read_some in the above example) returns a
+        future that will receive the result of the operation. If the operation completes
+        with an <a class="link" href="error_code.html" title="error_code"><code class="computeroutput">error_code</code></a>
+        indicating failure, it is converted into a <a class="link" href="system_error.html" title="system_error"><code class="computeroutput">system_error</code></a>
+        and passed back to the caller via the future.
+      </p>
+<h5>
+<a name="asio.reference.use_future_t.h2"></a>
+        <span><a name="asio.reference.use_future_t.requirements"></a></span><a class="link" href="use_future_t.html#asio.reference.use_future_t.requirements">Requirements</a>
+      </h5>
+<p>
+        <span class="emphasis"><em>Header: </em></span><code class="literal">asio/use_future.hpp</code>
+      </p>
+<p>
+        <span class="emphasis"><em>Convenience header: </em></span><code class="literal">asio.hpp</code>
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="use_future.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="use_future_t/allocator_type.html"><img src="../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

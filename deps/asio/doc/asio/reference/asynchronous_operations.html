@@ -1,0 +1,384 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Requirements on asynchronous operations</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../index.html" title="Asio">
+<link rel="up" href="../reference.html" title="Reference">
+<link rel="prev" href="../reference.html" title="Reference">
+<link rel="next" href="read_write_operations.html" title="Requirements on read and write operations">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../reference.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="read_write_operations.html"><img src="../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="asio.reference.asynchronous_operations"></a><a class="link" href="asynchronous_operations.html" title="Requirements on asynchronous operations">Requirements
+      on asynchronous operations</a>
+</h3></div></div></div>
+<p>
+        This section uses the names <code class="computeroutput">Alloc1</code>, <code class="computeroutput">Alloc2</code>, <code class="computeroutput">alloc1</code>,
+        <code class="computeroutput">alloc2</code>, <code class="computeroutput">Args</code>, <code class="computeroutput">CompletionHandler</code>,
+        <code class="computeroutput">completion_handler</code>, <code class="computeroutput">Executor1</code>, <code class="computeroutput">Executor2</code>,
+        <code class="computeroutput">ex1</code>, <code class="computeroutput">ex2</code>, <code class="computeroutput">f</code>, <code class="literal"><span class="emphasis"><em>i</em></span></code>,
+        <code class="literal"><span class="emphasis"><em>N</em></span></code>, <code class="computeroutput">Signature</code>, <code class="computeroutput">token</code>,
+        <code class="literal">T[sub <span class="emphasis"><em>i</em></span></code>], <code class="literal">t[sub <span class="emphasis"><em>i</em></span></code>],
+        <code class="computeroutput">work1</code>, and <code class="computeroutput">work2</code> as placeholders for specifying
+        the requirements below.
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h0"></a>
+        <span><a name="asio.reference.asynchronous_operations.general_asynchronous_operation_concepts"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.general_asynchronous_operation_concepts">General
+        asynchronous operation concepts</a>
+      </h5>
+<p>
+        An <span class="emphasis"><em>initiating function</em></span> is a function which may be called
+        to start an asynchronous operation. A <span class="emphasis"><em>completion handler</em></span>
+        is a function object that will be invoked, at most once, with the result
+        of the asynchronous operation.
+      </p>
+<p>
+        The lifecycle of an asynchronous operation is comprised of the following
+        events and phases:
+      </p>
+<p>
+        &#8212; Event 1: The asynchronous operation is started by a call to the initiating
+        function.
+      </p>
+<p>
+        &#8212; Phase 1: The asynchronous operation is now <span class="emphasis"><em>outstanding</em></span>.
+      </p>
+<p>
+        &#8212; Event 2: The externally observable side effects of the asynchronous operation,
+        if any, are fully established. The completion handler is submitted to an
+        executor.
+      </p>
+<p>
+        &#8212; Phase 2: The asynchronous operation is now <span class="emphasis"><em>completed</em></span>.
+      </p>
+<p>
+        &#8212; Event 3: The completion handler is called with the result of the asynchronous
+        operation.
+      </p>
+<p>
+        In this library, all functions with the prefix <code class="computeroutput">async_</code> are initiating
+        functions.
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h1"></a>
+        <span><a name="asio.reference.asynchronous_operations.completion_tokens_and_handlers"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.completion_tokens_and_handlers">Completion
+        tokens and handlers</a>
+      </h5>
+<p>
+        Initiating functions:
+      </p>
+<p>
+        &#8212; are function templates with template parameter <code class="computeroutput">CompletionToken</code>;
+      </p>
+<p>
+        &#8212; accept, as the final parameter, a <span class="emphasis"><em>completion token</em></span> object
+        <code class="computeroutput">token</code> of type <code class="computeroutput">CompletionToken</code>;
+      </p>
+<p>
+        &#8212; specify a <span class="emphasis"><em>completion signature</em></span>, which is a call signature
+        (C++Std [func.def]) <code class="computeroutput">Signature</code> that determines the arguments
+        to the completion handler.
+      </p>
+<p>
+        An initiating function determines the type <code class="computeroutput">CompletionHandler</code>
+        of its completion handler function object by performing <code class="computeroutput">typename async_result&lt;decay_t&lt;CompletionToken&gt;,
+        Signature&gt;::completion_handler_type</code>. The completion handler object
+        <code class="computeroutput">completion_handler</code> is initialized with <code class="computeroutput">forward&lt;CompletionToken&gt;(token)</code>.
+        [<span class="emphasis"><em>Note:</em></span> No other requirements are placed on the type
+        <code class="computeroutput">CompletionToken</code>. &#8212;<span class="emphasis"><em>end note</em></span>]
+      </p>
+<p>
+        The type <code class="computeroutput">CompletionHandler</code> must satisfy the requirements of
+        <code class="computeroutput">Destructible</code> (C++Std [destructible]) and <code class="computeroutput">MoveConstructible</code>
+        (C++Std [moveconstructible]), and be callable with the specified call signature.
+      </p>
+<p>
+        In this library, all initiating functions specify a <span class="emphasis"><em>Completion
+        signature</em></span> element that defines the call signature <code class="computeroutput">Signature</code>.
+        The <span class="emphasis"><em>Completion signature</em></span> elements in this Technical
+        Specification have named parameters, and the results of an asynchronous operation
+        are specified in terms of these names.
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h2"></a>
+        <span><a name="asio.reference.asynchronous_operations.automatic_deduction_of_initiating_function_return_type"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.automatic_deduction_of_initiating_function_return_type">Automatic
+        deduction of initiating function return type</a>
+      </h5>
+<p>
+        The return type of an initiating function is <code class="computeroutput">typename async_result&lt;decay_t&lt;CompletionToken&gt;,
+        Signature&gt;::return_type</code>.
+      </p>
+<p>
+        For the sake of exposition, this library sometimes annotates functions with
+        a return type <span class="emphasis"><em><code class="literal">DEDUCED</code></em></span>. For every
+        function declaration that returns <span class="emphasis"><em><code class="literal">DEDUCED</code></em></span>,
+        the meaning is equivalent to specifying the return type as <code class="computeroutput">typename
+        async_result&lt;decay_t&lt;CompletionToken&gt;, Signature&gt;::return_type</code>.
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h3"></a>
+        <span><a name="asio.reference.asynchronous_operations.production_of_initiating_function_return_value"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.production_of_initiating_function_return_value">Production
+        of initiating function return value</a>
+      </h5>
+<p>
+        An initiating function produces its return type as follows:
+      </p>
+<p>
+        &#8212; constructing an object <code class="computeroutput">result</code> of type <code class="computeroutput">async_result&lt;decay_t&lt;CompletionToken&gt;,
+        Signature&gt;</code>, initialized as <code class="computeroutput">result(completion_handler)</code>;
+        and
+      </p>
+<p>
+        &#8212; using <code class="computeroutput">result.get()</code> as the operand of the return statement.
+      </p>
+<p>
+        [<span class="emphasis"><em>Example:</em></span> Given an asynchronous operation with <span class="emphasis"><em>Completion
+        signature</em></span> <code class="computeroutput">void(R1 r1, R2 r2)</code>, an initiating function
+        meeting these requirements may be implemented as follows:
+      </p>
+<pre class="programlisting">template&lt;class CompletionToken&gt;
+auto async_xyz(T1 t1, T2 t2, CompletionToken&amp;&amp; token)
+{
+  typename async_result&lt;decay_t&lt;CompletionToken&gt;, void(R1, R2)&gt;::completion_handler_type
+    completion_handler(forward&lt;CompletionToken&gt;(token));
+
+  async_result&lt;decay_t&lt;CompletionToken&gt;, void(R1, R2)&gt; result(completion_handler);
+
+  // initiate the operation and cause completion_handler to be invoked with
+  // the result
+
+  return result.get();
+}
+</pre>
+<p>
+        For convenience, initiating functions may be implemented using the <code class="computeroutput">async_completion</code>
+        template:
+      </p>
+<pre class="programlisting">template&lt;class CompletionToken&gt;
+auto async_xyz(T1 t1, T2 t2, CompletionToken&amp;&amp; token)
+{
+  async_completion&lt;CompletionToken, void(R1, R2)&gt; init(token);
+
+  // initiate the operation and cause init.completion_handler to be invoked
+  // with the result
+
+  return init.result.get();
+}
+</pre>
+<p>
+        &#8212;<span class="emphasis"><em>end example</em></span>]
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h4"></a>
+        <span><a name="asio.reference.asynchronous_operations.lifetime_of_initiating_function_arguments"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.lifetime_of_initiating_function_arguments">Lifetime
+        of initiating function arguments</a>
+      </h5>
+<p>
+        Unless otherwise specified, the lifetime of arguments to initiating functions
+        shall be treated as follows:
+      </p>
+<p>
+        &#8212; If the parameter has a pointer type or has a type of lvalue reference to
+        non-const, the implementation may assume the validity of the pointee or referent,
+        respectively, until the completion handler is invoked. [<span class="emphasis"><em>Note:</em></span>
+        In other words, the program must guarantee the validity of the argument until
+        the completion handler is invoked. &#8212;<span class="emphasis"><em>end note</em></span>]
+      </p>
+<p>
+        &#8212; Otherwise, the implementation must not assume the validity of the argument
+        after the initiating function completes. [<span class="emphasis"><em>Note:</em></span> In other
+        words, the program is not required to guarantee the validity of the argument
+        after the initiating function completes. &#8212;<span class="emphasis"><em>end note</em></span>] The
+        implementation may make copies of the argument, and all copies shall be destroyed
+        no later than immediately after invocation of the completion handler.
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h5"></a>
+        <span><a name="asio.reference.asynchronous_operations.non_blocking_requirements_on_initiating_functions"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.non_blocking_requirements_on_initiating_functions">Non-blocking
+        requirements on initiating functions</a>
+      </h5>
+<p>
+        An initiating function shall not block (C++Std [defns.block]) the calling
+        thread pending completion of the outstanding operation.
+      </p>
+<p>
+        [std_note Initiating functions may still block the calling thread for other
+        reasons. For example, an initiating function may lock a mutex in order to
+        synchronize access to shared data.]
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h6"></a>
+        <span><a name="asio.reference.asynchronous_operations.associated_executor"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.associated_executor">Associated
+        executor</a>
+      </h5>
+<p>
+        Certain objects that participate in asynchronous operations have an <span class="emphasis"><em>associated
+        executor</em></span>. These are obtained as specified in the sections below.
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h7"></a>
+        <span><a name="asio.reference.asynchronous_operations.associated_i_o_executor"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.associated_i_o_executor">Associated
+        I/O executor</a>
+      </h5>
+<p>
+        An asynchronous operation has an associated executor satisfying the <a class="link" href="Executor1.html" title="Executor requirements"><code class="computeroutput">Executor</code></a> requirements.
+        If not otherwise specified by the asynchronous operation, this associated
+        executor is an object of type <code class="computeroutput">system_executor</code>.
+      </p>
+<p>
+        All asynchronous operations in this library have an associated executor object
+        that is determined as follows:
+      </p>
+<p>
+        &#8212; If the initiating function is a member function, the associated executor
+        is that returned by the <code class="computeroutput">get_executor</code> member function on the
+        same object.
+      </p>
+<p>
+        &#8212; If the initiating function is not a member function, the associated executor
+        is that returned by the <code class="computeroutput">get_executor</code> member function of the
+        first argument to the initiating function.
+      </p>
+<p>
+        Let <code class="computeroutput">Executor1</code> be the type of the associated executor. Let <code class="computeroutput">ex1</code>
+        be a value of type <code class="computeroutput">Executor1</code>, representing the associated executor
+        object obtained as described above.
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h8"></a>
+        <span><a name="asio.reference.asynchronous_operations.associated_completion_handler_executor"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.associated_completion_handler_executor">Associated
+        completion handler executor</a>
+      </h5>
+<p>
+        A completion handler object of type <code class="computeroutput">CompletionHandler</code> has an
+        associated executor of type <code class="computeroutput">Executor2</code> satisfying the <a class="link" href="Executor1.html" title="Executor requirements">Executor
+        requirements</a>. The type <code class="computeroutput">Executor2</code> is <code class="computeroutput">associated_executor_t&lt;CompletionHandler,
+        Executor1&gt;</code>. Let <code class="computeroutput">ex2</code> be a value of type <code class="computeroutput">Executor2</code>
+        obtained by performing <code class="computeroutput">get_associated_executor(completion_handler,
+        ex1)</code>.
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h9"></a>
+        <span><a name="asio.reference.asynchronous_operations.outstanding_work"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.outstanding_work">Outstanding
+        work</a>
+      </h5>
+<p>
+        Until the asynchronous operation has completed, the asynchronous operation
+        shall maintain:
+      </p>
+<p>
+        &#8212; an object <code class="computeroutput">work1</code> of type <code class="computeroutput">executor_work_guard&lt;Executor1&gt;</code>,
+        initialized as <code class="computeroutput">work1(ex1)</code>, and where <code class="computeroutput">work1.owns_work()
+        == true</code>; and
+      </p>
+<p>
+        &#8212; an object <code class="computeroutput">work2</code> of type <code class="computeroutput">executor_work_guard&lt;Executor2&gt;</code>,
+        initialized as <code class="computeroutput">work2(ex2)</code>, and where <code class="computeroutput">work2.owns_work()
+        == true</code>.
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h10"></a>
+        <span><a name="asio.reference.asynchronous_operations.allocation_of_intermediate_storage"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.allocation_of_intermediate_storage">Allocation
+        of intermediate storage</a>
+      </h5>
+<p>
+        Asynchronous operations may allocate memory. [<span class="emphasis"><em>Note:</em></span>
+        Such as a data structure to store copies of the <code class="computeroutput">completion_handler</code>
+        object and the initiating function's arguments. &#8212;<span class="emphasis"><em>end note</em></span>]
+      </p>
+<p>
+        Let <code class="computeroutput">Alloc1</code> be a type, satisfying the <a class="link" href="ProtoAllocator.html" title="Proto-allocator requirements"><code class="computeroutput">ProtoAllocator</code></a>
+        requirements, that represents the asynchronous operation's default allocation
+        strategy. [<span class="emphasis"><em>Note:</em></span> Typically <code class="computeroutput">std::allocator&lt;void&gt;</code>.
+        &#8212;<span class="emphasis"><em>end note</em></span>] Let <code class="computeroutput">alloc1</code> be a value of type
+        <code class="computeroutput">Alloc1</code>.
+      </p>
+<p>
+        A completion handler object of type <code class="computeroutput">CompletionHandler</code> has an
+        associated allocator object <code class="computeroutput">alloc2</code> of type <code class="computeroutput">Alloc2</code>
+        satisfying the <a class="link" href="ProtoAllocator.html" title="Proto-allocator requirements"><code class="computeroutput">ProtoAllocator</code></a>
+        requirements. The type <code class="computeroutput">Alloc2</code> is <code class="computeroutput">associated_allocator_t&lt;CompletionHandler,
+        Alloc1&gt;</code>. Let <code class="computeroutput">alloc2</code> be a value of type <code class="computeroutput">Alloc2</code>
+        obtained by performing <code class="computeroutput">get_associated_allocator(completion_handler,
+        alloc1)</code>.
+      </p>
+<p>
+        The asynchronous operations defined in this library:
+      </p>
+<p>
+        &#8212; If required, allocate memory using only the completion handler's associated
+        allocator.
+      </p>
+<p>
+        &#8212; Prior to completion handler execution, deallocate any memory allocated using
+        the completion handler's associated allocator.
+      </p>
+<p>
+        [std_note The implementation may perform operating system or underlying API
+        calls that perform memory allocations not using the associated allocator.
+        Invocations of the allocator functions may not introduce data races (See
+        C++Std [res.on.data.races]).]
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h11"></a>
+        <span><a name="asio.reference.asynchronous_operations.execution_of_completion_handler_on_completion_of_asynchronous_operation"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.execution_of_completion_handler_on_completion_of_asynchronous_operation">Execution
+        of completion handler on completion of asynchronous operation</a>
+      </h5>
+<p>
+        Let <code class="computeroutput">Args...</code> be the argument types of the completion signature
+        <code class="computeroutput">Signature</code> and let <code class="literal"><span class="emphasis"><em>N</em></span></code>
+        be <code class="computeroutput">sizeof...(Args)</code>. Let <code class="literal"><span class="emphasis"><em>i</em></span></code>
+        be in the range [<code class="computeroutput">0</code>,<code class="literal"><span class="emphasis"><em>N</em></span></code>).
+        Let <code class="literal">T[sub <span class="emphasis"><em>i</em></span></code>] be the <code class="literal"><span class="emphasis"><em>i</em></span></code>th
+        type in <code class="computeroutput">Args...</code> and let <code class="literal">t[sub <span class="emphasis"><em>i</em></span></code>]
+        be the <code class="literal"><span class="emphasis"><em>i</em></span></code>th completion handler argument
+        associated with <code class="literal">T[sub <span class="emphasis"><em>i</em></span></code>].
+      </p>
+<p>
+        Let <code class="computeroutput">f</code> be a function object, callable as <code class="computeroutput">f()</code>, that
+        invokes <code class="computeroutput">completion_handler</code> as if by <code class="literal">completion_handler(forward&lt;T[sub
+        <span class="emphasis"><em>0</em></span></code>&gt;(t[sub <span class="emphasis"><em>0</em></span>]), ...,
+        forward&lt;T[sub <span class="emphasis"><em>N-1</em></span>]&gt;(t[sub <span class="emphasis"><em>N-1</em></span>]))].
+      </p>
+<p>
+        If an asynchonous operation completes immediately (that is, within the thread
+        of execution calling the initiating function, and before the initiating function
+        returns), the completion handler shall be submitted for execution as if by
+        performing <code class="computeroutput">ex2.post(std::move(f), alloc2)</code>. Otherwise, the completion
+        handler shall be submitted for execution as if by performing <code class="computeroutput">ex2.dispatch(std::move(f),
+        alloc2)</code>.
+      </p>
+<h5>
+<a name="asio.reference.asynchronous_operations.h12"></a>
+        <span><a name="asio.reference.asynchronous_operations.completion_handlers_and_exceptions"></a></span><a class="link" href="asynchronous_operations.html#asio.reference.asynchronous_operations.completion_handlers_and_exceptions">Completion
+        handlers and exceptions</a>
+      </h5>
+<p>
+        Completion handlers are permitted to throw exceptions. The effect of any
+        exception propagated from the execution of a completion handler is determined
+        by the executor which is executing the completion handler.
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../reference.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="read_write_operations.html"><img src="../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

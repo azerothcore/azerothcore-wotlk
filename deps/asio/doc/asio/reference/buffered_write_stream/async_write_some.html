@@ -1,0 +1,49 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>buffered_write_stream::async_write_some</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../../index.html" title="Asio">
+<link rel="up" href="../buffered_write_stream.html" title="buffered_write_stream">
+<link rel="prev" href="async_read_some.html" title="buffered_write_stream::async_read_some">
+<link rel="next" href="buffered_write_stream.html" title="buffered_write_stream::buffered_write_stream">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="async_read_some.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../buffered_write_stream.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="buffered_write_stream.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="asio.reference.buffered_write_stream.async_write_some"></a><a class="link" href="async_write_some.html" title="buffered_write_stream::async_write_some">buffered_write_stream::async_write_some</a>
+</h4></div></div></div>
+<p>
+          <a class="indexterm" name="asio.indexterm.buffered_write_stream.async_write_some"></a> 
+Start
+          an asynchronous write. The data being written must be valid for the lifetime
+          of the asynchronous operation.
+        </p>
+<pre class="programlisting">template&lt;
+    typename <a class="link" href="../ConstBufferSequence.html" title="Constant buffer sequence requirements">ConstBufferSequence</a>,
+    typename <a class="link" href="../WriteHandler.html" title="Write handler requirements">WriteHandler</a>&gt;
+<a class="link" href="../asynchronous_operations.html#asio.reference.asynchronous_operations.automatic_deduction_of_initiating_function_return_type"><span class="emphasis"><em>DEDUCED</em></span></a> async_write_some(
+    const ConstBufferSequence &amp; buffers,
+    WriteHandler &amp;&amp; handler);
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="async_read_some.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../buffered_write_stream.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="buffered_write_stream.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

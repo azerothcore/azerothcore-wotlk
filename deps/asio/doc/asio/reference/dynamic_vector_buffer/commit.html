@@ -1,0 +1,71 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>dynamic_vector_buffer::commit</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../../index.html" title="Asio">
+<link rel="up" href="../dynamic_vector_buffer.html" title="dynamic_vector_buffer">
+<link rel="prev" href="capacity.html" title="dynamic_vector_buffer::capacity">
+<link rel="next" href="const_buffers_type.html" title="dynamic_vector_buffer::const_buffers_type">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="capacity.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../dynamic_vector_buffer.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="const_buffers_type.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="asio.reference.dynamic_vector_buffer.commit"></a><a class="link" href="commit.html" title="dynamic_vector_buffer::commit">dynamic_vector_buffer::commit</a>
+</h4></div></div></div>
+<p>
+          <a class="indexterm" name="asio.indexterm.dynamic_vector_buffer.commit"></a> 
+Move
+          bytes from the output sequence to the input sequence.
+        </p>
+<pre class="programlisting">void commit(
+    std::size_t n);
+</pre>
+<h6>
+<a name="asio.reference.dynamic_vector_buffer.commit.h0"></a>
+          <span><a name="asio.reference.dynamic_vector_buffer.commit.parameters"></a></span><a class="link" href="commit.html#asio.reference.dynamic_vector_buffer.commit.parameters">Parameters</a>
+        </h6>
+<div class="variablelist">
+<p class="title"><b></b></p>
+<dl>
+<dt><span class="term">n</span></dt>
+<dd><p>
+                The number of bytes to append from the start of the output sequence
+                to the end of the input sequence. The remainder of the output sequence
+                is discarded.
+              </p></dd>
+</dl>
+</div>
+<p>
+          Requires a preceding call <code class="computeroutput">prepare(x)</code> where <code class="computeroutput">x &gt;= n</code>,
+          and no intervening operations that modify the input or output sequence.
+        </p>
+<h6>
+<a name="asio.reference.dynamic_vector_buffer.commit.h1"></a>
+          <span><a name="asio.reference.dynamic_vector_buffer.commit.remarks"></a></span><a class="link" href="commit.html#asio.reference.dynamic_vector_buffer.commit.remarks">Remarks</a>
+        </h6>
+<p>
+          If <code class="computeroutput">n</code> is greater than the size of the output sequence, the
+          entire output sequence is moved to the input sequence and no error is issued.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="capacity.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../dynamic_vector_buffer.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="const_buffers_type.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

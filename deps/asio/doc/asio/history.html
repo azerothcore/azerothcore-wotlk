@@ -1,0 +1,2058 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Revision History</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../index.html" title="Asio">
+<link rel="up" href="../index.html" title="Asio">
+<link rel="prev" href="net_ts.html" title="Networking TS compatibility">
+<link rel="next" href="index.html" title="">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="net_ts.html"><img src="../prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../home.png" alt="Home"></a><a accesskey="n" href="index.html"><img src="../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="asio.history"></a><a class="link" href="history.html" title="Revision History">Revision History</a>
+</h2></div></div></div>
+<h4>
+<a name="asio.history.h0"></a>
+      <span><a name="asio.history.asio_1_12_2"></a></span><a class="link" href="history.html#asio.history.asio_1_12_2">Asio
+      1.12.2</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Fixed a problem with the detection of <code class="computeroutput">std::future</code> availability
+          with libstdc++.
+        </li>
+<li class="listitem">
+          Fixed compile error in regex overload of <code class="computeroutput">read_until</code>.
+        </li>
+<li class="listitem">
+          Fixed a timer heap corruption issue that can occur when moving a cancelled
+          timer.
+        </li>
+<li class="listitem">
+          Fixed detection of <code class="computeroutput">std::experimental::string_view</code> and <code class="computeroutput">std::string_view</code>
+          with newer clang/libc++.
+        </li>
+<li class="listitem">
+          Fixed MSVC version detection for availability of <code class="computeroutput">std::invoke_result</code>.
+        </li>
+<li class="listitem">
+          Fixed the buffer sequence traits to test the new requirements, if <code class="computeroutput">decltype</code>
+          is available.
+        </li>
+<li class="listitem">
+          Fixed an MSVC issue when building with exceptions disabled.
+        </li>
+<li class="listitem">
+          Added SSL context options for TLS v1.3.
+        </li>
+<li class="listitem">
+          Added a compile-time test for TLS v1 support.
+        </li>
+<li class="listitem">
+          Fixed the macro used to test for TLS v1.2 support.
+        </li>
+<li class="listitem">
+          Prevented global objects from being created once per thread on Windows.
+        </li>
+<li class="listitem">
+          Fixed a crash when using <code class="computeroutput">size()</code>, <code class="computeroutput">max_size()</code> or
+          <code class="computeroutput">empty()</code> on default-constructed resolver results.
+        </li>
+<li class="listitem">
+          Changed to move the return value in basic_resolver_results::begin() to
+          avoid copying.
+        </li>
+<li class="listitem">
+          Enabled move support for the Intel Compiler.
+        </li>
+<li class="listitem">
+          Fixed <code class="computeroutput">std::string_view</code> detection issue when using clang-cl.
+        </li>
+<li class="listitem">
+          Fixed the handler tracking operation name for <code class="computeroutput">io_context::executor_type::dispatch</code>.
+        </li>
+<li class="listitem">
+          Fixed a buffer overflow that could occur when parsing an address string
+          with a 64-bit scope id.
+        </li>
+<li class="listitem">
+          Added examples showing how to write composed operations.
+        </li>
+<li class="listitem">
+          Added C++11 versions of the Timeouts, Timers, SOCKS4 and SSL examples.
+        </li>
+<li class="listitem">
+          Fixed minor issues in documentation and examples.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h1"></a>
+      <span><a name="asio.history.asio_1_12_1"></a></span><a class="link" href="history.html#asio.history.asio_1_12_1">Asio
+      1.12.1</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Added missing const qualifier to <code class="computeroutput">basic_socket_acceptor::get_option</code>.
+        </li>
+<li class="listitem">
+          Worked around a parsing error that occurs with some versions of gcc.
+        </li>
+<li class="listitem">
+          Fixed broken code samples in tutorial.
+        </li>
+<li class="listitem">
+          Added new experimental features. (Note that "experimental" features
+          may be changed without notice in subsequent releases.)
+          <div class="itemizedlist"><ul class="itemizedlist" type="circle">
+<li class="listitem">
+                Added <code class="computeroutput">experimental::detached</code> completion token.
+              </li>
+<li class="listitem">
+                Added <code class="computeroutput">experimental::redirect_error</code> completion token.
+              </li>
+<li class="listitem">
+                Added <code class="computeroutput">experimental::co_spawn</code> facility for integration
+                with the coroutines technical specification.
+              </li>
+</ul></div>
+        </li>
+<li class="listitem">
+          Updated timeout examples to use latest features.
+          <div class="itemizedlist"><ul class="itemizedlist" type="circle">
+<li class="listitem">
+                Used <code class="computeroutput">asio::steady_timer</code> rather than <code class="computeroutput">asio::deadline_timer</code>.
+              </li>
+<li class="listitem">
+                Used <code class="computeroutput">asio::dynamic_buffer</code> rather than <code class="computeroutput">asio::streambuf</code>.
+              </li>
+<li class="listitem">
+                Used timed <code class="computeroutput">asio::io_context::run_for()</code> function for
+                blocking clients.
+              </li>
+<li class="listitem">
+                Added example showing a custom completion token for blocking with
+                timeouts.
+              </li>
+</ul></div>
+        </li>
+<li class="listitem">
+          Fixed unit tests to compile when <code class="computeroutput">(BOOST_)ASIO_NO_DEPRECATED</code>
+          is defined.
+        </li>
+<li class="listitem">
+          Changed socket iostreams to use chrono by default, to fix compatibility
+          with the Networking TS. Define <code class="computeroutput">(BOOST_)ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM</code>
+          to enable the old Boost.Date_Time interface in <code class="computeroutput">basic_socket_streambuf</code>
+          and <code class="computeroutput">basic_socket_iostream</code>.
+        </li>
+<li class="listitem">
+          Updated examples to use chrono rather than Boost.Date_Time.
+        </li>
+<li class="listitem">
+          Fixed an incorrect member function detector in the <code class="computeroutput">is_dynamic_buffer</code>
+          trait.
+        </li>
+<li class="listitem">
+          Fixed an <code class="computeroutput">async_result</code> incompatibility with deprecated <code class="computeroutput">handler_type</code>.
+        </li>
+<li class="listitem">
+          Added a missing move optimisation in the SSL stream implementation.
+        </li>
+<li class="listitem">
+          Fixed incorrect <code class="computeroutput">basic_resolver_results::value_type</code> typedef.
+        </li>
+<li class="listitem">
+          Fixed a compile error with some OpenSSL versions when <code class="computeroutput">SSL_OP_NO_COMPRESSION</code>
+          is defined.
+        </li>
+<li class="listitem">
+          Changed <code class="computeroutput">add_certificate_authority</code> to process multiple certificates
+          in a bundle.
+        </li>
+<li class="listitem">
+          Eliminated deprecation warning with MSVC by using <code class="computeroutput">std::invoke_result</code>
+          rather than <code class="computeroutput">std::result_of</code>.
+        </li>
+<li class="listitem">
+          Changed to use <code class="computeroutput">std::string_view</code> for C++17 or later, and <code class="computeroutput">std::experimental::string_view</code>
+          for C++14. Define the preprocessor macro <code class="computeroutput">(BOOST_)ASIO_DISABLE_STD_STRING_VIEW</code>
+          to force the use of std::experimental::string_view (assuming it is available)
+          when compiling in C++17 mode.
+        </li>
+<li class="listitem">
+          Ensured <code class="computeroutput">DynamicBuffer</code> template arguments are decayed before
+          using in <code class="computeroutput">enable_if</code> tests.
+        </li>
+<li class="listitem">
+          Changed documentation to distinguish legacy completion handlers (which
+          are still required to be CopyConstructible) from new MoveConstructible
+          handlers.
+        </li>
+<li class="listitem">
+          Suppressed a discarded return value warning in the buffer debugging support.
+        </li>
+<li class="listitem">
+          Fixed <code class="computeroutput">basic_yield_context</code> to work with completion signatures
+          containing reference parameters.
+        </li>
+<li class="listitem">
+          Ensured that stackful coroutines launched using <code class="computeroutput">spawn()</code> correctly
+          store decayed copies of their function and handler arguments.
+        </li>
+<li class="listitem">
+          Fixed some compatibility issues with Android.
+        </li>
+<li class="listitem">
+          Fixed some minor portability issues in examples.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h2"></a>
+      <span><a name="asio.history.asio_1_12_0"></a></span><a class="link" href="history.html#asio.history.asio_1_12_0">Asio
+      1.12.0</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Completed the interface changes to reflect the Networking TS (<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4656.pdf" target="_top">N4656</a>).
+          <div class="itemizedlist"><ul class="itemizedlist" type="circle">
+<li class="listitem">
+                See the <a class="link" href="net_ts.html" title="Networking TS compatibility">list</a> of new interfaces
+                and, where applicable, the corresponding old interfaces that have
+                been superseded.
+              </li>
+<li class="listitem">
+                The service template parameters, and the corresponding classes, are
+                disabled by default. For example, instead of <code class="computeroutput">basic_socket&lt;Protocol,
+                SocketService&gt;</code> we now have simply <code class="computeroutput">basic_socket&lt;Protocol&gt;</code>.
+                The old interface can be enabled by defining the <code class="computeroutput">(BOOST_)ASIO_ENABLE_OLD_SERVICES</code>
+                macro.
+              </li>
+</ul></div>
+        </li>
+<li class="listitem">
+          Added support for customised handler tracking.
+        </li>
+<li class="listitem">
+          Added reactor-related (i.e. descriptor readiness) events to handler tracking.
+        </li>
+<li class="listitem">
+          Added special <a class="link" href="overview/core/concurrency_hint.html" title="Concurrency Hints">concurrency
+          hint</a> values that may be used to disable locking on a per <code class="computeroutput">io_context</code>
+          basis.
+        </li>
+<li class="listitem">
+          Enabled perfect forwarding for the first <code class="computeroutput">ssl::stream&lt;&gt;</code>
+          constructor argument.
+        </li>
+<li class="listitem">
+          Added ability to release ownership of the underlying native socket. (Requires
+          Windows 8.1 or later when using the I/O completion port backend.)
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h3"></a>
+      <span><a name="asio.history.asio_1_11_0"></a></span><a class="link" href="history.html#asio.history.asio_1_11_0">Asio
+      1.11.0</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Implemented changes to substantially reflect the Networking Library Proposal
+          (<a href="../www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4370.html" target="_top">N4370</a>).
+          <div class="itemizedlist"><ul class="itemizedlist" type="circle">
+<li class="listitem">
+                New <code class="computeroutput">Executor</code> type requirements and classes to support
+                an executor framework, including the <code class="computeroutput">execution_context</code>
+                base class, the <code class="computeroutput">executor_work</code> class for tracking outstanding
+                work, and the <code class="computeroutput">executor</code> polymorphic wrapper. Free functions
+                <code class="computeroutput">dispatch()</code>, <code class="computeroutput">post()</code> and <code class="computeroutput">defer()</code>
+                have been added and are used to submit function objects to executors.
+              </li>
+<li class="listitem">
+                Completion handlers now have an associated executor and associated
+                allocator. The free function <code class="computeroutput">wrap()</code> is used to associate
+                an executor with a handler or other object. The handler hooks for
+                allocation, invocation and continuation have been deprecated.
+              </li>
+<li class="listitem">
+                A <code class="computeroutput">system_executor</code> class has been added as a default
+                executor.
+              </li>
+<li class="listitem">
+                The <code class="computeroutput">io_service</code> class is now derived from <code class="computeroutput">execution_context</code>
+                and implements the executor type requirements in its nested <code class="computeroutput">executor_type</code>
+                class. The member functions <code class="computeroutput">dispatch()</code>, <code class="computeroutput">post()</code>,
+                <code class="computeroutput">defer()</code> and <code class="computeroutput">wrap()</code> have been deprecated.
+                The <code class="computeroutput">io_service::work</code> class has been deprecated.
+              </li>
+<li class="listitem">
+                The <code class="computeroutput">io_service</code> member function <code class="computeroutput">reset()</code>
+                has been renamed to <code class="computeroutput">restart()</code>. The old name is retained
+                for backward compatibility but has been deprecated.
+              </li>
+<li class="listitem">
+                The <code class="computeroutput">make_service&lt;&gt;()</code> function is now used to add
+                a new service to an execution context such as an <code class="computeroutput">io_service</code>.
+                The <code class="computeroutput">add_service()</code> function has been deprecated.
+              </li>
+<li class="listitem">
+                A new <code class="computeroutput">strand&lt;&gt;</code> template has been added to allow
+                strand functionality to be used with generic executor types.
+              </li>
+<li class="listitem">
+                I/O objects (such as sockets and timers) now provide access to their
+                associated <code class="computeroutput">io_service</code> via a <code class="computeroutput">context()</code> member
+                function. The <code class="computeroutput">get_io_service()</code> member function is deprecated.
+              </li>
+<li class="listitem">
+                All asynchronous operations and executor operations now support move-only
+                handlers. However, the deprecated <code class="computeroutput">io_service::post()</code>,
+                <code class="computeroutput">io_service::dispatch()</code>, <code class="computeroutput">io_service::strand::post()</code>
+                and <code class="computeroutput">io_service::strand::dispatch()</code> functions still require
+                copyable handlers.
+              </li>
+<li class="listitem">
+                Waitable timer objects are now movable.
+              </li>
+<li class="listitem">
+                Waitable timers, socket iostreams and socket streambufs now provide
+                an <code class="computeroutput">expiry()</code> member function for obtaining the expiry
+                time. The accessors <code class="computeroutput">expires_at()</code> and <code class="computeroutput">expires_after()</code>
+                have been deprecated, though those names are retained for the mutating
+                members.
+              </li>
+<li class="listitem">
+                The <code class="computeroutput">std::packaged_task</code> class template is now supported
+                as a completion handler. The initiating operation automatically returns
+                the future associated with the task. The <code class="computeroutput">package()</code> function
+                has been added as a convenient factory for packaged tasks.
+              </li>
+<li class="listitem">
+                Sockets, socket acceptors and descriptors now provide <code class="computeroutput">wait()</code>
+                and <code class="computeroutput">async_wait()</code> operations that may be used to wait
+                for readiness. The <code class="computeroutput">null_buffers</code> type has been deprecated.
+              </li>
+<li class="listitem">
+                The proposed error code enum classes are simulated using namespaces.
+                Existing asio error codes now have a correspondence with the standard
+                error conditions.
+              </li>
+<li class="listitem">
+                Conversion between IP address types, and conversion from string to
+                address, is now supported via the <code class="computeroutput">address_cast&lt;&gt;()</code>,
+                <code class="computeroutput">make_address()</code>, <code class="computeroutput">make_address_v4()</code> and
+                <code class="computeroutput">make_address_v6()</code> free functions. The <code class="computeroutput">from_string()</code>,
+                <code class="computeroutput">to_v4()</code>, <code class="computeroutput">to_v6()</code> and <code class="computeroutput">v4_mapped()</code>
+                member functions have been deprecated.
+              </li>
+<li class="listitem">
+                A default-constructed <code class="computeroutput">ip::address</code> now represents an
+                invalid address value that is neither IPv4 nor IPv6.
+              </li>
+<li class="listitem">
+                New <code class="computeroutput">buffer()</code> overloads that generate mutable buffers
+                for non-const <code class="computeroutput">string</code> objects.
+              </li>
+<li class="listitem">
+                Support for dynamic buffer sequences that automatically grow and
+                shrink to accomodate data as it is read or written. This is a generic
+                facility similar to the existing <code class="computeroutput">asio::streambuf</code> class.
+                This support includes:
+                <div class="itemizedlist"><ul class="itemizedlist" type="square">
+<li class="listitem">
+                      New <code class="computeroutput">dynamic_string_buffer</code> and <code class="computeroutput">dynamic_vector_buffer</code>
+                      adapter classes that meet the <code class="computeroutput">DynamicBufferSequence</code>
+                      type requirements.
+                    </li>
+<li class="listitem">
+                      New <code class="computeroutput">dynamic_buffer()</code> factory functions for creating
+                      a dynamic buffer adapter for a <code class="computeroutput">vector</code> or <code class="computeroutput">string</code>.
+                    </li>
+<li class="listitem">
+                      New overloads for the <code class="computeroutput">read()</code>, <code class="computeroutput">async_read()</code>,
+                      <code class="computeroutput">write()</code> and <code class="computeroutput">async_write()</code>, <code class="computeroutput">read_until()</code>
+                      and <code class="computeroutput">async_read_until()</code> free functions that directly
+                      support dynamic buffer sequences.
+                    </li>
+</ul></div>
+              </li>
+<li class="listitem">
+                Support for networks and address ranges. Thanks go to Oliver Kowalke
+                for contributing to the design and providing the implementation on
+                which this facility is based. The following new classes have been
+                added:
+                <div class="itemizedlist"><ul class="itemizedlist" type="square">
+<li class="listitem">
+                      <code class="computeroutput">address_iterator_v4</code> for iterating across IPv4
+                      addresses
+                    </li>
+<li class="listitem">
+                      <code class="computeroutput">address_iterator_v6</code> for iterating across IPv6
+                      addresses
+                    </li>
+<li class="listitem">
+                      <code class="computeroutput">address_range_v4</code> to represent a range of IPv4
+                      addresses
+                    </li>
+<li class="listitem">
+                      <code class="computeroutput">address_range_v6</code> to represent a range of IPv6
+                      addresses
+                    </li>
+<li class="listitem">
+                      <code class="computeroutput">network_v4</code> for manipulating IPv4 CIDR addresses,
+                      e.g. 1.2.3.0/24
+                    </li>
+<li class="listitem">
+                      <code class="computeroutput">network_v6</code> for manipulating IPv6 CIDR addresses,
+                      e.g. ffe0:/120
+                    </li>
+</ul></div>
+              </li>
+<li class="listitem">
+                New convenience headers in <code class="literal">&lt;asio/ts/*.hpp&gt;</code>
+                that correspond to the headers in the proposal.
+              </li>
+</ul></div>
+        </li>
+<li class="listitem">
+          Added a new, executor-aware <code class="computeroutput">thread_pool</code> class.
+        </li>
+<li class="listitem">
+          Changed <code class="computeroutput">spawn()</code> to be executor-aware.
+        </li>
+<li class="listitem">
+          Added a new <code class="computeroutput">spawn()</code> overload that takes only a function object.
+        </li>
+<li class="listitem">
+          Changed <code class="computeroutput">spawn()</code> and <code class="computeroutput">yield_context</code> to permit nested
+          calls to the completion handler.
+        </li>
+<li class="listitem">
+          Removed previously deprecated functions.
+        </li>
+<li class="listitem">
+          Added options for disabling TLS v1.1 and v1.2.
+        </li>
+<li class="listitem">
+          Changed the SSL wrapper to call the password callback when loading an in-memory
+          key.
+        </li>
+<li class="listitem">
+          Changed the tutorial to use <code class="computeroutput">std::endl</code> to ensure output is
+          flushed.
+        </li>
+<li class="listitem">
+          Fixed false SSL error reports by ensuring that the SSL error queue is cleared
+          prior to each operation.
+        </li>
+<li class="listitem">
+          Fixed an <code class="computeroutput">ssl::stream&lt;&gt;</code> bug that may result in spurious
+          'short read' errors.
+        </li>
+<li class="listitem">
+          Enabled perfect forwarding for the first <code class="computeroutput">ssl::stream&lt;&gt;</code>
+          constructor argument.
+        </li>
+<li class="listitem">
+          Added standalone Asio support for Clang when used with libstdc++ and C++11.
+        </li>
+<li class="listitem">
+          Fixed an unsigned integer overflow reported by Clang's integer sanitizer.
+        </li>
+<li class="listitem">
+          Added support for move-only return types when using a <code class="computeroutput">yield_context</code>
+          object with asynchronous operations.
+        </li>
+<li class="listitem">
+          Ensured errors generated by Windows' <code class="computeroutput">ConnectEx</code> function are
+          mapped to their portable equivalents.
+        </li>
+<li class="listitem">
+          Changed multicast test to treat certain <code class="computeroutput">join_group</code> failures
+          as non-fatal.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h4"></a>
+      <span><a name="asio.history.asio_1_10_5"></a></span><a class="link" href="history.html#asio.history.asio_1_10_5">Asio
+      1.10.5</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Fixed the <code class="literal">kqueue</code> reactor so that it works on FreeBSD.
+        </li>
+<li class="listitem">
+          Fixed an issue in the <code class="literal">kqueue</code> reactor which resulted
+          in spinning when using serial ports on Mac OS.
+        </li>
+<li class="listitem">
+          Fixed <code class="literal">kqueue</code> reactor support for read-only file descriptors.
+        </li>
+<li class="listitem">
+          Fixed a compile error when using the <code class="literal">/dev/poll</code> reactor.
+        </li>
+<li class="listitem">
+          Changed the Windows backend to use <code class="computeroutput">WSASocketW</code>, as <code class="computeroutput">WSASocketA</code>
+          has been deprecated.
+        </li>
+<li class="listitem">
+          Fixed some warnings reported by Visual C++ 2013.
+        </li>
+<li class="listitem">
+          Fixed integer type used in the WinRT version of the byte-order conversion
+          functions.
+        </li>
+<li class="listitem">
+          Changed documentation to indicate that <code class="computeroutput">use_future</code> and <code class="computeroutput">spawn()</code>
+          are not made available when including the <code class="computeroutput">asio.hpp</code> convenience
+          header.
+        </li>
+<li class="listitem">
+          Explicitly marked <code class="computeroutput">asio::strand</code> as deprecated. Use <code class="computeroutput">asio::io_service::strand</code>
+          instead.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h5"></a>
+      <span><a name="asio.history.asio_1_10_4"></a></span><a class="link" href="history.html#asio.history.asio_1_10_4">Asio
+      1.10.4</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Stopped using certain Winsock functions that are marked as deprecated in
+          the latest Visual C++ and Windows SDK.
+        </li>
+<li class="listitem">
+          Fixed a shadow variable warning on Windows.
+        </li>
+<li class="listitem">
+          Fixed a regression in the <code class="literal">kqueue</code> backend that was introduced
+          in Asio 1.10.2.
+        </li>
+<li class="listitem">
+          Added a workaround for building the unit tests with <code class="literal">gcc</code>
+          on AIX.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h6"></a>
+      <span><a name="asio.history.asio_1_10_3"></a></span><a class="link" href="history.html#asio.history.asio_1_10_3">Asio
+      1.10.3</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Worked around a <code class="literal">gcc</code> problem to do with anonymous enums.
+        </li>
+<li class="listitem">
+          Reverted the Windows <code class="computeroutput">HANDLE</code> backend change to ignore <code class="computeroutput">ERROR_MORE_DATA</code>.
+          Instead, the error will be propagated as with any other (i.e. in an <code class="computeroutput">error_code</code>
+          or thrown as a <code class="computeroutput">system_error</code>), and the number of bytes transferred
+          will be returned. For code that needs to handle partial messages, the
+          <code class="computeroutput">error_code</code> overload should be used.
+        </li>
+<li class="listitem">
+          Fixed an off-by-one error in the <code class="computeroutput">signal_set</code> implementation's
+          signal number check.
+        </li>
+<li class="listitem">
+          Changed the Windows IOCP backend to not assume that <code class="computeroutput">SO_UPDATE_CONNECT_CONTEXT</code>
+          is defined.
+        </li>
+<li class="listitem">
+          Fixed a Windows-specific issue, introduced in Asio 1.10.2, by using <code class="computeroutput">VerifyVersionInfo</code>
+          rather than <code class="computeroutput">GetVersionEx</code>, as <code class="computeroutput">GetVersionEx</code> has
+          been deprecated.
+        </li>
+<li class="listitem">
+          Changed to use SSE2 intrinsics rather than inline assembly, to allow the
+          Cray compiler to work.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h7"></a>
+      <span><a name="asio.history.asio_1_10_2"></a></span><a class="link" href="history.html#asio.history.asio_1_10_2">Asio
+      1.10.2</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Fixed <code class="computeroutput">asio::spawn()</code> to work correctly with new Boost.Coroutine
+          interface.
+        </li>
+<li class="listitem">
+          Ensured that incomplete <code class="computeroutput">asio::spawn()</code> coroutines are correctly
+          unwound when cleaned up by the <code class="computeroutput">io_service</code> destructor.
+        </li>
+<li class="listitem">
+          Fixed delegation of continuation hook for handlers produced by <code class="computeroutput">io_service::wrap()</code>
+          and <code class="computeroutput">strand::wrap()</code>.
+        </li>
+<li class="listitem">
+          Changed the Windows I/O completion port backend to use <code class="computeroutput">ConnectEx</code>,
+          if available, for connection-oriented IP sockets.
+        </li>
+<li class="listitem">
+          Changed the <code class="computeroutput">io_service</code> backend for non-Windows (and non-IOCP
+          Windows) platforms to use a single condition variable per <code class="computeroutput">io_service</code>
+          instance. This addresses a potential race condition when <code class="computeroutput">run_one()</code>
+          is used from multiple threads.
+        </li>
+<li class="listitem">
+          Prevented integer overflow when computing timeouts based on some <code class="computeroutput">boost::chrono</code>
+          and <code class="computeroutput">std::chrono</code> clocks.
+        </li>
+<li class="listitem">
+          Made further changes to <code class="computeroutput">EV_CLEAR</code> handling in the kqueue backend,
+          to address other cases where the <code class="computeroutput">close()</code> system call may hang
+          on Mac OS X.
+        </li>
+<li class="listitem">
+          Fixed infinite recursion in implementation of <code class="computeroutput">resolver_query_base::flags::operator~</code>.
+        </li>
+<li class="listitem">
+          Made the <code class="computeroutput">select</code> reactor more efficient on Windows for large
+          numbers of sockets.
+        </li>
+<li class="listitem">
+          Fixed a Windows-specific type-aliasing issue reported by <code class="literal">gcc</code>.
+        </li>
+<li class="listitem">
+          Prevented execution of compile-time-only buffer test to avoid triggering
+          an address sanitiser warning.
+        </li>
+<li class="listitem">
+          Disabled the <code class="computeroutput">GetQueuedCompletionStatus</code> timeout workaround
+          on recent versions of Windows.
+        </li>
+<li class="listitem">
+          Changed implementation for Windows Runtime to use <code class="computeroutput">FormatMessageW</code>
+          rather than <code class="computeroutput">FormatMessageA</code>, as the Windows store does not
+          permit the latter.
+        </li>
+<li class="listitem">
+          Added support for string-based scope IDs when using link-local multicast
+          addresses.
+        </li>
+<li class="listitem">
+          Changed IPv6 multicast group join to use the address's scope ID as the
+          interface, if an interface is not explicitly specified.
+        </li>
+<li class="listitem">
+          Fixed multicast test failure on Mac OS X and the BSDs by using a link-local
+          multicast address.
+        </li>
+<li class="listitem">
+          Various minor documentation improvements.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h8"></a>
+      <span><a name="asio.history.asio_1_10_1"></a></span><a class="link" href="history.html#asio.history.asio_1_10_1">Asio
+      1.10.1</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Implemented a limited port to Windows Runtime. This support requires that
+          the language extensions be enabled. Due to the restricted facilities exposed
+          by the Windows Runtime API, the port also comes with the following caveats:
+          <div class="itemizedlist"><ul class="itemizedlist" type="circle">
+<li class="listitem">
+                The core facilities such as the <code class="computeroutput">io_service</code>, <code class="computeroutput">strand</code>,
+                buffers, composed operations, timers, etc., should all work as normal.
+              </li>
+<li class="listitem">
+                For sockets, only client-side TCP is supported.
+              </li>
+<li class="listitem">
+                Explicit binding of a client-side TCP socket is not supported.
+              </li>
+<li class="listitem">
+                The <code class="computeroutput">cancel()</code> function is not supported for sockets.
+                Asynchronous operations may only be cancelled by closing the socket.
+              </li>
+<li class="listitem">
+                Operations that use <code class="computeroutput">null_buffers</code> are not supported.
+              </li>
+<li class="listitem">
+                Only <code class="computeroutput">tcp::no_delay</code> and <code class="computeroutput">socket_base::keep_alive</code>
+                options are supported.
+              </li>
+<li class="listitem">
+                Resolvers do not support service names, only numbers. I.e. you must
+                use "80" rather than "http".
+              </li>
+<li class="listitem">
+                Most resolver query flags have no effect.
+              </li>
+</ul></div>
+        </li>
+<li class="listitem">
+          Extended the ability to use Asio without Boost to include Microsoft Visual
+          Studio 2012. When using a C++11 compiler, most of Asio may now be used
+          without a dependency on Boost header files or libraries. To use Asio in
+          this way, define <code class="computeroutput">ASIO_STANDALONE</code> on your compiler command
+          line or as part of the project options. This standalone configuration has
+          been tested for the following platforms and compilers:
+          <div class="itemizedlist"><ul class="itemizedlist" type="circle">
+<li class="listitem">
+                Microsoft Visual Studio 2012
+              </li>
+<li class="listitem">
+                Linux with g++ 4.7 or 4.8 (requires <code class="literal">-std=c++11</code>)
+              </li>
+<li class="listitem">
+                Mac OS X with clang++ / Xcode 4.6 (requires <code class="literal">-std=c++11 -stdlib=libc++</code>)
+              </li>
+</ul></div>
+        </li>
+<li class="listitem">
+          Fixed a regression (introduced in 1.10.0) where, on some platforms, errors
+          from <code class="computeroutput">async_connect</code> were not correctly propagated through to
+          the completion handler.
+        </li>
+<li class="listitem">
+          Fixed a Windows-specific regression (introduced in 1.10.0) that occurs
+          when multiple threads are running an <code class="computeroutput">io_service</code>. When the
+          bug occurs, the result of an asynchronous operation (error and bytes tranferred)
+          is incorrectly discarded and zero values used instead. For TCP sockets
+          this results in spurious end-of-file notifications.
+        </li>
+<li class="listitem">
+          Fixed a bug in handler tracking, where it was not correctly printing out
+          some handler IDs.
+        </li>
+<li class="listitem">
+          Fixed the comparison used to test for successful synchronous accept operations
+          so that it works correctly with unsigned socket descriptors.
+        </li>
+<li class="listitem">
+          Ensured the signal number is correctly passed to the completion handler
+          when starting an <code class="computeroutput">async_wait</code> on a signal that is already raised.
+        </li>
+<li class="listitem">
+          Suppressed a g++ 4.8+ warning about unused typedefs.
+        </li>
+<li class="listitem">
+          Enabled the move optimisation for handlers that use the default invocation
+          hook.
+        </li>
+<li class="listitem">
+          Clarified that programs must not issue overlapping <code class="computeroutput">async_write_at</code>
+          operations.
+        </li>
+<li class="listitem">
+          Changed the Windows <code class="computeroutput">HANDLE</code> backend to treat <code class="computeroutput">ERROR_MORE_DATA</code>
+          as a non-fatal error when returned by <code class="computeroutput">GetOverlappedResult</code>
+          for a synchronous read.
+        </li>
+<li class="listitem">
+          Visual C++ language extensions use <code class="computeroutput">generic</code> as a keyword. Added
+          a workaround that renames the namespace to <code class="computeroutput">cpp_generic</code> when
+          those language extensions are in effect.
+        </li>
+<li class="listitem">
+          Fixed some asynchronous operations that missed out on getting <code class="computeroutput">async_result</code>
+          support in 1.10.0. In particular, the buffered stream templates have been
+          updated so that they adhere to current handler patterns.
+        </li>
+<li class="listitem">
+          Enabled move support for Microsoft Visual Studio 2012.
+        </li>
+<li class="listitem">
+          Added <code class="computeroutput">use_future</code> support for Microsoft Visual Studio 2012.
+        </li>
+<li class="listitem">
+          Removed a use of <code class="computeroutput">std::min</code> in the Windows IOCP backend to avoid
+          a dependency on the <code class="computeroutput">&lt;algorithm&gt;</code> header.
+        </li>
+<li class="listitem">
+          Eliminated some unnecessary handler copies.
+        </li>
+<li class="listitem">
+          Fixed support for older versions of OpenSSL that do not provide the <code class="computeroutput">SSL_CTX_clear_options</code>
+          function.
+        </li>
+<li class="listitem">
+          Fixed various minor and cosmetic issues in code and documentation.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h9"></a>
+      <span><a name="asio.history.asio_1_10_0"></a></span><a class="link" href="history.html#asio.history.asio_1_10_0">Asio
+      1.10.0</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Added new traits classes, <code class="computeroutput">handler_type</code> and <code class="computeroutput">async_result</code>,
+          that allow the customisation of the return type of an initiating function.
+        </li>
+<li class="listitem">
+          Added the <code class="computeroutput">asio::spawn()</code> function, a high-level wrapper for
+          running stackful coroutines, based on the Boost.Coroutine library. The
+          <code class="computeroutput">spawn()</code> function enables programs to implement asynchronous
+          logic in a synchronous manner. For example: <code class="computeroutput">size_t n = my_socket.async_read_some(my_buffer,
+          yield);</code>. For further information, see <a class="link" href="overview/core/spawn.html" title="Stackful Coroutines">Stackful
+          Coroutines</a>.
+        </li>
+<li class="listitem">
+          Added the <code class="computeroutput">asio::use_future</code> special value, which provides first-class
+          support for returning a C++11 <code class="computeroutput">std::future</code> from an asynchronous
+          operation's initiating function. For example: <code class="computeroutput">future&lt;size_t&gt;
+          = my_socket.async_read_some(my_buffer, asio::use_future);</code>. For further
+          information, see <a class="link" href="overview/cpp2011/futures.html" title="Futures">C++ 2011
+          Support - Futures</a>.
+        </li>
+<li class="listitem">
+          Promoted the stackless coroutine class and macros to be part of Asio's
+          documented interface, rather than part of the HTTP server 4 example. For
+          further information, see <a class="link" href="overview/core/coroutine.html" title="Stackless Coroutines">Stackless
+          Coroutines</a>.
+        </li>
+<li class="listitem">
+          Added a new handler hook called <code class="computeroutput">asio_handler_is_continuation</code>.
+          Asynchronous operations may represent a continuation of the asynchronous
+          control flow associated with the current executing handler. The <code class="computeroutput">asio_handler_is_continuation</code>
+          hook can be customised to return <code class="computeroutput">true</code> if this is the case,
+          and Asio's implementation can use this knowledge to optimise scheduling
+          of the new handler. To cover common cases, Asio customises the hook for
+          strands, <code class="computeroutput">spawn()</code> and composed asynchronous operations.
+        </li>
+<li class="listitem">
+          Added four new generic protocol classes, <code class="computeroutput">generic::datagram_protocol</code>,
+          <code class="computeroutput">generic::raw_protocol</code>, <code class="computeroutput">generic::seq_packet_protocol</code>
+          and <code class="computeroutput">generic::stream_protocol</code>, which implement the <code class="computeroutput">Protocol</code>
+          type requirements, but allow the user to specify the address family (e.g.
+          <code class="computeroutput">AF_INET</code>) and protocol type (e.g. <code class="computeroutput">IPPROTO_TCP</code>)
+          at runtime. For further information, see <a class="link" href="overview/networking/other_protocols.html" title="Support for Other Protocols">Support
+          for Other Protocols</a>.
+        </li>
+<li class="listitem">
+          Added C++11 move constructors that allow the conversion of a socket (or
+          acceptor) into a more generic type. For example, an <code class="computeroutput">ip::tcp::socket</code>
+          can be converted into a <code class="computeroutput">generic::stream_protocol::socket</code> via
+          move construction. For further information, see <a class="link" href="overview/networking/other_protocols.html" title="Support for Other Protocols">Support
+          for Other Protocols</a>.
+        </li>
+<li class="listitem">
+          Extended the <code class="computeroutput">basic_socket_acceptor&lt;&gt;</code>'s <code class="computeroutput">accept()</code>
+          and <code class="computeroutput">async_accept()</code> functions to allow a new connection to
+          be accepted directly into a socket of a more generic type. For example,
+          an <code class="computeroutput">ip::tcp::acceptor</code> can be used to accept into a <code class="computeroutput">generic::stream_protocol::socket</code>
+          object. For further information, see <a class="link" href="overview/networking/other_protocols.html" title="Support for Other Protocols">Support
+          for Other Protocols</a>.
+        </li>
+<li class="listitem">
+          Moved existing examples into a C++03-specific directory, and added a new
+          directory for C++11-specific examples. A limited subset of the C++03 examples
+          have been converted to their C++11 equivalents.
+        </li>
+<li class="listitem">
+          Add the ability to use Asio without Boost, for a limited set of platforms.
+          When using a C++11 compiler, most of Asio may now be used without a dependency
+          on Boost header files or libraries. To use Asio in this way, define <code class="computeroutput">ASIO_STANDALONE</code>
+          on your compiler command line or as part of the project options. This standalone
+          configuration has currently been tested for the following platforms and
+          compilers:
+          <div class="itemizedlist"><ul class="itemizedlist" type="circle">
+<li class="listitem">
+                Linux with g++ 4.7 (requires <code class="literal">-std=c++11</code>)
+              </li>
+<li class="listitem">
+                Mac OS X with clang++ / Xcode 4.6 (requires <code class="literal">-std=c++11 -stdlib=libc++</code>)
+              </li>
+</ul></div>
+        </li>
+<li class="listitem">
+          Various SSL enhancements. Thanks go to Nick Jones, on whose work these
+          changes are based.
+          <div class="itemizedlist"><ul class="itemizedlist" type="circle">
+<li class="listitem">
+                Added support for SSL handshakes with re-use of data already read
+                from the wire. New overloads of the <code class="computeroutput">ssl::stream&lt;&gt;</code>
+                class's <code class="computeroutput">handshake()</code> and <code class="computeroutput">async_handshake()</code>
+                functions have been added. These accept a <code class="computeroutput">ConstBufferSequence</code>
+                to be used as initial input to the ssl engine for the handshake procedure.
+              </li>
+<li class="listitem">
+                Added support for creation of TLSv1.1 and TLSv1.2 <code class="computeroutput">ssl::context</code>
+                objects.
+              </li>
+<li class="listitem">
+                Added a <code class="computeroutput">set_verify_depth()</code> function to the <code class="computeroutput">ssl::context</code>
+                and <code class="computeroutput">ssl::stream&lt;&gt;</code> classes.
+              </li>
+<li class="listitem">
+                Added the ability to load SSL certificate and key data from memory
+                buffers. New functions, <code class="computeroutput">add_certificate_authority()</code>,
+                <code class="computeroutput">use_certificate()</code>, <code class="computeroutput">use_certificate_chain()</code>,
+                <code class="computeroutput">use_private_key()</code>, <code class="computeroutput">use_rsa_private_key()</code>
+                and <code class="computeroutput">use_tmp_dh()</code>, have been added to the <code class="computeroutput">ssl::context</code>
+                class.
+              </li>
+<li class="listitem">
+                Changed <code class="computeroutput">ssl::context</code> to automatically disable SSL compression
+                by default. To enable, use the new <code class="computeroutput">ssl::context::clear_options()</code>
+                function, as in <code class="computeroutput">my_context.clear_options(ssl::context::no_compression)</code>.
+              </li>
+</ul></div>
+        </li>
+<li class="listitem">
+          Fixed a potential deadlock in <code class="computeroutput">signal_set</code> implementation.
+        </li>
+<li class="listitem">
+          Fixed an error in acceptor example in documentation.
+        </li>
+<li class="listitem">
+          Fixed copy-paste errors in waitable timer documentation.
+        </li>
+<li class="listitem">
+          Added assertions to satisfy some code analysis tools.
+        </li>
+<li class="listitem">
+          Fixed a malformed <code class="computeroutput">#warning</code> directive.
+        </li>
+<li class="listitem">
+          Fixed a potential data race in the Linux <code class="computeroutput">epoll</code> implementation.
+        </li>
+<li class="listitem">
+          Fixed a Windows-specific bug, where certain operations might generate an
+          <code class="computeroutput">error_code</code> with an invalid (i.e. <code class="computeroutput">NULL</code>) <code class="computeroutput">error_category</code>.
+        </li>
+<li class="listitem">
+          Fixed <code class="computeroutput">basic_waitable_timer</code>'s underlying implementation so
+          that it can handle any <code class="computeroutput">time_point</code> value without overflowing
+          the intermediate duration objects.
+        </li>
+<li class="listitem">
+          Fixed a problem with lost thread wakeups that can occur when making concurrent
+          calls to <code class="computeroutput">run()</code> and <code class="computeroutput">poll()</code> on the same <code class="computeroutput">io_service</code>
+          object.
+        </li>
+<li class="listitem">
+          Fixed implementation of asynchronous connect operation so that it can cope
+          with spurious readiness notifications from the reactor.
+        </li>
+<li class="listitem">
+          Fixed a memory leak in the <code class="computeroutput">ssl::rfc2818_verification</code> class.
+        </li>
+<li class="listitem">
+          Added a mechanism for disabling automatic Winsock initialisation. See the
+          header file <code class="literal">asio/detail/winsock_init.hpp</code> for details.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h10"></a>
+      <span><a name="asio.history.asio_1_8_3"></a></span><a class="link" href="history.html#asio.history.asio_1_8_3">Asio
+      1.8.3</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Fixed some 64-to-32-bit conversion warnings.
+        </li>
+<li class="listitem">
+          Fixed various small errors in documentation and comments.
+        </li>
+<li class="listitem">
+          Fixed an error in the example embedded in <code class="computeroutput">basic_socket::get_option</code>'s
+          documentation.
+        </li>
+<li class="listitem">
+          Changed to use <code class="computeroutput">long</code> rather than <code class="computeroutput">int</code> for SSL_CTX
+          options, to match OpenSSL.
+        </li>
+<li class="listitem">
+          Changed to use <code class="computeroutput">_snwprintf</code> to address a compile error due to
+          the changed <code class="computeroutput">swprintf</code> signature in recent versions of MinGW.
+        </li>
+<li class="listitem">
+          Fixed a deadlock that can occur on Windows when shutting down a pool of
+          <code class="computeroutput">io_service</code> threads due to running out of work.
+        </li>
+<li class="listitem">
+          Changed UNIX domain socket example to treat errors from <code class="computeroutput">accept</code>
+          as non-fatal.
+        </li>
+<li class="listitem">
+          Added a small block recycling optimisation to improve default memory allocation
+          behaviour.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h11"></a>
+      <span><a name="asio.history.asio_1_8_2"></a></span><a class="link" href="history.html#asio.history.asio_1_8_2">Asio
+      1.8.2</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Fixed an incompatibility between <code class="computeroutput">ip::tcp::iostream</code> and C++11.
+        </li>
+<li class="listitem">
+          Decorated GCC attribute names with underscores to prevent interaction with
+          user-defined macros.
+        </li>
+<li class="listitem">
+          Added missing <code class="computeroutput">#include &lt;cctype&gt;</code>, needed for some versions
+          of MinGW.
+        </li>
+<li class="listitem">
+          Changed to use <code class="literal">gcc</code>'s atomic builtins on ARM CPUs, when
+          available.
+        </li>
+<li class="listitem">
+          Changed strand destruction to be a no-op, to allow strand objects to be
+          destroyed after their associated <code class="computeroutput">io_service</code> has been destroyed.
+        </li>
+<li class="listitem">
+          Added support for some newer versions of glibc which provide the <code class="computeroutput">epoll_create1()</code>
+          function but always fail with ENOSYS.
+        </li>
+<li class="listitem">
+          Changed the SSL implementation to throw an exception if SSL engine initialisation
+          fails.
+        </li>
+<li class="listitem">
+          Fixed another regression in <code class="computeroutput">buffered_write_stream</code>.
+        </li>
+<li class="listitem">
+          Implemented various minor performance improvements, primarily targeted
+          at Linux x86 and x86-64 platforms.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h12"></a>
+      <span><a name="asio.history.asio_1_8_1"></a></span><a class="link" href="history.html#asio.history.asio_1_8_1">Asio
+      1.8.1</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Changed the <code class="computeroutput">epoll_reactor</code> backend to do lazy registration
+          for <code class="computeroutput">EPOLLOUT</code> events.
+        </li>
+<li class="listitem">
+          Fixed the <code class="computeroutput">epoll_reactor</code> handling of out-of-band data, which
+          was broken by an incomplete fix in the last release.
+        </li>
+<li class="listitem">
+          Changed Asio's SSL wrapper to respect OpenSSL's <code class="computeroutput">OPENSSL_NO_ENGINE</code>
+          feature test <code class="computeroutput">#define</code>.
+        </li>
+<li class="listitem">
+          Fixed <code class="computeroutput">windows::object_handle</code> so that it works with Windows
+          compilers that support C++11 move semantics (such as <code class="literal">g++</code>).
+        </li>
+<li class="listitem">
+          Improved the performance of strand rescheduling.
+        </li>
+<li class="listitem">
+          Added support for <code class="literal">g++</code> 4.7 when compiling in C++11 mode.
+        </li>
+<li class="listitem">
+          Fixed a problem where <code class="computeroutput">signal_set</code> handlers were not being delivered
+          when the <code class="computeroutput">io_service</code> was constructed with a <code class="computeroutput">concurrency_hint</code>
+          of 1.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h13"></a>
+      <span><a name="asio.history.asio_1_8_0"></a></span><a class="link" href="history.html#asio.history.asio_1_8_0">Asio
+      1.8.0</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Added a new class template <code class="computeroutput">basic_waitable_timer</code> based around
+          the C++11 clock type requirements. It may be used with the clocks from
+          the C++11 <code class="computeroutput">&lt;chrono&gt;</code> library facility or, if those are
+          not available, Boost.Chrono. The typedefs <code class="computeroutput">high_resolution_timer</code>,
+          <code class="computeroutput">steady_timer</code> and <code class="computeroutput">system_timer</code> may be used to
+          create timer objects for the standard clock types.
+        </li>
+<li class="listitem">
+          Added a new <code class="computeroutput">windows::object_handle</code> class for performing waits
+          on Windows kernel objects. Thanks go to Boris Schaeling for contributing
+          substantially to the development of this feature.
+        </li>
+<li class="listitem">
+          On Linux, <code class="computeroutput">connect()</code> can return EAGAIN in certain circumstances.
+          Remapped this to another error so that it doesn't look like a non-blocking
+          operation.
+        </li>
+<li class="listitem">
+          Fixed a compile error on NetBSD.
+        </li>
+<li class="listitem">
+          Fixed deadlock on Mac OS X.
+        </li>
+<li class="listitem">
+          Fixed a regression in <code class="computeroutput">buffered_write_stream</code>.
+        </li>
+<li class="listitem">
+          Fixed a non-paged pool "leak" on Windows when an <code class="computeroutput">io_service</code>
+          is repeatedly run without anything to do.
+        </li>
+<li class="listitem">
+          Reverted earlier change to allow some speculative operations to be performed
+          without holding the lock, as it introduced a race condition in some multithreaded
+          scenarios.
+        </li>
+<li class="listitem">
+          Fixed a bug where the second buffer in an array of two buffers may be ignored
+          if the first buffer is empty.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h14"></a>
+      <span><a name="asio.history.asio_1_6_1"></a></span><a class="link" href="history.html#asio.history.asio_1_6_1">Asio
+      1.6.1</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Implemented various performance improvements, including:
+          <div class="itemizedlist"><ul class="itemizedlist" type="circle">
+<li class="listitem">
+                Using thread-local operation queues in single-threaded use cases
+                (i.e. when <code class="computeroutput">concurrency_hint</code> is 1) to eliminate a lock/unlock
+                pair.
+              </li>
+<li class="listitem">
+                Allowing some <code class="computeroutput">epoll_reactor</code> speculative operations to
+                be performed without holding the lock.
+              </li>
+<li class="listitem">
+                Improving locality of reference by performing an <code class="computeroutput">epoll_reactor</code>'s
+                I/O operation immediately before the corresponding handler is called.
+                This also improves scalability across CPUs when multiple threads
+                are running the <code class="computeroutput">io_service</code>.
+              </li>
+<li class="listitem">
+                Specialising asynchronous read and write operations for buffer sequences
+                that are arrays (<code class="computeroutput">boost::array</code> or <code class="computeroutput">std::array</code>)
+                of exactly two buffers.
+              </li>
+</ul></div>
+        </li>
+<li class="listitem">
+          Fixed a compile error in the regex overload of <code class="computeroutput">async_read_until</code>.
+        </li>
+<li class="listitem">
+          Fixed a Windows-specific compile error by explicitly specifying the <code class="computeroutput">signal()</code>
+          function from the global namespace.
+        </li>
+<li class="listitem">
+          Changed the <code class="computeroutput">deadline_timer</code> implementation so that it does
+          not read the clock unless the timer heap is non-empty.
+        </li>
+<li class="listitem">
+          Changed the SSL stream's buffers' sizes so that they are large enough to
+          hold a complete TLS record.
+        </li>
+<li class="listitem">
+          Fixed the behaviour of the synchronous <code class="computeroutput">null_buffers</code> operations
+          so that they obey the user's non-blocking setting.
+        </li>
+<li class="listitem">
+          Changed to set the size of the select <code class="computeroutput">fd_set</code> at runtime when
+          using Windows.
+        </li>
+<li class="listitem">
+          Disabled an MSVC warning due to const qualifier being applied to function
+          type.
+        </li>
+<li class="listitem">
+          Fixed a crash that occurs when using the Intel C++ compiler.
+        </li>
+<li class="listitem">
+          Changed the initialisation of the OpenSSL library so that it supports all
+          available algorithms.
+        </li>
+<li class="listitem">
+          Fixed the SSL error mapping used when the session is gracefully shut down.
+        </li>
+<li class="listitem">
+          Added some latency test programs.
+        </li>
+<li class="listitem">
+          Clarified that a read operation ends when the buffer is full.
+        </li>
+<li class="listitem">
+          Fixed an exception safety issue in <code class="computeroutput">epoll_reactor</code> initialisation.
+        </li>
+<li class="listitem">
+          Made the number of strand implementations configurable by defining <code class="computeroutput">(BOOST_)ASIO_STRAND_IMPLEMENTATIONS</code>
+          to the desired number.
+        </li>
+<li class="listitem">
+          Added support for a new <code class="computeroutput">(BOOST_)ASIO_ENABLE_SEQUENTIAL_STRAND_ALLOCATION</code>
+          flag which switches the allocation of strand implementations to use a round-robin
+          approach rather than hashing.
+        </li>
+<li class="listitem">
+          Fixed potential strand starvation issue that can occur when <code class="computeroutput">strand.post()</code>
+          is used.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h15"></a>
+      <span><a name="asio.history.asio_1_6_0"></a></span><a class="link" href="history.html#asio.history.asio_1_6_0">Asio
+      1.6.0</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Improved support for C++0x move construction to further reduce copying
+          of handler objects. In certain designs it is possible to eliminate virtually
+          all copies. Move support is now enabled when compiling in <code class="literal">-std=c++0x</code>
+          mode on g++ 4.5 or higher.
+        </li>
+<li class="listitem">
+          Added build support for platforms that don't provide either of <code class="computeroutput">signal()</code>
+          or <code class="computeroutput">sigaction()</code>.
+        </li>
+<li class="listitem">
+          Changed to use C++0x variadic templates when they are available, rather
+          than generating function overloads using the Boost.Preprocessor library.
+        </li>
+<li class="listitem">
+          Ensured the value of <code class="computeroutput">errno</code> is preserved across the implementation's
+          signal handler.
+        </li>
+<li class="listitem">
+          On Windows, ensured the count of outstanding work is decremented for abandoned
+          operations (i.e. operations that are being cleaned up within the <code class="computeroutput">io_service</code>
+          destructor).
+        </li>
+<li class="listitem">
+          Fixed behaviour of zero-length reads and writes in the new SSL implementation.
+        </li>
+<li class="listitem">
+          Added support for building with OpenSSL 1.0 when <code class="computeroutput">OPENSSL_NO_SSL2</code>
+          is defined.
+        </li>
+<li class="listitem">
+          Changed most examples to treat a failure by an accept operation as non-fatal.
+        </li>
+<li class="listitem">
+          Fixed an error in the <code class="literal">tick_count_timer</code> example by making
+          the duration type signed. Previously, a wait on an already-passed deadline
+          would not return for a very long time.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h16"></a>
+      <span><a name="asio.history.asio_1_5_3"></a></span><a class="link" href="history.html#asio.history.asio_1_5_3">Asio
+      1.5.3</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Added a new, completely rewritten SSL implementation. The new implementation
+          compiles faster, shows substantially improved performance, and supports
+          custom memory allocation and handler invocation. It includes new API features
+          such as certificate verification callbacks and has improved error reporting.
+          The new implementation is source-compatible with the old for most uses.
+          However, if necessary, the old implementation may still be used by defining
+          <code class="computeroutput">(BOOST_)ASIO_ENABLE_OLD_SSL</code>.
+        </li>
+<li class="listitem">
+          Added new <code class="computeroutput">asio::buffer()</code> overloads for <code class="computeroutput">std::array</code>,
+          when available. The support is automatically enabled when compiling in
+          <code class="literal">-std=c++0x</code> mode on g++ 4.3 or higher, or when using
+          MSVC 10. The support may be explicitly enabled by defining <code class="computeroutput">(BOOST_)ASIO_HAS_STD_ARRAY</code>,
+          or disabled by defining <code class="computeroutput">(BOOST_)ASIO_DISABLE_STD_ARRAY</code>.
+        </li>
+<li class="listitem">
+          Changed to use the C++0x standard library templates <code class="computeroutput">array</code>,
+          <code class="computeroutput">shared_ptr</code>, <code class="computeroutput">weak_ptr</code> and <code class="computeroutput">atomic</code>
+          when they are available, rather than the Boost equivalents.
+        </li>
+<li class="listitem">
+          Support for <code class="computeroutput">std::error_code</code> and <code class="computeroutput">std::system_error</code>
+          is no longer enabled by default for g++ 4.5, as that compiler's standard
+          library does not implement <code class="computeroutput">std::system_error::what()</code> correctly.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h17"></a>
+      <span><a name="asio.history.asio_1_5_2"></a></span><a class="link" href="history.html#asio.history.asio_1_5_2">Asio
+      1.5.2</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Added support for C++0x move construction and assignment to sockets, serial
+          ports, POSIX descriptors and Windows handles.
+        </li>
+<li class="listitem">
+          Added support for the <code class="computeroutput">fork()</code> system call. Programs that use
+          <code class="computeroutput">fork()</code> must call <code class="computeroutput">io_service.notify_fork()</code> at
+          the appropriate times. Two new examples have been added showing how to
+          use this feature.
+        </li>
+<li class="listitem">
+          Cleaned up the handling of errors reported by the <code class="computeroutput">close()</code>
+          system call. In particular, assume that most operating systems won't have
+          <code class="computeroutput">close()</code> fail with <code class="computeroutput">EWOULDBLOCK</code>, but if it does
+          then set the blocking mode and restart the call. If any other error occurs,
+          assume the descriptor is closed.
+        </li>
+<li class="listitem">
+          The kqueue flag <code class="computeroutput">EV_ONESHOT</code> seems to cause problems on some
+          versions of Mac OS X, with the <code class="computeroutput">io_service</code> destructor getting
+          stuck inside the <code class="computeroutput">close()</code> system call. Changed the kqueue backend
+          to use <code class="computeroutput">EV_CLEAR</code> instead.
+        </li>
+<li class="listitem">
+          Changed exception reporting to include the function name in exception
+          <code class="computeroutput">what()</code> messages.
+        </li>
+<li class="listitem">
+          Fixed an insufficient initialisers warning with MinGW.
+        </li>
+<li class="listitem">
+          Changed the <code class="computeroutput">shutdown_service()</code> member functions to be private.
+        </li>
+<li class="listitem">
+          Added archetypes for testing socket option functions.
+        </li>
+<li class="listitem">
+          Added a missing lock in <code class="computeroutput">signal_set_service::cancel()</code>.
+        </li>
+<li class="listitem">
+          Fixed a copy/paste error in <code class="computeroutput">SignalHandler</code> example.
+        </li>
+<li class="listitem">
+          Added the inclusion of the signal header to <code class="computeroutput">signal_set_service.hpp</code>
+          so that constants like <code class="computeroutput">NSIG</code> may be used.
+        </li>
+<li class="listitem">
+          Changed the <code class="computeroutput">signal_set_service</code> implementation so that it doesn't
+          assume that <code class="computeroutput">SIGRTMAX</code> is a compile-time constant.
+        </li>
+<li class="listitem">
+          Changed the Boost.Asio examples so that they don't use Boost.Thread's convenience
+          header. Use the header file that is specifically for the boost::thread
+          class instead.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h18"></a>
+      <span><a name="asio.history.asio_1_5_1"></a></span><a class="link" href="history.html#asio.history.asio_1_5_1">Asio
+      1.5.1</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Added support for signal handling, using a new class called <code class="computeroutput">signal_set</code>.
+          Programs may add one or more signals to the set, and then perform an <code class="computeroutput">async_wait()</code>
+          operation. The specified handler will be called when one of the signals
+          occurs. The same signal number may registered with multiple <code class="computeroutput">signal_set</code>
+          objects, however the signal number must be used only with Asio.
+        </li>
+<li class="listitem">
+          Added handler tracking, a new debugging aid. When enabled by defining
+          <code class="computeroutput">(BOOST_)ASIO_ENABLE_HANDLER_TRACKING</code>, Asio writes debugging
+          output to the standard error stream. The output records asynchronous operations
+          and the relationships between their handlers. It may be post-processed
+          using the included <code class="literal">handlerviz.pl</code> tool to create a visual
+          representation of the handlers (requires GraphViz).
+        </li>
+<li class="listitem">
+          Fixed a bug in <code class="computeroutput">asio::streambuf</code> where the <code class="computeroutput">consume()</code>
+          function did not always update the internal buffer pointers correctly.
+          The problem may occur when the <code class="computeroutput">asio::streambuf</code> is filled with
+          data using the standard C++ member functions such as <code class="computeroutput">sputn()</code>.
+          (Note: the problem does not manifest when the streambuf is populated by
+          the Asio free functions <code class="computeroutput">read()</code>, <code class="computeroutput">async_read()</code>,
+          <code class="computeroutput">read_until()</code> or <code class="computeroutput">async_read_until()</code>.)
+        </li>
+<li class="listitem">
+          Fixed a bug on kqueue-based platforms, where reactor read operations that
+          return false from their <code class="computeroutput">perform()</code> function are not correctly
+          re-registered with kqueue.
+        </li>
+<li class="listitem">
+          Support for <code class="computeroutput">std::error_code</code> and <code class="computeroutput">std::system_error</code>
+          is no longer enabled by default for MSVC10, as that compiler's standard
+          library does not implement <code class="computeroutput">std::system_error::what()</code> correctly.
+        </li>
+<li class="listitem">
+          Modified the <code class="computeroutput">buffers_iterator&lt;&gt;</code> and <code class="computeroutput">ip::basic_resolver_iterator</code>
+          classes so that the value_type typedefs are non-const byte types.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h19"></a>
+      <span><a name="asio.history.asio_1_5_0"></a></span><a class="link" href="history.html#asio.history.asio_1_5_0">Asio
+      1.5.0</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Added support for timeouts on socket iostreams, such as <code class="computeroutput">ip::tcp::iostream</code>.
+          A timeout is set by calling <code class="computeroutput">expires_at()</code> or <code class="computeroutput">expires_from_now()</code>
+          to establish a deadline. Any socket operations which occur past the deadline
+          will put the iostream into a bad state.
+        </li>
+<li class="listitem">
+          Added a new <code class="computeroutput">error()</code> member function to socket iostreams, for
+          retrieving the error code from the most recent system call.
+        </li>
+<li class="listitem">
+          Added a new <code class="computeroutput">basic_deadline_timer::cancel_one()</code> function. This
+          function lets you cancel a single waiting handler on a timer. Handlers
+          are cancelled in FIFO order.
+        </li>
+<li class="listitem">
+          Added a new <code class="computeroutput">transfer_exactly()</code> completion condition. This
+          can be used to send or receive a specified number of bytes even if the
+          total size of the buffer (or buffer sequence) is larger.
+        </li>
+<li class="listitem">
+          Added new free functions <code class="computeroutput">connect()</code> and <code class="computeroutput">async_connect()</code>.
+          These operations try each endpoint in a list until the socket is successfully
+          connected.
+        </li>
+<li class="listitem">
+          Extended the <code class="computeroutput">buffer_size()</code> function so that it works for buffer
+          sequences in addition to individual buffers.
+        </li>
+<li class="listitem">
+          Added a new <code class="computeroutput">buffer_copy()</code> function that can be used to copy
+          the raw bytes between individual buffers and buffer sequences.
+        </li>
+<li class="listitem">
+          Added new non-throwing overloads of <code class="computeroutput">read()</code>, <code class="computeroutput">read_at()</code>,
+          <code class="computeroutput">write()</code> and <code class="computeroutput">write_at()</code> that do not require a
+          completion condition.
+        </li>
+<li class="listitem">
+          Added friendlier compiler errors for when a completion handler does not
+          meet the necessary type requirements. When C++0x is available (currently
+          supported for g++ 4.5 or later, and MSVC 10), <code class="computeroutput">static_assert</code>
+          is also used to generate an informative error message. This checking may
+          be disabled by defining <code class="computeroutput">(BOOST_)ASIO_DISABLE_HANDLER_TYPE_REQUIREMENTS</code>.
+        </li>
+<li class="listitem">
+          Added support for using <code class="computeroutput">std::error_code</code> and <code class="computeroutput">std::system_error</code>,
+          when available. The support is automatically enabled when compiling in
+          <code class="literal">-std=c++0x</code> mode on g++ 4.5 or higher, or when using
+          MSVC 10. The support may be explicitly enabled by defining <code class="computeroutput">ASIO_HAS_STD_SYSTEM_ERROR</code>,
+          or disabled by defining <code class="computeroutput">ASIO_DISABLE_STD_SYSTEM_ERROR</code>. (Available
+          in non-Boost version of Asio only.)
+        </li>
+<li class="listitem">
+          Made the <code class="computeroutput">is_loopback()</code>, <code class="computeroutput">is_unspecified()</code> and
+          <code class="computeroutput">is_multicast()</code> functions consistently available across the
+          <code class="computeroutput">ip::address</code>, <code class="computeroutput">ip::address_v4</code> and <code class="computeroutput">ip::address_v6</code>
+          classes.
+        </li>
+<li class="listitem">
+          Added new <code class="computeroutput">non_blocking()</code> functions for managing the non-blocking
+          behaviour of a socket or descriptor. The <code class="computeroutput">io_control()</code> commands
+          named <code class="computeroutput">non_blocking_io</code> are now deprecated in favour of these
+          new functions.
+        </li>
+<li class="listitem">
+          Added new <code class="computeroutput">native_non_blocking()</code> functions for managing the
+          non-blocking mode of the underlying socket or descriptor. These functions
+          are intended to allow the encapsulation of arbitrary non-blocking system
+          calls as asynchronous operations, in a way that is transparent to the user
+          of the socket object. The functions have no effect on the behaviour of
+          the synchronous operations of the socket or descriptor.
+        </li>
+<li class="listitem">
+          Added the <code class="computeroutput">io_control()</code> member function for socket acceptors.
+        </li>
+<li class="listitem">
+          For consistency with the C++0x standard library, deprecated the <code class="computeroutput">native_type</code>
+          typedefs in favour of <code class="computeroutput">native_handle_type</code>, and the <code class="computeroutput">native()</code>
+          member functions in favour of <code class="computeroutput">native_handle()</code>.
+        </li>
+<li class="listitem">
+          Added a <code class="computeroutput">release()</code> member function to posix descriptors. This
+          function releases ownership of the underlying native descriptor to the
+          caller.
+        </li>
+<li class="listitem">
+          Added support for sequenced packet sockets (<code class="computeroutput">SOCK_SEQPACKET</code>).
+        </li>
+<li class="listitem">
+          Added a new <code class="computeroutput">io_service::stopped()</code> function that can be used
+          to determine whether the <code class="computeroutput">io_service</code> has stopped (i.e. a <code class="computeroutput">reset()</code>
+          call is needed prior to any further calls to <code class="computeroutput">run()</code>, <code class="computeroutput">run_one()</code>,
+          <code class="computeroutput">poll()</code> or <code class="computeroutput">poll_one()</code>).
+        </li>
+<li class="listitem">
+          Reduced the copying of handler function objects.
+        </li>
+<li class="listitem">
+          Added support for C++0x move construction to further reduce copying of
+          handler objects. Move support is enabled when compiling in <code class="literal">-std=c++0x</code>
+          mode on g++ 4.5 or higher, or when using MSVC10.
+        </li>
+<li class="listitem">
+          Removed the dependency on OS-provided macros for the well-known IPv4 and
+          IPv6 addresses. This should eliminate the annoying "missing braces
+          around initializer" warnings.
+        </li>
+<li class="listitem">
+          Reduced the size of <code class="computeroutput">ip::basic_endpoint&lt;&gt;</code> objects (such
+          as <code class="computeroutput">ip::tcp::endpoint</code> and <code class="computeroutput">ip::udp::endpoint</code>).
+        </li>
+<li class="listitem">
+          Changed the reactor backends to assume that any descriptors or sockets
+          added using <code class="computeroutput">assign()</code> may have been <code class="computeroutput">dup()</code>-ed,
+          and so require explicit deregistration from the reactor.
+        </li>
+<li class="listitem">
+          Changed the SSL error category to return error strings from the OpenSSL
+          library.
+        </li>
+<li class="listitem">
+          Changed the separate compilation support such that, to use Asio's SSL capabilities,
+          you should also include 'asio/ssl/impl/src.hpp` in one source file in your
+          program.
+        </li>
+<li class="listitem">
+          Removed the deprecated member functions named <code class="computeroutput">io_service()</code>.
+          The <code class="computeroutput">get_io_service()</code> member functions should be used instead.
+        </li>
+<li class="listitem">
+          Removed the deprecated typedefs <code class="computeroutput">resolver_query</code> and <code class="computeroutput">resolver_iterator</code>
+          from the <code class="computeroutput">ip::tcp</code>, <code class="computeroutput">ip::udp</code> and <code class="computeroutput">ip::icmp</code>
+          classes.
+        </li>
+<li class="listitem">
+          Fixed a compile error on some versions of g++ due to anonymous enums.
+        </li>
+<li class="listitem">
+          Added an explicit cast to the <code class="computeroutput">FIONBIO</code> constant to int to suppress
+          a compiler warning on some platforms.
+        </li>
+<li class="listitem">
+          Fixed warnings reported by g++'s <code class="literal">-Wshadow</code> compiler option.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h20"></a>
+      <span><a name="asio.history.asio_1_4_8"></a></span><a class="link" href="history.html#asio.history.asio_1_4_8">Asio
+      1.4.8</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Fixed an integer overflow problem that occurs when <code class="computeroutput">ip::address_v4::broadcast()</code>
+          is used on 64-bit platforms.
+        </li>
+<li class="listitem">
+          Fixed a problem on older Linux kernels (where epoll is used without <code class="computeroutput">timerfd</code>
+          support) that prevents timely delivery of <code class="computeroutput">deadline_timer</code> handlers,
+          after the program has been running for some time.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h21"></a>
+      <span><a name="asio.history.asio_1_4_7"></a></span><a class="link" href="history.html#asio.history.asio_1_4_7">Asio
+      1.4.7</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Fixed a problem on kqueue-based platforms where a <code class="computeroutput">deadline_timer</code>
+          may never fire if the <code class="computeroutput">io_service</code> is running in a background
+          thread.
+        </li>
+<li class="listitem">
+          Fixed a const-correctness issue that prevented valid uses of <code class="computeroutput">has_service&lt;&gt;</code>
+          from compiling.
+        </li>
+<li class="listitem">
+          Fixed MinGW cross-compilation.
+        </li>
+<li class="listitem">
+          Removed dependency on deprecated Boost.System functions (Boost.Asio only).
+        </li>
+<li class="listitem">
+          Ensured <code class="computeroutput">close()</code>/<code class="computeroutput">closesocket()</code> failures are correctly
+          propagated.
+        </li>
+<li class="listitem">
+          Added a check for errors returned by <code class="computeroutput">InitializeCriticalSectionAndSpinCount</code>.
+        </li>
+<li class="listitem">
+          Added support for hardware flow control on QNX.
+        </li>
+<li class="listitem">
+          Always use <code class="computeroutput">pselect()</code> on HP-UX, if it is available.
+        </li>
+<li class="listitem">
+          Ensured handler arguments are passed as lvalues.
+        </li>
+<li class="listitem">
+          Fixed Windows build when thread support is disabled.
+        </li>
+<li class="listitem">
+          Fixed a Windows-specific problem where <code class="computeroutput">deadline_timer</code> objects
+          with expiry times set more than 5 minutes in the future may never expire.
+        </li>
+<li class="listitem">
+          Fixed the resolver backend on BSD platforms so that an empty service name
+          resolves to port number <code class="computeroutput">0</code>, as per the documentation.
+        </li>
+<li class="listitem">
+          Fixed read operations so that they do not accept buffer sequences of type
+          <code class="computeroutput">const_buffers_1</code>.
+        </li>
+<li class="listitem">
+          Redefined <code class="computeroutput">Protocol</code> and <code class="computeroutput">id</code> to avoid clashing with
+          Objective-C++ keywords.
+        </li>
+<li class="listitem">
+          Fixed a <code class="computeroutput">vector</code> reallocation performance issue that can occur
+          when there are many active <code class="computeroutput">deadline_timer</code> objects.
+        </li>
+<li class="listitem">
+          Fixed the kqueue backend so that it compiles on NetBSD.
+        </li>
+<li class="listitem">
+          Fixed the socket <code class="computeroutput">io_control()</code> implementation on 64-bit Mac
+          OS X and BSD platforms.
+        </li>
+<li class="listitem">
+          Fixed a Windows-specific problem where failures from <code class="computeroutput">accept()</code>
+          are incorrectly treated as successes.
+        </li>
+<li class="listitem">
+          Deprecated the separate compilation header <code class="computeroutput">asio/impl/src.cpp</code>
+          in favour of <code class="computeroutput">asio/impl/src.hpp</code>.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h22"></a>
+      <span><a name="asio.history.asio_1_4_6"></a></span><a class="link" href="history.html#asio.history.asio_1_4_6">Asio
+      1.4.6</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Reduced compile times. (Note that some programs may need to add additional
+          <code class="computeroutput">#include</code>s, e.g. if the program uses boost::array but does
+          not explicitly include <code class="computeroutput">&lt;boost/array.hpp&gt;</code>.)
+        </li>
+<li class="listitem">
+          Reduced the size of generated code.
+        </li>
+<li class="listitem">
+          Refactored <code class="computeroutput">deadline_timer</code> implementation to improve performance.
+        </li>
+<li class="listitem">
+          Improved multiprocessor scalability on Windows by using a dedicated hidden
+          thread to wait for timers.
+        </li>
+<li class="listitem">
+          Improved performance of <code class="computeroutput">asio::streambuf</code> with <code class="computeroutput">async_read()</code>
+          and <code class="computeroutput">async_read_until()</code>. These read operations now use the
+          existing capacity of the <code class="computeroutput">streambuf</code> when reading, rather than
+          limiting the read to 512 bytes.
+        </li>
+<li class="listitem">
+          Added optional separate compilation. To enable, include <code class="computeroutput">asio/impl/src.cpp</code>
+          in one source file in a program, then build the program with <code class="computeroutput">(BOOST_)ASIO_SEPARATE_COMPILATION</code>
+          defined in the project/compiler settings. Alternatively, <code class="computeroutput">(BOOST_)ASIO_DYN_LINK</code>
+          may be defined to build a separately-compiled Asio as part of a shared
+          library.
+        </li>
+<li class="listitem">
+          Added new macro <code class="computeroutput">(BOOST_)ASIO_DISABLE_FENCED_BLOCK</code> to permit
+          the disabling of memory fences around completion handlers, even if thread
+          support is enabled.
+        </li>
+<li class="listitem">
+          Reworked timeout examples to better illustrate typical use cases.
+        </li>
+<li class="listitem">
+          Ensured that handler arguments are passed as const types.
+        </li>
+<li class="listitem">
+          Fixed incorrect parameter order in <code class="computeroutput">null_buffers</code> variant of
+          <code class="computeroutput">async_send_to</code>.
+        </li>
+<li class="listitem">
+          Ensured unsigned char is used with <code class="computeroutput">isdigit</code> in <code class="computeroutput">getaddrinfo</code>
+          emulation.
+        </li>
+<li class="listitem">
+          Fixed handling of very small but non-zero timeouts.
+        </li>
+<li class="listitem">
+          Fixed crash that occurred when an empty buffer sequence was passed to a
+          composed read or write operation.
+        </li>
+<li class="listitem">
+          Added missing operator+ overload in <code class="computeroutput">buffers_iterator</code>.
+        </li>
+<li class="listitem">
+          Implemented cancellation of <code class="computeroutput">null_buffers</code> operations on Windows.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h23"></a>
+      <span><a name="asio.history.asio_1_4_5"></a></span><a class="link" href="history.html#asio.history.asio_1_4_5">Asio
+      1.4.5</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Improved performance.
+        </li>
+<li class="listitem">
+          Reduced compile times.
+        </li>
+<li class="listitem">
+          Reduced the size of generated code.
+        </li>
+<li class="listitem">
+          Extended the guarantee that background threads don't call user code to
+          all asynchronous operations.
+        </li>
+<li class="listitem">
+          Changed to use edge-triggered epoll on Linux.
+        </li>
+<li class="listitem">
+          Changed to use <code class="computeroutput">timerfd</code> for dispatching timers on Linux, when
+          available.
+        </li>
+<li class="listitem">
+          Changed to use one-shot notifications with kqueue on Mac OS X and BSD platforms.
+        </li>
+<li class="listitem">
+          Added a bitmask type <code class="computeroutput">ip::resolver_query_base::flags</code> as per
+          the TR2 proposal. This type prevents implicit conversion from <code class="computeroutput">int</code>
+          to <code class="computeroutput">flags</code>, allowing the compiler to catch cases where users
+          incorrectly pass a numeric port number as the service name.
+        </li>
+<li class="listitem">
+          Added <code class="computeroutput">#define NOMINMAX</code> for all Windows compilers. Users can
+          define <code class="computeroutput">(BOOST_)ASIO_NO_NOMINMAX</code> to suppress this definition.
+        </li>
+<li class="listitem">
+          Fixed a bug where 0-byte asynchronous reads were incorrectly passing an
+          <code class="computeroutput">error::eof</code> result to the completion handler.
+        </li>
+<li class="listitem">
+          Changed the <code class="computeroutput">io_control()</code> member functions to always call
+          <code class="computeroutput">ioctl</code> on the underlying descriptor when modifying blocking
+          mode.
+        </li>
+<li class="listitem">
+          Changed the resolver implementation so that it no longer requires the typedefs
+          <code class="computeroutput">InternetProtocol::resolver_query</code> and <code class="computeroutput">InternetProtocol::resolver_iterator</code>,
+          as neither typedef is part of the documented <code class="computeroutput">InternetProtocol</code>
+          requirements. The corresponding typedefs in the <code class="computeroutput">ip::tcp</code>,
+          <code class="computeroutput">ip::udp</code> and <code class="computeroutput">ip::icmp</code> classes have been deprecated.
+        </li>
+<li class="listitem">
+          Fixed out-of-band handling for reactors not based on <code class="computeroutput">select()</code>.
+        </li>
+<li class="listitem">
+          Added new <code class="computeroutput">(BOOST_)ASIO_DISABLE_THREADS</code> macro that allows Asio's
+          threading support to be independently disabled.
+        </li>
+<li class="listitem">
+          Minor documentation improvements.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h24"></a>
+      <span><a name="asio.history.asio_1_4_4"></a></span><a class="link" href="history.html#asio.history.asio_1_4_4">Asio
+      1.4.4</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Added a new HTTP Server 4 example illustrating the use of stackless coroutines
+          with Asio.
+        </li>
+<li class="listitem">
+          Changed handler allocation and invocation to use <code class="computeroutput">boost::addressof</code>
+          to get the address of handler objects, rather than applying <code class="computeroutput">operator&amp;</code>
+          directly.
+        </li>
+<li class="listitem">
+          Restricted MSVC buffer debugging workaround to 2008, as it causes a crash
+          with 2010 beta 2.
+        </li>
+<li class="listitem">
+          Fixed a problem with the lifetime of handler memory, where Windows needs
+          the <code class="computeroutput">OVERLAPPED</code> structure to be valid until both the initiating
+          function call has returned and the completion packet has been delivered.
+        </li>
+<li class="listitem">
+          Don't block signals while performing system calls, but instead restart
+          the calls if they are interrupted.
+        </li>
+<li class="listitem">
+          Documented the guarantee made by strand objects with respect to order of
+          handler invocation.
+        </li>
+<li class="listitem">
+          Changed strands to use a pool of implementations, to make copying of strands
+          cheaper.
+        </li>
+<li class="listitem">
+          Ensured that kqueue support is enabled for BSD platforms.
+        </li>
+<li class="listitem">
+          Added a <code class="computeroutput">boost_</code> prefix to the <code class="computeroutput">extern "C"</code>
+          thread entry point function.
+        </li>
+<li class="listitem">
+          In <code class="computeroutput">getaddrinfo</code> emulation, only check the socket type (<code class="computeroutput">SOCK_STREAM</code>
+          or <code class="computeroutput">SOCK_DGRAM</code>) if a service name has been specified. This
+          should allow the emulation to work with raw sockets.
+        </li>
+<li class="listitem">
+          Added a workaround for some broken Windows firewalls that make a socket
+          appear bound to 0.0.0.0 when it is in fact bound to 127.0.0.1.
+        </li>
+<li class="listitem">
+          Applied a fix for reported excessive CPU usage under Solaris.
+        </li>
+<li class="listitem">
+          Added some support for platforms that use older compilers such as g++ 2.95.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h25"></a>
+      <span><a name="asio.history.asio_1_4_3"></a></span><a class="link" href="history.html#asio.history.asio_1_4_3">Asio
+      1.4.3</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Added a new ping example to illustrate the use of ICMP sockets.
+        </li>
+<li class="listitem">
+          Changed the <code class="computeroutput">buffered*_stream&lt;&gt;</code> templates to treat 0-byte
+          reads and writes as no-ops, to comply with the documented type requirements
+          for <code class="computeroutput">SyncReadStream</code>, <code class="computeroutput">AsyncReadStream</code>, <code class="computeroutput">SyncWriteStream</code>
+          and <code class="computeroutput">AsyncWriteStream</code>.
+        </li>
+<li class="listitem">
+          Changed some instances of the <code class="computeroutput">throw</code> keyword to <code class="computeroutput">boost::throw_exception()</code>
+          to allow Asio to be used when exception support is disabled. Note that
+          the SSL wrappers still require exception support.
+        </li>
+<li class="listitem">
+          Made Asio compatible with the OpenSSL 1.0 beta.
+        </li>
+<li class="listitem">
+          Eliminated a redundant system call in the Solaris /dev/poll backend.
+        </li>
+<li class="listitem">
+          Fixed a bug in resizing of the bucket array in the internal hash maps.
+        </li>
+<li class="listitem">
+          Ensured correct propagation of the error code when a synchronous accept
+          fails.
+        </li>
+<li class="listitem">
+          Ensured correct propagation of the error code when a synchronous read or
+          write on a Windows <code class="computeroutput">HANDLE</code> fails.
+        </li>
+<li class="listitem">
+          Fixed failures reported when <code class="computeroutput">_GLIBCXX_DEBUG</code> is defined.
+        </li>
+<li class="listitem">
+          Fixed custom memory allocation support for timers.
+        </li>
+<li class="listitem">
+          Tidied up various warnings reported by g++.
+        </li>
+<li class="listitem">
+          Various documentation improvements, including more obvious hyperlinks to
+          function overloads, header file information, examples for the handler type
+          requirements, and adding enum values to the index.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h26"></a>
+      <span><a name="asio.history.asio_1_4_2"></a></span><a class="link" href="history.html#asio.history.asio_1_4_2">Asio
+      1.4.2</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Implement automatic resizing of the bucket array in the internal hash maps.
+          This is to improve performance for very large numbers of asynchronous operations
+          and also to reduce memory usage for very small numbers. A new macro <code class="computeroutput">(BOOST_)ASIO_HASH_MAP_BUCKETS</code>
+          may be used to tweak the sizes used for the bucket arrays. (N.B. this feature
+          introduced a bug which was fixed in Asio 1.4.3 / Boost 1.40.)
+        </li>
+<li class="listitem">
+          Add performance optimisation for the Windows IOCP backend for when no timers
+          are used.
+        </li>
+<li class="listitem">
+          Prevent locale settings from affecting formatting of TCP and UDP endpoints.
+        </li>
+<li class="listitem">
+          Fix a memory leak that occurred when an asynchronous SSL operation's completion
+          handler threw an exception.
+        </li>
+<li class="listitem">
+          Fix the implementation of <code class="computeroutput">io_control()</code> so that it adheres
+          to the documented type requirements for IoControlCommand.
+        </li>
+<li class="listitem">
+          Fix incompatibility between Asio and ncurses.h.
+        </li>
+<li class="listitem">
+          On Windows, specifically handle the case when an overlapped <code class="computeroutput">ReadFile</code>
+          call fails with <code class="computeroutput">ERROR_MORE_DATA</code>. This enables a hack where
+          a <code class="computeroutput">windows::stream_handle</code> can be used with a message-oriented
+          named pipe.
+        </li>
+<li class="listitem">
+          Fix system call wrappers to always clear the error on success, as POSIX
+          allows successful system calls to modify errno.
+        </li>
+<li class="listitem">
+          Don't include termios.h if <code class="computeroutput">(BOOST_)ASIO_DISABLE_SERIAL_PORT</code>
+          is defined.
+        </li>
+<li class="listitem">
+          Cleaned up some more MSVC level 4 warnings.
+        </li>
+<li class="listitem">
+          Various documentation fixes.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h27"></a>
+      <span><a name="asio.history.asio_1_4_1"></a></span><a class="link" href="history.html#asio.history.asio_1_4_1">Asio
+      1.4.1</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Improved compatibility with some Windows firewall software.
+        </li>
+<li class="listitem">
+          Ensured arguments to <code class="computeroutput">windows::overlapped_ptr::complete()</code> are
+          correctly passed to the completion handler.
+        </li>
+<li class="listitem">
+          Fixed a link problem and multicast failure on QNX.
+        </li>
+<li class="listitem">
+          Fixed a compile error in SSL support on MinGW / g++ 3.4.5.
+        </li>
+<li class="listitem">
+          Drop back to using a pipe for notification if eventfd is not available
+          at runtime on Linux.
+        </li>
+<li class="listitem">
+          Various minor bug and documentation fixes.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h28"></a>
+      <span><a name="asio.history.asio_1_4_0"></a></span><a class="link" href="history.html#asio.history.asio_1_4_0">Asio
+      1.4.0</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Enhanced CompletionCondition concept with the signature <code class="computeroutput">size_t CompletionCondition(error_code
+          ec, size_t total)</code>, where the return value indicates the maximum
+          number of bytes to be transferred on the next read or write operation.
+          (The old CompletionCondition signature is still supported for backwards
+          compatibility).
+        </li>
+<li class="listitem">
+          New <code class="computeroutput">windows::overlapped_ptr</code> class to allow arbitrary overlapped
+          I/O functions (such as <code class="computeroutput">TransmitFile</code>) to be used with Asio.
+        </li>
+<li class="listitem">
+          On recent versions of Linux, an <code class="computeroutput">eventfd</code> descriptor is now
+          used (rather than a pipe) to interrupt a blocked select/epoll reactor.
+        </li>
+<li class="listitem">
+          Added const overloads of <code class="computeroutput">lowest_layer()</code>.
+        </li>
+<li class="listitem">
+          Synchronous read, write, accept and connect operations are now thread safe
+          (meaning that it is now permitted to perform concurrent synchronous operations
+          on an individual socket, if supported by the OS).
+        </li>
+<li class="listitem">
+          Reactor-based <code class="computeroutput">io_service</code> implementations now use lazy initialisation
+          to reduce the memory usage of an <code class="computeroutput">io_service</code> object used only
+          as a message queue.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h29"></a>
+      <span><a name="asio.history.asio_1_2_0"></a></span><a class="link" href="history.html#asio.history.asio_1_2_0">Asio
+      1.2.0</a>
+    </h4>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Added support for serial ports.
+        </li>
+<li class="listitem">
+          Added support for UNIX domain sockets.
+        </li>
+<li class="listitem">
+          Added support for raw sockets and ICMP.
+        </li>
+<li class="listitem">
+          Added wrappers for POSIX stream-oriented file descriptors (excluding regular
+          files).
+        </li>
+<li class="listitem">
+          Added wrappers for Windows stream-oriented <code class="computeroutput">HANDLE</code>s such as
+          named pipes (requires <code class="computeroutput">HANDLE</code>s that work with I/O completion
+          ports).
+        </li>
+<li class="listitem">
+          Added wrappers for Windows random-access <code class="computeroutput">HANDLE</code>s such as files
+          (requires <code class="computeroutput">HANDLE</code>s that work with I/O completion ports).
+        </li>
+<li class="listitem">
+          Added support for reactor-style operations (i.e. they report readiness
+          but perform no I/O) using a new <code class="computeroutput">null_buffers</code> type.
+        </li>
+<li class="listitem">
+          Added an iterator type for bytewise traversal of buffer sequences.
+        </li>
+<li class="listitem">
+          Added new <code class="computeroutput">read_until()</code> and <code class="computeroutput">async_read_until()</code>
+          overloads that take a user-defined function object for locating message
+          boundaries.
+        </li>
+<li class="listitem">
+          Added an experimental two-lock queue (enabled by defining <code class="computeroutput">(BOOST_)ASIO_ENABLE_TWO_LOCK_QUEUE</code>)
+          that may provide better <code class="computeroutput">io_service</code> scalability across many
+          processors.
+        </li>
+<li class="listitem">
+          Various fixes, performance improvements, and more complete coverage of
+          the custom memory allocation support.
+        </li>
+</ul></div>
+<h4>
+<a name="asio.history.h30"></a>
+      <span><a name="asio.history.asio_1_0_0"></a></span><a class="link" href="history.html#asio.history.asio_1_0_0">Asio
+      1.0.0</a>
+    </h4>
+<p>
+      First stable release of Asio.
+    </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="net_ts.html"><img src="../prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../home.png" alt="Home"></a><a accesskey="n" href="index.html"><img src="../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Execution context requirements</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../index.html" title="Asio">
+<link rel="up" href="../reference.html" title="Reference">
+<link rel="prev" href="EndpointSequence.html" title="Endpoint sequence requirements">
+<link rel="next" href="Executor1.html" title="Executor requirements">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="EndpointSequence.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="Executor1.html"><img src="../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="asio.reference.ExecutionContext"></a><a class="link" href="ExecutionContext.html" title="Execution context requirements">Execution context requirements</a>
+</h3></div></div></div>
+<p>
+        A type <code class="computeroutput">X</code> meets the <code class="computeroutput">ExecutionContext</code> requirements
+        if it is publicly and unambiguously derived from <code class="computeroutput">execution_context</code>,
+        and satisfies the additional requirements listed below.
+      </p>
+<p>
+        In the table below, <code class="computeroutput">x</code> denotes a value of type <code class="computeroutput">X</code>.
+      </p>
+<div class="table">
+<a name="asio.reference.ExecutionContext.t0"></a><p class="title"><b>Table&#160;13.&#160;ExecutionContext requirements</b></p>
+<div class="table-contents"><table class="table" summary="ExecutionContext requirements">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  expression
+                </p>
+              </th>
+<th>
+                <p>
+                  return type
+                </p>
+              </th>
+<th>
+                <p>
+                  assertion/note<br> pre/post-condition
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput">X::executor_type</code>
+                </p>
+              </td>
+<td>
+                <p>
+                  type meeting <a class="link" href="Executor1.html" title="Executor requirements"><code class="computeroutput">Executor</code></a>
+                  requirements
+                </p>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput">x.~X()</code>
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+                <p>
+                  Destroys all unexecuted function objects that were submitted via
+                  an executor object that is associated with the execution context.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput">x.get_executor()</code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput">X::executor_type</code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Returns an executor object that is associated with the execution
+                  context.
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break">
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="EndpointSequence.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="Executor1.html"><img src="../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

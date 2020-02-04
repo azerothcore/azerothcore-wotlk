@@ -1,0 +1,107 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>SSL handshake handler requirements</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../index.html" title="Asio">
+<link rel="up" href="../reference.html" title="Reference">
+<link rel="prev" href="Handler.html" title="Handlers">
+<link rel="next" href="InternetProtocol.html" title="Internet protocol requirements">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="Handler.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="InternetProtocol.html"><img src="../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="asio.reference.HandshakeHandler"></a><a class="link" href="HandshakeHandler.html" title="SSL handshake handler requirements">SSL handshake handler
+      requirements</a>
+</h3></div></div></div>
+<p>
+        A handshake handler must meet the requirements for a <a class="link" href="Handler.html" title="Handlers">handler</a>.
+        A value <code class="computeroutput">h</code> of a handshake handler class should work correctly
+        in the expression <code class="computeroutput">h(ec)</code>, where <code class="computeroutput">ec</code> is an lvalue
+        of type <code class="computeroutput">const error_code</code>.
+      </p>
+<h5>
+<a name="asio.reference.HandshakeHandler.h0"></a>
+        <span><a name="asio.reference.HandshakeHandler.examples"></a></span><a class="link" href="HandshakeHandler.html#asio.reference.HandshakeHandler.examples">Examples</a>
+      </h5>
+<p>
+        A free function as a handshake handler:
+      </p>
+<pre class="programlisting">void handshake_handler(
+    const asio::error_code&amp; ec)
+{
+  ...
+}
+</pre>
+<p>
+        A handshake handler function object:
+      </p>
+<pre class="programlisting">struct handshake_handler
+{
+  ...
+  void operator()(
+      const asio::error_code&amp; ec)
+  {
+    ...
+  }
+  ...
+};
+</pre>
+<p>
+        A lambda as a handshake handler:
+      </p>
+<pre class="programlisting">ssl_stream.async_handshake(...,
+    [](const asio::error_code&amp; ec)
+    {
+      ...
+    });
+</pre>
+<p>
+        A non-static class member function adapted to a handshake handler using
+        <code class="computeroutput">std::bind()</code>:
+      </p>
+<pre class="programlisting">void my_class::handshake_handler(
+    const asio::error_code&amp; ec)
+{
+  ...
+}
+...
+ssl_stream.async_handshake(...,
+    std::bind(&amp;my_class::handshake_handler,
+      this, std::placeholders::_1));
+</pre>
+<p>
+        A non-static class member function adapted to a handshake handler using
+        <code class="computeroutput">boost::bind()</code>:
+      </p>
+<pre class="programlisting">void my_class::handshake_handler(
+    const asio::error_code&amp; ec)
+{
+  ...
+}
+...
+ssl_stream.async_handshake(...,
+    boost::bind(&amp;my_class::handshake_handler,
+      this, asio::placeholders::error));
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="Handler.html"><img src="../../prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html"><img src="../../up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../home.png" alt="Home"></a><a accesskey="n" href="InternetProtocol.html"><img src="../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

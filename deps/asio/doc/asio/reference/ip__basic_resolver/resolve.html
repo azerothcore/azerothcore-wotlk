@@ -1,0 +1,118 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>ip::basic_resolver::resolve</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../../index.html" title="Asio">
+<link rel="up" href="../ip__basic_resolver.html" title="ip::basic_resolver">
+<link rel="prev" href="query.html" title="ip::basic_resolver::query">
+<link rel="next" href="resolve/overload1.html" title="ip::basic_resolver::resolve (1 of 12 overloads)">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="query.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../ip__basic_resolver.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="resolve/overload1.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="asio.reference.ip__basic_resolver.resolve"></a><a class="link" href="resolve.html" title="ip::basic_resolver::resolve">ip::basic_resolver::resolve</a>
+</h4></div></div></div>
+<p>
+          <a class="indexterm" name="asio.indexterm.ip__basic_resolver.resolve"></a> 
+(Deprecated:
+          Use overload with separate host and service parameters.) Perform forward
+          resolution of a query to a list of entries.
+        </p>
+<pre class="programlisting">results_type <a class="link" href="resolve/overload1.html" title="ip::basic_resolver::resolve (1 of 12 overloads)">resolve</a>(
+    const query &amp; q);
+  <span class="emphasis"><em>&#187; <a class="link" href="resolve/overload1.html" title="ip::basic_resolver::resolve (1 of 12 overloads)">more...</a></em></span>
+
+results_type <a class="link" href="resolve/overload2.html" title="ip::basic_resolver::resolve (2 of 12 overloads)">resolve</a>(
+    const query &amp; q,
+    asio::error_code &amp; ec);
+  <span class="emphasis"><em>&#187; <a class="link" href="resolve/overload2.html" title="ip::basic_resolver::resolve (2 of 12 overloads)">more...</a></em></span>
+</pre>
+<p>
+          Perform forward resolution of a query to a list of entries.
+        </p>
+<pre class="programlisting">results_type <a class="link" href="resolve/overload3.html" title="ip::basic_resolver::resolve (3 of 12 overloads)">resolve</a>(
+    string_view host,
+    string_view service);
+  <span class="emphasis"><em>&#187; <a class="link" href="resolve/overload3.html" title="ip::basic_resolver::resolve (3 of 12 overloads)">more...</a></em></span>
+
+results_type <a class="link" href="resolve/overload4.html" title="ip::basic_resolver::resolve (4 of 12 overloads)">resolve</a>(
+    string_view host,
+    string_view service,
+    asio::error_code &amp; ec);
+  <span class="emphasis"><em>&#187; <a class="link" href="resolve/overload4.html" title="ip::basic_resolver::resolve (4 of 12 overloads)">more...</a></em></span>
+
+results_type <a class="link" href="resolve/overload5.html" title="ip::basic_resolver::resolve (5 of 12 overloads)">resolve</a>(
+    string_view host,
+    string_view service,
+    resolver_base::flags resolve_flags);
+  <span class="emphasis"><em>&#187; <a class="link" href="resolve/overload5.html" title="ip::basic_resolver::resolve (5 of 12 overloads)">more...</a></em></span>
+
+results_type <a class="link" href="resolve/overload6.html" title="ip::basic_resolver::resolve (6 of 12 overloads)">resolve</a>(
+    string_view host,
+    string_view service,
+    resolver_base::flags resolve_flags,
+    asio::error_code &amp; ec);
+  <span class="emphasis"><em>&#187; <a class="link" href="resolve/overload6.html" title="ip::basic_resolver::resolve (6 of 12 overloads)">more...</a></em></span>
+
+results_type <a class="link" href="resolve/overload7.html" title="ip::basic_resolver::resolve (7 of 12 overloads)">resolve</a>(
+    const protocol_type &amp; protocol,
+    string_view host,
+    string_view service);
+  <span class="emphasis"><em>&#187; <a class="link" href="resolve/overload7.html" title="ip::basic_resolver::resolve (7 of 12 overloads)">more...</a></em></span>
+
+results_type <a class="link" href="resolve/overload8.html" title="ip::basic_resolver::resolve (8 of 12 overloads)">resolve</a>(
+    const protocol_type &amp; protocol,
+    string_view host,
+    string_view service,
+    asio::error_code &amp; ec);
+  <span class="emphasis"><em>&#187; <a class="link" href="resolve/overload8.html" title="ip::basic_resolver::resolve (8 of 12 overloads)">more...</a></em></span>
+
+results_type <a class="link" href="resolve/overload9.html" title="ip::basic_resolver::resolve (9 of 12 overloads)">resolve</a>(
+    const protocol_type &amp; protocol,
+    string_view host,
+    string_view service,
+    resolver_base::flags resolve_flags);
+  <span class="emphasis"><em>&#187; <a class="link" href="resolve/overload9.html" title="ip::basic_resolver::resolve (9 of 12 overloads)">more...</a></em></span>
+
+results_type <a class="link" href="resolve/overload10.html" title="ip::basic_resolver::resolve (10 of 12 overloads)">resolve</a>(
+    const protocol_type &amp; protocol,
+    string_view host,
+    string_view service,
+    resolver_base::flags resolve_flags,
+    asio::error_code &amp; ec);
+  <span class="emphasis"><em>&#187; <a class="link" href="resolve/overload10.html" title="ip::basic_resolver::resolve (10 of 12 overloads)">more...</a></em></span>
+</pre>
+<p>
+          Perform reverse resolution of an endpoint to a list of entries.
+        </p>
+<pre class="programlisting">results_type <a class="link" href="resolve/overload11.html" title="ip::basic_resolver::resolve (11 of 12 overloads)">resolve</a>(
+    const endpoint_type &amp; e);
+  <span class="emphasis"><em>&#187; <a class="link" href="resolve/overload11.html" title="ip::basic_resolver::resolve (11 of 12 overloads)">more...</a></em></span>
+
+results_type <a class="link" href="resolve/overload12.html" title="ip::basic_resolver::resolve (12 of 12 overloads)">resolve</a>(
+    const endpoint_type &amp; e,
+    asio::error_code &amp; ec);
+  <span class="emphasis"><em>&#187; <a class="link" href="resolve/overload12.html" title="ip::basic_resolver::resolve (12 of 12 overloads)">more...</a></em></span>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="query.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../ip__basic_resolver.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="resolve/overload1.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>

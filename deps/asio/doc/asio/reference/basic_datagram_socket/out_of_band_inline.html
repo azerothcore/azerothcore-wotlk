@@ -1,0 +1,80 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>basic_datagram_socket::out_of_band_inline</title>
+<link rel="stylesheet" href="../../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../../index.html" title="Asio">
+<link rel="up" href="../basic_datagram_socket.html" title="basic_datagram_socket">
+<link rel="prev" href="operator_eq_/overload2.html" title="basic_datagram_socket::operator= (2 of 2 overloads)">
+<link rel="next" href="protocol_type.html" title="basic_datagram_socket::protocol_type">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="asio C++ library" width="250" height="60" src="../../../asio.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="operator_eq_/overload2.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../basic_datagram_socket.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="protocol_type.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="asio.reference.basic_datagram_socket.out_of_band_inline"></a><a class="link" href="out_of_band_inline.html" title="basic_datagram_socket::out_of_band_inline">basic_datagram_socket::out_of_band_inline</a>
+</h4></div></div></div>
+<p>
+          <span class="emphasis"><em>Inherited from socket_base.</em></span>
+        </p>
+<p>
+          <a class="indexterm" name="asio.indexterm.basic_datagram_socket.out_of_band_inline"></a> 
+Socket
+          option for putting received out-of-band data inline.
+        </p>
+<pre class="programlisting">typedef implementation_defined out_of_band_inline;
+</pre>
+<p>
+          Implements the SOL_SOCKET/SO_OOBINLINE socket option.
+        </p>
+<h6>
+<a name="asio.reference.basic_datagram_socket.out_of_band_inline.h0"></a>
+          <span><a name="asio.reference.basic_datagram_socket.out_of_band_inline.examples"></a></span><a class="link" href="out_of_band_inline.html#asio.reference.basic_datagram_socket.out_of_band_inline.examples">Examples</a>
+        </h6>
+<p>
+          Setting the option:
+        </p>
+<pre class="programlisting">asio::ip::tcp::socket socket(io_context);
+...
+asio::socket_base::out_of_band_inline option(true);
+socket.set_option(option);
+</pre>
+<p>
+          Getting the current option value:
+        </p>
+<pre class="programlisting">asio::ip::tcp::socket socket(io_context);
+...
+asio::socket_base::out_of_band_inline option;
+socket.get_option(option);
+bool value = option.value();
+</pre>
+<h6>
+<a name="asio.reference.basic_datagram_socket.out_of_band_inline.h1"></a>
+          <span><a name="asio.reference.basic_datagram_socket.out_of_band_inline.requirements"></a></span><a class="link" href="out_of_band_inline.html#asio.reference.basic_datagram_socket.out_of_band_inline.requirements">Requirements</a>
+        </h6>
+<p>
+          <span class="emphasis"><em>Header: </em></span><code class="literal">asio/basic_datagram_socket.hpp</code>
+        </p>
+<p>
+          <span class="emphasis"><em>Convenience header: </em></span><code class="literal">asio.hpp</code>
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2003-2018 Christopher M. Kohlhoff<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="operator_eq_/overload2.html"><img src="../../../prev.png" alt="Prev"></a><a accesskey="u" href="../basic_datagram_socket.html"><img src="../../../up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../home.png" alt="Home"></a><a accesskey="n" href="protocol_type.html"><img src="../../../next.png" alt="Next"></a>
+</div>
+</body>
+</html>
