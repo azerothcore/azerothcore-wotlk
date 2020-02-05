@@ -15,14 +15,14 @@ jobs:
           MYSQL_PASSWORD: acore
           MYSQL_ROOT_PASSWORD: root
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
-    steps:     
+    steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
         
       - name: Configure OS
         run: |
-          sudo apt-get install git
+          apt-get install git
           bash ./acore.sh install-deps
 
       - name: Import db
