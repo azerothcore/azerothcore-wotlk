@@ -42,6 +42,7 @@ jobs:
       - name: Dry run
         run: |
           echo "[worldserver]" >> ./env/dist/etc/worldserver.conf
+          echo "DataDir = \"../\"" >> ./env/dist/etc/worldserver.conf
           echo "LoginDatabaseInfo     = \"mysql;3306;root;root;acore_auth\"" >> ./env/dist/etc/worldserver.conf
           echo "WorldDatabaseInfo     = \"mysql;3306;root;root;acore_world\"" >> ./env/dist/etc/worldserver.conf
           echo "CharacterDatabaseInfo = \"mysql;3306;root;root;acore_characters\"" >> ./env/dist/etc/worldserver.conf
