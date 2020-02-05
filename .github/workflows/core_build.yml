@@ -26,6 +26,8 @@ jobs:
           apt-get upgrade -y
           apt-get install git lsb-release sudo -y
           bash ./acore.sh install-deps
+        env:
+          CONTINUOUS_INTEGRATION: true
 
       - name: Import db
         run: |
