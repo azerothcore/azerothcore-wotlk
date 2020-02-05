@@ -11,7 +11,7 @@ jobs:
         env:
           MYSQL_USER: acore
           MYSQL_PASSWORD: acore
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
     runs-on: ubuntu-18.04
     steps:
