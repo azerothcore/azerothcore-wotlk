@@ -3,7 +3,7 @@ UBUNTU_VERSION=$(lsb_release -sr);
 
 sudo apt-get update
 
-if [[ $TRAVIS && $CONTINUOUS_INTEGRATION ]]; then
+if [[ $CONTINUOUS_INTEGRATION ]]; then
   sudo apt-get -y install build-essential libtool make cmake cmake-data clang openssl libgoogle-perftools-dev \
   libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
 else
