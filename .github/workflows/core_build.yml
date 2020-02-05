@@ -4,23 +4,25 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-18.04
-    steps:   
-      - name: Shutdown Ubuntu MySQL (SUDO)
-        run: sudo service mysql stop # Shutdown the Def
-      
+    steps:     
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 2
+          fetch-depth: 1
         
       - name: Configure OS
         run: |
           bash ./acore.sh install-deps
+      
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop # Shutdown the Def
 
       - name: Set up MySQL
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql user: 'acore'
           mysql password: 'acore'
+          host port: 3306
+          container port: 3306
 
       - name: Import db
         run: bash ./acore.sh "db-assembler" "import-all"
