@@ -21,3 +21,8 @@ jobs:
       - name: Build
         run: |
           bash ./acore.sh compiler all
+          
+      - name: Dry run
+        run: |
+          git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git ./env/dist/data
+          ./env/dist/bin/worldserver --dry-run
