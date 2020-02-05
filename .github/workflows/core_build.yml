@@ -4,7 +4,7 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-18.04
-    container: ubuntu
+    container: ubuntu:18.04
     services:
       mysql:
         image: mysql:latest
@@ -24,7 +24,7 @@ jobs:
         run: |
           apt-get update -y
           apt-get upgrade -y
-          apt-get install git -y
+          apt-get install git lsb-release -y
           bash ./acore.sh install-deps
 
       - name: Import db
