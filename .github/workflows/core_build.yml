@@ -22,10 +22,8 @@ jobs:
         
       - name: Configure OS
         run: |
+          sudo apt-get install git
           bash ./acore.sh install-deps
-      
-      - name: Shutdown Ubuntu MySQL (SUDO)
-        run: sudo service mysql stop # Shutdown the Def
 
       - name: Import db
         run: |
