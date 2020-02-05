@@ -149,8 +149,9 @@ void TempSummon::InitStats(uint32 duration)
     ASSERT(!IsPet());
 
     Unit* owner = GetSummoner();
-    if (Player* player = owner->ToPlayer())
-        sScriptMgr->OnBeforeTempSummonInitStats(player, this, duration);
+    if (owner)
+        if (Player* player = owner->ToPlayer())
+            sScriptMgr->OnBeforeTempSummonInitStats(player, this, duration);
 
     m_timer = duration;
     m_lifetime = duration;
