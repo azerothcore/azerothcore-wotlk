@@ -27,9 +27,9 @@ jobs:
 
       - name: Import db
         run: |
-          echo "DB_CHARACTERS_CONF=\"MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='127.0.0.1';\"" >> ./conf/config.sh
-          echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='127.0.0.1';\"" >> ./conf/config.sh
-          echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='127.0.0.1';\"" >> ./conf/config.sh 
+          echo "DB_CHARACTERS_CONF=\"MYSQL_USER='acore'; MYSQL_PASS='acore'; MYSQL_HOST='127.0.0.1';\"" >> ./conf/config.sh
+          echo "DB_AUTH_CONF=\"MYSQL_USER='acore'; MYSQL_PASS='acore'; MYSQL_HOST='127.0.0.1';\"" >> ./conf/config.sh
+          echo "DB_WORLD_CONF=\"MYSQL_USER='acore'; MYSQL_PASS='acore'; MYSQL_HOST='127.0.0.1';\"" >> ./conf/config.sh 
           bash ./acore.sh "db-assembler" "import-all"
  
       - name: Build
