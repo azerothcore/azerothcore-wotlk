@@ -22,8 +22,9 @@ jobs:
         
       - name: Configure OS
         run: |
-          apt-get update
-          apt-get install git
+          apt-get update -y
+          apt-get upgrade -y
+          apt-get install git -y
           bash ./acore.sh install-deps
 
       - name: Import db
