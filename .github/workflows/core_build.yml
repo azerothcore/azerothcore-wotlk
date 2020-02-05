@@ -3,22 +3,14 @@ on: [push]
 
 jobs:
   build:
-    services:
-      mysql:
-        image: mysql:latest
-        ports:
-          - 3306:3306
-        env:
-          MYSQL_USER: acore
-          MYSQL_PASSWORD: acore
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2 
 
-      - name: Install deps
-        run: bash ./acore.sh install-deps
+      - name: Configure OS
+        run: |
+          bash ./acore.sh install-deps
+          sudo mysql -e "use mysql; update user set authentication_string="" where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
       
       - name: Import db
         run: bash ./acore.sh "db-assembler" "import-all"
