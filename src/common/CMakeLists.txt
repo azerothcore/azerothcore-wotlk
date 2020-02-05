@@ -53,6 +53,7 @@ target_link_libraries(common
   PUBLIC
     acore-core-interface
     ace
+    asio
     mysql
     g3dlib
     Detour

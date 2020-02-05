@@ -98,6 +98,7 @@ set(ACE_EXPECTED_VERSION 6.0.3)
 
 find_package(PCHSupport)
 find_package(ACE REQUIRED)
+find_package(ASIO QUIET REQUIRED)
 find_package(MySQL REQUIRED)
 
 if(UNIX AND WITH_PERFTOOLS)
