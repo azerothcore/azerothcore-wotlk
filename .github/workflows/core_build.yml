@@ -6,20 +6,26 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2 
-
+    
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop # Shutdown the Def
+        
       - name: Configure OS
         run: |
           bash ./acore.sh install-deps
-          echo "CCUSTOMOPTIONS='-DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=1 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=0 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=\"-Werror\" -DCMAKE_CXX_FLAGS=\"-Werror\"';" >> ./conf/config.sh
-          echo "DB_CHARACTERS_CONF=\"MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='127.0.0.1';\"" >> ./conf/config.sh
-          echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='127.0.0.1';\"" >> ./conf/config.sh
-          echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='127.0.0.1';\"" >> ./conf/config.sh
+
+      - name: Set up MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql user: 'acore'
+          mysql password: 'acore'
 
       - name: Import db
         run: bash ./acore.sh "db-assembler" "import-all"
  
       - name: Build
         run: |
+          echo "CCUSTOMOPTIONS='-DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=1 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=0 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=\"-Werror\" -DCMAKE_CXX_FLAGS=\"-Werror\"';" >> ./conf/config.sh
           bash ./acore.sh compiler all
           
       - name: Dry run
