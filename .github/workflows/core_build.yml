@@ -27,7 +27,6 @@ jobs:
         run: sudo service mysql stop # Shutdown the Def
 
       - name: Import db
-        env: MYSQL_PORT=${{ job.services.mysql.ports[3306] }}
         run: |
           echo "DB_CHARACTERS_CONF=\"MYSQL_USER='acore'; MYSQL_PASS='acore'; MYSQL_HOST='mysql';\"" >> ./conf/config.sh
           echo "DB_AUTH_CONF=\"MYSQL_USER='acore'; MYSQL_PASS='acore'; MYSQL_HOST='mysql';\"" >> ./conf/config.sh
