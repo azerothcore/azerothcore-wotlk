@@ -9,6 +9,9 @@ jobs:
 
       - name: Install deps
         run: bash ./acore.sh install-deps
+      
+      - name: Import db
+        run: bash ./acore.sh "db-assembler" "import-all"
  
       - name: Build
         run: |
