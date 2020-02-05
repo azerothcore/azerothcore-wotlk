@@ -2,7 +2,17 @@ name: core-build
 on: [push]
 
 jobs:
-  latest:
+  build:
+    services:
+      mysql:
+        image: mysql:latest
+        ports:
+          - 3306
+        env:
+          MYSQL_USER: acore
+          MYSQL_PASSWORD: acore
+          MYSQL_ROOT_PASSWORD: root
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2 
