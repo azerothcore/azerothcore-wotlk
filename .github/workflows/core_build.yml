@@ -1,0 +1,22 @@
+name: coverity-scan
+on:
+  push:
+    branches:
+      - coverity_scan
+
+jobs:
+  latest:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Clone AzerothCore
+        run: git clone --depth=1 --branch=coverity_scan https://github.com/azerothcore/azerothcore-wotlk .
+  
+      - name: Install deps
+        run: bash ./acore.sh install-deps
+ 
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=1 -DUSE_SCRIPTPCH=1 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=0 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Release
+          make -j 2
