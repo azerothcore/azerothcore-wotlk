@@ -22,6 +22,7 @@ jobs:
         
       - name: Configure OS
         run: |
+          apt-get update
           apt-get install git
           bash ./acore.sh install-deps
 
