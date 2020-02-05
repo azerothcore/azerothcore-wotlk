@@ -4,11 +4,13 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v2 
-    
+    steps:   
       - name: Shutdown Ubuntu MySQL (SUDO)
         run: sudo service mysql stop # Shutdown the Def
+      
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
         
       - name: Configure OS
         run: |
