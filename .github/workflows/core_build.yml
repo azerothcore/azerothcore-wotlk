@@ -4,6 +4,7 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-18.04
+    container: ubuntu
     services:
       mysql:
         image: mysql:latest
