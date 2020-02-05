@@ -19,13 +19,18 @@ jobs:
       - name: Set up MySQL
         uses: mirromutth/mysql-action@v1.1
         with:
+          mysql root password: 'root'
           mysql user: 'acore'
           mysql password: 'acore'
           host port: 3306
           container port: 3306
 
       - name: Import db
-        run: bash ./acore.sh "db-assembler" "import-all"
+        run: |
+          echo "DB_CHARACTERS_CONF=\"MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='127.0.0.1';\"" >> ./conf/config.sh
+          echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='127.0.0.1';\"" >> ./conf/config.sh
+          echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='127.0.0.1';\"" >> ./conf/config.sh 
+          bash ./acore.sh "db-assembler" "import-all"
  
       - name: Build
         run: |
