@@ -38,8 +38,8 @@ public:
 
         bool brannAchievement;
         bool sjonnirAchievement;
-        bool maidenDead;
-        bool krystalusDead;
+        bool isMaidenOfGriefDead;
+        bool isKrystalusDead;
 
         void Initialize()
         {
@@ -61,8 +61,8 @@ public:
 
             brannAchievement = false;
             sjonnirAchievement = false;
-            maidenDead = false;
-            krystalusDead = false;
+            isMaidenOfGriefDead = false;
+            isKrystalusDead = false;
         }
 
         bool IsEncounterInProgress() const
@@ -95,7 +95,6 @@ public:
                     break;
                 case GO_TRIBUNAL_ACCESS_DOOR:
                     goTribunalDoorGUID = go->GetGUID();
-                    go->SetGoState(GO_STATE_READY);
                     go->SetGoState(GO_STATE_READY);
                     break;
                 case GO_SKY_FLOOR: 
@@ -186,11 +185,11 @@ public:
                 Encounter[type] = data;
 
             if (type == BOSS_MAIDEN_OF_GRIEF && data == DONE)
-                maidenDead = true;
+                isMaidenOfGriefDead = true;
             if (type == BOSS_KRYSTALLUS && data == DONE)
-                krystalusDead = true;
+                isKrystalusDead = true;
 
-            if (maidenDead && krystalusDead)
+            if (isMaidenOfGriefDead && isKrystalusDead)
                 if (GameObject* tribunalDoor = instance->GetGameObject(goTribunalDoorGUID))
                     tribunalDoor->SetGoState(GO_STATE_ACTIVE);
 
