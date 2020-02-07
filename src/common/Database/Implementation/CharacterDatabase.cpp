@@ -570,4 +570,10 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     // Recovery Item
     PrepareStatement(CHAR_INS_RECOVERY_ITEM, "INSERT INTO recovery_item (Guid, ItemEntry, Count) VALUES (?, ?, ?)", CONNECTION_SYNCH);
     PrepareStatement(CHAR_DEL_RECOVERY_ITEM, "DELETE FROM recovery_item WHERE Guid = ? AND ItemEntry = ? AND Count = ? ORDER BY Id DESC LIMIT 1", CONNECTION_ASYNC);
+
+    // Premium characters
+    PrepareStatement(CHAR_INS_PREMIUM_CHARACTER, "INSERT INTO premium_character (character_id, premium_level) VALUES (?, ?)", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_DEL_PREMIUM_CHARACTER, "DELETE FROM premium_character WHERE character_id = ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_PREMIUM_CHARACTER_PREMIUM_LEVEL, "SELECT premium_level FROM premium_character WHERE character_id = ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_PREMIUM_CHARACTER_ACCOUNT, "SELECT account FROM characters WHERE guid = ?", CONNECTION_SYNCH);
 }

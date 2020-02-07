@@ -2631,6 +2631,15 @@ class Player : public Unit, public GridObject<Player>
 
         static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
 
+        // Premium characters and accounts
+        int GetCharacterPremiumLevel(uint32 guid);
+        bool CreateCharacterPremiumLevel(uint32 guid, int premiumLevel);
+        bool DeleteCharacterPremiumLevel(uint32 guid);
+        int GetAccountPremiumLevel(uint32 guid);
+        bool CreateAccountPremiumLevel(uint32 guid, int premiumLevel);
+        bool DeleteAccountPremiumLevel(uint32 guid);
+        int Player::GetCharacterAccount(uint32 guid);
+
     protected:
         // Gamemaster whisper whitelist
         WhisperListContainer WhisperList;

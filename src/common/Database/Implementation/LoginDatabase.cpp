@@ -92,5 +92,9 @@ void LoginDatabaseConnection::DoPrepareStatements()
     // 0: uint32, 1: uint32, 2: uint8, 3: string, 4: string // Complete name: "Login_Insert_CharacterDelete_IP_Logging"
     PrepareStatement(LOGIN_INS_CHAR_IP_LOGGING, "INSERT INTO logs_ip_actions (account_id,character_guid,type,ip,systemnote,unixtime,time) VALUES (?, ?, ?, ?, ?, unix_timestamp(NOW()), NOW())", CONNECTION_ASYNC);
     // 0: string, 1: string, 2: string                      // Complete name: "Login_Insert_Failed_Account_Login_due_password_IP_Logging"
-    PrepareStatement(LOGIN_INS_FALP_IP_LOGGING, "INSERT INTO logs_ip_actions (account_id,character_guid,type,ip,systemnote,unixtime,time) VALUES ((SELECT id FROM account WHERE username = ?), 0, 1, ?, ?, unix_timestamp(NOW()), NOW())", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_INS_FALP_IP_LOGGING, "INSERT INTO logs_ip_action (account_id,character_guid,type,ip,systemnote,unixtime,time) VALUES ((SELECT id FROM account WHERE username = ?), 0, 1, ?, ?, unix_timestamp(NOW()), NOW())", CONNECTION_ASYNC);
+    // Premium accounts
+    PrepareStatement(CHAR_INS_PREMIUM_ACCOUNT, "INSERT INTO premium_account (account_id, premium_level) VALUES (?, ?)", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_DEL_PREMIUM_ACCOUNT, "DELETE FROM premium_account WHERE account_id = ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_PREMIUM_ACCOUNT_PREMIUM_LEVEL, "SELECT premium_level FROM premium_account WHERE account_id = ?", CONNECTION_SYNCH);
 }

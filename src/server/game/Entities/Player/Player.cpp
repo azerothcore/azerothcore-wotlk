@@ -27594,4 +27594,124 @@ bool Player::IsPetDismissed()
     return false;
 }
 
+/* Premium character interaction.
+ * These functions will allow modules to access the new generic
+ * premium tables designed to help modules that interact with
+ * players and characters without the need to create other tables.
+ */
+int Player::GetCharacterPremiumLevel(uint32 guid)
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PREMIUM_CHARACTER_PREMIUM_LEVEL);
+    stmt->setUInt32(0, GUID_LOPART(guid));
+
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (!result)
+        return 0;
+
+    int premium_level = (*result)[0].GetInt8();
+    return premium_level;
+}
+
+
+bool Player::CreateCharacterPremiumLevel(uint32 guid, int premiumLevel)
+{
+    // Validate if character to be inserted already has a premium level
+    int hasPremiumLevel = GetCharacterPremiumLevel(guid);
+
+    if (!hasPremiumLevel)
+    {
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PREMIUM_CHARACTER);
+        stmt->setUInt32(0, GUID_LOPART(guid));
+        stmt->setInt8(1, premiumLevel);
+
+        PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+        return true;
+    }
+    else
+        return false;
+}
+
+bool Player::DeleteCharacterPremiumLevel(uint32 guid)
+{
+    // Validate if character to be removed has a premium level
+    int hasPremiumLevel = GetCharacterPremiumLevel(guid);
+
+    if (hasPremiumLevel)
+    {
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PREMIUM_CHARACTER);
+        stmt->setUInt32(0, GUID_LOPART(guid));
+
+        PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+        return true;
+    }
+    else
+        return false;
+}
+
+int Player::GetAccountPremiumLevel(uint32 guid)
+{
+    uint32 accountID = GetCharacterAccount(GUID_LOPART(guid));
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(CHAR_SEL_PREMIUM_ACCOUNT_PREMIUM_LEVEL);
+    stmt->setUInt32(0, accountID);
+
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+    if (!result)
+        return 0;
+
+    int account_premium_level = (*result)[0].GetInt8();
+    return account_premium_level;
+}
+
+bool Player::CreateAccountPremiumLevel(uint32 guid, int premiumLevel)
+{
+    // Validate if account to be inserted already has a premium level
+    uint32 accountID = GetCharacterAccount(GUID_LOPART(guid));
+    int hasPremiumLevel = GetAccountPremiumLevel(accountID);
+
+    if (!hasPremiumLevel)
+    {
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(CHAR_INS_PREMIUM_ACCOUNT);
+        stmt->setUInt32(0, accountID);
+        stmt->setInt8(1, premiumLevel);
+        PreparedQueryResult result = LoginDatabase.Query(stmt);
+        return true;
+    }
+    else
+        return false;
+}
+
+bool Player::DeleteAccountPremiumLevel(uint32 guid)
+{
+    // Validate if account to be removed has a premium level
+    uint32 accountID = GetCharacterAccount(GUID_LOPART(guid));
+    int hasPremiumLevel = GetAccountPremiumLevel(accountID);
+    if (hasPremiumLevel)
+    {
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(CHAR_DEL_PREMIUM_ACCOUNT);
+        stmt->setUInt32(0, accountID);
+        PreparedQueryResult result = LoginDatabase.Query(stmt);
+        return true;
+    }
+    else
+        return false;
+}
+
+int Player::GetCharacterAccount(uint32 guid)
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PREMIUM_CHARACTER_ACCOUNT);
+    stmt->setUInt32(0, GUID_LOPART(guid));
+
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (!result)
+        return 0;
+
+    int accountID = (*result)[0].GetInt8();
+    return accountID;
+}
+
 std::unordered_map<int, bgZoneRef> Player::bgZoneIdToFillWorldStates = {};

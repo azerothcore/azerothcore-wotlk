@@ -63,6 +63,7 @@ void AddSC_ticket_commandscript();
 void AddSC_titles_commandscript();
 void AddSC_wp_commandscript();
 void AddSC_player_commandscript();
+void AddSC_premium_commandscript();
 
 #ifdef SCRIPTS
 //world
@@ -641,6 +642,7 @@ void AddCommandScripts()
     AddSC_titles_commandscript();
     AddSC_wp_commandscript();
     AddSC_player_commandscript();
+    AddSC_premium_commandscript();
 }
 
 void AddWorldScripts()
