@@ -2638,7 +2638,7 @@ class Player : public Unit, public GridObject<Player>
         int GetAccountPremiumLevel(uint32 guid);
         bool CreateAccountPremiumLevel(uint32 guid, int premiumLevel);
         bool DeleteAccountPremiumLevel(uint32 guid);
-        int Player::GetCharacterAccount(uint32 guid);
+        int GetCharacterAccount(uint32 guid);
 
     protected:
         // Gamemaster whisper whitelist
