@@ -201,13 +201,14 @@ public:
                 events.RescheduleEvent(EVENT_RESPAWN_SPHERE, 4000);
 
             for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
-                if( Creature* c = pInstance->instance->GetCreature(*itr) )
-                {
-                    c->GetMotionMaster()->MoveIdle();
-                    c->StopMoving();
-                    c->CastSpell(c, SPELL_SUBMERGE, false);
-                    c->AI()->DoAction(1);
-                }
+                if (pInstance)
+                    if(Creature* c = pInstance->instance->GetCreature(*itr) )
+                    {
+                        c->GetMotionMaster()->MoveIdle();
+                        c->StopMoving();
+                        c->CastSpell(c, SPELL_SUBMERGE, false);
+                        c->AI()->DoAction(1);
+                    }
             summons.clear();
             for( uint8 i=0; i<4; ++i )
                 if( Creature* c = me->SummonCreature(NPC_BURROW, AnubLocs[i+1]) )

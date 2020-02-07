@@ -18,6 +18,7 @@
 #include "DynamicObject.h"
 #include "ArenaTeam.h"
 #include "GameEventMgr.h"
+#include "PetDefines.h"
 #include <atomic>
 
 class AuctionHouseObject;
@@ -469,11 +470,11 @@ public:
 class MovementHandlerScript : public ScriptObject
 {
 protected:
-   
+
     MovementHandlerScript(const char* name);
-    
+
 public:
-    
+
     //Called whenever a player moves
     virtual void OnPlayerMove(Player* /*player*/, MovementInfo /*movementInfo*/, uint32 /*opcode*/) { }
 };
@@ -762,7 +763,7 @@ class AchievementCriteriaScript : public ScriptObject
         bool IsDatabaseBound() const { return true; }
 
         // Called when an additional criteria is checked.
-        virtual bool OnCheck(Player* source, Unit* target, uint32 /*criteria_id*/) { 
+        virtual bool OnCheck(Player* source, Unit* target, uint32 /*criteria_id*/) {
             return OnCheck(source, target);
         }
         // deprecated/legacy
@@ -777,7 +778,7 @@ class PlayerScript : public ScriptObject
 
     public:
         virtual void OnPlayerReleasedGhost(Player* /*player*/) { }
-        
+
         // Called when a player completes a quest
         virtual void OnPlayerCompleteQuest(Player* /*player*/, Quest const* /*quest_id*/) { }
 
@@ -921,7 +922,7 @@ class PlayerScript : public ScriptObject
 
         // To change behaviour of set visible item slot
         virtual void OnAfterSetVisibleItemSlot(Player* /*player*/, uint8 /*slot*/, Item* /*item*/) { }
-               
+
         // After an item has been moved from inventory
         virtual void OnAfterMoveItemFromInventory(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
 
@@ -933,7 +934,7 @@ class PlayerScript : public ScriptObject
 
         // After player enters queue for Arena
         virtual void OnPlayerJoinArena(Player* /*player*/) { }
-        
+
         //After looting item
         virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, uint64 /*lootguid*/) { }
 
@@ -962,8 +963,17 @@ class PlayerScript : public ScriptObject
 
         virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, uint64 /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
 
-        // Called after the player's pet has been loaded and initialized
-        virtual void OnPetInitStatsForLevel(Pet* /*pet*/) { }
+        // Called before the player's temporary summoned creature has initialized it's stats
+        virtual void OnBeforeTempSummonInitStats(Player* /*player*/, TempSummon* /*tempSummon*/, uint32& /*duration*/) { }
+
+        // Called before the player's guardian / pet has initialized it's stats for the player's level
+        virtual void OnBeforeGuardianInitStatsForLevel(Player* /*player*/, Guardian* /*guardian*/, CreatureTemplate const* /*cinfo*/, PetType& /*petType*/) { }
+
+        // Called after the player's guardian / pet has initialized it's stats for the player's level
+        virtual void OnAfterGuardianInitStatsForLevel(Player* /*player*/, Guardian* /*guardian*/) { }
+
+        // Called before loading a player's pet from the DB
+        virtual void OnBeforeLoadPetFromDB(Player* /*player*/, uint32& /*petentry*/, uint32& /*petnumber*/, bool& /*current*/, bool& /*forceLoadFromDB*/) { }
 };
 
 class AccountScript : public ScriptObject
@@ -1079,7 +1089,7 @@ class GlobalScript : public ScriptObject
         // items
         virtual void OnItemDelFromDB(SQLTransaction& /*trans*/, uint32 /*itemGuid*/) { }
         virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
-        
+
         // loot
         virtual void OnAfterRefCount(Player const* /*player*/, LootStoreItem* /*LootStoreItem*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, uint32& /*maxcount*/, LootStore const& /*store*/) { }
         virtual void OnBeforeDropAddItem(Player const* /*player*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, LootStoreItem* /*LootStoreItem*/, LootStore const& /*store*/) { }
@@ -1087,10 +1097,10 @@ class GlobalScript : public ScriptObject
 
         virtual void OnInitializeLockedDungeons(Player* /*player*/, uint8& /*level*/, uint32& /*lockData*/) { }
         virtual void OnAfterInitializeLockedDungeons(Player* /*player*/) { }
-       
+
         // On Before arena points distribution
         virtual void OnBeforeUpdateArenaPoints(ArenaTeam* /*at*/, std::map<uint32, uint32> & /*ap*/) { }
-        
+
         // Called when a dungeon encounter is updated.
         virtual void OnAfterUpdateEncounterState(Map* /*map*/, EncounterCreditType /*type*/,  uint32 /*creditEntry*/, Unit* /*source*/, Difficulty /*difficulty_fixed*/, DungeonEncounterList const* /*encounters*/, uint32 /*dungeonCompleted*/, bool /*updated*/) { }
 };
@@ -1145,7 +1155,7 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
-    // Calculate max duration in applying aura 
+    // Calculate max duration in applying aura
     virtual void OnCalcMaxDuration(Aura const* /*aura*/, int32& /*maxDuration*/) { }
 
 };
@@ -1167,7 +1177,7 @@ protected:
 public:
     // Runs on start event
     virtual void OnStart(uint16 /*EventID*/) { }
-    
+
     // Runs on stop event
     virtual void OnStop(uint16 /*EventID*/) { }
 };
@@ -1415,7 +1425,10 @@ class ScriptMgr
         void OnFirstLogin(Player* player);
         void OnPlayerCompleteQuest(Player* player, Quest const* quest);
         bool CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
-        void OnPetInitStatsForLevel(Pet* pet);
+        void OnBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration);
+        void OnBeforeGuardianInitStatsForLevel(Player* player, Guardian* guardian, CreatureTemplate const* cinfo, PetType& petType);
+        void OnAfterGuardianInitStatsForLevel(Player* player, Guardian* guardian);
+        void OnBeforeLoadPetFromDB(Player* player, uint32& petentry, uint32& petnumber, bool& current, bool& forceLoadFromDB);
 
     public: /* AccountScript */
 
@@ -1479,11 +1492,11 @@ class ScriptMgr
         uint32 DealDamage(Unit* AttackerUnit, Unit *pVictim, uint32 damage, DamageEffectType damagetype);
         void OnBeforeRollMeleeOutcomeAgainst(const Unit* attacker, const Unit* victim, WeaponAttackType attType, int32 &attackerMaxSkillValueForLevel, int32 &victimMaxSkillValueForLevel, int32 &attackerWeaponSkill, int32 &victimDefenseSkill, int32 &crit_chance, int32 &miss_chance, int32 &dodge_chance, int32 &parry_chance, int32 &block_chance);
 
-    
+
     public: /* MovementHandlerScript */
-        
+
         void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
-        
+
     public: /* AllCreatureScript */
 
         //listener function (OnAllCreatureUpdate) is called by OnCreatureUpdate
@@ -1512,7 +1525,7 @@ class ScriptMgr
         bool CanSendMessageQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
 
     public: /* SpellSC */
- 
+
         void OnCalcMaxDuration(Aura const* aura, int32& maxDuration);
 
     public: /* GameEventScript */
@@ -1606,7 +1619,7 @@ class ScriptRegistry
                         else
                         {
                             // If the script is already assigned -> delete it!
-                            sLog->outError("Script '%s' already assigned with the same script name, so the script can't work.",
+                            sLog->outError("Script named '%s' is already assigned (two or more scripts have the same name), so the script can't work, aborting...",
                                 script->GetName().c_str());
 
                             ABORT(); // Error that should be fixed ASAP.
@@ -1616,7 +1629,7 @@ class ScriptRegistry
                     {
                         // The script uses a script name from database, but isn't assigned to anything.
                         if (script->GetName().find("Smart") == std::string::npos)
-                            sLog->outErrorDb("Script named '%s' does not have a script name assigned in database.",
+                            sLog->outErrorDb("Script named '%s' is not assigned in the database.",
                                 script->GetName().c_str());
                     }
                 } else {

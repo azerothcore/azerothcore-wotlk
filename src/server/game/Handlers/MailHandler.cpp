@@ -710,6 +710,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recvData)
         if (!mailTemplateEntry)
         {
             player->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_INTERNAL_ERROR);
+            delete bodyItem;
             return;
         }
 

@@ -876,9 +876,9 @@ void Map::RemovePlayerFromMap(Player* player, bool remove)
     else
         ASSERT(remove); //maybe deleted in logoutplayer when player is not in a map
 
+    sScriptMgr->OnPlayerLeaveMap(this, player);
     if (remove)
     {
-        sScriptMgr->OnPlayerLeaveMap(this, player);
         DeleteFromWorld(player);
     }
 }
@@ -2568,6 +2568,8 @@ void InstanceMap::InitVisibilityDistance()
     switch (GetId())
     {
         case 429: // Dire Maul
+        case 550: // The Eye
+        case 578: // The Nexus: The Oculus
             m_VisibleDistance = 175.0f;
             break;
         case 649: // Trial of the Crusader
@@ -2575,10 +2577,6 @@ void InstanceMap::InitVisibilityDistance()
         case 595: // Culling of Startholme
         case 658: // Pit of Saron
             m_VisibleDistance = 150.0f;
-            break;
-        case 550: // The Eye
-        case 578: // The Nexus: The Oculus
-            m_VisibleDistance = 175.0f;
             break;
         case 615: // Obsidian Sanctum
         case 616: // Eye of Eternity
