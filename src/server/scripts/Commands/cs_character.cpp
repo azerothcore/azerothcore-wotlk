@@ -257,6 +257,9 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target))
             return false;
 
+        if (!target)
+            return false;
+
         LocaleConstant loc = handler->GetSessionDbcLocale();
         char const* targetName = target->GetName().c_str();
         char const* knownStr = handler->GetAcoreString(LANG_KNOWN);
