@@ -281,4 +281,105 @@ namespace AccountMgr
         return gmlevel == SEC_CONSOLE;
     }
 
+    /* Premium character interaction.
+     * These functions will allow modules to access the new generic
+     * premium tables designed to help modules that interact with
+     * players and characters without the need to create other tables.
+     */
+    int8 GetCharacterPremiumLevel(uint64 guid)
+    {
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PREMIUM_CHARACTER_PREMIUM_LEVEL);
+        stmt->setUInt32(0, GUID_LOPART(guid));
+
+        PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+        if (!result)
+            return 0;
+
+        int8 premium_level = (*result)[0].GetInt8();
+        return premium_level;
+    }
+
+
+    bool CreateCharacterPremiumLevel(uint64 guid, int8 premiumLevel)
+    {
+        // Validate if character to be inserted already has a premium level
+        int hasPremiumLevel = GetCharacterPremiumLevel(guid);
+
+        if (!hasPremiumLevel)
+        {
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PREMIUM_CHARACTER);
+            stmt->setUInt32(0, GUID_LOPART(guid));
+            stmt->setInt8(1, premiumLevel);
+            CharacterDatabase.Query(stmt);
+
+            return true;
+        }
+        else
+            return false;
+    }
+
+    bool DeleteCharacterPremiumLevel(uint64 guid)
+    {
+        // Validate if character to be removed has a premium level
+        int hasPremiumLevel = GetCharacterPremiumLevel(guid);
+
+        if (hasPremiumLevel)
+        {
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PREMIUM_CHARACTER);
+            stmt->setUInt32(0, GUID_LOPART(guid));
+            CharacterDatabase.Query(stmt);
+
+            return true;
+        }
+        else
+            return false;
+    }
+
+    int8 GetAccountPremiumLevel(uint64 accountID)
+    {
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(CHAR_SEL_PREMIUM_ACCOUNT_PREMIUM_LEVEL);
+        stmt->setUInt32(0, accountID);
+
+        PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+        if (!result)
+            return 0;
+
+        int8 account_premium_level = (*result)[0].GetInt8();
+        return account_premium_level;
+    }
+
+    bool CreateAccountPremiumLevel(uint64 accountID, int8 premiumLevel)
+    {
+        // Validate if account to be inserted already has a premium level
+        int hasPremiumLevel = GetAccountPremiumLevel(*accountID);
+
+        if (!hasPremiumLevel)
+        {
+            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(CHAR_INS_PREMIUM_ACCOUNT);
+            stmt->setUInt32(0, *accountID);
+            stmt->setInt8(1, premiumLevel);
+            LoginDatabase.Query(stmt);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    bool DeleteAccountPremiumLevel(uint64 accountID)
+    {
+        // Validate if account to be removed has a premium level
+        int hasPremiumLevel = GetAccountPremiumLevel(accountID);
+        if (hasPremiumLevel)
+        {
+            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(CHAR_DEL_PREMIUM_ACCOUNT);
+            stmt->setUInt32(0, accountID);
+            CharacterDatabase.Execute(stmt);
+            return true;
+        }
+        else
+            return false;
+    }
+
 } // Namespace AccountMgr

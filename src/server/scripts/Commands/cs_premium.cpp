@@ -54,7 +54,8 @@ public:
         if (handler->HasLowerSecurity(target, 0))
             return false;
 
-        int premium_level = target->GetCharacterPremiumLevel(target->GetGUIDLow());
+        int premium_level = AccountMgr::GetCharacterPremiumLevel(target->GetGUIDLow());
+        //int premium_level = target->GetCharacterPremiumLevel(target->GetGUIDLow());
         if (!premium_level)
         {
             (ChatHandler(handler->GetSession())).PSendSysMessage("No premium level available for character.");
@@ -87,12 +88,12 @@ public:
         if (handler->HasLowerSecurity(target, 0))
             return false;
 
-        bool characterPremiumLevelAdded = target->CreateCharacterPremiumLevel(target->GetGUIDLow(), premiumLevel);
+        bool characterPremiumLevelAdded = AccountMgr::CreateCharacterPremiumLevel(target->GetGUIDLow(), premiumLevel);
         if (characterPremiumLevelAdded)
             (ChatHandler(handler->GetSession())).PSendSysMessage("Character created with premium level %u.", premiumLevel);
         else
         {
-            (ChatHandler(handler->GetSession())).PSendSysMessage("Character already has a premium level. Please remove before hand.");
+            (ChatHandler(handler->GetSession())).PSendSysMessage("%s already has a premium level. Please remove first.", playerName);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -114,12 +115,12 @@ public:
         if (handler->HasLowerSecurity(target, 0))
             return false;
 
-        bool characterPremiumDeleted = target->DeleteCharacterPremiumLevel(target->GetGUIDLow());
+        bool characterPremiumDeleted = AccountMgr::DeleteCharacterPremiumLevel(target->GetGUIDLow());
         if (characterPremiumDeleted)
             (ChatHandler(handler->GetSession())).PSendSysMessage("Premium character deleted.");
         else
         {
-            (ChatHandler(handler->GetSession())).PSendSysMessage("No premium level assigned to character.");
+            (ChatHandler(handler->GetSession())).PSendSysMessage("No premium level assigned to %s.", playerName);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -141,15 +142,16 @@ public:
         if (handler->HasLowerSecurity(target, 0))
             return false;
 
-        int premium_level = target->GetAccountPremiumLevel(target->GetGUIDLow());
+        uint64 accountID = target->ToPlayer()->GetSession()->GetAccountId();
+        int premium_level = AccountMgr::GetAccountPremiumLevel(accountID);
         if (!premium_level)
         {
-            (ChatHandler(handler->GetSession())).PSendSysMessage("Character's account doesn't have premium level.");
+            (ChatHandler(handler->GetSession())).PSendSysMessage("%'s account doesn't have premium level.", playerName);
             handler->SetSentErrorMessage(true);
             return false;
         }
         else
-            (ChatHandler(handler->GetSession())).PSendSysMessage("Account premium level %u", premium_level);
+            (ChatHandler(handler->GetSession())).PSendSysMessage("%s's account premium level: %u", playerName, premium_level);
 
         return true;
     }
@@ -174,12 +176,14 @@ public:
         if (handler->HasLowerSecurity(target, 0))
             return false;
 
-        bool characterPremiumLevelAdded = target->CreateAccountPremiumLevel(target->GetGUIDLow(), premiumLevel);
+        uint64 accountID = target->ToPlayer()->GetSession()->GetAccountId();
+
+        bool characterPremiumLevelAdded = AccountMgr::CreateAccountPremiumLevel(accountID, premiumLevel);
         if (characterPremiumLevelAdded)
-            (ChatHandler(handler->GetSession())).PSendSysMessage("Account premium level set to: %u", premiumLevel);
+            (ChatHandler(handler->GetSession())).PSendSysMessage("%s's account premium level set to: %u", playerName, premiumLevel);
         else
         {
-            (ChatHandler(handler->GetSession())).PSendSysMessage("Account already has a premium level. Please remove before hand.");
+            (ChatHandler(handler->GetSession())).PSendSysMessage("%s's account already has a premium level. Remove first.", playerName);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -201,12 +205,14 @@ public:
         if (handler->HasLowerSecurity(target, 0))
             return false;
 
-        bool characterPremiumDeleted = target->DeleteAccountPremiumLevel(target->GetGUIDLow());
+        uint64 accountID = target->ToPlayer()->GetSession()->GetAccountId();
+
+        bool characterPremiumDeleted = AccountMgr::DeleteAccountPremiumLevel(accountID);
         if (characterPremiumDeleted)
-            (ChatHandler(handler->GetSession())).PSendSysMessage("Premium account deleted");
+            (ChatHandler(handler->GetSession())).PSendSysMessage("%s's Premium account deleted", playerName);
         else
         {
-            (ChatHandler(handler->GetSession())).PSendSysMessage("No premium level assigned.");
+            (ChatHandler(handler->GetSession())).PSendSysMessage("No premium level assigned to %s's account.", playerName);
             handler->SetSentErrorMessage(true);
             return false;
         }

@@ -42,6 +42,14 @@ namespace AccountMgr
     bool IsGMAccount(uint32 gmlevel);
     bool IsAdminAccount(uint32 gmlevel);
     bool IsConsoleAccount(uint32 gmlevel);
+
+    // Premium characters and accounts
+    int8 GetCharacterPremiumLevel(uint64 guid);
+    bool CreateCharacterPremiumLevel(uint64 guid, int8 premiumLevel);
+    bool DeleteCharacterPremiumLevel(uint64 guid);
+    int8 GetAccountPremiumLevel(uint64 accountID);
+    bool CreateAccountPremiumLevel(uint64 accountID, int8 premiumLevel);
+    bool DeleteAccountPremiumLevel(uint64 accountID);
 };
 
 #endif

@@ -573,7 +573,6 @@ void CharacterDatabaseConnection::DoPrepareStatements()
 
     // Premium characters
     PrepareStatement(CHAR_INS_PREMIUM_CHARACTER, "INSERT INTO premium_character (character_id, premium_level) VALUES (?, ?)", CONNECTION_SYNCH);
-    PrepareStatement(CHAR_DEL_PREMIUM_CHARACTER, "DELETE FROM premium_character WHERE character_id = ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_DEL_PREMIUM_CHARACTER, "DELETE FROM premium_character WHERE character_id = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_PREMIUM_CHARACTER_PREMIUM_LEVEL, "SELECT premium_level FROM premium_character WHERE character_id = ?", CONNECTION_SYNCH);
-    PrepareStatement(CHAR_SEL_PREMIUM_CHARACTER_ACCOUNT, "SELECT account FROM characters WHERE guid = ?", CONNECTION_SYNCH);
 }
