@@ -28,22 +28,11 @@ public:
 
     std::vector<ChatCommand> GetCommands() const override
     {
-        static std::vector<ChatCommand> serverIdleRestartCommandTable =
-        {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerIdleRestartCommand,         "" }
-        };
 
         static std::vector<ChatCommand> serverIdleShutdownCommandTable =
         {
             { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
             { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerIdleShutDownCommand,        "" }
-        };
-
-        static std::vector<ChatCommand> serverRestartCommandTable =
-        {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" }
         };
 
         static std::vector<ChatCommand> serverShutdownCommandTable =
@@ -65,11 +54,9 @@ public:
         {
             { "corpses",        SEC_GAMEMASTER,     true,  &HandleServerCorpsesCommand,             "" },
             { "exit",           SEC_CONSOLE,        true,  &HandleServerExitCommand,                "" },
-            { "idlerestart",    SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverIdleRestartCommandTable },
             { "idleshutdown",   SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverIdleShutdownCommandTable },
             { "info",           SEC_PLAYER,         true,  &HandleServerInfoCommand,                "" },
             { "motd",           SEC_PLAYER,         true,  &HandleServerMotdCommand,                "" },
-            { "restart",        SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverRestartCommandTable },
             { "shutdown",       SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverShutdownCommandTable },
             { "set",            SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverSetCommandTable },
             { "togglequerylog", SEC_CONSOLE,        true,  &HandleServerToggleQueryLogging,         "" }
@@ -167,77 +154,6 @@ public:
         else
             sWorld->ShutdownServ(time, 0, SHUTDOWN_EXIT_CODE);
 
-        return true;
-    }
-
-    static bool HandleServerRestartCommand(ChatHandler* /*handler*/, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        char* timeStr = strtok((char*) args, " ");
-        char* exitCodeStr = strtok(nullptr, "");
-
-        int32 time = atoi(timeStr);
-
-        //  Prevent interpret wrong arg value as 0 secs shutdown time
-        if ((time == 0 && (timeStr[0] != '0' || timeStr[1] != '\0')) || time < 0)
-            return false;
-
-        if (exitCodeStr)
-        {
-            int32 exitCode = atoi(exitCodeStr);
-
-            // Handle atoi() errors
-            if (exitCode == 0 && (exitCodeStr[0] != '0' || exitCodeStr[1] != '\0'))
-                return false;
-
-            // Exit code should be in range of 0-125, 126-255 is used
-            // in many shells for their own return codes and code > 255
-            // is not supported in many others
-            if (exitCode < 0 || exitCode > 125)
-                return false;
-
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, exitCode);
-        }
-        else
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
-
-            return true;
-    }
-
-    static bool HandleServerIdleRestartCommand(ChatHandler* /*handler*/, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        char* timeStr = strtok((char*) args, " ");
-        char* exitCodeStr = strtok(nullptr, "");
-
-        int32 time = atoi(timeStr);
-
-        // Prevent interpret wrong arg value as 0 secs shutdown time
-        if ((time == 0 && (timeStr[0] != '0' || timeStr[1] != '\0')) || time < 0)
-            return false;
-
-        if (exitCodeStr)
-        {
-            int32 exitCode = atoi(exitCodeStr);
-
-            // Handle atoi() errors
-            if (exitCode == 0 && (exitCodeStr[0] != '0' || exitCodeStr[1] != '\0'))
-                return false;
-
-            // Exit code should be in range of 0-125, 126-255 is used
-            // in many shells for their own return codes and code > 255
-            // is not supported in many others
-            if (exitCode < 0 || exitCode > 125)
-                return false;
-
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, exitCode);
-        }
-        else
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, RESTART_EXIT_CODE);
         return true;
     }
 
