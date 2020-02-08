@@ -284,7 +284,6 @@ class npc_forest_frog : public CreatureScript
 						default:
                             break;	
                     }
-                    
                 }
             }
 
@@ -342,7 +341,6 @@ class npc_forest_frog : public CreatureScript
                     else
                         DoSpawnRandom();
                 }
-                
             }
         };
 

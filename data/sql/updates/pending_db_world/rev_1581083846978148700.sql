@@ -17,8 +17,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (20584, 187359, 568, 0, 0, 1, 1, 134.009, 1642.8, 42.0841, 3.14159, 0, 0, -1, 0, 25, 255, 1, '', 0);
 
 -- add restriction for Amani Charm buffs
-DELETE FROM spell_area WHERE area=3805 AND spell IN (43822,43816,43820,43818);
-INSERT INTO spell_area (`spell`, `area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status`) VALUES
+DELETE FROM `spell_area` WHERE `area`= 3805 AND `spell` IN (43822,43816,43820,43818);
+INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status`) VALUES
 (43822, 3805, 0, 0, 0, 0, 0, 0, 0, 0), -- Charm of the Raging Defender
 (43816, 3805, 0, 0, 0, 0, 0, 0, 0, 0), -- Charm of the Bloodletter
 (43820, 3805, 0, 0, 0, 0, 0, 0, 0, 0), -- Charm of the Witch Doctor
@@ -195,7 +195,6 @@ INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language
 (@ENTRY, 0, 0, 'Oh, can it be? I... I\'m free of that hideous curse?', 12, 0, 100, 1, 0, 0, 100027, 0, 'SAY_GUNTER_0'),
 (@ENTRY, 1, 0, 'Words cannot express my gratitude, $n. Thank you for your kindness.', 12, 0, 100, 1, 0, 0, 100028, 0, 'SAY_GUNTER_1'),
 (@ENTRY, 2, 0, 'As you can see, I have but little after these savages got hold of me, but you\'re welcome to what I have. Come, have a look.', 12, 0, 100, 1, 0, 0, 100029, 0, 'SAY_GUNTER_2');
-
 
 -- Kyren Reagents https://wow.gamepedia.com/Eulinda
 SET @ENTRY := 24409;
