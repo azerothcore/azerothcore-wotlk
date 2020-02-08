@@ -184,10 +184,11 @@ public:
             if (type < MAX_ENCOUNTER)
                 Encounter[type] = data;
 
-            if (type == BOSS_MAIDEN_OF_GRIEF && data == DONE)
-                isMaidenOfGriefDead = true;
-            if (type == BOSS_KRYSTALLUS && data == DONE)
-                isKrystalusDead = true;
+            if (data == DONE)
+            {
+                isMaidenOfGriefDead = (type == BOSS_MAIDEN_OF_GRIEF ? true : isMaidenOfGriefDead);
+                isKrystalusDead = (type == BOSS_KRYSTALLUS ? true : isKrystalusDead);
+            }
 
             if (isMaidenOfGriefDead && isKrystalusDead)
                 if (GameObject* tribunalDoor = instance->GetGameObject(goTribunalDoorGUID))
