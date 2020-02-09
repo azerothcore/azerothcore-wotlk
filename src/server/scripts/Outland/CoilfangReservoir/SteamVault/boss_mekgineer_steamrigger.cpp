@@ -106,7 +106,7 @@ public:
                 return;
 
             events.Update(diff);
-            switch (uint32 eventId = events.GetEvent())
+            switch (uint32 eventId = events.ExecuteEvent())
             {
                 case EVENT_SPELL_SHRINK:
                     me->CastSpell(me->GetVictim(), SPELL_SUPER_SHRINK_RAY, false);

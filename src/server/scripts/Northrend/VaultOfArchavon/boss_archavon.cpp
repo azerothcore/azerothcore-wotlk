@@ -101,7 +101,7 @@ class boss_archavon : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_ROCK_SHARDS:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))

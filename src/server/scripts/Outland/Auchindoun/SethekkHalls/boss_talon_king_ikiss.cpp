@@ -105,7 +105,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_ARCANE_VOLLEY:
                     me->CastSpell(me, SPELL_ARCANE_VOLLEY_N, false);
@@ -271,7 +271,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING|UNIT_STATE_STUNNED))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_SCREECH:
                     me->CastSpell(me, SPELL_PARALYZING_SCREECH, false);

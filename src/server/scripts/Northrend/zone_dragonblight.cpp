@@ -347,7 +347,7 @@ public:
         void UpdateAI(uint32 diff)
         {
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_START_EVENT:
                     if (Creature* cr = getFuture())
@@ -1287,7 +1287,7 @@ public:
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

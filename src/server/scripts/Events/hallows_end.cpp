@@ -626,7 +626,7 @@ class npc_hallows_end_soh : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case 1:
                         me->MonsterYell("Prepare yourselves, the bells have tolled! Shelter your weak, your young and your old! Each of you shall pay the final sum! Cry for mercy; the reckoning has come!", LANG_UNIVERSAL, 0);
@@ -1050,7 +1050,7 @@ class boss_headless_horseman : public CreatureScript
                 if (inFight && !UpdateVictim())
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_HH_PLAYER_TALK:
                     {

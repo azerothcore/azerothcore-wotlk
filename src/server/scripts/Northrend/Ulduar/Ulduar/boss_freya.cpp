@@ -558,7 +558,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
             case EVENT_FREYA_ADDS_SPAM:
                 if (_spawnedAmount < 6)
@@ -742,7 +742,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_STONEBARK_FISTS_OF_STONE:
                     me->CastSpell(me, SPELL_FISTS_OF_STONE, false);
@@ -839,7 +839,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_BRIGHTLEAF_FLUX:
                     if (Aura* aur = me->AddAura(SPELL_BRIGHTLEAF_FLUX, me))
@@ -961,7 +961,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_IRONBRANCH_IMPALE:
                     me->CastSpell(me->GetVictim(), SPELL_IMPALE, false);
@@ -1193,7 +1193,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_ANCIENT_CONSERVATOR_NATURE_FURY:
                     me->CastSpell(me->GetVictim(), SPELL_NATURE_FURY, false);

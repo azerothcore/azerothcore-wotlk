@@ -270,7 +270,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_HEAT:
                     me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_HEAT_H : SPELL_HEAT_N, true);
@@ -381,7 +381,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_BLAST:
                     me->CastSpell(me, SPELL_BLAST_WAVE, false);
@@ -506,7 +506,7 @@ public:
                 return;
 
             events.Update(diff);
-            uint32 eventId = events.GetEvent();
+            uint32 eventId = events.ExecuteEvent();
 
             if (eventId == EVENT_UNFREEZE)
             {

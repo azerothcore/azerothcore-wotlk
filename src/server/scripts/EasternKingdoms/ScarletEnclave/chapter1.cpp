@@ -477,7 +477,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_GHOUL_MOVE_TO_PIT:
                     me->GetMotionMaster()->MovePoint(1, 2364.77f, -5776.14f, 151.36f);

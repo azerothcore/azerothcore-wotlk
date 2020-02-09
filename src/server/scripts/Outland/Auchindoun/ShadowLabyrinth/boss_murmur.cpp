@@ -91,7 +91,7 @@ public:
                 return;
 
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_SONIC_BOOM:
                     Talk(EMOTE_SONIC_BOOM);

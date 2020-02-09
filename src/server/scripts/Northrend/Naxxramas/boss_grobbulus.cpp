@@ -140,7 +140,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_POISON_CLOUD:
                     me->CastSpell(me, SPELL_POISON_CLOUD, true);

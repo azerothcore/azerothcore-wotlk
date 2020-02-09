@@ -325,7 +325,7 @@ class boss_lady_deathwhisper : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING) && !(events.GetPhaseMask() & PHASE_INTRO_MASK))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case 0:
                         break;
@@ -723,7 +723,7 @@ class npc_cult_fanatic : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_SPELL_FANATIC_NECROTIC_STRIKE:
                         me->CastSpell(me->GetVictim(), SPELL_NECROTIC_STRIKE, false);
@@ -839,7 +839,7 @@ class npc_cult_adherent : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_SPELL_ADHERENT_FROST_FEVER:
                         me->CastSpell(me->GetVictim(), SPELL_FROST_FEVER, false);
@@ -1072,7 +1072,7 @@ class npc_darnavan : public CreatureScript
                     return;
                 }
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_DARNAVAN_BLADESTORM:
                         me->CastSpell((Unit*)nullptr, SPELL_BLADESTORM, false);

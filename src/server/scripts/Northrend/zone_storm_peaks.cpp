@@ -275,7 +275,7 @@ public:
                 return;
 
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case SPELL_TIME_SHIFT:
                     me->CastSpell(me, SPELL_TIME_SHIFT, false);

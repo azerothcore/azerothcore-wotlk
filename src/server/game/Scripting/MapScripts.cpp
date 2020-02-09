@@ -945,6 +945,6 @@ void Map::ScriptsProcess()
 
         m_scriptSchedule.erase(iter);
         iter = m_scriptSchedule.begin();
-        sScriptMgr->DecreaseScheduledScriptCount();
+        sMapMgr->DecreaseScheduledScriptCount();
     }
 }

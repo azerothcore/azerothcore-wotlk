@@ -276,7 +276,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         if( me->HasUnitState(UNIT_STATE_CASTING) )
             return;
 
-        switch( events.GetEvent() )
+        switch( events.ExecuteEvent() )
         {
             case 0:
                 break;
@@ -294,7 +294,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
             case EVENT_SUMMON_BALLS_2:
             case EVENT_SUMMON_BALLS_3:
                 {
-                    uint8 eventId = events.GetEvent();
+                    uint8 eventId = events.ExecuteEvent();
                     uint8 count = 0;
                     if( IsHeroic() )
                         count = eventId==EVENT_SUMMON_BALLS_3 ? 36 : 6;
@@ -442,7 +442,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     if( (SpecialMask & 0xF) == 0xF )
                         SpecialMask = 0;
                     events.RepeatEvent(45000);
-                    events.DelayEventsToMax(15000, 1); // no touch of light/darkness during special abilities!
+                    events.DelayEvents(15000, 1); // no touch of light/darkness during special abilities!
                 }
                 break;
             case EVENT_REMOVE_DUAL_WIELD:

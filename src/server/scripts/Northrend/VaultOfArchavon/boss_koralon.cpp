@@ -121,7 +121,7 @@ class boss_koralon : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_BURNING_BREATH:
                         rotateTimer = 1500;

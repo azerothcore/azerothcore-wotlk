@@ -385,7 +385,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_INTRO_2:
                     Talk(SAY_INTRO_2);
@@ -583,7 +583,7 @@ public:
             if (me->GetUnitState() == UNIT_STATE_CASTING)
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_DEATH_PLAGUE:
                     me->CastSpell(me->GetVictim(), SPELL_DEATH_PLAGUE, false);

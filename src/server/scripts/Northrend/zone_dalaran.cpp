@@ -181,7 +181,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
-            switch (_events.GetEvent())
+            switch (_events.ExecuteEvent())
             {
                 case EVENT_INTRO_DH1:
                     Talk(SAY_SHANDY3);

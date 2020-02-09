@@ -220,7 +220,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (uint32 evId = events.GetEvent())
+            switch (uint32 evId = events.ExecuteEvent())
             {
                 case 0:
                     break;

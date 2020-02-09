@@ -224,7 +224,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SUMMON_FERAL_DEFENDER:
                     me->MonsterTextEmote("Auriaya begins to activate Feral Defender.", 0, true);

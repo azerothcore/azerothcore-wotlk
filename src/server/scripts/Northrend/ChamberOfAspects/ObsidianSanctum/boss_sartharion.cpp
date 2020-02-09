@@ -424,7 +424,7 @@ public:
             events.Update(diff);
 
             // Special events which needs to be fired immidiately
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case EVENT_SARTHARION_BOUNDARY:
                     if (me->GetPositionX() < 3218.86f || me->GetPositionX() > 3275.69f || me->GetPositionY() < 484.68f || me->GetPositionY() > 572.4f) // https://github.com/TrinityCore/TrinityCore/blob/3.3.5/src/server/scripts/Northrend/ChamberOfAspects/ObsidianSanctum/instance_obsidian_sanctum.cpp#L31
@@ -463,7 +463,7 @@ public:
 void boss_sartharion::boss_sartharionAI::HandleSartharionAbilities()
 {
     // Handling of Sartharion Events
-    switch (events.GetEvent())
+    switch (events.ExecuteEvent())
     {
         case EVENT_SARTHARION_CAST_CLEAVE:
             me->CastSpell(me->GetVictim(), SPELL_SARTHARION_CLEAVE, false);
@@ -538,7 +538,7 @@ void boss_sartharion::boss_sartharionAI::HandleSartharionAbilities()
 void boss_sartharion::boss_sartharionAI::HandleDrakeAbilities()
 {
     // Handling of Drakes Events
-    switch (events.GetEvent())
+    switch (events.ExecuteEvent())
     {
         // Dragon Calls
         case EVENT_SARTHARION_CALL_TENEBRON:
@@ -733,7 +733,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_MINIBOSS_SHADOW_BREATH:
                     if (!urand(0,10))
@@ -1005,7 +1005,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_MINIBOSS_SHADOW_BREATH:
                     if (!urand(0,10))
@@ -1235,7 +1235,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_MINIBOSS_SHADOW_BREATH:
                     if (!urand(0,10))

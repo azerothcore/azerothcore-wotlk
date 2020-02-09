@@ -232,7 +232,7 @@ class boss_kelidan_the_breaker : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_SPELL_VOLLEY:
                         me->CastSpell(me, SPELL_SHADOW_BOLT_VOLLEY, false);
@@ -321,7 +321,7 @@ class npc_shadowmoon_channeler : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_SPELL_SHADOW_BOLT:
                         me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_SHADOW_BOLT_H : SPELL_SHADOW_BOLT, false);
