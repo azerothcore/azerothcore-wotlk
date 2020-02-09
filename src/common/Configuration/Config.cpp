@@ -171,7 +171,7 @@ std::list<std::string> ConfigMgr::GetKeysByString(std::string const& name)
         {
             std::string temp = key_name.c_str();
 
-            if (!temp.find(name))
+            if (temp.find(name) != std::string::npos)
                 keys.push_back(temp);
         }
     }

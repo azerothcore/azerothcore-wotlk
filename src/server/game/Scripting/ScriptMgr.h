@@ -18,6 +18,7 @@
 #include "DynamicObject.h"
 #include "ArenaTeam.h"
 #include "GameEventMgr.h"
+#include "PetDefines.h"
 #include <atomic>
 
 class AuctionHouseObject;
@@ -962,8 +963,17 @@ class PlayerScript : public ScriptObject
 
         virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, uint64 /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
 
-        // Called after the player's pet has been loaded and initialized
-        virtual void OnPetInitStatsForLevel(Pet* /*pet*/) { }
+        // Called before the player's temporary summoned creature has initialized it's stats
+        virtual void OnBeforeTempSummonInitStats(Player* /*player*/, TempSummon* /*tempSummon*/, uint32& /*duration*/) { }
+
+        // Called before the player's guardian / pet has initialized it's stats for the player's level
+        virtual void OnBeforeGuardianInitStatsForLevel(Player* /*player*/, Guardian* /*guardian*/, CreatureTemplate const* /*cinfo*/, PetType& /*petType*/) { }
+
+        // Called after the player's guardian / pet has initialized it's stats for the player's level
+        virtual void OnAfterGuardianInitStatsForLevel(Player* /*player*/, Guardian* /*guardian*/) { }
+
+        // Called before loading a player's pet from the DB
+        virtual void OnBeforeLoadPetFromDB(Player* /*player*/, uint32& /*petentry*/, uint32& /*petnumber*/, bool& /*current*/, bool& /*forceLoadFromDB*/) { }
 };
 
 class AccountScript : public ScriptObject
@@ -1415,7 +1425,10 @@ class ScriptMgr
         void OnFirstLogin(Player* player);
         void OnPlayerCompleteQuest(Player* player, Quest const* quest);
         bool CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
-        void OnPetInitStatsForLevel(Pet* pet);
+        void OnBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration);
+        void OnBeforeGuardianInitStatsForLevel(Player* player, Guardian* guardian, CreatureTemplate const* cinfo, PetType& petType);
+        void OnAfterGuardianInitStatsForLevel(Player* player, Guardian* guardian);
+        void OnBeforeLoadPetFromDB(Player* player, uint32& petentry, uint32& petnumber, bool& current, bool& forceLoadFromDB);
 
     public: /* AccountScript */
 
