@@ -66,7 +66,7 @@ template class ScriptRegistry<GameEventScript>;
 #include "ScriptMgrMacros.h"
 
 ScriptMgr::ScriptMgr()
-    : _scriptCount(0), _scheduledScripts(0)
+    : _scriptCount(0)
 {
 
 }

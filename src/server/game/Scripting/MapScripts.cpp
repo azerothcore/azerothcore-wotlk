@@ -47,7 +47,7 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, Object* source, O
         if (iter->first == 0)
             immedScript = true;
 
-        sScriptMgr->IncreaseScheduledScriptsCount();
+        sMapMgr->DecreaseScheduledScriptCount();
     }
     ///- If one of the effects should be immediate, launch the script execution
     if (/*start &&*/ immedScript && !i_scriptLock)
@@ -75,7 +75,7 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* sou
     sa.script = &script;
     m_scriptSchedule.insert(ScriptScheduleMap::value_type(time_t(sWorld->GetGameTime() + delay), sa));
 
-    sScriptMgr->IncreaseScheduledScriptsCount();
+    sMapMgr->DecreaseScheduledScriptCount();
 
     ///- If effects should be immediate, launch the script execution
     if (delay == 0 && !i_scriptLock)
