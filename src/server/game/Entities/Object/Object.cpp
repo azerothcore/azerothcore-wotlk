@@ -40,6 +40,7 @@
 #include "Group.h"
 #include "Chat.h"
 #include "DynamicVisibility.h"
+#include "ScriptMgr.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -1057,6 +1058,12 @@ void WorldObject::_Create(uint32 guidlow, HighGuid guidhigh, uint32 phaseMask)
 { 
     Object::_Create(guidlow, 0, guidhigh);
     m_phaseMask = phaseMask;
+}
+
+bool WorldObject::InSamePhase(uint32 phasemask) const
+{
+    sScriptMgr->OnBeforeWorldObjectInSamePhase(this, phasemask);
+    return (GetPhaseMask() & phasemask);
 }
 
 uint32 WorldObject::GetZoneId(bool /*forceRecalc*/) const

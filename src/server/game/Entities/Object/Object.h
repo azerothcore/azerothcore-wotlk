@@ -799,7 +799,7 @@ class WorldObject : public Object, public WorldLocation
         virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
         uint32 GetPhaseMask() const { return m_phaseMask; }
         bool InSamePhase(WorldObject const* obj) const { return InSamePhase(obj->GetPhaseMask()); }
-        bool InSamePhase(uint32 phasemask) const { return (GetPhaseMask() & phasemask); }
+        bool InSamePhase(uint32 phasemask) const;
 
         virtual uint32 GetZoneId(bool forceRecalc = false) const;
         virtual uint32 GetAreaId(bool forceRecalc = false) const;

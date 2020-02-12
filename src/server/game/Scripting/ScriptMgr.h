@@ -1103,6 +1103,9 @@ class GlobalScript : public ScriptObject
 
         // Called when a dungeon encounter is updated.
         virtual void OnAfterUpdateEncounterState(Map* /*map*/, EncounterCreditType /*type*/,  uint32 /*creditEntry*/, Unit* /*source*/, Difficulty /*difficulty_fixed*/, DungeonEncounterList const* /*encounters*/, uint32 /*dungeonCompleted*/, bool /*updated*/) { }
+
+        // Called before check if the WorldObject is in the same phase as the specified phasemask
+        virtual void OnBeforeWorldObjectInSamePhase(WorldObject const* /*worldObject*/, uint32& /*phasemask*/) { }
 };
 
 class BGScript : public ScriptObject
@@ -1472,7 +1475,7 @@ class ScriptMgr
         void OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData);
         void OnAfterInitializeLockedDungeons(Player* player);
         void OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated);
-
+        void OnBeforeWorldObjectInSamePhase(WorldObject const* worldObject, uint32& phasemask);
 
     public: /* Scheduled scripts */
 
