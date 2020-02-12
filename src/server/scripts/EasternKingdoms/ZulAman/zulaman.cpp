@@ -281,8 +281,6 @@ class npc_forest_frog : public CreatureScript
                                 me->GetMotionMaster()->MovePoint(POINT_DESPAWN, 114.3155f, 1244.244f, -20.97606f);
                             eventTimer = 0;
                             break;
-						default:
-                            break;	
                     }
                 }
             }
@@ -291,29 +289,28 @@ class npc_forest_frog : public CreatureScript
             {
                 if (instance)
                 { 
-                    uint32 cEntry = 24397;
+                    uint32 cEntry = NPC_MANNUTH;
                     switch (urand(0, 9))
-                    {
-                        //case 0: cEntry = 24397; break;          //Mannuth
-                        case 1: cEntry = 24403; break;          //Deez
-                        case 2: cEntry = 24404; break;          //Galathryn
-                        case 3: cEntry = 24405; break;          //Adarrah
-                        case 4: cEntry = 24406; break;          //Fudgerick
-                        case 5: cEntry = 24407; break;          //Darwen
-                        case 6: cEntry = 24445; break;          //Mitzi
-                        case 7: cEntry = 24448; break;          //Christian
-                        case 8: cEntry = 24453; break;          //Brennan
-                        case 9: cEntry = 24455; break;          //Hollee
+                    {         
+                        case 1: cEntry = NPC_DEEZ; break;          
+                        case 2: cEntry = NPC_GALATHRYN; break;          
+                        case 3: cEntry = NPC_ADARRAH; break;          
+                        case 4: cEntry = NPC_FUDGERICK; break;          
+                        case 5: cEntry = NPC_DARWEN; break;          
+                        case 6: cEntry = NPC_MITZI; break;          
+                        case 7: cEntry = NPC_CHRISTIAN; break;          
+                        case 8: cEntry = NPC_BRENNAN; break;          
+                        case 9: cEntry = NPC_HOLLEE; break;          
                     }
 
                     if (!instance->GetData(TYPE_RAND_VENDOR_1) && roll_chance_i(10))
                     {
-                        cEntry = 24408;      //Gunter
+                        cEntry = NPC_GUNTER;      
                         instance->SetData(TYPE_RAND_VENDOR_1, DONE);
                     }
                     else if (!instance->GetData(TYPE_RAND_VENDOR_2) && roll_chance_i(10))
                     {
-                        cEntry = 24409;      //Kyren
+                        cEntry = NPC_KYREN;      
                         instance->SetData(TYPE_RAND_VENDOR_2, DONE);
                     }
 
