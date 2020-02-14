@@ -384,7 +384,7 @@ void Unit::Update(uint32 p_time)
         SendThreatListUpdate();
 
     // update combat timer only for players and pets (only pets with PetAI)
-    if (IsInCombat() && (GetTypeId() == TYPEID_PLAYER || (IsPet() && IsControlledByPlayer())))
+    if (IsInCombat() && (GetTypeId() == TYPEID_PLAYER || ((IsPet() || HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN)) && IsControlledByPlayer())))
     {
         // Check UNIT_STATE_MELEE_ATTACKING or UNIT_STATE_CHASE (without UNIT_STATE_FOLLOW in this case) so pets can reach far away
         // targets without stopping half way there and running off.
@@ -1297,8 +1297,6 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
        damageInfo->TargetState    = VICTIMSTATE_IS_IMMUNE;
 
        damageInfo->procEx        |= PROC_EX_IMMUNE;
-       damageInfo->damage         = 0;
-       damageInfo->cleanDamage    = 0;
        return;
     }
 
@@ -3448,7 +3446,7 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
         // special handling for ICC (map 631), for non-flying pets in Gunship Battle, for trash npcs this is done via CanAIAttack
         if (IS_PLAYER_GUID(c->GetOwnerGUID()) && !c->CanFly())
         {
-            if ((c->GetTransport() && !this->GetTransport()) || (!c->GetTransport() && this->GetTransport()))
+            if (c->GetTransport() != this->GetTransport())
                 return false;
             if (this->GetTransport())
             {
@@ -6780,7 +6778,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 70664:
                 {
                     // xinef: proc only from normal Rejuvenation, and proc rejuvenation
-                    if (!victim || procSpell->SpellIconID != 64)
+                    if (!victim || !procSpell || procSpell->SpellIconID != 64)
                         return false;
 
                     Player* caster = ToPlayer();
@@ -6989,13 +6987,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 basepoints0 = int32(damage);
                 triggered_spell_id = procSpell->IsRankOf(sSpellMgr->GetSpellInfo(635)) ? 53652 : 53654;
 
-                if (triggered_spell_id && beaconTarget)
-                {
-                    victim->CastCustomSpell(beaconTarget, triggered_spell_id, &basepoints0, NULL, NULL, true, 0, triggeredByAura, victim->GetGUID());
-                    return true;
-                }
-
-                return false;
+                victim->CastCustomSpell(beaconTarget, triggered_spell_id, &basepoints0, NULL, NULL, true, 0, triggeredByAura, victim->GetGUID());
+                return true;
             }
             // Judgements of the Wise
             if (dummySpell->SpellIconID == 3017)
@@ -7569,6 +7562,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             // Improved Water Shield
             if (dummySpell->SpellIconID == 2287)
             {
+                if (!procSpell)
+                    return false;
+
                 // Default chance for Healing Wave and Riptide
                 float chance = (float)triggeredByAura->GetAmount();
 
@@ -8627,6 +8623,9 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         case 15337: // Improved Spirit Tap (Rank 1)
         case 15338: // Improved Spirit Tap (Rank 2)
         {
+            if (!procSpell)
+                return false;
+
             if (procSpell->SpellFamilyFlags[0] & 0x800000)
                 if ((procSpell->Id != 58381) || !roll_chance_i(50))
                     return false;
@@ -8982,7 +8981,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
 
     // try detect target manually if not set
     if (target == NULL)
-        target = !(procFlags & (PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS)) && triggerEntry && triggerEntry->IsPositive() ? this : victim;
+        target = !(procFlags & (PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS)) && triggerEntry->IsPositive() ? this : victim;
 
     if (cooldown)
     {
@@ -15277,10 +15276,6 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         takeCharges = true;
                     break;
                 case SPELL_AURA_MECHANIC_IMMUNITY:
-                    // Compare mechanic
-                    if (procSpell && procSpell->Mechanic == uint32(triggeredByAura->GetMiscValue()))
-                        takeCharges = true;
-                    break;
                 case SPELL_AURA_MOD_MECHANIC_RESISTANCE:
                     // Compare mechanic
                     if (procSpell && procSpell->Mechanic == uint32(triggeredByAura->GetMiscValue()))
@@ -15815,7 +15810,7 @@ uint32 Unit::GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectTyp
     }
 
     // Combined Spells with Both Over Time and Direct Damage
-    if (overTime > 0 && CastingTime > 0 && DirectDamage)
+    if (overTime > 0 && DirectDamage)
     {
         // mainly for DoTs which are 3500 here otherwise
         uint32 OriginalCastTime = spellProto->CalcCastTime();
@@ -17264,7 +17259,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     if (Creature* creature = ToCreature())
     {
         // Vehicle should not attack its passenger after he exists the seat
-        if (type != CHARM_TYPE_VEHICLE && charmer && charmer->IsAlive() && !charmer->IsFriendlyTo(creature))
+        if (type != CHARM_TYPE_VEHICLE && charmer->IsAlive() && !charmer->IsFriendlyTo(creature))
             if (Attack(charmer, true))
                 GetMotionMaster()->MoveChase(charmer);
 
@@ -18132,7 +18127,7 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
         {
             uint8 i = 0;
             bool valid = false;
-            while (i < MAX_SPELL_EFFECTS && !valid)
+            while (i < MAX_SPELL_EFFECTS)
             {
                 if (spellEntry->Effects[i].ApplyAuraName == SPELL_AURA_CONTROL_VEHICLE)
                 {
