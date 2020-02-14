@@ -145,12 +145,20 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransa
     if (owner || owner_accId)
     {
         uint32 profit = auction->bid + auction->deposit - auction->GetAuctionCut();
+        bool sendNotification = true;
+        bool updateAchievementCriteria = true;
+        sScriptMgr->OnBeforeAuctionHouseMgrSendAuctionSuccessfulMail(this, auction, owner, owner_accId, profit, sendNotification, updateAchievementCriteria);
 
         if (owner)
         {
-            owner->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS, profit);
-            owner->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_SOLD, auction->bid);
-            owner->GetSession()->SendAuctionOwnerNotification(auction);
+            if (updateAchievementCriteria) // can be changed in the hook
+            {
+                owner->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS, profit);
+                owner->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_SOLD, auction->bid);
+            }
+
+            if (sendNotification) // can be changed in the hook
+                owner->GetSession()->SendAuctionOwnerNotification(auction);
         }
 
         MailDraft(auction->BuildAuctionMailSubject(AUCTION_SUCCESSFUL), AuctionEntry::BuildAuctionMailBody(auction->bidder, auction->bid, auction->buyout, auction->deposit, auction->GetAuctionCut()))
@@ -189,7 +197,10 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransacti
     // owner exist
     if (owner || owner_accId)
     {
-        if (owner)
+        bool sendNotification = true;
+        sScriptMgr->OnBeforeAuctionHouseMgrSendAuctionExpiredMail(this, auction, owner, owner_accId, sendNotification);
+
+        if (owner && sendNotification) // can be changed in the hook
             owner->GetSession()->SendAuctionOwnerNotification(auction);
 
         MailDraft(auction->BuildAuctionMailSubject(AUCTION_EXPIRED), AuctionEntry::BuildAuctionMailBody(0, 0, auction->buyout, auction->deposit, 0))
@@ -213,7 +224,10 @@ void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 new
     // old bidder exist
     if (oldBidder || oldBidder_accId)
     {
-        if (oldBidder && newBidder)
+        bool sendNotification = true;
+        sScriptMgr->OnBeforeAuctionHouseMgrSendAuctionOutbiddedMail(this, auction, oldBidder, oldBidder_accId, newBidder, newPrice, sendNotification);
+
+        if (oldBidder && newBidder && sendNotification) // can be changed in the hook
             oldBidder->GetSession()->SendAuctionBidderNotification(auction->GetHouseId(), auction->Id, newBidder->GetGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
 
         MailDraft(auction->BuildAuctionMailSubject(AUCTION_OUTBIDDED), AuctionEntry::BuildAuctionMailBody(auction->owner, auction->bid, auction->buyout, auction->deposit, auction->GetAuctionCut()))

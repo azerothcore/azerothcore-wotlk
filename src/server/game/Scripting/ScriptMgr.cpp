@@ -62,6 +62,7 @@ template class ScriptRegistry<BGScript>;
 template class ScriptRegistry<SpellSC>;
 template class ScriptRegistry<AccountScript>;
 template class ScriptRegistry<GameEventScript>;
+template class ScriptRegistry<MailScript>;
 
 #include "ScriptMgrMacros.h"
 
@@ -125,6 +126,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(BGScript);
     SCR_CLEAR(SpellSC);
     SCR_CLEAR(GameEventScript);
+    SCR_CLEAR(MailScript);
 
     #undef SCR_CLEAR
 }
@@ -1128,6 +1130,21 @@ void ScriptMgr::OnAuctionExpire(AuctionHouseObject* ah, AuctionEntry* entry)
     FOREACH_SCRIPT(AuctionHouseScript)->OnAuctionExpire(ah, entry);
 }
 
+void ScriptMgr::OnBeforeAuctionHouseMgrSendAuctionSuccessfulMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* owner, uint32& owner_accId, uint32& profit, bool& sendNotification, bool& updateAchievementCriteria)
+{
+    FOREACH_SCRIPT(AuctionHouseScript)->OnBeforeAuctionHouseMgrSendAuctionSuccessfulMail(auctionHouseMgr, auction, owner, owner_accId, profit, sendNotification, updateAchievementCriteria);
+}
+
+void ScriptMgr::OnBeforeAuctionHouseMgrSendAuctionExpiredMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* owner, uint32& owner_accId, bool& sendNotification)
+{
+    FOREACH_SCRIPT(AuctionHouseScript)->OnBeforeAuctionHouseMgrSendAuctionExpiredMail(auctionHouseMgr, auction, owner, owner_accId, sendNotification);
+}
+
+void ScriptMgr::OnBeforeAuctionHouseMgrSendAuctionOutbiddedMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* oldBidder, uint32& oldBidder_accId, Player* newBidder, uint32& newPrice, bool& sendNotification)
+{
+    FOREACH_SCRIPT(AuctionHouseScript)->OnBeforeAuctionHouseMgrSendAuctionOutbiddedMail(auctionHouseMgr, auction, oldBidder, oldBidder_accId, newBidder, newPrice, sendNotification);
+}
+
 bool ScriptMgr::OnConditionCheck(Condition* condition, ConditionSourceInfo& sourceInfo)
 {
     ASSERT(condition);
@@ -2074,6 +2091,12 @@ void ScriptMgr::OnGameEventStop(uint16 EventID)
     FOREACH_SCRIPT(GameEventScript)->OnStop(EventID);
 }
 
+// Mail
+void ScriptMgr::OnBeforeMailDraftSendMailTo(MailDraft* mailDraft, MailReceiver const& receiver, MailSender const& sender, MailCheckMask& checked, uint32& deliver_delay, uint32& custom_expiration, bool& deleteMailItemsFromDB, bool& sendMail)
+{
+    FOREACH_SCRIPT(MailScript)->OnBeforeMailDraftSendMailTo(mailDraft, receiver, sender, checked, deliver_delay, custom_expiration, deleteMailItemsFromDB, sendMail);
+}
+
 AllMapScript::AllMapScript(const char* name)
     : ScriptObject(name)
 {
@@ -2277,5 +2300,11 @@ GameEventScript::GameEventScript(const char* name)
     : ScriptObject(name)
 {
     ScriptRegistry<GameEventScript>::AddScript(this);
+}
+
+MailScript::MailScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<MailScript>::AddScript(this);
 }
 
