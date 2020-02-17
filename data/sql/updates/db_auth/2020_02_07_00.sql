@@ -20,7 +20,6 @@ INSERT INTO `version_db_auth` (`sql_rev`) VALUES ('1579213352894781043');
 ALTER TABLE `account_access` ADD COLUMN `comment` VARCHAR(255) DEFAULT '';
 
 -- UPDATE ACCOUNTS
-LOCK TABLES `account_access` WRITE, `account` WRITE;
 /*!40000 ALTER TABLE `account_access` DISABLE KEYS */;
 /*!40000 ALTER TABLE `account` DISABLE KEYS */;
 
@@ -67,7 +66,6 @@ WHERE (`account`.`username` = 'test9' AND `account`.`sha_pass_hash` = '4fce15ed2
 
 /*!40000 ALTER TABLE `account_access` ENABLE KEYS */;
 /*!40000 ALTER TABLE `account` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- END UPDATING QUERIES
