@@ -376,6 +376,7 @@ bool AuctionHouseMgr::RemoveAItem(uint32 id, bool deleteFromDB)
 
 void AuctionHouseMgr::Update()
 {
+    sScriptMgr->OnBeforeAuctionHouseMgrUpdate();
     mHordeAuctions.Update();
     mAllianceAuctions.Update();
     mNeutralAuctions.Update();

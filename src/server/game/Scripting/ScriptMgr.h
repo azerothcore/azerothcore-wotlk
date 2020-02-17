@@ -688,6 +688,9 @@ class AuctionHouseScript : public ScriptObject
 
         // Called before sending the mail concerning an outbidded auction
         virtual void OnBeforeAuctionHouseMgrSendAuctionOutbiddedMail(AuctionHouseMgr* /*auctionHouseMgr*/, AuctionEntry* /*auction*/, Player* /*oldBidder*/, uint32& /*oldBidder_accId*/, Player* /*newBidder*/, uint32& /*newPrice*/, bool& /*sendNotification*/) { }
+
+        // Called before updating the auctions
+        virtual void OnBeforeAuctionHouseMgrUpdate() { }
 };
 
 class ConditionScript : public ScriptObject
@@ -1351,6 +1354,7 @@ class ScriptMgr
         void OnBeforeAuctionHouseMgrSendAuctionSuccessfulMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* owner, uint32& owner_accId, uint32& profit, bool& sendNotification, bool& updateAchievementCriteria);
         void OnBeforeAuctionHouseMgrSendAuctionExpiredMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* owner, uint32& owner_accId, bool& sendNotification);
         void OnBeforeAuctionHouseMgrSendAuctionOutbiddedMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* oldBidder, uint32& oldBidder_accId, Player* newBidder, uint32& newPrice, bool& sendNotification);
+        void OnBeforeAuctionHouseMgrUpdate();
 
     public: /* ConditionScript */
 
