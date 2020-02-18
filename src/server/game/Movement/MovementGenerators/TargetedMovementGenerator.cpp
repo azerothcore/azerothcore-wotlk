@@ -183,7 +183,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
         bool result = i_path->CalculatePath(x, y, z, forceDest);
         if (result)
         {
-            float maxDist = MELEE_RANGE + owner->GetMeleeReach() + i_target->GetMeleeReach();
+            float maxDist = MELEE_RANGE + owner->GetCombatReach() + i_target->GetCombatReach();
             if (!forceDest && (i_path->GetPathType() & PATHFIND_NOPATH || (!i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist*maxDist)))
             {
                 lastPathingFailMSTime = World::GetGameTimeMS();
