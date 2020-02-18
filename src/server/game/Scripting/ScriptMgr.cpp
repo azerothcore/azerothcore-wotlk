@@ -1888,9 +1888,9 @@ void ScriptMgr::OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, 
     FOREACH_SCRIPT(GlobalScript)->OnAfterUpdateEncounterState(map, type, creditEntry, source, difficulty_fixed, encounters, dungeonCompleted, updated);
 }
 
-void ScriptMgr::OnBeforeWorldObjectInSamePhase(WorldObject const* worldObject, uint32& phasemask)
+void ScriptMgr::OnBeforeWorldObjectSetPhaseMask(WorldObject const* worldObject, uint32& oldPhaseMask, uint32& newPhaseMask, bool& useCombinedPhases, bool& update)
 {
-    FOREACH_SCRIPT(GlobalScript)->OnBeforeWorldObjectInSamePhase(worldObject, phasemask);
+    FOREACH_SCRIPT(GlobalScript)->OnBeforeWorldObjectSetPhaseMask(worldObject, oldPhaseMask, newPhaseMask, useCombinedPhases, update);
 }
 
 // Unit
