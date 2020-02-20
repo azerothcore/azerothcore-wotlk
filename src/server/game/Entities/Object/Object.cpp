@@ -1057,7 +1057,7 @@ void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 void WorldObject::_Create(uint32 guidlow, HighGuid guidhigh, uint32 phaseMask)
 { 
     Object::_Create(guidlow, 0, guidhigh);
-    m_phaseMask = phaseMask;
+    SetPhaseMask(phaseMask, false);
 }
 
 uint32 WorldObject::GetZoneId(bool /*forceRecalc*/) const
