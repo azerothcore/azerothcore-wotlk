@@ -676,7 +676,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recvData)
    if (diff > delay)
        diff = delay;
 
-   _lastAuctionListOwnerItemsMSTime = now + delay; // set longest possible here, actual exectuing will change this to getMSTime of that moment
+   _lastAuctionListOwnerItemsMSTime = now + delay - diff; // set longest possible here, actual exectuing will change this to getMSTime of that moment
 
     AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->getFaction());
 
