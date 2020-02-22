@@ -646,52 +646,34 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket & recvData)
 //this void sends player info about his auctions
 void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recvData)
 {
+    // prevent crash caused by malformed packet
     uint64 guid;
-    uint32 listfrom;
-
-    recvData >> guid;
-    recvData >> listfrom;                                  // not used in fact (this list not have page control in client)
+    WorldPacket* data = new WorldPacket(recvData);
+    *data >> guid;
+    delete(data);
 
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)
     {
-        #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionListOwnerItems - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
-        #endif
+#endif
         return;
     }
 
-    // remove fake death
-    if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
-        GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+    // pussywizard:
+    const uint32 delay = 4500;
+    const uint32 now = World::GetGameTimeMS();
+    if (_lastAuctionListOwnerItemsMSTime > now) // list is pending
+        return;
+    uint32 diff = getMSTimeDiff(_lastAuctionListOwnerItemsMSTime, now);
+    if (diff > delay)
+        diff = delay;
 
-   // pussywizard:
-   const uint32 delay = 4500;
-   const uint32 now = World::GetGameTimeMS();
-   if (_lastAuctionListOwnerItemsMSTime > now) // list is pending
-       return;
-
-   uint32 diff = getMSTimeDiff(_lastAuctionListOwnerItemsMSTime, now);
-
-   if (diff > delay)
-       diff = delay;
-
-   _lastAuctionListOwnerItemsMSTime = now + delay - diff; // set longest possible here, actual exectuing will change this to getMSTime of that moment
-
-    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->getFaction());
-
-    WorldPacket data(SMSG_AUCTION_OWNER_LIST_RESULT, (4+4+4)); // pussywizard: ensure there is enough memory
-    data << (uint32) 0;             // amount place holder
-
-    uint32 count = 0;
-    uint32 totalcount = 0;
-
-    auctionHouse->BuildListOwnerItems(data, _player, count, totalcount);
-    data.put<uint32>(0, count);
-    data << (uint32) totalcount;
-    data << (uint32) 0;
-    SendPacket(&data);
+    _lastAuctionListOwnerItemsMSTime = now + delay; // set longest possible here, actual exectuing will change this to getMSTime of that moment
+    _player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(recvData, _player->GetGUID(), true), _player->m_Events.CalculateTime(delay-diff));
 }
+
 
 void WorldSession::HandleAuctionListOwnerItemsEvent(WorldPacket & recvData)
 {
