@@ -977,7 +977,7 @@ class WorldObject : public Object, public WorldLocation
 
         bool isActiveObject() const { return m_isActive; }
         void setActive(bool isActiveObject);
-        bool IsVisibilityOverridden() const { return m_isVisibilityDistanceOverride || m_isActive; }
+        bool IsVisibilityOverridden() const { return m_isVisibilityDistanceOverride; }
         void SetVisibilityDistanceOverride(bool isVisibilityDistanceOverride);
         void SetWorldObject(bool apply);
         bool IsPermanentWorldObject() const { return m_isWorldObject; }
