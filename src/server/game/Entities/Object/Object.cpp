@@ -1520,9 +1520,7 @@ float WorldObject::GetGridActivationRange() const
 
 float WorldObject::GetVisibilityRange() const
 { 
-    if (isActiveObject() && !ToPlayer())
-        return MAX_VISIBILITY_DISTANCE;
-    else if (IsVisibilityOverridden() && GetTypeId() == TYPEID_UNIT)
+    if (IsVisibilityOverridden() && GetTypeId() == TYPEID_UNIT)
         return MAX_VISIBILITY_DISTANCE;
     else if (GetTypeId() == TYPEID_GAMEOBJECT)
     {
@@ -1545,9 +1543,7 @@ float WorldObject::GetSightRange(const WorldObject* target) const
         {
             if (target)
             {
-                if (target->isActiveObject() && !target->ToPlayer())
-                    return MAX_VISIBILITY_DISTANCE;
-                else if (target->IsVisibilityOverridden() && target->GetTypeId() == TYPEID_UNIT)
+                if (target->IsVisibilityOverridden() && target->GetTypeId() == TYPEID_UNIT)
                     return MAX_VISIBILITY_DISTANCE;
                 else if (target->GetTypeId() == TYPEID_GAMEOBJECT)
                 {
