@@ -648,9 +648,10 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recvData)
 {
     // prevent crash caused by malformed packet
     uint64 guid;
-    WorldPacket* data = new WorldPacket(recvData);
-    *data >> guid;
-    delete(data);
+    uint32 listfrom;
+
+    recvData >> guid;
+    recvData >> listfrom;
 
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)
@@ -671,23 +672,17 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recvData)
         diff = delay;
 
     _lastAuctionListOwnerItemsMSTime = now + delay; // set longest possible here, actual exectuing will change this to getMSTime of that moment
-    _player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(recvData, _player->GetGUID(), true), _player->m_Events.CalculateTime(delay-diff));
+    _player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(_player->GetGUID(), true), _player->m_Events.CalculateTime(delay-diff));
 }
 
 
-void WorldSession::HandleAuctionListOwnerItemsEvent(WorldPacket & recvData)
+void WorldSession::HandleAuctionListOwnerItemsEvent(uint64 guid)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_LIST_OWNER_ITEMS");
 #endif
 
     _lastAuctionListOwnerItemsMSTime = World::GetGameTimeMS(); // pussywizard
-
-    uint32 listfrom;
-    uint64 guid;
-
-    recvData >> guid;
-    recvData >> listfrom;                                  // not used in fact (this list not have page control in client)
 
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)
