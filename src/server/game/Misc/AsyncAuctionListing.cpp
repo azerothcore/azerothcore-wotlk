@@ -16,7 +16,7 @@ ACE_Thread_Mutex AsyncAuctionListingMgr::auctionListingTempLock;
 bool AuctionListOwnerItemsDelayEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
 {
     if (Player* plr = ObjectAccessor::FindPlayer(playerguid))
-        plr->GetSession()->HandleAuctionListOwnerItemsEvent(playerguid);
+        plr->GetSession()->HandleAuctionListOwnerItemsEvent(creatureGuid);
     return true;
 }
 

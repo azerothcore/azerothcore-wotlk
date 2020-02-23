@@ -653,15 +653,6 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recvData)
     recvData >> guid;
     recvData >> listfrom;
 
-    Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
-    if (!creature)
-    {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionListOwnerItems - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
-#endif
-        return;
-    }
-
     // pussywizard:
     const uint32 delay = 4500;
     const uint32 now = World::GetGameTimeMS();
@@ -672,11 +663,11 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recvData)
         diff = delay;
 
     _lastAuctionListOwnerItemsMSTime = now + delay; // set longest possible here, actual exectuing will change this to getMSTime of that moment
-    _player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(_player->GetGUID(), true), _player->m_Events.CalculateTime(delay-diff));
+    _player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(guid, _player->GetGUID(), true), _player->m_Events.CalculateTime(delay-diff));
 }
 
 
-void WorldSession::HandleAuctionListOwnerItemsEvent(uint64 guid)
+void WorldSession::HandleAuctionListOwnerItemsEvent(uint64 creatureGuid)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_LIST_OWNER_ITEMS");
@@ -684,7 +675,7 @@ void WorldSession::HandleAuctionListOwnerItemsEvent(uint64 guid)
 
     _lastAuctionListOwnerItemsMSTime = World::GetGameTimeMS(); // pussywizard
 
-    Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
+    Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(creatureGuid, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
