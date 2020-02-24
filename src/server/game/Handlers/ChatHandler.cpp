@@ -176,8 +176,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 
 		            if (msg.empty())
 			            return;
-
-		            sScriptMgr->OnPlayerChat(sender, type, lang, msg, receiver);
 	            }
 
 	            break;
@@ -395,7 +393,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 SendNotification(GetAcoreString(LANG_GM_SILENCE), GetPlayer()->GetName().c_str());
                 return;
             }*/
-
+			
+		    sScriptMgr->OnPlayerChat(sender, type, lang, msg, receiver);
+			
             // If player is a Gamemaster and doesn't accept whisper, we auto-whitelist every player that the Gamemaster is talking to
             if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
                 sender->AddWhisperWhiteList(receiver->GetGUID());
