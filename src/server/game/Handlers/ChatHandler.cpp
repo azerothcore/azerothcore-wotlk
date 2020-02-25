@@ -172,12 +172,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 	            {
 		            std::string to, msg;
 		            recvData >> to >> msg;
-		            Player* receiver = ObjectAccessor::FindPlayerByName(to, false);
-
 		            if (msg.empty())
 			            return;
-
-		            sScriptMgr->OnPlayerChat(sender, type, lang, msg, receiver);
 	            }
 
 	            break;
