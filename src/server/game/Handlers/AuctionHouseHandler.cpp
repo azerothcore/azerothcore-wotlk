@@ -715,7 +715,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recvData)
     uint32 listfrom, auctionSlotID, auctionMainCategory, auctionSubCategory, quality;
     uint64 guid;
 
-    recvData >> guid;
+    recvData >> creatureGuid;
     recvData >> listfrom;                                  // start, used for page control listing by 50 elements
     recvData >> searchedname;
 
@@ -735,6 +735,15 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recvData)
         recvData.read_skip<uint8>();
         recvData.read_skip<uint8>();
     }
+	
+	Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(creatureGuid, UNIT_NPC_FLAG_AUCTIONEER);
+    if (!creature)
+    {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionListItems - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(creatureGuid)));
+#endif
+        return;
+    }
 
     // remove fake death
     if (_player->HasUnitState(UNIT_STATE_DIED))
@@ -748,7 +757,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recvData)
         diff = delay;
     _lastAuctionListItemsMSTime = now + delay - diff;
     ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
-    AsyncAuctionListingMgr::GetTempList().push_back( AuctionListItemsDelayEvent(delay-diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, getAll) );
+    AsyncAuctionListingMgr::GetTempList().push_back( AuctionListItemsDelayEvent(delay-diff, _player->GetGUID(), creatureGuid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, getAll) );
 }
 
 void WorldSession::HandleAuctionListPendingSales(WorldPacket & recvData)
