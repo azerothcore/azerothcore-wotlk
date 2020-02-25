@@ -1,5 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1582663580844407800');
 
+UPDATE `creature` SET `MovementType` = 0 WHERE `guid` IN (46394,46416);
 UPDATE `creature_addon` SET `path_id`=0 WHERE `guid` IN (46394, 46416); 
 DELETE FROM `waypoint_data` WHERE `id` IN (463940,464160);
 
