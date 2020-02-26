@@ -1,4 +1,4 @@
--- INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1582663580844407800');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1582663580844407800');
 
 -- Set movement type to stay in one place
 UPDATE `creature` SET `MovementType` = 0 WHERE `guid` IN (46414, 46416);
