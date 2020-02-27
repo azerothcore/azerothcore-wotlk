@@ -1915,7 +1915,7 @@ ListenRange.Yell = 300
 #    WaypointMovementStopTimeForPlayer
 #        Description: Specifies the time (in seconds) that a creature with waypoint
 #                     movement will wait after a player interacts with it before returning
-#                     to it's patrol.
+#                     to its patrol.
 #        default:     120
 
 WaypointMovementStopTimeForPlayer = 120
