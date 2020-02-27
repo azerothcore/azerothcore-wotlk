@@ -799,7 +799,7 @@ class WorldObject : public Object, public WorldLocation
         virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
         uint32 GetPhaseMask() const { return m_phaseMask; }
         bool InSamePhase(WorldObject const* obj) const { return InSamePhase(obj->GetPhaseMask()); }
-        bool InSamePhase(uint32 phasemask) const { return (GetPhaseMask() & phasemask); }
+        bool InSamePhase(uint32 phasemask) const { return m_useCombinedPhases ? GetPhaseMask() & phasemask : GetPhaseMask() == phasemask; }
 
         virtual uint32 GetZoneId(bool forceRecalc = false) const;
         virtual uint32 GetAreaId(bool forceRecalc = false) const;
@@ -1047,6 +1047,8 @@ class WorldObject : public Object, public WorldLocation
         //uint32 m_mapId;                                     // object at map with map_id
         uint32 m_InstanceId;                                // in map copy with instance id
         uint32 m_phaseMask;                                 // in area phase state
+        bool m_useCombinedPhases;                           // true (default): use phaseMask as bit mask combining up to 32 phases
+                                                            // false: use phaseMask to represent single phases only (up to 4294967295 phases)
 
         uint16 m_notifyflags;
         uint16 m_executed_notifies;
