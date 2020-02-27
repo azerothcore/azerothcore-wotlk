@@ -19,6 +19,7 @@
 #include "ArenaTeam.h"
 #include "GameEventMgr.h"
 #include "PetDefines.h"
+#include "AuctionHouseMgr.h"
 #include <atomic>
 
 class AuctionHouseObject;
@@ -69,7 +70,6 @@ struct GroupQueueInfo;
 /*
     TODO: Add more script type classes.
 
-    MailScript
     SessionScript
     CollisionScript
     ArenaTeamScript
@@ -679,6 +679,27 @@ class AuctionHouseScript : public ScriptObject
 
         // Called when an auction expires.
         virtual void OnAuctionExpire(AuctionHouseObject* /*ah*/, AuctionEntry* /*entry*/) { }
+
+        // Called before sending the mail concerning a won auction
+        virtual void OnBeforeAuctionHouseMgrSendAuctionWonMail(AuctionHouseMgr* /*auctionHouseMgr*/, AuctionEntry* /*auction*/, Player* /*bidder*/, uint32& /*bidder_accId*/, bool& /*sendNotification*/, bool& /*updateAchievementCriteria*/, bool& /*sendMail*/) { }
+
+        // Called before sending the mail concerning a pending sale
+        virtual void OnBeforeAuctionHouseMgrSendAuctionSalePendingMail(AuctionHouseMgr* /*auctionHouseMgr*/, AuctionEntry* /*auction*/, Player* /*owner*/, uint32& /*owner_accId*/, bool& /*sendMail*/) { }
+
+        // Called before sending the mail concerning a successful auction
+        virtual void OnBeforeAuctionHouseMgrSendAuctionSuccessfulMail(AuctionHouseMgr* /*auctionHouseMgr*/, AuctionEntry* /*auction*/, Player* /*owner*/, uint32& /*owner_accId*/, uint32& /*profit*/, bool& /*sendNotification*/, bool& /*updateAchievementCriteria*/, bool& /*sendMail*/) { }
+
+        // Called before sending the mail concerning an expired auction
+        virtual void OnBeforeAuctionHouseMgrSendAuctionExpiredMail(AuctionHouseMgr* /*auctionHouseMgr*/, AuctionEntry* /*auction*/, Player* /*owner*/, uint32& /*owner_accId*/, bool& /*sendNotification*/, bool& /*sendMail*/) { }
+
+        // Called before sending the mail concerning an outbidded auction
+        virtual void OnBeforeAuctionHouseMgrSendAuctionOutbiddedMail(AuctionHouseMgr* /*auctionHouseMgr*/, AuctionEntry* /*auction*/, Player* /*oldBidder*/, uint32& /*oldBidder_accId*/, Player* /*newBidder*/, uint32& /*newPrice*/, bool& /*sendNotification*/, bool& /*sendMail*/) { }
+
+        // Called before sending the mail concerning an cancelled auction
+        virtual void OnBeforeAuctionHouseMgrSendAuctionCancelledToBidderMail(AuctionHouseMgr* /*auctionHouseMgr*/, AuctionEntry* /*auction*/, Player* /*bidder*/, uint32& /*bidder_accId*/, bool& /*sendMail*/) { }
+
+        // Called before updating the auctions
+        virtual void OnBeforeAuctionHouseMgrUpdate() { }
 };
 
 class ConditionScript : public ScriptObject
@@ -1185,6 +1206,18 @@ public:
     virtual void OnStop(uint16 /*EventID*/) { }
 };
 
+class MailScript : public ScriptObject
+{
+    protected:
+
+        MailScript(const char* name);
+
+    public:
+
+        // Called before mail is sent
+        virtual void OnBeforeMailDraftSendMailTo(MailDraft* /*mailDraft*/, MailReceiver const& /*receiver*/, MailSender const& /*sender*/, MailCheckMask& /*checked*/, uint32& /*deliver_delay*/, uint32& /*custom_expiration*/, bool& /*deleteMailItemsFromDB*/, bool& /*sendMail*/) { }
+};
+
 // Manages registration, loading, and execution of scripts.
 class ScriptMgr
 {
@@ -1330,6 +1363,13 @@ class ScriptMgr
         void OnAuctionRemove(AuctionHouseObject* ah, AuctionEntry* entry);
         void OnAuctionSuccessful(AuctionHouseObject* ah, AuctionEntry* entry);
         void OnAuctionExpire(AuctionHouseObject* ah, AuctionEntry* entry);
+        void OnBeforeAuctionHouseMgrSendAuctionWonMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* bidder, uint32& bidder_accId, bool& sendNotification, bool& updateAchievementCriteria, bool& sendMail);
+        void OnBeforeAuctionHouseMgrSendAuctionSalePendingMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* owner, uint32& owner_accId, bool& sendMail);
+        void OnBeforeAuctionHouseMgrSendAuctionSuccessfulMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* owner, uint32& owner_accId, uint32& profit, bool& sendNotification, bool& updateAchievementCriteria, bool& sendMail);
+        void OnBeforeAuctionHouseMgrSendAuctionExpiredMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* owner, uint32& owner_accId, bool& sendNotification, bool& sendMail);
+        void OnBeforeAuctionHouseMgrSendAuctionOutbiddedMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* oldBidder, uint32& oldBidder_accId, Player* newBidder, uint32& newPrice, bool& sendNotification, bool& sendMail);
+        void OnBeforeAuctionHouseMgrSendAuctionCancelledToBidderMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* bidder, uint32& bidder_accId, bool& sendMail);
+        void OnBeforeAuctionHouseMgrUpdate();
 
     public: /* ConditionScript */
 
@@ -1535,6 +1575,10 @@ class ScriptMgr
 
         void OnGameEventStart(uint16 EventID);
         void OnGameEventStop(uint16 EventID);
+
+    public: /* MailScript */
+
+        void OnBeforeMailDraftSendMailTo(MailDraft* mailDraft, MailReceiver const& receiver, MailSender const& sender, MailCheckMask& checked, uint32& deliver_delay, uint32& custom_expiration, bool& deleteMailItemsFromDB, bool& sendMail);
 
     private:
 
