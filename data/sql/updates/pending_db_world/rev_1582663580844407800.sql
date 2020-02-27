@@ -1,3 +1,5 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1582663580844407800');
+
 -- Set movement type to stay in one place
 UPDATE `creature` SET `MovementType` = 0 WHERE `guid` IN (46414, 46416);
 
@@ -33,12 +35,12 @@ VALUES
 (463940,23,9848.29,1050.17,1305.27,0,0,0,0,100,0),
 (463940,24,9845.39,1007.59,1305.43,0,0,0,0,100,0);
 
--- Delete waypoints for creature 46414
+-- Delete waypoints for creature 46414 and 46416
 DELETE FROM `waypoint_data` WHERE `id` IN (464140, 464160);
 
 -- Create the formation
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 46394;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (46394,46394,0,0,515,0,0),
-(46394,46414,2,135,515,0,0),
+(46394,46414,3,135,515,0,0),
 (46394,46416,3,225,515,0,0);
