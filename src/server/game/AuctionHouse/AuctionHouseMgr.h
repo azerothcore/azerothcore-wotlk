@@ -152,12 +152,12 @@ class AuctionHouseMgr
         }
 
         //auction messages
-        void SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& trans);
-        void SendAuctionSalePendingMail(AuctionEntry* auction, SQLTransaction& trans);
-        void SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransaction& trans);
-        void SendAuctionExpiredMail(AuctionEntry* auction, SQLTransaction& trans);
-        void SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans);
-        void SendAuctionCancelledToBidderMail(AuctionEntry* auction, SQLTransaction& trans);
+        void SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& trans, bool sendNotification = true, bool updateAchievementCriteria = true, bool sendMail = true);
+        void SendAuctionSalePendingMail(AuctionEntry* auction, SQLTransaction& trans, bool sendMail = true);
+        void SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransaction& trans, bool sendNotification = true, bool updateAchievementCriteria = true, bool sendMail = true);
+        void SendAuctionExpiredMail(AuctionEntry* auction, SQLTransaction& trans, bool sendNotification = true, bool sendMail = true);
+        void SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans, bool sendNotification = true, bool sendMail = true);
+        void SendAuctionCancelledToBidderMail(AuctionEntry* auction, SQLTransaction& trans, bool sendMail = true);
 
         static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem, uint32 count);
         static AuctionHouseEntry const* GetAuctionHouseEntry(uint32 factionTemplateId);
