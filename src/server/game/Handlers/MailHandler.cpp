@@ -118,7 +118,14 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
         return;
     }
 
-    uint32 cost = items_count ? 30 * items_count : 30;  // price hardcoded in client
+    if (money && COD) // cannot send money in a COD mail
+    {
+        sLog->outError("%s attempt to dupe money!!!.", receiver.c_str());
+        player->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
+        return;
+    }
+
+    uint32 cost = items_count ? 30 * items_count : 30; // price hardcoded in client
 
     uint32 reqmoney = cost + money;
   

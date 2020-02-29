@@ -548,8 +548,8 @@ void vutf8printf(FILE* out, const char *str, va_list* ap)
     temp_buf.resize(32 * 1024);
     std::wstring wtemp_buf;
 
-    size_t temp_len = vsnprintf(&temp_buf[0], 32 * 1024, str, *ap);
-    temp_buf.resize(strlen(temp_buf.c_str())); // Resize to match the formatted string
+    std::size_t temp_len = vsnprintf(&temp_buf[0], 32 * 1024, str, *ap);
+    temp_buf.resize(strnlen_s(temp_buf.c_str())); // Resize to match the formatted string
 
     if (!temp_buf.empty())
     {

@@ -2233,7 +2233,7 @@ class Unit : public WorldObject
         virtual bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const;
                                                             // redefined in Creature
         static bool IsDamageReducedByArmor(SpellSchoolMask damageSchoolMask, SpellInfo const* spellInfo = NULL, uint8 effIndex = MAX_SPELL_EFFECTS);
-        static uint32 CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, const uint32 damage, SpellInfo const* spellInfo, uint8 attackerLevel = 0, WeaponAttackType attackType=MAX_ATTACK);
+        static float CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, const float damage, SpellInfo const* spellInfo, uint8 attackerLevel = 0, WeaponAttackType attackType=MAX_ATTACK);
         static void CalcAbsorbResist(Unit* attacker, Unit* victim, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32 *absorb, uint32 *resist, SpellInfo const* spellInfo = NULL, bool Splited = false);
         static void CalcHealAbsorb(Unit const* victim, const SpellInfo* spellProto, uint32 &healAmount, uint32 &absorb);
 
