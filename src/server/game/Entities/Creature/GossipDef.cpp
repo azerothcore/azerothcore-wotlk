@@ -35,28 +35,28 @@ string GossipMenu::GetGossipOptionTextFromDB(uint64 gossipOptionTextID)
     {
         switch (locale)
         {
-            case 1:
+            case LOCALE_koKR:
                 stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC1);
                 break;
-            case 2:
+            case LOCALE_frFR:
                 stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC2);
                 break;
-            case 3:
+            case LOCALE_deDE:
                 stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC3);
                 break;
-            case 4:
+            case LOCALE_zhCN:
                 stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC4);
                 break;
-            case 5:
+            case LOCALE_zhTW:
                 stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC5);
                 break;
-            case 6:
+            case LOCALE_esES:
                 stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC6);
                 break;
-            case 7:
+            case LOCALE_esMX:
                 stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC7);
                 break;
-            case 8:
+            case LOCALE_ruRU:
                 stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC8);
                 break;
         }
