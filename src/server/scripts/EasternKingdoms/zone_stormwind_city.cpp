@@ -102,13 +102,20 @@ public:
 ## npc_lady_katrana_prestor
 ######*/
 
+// Gossip item texts are saved on acore_strings
+// npc texts are saved on npc_texts
 enum lady_gossip_text
 {
-    GOSSIP_ITEM_KAT_1 = 2697,
+    NPC_TEXT_KAT_1      = 2694,
+    NPC_TEXT_KAT_2,
+    NPC_TEXT_KAT_3,
+    GOSSIP_ITEM_KAT_1,
     GOSSIP_ITEM_KAT_2,
     GOSSIP_ITEM_KAT_3,
     GOSSIP_ITEM_KAT_4
 };
+
+int const QUEST_THE_TRUE_MASTERS = 4185;
 
 class npc_lady_katrana_prestor : public CreatureScript
 {
@@ -122,19 +129,19 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF:
                 AddGossipItemFromDB(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KAT_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, 2694, creature->GetGUID());
+                SendGossipMenuFor(player, NPC_TEXT_KAT_1, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+1:
                 AddGossipItemFromDB(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KAT_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, 2695, creature->GetGUID());
+                SendGossipMenuFor(player, NPC_TEXT_KAT_2, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 AddGossipItemFromDB(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KAT_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, 2696, creature->GetGUID());
+                SendGossipMenuFor(player, NPC_TEXT_KAT_3, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
                 CloseGossipMenuFor(player);
-                player->AreaExploredOrEventHappens(4185);
+                player->AreaExploredOrEventHappens(QUEST_THE_TRUE_MASTERS);
                 break;
         }
         return true;
@@ -145,10 +152,8 @@ public:
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        if (player->GetQuestStatus(4185) == QUEST_STATUS_INCOMPLETE)
+        if (player->GetQuestStatus(QUEST_THE_TRUE_MASTERS) == QUEST_STATUS_INCOMPLETE)
             AddGossipItemFromDB(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KAT_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-        // SendGossipMenuFor(player, 2693, creature->GetGUID());
 
         return true;
     }
