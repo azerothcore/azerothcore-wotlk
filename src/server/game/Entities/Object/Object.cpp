@@ -40,6 +40,7 @@
 #include "Group.h"
 #include "Chat.h"
 #include "DynamicVisibility.h"
+#include "ScriptMgr.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -970,7 +971,7 @@ elunaEvents(NULL),
 #endif
 LastUsedScriptID(0), m_name(""), m_isActive(false), m_isVisibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(NULL),
 m_transport(NULL), m_currMap(NULL), m_InstanceId(0),
-m_phaseMask(PHASEMASK_NORMAL), m_notifyflags(0), m_executed_notifies(0)
+m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
@@ -1056,7 +1057,7 @@ void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 void WorldObject::_Create(uint32 guidlow, HighGuid guidhigh, uint32 phaseMask)
 { 
     Object::_Create(guidlow, 0, guidhigh);
-    m_phaseMask = phaseMask;
+    SetPhaseMask(phaseMask, false);
 }
 
 uint32 WorldObject::GetZoneId(bool /*forceRecalc*/) const
@@ -2855,7 +2856,8 @@ void WorldObject::MovePositionToFirstCollisionForTotem(Position &pos, float dist
 }
 
 void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
-{ 
+{
+    sScriptMgr->OnBeforeWorldObjectSetPhaseMask(this, m_phaseMask, newPhaseMask, m_useCombinedPhases, update);
     m_phaseMask = newPhaseMask;
 
     if (update && IsInWorld())
