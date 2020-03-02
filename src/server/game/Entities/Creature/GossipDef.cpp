@@ -59,6 +59,8 @@ string GossipMenu::GetGossipOptionTextFromDB(uint64 gossipOptionTextID)
             case LOCALE_ruRU:
                 stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC8);
                 break;
+            default:
+                break;
         }
 
         stmt->setUInt32(0, gossipOptionTextID);
