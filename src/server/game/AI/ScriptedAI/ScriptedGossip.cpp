@@ -25,6 +25,12 @@ void AddGossipItemFor(Player* player, uint32 icon, std::string const& text, uint
     player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, icon, text, sender, action, popupText, popupMoney, coded);
 }
 
+// Get the gossip item text from the Database table NPC_TEXT
+void AddGossipItemFromDB(Player* player, uint32 icon, uint64 gossipOptionTextID, uint32 sender, uint32 action)
+{
+    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, icon, gossipOptionTextID, sender, action, "", 0);
+}
+
 // Uses gossip item info from DB
 void AddGossipItemFor(Player* player, uint32 gossipMenuID, uint32 gossipMenuItemID, uint32 sender, uint32 action)
 {

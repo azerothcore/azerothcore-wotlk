@@ -11,6 +11,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Formulas.h"
+#include "WorldDatabase.h"
 
 GossipMenu::GossipMenu()
 {
@@ -21,6 +22,110 @@ GossipMenu::GossipMenu()
 GossipMenu::~GossipMenu()
 {
     ClearMenu();
+}
+
+string GossipMenu::GetGossipOptionTextFromDB(uint64 gossipOptionTextID)
+{
+    string npc_text = "";
+    PreparedStatement* stmt = nullptr;
+
+    LocaleConstant locale = GetLocale();
+
+    if (locale != DEFAULT_LOCALE)
+    {
+        switch (locale)
+        {
+            case 1:
+                stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC1);
+                break;
+            case 2:
+                stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC2);
+                break;
+            case 3:
+                stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC3);
+                break;
+            case 4:
+                stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC4);
+                break;
+            case 5:
+                stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC5);
+                break;
+            case 6:
+                stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC6);
+                break;
+            case 7:
+                stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC7);
+                break;
+            case 8:
+                stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC8);
+                break;
+        }
+
+        stmt->setUInt32(0, gossipOptionTextID);
+
+        if (PreparedQueryResult _result = WorldDatabase.Query(stmt))
+        {
+            Field* fields = _result->Fetch();
+            npc_text = fields[0].GetString();
+        }
+        else
+        {
+            npc_text = "<error>";
+            sLog->outErrorDb("Gossip option locale ID or Locale not found (ID: %u - Locale: %s). Text not added to gossip menu.", gossipOptionTextID, localeNames[locale]);
+        }
+
+        return npc_text;
+    }
+    else
+    {
+        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ACORE_STRING_DEFAULT);
+        stmt->setUInt32(0, gossipOptionTextID);
+
+        if (PreparedQueryResult _result = WorldDatabase.Query(stmt))
+        {
+            Field* fields = _result->Fetch();
+            npc_text = fields[0].GetString();
+        }
+        else
+        {
+            npc_text = "<error>";
+            sLog->outErrorDb("Gossip option ID not found (ID: %u). Text not added to gossip menu.", gossipOptionTextID);
+        }
+
+        return npc_text;
+    }
+    
+}
+
+void GossipMenu::AddMenuItem(int32 menuItemId, uint8 icon, uint64 gossipOptionTextID, uint32 sender, uint32 action, std::string const& boxMessage, uint32 boxMoney, bool coded /*= false*/)
+{
+    ASSERT(_menuItems.size() <= GOSSIP_MAX_MENU_ITEMS);
+
+    // Find a free new id - script case
+    if (menuItemId == -1)
+    {
+        menuItemId = 0;
+        if (!_menuItems.empty())
+        {
+            for (GossipMenuItemContainer::const_iterator itr = _menuItems.begin(); itr != _menuItems.end(); ++itr)
+            {
+                if (int32(itr->first) > menuItemId)
+                    break;
+
+                menuItemId = itr->first + 1;
+            }
+        }
+    }
+
+    GossipMenuItem& menuItem = _menuItems[menuItemId];
+
+    menuItem.MenuItemIcon = icon;
+    menuItem.Message = GetGossipOptionTextFromDB(gossipOptionTextID);
+    menuItem.IsCoded = coded;
+    menuItem.Sender = sender;
+    menuItem.OptionType = action;
+    menuItem.BoxMessage = boxMessage;
+    menuItem.BoxMoney = boxMoney;
 }
 
 void GossipMenu::AddMenuItem(int32 menuItemId, uint8 icon, std::string const& message, uint32 sender, uint32 action, std::string const& boxMessage, uint32 boxMoney, bool coded /*= false*/)

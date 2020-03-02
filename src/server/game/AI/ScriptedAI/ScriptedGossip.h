@@ -73,6 +73,9 @@ class Creature;
 // Clear menu
 void ClearGossipMenuFor(Player* player);
 
+// Get the gossip text from NPC_TEXT table from world database
+void AddGossipItemFromDB(Player* player, uint32 icon, uint64 gossipOptionTextID, uint32 sender, uint32 action);
+
 // Using provided text, not from DB
 void AddGossipItemFor(Player* player, uint32 icon, std::string const& text, uint32 sender, uint32 action);
 

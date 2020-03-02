@@ -82,4 +82,13 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_UPD_GAMEOBJECT_ZONE_AREA_DATA, "UPDATE gameobject SET zoneId = ?, areaId = ? WHERE guid = ?", CONNECTION_ASYNC);
     // 0: uint8
     PrepareStatement(WORLD_SEL_REQ_XP, "SELECT Experience FROM player_xp_for_level WHERE Level = ?", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_ACORE_STRING_DEFAULT, "SELECT content_default FROM acore_string WHERE entry = ?", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC1, "SELECT content_loc1 FROM acore_string WHERE entry = ?", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC2, "SELECT content_loc2 FROM acore_string WHERE entry = ?", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC3, "SELECT content_loc3 FROM acore_string WHERE entry = ?", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC4, "SELECT content_loc4 FROM acore_string WHERE entry = ?", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC5, "SELECT content_loc5 FROM acore_string WHERE entry = ?", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC6, "SELECT content_loc6 FROM acore_string WHERE entry = ?", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC7, "SELECT content_loc7 FROM acore_string WHERE entry = ?", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_ACORE_STRING_CONTENT_LOC8, "SELECT content_loc8 FROM acore_string WHERE entry = ?", CONNECTION_SYNCH);
 }
