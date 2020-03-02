@@ -73,7 +73,7 @@ string GossipMenu::GetGossipOptionTextFromDB(uint64 gossipOptionTextID)
         else
         {
             npc_text = "<error>";
-            sLog->outErrorDb("Gossip option locale ID or Locale not found (ID: %u - Locale: %s). Text not added to gossip menu.", gossipOptionTextID, localeNames[locale]);
+            sLog->outErrorDb("Gossip option locale ID or Locale not found (ID: %lu - Locale: %s). Text not added to gossip menu.", gossipOptionTextID, localeNames[locale]);
         }
 
         return npc_text;
@@ -91,7 +91,7 @@ string GossipMenu::GetGossipOptionTextFromDB(uint64 gossipOptionTextID)
         else
         {
             npc_text = "<error>";
-            sLog->outErrorDb("Gossip option ID not found (ID: %u). Text not added to gossip menu.", gossipOptionTextID);
+            sLog->outErrorDb("Gossip option ID not found (ID: %lu). Text not added to gossip menu.", gossipOptionTextID);
         }
 
         return npc_text;
