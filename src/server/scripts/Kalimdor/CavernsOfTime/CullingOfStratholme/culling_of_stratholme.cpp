@@ -1261,7 +1261,8 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
             }
             else if (data == COS_PROGRESS_KILLED_SALRAMM)
             {
-                pInstance->DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, 10);
+                if (pInstance)
+                    pInstance->DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, 10);
                 DoAction(ACTION_KILLED_SALRAMM);
             }
             break;

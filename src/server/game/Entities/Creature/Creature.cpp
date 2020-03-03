@@ -365,7 +365,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     // Load creature equipment
     if (!data || data->equipmentId == 0)                    // use default from the template
         LoadEquipment();
-    else if (data && data->equipmentId != 0)                // override, 0 means no equipment
+    else
     {
         m_originalEquipmentId = data->equipmentId;
         LoadEquipment(data->equipmentId);
@@ -2217,7 +2217,11 @@ bool Creature::LoadCreaturesAddon(bool reload)
 
     //Load Path
     if (cainfo->path_id != 0)
+    {
+        if (sWorld->getBoolConfig(CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE))
+            setActive(true);
         m_path_id = cainfo->path_id;
+    }
 
     if (!cainfo->auras.empty())
     {
