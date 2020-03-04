@@ -41,8 +41,8 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     time_t now = time(NULL);
     player->duel->startTimer = now;
     plTarget->duel->startTimer = now;
-    player->duel->underDuel = true;
-    plTarget->duel->underDuel = true;
+    player->duel->isUnderDuel = true;
+    plTarget->duel->isUnderDuel = true;
 
     player->SendDuelCountdown(3000);
     plTarget->SendDuelCountdown(3000);
