@@ -35,7 +35,7 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     sLog->outStaticDebug("Player 2 is: %u (%s)", plTarget->GetGUIDLow(), plTarget->GetName().c_str());
 #endif
 
-   if(player->duel->underDuel || plTarget->duel->underDuel)
+   if (player->duel->isUnderDuel || plTarget->duel->isUnderDuel)
         return;
 
     time_t now = time(NULL);

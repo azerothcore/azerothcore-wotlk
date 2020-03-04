@@ -7801,8 +7801,8 @@ void Player::DuelComplete(DuelCompleteType type)
     sLog->outDebug(LOG_FILTER_UNITS, "Duel Complete %s %s", GetName().c_str(), duel->opponent->GetName().c_str());
 #endif
 
-    duel->initiator->duel->underDuel = false;
-    duel->opponent->duel->underDuel = false;
+    duel->initiator->duel->isUnderDuel = false;
+    duel->opponent->duel->isUnderDuel = false;
 
     WorldPacket data(SMSG_DUEL_COMPLETE, (1));
     data << (uint8)((type != DUEL_INTERRUPTED) ? 1 : 0);
