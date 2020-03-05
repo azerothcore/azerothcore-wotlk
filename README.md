@@ -154,7 +154,8 @@ This project exists thanks to:
 - [Module template / Module skeleton](https://github.com/azerothcore/skeleton-module/)
 - [Our community hub (Discord)](https://discord.gg/gkt4y2x)
 - [Our wiki](http://www.azerothcore.org/wiki "Easy to use and developed by AzerothCore founder")
-- [Our facebook page](https://www.facebook.com/AzerothCore/)
+- [Our Facebook page](https://www.facebook.com/AzerothCore/)
+- [Our LinkedIn page](https://www.linkedin.com/company/azerothcore/)
 
 
 ## SPONSORS
