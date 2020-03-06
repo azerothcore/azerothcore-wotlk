@@ -186,7 +186,7 @@ void WorldSession::HandleGuildMOTDOpcode(WorldPacket& recvPacket)
 #endif
 
     // Check for overflow
-    if (strlen(motd.c_str()) > 128)
+    if (motd.length() > 128)
         return;
 
     // Cleanup bad characters
@@ -207,7 +207,7 @@ void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPacket& recvPacket)
 #endif
 
     // Check for overflow
-    if (strlen(note.c_str()) > 31)
+    if (note.length() > 31)
         return;
 
     // Cleanup bad characters
@@ -230,7 +230,7 @@ void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPacket& recvPacket)
 #endif
 
     // Check for overflow
-    if (strlen(note.c_str()) > 31)
+    if (note.length() > 31)
         return;
 
     // Cleanup bad characters
@@ -267,7 +267,7 @@ void WorldSession::HandleGuildRankOpcode(WorldPacket& recvPacket)
     }
 
     // Check for overflow
-    if (strlen(rankName.c_str()) > 15)
+    if (rankName.length() > 15)
         return;
 
     // Cleanup bad characters
@@ -299,7 +299,7 @@ void WorldSession::HandleGuildAddRankOpcode(WorldPacket& recvPacket)
 #endif
 
     // Check for overflow
-    if (strlen(rankName.c_str()) > 15)
+    if (rankName.length() > 15)
         return;
 
     // Cleanup bad characters
@@ -329,7 +329,7 @@ void WorldSession::HandleGuildChangeInfoTextOpcode(WorldPacket& recvPacket)
 #endif
 
     // Check for overflow
-    if (strlen(info.c_str()) > 500)
+    if (info.length() > 500)
         return;
 
     // Cleanup bad characters
@@ -583,7 +583,7 @@ void WorldSession::HandleGuildBankUpdateTab(WorldPacket& recvData)
 #endif
 
     // Check for overflow
-    if (strlen(name.c_str()) > 16 || strlen(icon.c_str()) > 128)
+    if (name.length() > 16 || icon.length() > 128)
         return;
 
     // Cleanup bad characters
@@ -632,7 +632,7 @@ void WorldSession::HandleSetGuildBankTabText(WorldPacket &recvData)
 #endif
 
     // Check for overflow
-    if (strlen(text.c_str()) > 500)
+    if (text.length() > 500)
         return;
 
     // Cleanup bad characters
