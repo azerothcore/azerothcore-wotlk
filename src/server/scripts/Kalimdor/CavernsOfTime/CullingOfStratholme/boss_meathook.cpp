@@ -66,7 +66,7 @@ public:
         EventMap events;
         void Reset() { events.Reset(); }
 
-        void WaypointReached(uint32 id) { }
+        void WaypointReached() { }
 
         void EnterCombat(Unit* /*who*/)
         {

@@ -80,7 +80,7 @@ public:
             summons.DespawnAll();
         }
 
-        void WaypointReached(uint32 id) { }
+        void WaypointReached() { }
 
         void JustSummoned(Creature* cr) { summons.Summon(cr); }
 
