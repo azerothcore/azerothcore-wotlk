@@ -48,7 +48,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_salrammAI(creature);
+        return GetInstanceAI<boss_salrammAI>(creature);
     }
 
     struct boss_salrammAI : public npc_escortAI
@@ -79,6 +79,8 @@ public:
             events.Reset();
             summons.DespawnAll();
         }
+
+        void WaypointReached(uint32 id) { }
 
         void JustSummoned(Creature* cr) { summons.Summon(cr); }
 

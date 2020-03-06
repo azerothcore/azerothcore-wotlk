@@ -6,6 +6,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "culling_of_stratholme.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -38,7 +39,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_meathookAI (creature);
+        return GetInstanceAI<boss_meathookAI>(creature);
     }
 
     struct boss_meathookAI : public npc_escortAI
@@ -64,6 +65,8 @@ public:
 
         EventMap events;
         void Reset() { events.Reset(); }
+
+        void WaypointReached(uint32 id) { }
 
         void EnterCombat(Unit* /*who*/)
         {
