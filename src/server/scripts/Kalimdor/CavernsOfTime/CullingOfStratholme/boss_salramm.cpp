@@ -80,8 +80,6 @@ public:
             summons.DespawnAll();
         }
 
-        void WaypointReached() { }
-
         void JustSummoned(Creature* cr) { summons.Summon(cr); }
 
         void EnterCombat(Unit* /*who*/)

@@ -66,8 +66,6 @@ public:
         EventMap events;
         void Reset() { events.Reset(); }
 
-        void WaypointReached() { }
-
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
