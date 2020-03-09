@@ -1,3 +1,19 @@
+-- DB update 2020_03_04_00 -> 2020_03_09_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_03_04_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_03_04_00 2020_03_09_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1581083846978148700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1581083846978148700');
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=17 AND `SourceGroup`=0 AND `SourceEntry`=43732;
@@ -133,3 +149,12 @@ INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language
 (@ENTRY, 1, 0, 'It was just terrible. I was all slimy, and I kept licking my eyes!', 12, 0, 100, 1, 0, 0, 23426, 0, 'SAY_HOLLEE_1'),
 (@ENTRY, 2, 0, 'Thank goodness you came along when you did. Please, take one of these troll boxes to remember me by.', 12, 0, 100, 1, 0, 0, 23427, 0, 'SAY_HOLLEE_2'),
 (@ENTRY, 3, 0, 'I never want to see this nasty pond again. Thank you, $n. I\'ll never forget you!', 12, 0, 100, 1, 0, 0, 23428, 0, 'SAY_HOLLEE_3');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
