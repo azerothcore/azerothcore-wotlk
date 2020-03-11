@@ -556,11 +556,6 @@ void vutf8printf(FILE* out, const char *str, va_list* ap)
         Utf8toWStr(temp_buf, wtemp_buf, 32 * 1024);
         wtemp_buf.push_back('\0');
 
-    if (!temp_buf.empty())
-    {
-        Utf8toWStr(temp_buf, wtemp_buf, 32 * 1024);
-        wtemp_buf.push_back('\0');
-
         CharToOemBuffW(&wtemp_buf[0], &temp_buf[0], wtemp_buf.size());
     }
     fprintf(out, "%s", temp_buf.c_str());
