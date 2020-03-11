@@ -549,6 +549,8 @@ void vutf8printf(FILE* out, const char *str, va_list* ap)
     std::wstring wtemp_buf;
 
     std::size_t temp_len = vsnprintf(&temp_buf[0], 32 * 1024, str, *ap);
+    if (temp_len == size_t(-1)) //vsnprintf returns -1 if the buffer is too small
+        temp_len = 32*1024-1;
     temp_buf.resize(strnlen_s(temp_buf.c_str())); // Resize to match the formatted string
 
     if (!temp_buf.empty())
