@@ -1,3 +1,19 @@
+-- DB update 2020_03_11_00 -> 2020_03_12_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_03_11_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_03_11_00 2020_03_12_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1581463517639375967'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1581463517639375967');
 
 -- Only show both quests "Earth Sapta" as long as "Call of Earth" is neither rewarded nor completed
@@ -22,3 +38,12 @@ VALUES
 
 -- Make both quests "Earth Sapta" repeatable and enable auto-accept
 UPDATE `quest_template_addon` SET `SpecialFlags` = 1 | 4 WHERE `ID` IN (1463,1462);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
