@@ -1,4 +1,5 @@
-DELETE FROM `creature_template` WHERE `entry` = 55002;
+use acore_world;
+
 Set @NpcName = "Aljaan, the restorer",
 	@NpcSubname = "",
 	@NpcEntry = 9000,

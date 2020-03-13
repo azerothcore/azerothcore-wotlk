@@ -33,67 +33,50 @@ public:
 		switch (action)
 		{
 		case 1: // Restore HP and MP
-			player->CLOSE_GOSSIP_MENU();
-			if (player->IsInCombat())
-			{
-				player->CLOSE_GOSSIP_MENU();
-				player->GetSession()->SendNotification("You are in combat!");
-				return false;
-			}
-			else if (player->getPowerType() == POWER_MANA)
+		 	if (player->getPowerType() == POWER_MANA)
 				player->SetPower(POWER_MANA, player->GetMaxPower(POWER_MANA));
 
 			player->SetHealth(player->GetMaxHealth());
-			player->GetSession()->SendNotification("|cffFFFF00NPC SERVICES \n |cffFFFFFFHP & MP succesfully restored!");
+			player->GetSession()->SendNotification("|cffFFFFFFHP & MP succesfully restored!");
 			player->CastSpell(player, 31726);
 			break;
 		case 3: // Reset Cooldowns
-			player->CLOSE_GOSSIP_MENU();
-			if (player->IsInCombat())
-			{
-				player->CLOSE_GOSSIP_MENU();
-				player->GetSession()->SendNotification("You are in combat!");
-				return false;
-			}
-
 			player->RemoveAllSpellCooldown();
-			player->GetSession()->SendNotification("|cffFFFF00NPC SERVICES \n |cffFFFFFFCooldowns succesfully reseted!");
+			player->GetSession()->SendNotification("|cffFFFFFFCooldowns succesfully reseted!");
 			player->CastSpell(player, 31726);
 			break;
 
 		case 4: // Leave Combat
-			player->CLOSE_GOSSIP_MENU();
 			player->CombatStop();
-			player->GetSession()->SendNotification("|cffFFFF00NPC SERVICES \n |cffFFFFFFCombat succesfully removed!");
+			player->GetSession()->SendNotification("|cffFFFFFFCombat succesfully removed!");
 			player->CastSpell(player, 31726);
 			break;
 
 		case 5: // Remove Sickness
-			player->CLOSE_GOSSIP_MENU();
 			if (player->HasAura(15007))
 				player->RemoveAura(15007);
-			player->GetSession()->SendNotification("|cffFFFF00NPC SERVICES \n |cffFFFFFFSickness succesfully removed!");
+			player->GetSession()->SendNotification("|cffFFFFFFSickness succesfully removed!");
 			player->CastSpell(player, 31726);
 			break;
 
 		case 7: // Reset Talents
-			player->CLOSE_GOSSIP_MENU();
 			player->resetTalents(true);
 			player->SendTalentsInfoData(false);
-			player->GetSession()->SendNotification("|cffFFFF00NPC SERVICES \n |cffFFFFFFTalents reseted succesfully!");
+			player->GetSession()->SendNotification("|cffFFFFFFTalents reseted succesfully!");
 			player->CastSpell(player, 31726);
 			break;
 
 		case 8: // BANK
-			player->CLOSE_GOSSIP_MENU();
 			player->GetSession()->SendShowBank(player->GetGUID());
 			break;
 
 		case 9: // MAIL
-			player->CLOSE_GOSSIP_MENU();
 			player->GetSession()->SendShowMailBox(player->GetGUID());
 			break;
-		
+		}
+
+		player->PlayerTalkClass->SendCloseGossip();
+
 		return true;
 	}
 };
