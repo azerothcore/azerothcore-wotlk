@@ -15,8 +15,8 @@ fi
 
 for entry in "$AC_PATH_MODULES/"*/include.sh
 do
-    if [ -e $entry ]; then 
-        source $entry
+    if [ -e "$entry" ]; then
+        source "$entry"
     fi
 done
 
