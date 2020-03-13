@@ -208,6 +208,17 @@ void WorldSession::HandleCalendarArenaTeam(WorldPacket& recvData)
         team->MassInviteToEvent(this);
 }
 
+bool validUtf8String(WorldPacket& recvData, std::string& s, std::string action, uint64 playerGUID)
+{
+    if (!utf8::is_valid(s.begin(), s.end()))
+    {
+        sLog->outString("CalendarHandler: Player with guid %lu attempt to %s an event with invalid name or description (packet modification)", playerGUID, action);
+        recvData.rfinish();
+        return false;
+    }
+    return true;
+}
+
 void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
 {
     uint64 guid = _player->GetGUID();
@@ -228,12 +239,8 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
     recvData >> flags;
 
     // prevent attacks with non-utf8 chars -> with multiple packets it will hang up the db due to errors.
-    if (!utf8::is_valid(title.begin(), title.end()) || !utf8::is_valid(description.begin(), description.end()))
-    {
-        sLog->outString("CalendarHandler: Player with guid %u attempt to create an event with invalid name (packet modification)", guid);
-        recvData.rfinish();
+    if (!validUtf8String(recvData, title, "create", guid) || !validUtf8String(recvData, description, "create", guid))
         return;
-    }
 
     // prevent events in the past
     // To Do: properly handle timezones and remove the "- time_t(86400L)" hack
@@ -328,12 +335,8 @@ void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
     recvData >> flags;
 
     // prevent attacks with non-utf8 chars -> with multiple packets it will hang up the db due to errors.
-    if (!utf8::is_valid(title.begin(), title.end()) || !utf8::is_valid(description.begin(), description.end()))
-    {
-        sLog->outString("CalendarHandler: Player with guid %u attempt to update an event with invalid name (packet modification)", guid);
-        recvData.rfinish();
+    if (!validUtf8String(recvData, title, "update", guid) || !validUtf8String(recvData, description, "update", guid))
         return;
-    }
 
     // prevent events in the past
     // To Do: properly handle timezones and remove the "- time_t(86400L)" hack
