@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+#
+# CUSTOM
+#
+
+DB_WORLD_CUSTOM_PATHS+=(
+	$TEMPLATENPC_ROOT"/data/sql/db-characters/"
+)

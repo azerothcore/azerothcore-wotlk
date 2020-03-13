@@ -1,10 +1,15 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-set -e
+set -e -x
 
-CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd build
 
-source "$CUR_PATH/apps/installer/includes/includes.sh"
+pkill worldserver
+pkill authserver
 
+cmake ../ \
+	-DCMAKE_INSTALL_PREFIX=/home/$USER/wow_server2 \
+	-DCONF_DIR=/home/$USER/wow_server2 \
+	/
 
-
+make -j $(nproc) install

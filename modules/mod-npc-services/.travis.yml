@@ -1,0 +1,76 @@
+sudo: required
+dist: bionic # (18.04)
+
+language: cpp
+
+cache: ccache
+
+addons:
+  apt:
+    update: true
+
+services:
+  - mysql
+
+git:
+  depth: 10
+
+stages:
+  - prepare_cache
+  - run
+
+jobs:
+  include:
+    - stage: prepare_cache
+      env: TRAVIS_BUILD_ID="1"
+      before_install:
+        - cd ..
+        - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore-wotlk
+        - mv "$TRAVIS_BUILD_DIR" azerothcore-wotlk/modules
+        - cd azerothcore-wotlk
+        - source ./apps/ci/ci-before_install.sh
+      install:
+        - source ./apps/ci/ci-install.sh OFF
+      script:
+        - source ./apps/ci/ci-compile.sh
+
+    - stage: run
+      env: TRAVIS_BUILD_ID="1"
+      before_install:
+        - cd ..
+        - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore-wotlk
+        - mv "$TRAVIS_BUILD_DIR" azerothcore-wotlk/modules
+        - cd azerothcore-wotlk
+        - source ./apps/ci/ci-before_install.sh
+      install:
+        - source ./apps/ci/ci-install.sh ON
+        - source ./apps/ci/ci-import-db.sh
+      script:
+        - source ./apps/ci/ci-compile.sh
+        - source ./apps/ci/ci-worldserver-dry-run.sh
+
+    - stage: prepare_cache
+      env: TRAVIS_BUILD_ID="2"
+      before_install:
+        - cd ..
+        - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore-wotlk
+        - mv "$TRAVIS_BUILD_DIR" azerothcore-wotlk/modules
+        - cd azerothcore-wotlk
+        - source ./apps/ci/ci-before_install.sh
+      install:
+        - source ./apps/ci/ci-install.sh OFF
+      script:
+        - source ./apps/ci/ci-compile.sh
+
+    - stage: run
+      env: TRAVIS_BUILD_ID="2"
+      before_install:
+        - cd ..
+        - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore-wotlk
+        - mv "$TRAVIS_BUILD_DIR" azerothcore-wotlk/modules
+        - cd azerothcore-wotlk
+        - source ./apps/ci/ci-before_install.sh
+      install:
+        - source ./apps/ci/ci-install.sh ON
+      script:
+        - source ./apps/ci/ci-compile.sh
