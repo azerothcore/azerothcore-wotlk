@@ -35,6 +35,7 @@ Copied events should probably have a new owner
 #include "ArenaTeamMgr.h"
 #include "WorldSession.h"
 #include "GameEventMgr.h"
+#include "utf8.h"
 
 void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
 {
@@ -226,6 +227,14 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
     recvData.ReadPackedTime(unkPackedTime);
     recvData >> flags;
 
+    // prevent attacks with non-utf8 chars -> with multiple packets it will hang up the db due to errors.
+    if (!utf8::is_valid(title.begin(), title.end()) || !utf8::is_valid(description.begin(), description.end()))
+    {
+        sLog->outString("CalendarHandler: Player with guid %u attempt to create an event with invalid name (packet modification)", guid);
+        recvData.rfinish();
+        return;
+    }
+
     // prevent events in the past
     // To Do: properly handle timezones and remove the "- time_t(86400L)" hack
     if (time_t(eventPackedTime) < (time(NULL) - time_t(86400L)))
@@ -317,6 +326,14 @@ void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
     recvData.ReadPackedTime(eventPackedTime);
     recvData.ReadPackedTime(timeZoneTime);
     recvData >> flags;
+
+    // prevent attacks with non-utf8 chars -> with multiple packets it will hang up the db due to errors.
+    if (!utf8::is_valid(title.begin(), title.end()) || !utf8::is_valid(description.begin(), description.end()))
+    {
+        sLog->outString("CalendarHandler: Player with guid %u attempt to update an event with invalid name (packet modification)", guid);
+        recvData.rfinish();
+        return;
+    }
 
     // prevent events in the past
     // To Do: properly handle timezones and remove the "- time_t(86400L)" hack
