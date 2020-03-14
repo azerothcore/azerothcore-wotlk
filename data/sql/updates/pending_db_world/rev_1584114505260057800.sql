@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1584114505260057800');
 
--- Based off https://wowwiki.fandom.com/wiki/Clam?oldid=2076011
+-- Based on https://wowwiki.fandom.com/wiki/Clam?oldid=2076011
 DELETE FROM `spell_loot_template` WHERE `entry` IN (58172, 58168, 61898, 58165, 58160);
 INSERT INTO `spell_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES 
 (58172, 5503, 0, 100, 0, 1, 1, 1, 1, ''),
