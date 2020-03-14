@@ -1,8 +1,8 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1584155968143283600');
 
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `SourceEntry` = 3142 AND `ConditionTypeOrReference` = 8 AND `ConditionValue1` = 4442;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 3142 AND `SourceEntry` = 0 AND `ConditionTypeOrReference` = 8 AND `ConditionValue1` = 4442;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(15, 1, 3142, 0, 0, 8, 0, 4442, 0, 0, 0, 0, 0, '', 'Eridan Bluewind - Gossip Option 0 available if Purified! is rewarded');
+(15, 3142, 0, 0, 0, 8, 0, 4442, 0, 0, 0, 0, 0, '', 'Eridan Bluewind - Gossip Option 0 available if Purified! is rewarded');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 9116;
 
