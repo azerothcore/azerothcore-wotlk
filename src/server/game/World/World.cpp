@@ -553,6 +553,7 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_SELLVALUE_ITEM_EPIC] = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Epic", 1.0f);
     rate_values[RATE_SELLVALUE_ITEM_LEGENDARY] = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Legendary", 1.0f);
     rate_values[RATE_SELLVALUE_ITEM_ARTIFACT] = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Artifact", 1.0f);
+    rate_values[RATE_SELLVALUE_ITEM_HEIRLOOM] = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Heirloom", 1.0f);
 
     rate_values[ RATE_BUYVALUE_ITEM_POOR] = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Poor", 1.0f);
     rate_values[ RATE_BUYVALUE_ITEM_NORMAL] = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Normal", 1.0f);
@@ -560,7 +561,8 @@ void World::LoadConfigSettings(bool reload)
     rate_values[ RATE_BUYVALUE_ITEM_RARE] = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Rare", 1.0f);
     rate_values[ RATE_BUYVALUE_ITEM_EPIC] = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Epic", 1.0f);
     rate_values[ RATE_BUYVALUE_ITEM_LEGENDARY] = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Legendary", 1.0f);
-    rate_values[ RATE_BUYVALUE_ITEM_ARTIFACT] = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Artifact", 1.0f);
+    rate_values[RATE_BUYVALUE_ITEM_ARTIFACT] = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Artifact", 1.0f);
+    rate_values[RATE_BUYVALUE_ITEM_HEIRLOOM] = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Heirloom", 1.0f);
 
     if (rate_values[RATE_REPAIRCOST] < 0.0f)
     {
