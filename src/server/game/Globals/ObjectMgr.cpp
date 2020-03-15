@@ -2314,8 +2314,8 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.Flags                     = fields[7].GetUInt32();
         itemTemplate.Flags2                    = fields[8].GetUInt32();
         itemTemplate.BuyCount                  = uint32(fields[9].GetUInt8());
-        itemTemplate.BuyPrice                  = int32(fields[10].GetInt64()*sWorld->getRate((Rates)(RATE_BUYVALUE_ITEM_POOR + itemTemplate.Quality));
-        itemTemplate.SellPrice                 = fields[11].GetUInt32()*sWorld->getRate((Rates)(RATE_SELLVALUE_ITEM_POOR+itemTemplate.Quality));
+        itemTemplate.BuyPrice                  = int32(fields[10].GetInt64()*sWorld->getRate((Rates)(RATE_BUYVALUE_ITEM_POOR + itemTemplate.Quality)));
+        itemTemplate.SellPrice                 = uint32(fields[11].GetUInt32()*sWorld->getRate((Rates)(RATE_SELLVALUE_ITEM_POOR+itemTemplate.Quality)));
         itemTemplate.InventoryType             = uint32(fields[12].GetUInt8());
         itemTemplate.AllowableClass            = fields[13].GetInt32();
         itemTemplate.AllowableRace             = fields[14].GetInt32();
