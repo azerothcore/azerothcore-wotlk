@@ -1,6 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1584388487036984300');
 
-UPDATE `creature_template` SET `npcflag`=`npcflag`&~2 WHERE `entry` IN (15350,15351);
 DELETE FROM `creature_queststarter` WHERE `quest` IN (8388,13475,8371,8385,13477,13478,13476,8367);
 DELETE FROM `creature_questender` WHERE `quest` IN (8388,13475,8371,8385,13477,13478,13476,8367);
 DELETE FROM `disables` WHERE `sourceType`=1 AND `entry` IN (8388,13475,8371,8385,13477,13478,13476,8367);
