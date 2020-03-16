@@ -163,8 +163,29 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
     init.MoveTo(node->x, node->y, node->z);
 
     //! Accepts angles such as 0.00001 and -0.00001, 0 must be ignored, default value in waypoint table
-    if (node->orientation && node->delay)
+    if (node->orientation > 0.f && node->delay)
         init.SetFacing(node->orientation);
+    else
+    {
+        // Smoothing out waypoint transition
+        uint32 nextNodeId = (i_currentNode + 1) % i_path->size();
+        WaypointData const* nextWaypoint = i_path->at(nextNodeId);
+
+        // We are going to build a path that consists of the default path + the first point of the next waypoint path
+        _transitionPointId = init.Path().size() - 1;
+
+        // Relocate the owner serverside so we can get the path from our next waypoint to our 2nd next one
+        Position const originalPos = creature->GetPosition();
+        creature->Relocate(nextWaypoint->x, nextWaypoint->y, nextWaypoint->z);
+
+        // Now we are going to pick the first actual spline vertex and add it to out current path
+        Movement::MoveSplineInit smoothInit(creature);
+        smoothInit.MoveTo(nextWaypoint->x, nextWaypoint->y, nextWaypoint->z);
+        init.Path().push_back(smoothInit.Path().at(1)); // 0 is going to be normalized as starting vertex, we want the real one, so we go with 1
+
+        // Everything is done and in place, so time to put our owner serverside position back to it's original place
+        creature->Relocate(originalPos);
+    }
 
     switch (node->move_type)
     {
@@ -238,7 +259,7 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
         {
             // xinef: code to detect pre-empetively if we should start movement to next waypoint
             // xinef: do not start pre-empetive movement if current node has delay or we are ending waypoint movement
-            bool finished = creature->movespline->Finalized();
+            bool finished = creature->movespline->currentPathIdx() < _transitionPointId;
             if (!finished && !i_path->at(i_currentNode)->delay && ((i_currentNode != i_path->size() - 1) || repeating))
                 finished = (creature->movespline->_Spline().length(creature->movespline->_currentSplineIdx()+1) - creature->movespline->timePassed()) < 200;
 
