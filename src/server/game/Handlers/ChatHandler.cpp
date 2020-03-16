@@ -147,7 +147,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 	            if (sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
 		        {
 			        std::string msg;
-			        recvData >> msg;
+			        msg = recvData.ReadCString();
 
                     if (msg.empty())
                         return;
@@ -171,7 +171,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 	            if (sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
 	            {
 		            std::string to, msg;
-		            recvData >> to >> msg;
+		            recvData >> to;
+                    msg = recvData.ReadCString();
 		            if (msg.empty())
 			            return;
 	            }
@@ -260,19 +261,19 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         case CHAT_MSG_RAID_WARNING:
         case CHAT_MSG_BATTLEGROUND:
         case CHAT_MSG_BATTLEGROUND_LEADER:
-            recvData >> msg;
+            msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
         case CHAT_MSG_WHISPER:
             recvData >> to;
-            recvData >> msg;
+            msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
         case CHAT_MSG_CHANNEL:
             recvData >> channel;
-            recvData >> msg;
+            msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
         case CHAT_MSG_AFK:
         case CHAT_MSG_DND:
-            recvData >> msg;
+            msg = recvData.ReadCString(lang != LANG_ADDON);
             ignoreChecks = true;
             break;
     }

@@ -13,15 +13,37 @@
 class WorldPacket : public ByteBuffer
 {
     public:
-                                                            // just container for later use
-        WorldPacket()                                       : ByteBuffer(0), m_opcode(0)
+        // just container for later use
+        WorldPacket() : ByteBuffer(0), m_opcode(0) { }
+
+        explicit WorldPacket(uint16 opcode, size_t res = 200) : ByteBuffer(res), m_opcode(opcode) { }
+
+        // copy constructor
+        WorldPacket(const WorldPacket &packet) : ByteBuffer(packet), m_opcode(packet.m_opcode) { }
+
+        WorldPacket& operator=(WorldPacket const& right)
         {
+            if (this != &right)
+            {
+                m_opcode = right.m_opcode;
+                ByteBuffer::operator=(right);
+            }
+
+            return *this;
         }
-        explicit WorldPacket(uint16 opcode, size_t res=200) : ByteBuffer(res), m_opcode(opcode) { }
-                                                            // copy constructor
-        WorldPacket(const WorldPacket &packet)              : ByteBuffer(packet), m_opcode(packet.m_opcode)
+
+        WorldPacket& operator=(WorldPacket&& right)
         {
+            if (this != &right)
+            {
+                m_opcode = right.m_opcode;
+                ByteBuffer::operator=(std::move(right));
+            }
+
+            return *this;
         }
+
+        WorldPacket(uint16 opcode, MessageBuffer&& buffer) : ByteBuffer(std::move(buffer)), m_opcode(opcode) { }
 
         void Initialize(uint16 opcode, size_t newres=200)
         {
@@ -36,5 +58,5 @@ class WorldPacket : public ByteBuffer
     protected:
         uint16 m_opcode;
 };
-#endif
 
+#endif

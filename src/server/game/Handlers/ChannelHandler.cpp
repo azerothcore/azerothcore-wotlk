@@ -33,11 +33,13 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
             return;
     }
 
-    if (channelName.empty())
+    if (channelName.empty() || isdigit((unsigned char)channelName[0]))
+    {
+        WorldPacket data(SMSG_CHANNEL_NOTIFY, 1 + channelName.size());
+        data << uint8(CHAT_INVALID_NAME_NOTICE) << channelName;
+        SendPacket(&data);
         return;
-
-    if (isdigit(channelName[0]))
-        return;
+    }
 
     // pussywizard: restrict allowed characters in channel name to avoid |0 and possibly other exploits
     //if (!ObjectMgr::IsValidChannelName(channelName))
