@@ -636,7 +636,9 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
             newChar.SetAtLoginFlag(AT_LOGIN_FIRST);               // First login
 
             // Player created, save it now
-            newChar.SaveToDB(true, false);
+            newChar.SaveToDB(true, false);  // create
+            newChar.SaveToDB(false, false); // update
+            // ^ this way we avoid inconsistencies between the create/update code
             createInfo->CharCount += 1;
 
             SQLTransaction trans = LoginDatabase.BeginTransaction();
@@ -1070,11 +1072,6 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         SendNotification(LANG_RESET_TALENTS);
     }
 
-    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST)) {
-        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
-
-        sScriptMgr->OnFirstLogin(pCurrChar);
-    }
 
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_CHECK_ACHIEVS))
     {
@@ -1202,6 +1199,12 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     }
 
     sScriptMgr->OnPlayerLogin(pCurrChar);
+    
+    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST)) {
+        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
+        sScriptMgr->OnFirstLogin(pCurrChar);
+    }
+
     delete holder;
 }
 

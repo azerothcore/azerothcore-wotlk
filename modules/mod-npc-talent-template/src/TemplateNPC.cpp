@@ -8,24 +8,6 @@ TO DO:
 
 #include "TemplateNPC.h"
 
-void sTemplateNPC::LearnPlateMailSpells(Player* player)
-{
-    switch (player->getClass())
-    {
-    case CLASS_WARRIOR:
-    case CLASS_PALADIN:
-    case CLASS_DEATH_KNIGHT:
-        player->learnSpell(PLATE_MAIL);
-        break;
-    case CLASS_SHAMAN:
-    case CLASS_HUNTER:
-        player->learnSpell(MAIL);
-        break;
-    default:
-        break;
-    }
-}
-
 void sTemplateNPC::ApplyBonus(Player* player, Item* item, EnchantmentSlot slot, uint32 bonusEntry)
 {
     if (!item)
@@ -633,6 +615,8 @@ public:
                 break;
             }
 
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\Spell_ChargeNegative:30|t|r Reset Talents", GOSSIP_SENDER_MAIN, 31);
+
             /*player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\Spell_ChargeNegative:30|t|r Remove all glyphs", GOSSIP_SENDER_MAIN, 30);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\Spell_ChargeNegative:30|t|r Reset Talents", GOSSIP_SENDER_MAIN, 31);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\Spell_ChargeNegative:30|t|r Destroy my equipped gear", GOSSIP_SENDER_MAIN, 32);*/
@@ -673,9 +657,7 @@ public:
             sTemplateNpcMgr->LearnTemplateTalents(player);
             sTemplateNpcMgr->LearnTemplateGlyphs(player);
             sTemplateNpcMgr->EquipTemplateGear(player);
-            sTemplateNpcMgr->LearnPlateMailSpells(player);
 
-            LearnWeaponSkills(player);
 
             player->GetSession()->SendAreaTriggerMessage("Successfuly equipped %s %s template!", playerSpecStr.c_str(), sTemplateNpcMgr->GetClassString(player).c_str());
 
@@ -683,24 +665,6 @@ public:
                 player->SetPower(POWER_MANA, player->GetMaxPower(POWER_MANA));
 
             player->SetHealth(player->GetMaxHealth());
-
-            // Learn Riding/Flying
-            if (player->HasSpell(SPELL_Artisan_Riding) ||
-                player->HasSpell(SPELL_Cold_Weather_Flying) ||
-                player->HasSpell(SPELL_Amani_War_Bear) ||
-                player->HasSpell(SPELL_Teach_Learn_Talent_Specialization_Switches)
-                || player->HasSpell(SPELL_Learn_a_Second_Talent_Specialization)
-                )
-                return;
-
-            // Cast spells that teach dual spec
-            // Both are also ImplicitTarget self and must be cast by player
-            player->CastSpell(player, SPELL_Teach_Learn_Talent_Specialization_Switches, player->GetGUID());
-            player->CastSpell(player, SPELL_Learn_a_Second_Talent_Specialization, player->GetGUID());
-
-            player->learnSpell(SPELL_Artisan_Riding);
-            player->learnSpell(SPELL_Cold_Weather_Flying);
-            player->learnSpell(SPELL_Amani_War_Bear);
 
         }
 
@@ -723,29 +687,9 @@ public:
             sTemplateNpcMgr->LearnTemplateTalents(player);
             sTemplateNpcMgr->LearnTemplateGlyphs(player);
             //sTemplateNpcMgr->EquipTemplateGear(player);
-            sTemplateNpcMgr->LearnPlateMailSpells(player);
-
-            LearnWeaponSkills(player);
 
             player->GetSession()->SendAreaTriggerMessage("Successfuly learned talent spec %s!", playerSpecStr.c_str());
 
-            // Learn Riding/Flying
-            if (player->HasSpell(SPELL_Artisan_Riding) ||
-                player->HasSpell(SPELL_Cold_Weather_Flying) ||
-                player->HasSpell(SPELL_Amani_War_Bear) ||
-                player->HasSpell(SPELL_Teach_Learn_Talent_Specialization_Switches)
-               || player->HasSpell(SPELL_Learn_a_Second_Talent_Specialization)
-                )
-                return;
-
-            // Cast spells that teach dual spec
-            // Both are also ImplicitTarget self and must be cast by player
-            player->CastSpell(player, SPELL_Teach_Learn_Talent_Specialization_Switches, player->GetGUID());
-            player->CastSpell(player, SPELL_Learn_a_Second_Talent_Specialization, player->GetGUID());
-
-            player->learnSpell(SPELL_Artisan_Riding);
-            player->learnSpell(SPELL_Cold_Weather_Flying);
-            player->learnSpell(SPELL_Amani_War_Bear);
         }
 
         bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
@@ -943,39 +887,12 @@ public:
                 //GossipHello(player);
                 player->CLOSE_GOSSIP_MENU();
                 break;
-
             case 31:
                 player->resetTalents(true);
                 player->SendTalentsInfoData(false);
                 player->GetSession()->SendAreaTriggerMessage("Your talents have been reset.");
                 player->CLOSE_GOSSIP_MENU();
                 break;
-
-            case 32:
-                for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
-                {
-                    if (Item* haveItemEquipped = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-                    {
-                        if (haveItemEquipped)
-                        {
-                            player->DestroyItemCount(haveItemEquipped->GetEntry(), 1, true, true);
-
-                            if (haveItemEquipped->IsInWorld())
-                            {
-                                haveItemEquipped->RemoveFromWorld();
-                                haveItemEquipped->DestroyForPlayer(player);
-                            }
-
-                            haveItemEquipped->SetUInt64Value(ITEM_FIELD_CONTAINED, 0);
-                            haveItemEquipped->SetSlot(NULL_SLOT);
-                            haveItemEquipped->SetState(ITEM_REMOVED, player);
-                        }
-                    }
-                }
-                player->GetSession()->SendAreaTriggerMessage("Your equipped gear has been destroyed.");
-                player->CLOSE_GOSSIP_MENU();
-                break;
-
                 //Priest
             case 100:
                 sTemplateNpcMgr->sTalentsSpec = "Discipline";
@@ -1175,7 +1092,6 @@ public:
                 player->GetSession()->SendAreaTriggerMessage("Something went wrong in the code. Please contact the administrator.");
                 break;
             }
-            player->UpdateSkillsForLevel();
 
             return true;
         }
