@@ -1,5 +1,3 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1584403279317487100');
-
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1584283998126323200');
 
 -- Grizzly Hills, Alliance Log Ride Start
