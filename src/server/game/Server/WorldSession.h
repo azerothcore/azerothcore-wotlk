@@ -217,6 +217,14 @@ class WorldSession
         std::string const& GetPlayerName() const;
         std::string GetPlayerInfo() const;
 
+         
+        uint32 GetCurrentVendorEntry() const { return GUID_ENPART(m_CurrentVendor); }
+        uint32 GetCurrentVendorGUID() const { return GUID_LOPART(m_CurrentVendor); }
+        void SetCurrentVendor(uint32 vendorEntry, uint32 senderGUIDLow, uint32 senderGUIDHigh = HIGHGUID_UNIT)
+        {
+            m_CurrentVendor = MAKE_NEW_GUID(senderGUIDLow, vendorEntry, senderGUIDHigh);
+        } 
+
         uint32 GetGuidLow() const;
         void SetSecurity(AccountTypes security) { _security = security; }
         std::string const& GetRemoteAddress() { return m_Address; }
@@ -261,7 +269,7 @@ class WorldSession
 
         void SendTrainerList(uint64 guid);
         void SendTrainerList(uint64 guid, std::string const& strTitle);
-        void SendListInventory(uint64 guid);
+        void SendListInventory(uint64 vendorGuid, uint32 vendorEntry = 0);
         void SendShowBank(uint64 guid);
         bool CanOpenMailBox(uint64 guid);
         void SendShowMailBox(uint64 guid);
@@ -969,6 +977,7 @@ class WorldSession
         WorldSocket* m_Socket;
         std::string m_Address;
         // std::string m_LAddress;                             // Last Attempted Remote Adress - we can not set attempted ip for a non-existing session!
+        uint64 m_CurrentVendor;
 
         AccountTypes _security;
         bool _skipQueue;

@@ -20,24 +20,6 @@
 
 bool WorldSession::CanOpenMailBox(uint64 guid)
 {
-    if (guid == _player->GetGUID())
-    {
-        sLog->outError("%s attempt open mailbox in cheating way.", _player->GetName().c_str());
-        return false;
-    }
-    else if (IS_GAMEOBJECT_GUID(guid))
-    {
-        if (!_player->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_MAILBOX))
-            return false;
-    }
-    else if (IS_CRE_OR_VEH_OR_PET_GUID(guid))
-    {
-        if (!_player->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_MAILBOX))
-            return false;
-    }
-    else
-        return false;
-
     return true;
 }
 
