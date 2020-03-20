@@ -404,7 +404,7 @@ CleanCharacterDB = 0
 #                     Before use this feature, make a backup of your database.
 #
 #        Example:     14 - (CLEANING_FLAG_SKILLS + CLEANING_FLAG_SPELLS + CLEANING_FLAG_TALENTS
-#                           2+4+8 => 14. This will clean up skills, talents and spells will 
+#                           2+4+8 => 14. This will clean up skills, talents and spells will
 #                           remain enabled after the next cleanup)
 #        Default:     0  - (All cleanup methods will be disabled after the next cleanup)
 
@@ -3136,6 +3136,15 @@ Guild.AllowMultipleGuildMaster = 0
 ShowKickInWorld = 0
 
 #
+#     ShowMuteInWorld
+#        Description: Determines whether a message is broadcast to the entire server when a
+#                     player gets muted.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+ShowMuteInWorld = 0
+
+#
 #     ShowBanInWorld
 #        Description: Determines whether a message is broadcast to the entire server when a
 #                     player gets banned.
@@ -3153,6 +3162,7 @@ ShowBanInWorld = 0
 #                     0     - (Disabled)
 
 RecordUpdateTimeDiffInterval = 60000
+
 #
 #     MinRecordUpdateTimeDiff
 #        Description: Only record update time diff which is greater than this value.
