@@ -1070,6 +1070,47 @@ SET @TRINKETS = 91012;
 INSERT INTO `gossip_menu_option` (`menuid`, `optionid`, `optionicon`, `optiontext`, `optiontype`, `optionnpcflag`, `actionmenuid`, `actionpoiid`, `boxcoded`, `boxmoney`, `boxtext`) VALUES
 (@GENERAL_MENU_ID, 12, 1,  'Trinkets', 3, 128, @TRINKETS, 0, 0, 0, '');
 
-tm
+COMMIT;
+
+
+START TRANSACTION;
+
+-- usables vendor
+
+SET @USABLES_MENU_ID = 8576;
+SET @GENERAL_GOODS_VEND = 92012;
+
+INSERT INTO `gossip_menu_option` (`menuid`, `optionid`, `optionicon`, `optiontext`, `optiontype`, `optionnpcflag`, `actionmenuid`, `actionpoiid`, `boxcoded`, `boxmoney`, `boxtext`) VALUES
+(@USABLES_MENU_ID, 1, 1,  'General Goods', 3, 128, @GENERAL_GOODS_VEND, 0, 0, 0, '');
+
+insert into npc_vendor ( 
+`entry`, 
+`slot`, 
+`item`, 
+`maxcount`, 
+`incrtime`, 
+`ExtendedCost`, 
+`VerifiedBuild` 
+) values 
+(@GENERAL_GOODS_VEND, 0, 3775, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 5237, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 6265, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 17020, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 18714, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 21177, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 23162, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 41597, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 43231, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 43233, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 43235, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 43236, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 43237, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 44447, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 44605, 0, 0, 0, 0),                                                                                                                                                     
+(@GENERAL_GOODS_VEND, 0, 44614, 0, 0, 0, 0),       
+(@GENERAL_GOODS_VEND, 0, 44615, 0, 0, 0, 0),
+(@GENERAL_GOODS_VEND, 0, 46778, 0, 0, 0, 0),
+(@GENERAL_GOODS_VEND, 0, 52020, 0, 0, 0, 0),
+(@GENERAL_GOODS_VEND, 0, 5202, 0, 0, 0, 0);
 
 COMMIT;

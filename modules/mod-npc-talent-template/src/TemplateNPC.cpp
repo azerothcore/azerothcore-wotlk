@@ -253,6 +253,26 @@ void sTemplateNPC::PurgeTemplate(Player *player, std::string &playerSpecStr, Tem
     }
 }
 
+void sTemplateNPC::CopyGear(Player *target, Player *src)
+{
+    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        Item *equippedItem = src->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+        if (!equippedItem)
+            continue;
+
+        target->EquipNewItem(i, equippedItem->GetEntry(), true);
+
+        ApplyBonus(target, target->GetItemByPos(INVENTORY_SLOT_BAG_0, i), PERM_ENCHANTMENT_SLOT, equippedItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT));
+        ApplyBonus(target, target->GetItemByPos(INVENTORY_SLOT_BAG_0, i), SOCK_ENCHANTMENT_SLOT, equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT));
+        ApplyBonus(target, target->GetItemByPos(INVENTORY_SLOT_BAG_0, i), SOCK_ENCHANTMENT_SLOT_2, equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_2));
+        ApplyBonus(target, target->GetItemByPos(INVENTORY_SLOT_BAG_0, i), SOCK_ENCHANTMENT_SLOT_3, equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3));
+        ApplyBonus(target, target->GetItemByPos(INVENTORY_SLOT_BAG_0, i), BONUS_ENCHANTMENT_SLOT, equippedItem->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT));
+        ApplyBonus(target, target->GetItemByPos(INVENTORY_SLOT_BAG_0, i), PRISMATIC_ENCHANTMENT_SLOT, equippedItem->GetEnchantmentId(PRISMATIC_ENCHANTMENT_SLOT));
+    
+    }
+}
+
 void sTemplateNPC::ExtractGearTemplateToDB(Player *player, std::string &playerSpecStr, TemplateType type)
 {
     PurgeTemplate(player, playerSpecStr, type);
@@ -265,9 +285,13 @@ void sTemplateNPC::ExtractGearTemplateToDB(Player *player, std::string &playerSp
         {
             if (type == TYPE_HUMAN)
             {
-                CharacterDatabase.PExecute("INSERT INTO template_npc_human (`playerClass`, `playerSpec`, `pos`, `itemEntry`, `enchant`, `socket1`, `socket2`, `socket3`, `bonusEnchant`, `prismaticEnchant`) VALUES ('%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u');", GetClassString(player).c_str(), playerSpecStr.c_str(), equippedItem->GetSlot(), equippedItem->GetEntry(), equippedItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT),
-                                           equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_2), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3),
-                                           equippedItem->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(PRISMATIC_ENCHANTMENT_SLOT));
+                CharacterDatabase.PExecute("INSERT INTO template_npc_human (`playerClass`, `playerSpec`, `pos`, `itemEntry`, `enchant`, `socket1`, `socket2`, `socket3`, `bonusEnchant`, `prismaticEnchant`) VALUES ('%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u');", GetClassString(player).c_str(), playerSpecStr.c_str(), equippedItem->GetSlot(), equippedItem->GetEntry(),
+                                           equippedItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT),
+                                           equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT),
+                                           equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_2),
+                                           equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3),
+                                           equippedItem->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT),
+                                           equippedItem->GetEnchantmentId(PRISMATIC_ENCHANTMENT_SLOT));
             }
             else if (type == TYPE_ALLIANCE)
             {
@@ -864,6 +888,7 @@ public:
         };
 
         static std::vector<ChatCommand> TemplateNPCTable = {
+            {"copy", SEC_ADMINISTRATOR, true, &HandleCopyCommand, ""},
             {"save", SEC_ADMINISTRATOR, true, nullptr, "", saveTable},
             {"reload", SEC_ADMINISTRATOR, true, &HandleReloadTemplateNPCCommand, ""},
         };
@@ -873,6 +898,40 @@ public:
         };
 
         return commandTable;
+    }
+
+    static bool HandleCopyCommand(ChatHandler *handler, const char *_args)
+    {
+        Player *caller = handler->GetSession()->GetPlayer();
+        if (!caller)
+        {
+            handler->SendGlobalGMSysMessage("Wtf?");
+            return false;
+        }
+        uint64 selected = handler->GetSession()->GetPlayer()->GetTarget();
+        if (!selected)
+        {
+            handler->SendGlobalGMSysMessage("Need to select a player");
+            return false;
+        }
+        Player *target = ObjectAccessor::FindPlayerInOrOutOfWorld(selected);
+
+        if (!target)
+        {
+            handler->SendGlobalGMSysMessage("Need to select a player");
+            return false;
+        }
+
+        if (caller == target)
+        {
+            handler->SendGlobalGMSysMessage("You are trying to copy your own gear, which is pointless.");
+            return false;
+        }
+
+        sTemplateNpcMgr->CopyGear(caller, target);
+
+        handler->SendGlobalGMSysMessage("Gear coppied.");
+        return true;
     }
 
     static bool HandleSaveGearHorde(ChatHandler *handler, const char *_args)

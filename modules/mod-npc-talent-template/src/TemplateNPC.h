@@ -111,6 +111,7 @@ public:
     void PurgeTemplate(Player *player, std::string &playerSpecStr, TemplateType type);
     void ExtractGearTemplateToDB(Player * /*player*/, std::string & /*playerSpecStr*/, TemplateType /*templateType*/);
     bool CanEquipTemplate(Player * /*player*/, std::string & /*playerSpecStr*/);
+    void CopyGear(Player* target, Player* src);
 
     std::string GetClassString(Player * /*player*/);
     std::string sTalentsSpec;
