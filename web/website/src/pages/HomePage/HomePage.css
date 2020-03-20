@@ -1,0 +1,62 @@
+.HomePage-wrapper {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+}
+
+.HomePage-left {
+    width: 100%;
+    margin-right: 3rem;
+}
+
+.HomePage-right {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+@media screen and (max-width: 960px) {
+    .HomePage-wrapper {
+        flex-flow: column nowrap;
+    }
+    .HomePage-right {
+        margin-top: 32px;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-around;
+    }
+    .HomePage-Stats {
+        margin-right: 16px;
+    }
+}
+
+.HomePage-Stats {
+    max-width: 328px;
+    border: 2px solid white;
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.HomePage-right-realmlist {
+    font-size: 1.25rem;
+}
+
+.HomePage-Stats-Entry {
+    display: flex;
+    flex-flow: row nowrap;
+    margin: 7px 0;
+}
+
+.HomePage-Stats-Entry-Key {
+    padding: 0 12px;
+}
+
+.HomePage-Stats-Entry-Gutter {
+    flex-grow: 1;
+    height: 17px;
+    border-bottom: 3px dotted rgba(255, 255, 255, 0.7);
+}
+
+.HomePage-Stats-Entry-Value {
+    padding: 0 12px;
+}

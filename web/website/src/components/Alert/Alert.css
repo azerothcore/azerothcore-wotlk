@@ -1,0 +1,37 @@
+.Alert {
+    background-color: #1f2329;
+    padding: 13px;
+    border-left: 7px solid #ff9100;
+    margin-bottom: 13px;
+}
+
+.Alert.warn {
+    border-left: 7px solid #ff9100;
+}
+
+.Alert.info {
+    border-left: 7px solid rgba(255, 255, 255, 0.1);
+}
+
+.Alert-content-type {
+    user-select: none;
+    font-size: .80rem;
+    margin-bottom: .5rem;
+    font-style: italic;
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+}
+
+.Alert-closer {
+    cursor: pointer;
+}
+
+.Alert-content-type-close-btn {
+    font-size: 1.7rem;
+}
+
+.Alert-content {
+    font-size: 1.3rem;
+}

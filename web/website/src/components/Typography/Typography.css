@@ -1,0 +1,41 @@
+.Section {
+    margin: 7px;
+}
+
+.Header {
+    font-size: 2rem;
+    margin: 0;
+    padding: 27px 0 17px 0;
+}
+
+.Header>.Header-content {
+    color: white;
+}
+
+.Header>.Header-subheader {
+    margin-top: 7px;
+    display: block;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.Header>.Header-underline {
+    margin-top: 17px;
+    width: calc(100%);
+    height: 2px;
+    background-color: rgba(177, 177, 177, .2);
+}
+
+.Text {
+    padding: 0 0 0 7px;
+    font-family: 'Noto Sans' 'sans serif';
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.87);
+}
+
+.Text i {
+    padding: 3px 5px;
+    background-color: #1f2329;
+    color: white;
+    font-size: italic;
+}
