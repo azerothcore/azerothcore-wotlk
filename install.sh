@@ -9,8 +9,8 @@ cd build
 
 cmake ../ \
 	-DCMAKE_BUILD_TYPE=Debug \
-	-DCMAKE_INSTALL_PREFIX=/home/$USER/wow_server2 \
-	-DCONF_DIR=/home/$USER/wow_server2 \
+	-DCMAKE_INSTALL_PREFIX=/home/$USER/wow_server \
+	-DCONF_DIR=/home/$USER/wow_server \
 	/
 
 make -j $(nproc) install
