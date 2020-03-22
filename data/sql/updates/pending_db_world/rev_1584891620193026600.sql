@@ -35,3 +35,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28914, 0, 4, 0, 38, 0, 100, 0, 2, 2, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 28913, 0, 0, 0, 0, 0, 0, "Orbaz Bloodbane - On Data 2 2 Set - Face Tharassian"),
 (28914, 0, 5, 0, 38, 0, 100, 0, 3, 3, 0, 0, 66, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Orbaz Bloodbane - On Data 3 3 Set - Restore Orientation"),
 (28914, 0, 6, 0, 38, 0, 100, 0, 4, 4, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Orbaz Bloodbane - On Data 4 4 Set - Kneel");
+
