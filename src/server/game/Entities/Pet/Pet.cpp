@@ -18,7 +18,7 @@
 #include "Unit.h"
 #include "Util.h"
 #include "Group.h"
-#include "Opcodes.h"
+#include "WorldSession.h"
 #include "Battleground.h"
 #include "InstanceScript.h"
 #include "ArenaSpectator.h"
