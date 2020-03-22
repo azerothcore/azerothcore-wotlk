@@ -969,7 +969,7 @@ class WorldSession
                 private:
                     Policy _policy;
                     typedef std::unordered_map<uint16, PacketCounter> PacketThrottlingMap;
-                    // mark this member as "mutable" so it can be modified even in const functions 
+                    // mark this member as "mutable" so it can be modified even in const functions
                     mutable PacketThrottlingMap _PacketThrottlingMap;
 
                     DosProtection(DosProtection const& right) = delete;
