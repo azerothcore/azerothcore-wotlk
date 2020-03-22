@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
- /** \file
-     \ingroup u2w
- */
+/** \file
+    \ingroup u2w
+*/
 
 #include "WorldSocket.h"                                    // must be first to make ACE happy with ACE includes in it
 #include "Common.h"
