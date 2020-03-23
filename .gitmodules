@@ -1,0 +1,3 @@
+[submodule "modules/mod-learn-spells"]
+	path = modules/mod-learn-spells
+	url = https://github.com/arenacraftwow/mod-learn-spells
