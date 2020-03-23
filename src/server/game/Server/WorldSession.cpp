@@ -282,75 +282,75 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             {
                 switch (opHandle.status)
                 {
-                case STATUS_LOGGEDIN:
-                    if (!_player)
-                    {
-                        // pussywizard: such packets were sent to do something for a character that has already logged out, skip them
-                    }
-                    else if (!_player->IsInWorld())
-                    {
-                        // pussywizard: such packets may do something important and the player is just being teleported, move to the end of the queue
-                        // pussywizard: previously such were skipped, so leave it as it is xD proper code below if we wish to change that
+                    case STATUS_LOGGEDIN:
+                        if (!_player)
+                        {
+                            // pussywizard: such packets were sent to do something for a character that has already logged out, skip them
+                        }
+                        else if (!_player->IsInWorld())
+                        {
+                            // pussywizard: such packets may do something important and the player is just being teleported, move to the end of the queue
+                            // pussywizard: previously such were skipped, so leave it as it is xD proper code below if we wish to change that
 
-                        // pussywizard: requeue only important packets not related to maps (PROCESS_THREADUNSAFE)
-                        /*if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
-                        {
-                            if (!firstDelayedPacket)
-                                firstDelayedPacket = packet;
-                            deletePacket = false;
-                            QueuePacket(packet);
-                        }*/
-                    }
-                    else if (_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
-                    {
-                        if (movementPacket)
-                        {
-                            HandleMovementOpcodes(*movementPacket);
-                            delete movementPacket;
-                            movementPacket = NULL;
+                            // pussywizard: requeue only important packets not related to maps (PROCESS_THREADUNSAFE)
+                            /*if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
+                            {
+                                if (!firstDelayedPacket)
+                                    firstDelayedPacket = packet;
+                                deletePacket = false;
+                                QueuePacket(packet);
+                            }*/
                         }
-                        sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                        if (!sEluna->OnPacketReceive(this, *packet))
-                            break;
-#endif
-                        (this->*opHandle.handler)(*packet);
-                    }
-                    break;
-                case STATUS_TRANSFER:
-                    if (_player && !_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
-                    {
-                        if (movementPacket)
+                        else if (_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
                         {
-                            delete movementPacket;
-                            movementPacket = NULL;
+                            if (movementPacket)
+                            {
+                                HandleMovementOpcodes(*movementPacket);
+                                delete movementPacket;
+                                movementPacket = NULL;
+                            }
+                            sScriptMgr->OnPacketReceive(this, *packet);
+                            #ifdef ELUNA
+                            if (!sEluna->OnPacketReceive(this, *packet))
+                                break;
+                            #endif
+                            (this->*opHandle.handler)(*packet);
                         }
-                        sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                        if (!sEluna->OnPacketReceive(this, *packet))
-                            break;
-#endif
-                        (this->*opHandle.handler)(*packet);
-                    }
-                    break;
-                case STATUS_AUTHED:
-                    if (m_inQueue) // prevent cheating
                         break;
-
-                    if (AntiDOS.EvaluateOpcode(*packet, currentTime))
-                    {
-                        sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                        if (!sEluna->OnPacketReceive(this, *packet))
+                    case STATUS_TRANSFER:
+                        if (_player && !_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
+                        {
+                            if (movementPacket)
+                            {
+                                delete movementPacket;
+                                movementPacket = NULL;
+                            }
+                            sScriptMgr->OnPacketReceive(this, *packet);
+                            #ifdef ELUNA
+                            if (!sEluna->OnPacketReceive(this, *packet))
+                                break;
+                            #endif
+                            (this->*opHandle.handler)(*packet);
+                        }
+                        break;
+                    case STATUS_AUTHED:
+                        if (m_inQueue) // prevent cheating
                             break;
-#endif
-                        (this->*opHandle.handler)(*packet);
-                    }
-                    break;
-                case STATUS_NEVER:
-                    break;
-                case STATUS_UNHANDLED:
-                    break;
+
+                        if (AntiDOS.EvaluateOpcode(*packet, currentTime))
+                        {
+                            sScriptMgr->OnPacketReceive(this, *packet);
+                            #ifdef ELUNA
+                            if (!sEluna->OnPacketReceive(this, *packet))
+                                break;
+                            #endif
+                            (this->*opHandle.handler)(*packet);
+                        }
+                        break;
+                    case STATUS_NEVER:
+                        break;
+                    case STATUS_UNHANDLED:
+                        break;
                 }
             }
             catch (ByteBufferException const&)
