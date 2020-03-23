@@ -702,13 +702,21 @@ void GameObject::Update(uint32 diff)
 
             loot.clear();
 
-            //! If this is summoned by a spell with ie. SPELL_EFFECT_SUMMON_OBJECT_WILD, with or without owner, we check respawn criteria based on spell
-            //! The GetOwnerGUID() check is mostly for compatibility with hacky scripts - 99% of the time summoning should be done trough spells.
-            if (GetSpellId() || GetOwnerGUID())
+            // Do not delete gameobjects that are not consumed on loot, while still allowing them to despawn when they expire if summoned
+            bool isSummonedAndExpired = (GetOwner() || GetSpellId()) && m_respawnTime == 0;
+            bool isPermanentSpawn = m_respawnDelayTime == 0;
+            if (!GetGOInfo()->IsDespawnAtAction() &&
+                ((GetGoType() == GAMEOBJECT_TYPE_GOOBER && (!isSummonedAndExpired || isPermanentSpawn)) ||
+                (GetGoType() == GAMEOBJECT_TYPE_CHEST && !isSummonedAndExpired  && GetGOInfo()->chest.chestRestockTime == 0))) // ToDo: chests with data2 (chestRestockTime) > 0 and data3 (consumable) = 0 should not despawn on loot
+            {
+                SetLootState(GO_READY);
+                UpdateObjectVisibility();
+                return;
+            }
+            else
             {
                 SetRespawnTime(0);
                 Delete();
-                return;
             }
 
             SetLootState(GO_READY);
