@@ -281,7 +281,7 @@ class CalendarMgr
         
         void LoadFromDB();
 
-        CalendarEvent* GetEvent(uint64 eventId, CalendarEventStore::iterator* it = NULL);
+        CalendarEvent* GetEvent(uint64 eventId);
         CalendarEventStore const& GetEvents() const { return _events; }
         CalendarEventStore GetEventsCreatedBy(uint64 guid, bool includeGuildEvents = false);
         CalendarEventStore GetPlayerEvents(uint64 guid);
@@ -302,8 +302,8 @@ class CalendarMgr
         uint32 GetPlayerNumPending(uint64 guid);
 
         void AddEvent(CalendarEvent* calendarEvent, CalendarSendEventType sendType);
-        CalendarEventStore::iterator RemoveEvent(uint64 eventId, uint64 remover);
-        void RemoveEvent(CalendarEvent* calendarEvent, uint64 remover, CalendarEventStore::iterator& current);
+        void RemoveEvent(uint64 eventId, uint64 remover);
+        void RemoveEvent(CalendarEvent* calendarEvent, uint64 remover);
         void UpdateEvent(CalendarEvent* calendarEvent);
 
         void AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite);
