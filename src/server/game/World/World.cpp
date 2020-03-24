@@ -1351,6 +1351,7 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE] = sConfigMgr->GetBoolDefault("SetAllCreaturesWithWaypointMovementActive", false);
 
+    // packet spoof punishment
     m_int_configs[CONFIG_PACKET_SPOOF_POLICY] = sConfigMgr->GetIntDefault("PacketSpoof.Policy", (uint32)WorldSession::DosProtection::POLICY_KICK);
     m_int_configs[CONFIG_PACKET_SPOOF_BANMODE] = sConfigMgr->GetIntDefault("PacketSpoof.BanMode", (uint32)0);
     if (m_int_configs[CONFIG_PACKET_SPOOF_BANMODE] > 1)
