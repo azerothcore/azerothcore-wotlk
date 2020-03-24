@@ -239,7 +239,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
     recvData >> flags;
 
     // prevent attacks with non-utf8 chars -> with multiple packets it will hang up the db due to errors.
-    if ((!validUtf8String(recvData, title, "create", guid) && title.size() <= 31) || (!validUtf8String(recvData, description, "create", guid) && description.size() <= 255))
+    if (!validUtf8String(recvData, title, "create", guid) || title.size() > 31 || !validUtf8String(recvData, description, "create", guid) || description.size() > 255)
         return;
 
     // prevent events in the past
@@ -372,7 +372,7 @@ void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
     recvData >> flags;
 
     // prevent attacks with non-utf8 chars -> with multiple packets it will hang up the db due to errors.
-    if ((!validUtf8String(recvData, title, "update", guid) && title.size() <= 31) || (!validUtf8String(recvData, description, "update", guid) && description.size() <= 255))
+    if (!validUtf8String(recvData, title, "update", guid) || title.size() > 31 || !validUtf8String(recvData, description, "update", guid) || description.size() > 255)
         return;
 
     // prevent events in the past
