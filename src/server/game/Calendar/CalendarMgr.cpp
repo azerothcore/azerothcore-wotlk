@@ -152,13 +152,25 @@ CalendarEventStore::iterator CalendarMgr::RemoveEvent(uint64 eventId, uint64 rem
         return _events.end();
     }
 
+    RemoveEvent(calendarEvent, remover, current);
+    return current;
+}
+
+void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, uint64 remover, CalendarEventStore::iterator& current)
+{
+    if (!calendarEvent)
+    {
+        SendCalendarCommandResult(remover, CALENDAR_ERROR_EVENT_INVALID);
+        return;
+    }
+
     SendCalendarEventRemovedAlert(*calendarEvent);
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     PreparedStatement* stmt;
     MailDraft mail(calendarEvent->BuildCalendarMailSubject(remover), calendarEvent->BuildCalendarMailBody());
 
-    CalendarInviteStore& eventInvites = _invites[eventId];
+    CalendarInviteStore& eventInvites = _invites[calendarEvent->GetEventId()];
     for (size_t i = 0; i < eventInvites.size(); ++i)
     {
         CalendarInvite* invite = eventInvites[i];
@@ -174,16 +186,16 @@ CalendarEventStore::iterator CalendarMgr::RemoveEvent(uint64 eventId, uint64 rem
         delete invite;
     }
 
-    _invites.erase(eventId);
+    _invites.erase(calendarEvent->GetEventId());
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CALENDAR_EVENT);
-    stmt->setUInt64(0, eventId);
+    stmt->setUInt64(0, calendarEvent->GetEventId());
     trans->Append(stmt);
     CharacterDatabase.CommitTransaction(trans);
 
     delete calendarEvent;
     current = _events.erase(current);
-    return current;
+    return;
 }
 
 void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, uint64 /*remover*/)
@@ -260,9 +272,10 @@ void CalendarMgr::RemoveAllPlayerEventsAndInvites(uint64 guid)
 {
     for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end();)
     {
-        if ((*itr)->GetCreatorGUID() == guid)
+        CalendarEvent* event = *itr;
+        if (event->GetCreatorGUID() == guid)
         {
-            itr = RemoveEvent((*itr)->GetEventId(), 0); // don't send mail if removing a character
+            RemoveEvent(event, 0, itr);
             continue;
         }
         ++itr;
@@ -354,6 +367,47 @@ uint64 CalendarMgr::GetFreeInviteId()
     return inviteId;
 }
 
+void CalendarMgr::DeleteOldEvents()
+{
+    time_t oldEventsTime = time(nullptr) - CALENDAR_OLD_EVENTS_DELETION_TIME;
+
+    for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end();)
+    {
+        CalendarEvent* event = *itr;
+        if (event->GetEventTime() < oldEventsTime)
+        {
+            RemoveEvent(event, 0, itr);
+            continue;
+        }
+        ++itr;
+    }
+}
+
+CalendarEventStore CalendarMgr::GetEventsCreatedBy(uint64 guid, bool includeGuildEvents)
+{
+    CalendarEventStore result;
+    for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end(); ++itr)
+        if ((*itr)->GetCreatorGUID() == guid && (includeGuildEvents || (!(*itr)->IsGuildEvent() && !(*itr)->IsGuildAnnouncement())))
+            result.insert(*itr);
+
+    return result;
+}
+
+CalendarEventStore CalendarMgr::GetGuildEvents(uint32 guildId)
+{
+    CalendarEventStore result;
+
+    if (!guildId)
+        return result;
+
+    for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end(); ++itr)
+        if ((*itr)->IsGuildEvent() || (*itr)->IsGuildAnnouncement())
+            if ((*itr)->GetGuildId() == guildId)
+                result.insert(*itr);
+
+    return result;
+}
+
 CalendarEventStore CalendarMgr::GetPlayerEvents(uint64 guid)
 {
     CalendarEventStore events;
@@ -365,9 +419,10 @@ CalendarEventStore CalendarMgr::GetPlayerEvents(uint64 guid)
                     events.insert(event);
 
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
-        for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end(); ++itr)
-            if ((*itr)->GetGuildId() == player->GetGuildId())
-                events.insert(*itr);
+        if (player->GetGuildId())
+            for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end(); ++itr)
+                if ((*itr)->GetGuildId() == player->GetGuildId())
+                    events.insert(*itr);
 
     return events;
 }
