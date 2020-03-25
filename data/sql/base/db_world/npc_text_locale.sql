@@ -28,7 +28,7 @@ CREATE TABLE `npc_text_locale`
   `Text7_0` longtext,
   `Text7_1` longtext,
   PRIMARY KEY (`ID`,`Locale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `npc_text_locale` WRITE;
