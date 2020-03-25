@@ -1,3 +1,6 @@
 [submodule "modules/mod-learn-spells"]
 	path = modules/mod-learn-spells
 	url = https://github.com/arenacraftwow/mod-learn-spells
+[submodule "modules/mod-npc-talent-template"]
+	path = modules/mod-npc-talent-template
+	url = https://github.com/arenacraftwow/mod-npc-talent-template
