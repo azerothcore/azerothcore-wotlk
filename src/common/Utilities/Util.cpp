@@ -295,13 +295,41 @@ size_t utf8length(std::string& utf8str)
 {
     try
     {
-        return utf8::distance(utf8str.c_str(), utf8str.c_str()+utf8str.size());
+        return utf8::distance(utf8str.c_str(), utf8str.c_str() + utf8str.size());
     }
-    catch(std::exception const&)
+
+    catch (std::exception const&)
     {
         utf8str.clear();
-        return 0;
     }
+    return 0;
+}
+
+size_t utf8limit(std::string& utf8str, size_t bytes)
+{
+    if (utf8str.size() > bytes)
+    {
+        try
+        {
+            auto end = (utf8str.cbegin() + bytes);
+            auto itr = utf8::find_invalid(utf8str.cbegin(), end);
+
+            // Fix UTF8 if it was corrupted by bytes truncated
+            if (itr != end)
+                bytes = std::distance(utf8str.cbegin(), itr);
+
+            utf8str.resize(bytes);
+            utf8str.shrink_to_fit();
+
+            return bytes;
+        }
+        catch (std::exception const&)
+        {
+            utf8str.clear();
+        }
+    }
+
+    return 0;
 }
 
 void utf8truncate(std::string& utf8str, size_t len)
@@ -319,7 +347,8 @@ void utf8truncate(std::string& utf8str, size_t len)
         char* oend = utf8::utf16to8(wstr.c_str(), wstr.c_str()+wstr.size(), &utf8str[0]);
         utf8str.resize(oend-(&utf8str[0]));                 // remove unused tail
     }
-    catch(std::exception const&)
+
+    catch (std::exception const&)
     {
         utf8str.clear();
     }
@@ -334,7 +363,8 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
         wsize -= out.remaining(); // remaining unused space
         wstr[wsize] = L'\0';
     }
-    catch(std::exception const&)
+
+    catch (std::exception const&)
     {
         // Replace the converted string with an error message if there is enough space
         // Otherwise just return an empty string
@@ -366,7 +396,8 @@ bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr)
     {
         utf8::utf8to16(utf8str.c_str(), utf8str.c_str()+utf8str.size(), std::back_inserter(wstr));
     }
-    catch(std::exception const&)
+
+    catch (std::exception const&)
     {
         wstr.clear();
         return false;
@@ -375,44 +406,21 @@ bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr)
     return true;
 }
 
-bool WStrToUtf8(wchar_t* wstr, size_t size, std::string& utf8str)
+bool WStrToUtf8(const std::wstring& wstr, std::string& utf8str)
 {
     try
     {
         std::string utf8str2;
-        utf8str2.resize(size*4);                            // allocate for most long case
+        utf8str2.resize(wstr.size() * 4);                   // allocate for most long case
 
-        if (size)
-        {
-            char* oend = utf8::utf16to8(wstr, wstr+size, &utf8str2[0]);
-            utf8str2.resize(oend-(&utf8str2[0]));               // remove unused tail
-        }
+
+        auto end = utf8::utf16to8(wstr.cbegin(), wstr.cend(), utf8str2.begin());
+        if (end != utf8str2.end())
+            utf8str2.erase(end, utf8str2.end());
+
         utf8str = utf8str2;
     }
-    catch(std::exception const&)
-    {
-        utf8str.clear();
-        return false;
-    }
-
-    return true;
-}
-
-bool WStrToUtf8(std::wstring const& wstr, std::string& utf8str)
-{
-    try
-    {
-        std::string utf8str2;
-        utf8str2.resize(wstr.size()*4);                     // allocate for most long case
-
-        if (wstr.size())
-        {
-            char* oend = utf8::utf16to8(wstr.c_str(), wstr.c_str()+wstr.size(), &utf8str2[0]);
-            utf8str2.resize(oend-(&utf8str2[0]));                // remove unused tail
-        }
-        utf8str = utf8str2;
-    }
-    catch(std::exception const&)
+    catch (std::exception const&)
     {
         utf8str.clear();
         return false;
@@ -541,19 +549,24 @@ void utf8printf(FILE* out, const char *str, ...)
 void vutf8printf(FILE* out, const char *str, va_list* ap)
 {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-    char temp_buf[32 * 1024];
-    wchar_t wtemp_buf[32 * 1024];
+    std::string temp_buf;
+    temp_buf.resize(32 * 1024);
+    std::wstring wtemp_buf;
 
-    size_t temp_len = vsnprintf(temp_buf, 32 * 1024, str, *ap);
-    //vsnprintf returns -1 if the buffer is too small
-    if (temp_len == size_t(-1))
+    std::size_t temp_len = vsnprintf(&temp_buf[0], 32 * 1024, str, *ap);
+    if (temp_len == size_t(-1)) //vsnprintf returns -1 if the buffer is too small
         temp_len = 32*1024-1;
 
-    size_t wtemp_len = 32*1024-1;
-    Utf8toWStr(temp_buf, temp_len, wtemp_buf, wtemp_len);
+    temp_buf.resize(strnlen_s(temp_buf.c_str())); // Resize to match the formatted string
 
-    CharToOemBuffW(&wtemp_buf[0], &temp_buf[0], uint32(wtemp_len + 1));
-    fprintf(out, "%s", temp_buf);
+    if (!temp_buf.empty())
+    {
+        Utf8toWStr(temp_buf, wtemp_buf, 32 * 1024);
+        wtemp_buf.push_back('\0');
+
+        CharToOemBuffW(&wtemp_buf[0], &temp_buf[0], wtemp_buf.size());
+    }
+    fprintf(out, "%s", temp_buf.c_str());
 #else
     vfprintf(out, str, *ap);
 #endif

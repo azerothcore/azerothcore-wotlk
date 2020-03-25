@@ -140,11 +140,8 @@ inline bool Utf8toWStr(const std::string& utf8str, wchar_t* wstr, size_t& wsize)
 }
 
 bool WStrToUtf8(std::wstring const& wstr, std::string& utf8str);
-// size==real string size
-bool WStrToUtf8(wchar_t* wstr, size_t size, std::string& utf8str);
-
-// set string to "" if invalid utf8 sequence
-size_t utf8length(std::string& utf8str);
+size_t utf8length(std::string& utf8str);                    // returns string's length in utf8 chars, sets string to "" on invalid utf8 sequence
+size_t utf8limit(std::string& utf8str, size_t bytes);       // returns string's new size in bytes, sets string to "" on invalid utf8 sequence
 void utf8truncate(std::string& utf8str, size_t len);
 
 inline bool isBasicLatinCharacter(wchar_t wchar)

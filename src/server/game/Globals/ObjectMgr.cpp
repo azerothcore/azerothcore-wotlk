@@ -118,13 +118,17 @@ std::string ScriptInfo::GetDebugInfo() const
     return std::string(sz);
 }
 
-bool normalizePlayerName(std::string& name)
+bool normalizePlayerName(std::string& name, size_t max_len)
 {
     if (name.empty())
         return false;
 
     std::wstring tmp;
     if (!Utf8toWStr(name, tmp))
+        return false;
+
+    size_t len = tmp.size();
+    if (len > max_len)
         return false;
 
     wstrToLower(tmp);
