@@ -247,7 +247,7 @@ bool ConfigMgr::LoadModulesConfigs()
         defaultConfig = configFile;
 #endif
 
-        std::string ConfigFileDist = configFile + std::string(".dist");
+        std::string ConfigFileDist = defaultConfig + std::string(".dist");
 
         // Load .conf.dist config
         if (!sConfigMgr->LoadMore(ConfigFileDist.c_str()))
