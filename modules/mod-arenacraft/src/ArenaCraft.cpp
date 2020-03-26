@@ -127,11 +127,17 @@ static void LearnPlateMailSpells(Player *player)
     case CLASS_WARRIOR:
     case CLASS_PALADIN:
     case CLASS_DEATH_KNIGHT:
-        player->learnSpell(PLATE_MAIL);
+        if (!player->HasSpell(PLATE_MAIL))
+        {
+            player->learnSpell(PLATE_MAIL);
+        }
         break;
     case CLASS_SHAMAN:
     case CLASS_HUNTER:
-        player->learnSpell(MAIL);
+        if (!player->HasSpell(MAIL))
+        {
+            player->learnSpell(MAIL);
+        }
         break;
     default:
         break;
@@ -140,122 +146,118 @@ static void LearnPlateMailSpells(Player *player)
 
 static void LearnWeaponSkills(Player *player)
 {
-    WeaponProficiencies wepSkills[] = {
-        BLOCK, BOWS, CROSSBOWS, DAGGERS, FIST_WEAPONS, GUNS, ONE_H_AXES, ONE_H_MACES,
-        ONE_H_SWORDS, POLEARMS, SHOOT, STAVES, TWO_H_AXES, TWO_H_MACES, TWO_H_SWORDS, WANDS, THROW_WAR};
+    using ClassToWeapons = std::unordered_map<uint8, std::vector<WeaponProficiencies>>;
+    static ClassToWeapons classToWeaponLookup = {
+        {CLASS_WARRIOR, {
+                            THROW_WAR,
+                            TWO_H_SWORDS,
+                            TWO_H_MACES,
+                            TWO_H_AXES,
+                            STAVES,
+                            POLEARMS,
+                            ONE_H_SWORDS,
+                            ONE_H_MACES,
+                            ONE_H_AXES,
+                            GUNS,
+                            FIST_WEAPONS,
+                            DAGGERS,
+                            CROSSBOWS,
+                            BOWS,
+                            BLOCK,
+                        }},
+        {CLASS_PRIEST, {
+                           WANDS,
+                           STAVES,
+                           SHOOT,
+                           ONE_H_MACES,
+                           DAGGERS,
+                       }},
+        {CLASS_PALADIN, {
+                            TWO_H_SWORDS,
+                            TWO_H_MACES,
+                            TWO_H_AXES,
+                            POLEARMS,
+                            ONE_H_SWORDS,
+                            ONE_H_MACES,
+                            ONE_H_AXES,
+                            BLOCK,
+                        }},
+        {CLASS_ROGUE, {
+                          ONE_H_SWORDS,
+                          ONE_H_MACES,
+                          ONE_H_AXES,
+                          GUNS,
+                          FIST_WEAPONS,
+                          DAGGERS,
+                          CROSSBOWS,
+                          BOWS,
+                      }},
+        {CLASS_DEATH_KNIGHT, {
+                                 TWO_H_SWORDS,
+                                 TWO_H_MACES,
+                                 TWO_H_AXES,
+                                 POLEARMS,
+                                 ONE_H_SWORDS,
+                                 ONE_H_MACES,
+                                 ONE_H_AXES,
+                             }},
+        {CLASS_MAGE, {
+                         WANDS,
+                         STAVES,
+                         SHOOT,
+                         ONE_H_SWORDS,
+                         DAGGERS,
+                     }},
 
-    uint32 size = 17;
-
-    for (uint32 i = 0; i < size; ++i)
-        if (player->HasSpell(wepSkills[i]))
-            continue;
-
-    switch (player->getClass())
+        {CLASS_SHAMAN, {
+                           TWO_H_MACES,
+                           TWO_H_AXES,
+                           STAVES,
+                           ONE_H_MACES,
+                           ONE_H_AXES,
+                           FIST_WEAPONS,
+                           DAGGERS,
+                           BLOCK,
+                       }},
+        {CLASS_HUNTER, {
+                           THROW_WAR,
+                           TWO_H_SWORDS,
+                           TWO_H_AXES,
+                           STAVES,
+                           POLEARMS,
+                           ONE_H_SWORDS,
+                           ONE_H_AXES,
+                           GUNS,
+                           FIST_WEAPONS,
+                           DAGGERS,
+                           CROSSBOWS,
+                           BOWS,
+                       }},
+        {CLASS_DRUID, {
+                          TWO_H_MACES,
+                          STAVES,
+                          POLEARMS,
+                          ONE_H_MACES,
+                          FIST_WEAPONS,
+                          DAGGERS,
+                      }},
+        {CLASS_WARLOCK, {
+                            WANDS,
+                            STAVES,
+                            SHOOT,
+                            ONE_H_SWORDS,
+                            DAGGERS,
+                        }}};
+    auto playerClassWepSkills = classToWeaponLookup.find(player->getClass())->second;
+    for (auto playerClassWepSkill : playerClassWepSkills)
     {
-    case CLASS_WARRIOR:
-        player->learnSpell(THROW_WAR);
-        player->learnSpell(TWO_H_SWORDS);
-        player->learnSpell(TWO_H_MACES);
-        player->learnSpell(TWO_H_AXES);
-        player->learnSpell(STAVES);
-        player->learnSpell(POLEARMS);
-        player->learnSpell(ONE_H_SWORDS);
-        player->learnSpell(ONE_H_MACES);
-        player->learnSpell(ONE_H_AXES);
-        player->learnSpell(GUNS);
-        player->learnSpell(FIST_WEAPONS);
-        player->learnSpell(DAGGERS);
-        player->learnSpell(CROSSBOWS);
-        player->learnSpell(BOWS);
-        player->learnSpell(BLOCK);
-        break;
-    case CLASS_PRIEST:
-        player->learnSpell(WANDS);
-        player->learnSpell(STAVES);
-        player->learnSpell(SHOOT);
-        player->learnSpell(ONE_H_MACES);
-        player->learnSpell(DAGGERS);
-        break;
-    case CLASS_PALADIN:
-        player->learnSpell(TWO_H_SWORDS);
-        player->learnSpell(TWO_H_MACES);
-        player->learnSpell(TWO_H_AXES);
-        player->learnSpell(POLEARMS);
-        player->learnSpell(ONE_H_SWORDS);
-        player->learnSpell(ONE_H_MACES);
-        player->learnSpell(ONE_H_AXES);
-        player->learnSpell(BLOCK);
-        break;
-    case CLASS_ROGUE:
-        player->learnSpell(ONE_H_SWORDS);
-        player->learnSpell(ONE_H_MACES);
-        player->learnSpell(ONE_H_AXES);
-        player->learnSpell(GUNS);
-        player->learnSpell(FIST_WEAPONS);
-        player->learnSpell(DAGGERS);
-        player->learnSpell(CROSSBOWS);
-        player->learnSpell(BOWS);
-        break;
-    case CLASS_DEATH_KNIGHT:
-        player->learnSpell(TWO_H_SWORDS);
-        player->learnSpell(TWO_H_MACES);
-        player->learnSpell(TWO_H_AXES);
-        player->learnSpell(POLEARMS);
-        player->learnSpell(ONE_H_SWORDS);
-        player->learnSpell(ONE_H_MACES);
-        player->learnSpell(ONE_H_AXES);
-        break;
-    case CLASS_MAGE:
-        player->learnSpell(WANDS);
-        player->learnSpell(STAVES);
-        player->learnSpell(SHOOT);
-        player->learnSpell(ONE_H_SWORDS);
-        player->learnSpell(DAGGERS);
-        break;
-    case CLASS_SHAMAN:
-        player->learnSpell(TWO_H_MACES);
-        player->learnSpell(TWO_H_AXES);
-        player->learnSpell(STAVES);
-        player->learnSpell(ONE_H_MACES);
-        player->learnSpell(ONE_H_AXES);
-        player->learnSpell(FIST_WEAPONS);
-        player->learnSpell(DAGGERS);
-        player->learnSpell(BLOCK);
-        break;
-    case CLASS_HUNTER:
-        player->learnSpell(THROW_WAR);
-        player->learnSpell(TWO_H_SWORDS);
-        player->learnSpell(TWO_H_AXES);
-        player->learnSpell(STAVES);
-        player->learnSpell(POLEARMS);
-        player->learnSpell(ONE_H_SWORDS);
-        player->learnSpell(ONE_H_AXES);
-        player->learnSpell(GUNS);
-        player->learnSpell(FIST_WEAPONS);
-        player->learnSpell(DAGGERS);
-        player->learnSpell(CROSSBOWS);
-        player->learnSpell(BOWS);
-        break;
-    case CLASS_DRUID:
-        player->learnSpell(TWO_H_MACES);
-        player->learnSpell(STAVES);
-        player->learnSpell(POLEARMS);
-        player->learnSpell(ONE_H_MACES);
-        player->learnSpell(FIST_WEAPONS);
-        player->learnSpell(DAGGERS);
-        break;
-    case CLASS_WARLOCK:
-        player->learnSpell(WANDS);
-        player->learnSpell(STAVES);
-        player->learnSpell(SHOOT);
-        player->learnSpell(ONE_H_SWORDS);
-        player->learnSpell(DAGGERS);
-        break;
-    default:
-        break;
+        if (player->HasSpell(playerClassWepSkill))
+            continue;
+        player->learnSpell(playerClassWepSkill);
     }
     player->UpdateSkillsToMaxSkillsForLevel();
 }
+
 
 class ArenaCraftPlayerScripts : public PlayerScript
 {
