@@ -767,7 +767,10 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if ((e.action.cast.flags & SMARTCAST_COMBAT_MOVE) && GetCasterMaxDist() > 0.0f && me->GetMaxPower(GetCasterPowerType()) > 0)
                 {
                     // Xinef: check mana case only and operate movement accordingly, LoS and range is checked in targetet movement generator
-                    if (me->GetPowerPct(GetCasterPowerType()) < 15.0f)
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.cast.spell);
+                    int32 currentPower = me->GetPower(GetCasterPowerType());
+
+                    if ((spellInfo && (currentPower < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
                     {
                         SetCasterActualDist(0);
                         CAST_AI(SmartAI, me->AI())->SetForcedCombatMove(0);
