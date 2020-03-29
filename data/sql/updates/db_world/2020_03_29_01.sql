@@ -1,3 +1,19 @@
+-- DB update 2020_03_29_00 -> 2020_03_29_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_03_29_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_03_29_00 2020_03_29_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1582663580844407800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1582663580844407800');
 
 -- Set movement type to stay in one place
@@ -44,3 +60,12 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (46394,46394,0,0,515,0,0),
 (46394,46414,3,135,515,0,0),
 (46394,46416,3,225,515,0,0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
