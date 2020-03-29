@@ -18,7 +18,7 @@
 #include "Unit.h"
 #include "Util.h"
 #include "Group.h"
-#include "Opcodes.h"
+#include "WorldSession.h"
 #include "Battleground.h"
 #include "InstanceScript.h"
 #include "ArenaSpectator.h"
@@ -443,6 +443,8 @@ void Pet::Update(uint32 diff)
                     if (!spellInfo)
                         return;
                     float max_range = GetSpellMaxRangeForTarget(tempspellTarget, spellInfo);
+                    if (spellInfo->RangeEntry->type == SPELL_RANGE_MELEE)
+                        max_range -= 2*MIN_MELEE_REACH;
 
                     if (IsWithinLOSInMap(tempspellTarget) && GetDistance(tempspellTarget) < max_range)
                     {
