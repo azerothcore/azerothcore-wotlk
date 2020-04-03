@@ -140,9 +140,6 @@ function dbasm_assemble() {
 
     curTime=`date +%Y_%m_%d_%H_%M_%S`
 
-    # ALLOW FOR RECURSION WITH "**"
-    shopt -s globstar
-    
     if [ $with_base = true ]; then
         echo "" > $OUTPUT_FOLDER$database$suffix_base".sql"
 
