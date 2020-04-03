@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1585892474413237800');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1585927566208706590');
 
 -- add wp for Morin Cloudstalker
 SET @NPC := 26577;
