@@ -1,20 +1,13 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1586023897838741800');
 
 -- Delete queststarter for creature 20482
-DELETE FROM `creature_queststarter` WHERE  `id`=20482 AND `quest`=10975;
-DELETE FROM `creature_queststarter` WHERE  `id`=20482 AND `quest`=10976;
-DELETE FROM `creature_queststarter` WHERE  `id`=20482 AND `quest`=10977;
-DELETE FROM `creature_queststarter` WHERE  `id`=20482 AND `quest`=10981;
+DELETE FROM `creature_queststarter` WHERE `id` = 20482 AND `quest` IN (10975, 10976, 10977, 10981);
 
 -- Update queststarter for quest 10982 to 22919 (was previously set to 20482)
 UPDATE `creature_queststarter` SET `id`='22919' WHERE  `id`=20482 AND `quest`=10982;
 
 -- Delete questender for creature 20482
-DELETE FROM `creature_questender` WHERE  `id`=20482 AND `quest`=10975;
-DELETE FROM `creature_questender` WHERE  `id`=20482 AND `quest`=10976;
-DELETE FROM `creature_questender` WHERE  `id`=20482 AND `quest`=10977;
-DELETE FROM `creature_questender` WHERE  `id`=20482 AND `quest`=10981;
-DELETE FROM `creature_questender` WHERE  `id`=20482 AND `quest`=10982;
+DELETE FROM `creature_questender` WHERE `id` = 20482 AND `quest` IN (10975, 10976, 10977, 10981, 10982);
 
 /* Notes
 
