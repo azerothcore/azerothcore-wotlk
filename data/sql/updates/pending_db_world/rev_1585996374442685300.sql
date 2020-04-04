@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1585888188353605300');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1585996374442685300');
 
 -- fix creatures come together and don't move randomly
 UPDATE `creature` SET `position_x`=5608.7485, `position_y`=5587.217, `position_z`=-88.64437, `spawndist`=8, `MovementType`=1 WHERE `guid`=104560;
