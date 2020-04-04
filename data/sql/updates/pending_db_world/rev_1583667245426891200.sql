@@ -6,8 +6,8 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1583667245426891200');
 -- Bosses compared with Atlas Loot Enhanced ingame Addon & Online research sources:
 -- --------------------------------------------------------------------------------------------------------
 -- https://de.classic.wowhead.com/
+-- https://classicdb.ch/
 -- https://wotlk.evowow.com/
--- https://db.rising-gods.de/
 -- --------------------------------------------------------------------------------------------------------
 
 -- Ragefire Chasm (13-18)
@@ -46,7 +46,7 @@ UPDATE `creature_template` SET `mindmg` = 47, `maxdmg` = 63, `DamageModifier` = 
 
 -- The Deadmines (18-23)
 -- -------------------------------------------------------------------------------------------------------------------------------------------------
--- Brainwashed Noble (Entrance) (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=596 / https://db.rising-gods.de/?npc=596
+-- Brainwashed Noble (Entrance) (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=596 
 UPDATE `creature_template` SET `mindmg` = 19, `maxdmg` = 26, `DamageModifier` = 1 WHERE `entry` = 596;
 -- Marisa du'Paige (Entrance)
 UPDATE `creature_template` SET `mindmg` = 23, `maxdmg` = 33, `DamageModifier` = 1 WHERE `entry` = 599;
@@ -74,10 +74,8 @@ UPDATE `creature_template` SET `mindmg` = 47, `maxdmg` = 63, `DamageModifier` = 
 
 -- Shadowfang Keep (22-30)
 -- -------------------------------------------------------------------------------------------------------------------------------------------------
--- Fel Steed (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=3864 / https://db.rising-gods.de/?npc=3864
+-- Fel Steed (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=3864
 UPDATE `creature_template` SET `mindmg` = 49, `maxdmg` = 65, `DamageModifier` = 1 WHERE `entry` = 3864;
--- Shadow Charger (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=3865 / https://db.rising-gods.de/?npc=3865
-UPDATE `creature_template` SET `mindmg` = 203, `maxdmg` = 288, `DamageModifier` = 1 WHERE `entry` = 3865;
 -- Deathsworn Captain
 UPDATE `creature_template` SET `mindmg` = 49, `maxdmg` = 65, `DamageModifier` = 1 WHERE `entry` = 3872;
 -- Razorclaw the Butcher
@@ -101,7 +99,7 @@ UPDATE `creature_template` SET `mindmg` = 66, `maxdmg` = 76, `DamageModifier` = 
 -- -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Dextren Ward
 UPDATE `creature_template` SET `mindmg` = 73, `maxdmg` = 97, `DamageModifier` = 1 WHERE `entry` = 1663;
--- Kam Deepfury (Not listed in beastiary) Src: https://wotlk.evowow.com/?npc=1666 / https://db.rising-gods.de/?npc=1666
+-- Kam Deepfury (Not listed in beastiary) Src: https://wotlk.evowow.com/?npc=1666
 UPDATE `creature_template` SET `mindmg` = 65, `maxdmg` = 88, `DamageModifier` = 1 WHERE `entry` = 1666;
 -- Targorr the Dread
 UPDATE `creature_template` SET `mindmg` = 59, `maxdmg` = 78, `DamageModifier` = 1 WHERE `entry` = 1696;
@@ -133,14 +131,14 @@ UPDATE `creature_template` SET `mindmg` = 55, `maxdmg` = 72, `DamageModifier` = 
 
 -- Gnomeregan (29-38)
 -- -------------------------------------------------------------------------------------------------------------------------------------------------
--- Namdo Bizzfizzle (Entrance) (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=2683 / https://db.rising-gods.de/?npc=2683
+-- Namdo Bizzfizzle (Entrance) (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=2683
 UPDATE `creature_template` SET `mindmg` = 33, `maxdmg` = 44, `DamageModifier` = 1 WHERE `entry` = 2683;
 -- Techbot (Entrance)
 UPDATE `creature_template` SET `mindmg` = 37, `maxdmg` = 49, `DamageModifier` = 1 WHERE `entry` = 6231;
 -- -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Dark Iron Ambassador
 UPDATE `creature_template` SET `mindmg` = 94, `maxdmg` = 124, `DamageModifier` = 1 WHERE `entry` = 6228;
--- Crowd Pummeler 9-60 (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=6229 / https://db.rising-gods.de/?npc=6229
+-- Crowd Pummeler 9-60 (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=6229
 UPDATE `creature_template` SET `mindmg` = 74, `maxdmg` = 99, `DamageModifier` = 1 WHERE `entry` = 6229;
 -- Electrocutioner 6000
 UPDATE `creature_template` SET `mindmg` = 95, `maxdmg` = 126, `DamageModifier` = 1 WHERE `entry` = 6235;
@@ -178,7 +176,7 @@ UPDATE `creature_template` SET `mindmg` = 58, `maxdmg` = 77, `DamageModifier` = 
 UPDATE `creature_template` SET `mindmg` = 90, `maxdmg` = 104, `DamageModifier` = 1 WHERE `entry` = 3983;
 -- Bloodmage Thalnos
 UPDATE `creature_template` SET `mindmg` = 71, `maxdmg` = 94, `DamageModifier` = 1 WHERE `entry` = 4543;
--- Fallen Champion (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=6488 / https://db.rising-gods.de/?npc=6488
+-- Fallen Champion (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=6488
 UPDATE `creature_template` SET `mindmg` = 120, `maxdmg` = 161, `DamageModifier` = 1 WHERE `entry` = 6488;
 -- Ironspine
 UPDATE `creature_template` SET `mindmg` = 76, `maxdmg` = 101, `DamageModifier` = 1 WHERE `entry` = 6489;
@@ -230,7 +228,7 @@ UPDATE `creature_template` SET `mindmg` = 215, `maxdmg` = 286, `DamageModifier` 
 UPDATE `creature_template` SET `mindmg` = 197, `maxdmg` = 261, `DamageModifier` = 1 WHERE `entry` = 2748;
 -- Grimlok
 UPDATE `creature_template` SET `mindmg` = 130, `maxdmg` = 173, `DamageModifier` = 1 WHERE `entry` = 4854;
--- Baelog (Not listed in beastiary) Src: https://wotlk.evowow.com/?npc=6906 / https://db.rising-gods.de/?npc=6906
+-- Baelog (Not listed in beastiary) Src: https://wotlk.evowow.com/?npc=6906
 UPDATE `creature_template` SET `mindmg` = 148, `maxdmg` = 199, `DamageModifier` = 1 WHERE `entry` = 6906;
 -- Revelosh
 UPDATE `creature_template` SET `mindmg` = 101, `maxdmg` = 134, `DamageModifier` = 1 WHERE `entry` = 6910;
@@ -242,7 +240,7 @@ UPDATE `creature_template` SET `mindmg` = 158, `maxdmg` = 210, `DamageModifier` 
 UPDATE `creature_template` SET `mindmg` = 235, `maxdmg` = 312, `DamageModifier` = 1 WHERE `entry` = 7206;
 -- Ironaya 
 UPDATE `creature_template` SET `mindmg` = 354, `maxdmg` = 470, `DamageModifier` = 1 WHERE `entry` = 7228;
--- Galgann Firehammer (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=7291 / https://db.rising-gods.de/?npc=7291
+-- Galgann Firehammer (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=7291
 UPDATE `creature_template` SET `mindmg` = 125, `maxdmg` = 166, `DamageModifier` = 1 WHERE `entry` = 7291;
 
 -- Zul'Farrak (44-54)
@@ -271,7 +269,7 @@ UPDATE `creature_template` SET `mindmg` = 354, `maxdmg` = 470, `DamageModifier` 
 UPDATE `creature_template` SET `mindmg` = 305, `maxdmg` = 405, `DamageModifier` = 1 WHERE `entry` = 8127;
 -- Sandarr Dunereaver
 UPDATE `creature_template` SET `mindmg` = 189, `maxdmg` = 251, `DamageModifier` = 1 WHERE `entry` = 10080;
--- Dustwraith (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=10081 / https://db.rising-gods.de/?npc=10081
+-- Dustwraith (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=10081
 UPDATE `creature_template` SET `mindmg` = 583, `maxdmg` = 774, `DamageModifier` = 1 WHERE `entry` = 10081;
 -- Zerillis
 UPDATE `creature_template` SET `mindmg` = 189, `maxdmg` = 251, `DamageModifier` = 1 WHERE `entry` = 10082;
@@ -333,7 +331,7 @@ UPDATE `creature_template` SET `mindmg` = 169, `maxdmg` = 224, `DamageModifier` 
 UPDATE `creature_template` SET `mindmg` = 296, `maxdmg` = 393, `DamageModifier` = 1 WHERE `entry` = 5721;
 -- Hazzas
 UPDATE `creature_template` SET `mindmg` = 296, `maxdmg` = 393, `DamageModifier` = 1 WHERE `entry` = 5722;
--- Avatar of Hakkar (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=8443 / https://db.rising-gods.de/?npc=8443
+-- Avatar of Hakkar (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=8443
 UPDATE `creature_template` SET `mindmg` = 381, `maxdmg` = 518, `DamageModifier` = 1 WHERE `entry` = 8443;
 -- Atal'alarion
 UPDATE `creature_template` SET `mindmg` = 743, `maxdmg` = 986, `DamageModifier` = 1 WHERE `entry` = 8580;
@@ -402,7 +400,7 @@ UPDATE `creature_template` SET `mindmg` = 327, `maxdmg` = 434, `DamageModifier` 
 UPDATE `creature_template` SET `mindmg` = 331, `maxdmg` = 381, `DamageModifier` = 1 WHERE `entry` = 9499;
 -- Phalanx
 UPDATE `creature_template` SET `mindmg` = 658, `maxdmg` = 873, `DamageModifier` = 1 WHERE `entry` = 9502;
--- Hurley Blackbreath (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=9537 / https://db.rising-gods.de/?npc=9537
+-- Hurley Blackbreath (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=9537
 UPDATE `creature_template` SET `mindmg` = 705, `maxdmg` = 935, `DamageModifier` = 1 WHERE `entry` = 9537; 
 -- Ribbly Screwspigot
 UPDATE `creature_template` SET `mindmg` = 297, `maxdmg` = 394, `DamageModifier` = 1 WHERE `entry` = 9543; 
@@ -462,7 +460,7 @@ UPDATE `creature_template` SET `mindmg` = 1079, `maxdmg` = 1431, `DamageModifier
 UPDATE `creature_template` SET `mindmg` = 842, `maxdmg` = 1116, `DamageModifier` = 1 WHERE `entry` = 10429;
 -- The Beast 
 UPDATE `creature_template` SET `mindmg` = 1079, `maxdmg` = 1431, `DamageModifier` = 1 WHERE `entry` = 10430;
--- Jed Runewatcher (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=10509 / https://db.rising-gods.de/?npc=10509
+-- Jed Runewatcher (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=10509
 UPDATE `creature_template` SET `mindmg` = 762, `maxdmg` = 1010, `DamageModifier` = 1 WHERE `entry` = 10509;
 -- Goraluk Anvilcrack
 UPDATE `creature_template` SET `mindmg` = 635, `maxdmg` = 842, `DamageModifier` = 1 WHERE `entry` = 10899;
@@ -487,7 +485,7 @@ UPDATE `creature_template` SET `mindmg` = 624, `maxdmg` = 827, `DamageModifier` 
 UPDATE `creature_template` SET `mindmg` = 484, `maxdmg` = 641, `DamageModifier` = 1 WHERE `entry` = 10505;
 -- Kirtonos the Herald
 UPDATE `creature_template` SET `mindmg` = 1161, `maxdmg` = 1538, `DamageModifier` = 1 WHERE `entry` = 10506;
--- The Ravenian (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=10507 / https://db.rising-gods.de/?npc=10507
+-- The Ravenian (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=10507
 UPDATE `creature_template` SET `mindmg` = 362, `maxdmg` = 479, `DamageModifier` = 1 WHERE `entry` = 10507;
 -- Ras Frostwhisper
 UPDATE `creature_template` SET `mindmg` = 402, `maxdmg` = 532, `DamageModifier` = 1 WHERE `entry` = 10508;
@@ -518,8 +516,8 @@ UPDATE `creature_template` SET `mindmg` = 779, `maxdmg` = 1034, `DamageModifier`
 UPDATE `creature_template` SET `mindmg` = 448, `maxdmg` = 624, `DamageModifier` = 1 WHERE `entry` = 10438;
 -- Ramstein the Gorger
 UPDATE `creature_template` SET `mindmg` = 1190, `maxdmg` = 1578, `DamageModifier` = 1 WHERE `entry` = 10439;
--- Baron Rivendare (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=10440 / https://db.rising-gods.de/?npc=10440 
-UPDATE `creature_template` SET `mindmg` = 351, `maxdmg` = 465, `DamageModifier` = 1 WHERE `entry` = 10440;
+-- Baron Rivendare (Not listed in Beastiary) Src: https://classicdb.ch/?npc=10440
+UPDATE `creature_template` SET `mindmg` = 925, `maxdmg` = 1103 ,`DamageModifier` = 1 WHERE `entry` = 10440;
 -- The Unforgiven
 UPDATE `creature_template` SET `mindmg` = 362, `maxdmg` = 480, `DamageModifier` = 1 WHERE `entry` = 10516;
 -- Hearthsinger Forresten
@@ -540,7 +538,7 @@ UPDATE `creature_template` SET `mindmg` = 653, `maxdmg` = 865, `DamageModifier` 
 UPDATE `creature_template` SET `mindmg` = 899, `maxdmg` = 1193, `DamageModifier` = 1 WHERE `entry` = 11058;
 -- Crimson Hammersmith
 UPDATE `creature_template` SET `mindmg` = 624, `maxdmg` = 827, `DamageModifier` = 1 WHERE `entry` = 11120;
--- Black Guard Swordsmith (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=11121 / https://db.rising-gods.de/?npc=11121
+-- Black Guard Swordsmith (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=11121
 UPDATE `creature_template` SET `mindmg` = 448, `maxdmg` = 603, `DamageModifier` = 1 WHERE `entry` = 11121;
 -- Postmaster Malown
 UPDATE `creature_template` SET `mindmg` = 878, `maxdmg` = 1163, `DamageModifier` = 1 WHERE `entry` = 11143;
@@ -572,8 +570,8 @@ UPDATE `creature_template` SET `mindmg` = 755, `maxdmg` = 1000, `DamageModifier`
 -- -------------------------------------------------------------------------------------------------------------------------------------------------
 -- Tsu'zee
 UPDATE `creature_template` SET `mindmg` = 652, `maxdmg` = 864, `DamageModifier` = 1 WHERE `entry` = 11467;
--- Prince Tortheldrin (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=11486 / https://db.rising-gods.de/?npc=11486
-UPDATE `creature_template` SET `mindmg` = 395, `maxdmg` = 523, `DamageModifier` = 1 WHERE `entry` = 11486;
+-- Prince Tortheldrin (Not listed in Beastiary) Src: https://classicdb.ch/?npc=11486
+UPDATE `creature_template` SET `mindmg` = 854, `maxdmg` = 1015 ,`DamageModifier` = 1 WHERE `entry` = 11486;
 -- Magister Kalendris
 UPDATE `creature_template` SET `mindmg` = 677, `maxdmg` = 897, `DamageModifier` = 1 WHERE `entry` = 11487;
 -- Illyanna Ravenoak
@@ -601,8 +599,6 @@ UPDATE `creature_template` SET `mindmg` = 242, `maxdmg` = 320, `DamageModifier` 
 UPDATE `creature_template` SET `mindmg` = 847, `maxdmg` = 1122, `DamageModifier` = 1 WHERE `entry` = 14325;
 -- Guard Mol'dar
 UPDATE `creature_template` SET `mindmg` = 713, `maxdmg` = 945, `DamageModifier` = 1 WHERE `entry` = 14326;
--- Knot Thimblejack (Not listed in Beastiary) Src: https://wotlk.evowow.com/?npc=14338 / https://db.rising-gods.de/?npc=14338
-UPDATE `creature_template` SET `mindmg` = 321, `maxdmg` = 426, `DamageModifier` = 1 WHERE `entry` = 14338;
 
 -- -------------------------------------------------------------------------------------------------------------------------------------------------
 -- UPDATE rangedmg values based on the factor of increasing / decreasing `mindmg` and` maxdmg`
@@ -640,7 +636,6 @@ UPDATE `creature_template` SET `minrangedmg` = 48, `maxrangedmg` = 71 WHERE `ent
 UPDATE `creature_template` SET `minrangedmg` = 55, `maxrangedmg` = 81 WHERE `entry` = 3673;
 UPDATE `creature_template` SET `minrangedmg` = 41, `maxrangedmg` = 61 WHERE `entry` = 3674;
 UPDATE `creature_template` SET `minrangedmg` = 34, `maxrangedmg` = 49 WHERE `entry` = 3864;
-UPDATE `creature_template` SET `minrangedmg` = 143, `maxrangedmg` = 203 WHERE `entry` = 3865;
 UPDATE `creature_template` SET `minrangedmg` = 33, `maxrangedmg` = 47 WHERE `entry` = 3872;
 UPDATE `creature_template` SET `minrangedmg` = 79, `maxrangedmg` = 119 WHERE `entry` = 3886;
 UPDATE `creature_template` SET `minrangedmg` = 34, `maxrangedmg` = 52 WHERE `entry` = 3887;
@@ -792,7 +787,7 @@ UPDATE `creature_template` SET `minrangedmg` = 470, `maxrangedmg` = 687 WHERE `e
 UPDATE `creature_template` SET `minrangedmg` = 539, `maxrangedmg` = 794 WHERE `entry` = 10437;
 UPDATE `creature_template` SET `minrangedmg` = 404, `maxrangedmg` = 597 WHERE `entry` = 10438;
 UPDATE `creature_template` SET `minrangedmg` = 951, `maxrangedmg` = 1407 WHERE `entry` = 10439;
-UPDATE `creature_template` SET `minrangedmg` = 283, `maxrangedmg` = 419 WHERE `entry` = 10440;
+UPDATE `creature_template` SET `minrangedmg` = 746, `maxrangedmg` = 1104 WHERE `entry` = 10440;
 UPDATE `creature_template` SET `minrangedmg` = 435, `maxrangedmg` = 719 WHERE `entry` = 10502;
 UPDATE `creature_template` SET `minrangedmg` = 389, `maxrangedmg` = 581 WHERE `entry` = 10503;
 UPDATE `creature_template` SET `minrangedmg` = 432, `maxrangedmg` = 636 WHERE `entry` = 10504;
@@ -819,7 +814,7 @@ UPDATE `creature_template` SET `minrangedmg` = 362, `maxrangedmg` = 539 WHERE `e
 UPDATE `creature_template` SET `minrangedmg` = 607, `maxrangedmg` = 1004 WHERE `entry` = 11143;
 UPDATE `creature_template` SET `minrangedmg` = 593, `maxrangedmg` = 873 WHERE `entry` = 11261;
 UPDATE `creature_template` SET `minrangedmg` = 447, `maxrangedmg` = 658 WHERE `entry` = 11467;
-UPDATE `creature_template` SET `minrangedmg` = 316, `maxrangedmg` = 467 WHERE `entry` = 11486;
+UPDATE `creature_template` SET `minrangedmg` = 682, `maxrangedmg` = 1010 WHERE `entry` = 11486;
 UPDATE `creature_template` SET `minrangedmg` = 468, `maxrangedmg` = 774 WHERE `entry` = 11487;
 UPDATE `creature_template` SET `minrangedmg` = 402, `maxrangedmg` = 665 WHERE `entry` = 11488;
 UPDATE `creature_template` SET `minrangedmg` = 575, `maxrangedmg` = 847 WHERE `entry` = 11489;
@@ -851,7 +846,6 @@ UPDATE `creature_template` SET `minrangedmg` = 167, `maxrangedmg` = 277 WHERE `e
 UPDATE `creature_template` SET `minrangedmg` = 677, `maxrangedmg` = 1001 WHERE `entry` = 14325;
 UPDATE `creature_template` SET `minrangedmg` = 489, `maxrangedmg` = 720 WHERE `entry` = 14326;
 UPDATE `creature_template` SET `minrangedmg` = 373, `maxrangedmg` = 553 WHERE `entry` = 14327;
-UPDATE `creature_template` SET `minrangedmg` = 219, `maxrangedmg` = 325 WHERE `entry` = 14338;
 UPDATE `creature_template` SET `minrangedmg` = 245, `maxrangedmg` = 361 WHERE `entry` = 14349;
 UPDATE `creature_template` SET `minrangedmg` = 249, `maxrangedmg` = 369 WHERE `entry` = 14354;
 UPDATE `creature_template` SET `minrangedmg` = 777, `maxrangedmg` = 1151 WHERE `entry` = 14506;
