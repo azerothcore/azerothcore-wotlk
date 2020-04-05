@@ -1092,7 +1092,7 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, uint64* playe
         std::string name = extractPlayerNameFromLink(args);
         if (name.empty())
         {
-            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SendSysMessage(LANG_PLAYER_NOT_EXIST_OR_OFFLINE);
             SetSentErrorMessage(true);
             return false;
         }
