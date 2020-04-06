@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1586136135568974600');
 
 SET @OBJ := 188086;
-SET @GUID := @NPC * 10;
+SET @GUID := @OBJ * 10;
 DELETE FROM `gameobject` WHERE `guid`=@GUID;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`)
  VALUES 
