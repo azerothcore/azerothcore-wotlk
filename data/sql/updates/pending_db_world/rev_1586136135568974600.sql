@@ -2,6 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1586136135568974600');
 
 SET @OBJ := 188086;
 SET @GUID := @OBJ * 10;
+DELETE FROM `gameobject` WHERE `guid` = 268597 AND `id` = 188086;
 DELETE FROM `gameobject` WHERE `guid` IN (@GUID+0,@GUID+1,@GUID+2,@GUID+3,@GUID+4,@GUID+5,@GUID+6,@GUID+7,@GUID+8,@GUID+9,@GUID+10,@GUID+11,@GUID+12,@GUID+13,@GUID+14,@GUID+15,@GUID+16,@GUID+17,@GUID+18,@GUID+19);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`)
 VALUES 
