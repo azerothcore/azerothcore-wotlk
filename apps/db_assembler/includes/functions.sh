@@ -142,7 +142,7 @@ function dbasm_assemble() {
 
     # ALLOW FOR RECURSION WITH "**"
     shopt -s globstar
-
+    
     if [ $with_base = true ]; then
         echo "" > $OUTPUT_FOLDER$database$suffix_base".sql"
 
