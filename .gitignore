@@ -90,4 +90,7 @@ local.properties
 #  !modules/yourmodule
 #
 # ==================
-
+data/dbc
+data/mmaps
+data/vmaps
+data/maps
