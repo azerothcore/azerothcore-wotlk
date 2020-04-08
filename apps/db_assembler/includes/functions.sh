@@ -142,7 +142,7 @@ function dbasm_assemble() {
 
     # ALLOW FOR RECURSION WITH "**"
     shopt -s globstar
-    
+
     if [ $with_base = true ]; then
         echo "" > $OUTPUT_FOLDER$database$suffix_base".sql"
 
@@ -154,7 +154,7 @@ function dbasm_assemble() {
             do
                 echo "Searching on $d ..."
                 if [ ! -z $d ]; then
-                    for entry in "$d"/*.sql "$d"/**/*.sql
+                    for entry in "$d"/**/*.sql
                     do
                         if [[ -e $entry ]]; then
                             cat "$entry" >> $OUTPUT_FOLDER$database$suffix_base".sql"
@@ -177,7 +177,7 @@ function dbasm_assemble() {
             do
                 echo "Searching on $d ..."
                 if [ ! -z $d ]; then
-                    for entry in "$d"/*.sql "$d"/**/*.sql
+                    for entry in "$d"/**/*.sql
                     do
                         if [[ ! -e $entry ]]; then
                             continue
@@ -203,7 +203,7 @@ function dbasm_assemble() {
             do
                 echo "Searching on $d ..."
                 if [ ! -z $d ]; then
-                    for entry in "$d"/*.sql "$d"/**/*.sql
+                    for entry in "$d"/**/*.sql
                     do
                         if [[ ! -e $entry ]]; then
                             continue
