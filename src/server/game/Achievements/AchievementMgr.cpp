@@ -2219,22 +2219,22 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         MailDraft draft(reward->mailTemplate);
 
         if (!reward->mailTemplate)
-		{
-			std::string subject = reward->subject;
-			std::string text = reward->text;
-			
-			LocaleConstant localeConstant = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
-			if (localeConstant != LOCALE_enUS)
-			{
-				if(AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
-				{
-					ObjectMgr::GetLocaleString(loc->Subject, localeConstant, subject);
-					ObjectMgr::GetLocaleString(loc->Text, localeConstant, text);
-				}
-			}
-			
+        {
+            std::string subject = reward->subject;
+            std::string text = reward->text;
+            
+            LocaleConstant localeConstant = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
+            if (localeConstant != LOCALE_enUS)
+            {
+                if(AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
+                {
+                    ObjectMgr::GetLocaleString(loc->Subject, localeConstant, subject);
+                    ObjectMgr::GetLocaleString(loc->Text, localeConstant, text);
+                }
+            }
+          
             draft = MailDraft(subject, text);
-		}
+        }
 		
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
