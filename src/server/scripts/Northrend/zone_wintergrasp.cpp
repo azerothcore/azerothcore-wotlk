@@ -584,7 +584,7 @@ class npc_wg_quest_giver : public CreatureScript
                 if (!quest)
                     continue;
 
-                ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK, quest->GetQuestId());
+                ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_QUEST_AVAILABLE, quest->GetQuestId());
                 if (!sConditionMgr->IsObjectMeetToConditions(player, conditions))
                     continue;
 
@@ -612,7 +612,7 @@ class npc_wg_quest_giver : public CreatureScript
                 if (!quest)
                     continue;
 
-                ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK, quest->GetQuestId());
+                ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_QUEST_AVAILABLE, quest->GetQuestId());
                 if (!sConditionMgr->IsObjectMeetToConditions(player, conditions))
                     continue;
 
