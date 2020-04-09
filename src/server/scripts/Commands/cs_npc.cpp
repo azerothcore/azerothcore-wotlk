@@ -149,7 +149,7 @@ public:
             { "model",          SEC_ADMINISTRATOR,  false, &HandleNpcSetModelCommand,          "" },
             { "movetype",       SEC_ADMINISTRATOR,  false, &HandleNpcSetMoveTypeCommand,       "" },
             { "phase",          SEC_ADMINISTRATOR,  false, &HandleNpcSetPhaseCommand,          "" },
-            { "wanderdistance", SEC_ADMINISTRATOR,  false, &HandleNpcSetWanderDistanceCommand,      "" },
+            { "wanderdistance", SEC_ADMINISTRATOR,  false, &HandleNpcSetSpawnDistCommand,      "" },
             { "spawntime",      SEC_ADMINISTRATOR,  false, &HandleNpcSetSpawnTimeCommand,      "" },
             { "data",           SEC_ADMINISTRATOR,  false, &HandleNpcSetDataCommand,           "" },
             //{ TODO: fix or remove these commands
@@ -1107,7 +1107,7 @@ public:
     }
 
     //set spawn dist of creature
-    static bool HandleNpcSetWanderDistanceCommand(ChatHandler* handler, const char* args)
+    static bool HandleNpcSetSpawnDistCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
             return false;
