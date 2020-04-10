@@ -231,38 +231,53 @@ public:
 
         int flag = atoi((char*)args);
 
+        Unit* npc = handler->getSelectedCreature();
         Player* chr = handler->getSelectedPlayer();
-        if (!chr)
+
+        if (!npc)
+        {
+            if (!chr)
+            {
+                for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
+                {
+                    if (flag != 0)
+                        handler->GetSession()->GetPlayer()->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
+                    else
+                        handler->GetSession()->GetPlayer()->RemoveFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
+                }
+            }
+            else
+            {
+                for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
+                {
+                    if (flag != 0)
+                        chr->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
+                    else
+                        chr->RemoveFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
+                }
+            }
+
+            if (flag != 0)
+            {
+                handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_ALL, handler->GetNameLink(chr).c_str());
+                if (handler->needReportToTarget(chr))
+                    ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL, handler->GetNameLink().c_str());
+            }
+            else
+            {
+                handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_NOTHING, handler->GetNameLink(chr).c_str());
+                if (handler->needReportToTarget(chr))
+                    ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING, handler->GetNameLink().c_str());
+            }
+        }
+        else
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
             handler->SetSentErrorMessage(true);
             return false;
         }
-
-        if (flag != 0)
-        {
-            handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_ALL, handler->GetNameLink(chr).c_str());
-            if (handler->needReportToTarget(chr))
-                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL, handler->GetNameLink().c_str());
-        }
-        else
-        {
-            handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_NOTHING, handler->GetNameLink(chr).c_str());
-            if (handler->needReportToTarget(chr))
-                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING, handler->GetNameLink().c_str());
-        }
-
-        for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
-        {
-            if (flag != 0)
-                handler->GetSession()->GetPlayer()->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
-            else
-                handler->GetSession()->GetPlayer()->RemoveFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
-        }
-
         return true;
     }
-
 };
 
 void AddSC_cheat_commandscript()
