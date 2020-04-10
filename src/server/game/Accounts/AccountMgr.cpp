@@ -112,6 +112,10 @@ namespace AccountMgr
         stmt->setUInt32(0, accountId);
         trans->Append(stmt);
 
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_MUTEDEL);
+        stmt->setUInt32(0, accountId);
+        trans->Append(stmt);
+
         LoginDatabase.CommitTransaction(trans);
 
         return AOR_OK;
