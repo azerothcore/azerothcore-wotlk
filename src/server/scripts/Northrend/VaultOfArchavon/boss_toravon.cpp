@@ -95,6 +95,7 @@ public:
             events.ScheduleEvent(EVENT_FROZEN_ORB_STALKER, 12000);
             events.ScheduleEvent(EVENT_FREEZING_GROUND, 7000);
             events.ScheduleEvent(EVENT_CAST_WHITEOUT, 25000); // schedule FIRST whiteout event in 25 seconds -1 for compesate updateai 2seconds check delay
+           
             if (pInstance)
                 pInstance->SetData(EVENT_TORAVON, IN_PROGRESS);
         }
@@ -253,7 +254,6 @@ public:
         return new npc_frozen_orb_stalkerAI(creature);
     }
 };
-
 
 void AddSC_boss_toravon()
 {
