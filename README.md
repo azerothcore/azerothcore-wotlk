@@ -125,7 +125,7 @@ Feel free to join us on [our discord chat server][discord] where we taught a lot
 
 Installation instructions are available [here](http://www.azerothcore.org/wiki/Installation).
 
-We also have an auto-installation bash script [here](/apps/installer/main.sh)(*Warning: try it/analyze it before running it*).
+We also have an auto-installation bash script [here](/apps/installer/main.sh) (*Warning: try it/analyze it before running it*).
 
 Dockerization of AzerothCore is fully supported, and we have various community made tutorials (eg: AWS / Digital Ocean installation).
 
@@ -143,7 +143,7 @@ This project exists thanks to:
 
 - **The [AzerothCore developers and contributors](https://github.com/AzerothCore/azerothcore-wotlk/graphs/contributors)**
 - The [SunwellCore developers xinef and pussywizard](http://www.azerothcore.org/pages/sunwell.pl/)
-- All the [TrinityCore developers and contributors](https://github.com/TrinityCore/TrinityCore/blob/3.3.5/THANKS)
+- All the [TrinityCore developers and contributors](https://github.com/TrinityCore/TrinityCore/blob/3.3.5/AUTHORS)
 - All the [MaNGOS, ScriptDev2 and UDB developers and contributors](https://github.com/cmangos/mangos-wotlk/blob/master/AUTHORS.md)
 
 
@@ -154,7 +154,8 @@ This project exists thanks to:
 - [Module template / Module skeleton](https://github.com/azerothcore/skeleton-module/)
 - [Our community hub (Discord)](https://discord.gg/gkt4y2x)
 - [Our wiki](http://www.azerothcore.org/wiki "Easy to use and developed by AzerothCore founder")
-- [Our facebook page](https://www.facebook.com/AzerothCore/)
+- [Our Facebook page](https://www.facebook.com/AzerothCore/)
+- [Our LinkedIn page](https://www.linkedin.com/company/azerothcore/)
 
 
 ## SPONSORS

@@ -60,11 +60,17 @@ public:
             { "gender",         SEC_GAMEMASTER,      false, &HandleModifyGenderCommand,        "" },
             { "speed",          SEC_GAMEMASTER,      false, nullptr,                           "", modifyspeedCommandTable }
         };
+
+        static std::vector<ChatCommand> morphCommandTable =
+        {
+            { "reset",      SEC_GAMEMASTER,     false, &HandleMorphResetCommand, "" },
+            { "target",     SEC_GAMEMASTER,     false, &HandleMorphTargetCommand, "" }
+        };
+
         static std::vector<ChatCommand> commandTable =
         {
-            { "morph",          SEC_MODERATOR,      false, &HandleModifyMorphCommand,          "" },
-            { "demorph",        SEC_MODERATOR,      false, &HandleDeMorphCommand,              "" },
-            { "modify",         SEC_GAMEMASTER,     false, nullptr,                            "", modifyCommandTable }
+            { "morph",          SEC_MODERATOR,      false, nullptr,     "", morphCommandTable },
+            { "modify",         SEC_GAMEMASTER,     false, nullptr,     "", modifyCommandTable }
         };
         return commandTable;
     }
@@ -298,22 +304,12 @@ public:
 
         if (!pfactionid)
         {
-            if (target)
-            {
-                uint32 factionid = target->getFaction();
-                uint32 flag      = target->GetUInt32Value(UNIT_FIELD_FLAGS);
-                uint32 npcflag   = target->GetUInt32Value(UNIT_NPC_FLAGS);
-                uint32 dyflag    = target->GetUInt32Value(UNIT_DYNAMIC_FLAGS);
-                handler->PSendSysMessage(LANG_CURRENT_FACTION, target->GetGUIDLow(), factionid, flag, npcflag, dyflag);
-            }
+            uint32 factionid = target->getFaction();
+            uint32 flag      = target->GetUInt32Value(UNIT_FIELD_FLAGS);
+            uint32 npcflag   = target->GetUInt32Value(UNIT_NPC_FLAGS);
+            uint32 dyflag    = target->GetUInt32Value(UNIT_DYNAMIC_FLAGS);
+            handler->PSendSysMessage(LANG_CURRENT_FACTION, target->GetGUIDLow(), factionid, flag, npcflag, dyflag);
             return true;
-        }
-
-        if (!target)
-        {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
-            return false;
         }
 
         uint32 factionid = atoi(pfactionid);
@@ -1257,15 +1253,12 @@ public:
             handler->GetNameLink(target).c_str(), target->GetReputationMgr().GetReputation(factionEntry));
         return true;
     }
-
-    //morph creature or player
-    static bool HandleModifyMorphCommand(ChatHandler* handler, const char* args)
+    static bool HandleMorphTargetCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
             return false;
 
         uint32 display_id = (uint32)atoi((char*)args);
-
         Unit* target = handler->getSelectedUnit();
         if (!target)
             target = handler->GetSession()->GetPlayer();
@@ -1276,6 +1269,21 @@ public:
 
         target->SetDisplayId(display_id);
 
+        return true;
+    }
+
+    //morph creature or player
+    static bool HandleMorphResetCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+            target = handler->GetSession()->GetPlayer();
+
+        // check online security
+        else if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer(), 0))
+            return false;
+
+        target->DeMorph();
         return true;
     }
 
@@ -1392,21 +1400,6 @@ public:
         if (handler->needReportToTarget(target))
             (ChatHandler(target->GetSession())).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full, handler->GetNameLink().c_str());
 
-        return true;
-    }
-
-    //demorph player or unit
-    static bool HandleDeMorphCommand(ChatHandler* handler, const char* /*args*/)
-    {
-        Unit* target = handler->getSelectedUnit();
-        if (!target)
-            target = handler->GetSession()->GetPlayer();
-
-        // check online security
-        else if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer(), 0))
-            return false;
-
-        target->DeMorph();
         return true;
     }
 };

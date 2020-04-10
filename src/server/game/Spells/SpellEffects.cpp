@@ -2914,7 +2914,7 @@ void Spell::EffectEnchantItemPrismatic(SpellEffIndex effIndex)
     // support only enchantings with add socket in this slot
     {
         bool add_socket = false;
-        for (uint8 i = 0; i < MAX_ITEM_ENCHANTMENT_EFFECTS; ++i)
+        for (uint8 i = 0; i < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++i)
         {
             if (pEnchant->type[i] == ITEM_ENCHANTMENT_TYPE_PRISMATIC_SOCKET)
             {
@@ -3130,24 +3130,24 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
-
-    Player* owner = NULL;
-    if (m_originalCaster)
-    {
-        owner = m_originalCaster->ToPlayer();
-        if (!owner && m_originalCaster->ToCreature()->IsTotem())
-            owner = m_originalCaster->GetCharmerOrOwnerPlayerOrPlayerItself();
-    }
+    
+    if (!m_originalCaster)
+        return;
 
     uint32 petentry = m_spellInfo->Effects[effIndex].MiscValue;
     int32 duration = m_spellInfo->GetDuration();
+
     if(Player* modOwner = m_originalCaster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+
+    Player* owner = m_originalCaster->ToPlayer();
+    if (!owner && m_originalCaster->ToCreature()->IsTotem())
+        owner = m_originalCaster->GetCharmerOrOwnerPlayerOrPlayerItself();
 
     if (!owner)
     {
         SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(67);
-        if (properties && m_originalCaster)
+        if (properties)
         {
             // Xinef: unsummon old guardian
             if (Guardian* oldPet = m_originalCaster->GetGuardianPet())
@@ -4644,21 +4644,20 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
         default: return;
     }
 
-    uint64 guid = m_caster->m_ObjectSlot[slot];
-    if (guid != 0)
+    if (m_caster)
     {
-        GameObject* gameObject = NULL;
-        if (m_caster)
-            gameObject = m_caster->GetMap()->GetGameObject(guid);
-
-        if (gameObject)
+        uint64 guid = m_caster->m_ObjectSlot[slot];
+        if (guid != 0)
         {
-            // Recast case - null spell id to make auras not be removed on object remove from world
-            if (m_spellInfo->Id == gameObject->GetSpellId())
-                gameObject->SetSpellId(0);
-            m_caster->RemoveGameObject(gameObject, true);
+            if (GameObject* gameObject = m_caster->GetMap()->GetGameObject(guid))
+            {
+                // Recast case - null spell id to make auras not be removed on object remove from world
+                if (m_spellInfo->Id == gameObject->GetSpellId())
+                    gameObject->SetSpellId(0);
+                m_caster->RemoveGameObject(gameObject, true);
+            }
+            m_caster->m_ObjectSlot[slot] = 0;
         }
-        m_caster->m_ObjectSlot[slot] = 0;
     }
 
     GameObject* pGameObj = sObjectMgr->IsGameObjectStaticTransport(gameobjectId) ? new StaticTransport() : new GameObject();

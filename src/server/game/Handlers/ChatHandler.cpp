@@ -97,6 +97,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 return;
             }
     }
+	
+    if (sender->HasAura(1852) && type != CHAT_MSG_WHISPER)
+    {
+        SendNotification(GetAcoreString(LANG_GM_SILENCE), sender->GetName().c_str());
+        recvData.rfinish();
+        return;
+    }
 
     // prevent talking at unknown language (cheating)
     LanguageDesc const* langDesc = GetLanguageDescByID(lang);
@@ -172,12 +179,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 	            {
 		            std::string to, msg;
 		            recvData >> to >> msg;
-		            Player* receiver = ObjectAccessor::FindPlayerByName(to, false);
-
 		            if (msg.empty())
 			            return;
-
-		            sScriptMgr->OnPlayerChat(sender, type, lang, msg, receiver);
 	            }
 
 	            break;
@@ -239,14 +242,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
             sender->UpdateSpeakTime(specialMessageLimit);
     }
-
-    // pussywizard: optimization
-    /*if (sender->HasAura(1852) && type != CHAT_MSG_WHISPER)
-    {
-        SendNotification(GetAcoreString(LANG_GM_SILENCE), sender->GetName().c_str());
-        recvData.rfinish();
-        return;
-    }*/
 
     std::string to, channel, msg;
     bool ignoreChecks = false;
@@ -390,11 +385,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 }
 
             // pussywizard: optimization
-            /*if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
+            if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
             {
                 SendNotification(GetAcoreString(LANG_GM_SILENCE), GetPlayer()->GetName().c_str());
                 return;
-            }*/
+            }
 
             // If player is a Gamemaster and doesn't accept whisper, we auto-whitelist every player that the Gamemaster is talking to
             if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))

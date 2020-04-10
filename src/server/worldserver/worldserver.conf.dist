@@ -423,6 +423,18 @@ PersistentCharacterCleanFlags = 0
 PreloadAllNonInstancedMapGrids = 0
 
 #
+#    SetAllCreaturesWithWaypointMovementActive
+#        Description: Set all creatures with waypoint movement active. This means that they will start
+#                     movement once they are loaded (which happens on grid load) and keep moving even
+#                     when no player is near. This will increase CPU usage significantly and can be
+#                     used with enabled "PreloadAllNonInstancedMapGrids" to start waypoint movement on
+#                     server startup.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+SetAllCreaturesWithWaypointMovementActive = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -1327,6 +1339,14 @@ Quests.IgnoreAutoAccept = 0
 Quests.IgnoreAutoComplete = 0
 
 #
+#    Calendar.DeleteOldEventsHour
+#        Description: Hour of the day when the daily deletion of old calendar events occurs.
+#        Range:       0-23
+#        Default:     6 - (06:00 AM)
+
+Calendar.DeleteOldEventsHour = 6
+
+#
 #    Guild.EventLogRecordsCount
 #        Description: Number of log entries for guild events that are stored per guild. Old entries
 #                     will be overwritten if the number of log entries exceed the configured value.
@@ -1899,6 +1919,13 @@ ListenRange.TextEmote = 40
 #        Default:     300
 
 ListenRange.Yell = 300
+
+#    WaypointMovementStopTimeForPlayer
+#        Description: Specifies the time (in seconds) that a creature with waypoint
+#                     movement will wait after a player interacts with it.
+#        default:     120
+
+WaypointMovementStopTimeForPlayer = 120
 
 #
 ###################################################################################################
@@ -3365,3 +3392,39 @@ ICC.Buff.Alliance = 73828
 
 #
 ###################################################################################################
+
+###################################################################################################
+#
+# Packet Spoof Protection Settings
+#
+# These settings determine which action to take when harmful packet spoofing is detected.
+#
+#    PacketSpoof.Policy
+#        Description: Determines the course of action when packet spoofing is detected.
+#        Values:     0 - Log only 
+#                    1 - Log + kick
+#                    2 - Log + kick + ban
+
+PacketSpoof.Policy = 1
+
+#
+#    PacketSpoof.BanMode
+#        Description: If PacketSpoof.Policy equals 2, this will determine the ban mode.
+#        Values:     0 - Ban Account
+#                    1 - Ban IP
+#        Note: Banning by character not supported for logical reasons.
+#
+
+PacketSpoof.BanMode = 0
+
+#
+#    PacketSpoof.BanDuration
+#        Description: Duration of the ban in seconds. Only valid if PacketSpoof.Policy is set to 2.
+#                     Set to 0 for permanent ban.
+#        Default:     86400 seconds (1 day)
+#
+
+PacketSpoof.BanDuration = 86400
+
+#
+################################################################################################### 

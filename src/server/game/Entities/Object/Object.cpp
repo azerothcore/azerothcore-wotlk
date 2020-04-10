@@ -40,6 +40,7 @@
 #include "Group.h"
 #include "Chat.h"
 #include "DynamicVisibility.h"
+#include "ScriptMgr.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -970,7 +971,7 @@ elunaEvents(NULL),
 #endif
 LastUsedScriptID(0), m_name(""), m_isActive(false), m_isVisibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(NULL),
 m_transport(NULL), m_currMap(NULL), m_InstanceId(0),
-m_phaseMask(PHASEMASK_NORMAL), m_notifyflags(0), m_executed_notifies(0)
+m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
@@ -1012,7 +1013,7 @@ void WorldObject::setActive(bool on)
 
     m_isActive = on;
 
-    if (!IsInWorld())
+    if (on && !IsInWorld())
         return;
 
     Map* map = FindMap();
@@ -1056,7 +1057,7 @@ void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 void WorldObject::_Create(uint32 guidlow, HighGuid guidhigh, uint32 phaseMask)
 { 
     Object::_Create(guidlow, 0, guidhigh);
-    m_phaseMask = phaseMask;
+    SetPhaseMask(phaseMask, false);
 }
 
 uint32 WorldObject::GetZoneId(bool /*forceRecalc*/) const
@@ -1450,7 +1451,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
                 bool canSwim = ToCreature()->CanSwim();
                 float ground_z = z;
                 float max_z = canSwim
-                    ? GetMap()->GetWaterOrGroundLevel(x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK))
+                    ? GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK))
                     : ((ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true)));
                 if (max_z > INVALID_HEIGHT)
                 {
@@ -1474,7 +1475,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
             if (!ToPlayer()->CanFly())
             {
                 float ground_z = z;
-                float max_z = GetMap()->GetWaterOrGroundLevel(x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK));
+                float max_z = GetMap()->GetWaterOrGroundLevel(GetPhaseMask(),x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK));
                 if (max_z > INVALID_HEIGHT)
                 {
                     if (z > max_z)
@@ -1520,9 +1521,7 @@ float WorldObject::GetGridActivationRange() const
 
 float WorldObject::GetVisibilityRange() const
 { 
-    if (isActiveObject() && !ToPlayer())
-        return MAX_VISIBILITY_DISTANCE;
-    else if (IsVisibilityOverridden() && GetTypeId() == TYPEID_UNIT)
+    if (IsVisibilityOverridden() && GetTypeId() == TYPEID_UNIT)
         return MAX_VISIBILITY_DISTANCE;
     else if (GetTypeId() == TYPEID_GAMEOBJECT)
     {
@@ -1545,9 +1544,7 @@ float WorldObject::GetSightRange(const WorldObject* target) const
         {
             if (target)
             {
-                if (target->isActiveObject() && !target->ToPlayer())
-                    return MAX_VISIBILITY_DISTANCE;
-                else if (target->IsVisibilityOverridden() && target->GetTypeId() == TYPEID_UNIT)
+                if (target->IsVisibilityOverridden() && target->GetTypeId() == TYPEID_UNIT)
                     return MAX_VISIBILITY_DISTANCE;
                 else if (target->GetTypeId() == TYPEID_GAMEOBJECT)
                 {
@@ -2515,7 +2512,7 @@ void WorldObject::GetNearPoint2D(float &x, float &y, float distance2d, float abs
     acore::NormalizeMapCoord(y);
 }
 
-void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_size, float distance2d, float absAngle) const
+void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_size, float distance2d, float absAngle, float controlZ) const
 { 
     GetNearPoint2D(x, y, distance2d+searcher_size, absAngle);
     z = GetPositionZ();
@@ -2529,7 +2526,7 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
         return;
 
     // return if the point is already in LoS
-    if (IsWithinLOS(x, y, z))
+    if (!controlZ && IsWithinLOS(x, y, z))
         return;
 
     // remember first point
@@ -2543,6 +2540,9 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
         GetNearPoint2D(x, y, distance2d + searcher_size, absAngle + angle);
         z = GetPositionZ();
         UpdateAllowedPositionZ(x, y, z);
+        if (controlZ && fabsf(GetPositionZ() - z) > controlZ)
+            continue;
+
         if (IsWithinLOS(x, y, z))
             return;
     }
@@ -2551,6 +2551,12 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
     x = first_x;
     y = first_y;
     z = first_z;
+}
+
+void WorldObject::GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d /*= 0*/, float relAngle /*= 0*/, float controlZ /*= 0*/) const
+{
+    // angle calculated from current orientation
+    GetNearPoint(nullptr, x, y, z, size, distance2d, GetOrientation() + relAngle, controlZ);
 }
 
 bool WorldObject::GetClosePoint(float &x, float &y, float &z, float size, float distance2d, float angle, const WorldObject* forWho, bool force) const
@@ -2850,7 +2856,8 @@ void WorldObject::MovePositionToFirstCollisionForTotem(Position &pos, float dist
 }
 
 void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
-{ 
+{
+    sScriptMgr->OnBeforeWorldObjectSetPhaseMask(this, m_phaseMask, newPhaseMask, m_useCombinedPhases, update);
     m_phaseMask = newPhaseMask;
 
     if (update && IsInWorld())
