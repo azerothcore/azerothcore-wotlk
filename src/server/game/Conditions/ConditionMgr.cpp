@@ -1560,7 +1560,7 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
             }
             break;
         case CONDITION_SOURCE_TYPE_UNUSED_20:
-            sLog->outErrorDb("CONDITION_SOURCE_TYPE_UNUSED_20 is not in use.");
+            sLog->outErrorDb("CONDITION_SOURCE_TYPE_UNUSED_20 is not in use. SourceEntry = (%u), skipped", cond->SourceEntry);
             break;
         case CONDITION_SOURCE_TYPE_VEHICLE_SPELL:
         case CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT:
