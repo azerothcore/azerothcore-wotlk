@@ -457,7 +457,7 @@ enum SMART_ACTION
     SMART_ACTION_EVADE                              = 24,     // No Params
     SMART_ACTION_FLEE_FOR_ASSIST                    = 25,     // With Emote
     SMART_ACTION_CALL_GROUPEVENTHAPPENS             = 26,     // QuestID
-    SMART_ACTION_COMBAT_STOP                        = 27,     // 
+    SMART_ACTION_COMBAT_STOP                        = 27,     //
     SMART_ACTION_REMOVEAURASFROMSPELL               = 28,     // Spellid (0 removes all auras), charges (0 removes aura)
     SMART_ACTION_FOLLOW                             = 29,     // Distance (0 = default), Angle (0 = default), EndCreatureEntry, credit, creditType (0monsterkill, 1event)
     SMART_ACTION_RANDOM_PHASE                       = 30,     // PhaseId1, PhaseId2, PhaseId3...
@@ -1226,7 +1226,7 @@ enum SMARTAI_TARGETS
     SMART_TARGET_GAMEOBJECT_GUID                = 14,   // guid, entry
     SMART_TARGET_GAMEOBJECT_DISTANCE            = 15,   // entry(0any), maxDist
     SMART_TARGET_INVOKER_PARTY                  = 16,   // invoker's party members
-    SMART_TARGET_PLAYER_RANGE                   = 17,   // min, max, maxCount (maxCount by pussywizard)
+    SMART_TARGET_PLAYER_RANGE                   = 17,   // min, max, maxCount (maxCount by pussywizard), set target.o to 1 if u want to search for all in range if min, max fails
     SMART_TARGET_PLAYER_DISTANCE                = 18,   // maxDist
     SMART_TARGET_CLOSEST_CREATURE               = 19,   // CreatureEntry(0any), maxDist, dead?
     SMART_TARGET_CLOSEST_GAMEOBJECT             = 20,   // entry(0any), maxDist
@@ -1240,7 +1240,10 @@ enum SMARTAI_TARGETS
     SMART_TARGET_FARTHEST                       = 28,   // maxDist, playerOnly, isInLos
     SMART_TARGET_VEHICLE_PASSENGER              = 29,   // TODO: NOT SUPPORTED YET
 
-    SMART_TARGET_END                            = 30
+    SMART_TARGET_PLAYER_WITH_AURA               = 50,   // spellId, negation, MaxDist, MinDist, set target.o to a number to random resize the list
+    SMART_TARGET_RANDOM_POINT                   = 51,   // range, amount (for summoning creature), self als middle (0/1) else use xyz
+
+    SMART_TARGET_END                            = 52
 };
 
 struct SmartTarget
@@ -1363,6 +1366,21 @@ struct SmartTarget
             uint32 maxDist;
             uint32 playerOnly;
         } closestFriendly;
+
+        struct
+        {
+            uint32 range;
+            uint32 amount;
+            uint32 self;
+        } randomPoint;
+
+        struct
+        {
+            uint32 spellId;
+            uint32 negation;
+            uint32 distMax;
+            uint32 distMin;
+        } playerWithAura;
 
         struct
         {

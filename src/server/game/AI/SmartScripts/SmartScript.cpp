@@ -1532,6 +1532,28 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         if (!summoner)
             break;
 
+        if (e.GetTargetType() == SMART_TARGET_RANDOM_POINT)
+        {
+            float range = (float)e.target.randomPoint.range;
+            Position randomPoint;
+            Position srcPos = { e.target.x, e.target.y, e.target.z, e.target.o };
+            for (uint32 i = 0; i < e.target.randomPoint.amount; i++)
+            {
+                if (e.target.randomPoint.self > 0)
+                    me->GetRandomPoint(me->GetPosition(), range, randomPoint);
+                else
+                    me->GetRandomPoint(srcPos, range, randomPoint);
+                if (Creature* summon = summoner->SummonCreature(e.action.summonCreature.creature, randomPoint, (TempSummonType)e.action.summonCreature.type, e.action.summonCreature.duration))
+                {
+                    if (unit && e.action.summonCreature.attackInvoker)
+                        summon->AI()->AttackStart(unit);
+                    else if (me && e.action.summonCreature.attackScriptOwner)
+                        summon->AI()->AttackStart(me);
+                }
+            }
+            break;
+        }
+
         if (targets)
         {
             float x, y, z, o;
@@ -1871,6 +1893,20 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             break;
 
         WorldObject* target = NULL;
+
+        if (e.GetTargetType() == SMART_TARGET_RANDOM_POINT)
+        {
+            if (me)
+            {
+                float range = (float)e.target.randomPoint.range;
+                Position randomPoint;
+                Position srcPos = { e.target.x, e.target.y, e.target.z, e.target.o };
+                me->GetRandomPoint(srcPos, range, randomPoint);
+                me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, randomPoint.x, randomPoint.y, randomPoint.z, true, true, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+            }
+
+            break;
+        }
 
         /*if (e.GetTargetType() == SMART_TARGET_CREATURE_RANGE || e.GetTargetType() == SMART_TARGET_CREATURE_GUID ||
         e.GetTargetType() == SMART_TARGET_CREATURE_DISTANCE || e.GetTargetType() == SMART_TARGET_GAMEOBJECT_RANGE ||
@@ -2432,6 +2468,20 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
     }
     case SMART_ACTION_JUMP_TO_POS:
     {
+        if (e.GetTargetType() == SMART_TARGET_RANDOM_POINT)
+        {
+            if (me)
+            {
+                float range = (float)e.target.randomPoint.range;
+                Position randomPoint;
+                Position srcPos = { e.target.x, e.target.y, e.target.z, e.target.o };
+                me->GetRandomPoint(srcPos, range, randomPoint);
+                me->GetMotionMaster()->MoveJump(randomPoint, (float)e.action.jump.speedxy, (float)e.action.jump.speedz);
+            }
+
+            break;
+        }
+
         ObjectList* targets = GetTargets(e, unit);
         if (!targets)
             break;
@@ -3422,13 +3472,20 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
         // will always return a valid pointer, even if empty list
         ObjectList* units = GetWorldObjectsInDist((float)e.target.playerRange.maxDist);
         if (!units->empty() && GetBaseObject())
+        {
             for (ObjectList::const_iterator itr = units->begin(); itr != units->end(); ++itr)
-                if (IsPlayer(*itr) && GetBaseObject()->IsInRange(*itr, (float)e.target.playerRange.minDist, (float)e.target.playerRange.maxDist))
-                {
+                if (IsPlayer(*itr) && GetBaseObject()->IsInRange(*itr, (float)e.target.playerRange.minDist, (float)e.target.playerRange.maxDist) && (*itr)->ToPlayer()->IsAlive() && !(*itr)->ToPlayer()->IsGameMaster())
                     l->push_back(*itr);
-                    if (e.target.playerRange.maxCount && ++count >= e.target.playerRange.maxCount)
-                        break;
-                }
+
+            // If Orientation is also set and we didnt find targets, try it with all the range
+            if (l->empty() && e.target.o > 0)
+                for (ObjectList::const_iterator itr = units->begin(); itr != units->end(); ++itr)
+                    if (IsPlayer(*itr) && baseObject->IsInRange(*itr, 0.0f, float(e.target.playerRange.maxDist)) && (*itr)->ToPlayer()->IsAlive() && !(*itr)->ToPlayer()->IsGameMaster())
+                        l->push_back(*itr);
+
+            if (e.target.playerRange.maxCount > 0)
+                acore::Containers::RandomResizeList(*l, e.target.playerRange.maxCount);
+        }
 
         delete units;
         break;
@@ -3534,6 +3591,22 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
             if (Unit* target = DoFindClosestFriendlyInRange(e.target.closestFriendly.maxDist, e.target.closestFriendly.playerOnly))
                 l->push_back(target);
 
+        break;
+    }
+    case SMART_TARGET_PLAYER_WITH_AURA:
+    {
+        // will always return a valid pointer, even if empty list
+        ObjectList* units = GetWorldObjectsInDist(e.target.z ? e.target.z : float(e.target.playerWithAura.distMax));
+        for (ObjectList::const_iterator itr = units->begin(); itr != units->end(); ++itr)
+            if (IsPlayer(*itr) && (*itr)->ToPlayer()->IsAlive() && !(*itr)->ToPlayer()->IsGameMaster())
+                if (GetBaseObject()->IsInRange(*itr, (float)e.target.playerWithAura.distMin, (float)e.target.playerWithAura.distMax))
+                    if (bool(e.target.playerWithAura.negation) != (*itr)->ToPlayer()->HasAura(e.target.playerWithAura.spellId))
+                        l->push_back(*itr);
+
+        if (e.target.o > 0)
+            acore::Containers::RandomResizeList(*l, e.target.o);
+
+        delete units;
         break;
     }
     case SMART_TARGET_NONE:
@@ -4310,7 +4383,7 @@ void SmartScript::OnUpdate(uint32 const diff)
 void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at)
 {
     (void)at; // ensure that the variable is referenced even if extra logs are disabled in order to pass compiler checks
-    
+
     if (e.empty())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
