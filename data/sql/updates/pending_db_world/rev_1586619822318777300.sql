@@ -14,7 +14,7 @@ UPDATE `gameobject` SET `spawntimesecs` = 2 WHERE `guid` = 65527;
 -- Crazed Mana-Wyrm
 UPDATE `creature_template` SET `inhabittype`=`inhabittype`|2|4, `hoverheight` = 0 WHERE `entry` IN (26761,30521);
 DELETE FROM `creature` WHERE `guid` IN (126584,126585,126586,126587,126588,126589,126590,126591,126592,126593,126594,126595,126596,126597,126598);
-INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 
 (126584, 26761, 576, 0, 0, 3, 1, 23329, 0, 691.668, -302.82, 11.865, 2.37365, 3600, 5, 0, 951, 0, 1, 0, 0, 0, '', 0),
 (126585, 26761, 576, 0, 0, 3, 1, 23329, 0, 594.595, -311.187, 29.2439, 0.558505, 3600, 5, 0, 951, 0, 1, 0, 0, 0, '', 0),
 (126586, 26761, 576, 0, 0, 3, 1, 23329, 0, 630.482, -370.674, -8.66542, 1.27409, 3600, 5, 0, 951, 0, 1, 0, 0, 0, '', 0),
@@ -34,7 +34,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 -- Azure Skyrazor
 UPDATE `creature_template` SET `inhabittype`=`inhabittype`|2|4, `hoverheight` = 0 WHERE `entry` IN (26736,30518);
 DELETE FROM `creature` WHERE `guid` IN (126501,126502,126503,126504,126505,126506);
-INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 
 (126501, 26736, 576, 0, 0, 3, 1, 28080, 0, 721.425, -65.2332, -7.0575, 4.29351, 3600, 5, 0, 951, 0, 1, 0, 0, 0, '', 0),
 (126502, 26736, 576, 0, 0, 3, 1, 28080, 0, 578.682, -196.834, 3.08437, 4.69494, 3600, 5, 0, 951, 0, 1, 0, 0, 0, '', 0),
 (126503, 26736, 576, 0, 0, 3, 1, 28080, 0, 592.485, -58.6556, 13.7837, 5.34164, 3600, 5, 0, 951, 0, 1, 0, 0, 0, '', 0),
@@ -74,7 +74,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- Crazed Mana-Wraith
 DELETE FROM `creature` WHERE `GUID` IN (126522, 126523, 126524, 126525, 126526, 126527, 126528, 126529, 126530, 126531, 126532, 126533, 126534, 126535, 126536, 126537, 126538, 126539, 126540, 126541, 126542, 126543, 126544, 126545, 126546, 126547, 126548, 126549, 126550, 126551, 126552, 126553, 126554, 126555, 126556, 126557, 126558, 126559, 126560, 126561, 126562, 126563, 126564, 126565, 126566, 126567, 126568, 126569, 126570, 126571, 126572, 126573, 126574, 126575, 126576, 126577, 126578, 126579, 126580, 126581, 126582, 126583);
-INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 
 (126522, 26746, 576, 0, 0, 3, 1, 27810, 0, 595.397, -178.336, -27.6075, 4.01015, 3600, 5, 0, 5574, 29328, 1, 0, 0, 0, '', 0),
 (126523, 26746, 576, 0, 0, 3, 1, 27810, 0, 601.954, -183.935, -28.414, 0.697214, 3600, 5, 0, 5574, 29328, 1, 0, 0, 0, '', 0),
 (126524, 26746, 576, 0, 0, 3, 1, 27810, 0, 587.247, -171.544, -27.5525, 5.26858, 3600, 5, 0, 5574, 29328, 1, 0, 0, 0, '', 0),
