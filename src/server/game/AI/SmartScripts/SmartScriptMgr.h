@@ -1240,10 +1240,16 @@ enum SMARTAI_TARGETS
     SMART_TARGET_FARTHEST                       = 28,   // maxDist, playerOnly, isInLos
     SMART_TARGET_VEHICLE_PASSENGER              = 29,   // TODO: NOT SUPPORTED YET
 
+    SMART_TARGET_TC_END                         = 30,   // placeholder
+
+    // AC-only SmartTargets:
+
+    SMART_TARGET_AC_START                       = 49,   // placeholder
+
     SMART_TARGET_PLAYER_WITH_AURA               = 50,   // spellId, negation, MaxDist, MinDist, set target.o to a number to random resize the list
     SMART_TARGET_RANDOM_POINT                   = 51,   // range, amount (for summoning creature), self als middle (0/1) else use xyz
 
-    SMART_TARGET_END                            = 52
+    SMART_TARGET_AC_END                         = 52    // placeholder
 };
 
 struct SmartTarget

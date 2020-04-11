@@ -398,7 +398,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         default:
             break;
     }
-    if (e.target.type < 0 || e.target.type >= SMART_TARGET_END)
+    if (e.target.type < 0 || (e.target.type >= SMART_TARGET_TC_END && e.target.type < SMART_TARGET_AC_START) || e.target.type >= SMART_TARGET_AC_END)
     {
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an invalid target type (%u), skipped.",
                 e.entryOrGuid, e.event_id, e.GetTargetType());
