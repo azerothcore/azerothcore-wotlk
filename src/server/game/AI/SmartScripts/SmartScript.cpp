@@ -1822,6 +1822,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         if (!me)
             break;
 
+        if (e.action.orientation.random > 0)
+        {
+            float randomOri = frand(0.0f, 2 * M_PI);
+            me->SetFacingTo(randomOri);
+            if (e.action.orientation.quickChange)
+                me->SetOrientation(randomOri);
+            break;
+        }
+
         if (e.GetTargetType() == SMART_TARGET_SELF)
         {
             me->SetFacingTo((me->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && me->GetTransGUID() ? me->GetTransportHomePosition() : me->GetHomePosition()).GetOrientation());
