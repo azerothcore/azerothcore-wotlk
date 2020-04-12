@@ -1,50 +1,59 @@
 name: core-build
-on: [push]
+on:
+  push:
+  pull_request:
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [clang6, clang7]
+        modules: [with, without]
     runs-on: ubuntu-18.04
-    container: ubuntu:18.04
-    services:
-      mysql:
-        image: mysql:5.7
-        ports:
-          - 3306
-        env:
-          MYSQL_ROOT_PASSWORD: root
-        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+    name: ${{ matrix.compiler }}-${{ matrix.modules }}-modules
+    env:
+      COMPILER: ${{ matrix.compiler }}
     steps:
       - uses: actions/checkout@v2
+      - name: Checkout modules
+        run: ./apps/ci/ci-install-modules.sh
+        if: matrix.modules == 'with'
+      - name: Cache
+        uses: actions/cache@v1.1.2
         with:
-          fetch-depth: 1
-        
+          path: /home/runner/.ccache
+          key: ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
+          restore-keys: |
+            ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
+            ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules
+            ccache:${{ matrix.compiler }}
+            ccache
       - name: Configure OS
-        run: |
-          apt-get update -y
-          apt-get upgrade -y
-          apt-get install git lsb-release sudo -y
-          bash ./acore.sh install-deps
+        run: source ./apps/ci/ci-install.sh
         env:
           CONTINUOUS_INTEGRATION: true
-
       - name: Import db
+        run: source ./apps/ci/ci-import-db.sh
+      - name: Build
+        run: source ./apps/ci/ci-compile.sh
+      - name: Dry run
+        run: source ./apps/ci/ci-worldserver-dry-run.sh
+      - name: Check startup errors
+        run: source ./apps/ci/ci-error-check.sh
+
+  docker-build:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure
         run: |
-          echo "DB_CHARACTERS_CONF=\"MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='mysql';\"" >> ./conf/config.sh
-          echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='mysql';\"" >> ./conf/config.sh
-          echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='mysql';\"" >> ./conf/config.sh 
-          bash ./acore.sh "db-assembler" "import-all"
- 
+          docker --version
+          docker-compose --version
+          ./apps/ci/docker/ci-docker-config.sh
+          ./bin/acore-docker-generate-etc
       - name: Build
         run: |
-          echo "CCUSTOMOPTIONS='-DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=1 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=0 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=\"-Werror\" -DCMAKE_CXX_FLAGS=\"-Werror\"';" >> ./conf/config.sh
-          bash ./acore.sh compiler all
-          
-      - name: Dry run
-        run: |
-          echo "[worldserver]" >> ./env/dist/etc/worldserver.conf
-          echo "DataDir = \"./env/dist/data/\"" >> ./env/dist/etc/worldserver.conf
-          echo "LoginDatabaseInfo     = \"mysql;3306;root;root;acore_auth\"" >> ./env/dist/etc/worldserver.conf
-          echo "WorldDatabaseInfo     = \"mysql;3306;root;root;acore_world\"" >> ./env/dist/etc/worldserver.conf
-          echo "CharacterDatabaseInfo = \"mysql;3306;root;root;acore_characters\"" >> ./env/dist/etc/worldserver.conf
-          git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git ./env/dist/data
-          ./env/dist/bin/worldserver --dry-run
+          ./bin/acore-docker-build-no-scripts
