@@ -1190,9 +1190,9 @@ struct SmartAction
         struct
         {
             uint32 summonEntry;
-            uint32 summonDuration; // 0 -> permanent until dead
-            uint32 distanceBetweenRings; // Distance between rings (yard)
-            uint32 distanceBetweenSummons; // Distance between each summon in a row (yard)
+            uint32 summonDuration;
+            uint32 distanceBetweenRings;
+            uint32 distanceBetweenSummons;
             uint32 coneLength;
             uint32 coneAngle;
         } coneSummon;
@@ -1212,9 +1212,9 @@ struct SmartAction
 
         struct {
             uint32 summonEntry;
-            uint32 summonDuration; // 0 -> permanent until dead
-            uint32 a; // Skaliert die Spirale
-            uint32 k; // Aendert das aussehen (?)
+            uint32 summonDuration;
+            uint32 a;
+            uint32 k;
             uint32 r_max;
             uint32 phi_delta;
         } summonVortex;
