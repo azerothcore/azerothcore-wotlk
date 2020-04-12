@@ -73,10 +73,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-126435, 0, 2, 0, 60, 0, 100, 0, 10000, 10000, 10000, 10000, 0, 12, 26746, 4, 1000, 0, 1, 0, 8, 0, 0, 0, 0, 635.917, -206.815, -15.1531, 3.76991, 'Chaotic Rift - On Update - Summon Creature \'Crazed Mana-Wraith\'');
 
 -- Crazed Mana-Surge
-UPDATE `creature_template` SET `faction` = 1693 WHERE `entry` = 26737;
+UPDATE `creature_template` SET `faction` = 1693 WHERE `entry` IN (26737,30519);
 
 -- Crazed Mana-Wraith
-UPDATE `creature_template` SET `faction` = 1693 WHERE `entry` = 26746;
+UPDATE `creature_template` SET `faction` = 1693 WHERE `entry` IN (26746,30520);
 
 DELETE FROM `creature` WHERE `GUID` IN (126522, 126523, 126524, 126525, 126526, 126527, 126528, 126529, 126530, 126531, 126532, 126533, 126534, 126535, 126536, 126537, 126538, 126539, 126540, 126541, 126542, 126543, 126544, 126545, 126546, 126547, 126548, 126549, 126550, 126551, 126552, 126553, 126554, 126555, 126556, 126557, 126558, 126559, 126560, 126561, 126562, 126563, 126564, 126565, 126566, 126567, 126568, 126569, 126570, 126571, 126572, 126573, 126574, 126575, 126576, 126577, 126578, 126579, 126580, 126581, 126582, 126583);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 
