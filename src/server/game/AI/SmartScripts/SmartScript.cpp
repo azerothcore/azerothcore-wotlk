@@ -4141,7 +4141,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         {
             units->remove_if([](WorldObject* unit) { return unit->GetTypeId() != TYPEID_PLAYER; });
 
-            if (!(units->size() >= e.event.nearPlayerNegation.minCount))
+            if (units->size() < e.event.nearPlayerNegation.minCount)
                 ProcessAction(e, unit);
         }
         RecalcTimer(e, e.event.nearPlayerNegation.checkTimer, e.event.nearPlayerNegation.checkTimer);
