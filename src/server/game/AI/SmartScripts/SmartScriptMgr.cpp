@@ -870,6 +870,10 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             if (!IsSpellValid(e, e.action.crossCast.spell))
                 return false;
             break;
+        case SMART_ACTION_CUSTOM_CAST:
+            if (!IsSpellValid(e, e.action.castCustom.spell))
+                return false;
+            break;
         case SMART_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS:
         case SMART_ACTION_CALL_GROUPEVENTHAPPENS:
             if (Quest const* qid = sObjectMgr->GetQuestTemplate(e.action.quest.quest))
@@ -1208,6 +1212,10 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_STOP_MOTION:
         case SMART_ACTION_NO_ENVIRONMENT_UPDATE:
         case SMART_ACTION_ZONE_UNDER_ATTACK:
+        case SMART_ACTION_CONE_SUMMON:
+        case SMART_ACTION_VORTEX_SUMMON:
+        case SMART_ACTION_PLAYER_TALK:
+        case SMART_ACTION_CU_ENCOUNTER_START:
             break;
         default:
             sLog->outErrorDb("SmartAIMgr: Not handled action_type(%u), event_type(%u), Entry %d SourceType %u Event %u, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);
