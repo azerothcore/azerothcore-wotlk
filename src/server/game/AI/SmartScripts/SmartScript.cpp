@@ -3468,7 +3468,6 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
     }
     case SMART_TARGET_PLAYER_RANGE:
     {
-        uint32 count = 0;
         // will always return a valid pointer, even if empty list
         ObjectList* units = GetWorldObjectsInDist((float)e.target.playerRange.maxDist);
         if (!units->empty() && GetBaseObject())

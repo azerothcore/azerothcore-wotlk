@@ -1244,12 +1244,12 @@ enum SMARTAI_TARGETS
 
     // AC-only SmartTargets:
 
-    SMART_TARGET_AC_START                       = 49,   // placeholder
+    SMART_TARGET_AC_START                       = 200,  // placeholder
 
-    SMART_TARGET_PLAYER_WITH_AURA               = 50,   // spellId, negation, MaxDist, MinDist, set target.o to a number to random resize the list
-    SMART_TARGET_RANDOM_POINT                   = 51,   // range, amount (for summoning creature), self als middle (0/1) else use xyz
+    SMART_TARGET_PLAYER_WITH_AURA               = 201,  // spellId, negation, MaxDist, MinDist, set target.o to a number to random resize the list
+    SMART_TARGET_RANDOM_POINT                   = 202,  // range, amount (for summoning creature), self als middle (0/1) else use xyz
 
-    SMART_TARGET_AC_END                         = 52    // placeholder
+    SMART_TARGET_AC_END                         = 203   // placeholder
 };
 
 struct SmartTarget
