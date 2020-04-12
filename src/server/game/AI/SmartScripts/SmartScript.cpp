@@ -4119,6 +4119,34 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
 
         ProcessTimedAction(e, e.event.counter.cooldownMin, e.event.counter.cooldownMax);
         break;
+    case SMART_EVENT_NEAR_PLAYERS:
+    {
+        float range = (float)e.event.nearPlayer.radius;
+        ObjectList* units = GetWorldObjectsInDist(range);
+        if (!units->empty())
+        {
+            units->remove_if([](WorldObject* unit) { return unit->GetTypeId() != TYPEID_PLAYER; });
+
+            if (units->size() >= e.event.nearPlayer.minCount)
+                ProcessAction(e, unit);
+        }
+        RecalcTimer(e, e.event.nearPlayer.checkTimer, e.event.nearPlayer.checkTimer);
+        break;
+    }
+    case SMART_EVENT_NEAR_PLAYERS_NEGATION:
+    {
+        float range = (float)e.event.nearPlayerNegation.radius;
+        ObjectList* units = GetWorldObjectsInDist(range);
+        if (!units->empty())
+        {
+            units->remove_if([](WorldObject* unit) { return unit->GetTypeId() != TYPEID_PLAYER; });
+
+            if (!(units->size() >= e.event.nearPlayerNegation.minCount))
+                ProcessAction(e, unit);
+        }
+        RecalcTimer(e, e.event.nearPlayerNegation.checkTimer, e.event.nearPlayerNegation.checkTimer);
+        break;
+    }
     default:
         sLog->outErrorDb("SmartScript::ProcessEvent: Unhandled Event type %u", e.GetEventType());
         break;
@@ -4129,7 +4157,11 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
 {
     switch (e.GetEventType())
     {
-        //set only events which have initial timers
+    //set only events which have initial timers
+    case SMART_EVENT_NEAR_PLAYERS:
+    case SMART_EVENT_NEAR_PLAYERS_NEGATION:
+        RecalcTimer(e, e.event.nearPlayer.firstTimer, e.event.nearPlayer.firstTimer);
+        break;
     case SMART_EVENT_UPDATE:
     case SMART_EVENT_UPDATE_IC:
     case SMART_EVENT_UPDATE_OOC:
@@ -4188,6 +4220,8 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
         e.active = true;//activate events with cooldown
         switch (e.GetEventType())//process ONLY timed events
         {
+        case SMART_EVENT_NEAR_PLAYERS:
+        case SMART_EVENT_NEAR_PLAYERS_NEGATION:
         case SMART_EVENT_UPDATE:
         case SMART_EVENT_UPDATE_OOC:
         case SMART_EVENT_UPDATE_IC:
@@ -4310,7 +4344,7 @@ void SmartScript::OnUpdate(uint32 const diff)
 void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at)
 {
     (void)at; // ensure that the variable is referenced even if extra logs are disabled in order to pass compiler checks
-    
+
     if (e.empty())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
