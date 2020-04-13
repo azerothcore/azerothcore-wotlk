@@ -66,7 +66,7 @@ public:
 				if (Creature* barrett = instance->GetCreature(NPC_BarrettGUID))
 				{
 					barrett->SetVisible(false);
-					if (InstanceProgress == INSTANCE_PROGRESS_ANUB_ARAK && AttemptsLeft && EncounterStatus != IN_PROGRESS)
+					if (AttemptsLeft)
 						if (!ObjectAccessor::GetCreature(*barrett, NPC_AnubarakGUID))
 							barrett->SummonCreature(NPC_ANUBARAK, Locs[LOC_ANUB].GetPositionX(), Locs[LOC_ANUB].GetPositionY(), Locs[LOC_ANUB].GetPositionZ(), Locs[LOC_ANUB].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 630000000);
 				}
