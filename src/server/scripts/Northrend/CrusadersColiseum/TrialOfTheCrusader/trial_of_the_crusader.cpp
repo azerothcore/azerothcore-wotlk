@@ -45,6 +45,7 @@ public:
             case INSTANCE_PROGRESS_JARAXXUS_DEAD:
                 gossipTextId = MSG_CRUSADERS;
                 break;
+            case INSTANCE_PROGRESS_ANUB_ARAK:
             case INSTANCE_PROGRESS_DONE:
                 creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 return true;
