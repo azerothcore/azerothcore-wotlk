@@ -1,3 +1,19 @@
+-- DB update 2020_04_12_00 -> 2020_04_13_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_04_12_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_04_12_00 2020_04_13_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1583860566062662900'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1583860566062662900');
 
 UPDATE `quest_template_addon` SET `NextQuestID` = 0 WHERE `id` IN (10644,10633);
@@ -18,3 +34,12 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (19, 0, 10639, 0, 1, 8, 0, 10634, 0, 0, 0, 0, 0, '', 'Quest 10639 available if Quest 10634 AND'),
 (19, 0, 10639, 0, 1, 8, 0, 10635, 0, 0, 0, 0, 0, '', 'Quest 10639 available if Quest 10633 AND'),
 (19, 0, 10639, 0, 1, 8, 0, 10636, 0, 0, 0, 0, 0, '', 'Quest 10639 available if Quest 10636 Rewarded');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
