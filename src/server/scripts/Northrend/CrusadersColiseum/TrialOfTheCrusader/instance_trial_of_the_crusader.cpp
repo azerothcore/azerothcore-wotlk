@@ -61,31 +61,34 @@ public:
 
         void SpawnAnubArak()
 		{
-			if (Creature* barrett = instance->GetCreature(NPC_BarrettGUID))
+			if (InstanceProgress == INSTANCE_PROGRESS_ANUB_ARAK)
 			{
-				barrett->SetVisible(false);
-				if (InstanceProgress == INSTANCE_PROGRESS_ANUB_ARAK && AttemptsLeft && EncounterStatus != IN_PROGRESS)
-					if (!ObjectAccessor::GetCreature(*barrett, NPC_AnubarakGUID))
-						barrett->SummonCreature(NPC_ANUBARAK, Locs[LOC_ANUB].GetPositionX(), Locs[LOC_ANUB].GetPositionY(), Locs[LOC_ANUB].GetPositionZ(), Locs[LOC_ANUB].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 630000000);
-			}
-			
-			// move corpses
-			static const uint64 Npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
-			for (auto& i : Npcs)
-			{
-				if (Creature* c = instance->GetCreature(i))
+				if (Creature* barrett = instance->GetCreature(NPC_BarrettGUID))
 				{
-					if (c->GetGUID() == NPC_IcehowlGUID)
-						c->UpdatePosition(626.57f, 162.8f, 140.25f, 4.44f, true);
-					else if (c->GetGUID() == NPC_JaraxxusGUID)
-						c->UpdatePosition(603.92f, 102.61f, 141.85f, 1.4f, true);
-					else if (c->GetGUID() == NPC_LightbaneGUID)
-						c->UpdatePosition(634.58f, 147.16f, 140.5f, 3.02f, true);
-					else if (c->GetGUID() == NPC_DarkbaneGUID)
-						c->UpdatePosition(630.88f, 131.39f, 140.8f, 3.02f, true);
+					barrett->SetVisible(false);
+					if (InstanceProgress == INSTANCE_PROGRESS_ANUB_ARAK && AttemptsLeft && EncounterStatus != IN_PROGRESS)
+						if (!ObjectAccessor::GetCreature(*barrett, NPC_AnubarakGUID))
+							barrett->SummonCreature(NPC_ANUBARAK, Locs[LOC_ANUB].GetPositionX(), Locs[LOC_ANUB].GetPositionY(), Locs[LOC_ANUB].GetPositionZ(), Locs[LOC_ANUB].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 630000000);
+				}
 
-					c->StopMovingOnCurrentPos();
-					c->DestroyForNearbyPlayers();
+				// move corpses
+				static const uint64 Npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
+				for (auto& i : Npcs)
+				{
+					if (Creature* c = instance->GetCreature(i))
+					{
+						if (c->GetGUID() == NPC_IcehowlGUID)
+							c->UpdatePosition(626.57f, 162.8f, 140.25f, 4.44f, true);
+						else if (c->GetGUID() == NPC_JaraxxusGUID)
+							c->UpdatePosition(603.92f, 102.61f, 141.85f, 1.4f, true);
+						else if (c->GetGUID() == NPC_LightbaneGUID)
+							c->UpdatePosition(634.58f, 147.16f, 140.5f, 3.02f, true);
+						else if (c->GetGUID() == NPC_DarkbaneGUID)
+							c->UpdatePosition(630.88f, 131.39f, 140.8f, 3.02f, true);
+
+						c->StopMovingOnCurrentPos();
+						c->DestroyForNearbyPlayers();
+					}
 				}
 			}
 		}
@@ -1333,9 +1336,9 @@ public:
                             c->SetDisplayId(11686);
                             if( Creature* t = c->FindNearestCreature(NPC_WORLD_TRIGGER, 500.0f, true) )
                                 t->DespawnOrUnsummon();
-
+                            
+                            InstanceProgress = INSTANCE_PROGRESS_ANUB_ARAK;
                             SpawnAnubArak();
-							InstanceProgress = INSTANCE_PROGRESS_ANUB_ARAK;
                         }
                         events.PopEvent();
                         events.RescheduleEvent(EVENT_SCENE_410, 2000);
@@ -1432,7 +1435,7 @@ public:
                 InstanceCleanup();
                 
             // if missing spawn anub'arak 
-			SpawnAnubArak();
+            SpawnAnubArak();
 
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
         }
@@ -1552,7 +1555,7 @@ public:
 						}
 						else
 						{
-							c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+						    c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 							c->SetVisible(true);
 							c->SetFacingTo(c->GetOrientation());
 						}
