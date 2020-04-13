@@ -60,7 +60,7 @@ public:
         uint64 GO_FloorGUID;
 
         void SpawnAnubArak()
-		{
+        {
 			if (InstanceProgress == INSTANCE_PROGRESS_ANUB_ARAK)
 			{
 				if (Creature* barrett = instance->GetCreature(NPC_BarrettGUID))
@@ -91,7 +91,7 @@ public:
 					}
 				}
 			}
-		}
+        }
 
         bool IsValidDedicatedInsanityItem(const ItemTemplate* item)
         {
@@ -1549,16 +1549,16 @@ public:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                     {
                         if (InstanceProgress == INSTANCE_PROGRESS_ANUB_ARAK)
-						{
+                        {
 							c->SetVisible(false);
 							c->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-						}
-						else
-						{
+                        }
+                        else
+                        {
 						    c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 							c->SetVisible(true);
 							c->SetFacingTo(c->GetOrientation());
-						}
+                        }
                         if( Creature* t = c->FindNearestCreature(NPC_WORLD_TRIGGER, 500.0f, true) )
                             t->DespawnOrUnsummon();
                     }
