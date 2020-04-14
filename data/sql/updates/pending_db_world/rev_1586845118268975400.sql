@@ -1,7 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1586845118268975400');
 
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1586844502698710500');
-
 ALTER TABLE `holiday_dates` ADD COLUMN `holiday_duration` INT(10) UNSIGNED DEFAULT 0 NOT NULL AFTER `date_value`;
 UPDATE `holiday_dates` SET `holiday_duration`= 360 WHERE `id`= 327;
 
