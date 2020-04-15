@@ -234,7 +234,7 @@ enum ThorimEvents
 
     EVENT_DR_COMMONER_PM                    = 140,
     EVENT_DR_COMMONER_LB                    = 141,
-    EVENT_SIF_STAGE_TWO                    = 142,
+    EVENT_SIF_STAGE_TWO                     = 142,
 };
 
 const Position ArenaNPCs[] =
