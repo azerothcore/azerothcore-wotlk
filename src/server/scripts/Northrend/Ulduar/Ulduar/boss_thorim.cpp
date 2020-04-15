@@ -234,6 +234,7 @@ enum ThorimEvents
 
     EVENT_DR_COMMONER_PM                    = 140,
     EVENT_DR_COMMONER_LB                    = 141,
+	EVENT_SIF_STAGE_TWO                    = 142,	
 };
 
 const Position ArenaNPCs[] =
@@ -905,8 +906,14 @@ public:
                     events.ScheduleEvent(EVENT_SIF_BLIZZARD, 15000);
                     break;
                 case EVENT_SIF_FROSTBOLT_VALLEY:
-                    me->CastSpell(me, SPELL_FROSTBOLT_VALLEY, false);
+					_allowCast = false;
+                    events.ScheduleEvent(EVENT_SIF_STAGE_TWO, 1500);
                     events.RepeatEvent(13000);
+                    return;
+                case EVENT_SIF_STAGE_TWO:
+                    me->CastSpell(me, SPELL_FROSTBOLT_VALLEY, false);
+					_allowCast = true;
+					events.PopEvent();
                     return;
                 case EVENT_SIF_BLIZZARD:
                     me->SummonCreature(NPC_SIF_BLIZZARD, 2108.7f, -280.04f, 419.42f, 0, TEMPSUMMON_TIMED_DESPAWN, 30000);
