@@ -27591,7 +27591,7 @@ uint32 Player::GetSpec(int8 spec)
     if (m_specsCount) // not all instances of Player have a spec for some reason
     {
         if (spec < 0)
-            uint32 specIdx = m_activeSpec;
+            specIdx = m_activeSpec;
         else
             specIdx = spec;
         // find class talent tabs (all players have 3 talent tabs)
