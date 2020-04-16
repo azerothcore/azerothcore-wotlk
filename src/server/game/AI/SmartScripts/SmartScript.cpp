@@ -3616,6 +3616,48 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
         delete units;
         break;
     }
+    case SMART_TARGET_ROLE_SELECTION:
+    {
+        // will always return a valid pointer, even if empty list
+        ObjectList* units = GetWorldObjectsInDist(float(e.target.roleSelection.maxDist));
+        // 1 = Tanks, 2 = Healer, 4 = Damage
+        uint32 roleMask = e.target.roleSelection.roleMask;
+        for (ObjectList::const_iterator itr = units->begin(); itr != units->end(); ++itr)
+            if (Player* targetPlayer = (*itr)->ToPlayer())
+                if (targetPlayer->IsAlive() && !targetPlayer->IsGameMaster())
+                {
+                    if (roleMask & SMART_TARGET_ROLE_FLAG_TANKS)
+                    {
+                        if (targetPlayer->HasTankSpec())
+                        {
+                            l->push_back(*itr);
+                            continue;
+                        }
+                    }
+                    if (roleMask & SMART_TARGET_ROLE_FLAG_HEALERS)
+                    {
+                        if (targetPlayer->HasHealSpec())
+                        {
+                            l->push_back(*itr);
+                            continue;
+                        }
+                    }
+                    if (roleMask & SMART_TARGET_ROLE_FLAG_DAMAGERS)
+                    {
+                        if (targetPlayer->HasCasterSpec() || targetPlayer->HasMeleeSpec())
+                        {
+                            l->push_back(*itr);
+                            continue;
+                        }
+                    }
+                }
+
+        if (e.target.roleSelection.resize > 0)
+            acore::Containers::RandomResizeList(*l, e.target.roleSelection.resize);
+
+        delete units;
+        break;
+    }
     case SMART_TARGET_NONE:
     case SMART_TARGET_POSITION:
     default:

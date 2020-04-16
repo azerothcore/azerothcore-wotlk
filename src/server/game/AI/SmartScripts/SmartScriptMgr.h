@@ -1248,8 +1248,9 @@ enum SMARTAI_TARGETS
 
     SMART_TARGET_PLAYER_WITH_AURA               = 201,  // spellId, negation, MaxDist, MinDist, set target.o to a number to random resize the list
     SMART_TARGET_RANDOM_POINT                   = 202,  // range, amount (for summoning creature), self als middle (0/1) else use xyz
+    SMART_TARGET_ROLE_SELECTION                 = 203,  // Range Max, TargetMask (Tanks (1), Healer (2) Damage (4)), resize list
 
-    SMART_TARGET_AC_END                         = 203   // placeholder
+    SMART_TARGET_AC_END                         = 204   // placeholder
 };
 
 struct SmartTarget
@@ -1299,6 +1300,13 @@ struct SmartTarget
             uint32 entry;
             uint32 getFromHashMap; // Does not work in instances
         } unitGUID;
+
+        struct
+        {
+            uint32 maxDist;
+            uint32 roleMask;
+            uint32 resize;
+        } roleSelection;
 
         struct
         {
@@ -1396,6 +1404,13 @@ struct SmartTarget
             uint32 param4;
         } raw;
     };
+};
+
+enum SmartTargetRoleFlags
+{
+    SMART_TARGET_ROLE_FLAG_TANKS        = 0x001,
+    SMART_TARGET_ROLE_FLAG_HEALERS      = 0x002,
+    SMART_TARGET_ROLE_FLAG_DAMAGERS     = 0x004
 };
 
 enum eSmartAI
