@@ -1498,8 +1498,23 @@ public:
         // Subtract
         if (count < 0)
         {
-            playerTarget->DestroyItemCount(itemId, -count, true, false);
-            handler->PSendSysMessage(LANG_REMOVEITEM, itemId, -count, handler->GetNameLink(playerTarget).c_str());
+            if (!playerTarget->HasItemCount(itemId, 0))
+            {
+                // output that player don't have any items to destroy
+                handler->PSendSysMessage(LANG_REMOVEITEM_FAILURE, handler->GetNameLink(playerTarget).c_str(), itemId);
+            }
+            else if (!playerTarget->HasItemCount(itemId, -count))
+            {
+                // output that player don't have as many items that you want to destroy
+                handler->PSendSysMessage(LANG_REMOVEITEM_ERROR, handler->GetNameLink(playerTarget).c_str(), itemId);
+            }
+            else
+            {
+                // output successful amount of destroyed items
+                playerTarget->DestroyItemCount(itemId, -count, true, false);
+                handler->PSendSysMessage(LANG_REMOVEITEM, itemId, -count, handler->GetNameLink(playerTarget).c_str());
+            }
+
             return true;
         }
 
