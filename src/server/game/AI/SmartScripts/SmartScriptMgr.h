@@ -457,7 +457,7 @@ enum SMART_ACTION
     SMART_ACTION_EVADE                              = 24,     // No Params
     SMART_ACTION_FLEE_FOR_ASSIST                    = 25,     // With Emote
     SMART_ACTION_CALL_GROUPEVENTHAPPENS             = 26,     // QuestID
-    SMART_ACTION_COMBAT_STOP                        = 27,     // 
+    SMART_ACTION_COMBAT_STOP                        = 27,     //
     SMART_ACTION_REMOVEAURASFROMSPELL               = 28,     // Spellid (0 removes all auras), charges (0 removes aura)
     SMART_ACTION_FOLLOW                             = 29,     // Distance (0 = default), Angle (0 = default), EndCreatureEntry, credit, creditType (0monsterkill, 1event)
     SMART_ACTION_RANDOM_PHASE                       = 30,     // PhaseId1, PhaseId2, PhaseId3...
@@ -496,7 +496,7 @@ enum SMART_ACTION
     SMART_ACTION_SET_COUNTER                        = 63,     // id, value, reset (0/1)
     SMART_ACTION_STORE_TARGET_LIST                  = 64,     // varID,
     SMART_ACTION_WP_RESUME                          = 65,     // none
-    SMART_ACTION_SET_ORIENTATION                    = 66,     //
+    SMART_ACTION_SET_ORIENTATION                    = 66,     // quick change, random orientation? (0/1)
     SMART_ACTION_CREATE_TIMED_EVENT                 = 67,     // id, InitialMin, InitialMax, RepeatMin(only if it repeats), RepeatMax(only if it repeats), chance
     SMART_ACTION_PLAYMOVIE                          = 68,     // entry
     SMART_ACTION_MOVE_TO_POS                        = 69,     // PointId (optional x,y,z offset), transport, controlled, ContactDistance
@@ -590,7 +590,13 @@ enum SMART_ACTION
     SMART_ACTION_MUSIC                              = 216,    // SoundId, onlySelf, type
     SMART_ACTION_RANDOM_MUSIC                       = 217,    // SoundId1, SoundId2, SoundId3, SoundId4, onlySelf, type
 
-    SMART_ACTION_AC_END                             = 218,    // placeholder
+    SMART_ACTION_CUSTOM_CAST                        = 218,    // spellId, castflag, bp0, bp1, bp2
+    SMART_ACTION_CONE_SUMMON                        = 219,    // entry, duration (0 = perm), dist between rings, dist between earch summon in a row, length of cone, width of cone (angle)
+    SMART_ACTION_PLAYER_TALK                        = 220,    // acore_string.entry, yell? (0/1)
+    SMART_ACTION_VORTEX_SUMMON                      = 221,    // entry, duration (0 = perm), spiral scaling, spiral appearance, range max, phi_delta     <-- yes confusing math, try it ingame and see, my lovely AC boys!
+    SMART_ACTION_CU_ENCOUNTER_START                 = 222,    // Resets cooldowns on all targets and removes Heroism debuff(s)
+
+    SMART_ACTION_AC_END                             = 223,    // placeholder
 };
 
 struct SmartAction
@@ -1173,6 +1179,7 @@ struct SmartAction
         struct
         {
             uint32 quickChange;
+            uint32 random;
         } orientation;
 
         struct
@@ -1180,6 +1187,38 @@ struct SmartAction
             uint32 stopMovement;
             uint32 movementExpired;
         } stopMotion;
+
+        struct
+        {
+            uint32 summonEntry;
+            uint32 summonDuration;
+            uint32 distanceBetweenRings;
+            uint32 distanceBetweenSummons;
+            uint32 coneLength;
+            uint32 coneAngle;
+        } coneSummon;
+
+        struct {
+            uint32 textId;
+            uint32 flag;
+        } playerTalk;
+
+        struct {
+            uint32 spell;
+            uint32 flags;
+            uint32 bp1;
+            uint32 bp2;
+            uint32 bp3;
+        } castCustom;
+
+        struct {
+            uint32 summonEntry;
+            uint32 summonDuration;
+            uint32 a;
+            uint32 k;
+            uint32 r_max;
+            uint32 phi_delta;
+        } summonVortex;
 
         //! Note for any new future actions
         //! All parameters must have type uint32
