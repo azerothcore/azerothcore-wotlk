@@ -167,7 +167,15 @@ enum SMART_EVENT
     SMART_EVENT_DISTANCE_GAMEOBJECT      = 76,      // guid, entry, distance, repeat
     SMART_EVENT_COUNTER_SET              = 77,      // id, value, cooldownMin, cooldownMax
 
-    SMART_EVENT_END                      = 78
+    SMART_EVENT_TC_END                   = 78,
+
+    /* AC Custom Events */
+    SMART_EVENT_AC_START                 = 100,
+
+    SMART_EVENT_NEAR_PLAYERS             = 101,      // min, radius, first timer, check timer
+    SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // min, radius, first timer, check timer
+
+    SMART_EVENT_AC_END                   = 103
 };
 
 struct SmartEvent
@@ -408,6 +416,22 @@ struct SmartEvent
             uint32 cooldownMin;
             uint32 cooldownMax;
         } counter;
+
+        struct
+        {
+            uint32 minCount;
+            uint32 radius;
+            uint32 firstTimer;
+            uint32 checkTimer;
+        } nearPlayer;
+
+        struct
+        {
+            uint32 minCount;
+            uint32 radius;
+            uint32 firstTimer;
+            uint32 checkTimer;
+        } nearPlayerNegation;
 
         struct
         {
@@ -1466,7 +1490,7 @@ const uint32 SmartAITypeMask[SMART_SCRIPT_TYPE_MAX][2] =
     {SMART_SCRIPT_TYPE_TIMED_ACTIONLIST,    SMART_SCRIPT_TYPE_MASK_TIMED_ACTIONLIST }
 };
 
-const uint32 SmartAIEventMask[SMART_EVENT_END][2] =
+const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
 {
     {SMART_EVENT_UPDATE_IC,                 SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_TIMED_ACTIONLIST},
     {SMART_EVENT_UPDATE_OOC,                SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT + SMART_SCRIPT_TYPE_MASK_INSTANCE },
@@ -1545,7 +1569,32 @@ const uint32 SmartAIEventMask[SMART_EVENT_END][2] =
     {SMART_EVENT_FRIENDLY_HEALTH_PCT,       SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_DISTANCE_CREATURE,         SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_DISTANCE_GAMEOBJECT,       SMART_SCRIPT_TYPE_MASK_CREATURE },
-    {SMART_EVENT_COUNTER_SET,               SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT }
+    {SMART_EVENT_COUNTER_SET,               SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    { 0, 0 }, // 78
+    { 0, 0 }, // 79
+    { 0, 0 }, // 80
+    { 0, 0 }, // 81
+    { 0, 0 }, // 82
+    { 0, 0 }, // 83
+    { 0, 0 }, // 84
+    { 0, 0 }, // 85
+    { 0, 0 }, // 86
+    { 0, 0 }, // 87
+    { 0, 0 }, // 88
+    { 0, 0 }, // 89
+    { 0, 0 }, // 90
+    { 0, 0 }, // 91
+    { 0, 0 }, // 92
+    { 0, 0 }, // 93
+    { 0, 0 }, // 94
+    { 0, 0 }, // 95
+    { 0, 0 }, // 96
+    { 0, 0 }, // 97
+    { 0, 0 }, // 98
+    { 0, 0 }, // 99
+    { 0, 0 }, // 100
+    {SMART_EVENT_NEAR_PLAYERS,              SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_NEAR_PLAYERS_NEGATION,     SMART_SCRIPT_TYPE_MASK_CREATURE }
 };
 
 enum SmartEventFlags
