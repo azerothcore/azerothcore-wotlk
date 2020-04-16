@@ -203,8 +203,8 @@ m_bind(NULL)
     memset(m_bind, 0, sizeof(MYSQL_BIND)*m_paramCount);
 
     /// "If set to 1, causes mysql_stmt_store_result() to update the metadata MYSQL_FIELD->max_length value."
-    my_bool bool_tmp = 1;
-    mysql_stmt_attr_set(stmt, STMT_ATTR_UPDATE_MAX_LENGTH, &bool_tmp);
+    bool tmp = 1;
+    mysql_stmt_attr_set(stmt, STMT_ATTR_UPDATE_MAX_LENGTH, &tmp);
 }
 
 MySQLPreparedStatement::~MySQLPreparedStatement()
