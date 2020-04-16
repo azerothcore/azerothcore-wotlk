@@ -72,7 +72,7 @@ public:
                 }
 
                 // move corpses
-                static const uint64 npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
+                const uint64 npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
                 for (const uint64 i : npcs)
                 {
                     if (Creature* c = instance->GetCreature(i))
