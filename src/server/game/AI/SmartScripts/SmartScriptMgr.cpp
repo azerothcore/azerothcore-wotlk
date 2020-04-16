@@ -354,7 +354,7 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
 
 bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
 {
-    if (e.event.type >= SMART_EVENT_END)
+    if ((e.event.type >= SMART_EVENT_TC_END && e.event.type <= SMART_EVENT_AC_START) || e.event.type >= SMART_EVENT_AC_END)
     {
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has invalid event type (%u), skipped.", e.entryOrGuid, e.event_id, e.GetEventType());
         return false;
@@ -716,6 +716,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 break;
             case SMART_EVENT_GO_STATE_CHANGED:
             case SMART_EVENT_GO_EVENT_INFORM:
+            case SMART_EVENT_NEAR_PLAYERS:
+            case SMART_EVENT_NEAR_PLAYERS_NEGATION:
             case SMART_EVENT_TIMED_EVENT_TRIGGERED:
             case SMART_EVENT_INSTANCE_PLAYER_ENTER:
             case SMART_EVENT_TRANSPORT_RELOCATE:
