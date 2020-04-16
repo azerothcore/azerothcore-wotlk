@@ -396,7 +396,7 @@ void ObjectMgr::LoadCreatureTemplates()
     //                                           9       10      11       12           13           14        15     16      17          18       19         20         21
                                              "modelid4, name, subname, IconName, gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, "
     //                                         22     23     24     25        26          27             28              29                30           31          32          33
-                                             "scale, rank, mindmg, maxdmg, dmgschool, attackpower, DamageModifier, BaseAttackTime, RangeAttackTime, unit_class, unit_flags, unit_flags2, "
+                                             "scale, `rank`, mindmg, maxdmg, dmgschool, attackpower, DamageModifier, BaseAttackTime, RangeAttackTime, unit_class, unit_flags, unit_flags2, "
     //                                             34         35         36             37             38             39          40           41              42           43
                                              "dynamicflags, family, trainer_type, trainer_spell, trainer_class, trainer_race, minrangedmg, maxrangedmg, rangedattackpower, type, "
     //                                            44        45          46           47          48          49           50           51           52           53         54
