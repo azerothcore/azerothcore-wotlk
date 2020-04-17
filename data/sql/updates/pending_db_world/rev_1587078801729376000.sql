@@ -16,7 +16,7 @@ UPDATE `quest_template_addon` SET `PrevQuestID` = 13346 WHERE `ID` = 13350; -- N
 UPDATE `quest_template_addon` SET `PrevQuestID` = 13321 WHERE `ID` = 13322; -- Retest Now (daily) requires Retest Now (non-daily)
 UPDATE `quest_template_addon` SET `PrevQuestID` = 13341 WHERE `ID` IN (13284, 13309); -- Assault by Air and Assault by Ground require Joining the Assault
 
-DELETE FROM `quest_template_addon` WHERE `ID` IN (13294, 13231, 13296, 13286, 13290, 13298, 13315, 13319, 13318, 13334, 13339, 13338, 13345, 13341,13233);
+DELETE FROM `quest_template_addon` WHERE `ID` IN (13294, 13231, 13296, 13286, 13290, 13298, 13315, 13319, 13318, 13334, 13339, 13338, 13345, 13341);
 INSERT INTO `quest_template_addon` (`ID`, `PrevQuestID`) VALUES
 (13294, 13287), -- Against the Giants requires Poke and Prod
 (13231, 13225), -- The Broken Front requires The Skybreaker
@@ -31,8 +31,11 @@ INSERT INTO `quest_template_addon` (`ID`, `PrevQuestID`) VALUES
 (13339, 13335), -- Shatter the Shards requires Before the Gate of Horror
 (13338, 13335), -- The Guardians of Corp'rethar requires Before the Gate of Horror
 (13345, 13318), -- Need More Info requires Drag and Drop (non-daily)
-(13341, 13225), -- Joining the Assault requires The Skybreaker
-(13233, 13231); -- No Mercy! requires The Broken Front
+(13341, 13225); -- Joining the Assault requires The Skybreaker
+
+DELETE FROM `quest_template_addon` WHERE `id` = 13233;
+INSERT INTO `quest_template_addon` (`id`, `PrevQuestID`, `SpecialFlags`) VALUES
+(13233, 13231, 1); -- No Mercy! requires The Broken Front
 
 UPDATE `quest_template_addon` SET `PrevQuestID` = 0 WHERE `ID` IN (13335,13337);
 UPDATE `quest_template_addon` SET `NextQuestID` = 13335, `ExclusiveGroup` = -13335 WHERE `ID` IN (13334, 13337); -- Before the Gates of Horror requires Bloodspattered Banners and The Ironwall Rampart
