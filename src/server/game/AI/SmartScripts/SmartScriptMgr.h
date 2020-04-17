@@ -481,7 +481,7 @@ enum SMART_ACTION
     SMART_ACTION_EVADE                              = 24,     // No Params
     SMART_ACTION_FLEE_FOR_ASSIST                    = 25,     // With Emote
     SMART_ACTION_CALL_GROUPEVENTHAPPENS             = 26,     // QuestID
-    SMART_ACTION_COMBAT_STOP                        = 27,     //
+    SMART_ACTION_COMBAT_STOP                        = 27,     // No Params
     SMART_ACTION_REMOVEAURASFROMSPELL               = 28,     // Spellid (0 removes all auras), charges (0 removes aura)
     SMART_ACTION_FOLLOW                             = 29,     // Distance (0 = default), Angle (0 = default), EndCreatureEntry, credit, creditType (0monsterkill, 1event)
     SMART_ACTION_RANDOM_PHASE                       = 30,     // PhaseId1, PhaseId2, PhaseId3...
@@ -492,7 +492,7 @@ enum SMART_ACTION
     SMART_ACTION_SET_INST_DATA64                    = 35,     // Field,
     SMART_ACTION_UPDATE_TEMPLATE                    = 36,     // Entry, UpdateLevel
     SMART_ACTION_DIE                                = 37,     // No Params
-    SMART_ACTION_SET_IN_COMBAT_WITH_ZONE            = 38,     // No Params
+    SMART_ACTION_SET_IN_COMBAT_WITH_ZONE            = 38,     // Range (if outside of dungeon)
     SMART_ACTION_CALL_FOR_HELP                      = 39,     // Radius, With Emote
     SMART_ACTION_SET_SHEATH                         = 40,     // Sheath (0-unarmed, 1-melee, 2-ranged)
     SMART_ACTION_FORCE_DESPAWN                      = 41,     // timer
@@ -732,6 +732,11 @@ struct SmartAction
         {
             uint32 alternative;
         } activateObject;
+
+        struct
+        {
+            uint32 range;
+        } combatZone;
 
         struct
         {
