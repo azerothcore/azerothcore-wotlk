@@ -1324,9 +1324,24 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         if (!targets)
             break;
 
-        for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
-            if (IsCreature(*itr))
-                (*itr)->ToCreature()->SetInCombatWithZone();
+        if (!me->GetMap()->IsDungeon())
+        {
+            ObjectList* units = GetWorldObjectsInDist((float)e.action.combatZone.range);
+            if (!units->empty() && GetBaseObject())
+                for (ObjectList::const_iterator itr = units->begin(); itr != units->end(); ++itr)
+                    if (IsPlayer(*itr) && !(*itr)->ToPlayer()->isDead())
+                    {
+                        me->SetInCombatWith((*itr)->ToPlayer());
+                        (*itr)->ToPlayer()->SetInCombatWith(me);
+                        me->AddThreat((*itr)->ToPlayer(), 0.0f);
+                    }
+        }
+        else
+        {
+            for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+                if (IsCreature(*itr))
+                    (*itr)->ToCreature()->SetInCombatWithZone();
+        }
 
         delete targets;
         break;
