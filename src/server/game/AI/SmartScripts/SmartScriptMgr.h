@@ -1294,7 +1294,7 @@ enum SMARTAI_TARGETS
     SMART_TARGET_GAMEOBJECT_GUID                = 14,   // guid, entry
     SMART_TARGET_GAMEOBJECT_DISTANCE            = 15,   // entry(0any), maxDist
     SMART_TARGET_INVOKER_PARTY                  = 16,   // invoker's party members
-    SMART_TARGET_PLAYER_RANGE                   = 17,   // min, max, maxCount (maxCount by pussywizard)
+    SMART_TARGET_PLAYER_RANGE                   = 17,   // min, max, maxCount (maxCount by pussywizard), set target.o to 1 if u want to search for all in range if min, max fails
     SMART_TARGET_PLAYER_DISTANCE                = 18,   // maxDist
     SMART_TARGET_CLOSEST_CREATURE               = 19,   // CreatureEntry(0any), maxDist, dead?
     SMART_TARGET_CLOSEST_GAMEOBJECT             = 20,   // entry(0any), maxDist
@@ -1308,7 +1308,17 @@ enum SMARTAI_TARGETS
     SMART_TARGET_FARTHEST                       = 28,   // maxDist, playerOnly, isInLos
     SMART_TARGET_VEHICLE_PASSENGER              = 29,   // TODO: NOT SUPPORTED YET
 
-    SMART_TARGET_END                            = 30
+    SMART_TARGET_TC_END                         = 30,   // placeholder
+
+    // AC-only SmartTargets:
+
+    SMART_TARGET_AC_START                       = 200,  // placeholder
+
+    SMART_TARGET_PLAYER_WITH_AURA               = 201,  // spellId, negation, MaxDist, MinDist, set target.o to a number to random resize the list
+    SMART_TARGET_RANDOM_POINT                   = 202,  // range, amount (for summoning creature), self als middle (0/1) else use xyz
+    SMART_TARGET_ROLE_SELECTION                 = 203,  // Range Max, TargetMask (Tanks (1), Healer (2) Damage (4)), resize list
+
+    SMART_TARGET_AC_END                         = 204   // placeholder
 };
 
 struct SmartTarget
@@ -1358,6 +1368,13 @@ struct SmartTarget
             uint32 entry;
             uint32 getFromHashMap; // Does not work in instances
         } unitGUID;
+
+        struct
+        {
+            uint32 maxDist;
+            uint32 roleMask;
+            uint32 resize;
+        } roleSelection;
 
         struct
         {
@@ -1434,12 +1451,34 @@ struct SmartTarget
 
         struct
         {
+            uint32 range;
+            uint32 amount;
+            uint32 self;
+        } randomPoint;
+
+        struct
+        {
+            uint32 spellId;
+            uint32 negation;
+            uint32 distMax;
+            uint32 distMin;
+        } playerWithAura;
+
+        struct
+        {
             uint32 param1;
             uint32 param2;
             uint32 param3;
             uint32 param4;
         } raw;
     };
+};
+
+enum SmartTargetRoleFlags
+{
+    SMART_TARGET_ROLE_FLAG_TANKS        = 0x001,
+    SMART_TARGET_ROLE_FLAG_HEALERS      = 0x002,
+    SMART_TARGET_ROLE_FLAG_DAMAGERS     = 0x004
 };
 
 enum eSmartAI
