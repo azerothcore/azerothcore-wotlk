@@ -344,6 +344,9 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         case SMART_TARGET_CLOSEST_FRIENDLY:
         case SMART_TARGET_STORED:
         case SMART_TARGET_FARTHEST:
+        case SMART_TARGET_PLAYER_WITH_AURA:
+        case SMART_TARGET_RANDOM_POINT:
+        case SMART_TARGET_ROLE_SELECTION:
             break;
         default:
             sLog->outErrorDb("SmartAIMgr: Not handled target_type(%u), Entry %d SourceType %u Event %u Action %u, skipped.", e.GetTargetType(), e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -396,7 +399,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         default:
             break;
     }
-    if (e.target.type < 0 || e.target.type >= SMART_TARGET_END)
+    if (e.target.type < 0 || (e.target.type >= SMART_TARGET_TC_END && e.target.type < SMART_TARGET_AC_START) || e.target.type >= SMART_TARGET_AC_END)
     {
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an invalid target type (%u), skipped.",
                 e.entryOrGuid, e.event_id, e.GetTargetType());
