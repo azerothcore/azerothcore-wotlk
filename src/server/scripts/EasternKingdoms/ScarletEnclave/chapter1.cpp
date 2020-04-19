@@ -34,7 +34,6 @@ enum eyeOfAcherus
     EYE_POINT_DESTINATION_2         = 1,
 
     SPELL_EYE_OF_ACHERUS_VISUAL     = 51892,
-//    SPELL_EYE_OF_ACHERUS_SPEED_BOOST = 51923,
 };
 
 class npc_eye_of_acherus : public CreatureScript
@@ -59,22 +58,15 @@ public:
 
             events.ScheduleEvent(EVENT_REMOVE_CONTROL, 500);
             events.ScheduleEvent(EVENT_SPEAK_1, 4000);
-            events.ScheduleEvent(EVENT_LAUNCH, 7000); // Was 7000
+            events.ScheduleEvent(EVENT_LAUNCH, 7000);
 
             me->CastSpell(me, SPELL_EYE_OF_ACHERUS_VISUAL, true);
-//            if (Aura* aur = me->AddAura(SPELL_EYE_OF_ACHERUS_SPEED_BOOST, me))
-//            {
-//                aur->SetMaxDuration(60 * MINUTE * IN_MILLISECONDS);
-//                aur->SetDuration(60 * MINUTE * IN_MILLISECONDS);
-//            }
         }
 
         void MovementInform(uint32 type, uint32 point) override
         {
-            //if (type == ESCORT_MOTION_TYPE || point !=0)
             if (type == POINT_MOTION_TYPE && point == EYE_POINT_DESTINATION_2)
             {
-                //me->RemoveAura(SPELL_EYE_OF_ACHERUS_SPEED_BOOST);
                 events.ScheduleEvent(EVENT_REGAIN_CONTROL, 1000);
             }
         }
@@ -110,11 +102,6 @@ public:
                     break;
                 case EVENT_LAUNCH:
                 {
-                    //Movement::PointsArray path;
-                    //path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                    //path.push_back(G3D::Vector3(me->GetPositionX()-40.0f, me->GetPositionY(), me->GetPositionZ()+10.0f));
-                    //path.push_back(G3D::Vector3(1768.0f, -5876.0f, 153.0f));
-                    //me->GetMotionMaster()->MoveSplinePath(&path);
                     me->SetSpeed(MOVE_FLIGHT, 4.5f, true);
 
                     const Position EYE_DESTINATION_1 = { me->GetPositionX()-40.0f, me->GetPositionY(), me->GetPositionZ()+10.0f, 0.0f };
@@ -128,7 +115,8 @@ public:
                     if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-                        me->SetSpeed(MOVE_FLIGHT, 2.5f, true);
+                        me->SetSpeed(MOVE_FLIGHT, 3.3f, true);
+
                         SetControl(player, true);
                         Talk(EYE_TEXT_CONTROL, player);
                     }
