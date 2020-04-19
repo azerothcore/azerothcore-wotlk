@@ -99,6 +99,7 @@ public:
             _screamTimer = 2 * MINUTE * IN_MILLISECONDS;
             _hadThaddiusGreet = false;
             _currentWingTaunt = SAY_FIRST_WING_TAUNT;
+            _horsemanLoadDoneState = false;
 
             // Achievements
             abominationsKilled = 0;
@@ -163,6 +164,7 @@ public:
         bool _hadThaddiusGreet;
         EventMap events;
         uint8 _currentWingTaunt;
+        bool _horsemanLoadDoneState;
 
         // Achievements
         uint8 abominationsKilled;
@@ -525,7 +527,7 @@ public:
             }
 
             // Horseman handling
-            if (bossId == BOSS_HORSEMAN)
+            if (bossId == BOSS_HORSEMAN && _horsemanLoadDoneState == false)
             {
                 if (state == DONE)
                 {
@@ -866,7 +868,8 @@ public:
                     loadStream >> tmpState;
                     if (tmpState == IN_PROGRESS)
                         tmpState = NOT_STARTED;
-                    
+                    if (i == BOSS_HORSEMAN && tmpState == DONE)
+                        _horsemanLoadDoneState = true;
                     SetBossState(i, EncounterState(tmpState));
                 }
                 loadStream >> immortalAchievement;
