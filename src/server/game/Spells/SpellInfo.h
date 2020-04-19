@@ -425,6 +425,7 @@ public:
     void SetSpellValid(bool val);
     bool IsPassiveStackableWithRanks() const;
     bool IsMultiSlotAura() const;
+    bool IsStackableOnOneSlotWithDifferentCasters() const;
     bool IsCooldownStartedOnEvent() const;
     bool IsDeathPersistent() const;
     bool IsRequiringDeadTarget() const;
