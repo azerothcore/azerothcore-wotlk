@@ -15583,7 +15583,7 @@ void Unit::RestoreDisplayId()
     AuraEffectList const& shapeshiftAura = GetAuraEffectsByType(SPELL_AURA_MOD_SHAPESHIFT);
 
     // Xinef: include clone auras (eg mirror images)
-    if (!handledAuraForced && !handledAura)
+    if (!handledAura)
     {
         AuraEffectList const& cloneAuras = GetAuraEffectsByType(SPELL_AURA_CLONE_CASTER);
         if (!cloneAuras.empty())
@@ -15606,7 +15606,6 @@ void Unit::RestoreDisplayId()
     // no auras found - set modelid to default
     else
         SetDisplayId(GetNativeDisplayId());
-}
 }
 
 void Unit::ClearComboPointHolders()

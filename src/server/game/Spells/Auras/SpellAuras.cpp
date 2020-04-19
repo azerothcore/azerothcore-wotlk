@@ -28,6 +28,16 @@
 // update aura target map every 500 ms instead of every update - reduce amount of grid searcher calls
 static constexpr int32 UPDATE_TARGET_MAP_INTERVAL = 500;
 
+AuraCreateInfo::AuraCreateInfo(SpellInfo const* spellInfo, uint8 auraEffMask, WorldObject* owner) :
+    _spellInfo(spellInfo), _auraEffectMask(auraEffMask), _owner(owner)
+{
+    ASSERT(spellInfo);
+    ASSERT(auraEffMask);
+    ASSERT(owner);
+
+    ASSERT(auraEffMask <= MAX_EFFECT_MASK);
+}
+
 AuraApplication::AuraApplication(Unit* target, Unit* caster, Aura* aura, uint8 effMask):
 _target(target), _base(aura), _removeMode(AURA_REMOVE_NONE), _slot(MAX_AURAS),
 _flags(AFLAG_NONE), _effectsToApply(effMask), _needClientUpdate(false), _disableMask(0)
@@ -2654,8 +2664,8 @@ void UnitAura::FillTargetMap(std::unordered_map<Unit*, uint8>& targets, Unit* ca
 
             if (selectionType != TARGET_CHECK_DEFAULT)
             {
-                Trinity::WorldObjectSpellAreaTargetCheck check(radius, GetUnitOwner(), ref, GetUnitOwner(), m_spellInfo, selectionType, condList);
-                Trinity::UnitListSearcher<Trinity::WorldObjectSpellAreaTargetCheck> searcher(GetUnitOwner(), units, check);
+                acore::WorldObjectSpellAreaTargetCheck check(radius, GetUnitOwner(), ref, GetUnitOwner(), m_spellInfo, selectionType, condList);
+                acore::UnitListSearcher<acore::WorldObjectSpellAreaTargetCheck> searcher(GetUnitOwner(), units, check);
                 Cell::VisitAllObjects(GetUnitOwner(), searcher, radius);
             }
         }
@@ -2707,8 +2717,8 @@ void DynObjAura::FillTargetMap(std::unordered_map<Unit*, uint8> & targets, Unit*
         std::vector<Unit*> units;
         ConditionList* condList = m_spellInfo->Effects[effIndex].ImplicitTargetConditions;
 
-        Trinity::WorldObjectSpellAreaTargetCheck check(radius, GetDynobjOwner(), dynObjOwnerCaster, dynObjOwnerCaster, m_spellInfo, selectionType, condList);
-        Trinity::UnitListSearcher<Trinity::WorldObjectSpellAreaTargetCheck> searcher(GetDynobjOwner(), units, check);
+        acore::WorldObjectSpellAreaTargetCheck check(radius, GetDynobjOwner(), dynObjOwnerCaster, dynObjOwnerCaster, m_spellInfo, selectionType, condList);
+        acore::UnitListSearcher<acore::WorldObjectSpellAreaTargetCheck> searcher(GetDynobjOwner(), units, check);
         Cell::VisitAllObjects(GetDynobjOwner(), searcher, radius);
 
         for (Unit* unit : units)
