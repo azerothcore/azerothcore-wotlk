@@ -28,5 +28,5 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@fe38f0a751bf9149f0270cc1fe20bf9156854365
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.AC_GITHUB_TOKEN }}
           branch: ${{ steps.extract_branch.outputs.branch }}
