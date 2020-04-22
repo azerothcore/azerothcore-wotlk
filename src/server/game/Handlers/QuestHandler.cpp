@@ -592,9 +592,9 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
                 {
                     // Check if player is in Batleground and trying to share quest
                     if (_player->CanShareQuest(questId) && _player->InBattleground())
-                         {
-                        _player->GetSession()->SendNotification(LANG_BG_SHARE_QUEST_ERROR);
-                        continue;
+                        {
+                            _player->GetSession()->SendNotification(LANG_BG_SHARE_QUEST_ERROR);
+                            continue;
                         }
                 }
 

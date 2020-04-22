@@ -749,8 +749,8 @@ void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recvData)
             // Check if player is in BG and trying to send Ready Check
             if (group->IsLeader(GetPlayer()->GetGUID()) && _player->InBattleground())
                 {
-                _player->GetSession()->SendNotification(LANG_BG_READY_CHECK_ERROR);
-                return;
+                    _player->GetSession()->SendNotification(LANG_BG_READY_CHECK_ERROR);
+                    return;
                 }
         }
 
