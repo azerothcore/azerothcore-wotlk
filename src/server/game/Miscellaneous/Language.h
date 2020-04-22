@@ -1314,6 +1314,9 @@ enum AcoreStrings
     LANG_INSTANT_FLIGHT_ON                        = 30078,
     LANG_INSTANT_FLIGHT_OFF                       = 30079,
 
-    LANG_DEBUG_OPCODE_FILE_MISSING                = 30080
+    LANG_DEBUG_OPCODE_FILE_MISSING                = 30080,
+
+    LANG_BG_SHARE_QUEST_ERROR                     = 30081,
+    LANG_BG_READY_CHECK_ERROR                     = 30082
 };
 #endif

@@ -2691,6 +2691,22 @@ Battleground.TrackDeserters.Enable = 1
 Battleground.InvitationType = 0
 
 #
+#	Battleground.DisableQuestShareInBG
+#        Description: Disables the ability to share quests while in a Battleground.
+#        Default:     0  - (Disabled)
+#                     1  - (Enabled)
+
+Battleground.DisableQuestShareInBG = 0
+
+#
+#	Battleground.DisableReadyCheckInBG
+#        Description: Enables the ability to Ready Check while in a Battleground.
+#        Default:     0  - (Disabled)
+#                     1  - (Enabled)
+
+Battleground.DisableReadyCheckInBG = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
