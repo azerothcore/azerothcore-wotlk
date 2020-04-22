@@ -1,3 +1,19 @@
+-- DB update 2020_04_22_00 -> 2020_04_22_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_04_22_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_04_22_00 2020_04_22_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1584389666044943800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1584389666044943800');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 11319;
@@ -7,3 +23,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (11319, 0, 0, 0, 0, 0, 100, 2, 0, 0, 6000, 8000, 0, 11, 9532, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ragefire Shaman - In Combat - Cast \'Lightning Bolt\' (Normal Dungeon)'),
 (11319, 0, 1, 0, 14, 0, 100, 2, 400, 40, 18000, 22000, 0, 11, 11986, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ragefire Shaman - Friendly At 400 Health - Cast \'Healing Wave\' (Normal Dungeon)'),
 (11319, 0, 2, 0, 2, 0, 100, 3, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ragefire Shaman - Between 0-15% Health - Flee For Assist (No Repeat) (Normal Dungeon)');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
