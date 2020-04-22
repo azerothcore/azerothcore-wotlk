@@ -2700,7 +2700,7 @@ Battleground.DisableQuestShareInBG = 0
 
 #
 #    Battleground.DisableReadyCheckInBG
-#        Description: Disables the ability to send a Ready Check while in a Battleground.
+#        Description: Disables the ability to send a Ready Check survey while in a Battleground.
 #        Default:     0  - (Disabled)
 #                     1  - (Enabled)
 
