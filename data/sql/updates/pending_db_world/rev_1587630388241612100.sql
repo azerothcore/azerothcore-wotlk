@@ -1,18 +1,11 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1587630388241612100');
 
 ALTER TABLE `acore_string`
-	RENAME COLUMN `content_loc1` TO `locale_koKR`,
-ALTER TABLE `acore_string`
-	RENAME COLUMN `content_loc2` TO `locale_frFR`,
-ALTER TABLE `acore_string`
-	RENAME COLUMN `content_loc3` TO `locale_deDE`,
-ALTER TABLE `acore_string`
-	RENAME COLUMN `content_loc4` TO `locale_zhCN`,
-ALTER TABLE `acore_string`
-	RENAME COLUMN `content_loc5` TO `locale_zhTW`,
-ALTER TABLE `acore_string`
-	RENAME COLUMN `content_loc6` TO `locale_esES`,
-ALTER TABLE `acore_string`
-	RENAME COLUMN `content_loc7` TO `locale_esMX`,
-ALTER TABLE `acore_string`
-	RENAME COLUMN `content_loc8` TO `locale_ruRU`;
+	CHANGE `content_loc1` `locale_koKR` TEXT,
+	CHANGE `content_loc2` `locale_frFR` TEXT,
+	CHANGE `content_loc3` `locale_deDE` TEXT,
+	CHANGE `content_loc4` `locale_zhCN` TEXT,
+	CHANGE `content_loc5` `locale_zhTW` TEXT,
+	CHANGE `content_loc6` `locale_esES` TEXT,
+	CHANGE `content_loc7` `locale_esMX` TEXT,
+	CHANGE `content_loc8` `locale_ruRU` TEXT;
