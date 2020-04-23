@@ -35,7 +35,7 @@ enum Events
     EVENT_FROZEN_ORB_STALKER            = 2,
     EVENT_CAST_WHITEOUT                 = 3,
     EVENT_CAST_WHITEOUT_GROUND_EFFECT   = 4,
-    EVENT_CHECK_SUMMONS                 = 5,
+
 
 };
 
@@ -146,28 +146,6 @@ public:
                 whiteOutGround->CastSpell(whiteOutGround, SPELL_WHITEOUT_VISUAL, false); // Cast the spell
                 events.PopEvent();
                 break;
-            case EVENT_CHECK_SUMMONS:
-                for (SummonList::iterator i = summons.begin(); i != summons.end();)
-                {
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, *i))
-                    {
-                        if (!cr->IsAlive())
-                            summons.erase(i++);
-                        else
-                            ++i;
-                    }
-                    else
-                        summons.erase(i++);
-                }
-                 if (summons.empty())
-                        {
-                            events.PopEvent();
-                            break;
-                        }
-                
-                events.RepeatEvent(2000);
-                break;
-
             }
 
             DoMeleeAttackIfReady();
