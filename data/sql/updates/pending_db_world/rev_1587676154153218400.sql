@@ -11,4 +11,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (6497, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Astor Hadren - On Gossip Option 0 Selected - Start Attacking'),
 (6497, 0, 7, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 2, 68, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Astor Hadren - On Evade - Set Faction 68');
 
-UPDATE `conditions` SET `comment` = 'Show gossip if quest 14420 is taken' WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 126;
+UPDATE `conditions` SET `comment` = 'Astor Hadren - Show gossip if quest 14420 is taken' WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 126;
