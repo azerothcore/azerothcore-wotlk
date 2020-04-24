@@ -29,7 +29,7 @@ enum eyeOfAcherus
     EYE_TEXT_LAUNCH                 = 0,
     EYE_TEXT_CONTROL                = 1,
 
-    EYE_POINT_DESTINATION_1	    = 0,
+    EYE_POINT_DESTINATION_1         = 0,
     EYE_POINT_DESTINATION_2         = 1,
 
     SPELL_EYE_OF_ACHERUS_VISUAL     = 51892,
