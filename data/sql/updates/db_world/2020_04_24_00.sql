@@ -1,3 +1,19 @@
+-- DB update 2020_04_23_00 -> 2020_04_24_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_04_23_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_04_23_00 2020_04_24_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1586845118268975400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1586845118268975400');
 
 ALTER TABLE `holiday_dates` ADD COLUMN `holiday_duration` INT(10) UNSIGNED DEFAULT 0 NOT NULL AFTER `date_value`;
@@ -92,3 +108,12 @@ UPDATE `holiday_dates` SET `holiday_duration`=336 WHERE `id`=327;
 -- End Dates
 
 UPDATE `game_event` SET `end_time` = '2030-12-31 06:00:00' WHERE `eventEntry` IN (3,  73,  81,  79,  53,  54,  77,  70,  80,  71,  65,  34,  35,  64,  63,  62,  43,  51,  36,  37,  69,  68,  67,  45,  44,  42,  41,  40,  39,  38,  52,  26,  27,  25,  24,  11,  12,  23,  21,  20,  19,  18,  14,  10,  9,  1,  2,  4,  30,  5,  15,  6,  29,  7,  8,  28,  16,  50,  72,  75,  74,  33,  76,  32,  78);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
