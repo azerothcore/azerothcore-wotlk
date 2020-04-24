@@ -1,6 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1587689314000956500');
 
-
 UPDATE `creature_template` SET `AIName`='SmartAI', `ScriptName`='' WHERE `entry`=25623;
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`=25623 AND `source_type`=0;
