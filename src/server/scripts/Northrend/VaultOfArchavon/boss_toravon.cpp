@@ -26,7 +26,7 @@ enum Spells
     SPELL_FROZEN_ORB_STALKER_VISUAL     = 72094,
 
     // Whiteout GroundEffect NPC
-    NPC_WHITEOUT_GROUND_EFFECT          = 500005,
+    NPC_WHITEOUT_GROUND_EFFECT          = 38440,
 };
 
 enum Events
