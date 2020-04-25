@@ -4089,7 +4089,7 @@ public:
     {
         PrepareSpellScript(spell_item_eggnog_SpellScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_EGG_NOG_REINDEER) || !sSpellMgr->GetSpellInfo(SPELL_EGG_NOG_SNOWMAN))
                 return false;
