@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
       - name: Extract branch name
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
@@ -22,7 +24,7 @@ jobs:
           cd ..
           git fetch --unshallow origin ${BRANCH}
           git add -A .
-          git commit -am "Import pending SQL update file..." -m "Referenced commit(s):${GITHUB_SHA}" || true
+          git commit -am "Import pending SQL update file..." -m "Referenced commit(s): ${GITHUB_SHA}" || true
         env:
           BRANCH: ${{ steps.extract_branch.outputs.branch }}
       - name: Push changes
