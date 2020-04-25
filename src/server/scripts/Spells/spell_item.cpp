@@ -4078,7 +4078,7 @@ public:
 enum Eggnog
 {
     SPELL_EGG_NOG_REINDEER = 21936,
-    SPELL_EGG_NOG_SNOWMAN = 21980,
+    SPELL_EGG_NOG_SNOWMAN  = 21980,
 };
 class spell_item_eggnog : public SpellScriptLoader
 {
