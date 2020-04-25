@@ -1,8 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1587846457474224200');
 
 UPDATE `gameobject_template` SET `Data0`=1505 WHERE `entry`=188112;
-DELETE FROM `gameobject_template` WHERE `entry`=300184;
-DELETE FROM `gameobject` WHERE `id`=300184;
 SET @ENTRY := 26161;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY*100 AND `source_type`=9;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
