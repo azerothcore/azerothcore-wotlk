@@ -1,3 +1,19 @@
+-- DB update 2020_04_25_01 -> 2020_04_26_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_04_25_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_04_25_01 2020_04_26_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1584403279317487100'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1584403279317487100');
 
 -- Grizzly Hills, Alliance Log Ride Start
@@ -22,3 +38,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (27425, 0, 0, 1, 62, 0, 100, 0, 9528, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Darrok - On Gossip Option 0 Selected - Close Gossip'),
 (27425, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 85, 48960, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Darrok - On Gossip Option 0 Selected - Invoker Cast \'Horde Log Ride 01 Begin\''),
 (27425, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 85, 48961, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Darrok - On Gossip Option 0 Selected - Invoker Cast \'Log Ride Horde 00\'');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
