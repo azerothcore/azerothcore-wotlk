@@ -1121,13 +1121,10 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_BG_XP_FOR_KILL]                            = sConfigMgr->GetBoolDefault("Battleground.GiveXPForKills", false);
     m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK_TIMER]              = sConfigMgr->GetIntDefault("Battleground.ReportAFK.Timer", 4);
     m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]                    = sConfigMgr->GetIntDefault("Battleground.ReportAFK", 3);
-    if (m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] < 1)
-    {
+    if (m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] < 1) {
         sLog->outError("Battleground.ReportAFK (%d) must be >0. Using 3 instead.", m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]);
         m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] = 3;
-    }
-    if (m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] > 9)
-    {
+    } else if (m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] > 9) {
         sLog->outError("Battleground.ReportAFK (%d) must be <10. Using 3 instead.", m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]);
         m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] = 3;
     }
