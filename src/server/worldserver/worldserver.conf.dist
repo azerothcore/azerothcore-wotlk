@@ -2308,6 +2308,62 @@ Rate.Drop.Item.Referenced       = 1
 Rate.Drop.Money                 = 1
 
 #
+#    Rate.SellValue.Item.Poor
+#    Rate.SellValue.Item.Normal
+#    Rate.SellValue.Item.Uncommon
+#    Rate.SellValue.Item.Rare
+#    Rate.SellValue.Item.Epic
+#    Rate.SellValue.Item.Legendary
+#    Rate.SellValue.Item.Artifact
+#    Rate.SellValue.Item.Heirloom
+#        Description: Item Sale Value rates based on quality.
+#        Default:     1 - (Rate.SellValue.Item.Poor)
+#                     1 - (Rate.SellValue.Item.Normal)
+#                     1 - (Rate.SellValue.Item.Uncommon)
+#                     1 - (Rate.SellValue.Item.Rare)
+#                     1 - (Rate.SellValue.Item.Epic)
+#                     1 - (Rate.SellValue.Item.Legendary)
+#                     1 - (Rate.SellValue.Item.Artifact)
+#                     1 - (Rate.SellValue.Item.Heirloom)
+
+Rate.SellValue.Item.Poor             = 1
+Rate.SellValue.Item.Normal           = 1
+Rate.SellValue.Item.Uncommon         = 1
+Rate.SellValue.Item.Rare             = 1
+Rate.SellValue.Item.Epic             = 1
+Rate.SellValue.Item.Legendary        = 1
+Rate.SellValue.Item.Artifact         = 1
+Rate.SellValue.Item.Heirloom         = 1
+
+#
+#    Rate.BuyValue.Item.Poor
+#    Rate.BuyValue.Item.Normal
+#    Rate.BuyValue.Item.Uncommon
+#    Rate.BuyValue.Item.Rare
+#    Rate.BuyValue.Item.Epic
+#    Rate.BuyValue.Item.Legendary
+#    Rate.BuyValue.Item.Artifact
+#    Rate.BuyValue.Item.Heirloom
+#        Description: Item Sale Value rates based on quality.
+#        Default:     1 - (Rate.BuyValue.Item.Poor)
+#                     1 - (Rate.BuyValue.Item.Normal)
+#                     1 - (Rate.BuyValue.Item.Uncommon)
+#                     1 - (Rate.BuyValue.Item.Rare)
+#                     1 - (Rate.BuyValue.Item.Epic)
+#                     1 - (Rate.BuyValue.Item.Legendary)
+#                     1 - (Rate.BuyValue.Item.Artifact)
+#                     1 - (Rate.BuyValue.Item.Heirloom)
+
+Rate.BuyValue.Item.Poor             = 1
+Rate.BuyValue.Item.Normal           = 1
+Rate.BuyValue.Item.Uncommon         = 1
+Rate.BuyValue.Item.Rare             = 1
+Rate.BuyValue.Item.Epic             = 1
+Rate.BuyValue.Item.Legendary        = 1
+Rate.BuyValue.Item.Artifact         = 1
+Rate.BuyValue.Item.Heirloom         = 1
+
+#
 #    Rate.Drop.Item.ReferencedAmount
 #        Description: Multiplier for referenced loot amount.
 #        Default:     1
