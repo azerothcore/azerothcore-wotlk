@@ -1045,7 +1045,7 @@ public:
         return true;
     }
 
-    // Find teleport in game_teleport order by name
+    // Find teleport in game_tele order by name
     static bool HandleLookupTeleCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
