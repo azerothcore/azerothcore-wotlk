@@ -82,7 +82,7 @@ public:
             { "fishing_loot_template",        SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesFishingCommand,       "" },
             { "game_graveyard",               SEC_ADMINISTRATOR, true,  &HandleReloadGameGraveyardCommand,              "" },
             { "graveyard_zone",               SEC_ADMINISTRATOR, true,  &HandleReloadGameGraveyardZoneCommand,          "" },
-            { "game_tele",                    SEC_ADMINISTRATOR, true,  &HandleReloadGameTeleCommand,                   "" },
+            { "game_teleport",                SEC_ADMINISTRATOR, true,  &HandleReloadGameTeleCommand,                   "" },
             { "gameobject_questender",        SEC_ADMINISTRATOR, true,  &HandleReloadGOQuestEnderCommand,               "" },
             { "gameobject_loot_template",     SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesGameobjectCommand,    "" },
             { "gameobject_queststarter",      SEC_ADMINISTRATOR, true,  &HandleReloadGOQuestStarterCommand,             "" },
