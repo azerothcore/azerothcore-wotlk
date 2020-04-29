@@ -8,3 +8,7 @@ CREATE TABLE IF NOT EXISTS `map_difficulty_data` (
   `Comment` TEXT,
   PRIMARY KEY (`MapId`, `Difficulty`)
 ) ENGINE=MYISAM;
+
+DELETE FROM `command` WHERE `name`='mythic';
+INSERT INTO `command` VALUES 
+('mythic', 0, 'Syntax: .mythic\r\n\r\nSets your (and your groups) Dungeon Difficulty to mythic.');

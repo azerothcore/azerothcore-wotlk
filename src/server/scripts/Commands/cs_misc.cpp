@@ -113,9 +113,23 @@ public:
             { "unbindsight",        SEC_ADMINISTRATOR,      false, HandleUnbindSightCommand,            "" },
             { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "" },
             { "skirmish",           SEC_ADMINISTRATOR,      false, HandleSkirmishCommand,               "" },
-            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" }
+            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" },
+            { "mythic",             SEC_PLAYER,             false, &HandleMythicCommand,                "" }
         };
         return commandTable;
+    }
+
+    static bool HandleMythicCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* usingPlayer = handler->GetSession()->GetPlayer();
+        usingPlayer->SetRaidDifficulty(DUNGEON_DIFFICULTY_EPIC);
+        usingPlayer->SetDungeonDifficulty(DUNGEON_DIFFICULTY_EPIC);
+        if (Group* pGroup = usingPlayer->GetGroup())
+            pGroup->SetDungeonDifficulty(DUNGEON_DIFFICULTY_EPIC);
+
+        handler->PSendSysMessage("Dungeon Difficulty changed: You and your group can now enter Mythic Dungeons!");
+        handler->SetSentErrorMessage(true);
+        return true;
     }
 
     static bool HandleSkirmishCommand(ChatHandler* handler, char const* args)
