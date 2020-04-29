@@ -885,7 +885,7 @@ void LoadMapDifficultyDataFromDB()
 
             if (difficulty >= MAX_DIFFICULTY)
             {
-                sLog->outSQLDev("MapDifficultyData (MapId: %u, Difficulty: %u) in table `map_difficulty_data` has invalid difficulty.", mapId, difficulty, parent);
+                sLog->outSQLDev("MapDifficultyData (MapId: %u, Difficulty: %u) in table `map_difficulty_data` has invalid difficulty.", mapId, difficulty);
                 continue;
             }
 
