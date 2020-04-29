@@ -175,7 +175,7 @@ time_t InstanceSave::GetResetTimeForDB()
 {
     // only save the reset time for normal instances
     const MapEntry* entry = sMapStore.LookupEntry(GetMapId());
-    if (!entry || entry->map_type == MAP_RAID || GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
+    if (!entry || entry->map_type == MAP_RAID || GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC || GetDifficulty() == DUNGEON_DIFFICULTY_EPIC)
         return 0;
     else
         return GetResetTime();
@@ -713,7 +713,7 @@ InstancePlayerBind* InstanceSaveManager::PlayerGetBoundInstance(uint32 guidLow, 
 }
 
 bool InstanceSaveManager::PlayerIsPermBoundToInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty)
-{ 
+{
     if (InstancePlayerBind* bind = PlayerGetBoundInstance(guidLow, mapid, difficulty))
         if (bind->perm)
             return true;

@@ -353,6 +353,7 @@ void LoadDBCStores(const std::string& dataPath)
         if (MapDifficultyEntry const* entry = sMapDifficultyStore.LookupEntry(i))
             sMapDifficultyMap[MAKE_PAIR32(entry->MapId, entry->Difficulty)] = MapDifficulty(entry->resetTime, entry->maxPlayers, entry->areaTriggerText[0] != '\0');
     sMapDifficultyStore.Clear();
+    LoadMapDifficultyDataFromDB();
 
     LoadDBC(availableDbcLocales, bad_dbc_files, sMovieStore,                  dbcPath, "Movie.dbc");
 
@@ -863,4 +864,55 @@ uint32 GetDefaultMapLight(uint32 mapId)
     }
 
     return 0;
+}
+
+void LoadMapDifficultyDataFromDB()
+{
+    sLog->outString("Loading custom MapDifficultyData from DB.");
+
+    uint32 oldMSTime = getMSTime();
+
+    uint32 count = 0;
+
+    if (QueryResult result = WorldDatabase.Query("SELECT MapId, Difficulty, ParentDifficulty FROM map_difficulty_data"))
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 mapId = fields[0].GetUInt32();
+            uint32 difficulty = fields[1].GetUInt32();
+            uint32 parent = fields[2].GetUInt32();
+
+            if (difficulty >= MAX_DIFFICULTY)
+            {
+                sLog->outSQLDev("MapDifficultyData (MapId: %u, Difficulty: %u) in table `map_difficulty_data` has invalid difficulty.", mapId, difficulty, parent);
+                continue;
+            }
+
+            MapDifficulty const* diff = GetMapDifficultyData(mapId, Difficulty(parent));
+            if (!diff)
+            {
+                sLog->outSQLDev("MapDifficultyData (MapId: %u, Difficulty: %u) in table `map_difficulty_data` has invalid parent %u.", mapId, difficulty, parent);
+                continue;
+            }
+
+            if (GetMapDifficultyData(mapId, Difficulty(difficulty)))
+            {
+                sLog->outSQLDev("MapDifficultyData (MapId: %u, Difficulty: %u) in table `map_difficulty_data` already listen in dbc. Don't support override.", mapId, difficulty);
+                continue;
+            }
+
+            uint32 resetTime = diff->resetTime;
+            if (difficulty == DUNGEON_DIFFICULTY_EPIC && !resetTime)
+            {
+                resetTime = DAY;
+                sLog->outSQLDev("MapDifficultyData (MapId: %u, Difficulty: %u) in `map_difficulty_data` has no resettime. Setting to default %u.", mapId, difficulty, resetTime);
+            }
+
+            sMapDifficultyMap[MAKE_PAIR32(mapId, difficulty)] = MapDifficulty(resetTime, diff->maxPlayers, diff->hasErrorMessage);
+            ++count;
+        } while (result->NextRow());
+    }
+
+    sLog->outString(">> Loaded %u custom MapDifficultyData in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

@@ -38,6 +38,7 @@ void Map2ZoneCoordinates(float &x, float &y, uint32 zone);
 typedef std::map<uint32/*pair32(map, diff)*/, MapDifficulty> MapDifficultyMap;
 MapDifficulty const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty);
 MapDifficulty const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty &difficulty);
+void LoadMapDifficultyDataFromDB();
 
 bool IsSharedDifficultyMap(uint32 mapid);
 

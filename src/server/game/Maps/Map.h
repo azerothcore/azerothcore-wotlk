@@ -233,7 +233,7 @@ enum LevelRequirementVsMode
 {
     LEVELREQUIREMENT_HEROIC = 70
 };
- 
+
 struct ZoneDynamicInfo
 {
     ZoneDynamicInfo() : MusicId(0), WeatherId(0), WeatherGrade(0.0f),
@@ -304,7 +304,7 @@ class Map : public GridRefManager<NGridType>
             TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
             TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
             TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor);
-            
+
         virtual void Update(const uint32, const uint32, bool thread = true);
 
         float GetVisibilityRange() const { return m_VisibleDistance; }
@@ -393,6 +393,8 @@ class Map : public GridRefManager<NGridType>
         bool IsRaid() const { return i_mapEntry && i_mapEntry->IsRaid(); }
         bool IsRaidOrHeroicDungeon() const { return IsRaid() || i_spawnMode > DUNGEON_DIFFICULTY_NORMAL; }
         bool IsHeroic() const { return IsRaid() ? i_spawnMode >= RAID_DIFFICULTY_10MAN_HEROIC : i_spawnMode >= DUNGEON_DIFFICULTY_HEROIC; }
+        bool IsMythic() const { return IsDungeon() && GetDifficulty() == DUNGEON_DIFFICULTY_EPIC; }
+        bool IsHeroicRaidOrMythicDungeon() const { return IsRaid() ? i_spawnMode >= RAID_DIFFICULTY_10MAN_HEROIC : i_spawnMode == DUNGEON_DIFFICULTY_EPIC; }
         bool Is25ManRaid() const { return IsRaid() && i_spawnMode & RAID_DIFFICULTY_MASK_25MAN; }   // since 25man difficulties are 1 and 3, we can check them like that
         bool IsBattleground() const { return i_mapEntry && i_mapEntry->IsBattleground(); }
         bool IsBattleArena() const { return i_mapEntry && i_mapEntry->IsBattleArena(); }
@@ -521,7 +523,7 @@ class Map : public GridRefManager<NGridType>
         void SetZoneMusic(uint32 zoneId, uint32 musicId);
         void SetZoneWeather(uint32 zoneId, uint32 weatherId, float weatherGrade);
         void SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime);
-  
+
         // Checks encounter state at kill/spellcast, originally in InstanceScript however not every map has instance script :(
         void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);
         void LogEncounterFinished(EncounterCreditType type, uint32 creditEntry);
@@ -722,7 +724,7 @@ class BattlegroundMap : public Map
 
 template<class T, class CONTAINER>
 inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& visitor)
-{ 
+{
     const uint32 x = cell.GridX();
     const uint32 y = cell.GridY();
     const uint32 cell_x = cell.CellX();
@@ -737,7 +739,7 @@ inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& vis
 
 template<class NOTIFIER>
 inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER& notifier)
-{ 
+{
     CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
@@ -751,7 +753,7 @@ inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER
 // should be used with Searcher notifiers, tries to search world if nothing found in grid
 template<class NOTIFIER>
 inline void Map::VisitFirstFound(const float &x, const float &y, float radius, NOTIFIER &notifier)
-{ 
+{
     CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
@@ -767,7 +769,7 @@ inline void Map::VisitFirstFound(const float &x, const float &y, float radius, N
 
 template<class NOTIFIER>
 inline void Map::VisitWorld(const float &x, const float &y, float radius, NOTIFIER &notifier)
-{ 
+{
     CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
@@ -778,7 +780,7 @@ inline void Map::VisitWorld(const float &x, const float &y, float radius, NOTIFI
 
 template<class NOTIFIER>
 inline void Map::VisitGrid(const float &x, const float &y, float radius, NOTIFIER &notifier)
-{ 
+{
     CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
