@@ -28,6 +28,7 @@
 #include "BattlegroundMgr.h"
 #include "MapManager.h"
 #include "GameGraveyard.h"
+#include "InstanceScript.h"
 
 class misc_commandscript : public CommandScript
 {
