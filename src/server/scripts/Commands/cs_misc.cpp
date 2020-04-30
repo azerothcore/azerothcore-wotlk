@@ -133,7 +133,7 @@ public:
             int32 level = atoi((char*)args);
             if (usingPlayer->GetMap()->IsDungeon() && usingPlayer->GetInstanceScript())
             {
-                usingPlayer->GetInstanceScript()->StartMythic(level, usingPlayer);
+                usingPlayer->GetInstanceScript()->StartMythic(level);
                 handler->PSendSysMessage("DEBUG: STARTED MYTHIC LEVEL %u", level);
             }
         }

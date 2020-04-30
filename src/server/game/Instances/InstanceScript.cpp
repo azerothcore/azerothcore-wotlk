@@ -468,7 +468,7 @@ std::string InstanceScript::GetBossStateName(uint8 state)
     }
 }
 
-void InstanceScript::StartMythic(uint32 level, Player* groupLeader)
+void InstanceScript::StartMythic(uint32 level)
 {
     // Dungeon already set to a level
     if (mythicLevel > 0)
