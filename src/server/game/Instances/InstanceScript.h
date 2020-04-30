@@ -77,6 +77,19 @@ enum BoundaryType
 
 typedef std::map<BoundaryType, float> BossBoundaryMap;
 
+enum MythicAffix
+{
+    MYTHIC_AFFIX_NONE       = 0,
+    MYTHIC_AFFIX_BURSTING   = 1,
+
+    MYTHIC_AFFIX_MAX
+};
+
+enum MythicSpellId
+{
+    MYTHIC_SPELL_TENACITY   = 58549
+};
+
 struct DoorData
 {
     uint32 entry, bossId;
@@ -190,7 +203,7 @@ class InstanceScript : public ZoneScript
         EncounterState GetBossState(uint32 id) const { return id < bosses.size() ? bosses[id].state : TO_BE_DECIDED; }
         static std::string GetBossStateName(uint8 state);
         BossBoundaryMap const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : NULL; }
-        BossInfo const* GetBossInfo(uint32 id) const { return &bosses[id]; } 
+        BossInfo const* GetBossInfo(uint32 id) const { return &bosses[id]; }
 
         // Achievement criteria additional requirements check
         // NOTE: not use this if same can be checked existed requirement types from AchievementCriteriaRequirementType
@@ -210,6 +223,12 @@ class InstanceScript : public ZoneScript
 
         uint32 GetEncounterCount() const { return bosses.size(); }
 
+        void SetAffixActive(MythicAffix affix) { affixesActive.push_back(affix); }
+        void StartMythic(uint32 level, Player* groupLeader);
+        std::vector<MythicAffix> GetActiveAffixes() { return affixesActive; }
+
+        void OnCreatureCreate(Creature* creature) { npcs.push_back(creature); }
+
     protected:
         void SetBossNumber(uint32 number) { bosses.resize(number); }
         void LoadDoorData(DoorData const* data);
@@ -228,6 +247,9 @@ class InstanceScript : public ZoneScript
         DoorInfoMap doors;
         MinionInfoMap minions;
         uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
+        std::vector<MythicAffix> affixesActive;
+        uint32 mythicLevel;
+        std::vector<Creature*> npcs;
 };
 
 template<class AI, class T>

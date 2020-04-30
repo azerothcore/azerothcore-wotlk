@@ -18,6 +18,7 @@
 #include "WorldSession.h"
 #include "Opcodes.h"
 #include "Spell.h"
+#include "SpellAuras.h"
 
 void InstanceScript::SaveToDB()
 {
@@ -465,4 +466,26 @@ std::string InstanceScript::GetBossStateName(uint8 state)
         default:
             return "INVALID";
     }
+}
+
+void InstanceScript::StartMythic(uint32 level, Player* groupLeader)
+{
+    // Testing purpose, always bursting
+    switch (level)
+    {
+        case 0:
+        case 1:
+            SetAffixActive(MYTHIC_AFFIX_BURSTING);
+            break;
+        default:
+            SetAffixActive(MYTHIC_AFFIX_BURSTING);
+            break;
+    }
+
+    mythicLevel = level;
+
+    for (Creature* cr : npcs)
+        if (cr)
+            if (Aura* aur = cr->AddAura(MYTHIC_SPELL_TENACITY, cr))
+                aur->SetStackAmount(level);
 }
