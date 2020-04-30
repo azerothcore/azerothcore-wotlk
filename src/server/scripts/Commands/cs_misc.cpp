@@ -122,12 +122,10 @@ public:
     static bool HandleMythicCommand(ChatHandler* handler, char const* /*args*/)
     {
         Player* usingPlayer = handler->GetSession()->GetPlayer();
-        usingPlayer->SetRaidDifficulty(DUNGEON_DIFFICULTY_EPIC);
         usingPlayer->SetDungeonDifficulty(DUNGEON_DIFFICULTY_EPIC);
-        if (Group* pGroup = usingPlayer->GetGroup())
-            pGroup->SetDungeonDifficulty(DUNGEON_DIFFICULTY_EPIC);
+        usingPlayer->SendDungeonDifficulty(usingPlayer->GetGroup());
 
-        handler->PSendSysMessage("Dungeon Difficulty changed: You and your group can now enter Mythic Dungeons!");
+        handler->PSendSysMessage("Dungeon Difficulty changed: Dungeons set to Mythic! Please re-enter the dungeon, if you were already inside.");
         handler->SetSentErrorMessage(true);
         return true;
     }
