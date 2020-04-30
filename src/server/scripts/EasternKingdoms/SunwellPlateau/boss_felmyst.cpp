@@ -14,11 +14,11 @@ enum Yells
 {
     YELL_BIRTH                                  = 0,
     YELL_KILL                                   = 1,
-    YELL_BREATH                                 = 2,
+    YELL_BREATH                                 = 2, // Choke on your final breath
     YELL_TAKEOFF                                = 3,
     YELL_BERSERK                                = 4,
     YELL_DEATH                                  = 5,
-    EMOTE_BREATH                                = 6
+    EMOTE_BREATH                                = 6 // Felmyst takes a deep breath...
 };
 
 enum Spells
@@ -343,6 +343,7 @@ public:
                     Talk(EMOTE_BREATH);
                     break;
                 case EVENT_CORRUPT_TRIGGERS:
+                    Talk(YELL_BREATH);
                     me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(0));
                     me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(500));
                     me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(1000));
@@ -508,6 +509,7 @@ class spell_felmyst_fog_of_corruption_charm : public SpellScriptLoader
 
             void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
+                GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM);
                 GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM2);
                 Unit::Kill(GetCaster(), GetTarget(), false);
             }
