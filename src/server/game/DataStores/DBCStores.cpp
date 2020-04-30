@@ -874,7 +874,7 @@ void LoadMapDifficultyDataFromDB()
 
     uint32 count = 0;
 
-    if (QueryResult result = WorldDatabase.Query("SELECT MapId, Difficulty, ParentDifficulty FROM map_difficulty_data"))
+    if (QueryResult result = WorldDatabase.Query("SELECT mapId, difficulty, parentDifficulty FROM map_difficulty_data"))
     {
         do
         {

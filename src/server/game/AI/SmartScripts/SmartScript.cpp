@@ -4689,6 +4689,11 @@ void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger c
                 {
                     mEvents.push_back((*i));
                 }
+                // if dungeon is mythic and sai should trigger in heroic, we use it in mythic too
+                else if ((*i).event.event_flags & SMART_EVENT_FLAG_DIFFICULTY_1 && obj->GetMap()->IsMythic())
+                {
+                    mEvents.push_back((*i));
+                }
             }
             continue;
         }
