@@ -226,8 +226,7 @@ class InstanceScript : public ZoneScript
         void SetAffixActive(MythicAffix affix) { affixesActive.push_back(affix); }
         void StartMythic(uint32 level, Player* groupLeader);
         std::vector<MythicAffix> GetActiveAffixes() { return affixesActive; }
-
-        void OnCreatureCreate(Creature* creature) { npcs.push_back(creature); }
+        void AddAffixAffectedCreature(Creature* creature) { npcs.push_back(creature); }
 
     protected:
         void SetBossNumber(uint32 number) { bosses.resize(number); }
