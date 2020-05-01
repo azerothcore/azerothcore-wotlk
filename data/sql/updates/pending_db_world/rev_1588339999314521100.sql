@@ -7,26 +7,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1588339999314521100');
 */
 
 /* RESPAWNS */
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18695;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18697;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18694;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18686;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18678;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18692;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18680;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18690;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18685;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18683;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18682;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18681;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18689;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18698;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 17144;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18696;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18677;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 20932;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18693;
-UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` = 18679;
+UPDATE `creature` SET `spawntimesecs` = 600 WHERE `id` IN (18695, 18697, 18694, 18686, 18678, 18692, 18680, 18690, 18685, 18683, 18682, 18681, 18689, 18698, 17144, 18696, 18677, 20932, 18693, 18679);
 
 
 /* SMARTSCRIPTS */
