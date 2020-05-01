@@ -7,9 +7,9 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1588339146103973500');
 */
 
 /* FLAGS */
-UPDATE `creature_template` SET `unit_flags` = 4 WHERE `id` = 29125;
-UPDATE `creature_template` SET `unit_flags` = 4 WHERE `id` = 29126;
-UPDATE `creature_template` SET `unit_flags` = 4 WHERE `id` = 29127;
+UPDATE `creature_template` SET `unit_flags` = 4 WHERE `entry` = 29125;
+UPDATE `creature_template` SET `unit_flags` = 4 WHERE `entry` = 29126;
+UPDATE `creature_template` SET `unit_flags` = 4 WHERE `entry` = 29127;
 
 
 /* DROPCHANCE */
