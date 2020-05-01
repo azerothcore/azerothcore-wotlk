@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1588341202074539400');
 
 /*
- * Dungeon: Deadmines
+ * NPC: Dragonmaw Bonewarder
  * Update by Knindza | <www.azerothcore.org>
  * Copyright (C) <www.shadowburn.net> & <www.lichbane.com>
 */
