@@ -1,0 +1,42 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1588336378116569500');
+
+/*
+ * Dungeon: Shadowfang Keep
+ * Update by Knindza | <www.azerothcore.org>
+*/
+
+/* REGULAR */ 
+UPDATE `creature_template` SET `mindmg` = 42, `maxdmg` = 59, `DamageModifier` = 1.03 WHERE `entry` = 3851;
+UPDATE `creature_template` SET `mindmg` = 46, `maxdmg` = 73, `DamageModifier` = 1.03 WHERE `entry` = 3861;
+UPDATE `creature_template` SET `mindmg` = 28, `maxdmg` = 44, `DamageModifier` = 1.03 WHERE `entry` = 3862;
+UPDATE `creature_template` SET `mindmg` = 44, `maxdmg` = 59, `DamageModifier` = 1.03 WHERE `entry` = 3853;
+UPDATE `creature_template` SET `mindmg` = 54, `maxdmg` = 73, `DamageModifier` = 1.03 WHERE `entry` = 4444;
+UPDATE `creature_template` SET `mindmg` = 46, `maxdmg` = 65, `DamageModifier` = 1.03 WHERE `entry` = 3875;
+UPDATE `creature_template` SET `mindmg` = 27, `maxdmg` = 36, `DamageModifier` = 1.03 WHERE `entry` = 4958;
+UPDATE `creature_template` SET `mindmg` = 51, `maxdmg` = 69, `DamageModifier` = 1.03 WHERE `entry` = 3854;
+UPDATE `creature_template` SET `mindmg` = 39, `maxdmg` = 52, `DamageModifier` = 1.03 WHERE `entry` = 5058;
+UPDATE `creature_template` SET `mindmg` = 49, `maxdmg` = 65, `DamageModifier` = 1.03 WHERE `entry` = 3857;
+UPDATE `creature_template` SET `mindmg` = 44, `maxdmg` = 59, `DamageModifier` = 1.03 WHERE `entry` = 3855;
+UPDATE `creature_template` SET `mindmg` = 49, `maxdmg` = 65, `DamageModifier` = 1.03 WHERE `entry` = 3877;
+UPDATE `creature_template` SET `mindmg` = 51, `maxdmg` = 69, `DamageModifier` = 1.03 WHERE `entry` = 3866;
+UPDATE `creature_template` SET `mindmg` = 51, `maxdmg` = 69, `DamageModifier` = 1.03 WHERE `entry` = 3868;
+UPDATE `creature_template` SET `mindmg` = 51, `maxdmg` = 69, `DamageModifier` = 1.03 WHERE `entry` = 3873;
+UPDATE `creature_template` SET `mindmg` = 51, `maxdmg` = 69, `DamageModifier` = 1.03 WHERE `entry` = 3859;
+UPDATE `creature_template` SET `mindmg` = 51, `maxdmg` = 69, `DamageModifier` = 1.03 WHERE `entry` = 2529;
+UPDATE `creature_template` SET `mindmg` = 51, `maxdmg` = 73, `DamageModifier` = 1.03 WHERE `entry` = 3863;
+UPDATE `creature_template` SET `mindmg` = 30, `maxdmg` = 40, `DamageModifier` = 1.03 WHERE `entry` = 4627;
+UPDATE `creature_template` SET `mindmg` = 22, `maxdmg` = 31, `DamageModifier` = 1.03 WHERE `entry` = 5097;
+
+/* RARE */
+UPDATE `creature_template` SET `rank` = 2, `mindmg` = 101, `maxdmg` = 130, `DamageModifier` = 1.02 WHERE `entry` = 3872;
+
+/* BOSS */
+UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 85, `maxdmg` = 110, `DamageModifier` = 1.01 WHERE `entry` = 3914;
+UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 95, `maxdmg` = 122, `DamageModifier` = 1.01 WHERE `entry` = 3865;
+UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 101, `maxdmg` = 130, `DamageModifier` = 1.01 WHERE `entry` = 3886;
+UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 112, `maxdmg` = 144, `DamageModifier` = 1.01 WHERE `entry` = 3887;
+UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 117, `maxdmg` = 151, `DamageModifier` = 1.01 WHERE `entry` = 4278;
+UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 106, `maxdmg` = 136, `DamageModifier` = 1.01 WHERE `entry` = 4279;
+UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 106, `maxdmg` = 136, `DamageModifier` = 1.01 WHERE `entry` = 4274;
+UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 117, `maxdmg` = 151, `DamageModifier` = 1.01 WHERE `entry` = 3927;
+UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 129, `maxdmg` = 166, `DamageModifier` = 1.01 WHERE `entry` = 4275;
