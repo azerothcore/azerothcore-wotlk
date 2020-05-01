@@ -14,5 +14,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (20058, 0, 7, 8, 61, 0, 100, 0, 36310, 0, 0, 0, 0, 18, 256, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodmaul Dire Wolf - On Spellhit \'Rina`s Diminution Powder\' - Set Flags Immune To Players'),
 (20058, 0, 8, 0, 61, 0, 100, 0, 36310, 0, 0, 0, 0, 27, 20058, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodmaul Dire Wolf - On Spellhit \'Rina`s Diminution Powder\' - Stop Combat');
 
-DELETE FROM `creature` WHERE `id` = 20058;
-DELETE FROM `creature_addon` WHERE `guid` IN (71502,71505,71510,71512,71513);
+DELETE FROM `creature` WHERE `id` = 21176;
