@@ -8704,20 +8704,11 @@ void ObjectMgr::LoadBroadcastTexts()
             bct.Language = LANG_UNIVERSAL;
         }
 
-        if (bct.EmoteId0)
-        {
-            if (!sEmotesStore.LookupEntry(bct.EmoteId0))
-            {
-                sLog->outDebug(LOG_FILTER_NONE, "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId0 %u but emote does not exist.", bct.Id, bct.EmoteId0);
-                bct.EmoteId0 = 0;
-            }
-        }
-
         if (bct.EmoteId1)
         {
             if (!sEmotesStore.LookupEntry(bct.EmoteId1))
             {
-                sLog->outDebug(LOG_FILTER_NONE, "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId1 %u but emote does not exist.", bct.Id, bct.EmoteId1);
+                sLog->outDebug(LOG_FILTER_NONE, "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId0 %u but emote does not exist.", bct.Id, bct.EmoteId0);
                 bct.EmoteId1 = 0;
             }
         }
@@ -8726,8 +8717,17 @@ void ObjectMgr::LoadBroadcastTexts()
         {
             if (!sEmotesStore.LookupEntry(bct.EmoteId2))
             {
-                sLog->outDebug(LOG_FILTER_NONE, "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId2 %u but emote does not exist.", bct.Id, bct.EmoteId2);
+                sLog->outDebug(LOG_FILTER_NONE, "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId1 %u but emote does not exist.", bct.Id, bct.EmoteId1);
                 bct.EmoteId2 = 0;
+            }
+        }
+
+        if (bct.EmoteId3)
+        {
+            if (!sEmotesStore.LookupEntry(bct.EmoteId3))
+            {
+                sLog->outDebug(LOG_FILTER_NONE, "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId2 %u but emote does not exist.", bct.Id, bct.EmoteId2);
+                bct.EmoteId3 = 0;
             }
         }
 
