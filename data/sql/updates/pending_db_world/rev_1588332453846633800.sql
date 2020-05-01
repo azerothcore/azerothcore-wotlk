@@ -16,3 +16,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `creature` WHERE `id` = 20058;
 DELETE FROM `creature_addon` WHERE `guid` IN (71502,71505,71510,71512,71513);
+
