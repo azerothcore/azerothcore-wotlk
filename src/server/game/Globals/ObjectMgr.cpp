@@ -7795,7 +7795,7 @@ char const* ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
         return ts->Content[DEFAULT_LOCALE].c_str();
     }
 
-    sLog->outErrorDb("Trinity string entry %u not found in DB.", entry);
+    sLog->outErrorDb("Acore string entry %u not found in DB.", entry);
 
     return "<error>";
 }
