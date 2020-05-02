@@ -32,6 +32,9 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
             //If Vem is dead...
             bool IsBossDied[3];
 
+            //If Ouro is dead...
+            bool IsOuroDead;
+
             //Storing Skeram, Vem and Kri.
             uint64 SkeramGUID;
             uint64 VemGUID;
@@ -39,6 +42,7 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
             uint64 VeklorGUID;
             uint64 VeknilashGUID;
             uint64 ViscidusGUID;
+            uint64 OuroSpawnerGUID;
 
             uint32 BugTrioDeathCount;
 
@@ -49,6 +53,7 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                 IsBossDied[0] = false;
                 IsBossDied[1] = false;
                 IsBossDied[2] = false;
+                IsOuroDead = false;
 
                 SkeramGUID = 0;
                 VemGUID = 0;
@@ -56,6 +61,7 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                 VeklorGUID = 0;
                 VeknilashGUID = 0;
                 ViscidusGUID = 0;
+                OuroSpawnerGUID = 0;
 
                 BugTrioDeathCount = 0;
 
@@ -83,6 +89,11 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                     break;
                 case NPC_VISCIDUS:
                     ViscidusGUID = creature->GetGUID();
+                    break;
+                case NPC_OURO_SPAWNER:
+                    OuroSpawnerGUID = creature->GetGUID();
+                    if (GetBossState(NPC_OURO_SPAWNER) != DONE)
+                        creature->Respawn();
                     break;
                 }
             }
@@ -117,6 +128,9 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
 
                 case DATA_CTHUN_PHASE:
                     return CthunPhase;
+
+                case DATA_OURO_SPAWNER:
+                    return OuroSpawnerGUID;
                 }
                 return 0;
             }
@@ -137,6 +151,8 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                     return VeknilashGUID;
                 case DATA_VISCIDUS:
                     return ViscidusGUID;
+                case DATA_OURO_SPAWNER:
+                    return OuroSpawnerGUID;
                 }
                 return 0;
             }                                                       // end GetData64

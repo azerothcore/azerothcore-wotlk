@@ -17,11 +17,75 @@ EndScriptData */
 
 enum Spells
 {
+    // Ouro
     SPELL_SWEEP                 = 26103,
     SPELL_SANDBLAST             = 26102,
     SPELL_GROUND_RUPTURE        = 26100,
     SPELL_BIRTH                 = 26262, // The Birth Animation
-    SPELL_DIRTMOUND_PASSIVE     = 26092
+    SPELL_DIRTMOUND_PASSIVE     = 26092,
+
+    // Ouro Spawner
+    SPELL_SUMMON_OURO           = 26061 // Summons Ouro, used by the Ouro Spawner
+};
+
+enum Events
+{
+    EVENT_SPELL_SWEEP = 1,
+    EVENT_SPELL_SANDBLAST = 2,
+    EVENT_SUBMERGE = 3,
+    EVENT_BACK = 4,
+    EVENT_CHARGE_TARGET = 5,
+    EVENT_SPAWN = 6
+};
+
+class npc_ouro_spawner : public CreatureScript
+{
+public:
+    npc_ouro_spawner() : CreatureScript("npc_ouro_spawner") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ouro_spawnerAI(creature);
+    }
+
+    struct npc_ouro_spawnerAI : public ScriptedAI
+    {
+        npc_ouro_spawnerAI(Creature* creature) : ScriptedAI(creature) { Reset(); }
+
+        bool hasSummoned;
+
+        void Reset() override
+        {
+            hasSummoned = false;
+            DoCast(me, SPELL_DIRTMOUND_PASSIVE);
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            // Spawn Ouro on LoS check
+            if (!hasSummoned && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 25.0f))
+            {
+                DoCast(me, SPELL_SUMMON_OURO);
+                hasSummoned = true;
+            }
+
+            ScriptedAI::MoveInLineOfSight(who);
+        }
+
+        void JustSummoned(Creature* creature) override
+        {
+            // Despawn when Ouro is spawned
+            if (creature->GetEntry() == NPC_OURO)
+            {
+                creature->SetInCombatWithZone();
+                creature->CastSpell(creature, SPELL_BIRTH, false);
+                me->DespawnOrUnsummon();
+            }
+        }
+
+        void UpdateAI(uint32 const /*uiDiff*/) override { me->StopMoving(); }
+    };
+
 };
 
 class boss_ouro : public CreatureScript
@@ -36,34 +100,29 @@ public:
 
     struct boss_ouroAI : public ScriptedAI
     {
-        boss_ouroAI(Creature* creature) : ScriptedAI(creature) { }
+        boss_ouroAI(Creature* creature) : ScriptedAI(creature) { me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); }
 
-        uint32 Sweep_Timer;
-        uint32 SandBlast_Timer;
-        uint32 Submerge_Timer;
-        uint32 Back_Timer;
-        uint32 ChangeTarget_Timer;
-        uint32 Spawn_Timer;
+        EventMap events;
 
-        bool Enrage;
         bool Submerged;
 
         void Reset()
         {
-            Sweep_Timer = urand(5000, 10000);
-            SandBlast_Timer = urand(20000, 35000);
-            Submerge_Timer = urand(90000, 150000);
-            Back_Timer = urand(30000, 45000);
-            ChangeTarget_Timer = urand(5000, 8000);
-            Spawn_Timer = urand(10000, 20000);
+            events.Reset();
 
-            Enrage = false;
             Submerged = false;
         }
 
         void EnterCombat(Unit* /*who*/)
         {
-            DoCastVictim(SPELL_BIRTH);
+            Submerged = false;
+
+            events.Reset();
+            events.ScheduleEvent(EVENT_SPELL_SWEEP, urand(5000, 10000));
+            events.ScheduleEvent(EVENT_SPELL_SANDBLAST, urand(20000, 35000));
+            events.ScheduleEvent(EVENT_SUBMERGE, urand(90000, 150000));
+            events.ScheduleEvent(EVENT_CHARGE_TARGET, urand(5000, 8000));
+            events.ScheduleEvent(EVENT_SPAWN, urand(10000, 20000));
         }
 
         void UpdateAI(uint32 diff)
@@ -72,56 +131,67 @@ public:
             if (!UpdateVictim())
                 return;
 
-            //Sweep_Timer
-            if (!Submerged && Sweep_Timer <= diff)
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while(uint32 eventId = events.ExecuteEvent())
             {
-                DoCastVictim(SPELL_SWEEP);
-                Sweep_Timer = urand(15000, 30000);
-            } else Sweep_Timer -= diff;
+                switch (eventId)
+                {
+                    case 0:
+                        break;
+                    case EVENT_SPELL_SWEEP:
+                    {
+                        DoCastVictim(SPELL_SWEEP);
+                        events.ScheduleEvent(EVENT_SPELL_SWEEP, urand(15000, 30000));
+                        break;
+                    }
+                    case EVENT_SPELL_SANDBLAST:
+                    {
+                        DoCastVictim(SPELL_SANDBLAST);
+                        events.ScheduleEvent(EVENT_SPELL_SANDBLAST, urand(20000, 35000));
+                        break;
+                    }
+                    case EVENT_SUBMERGE:
+                    {
+                        if (Submerged == false)
+                        {
+                            // Cast
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
+                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            me->setFaction(35);
+                            DoCast(me, SPELL_DIRTMOUND_PASSIVE);
 
-            //SandBlast_Timer
-            if (!Submerged && SandBlast_Timer <= diff)
-            {
-                DoCastVictim(SPELL_SANDBLAST);
-                SandBlast_Timer = urand(20000, 35000);
-            } else SandBlast_Timer -= diff;
+                            Submerged = true;
+                        }
+                        events.ScheduleEvent(EVENT_BACK, urand(30000, 45000));
+                        break;
+                    }
+                    case EVENT_CHARGE_TARGET:
+                    {
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
+                        events.ScheduleEvent(EVENT_CHARGE_TARGET, urand(10000, 20000));
+                        break;
+                    }
+                    case EVENT_BACK:
+                    {
+                        if (Submerged == true)
+                        {
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            me->setFaction(14);
 
-            //Submerge_Timer
-            if (!Submerged && Submerge_Timer <= diff)
-            {
-                //Cast
-                me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                me->setFaction(35);
-                DoCast(me, SPELL_DIRTMOUND_PASSIVE);
+                            DoCastVictim(SPELL_GROUND_RUPTURE);
 
-                Submerged = true;
-                Back_Timer = urand(30000, 45000);
-            } else Submerge_Timer -= diff;
-
-            //ChangeTarget_Timer
-            if (Submerged && ChangeTarget_Timer <= diff)
-            {
-                Unit* target = NULL;
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-
-                if (target)
-                    me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
-
-                ChangeTarget_Timer = urand(10000, 20000);
-            } else ChangeTarget_Timer -= diff;
-
-            //Back_Timer
-            if (Submerged && Back_Timer <= diff)
-            {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                me->setFaction(14);
-
-                DoCastVictim(SPELL_GROUND_RUPTURE);
-
-                Submerged = false;
-                Submerge_Timer = urand(60000, 120000);
-            } else Back_Timer -= diff;
+                            Submerged = false;
+                        }
+                        events.ScheduleEvent(EVENT_SUBMERGE, urand(60000, 120000));
+                        break;
+                    }
+                }
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -131,5 +201,6 @@ public:
 
 void AddSC_boss_ouro()
 {
+    new npc_ouro_spawner();
     new boss_ouro();
 }
