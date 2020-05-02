@@ -92,7 +92,7 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                     break;
                 case NPC_OURO_SPAWNER:
                     OuroSpawnerGUID = creature->GetGUID();
-                    if (GetBossState(NPC_OURO_SPAWNER) != DONE)
+                    if (GetBossState(NPC_OURO) != DONE)
                         creature->Respawn();
                     break;
                 }

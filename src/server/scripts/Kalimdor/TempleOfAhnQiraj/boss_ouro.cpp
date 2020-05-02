@@ -113,6 +113,12 @@ public:
             Submerged = false;
         }
 
+        void JustDied(Unit* /*killer*/)
+        {
+            if (InstanceScript* instance = me->GetInstanceScripT())
+                instance->SetBossState(NPC_OURO, DONE);
+        }
+
         void EnterCombat(Unit* /*who*/)
         {
             Submerged = false;
