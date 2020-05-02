@@ -91,7 +91,7 @@ public:
 class boss_ouro : public CreatureScript
 {
 public:
-    boss_ouro() : CreatureScript("boss_ouro") { }
+    boss_ouro() : CreatureScript("boss_ouro") { Submerged = false; }
 
     CreatureAI* GetAI(Creature* creature) const
     {
