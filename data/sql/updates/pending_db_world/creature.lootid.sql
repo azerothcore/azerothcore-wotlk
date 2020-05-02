@@ -1,0 +1,1 @@
+UPDATE `creature_template` SET `lootid` = '0' WHERE `entry` IN (2992, 7484, 3680, 17079, 17080);
