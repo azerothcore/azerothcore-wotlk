@@ -32,9 +32,6 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
             //If Vem is dead...
             bool IsBossDied[3];
 
-            //If Ouro is dead...
-            bool IsOuroDead;
-
             //Storing Skeram, Vem and Kri.
             uint64 SkeramGUID;
             uint64 VemGUID;
@@ -53,7 +50,6 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                 IsBossDied[0] = false;
                 IsBossDied[1] = false;
                 IsBossDied[2] = false;
-                IsOuroDead = false;
 
                 SkeramGUID = 0;
                 VemGUID = 0;

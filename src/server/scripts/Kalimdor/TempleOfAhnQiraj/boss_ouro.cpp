@@ -100,7 +100,7 @@ public:
 
     struct boss_ouroAI : public ScriptedAI
     {
-        boss_ouroAI(Creature* creature) : ScriptedAI(creature) 
+        boss_ouroAI(Creature* creature) : ScriptedAI(creature)
         {
             Submerged = false;
 
