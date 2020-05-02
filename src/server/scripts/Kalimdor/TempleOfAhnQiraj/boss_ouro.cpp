@@ -91,7 +91,7 @@ public:
 class boss_ouro : public CreatureScript
 {
 public:
-    boss_ouro() : CreatureScript("boss_ouro") { Submerged = false; }
+    boss_ouro() : CreatureScript("boss_ouro") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -100,7 +100,12 @@ public:
 
     struct boss_ouroAI : public ScriptedAI
     {
-        boss_ouroAI(Creature* creature) : ScriptedAI(creature) { me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); }
+        boss_ouroAI(Creature* creature) : ScriptedAI(creature) 
+        {
+            Submerged = false;
+
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+        }
 
         EventMap events;
 
