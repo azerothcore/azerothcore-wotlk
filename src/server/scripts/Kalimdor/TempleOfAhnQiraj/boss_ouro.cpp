@@ -115,7 +115,7 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            if (InstanceScript* instance = me->GetInstanceScripT())
+            if (InstanceScript* instance = me->GetInstanceScript())
                 instance->SetBossState(NPC_OURO, DONE);
         }
 
