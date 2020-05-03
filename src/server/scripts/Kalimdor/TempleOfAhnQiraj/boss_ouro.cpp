@@ -111,20 +111,20 @@ public:
 
         bool Submerged;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
 
             Submerged = false;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
                 instance->SetBossState(NPC_OURO, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Submerged = false;
 
@@ -136,7 +136,7 @@ public:
             events.ScheduleEvent(EVENT_SPAWN, urand(10000, 20000));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -151,8 +151,6 @@ public:
             {
                 switch (eventId)
                 {
-                    case 0:
-                        break;
                     case EVENT_SPELL_SWEEP:
                     {
                         DoCastVictim(SPELL_SWEEP);
