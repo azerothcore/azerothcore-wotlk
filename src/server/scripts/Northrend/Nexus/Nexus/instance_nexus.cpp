@@ -205,6 +205,7 @@ class npc_crystalline_frayer : public CreatureScript
                 abilityTimer1 = 0;
                 abilityTimer2 = 30000;
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             }
 
             void EnterCombat(Unit*)
@@ -230,6 +231,7 @@ class npc_crystalline_frayer : public CreatureScript
                         damage = 0;
 
                         me->SetReactState(REACT_PASSIVE);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         me->SetRegeneratingHealth(false);
                         me->CastSpell(me, SPELL_SUMMON_SEED_POD, true);
@@ -252,6 +254,7 @@ class npc_crystalline_frayer : public CreatureScript
                         restoreTimer = 0;
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     }
                     return;
                 }
