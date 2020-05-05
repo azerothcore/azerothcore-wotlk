@@ -1,25 +1,35 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "DBCFileLoader.h"
 #include "Errors.h"
 
-DBCFileLoader::DBCFileLoader() : recordSize(0), recordCount(0), fieldCount(0), stringSize(0), fieldsOffset(NULL), data(NULL), stringTable(NULL) { }
+DBCFileLoader::DBCFileLoader() : recordSize(0), recordCount(0), fieldCount(0), stringSize(0), fieldsOffset(nullptr), data(nullptr), stringTable(nullptr) { }
 
-bool DBCFileLoader::Load(const char* filename, const char* fmt)
+bool DBCFileLoader::Load(char const* filename, char const* fmt)
 {
     uint32 header;
     if (data)
     {
         delete [] data;
-        data = NULL;
+        data = nullptr;
     }
 
     FILE* f = fopen(filename, "rb");
@@ -31,7 +41,6 @@ bool DBCFileLoader::Load(const char* filename, const char* fmt)
         fclose(f);
         return false;
     }
-
 
     EndianConvert(header);
 
@@ -75,6 +84,7 @@ bool DBCFileLoader::Load(const char* filename, const char* fmt)
 
     fieldsOffset = new uint32[fieldCount];
     fieldsOffset[0] = 0;
+
     for (uint32 i = 1; i < fieldCount; ++i)
     {
         fieldsOffset[i] = fieldsOffset[i - 1];
@@ -100,23 +110,22 @@ bool DBCFileLoader::Load(const char* filename, const char* fmt)
 
 DBCFileLoader::~DBCFileLoader()
 {
-    if (data)
-        delete [] data;
+    delete[] data;
 
-    if (fieldsOffset)
-        delete [] fieldsOffset;
+    delete[] fieldsOffset;
 }
 
 DBCFileLoader::Record DBCFileLoader::getRecord(size_t id)
 {
-    assert(data);
+    ASSERT(data);
     return Record(*this, data + id * recordSize);
 }
 
-uint32 DBCFileLoader::GetFormatRecordSize(const char* format, int32* index_pos)
+uint32 DBCFileLoader::GetFormatRecordSize(char const* format, int32* index_pos)
 {
     uint32 recordsize = 0;
     int32 i = -1;
+
     for (uint32 x = 0; format[x]; ++x)
     {
         switch (format[x])
@@ -158,7 +167,7 @@ uint32 DBCFileLoader::GetFormatRecordSize(const char* format, int32* index_pos)
     return recordsize;
 }
 
-char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**& indexTable, uint32 sqlRecordCount, uint32 sqlHighestIndex, char*& sqlDataTable)
+char* DBCFileLoader::AutoProduceData(char const* format, uint32& records, char**& indexTable)
 {
     /*
     format STRING, NA, FLOAT, NA, INT <=>
@@ -173,7 +182,7 @@ char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**
 
     typedef char* ptr;
     if (strlen(format) != fieldCount)
-        return NULL;
+        return nullptr;
 
     //get struct size and index pos
     int32 i;
@@ -190,10 +199,6 @@ char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**
                 maxi = ind;
         }
 
-        // If higher index avalible from sql - use it instead of dbcs
-        if (sqlHighestIndex > maxi)
-            maxi = sqlHighestIndex;
-
         ++maxi;
         records = maxi;
         indexTable = new ptr[maxi];
@@ -201,11 +206,11 @@ char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**
     }
     else
     {
-        records = recordCount + sqlRecordCount;
-        indexTable = new ptr[recordCount + sqlRecordCount];
+        records = recordCount;
+        indexTable = new ptr[recordCount];
     }
 
-    char* dataTable = new char[(recordCount + sqlRecordCount) * recordsize];
+    char* dataTable = new char[recordCount * recordsize];
 
     uint32 offset = 0;
 
@@ -234,7 +239,7 @@ char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**
                     offset += sizeof(uint8);
                     break;
                 case FT_STRING:
-                    *((char**)(&dataTable[offset])) = NULL;   // will replace non-empty or "" strings in AutoProduceStrings
+                    *((char**)(&dataTable[offset])) = nullptr;   // will replace non-empty or "" strings in AutoProduceStrings
                     offset += sizeof(char*);
                     break;
                 case FT_LOGIC:
@@ -251,15 +256,13 @@ char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**
         }
     }
 
-    sqlDataTable = dataTable + offset;
-
     return dataTable;
 }
 
-char* DBCFileLoader::AutoProduceStrings(const char* format, char* dataTable)
+char* DBCFileLoader::AutoProduceStrings(char const* format, char* dataTable)
 {
     if (strlen(format) != fieldCount)
-        return NULL;
+        return nullptr;
 
     char* stringPool = new char[stringSize];
     memcpy(stringPool, stringTable, stringSize);
@@ -289,21 +292,21 @@ char* DBCFileLoader::AutoProduceStrings(const char* format, char* dataTable)
                     if (!*slot || !**slot)
                     {
                         const char * st = getRecord(y).getString(x);
-                        *slot=stringPool+(st-(const char*)stringTable);
+                        *slot = stringPool + (st - (char const*)stringTable);
                     }
                     offset += sizeof(char*);
                     break;
-                 }
-                 case FT_LOGIC:
-                     ASSERT(false && "Attempted to load DBC files that does not have field types that match what is in the core. Check DBCfmt.h or your DBC files.");
-                     break;
-                 case FT_NA:
-                 case FT_NA_BYTE:
-                 case FT_SORT:
-                     break;
-                 default:
-                     ASSERT(false && "Unknown field format character in DBCfmt.h");
-                     break;
+                }
+                case FT_LOGIC:
+                    ASSERT(false && "Attempted to load DBC files that does not have field types that match what is in the core. Check DBCfmt.h or your DBC files.");
+                    break;
+                case FT_NA:
+                case FT_NA_BYTE:
+                case FT_SORT:
+                    break;
+                default:
+                    ASSERT(false && "Unknown field format character in DBCfmt.h");
+                    break;
             }
         }
     }

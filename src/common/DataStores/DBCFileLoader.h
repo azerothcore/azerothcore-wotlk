@@ -1,14 +1,26 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef DBC_FILE_LOADER_H
 #define DBC_FILE_LOADER_H
+
 #include "Define.h"
+#include "Errors.h"
 #include "Utilities/ByteConverter.h"
-#include <cassert>
 
 enum DbcFieldFormat
 {
@@ -25,7 +37,7 @@ enum DbcFieldFormat
     FT_SQL_ABSENT='a'                                       //Used in sql format to mark column absent in sql dbc
 };
 
-class DBCFileLoader
+class AC_COMMON_API DBCFileLoader
 {
     public:
         DBCFileLoader();
@@ -38,29 +50,29 @@ class DBCFileLoader
             public:
                 float getFloat(size_t field) const
                 {
-                    assert(field < file.fieldCount);
+                    ASSERT(field < file.fieldCount);
                     float val = *reinterpret_cast<float*>(offset+file.GetOffset(field));
                     EndianConvert(val);
                     return val;
                 }
                 uint32 getUInt(size_t field) const
                 {
-                    assert(field < file.fieldCount);
+                    ASSERT(field < file.fieldCount);
                     uint32 val = *reinterpret_cast<uint32*>(offset+file.GetOffset(field));
                     EndianConvert(val);
                     return val;
                 }
                 uint8 getUInt8(size_t field) const
                 {
-                    assert(field < file.fieldCount);
+                    ASSERT(field < file.fieldCount);
                     return *reinterpret_cast<uint8*>(offset+file.GetOffset(field));
                 }
 
                 const char *getString(size_t field) const
                 {
-                    assert(field < file.fieldCount);
+                    ASSERT(field < file.fieldCount);
                     size_t stringOffset = getUInt(field);
-                    assert(stringOffset < file.stringSize);
+                    ASSERT(stringOffset < file.stringSize);
                     return reinterpret_cast<char*>(file.stringTable + stringOffset);
                 }
 
@@ -80,11 +92,11 @@ class DBCFileLoader
         uint32 GetNumRows() const { return recordCount; }
         uint32 GetRowSize() const { return recordSize; }
         uint32 GetCols() const { return fieldCount; }
-        uint32 GetOffset(size_t id) const { return (fieldsOffset != NULL && id < fieldCount) ? fieldsOffset[id] : 0; }
-        bool IsLoaded() const { return data != NULL; }
-        char* AutoProduceData(const char* fmt, uint32& count, char**& indexTable, uint32 sqlRecordCount, uint32 sqlHighestIndex, char *& sqlDataTable);
-        char* AutoProduceStrings(const char* fmt, char* dataTable);
-        static uint32 GetFormatRecordSize(const char * format, int32 * index_pos = NULL);
+        uint32 GetOffset(size_t id) const { return (fieldsOffset != nullptr && id < fieldCount) ? fieldsOffset[id] : 0; }
+        bool IsLoaded() const { return data != nullptr; }
+        char* AutoProduceData(char const* fmt, uint32& count, char**& indexTable);
+        char* AutoProduceStrings(char const* fmt, char* dataTable);
+        static uint32 GetFormatRecordSize(const char * format, int32 * index_pos = nullptr);
     private:
 
         uint32 recordSize;
@@ -94,5 +106,8 @@ class DBCFileLoader
         uint32 *fieldsOffset;
         unsigned char *data;
         unsigned char *stringTable;
+
+        DBCFileLoader(DBCFileLoader const& right) = delete;
+        DBCFileLoader& operator=(DBCFileLoader const& right) = delete;
 };
 #endif
