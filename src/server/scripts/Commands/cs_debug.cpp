@@ -769,10 +769,18 @@ public:
         return true;
     }
 
-    static bool HandleDebugBattlegroundCommand(ChatHandler* /*handler*/, char const* /*args*/)
+    static bool HandleDebugBattlegroundCommand(ChatHandler* handler, char const* /*args*/)
     {
-        sBattlegroundMgr->ToggleTesting();
-        return true;
+        if (sWorld->getBoolConfig(CONFIG_DEBUG_BATTLEGROUND))
+        {
+            handler->PSendSysMessage("Battleground debugging is enabled via config, thus you are not able to enable/disable it by command.");
+                return true;
+        }
+        else if (!sWorld->getBoolConfig(CONFIG_DEBUG_BATTLEGROUND))
+        {
+            sBattlegroundMgr->ToggleTesting();
+                return true;
+        }
     }
 
     static bool HandleDebugArenaCommand(ChatHandler* /*handler*/, char const* /*args*/)

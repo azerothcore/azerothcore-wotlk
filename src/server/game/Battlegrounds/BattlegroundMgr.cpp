@@ -794,8 +794,17 @@ uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
 
 void BattlegroundMgr::ToggleTesting()
 {
-    m_Testing = !m_Testing;
-    sWorld->SendWorldText(m_Testing ? LANG_DEBUG_BG_ON : LANG_DEBUG_BG_OFF);
+    if (sWorld->getBoolConfig(CONFIG_DEBUG_BATTLEGROUND))
+    {
+        m_Testing = true;
+        return;
+    }
+    else
+    {
+        m_Testing = !m_Testing;
+        sWorld->SendWorldText(m_Testing ? LANG_DEBUG_BG_ON : LANG_DEBUG_BG_OFF);
+        return;
+    }
 }
 
 void BattlegroundMgr::ToggleArenaTesting()

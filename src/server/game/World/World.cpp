@@ -1394,6 +1394,9 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER] = sConfigMgr->GetIntDefault("WaypointMovementStopTimeForPlayer", 120);
 
+    //Debug
+    m_bool_configs[CONFIG_DEBUG_BATTLEGROUND] = sConfigMgr->GetBoolDefault("Debug.Battleground", false);
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
@@ -2066,6 +2069,11 @@ void World::SetInitialWorldSettings()
     if (sConfigMgr->isDryRun()) {
         sLog->outString("AzerothCore dry run completed, terminating.");
         exit(0);
+    }
+
+    if (sWorld->getBoolConfig(CONFIG_DEBUG_BATTLEGROUND))
+    {
+        sLog->outString("Battleground debugging is enabled via config.");
     }
 }
 
