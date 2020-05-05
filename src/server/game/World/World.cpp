@@ -2071,11 +2071,6 @@ void World::SetInitialWorldSettings()
         sLog->outString("AzerothCore dry run completed, terminating.");
         exit(0);
     }
-
-    if (sWorld->getBoolConfig(CONFIG_DEBUG_BATTLEGROUND))
-    {
-        sLog->outString("Battleground debugging is enabled via config.");
-    }
 }
 
 void World::DetectDBCLang()
