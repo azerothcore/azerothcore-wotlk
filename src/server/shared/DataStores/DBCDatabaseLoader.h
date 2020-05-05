@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-struct AC_SHARED_API DBCDatabaseLoader
+struct DBCDatabaseLoader
 {
     DBCDatabaseLoader(char const* dbTable, char const* dbFormatString, char const* index, char const* dbcFormatString, std::vector<char*>& stringPool);
 
