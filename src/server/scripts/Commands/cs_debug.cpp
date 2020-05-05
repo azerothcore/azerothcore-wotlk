@@ -769,7 +769,7 @@ public:
         return true;
     }
 
-    static bool HandleDebugBattlegroundCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleDebugBattlegroundCommand(ChatHandler* /*handler*/, char const* /*args*/)
     {
         sBattlegroundMgr->ToggleTesting();
         return true;
