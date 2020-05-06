@@ -14,6 +14,7 @@
 #include "UnitEvents.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "SpellInfo.h"
 
 //==============================================================
 //================= ThreatCalcHelper ===========================

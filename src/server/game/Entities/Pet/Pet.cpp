@@ -18,7 +18,7 @@
 #include "Unit.h"
 #include "Util.h"
 #include "Group.h"
-#include "Opcodes.h"
+#include "WorldSession.h"
 #include "Battleground.h"
 #include "InstanceScript.h"
 #include "ArenaSpectator.h"
@@ -152,9 +152,12 @@ bool Pet::LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry, ui
     if (owner->IsSpectator() || owner->GetPet() || !owner->IsInWorld() || !owner->FindMap())
         return false;
 
-    // DK Pet exception
-    if (owner->getClass() == CLASS_DEATH_KNIGHT && !owner->CanSeeDKPet())
-        return false;
+    bool forceLoadFromDB = false;
+    sScriptMgr->OnBeforeLoadPetFromDB(owner, petentry, petnumber, current, forceLoadFromDB);
+
+    if (!forceLoadFromDB)
+        if (owner->getClass() == CLASS_DEATH_KNIGHT && !owner->CanSeeDKPet()) // DK Pet exception
+            return false;
 
     uint32 ownerid = owner->GetGUIDLow();
     PreparedStatement* stmt;
@@ -440,6 +443,8 @@ void Pet::Update(uint32 diff)
                     if (!spellInfo)
                         return;
                     float max_range = GetSpellMaxRangeForTarget(tempspellTarget, spellInfo);
+                    if (spellInfo->RangeEntry->type == SPELL_RANGE_MELEE)
+                        max_range -= 2*MIN_MELEE_REACH;
 
                     if (IsWithinLOSInMap(tempspellTarget) && GetDistance(tempspellTarget) < max_range)
                     {
@@ -720,20 +725,31 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     //Determine pet type
     PetType petType = MAX_PET_TYPE;
-    if (IsPet() && owner->GetTypeId() == TYPEID_PLAYER)
+    if (owner->GetTypeId() == TYPEID_PLAYER)
     {
-        if (owner->getClass() == CLASS_WARLOCK ||
-            owner->getClass() == CLASS_SHAMAN ||          // Fire Elemental
-            owner->getClass() == CLASS_DEATH_KNIGHT ||    // Risen Ghoul
-            owner->getClass() == CLASS_MAGE)              // Water Elemental with glyph
-            petType = SUMMON_PET;
-        else if (owner->getClass() == CLASS_HUNTER)
+        sScriptMgr->OnBeforeGuardianInitStatsForLevel(owner->ToPlayer(), this, cinfo, petType);
+
+        if (IsPet())
         {
-            petType = HUNTER_PET;
-            m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
+            if (petType == MAX_PET_TYPE)
+            {
+                // The petType was not overwritten by the hook, continue with default initialization
+                if (owner->getClass() == CLASS_WARLOCK ||
+                    owner->getClass() == CLASS_SHAMAN ||          // Fire Elemental
+                    owner->getClass() == CLASS_DEATH_KNIGHT ||    // Risen Ghoul
+                    owner->getClass() == CLASS_MAGE)              // Water Elemental with glyph
+                    petType = SUMMON_PET;
+                else if (owner->getClass() == CLASS_HUNTER)
+                {
+                    petType = HUNTER_PET;
+                }
+            }
+
+            if (petType == HUNTER_PET)
+                m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
+            else if (petType != SUMMON_PET)
+                sLog->outError("Unknown type pet %u is summoned by player class %u", GetEntry(), owner->getClass());
         }
-        else
-            sLog->outError("Unknown type pet %u is summoned by player class %u", GetEntry(), owner->getClass());
     }
 
     uint32 creature_ID = (petType == HUNTER_PET) ? 1 : cinfo->Entry;
@@ -1066,8 +1082,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     SetFullHealth();
     SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
 
-    if (Pet* pet = ToPet())
-        sScriptMgr->OnPetInitStatsForLevel(pet);
+    if (owner->GetTypeId() == TYPEID_PLAYER)
+        sScriptMgr->OnAfterGuardianInitStatsForLevel(owner->ToPlayer(), this);
 
     return true;
 }
@@ -2189,8 +2205,11 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
 
         if (info->m_petType == SUMMON_PET)
         {
-            // this enables pet details window (Shift+P)
-            pet->GetCharmInfo()->SetPetNumber(pet_number, true);
+            if (pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON)
+                pet->GetCharmInfo()->SetPetNumber(pet_number, true); // Show pet details tab (Shift+P) only for demons
+            else
+                pet->GetCharmInfo()->SetPetNumber(pet_number, false);
+
             pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
             pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);

@@ -11,6 +11,7 @@
 #include "TemporarySummon.h"
 #include "Pet.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 
 TempSummon::TempSummon(SummonPropertiesEntry const* properties, uint64 owner, bool isWorldObject) :
 Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
@@ -147,13 +148,17 @@ void TempSummon::InitStats(uint32 duration)
 { 
     ASSERT(!IsPet());
 
+    Unit* owner = GetSummoner();
+    if (owner)
+        if (Player* player = owner->ToPlayer())
+            sScriptMgr->OnBeforeTempSummonInitStats(player, this, duration);
+
     m_timer = duration;
     m_lifetime = duration;
 
     if (m_type == TEMPSUMMON_MANUAL_DESPAWN)
         m_type = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
 
-    Unit* owner = GetSummoner();
     if (owner)
     {
         if (IsTrigger() && m_spells[0])
