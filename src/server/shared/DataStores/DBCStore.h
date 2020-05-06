@@ -35,12 +35,12 @@ public:
 
     virtual bool Load(char const* path) = 0;
     virtual bool LoadStringsFrom(char const* path) = 0;
-    virtual void LoadFromDB(char const* table, char const* format, char const* index) = 0;
+    virtual void LoadFromDB(char const* table, char const* format) = 0;
 
 protected:
     bool Load(char const* path, char**& indexTable);
     bool LoadStringsFrom(char const* path, char** indexTable);
-    void LoadFromDB(char const* table, char const* format, char const* index, char**& indexTable);
+    void LoadFromDB(char const* table, char const* format, char**& indexTable);
 
     uint32 _fieldCount;
     char const* _fileFormat;
@@ -73,16 +73,16 @@ public:
     bool Load(char const* path) override
     {
         return DBCStorageBase::Load(path, _indexTable.AsChar);
-}
+    }
 
     bool LoadStringsFrom(char const* path) override
     {
         return DBCStorageBase::LoadStringsFrom(path, _indexTable.AsChar);
     }
 
-    void LoadFromDB(char const* table, char const* format, char const* index) override
+    void LoadFromDB(char const* table, char const* format) override
     {
-        DBCStorageBase::LoadFromDB(table, format, index, _indexTable.AsChar);
+        DBCStorageBase::LoadFromDB(table, format, _indexTable.AsChar);
     }
 
     iterator begin() { return iterator(_indexTable.AsT, _indexTableSize); }

@@ -69,7 +69,7 @@ bool DBCStorageBase::LoadStringsFrom(char const* path, char** indexTable)
     return true;
 }
 
-void DBCStorageBase::LoadFromDB(char const* table, char const* format, char const* index, char**& indexTable)
+void DBCStorageBase::LoadFromDB(char const* table, char const* format, char**& indexTable)
 {
-    _stringPool.push_back(DBCDatabaseLoader(table, format, index, _fileFormat, _stringPool).Load(_indexTableSize, indexTable));
+    _stringPool.push_back(DBCDatabaseLoader(table, format, _stringPool).Load(_indexTableSize, indexTable));
 }
