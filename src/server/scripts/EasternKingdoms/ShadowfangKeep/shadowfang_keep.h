@@ -5,7 +5,8 @@
 #ifndef DEF_SHADOWFANG_H
 #define DEF_SHADOWFANG_H
 
-#include "ScriptPCH.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum DataTypes
 {

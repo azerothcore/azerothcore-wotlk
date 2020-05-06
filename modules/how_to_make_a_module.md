@@ -2,7 +2,7 @@
 
 1) Read this page first:
 
-https://github.com/azerothcore/azerothcore-wotlk/wiki/Create-a-Module
+http://www.azerothcore.org/wiki/Create-a-Module
 
 
 2) Run the script `create_module.sh`:

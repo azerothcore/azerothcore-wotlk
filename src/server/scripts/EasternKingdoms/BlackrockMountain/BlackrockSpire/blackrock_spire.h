@@ -7,8 +7,6 @@
 #ifndef DEF_BLACKROCK_SPIRE_H
 #define DEF_BLACKROCK_SPIRE_H
 
-#include "ScriptPCH.h"
-
 uint32 const EncounterCount         = 23;
 
 #define BRSScriptName "instance_blackrock_spire"

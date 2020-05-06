@@ -11,6 +11,7 @@
  * Scriptnames of files in this file should be prefixed with "spell_gen_"
  */
 
+#include <array>
 #include "ScriptMgr.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
@@ -45,7 +46,6 @@ public:
 
         bool Load()
         {
-            memset(_itemId, 0, sizeof(_itemId));
             _modelId = 0;
             _hasFlag = false;
             return true;
@@ -56,7 +56,7 @@ public:
             _modelId = GetUnitOwner()->GetDisplayId();
             _hasFlag = GetUnitOwner()->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             for (uint8 i = 0; i < 3; ++i)
-                _itemId[i] = GetUnitOwner()->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i);
+                _itemId.at(i) = GetUnitOwner()->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i);
 
             GetUnitOwner()->SetDisplayId(11686);
             GetUnitOwner()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -70,7 +70,7 @@ public:
             if (!_hasFlag)
                 GetUnitOwner()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             for (uint8 i = 0; i < 3; ++i)
-                 GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, _itemId[i]);
+                GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, _itemId.at(i));
         }
 
         void Register()
@@ -80,7 +80,7 @@ public:
         }
 
     private:
-        uint32 _itemId[3];
+        std::array<uint32, 3> _itemId = { {0, 0, 0} };
         uint32 _modelId;
         bool _hasFlag;
     };
@@ -766,7 +766,7 @@ class spell_gen_select_target_count : public SpellScriptLoader
             void FilterTargets(std::list<WorldObject*>& targets)
             {
                 targets.remove(GetCaster());
-                Trinity::Containers::RandomResizeList(targets, _count);
+                acore::Containers::RandomResizeList(targets, _count);
             }
 
             void Register()
@@ -1408,6 +1408,92 @@ class spell_gen_throw_back : public SpellScriptLoader
         }
 };
 
+enum eHaunted
+{
+    NPC_SCOURGE_HAUNT = 29238
+};
+
+class spell_gen_haunted :  public SpellScriptLoader
+{
+    public:
+        spell_gen_haunted() : SpellScriptLoader("spell_gen_haunted") { }
+
+        class spell_gen_haunted_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_gen_haunted_AuraScript);
+
+            void HandleEffectCalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+            {
+                isPeriodic = true;
+                amplitude = urand(120,300) * IN_MILLISECONDS;
+            }
+
+            void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    Position pos;
+                    caster->GetRandomNearPosition(pos, 5.0f);
+                    if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10,20) * IN_MILLISECONDS))
+                    {
+                        haunt->SetSpeed(MOVE_RUN, 0.5, true);
+                        haunt->GetMotionMaster()->MoveFollow(caster, 1, M_PI);
+                    }
+                }
+            }
+
+            void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Unit* caster = GetCaster())
+                    if (Creature* haunt = caster->FindNearestCreature(NPC_SCOURGE_HAUNT, 5.0f, true))
+                        haunt->DespawnOrUnsummon();
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_haunted_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_DUMMY);
+                DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_haunted_AuraScript::HandleEffectCalcPeriodic, EFFECT_1, SPELL_AURA_DUMMY);
+                OnEffectRemove += AuraEffectRemoveFn(spell_gen_haunted_AuraScript::HandleOnEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_gen_haunted_AuraScript();
+        }
+
+        class spell_gen_haunted_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_gen_haunted_SpellScript);
+
+            void HandleOnEffectHit(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+
+                if (Unit* caster = GetCaster())
+                {
+                    Position pos;
+                    caster->GetRandomNearPosition(pos, 5.0f);
+                    if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10,20) * IN_MILLISECONDS))
+                    {
+                        haunt->SetSpeed(MOVE_RUN, 0.5, true);
+                        haunt->GetMotionMaster()->MoveFollow(caster, 1, M_PI);
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHit += SpellEffectFn(spell_gen_haunted_SpellScript::HandleOnEffectHit, EFFECT_0, SPELL_EFFECT_SUMMON);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_gen_haunted_SpellScript();
+        }
+};
+
 
 // Theirs
 class spell_gen_absorb0_hitlimit1 : public SpellScriptLoader
@@ -1634,8 +1720,8 @@ class spell_gen_cannibalize : public SpellScriptLoader
                 float max_range = GetSpellInfo()->GetMaxRange(false);
                 WorldObject* result = NULL;
                 // search for nearby enemy corpse in range
-                Trinity::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
-                Trinity::WorldObjectSearcher<Trinity::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
+                acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
+                acore::WorldObjectSearcher<acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
                 caster->GetMap()->VisitFirstFound(caster->m_positionX, caster->m_positionY, max_range, searcher);
                 if (!result)
                     return SPELL_FAILED_NO_EDIBLE_CORPSES;
@@ -4374,7 +4460,10 @@ enum Mounts
 
     // Big Blizzard Bear
     SPELL_BIG_BLIZZARD_BEAR_60          = 58997,
-    SPELL_BIG_BLIZZARD_BEAR_100         = 58999
+    SPELL_BIG_BLIZZARD_BEAR_100         = 58999,
+    SPELL_BIG_BLIZZARD_BEAR_150         = 58999,
+    SPELL_BIG_BLIZZARD_BEAR_280         = 58999,
+    SPELL_BIG_BLIZZARD_BEAR_310         = 58999
 };
 
 class spell_gen_mount : public SpellScriptLoader
@@ -4677,13 +4766,13 @@ class spell_gen_replenishment : public SpellScriptLoader
                     }
                 }
 
-                targets.remove_if(Trinity::PowerCheck(POWER_MANA, false));
+                targets.remove_if(acore::PowerCheck(POWER_MANA, false));
 
                 uint8 const maxTargets = 10;
 
                 if (targets.size() > maxTargets)
                 {
-                    targets.sort(Trinity::PowerPctOrderPred(POWER_MANA));
+                    targets.sort(acore::PowerPctOrderPred(POWER_MANA));
                     targets.resize(maxTargets);
                 }
             }
@@ -4935,7 +5024,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_disabled_above_63();
     new spell_gen_black_magic_enchant();
     new spell_gen_area_aura_select_players();
-    new spell_gen_mount("spell_big_blizzard_bear", 0, SPELL_BIG_BLIZZARD_BEAR_60, SPELL_BIG_BLIZZARD_BEAR_100, 0, 0);
+    new spell_gen_mount("spell_big_blizzard_bear", 0, SPELL_BIG_BLIZZARD_BEAR_60, SPELL_BIG_BLIZZARD_BEAR_100, SPELL_BIG_BLIZZARD_BEAR_150, SPELL_BIG_BLIZZARD_BEAR_280, SPELL_BIG_BLIZZARD_BEAR_310);
     new spell_gen_select_target_count("spell_gen_select_target_count_15_1", TARGET_UNIT_SRC_AREA_ENEMY, 1);
     new spell_gen_select_target_count("spell_gen_select_target_count_15_2", TARGET_UNIT_SRC_AREA_ENEMY, 2);
     new spell_gen_select_target_count("spell_gen_select_target_count_15_5", TARGET_UNIT_SRC_AREA_ENEMY, 5);
@@ -4962,6 +5051,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_focused_bursts();
     new spell_gen_flurry_of_claws();
     new spell_gen_throw_back();
+    new spell_gen_haunted();
 
     // theirs:
     new spell_gen_absorb0_hitlimit1();

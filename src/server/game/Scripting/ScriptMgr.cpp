@@ -17,6 +17,7 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "GossipDef.h"
+#include "ScriptedGossip.h"
 #include "CreatureAI.h"
 #include "Player.h"
 #include "WorldPacket.h"
@@ -59,105 +60,11 @@ template class ScriptRegistry<AllMapScript>;
 template class ScriptRegistry<MovementHandlerScript>;
 template class ScriptRegistry<BGScript>;
 template class ScriptRegistry<SpellSC>;
+template class ScriptRegistry<AccountScript>;
+template class ScriptRegistry<GameEventScript>;
+template class ScriptRegistry<MailScript>;
 
 #include "ScriptMgrMacros.h"
-
-// This is the global static registry of scripts.
-/*template<class TScript>
-class ScriptRegistry
-{
-    public:
-
-        typedef std::map<uint32, TScript*> ScriptMap;
-        typedef typename ScriptMap::iterator ScriptMapIterator;
-
-        // The actual list of scripts. This will be accessed concurrently, so it must not be modified
-        // after server startup.
-        static ScriptMap ScriptPointerList;
-
-        static void AddScript(TScript* const script)
-        {
-            ASSERT(script);
-
-            // See if the script is using the same memory as another script. If this happens, it means that
-            // someone forgot to allocate new memory for a script.
-            for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
-            {
-                if (it->second == script)
-                {
-                    sLog->outError("Script '%s' has same memory pointer as '%s'.",
-                        script->GetName().c_str(), it->second->GetName().c_str());
-
-                    return;
-                }
-            }
-
-            if (script->IsDatabaseBound())
-            {
-                // Get an ID for the script. An ID only exists if it's a script that is assigned in the database
-                // through a script name (or similar).
-                uint32 id = sObjectMgr->GetScriptId(script->GetName().c_str());
-                if (id)
-                {
-                    // Try to find an existing script.
-                    bool existing = false;
-                    for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
-                    {
-                        // If the script names match...
-                        if (it->second->GetName() == script->GetName())
-                        {
-                            // ... It exists.
-                            existing = true;
-                            break;
-                        }
-                    }
-
-                    // If the script isn't assigned -> assign it!
-                    if (!existing)
-                    {
-                        ScriptPointerList[id] = script;
-                        sScriptMgr->IncrementScriptCount();
-                    }
-                    else
-                    {
-                        // If the script is already assigned -> delete it!
-                        sLog->outError("Script '%s' already assigned with the same script name, so the script can't work.",
-                            script->GetName().c_str());
-
-                        ASSERT(false); // Error that should be fixed ASAP.
-                    }
-                }
-                else
-                {
-                    // The script uses a script name from database, but isn't assigned to anything.
-                    if (script->GetName().find("example") == std::string::npos && script->GetName().find("Smart") == std::string::npos)
-                        sLog->outErrorDb("Script named '%s' does not have a script name assigned in database.",
-                            script->GetName().c_str());
-                }
-            }
-            else
-            {
-                // We're dealing with a code-only script; just add it.
-                ScriptPointerList[_scriptIdCounter++] = script;
-                sScriptMgr->IncrementScriptCount();
-            }
-        }
-
-        // Gets a script by its ID (assigned by ObjectMgr).
-        static TScript* GetScriptById(uint32 id)
-        {
-            ScriptMapIterator it = ScriptPointerList.find(id);
-            if (it != ScriptPointerList.end())
-                return it->second;
-
-            return NULL;
-        }
-
-    private:
-
-        // Counter used for code-only scripts.
-        static uint32 _scriptIdCounter;
-};*/
 
 ScriptMgr::ScriptMgr()
     : _scriptCount(0), _scheduledScripts(0)
@@ -167,6 +74,12 @@ ScriptMgr::ScriptMgr()
 
 ScriptMgr::~ScriptMgr()
 {
+}
+
+ScriptMgr* ScriptMgr::instance()
+{
+    static ScriptMgr instance;
+    return &instance;
 }
 
 void ScriptMgr::Initialize()
@@ -205,12 +118,15 @@ void ScriptMgr::Unload()
     SCR_CLEAR(TransportScript);
     SCR_CLEAR(AchievementCriteriaScript);
     SCR_CLEAR(PlayerScript);
+    SCR_CLEAR(AccountScript);
     SCR_CLEAR(GuildScript);
     SCR_CLEAR(GroupScript);
     SCR_CLEAR(GlobalScript);
     SCR_CLEAR(ModuleScript);
     SCR_CLEAR(BGScript);
     SCR_CLEAR(SpellSC);
+    SCR_CLEAR(GameEventScript);
+    SCR_CLEAR(MailScript);
 
     #undef SCR_CLEAR
 }
@@ -283,7 +199,7 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<BGScript>::GetScriptById(sid) &&
                 !ScriptRegistry<SpellSC>::GetScriptById(sid) &&
                 !ScriptRegistry<GroupScript>::GetScriptById(sid))
-                sLog->outErrorDb("Script named '%s' is assigned in database, but has no code!", (*itr).c_str());
+                sLog->outErrorDb("Script named '%s' is assigned in the database, but has no code!", (*itr).c_str());
         }
 }
 
@@ -703,7 +619,7 @@ void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
 #endif
 
     FOREACH_SCRIPT(AllMapScript)->OnPlayerLeaveAll(map, player);
-    
+
     SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
         itr->second->OnPlayerLeave(map, player);
     SCR_MAP_END;
@@ -761,7 +677,7 @@ bool ScriptMgr::OnQuestAccept(Player* player, Item* item, Quest const* quest)
 #endif
 
     GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestAccept(player, item, quest);
 }
 
@@ -853,7 +769,7 @@ bool ScriptMgr::OnGossipHello(Player* player, Creature* creature)
         return true;
 #endif
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnGossipHello(player, creature);
 }
 
@@ -889,7 +805,7 @@ bool ScriptMgr::OnQuestAccept(Player* player, Creature* creature, Quest const* q
     ASSERT(quest);
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestAccept(player, creature, quest);
 }
 
@@ -900,7 +816,7 @@ bool ScriptMgr::OnQuestSelect(Player* player, Creature* creature, Quest const* q
     ASSERT(quest);
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestSelect(player, creature, quest);
 }
 
@@ -911,7 +827,7 @@ bool ScriptMgr::OnQuestComplete(Player* player, Creature* creature, Quest const*
     ASSERT(quest);
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestComplete(player, creature, quest);
 }
 
@@ -923,12 +839,12 @@ bool ScriptMgr::OnQuestReward(Player* player, Creature* creature, Quest const* q
 #ifdef ELUNA
     if (sEluna->OnQuestReward(player, creature, quest, opt))
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         return false;
     }
 #endif
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestReward(player, creature, quest, opt);
 }
 
@@ -938,7 +854,7 @@ uint32 ScriptMgr::GetDialogStatus(Player* player, Creature* creature)
     ASSERT(creature);
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, DIALOG_STATUS_SCRIPTED_NO_STATUS);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->GetDialogStatus(player, creature);
 }
 
@@ -976,7 +892,7 @@ bool ScriptMgr::OnGossipHello(Player* player, GameObject* go)
         return true;
 #endif
     GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnGossipHello(player, go);
 }
 
@@ -1012,7 +928,7 @@ bool ScriptMgr::OnQuestAccept(Player* player, GameObject* go, Quest const* quest
     ASSERT(quest);
 
     GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestAccept(player, go, quest);
 }
 
@@ -1030,7 +946,7 @@ bool ScriptMgr::OnQuestReward(Player* player, GameObject* go, Quest const* quest
         return false;
 #endif
     GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestReward(player, go, quest, opt);
 }
 
@@ -1040,7 +956,7 @@ uint32 ScriptMgr::GetDialogStatus(Player* player, GameObject* go)
     ASSERT(go);
 
     GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, DIALOG_STATUS_SCRIPTED_NO_STATUS);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->GetDialogStatus(player, go);
 }
 
@@ -1115,7 +1031,7 @@ bool ScriptMgr::OnAreaTrigger(Player* player, AreaTrigger const* trigger)
 Battleground* ScriptMgr::CreateBattleground(BattlegroundTypeId /*typeId*/)
 {
     // TODO: Implement script-side battlegrounds.
-    ASSERT(false);
+    ABORT();
     return NULL;
 }
 
@@ -1212,6 +1128,41 @@ void ScriptMgr::OnAuctionExpire(AuctionHouseObject* ah, AuctionEntry* entry)
 #endif
 
     FOREACH_SCRIPT(AuctionHouseScript)->OnAuctionExpire(ah, entry);
+}
+
+void ScriptMgr::OnBeforeAuctionHouseMgrSendAuctionWonMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* bidder, uint32& bidder_accId, bool& sendNotification, bool& updateAchievementCriteria, bool& sendMail)
+{
+    FOREACH_SCRIPT(AuctionHouseScript)->OnBeforeAuctionHouseMgrSendAuctionWonMail(auctionHouseMgr, auction, bidder, bidder_accId, sendNotification, updateAchievementCriteria, sendMail);
+}
+
+void ScriptMgr::OnBeforeAuctionHouseMgrSendAuctionSalePendingMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* owner, uint32& owner_accId, bool& sendMail)
+{
+    FOREACH_SCRIPT(AuctionHouseScript)->OnBeforeAuctionHouseMgrSendAuctionSalePendingMail(auctionHouseMgr, auction, owner, owner_accId, sendMail);
+}
+
+void ScriptMgr::OnBeforeAuctionHouseMgrSendAuctionSuccessfulMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* owner, uint32& owner_accId, uint32& profit, bool& sendNotification, bool& updateAchievementCriteria, bool& sendMail)
+{
+    FOREACH_SCRIPT(AuctionHouseScript)->OnBeforeAuctionHouseMgrSendAuctionSuccessfulMail(auctionHouseMgr, auction, owner, owner_accId, profit, sendNotification, updateAchievementCriteria, sendMail);
+}
+
+void ScriptMgr::OnBeforeAuctionHouseMgrSendAuctionExpiredMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* owner, uint32& owner_accId, bool& sendNotification, bool& sendMail)
+{
+    FOREACH_SCRIPT(AuctionHouseScript)->OnBeforeAuctionHouseMgrSendAuctionExpiredMail(auctionHouseMgr, auction, owner, owner_accId, sendNotification, sendMail);
+}
+
+void ScriptMgr::OnBeforeAuctionHouseMgrSendAuctionOutbiddedMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* oldBidder, uint32& oldBidder_accId, Player* newBidder, uint32& newPrice, bool& sendNotification, bool& sendMail)
+{
+    FOREACH_SCRIPT(AuctionHouseScript)->OnBeforeAuctionHouseMgrSendAuctionOutbiddedMail(auctionHouseMgr, auction, oldBidder, oldBidder_accId, newBidder, newPrice, sendNotification, sendMail);
+}
+
+void ScriptMgr::OnBeforeAuctionHouseMgrSendAuctionCancelledToBidderMail(AuctionHouseMgr* auctionHouseMgr, AuctionEntry* auction, Player* bidder, uint32& bidder_accId, bool& sendMail)
+{
+    FOREACH_SCRIPT(AuctionHouseScript)->OnBeforeAuctionHouseMgrSendAuctionCancelledToBidderMail(auctionHouseMgr, auction, bidder, bidder_accId, sendMail);
+}
+
+void ScriptMgr::OnBeforeAuctionHouseMgrUpdate()
+{
+    FOREACH_SCRIPT(AuctionHouseScript)->OnBeforeAuctionHouseMgrUpdate();
 }
 
 bool ScriptMgr::OnConditionCheck(Condition* condition, ConditionSourceInfo& sourceInfo)
@@ -1374,6 +1325,11 @@ bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, u
 }
 
 // Player
+void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerCompleteQuest(player, quest);
+}
+
 void ScriptMgr::OnPlayerReleasedGhost(Player* player)
 {
     FOREACH_SCRIPT(PlayerScript)->OnPlayerReleasedGhost(player);
@@ -1456,6 +1412,21 @@ void ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32
     FOREACH_SCRIPT(PlayerScript)->OnReputationChange(player, factionID, standing, incremental);
 }
 
+void ScriptMgr::OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnReputationRankChange(player, factionID, newRank, oldRank, increased);
+}
+
+void ScriptMgr::OnPlayerLearnSpell(Player* player, uint32 spellID)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnLearnSpell(player, spellID);
+}
+
+void ScriptMgr::OnPlayerForgotSpell(Player* player, uint32 spellID)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnForgotSpell(player, spellID);
+}
+
 void ScriptMgr::OnPlayerDuelRequest(Player* target, Player* challenger)
 {
 #ifdef ELUNA
@@ -1483,6 +1454,11 @@ void ScriptMgr::OnPlayerDuelEnd(Player* winner, Player* loser, DuelCompleteType 
 void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg)
 {
     FOREACH_SCRIPT(PlayerScript)->OnChat(player, type, lang, msg);
+}
+
+void ScriptMgr::OnBeforeSendChatMessage(Player* player, uint32& type, uint32& lang, std::string& msg)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeSendChatMessage(player, type, lang, msg);
 }
 
 void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver)
@@ -1571,12 +1547,17 @@ void ScriptMgr::OnPlayerSave(Player * player)
     FOREACH_SCRIPT(PlayerScript)->OnSave(player);
 }
 
-void ScriptMgr::OnPlayerDelete(uint64 guid)
+void ScriptMgr::OnPlayerDelete(uint64 guid, uint32 accountId)
 {
 #ifdef ELUNA
     sEluna->OnDelete(GUID_LOPART(guid));
 #endif
-    FOREACH_SCRIPT(PlayerScript)->OnDelete(guid);
+    FOREACH_SCRIPT(PlayerScript)->OnDelete(guid, accountId);
+}
+
+void ScriptMgr::OnPlayerFailedDelete(uint64 guid, uint32 accountId)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnFailedDelete(guid, accountId);
 }
 
 void ScriptMgr::OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent)
@@ -1696,6 +1677,68 @@ void ScriptMgr::OnFirstLogin(Player* player)
     sEluna->OnFirstLogin(player);
 #endif
     FOREACH_SCRIPT(PlayerScript)->OnFirstLogin(player);
+}
+
+bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanJoinInBattlegroundQueue(player, BattlemasterGuid, BGTypeID, joinAsGroup, err))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeTempSummonInitStats(player, tempSummon, duration);
+}
+
+void ScriptMgr::OnBeforeGuardianInitStatsForLevel(Player* player, Guardian* guardian, CreatureTemplate const* cinfo, PetType& petType)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeGuardianInitStatsForLevel(player, guardian, cinfo, petType);
+}
+
+void ScriptMgr::OnAfterGuardianInitStatsForLevel(Player* player, Guardian* guardian)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnAfterGuardianInitStatsForLevel(player, guardian);
+}
+
+void ScriptMgr::OnBeforeLoadPetFromDB(Player* player, uint32& petentry, uint32& petnumber, bool& current, bool& forceLoadFromDB)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeLoadPetFromDB(player, petentry, petnumber, current, forceLoadFromDB);
+}
+
+// Account
+void ScriptMgr::OnAccountLogin(uint32 accountId)
+{
+    FOREACH_SCRIPT(AccountScript)->OnAccountLogin(accountId);
+}
+
+void ScriptMgr::OnFailedAccountLogin(uint32 accountId)
+{
+    FOREACH_SCRIPT(AccountScript)->OnFailedAccountLogin(accountId);
+}
+
+void ScriptMgr::OnEmailChange(uint32 accountId)
+{
+    FOREACH_SCRIPT(AccountScript)->OnEmailChange(accountId);
+}
+
+void ScriptMgr::OnFailedEmailChange(uint32 accountId)
+{
+    FOREACH_SCRIPT(AccountScript)->OnFailedEmailChange(accountId);
+}
+
+void ScriptMgr::OnPasswordChange(uint32 accountId)
+{
+    FOREACH_SCRIPT(AccountScript)->OnPasswordChange(accountId);
+}
+
+void ScriptMgr::OnFailedPasswordChange(uint32 accountId)
+{
+    FOREACH_SCRIPT(AccountScript)->OnFailedPasswordChange(accountId);
 }
 
 // Guild
@@ -1834,6 +1877,7 @@ void ScriptMgr::OnGroupDisband(Group* group)
     FOREACH_SCRIPT(GroupScript)->OnDisband(group);
 }
 
+// Global
 void ScriptMgr::OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid)
 {
     ASSERT(trans);
@@ -1876,11 +1920,17 @@ void ScriptMgr::OnAfterInitializeLockedDungeons(Player* player)
     FOREACH_SCRIPT(GlobalScript)->OnAfterInitializeLockedDungeons(player);
 }
 
-void ScriptMgr::OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated) 
+void ScriptMgr::OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated)
 {
     FOREACH_SCRIPT(GlobalScript)->OnAfterUpdateEncounterState(map, type, creditEntry, source, difficulty_fixed, encounters, dungeonCompleted, updated);
 }
 
+void ScriptMgr::OnBeforeWorldObjectSetPhaseMask(WorldObject const* worldObject, uint32& oldPhaseMask, uint32& newPhaseMask, bool& useCombinedPhases, bool& update)
+{
+    FOREACH_SCRIPT(GlobalScript)->OnBeforeWorldObjectSetPhaseMask(worldObject, oldPhaseMask, newPhaseMask, useCombinedPhases, update);
+}
+
+// Unit
 uint32 ScriptMgr::DealDamage(Unit* AttackerUnit, Unit *pVictim, uint32 damage, DamageEffectType damagetype)
 {
     FOR_SCRIPTS_RET(UnitScript, itr, end, damage)
@@ -1936,11 +1986,10 @@ void ScriptMgr::OnBeforeBuyItemFromVendor(Player* player, uint64 vendorguid, uin
     FOREACH_SCRIPT(PlayerScript)->OnBeforeBuyItemFromVendor(player, vendorguid, vendorslot, item, count, bag, slot);
 }
 
-void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32 &item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore) 
+void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32 &item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAfterStoreOrEquipNewItem(player, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore);
 }
-
 
 void ScriptMgr::OnAfterUpdateMaxPower(Player* player, Powers& power, float& value)
 {
@@ -1993,10 +2042,86 @@ void ScriptMgr::OnBattlegroundAddPlayer(Battleground* bg, Player* player)
     FOREACH_SCRIPT(BGScript)->OnBattlegroundAddPlayer(bg, player);
 }
 
+void ScriptMgr::OnBattlegroundBeforeAddPlayer(Battleground* bg, Player* player)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundBeforeAddPlayer(bg, player);
+}
+
+void ScriptMgr::OnBattlegroundRemovePlayerAtLeave(Battleground* bg, Player* player)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundRemovePlayerAtLeave(bg, player);
+}
+
+void ScriptMgr::OnAddGroup(BattlegroundQueue* queue, GroupQueueInfo* ginfo, uint32& index, Player* leader, Group* grp, PvPDifficultyEntry const* bracketEntry, bool isPremade)
+{
+    FOREACH_SCRIPT(BGScript)->OnAddGroup(queue, ginfo, index, leader, grp, bracketEntry, isPremade);
+}
+
+bool ScriptMgr::CanFillPlayersToBG(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId bracket_id)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanFillPlayersToBG(queue, bg, aliFree, hordeFree, bracket_id))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanFillPlayersToBGWithSpecific(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree,
+    BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanFillPlayersToBGWithSpecific(queue, bg, aliFree, hordeFree, thisBracketId, specificQueue, specificBracketId))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32& minPlayers, uint32& maxPlayers)
+{
+    FOREACH_SCRIPT(BGScript)->OnCheckNormalMatch(queue, Coef, bgTemplate, bracket_id, minPlayers, maxPlayers);
+}
+
+bool ScriptMgr::CanSendMessageQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanSendMessageQueue(queue, leader, bg, bracketEntry))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
 // SpellSC
 void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
 {
     FOREACH_SCRIPT(SpellSC)->OnCalcMaxDuration(aura, maxDuration);
+}
+
+void ScriptMgr::OnGameEventStart(uint16 EventID)
+{
+#ifdef ELUNA
+    sEluna->OnGameEventStart(EventID);
+#endif
+    FOREACH_SCRIPT(GameEventScript)->OnStart(EventID);
+}
+
+void ScriptMgr::OnGameEventStop(uint16 EventID)
+{
+#ifdef ELUNA
+    sEluna->OnGameEventStop(EventID);
+#endif
+    FOREACH_SCRIPT(GameEventScript)->OnStop(EventID);
+}
+
+// Mail
+void ScriptMgr::OnBeforeMailDraftSendMailTo(MailDraft* mailDraft, MailReceiver const& receiver, MailSender const& sender, MailCheckMask& checked, uint32& deliver_delay, uint32& custom_expiration, bool& deleteMailItemsFromDB, bool& sendMail)
+{
+    FOREACH_SCRIPT(MailScript)->OnBeforeMailDraftSendMailTo(mailDraft, receiver, sender, checked, deliver_delay, custom_expiration, deleteMailItemsFromDB, sendMail);
 }
 
 AllMapScript::AllMapScript(const char* name)
@@ -2156,6 +2281,12 @@ PlayerScript::PlayerScript(const char* name)
     ScriptRegistry<PlayerScript>::AddScript(this);
 }
 
+AccountScript::AccountScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<AccountScript>::AddScript(this);
+}
+
 GuildScript::GuildScript(const char* name)
     : ScriptObject(name)
 {
@@ -2190,5 +2321,17 @@ ModuleScript::ModuleScript(const char* name)
     : ScriptObject(name)
 {
     ScriptRegistry<ModuleScript>::AddScript(this);
+}
+
+GameEventScript::GameEventScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<GameEventScript>::AddScript(this);
+}
+
+MailScript::MailScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<MailScript>::AddScript(this);
 }
 

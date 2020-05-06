@@ -5,7 +5,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "Vehicle.h"
@@ -14,6 +13,7 @@
 #include "Pet.h"
 #include "SpellInfo.h"
 #include "CreatureTextMgr.h"
+#include "SpellScript.h"
 
 // Ours
 enum qRedRocket
@@ -942,6 +942,7 @@ void AddSC_grizzly_hills()
     // Theirs
     new npc_emily();
     new npc_mrfloppy();
+    new npc_ravenous_worg();
     new npc_outhouse_bunny();
     new npc_tallhorn_stag();
     new npc_amberpine_woodsman();

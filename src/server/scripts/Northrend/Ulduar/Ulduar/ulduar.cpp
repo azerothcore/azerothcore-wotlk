@@ -25,44 +25,44 @@ class go_ulduar_teleporter : public GameObjectScript
 public:
     go_ulduar_teleporter() : GameObjectScript("ulduar_teleporter") { }
 
-    bool OnGossipHello(Player* player, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
         InstanceScript* pInstance = go->GetInstanceScript();
         if (!pInstance)
             return true;
 
-        player->ADD_GOSSIP_ITEM(0, "Teleport to the Expedition Base Camp.", GOSSIP_SENDER_MAIN, BASE_CAMP);
+        AddGossipItemFor(player, 0, "Teleport to the Expedition Base Camp.", GOSSIP_SENDER_MAIN, BASE_CAMP);
         if (pInstance->GetData(TYPE_LEVIATHAN) >= DONE) // count special
         {
-            player->ADD_GOSSIP_ITEM(0, "Teleport to the Formation Grounds.", GOSSIP_SENDER_MAIN, GROUNDS);
+            AddGossipItemFor(player, 0, "Teleport to the Formation Grounds.", GOSSIP_SENDER_MAIN, GROUNDS);
             if (pInstance->GetData(TYPE_LEVIATHAN) == DONE)
             {
-                player->ADD_GOSSIP_ITEM(0, "Teleport to the Colossal Forge.", GOSSIP_SENDER_MAIN, FORGE);
+                AddGossipItemFor(player, 0, "Teleport to the Colossal Forge.", GOSSIP_SENDER_MAIN, FORGE);
                 if (pInstance->GetData(TYPE_XT002) == DONE)
                 {
-                    player->ADD_GOSSIP_ITEM(0, "Teleport to the Scrapyard.", GOSSIP_SENDER_MAIN, SCRAPYARD);
-                    player->ADD_GOSSIP_ITEM(0, "Teleport to the Antechamber of Ulduar.", GOSSIP_SENDER_MAIN, ANTECHAMBER);
+                    AddGossipItemFor(player, 0, "Teleport to the Scrapyard.", GOSSIP_SENDER_MAIN, SCRAPYARD);
+                    AddGossipItemFor(player, 0, "Teleport to the Antechamber of Ulduar.", GOSSIP_SENDER_MAIN, ANTECHAMBER);
                     if (pInstance->GetData(TYPE_KOLOGARN) == DONE)
                     {
-                        player->ADD_GOSSIP_ITEM(0, "Teleport to the Shattered Walkway.", GOSSIP_SENDER_MAIN, WALKWAY);
+                        AddGossipItemFor(player, 0, "Teleport to the Shattered Walkway.", GOSSIP_SENDER_MAIN, WALKWAY);
                         if (pInstance->GetData(TYPE_AURIAYA) == DONE)
                         {
-                            player->ADD_GOSSIP_ITEM(0, "Teleport to the Conservatory of Life.", GOSSIP_SENDER_MAIN, CONSERVATORY);
+                            AddGossipItemFor(player, 0, "Teleport to the Conservatory of Life.", GOSSIP_SENDER_MAIN, CONSERVATORY);
                             if (pInstance->GetData(DATA_CALL_TRAM))
-                                player->ADD_GOSSIP_ITEM(0, "Teleport to the Spark of Imagination.", GOSSIP_SENDER_MAIN, SPARK);
+                                AddGossipItemFor(player, 0, "Teleport to the Spark of Imagination.", GOSSIP_SENDER_MAIN, SPARK);
                             if (pInstance->GetData(TYPE_VEZAX) == DONE)
-                                player->ADD_GOSSIP_ITEM(0, "Teleport to the Prison of Yogg-Saron.", GOSSIP_SENDER_MAIN, MADNESS);
+                                AddGossipItemFor(player, 0, "Teleport to the Prison of Yogg-Saron.", GOSSIP_SENDER_MAIN, MADNESS);
                         }
                     }
                 }
             }
         }
 
-        player->SEND_GOSSIP_MENU(14424, go->GetGUID());
+        SendGossipMenuFor(player, 14424, go->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* player, GameObject*  /*go*/, uint32 sender, uint32 action)
+    bool OnGossipSelect(Player* player, GameObject*  /*go*/, uint32 sender, uint32 action) override
     {
         if (sender != GOSSIP_SENDER_MAIN || !player->getAttackers().empty())
             return true;
@@ -71,31 +71,31 @@ public:
         {
             case BASE_CAMP:
                 player->TeleportTo(603, -706.122f, -92.6024f, 429.876f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
+                CloseGossipMenuFor(player); break;
             case GROUNDS:
                 player->TeleportTo(603, 131.248f, -35.3802f, 409.804f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
+                CloseGossipMenuFor(player); break;
             case FORGE:
                 player->TeleportTo(603, 553.233f, -12.3247f, 409.679f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
+                CloseGossipMenuFor(player); break;
             case SCRAPYARD:
                 player->TeleportTo(603, 926.292f, -11.4635f, 418.595f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
+                CloseGossipMenuFor(player); break;
             case ANTECHAMBER:
                 player->TeleportTo(603, 1498.09f, -24.246f, 420.967f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
+                CloseGossipMenuFor(player); break;
             case WALKWAY:
                 player->TeleportTo(603, 1859.45f, -24.1f, 448.9f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
+                CloseGossipMenuFor(player); break;
             case CONSERVATORY:
                 player->TeleportTo(603, 2086.27f, -24.3134f, 421.239f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
+                CloseGossipMenuFor(player); break;
             case MADNESS:
                 player->TeleportTo(603, 1854.8f, -11.46f, 334.57f, 4.8f);
-                player->CLOSE_GOSSIP_MENU(); break;
+                CloseGossipMenuFor(player); break;
             case SPARK:
                 player->TeleportTo(603, 2517.9f, 2568.9f, 412.7f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
+                CloseGossipMenuFor(player); break;
         }
 
         return true;
@@ -107,14 +107,14 @@ class npc_ulduar_keeper : public CreatureScript
 public:
     npc_ulduar_keeper() : CreatureScript("npc_ulduar_keeper_gossip") { }
 
-    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Lend us your aid, keeper. Together we shall defeat Yogg-Saron.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-        pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Lend us your aid, keeper. Together we shall defeat Yogg-Saron.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+        SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player*  /*player*/, Creature* creature, uint32  /*uiSender*/, uint32  /*uiAction*/)
+    bool OnGossipSelect(Player*  /*player*/, Creature* creature, uint32  /*uiSender*/, uint32  /*uiAction*/) override
     {
         creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
         uint8 _keeper = 0;
@@ -184,14 +184,14 @@ class npc_ulduar_snow_mound : public CreatureScript
 public:
     npc_ulduar_snow_mound() : CreatureScript("npc_ulduar_snow_mound") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_ulduar_snow_moundAI(pCreature);
+        return new npc_ulduar_snow_moundAI(creature);
     }
 
     struct npc_ulduar_snow_moundAI : public ScriptedAI
     {
-        npc_ulduar_snow_moundAI(Creature* pCreature) : ScriptedAI(pCreature)
+        npc_ulduar_snow_moundAI(Creature* creature) : ScriptedAI(creature)
         {
             activated = false;
             me->CastSpell(me, 64615, true);
@@ -202,7 +202,7 @@ public:
         void MoveInLineOfSight(Unit* who)
         {
             if (!activated && who->GetTypeId() == TYPEID_PLAYER)
-                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ()+5.0f, 2))
+                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ()+5.0f, 2, LINEOFSIGHT_ALL_CHECKS))
                 {
                     activated = true;
                     me->RemoveAura(64615);
@@ -230,14 +230,14 @@ class npc_ulduar_storm_tempered_keeper : public CreatureScript
 public:
     npc_ulduar_storm_tempered_keeper() : CreatureScript("npc_ulduar_storm_tempered_keeper") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_ulduar_storm_tempered_keeperAI(pCreature);
+        return new npc_ulduar_storm_tempered_keeperAI(creature);
     }
 
     struct npc_ulduar_storm_tempered_keeperAI : public ScriptedAI
     {
-        npc_ulduar_storm_tempered_keeperAI(Creature* pCreature) : ScriptedAI(pCreature)
+        npc_ulduar_storm_tempered_keeperAI(Creature* creature) : ScriptedAI(creature)
         {
             otherGUID = 0;
         }
@@ -319,14 +319,14 @@ class npc_ulduar_arachnopod_destroyer : public CreatureScript
 public:
     npc_ulduar_arachnopod_destroyer() : CreatureScript("npc_ulduar_arachnopod_destroyer") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_ulduar_arachnopod_destroyerAI(pCreature);
+        return new npc_ulduar_arachnopod_destroyerAI(creature);
     }
 
     struct npc_ulduar_arachnopod_destroyerAI : public ScriptedAI
     {
-        npc_ulduar_arachnopod_destroyerAI(Creature* pCreature) : ScriptedAI(pCreature)
+        npc_ulduar_arachnopod_destroyerAI(Creature* creature) : ScriptedAI(creature)
         {
             _spawnedMechanic = false;
             me->ApplySpellImmune(0, IMMUNITY_ID, 64919, true); // Ice Nova from Ice Turret
@@ -480,14 +480,14 @@ class go_call_tram : public GameObjectScript
 public:
     go_call_tram() : GameObjectScript("go_call_tram") { }
 
-    bool OnGossipHello(Player* /*pPlayer*/, GameObject* pGo)
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
-        InstanceScript* pInstance = pGo->GetInstanceScript();
+        InstanceScript* pInstance = go->GetInstanceScript();
 
         if (!pInstance)
             return false;
 
-        switch(pGo->GetEntry())
+        switch(go->GetEntry())
         {
             case 194914:
             case 194438:

@@ -43,7 +43,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_pyroguard_emberseer.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_drakkisath.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_warmaster_voone.cpp
-  ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_mother_smolderweb.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_quartermaster_zigris.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_halycon.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_overlord_wyrmthalak.cpp

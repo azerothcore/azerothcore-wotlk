@@ -17,3 +17,6 @@ CharacterDatabaseInfo = "ac-database;3306;root;password;acore_characters"
 
 # Add more configuration overwrites by copying settings from worldserver.conf.dist
 LogLevel = 2
+
+# Disable idle connections automatic kick since it doesn't work well on macOS + Docker
+CloseIdleConnections = 0

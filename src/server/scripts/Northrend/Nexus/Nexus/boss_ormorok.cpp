@@ -153,7 +153,10 @@ class boss_ormorok : public CreatureScript
                             float o = rand_norm()*2.0f*M_PI;
                             float x = me->GetPositionX()+5.0f*_spikesCount*cos(o);
                             float y = me->GetPositionY()+5.0f*_spikesCount*sin(o);
-                            me->SummonCreature(NPC_CRYSTAL_SPIKE, x, y, me->GetMap()->GetHeight(x, y, me->GetPositionZ()+5.0f), 0, TEMPSUMMON_TIMED_DESPAWN, 7000);
+                            float h = me->GetMap()->GetHeight(x, y, me->GetPositionZ()+5.0f);
+
+                            if (h != INVALID_HEIGHT)
+                                me->SummonCreature(NPC_CRYSTAL_SPIKE, x, y, h, 0, TEMPSUMMON_TIMED_DESPAWN, 7000);
                         }
                         events.ScheduleEvent(EVENT_ORMOROK_SUMMON_SPIKES, 200);
                         break;

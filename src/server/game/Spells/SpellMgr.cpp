@@ -351,6 +351,12 @@ SpellMgr::~SpellMgr()
     UnloadSpellInfoStore();
 }
 
+SpellMgr* SpellMgr::instance()
+{
+    static SpellMgr instance;
+    return &instance;
+}
+
 /// Some checks for spells, to prevent adding deprecated/broken spells for trainers, spell book, etc
 bool SpellMgr::ComputeIsSpellValid(SpellInfo const *spellInfo, bool msg)
 {
@@ -1125,7 +1131,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 return false;
 
             Battleground* bg = player->GetBattleground();
-            if (!bg || bg->GetBgTypeID() != BATTLEGROUND_IC)
+            if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_IC)
                 return false;
 
             uint8 nodeType = spellId == 68719 ? NODE_TYPE_REFINERY : NODE_TYPE_QUARRY;
@@ -2621,6 +2627,28 @@ void SpellMgr::LoadSpellAreas()
         ++count;
     } while (result->NextRow());
 
+    if (sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE) > 0)
+    {
+        sLog->outString(">> Using ICC buff Horde: %u", sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE));
+        SpellArea spellAreaICCBuffHorde = { sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE),ICC_AREA,0,0,0,ICC_RACEMASK_HORDE,Gender(2),64,11,1 };
+        SpellArea const* saICCBuffHorde = &mSpellAreaMap.insert(SpellAreaMap::value_type(sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE), spellAreaICCBuffHorde))->second;
+        mSpellAreaForAreaMap.insert(SpellAreaForAreaMap::value_type(ICC_AREA, saICCBuffHorde));
+        ++count;
+    }
+    else
+        sLog->outString(">> ICC buff Horde: disabled");
+
+    if (sWorld->getIntConfig(CONFIG_ICC_BUFF_ALLIANCE) > 0)
+    {
+        sLog->outString(">> Using ICC buff Alliance: %u", sWorld->getIntConfig(CONFIG_ICC_BUFF_ALLIANCE));
+        SpellArea spellAreaICCBuffAlliance = { sWorld->getIntConfig(CONFIG_ICC_BUFF_ALLIANCE),ICC_AREA,0,0,0,ICC_RACEMASK_ALLIANCE,Gender(2),64,11,1 };
+        SpellArea const* saICCBuffAlliance = &mSpellAreaMap.insert(SpellAreaMap::value_type(sWorld->getIntConfig(CONFIG_ICC_BUFF_ALLIANCE), spellAreaICCBuffAlliance))->second;
+        mSpellAreaForAreaMap.insert(SpellAreaForAreaMap::value_type(ICC_AREA, saICCBuffAlliance));
+        ++count;
+    }
+    else
+        sLog->outString(">> ICC buff Alliance: disabled");
+
     sLog->outString(">> Loaded %u spell area requirements in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
@@ -2773,7 +2801,7 @@ void SpellMgr::LoadSpellCustomAttr()
                     {
                         uint32 enchantId = spellInfo->Effects[j].MiscValue;
                         SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
-                        for (uint8 s = 0; s < MAX_ITEM_ENCHANTMENT_EFFECTS; ++s)
+                        for (uint8 s = 0; s < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++s)
                         {
                             if (enchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
                                 continue;
@@ -3374,6 +3402,9 @@ void SpellMgr::LoadDbcDataCorrections()
         case 29809: // Desecration Arm - 36 instead of 37 - typo? :/
             spellInfo->EffectRadiusIndex[0] = 37;
             break;
+        case 42767: // Sic'em
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_NEARBY_ENTRY;
+            break;
         // Master Shapeshifter: missing stance data for forms other than bear - bear version has correct data
         // To prevent aura staying on target after talent unlearned
         case 48420:
@@ -3884,6 +3915,10 @@ void SpellMgr::LoadDbcDataCorrections()
         case 55268:
             spellInfo->AttributesEx3 |= SPELL_ATTR3_BLOCKABLE_SPELL;
             break;
+        // Death Knight T10 Tank 2p Bonus
+        case 70650:
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+            break;
 
 
 
@@ -4307,17 +4342,35 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->DurationIndex = 367; // 2 Hours
             break;
         // Wintergrasp spells
-        case 51422: // Cannon (Tower Cannon)
-            spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
-            break;
+        case 57607: // WintergraspCatapult - Spell Plague Barrel - EffectRadiusIndex
+        case 57619: // WintergraspDemolisher - Spell Hourl Boulder - EffectRadiusIndex
         case 57610: // Cannon (Siege Turret)
-            spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
+            spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_25_YARDS; // SPELL_EFFECT_WMO_DAMAGE
+        case 51422: // WintergraspCannon - Spell Fire Cannon - EffectRadiusIndex
+            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS; // SPELL_EFFECT_SCHOOL_DAMAGE
+            break;
+        case 54107: // WintergraspDemolisher - Spell Ram -  EffectRadiusIndex
+            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_3_YARDS; // SPELL_EFFECT_KNOCK_BACK
+            spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_3_YARDS; // SPELL_EFFECT_SCHOOL_DAMAGE
+            spellInfo->EffectRadiusIndex[2] = EFFECT_RADIUS_3_YARDS; // SPELL_EFFECT_WEAPON_DAMAGE
+            break;
+        case 51678: // WintergraspSiegeEngine - Spell Ram - EffectRadiusIndex
+            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS; // SPELL_EFFECT_KNOCK_BACK
+            spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_10_YARDS; // SPELL_EFFECT_SCHOOL_DAMAGE
+            spellInfo->EffectRadiusIndex[2] = EFFECT_RADIUS_20_YARDS; // SPELL_EFFECT_WEAPON_DAMAGE
+            break;
+        case 57606: // WintergraspCatapult - Spell Plague Barrell - Range
+            spellInfo->rangeIndex = 164; // "Catapult Range"
             break;
         case 50999: // Boulder (Demolisher)
             spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
             break;
         case 50990: // Flame Breath (Catapult)
             spellInfo->EffectRadiusIndex[EFFECT_0] = 19; // 18yd
+            break;
+        case 56103: // Jormungar Bite
+            spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_UNIT_TARGET_ENEMY;
+            spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
             break;
 
         /////////////////////////////////
@@ -4464,6 +4517,12 @@ void SpellMgr::LoadDbcDataCorrections()
         case 37852:
             spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
             break;
+                
+        // Karazhan
+        // Amplify Damage
+        case 39095:
+            spellInfo->MaxAffectedTargets = 1;
+            break;
 
         // Magisters' Terrace
         // Energy Feedback
@@ -4471,7 +4530,17 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
             break;
 
-
+        /*
+            Raid: Battle for Mount Hyjal
+            Boss: Archimonde
+        */
+        case 31984: // Spell doesn't need to ignore invulnerabilities
+        case 35354:
+            spellInfo->Attributes = SPELL_ATTR0_ABILITY;
+            break;
+        case 32111: // We only need the animation, no damage
+            spellInfo->CastingTimeIndex = 0;
+            break;
 
         //////////////////////////////////////////
         ////////// Vault of Archavon (VOA)
@@ -4511,6 +4580,10 @@ void SpellMgr::LoadDbcDataCorrections()
         case 29125:
             spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
             break;
+        // Jagged Knife
+        case 55550:
+            spellInfo->Attributes |= SPELL_ATTR0_REQ_AMMO;
+            break;
 
         //////////////////////////////////////////
         ////////// Gundrak
@@ -4518,6 +4591,12 @@ void SpellMgr::LoadDbcDataCorrections()
         // Moorabi - Transformation
         case 55098:
             spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+            break;
+        case 55521: // Poisoned Spear (Normal)
+        case 58967: // Poisoned Spear (Heroic)
+        case 55348: // Throw (Normal)
+        case 58966: // Throw (Heroic)
+            spellInfo->Attributes |= SPELL_ATTR0_REQ_AMMO;
             break;
 
         //////////////////////////////////////////
@@ -4579,6 +4658,10 @@ void SpellMgr::LoadDbcDataCorrections()
         // Ingvar the Plunderer, Ingvar transform
         case 42796:
             spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
+            break;
+        case 42772: // Hurl Dagger (Normal)
+        case 59685: // Hurl Dagger (Heroic)
+            spellInfo->Attributes |= SPELL_ATTR0_REQ_AMMO;
             break;
 
         //////////////////////////////////////////
@@ -5836,6 +5919,17 @@ void SpellMgr::LoadDbcDataCorrections()
         case 74637:
             spellInfo->speed = 0;
             break;
+        //Blazing Aura
+        case 75885:
+        case 75886:
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+            break;
+        //Meteor Strike
+        case 75952:
+        //Combustion Periodic
+        case 74629:
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+            break;
 
 
         // ///////////////////////////////////////////
@@ -6029,6 +6123,13 @@ void SpellMgr::LoadDbcDataCorrections()
         //Crushing the Crown
         case 71024:
             spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DYNOBJ_NONE;
+            break;
+        // Battle for the Undercity
+        case 59892: // Cyclone fall
+            spellInfo->Effect[EFFECT_0] = SPELL_EFFECT_APPLY_AREA_AURA_FRIEND;
+            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS;
+            spellInfo->AttributesEx &= ~SPELL_ATTR0_CANT_CANCEL;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
             break;
 
         // ///////////////////////////////////////////
@@ -6267,7 +6368,11 @@ void SpellMgr::LoadDbcDataCorrections()
     properties->Type = SUMMON_TYPE_TOTEM;
     properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(647)); // 52893
     properties->Type = SUMMON_TYPE_TOTEM;
-
+    if ((properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(628)))) // Hungry Plaguehound
+    {
+        properties->Category = SUMMON_CATEGORY_PET;
+        properties->Type = SUMMON_TYPE_PET;
+    }
 
     // Correct Pet Size
     CreatureDisplayInfoEntry* displayEntry = const_cast<CreatureDisplayInfoEntry*>(sCreatureDisplayInfoStore.LookupEntry(17028)); // Kurken

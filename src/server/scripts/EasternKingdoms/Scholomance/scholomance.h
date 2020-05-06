@@ -5,12 +5,21 @@
 #ifndef DEF_SCHOLOMANCE_H
 #define DEF_SCHOLOMANCE_H
 
-#include "ScriptPCH.h"
-
 enum DataTypes
 {
     DATA_KIRTONOS_THE_HERALD            = 0,
-    DATA_MINI_BOSSES                    = 1
+    DATA_MINI_BOSSES                    = 1,
+    DATA_RAS_HUMAN                      = 2
+};
+
+enum ModelIds
+{
+    MODEL_RAS_HUMAN                     = 3975
+};
+
+enum TalkGroupIds
+{
+    TALK_RAS_HUMAN                      = 0
 };
 
 enum CreatureIds

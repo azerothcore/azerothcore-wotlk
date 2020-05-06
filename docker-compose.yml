@@ -27,6 +27,9 @@ services:
       - ${WORLD_EXTERNAL_PORT:-8085}:8085
     volumes:
       - type: bind
+        source: ./docker/worldserver/bin
+        target: /azeroth-server/bin
+      - type: bind
         source: ${WORLDSERVER_ETC:-./docker/worldserver/etc}
         target: /azeroth-server/etc
       - type: bind
@@ -48,6 +51,9 @@ services:
     ports:
       - ${AUTH_EXTERNAL_PORT:-3724}:3724
     volumes:
+      - type: bind
+        source: ./docker/authserver/bin
+        target: /azeroth-server/bin
       - type: bind
         source: ${AUTHSERVER_ETC:-./docker/authserver/etc}
         target: /azeroth-server/etc

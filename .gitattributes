@@ -1,6 +1,10 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
+# End of line rules
+*.sh      eol=lf
+*.sh.dist eol=lf
+bin/*     eol=lf
 
 # Whitespace rules
 # strict (no trailing, no tabs)

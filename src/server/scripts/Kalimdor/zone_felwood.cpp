@@ -42,18 +42,18 @@ class npcs_riverbreeze_and_silversky : public CreatureScript
 public:
     npcs_riverbreeze_and_silversky() : CreatureScript("npcs_riverbreeze_and_silversky") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         if (action == GOSSIP_ACTION_INFO_DEF+1)
         {
-            player->CLOSE_GOSSIP_MENU();
+            CloseGossipMenuFor(player);
             creature->CastSpell(player, SPELL_CENARION_BEACON, false);
         }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -64,24 +64,24 @@ public:
         {
             if (player->GetQuestRewardStatus(QUEST_CLEASING_FELWOOD_A))
             {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-                player->SEND_GOSSIP_MENU(2848, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                SendGossipMenuFor(player, 2848, creature->GetGUID());
             } else if (player->GetTeamId() == TEAM_HORDE)
-            player->SEND_GOSSIP_MENU(2845, creature->GetGUID());
+            SendGossipMenuFor(player, 2845, creature->GetGUID());
             else
-                player->SEND_GOSSIP_MENU(2844, creature->GetGUID());
+                SendGossipMenuFor(player, 2844, creature->GetGUID());
         }
 
         if (creatureId == NPC_MAYBESS_RIVERBREEZE)
         {
             if (player->GetQuestRewardStatus(QUEST_CLEASING_FELWOOD_H))
             {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-                player->SEND_GOSSIP_MENU(2849, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                SendGossipMenuFor(player, 2849, creature->GetGUID());
             } else if (player->GetTeamId() == TEAM_ALLIANCE)
-            player->SEND_GOSSIP_MENU(2843, creature->GetGUID());
+            SendGossipMenuFor(player, 2843, creature->GetGUID());
             else
-                player->SEND_GOSSIP_MENU(2842, creature->GetGUID());
+                SendGossipMenuFor(player, 2842, creature->GetGUID());
         }
 
         return true;

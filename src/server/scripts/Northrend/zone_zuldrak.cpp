@@ -5,7 +5,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
@@ -14,6 +13,7 @@
 #include "PassiveAI.h"
 #include "SpellInfo.h"
 #include "Vehicle.h"
+#include "SpellAuras.h"
 
 // Ours
 enum AlchemistItemRequirements
@@ -162,7 +162,7 @@ public:
 
         };
 
-        bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+        bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
         {
             if (quest->GetQuestId() == QUEST_ALCHEMIST_APPRENTICE)
                 if (creature->AI() && CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI()))
@@ -171,31 +171,31 @@ public:
             return true;
         }
 
-        bool OnGossipHello(Player* player, Creature* creature)
+        bool OnGossipHello(Player* player, Creature* creature) override
         {
             if (creature->IsQuestGiver())
                 player->PrepareQuestMenu(creature->GetGUID());
 
-            player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+            SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
             if (player->GetQuestStatus(QUEST_ALCHEMIST_APPRENTICE) == QUEST_STATUS_INCOMPLETE)
             {
                 if (creature->AI() && CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI()))
                     if (!CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI())->IsPlayerOnTask(player->GetGUID()))
-                        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I'm ready to begin. What is the first ingredient you require?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I'm ready to begin. What is the first ingredient you require?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
-                player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+                SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
             }
 
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
         {
-            player->CLOSE_GOSSIP_MENU();
+            CloseGossipMenuFor(player);
             if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
             {
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 if (creature->AI() && CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI()))
                     CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI())->StartNextTask(player->GetGUID(), 1);
             }
@@ -203,7 +203,7 @@ public:
             return true;
         }
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI *GetAI(Creature* creature) const override
     {
         return new npc_finklesteinAI(creature);
     }
@@ -214,7 +214,7 @@ class go_finklestein_cauldron : public GameObjectScript
 public:
     go_finklestein_cauldron() : GameObjectScript("go_finklestein_cauldron") { }
 
-    bool OnGossipHello(Player* player, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
         Creature* finklestein = go->FindNearestCreature(NPC_FINKLESTEIN, 30.0f, true);
         if (finklestein && finklestein->AI())
@@ -580,7 +580,7 @@ public:
                     playerGUID = 0;
                     EnterEvadeMode();
                     break;
-                    
+
             }
 
             if (me->getFaction() == 35 || me->HasUnitState(UNIT_STATE_CASTING|UNIT_STATE_STUNNED))
@@ -856,7 +856,7 @@ public:
         void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/)
         {
             _events.ScheduleEvent(EVENT_RECRUIT_1, 100);
-            player->CLOSE_GOSSIP_MENU();
+            CloseGossipMenuFor(player);
             me->CastSpell(player, SPELL_QUEST_CREDIT, true);
             me->SetFacingToObject(player);
         }
@@ -889,7 +889,7 @@ class go_scourge_enclosure : public GameObjectScript
 public:
     go_scourge_enclosure() : GameObjectScript("go_scourge_enclosure") { }
 
-    bool OnGossipHello(Player* player, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
         go->UseDoorOrButton();
         if (player->GetQuestStatus(QUEST_OUR_ONLY_HOPE) == QUEST_STATUS_INCOMPLETE)

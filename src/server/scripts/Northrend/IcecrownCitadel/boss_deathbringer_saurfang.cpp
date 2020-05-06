@@ -515,14 +515,14 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                 _instance = me->GetInstanceScript();
             }
 
-            void Reset()
+            void Reset() override
             {
                 _events.Reset();
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void DoAction(int32 action)
+            void DoAction(int32 action) override
             {
                 switch (action)
                 {
@@ -539,7 +539,7 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                             if (_guardList.empty())
                             {
                                 GetCreatureListWithEntryInGrid(_guardList, me, NPC_SE_KOR_KRON_REAVER, 20.0f);
-                                _guardList.sort(Trinity::ObjectDistanceOrderPred(me));
+                                _guardList.sort(acore::ObjectDistanceOrderPred(me));
                             }
                             uint32 x = 1;
                             for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
@@ -551,7 +551,7 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                             _events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5000, 0, PHASE_INTRO_H);
                             _events.ScheduleEvent(EVENT_INTRO_HORDE_3, 18500, 0, PHASE_INTRO_H);
                             _instance->HandleGameObject(_instance->GetData64(GO_SAURFANG_S_DOOR), true);
-                            
+
                             if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetData64(GO_SCOURGE_TRANSPORTER_SAURFANG)))
                             {
                                 _instance->HandleGameObject(0, false, teleporter);
@@ -575,7 +575,7 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                             _events.ScheduleEvent(EVENT_OUTRO_HORDE_1, 10000);
                             _events.ScheduleEvent(EVENT_OUTRO_HORDE_2, 18000);
                             _events.ScheduleEvent(EVENT_OUTRO_HORDE_3, 24000);*/
-                            
+
                         }
                         break;
                     case ACTION_EVADE:
@@ -603,7 +603,7 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                 }
             }
 
-            void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_GRIP_OF_AGONY)
                 {
@@ -612,7 +612,7 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                 }
             }
 
-            void MovementInform(uint32 type, uint32 id)
+            void MovementInform(uint32 type, uint32 id) override
             {
                 if (type == POINT_MOTION_TYPE)
                 {
@@ -650,7 +650,7 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 _events.Update(diff);
                 switch (_events.ExecuteEvent())
@@ -733,25 +733,25 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
             std::list<Creature*> _guardList;
         };
 
-        bool OnGossipHello(Player* player, Creature* creature)
+        bool OnGossipHello(Player* player, Creature* creature) override
         {
             InstanceScript* instance = creature->GetInstanceScript();
             if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
             {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "We are ready to go, High Overlord. The Lich King must fall!", 631, -ACTION_START_EVENT);
-                player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready to go, High Overlord. The Lich King must fall!", 631, -ACTION_START_EVENT);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             }
 
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
         {
             InstanceScript* instance = creature->GetInstanceScript();
             if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
             {
-                player->PlayerTalkClass->ClearMenus();
-                player->CLOSE_GOSSIP_MENU();
+                ClearGossipMenuFor(player);
+                CloseGossipMenuFor(player);
                 if (action == -ACTION_START_EVENT)
                     creature->AI()->DoAction(ACTION_START_EVENT);
             }
@@ -759,7 +759,7 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
             return true;
         }
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return GetIcecrownCitadelAI<npc_high_overlord_saurfangAI>(creature);
         }
@@ -777,14 +777,14 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                 _instance = me->GetInstanceScript();
             }
 
-            void Reset()
+            void Reset() override
             {
                 _events.Reset();
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void DoAction(int32 action)
+            void DoAction(int32 action) override
             {
                 switch (action)
                 {
@@ -801,7 +801,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                             if (_guardList.empty())
                             {
                                 GetCreatureListWithEntryInGrid(_guardList, me, NPC_SE_SKYBREAKER_MARINE, 20.0f);
-                                _guardList.sort(Trinity::ObjectDistanceOrderPred(me));
+                                _guardList.sort(acore::ObjectDistanceOrderPred(me));
                             }
                             uint32 x = 1;
                             for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
@@ -862,7 +862,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                 }
             }
 
-            void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_GRIP_OF_AGONY)
                 {
@@ -871,7 +871,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                 }
             }
 
-            void MovementInform(uint32 type, uint32 id)
+            void MovementInform(uint32 type, uint32 id) override
             {
                 if (type == POINT_MOTION_TYPE)
                 {
@@ -891,7 +891,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 _events.Update(diff);
                 switch (_events.ExecuteEvent())
@@ -947,25 +947,25 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
             std::list<Creature*> _guardList;
         };
 
-        bool OnGossipHello(Player* player, Creature* creature)
+        bool OnGossipHello(Player* player, Creature* creature) override
         {
             InstanceScript* instance = creature->GetInstanceScript();
             if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
             {
-                player->ADD_GOSSIP_ITEM(0, "Let it begin...", 631, -ACTION_START_EVENT + 1);
-                player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                AddGossipItemFor(player, 0, "Let it begin...", 631, -ACTION_START_EVENT + 1);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             }
 
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
         {
             InstanceScript* instance = creature->GetInstanceScript();
             if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
             {
-                player->PlayerTalkClass->ClearMenus();
-                player->CLOSE_GOSSIP_MENU();
+                ClearGossipMenuFor(player);
+                CloseGossipMenuFor(player);
                 if (action == -ACTION_START_EVENT + 1)
                     creature->AI()->DoAction(ACTION_START_EVENT);
             }
@@ -973,7 +973,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
             return true;
         }
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return GetIcecrownCitadelAI<npc_muradin_bronzebeard_iccAI>(creature);
         }
@@ -1240,7 +1240,7 @@ class spell_deathbringer_blood_nova_targeting : public SpellScriptLoader
                 // select one random target, with preference of ranged targets
                 uint32 targetsAtRange = 0;
                 uint32 const minTargets = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 10 : 4);
-                targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster(), false));
+                targets.sort(acore::ObjectDistanceOrderPred(GetCaster(), false));
 
                 // get target count at range
                 for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr, ++targetsAtRange)
@@ -1308,12 +1308,12 @@ class spell_deathbringer_boiling_blood : public SpellScriptLoader
 
                 if (GetSpellInfo()->Id == 72385 || GetSpellInfo()->Id == 72442) // 10n, 10h
                 {
-                    WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+                    WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
                     targets.clear();
                     targets.push_back(target);
                 }
                 else
-                    Trinity::Containers::RandomResizeList(targets, 3);
+                    acore::Containers::RandomResizeList(targets, 3);
             }
 
             void Register()

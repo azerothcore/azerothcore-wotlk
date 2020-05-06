@@ -23,7 +23,6 @@ npc_nexus_drake_hatchling
 EndContentData */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
@@ -31,6 +30,9 @@ EndContentData */
 #include "Player.h"
 #include "SpellInfo.h"
 #include "WorldSession.h"
+#include "SpellScript.h"
+#include "PassiveAI.h"
+#include "SpellAuras.h"
 
 // Ours
 enum eDrakeHunt
@@ -273,24 +275,24 @@ class npc_corastrasza : public CreatureScript
 public:
     npc_corastrasza() : CreatureScript("npc_corastrasza") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(QUEST_ACES_HIGH) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_ACES_HIGH_DAILY) == QUEST_STATUS_INCOMPLETE) //It's the same dragon for both quests.
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_C_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_C_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         if (action == GOSSIP_ACTION_INFO_DEF+1)
         {
-            player->CLOSE_GOSSIP_MENU();
+            CloseGossipMenuFor(player);
 
             player->CastSpell(player, SPELL_SUMMON_WYRMREST_SKYTALON, true);
             player->CastSpell(player, SPELL_WYRMREST_SKYTALON_RIDE_PERIODIC, true);
@@ -305,13 +307,15 @@ public:
 ## npc_iruk
 ######*/
 
-#define GOSSIP_ITEM_I  "<Search corpse for Issliruk's Totem.>"
-
 enum Iruk
 {
+    GOSSIP_MENU_ID_NPC_IRUK                 = 9280,
+    GOSSIP_OPTION_SEARCH_CORPSE             = 0,
+    NPC_TEXT_THIS_YOUNG_TUSKARR             = 12585,
+
     QUEST_SPIRITS_WATCH_OVER_US             = 11961,
-    SPELL_CREATURE_TOTEM_OF_ISSLIRUK        = 46816,
-    GOSSIP_TEXT_I                           = 12585
+
+    SPELL_CREATE_TOTEM_OF_ISSLIRUK          = 46816
 };
 
 class npc_iruk : public CreatureScript
@@ -319,26 +323,26 @@ class npc_iruk : public CreatureScript
 public:
     npc_iruk() : CreatureScript("npc_iruk") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_SPIRITS_WATCH_OVER_US) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_I, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_MENU_ID_NPC_IRUK, GOSSIP_OPTION_SEARCH_CORPSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        
+        SendGossipMenuFor(player, NPC_TEXT_THIS_YOUNG_TUSKARR, creature->GetGUID());
 
-        player->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_I, creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
-        switch (action)
+        ClearGossipMenuFor(player);
+        
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                player->CastSpell(player, SPELL_CREATURE_TOTEM_OF_ISSLIRUK, true);
-                player->CLOSE_GOSSIP_MENU();
-                break;
-
+            player->CastSpell(player, SPELL_CREATE_TOTEM_OF_ISSLIRUK, true);
+            CloseGossipMenuFor(player);
         }
+        
         return true;
     }
 };
@@ -1104,7 +1108,7 @@ public:
 
         uint64 uiPlayerGUID;
 
-        void Reset()
+        void Reset() override
         {
             if (uiEmoteState)
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, uiEmoteState);
@@ -1122,7 +1126,7 @@ public:
             me->RestoreFaction();
         }
 
-        void DoAction(int32 /*iParam*/)
+        void DoAction(int32 /*iParam*/) override
         {
             me->StopMoving();
             me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
@@ -1132,7 +1136,7 @@ public:
             uiEventPhase = 1;
         }
 
-        void SetGUID(uint64 uiGuid, int32 /*iId*/)
+        void SetGUID(uint64 uiGuid, int32 /*iId*/) override
         {
             uiPlayerGUID = uiGuid;
         }
@@ -1144,7 +1148,7 @@ public:
                 AttackStart(player);
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) override
         {
             if (uiEventTimer && uiEventTimer <= uiDiff)
             {
@@ -1205,12 +1209,12 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hidden_cultistAI(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         uint32 uiGossipText = 0;
         const char* charGossipItem;
@@ -1235,23 +1239,23 @@ public:
         }
 
         if (player->HasAura(SPELL_RIGHTEOUS_VISION) && player->GetQuestStatus(QUEST_THE_HUNT_IS_ON) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, charGossipItem, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, charGossipItem, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
         if (creature->IsVendor())
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        player->SEND_GOSSIP_MENU(uiGossipText, creature->GetGUID());
+        SendGossipMenuFor(player, uiGossipText, creature->GetGUID());
 
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
 
         if (action == GOSSIP_ACTION_INFO_DEF+1)
         {
-            player->CLOSE_GOSSIP_MENU();
+            CloseGossipMenuFor(player);
             creature->AI()->SetGUID(player->GetGUID());
             creature->AI()->DoAction(1);
         }

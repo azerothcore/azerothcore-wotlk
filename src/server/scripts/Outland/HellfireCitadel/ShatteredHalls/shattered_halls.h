@@ -5,7 +5,8 @@
 #ifndef DEF_SHATTERED_H
 #define DEF_SHATTERED_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
+#include "PassiveAI.h"
 
 enum DataTypes
 {

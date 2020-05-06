@@ -831,7 +831,7 @@ class npc_crok_scourgebane : public CreatureScript
                     // get all nearby vrykul
                     std::list<Creature*> temp;
                     FrostwingVrykulSearcher check(me, 150.0f);
-                    Trinity::CreatureListSearcher<FrostwingVrykulSearcher> searcher(me, temp, check);
+                    acore::CreatureListSearcher<FrostwingVrykulSearcher> searcher(me, temp, check);
                     me->VisitNearbyGridObject(150.0f, searcher);
 
                     _aliveTrash.clear();
@@ -875,15 +875,15 @@ class npc_crok_scourgebane : public CreatureScript
                     _wipeCheckTimer = 3000;
 
                     Player* player = NULL;
-                    Trinity::AnyPlayerInObjectRangeCheck check(me, 140.0f);
-                    Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
+                    acore::AnyPlayerInObjectRangeCheck check(me, 140.0f);
+                    acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
                     me->VisitNearbyWorldObject(140.0f, searcher);
                     // wipe
                     if (!player || me->GetExactDist(4357.0f, 2606.0f, 350.0f) > 125.0f)
                     {
                         //Talk(SAY_CROK_DEATH);
                         FrostwingGauntletRespawner respawner;
-                        Trinity::CreatureWorker<FrostwingGauntletRespawner> worker(me, respawner);
+                        acore::CreatureWorker<FrostwingGauntletRespawner> worker(me, respawner);
                         me->VisitNearbyGridObject(333.0f, worker);
                         return;
                     }
@@ -1330,7 +1330,7 @@ class npc_captain_arnath : public CreatureScript
                     {
                         std::list<Creature*> targets = DoFindFriendlyMissingBuff(40.0f, SPELL_POWER_WORD_SHIELD);
                         if (!targets.empty())
-                            DoCast(Trinity::Containers::SelectRandomContainerElement(targets), SPELL_POWER_WORD_SHIELD);
+                            DoCast(acore::Containers::SelectRandomContainerElement(targets), SPELL_POWER_WORD_SHIELD);
                         Events.ScheduleEvent(EVENT_ARNATH_PW_SHIELD, urand(15000, 20000));
                         break;
                     }
@@ -1354,8 +1354,8 @@ class npc_captain_arnath : public CreatureScript
             Creature* FindFriendlyCreature() const
             {
                 Creature* target = NULL;
-                Trinity::MostHPMissingInRange u_check(me, 60.0f, 0);
-                Trinity::CreatureLastSearcher<Trinity::MostHPMissingInRange> searcher(me, target, u_check);
+                acore::MostHPMissingInRange u_check(me, 60.0f, 0);
+                acore::CreatureLastSearcher<acore::MostHPMissingInRange> searcher(me, target, u_check);
                 me->VisitNearbyGridObject(60.0f, searcher);
                 return target;
             }
@@ -1826,7 +1826,7 @@ class npc_alchemist_adrianna : public CreatureScript
     public:
         npc_alchemist_adrianna() : CreatureScript("npc_alchemist_adrianna") { }
 
-        bool OnGossipHello(Player* player, Creature* creature)
+        bool OnGossipHello(Player* player, Creature* creature) override
         {
             if (InstanceScript* instance = creature->GetInstanceScript())
                 if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE && !creature->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN) && !creature->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN25))
@@ -1957,7 +1957,7 @@ class spell_icc_sprit_alarm : public SpellScriptLoader
 
                 std::list<Creature*> wards;
                 GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, range);
-                wards.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
+                wards.sort(acore::ObjectDistanceOrderPred(GetCaster()));
                 for (std::list<Creature*>::iterator itr = wards.begin(); itr != wards.end(); ++itr)
                 {
                     if ((*itr)->IsAlive() && (*itr)->HasAura(SPELL_STONEFORM))
@@ -2056,8 +2056,8 @@ class spell_frost_giant_death_plague : public SpellScriptLoader
             // First effect
             void CountTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-                targets.remove_if(Trinity::ObjectGUIDCheck(GetCaster()->GetGUID(), true));
+                targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+                targets.remove_if(acore::ObjectGUIDCheck(GetCaster()->GetGUID(), true));
 
                 bool kill = true;
                 for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
@@ -2150,7 +2150,7 @@ class spell_svalna_revive_champion : public SpellScriptLoader
             void RemoveAliveTarget(std::list<WorldObject*>& targets)
             {
                 targets.remove_if(AliveCheck());
-                Trinity::Containers::RandomResizeList(targets, 2);
+                acore::Containers::RandomResizeList(targets, 2);
             }
 
             void Land(SpellEffIndex /*effIndex*/)
@@ -2265,7 +2265,7 @@ class at_icc_saurfang_portal : public AreaTriggerScript
                 instance->SetData(DATA_COLDFLAME_JETS, IN_PROGRESS);
                 std::list<Creature*> traps;
                 GetCreatureListWithEntryInGrid(traps, player, NPC_FROST_FREEZE_TRAP, 120.0f);
-                traps.sort(Trinity::ObjectDistanceOrderPred(player));
+                traps.sort(acore::ObjectDistanceOrderPred(player));
                 bool instant = false;
                 for (std::list<Creature*>::iterator itr = traps.begin(); itr != traps.end(); ++itr)
                 {
@@ -2323,7 +2323,7 @@ class at_icc_start_frostwing_gauntlet : public AreaTriggerScript
                         if (!crok->IsAlive())
                         {
                             FrostwingGauntletRespawner respawner;
-                            Trinity::CreatureWorker<FrostwingGauntletRespawner> worker(crok, respawner);
+                            acore::CreatureWorker<FrostwingGauntletRespawner> worker(crok, respawner);
                             crok->VisitNearbyGridObject(333.0f, worker);
                             return true;
                         }
@@ -2569,7 +2569,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -2634,7 +2634,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -2689,7 +2689,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -2751,7 +2751,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -2870,7 +2870,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -2916,7 +2916,7 @@ public:
 SeveredEssenceSpellInfo sesi_spells[] =
 {
     {CLASS_SHAMAN, 71938, 5000, 1, 0.0f},
-    {CLASS_PALADIN, 57767, 8000, 2, 30.0f}, 
+    {CLASS_PALADIN, 57767, 8000, 2, 30.0f},
     {CLASS_WARLOCK, 71937, 10000, 1, 0.0f},
     {CLASS_DEATH_KNIGHT, 49576, 15000, 1, 30.0f},
     {CLASS_ROGUE, 71933, 8000, 1, 0.0f},
@@ -2993,7 +2993,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -3092,7 +3092,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -3241,7 +3241,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -3273,13 +3273,13 @@ class npc_icc_buff_switcher : public CreatureScript
 public:
     npc_icc_buff_switcher() : CreatureScript("npc_icc_buff_switcher") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*sender*/, uint32  /*action*/)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*sender*/, uint32  /*action*/) override
     {
         if ((creature->GetEntry() == NPC_GARROSH_HELLSCREAM && player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11206) || (creature->GetEntry() == NPC_KING_VARIAN_WRYNN && player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11204))
         {
             if (!player->GetGroup() || !player->GetGroup()->isRaidGroup() || !player->GetGroup()->IsLeader(player->GetGUID()))
             {
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 ChatHandler(player->GetSession()).PSendSysMessage("Only the raid leader can turn off the buff.");
                 return true;
             }
@@ -3288,7 +3288,7 @@ public:
                     inst->SetData(DATA_BUFF_AVAILABLE, 0);
             if (creature->GetEntry() == NPC_GARROSH_HELLSCREAM)
             {
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 return true;
             }
         }
@@ -3382,7 +3382,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -3571,7 +3571,7 @@ class npc_icc_gauntlet_controller : public CreatureScript
                         {
                             if (me->GetDistance(itr->GetSource()) > 100.0f || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
                                 continue;
-                            
+
                             events.ScheduleEvent(EVENT_CHECK_FIGHT, 1000);
                             return;
                         }
@@ -3673,7 +3673,7 @@ class npc_icc_putricades_trap : public CreatureScript
                         {
                             if (me->GetDistance(itr->GetSource()) > 100.0f || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
                                 continue;
-                            
+
                             events.ScheduleEvent(EVENT_CHECK_FIGHT, 1000);
                             return;
                         }
@@ -3726,7 +3726,7 @@ class at_icc_putricide_trap : public AreaTriggerScript
         at_icc_putricide_trap() : AreaTriggerScript("at_icc_putricide_trap") { }
 
         bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
-        {           
+        {
             if (InstanceScript* instance = player->GetInstanceScript())
                 if (instance->GetData(DATA_PUTRICIDE_TRAP_STATE) == NOT_STARTED && !player->IsGameMaster())
                     if (Creature* trap = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_PUTRICADES_TRAP)))

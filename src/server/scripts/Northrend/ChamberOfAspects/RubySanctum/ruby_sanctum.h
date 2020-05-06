@@ -5,13 +5,13 @@
 #ifndef RUBY_SANCTUM_H_
 #define RUBY_SANCTUM_H_
 
-#include "ScriptPCH.h"
-
+#include "Player.h"
 #include "SpellScript.h"
 #include "Map.h"
 #include "Creature.h"
 #include "GameObjectAI.h"
-
+#include "PassiveAI.h"
+#include "Opcodes.h"
 
 enum DataTypes
 {

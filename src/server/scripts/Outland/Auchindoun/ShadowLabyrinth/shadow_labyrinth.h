@@ -5,7 +5,9 @@
 #ifndef DEF_SHADOW_LABYRINTH_H
 #define DEF_SHADOW_LABYRINTH_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
+#include "CreatureAI.h"
+#include "GridNotifiers.h"
 
 enum slData
 {

@@ -798,7 +798,7 @@ class boss_prince_valanar_icc : public CreatureScript
                 DoAction(ACTION_CAST_INVOCATION);
                 currentInvocationIndex = 0;
                 invocationOrder[0] = DATA_PRINCE_VALANAR_GUID;
-                invocationOrder[1] = RAND<uint32>(DATA_PRINCE_KELESETH_GUID, DATA_PRINCE_TALDARAM_GUID);
+                invocationOrder[1] = RAND(DATA_PRINCE_KELESETH_GUID, DATA_PRINCE_TALDARAM_GUID);
                 invocationOrder[2] = DATA_PRINCE_KELESETH_GUID + DATA_PRINCE_TALDARAM_GUID - invocationOrder[1];
 
                 events.ScheduleEvent(EVENT_BERSERK, 600000);
@@ -1696,7 +1696,7 @@ class spell_blood_council_summon_shadow_resonance : public SpellScriptLoader
                     {
                         float destX = summoner->GetPositionX()+cos(angle + a*M_PI)*i*10.0f;
                         float destY = summoner->GetPositionY()+sin(angle + a*M_PI)*i*10.0f;
-                        if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ()+10.0f, destX, destY, summoner->GetPositionZ()+10.0f, summoner->GetPhaseMask()) && destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
+                        if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ()+10.0f, destX, destY, summoner->GetPositionZ()+10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS) && destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
                         {
                             float destZ = summoner->GetMap()->GetHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ()+10.0f);
                             if (fabs(destZ-summoner->GetPositionZ()) < 10.0f) // valid z found

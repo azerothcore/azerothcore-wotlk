@@ -154,7 +154,7 @@ void Quest::LoadQuestTemplateAddon(Field* fields)
     RequiredClasses = fields[2].GetUInt32();
     SourceSpellid = fields[3].GetUInt32();
     PrevQuestId = fields[4].GetInt32();
-    NextQuestId = fields[5].GetInt32();
+    NextQuestId = fields[5].GetUInt32();
     ExclusiveGroup = fields[6].GetInt32();
     RewardMailTemplateId = fields[7].GetUInt32();
     RewardMailDelay = fields[8].GetUInt32();
@@ -270,7 +270,7 @@ uint32 Quest::CalculateHonorGain(uint8 level) const
         honor = uint32(tc->value * GetRewHonorMultiplier() * 0.1000000014901161);
 
         // Xinef: exactly this is calculated above, however with higher precision...
-        //honor += Trinity::Honor::hk_honor_at_level(level, GetRewHonorMultiplier());
+        //honor += acore::Honor::hk_honor_at_level(level, GetRewHonorMultiplier());
         honor += GetRewHonorAddition();
     }
 

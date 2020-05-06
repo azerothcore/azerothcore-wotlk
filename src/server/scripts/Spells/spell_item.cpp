@@ -48,6 +48,13 @@ class spell_item_massive_seaforium_charge : public SpellScriptLoader
         }
 };
 
+enum TitaniumSealOfDalaran
+{
+    TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FLIP      = 32638,
+    TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_HEADS_UP  = 32663,
+    TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FACE_DOWN = 32664
+};
+
 class spell_item_titanium_seal_of_dalaran : public SpellScriptLoader
 {
     public:
@@ -64,12 +71,19 @@ class spell_item_titanium_seal_of_dalaran : public SpellScriptLoader
                 Unit* caster = GetCaster();
                 if (Player* player = caster->ToPlayer())
                 {
-                    std::string name = player->GetName();
-                    player->TextEmote("casually flips his Titanium Seal of Dalaran");
+                    LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FLIP))
+                        player->TextEmote(bct->GetText(loc_idx, player->getGender()));
                     if (urand(0,1))
-                        player->TextEmote("finds the coin face down for tails!");
+                    {
+                        if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FACE_DOWN))
+                            player->TextEmote(bct->GetText(loc_idx, player->getGender()));
+                    }
                     else
-                        player->TextEmote("catches the coin heads up!");
+                    {
+                        if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_HEADS_UP))
+                            player->TextEmote(bct->GetText(loc_idx, player->getGender()));
+                    }
                 }
             }
 
@@ -734,14 +748,27 @@ public:
     }
 };
 
-class spell_item_fish_feast : public SpellScriptLoader
+enum Feast
+{
+    SPELL_GREAT_FEAST                        = 57301,
+    SPELL_FISH_FEAST                         = 57426,
+    SPELL_SMALL_FEAST                        = 58474,
+    SPELL_GIGANTIC_FEAST                     = 58465,
+
+    GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE    = 31843,
+    FISH_FEAST_BROADCAST_TEXT_ID_PREPARE     = 31844,
+    SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE    = 31845,
+    GIGANTIC_FEAST_BROADCAST_TEXT_ID_PREPARE = 31846
+};
+
+class spell_item_feast : public SpellScriptLoader
 {
     public:
-        spell_item_fish_feast() : SpellScriptLoader("spell_item_fish_feast") {}
+        spell_item_feast() : SpellScriptLoader("spell_item_feast") {}
 
-        class spell_item_fish_feast_SpellScript : public SpellScript
+        class spell_item_feast_SpellScript : public SpellScript
         {
-            PrepareSpellScript(spell_item_fish_feast_SpellScript);
+            PrepareSpellScript(spell_item_feast_SpellScript);
 
             bool Load()
             {
@@ -751,18 +778,43 @@ class spell_item_fish_feast : public SpellScriptLoader
             void HandleScriptEffect(SpellEffIndex effIndex)
             {
                 PreventHitDefaultEffect(effIndex);
-                GetCaster()->ToPlayer()->TextEmote("prepares a Fish Feast!");
+
+                Unit* caster = GetCaster();
+                if (Player* player = caster->ToPlayer())
+                {
+                    LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+
+                    switch(GetSpellInfo()->Id)
+                    {
+                        case SPELL_GREAT_FEAST:
+                            if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE))
+                                player->MonsterTextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player, false);
+                            break;
+                        case SPELL_FISH_FEAST:
+                            if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(FISH_FEAST_BROADCAST_TEXT_ID_PREPARE))
+                                player->MonsterTextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player, false);
+                            break;
+                        case SPELL_SMALL_FEAST:
+                            if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE))
+                                player->MonsterTextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player, false);
+                            break;
+                        case SPELL_GIGANTIC_FEAST:
+                            if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GIGANTIC_FEAST_BROADCAST_TEXT_ID_PREPARE))
+                                player->MonsterTextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player, false);
+                            break;
+                    }
+                }
             }
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_item_fish_feast_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+                OnEffectHitTarget += SpellEffectFn(spell_item_feast_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
         SpellScript* GetSpellScript() const
         {
-            return new spell_item_fish_feast_SpellScript();
+            return new spell_item_feast_SpellScript();
         }
 };
 
@@ -1055,15 +1107,6 @@ class spell_item_oracle_ablutions : public SpellScriptLoader
                         break;
                     default:
                         break;
-                }
-                if (Player* player = caster->ToPlayer())
-                {
-                    std::string name = player->GetName();
-                    player->TextEmote("casually flips his Titanium Seal of Dalaran");
-                    if (urand(0,1))
-                        player->TextEmote("finds the coin face down for tails!");
-                    else
-                        player->TextEmote("catches the coin heads up!");
                 }
             }
 
@@ -1386,6 +1429,116 @@ class spell_item_direbrew_remote : public SpellScriptLoader
         }
 };
 
+enum EyeOfGruul
+{
+    SPELL_DRUID_ITEM_HEALING_TRANCE   = 37721,
+    SPELL_PALADIN_ITEM_HEALING_TRANCE = 37723,
+    SPELL_PRIEST_ITEM_HEALING_TRANCE  = 37706,
+    SPELL_SHAMAN_ITEM_HEALING_TRANCE  = 37722
+};
+
+// 37705 - Healing Discount
+class spell_item_eye_of_gruul_healing_discount : public SpellScriptLoader
+{
+    public:
+        spell_item_eye_of_gruul_healing_discount() : SpellScriptLoader("spell_item_eye_of_gruul_healing_discount") { }
+
+        class spell_item_eye_of_gruul_healing_discount_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_item_eye_of_gruul_healing_discount_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_ITEM_HEALING_TRANCE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_PALADIN_ITEM_HEALING_TRANCE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_PRIEST_ITEM_HEALING_TRANCE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_SHAMAN_ITEM_HEALING_TRANCE))
+                    return false;
+                return true;
+            }
+
+            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+            {
+                PreventDefaultAction();
+                if (Unit* unitTarget = GetTarget())
+                {
+                    uint32 spell_id = 0;
+                    switch (unitTarget->getClass())
+                    {
+                        case CLASS_DRUID:
+                            spell_id = SPELL_DRUID_ITEM_HEALING_TRANCE;
+                            break;
+                        case CLASS_PALADIN:
+                            spell_id = SPELL_PALADIN_ITEM_HEALING_TRANCE;
+                            break;
+                        case CLASS_PRIEST:
+                            spell_id = SPELL_PRIEST_ITEM_HEALING_TRANCE;
+                            break;
+                        case CLASS_SHAMAN:
+                            spell_id = SPELL_SHAMAN_ITEM_HEALING_TRANCE;
+                            break;
+                        default:
+                            return; // ignore for non-healing classes
+                    }
+
+                    unitTarget->CastSpell(unitTarget, spell_id, true, NULL, aurEff);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectProc += AuraEffectProcFn(spell_item_eye_of_gruul_healing_discount_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_item_eye_of_gruul_healing_discount_AuraScript();
+        }
+};
+
+enum eArgentKnight
+{
+    SPELL_SUMMON_ARGENT_KNIGHT_ALLIANCE = 54296
+};
+
+class spell_item_summon_argent_knight :  public SpellScriptLoader
+{
+    public:
+        spell_item_summon_argent_knight() : SpellScriptLoader("spell_item_summon_argent_knight") { }
+
+        class spell_item_summon_argent_knight_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_item_summon_argent_knight_SpellScript);
+
+            void HandleOnEffectHit(SpellEffIndex effIndex)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (caster->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        // summoning the "Argent Knight (Horde)" is default for spell 54307;
+                        if (caster->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
+                        {
+                            // prevent default summoning and summon "Argent Knight (Alliance)" instead
+                            PreventHitDefaultEffect(effIndex);
+                            caster->CastSpell(caster, SPELL_SUMMON_ARGENT_KNIGHT_ALLIANCE, true);
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHit += SpellEffectFn(spell_item_summon_argent_knight_SpellScript::HandleOnEffectHit, EFFECT_0, SPELL_EFFECT_SUMMON);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_item_summon_argent_knight_SpellScript();
+        }
+};
 
 // Theirs
 // Generic script for handling item dummy effects which trigger another spell.
@@ -1499,6 +1652,39 @@ class spell_item_arcane_shroud : public SpellScriptLoader
         {
             return new spell_item_arcane_shroud_AuraScript();
         }
+};
+
+// 64415 - Val'anyr Hammer of Ancient Kings - Equip Effect
+class spell_item_valanyr_hammer_of_ancient_kings : public SpellScriptLoader
+{
+public:
+    spell_item_valanyr_hammer_of_ancient_kings() : SpellScriptLoader("spell_item_valanyr_hammer_of_ancient_kings") { }
+
+    class spell_item_valanyr_hammer_of_ancient_kingsAuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_item_valanyr_hammer_of_ancient_kingsAuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+
+            SpellInfo const* spellInfo = eventInfo.GetHealInfo()->GetSpellInfo();
+            if (!spellInfo || !spellInfo->HasEffect(SPELL_EFFECT_HEAL))
+                return false;
+
+            return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetHeal() > 0;
+
+        }
+
+        void Register()
+        {
+            DoCheckProc += AuraCheckProcFn(spell_item_valanyr_hammer_of_ancient_kingsAuraScript::CheckProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_item_valanyr_hammer_of_ancient_kingsAuraScript();
+    }
 };
 
 // 64411 - Blessing of Ancient Kings (Val'anyr, Hammer of Ancient Kings)
@@ -1724,7 +1910,7 @@ class spell_item_echoes_of_light : public SpellScriptLoader
                 if (targets.size() < 2)
                     return;
 
-                targets.sort(Trinity::HealthPctOrderPred());
+                targets.sort(acore::HealthPctOrderPred());
 
                 WorldObject* target = targets.front();
                 targets.clear();
@@ -2484,11 +2670,17 @@ class spell_item_shadowmourne : public SpellScriptLoader
                     }
                 }
             }
+			
+			void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+			{
+				GetTarget()->RemoveAurasDueToSpell(SPELL_SHADOWMOURNE_SOUL_FRAGMENT);
+			}
 
             void Register()
             {
                 DoCheckProc += AuraCheckProcFn(spell_item_shadowmourne_AuraScript::CheckProc);
                 OnEffectProc += AuraEffectProcFn(spell_item_shadowmourne_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+				AfterEffectRemove += AuraEffectRemoveFn(spell_item_shadowmourne_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -3905,7 +4097,7 @@ void AddSC_item_spell_scripts()
     new spell_item_crazy_alchemists_potion();
     new spell_item_skull_of_impeding_doom();
     new spell_item_carrot_on_a_stick();
-    new spell_item_fish_feast();
+    new spell_item_feast();
     new spell_item_gnomish_universal_remote();
     new spell_item_strong_anti_venom();
     new spell_item_gnomish_shrink_ray();
@@ -3921,6 +4113,8 @@ void AddSC_item_spell_scripts()
     new spell_item_summon_or_dismiss();
     new spell_item_draenic_pale_ale();
     new spell_item_direbrew_remote();
+    new spell_item_eye_of_gruul_healing_discount();
+    new spell_item_summon_argent_knight();
 
     // Theirs
     // 23074 Arcanite Dragonling
@@ -3935,6 +4129,7 @@ void AddSC_item_spell_scripts()
     new spell_item_aegis_of_preservation();
     new spell_item_arcane_shroud();
     new spell_item_blessing_of_ancient_kings();
+    new spell_item_valanyr_hammer_of_ancient_kings();
     new spell_item_defibrillate("spell_item_goblin_jumper_cables", 67, SPELL_GOBLIN_JUMPER_CABLES_FAIL);
     new spell_item_defibrillate("spell_item_goblin_jumper_cables_xl", 50, SPELL_GOBLIN_JUMPER_CABLES_XL_FAIL);
     new spell_item_defibrillate("spell_item_gnomish_army_knife", 33);

@@ -59,6 +59,9 @@ public:
         // XT-002
         uint64 m_xt002DoorsGUID;
 
+        // Kologarn
+        uint64 KologarnDoorGUID;
+
         // Assembly of Iron
         uint64 m_assemblyDoorsGUID;
         uint64 m_archivumDoorsGUID;
@@ -132,6 +135,7 @@ public:
             // XT-002
             m_xt002DoorsGUID        = 0;
 
+            // Kologarn Door
             // Assembly of Iron
             m_assemblyDoorsGUID     = 0;
             m_archivumDoorsGUID     = 0;
@@ -439,6 +443,9 @@ public:
                 // XT-002, Kologarn, Assembly of Iron
                 case GO_XT002_DOORS:
                     m_xt002DoorsGUID = gameObject->GetGUID();
+                    break;
+                case GO_KOLOGARN_DOORS:
+                    KologarnDoorGUID = gameObject->GetGUID();
                     break;
                 case GO_KOLOGARN_BRIDGE:
                     OpenIfDone(TYPE_KOLOGARN, gameObject, GO_STATE_READY);
@@ -781,7 +788,9 @@ public:
                 // XT-002
                 case GO_XT002_DOORS:
                     return m_xt002DoorsGUID;
-
+                // XT-002
+                case GO_KOLOGARN_DOORS:
+                    return KologarnDoorGUID;
                 // Thorim
                 case DATA_THORIM_LEVER_GATE:
                 case DATA_THORIM_LEVER:
