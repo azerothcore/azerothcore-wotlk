@@ -11,8 +11,8 @@ SDComment: SDComment: Timers may incorrect
 SDCategory: Karazhan
 EndScriptData */
 
+#include "Player.h"
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "karazhan.h"
 
@@ -272,7 +272,7 @@ public:
                 }
                 else
                     me->GetMotionMaster()->MovePoint(MovePhase, IntroWay[MovePhase][0], IntroWay[MovePhase][1], IntroWay[MovePhase][2]);
-                    
+
                 MovePhase = 0;
             }
 
@@ -295,14 +295,14 @@ public:
                 {
                     DoCastVictim(SPELL_BELLOWING_ROAR);
                     BellowingRoarTimer = urand(30000, 40000);
-                } else 
+                } else
                     BellowingRoarTimer -= diff;
 
                 if (SmolderingBreathTimer <= diff)
                 {
                     DoCastVictim(SPELL_SMOLDERING_BREATH);
                     SmolderingBreathTimer = 20000;
-                } else 
+                } else
                     SmolderingBreathTimer -= diff;
 
                 if (CharredEarthTimer <= diff)
@@ -310,7 +310,7 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         DoCast(target, SPELL_CHARRED_EARTH);
                     CharredEarthTimer = 20000;
-                } else 
+                } else
                     CharredEarthTimer -= diff;
 
                 if (TailSweepTimer <= diff)
@@ -319,7 +319,7 @@ public:
                         if (!me->HasInArc(M_PI, target))
                             DoCast(target, SPELL_TAIL_SWEEP);
                     TailSweepTimer = 15000;
-                } else 
+                } else
                     TailSweepTimer -= diff;
 
                 if (SearingCindersTimer <= diff)
@@ -327,7 +327,7 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         DoCast(target, SPELL_SEARING_CINDERS);
                     SearingCindersTimer = 10000;
-                } else 
+                } else
                     SearingCindersTimer -= diff;
 
                 uint32 Prozent = uint32(me->GetHealthPct());
@@ -363,7 +363,7 @@ public:
                         DoCastVictim(SPELL_RAIN_OF_BONES);
                         RainBones = true;
                         SmokingBlastTimer = 20000;
-                    } else 
+                    } else
                         RainofBonesTimer -= diff;
 
                     if (DistractingAshTimer <= diff)
@@ -371,7 +371,7 @@ public:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                             DoCast(target, SPELL_DISTRACTING_ASH);
                         DistractingAshTimer = 2000; //timer wrong
-                    } else 
+                    } else
                         DistractingAshTimer -= diff;
                 }
 
@@ -381,7 +381,7 @@ public:
                      {
                         DoCastVictim(SPELL_SMOKING_BLAST);
                         SmokingBlastTimer = 1500; //timer wrong
-                     } else 
+                     } else
                         SmokingBlastTimer -= diff;
                 }
 
@@ -390,7 +390,7 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0))
                         DoCast(target, SPELL_FIREBALL_BARRAGE);
                     FireballBarrageTimer = 20000;
-                } else 
+                } else
                     FireballBarrageTimer -= diff;
 
                 if (FlyTimer <= diff) //landing
@@ -401,7 +401,7 @@ public:
                     me->GetMotionMaster()->MovePoint(3, IntroWay[3][0], IntroWay[3][1], IntroWay[3][2]);
 
                     Flying = true;
-                } else 
+                } else
 					FlyTimer -= diff;
             }
         }
@@ -414,14 +414,15 @@ class go_blackened_urn : public GameObjectScript
 public:
     go_blackened_urn() : GameObjectScript("go_blackened_urn") { }
 
-    bool OnGossipHello(Player* pPlayer, GameObject *pGo)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if (InstanceScript* pInstance = pGo->GetInstanceScript())
+        if (InstanceScript* pInstance = go->GetInstanceScript())
         {
-            if (pInstance->GetData(DATA_NIGHTBANE) != DONE && !pGo->FindNearestCreature(NPC_NIGHTBANE, 40.0f))
-                if (Creature *cr = ObjectAccessor::GetCreature(*pPlayer, pInstance->GetData64(DATA_NIGHTBANE)))
+            if (pInstance->GetData(DATA_NIGHTBANE) != DONE && !go->FindNearestCreature(NPC_NIGHTBANE, 40.0f))
+                if (Creature *cr = ObjectAccessor::GetCreature(*player, pInstance->GetData64(DATA_NIGHTBANE)))
                     cr->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
         }
+        
         return false;
     }
 };

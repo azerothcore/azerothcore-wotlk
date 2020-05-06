@@ -98,8 +98,22 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
         if ((!initial || (owner->movespline->Finalized() && this->GetMovementGeneratorType() == CHASE_MOTION_TYPE)) && i_target->IsWithinDistInMap(owner, dist) && i_target->IsWithinLOS(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ()))
             return;
 
-        // Xinef: Fix follow angle for hostile units
         float angle = i_angle;
+
+        if (i_target->GetTypeId() == TYPEID_PLAYER)
+        {
+            Creature* creature = owner->ToCreature();
+
+            if (creature && creature->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
+            {
+                // fix distance and angle for vanity pets
+                dist = 0.3f;
+                angle = PET_FOLLOW_ANGLE + M_PI * 0.2f;
+                size = i_target->GetCombatReach() - i_target->GetObjectSize();
+            }
+        }
+
+        // Xinef: Fix follow angle for hostile units
         if (angle == 0.0f && owner->GetVictim() && owner->GetVictim()->GetGUID() == i_target->GetGUID())
             angle = MapManager::NormalizeOrientation(i_target->GetAngle(owner)-i_target->GetOrientation());
         // to at i_offset distance from target and i_angle from target facing
@@ -298,6 +312,18 @@ bool TargetedMovementGeneratorMedium<T,D>::DoUpdate(T* owner, uint32 time_diff)
         if (i_recalculateTravel)
             _setTargetLocation(owner, false);
     }
+
+    Unit* pOwner = owner->GetCharmerOrOwner();
+
+    if (pOwner && pOwner->GetTypeId() == TYPEID_PLAYER)
+    {
+        // Update pet speed for players in order to avoid stuttering
+        if (pOwner->IsFlying())
+            owner->UpdateSpeed(MOVE_FLIGHT, true);
+        else
+            owner->UpdateSpeed(MOVE_RUN, true);
+    }
+
     return true;
 }
 

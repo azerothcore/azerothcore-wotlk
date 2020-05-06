@@ -70,9 +70,13 @@ bool MotionTransport::CreateMoTrans(uint32 guidlow, uint32 entry, uint32 mapid, 
     _triggeredArrivalEvent = false;
     _triggeredDepartureEvent = false;
 
+    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+    {
+        SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
+        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+    }
+
     SetObjectScale(goinfo->size);
-    SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
-    SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
     SetPathProgress(0);
     SetPeriod(tInfo->pathTime);
     SetEntry(goinfo->entry);
@@ -246,7 +250,7 @@ void MotionTransport::UpdatePosition(float x, float y, float z, float o)
 
 void MotionTransport::AddPassenger(WorldObject* passenger, bool withAll)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, Lock);
+    ACORE_GUARD(ACE_Thread_Mutex, Lock);
     if (_passengers.insert(passenger).second)
     {
         if (Player* plr = passenger->ToPlayer())
@@ -271,7 +275,7 @@ void MotionTransport::AddPassenger(WorldObject* passenger, bool withAll)
 
 void MotionTransport::RemovePassenger(WorldObject* passenger, bool withAll)
 { 
-    TRINITY_GUARD(ACE_Thread_Mutex, Lock);
+    ACORE_GUARD(ACE_Thread_Mutex, Lock);
     if (_passengers.erase(passenger) || _staticPassengers.erase(passenger))
     {
         if (Player* plr = passenger->ToPlayer())
@@ -595,7 +599,7 @@ void MotionTransport::UpdatePassengerPositions(PassengerSet& passengers)
         CalculatePassengerPosition(x, y, z, &o);
 
         // check if position is valid
-        if (!Trinity::IsValidMapCoord(x, y, z))
+        if (!acore::IsValidMapCoord(x, y, z))
             continue;
 
         switch (passenger->GetTypeId())
@@ -696,8 +700,11 @@ bool StaticTransport::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 ph
 
     SetObjectScale(goinfo->size);
 
-    SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
-    SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
+    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+    {
+        SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
+        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+    }
 
     SetEntry(goinfo->entry);
     SetName(goinfo->name);
@@ -858,7 +865,7 @@ void StaticTransport::RelocateToProgress(uint32 progress)
         float oriRotAngle = oriRotAngleCurr + percRot * (oriRotAngleNext - oriRotAngleCurr);
 
         // check if position is valid
-        if (!Trinity::IsValidMapCoord(pos.x, pos.y, pos.z))
+        if (!acore::IsValidMapCoord(pos.x, pos.y, pos.z))
             return;
 
         // update position to new one
@@ -893,7 +900,7 @@ void StaticTransport::UpdatePassengerPositions()
         CalculatePassengerPosition(x, y, z, &o);
 
         // check if position is valid
-        if (!Trinity::IsValidMapCoord(x, y, z))
+        if (!acore::IsValidMapCoord(x, y, z))
             continue;
 
         switch (passenger->GetTypeId())

@@ -8,15 +8,15 @@
 #define _INSTANCESAVEMGR_H
 
 #include "Define.h"
-#include <ace/Singleton.h>
+#include "DatabaseEnv.h"
+#include "DBCEnums.h"
+#include "ObjectDefines.h"
+
 #include <ace/Null_Mutex.h>
 #include <ace/Thread_Mutex.h>
 #include <list>
 #include <map>
-#include "UnorderedMap.h"
-#include "DatabaseEnv.h"
-#include "DBCEnums.h"
-#include "ObjectDefines.h"
+#include <unordered_map>
 
 struct InstanceTemplate;
 struct MapEntry;
@@ -33,14 +33,14 @@ struct InstancePlayerBind
     InstancePlayerBind() : save(NULL), perm(false), extended(false) {}
 };
 
-typedef UNORDERED_MAP< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
+typedef std::unordered_map< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
 
 struct BoundInstancesMapWrapper
 {
     BoundInstancesMap m[MAX_DIFFICULTY];
 };
 
-typedef UNORDERED_MAP< uint32 /*guidLow*/, BoundInstancesMapWrapper* > PlayerBindStorage;
+typedef std::unordered_map< uint32 /*guidLow*/, BoundInstancesMapWrapper* > PlayerBindStorage;
 
 class InstanceSave
 {
@@ -94,11 +94,10 @@ class InstanceSave
         ACE_Thread_Mutex _lock;
 };
 
-typedef UNORDERED_MAP<uint32 /*PAIR32(map, difficulty)*/, time_t /*resetTime*/> ResetTimeByMapDifficultyMap;
+typedef std::unordered_map<uint32 /*PAIR32(map, difficulty)*/, time_t /*resetTime*/> ResetTimeByMapDifficultyMap;
 
 class InstanceSaveManager
 {
-    friend class ACE_Singleton<InstanceSaveManager, ACE_Thread_Mutex>;
     friend class InstanceSave;
 
     private:
@@ -106,7 +105,9 @@ class InstanceSaveManager
         ~InstanceSaveManager();
 
     public:
-        typedef UNORDERED_MAP<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveHashMap;
+        static InstanceSaveManager* instance();
+        
+        typedef std::unordered_map<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveHashMap;
 
         struct InstResetEvent
         {
@@ -189,5 +190,6 @@ class InstanceSaveManager
         ResetTimeQueue m_resetTimeQueue;
 };
 
-#define sInstanceSaveMgr ACE_Singleton<InstanceSaveManager, ACE_Thread_Mutex>::instance()
+#define sInstanceSaveMgr InstanceSaveManager::instance()
+
 #endif

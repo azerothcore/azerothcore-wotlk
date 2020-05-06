@@ -13,6 +13,7 @@
 #include "Player.h"
 #include "Util.h"
 #include "WorldSession.h"
+#include "GameGraveyard.h"
 
 BattlegroundAB::BattlegroundAB()
 {
@@ -33,9 +34,7 @@ BattlegroundAB::BattlegroundAB()
     StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_AB_HAS_BEGUN;
 }
 
-BattlegroundAB::~BattlegroundAB()
-{
-}
+BattlegroundAB::~BattlegroundAB() = default;
 
 void BattlegroundAB::PostUpdateImpl(uint32 diff)
 {
@@ -69,14 +68,14 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                     NodeOccupied(node);
                     SendNodeUpdate(node);
 
-                    SendMessage2ToAll(LANG_BG_AB_NODE_TAKEN, teamId == TEAM_ALLIANCE ? CHAT_MSG_BG_SYSTEM_ALLIANCE : CHAT_MSG_BG_SYSTEM_HORDE, NULL, teamId == TEAM_ALLIANCE ? LANG_BG_AB_ALLY : LANG_BG_AB_HORDE, LANG_BG_AB_NODE_STABLES + node);
+                    SendMessage2ToAll(LANG_BG_AB_NODE_TAKEN, teamId == TEAM_ALLIANCE ? CHAT_MSG_BG_SYSTEM_ALLIANCE : CHAT_MSG_BG_SYSTEM_HORDE, nullptr, teamId == TEAM_ALLIANCE ? LANG_BG_AB_ALLY : LANG_BG_AB_HORDE, LANG_BG_AB_NODE_STABLES + node);
                     PlaySoundToAll(teamId == TEAM_ALLIANCE ? BG_AB_SOUND_NODE_CAPTURED_ALLIANCE : BG_AB_SOUND_NODE_CAPTURED_HORDE);
                     break;
                 }
                 case BG_AB_EVENT_ALLIANCE_TICK:
                 case BG_AB_EVENT_HORDE_TICK:
                 {
-                    TeamId teamId = TeamId(eventId - BG_AB_EVENT_ALLIANCE_TICK);
+                    auto teamId = TeamId(eventId - BG_AB_EVENT_ALLIANCE_TICK);
                     uint8 controlledPoints = _controlledPoints[teamId];
                     if (controlledPoints == 0)
                     {
@@ -84,9 +83,9 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         break;
                     }
 
-                    uint8 honorRewards = uint8(m_TeamScores[teamId] / _honorTics);
-                    uint8 reputationRewards = uint8(m_TeamScores[teamId] / _reputationTics);
-                    uint8 information = uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE);
+                    auto honorRewards = uint8(m_TeamScores[teamId] / _honorTics);
+                    auto reputationRewards = uint8(m_TeamScores[teamId] / _reputationTics);
+                    auto information = uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE);
                     m_TeamScores[teamId] += BG_AB_TickPoints[controlledPoints];
                     if (m_TeamScores[teamId] > BG_AB_MAX_TEAM_SCORE)
                         m_TeamScores[teamId] = BG_AB_MAX_TEAM_SCORE;
@@ -110,6 +109,8 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                     _bgEvents.ScheduleEvent(eventId, BG_AB_TickIntervals[controlledPoints]);
                     break;
                 }
+                default:
+                    break;
             }
     }
 }
@@ -182,6 +183,8 @@ void BattlegroundAB::HandleAreaTrigger(Player* player, uint32 trigger)
         case 4020:                                          // Unk1
         case 4021:                                          // Unk2
             break;
+        default:
+            break;
     }
 }
 
@@ -206,13 +209,13 @@ void BattlegroundAB::DeleteBanner(uint8 node)
 
 void BattlegroundAB::FillInitialWorldStates(WorldPacket& data)
 {
-    for (uint8 node = 0; node < BG_AB_DYNAMIC_NODES_COUNT; ++node)
+    for (auto & node : _capturePointInfo)
     {
-        if (_capturePointInfo[node]._state == BG_AB_NODE_STATE_NEUTRAL)
-            data << uint32(_capturePointInfo[node]._iconNone) << uint32(1);
+        if (node._state == BG_AB_NODE_STATE_NEUTRAL)
+            data << uint32(node._iconNone) << uint32(1);
 
         for (uint8 i = BG_AB_NODE_STATE_ALLY_OCCUPIED; i <= BG_AB_NODE_STATE_HORDE_CONTESTED; ++i)
-            data << uint32(_capturePointInfo[node]._iconCapture + i-1) << uint32(_capturePointInfo[node]._state == i);
+            data << uint32(node._iconCapture + i-1) << uint32(node._state == i);
     }
 
     data << uint32(BG_AB_OP_OCCUPIED_BASES_ALLY)  << uint32(_controlledPoints[TEAM_ALLIANCE]);
@@ -400,8 +403,8 @@ void BattlegroundAB::Init()
 
     _bgEvents.Reset();
 
-    _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID()) ? BG_AB_HONOR_TICK_WEEKEND : BG_AB_HONOR_TICK_NORMAL;
-    _reputationTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID()) ? BG_AB_REP_TICK_WEEKEND : BG_AB_REP_TICK_NORMAL;
+    _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_HONOR_TICK_WEEKEND : BG_AB_HONOR_TICK_NORMAL;
+    _reputationTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_REP_TICK_WEEKEND : BG_AB_REP_TICK_NORMAL;
 
     _capturePointInfo[BG_AB_NODE_STABLES]._iconNone = BG_AB_OP_STABLE_ICON;
     _capturePointInfo[BG_AB_NODE_FARM]._iconNone = BG_AB_OP_FARM_ICON;
@@ -424,10 +427,10 @@ void BattlegroundAB::EndBattleground(TeamId winnerTeamId)
     _bgEvents.Reset();
 }
 
-WorldSafeLocsEntry const* BattlegroundAB::GetClosestGraveyard(Player* player)
+GraveyardStruct const* BattlegroundAB::GetClosestGraveyard(Player* player)
 {
-    WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(BG_AB_GraveyardIds[BG_AB_SPIRIT_ALIANCE + player->GetTeamId()]);
-    WorldSafeLocsEntry const* nearestEntry = entry;
+    GraveyardStruct const* entry = sGraveyard->GetGraveyard(BG_AB_GraveyardIds[BG_AB_SPIRIT_ALIANCE + player->GetTeamId()]);
+    GraveyardStruct const* nearestEntry = entry;
 
     float pX = player->GetPositionX();
     float pY = player->GetPositionY();
@@ -437,7 +440,7 @@ WorldSafeLocsEntry const* BattlegroundAB::GetClosestGraveyard(Player* player)
     for (uint8 i = BG_AB_NODE_STABLES; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
         if (_capturePointInfo[i]._ownerTeamId == player->GetTeamId())
         {
-            entry = sWorldSafeLocsStore.LookupEntry(BG_AB_GraveyardIds[i]);
+            entry = sGraveyard->GetGraveyard(BG_AB_GraveyardIds[i]);
             dist = (entry->x - pX)*(entry->x - pX) + (entry->y - pY)*(entry->y - pY);
             if (dist < minDist)
             {
@@ -451,7 +454,7 @@ WorldSafeLocsEntry const* BattlegroundAB::GetClosestGraveyard(Player* player)
 
 void BattlegroundAB::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
 {
-    BattlegroundScoreMap::iterator itr = PlayerScores.find(player->GetGUID());
+    auto itr = PlayerScores.find(player->GetGUID());
     if (itr == PlayerScores.end())
         return;
 
@@ -484,9 +487,9 @@ void BattlegroundAB::ApplyPhaseMask()
             phaseMask |= 1 << (i*2+1 + _capturePointInfo[i]._ownerTeamId);
 
     const BattlegroundPlayerMap& bgPlayerMap = GetPlayers();
-    for (BattlegroundPlayerMap::const_iterator itr = bgPlayerMap.begin(); itr != bgPlayerMap.end(); ++itr)
+    for (auto itr : bgPlayerMap)
     {
-        itr->second->SetPhaseMask(phaseMask, false);
-        itr->second->UpdateObjectVisibility(true, false);
+        itr.second->SetPhaseMask(phaseMask, false);
+        itr.second->UpdateObjectVisibility(true, false);
     }
 }

@@ -15,7 +15,6 @@ EndScriptData */
 EndContentData */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
@@ -23,6 +22,11 @@ EndContentData */
 #include "Player.h"
 #include "Vehicle.h"
 #include "CreatureTextMgr.h"
+#include "PassiveAI.h"
+#include "CombatAI.h"
+#include "SpellAuras.h"
+#include "Chat.h"
+#include "CellImpl.h"
 
 // Ours
 /********
@@ -243,15 +247,15 @@ class go_the_pearl_of_the_depths : public GameObjectScript
 public:
     go_the_pearl_of_the_depths() : GameObjectScript("go_the_pearl_of_the_depths") { }
 
-    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if( !pPlayer || !pGo )
+        if(!player || !go)
             return true;
 
-        Creature* t = pPlayer->FindNearestCreature(NPC_CONVERSING_WITH_THE_DEPTHS_TRIGGER, 10.0f, true);
-        if( t && t->AI() && CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI()) )
-            if( !CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->running )
-                CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->Start(pPlayer->GetGUID());
+        Creature* t = player->FindNearestCreature(NPC_CONVERSING_WITH_THE_DEPTHS_TRIGGER, 10.0f, true);
+        if(t && t->AI() && CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI()))
+            if(!CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->running)
+                CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->Start(player->GetGUID());
 
         return true;
     }
@@ -339,7 +343,7 @@ public:
         {
             return NPC_INFINITE_ASSAILANT+urand(0,2);
         }
-        
+
         void UpdateAI(uint32 diff)
         {
             events.Update(diff);
@@ -458,15 +462,15 @@ public:
     struct npc_future_youAI : public ScriptedAI
     {
         npc_future_youAI(Creature* c) : ScriptedAI(c) {}
-        
-        void EnterEvadeMode() 
+
+        void EnterEvadeMode()
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
             me->ClearUnitState(UNIT_STATE_EVADE);
         }
 
-        void Reset() 
-        { 
+        void Reset()
+        {
             if (me->ToTempSummon() && me->ToTempSummon()->GetSummoner())
                 me->setFaction(me->ToTempSummon()->GetSummoner()->getFaction());
         }
@@ -761,7 +765,7 @@ public:
             if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_2, 150.0f))
                 go->Delete();
             WretchedGhoulCleaner cleaner;
-            Trinity::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
+            acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
             me->VisitNearbyGridObject(150.0f, worker);
         }
 
@@ -974,7 +978,7 @@ public:
                 case 17: // kill vegard
                     {
                         WretchedGhoulCleaner cleaner;
-                        Trinity::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
+                        acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
                         me->VisitNearbyGridObject(150.0f, worker);
 
                         if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE, 150.0f, true))
@@ -1181,7 +1185,7 @@ class spell_q24545_aod_special : public SpellScriptLoader
             void FilterTargets(std::list<WorldObject*>& targets)
             {
                 targets.remove_if(GhoulTargetCheck(GetSpellInfo()->Id == 70790));
-                Trinity::Containers::RandomResizeList(targets, 2);
+                acore::Containers::RandomResizeList(targets, 2);
             }
 
             void HandleScript(SpellEffIndex effIndex)

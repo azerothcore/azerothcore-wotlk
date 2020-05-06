@@ -130,18 +130,26 @@ public:
             { "stop",           SEC_GAMEMASTER,     false, &HandleNpcUnFollowCommand,          "" },
             { "",               SEC_GAMEMASTER,     false, &HandleNpcFollowCommand,            "" }
         };
+
+        static std::vector<ChatCommand> npcFactionCommandTable =
+        {
+            { "permanent",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
+            { "temp",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionTempIdCommand,  "" },
+            { "original",       SEC_ADMINISTRATOR,  false, &HandleNpcSetOriginalFaction,       "" }
+        };
+
         static std::vector<ChatCommand> npcSetCommandTable =
         {
             { "allowmove",      SEC_ADMINISTRATOR,  false, &HandleNpcSetAllowMovementCommand,  "" },
             { "entry",          SEC_ADMINISTRATOR,  false, &HandleNpcSetEntryCommand,          "" },
-            { "factionid",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
+            { "faction",        SEC_ADMINISTRATOR,  false, nullptr,                            "", npcFactionCommandTable},
             { "flag",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFlagCommand,           "" },
             { "level",          SEC_ADMINISTRATOR,  false, &HandleNpcSetLevelCommand,          "" },
             { "link",           SEC_ADMINISTRATOR,  false, &HandleNpcSetLinkCommand,           "" },
             { "model",          SEC_ADMINISTRATOR,  false, &HandleNpcSetModelCommand,          "" },
             { "movetype",       SEC_ADMINISTRATOR,  false, &HandleNpcSetMoveTypeCommand,       "" },
             { "phase",          SEC_ADMINISTRATOR,  false, &HandleNpcSetPhaseCommand,          "" },
-            { "spawndist",      SEC_ADMINISTRATOR,  false, &HandleNpcSetSpawnDistCommand,      "" },
+            { "wanderdistance", SEC_ADMINISTRATOR,  false, &HandleNpcSetWanderDistanceCommand, "" },
             { "spawntime",      SEC_ADMINISTRATOR,  false, &HandleNpcSetSpawnTimeCommand,      "" },
             { "data",           SEC_ADMINISTRATOR,  false, &HandleNpcSetDataCommand,           "" },
             //{ TODO: fix or remove these commands
@@ -204,7 +212,7 @@ public:
         if (Transport* tt = chr->GetTransport())
             if (MotionTransport* trans = tt->ToMotionTransport())
             {
-                uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT);
+                uint32 guid = sObjectMgr->GenerateRecycledLowGuid(HIGHGUID_UNIT);
                 CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
                 data.id = id;
                 data.phaseMask = chr->GetPhaseMaskForSpawn();
@@ -222,7 +230,7 @@ public:
             }
 
         Creature* creature = new Creature();
-        if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), id, 0, x, y, z, o))
+        if (!creature->Create(sObjectMgr->GenerateRecycledLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), id, 0, x, y, z, o))
         {
             delete creature;
             return false;
@@ -287,7 +295,7 @@ public:
             return false;
         }
 
-        uint32 vendor_entry = vendor ? vendor->GetEntry() : 0;
+        uint32 vendor_entry = vendor->GetEntry();
 
         if (!sObjectMgr->IsVendorItemValid(vendor_entry, itemId, maxcount, incrtime, extendedcost, handler->GetSession()->GetPlayer()))
         {
@@ -568,6 +576,47 @@ public:
         return true;
     }
 
+    //set tempfaction for creature
+    static bool HandleNpcSetFactionTempIdCommand(ChatHandler* handler, const char* args)
+    {
+        Player* me = handler->GetSession()->GetPlayer();
+        Unit* SelectedCreature = me->GetSelectedUnit();
+
+        if (!SelectedCreature)
+            return false;
+
+        Creature* creature = SelectedCreature->ToCreature();
+
+        if (!creature)
+            return false;
+
+        if (!*args)
+            return false;
+
+        uint32 tempfaction = (uint32)atoi((char*)args);
+
+        creature->setFaction(tempfaction);
+        return true;
+    }
+
+    //set orginal faction for npc
+    static bool HandleNpcSetOriginalFaction(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* me = handler->GetSession()->GetPlayer();
+
+        if (!me)
+            return false;
+
+        Creature* creature = me->GetSelectedUnit()->ToCreature();
+
+        if (!creature)
+            return false;
+
+        creature->RestoreFaction();
+
+        return true;
+    }
+
     //set npcflag of creature
     static bool HandleNpcSetFlagCommand(ChatHandler* handler, const char* args)
     {
@@ -693,7 +742,7 @@ public:
         for (uint8 i = 0; i < NPCFLAG_COUNT; i++)
             if (npcflags & npcFlagTexts[i].flag)
                 handler->PSendSysMessage(npcFlagTexts[i].text, npcFlagTexts[i].flag);
-        
+
         handler->PSendSysMessage(LANG_NPCINFO_MECHANIC_IMMUNE, mechanicImmuneMask);
         for (uint8 i = 1; i < MAX_MECHANIC; ++i)
             if (mechanicImmuneMask & (1 << (mechanicImmunes[i].flag - 1)))
@@ -718,7 +767,7 @@ public:
         stmt->setFloat(5, player->GetPositionY());
         stmt->setFloat(6, player->GetPositionZ());
         stmt->setFloat(7, distance * distance);
-        stmt->setFloat(8, player->GetPhaseMask());
+        stmt->setUInt32(8, player->GetPhaseMask());
         PreparedQueryResult result = WorldDatabase.Query(stmt);
 
         if (result)
@@ -886,7 +935,7 @@ public:
     * Valid movement types are:
     * <ul>
     * <li> stay - NPC wont move </li>
-    * <li> random - NPC will move randomly according to the spawndist </li>
+    * <li> random - NPC will move randomly according to the wander_distance </li>
     * <li> way - NPC will move with given waypoints set </li>
     * </ul>
     * additional parameter: NODEL - so no waypoints are deleted, if you
@@ -1058,7 +1107,7 @@ public:
     }
 
     //set spawn dist of creature
-    static bool HandleNpcSetSpawnDistCommand(ChatHandler* handler, const char* args)
+    static bool HandleNpcSetWanderDistanceCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
             return false;
@@ -1082,7 +1131,7 @@ public:
         else
             return false;
 
-        creature->SetRespawnRadius((float)option);
+        creature->SetWanderDistance((float)option);
         creature->SetDefaultMovementType(mtype);
         creature->GetMotionMaster()->Initialize();
         if (creature->IsAlive())                                // dead creature will reset movement generator at respawn
@@ -1091,7 +1140,7 @@ public:
             creature->Respawn();
         }
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_DISTANCE);
+        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_WANDER_DISTANCE);
 
         stmt->setFloat(0, option);
         stmt->setUInt8(1, uint8(mtype));
@@ -1099,7 +1148,7 @@ public:
 
         WorldDatabase.Execute(stmt);
 
-        handler->PSendSysMessage(LANG_COMMAND_SPAWNDIST, option);
+        handler->PSendSysMessage(LANG_COMMAND_WANDER_DISTANCE, option);
         return true;
     }
 

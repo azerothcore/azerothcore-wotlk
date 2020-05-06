@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+sudo rm -rf ./docker/build/cache/CMakeFiles
+sudo rm -rf ./docker/build/cache/deps
+sudo rm -rf ./docker/build/cache/src
+sudo rm ./docker/build/cache/*.cmake
+sudo rm ./docker/build/cache/*.txt
+sudo rm ./docker/build/cache/*.h
+sudo rm ./docker/build/cache/*.cpp
+sudo rm ./docker/build/cache/Makefile

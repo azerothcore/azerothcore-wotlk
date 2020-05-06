@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_DISABLEMGR_H
-#define TRINITY_DISABLEMGR_H
+#ifndef ACORE_DISABLEMGR_H
+#define ACORE_DISABLEMGR_H
 
 #include "Define.h"
 
@@ -21,6 +21,7 @@ enum DisableType
     DISABLE_TYPE_OUTDOORPVP             = 5,
     DISABLE_TYPE_VMAP                   = 6,
     DISABLE_TYPE_GO_LOS                 = 7,
+    DISABLE_TYPE_LFG_MAP                = 8,
 };
 
 enum SpellDisableTypes
@@ -52,4 +53,4 @@ namespace DisableMgr
     void CheckQuestDisables();
 }
 
-#endif //TRINITY_DISABLEMGR_H
+#endif //ACORE_DISABLEMGR_H

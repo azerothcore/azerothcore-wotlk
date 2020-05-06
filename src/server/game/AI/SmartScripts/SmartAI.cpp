@@ -674,7 +674,14 @@ void SmartAI::MoveInLineOfSight(Unit* who)
         return;
 
     if (me->CanStartAttack(who))
+    {
+        if (me->HasUnitState(UNIT_STATE_DISTRACTED))
+        {
+            me->ClearUnitState(UNIT_STATE_DISTRACTED);
+            me->GetMotionMaster()->Clear();
+        }
         AttackStart(who);
+    }
 }
 
 bool SmartAI::CanAIAttack(const Unit* /*who*/) const
@@ -691,7 +698,7 @@ bool SmartAI::AssistPlayerInCombat(Unit* who)
         return false;
 
     //experimental (unknown) flag not present
-    if (!(me->GetCreatureTemplate()->type_flags & CREATURE_TYPEFLAGS_AID_PLAYERS))
+    if (!(me->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_CAN_ASSIST))
         return false;
 
     // Xinef: victim of unit has to be a player controlled unit

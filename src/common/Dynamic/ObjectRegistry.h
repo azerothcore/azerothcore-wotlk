@@ -4,16 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_OBJECTREGISTRY_H
-#define TRINITY_OBJECTREGISTRY_H
+#ifndef ACORE_OBJECTREGISTRY_H
+#define ACORE_OBJECTREGISTRY_H
 
 #include "Define.h"
-#include "Dynamic/UnorderedMap.h"
-#include <ace/Singleton.h>
-
 #include <string>
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 /** ObjectRegistry holds all registry item of the same type
  */
@@ -28,6 +26,12 @@ class ObjectRegistry
         {
             typename RegistryMapType::const_iterator iter = i_registeredObjects.find(key);
             return( iter == i_registeredObjects.end() ? NULL : iter->second );
+        }
+
+        static ObjectRegistry<T, Key>* instance()
+        {
+            static ObjectRegistry<T, Key>* instance = new ObjectRegistry<T, Key>();
+            return instance;
         }
 
         /// Inserts a registry item

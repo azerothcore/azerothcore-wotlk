@@ -262,19 +262,36 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
     }
 
     GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(guidlow);
-    // xinef: hackfix - but make it possible to use original WorldRotation (using special gameobject addon data) 
-    // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
-    if (addon && addon->invisibilityType == INVISIBILITY_GENERAL && addon->InvisibilityValue == 0)
-        SetWorldRotation(rotation);
-    else
-        SetWorldRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
+
+    // hackfix for the hackfix down below
+    switch (goinfo->entry)
+    {
+        // excluded ids from the hackfix below
+        // used switch since there should be more
+        case 181233: // maexxna portal effect
+        case 181575: // maexxna portal
+            SetWorldRotation(rotation);
+            break;
+        default:
+            // xinef: hackfix - but make it possible to use original WorldRotation (using special gameobject addon data) 
+            // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
+            if (addon && addon->invisibilityType == INVISIBILITY_GENERAL && addon->InvisibilityValue == 0)
+                SetWorldRotation(rotation);
+            else
+                SetWorldRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
+            break;
+    }
+
     // pussywizard: no PathRotation for normal gameobjects
     SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
 
     SetObjectScale(goinfo->size);
 
-    SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
-    SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
+    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+    {
+        SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
+        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+    }
 
     SetEntry(goinfo->entry);
 
@@ -333,6 +350,10 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
 
     LastUsedScriptID = GetGOInfo()->ScriptId;
     AIM_Initialize();
+
+    // Check if GameObject is Large
+    if (goinfo->IsLargeGameObject())
+        SetVisibilityDistanceOverride(true);
 
     return true;
 }
@@ -432,7 +453,7 @@ void GameObject::Update(uint32 diff)
                     if (info->summoningRitual.casterTargetSpell && info->summoningRitual.casterTargetSpell != 1) // No idea why this field is a bool in some cases
                         for (uint32 i = 0; i < info->summoningRitual.casterTargetSpellTargets; i++)
                             // m_unique_users can contain only player GUIDs
-                            if (Player* target = ObjectAccessor::GetPlayer(*this, Trinity::Containers::SelectRandomContainerElement(m_unique_users)))
+                            if (Player* target = ObjectAccessor::GetPlayer(*this, acore::Containers::SelectRandomContainerElement(m_unique_users)))
                                 spellCaster->CastSpell(target, info->summoningRitual.casterTargetSpell, true);
 
                     // finish owners spell
@@ -580,8 +601,8 @@ void GameObject::Update(uint32 diff)
                     // search unfriendly creature
                     if (owner)                    // hunter trap
                     {
-                        Trinity::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
-                        Trinity::UnitSearcher<Trinity::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
+                        acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
+                        acore::UnitSearcher<acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
                         VisitNearbyGridObject(radius, searcher);
                         if (!target)
                             VisitNearbyWorldObject(radius, searcher);
@@ -591,8 +612,8 @@ void GameObject::Update(uint32 diff)
                         // environmental damage spells already have around enemies targeting but this not help in case not existed GO casting support
                         // affect only players
                         Player* player = NULL;
-                        Trinity::AnyPlayerInObjectRangeCheck checker(this, radius, true, true);
-                        Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
+                        acore::AnyPlayerInObjectRangeCheck checker(this, radius, true, true);
+                        acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
                         VisitNearbyWorldObject(radius, searcher);
                         target = player;
                     }
@@ -674,8 +695,9 @@ void GameObject::Update(uint32 diff)
                 //any return here in case battleground traps
                 // Xinef: Do not return here for summoned gos that should be deleted few lines below
                 // Xinef: Battleground objects are treated as spawned by default
-                if ((GetGOInfo()->flags & GO_FLAG_NODESPAWN) && isSpawnedByDefault())
-                    return;
+                if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+                    if ((addon->flags & GO_FLAG_NODESPAWN) && isSpawnedByDefault())
+                        return;
             }
 
             loot.clear();
@@ -696,7 +718,8 @@ void GameObject::Update(uint32 diff)
             {
                 SendObjectDeSpawnAnim(GetGUID());
                 //reset flags
-                SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);
+                if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+                    SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
             }
 
             if (!m_respawnDelayTime)
@@ -720,6 +743,11 @@ void GameObject::Update(uint32 diff)
         }
     }
     sScriptMgr->OnGameObjectUpdate(this, diff);
+}
+
+GameObjectTemplateAddon const* GameObject::GetTemplateAddon() const
+{
+    return sObjectMgr->GetGameObjectTemplateAddon(GetGOInfo()->entry);
 }
 
 void GameObject::Refresh()
@@ -746,7 +774,9 @@ void GameObject::Delete()
     SendObjectDeSpawnAnim(GetGUID());
 
     SetGoState(GO_STATE_READY);
-    SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);
+
+    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
 
     // Xinef: if ritual gameobject is removed, clear anim spells
     if (GetGOInfo()->type == GAMEOBJECT_TYPE_SUMMONING_RITUAL)
@@ -1090,7 +1120,7 @@ bool GameObject::ActivateToQuest(Player* target) const
                 //look for battlegroundAV for some objects which are only activated after mine gots captured by own team
                 if (GetEntry() == BG_AV_OBJECTID_MINE_N || GetEntry() == BG_AV_OBJECTID_MINE_S)
                     if (Battleground* bg = target->GetBattleground())
-                        if (bg->GetBgTypeID() == BATTLEGROUND_AV && !bg->ToBattlegroundAV()->PlayerCanDoMineQuest(GetEntry(), target->GetTeamId()))
+                        if (bg->GetBgTypeID(true) == BATTLEGROUND_AV && !bg->ToBattlegroundAV()->PlayerCanDoMineQuest(GetEntry(), target->GetTeamId()))
                             return false;
                 return true;
             }
@@ -1099,6 +1129,12 @@ bool GameObject::ActivateToQuest(Player* target) const
         case GAMEOBJECT_TYPE_GENERIC:
         {
             if (GetGOInfo()->_generic.questID == -1 || target->GetQuestStatus(GetGOInfo()->_generic.questID) == QUEST_STATUS_INCOMPLETE)
+                return true;
+            break;
+        }
+        case GAMEOBJECT_TYPE_SPELL_FOCUS:
+        {
+            if (GetGOInfo()->spellFocus.questID > 0 && target->GetQuestStatus(GetGOInfo()->spellFocus.questID) == QUEST_STATUS_INCOMPLETE)
                 return true;
             break;
         }
@@ -1134,13 +1170,13 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
     GameObject* trapGO = NULL;
     {
         // using original GO distance
-        CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
+        CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
         Cell cell(p);
 
-        Trinity::NearestGameObjectEntryInObjectRangeCheck go_check(*target, trapEntry, range);
-        Trinity::GameObjectLastSearcher<Trinity::NearestGameObjectEntryInObjectRangeCheck> checker(this, trapGO, go_check);
+        acore::NearestGameObjectEntryInObjectRangeCheck go_check(*target, trapEntry, range);
+        acore::GameObjectLastSearcher<acore::NearestGameObjectEntryInObjectRangeCheck> checker(this, trapGO, go_check);
 
-        TypeContainerVisitor<Trinity::GameObjectLastSearcher<Trinity::NearestGameObjectEntryInObjectRangeCheck>, GridTypeMapContainer > object_checker(checker);
+        TypeContainerVisitor<acore::GameObjectLastSearcher<acore::NearestGameObjectEntryInObjectRangeCheck>, GridTypeMapContainer > object_checker(checker);
         cell.Visit(p, object_checker, *GetMap(), *target, range);
     }
 
@@ -1154,12 +1190,12 @@ GameObject* GameObject::LookupFishingHoleAround(float range)
 { 
     GameObject* ok = NULL;
 
-    CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
+    CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
     Cell cell(p);
-    Trinity::NearestGameObjectFishingHole u_check(*this, range);
-    Trinity::GameObjectSearcher<Trinity::NearestGameObjectFishingHole> checker(this, ok, u_check);
+    acore::NearestGameObjectFishingHole u_check(*this, range);
+    acore::GameObjectSearcher<acore::NearestGameObjectFishingHole> checker(this, ok, u_check);
 
-    TypeContainerVisitor<Trinity::GameObjectSearcher<Trinity::NearestGameObjectFishingHole>, GridTypeMapContainer > grid_object_checker(checker);
+    TypeContainerVisitor<acore::GameObjectSearcher<acore::NearestGameObjectFishingHole>, GridTypeMapContainer > grid_object_checker(checker);
     cell.Visit(p, grid_object_checker, *GetMap(), *this, range);
 
     return ok;
@@ -1235,6 +1271,7 @@ void GameObject::Use(Unit* user)
     Unit* spellCaster = user;
     uint32 spellId = 0;
     bool triggered = false;
+    bool tmpfish = false;
 
     if (Player* playerUser = user->ToPlayer())
     {
@@ -1447,7 +1484,8 @@ void GameObject::Use(Unit* user)
             // cast this spell later if provided
             spellId = info->goober.spellId;
             spellCaster = user;
-
+            tmpfish = true;
+            
             break;
         }
         case GAMEOBJECT_TYPE_CAMERA:                        //13
@@ -1535,6 +1573,8 @@ void GameObject::Use(Unit* user)
                     }
                     else // else: junk
                         player->SendLoot(GetGUID(), LOOT_FISHING_JUNK);
+                        
+                    tmpfish = true;
                     break;
                 }
                 case GO_JUST_DEACTIVATED:                   // nothing to do, will be deleted at next update
@@ -1549,7 +1589,10 @@ void GameObject::Use(Unit* user)
                 }
             }
 
-            player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
+            if(tmpfish)
+                player->FinishSpell(CURRENT_CHANNELED_SPELL, true);
+            else
+                player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
             return;
         }
 
@@ -1737,17 +1780,24 @@ void GameObject::Use(Unit* user)
                 GameObjectTemplate const* info = GetGOInfo();
                 if (info)
                 {
-                    switch (info->entry)
+                    if (GameObject::gameObjectToEventFlag.find(info->entry) != GameObject::gameObjectToEventFlag.end())
                     {
-                        case 179785:                        // Silverwing Flag
-                        case 179786:                        // Warsong Flag
-                            if (bg->GetBgTypeID() == BATTLEGROUND_WS)
-                                bg->EventPlayerClickedOnFlag(player, this);
-                            break;
-                        case 184142:                        // Netherstorm Flag
-                            if (bg->GetBgTypeID() == BATTLEGROUND_EY)
-                                bg->EventPlayerClickedOnFlag(player, this);
-                            break;
+                        GameObject::gameObjectToEventFlag[info->entry](player, this, bg);
+                    }
+                    else
+                    {
+                        switch (info->entry)
+                        {
+                            case 179785:                        // Silverwing Flag
+                            case 179786:                        // Warsong Flag
+                                if (bg->GetBgTypeID(true) == BATTLEGROUND_WS)
+                                    bg->EventPlayerClickedOnFlag(player, this);
+                                break;
+                            case 184142:                        // Netherstorm Flag
+                                if (bg->GetBgTypeID(true) == BATTLEGROUND_EY)
+                                    bg->EventPlayerClickedOnFlag(player, this);
+                                break;
+                        }
                     }
                 }
                 //this cause to call return, all flags must be deleted here!!
@@ -1857,7 +1907,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
     else
     {
         // xinef: set faction of gameobject, if no faction - assume hostile
-        trigger->setFaction(GetGOInfo()->faction ? GetGOInfo()->faction : 14);
+        trigger->setFaction(GetTemplateAddon() && GetTemplateAddon()->faction ? GetTemplateAddon()->faction : 14);
         // Set owner guid for target if no owner availble - needed by trigger auras
         // - trigger gets despawned and there's no caster avalible (see AuraEffect::TriggerSpell())
         // xinef: set proper orientation, fixes cast against stealthed targets
@@ -1908,7 +1958,7 @@ void GameObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*s
     dist += GetObjectSize();
     if (includeMargin)
         dist += VISIBILITY_COMPENSATION * 2.0f; // pussywizard: to ensure everyone receives all important packets
-    Trinity::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
+    acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
     VisitNearbyWorldObject(dist, notifier);
 }
 
@@ -2334,6 +2384,7 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
                         else if (targetIsGM)
                             dynFlags |= GO_DYNFLAG_LO_ACTIVATE;
                         break;
+                    case GAMEOBJECT_TYPE_SPELL_FOCUS:
                     case GAMEOBJECT_TYPE_GENERIC:
                         if (ActivateToQuest(target))
                             dynFlags |= GO_DYNFLAG_LO_SPARKLE;
@@ -2411,7 +2462,7 @@ void GameObject::SetPosition(float x, float y, float z, float o)
 { 
     // pussywizard: do not call for MotionTransport and other gobjects not in grid
 
-    if (!Trinity::IsValidMapCoord(x, y, z, o))
+    if (!acore::IsValidMapCoord(x, y, z, o))
         return;
 
     GetMap()->GameObjectRelocation(this, x, y, z, o);
@@ -2446,3 +2497,5 @@ void GameObject::UpdateModelPosition()
         GetMap()->InsertGameObjectModel(*m_model);
     }
 }
+
+std::unordered_map<int, goEventFlag> GameObject::gameObjectToEventFlag = {};

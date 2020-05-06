@@ -11,7 +11,7 @@ CREATE TABLE `version_db_characters`
 (
   `sql_rev` varchar(100) NOT NULL,
   `required_rev` varchar(100) DEFAULT NULL,
-  `2016_08_25_00` bit(1) DEFAULT NULL,
+  `2019_01_06_00` bit(1) DEFAULT NULL,
   PRIMARY KEY (`sql_rev`),
   KEY `required` (`required_rev`),
   CONSTRAINT `required` FOREIGN KEY (`required_rev`) REFERENCES `version_db_characters` (`sql_rev`)

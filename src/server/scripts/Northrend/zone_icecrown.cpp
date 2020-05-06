@@ -16,7 +16,6 @@ npc_arete
 EndContentData */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
@@ -26,6 +25,8 @@ EndContentData */
 #include "ScriptedEscortAI.h"
 #include "Vehicle.h"
 #include "SmartScriptMgr.h"
+#include "SpellScript.h"
+#include "PassiveAI.h"
 
 // Ours
 enum eBKG
@@ -122,8 +123,8 @@ public:
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
 
-        void JustSummoned(Creature* creature) 
-        { 
+        void JustSummoned(Creature* creature)
+        {
             summons.Summon(creature);
             if (creature->GetEntry() != NPC_PRINCE)
                 if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
@@ -190,7 +191,7 @@ public:
                             me->MonsterYell("Khit'rix the Dark Master has been defeated by $N and his band of companions. Let the next challenge be issued!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                         case QUEST_BFV_SIGRID:
-                            me->MonsterYell("$N has defeated Sigrid Iceborn for a second time. Well, this time he did it with the help of his friends, but a win is a win!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID)); 
+                            me->MonsterYell("$N has defeated Sigrid Iceborn for a second time. Well, this time he did it with the help of his friends, but a win is a win!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                         case QUEST_BFV_CARNAGE:
                             me->MonsterYell("The horror known as Carnage is no more. Could it be that $N is truly worthy of battle in Valhalas? We shall see.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
@@ -367,7 +368,7 @@ public:
             CombatAI::Reset();
         }
 
-        void UpdateAI(uint32 diff) 
+        void UpdateAI(uint32 diff)
         {
             attackTimer += diff;
             if (attackTimer >= 1500)
@@ -458,7 +459,7 @@ class npc_lord_arete : public CreatureScript
             {
                 _landgrenGUID = 0;
                 _landgrenSoulGUID = 0;
-                
+
                 events.Reset();
                 events.RescheduleEvent(EVENT_START, 1000);
                 me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -616,7 +617,7 @@ class npc_boneguard_footman : public CreatureScript
                         }
                     }
                 }
-                
+
                 ScriptedAI::UpdateAI(diff);
             }
         };
@@ -665,9 +666,9 @@ class npc_tirions_gambit_tirion : public CreatureScript
     public:
         npc_tirions_gambit_tirion(): CreatureScript("npc_tirions_gambit_tirion"){}
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/) override
         {
-            player->CLOSE_GOSSIP_MENU();
+            CloseGossipMenuFor(player);
             creature->AI()->DoAction(ACTION_START_EVENT);
             return true;
         }
@@ -681,20 +682,19 @@ class npc_tirions_gambit_tirion : public CreatureScript
             EventMap events;
             SummonList summons;
 
-            void Reset()
+            void Reset() override
             {
                 me->setActive(false);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
             }
 
-            void SetData(uint32 type, uint32 data)
+            void SetData(uint32 type, uint32 data) override
             {
                 if (type == 1 && data == 1)
                     events.ScheduleEvent(EVENT_SCENE_0+30, 10000);
             }
 
-
-            void DoAction(int32 param)
+            void DoAction(int32 param) override
             {
                 if (param == ACTION_START_EVENT)
                 {
@@ -717,7 +717,7 @@ class npc_tirions_gambit_tirion : public CreatureScript
                 }
             }
 
-            void JustSummoned(Creature* summon)
+            void JustSummoned(Creature* summon) override
             {
                 summons.Summon(summon);
                 if (summon->GetEntry() == NPC_CHOSEN_ZEALOT || summon->GetEntry() == NPC_TIRION_LICH_KING)
@@ -730,12 +730,12 @@ class npc_tirions_gambit_tirion : public CreatureScript
                 }
             }
 
-            void SummonedCreatureDespawn(Creature* summon)
+            void SummonedCreatureDespawn(Creature* summon) override
             {
                 summons.Despawn(summon);
             }
 
-            void WaypointReached(uint32 pointId)
+            void WaypointReached(uint32 pointId) override
             {
                 switch (pointId)
                 {
@@ -796,7 +796,7 @@ class npc_tirions_gambit_tirion : public CreatureScript
                         }
             }
 
-            void UpdateEscortAI(uint32 diff)
+            void UpdateEscortAI(uint32 diff) override
             {
                 events.Update(diff);
                 switch (events.ExecuteEvent())
@@ -1015,7 +1015,7 @@ class npc_tirions_gambit_tirion : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new npc_tirions_gambit_tirionAI(creature);
         }
@@ -1122,7 +1122,7 @@ class spell_charge_shield_bomber : public SpellScriptLoader
                 Aura* aura = ship->GetAura(SPELL_INFRA_GREEN_SHIELD);
                 if (!aura)
                     return;
-                
+
                 aura->ModStackAmount(GetEffectValue() - 1);
             }
 
@@ -1303,7 +1303,7 @@ class npc_infra_green_bomber_generic : public CreatureScript
                         me->MonsterTextEmote("Your Vehicle is burning!", GetSummoner(), true);
                         passenger->AddAura(SPELL_BURNING, passenger);
                     }
-                    
+
                 for (uint8 seat = 3; seat <= 5; ++seat)
                     if (Unit* banner = kit->GetPassenger(seat))
                         if (!banner->HasAura(SPELL_COSMETIC_FIRE))
@@ -1372,7 +1372,7 @@ class npc_infra_green_bomber_generic : public CreatureScript
                                 if (Unit* banner = kit->GetPassenger(seat))
                                     if (banner->HasAura(SPELL_COSMETIC_FIRE))
                                         fireCount++;
-                        
+
                         if (fireCount)
                             Unit::DealDamage(me, me, 3000*fireCount, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_FIRE);
                         else // Heal

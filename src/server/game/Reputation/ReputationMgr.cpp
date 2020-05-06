@@ -12,7 +12,7 @@
 #include "World.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
-#include "Opcodes.h"
+#include "WorldSession.h"
 
 const int32 ReputationMgr::PointsInRank[MAX_REPUTATION_RANK] = {36000, 3000, 3000, 3000, 6000, 12000, 21000, 1000};
 
@@ -271,7 +271,6 @@ void ReputationMgr::Initialize()
 
 bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental, bool spillOverOnly)
 {
-    sScriptMgr->OnPlayerReputationChange(_player, factionEntry->ID, standing, incremental);
     bool res = false;
     // if spillover definition exists in DB, override DBC
     if (const RepSpilloverTemplate* repTemplate = sObjectMgr->GetRepSpilloverTemplate(factionEntry->ID))
@@ -375,6 +374,11 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
 
         if (new_rank > old_rank)
             _sendFactionIncreased = true;
+
+        sScriptMgr->OnPlayerReputationChange(_player, factionEntry->ID, standing, incremental);
+
+        if (new_rank != old_rank)
+            sScriptMgr->OnPlayerReputationRankChange(_player, factionEntry->ID, new_rank, old_rank, _sendFactionIncreased);
 
         UpdateRankCounters(old_rank, new_rank);
 

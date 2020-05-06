@@ -127,10 +127,12 @@ public:
 ## pyrewood_ambush
 #######*/
 
-#define QUEST_PYREWOOD_AMBUSH 452
-
-#define NPCSAY_INIT "Get ready, they'll be arriving any minute..." //not blizzlike
-#define NPCSAY_END "Thanks for your help!" //not blizzlike
+enum PyrewoodAmbush
+{
+    QUEST_PYREWOOD_AMBUSH = 452,
+    NPCSAY_INIT = 0,
+    NPCSAY_END = 1
+};
 
 static float PyrewoodSpawnPoints[3][4] =
 {
@@ -260,9 +262,15 @@ public:
             switch (Phase)
             {
                 case 0:
-                    if (WaitTimer == WAIT_SECS)
-                        me->MonsterSay(NPCSAY_INIT, LANG_UNIVERSAL, NULL); //no blizzlike
-
+                    if (WaitTimer == WAIT_SECS) {
+                        if (PlayerGUID)
+                        {
+                            if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
+                            {
+                                me->AI()->Talk(NPCSAY_INIT, player);
+                            }
+                        }
+                    }
                     if (WaitTimer <= diff)
                     {
                         WaitTimer -= diff;
@@ -291,7 +299,7 @@ public:
                     {
                         if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                         {
-                            me->MonsterSay(NPCSAY_END, LANG_UNIVERSAL, NULL); //not blizzlike
+                            me->AI()->Talk(NPCSAY_END, player);
                             player->GroupEventHappens(QUEST_PYREWOOD_AMBUSH, me);
                         }
                     }

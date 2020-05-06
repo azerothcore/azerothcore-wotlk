@@ -12,7 +12,6 @@ SDCategory: Thousand Needles
 EndScriptData */
 
 /* ContentData
-npc_kanati
 npc_lakota_windsong
 npc_swiftmountain
 npc_plucky
@@ -25,74 +24,6 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Player.h"
-
-/*#####
-# npc_kanati
-######*/
-
-enum Kanati
-{
-    SAY_KAN_START              = 0,
-
-    QUEST_PROTECT_KANATI        = 4966,
-    NPC_GALAK_ASS               = 10720
-};
-
-Position const GalakLoc = {-4867.387695f, -1357.353760f, -48.226f, 0.0f};
-
-class npc_kanati : public CreatureScript
-{
-public:
-    npc_kanati() : CreatureScript("npc_kanati") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
-    {
-        if (quest->GetQuestId() == QUEST_PROTECT_KANATI)
-            if (npc_kanatiAI* pEscortAI = CAST_AI(npc_kanati::npc_kanatiAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), quest, true);
-
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_kanatiAI(creature);
-    }
-
-    struct npc_kanatiAI : public npc_escortAI
-    {
-        npc_kanatiAI(Creature* creature) : npc_escortAI(creature) { }
-
-        void Reset() { }
-
-        void WaypointReached(uint32 waypointId)
-        {
-            switch (waypointId)
-            {
-                case 0:
-                    Talk(SAY_KAN_START);
-                    DoSpawnGalak();
-                    break;
-                case 1:
-                    if (Player* player = GetPlayerForEscort())
-                        player->GroupEventHappens(QUEST_PROTECT_KANATI, me);
-                    break;
-            }
-        }
-
-        void DoSpawnGalak()
-        {
-            for (int i = 0; i < 3; ++i)
-                me->SummonCreature(NPC_GALAK_ASS, GalakLoc, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-        }
-
-        void JustSummoned(Creature* summoned)
-        {
-            summoned->AI()->AttackStart(me);
-        }
-    };
-
-};
 
 /*######
 # npc_lakota_windsong
@@ -282,30 +213,30 @@ class npc_plucky : public CreatureScript
 public:
     npc_plucky() : CreatureScript("npc_plucky") { }
 
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 player->CompleteQuest(QUEST_SCOOP);
             break;
         }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_SCOOP) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_P, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_P, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
-        player->SEND_GOSSIP_MENU(738, creature->GetGUID());
+        SendGossipMenuFor(player, 738, creature->GetGUID());
 
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pluckyAI(creature);
     }
@@ -317,7 +248,7 @@ public:
         uint32 NormFaction;
         uint32 ResetTimer;
 
-        void Reset()
+        void Reset() override
         {
             ResetTimer = 120000;
 
@@ -330,7 +261,7 @@ public:
             DoCast(me, SPELL_PLUCKY_CHICKEN, false);
         }
 
-        void ReceiveEmote(Player* player, uint32 TextEmote)
+        void ReceiveEmote(Player* player, uint32 TextEmote) override
         {
             if (player->GetQuestStatus(QUEST_SCOOP) == QUEST_STATUS_INCOMPLETE)
             {
@@ -356,7 +287,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 Diff)
+        void UpdateAI(uint32 Diff) override
         {
             if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
             {
@@ -392,7 +323,7 @@ class go_panther_cage : public GameObjectScript
 public:
     go_panther_cage() : GameObjectScript("go_panther_cage") { }
 
-    bool OnGossipHello(Player* player, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
         go->UseDoorOrButton();
         if (player->GetQuestStatus(5151) == QUEST_STATUS_INCOMPLETE)
@@ -442,7 +373,6 @@ public:
 
 void AddSC_thousand_needles()
 {
-    new npc_kanati();
     new npc_lakota_windsong();
     new npc_paoka_swiftmountain();
     new npc_plucky();

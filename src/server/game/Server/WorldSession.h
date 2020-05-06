@@ -19,6 +19,9 @@
 #include "WorldPacket.h"
 #include "GossipDef.h"
 #include "Cryptography/BigNumber.h"
+#include "AccountMgr.h"
+#include "BanManager.h"
+#include "Opcodes.h"
 
 class Creature;
 class GameObject;
@@ -181,11 +184,17 @@ class CharacterCreateInfo
         virtual ~CharacterCreateInfo(){};
 };
 
+struct PacketCounter
+{
+    time_t lastReceiveTime;
+    uint32 amountCounter;
+};
+
 /// Player session in the World
 class WorldSession
 {
     public:
-        WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue);
+        WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
         ~WorldSession();
 
         bool PlayerLoading() const { return m_playerLoading; }
@@ -223,6 +232,9 @@ class WorldSession
         void SetPlayer(Player* player);
         uint8 Expansion() const { return m_expansion; }
 
+        void SetTotalTime(uint32 TotalTime) { m_total_time = TotalTime; }
+        uint32 GetTotalTime() const { return m_total_time; }
+
         void InitWarden(BigNumber* k, std::string const& os);
 
         /// Session in auth.queue currently
@@ -244,7 +256,8 @@ class WorldSession
         }
 
         void LogoutPlayer(bool save);
-        void KickPlayer(bool setKicked = true);
+        void KickPlayer(bool setKicked = true) { return this->KickPlayer("Unknown reason", setKicked); }
+        void KickPlayer(std::string const& reason, bool setKicked = true);
 
         void QueuePacket(WorldPacket* new_packet);
         bool Update(uint32 diff, PacketFilter& updater);
@@ -304,8 +317,6 @@ class WorldSession
                 m_TutorialsChanged = true;
             }
         }
-        //used with item_page table
-        bool SendItemInfo(uint32 itemid, WorldPacket data);
         //auction
         void SendAuctionHello(uint64 guid, Creature* unit);
         void SendAuctionCommandResult(uint32 auctionId, uint32 Action, uint32 ErrorCode, uint32 bidError = 0);
@@ -338,7 +349,7 @@ class WorldSession
         // Locales
         LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }
         LocaleConstant GetSessionDbLocaleIndex() const { return m_sessionDbLocaleIndex; }
-        const char *GetTrinityString(int32 entry) const;
+        char const* GetAcoreString(uint32 entry) const;
 
         uint32 GetLatency() const { return m_latency; }
         void SetLatency(uint32 latency) { m_latency = latency; }
@@ -352,9 +363,12 @@ class WorldSession
             else
                 m_timeOutTime -= diff;
         }
-        void ResetTimeOutTime()
+        void ResetTimeOutTime(bool onlyActive)
         {
-            m_timeOutTime = sWorld->getIntConfig(CONFIG_SOCKET_TIMEOUTTIME);
+            if (GetPlayer())
+                m_timeOutTime = int32(sWorld->getIntConfig(CONFIG_SOCKET_TIMEOUTTIME_ACTIVE));
+            else if (!onlyActive)
+                m_timeOutTime = int32(sWorld->getIntConfig(CONFIG_SOCKET_TIMEOUTTIME));
         }
         bool IsConnectionIdle() const
         {
@@ -364,6 +378,10 @@ class WorldSession
         // Recruit-A-Friend Handling
         uint32 GetRecruiterId() const { return recruiterId; }
         bool IsARecruiter() const { return isRecruiter; }
+
+        // Packets cooldown
+        time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
+        void SetCalendarEventCreationCooldown(time_t cooldown) { _calendarEventCreationCooldown = cooldown; }
 
     public:                                                 // opcodes handlers
 
@@ -389,7 +407,6 @@ class WorldSession
         // new
         void HandleMoveUnRootAck(WorldPacket& recvPacket);
         void HandleMoveRootAck(WorldPacket& recvPacket);
-        void HandleLookingForGroup(WorldPacket& recvPacket);
 
         // new inspect
         void HandleInspectOpcode(WorldPacket& recvPacket);
@@ -417,8 +434,6 @@ class WorldSession
         void HandleMoveTeleportAck(WorldPacket& recvPacket);
         void HandleForceSpeedChangeAck(WorldPacket& recvData);
 
-        void HandlePingOpcode(WorldPacket& recvPacket);
-        void HandleAuthSessionOpcode(WorldPacket& recvPacket);
         void HandleRepopRequestOpcode(WorldPacket& recvPacket);
         void HandleAutostoreLootItemOpcode(WorldPacket& recvPacket);
         void HandleLootMoneyOpcode(WorldPacket& recvPacket);
@@ -468,7 +483,6 @@ class WorldSession
         void HandleSetActionButtonOpcode(WorldPacket& recvPacket);
 
         void HandleGameObjectUseOpcode(WorldPacket& recPacket);
-        void HandleMeetingStoneInfo(WorldPacket& recPacket);
         void HandleGameobjectReportUse(WorldPacket& recvPacket);
 
         void HandleNameQueryOpcode(WorldPacket& recvPacket);
@@ -495,7 +509,6 @@ class WorldSession
         void HandleBattlefieldStatusOpcode(WorldPacket& recvData);
 
         void HandleGroupInviteOpcode(WorldPacket& recvPacket);
-        //void HandleGroupCancelOpcode(WorldPacket& recvPacket);
         void HandleGroupAcceptOpcode(WorldPacket& recvPacket);
         void HandleGroupDeclineOpcode(WorldPacket& recvPacket);
         void HandleGroupUninviteOpcode(WorldPacket& recvPacket);
@@ -599,7 +612,7 @@ class WorldSession
         void HandleAuctionSellItem(WorldPacket& recvData);
         void HandleAuctionRemoveItem(WorldPacket& recvData);
         void HandleAuctionListOwnerItems(WorldPacket& recvData);
-        void HandleAuctionListOwnerItemsEvent(WorldPacket & recvData);
+        void HandleAuctionListOwnerItemsEvent(uint64 creatureGuid);
         void HandleAuctionPlaceBid(WorldPacket& recvData);
         void HandleAuctionListPendingSales(WorldPacket& recvData);
 
@@ -615,7 +628,6 @@ class WorldSession
         void HandleQueryNextMailTime(WorldPacket& recvData);
         void HandleCancelChanneling(WorldPacket& recvData);
 
-        void SendItemPageInfo(ItemTemplate* itemProto);
         void HandleSplitItemOpcode(WorldPacket& recvPacket);
         void HandleSwapInvItemOpcode(WorldPacket& recvPacket);
         void HandleDestroyItemOpcode(WorldPacket& recvPacket);
@@ -697,7 +709,6 @@ class WorldSession
         void HandleChannelBan(WorldPacket& recvPacket);
         void HandleChannelUnban(WorldPacket& recvPacket);
         void HandleChannelAnnouncements(WorldPacket& recvPacket);
-        void HandleChannelModerate(WorldPacket& recvPacket);
         void HandleChannelDeclineInvite(WorldPacket& recvPacket);
         void HandleChannelDisplayListQuery(WorldPacket& recvPacket);
         void HandleGetChannelMemberCount(WorldPacket& recvPacket);
@@ -930,6 +941,36 @@ class WorldSession
         QueryResultHolderFuture _loadPetFromDBSecondCallback;
         QueryCallback_3<PreparedQueryResult, uint8, uint8, uint32> _openWrappedItemCallback;
 
+        friend class World;
+        protected:
+            class DosProtection
+            {
+                friend class World;
+                public:
+                    DosProtection(WorldSession* s) : Session(s), _policy((Policy)sWorld->getIntConfig(CONFIG_PACKET_SPOOF_POLICY)) { }
+                    bool EvaluateOpcode(WorldPacket& p, time_t time) const;
+                protected:
+                    enum Policy
+                    {
+                        POLICY_LOG,
+                        POLICY_KICK,
+                        POLICY_BAN
+                    };
+
+                    uint32 GetMaxPacketCounterAllowed(uint16 opcode) const;
+
+                    WorldSession* Session;
+
+                private:
+                    Policy _policy;
+                    typedef std::unordered_map<uint16, PacketCounter> PacketThrottlingMap;
+                    // mark this member as "mutable" so it can be modified even in const functions
+                    mutable PacketThrottlingMap _PacketThrottlingMap;
+
+                    DosProtection(DosProtection const& right) = delete;
+                    DosProtection& operator=(DosProtection const& right) = delete;
+            } AntiDOS;
+
     public:
         // xinef: those must be public, requires calls out of worldsession :(
         QueryCallback_2<PreparedQueryResult, uint32, AsynchPetSummon*> _loadPetFromDBFirstCallback;
@@ -945,6 +986,8 @@ class WorldSession
 
         bool CanUseBank(uint64 bankerGUID = 0) const;
 
+        bool recoveryItem(Item* pItem);
+
         // EnumData helpers
         bool IsLegitCharacterForAccount(uint32 lowGUID)
         {
@@ -959,11 +1002,13 @@ class WorldSession
         Player* _player;
         WorldSocket* m_Socket;
         std::string m_Address;
+        // std::string m_LAddress;                             // Last Attempted Remote Adress - we can not set attempted ip for a non-existing session!
 
         AccountTypes _security;
         bool _skipQueue;
         uint32 _accountId;
         uint8 m_expansion;
+        uint32 m_total_time;
 
         typedef std::list<AddonInfo> AddonsList;
 
@@ -991,6 +1036,8 @@ class WorldSession
         uint32 _offlineTime;
         bool _kicked;
         bool _shouldSetOfflineInDB;
+        // Packets cooldown
+        time_t _calendarEventCreationCooldown;
 };
 #endif
 /// @}

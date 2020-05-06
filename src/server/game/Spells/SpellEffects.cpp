@@ -276,6 +276,10 @@ void Spell::EffectInstaKill(SpellEffIndex /*effIndex*/)
     if (!unitTarget || !unitTarget->IsAlive() || unitTarget->HasAura(27827)) // Spirit of redemption doesn't make you death, but can cause infinite loops
         return;
 
+    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+        if (unitTarget->ToPlayer()->GetCommandStatus(CHEAT_GOD))
+            return;
+
     if (m_caster == unitTarget)                              // prevent interrupt message
         finish();
 
@@ -1101,12 +1105,9 @@ void Spell::EffectJump(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
-    float x, y, z;
-    unitTarget->GetContactPoint(m_caster, x, y, z, CONTACT_DISTANCE);
-
     float speedXY, speedZ;
-    CalculateJumpSpeeds(effIndex, m_caster->GetExactDist2d(x, y), speedXY, speedZ);
-    m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
+    CalculateJumpSpeeds(effIndex, m_caster->GetExactDist2d(unitTarget), speedXY, speedZ);
+    m_caster->GetMotionMaster()->MoveJump(*unitTarget, speedXY, speedZ);
 }
 
 void Spell::EffectJumpDest(SpellEffIndex effIndex)
@@ -1124,7 +1125,7 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     float x, y, z;
     destTarget->GetPosition(x, y, z);
     // xinef: this can happen if MovePositionToFirstCollision detects that X, Y cords are invalid and returns prematurely
-    if (!Trinity::IsValidMapCoord(x, y, z) || z <= INVALID_HEIGHT)
+    if (!acore::IsValidMapCoord(x, y, z) || z <= INVALID_HEIGHT)
         return;
 
     float speedXY, speedZ;
@@ -1662,7 +1663,9 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
 
     Player* player = unitTarget->ToPlayer();
 
-    ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemId);
+    uint32 newitemid = itemId;
+
+    ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(newitemid);
     if (!pProto)
     {
         player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL);
@@ -1699,30 +1702,46 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
     if (addNumber > pProto->GetMaxStackSize())
         addNumber = pProto->GetMaxStackSize();
 
+    /* == gem perfection handling == */
+
+    // the chance of getting a perfect result
+    float perfectCreateChance = 0.0f;
+
+    // the resulting perfect item if successful
+    uint32 perfectItemType = itemId;
+
+    // get perfection capability and chance
+    if (CanCreatePerfectItem(player, m_spellInfo->Id, perfectCreateChance, perfectItemType))
+        if (roll_chance_f(perfectCreateChance)) // if the roll succeeds...
+            newitemid = perfectItemType;        // the perfect item replaces the regular one
+
+    /* == gem perfection handling over == */
+
+
+    /* == profession specialization handling == */
+
+
     // init items_count to 1, since 1 item will be created regardless of specialization
     int32 itemsCount = 1;
     float additionalCreateChance = 0.0f;
-    int32 newMaxOrEntry = 0;
+    int32 additionalMaxNum = 0;
     // get the chance and maximum number for creating extra items
-    if (canCreateExtraItems(player, m_spellInfo->Id, additionalCreateChance, newMaxOrEntry))
+    if (canCreateExtraItems(player, m_spellInfo->Id, additionalCreateChance, additionalMaxNum))
     {
-        if (newMaxOrEntry > 0)
-        {
-            // roll with this chance till we roll not to create or we create the max num
-            while (roll_chance_f(additionalCreateChance) && itemsCount <= newMaxOrEntry)
-                ++itemsCount;
-        }
-        else if (roll_chance_f(additionalCreateChance))   // if the roll succeeds...
-            itemId = uint32(-newMaxOrEntry);        // the perfect item replaces the regular one
+        // roll with this chance till we roll not to create or we create the max num
+        while (roll_chance_f(additionalCreateChance) && itemsCount <= additionalMaxNum)
+            ++itemsCount;
     }
 
     // really will be created more items
     addNumber *= itemsCount;
 
+    /* == profession specialization handling over == */
+
     // can the player store the new item?
     ItemPosCountVec dest;
     uint32 no_space = 0;
-    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, addNumber, &no_space);
+    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, newitemid, addNumber, &no_space);
     if (msg != EQUIP_ERR_OK)
     {
         // convert to possible store amount
@@ -1731,7 +1750,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
         else
         {
             // if not created by another reason from full inventory or unique items amount limitation
-            player->SendEquipError(msg, NULL, NULL, itemId);
+            player->SendEquipError(msg, NULL, NULL, newitemid);
             return;
         }
     }
@@ -1739,7 +1758,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
     if (addNumber)
     {
         // create the new item and store it
-        Item* pItem = player->StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+        Item* pItem = player->StoreNewItem(dest, newitemid, true);
 
         // was it successful? return error if not
         if (!pItem)
@@ -1749,7 +1768,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
         }
 
         // set the "Crafted by ..." property of the item
-        if (pItem->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE && pItem->GetTemplate()->Class != ITEM_CLASS_QUEST && itemId != 6265 && itemId != 6948)
+        if (pItem->GetTemplate()->HasSignature())
             pItem->SetUInt32Value(ITEM_FIELD_CREATOR, player->GetGUIDLow());
 
         // send info to the client
@@ -1870,7 +1889,8 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
 
     Powers power = Powers(m_spellInfo->Effects[effIndex].MiscValue);
 
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER && unitTarget->getPowerType() != power && !m_spellInfo->HasAttribute(SPELL_ATTR7_CAN_RESTORE_SECONDARY_POWER))
+    if (unitTarget->GetTypeId() == TYPEID_PLAYER && unitTarget->getPowerType() != power && m_spellInfo->SpellFamilyName != SPELLFAMILY_POTION
+	    && !m_spellInfo->HasAttribute(SPELL_ATTR7_CAN_RESTORE_SECONDARY_POWER))
         return;
 
     if (unitTarget->GetMaxPower(power) == 0)
@@ -1961,7 +1981,7 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
         if (!availableElixirs.empty())
         {
             // cast random elixir on target
-            m_caster->CastSpell(unitTarget, Trinity::Containers::SelectRandomContainerElement(availableElixirs), true, m_CastItem);
+            m_caster->CastSpell(unitTarget, acore::Containers::SelectRandomContainerElement(availableElixirs), true, m_CastItem);
         }
     }
 }
@@ -2099,7 +2119,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
             // in battleground check
             if (Battleground* bg = player->GetBattleground())
             {
-                if (bg->GetBgTypeID() == BATTLEGROUND_EY)
+                if (bg->GetBgTypeID(true) == BATTLEGROUND_EY)
                     bg->EventPlayerClickedOnFlag(player, gameObjTarget);
                 return;
             }
@@ -2147,7 +2167,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
         SendLoot(guid, LOOT_SKINNING);
     else if (itemTarget)
     {
-        itemTarget->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_UNLOCKED);
+        itemTarget->SetFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_UNLOCKED);
         if (Player* itemOwner = itemTarget->GetOwner())
             itemTarget->SetState(ITEM_CHANGED, itemOwner);
     }
@@ -2789,7 +2809,7 @@ void Spell::EffectAddHonor(SpellEffIndex /*effIndex*/)
     // do not allow to add too many honor for player (50 * 21) = 1040 at level 70, or (50 * 31) = 1550 at level 80
     if (damage <= 50)
     {
-        uint32 honor_reward = Trinity::Honor::hk_honor_at_level(unitTarget->getLevel(), float(damage));
+        uint32 honor_reward = acore::Honor::hk_honor_at_level(unitTarget->getLevel(), float(damage));
         unitTarget->ToPlayer()->RewardHonor(NULL, 1, honor_reward, false);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SpellEffect::AddHonor (spell_id %u) rewards %u honor points (scale) to player: %u", m_spellInfo->Id, honor_reward, unitTarget->ToPlayer()->GetGUIDLow());
@@ -2844,7 +2864,7 @@ void Spell::EffectEnchantItemPerm(SpellEffIndex effIndex)
     else
     {
         // do not increase skill if vellum used
-        if (!(m_CastItem && m_CastItem->GetTemplate()->Flags & ITEM_PROTO_FLAG_TRIGGERED_CAST))
+        if (!(m_CastItem && m_CastItem->GetTemplate()->Flags & ITEM_FLAG_NO_REAGENT_COST))
             p_caster->UpdateCraftSkill(m_spellInfo->Id);
 
         uint32 enchant_id = m_spellInfo->Effects[effIndex].MiscValue;
@@ -2894,7 +2914,7 @@ void Spell::EffectEnchantItemPrismatic(SpellEffIndex effIndex)
     // support only enchantings with add socket in this slot
     {
         bool add_socket = false;
-        for (uint8 i = 0; i < MAX_ITEM_ENCHANTMENT_EFFECTS; ++i)
+        for (uint8 i = 0; i < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++i)
         {
             if (pEnchant->type[i] == ITEM_ENCHANTMENT_TYPE_PRISMATIC_SOCKET)
             {
@@ -3110,24 +3130,24 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
-
-    Player* owner = NULL;
-    if (m_originalCaster)
-    {
-        owner = m_originalCaster->ToPlayer();
-        if (!owner && m_originalCaster->ToCreature()->IsTotem())
-            owner = m_originalCaster->GetCharmerOrOwnerPlayerOrPlayerItself();
-    }
+    
+    if (!m_originalCaster)
+        return;
 
     uint32 petentry = m_spellInfo->Effects[effIndex].MiscValue;
     int32 duration = m_spellInfo->GetDuration();
+
     if(Player* modOwner = m_originalCaster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+
+    Player* owner = m_originalCaster->ToPlayer();
+    if (!owner && m_originalCaster->ToCreature()->IsTotem())
+        owner = m_originalCaster->GetCharmerOrOwnerPlayerOrPlayerItself();
 
     if (!owner)
     {
         SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(67);
-        if (properties && m_originalCaster)
+        if (properties)
         {
             // Xinef: unsummon old guardian
             if (Guardian* oldPet = m_originalCaster->GetGuardianPet())
@@ -3230,7 +3250,10 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
 
     // xinef: Hand of Reckoning, cast before checing canhavethreatlist. fixes damage against pets
     if (m_spellInfo->Id == 62124 && unitTarget->GetVictim() != m_caster)
+    {
         m_caster->CastSpell(unitTarget, 67485, true);
+        unitTarget->CombatStart(m_caster);
+    }
 
     // this effect use before aura Taunt apply for prevent taunt already attacking target
     // for spell as marked "non effective at already attacking target"
@@ -3845,7 +3868,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 case 54640:
                 {
                     if (Player* player = unitTarget->ToPlayer())
-                        if (player->GetBattleground() && player->GetBattleground()->GetBgTypeID() == BATTLEGROUND_SA)
+                        if (player->GetBattleground() && player->GetBattleground()->GetBgTypeID(true) == BATTLEGROUND_SA)
                         {
                             if (GameObject* dportal = player->FindNearestGameObject(192819, 10.0f))
                             {
@@ -4173,8 +4196,8 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     }
 
     UnitList targets;
-    Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(unitTarget, unitTarget, unitTarget->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
-    Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(unitTarget, targets, u_check);
+    acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(unitTarget, unitTarget, unitTarget->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
+    acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(unitTarget, targets, u_check);
     unitTarget->VisitNearbyObject(unitTarget->GetVisibilityRange(), searcher); // no VISIBILITY_COMPENSATION, distance is enough
     for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
     {
@@ -4215,6 +4238,10 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
         && (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VANISH))
     {
         m_caster->ToPlayer()->RemoveAurasByType(SPELL_AURA_MOD_ROOT);
+
+        //Clean Escape
+        if (m_caster->HasAura(23582))
+            m_caster->CastSpell(m_caster, 23583, true);
     }
 }
 
@@ -4617,21 +4644,20 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
         default: return;
     }
 
-    uint64 guid = m_caster->m_ObjectSlot[slot];
-    if (guid != 0)
+    if (m_caster)
     {
-        GameObject* gameObject = NULL;
-        if (m_caster)
-            gameObject = m_caster->GetMap()->GetGameObject(guid);
-
-        if (gameObject)
+        uint64 guid = m_caster->m_ObjectSlot[slot];
+        if (guid != 0)
         {
-            // Recast case - null spell id to make auras not be removed on object remove from world
-            if (m_spellInfo->Id == gameObject->GetSpellId())
-                gameObject->SetSpellId(0);
-            m_caster->RemoveGameObject(gameObject, true);
+            if (GameObject* gameObject = m_caster->GetMap()->GetGameObject(guid))
+            {
+                // Recast case - null spell id to make auras not be removed on object remove from world
+                if (m_spellInfo->Id == gameObject->GetSpellId())
+                    gameObject->SetSpellId(0);
+                m_caster->RemoveGameObject(gameObject, true);
+            }
+            m_caster->m_ObjectSlot[slot] = 0;
         }
-        m_caster->m_ObjectSlot[slot] = 0;
     }
 
     GameObject* pGameObj = sObjectMgr->IsGameObjectStaticTransport(gameobjectId) ? new StaticTransport() : new GameObject();
@@ -4798,7 +4824,7 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
     data << uint64(m_caster->GetGUID());
 
     float dist = m_caster->GetVisibilityRange()+VISIBILITY_COMPENSATION;
-    Trinity::MessageDistDelivererToHostile notifier(m_caster, &data, dist);
+    acore::MessageDistDelivererToHostile notifier(m_caster, &data, dist);
     m_caster->VisitNearbyWorldObject(dist, notifier);
 
     // xinef: we should also force pets to remove us from current target
@@ -4822,8 +4848,8 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
             return;
 
         UnitList targets;
-        Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(m_caster, m_caster, m_caster->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
-        Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(m_caster, targets, u_check);
+        acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(m_caster, m_caster, m_caster->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
+        acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(m_caster, targets, u_check);
         m_caster->VisitNearbyObject(m_caster->GetVisibilityRange(), searcher); // no VISIBILITY_COMPENSATION, distance is enough
         for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
@@ -5460,7 +5486,7 @@ void Spell::EffectProspecting(SpellEffIndex /*effIndex*/)
         return;
 
     Player* p_caster = m_caster->ToPlayer();
-    if (!itemTarget || !(itemTarget->GetTemplate()->Flags & ITEM_PROTO_FLAG_PROSPECTABLE))
+    if (!itemTarget || !(itemTarget->GetTemplate()->Flags & ITEM_FLAG_IS_PROSPECTABLE))
         return;
 
     if (itemTarget->GetCount() < 5)
@@ -5485,7 +5511,7 @@ void Spell::EffectMilling(SpellEffIndex /*effIndex*/)
         return;
 
     Player* p_caster = m_caster->ToPlayer();
-    if (!itemTarget || !(itemTarget->GetTemplate()->Flags & ITEM_PROTO_FLAG_MILLABLE))
+    if (!itemTarget || !(itemTarget->GetTemplate()->Flags & ITEM_FLAG_IS_MILLABLE))
         return;
 
     if (itemTarget->GetCount() < 5)

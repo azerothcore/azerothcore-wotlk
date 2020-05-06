@@ -1418,11 +1418,8 @@ void Guild::HandleSetBankTabInfo(WorldSession* session, uint8 tabId, std::string
         return;
     }
 
-    char aux[2];
-    sprintf(aux, "%u", tabId);
-
     tab->SetInfo(name, icon);
-    _BroadcastEvent(GE_BANK_TAB_UPDATED, 0, aux, name.c_str(), icon.c_str());
+    _BroadcastEvent(GE_BANK_TAB_UPDATED, 0, std::to_string(tabId).c_str(), name.c_str(), icon.c_str());
 }
 
 void Guild::HandleSetMemberNote(WorldSession* session, std::string const& name, std::string const& note, bool isPublic)
@@ -1459,9 +1456,7 @@ void Guild::HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string c
         for (GuildBankRightsAndSlotsVec::const_iterator itr = rightsAndSlots.begin(); itr != rightsAndSlots.end(); ++itr)
             _SetRankBankTabRightsAndSlots(rankId, *itr);
 
-        char aux[2];
-        sprintf(aux, "%u", rankId);
-        _BroadcastEvent(GE_RANK_UPDATED, 0, aux, name.c_str());
+        _BroadcastEvent(GE_RANK_UPDATED, 0, std::to_string(rankId).c_str(), name.c_str());
     }
 }
 
@@ -1686,11 +1681,7 @@ void Guild::HandleAddNewRank(WorldSession* session, std::string const& name)
     // Only leader can add new rank
     if (_IsLeader(session->GetPlayer()))
         if (_CreateRank(name, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK))
-        {
-            char aux[2];
-            sprintf(aux, "%u", size);
-            _BroadcastEvent(GE_RANK_UPDATED, 0, aux, name.c_str());
-        }
+            _BroadcastEvent(GE_RANK_UPDATED, 0, std::to_string(size).c_str(), name.c_str());
 }
 
 void Guild::HandleRemoveLowestRank(WorldSession* session)
@@ -1740,7 +1731,7 @@ void Guild::HandleMemberDepositMoney(WorldSession* session, uint32 amount)
     _BroadcastEvent(GE_BANK_MONEY_SET, 0, aux.c_str());
 
     if (amount > 10*GOLD)
-        CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<GB DEPOSIT> %s (guild id: %u, members: %u, new amount: " UI64FMTD ", leader guid low: %u, char level: %u)\", NOW())", session->GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), 0, "", amount, GetName().c_str(), GetId(), GetMemberCount(), GetTotalBankMoney(), (uint32)(GetLeaderGUID()&0xFFFFFFFF), player->getLevel());
+        CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<GB DEPOSIT> %s (guild id: %u, members: %u, new amount: %u, leader guid low: %u, char level: %u)\", NOW())", session->GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), 0, "", amount, GetName().c_str(), GetId(), GetMemberCount(), GetTotalBankMoney(), (uint32)(GetLeaderGUID()&0xFFFFFFFF), player->getLevel());
 }
 
 bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool repair)
@@ -1783,7 +1774,7 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool
     CharacterDatabase.CommitTransaction(trans);
 
     if (amount > 10*GOLD)
-        CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<GB WITHDRAW> %s (guild id: %u, members: %u, new amount: " UI64FMTD ", leader guid low: %u, char level: %u)\", NOW())", session->GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), 0, "", amount, GetName().c_str(), GetId(), GetMemberCount(), GetTotalBankMoney(), (uint32)(GetLeaderGUID()&0xFFFFFFFF), player->getLevel());
+        CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<GB WITHDRAW> %s (guild id: %u, members: %u, new amount: %u, leader guid low: %u, char level: %u)\", NOW())", session->GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), 0, "", amount, GetName().c_str(), GetId(), GetMemberCount(), GetTotalBankMoney(), (uint32)(GetLeaderGUID()&0xFFFFFFFF), player->getLevel());
 
     std::string aux = ByteArrayToHexStr(reinterpret_cast<uint8*>(&m_bankMoney), 8, true);
     _BroadcastEvent(GE_BANK_MONEY_SET, 0, aux.c_str());
@@ -2329,9 +2320,12 @@ void Guild::DeleteMember(uint64 guid, bool isDisbanding, bool isKicked, bool can
     // Call script on remove before member is actually removed from guild (and database)
     sScriptMgr->OnGuildRemoveMember(this, player, isDisbanding, isKicked);
 
-    if (Member* member = GetMember(guid))
-        delete member;
-    m_members.erase(lowguid);
+    auto memberItr = m_members.find(lowguid);
+    if (memberItr != m_members.end())
+    {
+        delete memberItr->second;
+        m_members.erase(memberItr);
+    }
 
     // If player not online data in data field will be loaded from guild tabs no need to update it !!
     if (player)
@@ -2438,11 +2432,11 @@ void Guild::_CreateDefaultGuildRanks(LocaleConstant loc)
     stmt->setUInt32(0, m_id);
     CharacterDatabase.Execute(stmt);
 
-    _CreateRank(sObjectMgr->GetTrinityString(LANG_GUILD_MASTER,   loc), GR_RIGHT_ALL);
-    _CreateRank(sObjectMgr->GetTrinityString(LANG_GUILD_OFFICER,  loc), GR_RIGHT_ALL);
-    _CreateRank(sObjectMgr->GetTrinityString(LANG_GUILD_VETERAN,  loc), GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
-    _CreateRank(sObjectMgr->GetTrinityString(LANG_GUILD_MEMBER,   loc), GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
-    _CreateRank(sObjectMgr->GetTrinityString(LANG_GUILD_INITIATE, loc), GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
+    _CreateRank(sObjectMgr->GetAcoreString(LANG_GUILD_MASTER,   loc), GR_RIGHT_ALL);
+    _CreateRank(sObjectMgr->GetAcoreString(LANG_GUILD_OFFICER,  loc), GR_RIGHT_ALL);
+    _CreateRank(sObjectMgr->GetAcoreString(LANG_GUILD_VETERAN,  loc), GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
+    _CreateRank(sObjectMgr->GetAcoreString(LANG_GUILD_MEMBER,   loc), GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
+    _CreateRank(sObjectMgr->GetAcoreString(LANG_GUILD_INITIATE, loc), GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
 }
 
 bool Guild::_CreateRank(std::string const& name, uint32 rights)

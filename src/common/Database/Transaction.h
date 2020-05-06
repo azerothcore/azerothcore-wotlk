@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -40,7 +39,7 @@ class Transaction
         bool _cleanedUp;
 
 };
-typedef Trinity::AutoPtr<Transaction, ACE_Thread_Mutex> SQLTransaction;
+typedef acore::AutoPtr<Transaction, ACE_Thread_Mutex> SQLTransaction;
 
 /*! Low level class*/
 class TransactionTask : public SQLOperation

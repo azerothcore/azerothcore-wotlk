@@ -4,18 +4,16 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PathCommon.h"
 #include "MapBuilder.h"
-
 #include "MapTree.h"
 #include "ModelInstance.h"
+#include "PathCommon.h"
 
-#include "DetourNavMeshBuilder.h"
-#include "DetourNavMesh.h"
-#include "DetourCommon.h"
+#include <DetourCommon.h>
+#include <DetourNavMesh.h>
+#include <DetourNavMeshBuilder.h>
 
 #include "DisableMgr.h"
-#include <ace/OS_NS_unistd.h>
 
 namespace DisableMgr
 {
@@ -23,7 +21,7 @@ namespace DisableMgr
 }
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 8
+#define MMAP_VERSION 10
 
 struct MmapTileHeader
 {
@@ -90,14 +88,14 @@ namespace MMAP
     void MapBuilder::discoverTiles()
     {
         std::vector<std::string> files;
-        uint32 mapID, tileX, tileY, tileID, count = 0;
+        uint32 mapID, tileX, tileY, tileID, count = 0, fsize = 0;
         char filter[12];
 
         printf("Discovering maps... ");
         getDirContents(files, "maps");
         for (uint32 i = 0; i < files.size(); ++i)
         {
-            mapID = uint32(atoi(files[i].substr(0,3).c_str()));
+            mapID = uint32(atoi(files[i].substr(0, files[i].size() - 8).c_str()));
             if (std::find(m_tiles.begin(), m_tiles.end(), mapID) == m_tiles.end())
             {
                 m_tiles.emplace_back(MapTiles(mapID, new std::set<uint32>));
@@ -109,7 +107,7 @@ namespace MMAP
         getDirContents(files, "vmaps", "*.vmtree");
         for (uint32 i = 0; i < files.size(); ++i)
         {
-            mapID = uint32(atoi(files[i].substr(0,3).c_str()));
+            mapID = uint32(atoi(files[i].substr(0, files[i].size() - 7).c_str()));
             if (std::find(m_tiles.begin(), m_tiles.end(), mapID) == m_tiles.end())
             {
                 m_tiles.emplace_back(MapTiles(mapID, new std::set<uint32>));
@@ -130,8 +128,10 @@ namespace MMAP
             getDirContents(files, "vmaps", filter);
             for (uint32 i = 0; i < files.size(); ++i)
             {
-                tileX = uint32(atoi(files[i].substr(7,2).c_str()));
-                tileY = uint32(atoi(files[i].substr(4,2).c_str()));
+                fsize = files[i].size();
+
+                tileY = uint32(atoi(files[i].substr(fsize - 12, 2).c_str()));
+                tileX = uint32(atoi(files[i].substr(fsize - 9, 2).c_str()));
                 tileID = StaticMapTree::packTileID(tileY, tileX);
 
                 tiles->insert(tileID);
@@ -143,8 +143,10 @@ namespace MMAP
             getDirContents(files, "maps", filter);
             for (uint32 i = 0; i < files.size(); ++i)
             {
-                tileY = uint32(atoi(files[i].substr(3,2).c_str()));
-                tileX = uint32(atoi(files[i].substr(5,2).c_str()));
+                fsize = files[i].size();
+
+                tileY = uint32(atoi(files[i].substr(fsize - 8, 2).c_str()));
+                tileX = uint32(atoi(files[i].substr(fsize - 6, 2).c_str()));
                 tileID = StaticMapTree::packTileID(tileX, tileY);
 
                 if (tiles->insert(tileID).second)
@@ -388,6 +390,8 @@ namespace MMAP
             printf("[Map %03i] We have %u tiles.                          \n", mapID, (unsigned int)tiles->size());
             for (std::set<uint32>::iterator it = tiles->begin(); it != tiles->end(); ++it)
             {
+                // percentageDone - increment tiles built
+                m_totalTilesBuilt++;
                 uint32 tileX, tileY;
 
                 // unpack tile coords
@@ -443,9 +447,6 @@ namespace MMAP
 
         // build navmesh tile
         buildMoveMapTile(mapID, tileX, tileY, meshData, bmin, bmax, navMesh);
-
-        // percentageDone - increment tiles built
-        m_totalTilesBuilt++;
     }
 
     /**************************************************************************/
@@ -577,8 +578,8 @@ namespace MMAP
         config.minRegionArea = rcSqr(60);
         config.mergeRegionArea = rcSqr(50);
         config.maxSimplificationError = 1.8f;           // eliminates most jagged edges (tiny polygons)
-        config.detailSampleDist = config.cs * 64;
-        config.detailSampleMaxError = config.ch * 2;
+        config.detailSampleDist = config.cs * 16;
+        config.detailSampleMaxError = config.ch * 1;
 
         // this sets the dimensions of the heightfield - should maybe happen before border padding
         rcCalcGridSize(config.bmin, config.bmax, config.cs, &config.width, &config.height);

@@ -5,8 +5,6 @@
 #ifndef DEF_CULLING_OF_STRATHOLME_H
 #define DEF_CULLING_OF_STRATHOLME_H
 
-#include "ScriptPCH.h"
-
 enum Data
 {
     DATA_ARTHAS_EVENT,

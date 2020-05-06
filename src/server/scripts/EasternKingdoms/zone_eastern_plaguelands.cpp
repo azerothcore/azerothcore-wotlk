@@ -19,11 +19,12 @@ npc_tirion_fordring
 EndContentData */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Player.h"
 #include "WorldSession.h"
+#include "PassiveAI.h"
+#include "SpellInfo.h"
 
 // Ours
 
@@ -339,23 +340,23 @@ class npc_augustus_the_touched : public CreatureScript
 public:
     npc_augustus_the_touched() : CreatureScript("npc_augustus_the_touched") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         if (action == GOSSIP_ACTION_TRADE)
             player->GetSession()->SendListInventory(creature->GetGUID());
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->IsVendor() && player->GetQuestRewardStatus(6164))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
     }
 };
@@ -374,15 +375,15 @@ class npc_darrowshire_spirit : public CreatureScript
 public:
     npc_darrowshire_spirit() : CreatureScript("npc_darrowshire_spirit") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
-        player->SEND_GOSSIP_MENU(3873, creature->GetGUID());
+        SendGossipMenuFor(player, 3873, creature->GetGUID());
         player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
         creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_darrowshire_spiritAI(creature);
     }
@@ -391,67 +392,14 @@ public:
     {
         npc_darrowshire_spiritAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             DoCast(me, SPELL_SPIRIT_SPAWNIN);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
     };
-};
-
-/*######
-## npc_tirion_fordring
-######*/
-
-#define GOSSIP_HELLO    "I am ready to hear your tale, Tirion."
-#define GOSSIP_SELECT1  "Thank you, Tirion.  What of your identity?"
-#define GOSSIP_SELECT2  "That is terrible."
-#define GOSSIP_SELECT3  "I will, Tirion."
-
-class npc_tirion_fordring : public CreatureScript
-{
-public:
-    npc_tirion_fordring() : CreatureScript("npc_tirion_fordring") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
-    {
-        player->PlayerTalkClass->ClearMenus();
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(4493, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                player->SEND_GOSSIP_MENU(4494, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+3:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                player->SEND_GOSSIP_MENU(4495, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+4:
-                player->CLOSE_GOSSIP_MENU();
-                player->AreaExploredOrEventHappens(5742);
-                break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(5742) == QUEST_STATUS_INCOMPLETE && player->getStandState() == UNIT_STAND_STATE_SIT)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
 };
 
 void AddSC_eastern_plaguelands()
@@ -464,5 +412,4 @@ void AddSC_eastern_plaguelands()
     new npc_ghoul_flayer();
     new npc_augustus_the_touched();
     new npc_darrowshire_spirit();
-    new npc_tirion_fordring();
 }

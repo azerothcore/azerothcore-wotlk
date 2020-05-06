@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_MAP_H
-#define TRINITY_MAP_H
+#ifndef ACORE_MAP_H
+#define ACORE_MAP_H
 
 // Pathfinding
 #include "DetourAlloc.h"
@@ -51,7 +51,11 @@ class BattlegroundMap;
 class Transport;
 class StaticTransport;
 class MotionTransport;
-namespace Trinity { struct ObjectUpdater; }
+namespace acore
+{
+    struct ObjectUpdater;
+    struct LargeObjectUpdater;
+}
 
 struct ScriptAction
 {
@@ -140,6 +144,14 @@ struct LiquidData
     uint32 entry;
     float  level;
     float  depth_level;
+};
+
+enum LineOfSightChecks
+{
+    LINEOFSIGHT_CHECK_VMAP      = 0x1, // check static floor layout data
+    LINEOFSIGHT_CHECK_GOBJECT   = 0x2, // check dynamic game object data
+
+    LINEOFSIGHT_ALL_CHECKS      = (LINEOFSIGHT_CHECK_VMAP | LINEOFSIGHT_CHECK_GOBJECT)
 };
 
 class GridMap
@@ -247,7 +259,7 @@ struct ZoneDynamicInfo
 #define MIN_UNLOAD_DELAY      1                             // immediate unload
 
 typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHolderType;
-typedef UNORDERED_MAP<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
+typedef std::unordered_map<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
 typedef std::set<MotionTransport*> TransportsContainer;
 
 enum EncounterCreditType
@@ -284,7 +296,15 @@ class Map : public GridRefManager<NGridType>
         template<class T> bool AddToMap(T *, bool checkTransport = false);
         template<class T> void RemoveFromMap(T *, bool);
 
-        void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor, TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor);
+        void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor);
+        void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor);
+            
         virtual void Update(const uint32, const uint32, bool thread = true);
 
         float GetVisibilityRange() const { return m_VisibleDistance; }
@@ -301,16 +321,17 @@ class Map : public GridRefManager<NGridType>
 
         bool IsRemovalGrid(float x, float y) const
         {
-            GridCoord p = Trinity::ComputeGridCoord(x, y);
+            GridCoord p = acore::ComputeGridCoord(x, y);
             return !getNGrid(p.x_coord, p.y_coord);
         }
 
         bool IsGridLoaded(float x, float y) const
         {
-            return IsGridLoaded(Trinity::ComputeGridCoord(x, y));
+            return IsGridLoaded(acore::ComputeGridCoord(x, y));
         }
 
         void LoadGrid(float x, float y);
+        void LoadAllCells();
         bool UnloadGrid(NGridType& ngrid);
         virtual void UnloadAll();
 
@@ -324,9 +345,9 @@ class Map : public GridRefManager<NGridType>
         // pussywizard: movemaps, mmaps
         ACE_RW_Thread_Mutex& GetMMapLock() const { return *(const_cast<ACE_RW_Thread_Mutex*>(&MMapLock)); }
         // pussywizard:
-        UNORDERED_SET<Object*> i_objectsToUpdate;
+        std::unordered_set<Object*> i_objectsToUpdate;
         void BuildAndSendUpdateForObjects(); // definition in ObjectAccessor.cpp, below ObjectAccessor::Update, because it does the same for a map
-        UNORDERED_SET<Unit*> i_objectsForDelayedVisibility;
+        std::unordered_set<Unit*> i_objectsForDelayedVisibility;
         void HandleDelayedVisibility();
 
         // some calls like isInWater should not use vmaps due to processor power
@@ -393,6 +414,9 @@ class Map : public GridRefManager<NGridType>
         void resetMarkedCells() { marked_cells.reset(); }
         bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
         void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
+        void resetMarkedCellsLarge() { marked_cells_large.reset(); }
+        bool isCellMarkedLarge(uint32 pCellId) { return marked_cells_large.test(pCellId); }
+        void markCellLarge(uint32 pCellId) { marked_cells_large.set(pCellId); }
 
         bool HavePlayers() const { return !m_mapRefManager.isEmpty(); }
         uint32 GetPlayersCountExceptGMs() const;
@@ -446,9 +470,9 @@ class Map : public GridRefManager<NGridType>
         BattlegroundMap* ToBattlegroundMap() { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap*>(this); else return NULL;  }
         const BattlegroundMap* ToBattlegroundMap() const { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap const*>(this); return NULL; }
 
-        float GetWaterOrGroundLevel(float x, float y, float z, float* ground = NULL, bool swim = false, float maxSearchDist = 50.0f) const;
+        float GetWaterOrGroundLevel(uint32 phasemask,float x, float y, float z, float* ground = NULL, bool swim = false, float maxSearchDist = 50.0f) const;
         float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
-        bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask) const;
+        bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const;
         void Balance() { _dynamicTree.balance(); }
         void RemoveGameObjectModel(const GameObjectModel& model) { _dynamicTree.remove(model); }
         void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
@@ -462,7 +486,7 @@ class Map : public GridRefManager<NGridType>
         time_t GetLinkedRespawnTime(uint64 guid) const;
         time_t GetCreatureRespawnTime(uint32 dbGuid) const
         {
-            UNORDERED_MAP<uint32 /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
+            std::unordered_map<uint32 /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
             if (itr != _creatureRespawnTimes.end())
                 return itr->second;
 
@@ -471,7 +495,7 @@ class Map : public GridRefManager<NGridType>
 
         time_t GetGORespawnTime(uint32 dbGuid) const
         {
-            UNORDERED_MAP<uint32 /*dbGUID*/, time_t>::const_iterator itr = _goRespawnTimes.find(dbGuid);
+            std::unordered_map<uint32 /*dbGUID*/, time_t>::const_iterator itr = _goRespawnTimes.find(dbGuid);
             if (itr != _goRespawnTimes.end())
                 return itr->second;
 
@@ -493,6 +517,7 @@ class Map : public GridRefManager<NGridType>
         void SendZoneDynamicInfo(Player* player);
         void SendInitSelf(Player* player);
 
+        void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0);
         void SetZoneMusic(uint32 zoneId, uint32 musicId);
         void SetZoneWeather(uint32 zoneId, uint32 weatherId, float weatherGrade);
         void SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime);
@@ -591,11 +616,12 @@ class Map : public GridRefManager<NGridType>
         NGridType* i_grids[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
         GridMap* GridMaps[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
         std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP*TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
+        std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP*TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells_large;
 
         bool i_scriptLock;
-        UNORDERED_SET<WorldObject*> i_objectsToRemove;
+        std::unordered_set<WorldObject*> i_objectsToRemove;
         std::map<WorldObject*, bool> i_objectsToSwitch;
-        UNORDERED_SET<WorldObject*> i_worldObjects;
+        std::unordered_set<WorldObject*> i_worldObjects;
 
         typedef std::multimap<time_t, ScriptAction> ScriptScheduleMap;
         ScriptScheduleMap m_scriptSchedule;
@@ -628,8 +654,8 @@ class Map : public GridRefManager<NGridType>
                 m_activeNonPlayers.erase(obj);
         }
 
-        UNORDERED_MAP<uint32 /*dbGUID*/, time_t> _creatureRespawnTimes;
-        UNORDERED_MAP<uint32 /*dbGUID*/, time_t> _goRespawnTimes;
+        std::unordered_map<uint32 /*dbGUID*/, time_t> _creatureRespawnTimes;
+        std::unordered_map<uint32 /*dbGUID*/, time_t> _goRespawnTimes;
 
         ZoneDynamicInfoMap _zoneDynamicInfo;
         uint32 _defaultLight;
@@ -712,7 +738,7 @@ inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& vis
 template<class NOTIFIER>
 inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER& notifier)
 { 
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
 
@@ -726,7 +752,7 @@ inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER
 template<class NOTIFIER>
 inline void Map::VisitFirstFound(const float &x, const float &y, float radius, NOTIFIER &notifier)
 { 
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
 
@@ -742,7 +768,7 @@ inline void Map::VisitFirstFound(const float &x, const float &y, float radius, N
 template<class NOTIFIER>
 inline void Map::VisitWorld(const float &x, const float &y, float radius, NOTIFIER &notifier)
 { 
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
 
@@ -753,7 +779,7 @@ inline void Map::VisitWorld(const float &x, const float &y, float radius, NOTIFI
 template<class NOTIFIER>
 inline void Map::VisitGrid(const float &x, const float &y, float radius, NOTIFIER &notifier)
 { 
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
 

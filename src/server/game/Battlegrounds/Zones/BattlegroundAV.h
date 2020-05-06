@@ -994,7 +994,7 @@ const float BG_AV_CreaturePos[AV_CPLACE_MAX][4] =
     {-1297.5f, -266.767f, 114.15f, 3.31044f},      //frostwolf_wtower
     {-57.7891f, -286.597f, 15.6479f, 6.02139f},    //AV_NPC_A_CAPTAIN balinda
     {722.43f, -10.9982f, 50.7046f, 3.42085f},      //AV_NPC_A_BOSS vanndar
-    {-545.23f, -165.35f, 57.7886f, 3.01145f},      //AV_NPC_H_CAPTAIN galvangar
+    {-545.23f, -165.35f, 57.7886f, 5.88342f},      //AV_NPC_H_CAPTAIN galvangar
     {-1370.9f, -219.793f, 98.4258f, 5.04381f}      //AV_NPC_H_BOSS drek thar
 };
 
@@ -1177,7 +1177,7 @@ const float BG_AV_StaticCreaturePos[AV_STATICCPLACE_MAX][5] =
     {428.091f, -122.731f, 3.40332f, 6.05901f, 14 }, //11678 - Snowblind Ambusher
     {235.05f, 85.5705f, 18.3079f, -0.914255f, 14 }, //11678 - Snowblind Ambusher
     {-1553.04f, -344.342f, 64.4163f, 6.09933f, 15 }, //11839 - Wildpaw Brute
-    {-545.23f, -165.35f, 57.7886f, 3.01145f, 16 }, //11947 - Captain Galvangar
+    {-545.23f, -165.35f, 57.7886f, 5.88342f, 16 }, //11947 - Captain Galvangar
     {722.43f, -10.9982f, 50.7046f, 3.42085f, 17 }, //11948 - Vanndar Stormpike
     {-57.7891f, -286.597f, 15.6479f, 6.02139f, 18 }, //11949 - Captain Balinda Stonehearth
     {930.498f, -520.755f, 93.7334f, 1.8326f, 19 }, //11997 - Stormpike Herald
@@ -1544,8 +1544,8 @@ inline BG_AV_Nodes &operator++(BG_AV_Nodes &i){ return i = BG_AV_Nodes(i + 1); }
 
 struct BattlegroundAVScore : public BattlegroundScore
 {
-    BattlegroundAVScore(Player* player) : BattlegroundScore(player), GraveyardsAssaulted(0), GraveyardsDefended(0), TowersAssaulted(0), TowersDefended(0), MinesCaptured(0), LeadersKilled(0), SecondaryObjectives(0) { }
-    ~BattlegroundAVScore() { }
+    explicit BattlegroundAVScore(Player* player) : BattlegroundScore(player), GraveyardsAssaulted(0), GraveyardsDefended(0), TowersAssaulted(0), TowersDefended(0), MinesCaptured(0), LeadersKilled(0), SecondaryObjectives(0) { }
+    ~BattlegroundAVScore() override { }
     uint32 GraveyardsAssaulted;
     uint32 GraveyardsDefended;
     uint32 TowersAssaulted;
@@ -1554,53 +1554,52 @@ struct BattlegroundAVScore : public BattlegroundScore
     uint32 LeadersKilled;
     uint32 SecondaryObjectives;
 
-    uint32 GetAttr1() const final override { return GraveyardsAssaulted; }
-    uint32 GetAttr2() const final override { return GraveyardsDefended; }
-    uint32 GetAttr3() const final override { return TowersAssaulted; }
-    uint32 GetAttr4() const final override { return TowersDefended; }
-    uint32 GetAttr5() const final override { return MinesCaptured; }
+    uint32 GetAttr1() const final { return GraveyardsAssaulted; }
+    uint32 GetAttr2() const final { return GraveyardsDefended; }
+    uint32 GetAttr3() const final { return TowersAssaulted; }
+    uint32 GetAttr4() const final { return TowersDefended; }
+    uint32 GetAttr5() const final { return MinesCaptured; }
 };
 
 class BattlegroundAV : public Battleground
 {
     public:
         BattlegroundAV();
-        ~BattlegroundAV();
+        ~BattlegroundAV() override;
 
         /* inherited from BattlegroundClass */
-        void AddPlayer(Player* player);
-        void StartingEventCloseDoors();
-        void StartingEventOpenDoors();
+        void AddPlayer(Player* player) override;
+        void StartingEventCloseDoors() override;
+        void StartingEventOpenDoors() override;
 
-        void RemovePlayer(Player* player);
-        void HandleAreaTrigger(Player* player, uint32 trigger);
-        bool SetupBattleground();
-        void ResetBGSubclass();
+        void RemovePlayer(Player* player) override;
+        void HandleAreaTrigger(Player* player, uint32 trigger) override;
+        bool SetupBattleground() override;
+        void ResetBGSubclass() override;
 
         /*general stuff*/
         void UpdateScore(TeamId teamId, int16 points);
-        void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
+        void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
 
         /*handlestuff*/ //these are functions which get called from extern
-        void EventPlayerClickedOnFlag(Player* source, GameObject* gameObject);
-        void HandleKillPlayer(Player* player, Player* killer);
-        void HandleKillUnit(Creature* unit, Player* killer);
+        void EventPlayerClickedOnFlag(Player* source, GameObject* gameObject) override;
+        void HandleKillPlayer(Player* player, Player* killer) override;
+        void HandleKillUnit(Creature* unit, Player* killer) override;
         void HandleQuestComplete(uint32 questid, Player* player);
         bool PlayerCanDoMineQuest(int32 GOId, TeamId teamId);
-        TeamId GetMineOwner(uint8 mine) { return m_Mine_Owner[mine]; }
 
-        void EndBattleground(TeamId winnerTeamId);
+        void EndBattleground(TeamId winnerTeamId) override;
 
-        WorldSafeLocsEntry const* GetClosestGraveyard(Player* player);
+        GraveyardStruct const* GetClosestGraveyard(Player* player) override;
 
         /* achievement req. */
         bool IsBothMinesControlledByTeam(TeamId teamId) const;
         bool IsAllTowersControlledAndCaptainAlive(TeamId teamId) const;
         
-        TeamId GetPrematureWinner();
+        TeamId GetPrematureWinner() override;
 
     private:
-        void PostUpdateImpl(uint32 diff);
+        void PostUpdateImpl(uint32 diff) override;
 
         /* Nodes occupying */
         void EventPlayerAssaultsPoint(Player* player, uint32 object);
@@ -1624,7 +1623,7 @@ class BattlegroundAV : public Battleground
         void ChangeMineOwner(uint8 mine, TeamId teamId, bool initial=false);
 
         /*worldstates*/
-        void FillInitialWorldStates(WorldPacket& data);
+        void FillInitialWorldStates(WorldPacket& data) override;
         uint8 GetWorldStateType(uint8 state, TeamId teamId);
         void SendMineWorldStates(uint32 mine);
         void UpdateNodeWorldState(BG_AV_Nodes node);
@@ -1633,18 +1632,18 @@ class BattlegroundAV : public Battleground
         Creature* AddAVCreature(uint16 cinfoid, uint16 type);
 
         /*variables */
-        int32 m_Team_Scores[2];
-        uint32 m_Team_QuestStatus[2][9]; //[x][y] x=team y=questcounter
+        int32 m_Team_Scores[2]{};
+        uint32 m_Team_QuestStatus[2][9]{}; //[x][y] x=team y=questcounter
 
-        BG_AV_NodeInfo m_Nodes[BG_AV_NODES_MAX];
+        BG_AV_NodeInfo m_Nodes[BG_AV_NODES_MAX]{};
 
-        TeamId m_Mine_Owner[2];
+        TeamId m_Mine_Owner[2]{};
         int32 m_Mine_Timer; //ticks for both teams
-        uint32 m_Mine_Reclaim_Timer[2];
-        uint32 m_CaptainBuffTimer[2];
-        bool m_CaptainAlive[2];
+        uint32 m_Mine_Reclaim_Timer[2]{};
+        uint32 m_CaptainBuffTimer[2]{};
+        bool m_CaptainAlive[2]{};
 
-        bool m_IsInformedNearVictory[2];
+        bool m_IsInformedNearVictory[2]{};
 };
 
 #endif

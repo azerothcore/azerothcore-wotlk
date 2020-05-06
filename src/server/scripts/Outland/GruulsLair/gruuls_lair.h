@@ -5,7 +5,8 @@
 #ifndef GRUULS_LAIR_H_
 #define GRUULS_LAIR_H_
 
-#include "ScriptPCH.h"
+#include "SpellAuraEffects.h"
+#include "CreatureAI.h"
 
 enum DataTypes
 {

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -65,7 +64,7 @@ void MPQManager::InitializeDBC()
     if (BaseLocale == -1)
     {
         printf("No locale data detected. Please make sure that the executable is in the same folder as your WoW installation.\n");
-        ASSERT(false);
+        ABORT();
     }
     else
         printf("Using default locale: %s\n", Languages[BaseLocale]);

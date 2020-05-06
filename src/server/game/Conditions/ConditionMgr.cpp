@@ -361,6 +361,19 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                 condMeets = unit->IsInWater();
             break;
         }
+        case CONDITION_QUEST_OBJECTIVE_PROGRESS:
+        {
+            if (Player* player = object->ToPlayer())
+            {
+                const Quest* quest = ASSERT_NOTNULL(sObjectMgr->GetQuestTemplate(ConditionValue1));
+                uint16 log_slot = player->FindQuestSlot(quest->GetQuestId());
+                if (log_slot >= MAX_QUEST_LOG_SIZE)
+                    break;
+                if (player->GetQuestSlotCounter(log_slot, ConditionValue2) == ConditionValue3)
+                    condMeets = true;
+            }
+            break;
+        }
         case CONDITION_HAS_AURA_TYPE:
         {
             if (Unit* unit = object->ToUnit())
@@ -540,6 +553,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         case CONDITION_IN_WATER:
             mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
             break;
+        case CONDITION_QUEST_OBJECTIVE_PROGRESS:
+            mask |= GRID_MAP_TYPE_MASK_PLAYER;
+            break;
         case CONDITION_HAS_AURA_TYPE:
             mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
             break;
@@ -579,6 +595,12 @@ ConditionMgr::ConditionMgr()
 ConditionMgr::~ConditionMgr()
 {
     Clean();
+}
+
+ConditionMgr* ConditionMgr::instance()
+{
+    static ConditionMgr instance;
+    return &instance;
 }
 
 ConditionList ConditionMgr::GetConditionReferences(uint32 refId)
@@ -1117,9 +1139,9 @@ bool ConditionMgr::addToGossipMenus(Condition* cond)
     {
         for (GossipMenusContainer::iterator itr = pMenuBounds.first; itr != pMenuBounds.second; ++itr)
         {
-            if ((*itr).second.entry == cond->SourceGroup && (*itr).second.text_id == uint32(cond->SourceEntry))
+            if ((*itr).second.MenuID == cond->SourceGroup && (*itr).second.TextID == uint32(cond->SourceEntry))
             {
-                (*itr).second.conditions.push_back(cond);
+                (*itr).second.Conditions.push_back(cond);
                 return true;
             }
         }
@@ -1136,7 +1158,7 @@ bool ConditionMgr::addToGossipMenuItems(Condition* cond)
     {
         for (GossipMenuItemsContainer::iterator itr = pMenuItemBounds.first; itr != pMenuItemBounds.second; ++itr)
         {
-            if ((*itr).second.MenuId == cond->SourceGroup && (*itr).second.OptionIndex == uint32(cond->SourceEntry))
+            if ((*itr).second.MenuID == cond->SourceGroup && (*itr).second.OptionID == uint32(cond->SourceEntry))
             {
                 (*itr).second.Conditions.push_back(cond);
                 return true;
@@ -1225,7 +1247,8 @@ bool ConditionMgr::addToSpellImplicitTargetConditions(Condition* cond)
                 if (!assigned)
                     delete sharedList;
             }
-            sharedList->push_back(cond);
+            if (sharedList)
+                sharedList->push_back(cond);
             break;
         }
     }
@@ -1242,6 +1265,13 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
 
     switch (cond->SourceType)
     {
+        case CONDITION_SOURCE_TYPE_TERRAIN_SWAP:
+        case CONDITION_SOURCE_TYPE_PHASE:
+        case CONDITION_SOURCE_TYPE_GRAVEYARD:
+        {
+            sLog->outErrorDb("ConditionSourceType %u in `condition` table is not supported on 3.3.5a, ignoring.", uint32(cond->SourceType));
+            return false;
+        }
         case CONDITION_SOURCE_TYPE_CREATURE_LOOT_TEMPLATE:
         {
             if (!LootTemplates_Creature.HaveLootFor(cond->SourceGroup))
@@ -1537,18 +1567,6 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
             }
             break;
         case CONDITION_SOURCE_TYPE_VEHICLE_SPELL:
-            if (!sObjectMgr->GetCreatureTemplate(cond->SourceGroup))
-            {
-                sLog->outErrorDb("SourceEntry %u in `condition` table, does not exist in `creature_template`, ignoring.", cond->SourceGroup);
-                return false;
-            }
-
-            if (!sSpellMgr->GetSpellInfo(cond->SourceEntry))
-            {
-                sLog->outErrorDb("SourceEntry %u in `condition` table, does not exist in `spell.dbc`, ignoring.", cond->SourceEntry);
-                return false;
-            }
-            break;
         case CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT:
             if (!sObjectMgr->GetCreatureTemplate(cond->SourceGroup))
             {
@@ -1577,11 +1595,6 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
             }
             break;
         }
-        case CONDITION_SOURCE_TYPE_PHASE_DEFINITION:
-        {
-            sLog->outError("CONDITION_SOURCE_TYPE_PHASE_DEFINITION:: is only for 4.3.4 branch, skipped");
-            return false;
-        }
         case CONDITION_SOURCE_TYPE_GOSSIP_MENU:
         case CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION:
         case CONDITION_SOURCE_TYPE_SMART_EVENT:
@@ -1594,10 +1607,32 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
 }
 bool ConditionMgr::isConditionTypeValid(Condition* cond)
 {
-    if (cond->ConditionType == CONDITION_NONE || cond->ConditionType >= CONDITION_MAX)
+    if (cond->ConditionType == CONDITION_NONE
+        || (cond->ConditionType >= CONDITION_TC_END && cond->ConditionType <= CONDITION_AC_START)
+        || (cond->ConditionType >= CONDITION_AC_END)
+        )
     {
-        sLog->outErrorDb("Invalid ConditionType %u at SourceEntry %u in `condition` table, ignoring.", uint32(cond->ConditionType), cond->SourceEntry);
+        sLog->outErrorDb("SourceEntry %u in `condition` table has an invalid ConditionType (%u), ignoring.",
+                         cond->SourceEntry, uint32(cond->ConditionType));
         return false;
+    }
+    switch (cond->ConditionType) {
+        case CONDITION_TERRAIN_SWAP:
+        case CONDITION_DIFFICULTY_ID:
+            sLog->outErrorDb("SourceEntry %u in `condition` table has a ConditionType that is not supported on 3.3.5a (%u), ignoring.",
+                             cond->SourceEntry, uint32(cond->ConditionType));
+            return false;
+        case CONDITION_STAND_STATE:
+        case CONDITION_DAILY_QUEST_DONE:
+        case CONDITION_CHARMED:
+        case CONDITION_PET_TYPE:
+        case CONDITION_TAXI:
+        case CONDITION_QUESTSTATE:
+            sLog->outErrorDb("SourceEntry %u in `condition` table has a ConditionType that is not yet supported on AzerothCore (%u), ignoring.",
+                             cond->SourceEntry, uint32(cond->ConditionType));
+            return false;
+        default:
+            break;
     }
 
     if (cond->ConditionTarget >= cond->GetMaxAvailableConditionTargets())
@@ -2130,6 +2165,34 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         }
         case CONDITION_IN_WATER:
         {
+            break;
+        }
+        case CONDITION_QUEST_OBJECTIVE_PROGRESS:
+        {
+            const Quest* quest = sObjectMgr->GetQuestTemplate(cond->ConditionValue1);
+            if (!quest)
+            {
+                sLog->outErrorDb("CONDITION_QUEST_OBJECTIVE_PROGRESS points to non-existing quest (%u), skipped.", cond->ConditionValue1);
+                return false;
+            }
+
+            if (cond->ConditionValue2 > 3)
+            {
+                sLog->outErrorDb("CONDITION_QUEST_OBJECTIVE_PROGRESS has out-of-range quest objective index specified (%u), it must be a number between 0 and 3. skipped.", cond->ConditionValue2);
+                return false;
+            }
+
+            if (quest->RequiredNpcOrGo[cond->ConditionValue2] == 0)
+            {
+                sLog->outErrorDb("CONDITION_QUEST_OBJECTIVE_PROGRESS has quest objective %u for quest %u, but the field RequiredNPCOrGo%u is 0, skipped.", cond->ConditionValue2, cond->ConditionValue1, cond->ConditionValue2);
+                return false;
+            }
+
+            if (cond->ConditionValue3 > quest->RequiredNpcOrGoCount[cond->ConditionValue2])
+            {
+                sLog->outErrorDb("CONDITION_QUEST_OBJECTIVE_PROGRESS has quest objective count %u in value3, but quest %u has a maximum objective count of %u in RequiredNPCOrGOCount%u, skipped.", cond->ConditionValue3, cond->ConditionValue2, quest->RequiredNpcOrGoCount[cond->ConditionValue2], cond->ConditionValue2);
+                return false;
+            }
             break;
         }
         case CONDITION_HAS_AURA_TYPE:

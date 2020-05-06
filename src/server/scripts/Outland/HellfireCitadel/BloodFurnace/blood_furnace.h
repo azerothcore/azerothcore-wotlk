@@ -5,7 +5,7 @@
 #ifndef DEF_BLOOD_FURNACE_H
 #define DEF_BLOOD_FURNACE_H
 
-#include "ScriptPCH.h"
+#include "Player.h"
 
 enum bloodFurnace
 {

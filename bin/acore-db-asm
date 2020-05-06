@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-bash ../apps/db_assembler/db_assembler.sh
+CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+source "$CUR_PATH/../apps/db_assembler/db_assembler.sh"

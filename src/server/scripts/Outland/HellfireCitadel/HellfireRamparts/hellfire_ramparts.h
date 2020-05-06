@@ -5,7 +5,7 @@
 #ifndef DEF_RAMPARTS_H
 #define DEF_RAMPARTS_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
 
 enum DataTypes
 {

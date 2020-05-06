@@ -5,7 +5,7 @@
 #ifndef DEF_WAILING_CAVERNS_H
 #define DEF_WAILING_CAVERNS_H
 
-#include "ScriptPCH.h"
+#include "CreatureAI.h"
 
 enum DataTypes
 {

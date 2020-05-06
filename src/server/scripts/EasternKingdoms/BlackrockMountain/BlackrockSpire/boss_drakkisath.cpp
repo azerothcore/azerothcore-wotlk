@@ -24,6 +24,23 @@ enum Events
     EVENT_THUNDERCLAP              = 4,
 };
 
+enum ChromaticEliteGuardEvents
+{
+    EVENT_MORTAL_STRIKE = 1,
+    EVENT_KNOCKDOWN     = 2,
+    EVENT_STRIKE        = 3
+};
+
+enum ChromaticEliteGuardSpells
+{
+    SPELL_MORTAL_STRIKE = 15708,
+    SPELL_KNOCKDOWN     = 16790,
+    SPELL_STRIKE        = 15580
+};
+
+int const ChromaticEliteGuardEntry  = 10814;
+int const GeneralDrakkisathEntry    = 10814;
+
 class boss_drakkisath : public CreatureScript
 {
 public:
@@ -41,10 +58,23 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             _EnterCombat();
+            CallForHelp();
             events.ScheduleEvent(EVENT_FIRE_NOVA, 6000);
             events.ScheduleEvent(EVENT_CLEAVE,    8000);
             events.ScheduleEvent(EVENT_CONFLIGURATION, 15000);
             events.ScheduleEvent(EVENT_THUNDERCLAP,    17000);
+        }
+
+        // Will make his two adds engage combat
+        void CallForHelp()
+        {
+            std::list<Creature*> ChromaticEliteGuards;
+            me->GetCreaturesWithEntryInRange(ChromaticEliteGuards, 15.0f, ChromaticEliteGuardEntry);
+            for (std::list<Creature*>::const_iterator itr = ChromaticEliteGuards.begin(); itr != ChromaticEliteGuards.end(); ++itr)
+            {
+                if ((*itr)->GetGUID())
+                    (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
+            }
         }
 
         void JustDied(Unit* /*killer*/)
@@ -94,7 +124,75 @@ public:
     }
 };
 
+class chromatic_elite_guard : public CreatureScript
+{
+public:
+    chromatic_elite_guard() : CreatureScript("chromatic_elite_guard") { }
+
+    struct chromatic_elite_guardAI : public ScriptedAI
+    {
+        chromatic_elite_guardAI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap _events;
+
+        void EnterCombat(Unit* who)
+        {
+            _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(5000, 12800));
+            _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(5600, 15400));
+            _events.ScheduleEvent(EVENT_STRIKE, urand(12000, 20800));
+
+            std::list<Creature*> GeneralDrakkisath;
+            me->GetCreaturesWithEntryInRange(GeneralDrakkisath, 15.0f, GeneralDrakkisathEntry);
+            for (std::list<Creature*>::const_iterator itr = GeneralDrakkisath.begin(); itr != GeneralDrakkisath.end(); ++itr)
+            {
+                if ((*itr)->GetGUID())
+                    (*itr)->ToCreature()->AI()->AttackStart(who);
+            }
+
+            std::list<Creature*> ChromaticEliteGuards;
+            me->GetCreaturesWithEntryInRange(ChromaticEliteGuards, 15.0f, ChromaticEliteGuardEntry);
+            for (std::list<Creature*>::const_iterator itr = ChromaticEliteGuards.begin(); itr != ChromaticEliteGuards.end(); ++itr)
+            {
+                if ((*itr)->GetGUID())
+                    (*itr)->ToCreature()->AI()->AttackStart(who);
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            _events.Update(diff);
+
+            switch (_events.ExecuteEvent())
+            {
+                case EVENT_MORTAL_STRIKE:
+                    DoCastVictim(SPELL_MORTAL_STRIKE);
+                    _events.ScheduleEvent(EVENT_MORTAL_STRIKE, 13000);
+                    break;
+                case EVENT_KNOCKDOWN:
+                    DoCastVictim(SPELL_KNOCKDOWN);
+                    _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(11200, 25700));
+                    break;
+                case EVENT_STRIKE:
+                    DoCastVictim(SPELL_STRIKE);
+                    _events.ScheduleEvent(EVENT_MORTAL_STRIKE, 9000);
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new chromatic_elite_guardAI(creature);
+    }
+};
+
 void AddSC_boss_drakkisath()
 {
     new boss_drakkisath();
+    new chromatic_elite_guard();
 }

@@ -48,7 +48,7 @@ class ResultSet
         MYSQL_FIELD* _fields;
 };
 
-typedef Trinity::AutoPtr<ResultSet, ACE_Thread_Mutex> QueryResult;
+typedef acore::AutoPtr<ResultSet, ACE_Thread_Mutex> QueryResult;
 
 class PreparedResultSet
 {
@@ -93,7 +93,7 @@ class PreparedResultSet
 
 };
 
-typedef Trinity::AutoPtr<PreparedResultSet, ACE_Thread_Mutex> PreparedQueryResult;
+typedef acore::AutoPtr<PreparedResultSet, ACE_Thread_Mutex> PreparedQueryResult;
 
 #endif
 

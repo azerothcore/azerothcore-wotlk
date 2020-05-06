@@ -336,7 +336,7 @@ class BattlegroundEY : public Battleground
         void HandleBuffUse(uint64 buff_guid);
         void HandleAreaTrigger(Player* player, uint32 trigger);
         void HandleKillPlayer(Player* player, Player* killer);
-        WorldSafeLocsEntry const* GetClosestGraveyard(Player* player);
+        GraveyardStruct const* GetClosestGraveyard(Player* player);
         bool SetupBattleground();
         void Init();
         void EndBattleground(TeamId winnerTeamId);

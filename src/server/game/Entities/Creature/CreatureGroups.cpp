@@ -1,7 +1,7 @@
-﻿/*
- licenzastrasd1
- licenzastrasd2
- licenzastrasd3
+/*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "Creature.h"
@@ -15,6 +15,12 @@ FormationMgr::~FormationMgr()
 {
     for (CreatureGroupInfoType::iterator itr = CreatureGroupMap.begin(); itr != CreatureGroupMap.end(); ++itr)
         delete itr->second;
+}
+
+FormationMgr* FormationMgr::instance()
+{
+    static FormationMgr instance;
+    return &instance;
 }
 
 void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
@@ -258,8 +264,8 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         float dy = y + sin(followAngle + pathAngle) * followDist;
         float dz = z;
 
-        Trinity::NormalizeMapCoord(dx);
-        Trinity::NormalizeMapCoord(dy);
+        acore::NormalizeMapCoord(dx);
+        acore::NormalizeMapCoord(dy);
 
         member->UpdateGroundPositionZ(dx, dy, dz);
 
@@ -273,9 +279,13 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         // xinef: if we move members to position without taking care of sizes, we should compare distance without sizes
         // xinef: change members speed basing on distance - if too far speed up, if too close slow down
         UnitMoveType mtype = Movement::SelectSpeedType(member->GetUnitMovementFlags());
-        member->SetSpeedRate(mtype, m_leader->GetSpeedRate(mtype) * member->GetExactDist(dx, dy, dz) / pathDist);
+        float speedRate = m_leader->GetSpeedRate(mtype) * member->GetExactDist(dx, dy, dz) / pathDist;
 
-        member->GetMotionMaster()->MovePoint(0, dx, dy, dz);
-        member->SetHomePosition(dx, dy, dz, pathAngle);
+        if (speedRate > 0.01f) // don't move if speed rate is too low
+        {
+            member->SetSpeedRate(mtype, speedRate);
+            member->GetMotionMaster()->MovePoint(0, dx, dy, dz);
+            member->SetHomePosition(dx, dy, dz, pathAngle);
+        }
     }
 }

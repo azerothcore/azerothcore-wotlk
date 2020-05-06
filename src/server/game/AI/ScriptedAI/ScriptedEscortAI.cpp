@@ -65,7 +65,7 @@ bool npc_escortAI::AssistPlayerInCombat(Unit* who)
         return false;
 
     //experimental (unknown) flag not present
-    if (!(me->GetCreatureTemplate()->type_flags & CREATURE_TYPEFLAGS_AID_PLAYERS))
+    if (!(me->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_CAN_ASSIST))
         return false;
 
     //not a player
@@ -96,7 +96,15 @@ void npc_escortAI::MoveInLineOfSight(Unit* who)
             return;
 
     if (me->CanStartAttack(who))
+    {
+        if (me->HasUnitState(UNIT_STATE_DISTRACTED))
+        {
+            me->ClearUnitState(UNIT_STATE_DISTRACTED);
+            me->GetMotionMaster()->Clear();
+        }
         AttackStart(who);
+    }
+
 }
 
 void npc_escortAI::JustDied(Unit* /*killer*/)

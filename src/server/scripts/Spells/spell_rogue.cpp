@@ -125,7 +125,7 @@ class spell_rog_blade_flurry : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-                Unit* _procTarget = eventInfo.GetActor()->SelectNearbyTarget(eventInfo.GetProcTarget());
+                Unit* _procTarget = eventInfo.GetActor()->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
                 if (_procTarget)
                     _procTargetGUID = _procTarget->GetGUID();
                 return _procTarget;
@@ -399,7 +399,7 @@ class spell_rog_killing_spree : public SpellScriptLoader
             {
                 while (!_targets.empty())
                 {
-                    uint64 guid = Trinity::Containers::SelectRandomContainerElement(_targets);
+                    uint64 guid = acore::Containers::SelectRandomContainerElement(_targets);
                     if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
                     {
                         // xinef: target may be no longer valid

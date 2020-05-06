@@ -32,20 +32,21 @@
 #include "BattlegroundRV.h"
 #include "Transport.h"
 #include "ScriptMgr.h"
+#include "GameGraveyard.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
-namespace Trinity
+namespace acore
 {
     class BattlegroundChatBuilder
     {
         public:
-            BattlegroundChatBuilder(ChatMsg msgtype, int32 textId, Player const* source, va_list* args = NULL)
+            BattlegroundChatBuilder(ChatMsg msgtype, uint32 textId, Player const* source, va_list* args = NULL)
                 : _msgtype(msgtype), _textId(textId), _source(source), _args(args) { }
 
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
             {
-                char const* text = sObjectMgr->GetTrinityString(_textId, loc_idx);
+                char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx);
                 if (_args)
                 {
                     // we need copy va_list before use or original va_list will corrupted
@@ -69,7 +70,7 @@ namespace Trinity
             }
 
             ChatMsg _msgtype;
-            int32 _textId;
+            uint32 _textId;
             Player const* _source;
             va_list* _args;
     };
@@ -77,14 +78,14 @@ namespace Trinity
     class Battleground2ChatBuilder
     {
         public:
-            Battleground2ChatBuilder(ChatMsg msgtype, int32 textId, Player const* source, int32 arg1, int32 arg2)
+            Battleground2ChatBuilder(ChatMsg msgtype, uint32 textId, Player const* source, int32 arg1, int32 arg2)
                 : _msgtype(msgtype), _textId(textId), _source(source), _arg1(arg1), _arg2(arg2) {}
 
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
             {
-                char const* text = sObjectMgr->GetTrinityString(_textId, loc_idx);
-                char const* arg1str = _arg1 ? sObjectMgr->GetTrinityString(_arg1, loc_idx) : "";
-                char const* arg2str = _arg2 ? sObjectMgr->GetTrinityString(_arg2, loc_idx) : "";
+                char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx);
+                char const* arg1str = _arg1 ? sObjectMgr->GetAcoreString(_arg1, loc_idx) : "";
+                char const* arg2str = _arg2 ? sObjectMgr->GetAcoreString(_arg2, loc_idx) : "";
 
                 char str[2048];
                 snprintf(str, 2048, text, arg1str, arg2str);
@@ -94,12 +95,12 @@ namespace Trinity
 
         private:
             ChatMsg _msgtype;
-            int32 _textId;
+            uint32 _textId;
             Player const* _source;
-            int32 _arg1;
-            int32 _arg2;
+            uint32 _arg1;
+            uint32 _arg2;
     };
-}                                                           // namespace Trinity
+}                                                           // namespace acore
 
 template<class Do>
 void Battleground::BroadcastWorker(Do& _do)
@@ -111,6 +112,7 @@ void Battleground::BroadcastWorker(Do& _do)
 Battleground::Battleground()
 {
     m_RealTypeID        = BATTLEGROUND_TYPE_NONE;
+    m_RandomTypeID      = BATTLEGROUND_TYPE_NONE;
     m_InstanceID        = 0;
     m_Status            = STATUS_NONE;
     m_ClientInstanceID  = 0;
@@ -126,6 +128,7 @@ Battleground::Battleground()
     m_StartDelayTime    = 0;
     m_IsRated           = false;
     m_BuffChange        = false;
+    m_IsRandom          = false;
     m_Name              = "";
     m_LevelMin          = 0;
     m_LevelMax          = 0;
@@ -281,6 +284,8 @@ void Battleground::Update(uint32 diff)
     m_ResetStatTimer += diff;
 
     PostUpdateImpl(diff);
+
+    sScriptMgr->OnBattlegroundUpdate(this, diff);
 }
 
 inline void Battleground::_CheckSafePositions(uint32 diff)
@@ -581,6 +586,8 @@ inline void Battleground::_ProcessJoin(uint32 diff)
             // Announce BG starting
             if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
                 sWorld->SendWorldText(LANG_BG_STARTED_ANNOUNCE_WORLD, GetName(), std::min(GetMinLevel(), (uint32)80), std::min(GetMaxLevel(), (uint32)80));
+
+            sScriptMgr->OnBattlegroundStart(this);
         }
     }
 }
@@ -780,7 +787,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
         stmt->setUInt64(0, battlegroundId);
         stmt->setUInt8(1, GetWinner());
         stmt->setUInt8(2, GetUniqueBracketId());
-        stmt->setUInt8(3, GetBgTypeID());
+        stmt->setUInt8(3, GetBgTypeID(true));
         CharacterDatabase.Execute(stmt);
     }
 
@@ -974,10 +981,12 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
         uint32 loser_kills = player->GetRandomWinner() ? BG_REWARD_LOSER_HONOR_LAST : BG_REWARD_LOSER_HONOR_FIRST;
         uint32 winner_arena = player->GetRandomWinner() ? BG_REWARD_WINNER_ARENA_LAST : BG_REWARD_WINNER_ARENA_FIRST;
 
+        sScriptMgr->OnBattlegroundEndReward(this, player, winnerTeamId);
+
         // Reward winner team
         if (bgTeamId == winnerTeamId)
         {
-            if (player->IsCurrentBattlegroundRandom() || BattlegroundMgr::IsBGWeekend(GetBgTypeID()))
+            if (IsRandom() || BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)))
             {
                 UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(winner_kills));
 
@@ -993,7 +1002,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
         }
         else
         {
-            if (player->IsCurrentBattlegroundRandom() || BattlegroundMgr::IsBGWeekend(GetBgTypeID()))
+            if (IsRandom() || BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)))
                 UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(loser_kills));
         }
 
@@ -1057,7 +1066,7 @@ uint32 Battleground::GetBonusHonorFromKill(uint32 kills) const
 {
     //variable kills means how many honorable kills you scored (so we need kills * honor_for_one_kill)
     uint32 maxLevel = std::min<uint32>(GetMaxLevel(), 80U);
-    return Trinity::Honor::hk_honor_at_level(maxLevel, float(kills));
+    return acore::Honor::hk_honor_at_level(maxLevel, float(kills));
 }
 
 void Battleground::BlockMovement(Player* player)
@@ -1143,6 +1152,8 @@ void Battleground::RemovePlayerAtLeave(Player* player)
 
     // Xinef: remove all criterias on bg leave
     player->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_BG_MAP, GetMapId(), true);
+
+    sScriptMgr->OnBattlegroundRemovePlayerAtLeave(this, player);
 }
 
 // this method is called when creating bg
@@ -1159,7 +1170,7 @@ void Battleground::Init()
     if (m_BgInvitedPlayers[TEAM_ALLIANCE] > 0 || m_BgInvitedPlayers[TEAM_HORDE] > 0)
     {
         sLog->outError("Battleground::Reset: one of the counters is not 0 (alliance: %u, horde: %u) for BG (map: %u, instance id: %u)!", m_BgInvitedPlayers[TEAM_ALLIANCE], m_BgInvitedPlayers[TEAM_HORDE], m_MapId, m_InstanceID);
-        ASSERT(false);
+        ABORT();
     }
 
     m_BgInvitedPlayers[TEAM_ALLIANCE] = 0;
@@ -1190,11 +1201,12 @@ void Battleground::AddPlayer(Player* player)
     if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK))
         player->ToggleAFK();
 
+    sScriptMgr->OnBattlegroundBeforeAddPlayer(this, player);
+
     // score struct must be created in inherited class
 
     uint64 guid = player->GetGUID();
     TeamId teamId = player->GetBgTeamId();
-
 
     // Add to list/maps
     m_Players[guid] = player;
@@ -1253,6 +1265,8 @@ void Battleground::AddPlayer(Player* player)
     PlayerAddedToBGCheckIfBGIsRunning(player);
     AddOrSetPlayerToCorrectBgGroup(player, teamId);
 
+    sScriptMgr->OnBattlegroundAddPlayer(this, player);
+
     // Log
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDetail("BATTLEGROUND: Player %s joined the battle.", player->GetName().c_str());
@@ -1296,7 +1310,51 @@ void Battleground::AddOrSetPlayerToCorrectBgGroup(Player* player, TeamId teamId)
 
 uint32 Battleground::GetFreeSlotsForTeam(TeamId teamId) const
 {
-    return GetInvitedCount(teamId) < GetMaxPlayersPerTeam() ? GetMaxPlayersPerTeam() - GetInvitedCount(teamId) : 0;
+    // if BG is starting and CONFIG_BATTLEGROUND_INVITATION_TYPE == BG_QUEUE_INVITATION_TYPE_NO_BALANCE, invite anyone
+    if (GetStatus() == STATUS_WAIT_JOIN && sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE) == BG_QUEUE_INVITATION_TYPE_NO_BALANCE)
+        return (GetInvitedCount(teamId) < GetMaxPlayersPerTeam()) ? GetMaxPlayersPerTeam() - GetInvitedCount(teamId) : 0;
+
+    // if BG is already started or CONFIG_BATTLEGROUND_INVITATION_TYPE != BG_QUEUE_INVITATION_TYPE_NO_BALANCE, do not allow to join too many players of one faction
+    uint32 thisTeamInvitedCount = teamId == TEAM_ALLIANCE ? GetInvitedCount(TEAM_ALLIANCE) : GetInvitedCount(TEAM_HORDE);
+    uint32 thisTeamPlayersCount = teamId == TEAM_ALLIANCE ? GetPlayersCountByTeam(TEAM_ALLIANCE) : GetPlayersCountByTeam(TEAM_HORDE);
+    uint32 otherTeamInvitedCount = teamId == TEAM_ALLIANCE ? GetInvitedCount(TEAM_HORDE) : GetInvitedCount(TEAM_ALLIANCE);
+    uint32 otherTeamPlayersCount = teamId == TEAM_ALLIANCE ? GetPlayersCountByTeam(TEAM_HORDE) : GetPlayersCountByTeam(TEAM_ALLIANCE);
+
+    if (GetStatus() == STATUS_IN_PROGRESS || GetStatus() == STATUS_WAIT_JOIN)
+    {
+        // difference based on ppl invited (not necessarily entered battle)
+        // default: allow 0
+        uint32 diff = 0;
+        uint32 maxPlayersPerTeam = GetMaxPlayersPerTeam();
+        uint32 minPlayersPerTeam = GetMinPlayersPerTeam();
+
+        // allow join one person if the sides are equal (to fill up bg to minPlayerPerTeam)
+        if (otherTeamInvitedCount == thisTeamInvitedCount)
+            diff = 1;
+        else if (otherTeamInvitedCount > thisTeamInvitedCount) // allow join more ppl if the other side has more players
+            diff = otherTeamInvitedCount - thisTeamInvitedCount;
+
+        // difference based on max players per team (don't allow inviting more)
+        uint32 diff2 = (thisTeamInvitedCount < maxPlayersPerTeam) ? maxPlayersPerTeam - thisTeamInvitedCount : 0;
+
+        // difference based on players who already entered
+        // default: allow 0
+        uint32 diff3 = 0;
+
+        // allow join one person if the sides are equal (to fill up bg minPlayerPerTeam)
+        if (otherTeamPlayersCount == thisTeamPlayersCount)
+            diff3 = 1;
+        else if (otherTeamPlayersCount > thisTeamPlayersCount) // allow join more ppl if the other side has more players
+            diff3 = otherTeamPlayersCount - thisTeamPlayersCount;
+        else if (thisTeamInvitedCount <= minPlayersPerTeam) // or other side has less than minPlayersPerTeam
+            diff3 = minPlayersPerTeam - thisTeamInvitedCount + 1;
+
+        // return the minimum of the 3 differences
+        // min of diff, diff2 and diff3
+        return std::min({ diff, diff2, diff3 });
+    }
+
+    return 0;
 }
 
 uint32 Battleground::GetMaxFreeSlots() const
@@ -1426,7 +1484,7 @@ void Battleground::RelocateDeadPlayers(uint64 queueIndex)
     std::vector<uint64>& ghostList = m_ReviveQueue[queueIndex];
     if (!ghostList.empty())
     {
-        WorldSafeLocsEntry const* closestGrave = NULL;
+        GraveyardStruct const* closestGrave = NULL;
         for (std::vector<uint64>::const_iterator itr = ghostList.begin(); itr != ghostList.end(); ++itr)
         {
             Player* player = ObjectAccessor::FindPlayer(*itr);
@@ -1684,17 +1742,17 @@ bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float 
     return false;
 }
 
-void Battleground::SendMessageToAll(int32 entry, ChatMsg type, Player const* source)
+void Battleground::SendMessageToAll(uint32 entry, ChatMsg type, Player const* source)
 {
     if (!entry)
         return;
 
-    Trinity::BattlegroundChatBuilder bg_builder(type, entry, source);
-    Trinity::LocalizedPacketDo<Trinity::BattlegroundChatBuilder> bg_do(bg_builder);
+    acore::BattlegroundChatBuilder bg_builder(type, entry, source);
+    acore::LocalizedPacketDo<acore::BattlegroundChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 }
 
-void Battleground::PSendMessageToAll(int32 entry, ChatMsg type, Player const* source, ...)
+void Battleground::PSendMessageToAll(uint32 entry, ChatMsg type, Player const* source, ...)
 {
     if (!entry)
         return;
@@ -1702,14 +1760,14 @@ void Battleground::PSendMessageToAll(int32 entry, ChatMsg type, Player const* so
     va_list ap;
     va_start(ap, source);
 
-    Trinity::BattlegroundChatBuilder bg_builder(type, entry, source, &ap);
-    Trinity::LocalizedPacketDo<Trinity::BattlegroundChatBuilder> bg_do(bg_builder);
+    acore::BattlegroundChatBuilder bg_builder(type, entry, source, &ap);
+    acore::LocalizedPacketDo<acore::BattlegroundChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 
     va_end(ap);
 }
 
-void Battleground::SendWarningToAll(int32 entry, ...)
+void Battleground::SendWarningToAll(uint32 entry, ...)
 {
     if (!entry)
         return;
@@ -1719,7 +1777,7 @@ void Battleground::SendWarningToAll(int32 entry, ...)
     {
         if (localizedPackets.find(itr->second->GetSession()->GetSessionDbLocaleIndex()) == localizedPackets.end())
         {
-            char const* format = sObjectMgr->GetTrinityString(entry, itr->second->GetSession()->GetSessionDbLocaleIndex());
+            char const* format = sObjectMgr->GetAcoreString(entry, itr->second->GetSession()->GetSessionDbLocaleIndex());
 
             char str[1024];
             va_list ap;
@@ -1734,10 +1792,10 @@ void Battleground::SendWarningToAll(int32 entry, ...)
     }
 }
 
-void Battleground::SendMessage2ToAll(int32 entry, ChatMsg type, Player const* source, int32 arg1, int32 arg2)
+void Battleground::SendMessage2ToAll(uint32 entry, ChatMsg type, Player const* source, uint32 arg1, uint32 arg2)
 {
-    Trinity::Battleground2ChatBuilder bg_builder(type, entry, source, arg1, arg2);
-    Trinity::LocalizedPacketDo<Trinity::Battleground2ChatBuilder> bg_do(bg_builder);
+    acore::Battleground2ChatBuilder bg_builder(type, entry, source, arg1, arg2);
+    acore::LocalizedPacketDo<acore::Battleground2ChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 }
 
@@ -1748,10 +1806,10 @@ void Battleground::EndNow()
 }
 
 // To be removed
-char const* Battleground::GetTrinityString(int32 entry)
+char const* Battleground::GetAcoreString(int32 entry)
 {
     // FIXME: now we have different DBC locales and need localized message for each target client
-    return sObjectMgr->GetTrinityStringForDBCLocale(entry);
+    return sObjectMgr->GetAcoreStringForDBCLocale(entry);
 }
 
 void Battleground::HandleTriggerBuff(GameObject* gameObject)
@@ -1906,9 +1964,9 @@ void Battleground::SetBgRaid(TeamId teamId, Group* bg_raid)
     old_raid = bg_raid;
 }
 
-WorldSafeLocsEntry const* Battleground::GetClosestGraveyard(Player* player)
+GraveyardStruct const* Battleground::GetClosestGraveyard(Player* player)
 {
-    return sObjectMgr->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetBgTeamId());
+    return sGraveyard->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetBgTeamId());
 }
 
 void Battleground::StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)

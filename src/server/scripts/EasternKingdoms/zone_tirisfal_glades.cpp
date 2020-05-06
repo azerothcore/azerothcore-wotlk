@@ -145,65 +145,7 @@ public:
     };
 };
 
-/*######
-## go_mausoleum_door
-## go_mausoleum_trigger
-######*/
-
-enum Mausoleum
-{
-    QUEST_ULAG      = 1819,
-    NPC_ULAG        = 6390,
-    GO_TRIGGER      = 104593,
-    GO_DOOR         = 176594
-};
-
-class go_mausoleum_door : public GameObjectScript
-{
-public:
-    go_mausoleum_door() : GameObjectScript("go_mausoleum_door") { }
-
-    bool OnGossipHello(Player* player, GameObject* /*go*/)
-    {
-        if (player->GetQuestStatus(QUEST_ULAG) != QUEST_STATUS_INCOMPLETE)
-            return false;
-
-        if (!player->FindNearestCreature(NPC_ULAG, 50.0f))
-            if (GameObject* pTrigger = player->FindNearestGameObject(GO_TRIGGER, 30.0f))
-            {
-                pTrigger->SetGoState(GO_STATE_READY);
-                player->SummonCreature(NPC_ULAG, 2390.26f, 336.47f, 40.01f, 2.26f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);
-                return false;
-            }
-
-        return false;
-    }
-};
-
-class go_mausoleum_trigger : public GameObjectScript
-{
-public:
-    go_mausoleum_trigger() : GameObjectScript("go_mausoleum_trigger") { }
-
-    bool OnGossipHello(Player* player, GameObject* go)
-    {
-        if (player->GetQuestStatus(QUEST_ULAG) != QUEST_STATUS_INCOMPLETE)
-            return false;
-
-        if (GameObject* pDoor = player->FindNearestGameObject(GO_DOOR, 30.0f))
-        {
-            go->SetGoState(GO_STATE_ACTIVE);
-            pDoor->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);
-            return true;
-        }
-
-        return false;
-    }
-};
-
 void AddSC_tirisfal_glades()
 {
     new npc_calvin_montague();
-    new go_mausoleum_door();
-    new go_mausoleum_trigger();
 }

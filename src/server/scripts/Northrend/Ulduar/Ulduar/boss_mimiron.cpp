@@ -395,11 +395,12 @@ public:
             }
 
             // ensure LMK2 is at proper position
-            if (Creature* LMK2 = GetLMK2())
-            {
-                LMK2->UpdatePosition(LMK2->GetHomePosition(), true);
-                LMK2->StopMovingOnCurrentPos();
-            }
+            if (pInstance)
+                if (Creature* LMK2 = GetLMK2())
+                {
+                    LMK2->UpdatePosition(LMK2->GetHomePosition(), true);
+                    LMK2->StopMovingOnCurrentPos();
+                }
 
             if (pInstance && pInstance->GetData(TYPE_MIMIRON) != DONE)
                 pInstance->SetData(TYPE_MIMIRON, IN_PROGRESS);
@@ -775,7 +776,7 @@ public:
                         Creature* LMK2 = GetLMK2();
                         Creature* VX001 = GetVX001();
                         Creature* ACU = GetACU();
-                        
+
                         if (!VX001 || !LMK2 || !ACU)
                             return;
 
@@ -1113,7 +1114,7 @@ public:
                             cannon->ExitVehicle();
                         me->GetMotionMaster()->MoveCharge(2795.076f, 2598.616f, 364.32f, 21.0f);
                         if (Creature* c = GetMimiron())
-                            c->AI()->SetData(0, 1); 
+                            c->AI()->SetData(0, 1);
                     }
                 }
                 else if (Phase == 4)
@@ -1752,7 +1753,7 @@ public:
                         me->UpdatePosition(2744.65f, 2569.46f, 381.34f, M_PI, false);
 
                         if (Creature* c = GetMimiron())
-                            c->AI()->SetData(0, 3); 
+                            c->AI()->SetData(0, 3);
                     }
                 }
                 else if (Phase == 4)
@@ -2164,7 +2165,7 @@ public:
                     me->CastSpell(me, SPELL_BEAM_BLUE, true);
                     option = 3;
                     break;
-            }           
+            }
         }
 
         void UpdateAI(uint32 diff)
@@ -2276,25 +2277,24 @@ public:
 };
 
 class go_ulduar_do_not_push_this_button : public GameObjectScript
-{ 
-public: 
-    go_ulduar_do_not_push_this_button() : GameObjectScript("go_ulduar_do_not_push_this_button") { } 
+{
+public:
+    go_ulduar_do_not_push_this_button() : GameObjectScript("go_ulduar_do_not_push_this_button") { }
 
-    bool OnGossipHello(Player* Player, GameObject* GO)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if( !Player || !GO )
+        if(!player || !go)
             return true;
 
-        InstanceScript* pInstance = GO->GetInstanceScript();
-        if (pInstance)
+        if (InstanceScript* instance = go->GetInstanceScript())
         {
-            if( pInstance->GetData(TYPE_MIMIRON) != NOT_STARTED )
+            if(instance->GetData(TYPE_MIMIRON) != NOT_STARTED)
                 return false;
 
-            if (Creature* c = ObjectAccessor::GetCreature(*GO, pInstance->GetData64(TYPE_MIMIRON)))
+            if (Creature* c = ObjectAccessor::GetCreature(*go, instance->GetData64(TYPE_MIMIRON)))
             {
                 c->AI()->SetData(0, 7);
-                c->AI()->AttackStart(Player);
+                c->AI()->AttackStart(player);
             }
         }
 

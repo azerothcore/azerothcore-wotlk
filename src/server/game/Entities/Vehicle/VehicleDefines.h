@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef __TRINITY_VEHICLEDEFINES_H
-#define __TRINITY_VEHICLEDEFINES_H
+#ifndef __ACORE_VEHICLEDEFINES_H
+#define __ACORE_VEHICLEDEFINES_H
 
 #include "Define.h"
 #include "Map.h"

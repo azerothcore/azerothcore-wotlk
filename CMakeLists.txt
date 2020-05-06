@@ -1,4 +1,5 @@
-# Copyright (C)
+#
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -7,13 +8,16 @@
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
 
 # Set projectname (must be done AFTER setting configurationtypes)
 project(AzerothCore)
 
+# Require a min version Cmake
+cmake_minimum_required(VERSION 3.8)
+
 # CMake policies (can not be handled elsewhere)
-cmake_minimum_required(VERSION 2.8)
-cmake_policy(SET CMP0005 OLD)
+cmake_policy(SET CMP0005 NEW)
 
 # add this options before PROJECT keyword
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
@@ -28,7 +32,9 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 set(AC_PATH_ROOT "${CMAKE_SOURCE_DIR}")
 
 # set macro-directory
-set(CMAKE_MODULE_PATH "${AC_PATH_ROOT}/src/cmake/macros")
+list(APPEND CMAKE_MODULE_PATH
+  "${CMAKE_SOURCE_DIR}/src/cmake/macros"
+  "${CMAKE_SOURCE_DIR}/deps/cotire/CMake")
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
@@ -42,7 +48,7 @@ include(src/cmake/ac_macros.cmake)
 include(conf/config.cmake.dist)
 
 # load custom configurations for cmake if exists
-if(EXISTS "conf/config.cmake")
+if(EXISTS "${CMAKE_SOURCE_DIR}/conf/config.cmake")
   include(conf/config.cmake)
 endif()
 
@@ -80,27 +86,22 @@ if( NOPCH )
   set(USE_SCRIPTPCH 0)
 endif()
 
+include(ConfigureBaseTargets)
 include(CheckPlatform)
+include(GroupSources)
+include(AutoCollect)
+
+CU_RUN_HOOK("AFTER_LOAD_CMAKE_MODULES")
 
 # basic packagesearching and setup (further support will be needed, this is a preliminary release!)
-set(OPENSSL_EXPECTED_VERSION 1.0.0)
 set(ACE_EXPECTED_VERSION 6.0.3)
 
 find_package(PCHSupport)
 find_package(ACE REQUIRED)
-find_package(OpenSSL REQUIRED)
-find_package(Threads REQUIRED)
 find_package(MySQL REQUIRED)
 
-if( UNIX )
-  find_package(Readline)
-  find_package(ZLIB)
-  find_package(BZip2)
-
-  if ( WITH_PERFTOOLS )
-    find_package(Gperftools)
-  endif()
-
+if(UNIX AND WITH_PERFTOOLS)
+  find_package(Gperftools)
 endif()
 
 if(NOT WITHOUT_GIT)
@@ -112,7 +113,6 @@ include(src/cmake/genrev.cmake)
 
 # print out the results before continuing
 include(src/cmake/showoptions.cmake)
-
 
 #
 # Loading framework
@@ -127,7 +127,6 @@ endif()
 if( TOOLS )
   add_subdirectory(src/tools)
 endif()
-
 
 #
 # Loading application sources

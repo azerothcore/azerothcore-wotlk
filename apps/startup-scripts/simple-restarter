@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+#PARAMETER 1: directory
+#PARAMETER 2: binary file
+
+_bin_path=$1
+_bin_file=$2
+
+_instant_crash_cnt=0
+_total_crashes=0
+
+trap 'echo "va bene"' SIGHUP
+
+while true
+do
+    if [ ! -f "$_bin_path/$_bin_file" ]; then
+        echo "$_bin_path/$_bin_file doesn't exists!"
+        exit 0
+    fi
+
+    STARTING_TIME=$(date +%s)
+
+    cd "$_bin_path" && "./$_bin_file" # &>/dev/null;
+    _exit_code=$?
+
+    echo "exit code: $_exit_code"
+    # stop restarter on SIGKILL (disabled for now)
+    # 128 + 9 (SIGKILL)
+    #if [ $_exit_code -eq 137 ]; then
+    #	echo "$_bin_file has been killed"
+    #    exit 0
+    #fi
+
+    echo "$_bin_file crashed (?), restarting..."
+
+    ENDING_TIME=$(date +%s)
+    DIFFERENCE=$(( $ENDING_TIME - $STARTING_TIME ))
+
+    ((_total_crashes++))
+    echo "$_bin_file Crashed after $DIFFERENCE seconds, total crashes: $_total_crashes"
+
+    if [ $DIFFERENCE -lt 10 ]; then
+        # increment instant crash if runtime is lower than 10 seconds 
+        ((_instant_crash_cnt++))
+    else
+        _instant_crash_cnt=0 # reset count
+    fi
+
+    if [ $_instant_crash_cnt -gt 5 ]; then
+        echo "$_bin_file Restarter exited. Infinite crash loop prevented. Please check your system"
+        exit 0
+    fi
+done

@@ -103,7 +103,8 @@ class boss_gruul : public CreatureScript
                     case EVENT_CAVE_IN:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                             me->CastSpell(target, SPELL_CAVE_IN, false);
-                        _caveInTimer -= 1500;
+                        if (_caveInTimer >= 4000)
+                            _caveInTimer -= 1500;
                         events.ScheduleEvent(EVENT_CAVE_IN, _caveInTimer);
                         break;
                     case EVENT_REVERBERATION:

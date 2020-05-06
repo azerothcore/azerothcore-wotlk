@@ -97,7 +97,7 @@ class ReactorRunnable : protected ACE_Task_Base
 
         int AddSocket (WorldSocket* sock)
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
+            ACORE_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
 
             ++m_Connections;
             sock->AddReference();
@@ -118,7 +118,7 @@ class ReactorRunnable : protected ACE_Task_Base
 
         void AddNewSockets()
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
+            ACORE_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
 
             if (m_NewSockets.empty())
                 return;
@@ -169,7 +169,7 @@ class ReactorRunnable : protected ACE_Task_Base
                         t = i;
                         ++i;
 
-                        (*t)->CloseSocket();
+                        (*t)->CloseSocket("svc()");
 
                         sScriptMgr->OnSocketClose((*t), false);
 
@@ -219,8 +219,14 @@ WorldSocketMgr::~WorldSocketMgr()
     delete m_Acceptor;
 }
 
+WorldSocketMgr* WorldSocketMgr::instance()
+{
+    static WorldSocketMgr instance;
+    return &instance;
+}
+
 int
-WorldSocketMgr::StartReactiveIO (ACE_UINT16 port, const char* address)
+WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 {
     m_UseNoDelay = sConfigMgr->GetBoolDefault ("Network.TcpNodelay", true);
 
@@ -266,7 +272,7 @@ WorldSocketMgr::StartReactiveIO (ACE_UINT16 port, const char* address)
 }
 
 int
-WorldSocketMgr::StartNetwork (ACE_UINT16 port, const char* address)
+WorldSocketMgr::StartNetwork (uint16 port, const char* address)
 {
     if (!sLog->IsOutDebug())
         ACE_Log_Msg::instance()->priority_mask (LM_ERROR, ACE_Log_Msg::PROCESS);

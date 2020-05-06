@@ -178,7 +178,7 @@ class npc_cork_gizelton : public CreatureScript
                 {
                     if (Creature* summon = ObjectAccessor::GetCreature(*me, summons[i]))
                         summon->DespawnOrUnsummon();
-                    
+
                     summons[i] = 0;
                 }
             }
@@ -198,7 +198,7 @@ class npc_cork_gizelton : public CreatureScript
                     summons[1] = cr->GetGUID();
                 if ((cr = me->SummonCreature(NPC_CARAVAN_KODO, *me)))
                     summons[2] = cr->GetGUID();
-                
+
                 SummonsFollow();
             }
 
@@ -442,12 +442,12 @@ public:
     {
         npc_aged_dying_ancient_kodoAI(Creature* creature) : ScriptedAI(creature) {}
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             me->UpdateEntry(RAND(NPC_AGED_KODO, NPC_DYING_KODO, NPC_ANCIENT_KODO), NULL, false);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who->GetEntry() == NPC_SMEED && me->IsWithinDistInMap(who, 10.0f) && !me->HasAura(SPELL_KODO_KOMBO_GOSSIP))
             {
@@ -460,7 +460,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_KODO_KOMBO_ITEM)
             {
@@ -483,7 +483,7 @@ public:
         }
     };
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) && creature->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
         {
@@ -491,11 +491,11 @@ public:
             player->RemoveAurasDueToSpell(SPELL_KODO_KOMBO_PLAYER_BUFF);
         }
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_aged_dying_ancient_kodoAI(creature);
     }
@@ -592,7 +592,7 @@ class go_demon_portal : public GameObjectScript
     public:
         go_demon_portal() : GameObjectScript("go_demon_portal") { }
 
-        bool OnGossipHello(Player* player, GameObject* go)
+        bool OnGossipHello(Player* player, GameObject* go) override
         {
             if (player->GetQuestStatus(QUEST_PORTAL_OF_THE_LEGION) == QUEST_STATUS_INCOMPLETE && !go->FindNearestCreature(NPC_DEMON_GUARDIAN, 5.0f, true))
             {

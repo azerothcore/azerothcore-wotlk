@@ -1,0 +1,35 @@
+-- DB update 2019_01_20_01 -> 2019_01_20_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_01_20_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_01_20_01 2019_01_20_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1547901412383310168'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1547901412383310168');
+
+ALTER TABLE `creature_template`
+  CHANGE `baseattacktime` `BaseAttackTime` INT(10) UNSIGNED DEFAULT 0  NOT NULL,
+  CHANGE `rangeattacktime` `RangeAttackTime` INT(10) UNSIGNED DEFAULT 0  NOT NULL,
+  CHANGE `Health_mod` `HealthModifier` FLOAT DEFAULT 1  NOT NULL,
+  CHANGE `Mana_mod` `ManaModifier` FLOAT DEFAULT 1  NOT NULL,
+  CHANGE `Armor_mod` `ArmorModifier` FLOAT DEFAULT 1  NOT NULL,
+  CHANGE `dmg_multiplier` `DamageModifier` FLOAT DEFAULT 1  NOT NULL,
+  CHANGE `VerifiedBuild` `VerifiedBuild` SMALLINT(5) DEFAULT '0';
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

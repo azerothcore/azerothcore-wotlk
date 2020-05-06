@@ -8,13 +8,13 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
-enum misc
+enum Misc
 {
     // ACTIONS
     ACTION_GUARDIAN_DIED            = 1,
 };
 
-enum spells
+enum Spells
 {
     // NADOX
     SPELL_BROOD_PLAGUE              = 56130,
@@ -30,13 +30,13 @@ enum spells
     SPELL_SWARMER_AURA              = 56158,
 };
 
-enum creatures
+enum Creatures
 {
     NPC_AHNKAHAR_SWARMER            = 30178,
     NPC_AHNKAHAR_GUARDIAN_ENTRY     = 30176,
 };
 
-enum events
+enum Events
 {
     EVENT_CHECK_HEALTH              = 1,
     EVENT_CHECK_HOME                = 2,
@@ -46,18 +46,14 @@ enum events
     EVENT_SUMMON_GUARD              = 6,
 };
 
-enum sounds
+enum Yells
 {
-    SOUND_AGGRO                     = 14033,
-    SOUND_SUMMON1                   = 14034,
-    SOUND_SUMMON2                   = 14035,
-    SOUND_SLAY1                     = 14036,
-    SOUND_SLAY2                     = 14037,
-    SOUND_SLAY3                     = 14038,
-    SOUND_DEATH                     = 14039,
+    SAY_AGGRO       = 0,
+    SAY_SLAY        = 1,
+    SAY_DEATH       = 2,
+    SAY_EGG_SAC     = 3,
+    EMOTE_HATCHES   = 4
 };
-
-#define EMOTE_HATCHES        "An Ahn'kahar Guardian hatches!"
 
 class boss_elder_nadox : public CreatureScript
 {
@@ -106,8 +102,7 @@ public:
 
         void EnterCombat(Unit * /*who*/)
         {
-            me->MonsterYell("The secrets of the deep shall remain hidden.", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(SOUND_AGGRO);
+            Talk(SAY_AGGRO);
 
             events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
             events.ScheduleEvent(EVENT_SWARMER, 10000);
@@ -128,26 +123,10 @@ public:
             }
         }
 
-        void KilledUnit(Unit * /*victim*/)
+        void KilledUnit(Unit* victim)
         {
-            if (urand(0,1))
-                return;
-
-            switch (rand()%3)
-            {
-                case 0: 
-                    me->MonsterYell("Sleep now, in the cold dark.", LANG_UNIVERSAL,0);
-                    me->PlayDirectSound(SOUND_SLAY1);
-                    break;
-                case 1: 
-                    me->MonsterYell("For the Lich King!", LANG_UNIVERSAL,0);
-                    me->PlayDirectSound(SOUND_SLAY2);
-                    break;
-                case 2: 
-                    me->MonsterYell("Perhaps we will be allies soon.", LANG_UNIVERSAL,0);
-                    me->PlayDirectSound(SOUND_SLAY3);
-                    break;
-            }
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                Talk(SAY_SLAY);
         }
 
         void JustDied(Unit* /*killer*/)
@@ -155,8 +134,8 @@ public:
             events.Reset();
             summons.DespawnAll();
             
-            me->MonsterYell("Master, is my service complete?", LANG_UNIVERSAL, 0);
-             me->PlayDirectSound(SOUND_DEATH);
+            Talk(SAY_DEATH);
+
             if (pInstance)
                 pInstance->SetData(DATA_ELDER_NADOX_EVENT, DONE);
         }
@@ -166,23 +145,12 @@ public:
             if (cr)
             {
                 if (cr->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY )
-                {
-                    switch (rand()%2)
-                    {
-                        case 0: 
-                            me->MonsterYell("The young must not grow hungry...", LANG_UNIVERSAL, 0);
-                            me->PlayDirectSound(SOUND_SUMMON1);
-                            break;
-                        case 1: 
-                            me->MonsterYell("Shhhad ak kereeesshh chak-k-k!", LANG_UNIVERSAL, 0);
-                            me->PlayDirectSound(SOUND_SUMMON2);
-                            break;
-                    }
-                }
+                    Talk(SAY_EGG_SAC);
                 
                 summons.Summon(cr);
             }
         }
+
         void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
@@ -207,7 +175,7 @@ public:
                 }
                 case EVENT_SUMMON_GUARD:
                 {
-                    me->MonsterTextEmote(EMOTE_HATCHES, me, true);
+                    Talk(EMOTE_HATCHES, me);
                     SummonHelpers(false);
                     events.PopEvent();
                     break;

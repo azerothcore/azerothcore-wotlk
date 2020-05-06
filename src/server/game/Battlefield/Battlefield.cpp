@@ -20,6 +20,7 @@
 #include "CreatureTextMgr.h"
 #include "GroupMgr.h"
 #include "Transport.h"
+#include "GameGraveyard.h"
 
 Battlefield::Battlefield()
 {
@@ -395,6 +396,13 @@ void Battlefield::AskToLeaveQueue(Player* player)
     m_PlayersInQueue[player->GetTeamId()].erase(player->GetGUID());
 }
 
+// Called in WorldSession::HandleHearthAndResurrect
+void Battlefield::PlayerAskToLeave(Player* player)
+{
+    // Player leaving Wintergrasp, trigger Hearthstone spell.
+    player->CastSpell(player, 8690, true);
+}
+
 // Called in WorldSession::HandleBfEntryInviteResponse
 void Battlefield::PlayerAcceptInviteToWar(Player* player)
 {
@@ -583,7 +591,7 @@ BfGraveyard* Battlefield::GetGraveyardById(uint32 id) const
     return NULL;
 }
 
-WorldSafeLocsEntry const * Battlefield::GetClosestGraveyard(Player* player)
+GraveyardStruct const * Battlefield::GetClosestGraveyard(Player* player)
 {
     BfGraveyard* closestGY = NULL;
     float maxdist = -1;
@@ -604,7 +612,7 @@ WorldSafeLocsEntry const * Battlefield::GetClosestGraveyard(Player* player)
     }
 
     if (closestGY)
-        return sWorldSafeLocsStore.LookupEntry(closestGY->GetGraveyardId());
+        return sGraveyard->GetGraveyard(closestGY->GetGraveyardId());
 
     return NULL;
 }
@@ -682,7 +690,7 @@ void BfGraveyard::SetSpirit(Creature* spirit, TeamId team)
 
 float BfGraveyard::GetDistance(Player* player)
 {
-    const WorldSafeLocsEntry* safeLoc = sWorldSafeLocsStore.LookupEntry(m_GraveyardId);
+    const GraveyardStruct* safeLoc = sGraveyard->GetGraveyard(m_GraveyardId);
     return player->GetDistance2d(safeLoc->x, safeLoc->y);
 }
 
@@ -744,7 +752,7 @@ void BfGraveyard::GiveControlTo(TeamId team)
 
 void BfGraveyard::RelocateDeadPlayers()
 {
-    WorldSafeLocsEntry const* closestGrave = NULL;
+    GraveyardStruct const* closestGrave = NULL;
     for (GuidSet::const_iterator itr = m_ResurrectQueue.begin(); itr != m_ResurrectQueue.end(); ++itr)
     {
         Player* player = ObjectAccessor::FindPlayer(*itr);
@@ -970,8 +978,8 @@ bool BfCapturePoint::Update(uint32 diff)
     }
 
     std::list<Player*> players;
-    Trinity::AnyPlayerInObjectRangeCheck checker(capturePoint, radius);
-    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(capturePoint, players, checker);
+    acore::AnyPlayerInObjectRangeCheck checker(capturePoint, radius);
+    acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(capturePoint, players, checker);
     capturePoint->VisitNearbyWorldObject(radius, searcher);
 
     for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)

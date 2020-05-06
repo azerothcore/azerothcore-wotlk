@@ -3,8 +3,9 @@
 */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellAuraEffects.h"
 #include "blood_furnace.h"
 
 enum eEnums
@@ -89,7 +90,7 @@ class boss_broggok : public CreatureScript
                         me->CastSpell(me, SPELL_POISON_CLOUD, false);
                         events.RepeatEvent(20000);
                         break;
-                    
+
                 }
 
                 DoMeleeAttackIfReady();
@@ -137,7 +138,7 @@ class go_broggok_lever : public GameObjectScript
     public:
         go_broggok_lever() : GameObjectScript("go_broggok_lever") {}
 
-        bool OnGossipHello(Player* /*player*/, GameObject* go)
+        bool OnGossipHello(Player* /*player*/, GameObject* go) override
         {
             if (InstanceScript* instance = go->GetInstanceScript())
                 if (instance->GetData(DATA_BROGGOK) != DONE && instance->GetData(DATA_BROGGOK) != IN_PROGRESS)

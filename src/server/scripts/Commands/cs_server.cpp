@@ -17,8 +17,9 @@ EndScriptData */
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "SystemConfig.h"
+#include "GitRevision.h"
 #include "AvgDiffTracker.h"
+#include "ServerMotd.h"
 
 class server_commandscript : public CommandScript
 {
@@ -99,7 +100,7 @@ public:
         uint32 updateTime = sWorld->GetUpdateTime();
         uint32 avgUpdateTime = avgDiffTracker.getAverage();
 
-        handler->PSendSysMessage("%s", _FULLVERSION);
+        handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
         if (!queuedSessionCount)
             handler->PSendSysMessage("Connected players: %u. Characters in world: %u.", activeSessionCount, playerCount);
         else
@@ -122,7 +123,7 @@ public:
     // Display the 'Message of the day' for the realm
     static bool HandleServerMotdCommand(ChatHandler* handler, char const* /*args*/)
     {
-        handler->PSendSysMessage(LANG_MOTD_CURRENT, sWorld->GetMotd());
+        handler->PSendSysMessage(LANG_MOTD_CURRENT, Motd::GetMotd());
         return true;
     }
 
@@ -286,7 +287,7 @@ public:
     // Define the 'Message of the day' for the realm
     static bool HandleServerSetMotdCommand(ChatHandler* handler, char const* args)
     {
-        sWorld->SetMotd(args);
+        Motd::SetMotd(args);
         handler->PSendSysMessage(LANG_MOTD_NEW, args);
         return true;
     }

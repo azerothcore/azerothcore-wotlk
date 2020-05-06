@@ -1,0 +1,19 @@
+{
+  "name": "jsonpath.sh",
+  "version": "0.0.14",
+  "description": "JSONPath implementation written in Bash",
+  "homepage": "http://github.com/mclarkson/JSONPath.sh",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mclarkson/JSONPath.sh.git"
+  },
+  "bin": {
+    "JSONPath.sh": "./JSONPath.sh"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "author": "Mark Clarkson <mark.clarkson@smorg.co.uk>",
+  "scripts": {
+    "test": "./all-tests.sh"
+  }
+}

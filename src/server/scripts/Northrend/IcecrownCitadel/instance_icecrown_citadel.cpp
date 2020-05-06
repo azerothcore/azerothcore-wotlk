@@ -157,6 +157,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                 LoadDoorData(doorData);
                 TeamIdInInstance = TEAM_NEUTRAL;
                 HeroicAttempts = MaxHeroicAttempts;
+                LadyDeathwhisperGUID = 0;
                 LadyDeathwisperElevatorGUID = 0;
                 GunshipGUID = 0;
                 EnemyGunshipGUID = 0;
@@ -343,6 +344,9 @@ class instance_icecrown_citadel : public InstanceMapScript
                             instance->SummonCreature(NPC_UTHER_THE_LIGHTBRINGER_QUEST, UtherSpawnPos);
                             instance->SummonCreature(NPC_LADY_SYLVANAS_WINDRUNNER_QUEST, SylvanasSpawnPos);
                         }
+                        break;
+                    case NPC_LADY_DEATHWHISPER:
+                        LadyDeathwhisperGUID = creature->GetGUID();
                         break;
                     case NPC_DEATHBRINGER_SAURFANG:
                         DeathbringerSaurfangGUID = creature->GetGUID();
@@ -925,6 +929,8 @@ class instance_icecrown_citadel : public InstanceMapScript
             {
                 switch (type)
                 {
+                    case DATA_LADY_DEATHWHISPER:
+                        return LadyDeathwhisperGUID;
                     case DATA_ICECROWN_GUNSHIP_BATTLE:
                         return GunshipGUID;
                     case DATA_ENEMY_GUNSHIP:
@@ -1020,6 +1026,13 @@ class instance_icecrown_citadel : public InstanceMapScript
                 if (Creature* theLichKing = instance->GetCreature(TheLichKingGUID))
                     if (theLichKing->IsAlive())
                         theLichKing->SetVisible(false);
+            }
+            
+            void RemoveBackPack()
+            {
+                for (auto const& itr : instance->GetPlayers())
+                    if (Player* _player = itr.GetSource())
+                        _player->DestroyItemCount(ITEM_GOBLIN_ROCKET_PACK, _player->GetItemCount(ITEM_GOBLIN_ROCKET_PACK), true);
             }
 
             bool SetBossState(uint32 type, EncounterState state)
@@ -1532,7 +1545,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                         if (stalkers.empty())
                             return;
 
-                        stalkers.sort(Trinity::ObjectDistanceOrderPred(teleporter));
+                        stalkers.sort(acore::ObjectDistanceOrderPred(teleporter));
                         stalkers.front()->CastSpell((Unit*)NULL, SPELL_ARTHAS_TELEPORTER_CEREMONY, false);
                         stalkers.pop_front();
                         for (std::list<Creature*>::iterator itr = stalkers.begin(); itr != stalkers.end(); ++itr)
@@ -1736,6 +1749,8 @@ class instance_icecrown_citadel : public InstanceMapScript
                             {
                                 transport->setActive(false);
                                 transport->EnableMovement(false);
+                                //After movement is stopped remove the backpack
+                                RemoveBackPack();
                             }
                         if (Creature* captain = source->FindNearestCreature(TeamIdInInstance == TEAM_HORDE ? NPC_IGB_HIGH_OVERLORD_SAURFANG : NPC_IGB_MURADIN_BRONZEBEARD, 200.0f))
                             captain->AI()->DoAction(ACTION_EXIT_SHIP);
@@ -1761,7 +1776,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                             GetCreatureListWithEntryInGrid(triggers, terenas, NPC_WORLD_TRIGGER_INFINITE_AOI, 100.0f);
                             if (!triggers.empty())
                             {
-                                triggers.sort(Trinity::ObjectDistanceOrderPred(terenas, false));
+                                triggers.sort(acore::ObjectDistanceOrderPred(terenas, false));
                                 Unit* visual = triggers.front();
                                 visual->CastSpell(visual, SPELL_FROSTMOURNE_TELEPORT_VISUAL, true);
                             }
@@ -1825,6 +1840,7 @@ class instance_icecrown_citadel : public InstanceMapScript
             uint64 ScourgeTransporterFirstGUID;
 
             EventMap Events;
+            uint64 LadyDeathwhisperGUID;
             uint64 LadyDeathwisperElevatorGUID;
             uint64 GunshipGUID;
             uint64 EnemyGunshipGUID;

@@ -17,6 +17,7 @@
 #include "Util.h"
 #include "Warden.h"
 #include "AccountMgr.h"
+#include "BanManager.h"
 
 Warden::Warden() : _session(NULL), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
                    _dataSent(false), _previousTimestamp(0), _module(NULL), _initialized(false)
@@ -98,7 +99,7 @@ void Warden::Update()
             if (maxClientResponseDelay > 0)
             {
                 if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
-                    _session->KickPlayer();
+                    _session->KickPlayer("clientResponseTimer > maxClientResponseDelay");
                 else
                     _clientResponseTimer += diff;
             }
@@ -218,7 +219,7 @@ std::string Warden::Penalty(WardenCheck* check /*= NULL*/, uint16 checkFailed /*
         return "None";
         break;
     case WARDEN_ACTION_KICK:
-        _session->KickPlayer();
+        _session->KickPlayer("WARDEN_ACTION_KICK");
         return "Kick";
         break;
     case WARDEN_ACTION_BAN:
@@ -227,7 +228,7 @@ std::string Warden::Penalty(WardenCheck* check /*= NULL*/, uint16 checkFailed /*
             duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
             std::string accountName;
             AccountMgr::GetName(_session->GetAccountId(), accountName);
-            sWorld->BanAccount(BAN_ACCOUNT, accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), banReason, "Server");
+            sBan->BanAccount(accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), banReason, "Server");
 
             return "Ban";
         }

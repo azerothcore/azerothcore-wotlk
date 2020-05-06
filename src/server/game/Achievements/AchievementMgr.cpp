@@ -5,6 +5,7 @@
  */
 
 #include "AchievementMgr.h"
+#include "AccountMgr.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "BattlegroundAB.h"
@@ -31,7 +32,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 
-namespace Trinity
+namespace acore
 {
     class AchievementChatBuilder
     {
@@ -41,7 +42,7 @@ namespace Trinity
 
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
             {
-                std::string text = sObjectMgr->GetTrinityString(i_textId, loc_idx);
+                std::string text = sObjectMgr->GetAcoreString(i_textId, loc_idx);
                 ChatHandler::BuildChatPacket(data, i_msgtype, LANG_UNIVERSAL, &i_player, &i_player, text, i_achievementId);
             }
 
@@ -51,7 +52,7 @@ namespace Trinity
             int32 i_textId;
             uint32 i_achievementId;
     };
-}                                                           // namespace Trinity
+}                                                           // namespace acore
 
 bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 {
@@ -493,6 +494,12 @@ void AchievementMgr::Reset()
 
 void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete)
 {
+    // disable for gamemasters with GM-mode enabled
+    if (m_player->IsGameMaster())
+        return;
+
+    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::ResetAchievementCriteria(%u, %u, %u)", condition, value, evenIfCriteriaComplete);
+
     AchievementCriteriaEntryList const* achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByCondition(condition, value);
     if (!achievementCriteriaList)
         return;
@@ -655,14 +662,14 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     if (achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
         return;
 
-    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(TRINITY_DEBUG) 
+    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(ACORE_DEBUG) 
         sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
     #endif
 
     if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
     {
-        Trinity::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
-        Trinity::LocalizedPacketDo<Trinity::AchievementChatBuilder> say_do(say_builder);
+        acore::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
+        acore::LocalizedPacketDo<acore::AchievementChatBuilder> say_do(say_builder);
         guild->BroadcastWorker(say_do, GetPlayer());
     }
 
@@ -679,15 +686,15 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     // if player is in world he can tell his friends about new achievement
     else if (GetPlayer()->IsInWorld())
     {
-        CellCoord p = Trinity::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
+        CellCoord p = acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
         Cell cell(p);
         cell.SetNoCreate();
 
-        Trinity::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
-        Trinity::LocalizedPacketDo<Trinity::AchievementChatBuilder> say_do(say_builder);
-        Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::AchievementChatBuilder> > say_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
-        TypeContainerVisitor<Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::AchievementChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+        acore::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
+        acore::LocalizedPacketDo<acore::AchievementChatBuilder> say_do(say_builder);
+        acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::AchievementChatBuilder> > say_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
+        TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::AchievementChatBuilder> >, WorldTypeMapContainer > message(say_worker);
         cell.Visit(p, message, *GetPlayer()->GetMap(), *GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
     }
 
@@ -745,13 +752,20 @@ static const uint32 achievIdForDungeon[][4] =
  */
 void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= NULL*/)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::UpdateAchievementCriteria(%u, %u, %u)", type, miscValue1, miscValue2);
-#endif
 
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
         return;
+
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    if (type >= ACHIEVEMENT_CRITERIA_TYPE_TOTAL)
+    {
+        sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "UpdateAchievementCriteria: Wrong criteria type %u", type);
+        return;
+    }
+    
+    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::UpdateAchievementCriteria(%u, %u, %u)", type, miscValue1, miscValue2);
+#endif
 
     AchievementCriteriaEntryList const* achievementCriteriaList = NULL;
 
@@ -2132,16 +2146,20 @@ void AchievementMgr::RemoveTimedAchievement(AchievementCriteriaTimedTypes type, 
 
 void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDetail("AchievementMgr::CompletedAchievement(%u)", achievement->ID);
-#endif
-
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
+    {
+        sLog->outString("Not available in GM mode.");
+        ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");        
         return;
+    }
 
     if (achievement->flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
         return;
+
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDetail("AchievementMgr::CompletedAchievement(%u)", achievement->ID);
+#endif
 
     SendAchievementEarned(achievement);
     CompletedAchievementData& ca = m_completedAchievements[achievement->ID];
@@ -2173,7 +2191,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
                     }
     }
 
-    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
+    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL) && AccountMgr::IsPlayerAccount(m_player->GetSession()->GetSecurity()))
         sAchievementMgr->SetRealmCompleted(achievement);
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT, achievement->ID);
@@ -2201,8 +2219,23 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         MailDraft draft(reward->mailTemplate);
 
         if (!reward->mailTemplate)
-            draft = MailDraft(reward->subject, reward->text);
-
+        {
+            std::string subject = reward->subject;
+            std::string text = reward->text;
+            
+            LocaleConstant localeConstant = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
+            if (localeConstant != LOCALE_enUS)
+            {
+                if(AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
+                {
+                    ObjectMgr::GetLocaleString(loc->Subject, localeConstant, subject);
+                    ObjectMgr::GetLocaleString(loc->Text, localeConstant, text);
+                }
+            }
+          
+            draft = MailDraft(subject, text);
+        }
+		
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
         Item* item = reward->itemId ? Item::CreateItem(reward->itemId, 1, GetPlayer()) : NULL;
@@ -2313,6 +2346,12 @@ bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria,
         return false;
 
     return true;
+}
+
+AchievementGlobalMgr* AchievementGlobalMgr::instance()
+{
+    static AchievementGlobalMgr instance;
+    return &instance;
 }
 
 bool AchievementGlobalMgr::IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const
@@ -2740,7 +2779,7 @@ void AchievementGlobalMgr::LoadRewards()
     m_achievementRewards.clear();                           // need for reload case
 
     //                                               0      1        2        3     4       5        6     7
-    QueryResult result = WorldDatabase.Query("SELECT entry, title_A, title_H, item, sender, subject, text, mailTemplate FROM achievement_reward");
+    QueryResult result = WorldDatabase.Query("SELECT ID, TitleA, TitleH, ItemID, Sender, Subject, Body, MailTemplateID FROM achievement_reward");
 
     if (!result)
     {
@@ -2861,13 +2900,12 @@ void AchievementGlobalMgr::LoadRewardLocales()
 
     m_achievementRewardLocales.clear();                       // need for reload case
 
-    QueryResult result = WorldDatabase.Query("SELECT entry, subject_loc1, text_loc1, subject_loc2, text_loc2, subject_loc3, text_loc3, subject_loc4, text_loc4, "
-                                             "subject_loc5, text_loc5, subject_loc6, text_loc6, subject_loc7, text_loc7, subject_loc8, text_loc8"
-                                             " FROM locales_achievement_reward");
+    //                                               0   1       2        3
+    QueryResult result = WorldDatabase.Query("SELECT ID, Locale, Subject, Text FROM achievement_reward_locale");
 
     if (!result)
     {
-        sLog->outString(">> Loaded 0 achievement reward locale strings.  DB table `locales_achievement_reward` is empty");
+        sLog->outString(">> Loaded 0 achievement reward locale strings.  DB table `achievement_reward_locale` is empty");
         sLog->outString();
         return;
     }
@@ -2876,24 +2914,27 @@ void AchievementGlobalMgr::LoadRewardLocales()
     {
         Field* fields = result->Fetch();
 
-        uint32 entry = fields[0].GetUInt32();
+        uint32 ID               = fields[0].GetUInt32();
+        std::string LocaleName  = fields[1].GetString();
+        std::string Subject     = fields[2].GetString();
+        std::string Text        = fields[3].GetString();
 
-        if (m_achievementRewards.find(entry) == m_achievementRewards.end())
+        if (m_achievementRewards.find(ID) == m_achievementRewards.end())
         {
-            sLog->outErrorDb("Table `locales_achievement_reward` (Entry: %u) has locale strings for non-existing achievement reward.", entry);
+            sLog->outErrorDb("Table `achievement_reward_locale` (Entry: %u) has locale strings for non-existing achievement reward.", ID);
             continue;
         }
 
-        AchievementRewardLocale& data = m_achievementRewardLocales[entry];
+        AchievementRewardLocale& data = m_achievementRewardLocales[ID];
+        LocaleConstant locale = GetLocaleByName(LocaleName);
+        if (locale == LOCALE_enUS)
+            continue;
 
-        for (int i = 1; i < TOTAL_LOCALES; ++i)
-        {
-            LocaleConstant locale = (LocaleConstant) i;
-            ObjectMgr::AddLocaleString(fields[1 + 2 * (i - 1)].GetString(), locale, data.subject);
-            ObjectMgr::AddLocaleString(fields[1 + 2 * (i - 1) + 1].GetString(), locale, data.text);
-        }
+        ObjectMgr::AddLocaleString(Subject, locale, data.Subject);
+        ObjectMgr::AddLocaleString(Text, locale, data.Text);
+
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu achievement reward locale strings in %u ms", (unsigned long)m_achievementRewardLocales.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %lu Achievement Reward Locale strings in %u ms", (unsigned long)m_achievementRewardLocales.size(), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }

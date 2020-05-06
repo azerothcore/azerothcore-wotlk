@@ -193,7 +193,7 @@ bool MoveSplineInitArgs::Validate(Unit* unit) const
         return false;\
     }
     CHECK(path.size() > 1);
-    CHECK(velocity > 0.1f);
+    CHECK(velocity > 0.01f);
     CHECK(time_perc >= 0.f && time_perc <= 1.f);
     //CHECK(_checkPathBounds());
     return true;
@@ -237,6 +237,9 @@ MoveSpline::UpdateResult MoveSpline::_updateState(int32& ms_time_diff)
     UpdateResult result = Result_None;
 
     int32 minimal_diff = std::min(ms_time_diff, segment_time_elapsed());
+    if (minimal_diff < 0)
+        minimal_diff = 0;
+
     ASSERT(minimal_diff >= 0);
     time_passed += minimal_diff;
     ms_time_diff -= minimal_diff;

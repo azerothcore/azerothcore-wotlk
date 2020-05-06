@@ -2,7 +2,6 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptPCH.h"
 #include "halls_of_reflection.h"
 #include "MotionMaster.h"
 
@@ -77,7 +76,7 @@ class npc_hor_leader : public CreatureScript
 public:
     npc_hor_leader() : CreatureScript("npc_hor_leader") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
             return true;
@@ -95,24 +94,24 @@ public:
         {
             QuestStatus status = player->GetQuestStatus(creature->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_DELIVRANCE_FROM_THE_PIT_H2 : QUEST_DELIVRANCE_FROM_THE_PIT_A2);
             if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
-                player->ADD_GOSSIP_ITEM(0, "Can you remove the sword?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, 0, "Can you remove the sword?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
             // once last quest is completed, she offers this shortcut of the starting event
             status = player->GetQuestStatus(creature->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_WRATH_OF_THE_LICH_KING_H2 : QUEST_WRATH_OF_THE_LICH_KING_A2);
             if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
             {
                 if (creature->GetEntry() == NPC_SYLVANAS_PART1)
-                    player->ADD_GOSSIP_ITEM(0, "Dark Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                    AddGossipItemFor(player, 0, "Dark Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
                 else
-                    player->ADD_GOSSIP_ITEM(0, "My Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                    AddGossipItemFor(player, 0, "My Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
             }
         }
 
-        player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+        SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
         if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
             return true;
@@ -127,17 +126,17 @@ public:
 
         instance->SetData(DATA_BATTERED_HILT, 1);
 
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         switch (uiAction)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 if (creature->AI())
                     creature->AI()->DoAction(ACTION_START_INTRO);
                 creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 if (creature->AI())
                     creature->AI()->DoAction(ACTION_SKIP_INTRO);
                 creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
@@ -147,7 +146,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_leaderAI(creature);
     }
@@ -167,7 +166,7 @@ public:
         bool first;
         bool shortver;
 
-        void Reset()
+        void Reset() override
         {
             shortver = false;
             events.Reset();
@@ -181,7 +180,7 @@ public:
             }
         }
 
-        void DoAction(int32 actionId)
+        void DoAction(int32 actionId) override
         {
             switch(actionId)
             {
@@ -194,7 +193,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch(events.ExecuteEvent())
@@ -1453,7 +1452,7 @@ public:
                 me->SetHealth(me->GetMaxHealth()*3/4);
 
             events.Update(diff);
-            
+
             if (me->IsNonMeleeSpellCast(false, true, true))
                 return;
 
@@ -1598,12 +1597,12 @@ class npc_hor_leader_second : public CreatureScript
 public:
     npc_hor_leader_second() : CreatureScript("npc_hor_leader_second") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32  /*uiAction*/)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32  /*uiAction*/) override
     {
         if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
             return true;
 
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
 
         if (InstanceScript* pInstance = creature->GetInstanceScript())
             if (!pInstance->GetData(DATA_LICH_KING))
@@ -1616,7 +1615,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_leader_secondAI(creature);
     }
@@ -1634,13 +1633,13 @@ public:
         EventMap events;
         uint8 currentStopPoint;
 
-        void Reset()
+        void Reset() override
         {
             currentStopPoint = 0;
             events.Reset();
         }
 
-        void DoAction(int32 actionId)
+        void DoAction(int32 actionId) override
         {
             switch(actionId)
             {
@@ -1658,7 +1657,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32& dmg, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& dmg, DamageEffectType, SpellSchoolMask) override
         {
             if (dmg >= me->GetHealth())
                 dmg = me->GetHealth()-1;
@@ -1675,13 +1674,13 @@ public:
             me->GetMotionMaster()->MoveSplinePath(&path);
         }
 
-        void MovementInform(uint32 type, uint32  /*id*/)
+        void MovementInform(uint32 type, uint32 /*id*/) override
         {
             if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
                 events.ScheduleEvent(EVENT_SAY_LEADER_STOP_TEXT, 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch(events.ExecuteEvent())
@@ -2016,7 +2015,7 @@ class at_hor_battered_hilt_throw : public AreaTriggerScript
                 if (InstanceScript* instance = player->GetInstanceScript())
                 {
                     uint32 bhd = instance->GetData(DATA_BATTERED_HILT);
-                    if (bhd == BHSF_NONE || bhd != BHSF_STARTED)
+                    if (bhd != BHSF_STARTED)
                         return true;
                     player->CastSpell(player, 70698, true);
                     player->DestroyItemCount(49766, 1, true);

@@ -259,13 +259,13 @@ inline GameObject* Map::_FindGameObject(WorldObject* searchObject, uint32 guid) 
 { 
     GameObject* gameobject = NULL;
 
-    CellCoord p(Trinity::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
+    CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
     Cell cell(p);
 
-    Trinity::GameObjectWithDbGUIDCheck goCheck(guid);
-    Trinity::GameObjectSearcher<Trinity::GameObjectWithDbGUIDCheck> checker(searchObject, gameobject, goCheck);
+    acore::GameObjectWithDbGUIDCheck goCheck(guid);
+    acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck> checker(searchObject, gameobject, goCheck);
 
-    TypeContainerVisitor<Trinity::GameObjectSearcher<Trinity::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > objectChecker(checker);
+    TypeContainerVisitor<acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > objectChecker(checker);
     cell.Visit(p, objectChecker, *searchObject->GetMap(), *searchObject, searchObject->GetGridActivationRange());
 
     return gameobject;
@@ -371,7 +371,8 @@ void Map::ScriptsProcess()
                     if (Player* player = _GetScriptPlayerSourceOrTarget(source, target, step.script))
                     {
                         LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-                        std::string text(sObjectMgr->GetTrinityString(step.script->Talk.TextID, loc_idx));
+                        BroadcastText const* broadcastText = sObjectMgr->GetBroadcastText(step.script->Talk.TextID);
+                        std::string text = broadcastText->GetText(loc_idx, player->getGender());
 
                         switch (step.script->Talk.ChatType)
                         {
@@ -822,13 +823,13 @@ void Map::ScriptsProcess()
                 WorldObject* wSource = dynamic_cast <WorldObject*> (source);
                 if (wSource) //using grid searcher
                 {
-                    CellCoord p(Trinity::ComputeCellCoord(wSource->GetPositionX(), wSource->GetPositionY()));
+                    CellCoord p(acore::ComputeCellCoord(wSource->GetPositionX(), wSource->GetPositionY()));
                     Cell cell(p);
 
-                    Trinity::CreatureWithDbGUIDCheck target_check(step.script->CallScript.CreatureEntry);
-                    Trinity::CreatureSearcher<Trinity::CreatureWithDbGUIDCheck> checker(wSource, cTarget, target_check);
+                    acore::CreatureWithDbGUIDCheck target_check(step.script->CallScript.CreatureEntry);
+                    acore::CreatureSearcher<acore::CreatureWithDbGUIDCheck> checker(wSource, cTarget, target_check);
 
-                    TypeContainerVisitor<Trinity::CreatureSearcher <Trinity::CreatureWithDbGUIDCheck>, GridTypeMapContainer > unit_checker(checker);
+                    TypeContainerVisitor<acore::CreatureSearcher <acore::CreatureWithDbGUIDCheck>, GridTypeMapContainer > unit_checker(checker);
                     cell.Visit(p, unit_checker, *wSource->GetMap(), *wSource, wSource->GetGridActivationRange());
                 }
                 else //check hashmap holders
@@ -913,6 +914,28 @@ void Map::ScriptsProcess()
                 // Source must be Player.
                 if (Player* player = _GetScriptPlayer(source, true, step.script))
                     player->SendMovieStart(step.script->PlayMovie.MovieID);
+                break;
+
+            case SCRIPT_COMMAND_MOVEMENT:
+                // Source must be Creature.
+                if (Creature* cSource = _GetScriptCreature(source, true, step.script))
+                {
+                    if (!cSource->IsAlive())
+                        return;
+
+                    cSource->GetMotionMaster()->MovementExpired();
+                    cSource->GetMotionMaster()->MoveIdle();
+
+                    switch (step.script->Movement.MovementType)
+                    {
+                        case RANDOM_MOTION_TYPE:
+                            cSource->GetMotionMaster()->MoveRandom((float)step.script->Movement.MovementDistance);
+                            break;
+                        case WAYPOINT_MOTION_TYPE:
+                            cSource->GetMotionMaster()->MovePath(step.script->Movement.Path, false);
+                            break;
+                    }
+                }
                 break;
 
             default:

@@ -38,6 +38,7 @@ enum Gossip_Option
     GOSSIP_OPTION_UNLEARNPETTALENTS = 17,                   //UNIT_NPC_FLAG_TRAINER             (16) (bonus option for GOSSIP_OPTION_TRAINER)
     GOSSIP_OPTION_LEARNDUALSPEC     = 18,                   //UNIT_NPC_FLAG_TRAINER             (16) (bonus option for GOSSIP_OPTION_TRAINER)
     GOSSIP_OPTION_OUTDOORPVP        = 19,                   //added by code (option for outdoor pvp creatures)
+    GOSSIP_OPTION_DUALSPEC_INFO     = 20,                   //UNIT_NPC_FLAG_TRAINER             (16) (bonus option for GOSSIP_OPTION_TRAINER)
     GOSSIP_OPTION_MAX
 };
 
@@ -162,19 +163,16 @@ class GossipMenu
 
         uint32 GetMenuItemCount() const
         {
-            //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
             return _menuItems.size();
         }
 
         bool Empty() const
         {
-            //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
             return _menuItems.empty();
         }
 
         GossipMenuItem const* GetItem(uint32 id) const
         {
-            //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
             GossipMenuItemContainer::const_iterator itr = _menuItems.find(id);
             if (itr != _menuItems.end())
                 return &itr->second;
@@ -184,7 +182,6 @@ class GossipMenu
 
         GossipMenuItemData const* GetItemData(uint32 indexId) const
         {
-            //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
             GossipMenuItemDataContainer::const_iterator itr = _menuItemData.find(indexId);
             if (itr != _menuItemData.end())
                 return &itr->second;
@@ -202,9 +199,6 @@ class GossipMenu
         {
             return _menuItems;
         }
-
-        //ACE_RW_Thread_Mutex& GetLock() const { return *(const_cast<ACE_RW_Thread_Mutex*>(&_menuLock)); }
-        //ACE_RW_Thread_Mutex _menuLock; // pussywizard
 
     private:
         GossipMenuItemContainer _menuItems;
@@ -224,13 +218,11 @@ class QuestMenu
 
         uint8 GetMenuItemCount() const
         {
-            //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
             return _questMenuItems.size();
         }
 
         bool Empty() const
         {
-            //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
             return _questMenuItems.empty();
         }
 
@@ -238,12 +230,8 @@ class QuestMenu
 
         QuestMenuItem const& GetItem(uint16 index) const
         {
-            //TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
             return _questMenuItems[index];
         }
-
-        //ACE_RW_Thread_Mutex& GetLock() const { return *(const_cast<ACE_RW_Thread_Mutex*>(&_menuLock)); }
-        //ACE_RW_Thread_Mutex _menuLock; // pussywizard
 
     private:
         QuestMenuItemList _questMenuItems;

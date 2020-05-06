@@ -15,13 +15,17 @@
 #include "loadlib/loadlib.h"
 
 // MOPY flags
-#define WMO_MATERIAL_NOCAMCOLLIDE    0x01
-#define WMO_MATERIAL_DETAIL          0x02
-#define WMO_MATERIAL_NO_COLLISION    0x04
-#define WMO_MATERIAL_HINT            0x08
-#define WMO_MATERIAL_RENDER          0x10
-#define WMO_MATERIAL_COLLIDE_HIT     0x20
-#define WMO_MATERIAL_WALL_SURFACE    0x40
+enum MopyFlags
+{
+    WHO_MATERIAL_UNK01            = 0x01,
+    WMO_MATERIAL_NOCAMCOLLIDE     = 0x02,
+    WMO_MATERIAL_DETAIL           = 0x04,
+    WMO_MATERIAL_COLLISION        = 0x08,
+    WMO_MATERIAL_HINT             = 0x10,
+    WMO_MATERIAL_RENDER           = 0x20,
+    WMO_MATERIAL_WALL_SURFACE     = 0x40, // Guessed
+    WMO_MATERIAL_COLLIDE_HIT      = 0x80,
+};
 
 class WMOInstance;
 class WMOManager;
