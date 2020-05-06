@@ -14,6 +14,7 @@
 #include "UnitEvents.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "SpellInfo.h"
 
 //==============================================================
 //================= ThreatCalcHelper ===========================
@@ -279,7 +280,7 @@ void ThreatContainer::modifyThreatPercent(Unit* victim, int32 percent)
 void ThreatContainer::update()
 {
     if (iDirty && iThreatList.size() > 1)
-        iThreatList.sort(Trinity::ThreatOrderPred());
+        iThreatList.sort(acore::ThreatOrderPred());
 
     iDirty = false;
 }

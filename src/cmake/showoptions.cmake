@@ -14,7 +14,7 @@ if( UNIX )
 endif()
 
 message("* Install configs to              : ${CONF_DIR}")
-add_definitions(-D_CONF_DIR="\\"${CONF_DIR}\\"")
+add_definitions(-D_CONF_DIR=$<1:"${CONF_DIR}">)
 
 message("")
 
@@ -60,7 +60,7 @@ endif()
 
 if( WITH_COREDEBUG )
   message("* Use coreside debug              : Yes")
-  add_definitions(-DTRINITY_DEBUG)
+  add_definitions(-DACORE_DEBUG)
 else()
   message("* Use coreside debug              : No  (default)")
 endif()

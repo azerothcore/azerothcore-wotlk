@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_SKILL_EXTRA_ITEMS_H
-#define TRINITY_SKILL_EXTRA_ITEMS_H
+#ifndef ACORE_SKILL_EXTRA_ITEMS_H
+#define ACORE_SKILL_EXTRA_ITEMS_H
 
 #include "Common.h"
 

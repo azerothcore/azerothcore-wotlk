@@ -227,7 +227,7 @@ class IceTombSummonEvent : public BasicEvent
         uint64 _sindragosaGUID;
 };
 
-struct LastPhaseIceTombTargetSelector : public std::unary_function<Unit*, bool>
+struct LastPhaseIceTombTargetSelector : public acore::unary_function<Unit*, bool>
 {
     public:
         LastPhaseIceTombTargetSelector(Creature* source) : _source(source) { }
@@ -240,6 +240,9 @@ struct LastPhaseIceTombTargetSelector : public std::unary_function<Unit*, bool>
                 return false;
 
             if (target->GetTypeId() != TYPEID_PLAYER)
+                return false;
+
+            if (target->HasAura(SPELL_FROST_IMBUED_BLADE))
                 return false;
 
             if (target->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL) || target->HasAura(SPELL_ICE_TOMB_UNTARGETABLE) || target->HasAura(SPELL_ICE_TOMB_DAMAGE) || target->HasAura(SPELL_TANK_MARKER_AURA) || target->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
@@ -911,10 +914,10 @@ class spell_sindragosa_unchained_magic : public SpellScriptLoader
                 uint32 maxSize = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 3 : 1);
                 healList.remove_if(UnchainedMagicTargetSelector(false));
                 if (healList.size() > maxSize)
-                    Trinity::Containers::RandomResizeList(healList, maxSize);
+                    acore::Containers::RandomResizeList(healList, maxSize);
                 dpsList.remove_if(UnchainedMagicTargetSelector(true));
                 if (dpsList.size() > maxSize)
-                    Trinity::Containers::RandomResizeList(dpsList, maxSize);
+                    acore::Containers::RandomResizeList(dpsList, maxSize);
                 unitList.splice(unitList.begin(), healList);
                 unitList.splice(unitList.begin(), dpsList);
             }
@@ -1154,12 +1157,12 @@ class SindragosaIceTombCheck
     public:
         bool operator()(Unit* unit) const
         {
-            return unit->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL);
+            return unit->HasAura(SPELL_FROST_IMBUED_BLADE) || unit->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL);
         }
 
         bool operator()(WorldObject* object) const
         {
-            return object->ToUnit() && object->ToUnit()->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL);
+            return object->ToUnit() && (object->ToUnit()->HasAura(SPELL_FROST_IMBUED_BLADE) || object->ToUnit()->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL));
         }
 };
 
@@ -1211,7 +1214,7 @@ class spell_sindragosa_ice_tomb : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& unitList)
             {
-                unitList.remove_if(Trinity::UnitAuraCheck(true, GetSpellInfo()->Id));
+                unitList.remove_if(acore::UnitAuraCheck(true, GetSpellInfo()->Id));
                 targetList.clear();
                 targetList = unitList;
             }
@@ -1930,11 +1933,11 @@ class spell_frostwarden_handler_order_whelp : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+                targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
                 if (targets.empty())
                     return;
 
-                WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -1951,7 +1954,7 @@ class spell_frostwarden_handler_order_whelp : public SpellScriptLoader
                 if (unitList.empty())
                     return;
 
-                Trinity::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+                acore::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
             }
 
             void Register()

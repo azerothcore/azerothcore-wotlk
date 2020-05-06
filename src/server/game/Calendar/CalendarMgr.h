@@ -4,10 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_CALENDARMGR_H
-#define TRINITY_CALENDARMGR_H
+#ifndef ACORE_CALENDARMGR_H
+#define ACORE_CALENDARMGR_H
 
-#include <ace/Singleton.h>
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "WorldPacket.h"
@@ -111,9 +110,14 @@ enum CalendarError
     CALENDAR_ERROR_NO_MODERATOR                 = 40
 };
 
-#define CALENDAR_MAX_EVENTS         30
-#define CALENDAR_MAX_GUILD_EVENTS   100
-#define CALENDAR_MAX_INVITES        100
+enum CalendarLimits
+{
+    CALENDAR_MAX_EVENTS               = 30,
+    CALENDAR_MAX_GUILD_EVENTS         = 100,
+    CALENDAR_MAX_INVITES              = 100,
+    CALENDAR_CREATE_EVENT_COOLDOWN    = 5,
+    CALENDAR_OLD_EVENTS_DELETION_TIME = 1 * MONTH,
+};
 
 struct CalendarInvite
 {
@@ -236,6 +240,9 @@ struct CalendarEvent
         bool IsGuildEvent() const { return _flags & CALENDAR_FLAG_GUILD_EVENT; }
         bool IsGuildAnnouncement() const { return _flags & CALENDAR_FLAG_WITHOUT_INVITES; }
 
+        static bool IsGuildEvent(uint32 flags) { return (flags & CALENDAR_FLAG_GUILD_EVENT) != 0; }
+        static bool IsGuildAnnouncement(uint32 flags) { return (flags & CALENDAR_FLAG_WITHOUT_INVITES) != 0; }
+
         std::string BuildCalendarMailSubject(uint64 remover) const;
         std::string BuildCalendarMailBody() const;
 
@@ -257,8 +264,6 @@ typedef std::unordered_map<uint64 /* eventId */, CalendarInviteStore > CalendarE
 
 class CalendarMgr
 {
-    friend class ACE_Singleton<CalendarMgr, ACE_Null_Mutex>;
-
     private:
         CalendarMgr();
         ~CalendarMgr();
@@ -272,11 +277,15 @@ class CalendarMgr
         uint64 _maxInviteId;
 
     public:
+        static CalendarMgr* instance();
+        
         void LoadFromDB();
 
-        CalendarEvent* GetEvent(uint64 eventId, CalendarEventStore::iterator* it = NULL);
+        CalendarEvent* GetEvent(uint64 eventId);
         CalendarEventStore const& GetEvents() const { return _events; }
+        CalendarEventStore GetEventsCreatedBy(uint64 guid, bool includeGuildEvents = false);
         CalendarEventStore GetPlayerEvents(uint64 guid);
+        CalendarEventStore GetGuildEvents(uint32 guildId);
 
         CalendarInvite* GetInvite(uint64 inviteId) const;
         CalendarEventInviteStore const& GetInvites() const { return _invites; }
@@ -288,10 +297,13 @@ class CalendarMgr
         void FreeInviteId(uint64 id);
         uint64 GetFreeInviteId();
 
+        void DeleteOldEvents();
+
         uint32 GetPlayerNumPending(uint64 guid);
 
         void AddEvent(CalendarEvent* calendarEvent, CalendarSendEventType sendType);
-        CalendarEventStore::iterator RemoveEvent(uint64 eventId, uint64 remover);
+        void RemoveEvent(uint64 eventId, uint64 remover);
+        void RemoveEvent(CalendarEvent* calendarEvent, uint64 remover);
         void UpdateEvent(CalendarEvent* calendarEvent);
 
         void AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite);
@@ -318,6 +330,6 @@ class CalendarMgr
         void SendPacketToAllEventRelatives(WorldPacket packet, CalendarEvent const& calendarEvent);
 };
 
-#define sCalendarMgr ACE_Singleton<CalendarMgr, ACE_Null_Mutex>::instance()
+#define sCalendarMgr CalendarMgr::instance()
 
 #endif

@@ -316,7 +316,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket & recvData)
                         // Send next quest
                         if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
                         {
-                            if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(quest, false))
+                            if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(nextQuest, false))
                             {
                                 if (nextQuest->IsAutoAccept())
                                     _player->AddQuestAndCheckCompletion(nextQuest, object);
@@ -512,7 +512,7 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
         }
 
         if (Battleground* bg = _player->GetBattleground())
-            if (bg->GetBgTypeID() == BATTLEGROUND_AV)
+            if (bg->GetBgTypeID(true) == BATTLEGROUND_AV)
                 bg->ToBattlegroundAV()->HandleQuestComplete(questId, _player);
 
         if (_player->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE)

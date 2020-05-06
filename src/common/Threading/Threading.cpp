@@ -10,7 +10,7 @@
 #include <chrono>
 #include <system_error>
 
-using namespace ACORE;
+using namespace acore;
 
 Thread::Thread() : m_task(nullptr), m_iThreadId(), m_ThreadImp()
 {

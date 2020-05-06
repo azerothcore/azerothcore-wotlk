@@ -168,7 +168,6 @@ enum Spells
 
 enum MiscData
 {
-    ITEM_GOBLIN_ROCKET_PACK = 49278,
     MUSIC_ENCOUNTER         = 17289
 };
 
@@ -646,13 +645,6 @@ class npc_gunship : public CreatureScript
                                         c->DespawnOrUnsummon(1);
                                 }
                             }
-                            
-                    // Destory Goblin Rocket Pack
-                    Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-                    if (!PlayerList.isEmpty())
-                        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-                            if (Player* pPlr = itr->GetSource())
-                                pPlr->DestroyItemCount(49278, 1, true);
                 }
                 else
                 {
@@ -2211,7 +2203,7 @@ class spell_igb_explosion : public SpellScriptLoader
             void SelectTarget(std::list<WorldObject*>& targets)
             {
                 targets.remove_if(IgbExplosionCheck(GetCaster()));
-                Trinity::Containers::RandomResizeList(targets, 1);
+                acore::Containers::RandomResizeList(targets, 1);
             }
 
             void Register()
@@ -2480,7 +2472,7 @@ class spell_igb_burning_pitch_selector : public SpellScriptLoader
                 targets.remove_if(BurningPitchFilterCheck(teamId == TEAM_HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A));
                 if (!targets.empty())
                 {
-                    WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+                    WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
                     targets.clear();
                     targets.push_back(target);
                 }
@@ -2565,7 +2557,7 @@ class spell_igb_rocket_artillery : public SpellScriptLoader
 
                 if (!targets.empty())
                 {
-                    WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+                    WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
                     targets.clear();
                     targets.push_back(target);
                 }

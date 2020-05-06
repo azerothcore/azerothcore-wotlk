@@ -38,6 +38,7 @@ enum Misc
 {
     NPC_CRYSTAL_CHANNEL_TARGET              = 26712,
     NPC_CRYSTAL_HANDLER                     = 26627,
+    NPC_SUMMON_CRYSTAL_HANDLER_TARGET       = 27583,
 
     EVENT_SUMMON_FETID_TROLL                = 1,
     EVENT_SUMMON_SHADOWCASTER               = 2,
@@ -46,7 +47,18 @@ enum Misc
     EVENT_CAST_OFFENSIVE_SPELL              = 5,
     EVENT_KILL_TALK                         = 6,
     EVENT_CHECK_PHASE                       = 7,
-    EVENT_SPELL_SUMMON_MINIONS              = 8
+    EVENT_SPELL_SUMMON_MINIONS              = 8,
+    
+    ROOM_RIGHT  = 0,
+    ROOM_LEFT   = 1,
+    ROOM_STAIRS = 2
+};
+
+std::unordered_map<uint32, std::tuple <uint32, Position>> const npcSummon =
+{
+    { ROOM_RIGHT,   { NPC_SUMMON_CRYSTAL_HANDLER_TARGET,    { -341.31f, -724.40f, 28.57f, 0.0f } } },
+    { ROOM_LEFT,    { NPC_SUMMON_CRYSTAL_HANDLER_TARGET,    { -408.87f, -730.21f, 28.58f, 0.0f } } },
+    { ROOM_STAIRS,  { NPC_CRYSTAL_CHANNEL_TARGET,           { -378.40f, -813.13f, 59.74f, 0.0f } } },
 };
 
 class boss_novos : public CreatureScript
@@ -65,7 +77,7 @@ class boss_novos : public CreatureScript
                 BossAI::Reset();
                 instance->SetBossState(DATA_NOVOS_CRYSTALS, IN_PROGRESS);
                 instance->SetBossState(DATA_NOVOS_CRYSTALS, NOT_STARTED);
-                _crystalCounter = 0;
+                _crystalCounter = _summonTargetRightGUID = _summonTargetLeftGUID = _stage = 0;
 
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -103,7 +115,23 @@ class boss_novos : public CreatureScript
                 me->CastSpell(me, SPELL_ARCANE_BLAST, true);
                 me->CastSpell(me, SPELL_ARCANE_FIELD, true);
                 me->CastSpell(me, SPELL_DESPAWN_CRYSTAL_HANDLER, true);
-                me->SummonCreature(NPC_CRYSTAL_CHANNEL_TARGET, -378.40f, -813.13f, 59.74f, 0.0f);
+                
+                for (auto itr : npcSummon)
+                {
+                    uint32 summonEntry;
+                    Position summonPos;
+                    std::tie(summonEntry, summonPos) = itr.second;
+                    if (Creature *creature = me->SummonCreature(summonEntry, summonPos))
+                        switch (itr.first)
+                        {
+                            case ROOM_LEFT:
+                                _summonTargetLeftGUID = creature->GetGUID();
+                                break;
+                            case ROOM_RIGHT:
+                                _summonTargetRightGUID = creature->GetGUID();
+                                break;
+                        }
+                }
 
                 me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
                 me->RemoveAllAuras();
@@ -164,8 +192,9 @@ class boss_novos : public CreatureScript
                         {
                             Talk(SAY_SUMMONING_ADDS);
                             Talk(EMOTE_SUMMONING_ADDS);
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f))
+                            if (Creature* target = ObjectAccessor::GetCreature(*me, _stage ? _summonTargetLeftGUID : _summonTargetRightGUID))
                                 target->CastSpell(target, SPELL_SUMMON_CRYSTAL_HANDLER, true, NULL, NULL, me->GetGUID());
+                            _stage = _stage ? 0 : 1;
                             events.ScheduleEvent(EVENT_SUMMON_CRYSTAL_HANDLER, 20000);
                         }
                         break;
@@ -210,6 +239,10 @@ class boss_novos : public CreatureScript
 
         private:
             uint8 _crystalCounter;
+            uint8 _stage;
+            uint64 _summonTargetRightGUID;
+            uint64 _summonTargetLeftGUID;
+            
             bool _achievement;
         };
 

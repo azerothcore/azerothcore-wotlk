@@ -73,7 +73,11 @@ public:
             _loathebPortalGUID = 0;
             _maexxnaPortalGUID = 0;
             _thaddiusPortalGUID = 0;
-
+            _deathknightEyePortalGUID = 0;
+            _plagueEyePortalGUID = 0;
+            _spiderEyePortalGUID = 0;
+            _abomEyePortalGUID = 0;
+			
             // NPCs
             PatchwerkRoomTrash.clear();
             _patchwerkGUID = 0;
@@ -95,6 +99,7 @@ public:
             _screamTimer = 2 * MINUTE * IN_MILLISECONDS;
             _hadThaddiusGreet = false;
             _currentWingTaunt = SAY_FIRST_WING_TAUNT;
+            _horsemanLoadDoneState = false;
 
             // Achievements
             abominationsKilled = 0;
@@ -132,7 +137,11 @@ public:
         uint64 _loathebPortalGUID;
         uint64 _maexxnaPortalGUID;
         uint64 _thaddiusPortalGUID;
-
+        uint64 _deathknightEyePortalGUID;
+        uint64 _plagueEyePortalGUID;
+        uint64 _spiderEyePortalGUID;
+        uint64 _abomEyePortalGUID;
+		
         // NPCs
         std::list<uint64> PatchwerkRoomTrash;
         uint64 _patchwerkGUID;
@@ -155,6 +164,7 @@ public:
         bool _hadThaddiusGreet;
         EventMap events;
         uint8 _currentWingTaunt;
+        bool _horsemanLoadDoneState;
 
         // Achievements
         uint8 abominationsKilled;
@@ -338,7 +348,7 @@ public:
                     _kelthuzadgateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_SAPPHIRON) == DONE && _speakTimer==0)
                         pGo->SetGoState(GO_STATE_ACTIVE);
-               	   break;
+               	    break;
                 case GO_SAPPHIRON_GATE:
                     _sapphironGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_SAPPHIRON) == DONE)
@@ -347,22 +357,42 @@ public:
                 case GO_DEATHKNIGHT_WING: 
                     _loathebPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_LOATHEB) == DONE)
-                         pGo->SetPhaseMask(1, true);
+                        pGo->SetPhaseMask(1, true);
                     break;
                 case GO_THADDIUS_PORTAL: 
                     _thaddiusPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_THADDIUS) == DONE)
-                         pGo->SetPhaseMask(1, true);
+                        pGo->SetPhaseMask(1, true);
                     break;
                 case GO_MAEXXNA_PORTAL: 
                     _maexxnaPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_MAEXXNA) == DONE)
-                         pGo->SetPhaseMask(1, true);
+                        pGo->SetPhaseMask(1, true);
                     break;
                 case GO_HORSEMAN_PORTAL: 
                     _horsemanPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_HORSEMAN) == DONE)
-                         pGo->SetPhaseMask(1, true);
+                        pGo->SetPhaseMask(1, true);
+                    break;
+                case GO_DEATHKNIGHT_EYE_PORTAL:
+                    _deathknightEyePortalGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_HORSEMAN) == DONE)
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_PLAGUE_EYE_PORTAL:
+                    _plagueEyePortalGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_LOATHEB) == DONE)
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_SPIDER_EYE_PORTAL:
+                    _spiderEyePortalGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_MAEXXNA) == DONE)
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_ABOM_EYE_PORTAL:
+                    _abomEyePortalGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_THADDIUS) == DONE)
+                        pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
             }
         }
@@ -497,7 +527,7 @@ public:
             }
 
             // Horseman handling
-            if (bossId == BOSS_HORSEMAN)
+            if (bossId == BOSS_HORSEMAN && _horsemanLoadDoneState == false)
             {
                 if (state == DONE)
                 {
@@ -634,6 +664,8 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_loathebPortalGUID))
                             go->SetPhaseMask(1, true);
+                        if (GameObject* go = instance->GetGameObject(_plagueEyePortalGUID))
+                            go->SetGoState(GO_STATE_ACTIVE);
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_ANUB:
@@ -653,6 +685,8 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_maexxnaPortalGUID))
                             go->SetPhaseMask(1, true);
+                        if (GameObject* go = instance->GetGameObject(_spiderEyePortalGUID))
+                            go->SetGoState(GO_STATE_ACTIVE);
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_GOTHIK:
@@ -670,11 +704,15 @@ public:
                     case BOSS_THADDIUS:
                         if (GameObject* go = instance->GetGameObject(_thaddiusPortalGUID))
                             go->SetPhaseMask(1, true);
+                        if (GameObject* go = instance->GetGameObject(_abomEyePortalGUID))
+                            go->SetGoState(GO_STATE_ACTIVE);
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_HORSEMAN:
                         if (GameObject* go = instance->GetGameObject(_horsemanPortalGUID))
                             go->SetPhaseMask(1, true);
+                        if (GameObject* go = instance->GetGameObject(_deathknightEyePortalGUID))
+                            go->SetGoState(GO_STATE_ACTIVE);
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     default:
@@ -830,7 +868,8 @@ public:
                     loadStream >> tmpState;
                     if (tmpState == IN_PROGRESS)
                         tmpState = NOT_STARTED;
-                    
+                    if (i == BOSS_HORSEMAN && tmpState == DONE)
+                        _horsemanLoadDoneState = true;
                     SetBossState(i, EncounterState(tmpState));
                 }
                 loadStream >> immortalAchievement;
@@ -892,8 +931,8 @@ public:
             else if (me->GetEntry() == NPC_LIVING_POISON)
             {
                 Unit* target = nullptr;
-                Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 0.5f);
-                Trinity::UnitLastSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, target, u_check);
+                acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 0.5f);
+                acore::UnitLastSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, target, u_check);
                 me->VisitNearbyObject(1.5f, searcher);
                 if (target)
                     me->CastSpell(me, SPELL_FROGGER_EXPLODE, true);
