@@ -1129,8 +1129,16 @@ public:
         if (handler->HasLowerSecurity(target, 0))
             return false;
 
+        std::string kickReasonStr = handler->GetAcoreString(LANG_NO_REASON);
+        if (*args != '\0')
+        {
+            char const* kickReason = strtok(nullptr, "\r");
+            if (kickReason != nullptr)
+                kickReasonStr = kickReason;
+        }
+
         if (sWorld->getBoolConfig(CONFIG_SHOW_KICK_IN_WORLD))
-            sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE, playerName.c_str());
+            sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "Server"), playerName.c_str(), kickReasonStr.c_str());
         else
             handler->PSendSysMessage(LANG_COMMAND_KICKMESSAGE, playerName.c_str());
 
@@ -2202,7 +2210,7 @@ public:
             return false;
 
         char const* muteReason = strtok(nullptr, "\r");
-        std::string muteReasonStr = "No reason";
+        std::string muteReasonStr = handler->GetAcoreString(LANG_NO_REASON);
         if (muteReason != nullptr)
             muteReasonStr = muteReason;
 
@@ -2230,7 +2238,7 @@ public:
         if (handler->GetSession())
             muteBy = handler->GetSession()->GetPlayerName();
         else
-            muteBy = "Console";
+            muteBy = handler->GetAcoreString(LANG_CONSOLE);
 
         if (target)
         {
@@ -2238,6 +2246,11 @@ public:
             int64 muteTime = time(nullptr) + notSpeakTime * MINUTE;
             target->GetSession()->m_muteTime = muteTime;
             stmt->setInt64(0, muteTime);
+            std::string nameLink = handler->playerLink(targetName);
+
+            if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
+                sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+
             ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notSpeakTime, muteBy.c_str(), muteReasonStr.c_str());
         }
         else
@@ -2247,25 +2260,29 @@ public:
             stmt->setInt64(0, muteTime);
         }
 
-        stmt->setString(1, muteReasonStr.c_str());
-        stmt->setString(2, muteBy.c_str());
+        stmt->setString(1, muteReasonStr);
+        stmt->setString(2, muteBy);
         stmt->setUInt32(3, accountId);
         LoginDatabase.Execute(stmt);
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_MUTE);
         stmt->setUInt32(0, accountId);
         stmt->setUInt32(1, notSpeakTime);
-        stmt->setString(2, muteBy.c_str());
-        stmt->setString(3, muteReasonStr.c_str());
+        stmt->setString(2, muteBy);
+        stmt->setString(3, muteReasonStr);
         LoginDatabase.Execute(stmt);
-
         std::string nameLink = handler->playerLink(targetName);
 
-        // pussywizard: notify all online GMs
-        ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
-        HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();
-        for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
-            if (itr->second->GetSession()->GetSecurity())
-                ChatHandler(itr->second->GetSession()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "Console"), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+        if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD) && !target)
+            sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+        else
+        {
+            // pussywizard: notify all online GMs
+            ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+            HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();
+            for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
+                if (itr->second->GetSession()->GetSecurity())
+                    ChatHandler(itr->second->GetSession()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : handler->GetAcoreString(LANG_CONSOLE)), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+        }
 
         return true;
     }

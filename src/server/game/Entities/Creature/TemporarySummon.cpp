@@ -11,6 +11,7 @@
 #include "TemporarySummon.h"
 #include "Pet.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 
 TempSummon::TempSummon(SummonPropertiesEntry const* properties, uint64 owner, bool isWorldObject) :
 Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
@@ -85,7 +86,7 @@ void TempSummon::Update(uint32 diff)
         case TEMPSUMMON_CORPSE_DESPAWN:
         {
             // if m_deathState is DEAD, CORPSE was skipped
-            if (m_deathState == CORPSE || m_deathState == DEAD)
+            if (m_deathState == CORPSE)
             {
                 UnSummon();
                 return;
@@ -95,17 +96,12 @@ void TempSummon::Update(uint32 diff)
         }
         case TEMPSUMMON_DEAD_DESPAWN:
         {
-            if (m_deathState == DEAD)
-            {
-                UnSummon();
-                return;
-            }
             break;
         }
         case TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN:
         {
             // if m_deathState is DEAD, CORPSE was skipped
-            if (m_deathState == CORPSE || m_deathState == DEAD)
+            if (m_deathState == CORPSE)
             {
                 UnSummon();
                 return;
@@ -127,13 +123,6 @@ void TempSummon::Update(uint32 diff)
         }
         case TEMPSUMMON_TIMED_OR_DEAD_DESPAWN:
         {
-            // if m_deathState is DEAD, CORPSE was skipped
-            if (m_deathState == DEAD)
-            {
-                UnSummon();
-                return;
-            }
-
             if (!IsInCombat() && IsAlive())
             {
                 if (m_timer <= diff)
@@ -159,13 +148,17 @@ void TempSummon::InitStats(uint32 duration)
 { 
     ASSERT(!IsPet());
 
+    Unit* owner = GetSummoner();
+    if (owner)
+        if (Player* player = owner->ToPlayer())
+            sScriptMgr->OnBeforeTempSummonInitStats(player, this, duration);
+
     m_timer = duration;
     m_lifetime = duration;
 
     if (m_type == TEMPSUMMON_MANUAL_DESPAWN)
         m_type = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
 
-    Unit* owner = GetSummoner();
     if (owner)
     {
         if (IsTrigger() && m_spells[0])
