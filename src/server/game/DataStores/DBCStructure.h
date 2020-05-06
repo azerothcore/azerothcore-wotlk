@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_DBCSTRUCTURE_H
-#define TRINITY_DBCSTRUCTURE_H
+#ifndef ACORE_DBCSTRUCTURE_H
+#define ACORE_DBCSTRUCTURE_H
 
 #include "Common.h"
 #include "DBCEnums.h"
@@ -1131,14 +1131,13 @@ struct ItemLimitCategoryEntry
     uint32      mode;                                       // 19, 0 = have, 1 = equip (enum ItemLimitCategoryMode)
 };
 
-#define MAX_ITEM_ENCHANTMENT_EFFECTS 3
+#define MAX_ITEM_ENCHANTMENT_EFFECTS 5
 
 struct ItemRandomPropertiesEntry
 {
     uint32    ID;                                           // 0        m_ID
     //char*     internalName                                // 1        m_Name
-    uint32    enchant_id[MAX_ITEM_ENCHANTMENT_EFFECTS];     // 2-4      m_Enchantment
-                                                            // 5-6      unused
+    uint32    enchant_id[MAX_ITEM_ENCHANTMENT_EFFECTS];     // 2-6      m_Enchantment
     char*     nameSuffix[16];                               // 7-22     m_name_lang
                                                             // 23 name flags
 };
@@ -1149,10 +1148,8 @@ struct ItemRandomSuffixEntry
     char*     nameSuffix[16];                               // 1-16     m_name_lang
                                                             // 17, name flags
                                                             // 18       m_internalName
-    uint32    enchant_id[MAX_ITEM_ENCHANTMENT_EFFECTS];     // 19-21    m_enchantment
-    //uint32    unk1[2]                                     // 22-23    unknown
-    uint32    prefix[MAX_ITEM_ENCHANTMENT_EFFECTS];         // 24-26    m_allocationPct
-    //uint32    unk2[2]                                     // 27-28    unknown
+    uint32    enchant_id[MAX_ITEM_ENCHANTMENT_EFFECTS];     // 19-23    m_enchantment
+    uint32    prefix[MAX_ITEM_ENCHANTMENT_EFFECTS];         // 24-28    m_allocationPct
 };
 
 #define MAX_ITEM_SET_ITEMS 10
@@ -1746,23 +1743,25 @@ struct SpellDurationEntry
     int32     Duration[3];
 };
 
+#define MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS 3
+
 struct SpellItemEnchantmentEntry
 {
-    uint32      ID;                                         // 0        m_ID
-    uint32      charges;                                    // 1        m_charges
-    uint32      type[MAX_ITEM_ENCHANTMENT_EFFECTS];         // 2-4      m_effect[MAX_ITEM_ENCHANTMENT_EFFECTS]
-    uint32      amount[MAX_ITEM_ENCHANTMENT_EFFECTS];       // 5-7      m_effectPointsMin[MAX_ITEM_ENCHANTMENT_EFFECTS]
-    //uint32      amount2[MAX_ITEM_ENCHANTMENT_EFFECTS]     // 8-10     m_effectPointsMax[MAX_ITEM_ENCHANTMENT_EFFECTS]
-    uint32      spellid[MAX_ITEM_ENCHANTMENT_EFFECTS];      // 11-13    m_effectArg[MAX_ITEM_ENCHANTMENT_EFFECTS]
-    char*       description[16];                            // 14-29    m_name_lang[16]
-    //uint32      descriptionFlags;                         // 30 name flags
-    uint32      aura_id;                                    // 31       m_itemVisual
-    uint32      slot;                                       // 32       m_flags
-    uint32      GemID;                                      // 33       m_src_itemID
-    uint32      EnchantmentCondition;                       // 34       m_condition_id
-    uint32      requiredSkill;                              // 35       m_requiredSkillID
-    uint32      requiredSkillValue;                         // 36       m_requiredSkillRank
-    uint32      requiredLevel;                              // 37       m_requiredLevel
+    uint32      ID;                                             // 0        m_ID
+    uint32      charges;                                        // 1        m_charges
+    uint32      type[MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS];       // 2-4      m_effect[MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS]
+    uint32      amount[MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS];     // 5-7      m_effectPointsMin[MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS]
+    //uint32      amount2[MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS]   // 8-10     m_effectPointsMax[MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS]
+    uint32      spellid[MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS];    // 11-13    m_effectArg[MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS]
+    char*       description[16];                                // 14-29    m_name_lang[16]
+    //uint32      descriptionFlags;                             // 30 name flags
+    uint32      aura_id;                                        // 31       m_itemVisual
+    uint32      slot;                                           // 32       m_flags
+    uint32      GemID;                                          // 33       m_src_itemID
+    uint32      EnchantmentCondition;                           // 34       m_condition_id
+    uint32      requiredSkill;                                  // 35       m_requiredSkillID
+    uint32      requiredSkillValue;                             // 36       m_requiredSkillRank
+    uint32      requiredLevel;                                  // 37       m_requiredLevel
 };
 
 struct SpellItemEnchantmentConditionEntry

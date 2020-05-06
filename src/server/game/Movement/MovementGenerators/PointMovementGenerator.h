@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_POINTMOVEMENTGENERATOR_H
-#define TRINITY_POINTMOVEMENTGENERATOR_H
+#ifndef ACORE_POINTMOVEMENTGENERATOR_H
+#define ACORE_POINTMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
 #include "FollowerReference.h"

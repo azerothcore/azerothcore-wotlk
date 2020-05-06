@@ -9,7 +9,7 @@ Instances (containers) can be easily set up and then destroyed, so you can alway
 **NOTE**: you do **not** need to install any mysql-server manually in your system and if you already have it, the docker instances will **not** interfere with it.
 
 
-If you just want to install the whole AzerothCore quickly using Docker Compose, we recommend following [this guide instead](https://github.com/azerothcore/azerothcore-wotlk/wiki/install-with-Docker).
+If you just want to install the whole AzerothCore quickly using Docker Compose, we recommend following [this guide instead](http://www.azerothcore.org/wiki/install-with-Docker).
 
 
 # Setup & usage instructions

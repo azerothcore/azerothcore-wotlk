@@ -66,7 +66,7 @@ class Unit;
 class Battlefield;
 class BfGraveyard;
 
-typedef UNORDERED_SET<uint64> GuidSet;
+typedef std::unordered_set<uint64> GuidSet;
 typedef std::vector<BfGraveyard*> GraveyardVect;
 typedef std::map<uint64, time_t> PlayerTimerMap;
 
@@ -321,6 +321,7 @@ class Battlefield : public ZoneScript
         void PlayerAcceptInviteToWar(Player* player);
         uint32 GetBattleId() { return m_BattleId; }
         void AskToLeaveQueue(Player* player);
+        void PlayerAskToLeave(Player* player);
 
         //virtual void DoCompleteOrIncrementAchievement(uint32 /*achievement*/, Player* /*player*/, uint8 /*incrementNumber = 1*/) {};
 

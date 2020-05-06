@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#ifndef TRINITY_RANDOMMOTIONGENERATOR_H
-#define TRINITY_RANDOMMOTIONGENERATOR_H
+#ifndef ACORE_RANDOMMOTIONGENERATOR_H
+#define ACORE_RANDOMMOTIONGENERATOR_H
 
 #include "MovementGenerator.h"
 #include "PathGenerator.h"
@@ -18,7 +18,7 @@ template<class T>
 class RandomMovementGenerator : public MovementGeneratorMedium< T, RandomMovementGenerator<T> >
 {
     public:
-        RandomMovementGenerator(float spawnDist = 0.0f) : _nextMoveTime(0), _moveCount(0), _wanderDistance(spawnDist), _pathGenerator(NULL), _currentPoint(RANDOM_POINTS_NUMBER)
+        RandomMovementGenerator(float wanderDistance = 0.0f) : _nextMoveTime(0), _moveCount(0), _wanderDistance(wanderDistance), _pathGenerator(NULL), _currentPoint(RANDOM_POINTS_NUMBER)
         {
             _initialPosition.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
             _destinationPoints.reserve(RANDOM_POINTS_NUMBER);

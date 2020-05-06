@@ -46,6 +46,9 @@ enum Spells
     SPELL_METEOR_STRIKE_TARGETING       = 74638,
     SPELL_TAIL_LASH                     = 74531,
 
+    // Living Inferno
+    SPELL_BLAZING_AURA                  = 75885,
+
     // Combustion / Consumption
     SPELL_SCALE_AURA                    = 70507,
     SPELL_FIERY_COMBUSTION              = 74562,
@@ -1184,7 +1187,7 @@ class spell_halion_twilight_realm : public SpellScriptLoader
                 if (!target)
                     return;
 
-                target->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION, 0, 0, AURA_REMOVE_BY_ENEMY_SPELL);                
+                target->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION, 0, 0, AURA_REMOVE_BY_ENEMY_SPELL);
                 if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
                     return;
                 GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
@@ -1385,7 +1388,7 @@ class spell_halion_twilight_division : public SpellScriptLoader
                 halion->RemoveAurasDueToSpell(SPELL_TWILIGHT_PHASING);
                 if (GameObject* gobject = halion->FindNearestGameObject(GO_HALION_PORTAL_1, 100.0f))
                     gobject->Delete();
-                
+
                 instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TOGGLE, 1);
                 instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_MATERIAL, 50);
                 instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TWILIGHT, 50);
@@ -1430,12 +1433,45 @@ class spell_halion_twilight_mending : public SpellScriptLoader
         }
 };
 
+class npc_living_inferno : public CreatureScript
+{
+public:
+    npc_living_inferno() : CreatureScript("npc_living_inferno") { }
+
+     struct npc_living_infernoAI : public ScriptedAI
+    {
+        npc_living_infernoAI(Creature* creature) : ScriptedAI(creature) { }
+
+         void IsSummonedBy(Unit* /*summoner*/)
+        {
+            me->SetInCombatWithZone();
+            me->CastSpell(me, SPELL_BLAZING_AURA, true);
+
+             if (InstanceScript* instance = me->GetInstanceScript())
+                if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_HALION_CONTROLLER)))
+                    controller->AI()->JustSummoned(me);
+        }
+
+         void JustDied(Unit* /*killer*/)
+        {
+            me->DespawnOrUnsummon(1);
+        }
+    };
+
+     CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetInstanceAI<npc_living_infernoAI>(creature);
+    }
+};
+
+
 void AddSC_boss_halion()
 {
     new boss_halion();
     new boss_twilight_halion();
     new npc_halion_controller();
     new npc_orb_carrier();
+    new npc_living_inferno();
 
     new spell_halion_meteor_strike_targeting();
     new spell_halion_meteor_strike_marker();

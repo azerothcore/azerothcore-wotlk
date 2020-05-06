@@ -16,6 +16,12 @@ GuildMgr::~GuildMgr()
         delete itr->second;
 }
 
+GuildMgr* GuildMgr::instance()
+{
+    static GuildMgr instance;
+    return &instance;
+}
+
 void GuildMgr::AddGuild(Guild* guild)
 {
     GuildStore[guild->GetId()] = guild;

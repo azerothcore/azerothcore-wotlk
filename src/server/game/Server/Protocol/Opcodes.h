@@ -13,12 +13,6 @@
 
 #include "Common.h"
 
-// Note: this include need for be sure have full definition of class WorldSession
-//       if this class definition not complete then VS for x64 release use different size for
-//       struct OpcodeHandler in this header and Opcode.cpp and get totally wrong data from
-//       table opcodeTable in source when Opcode.h included but WorldSession.h not included
-#include "WorldSession.h"
-
 /// List of Opcodes
 enum Opcodes
 {
@@ -1353,7 +1347,14 @@ enum PacketProcessing
     PROCESS_THREADSAFE                                      //packet is thread-safe - process it in Map::Update()
 };
 
+class WorldSession;
 class WorldPacket;
+
+#if defined(__GNUC__)
+#pragma pack(1)
+#else
+#pragma pack(push, 1)
+#endif
 
 struct OpcodeHandler
 {
@@ -1361,10 +1362,15 @@ struct OpcodeHandler
     SessionStatus status;
     PacketProcessing packetProcessing;
     void (WorldSession::*handler)(WorldPacket& recvPacket);
-    bool isGrouppedMovementOpcode; // pussywizard
 };
 
 extern OpcodeHandler opcodeTable[NUM_MSG_TYPES];
+
+#if defined(__GNUC__)
+#pragma pack()
+#else
+#pragma pack(pop)
+#endif
 
 /// Lookup opcode name for human understandable logging
 inline const char* LookupOpcodeName(uint16 id)

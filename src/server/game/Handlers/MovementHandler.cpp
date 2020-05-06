@@ -50,7 +50,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // possible errors in the coordinate validity check
     if (!MapManager::IsValidMapCoord(loc))
     {
-        KickPlayer();
+        KickPlayer("!MapManager::IsValidMapCoord(loc)");
         return;
     }
 
@@ -115,11 +115,11 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     if (!_player->getHostileRefManager().isEmpty())
         _player->getHostileRefManager().deleteReferences(); // pussywizard: multithreading crashfix
 
-    CellCoord pair(Trinity::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
+    CellCoord pair(acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
     Cell cell(pair);
     if (!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid())
     {
-        KickPlayer();
+        KickPlayer("!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid()");
         return;
     }
     newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
@@ -163,11 +163,11 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     }
 
     // xinef: do this again, player can be teleported inside bg->AddPlayer(_player)!!!!
-    CellCoord pair2(Trinity::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
+    CellCoord pair2(acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
     Cell cell2(pair2);
     if (!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid())
     {
-        KickPlayer();
+        KickPlayer("!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid()");
         return;
     }
     newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
@@ -303,7 +303,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
     Unit* mover = _player->m_mover;
 
-    ASSERT(mover != NULL);                      // there must always be a mover
+    ASSERT(mover != nullptr);                      // there must always be a mover
 
     Player* plrMover = mover->ToPlayer();
 
@@ -319,21 +319,29 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
     recvData.readPackGUID(guid);
 
-    MovementInfo movementInfo;
-    movementInfo.guid = guid;
-    ReadMovementInfo(recvData, &movementInfo);
-
-    recvData.rfinish();                         // prevent warnings spam
+    // prevent tampered movement data
+    if (!guid || guid != mover->GetGUID()) {
+        recvData.rfinish();                     // prevent warnings spam
+        return;
+    }
 
     // pussywizard: typical check for incomming movement packets
-    if (!mover || !mover->IsInWorld() || mover->IsDuringRemoveFromWorld() || guid != mover->GetGUID())
-        return;
-
-    if (!movementInfo.pos.IsPositionValid())
+    if (!mover || !(mover->IsInWorld()) || mover->IsDuringRemoveFromWorld() || !(mover->movespline->Finalized()))
     {
         recvData.rfinish();                     // prevent warnings spam
         return;
     }
+
+    MovementInfo movementInfo;
+    movementInfo.guid = guid;
+    ReadMovementInfo(recvData, &movementInfo);
+
+    if (!movementInfo.pos.IsPositionValid()) {
+        recvData.rfinish();                     // prevent warnings spam
+        return;
+    }
+
+    recvData.rfinish();                         // prevent warnings spam
 
     if (movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT)
     {
@@ -350,7 +358,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
             return;
         }
 
-        if (!Trinity::IsValidMapCoord(movementInfo.pos.GetPositionX() + movementInfo.transport.pos.GetPositionX(), movementInfo.pos.GetPositionY() + movementInfo.transport.pos.GetPositionY(),
+        if (!acore::IsValidMapCoord(movementInfo.pos.GetPositionX() + movementInfo.transport.pos.GetPositionX(), movementInfo.pos.GetPositionY() + movementInfo.transport.pos.GetPositionY(),
             movementInfo.pos.GetPositionZ() + movementInfo.transport.pos.GetPositionZ(), movementInfo.pos.GetOrientation() + movementInfo.transport.pos.GetOrientation()))
         {
             recvData.rfinish();                   // prevent warnings spam
@@ -577,7 +585,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
         {
             sLog->outBasic("Player %s from account id %u kicked for incorrect speed (must be %f instead %f)",
                 _player->GetName().c_str(), GetAccountId(), _player->GetSpeed(move_type), newspeed);
-            KickPlayer();
+            KickPlayer("Incorrect speed");
         }
     }
 }
@@ -724,4 +732,38 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
     }
     _player->SetSummonAsSpectator(false);
     _player->SummonIfPossible(agree, summoner_guid);
+}
+
+void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
+{
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_MOVE_TIME_SKIPPED");
+#endif
+    
+    uint64 guid;
+    uint32 timeSkipped;
+    recvData.readPackGUID(guid);
+    recvData >> timeSkipped;
+
+    Unit* mover = GetPlayer()->m_mover;
+
+    if (!mover)
+    {
+        sLog->outError("WorldSession::HandleMoveTimeSkippedOpcode wrong mover state from the unit moved by the player [" UI64FMTD "]", GetPlayer()->GetGUID());
+        return;
+    }
+
+    // prevent tampered movement data
+    if (guid != mover->GetGUID())
+    {
+        sLog->outError("WorldSession::HandleMoveTimeSkippedOpcode wrong guid from the unit moved by the player [" UI64FMTD "]", GetPlayer()->GetGUID());
+        return;
+    }
+
+    mover->m_movementInfo.time += timeSkipped;
+
+    WorldPacket data(MSG_MOVE_TIME_SKIPPED, recvData.size());
+    data.appendPackGUID(guid);
+    data << timeSkipped;
+    GetPlayer()->SendMessageToSet(&data, false);
 }

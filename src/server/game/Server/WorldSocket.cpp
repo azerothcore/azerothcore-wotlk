@@ -119,8 +119,11 @@ bool WorldSocket::IsClosed(void) const
     return closing_;
 }
 
-void WorldSocket::CloseSocket(void)
+void WorldSocket::CloseSocket(std::string const& reason)
 {
+    if (!reason.empty())
+        sLog->outDebug(LOG_FILTER_CLOSE_SOCKET, "Socket closed because of: %s", reason.c_str());
+
     {
         ACE_GUARD (LockType, Guard, m_OutBufferLock);
 
@@ -659,7 +662,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     // manage memory ;)
     ACE_Auto_Ptr<WorldPacket> aptr (new_pct);
 
-    const ACE_UINT16 opcode = new_pct->GetOpcode();
+    const uint16 opcode = new_pct->GetOpcode();
 
     if (closing_)
         return -1;
@@ -673,7 +676,15 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
         switch (opcode)
         {
             case CMSG_PING:
-                return HandlePing (*new_pct);
+            {
+                try
+                {
+                    return HandlePing(*new_pct);
+                }
+                catch (ByteBufferPositionException const&) {}
+                sLog->outError("WorldSocket::ReadDataHandler(): client sent malformed CMSG_PING");
+                return -1;
+            }
             case CMSG_AUTH_SESSION:
                 if (m_Session)
                 {
@@ -708,7 +719,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
             }
         }
     }
-    catch (ByteBufferException &)
+    catch (ByteBufferException const&)
     {
         sLog->outError("WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%i. Disconnected client.", opcode, GetRemoteAddress().c_str(), m_Session?m_Session->GetAccountId():-1);
         if (sLog->IsOutDebug())

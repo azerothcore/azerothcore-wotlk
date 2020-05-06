@@ -271,7 +271,11 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
         }
         return;
     }
-
+    if (player->IsMounted())
+    {
+        player->Dismount();
+        player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+    }
     // Alliance Flag on ground
     if (GetFlagState(TEAM_ALLIANCE) == BG_WS_FLAG_STATE_ON_GROUND && player->IsWithinDistInMap(gameObject, 10.0f) && gameObject->GetEntry() == BG_OBJECT_A_FLAG_GROUND_WS_ENTRY)
     {
@@ -439,7 +443,7 @@ void BattlegroundWS::Init()
     _flagState[TEAM_HORDE]          = BG_WS_FLAG_STATE_ON_BASE;
     _lastFlagCaptureTeam            = TEAM_NEUTRAL;
 
-    if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID()))
+    if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
     {
         _reputationCapture = 45;
         _honorWinKills = 3;

@@ -88,7 +88,7 @@ class WorldSocket : public WorldHandler
         bool IsClosed (void) const;
 
         /// Close the socket.
-        void CloseSocket (void);
+        void CloseSocket(std::string const& reason);
 
         /// Get address of connected peer.
         const std::string& GetRemoteAddress (void) const;

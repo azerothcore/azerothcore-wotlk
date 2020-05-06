@@ -9,7 +9,6 @@
 
 #include "Common.h"
 #include <ace/Task.h>
-#include <ace/Singleton.h>
 
 class WorldPacket;
 
@@ -42,6 +41,7 @@ enum DebugLogFilters
     LOG_FILTER_WARDEN                   = 0x00800000,   // Warden related
     LOG_FILTER_BATTLEFIELD              = 0x01000000,   // Battlefield related
     LOG_FILTER_MODULES                  = 0x02000000,   // Modules debug
+    LOG_FILTER_CLOSE_SOCKET             = 0x04000000,   // Whenever KickPlayer() or CloseSocket() are called
 };
 
 enum LogTypes
@@ -95,13 +95,17 @@ const int Colors = int(WHITE)+1;
 
 class Log
 {
-    friend class ACE_Singleton<Log, ACE_Thread_Mutex>;
-
     private:
         Log();
         ~Log();
+        Log(Log const&) = delete;
+        Log(Log&&) = delete;
+        Log& operator=(Log const&) = delete;
+        Log& operator=(Log&&) = delete;
 
     public:
+        static Log* instance();
+        
         void Initialize();
 
         void ReloadConfig();
@@ -193,7 +197,7 @@ class Log
         DebugLogFilters m_DebugLogMask;
 };
 
-#define sLog ACE_Singleton<Log, ACE_Thread_Mutex>::instance()
+#define sLog Log::instance()
 
 #endif
 

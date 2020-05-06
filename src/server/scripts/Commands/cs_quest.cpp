@@ -64,6 +64,12 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
+		
+		if (player->IsActiveQuest(entry))
+        {
+            handler->PSendSysMessage("This quest is already active!");
+            return false;
+        }
 
         // check item starting quest (it can work incorrectly if added without item in inventory)
         ItemTemplateContainer const* itc = sObjectMgr->GetItemTemplateStore();

@@ -758,7 +758,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recvData)
     if (PlayerLoading() || GetPlayer() != NULL)
     {
         sLog->outError("Player tries to login again, AccountId = %d", GetAccountId());
-        KickPlayer();
+        KickPlayer("Player tries to login again");
         return;
     }
 
@@ -768,7 +768,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recvData)
     if (!IsLegitCharacterForAccount(GUID_LOPART(playerGuid)))
     {
         sLog->outError("Account (%u) can't login with that character (%u).", GetAccountId(), GUID_LOPART(playerGuid));
-        KickPlayer();
+        KickPlayer("Account can't login with this character");
         return;
     }
     
@@ -794,7 +794,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recvData)
         }
 
         if (p->GetGUID() != playerGuid)
-            sess->KickPlayer(); // no return, go to normal loading
+            sess->KickPlayer("No return, go to normal loading"); // no return, go to normal loading
         else
         {
             // pussywizard: players stay ingame no matter what (prevent abuse), but allow to turn it off to stop crashing
@@ -883,7 +883,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     if (!pCurrChar->LoadFromDB(GUID_LOPART(playerGuid), holder))
     {
         SetPlayer(NULL);
-        KickPlayer();                                       // disconnect client, player no set to session and it will not deleted or saved at kick
+        KickPlayer("HandlePlayerLoginFromDB");              // disconnect client, player no set to session and it will not deleted or saved at kick
         delete pCurrChar;                                   // delete it manually
         delete holder;                                      // delete all unprocessed queries
         m_playerLoading = false;
@@ -1070,12 +1070,6 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         SendNotification(LANG_RESET_TALENTS);
     }
 
-    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST)) {
-        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
-
-        sScriptMgr->OnFirstLogin(pCurrChar);
-    }
-
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_CHECK_ACHIEVS))
     {
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_CHECK_ACHIEVS, true);
@@ -1202,6 +1196,13 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     }
 
     sScriptMgr->OnPlayerLogin(pCurrChar);
+
+    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST)) 
+    {
+        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
+        sScriptMgr->OnFirstLogin(pCurrChar);
+    }
+
     delete holder;
 }
 
@@ -1331,7 +1332,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
 
 void WorldSession::HandlePlayerLoginToCharOutOfWorld(Player*  /*pCurrChar*/)
 {
-    ASSERT(false);
+    ABORT();
 }
 
 void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
@@ -1744,7 +1745,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
         sLog->outError("Account %u, IP: %s tried to customise character %u, but it does not belong to their account!",
             GetAccountId(), GetRemoteAddress().c_str(), GUID_LOPART(guid));
         recvData.rfinish();
-        KickPlayer();
+        KickPlayer("HandleCharCustomize");
         return;
     }
 
@@ -2043,7 +2044,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         sLog->outError("Account %u, IP: %s tried to factionchange character %u, but it does not belong to their account!",
             GetAccountId(), GetRemoteAddress().c_str(), GUID_LOPART(guid));
         recvData.rfinish();
-        KickPlayer();
+        KickPlayer("HandleCharFactionOrRaceChange");
         return;
     }
 

@@ -88,54 +88,13 @@ const Position FourSidesPos[] =
 
 const Position Phase2NorthPos = {837.22f, 1301.676f, 296.10f, M_PI};
 
-/*** TEXTS/SOUNDS BELOW ***/
-
-enum sounds
-{
-    SOUND_VORTEX                            = 14525,
-    SOUND_SPARK_BUFF                        = 14533,
-
-    SOUND_SLAY_1_1                          = 14519,
-    SOUND_SLAY_1_2                          = 14520,
-    SOUND_SLAY_1_3                          = 14521,
-    SOUND_SLAY_2_1                           = 14526,
-    SOUND_SLAY_2_2                           = 14527,
-    SOUND_SLAY_2_3                           = 14528,
-    SOUND_SLAY_3_1                           = 14534,
-    SOUND_SLAY_3_2                           = 14535,
-    SOUND_SLAY_3_3                           = 14536,
-    
-    SOUND_AGGRO_1                            = 14517,
-    SOUND_AGGRO_2                            = 14523,
-    SOUND_DEEP_BREATH                        = 14518,
-    SOUND_DEATH                              = 14540,
-    SOUND_PHASE_1_END                        = 14522,
-    SOUND_PHASE_2_END                        = 14529,
-    SOUND_PHASE_3_START                      = 14530
-};
-
-struct Speech
-{
-    uint32 sound;
-    const char* text;
-};
-
-const Speech MalygosIntroTexts[] =
-{
-    {14512, "Lesser beings, intruding here! A shame that your excess courage does not compensate for your stupidity!"},
-    {14513, "None but the blue dragonflight are welcome here! Perhaps this is the work of Alexstrasza? Well then, she has sent you to your deaths."},
-    {14514, "What could you hope to accomplish, to storm brazenly into my domain? To employ MAGIC? Against ME?"},
-    {14515, "I am without limits here... the rules of your cherished reality do not apply... In this realm, I am in control..."},
-    {14516, "I give you one chance. Pledge fealty to me, and perhaps I won\'t slaughter you for your insolence!"},
-};
-
 const uint32 MalygosIntroIntervals[] = {18000, 19000, 21000, 18000, 15000};
 
 class EoEDrakeEnterVehicleEvent : public BasicEvent
 {
     public:
         EoEDrakeEnterVehicleEvent(Creature& owner, uint64 playerGUID) : _owner(owner), _playerGUID(playerGUID) { }
-        bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/);
+        bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override;
     private:
         Creature& _owner;
         uint64 _playerGUID;

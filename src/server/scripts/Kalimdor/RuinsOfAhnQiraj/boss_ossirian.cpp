@@ -266,22 +266,22 @@ class boss_ossirian : public CreatureScript
 
 class go_ossirian_crystal : public GameObjectScript
 {
-    public:
-        go_ossirian_crystal() : GameObjectScript("go_ossirian_crystal") { }
+public:
+    go_ossirian_crystal() : GameObjectScript("go_ossirian_crystal") { }
 
-        bool OnGossipHello(Player* player, GameObject* /*go*/)
-        {
-            InstanceScript* Instance = player->GetInstanceScript();
-            if (!Instance)
-                return false;
+    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+    {
+        InstanceScript* Instance = player->GetInstanceScript();
+        if (!Instance)
+            return false;
 
-            Creature* Ossirian = player->FindNearestCreature(NPC_OSSIRIAN, 30.0f);
-            if (!Ossirian || Instance->GetBossState(DATA_OSSIRIAN) != IN_PROGRESS)
-                return false;
+        Creature* Ossirian = player->FindNearestCreature(NPC_OSSIRIAN, 30.0f);
+        if (!Ossirian || Instance->GetBossState(DATA_OSSIRIAN) != IN_PROGRESS)
+            return false;
 
-            Ossirian->AI()->DoAction(ACTION_TRIGGER_WEAKNESS);
-            return true;
-        }
+        Ossirian->AI()->DoAction(ACTION_TRIGGER_WEAKNESS);
+        return true;
+    }
 };
 
 void AddSC_boss_ossirian()

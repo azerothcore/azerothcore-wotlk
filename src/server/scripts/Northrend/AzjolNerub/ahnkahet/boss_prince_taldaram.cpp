@@ -113,7 +113,7 @@ public:
         {
             if (pInstance)
                 pInstance->SetData(DATA_PRINCE_TALDARAM_EVENT, IN_PROGRESS);
-           
+
             Talk(SAY_AGGRO);
             ScheduleEvents();
 
@@ -253,7 +253,7 @@ public:
 
             if (vanishTarget && victim->GetGUID() == vanishTarget)
                 ScheduleEvents();
-            
+
             Talk(SAY_SLAY);
         }
     };
@@ -331,17 +331,17 @@ class go_prince_taldaram_sphere : public GameObjectScript
 public:
     go_prince_taldaram_sphere() : GameObjectScript("go_prince_taldaram_sphere") { }
 
-    bool OnGossipHello(Player * /*pPlayer*/, GameObject *pGO)
+    bool OnGossipHello(Player * /*pPlayer*/, GameObject *go) override
     {
-        InstanceScript *pInstance = pGO->GetInstanceScript();
+        InstanceScript *pInstance = go->GetInstanceScript();
         if (!pInstance)
             return false;
 
-        Creature *pPrinceTaldaram = ObjectAccessor::GetCreature(*pGO, pInstance->GetData64(DATA_PRINCE_TALDARAM));
+        Creature *pPrinceTaldaram = ObjectAccessor::GetCreature(*go, pInstance->GetData64(DATA_PRINCE_TALDARAM));
         if (pPrinceTaldaram && pPrinceTaldaram->IsAlive())
         {
-            pGO->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-            pGO->SetGoState(GO_STATE_ACTIVE);
+            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            go->SetGoState(GO_STATE_ACTIVE);
 
             if (pInstance->GetData(DATA_SPHERE_EVENT) == NOT_STARTED)
             {

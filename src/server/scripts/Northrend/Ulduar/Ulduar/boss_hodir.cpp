@@ -398,9 +398,9 @@ public:
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             targets.push_back(itr->GetSource());
-                        targets.remove_if(Trinity::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-                        targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-                        Trinity::Containers::RandomResizeList(targets, 2);
+                        targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+                        targets.remove_if(acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+                        acore::Containers::RandomResizeList(targets, 2);
                         for (std::list<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                         {
                             float prevZ = (*itr)->GetPositionZ();
@@ -415,7 +415,7 @@ public:
                         me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
                         SmallIcicles(false);
                         events.RepeatEvent(55000 + urand(0,10000));
-                        events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, 12000);
+                        events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, Is25ManRaid() ? 12000 : 24000);
                         events.ScheduleEvent(EVENT_FROZEN_BLOWS, 15000);
                         events.RescheduleEvent(EVENT_FREEZE, 20000);
                     }
@@ -1232,9 +1232,9 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(Trinity::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-            Trinity::Containers::RandomResizeList(targets, 1);
+            targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+            targets.remove_if(acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+            acore::Containers::RandomResizeList(targets, 1);
         }
 
         void Register()

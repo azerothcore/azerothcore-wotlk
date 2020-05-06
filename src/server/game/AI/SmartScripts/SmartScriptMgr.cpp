@@ -20,11 +20,17 @@
 
 #include "SmartScriptMgr.h"
 
+SmartWaypointMgr* SmartWaypointMgr::instance()
+{
+    static SmartWaypointMgr instance;
+    return &instance;
+}
+
 void SmartWaypointMgr::LoadFromDB()
 {
     uint32 oldMSTime = getMSTime();
 
-    for (UNORDERED_MAP<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
+    for (std::unordered_map<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
     {
         for (WPPath::iterator pathItr = itr->second->begin(); pathItr != itr->second->end(); ++pathItr)
             delete pathItr->second;
@@ -83,13 +89,19 @@ void SmartWaypointMgr::LoadFromDB()
 
 SmartWaypointMgr::~SmartWaypointMgr()
 {
-    for (UNORDERED_MAP<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
+    for (std::unordered_map<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
     {
         for (WPPath::iterator pathItr = itr->second->begin(); pathItr != itr->second->end(); ++pathItr)
             delete pathItr->second;
 
         delete itr->second;
     }
+}
+
+SmartAIMgr* SmartAIMgr::instance()
+{
+    static SmartAIMgr instance;
+    return &instance;
 }
 
 void SmartAIMgr::LoadSmartAIFromDB()
@@ -332,6 +344,9 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         case SMART_TARGET_CLOSEST_FRIENDLY:
         case SMART_TARGET_STORED:
         case SMART_TARGET_FARTHEST:
+        case SMART_TARGET_PLAYER_WITH_AURA:
+        case SMART_TARGET_RANDOM_POINT:
+        case SMART_TARGET_ROLE_SELECTION:
             break;
         default:
             sLog->outErrorDb("SmartAIMgr: Not handled target_type(%u), Entry %d SourceType %u Event %u Action %u, skipped.", e.GetTargetType(), e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -342,7 +357,7 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
 
 bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
 {
-    if (e.event.type >= SMART_EVENT_END)
+    if ((e.event.type >= SMART_EVENT_TC_END && e.event.type <= SMART_EVENT_AC_START) || e.event.type >= SMART_EVENT_AC_END)
     {
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has invalid event type (%u), skipped.", e.entryOrGuid, e.event_id, e.GetEventType());
         return false;
@@ -384,7 +399,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         default:
             break;
     }
-    if (e.target.type < 0 || e.target.type >= SMART_TARGET_END)
+    if (e.target.type < 0 || (e.target.type >= SMART_TARGET_TC_END && e.target.type < SMART_TARGET_AC_START) || e.target.type >= SMART_TARGET_AC_END)
     {
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an invalid target type (%u), skipped.",
                 e.entryOrGuid, e.event_id, e.GetTargetType());
@@ -704,6 +719,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 break;
             case SMART_EVENT_GO_STATE_CHANGED:
             case SMART_EVENT_GO_EVENT_INFORM:
+            case SMART_EVENT_NEAR_PLAYERS:
+            case SMART_EVENT_NEAR_PLAYERS_NEGATION:
             case SMART_EVENT_TIMED_EVENT_TRIGGERED:
             case SMART_EVENT_INSTANCE_PLAYER_ENTER:
             case SMART_EVENT_TRANSPORT_RELOCATE:
@@ -793,6 +810,23 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             if (e.action.randomSound.sound4 && !IsSoundValid(e, e.action.randomSound.sound4))
                 return false;
             break;
+        case SMART_ACTION_MUSIC:
+            if (!IsSoundValid(e, e.action.music.sound))
+                return false;
+            break;
+        case SMART_ACTION_RANDOM_MUSIC:
+            if (e.action.randomMusic.sound1 && !IsSoundValid(e, e.action.randomMusic.sound1))
+                return false;
+
+            if (e.action.randomMusic.sound2 && !IsSoundValid(e, e.action.randomMusic.sound2))
+                return false;
+
+            if (e.action.randomMusic.sound3 && !IsSoundValid(e, e.action.randomMusic.sound3))
+                return false;
+
+            if (e.action.randomMusic.sound4 && !IsSoundValid(e, e.action.randomMusic.sound4))
+                return false;
+            break;
         case SMART_ACTION_SET_EMOTE_STATE:
         case SMART_ACTION_PLAY_EMOTE:
             if (!IsEmoteValid(e, e.action.emote.emote))
@@ -839,6 +873,10 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             break;
         case SMART_ACTION_CROSS_CAST:
             if (!IsSpellValid(e, e.action.crossCast.spell))
+                return false;
+            break;
+        case SMART_ACTION_CUSTOM_CAST:
+            if (!IsSpellValid(e, e.action.castCustom.spell))
                 return false;
             break;
         case SMART_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS:
@@ -1080,7 +1118,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         }
         case SMART_ACTION_LOAD_GRID:
         {
-            if (!Trinity::IsValidMapCoord(e.target.x, e.target.y))
+            if (!acore::IsValidMapCoord(e.target.x, e.target.y))
             {
                 sLog->outError("SmartScript: SMART_ACTION_LOAD_GRID uses invalid map coords: %u, skipped.", e.entryOrGuid);
                 return false;
@@ -1179,6 +1217,10 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_STOP_MOTION:
         case SMART_ACTION_NO_ENVIRONMENT_UPDATE:
         case SMART_ACTION_ZONE_UNDER_ATTACK:
+        case SMART_ACTION_CONE_SUMMON:
+        case SMART_ACTION_VORTEX_SUMMON:
+        case SMART_ACTION_PLAYER_TALK:
+        case SMART_ACTION_CU_ENCOUNTER_START:
             break;
         default:
             sLog->outErrorDb("SmartAIMgr: Not handled action_type(%u), event_type(%u), Entry %d SourceType %u Event %u, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);
