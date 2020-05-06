@@ -25,6 +25,7 @@ services:
       - ac-network
     ports:
       - ${WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
       - type: bind
         source: ./docker/worldserver/bin
