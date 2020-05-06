@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_DBCSFRM_H
-#define TRINITY_DBCSFRM_H
+#ifndef ACORE_DBCSFRM_H
+#define ACORE_DBCSFRM_H
 
 char const Achievementfmt[] = "niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii";
 const std::string CustomAchievementfmt="pppaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaapapaaaaaaaaaaaaaaaaaapp";
@@ -61,8 +61,8 @@ char const ItemDisplayTemplateEntryfmt[] = "nxxxxsxxxxxxxxxxxxxxxxxxx";
 //char const ItemCondExtCostsEntryfmt[] = "xiii";
 char const ItemExtendedCostEntryfmt[] = "niiiiiiiiiiiiiix";
 char const ItemLimitCategoryEntryfmt[] = "nxxxxxxxxxxxxxxxxxii";
-char const ItemRandomPropertiesfmt[] = "nxiiixxssssssssssssssssx";
-char const ItemRandomSuffixfmt[] = "nssssssssssssssssxxiiixxiiixx";
+char const ItemRandomPropertiesfmt[] = "nxiiiiissssssssssssssssx";
+char const ItemRandomSuffixfmt[] = "nssssssssssssssssxxiiiiiiiiii";
 char const ItemSetEntryfmt[] = "dssssssssssssssssxiiiiiiiiiixxxxxxxiiiiiiiiiiiiiiiiii";
 char const LFGDungeonEntryfmt[] = "nssssssssssssssssxiiiiiiiiixxixixxxxxxxxxxxxxxxxx";
 char const LightEntryfmt[] = "nifffxxxxxxxxxx";

@@ -15,7 +15,7 @@
 #include "ScriptMgr.h"
 #include "ConditionMgr.h"
 #include "Player.h"
-#include "Opcodes.h"
+#include "WorldSession.h"
 
 void AddItemsSetItem(Player* player, Item* item)
 {
@@ -608,8 +608,8 @@ void Item::SetItemRandomProperties(int32 randomPropId)
                 SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, item_rand->ID);
                 SetState(ITEM_CHANGED, GetOwner());
             }
-            for (uint32 i = PROP_ENCHANTMENT_SLOT_2; i < PROP_ENCHANTMENT_SLOT_2 + 3; ++i)
-                SetEnchantment(EnchantmentSlot(i), item_rand->enchant_id[i - PROP_ENCHANTMENT_SLOT_2], 0, 0);
+            for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < MAX_ENCHANTMENT_SLOT; ++i)
+                SetEnchantment(EnchantmentSlot(i), item_rand->enchant_id[i - PROP_ENCHANTMENT_SLOT_0], 0, 0);
         }
     }
     else
@@ -625,7 +625,7 @@ void Item::SetItemRandomProperties(int32 randomPropId)
                 SetState(ITEM_CHANGED, GetOwner());
             }
 
-            for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < PROP_ENCHANTMENT_SLOT_0 + 3; ++i)
+            for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < MAX_ENCHANTMENT_SLOT; ++i)
                 SetEnchantment(EnchantmentSlot(i), item_rand->enchant_id[i - PROP_ENCHANTMENT_SLOT_0], 0, 0);
         }
     }
@@ -898,7 +898,7 @@ void Item::ClearEnchantment(EnchantmentSlot slot)
     if (!GetEnchantmentId(slot))
         return;
 
-    for (uint8 x = 0; x < MAX_ITEM_ENCHANTMENT_EFFECTS; ++x)
+    for (uint8 x = 0; x < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++x)
         SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot*MAX_ENCHANTMENT_OFFSET + x, 0);
     SetState(ITEM_CHANGED, GetOwner());
 }
@@ -1013,7 +1013,7 @@ void Item::SendTimeUpdate(Player* owner)
     owner->GetSession()->SendPacket(&data);
 }
 
-Item* Item::CreateItem(uint32 item, uint32 count, Player const* player)
+Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clone, uint32 randomPropertyId)
 {
     if (count < 1)
         return NULL;                                        //don't create item at zero count
@@ -1030,6 +1030,11 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player)
         if (pItem->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_ITEM), item, player))
         {
             pItem->SetCount(count);
+            if (!clone)
+                pItem->SetItemRandomProperties(randomPropertyId ? randomPropertyId : Item::GenerateItemRandomPropertyId(item));
+            else
+                if (randomPropertyId)
+                    pItem->SetItemRandomProperties(randomPropertyId);
             return pItem;
         }
         else
@@ -1042,7 +1047,8 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player)
 
 Item* Item::CloneItem(uint32 count, Player const* player) const
 {
-    Item* newItem = CreateItem(GetEntry(), count, player);
+    // player CAN be NULL in which case we must not update random properties because that accesses player's item update queue
+    Item * newItem = CreateItem(GetEntry(), count, player, true, player ? GetItemRandomPropertyId() : 0);
     if (!newItem)
         return NULL;
 
@@ -1050,9 +1056,6 @@ Item* Item::CloneItem(uint32 count, Player const* player) const
     newItem->SetUInt32Value(ITEM_FIELD_GIFTCREATOR,  GetUInt32Value(ITEM_FIELD_GIFTCREATOR));
     newItem->SetUInt32Value(ITEM_FIELD_FLAGS,        GetUInt32Value(ITEM_FIELD_FLAGS) & ~(ITEM_FIELD_FLAG_REFUNDABLE | ITEM_FIELD_FLAG_BOP_TRADEABLE));
     newItem->SetUInt32Value(ITEM_FIELD_DURATION,     GetUInt32Value(ITEM_FIELD_DURATION));
-    // player CAN be NULL in which case we must not update random properties because that accesses player's item update queue
-    if (player)
-        newItem->SetItemRandomProperties(GetItemRandomPropertyId());
     return newItem;
 }
 

@@ -8,8 +8,6 @@
     \ingroup Trinityd
 */
 
-#include <ace/Sig_Handler.h>
-
 #include "Common.h"
 #include "GitRevision.h"
 #include "SignalHandler.h"
@@ -17,23 +15,22 @@
 #include "WorldRunnable.h"
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
-#include "Configuration/Config.h"
-#include "Database/DatabaseEnv.h"
-#include "Database/DatabaseWorkerPool.h"
+#include "Config.h"
+#include "DatabaseEnv.h"
+#include "DatabaseWorkerPool.h"
 
 #include "CliRunnable.h"
 #include "Log.h"
 #include "Master.h"
 #include "RARunnable.h"
-#include "TCSoap.h"
+#include "ACSoap.h"
 #include "Timer.h"
 #include "Util.h"
-#include "AuthSocket.h"
 #include "RealmList.h"
 #include "ScriptMgr.h"
-
 #include "BigNumber.h"
 #include "OpenSSLCrypto.h"
+#include <ace/Sig_Handler.h>
 
 #ifdef _WIN32
 #include "ServiceWin32.h"
@@ -47,7 +44,7 @@ extern int m_ServiceStatus;
 #endif
 
 /// Handle worldservers's termination signals
-class WorldServerSignalHandler : public Trinity::SignalHandler
+class WorldServerSignalHandler : public acore::SignalHandler
 {
     public:
         virtual void HandleSignal(int sigNum)
@@ -72,7 +69,7 @@ class WorldServerSignalHandler : public Trinity::SignalHandler
         }
 };
 
-class FreezeDetectorRunnable : public ACORE::Runnable
+class FreezeDetectorRunnable : public acore::Runnable
 {
 private:
     uint32 _loops;
@@ -102,11 +99,17 @@ public:
                 ABORT();
             }
 
-            ACORE::Thread::Sleep(1000);
+            acore::Thread::Sleep(1000);
         }
         sLog->outString("Anti-freeze thread exiting without problems.");
     }
 };
+
+Master* Master::instance()
+{
+    static Master instance;
+    return &instance;
+}
 
 /// Main function
 int Master::Run()
@@ -118,16 +121,16 @@ int Master::Run()
     sLog->outString("%s (worldserver-daemon)", GitRevision::GetFullVersion());
     sLog->outString("<Ctrl-C> to stop.\n");
 
-    sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
-    sLog->outString("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           
-    sLog->outString("  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
-    sLog->outString("  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");           
-    sLog->outString("  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");           
-    sLog->outString("  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");                                                                
+    sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");
+    sLog->outString("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");
+    sLog->outString("  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");
+    sLog->outString("  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");
+    sLog->outString("  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");
+    sLog->outString("  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");
     sLog->outString("                                ██████╗ ██████╗ ██████╗ ███████╗");
     sLog->outString("                                ██╔════╝██╔═══██╗██╔══██╗██╔═══╝");
-    sLog->outString("                                ██║     ██║   ██║██████╔╝█████╗");  
-    sLog->outString("                                ██║     ██║   ██║██╔══██╗██╔══╝");  
+    sLog->outString("                                ██║     ██║   ██║██████╔╝█████╗");
+    sLog->outString("                                ██║     ██║   ██║██╔══██╗██╔══╝");
     sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");
     sLog->outString("                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
 
@@ -138,10 +141,10 @@ int Master::Run()
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            sLog->outString("Daemon PID: %u\n", pid);
+            sLog->outError("Daemon PID: %u\n", pid); // outError for red color in console
         else
         {
-            sLog->outString("Cannot create PID file %s.\n", pidFile.c_str());
+            sLog->outError("Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
             return 1;
         }
     }
@@ -177,10 +180,10 @@ int Master::Run()
     //handle.register_handler(SIGSEGV, &signalSEGV);
 
     ///- Launch WorldRunnable thread
-    ACORE::Thread worldThread(new WorldRunnable);
-    worldThread.setPriority(ACORE::Priority_Highest);
+    acore::Thread worldThread(new WorldRunnable);
+    worldThread.setPriority(acore::Priority_Highest);
 
-    ACORE::Thread* cliThread = NULL;
+    acore::Thread* cliThread = NULL;
 
 #ifdef _WIN32
     if (sConfigMgr->GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -189,35 +192,35 @@ int Master::Run()
 #endif
     {
         ///- Launch CliRunnable thread
-        cliThread = new ACORE::Thread(new CliRunnable);
+        cliThread = new acore::Thread(new CliRunnable);
     }
 
-    ACORE::Thread rarThread(new RARunnable);
+    acore::Thread rarThread(new RARunnable);
 
     // pussywizard:
-    ACORE::Thread auctionLising_thread(new AuctionListingRunnable);
-    auctionLising_thread.setPriority(ACORE::Priority_High);
+    acore::Thread auctionLising_thread(new AuctionListingRunnable);
+    auctionLising_thread.setPriority(acore::Priority_High);
 
 #if defined(_WIN32) || defined(__linux__)
-    
+
 
     ///- Handle affinity for multiple processors and process priority
     uint32 affinity = sConfigMgr->GetIntDefault("UseProcessors", 0);
     bool highPriority = sConfigMgr->GetBoolDefault("ProcessPriority", false);
 
 #ifdef _WIN32 // Windows
-    
+
     HANDLE hProcess = GetCurrentProcess();
-    
+
     if (affinity > 0)
     {
         ULONG_PTR appAff;
         ULONG_PTR sysAff;
-        
+
         if (GetProcessAffinityMask(hProcess, &appAff, &sysAff))
         {
             ULONG_PTR currentAffinity = affinity & appAff;            // remove non accessible processors
-            
+
             if (!currentAffinity)
                 sLog->outError("Processors marked in UseProcessors bitmask (hex) %x are not accessible for the worldserver. Accessible processors bitmask (hex): %x", affinity, appAff);
             else if (SetProcessAffinityMask(hProcess, currentAffinity))
@@ -226,7 +229,7 @@ int Master::Run()
                 sLog->outError("Can't set used processors (hex): %x", currentAffinity);
         }
     }
-    
+
     if (highPriority)
     {
         if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
@@ -234,9 +237,9 @@ int Master::Run()
         else
             sLog->outError("Can't set worldserver process priority class.");
     }
-    
+
 #else // Linux
-    
+
     if (affinity > 0)
     {
         cpu_set_t mask;
@@ -263,26 +266,26 @@ int Master::Run()
         else
             sLog->outString("worldserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
     }
-    
+
 #endif
 #endif
 
     // Start soap serving thread
-    ACORE::Thread* soapThread = NULL;
+    acore::Thread* soapThread = NULL;
     if (sConfigMgr->GetBoolDefault("SOAP.Enabled", false))
     {
-        TCSoapRunnable* runnable = new TCSoapRunnable();
+        ACSoapRunnable* runnable = new ACSoapRunnable();
         runnable->SetListenArguments(sConfigMgr->GetStringDefault("SOAP.IP", "127.0.0.1"), uint16(sConfigMgr->GetIntDefault("SOAP.Port", 7878)));
-        soapThread = new ACORE::Thread(runnable);
+        soapThread = new acore::Thread(runnable);
     }
 
     // Start up freeze catcher thread
-    ACORE::Thread* freezeThread = NULL;
+    acore::Thread* freezeThread = NULL;
     if (uint32 freezeDelay = sConfigMgr->GetIntDefault("MaxCoreStuckTime", 0))
     {
         FreezeDetectorRunnable* runnable = new FreezeDetectorRunnable(freezeDelay*1000);
-        freezeThread = new ACORE::Thread(runnable);
-        freezeThread->setPriority(ACORE::Priority_Highest);
+        freezeThread = new acore::Thread(runnable);
+        freezeThread->setPriority(acore::Priority_Highest);
     }
 
     ///- Launch the world listener socket

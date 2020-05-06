@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_SMARTSCRIPTMGR_H
-#define TRINITY_SMARTSCRIPTMGR_H
+#ifndef ACORE_SMARTSCRIPTMGR_H
+#define ACORE_SMARTSCRIPTMGR_H
 
 #include "Common.h"
 #include "Creature.h"
@@ -167,7 +167,15 @@ enum SMART_EVENT
     SMART_EVENT_DISTANCE_GAMEOBJECT      = 76,      // guid, entry, distance, repeat
     SMART_EVENT_COUNTER_SET              = 77,      // id, value, cooldownMin, cooldownMax
 
-    SMART_EVENT_END                      = 78
+    SMART_EVENT_TC_END                   = 78,
+
+    /* AC Custom Events */
+    SMART_EVENT_AC_START                 = 100,
+
+    SMART_EVENT_NEAR_PLAYERS             = 101,      // min, radius, first timer, check timer
+    SMART_EVENT_NEAR_PLAYERS_NEGATION    = 102,      // min, radius, first timer, check timer
+
+    SMART_EVENT_AC_END                   = 103
 };
 
 struct SmartEvent
@@ -411,6 +419,22 @@ struct SmartEvent
 
         struct
         {
+            uint32 minCount;
+            uint32 radius;
+            uint32 firstTimer;
+            uint32 checkTimer;
+        } nearPlayer;
+
+        struct
+        {
+            uint32 minCount;
+            uint32 radius;
+            uint32 firstTimer;
+            uint32 checkTimer;
+        } nearPlayerNegation;
+
+        struct
+        {
             uint32 param1;
             uint32 param2;
             uint32 param3;
@@ -457,7 +481,7 @@ enum SMART_ACTION
     SMART_ACTION_EVADE                              = 24,     // No Params
     SMART_ACTION_FLEE_FOR_ASSIST                    = 25,     // With Emote
     SMART_ACTION_CALL_GROUPEVENTHAPPENS             = 26,     // QuestID
-    SMART_ACTION_COMBAT_STOP                        = 27,     // 
+    SMART_ACTION_COMBAT_STOP                        = 27,     // No Params
     SMART_ACTION_REMOVEAURASFROMSPELL               = 28,     // Spellid (0 removes all auras), charges (0 removes aura)
     SMART_ACTION_FOLLOW                             = 29,     // Distance (0 = default), Angle (0 = default), EndCreatureEntry, credit, creditType (0monsterkill, 1event)
     SMART_ACTION_RANDOM_PHASE                       = 30,     // PhaseId1, PhaseId2, PhaseId3...
@@ -468,7 +492,7 @@ enum SMART_ACTION
     SMART_ACTION_SET_INST_DATA64                    = 35,     // Field,
     SMART_ACTION_UPDATE_TEMPLATE                    = 36,     // Entry, UpdateLevel
     SMART_ACTION_DIE                                = 37,     // No Params
-    SMART_ACTION_SET_IN_COMBAT_WITH_ZONE            = 38,     // No Params
+    SMART_ACTION_SET_IN_COMBAT_WITH_ZONE            = 38,     // Range (if outside of dungeon)
     SMART_ACTION_CALL_FOR_HELP                      = 39,     // Radius, With Emote
     SMART_ACTION_SET_SHEATH                         = 40,     // Sheath (0-unarmed, 1-melee, 2-ranged)
     SMART_ACTION_FORCE_DESPAWN                      = 41,     // timer
@@ -496,7 +520,7 @@ enum SMART_ACTION
     SMART_ACTION_SET_COUNTER                        = 63,     // id, value, reset (0/1)
     SMART_ACTION_STORE_TARGET_LIST                  = 64,     // varID,
     SMART_ACTION_WP_RESUME                          = 65,     // none
-    SMART_ACTION_SET_ORIENTATION                    = 66,     //
+    SMART_ACTION_SET_ORIENTATION                    = 66,     // quick change, random orientation? (0/1)
     SMART_ACTION_CREATE_TIMED_EVENT                 = 67,     // id, InitialMin, InitialMax, RepeatMin(only if it repeats), RepeatMax(only if it repeats), chance
     SMART_ACTION_PLAYMOVIE                          = 68,     // entry
     SMART_ACTION_MOVE_TO_POS                        = 69,     // PointId (optional x,y,z offset), transport, controlled, ContactDistance
@@ -590,7 +614,13 @@ enum SMART_ACTION
     SMART_ACTION_MUSIC                              = 216,    // SoundId, onlySelf, type
     SMART_ACTION_RANDOM_MUSIC                       = 217,    // SoundId1, SoundId2, SoundId3, SoundId4, onlySelf, type
 
-    SMART_ACTION_AC_END                             = 218,    // placeholder
+    SMART_ACTION_CUSTOM_CAST                        = 218,    // spellId, castflag, bp0, bp1, bp2
+    SMART_ACTION_CONE_SUMMON                        = 219,    // entry, duration (0 = perm), dist between rings, dist between earch summon in a row, length of cone, width of cone (angle)
+    SMART_ACTION_PLAYER_TALK                        = 220,    // acore_string.entry, yell? (0/1)
+    SMART_ACTION_VORTEX_SUMMON                      = 221,    // entry, duration (0 = perm), spiral scaling, spiral appearance, range max, phi_delta     <-- yes confusing math, try it ingame and see, my lovely AC boys!
+    SMART_ACTION_CU_ENCOUNTER_START                 = 222,    // Resets cooldowns on all targets and removes Heroism debuff(s)
+
+    SMART_ACTION_AC_END                             = 223,    // placeholder
 };
 
 struct SmartAction
@@ -702,6 +732,11 @@ struct SmartAction
         {
             uint32 alternative;
         } activateObject;
+
+        struct
+        {
+            uint32 range;
+        } combatZone;
 
         struct
         {
@@ -1173,6 +1208,7 @@ struct SmartAction
         struct
         {
             uint32 quickChange;
+            uint32 random;
         } orientation;
 
         struct
@@ -1180,6 +1216,38 @@ struct SmartAction
             uint32 stopMovement;
             uint32 movementExpired;
         } stopMotion;
+
+        struct
+        {
+            uint32 summonEntry;
+            uint32 summonDuration;
+            uint32 distanceBetweenRings;
+            uint32 distanceBetweenSummons;
+            uint32 coneLength;
+            uint32 coneAngle;
+        } coneSummon;
+
+        struct {
+            uint32 textId;
+            uint32 flag;
+        } playerTalk;
+
+        struct {
+            uint32 spell;
+            uint32 flags;
+            uint32 bp1;
+            uint32 bp2;
+            uint32 bp3;
+        } castCustom;
+
+        struct {
+            uint32 summonEntry;
+            uint32 summonDuration;
+            uint32 a;
+            uint32 k;
+            uint32 r_max;
+            uint32 phi_delta;
+        } summonVortex;
 
         //! Note for any new future actions
         //! All parameters must have type uint32
@@ -1226,7 +1294,7 @@ enum SMARTAI_TARGETS
     SMART_TARGET_GAMEOBJECT_GUID                = 14,   // guid, entry
     SMART_TARGET_GAMEOBJECT_DISTANCE            = 15,   // entry(0any), maxDist
     SMART_TARGET_INVOKER_PARTY                  = 16,   // invoker's party members
-    SMART_TARGET_PLAYER_RANGE                   = 17,   // min, max, maxCount (maxCount by pussywizard)
+    SMART_TARGET_PLAYER_RANGE                   = 17,   // min, max, maxCount (maxCount by pussywizard), set target.o to 1 if u want to search for all in range if min, max fails
     SMART_TARGET_PLAYER_DISTANCE                = 18,   // maxDist
     SMART_TARGET_CLOSEST_CREATURE               = 19,   // CreatureEntry(0any), maxDist, dead?
     SMART_TARGET_CLOSEST_GAMEOBJECT             = 20,   // entry(0any), maxDist
@@ -1240,7 +1308,17 @@ enum SMARTAI_TARGETS
     SMART_TARGET_FARTHEST                       = 28,   // maxDist, playerOnly, isInLos
     SMART_TARGET_VEHICLE_PASSENGER              = 29,   // TODO: NOT SUPPORTED YET
 
-    SMART_TARGET_END                            = 30
+    SMART_TARGET_TC_END                         = 30,   // placeholder
+
+    // AC-only SmartTargets:
+
+    SMART_TARGET_AC_START                       = 200,  // placeholder
+
+    SMART_TARGET_PLAYER_WITH_AURA               = 201,  // spellId, negation, MaxDist, MinDist, set target.o to a number to random resize the list
+    SMART_TARGET_RANDOM_POINT                   = 202,  // range, amount (for summoning creature), self als middle (0/1) else use xyz
+    SMART_TARGET_ROLE_SELECTION                 = 203,  // Range Max, TargetMask (Tanks (1), Healer (2) Damage (4)), resize list
+
+    SMART_TARGET_AC_END                         = 204   // placeholder
 };
 
 struct SmartTarget
@@ -1290,6 +1368,13 @@ struct SmartTarget
             uint32 entry;
             uint32 getFromHashMap; // Does not work in instances
         } unitGUID;
+
+        struct
+        {
+            uint32 maxDist;
+            uint32 roleMask;
+            uint32 resize;
+        } roleSelection;
 
         struct
         {
@@ -1366,12 +1451,34 @@ struct SmartTarget
 
         struct
         {
+            uint32 range;
+            uint32 amount;
+            uint32 self;
+        } randomPoint;
+
+        struct
+        {
+            uint32 spellId;
+            uint32 negation;
+            uint32 distMax;
+            uint32 distMin;
+        } playerWithAura;
+
+        struct
+        {
             uint32 param1;
             uint32 param2;
             uint32 param3;
             uint32 param4;
         } raw;
     };
+};
+
+enum SmartTargetRoleFlags
+{
+    SMART_TARGET_ROLE_FLAG_TANKS        = 0x001,
+    SMART_TARGET_ROLE_FLAG_HEALERS      = 0x002,
+    SMART_TARGET_ROLE_FLAG_DAMAGERS     = 0x004
 };
 
 enum eSmartAI
@@ -1427,7 +1534,7 @@ const uint32 SmartAITypeMask[SMART_SCRIPT_TYPE_MAX][2] =
     {SMART_SCRIPT_TYPE_TIMED_ACTIONLIST,    SMART_SCRIPT_TYPE_MASK_TIMED_ACTIONLIST }
 };
 
-const uint32 SmartAIEventMask[SMART_EVENT_END][2] =
+const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
 {
     {SMART_EVENT_UPDATE_IC,                 SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_TIMED_ACTIONLIST},
     {SMART_EVENT_UPDATE_OOC,                SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT + SMART_SCRIPT_TYPE_MASK_INSTANCE },
@@ -1506,7 +1613,32 @@ const uint32 SmartAIEventMask[SMART_EVENT_END][2] =
     {SMART_EVENT_FRIENDLY_HEALTH_PCT,       SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_DISTANCE_CREATURE,         SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_DISTANCE_GAMEOBJECT,       SMART_SCRIPT_TYPE_MASK_CREATURE },
-    {SMART_EVENT_COUNTER_SET,               SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT }
+    {SMART_EVENT_COUNTER_SET,               SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    { 0, 0 }, // 78
+    { 0, 0 }, // 79
+    { 0, 0 }, // 80
+    { 0, 0 }, // 81
+    { 0, 0 }, // 82
+    { 0, 0 }, // 83
+    { 0, 0 }, // 84
+    { 0, 0 }, // 85
+    { 0, 0 }, // 86
+    { 0, 0 }, // 87
+    { 0, 0 }, // 88
+    { 0, 0 }, // 89
+    { 0, 0 }, // 90
+    { 0, 0 }, // 91
+    { 0, 0 }, // 92
+    { 0, 0 }, // 93
+    { 0, 0 }, // 94
+    { 0, 0 }, // 95
+    { 0, 0 }, // 96
+    { 0, 0 }, // 97
+    { 0, 0 }, // 98
+    { 0, 0 }, // 99
+    { 0, 0 }, // 100
+    {SMART_EVENT_NEAR_PLAYERS,              SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_NEAR_PLAYERS_NEGATION,     SMART_SCRIPT_TYPE_MASK_CREATURE }
 };
 
 enum SmartEventFlags
@@ -1569,6 +1701,7 @@ typedef std::unordered_map<uint32, WayPoint*> WPPath;
 
 typedef std::list<WorldObject*> ObjectList;
 typedef std::list<uint64> GuidList;
+
 class ObjectGuidList
 {
     ObjectList* m_objectList;
@@ -1619,14 +1752,16 @@ public:
         delete m_guidList;
     }
 };
+
 typedef std::unordered_map<uint32, ObjectGuidList*> ObjectListMap;
 
 class SmartWaypointMgr
 {
-    friend class ACE_Singleton<SmartWaypointMgr, ACE_Null_Mutex>;
     SmartWaypointMgr() {}
     public:
         ~SmartWaypointMgr();
+
+        static SmartWaypointMgr* instance();
 
         void LoadFromDB();
 
@@ -1650,10 +1785,11 @@ typedef std::unordered_map<int32, SmartAIEventList> SmartAIEventMap;
 
 class SmartAIMgr
 {
-    friend class ACE_Singleton<SmartAIMgr, ACE_Null_Mutex>;
     SmartAIMgr(){};
     public:
         ~SmartAIMgr(){};
+
+        static SmartAIMgr* instance();
 
         void LoadSmartAIFromDB();
 
@@ -1812,6 +1948,7 @@ class SmartAIMgr
         //bool IsTextValid(SmartScriptHolder const& e, uint32 id);
 };
 
-#define sSmartScriptMgr ACE_Singleton<SmartAIMgr, ACE_Null_Mutex>::instance()
-#define sSmartWaypointMgr ACE_Singleton<SmartWaypointMgr, ACE_Null_Mutex>::instance()
+#define sSmartScriptMgr SmartAIMgr::instance()
+#define sSmartWaypointMgr SmartWaypointMgr::instance()
+
 #endif

@@ -98,6 +98,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             }
     }
 
+    if (sender->HasAura(1852) && type != CHAT_MSG_WHISPER)
+    {
+        SendNotification(GetAcoreString(LANG_GM_SILENCE), sender->GetName().c_str());
+        recvData.rfinish();
+        return;
+    }
+
     // prevent talking at unknown language (cheating)
     LanguageDesc const* langDesc = GetLanguageDescByID(lang);
     if (!langDesc)
@@ -106,7 +113,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         recvData.rfinish();
         return;
     }
-    
+
     if (langDesc->skill_id != 0 && !sender->HasSkill(langDesc->skill_id))
     {
         // also check SPELL_AURA_COMPREHEND_LANGUAGE (client offers option to speak in that language)
@@ -172,17 +179,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 	            {
 		            std::string to, msg;
 		            recvData >> to >> msg;
-		            Player* receiver = ObjectAccessor::FindPlayerByName(to, false);
-
 		            if (msg.empty())
 			            return;
-
-		            sScriptMgr->OnPlayerChat(sender, type, lang, msg, receiver);
 	            }
 
 	            break;
             default:
-                sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination", 
+                sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination",
                                                      GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
 
                 recvData.rfinish();
@@ -240,14 +243,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             sender->UpdateSpeakTime(specialMessageLimit);
     }
 
-    // pussywizard: optimization
-    /*if (sender->HasAura(1852) && type != CHAT_MSG_WHISPER)
-    {
-        SendNotification(GetTrinityString(LANG_GM_SILENCE), sender->GetName().c_str());
-        recvData.rfinish();
-        return;
-    }*/
-
     std::string to, channel, msg;
     bool ignoreChecks = false;
     switch (type)
@@ -300,7 +295,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         if (!_player->CanSpeak())
         {
             std::string timeStr = secsToTimeString(m_muteTime - time(NULL));
-            SendNotification(GetTrinityString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
+            SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
             return;
         }
 
@@ -334,6 +329,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         }
     }
 
+    // prevent crash player
+    if (msg.find("| |Hquest") != std::string::npos) {
+        return;
+    }
+
     sScriptMgr->OnBeforeSendChatMessage(_player, type, lang, msg);
 
     switch (type)
@@ -348,7 +348,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 
             if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ))
             {
-                SendNotification(GetTrinityString(LANG_SAY_REQ), sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ));
+                SendNotification(GetAcoreString(LANG_SAY_REQ), sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ));
                 return;
             }
 
@@ -363,7 +363,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         {
             if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ))
             {
-                SendNotification(GetTrinityString(LANG_WHISPER_REQ), sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
+                SendNotification(GetAcoreString(LANG_WHISPER_REQ), sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
                 return;
             }
 
@@ -390,11 +390,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 }
 
             // pussywizard: optimization
-            /*if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
+            if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
             {
-                SendNotification(GetTrinityString(LANG_GM_SILENCE), GetPlayer()->GetName().c_str());
+                SendNotification(GetAcoreString(LANG_GM_SILENCE), GetPlayer()->GetName().c_str());
                 return;
-            }*/
+            }
 
             // If player is a Gamemaster and doesn't accept whisper, we auto-whitelist every player that the Gamemaster is talking to
             if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
@@ -552,7 +552,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             {
                 if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ))
                 {
-                    SendNotification(GetTrinityString(LANG_CHANNEL_REQ), sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ));
+                    SendNotification(GetAcoreString(LANG_CHANNEL_REQ), sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ));
                     return;
                 }
             }
@@ -584,7 +584,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 }
                 else                                        // New AFK mode
                 {
-                    sender->autoReplyMsg = msg.empty() ? GetTrinityString(LANG_PLAYER_AFK_DEFAULT) : msg;
+                    sender->autoReplyMsg = msg.empty() ? GetAcoreString(LANG_PLAYER_AFK_DEFAULT) : msg;
 
                     if (sender->isDND())
                         sender->ToggleDND();
@@ -611,7 +611,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             }
             else                                            // New DND mode
             {
-                sender->autoReplyMsg = msg.empty() ? GetTrinityString(LANG_PLAYER_DND_DEFAULT) : msg;
+                sender->autoReplyMsg = msg.empty() ? GetAcoreString(LANG_PLAYER_DND_DEFAULT) : msg;
 
                 if (sender->isAFK())
                     sender->ToggleAFK();
@@ -642,11 +642,16 @@ void WorldSession::HandleEmoteOpcode(WorldPacket & recvData)
 
     uint32 emote;
     recvData >> emote;
+
+    // restrict to the only emotes hardcoded in client
+    if (emote != EMOTE_ONESHOT_NONE && emote != EMOTE_ONESHOT_WAVE)
+        return;
+
     sScriptMgr->OnPlayerEmote(GetPlayer(), emote);
     GetPlayer()->HandleEmoteCommand(emote);
 }
 
-namespace Trinity
+namespace acore
 {
     class EmoteChatBuilder
     {
@@ -676,7 +681,7 @@ namespace Trinity
             uint32        i_emote_num;
             Unit const*   i_target;
     };
-}                                                           // namespace Trinity
+}                                                           // namespace acore
 
 void WorldSession::HandleTextEmoteOpcode(WorldPacket & recvData)
 {
@@ -688,7 +693,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recvData)
     if (!GetPlayer()->CanSpeak())
     {
         std::string timeStr = secsToTimeString(m_muteTime - time(NULL));
-        SendNotification(GetTrinityString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
+        SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
         return;
     }
 
@@ -727,15 +732,15 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recvData)
 
     Unit* unit = ObjectAccessor::GetUnit(*_player, guid);
 
-    CellCoord p = Trinity::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
+    CellCoord p = acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    Trinity::EmoteChatBuilder emote_builder(*GetPlayer(), text_emote, emoteNum, unit);
-    Trinity::LocalizedPacketDo<Trinity::EmoteChatBuilder > emote_do(emote_builder);
-    Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::EmoteChatBuilder > > emote_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), emote_do);
-    TypeContainerVisitor<Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::EmoteChatBuilder> >, WorldTypeMapContainer> message(emote_worker);
+    acore::EmoteChatBuilder emote_builder(*GetPlayer(), text_emote, emoteNum, unit);
+    acore::LocalizedPacketDo<acore::EmoteChatBuilder > emote_do(emote_builder);
+    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::EmoteChatBuilder > > emote_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), emote_do);
+    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::EmoteChatBuilder> >, WorldTypeMapContainer> message(emote_worker);
     cell.Visit(p, message, *GetPlayer()->GetMap(), *GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 
     GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE, text_emote, 0, unit);

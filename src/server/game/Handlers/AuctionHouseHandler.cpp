@@ -47,7 +47,7 @@ void WorldSession::SendAuctionHello(uint64 guid, Creature* unit)
 {
     if (GetPlayer()->getLevel() < sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ))
     {
-        SendNotification(GetTrinityString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
+        SendNotification(GetAcoreString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
         return;
     }
 
@@ -218,7 +218,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recvData)
         SendAuctionCommandResult(0, AUCTION_SELL_ITEM, ERR_AUCTION_DATABASE_ERROR);
         return;
     }
- 
+
     // check if there are 2 identical guids, in this case user is most likely cheating
     for (uint32 i = 0; i < itemsCount - 1; ++i)
     {
@@ -646,6 +646,13 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket & recvData)
 //this void sends player info about his auctions
 void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recvData)
 {
+    // prevent crash caused by malformed packet
+    uint64 guid;
+    uint32 listfrom;
+
+    recvData >> guid;
+    recvData >> listfrom;       // not used in fact (this list does not have page control in client)
+
     // pussywizard:
     const uint32 delay = 4500;
     const uint32 now = World::GetGameTimeMS();
@@ -656,10 +663,11 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recvData)
         diff = delay;
 
     _lastAuctionListOwnerItemsMSTime = now + delay; // set longest possible here, actual exectuing will change this to getMSTime of that moment
-    _player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(recvData, _player->GetGUID(), true), _player->m_Events.CalculateTime(delay-diff));
+    _player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(guid, _player->GetGUID(), true), _player->m_Events.CalculateTime(delay-diff));
 }
 
-void WorldSession::HandleAuctionListOwnerItemsEvent(WorldPacket & recvData)
+
+void WorldSession::HandleAuctionListOwnerItemsEvent(uint64 creatureGuid)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_LIST_OWNER_ITEMS");
@@ -667,17 +675,11 @@ void WorldSession::HandleAuctionListOwnerItemsEvent(WorldPacket & recvData)
 
     _lastAuctionListOwnerItemsMSTime = World::GetGameTimeMS(); // pussywizard
 
-    uint32 listfrom;
-    uint64 guid;
-
-    recvData >> guid;
-    recvData >> listfrom;                                  // not used in fact (this list not have page control in client)
-
-    Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
+    Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(creatureGuid, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionListOwnerItems - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionListOwnerItems - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(creatureGuid)));
 #endif
         return;
     }
@@ -745,7 +747,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recvData)
     if (diff > delay)
         diff = delay;
     _lastAuctionListItemsMSTime = now + delay - diff;
-    TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
+    ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
     AsyncAuctionListingMgr::GetTempList().push_back( AuctionListItemsDelayEvent(delay-diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, getAll) );
 }
 

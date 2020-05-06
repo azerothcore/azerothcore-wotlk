@@ -270,6 +270,12 @@ ObjectMgr::~ObjectMgr()
         delete itr->second;
 }
 
+ObjectMgr* ObjectMgr::instance()
+{
+    static ObjectMgr instance;
+    return &instance;
+}
+
 void ObjectMgr::AddLocaleString(std::string const& s, LocaleConstant locale, StringVector& data)
 {
     if (!s.empty())
@@ -1641,7 +1647,7 @@ void ObjectMgr::LoadCreatures()
     uint32 oldMSTime = getMSTime();
 
     //                                               0              1   2    3        4             5           6           7           8            9              10
-    QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, "
+    QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
     //   11               12         13       14            15         16         17          18          19                20                   21
         "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags "
         "FROM creature "
@@ -1679,28 +1685,28 @@ void ObjectMgr::LoadCreatures()
             continue;
         }
 
-        CreatureData& data = _creatureDataStore[guid];
-        data.id             = entry;
-        data.mapid          = fields[2].GetUInt16();
-        data.displayid      = fields[3].GetUInt32();
-        data.equipmentId    = fields[4].GetInt8();
-        data.posX           = fields[5].GetFloat();
-        data.posY           = fields[6].GetFloat();
-        data.posZ           = fields[7].GetFloat();
-        data.orientation    = fields[8].GetFloat();
-        data.spawntimesecs  = fields[9].GetUInt32();
-        data.spawndist      = fields[10].GetFloat();
-        data.currentwaypoint= fields[11].GetUInt32();
-        data.curhealth      = fields[12].GetUInt32();
-        data.curmana        = fields[13].GetUInt32();
-        data.movementType   = fields[14].GetUInt8();
-        data.spawnMask      = fields[15].GetUInt8();
-        data.phaseMask      = fields[16].GetUInt32();
-        int16 gameEvent     = fields[17].GetInt8();
-        uint32 PoolId       = fields[18].GetUInt32();
-        data.npcflag        = fields[19].GetUInt32();
-        data.unit_flags     = fields[20].GetUInt32();
-        data.dynamicflags   = fields[21].GetUInt32();
+        CreatureData& data      = _creatureDataStore[guid];
+        data.id                 = entry;
+        data.mapid              = fields[2].GetUInt16();
+        data.displayid          = fields[3].GetUInt32();
+        data.equipmentId        = fields[4].GetInt8();
+        data.posX               = fields[5].GetFloat();
+        data.posY               = fields[6].GetFloat();
+        data.posZ               = fields[7].GetFloat();
+        data.orientation        = fields[8].GetFloat();
+        data.spawntimesecs      = fields[9].GetUInt32();
+        data.wander_distance    = fields[10].GetFloat();
+        data.currentwaypoint    = fields[11].GetUInt32();
+        data.curhealth          = fields[12].GetUInt32();
+        data.curmana            = fields[13].GetUInt32();
+        data.movementType       = fields[14].GetUInt8();
+        data.spawnMask          = fields[15].GetUInt8();
+        data.phaseMask          = fields[16].GetUInt32();
+        int16 gameEvent         = fields[17].GetInt8();
+        uint32 PoolId           = fields[18].GetUInt32();
+        data.npcflag            = fields[19].GetUInt32();
+        data.unit_flags         = fields[20].GetUInt32();
+        data.dynamicflags       = fields[21].GetUInt32();
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
         if (!mapEntry)
@@ -1742,29 +1748,29 @@ void ObjectMgr::LoadCreatures()
 
         if (cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
         {
-            if (!mapEntry || !mapEntry->IsDungeon())
+            if (!mapEntry->IsDungeon())
                 sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `creature_template`.`flags_extra` including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.", guid, data.id);
         }
 
-        if (data.spawndist < 0.0f)
+        if (data.wander_distance < 0.0f)
         {
-            sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `spawndist`< 0, set to 0.", guid, data.id);
-            data.spawndist = 0.0f;
+            sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `wander_distance`< 0, set to 0.", guid, data.id);
+            data.wander_distance = 0.0f;
         }
         else if (data.movementType == RANDOM_MOTION_TYPE)
         {
-            if (data.spawndist == 0.0f)
+            if (data.wander_distance == 0.0f)
             {
-                sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=1 (random movement) but with `spawndist`=0, replace by idle movement type (0).", guid, data.id);
+                sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).", guid, data.id);
                 data.movementType = IDLE_MOTION_TYPE;
             }
         }
         else if (data.movementType == IDLE_MOTION_TYPE)
         {
-            if (data.spawndist != 0.0f)
+            if (data.wander_distance != 0.0f)
             {
-                sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=0 (idle) have `spawndist`<>0, set to 0.", guid, data.id);
-                data.spawndist = 0.0f;
+                sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.", guid, data.id);
+                data.wander_distance = 0.0f;
             }
         }
 
@@ -1807,7 +1813,7 @@ void ObjectMgr::AddCreatureToGrid(uint32 guid, CreatureData const* data)
     {
         if (mask & 1)
         {
-            CellCoord cellCoord = Trinity::ComputeCellCoord(data->posX, data->posY);
+            CellCoord cellCoord = acore::ComputeCellCoord(data->posX, data->posY);
             CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][cellCoord.GetId()];
             cell_guids.creatures.insert(guid);
         }
@@ -1821,7 +1827,7 @@ void ObjectMgr::RemoveCreatureFromGrid(uint32 guid, CreatureData const* data)
     {
         if (mask & 1)
         {
-            CellCoord cellCoord = Trinity::ComputeCellCoord(data->posX, data->posY);
+            CellCoord cellCoord = acore::ComputeCellCoord(data->posX, data->posY);
             CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][cellCoord.GetId()];
             cell_guids.creatures.erase(guid);
         }
@@ -1933,7 +1939,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     data.posZ = z;
     data.orientation = o;
     data.spawntimesecs = spawntimedelay;
-    data.spawndist = 0;
+    data.wander_distance = 0;
     data.currentwaypoint = 0;
     data.curhealth = stats->GenerateHealth(cInfo);
     data.curmana = stats->GenerateMana(cInfo);
@@ -2140,7 +2146,7 @@ void ObjectMgr::AddGameobjectToGrid(uint32 guid, GameObjectData const* data)
     {
         if (mask & 1)
         {
-            CellCoord cellCoord = Trinity::ComputeCellCoord(data->posX, data->posY);
+            CellCoord cellCoord = acore::ComputeCellCoord(data->posX, data->posY);
             CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][cellCoord.GetId()];
             cell_guids.gameobjects.insert(guid);
         }
@@ -2154,7 +2160,7 @@ void ObjectMgr::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data
     {
         if (mask & 1)
         {
-            CellCoord cellCoord = Trinity::ComputeCellCoord(data->posX, data->posY);
+            CellCoord cellCoord = acore::ComputeCellCoord(data->posX, data->posY);
             CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][cellCoord.GetId()];
             cell_guids.gameobjects.erase(guid);
         }
@@ -2308,8 +2314,8 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.Flags                     = fields[7].GetUInt32();
         itemTemplate.Flags2                    = fields[8].GetUInt32();
         itemTemplate.BuyCount                  = uint32(fields[9].GetUInt8());
-        itemTemplate.BuyPrice                  = int32(fields[10].GetInt64());
-        itemTemplate.SellPrice                 = fields[11].GetUInt32();
+        itemTemplate.BuyPrice                  = int32(fields[10].GetInt64() * sWorld->getRate((Rates)(RATE_BUYVALUE_ITEM_POOR + itemTemplate.Quality)));
+        itemTemplate.SellPrice                 = uint32(fields[11].GetUInt32() * sWorld->getRate((Rates)(RATE_SELLVALUE_ITEM_POOR + itemTemplate.Quality)));
         itemTemplate.InventoryType             = uint32(fields[12].GetUInt8());
         itemTemplate.AllowableClass            = fields[13].GetInt32();
         itemTemplate.AllowableRace             = fields[14].GetInt32();
@@ -4701,7 +4707,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
                     continue;
                 }
 
-                if (!Trinity::IsValidMapCoord(tmp.TeleportTo.DestX, tmp.TeleportTo.DestY, tmp.TeleportTo.DestZ, tmp.TeleportTo.Orientation))
+                if (!acore::IsValidMapCoord(tmp.TeleportTo.DestX, tmp.TeleportTo.DestY, tmp.TeleportTo.DestZ, tmp.TeleportTo.Orientation))
                 {
                     sLog->outErrorDb("Table `%s` has invalid coordinates (X: %f Y: %f Z: %f O: %f) in SCRIPT_COMMAND_TELEPORT_TO for script id %u",
                         tableName.c_str(), tmp.TeleportTo.DestX, tmp.TeleportTo.DestY, tmp.TeleportTo.DestZ, tmp.TeleportTo.Orientation, tmp.id);
@@ -4799,7 +4805,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
 
             case SCRIPT_COMMAND_TEMP_SUMMON_CREATURE:
             {
-                if (!Trinity::IsValidMapCoord(tmp.TempSummonCreature.PosX, tmp.TempSummonCreature.PosY, tmp.TempSummonCreature.PosZ, tmp.TempSummonCreature.Orientation))
+                if (!acore::IsValidMapCoord(tmp.TempSummonCreature.PosX, tmp.TempSummonCreature.PosY, tmp.TempSummonCreature.PosZ, tmp.TempSummonCreature.Orientation))
                 {
                     sLog->outErrorDb("Table `%s` has invalid coordinates (X: %f Y: %f Z: %f O: %f) in SCRIPT_COMMAND_TEMP_SUMMON_CREATURE for script id %u",
                         tableName.c_str(), tmp.TempSummonCreature.PosX, tmp.TempSummonCreature.PosY, tmp.TempSummonCreature.PosZ, tmp.TempSummonCreature.Orientation, tmp.id);
@@ -6277,7 +6283,7 @@ uint32 ObjectMgr::GenerateMailID()
         sLog->outError("Mail ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
-    TRINITY_GUARD(ACE_Thread_Mutex, _mailIdMutex);
+    ACORE_GUARD(ACE_Thread_Mutex, _mailIdMutex);
     return _mailId++;
 }
 
@@ -6288,25 +6294,25 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
         case HIGHGUID_ITEM:
         {
             ASSERT(_hiItemGuid < 0xFFFFFFFE && "Item guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiItemGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiItemGuidMutex);
             return _hiItemGuid++;
         }
         case HIGHGUID_UNIT:
         {
             ASSERT(_hiCreatureGuid < 0x00FFFFFE && "Creature guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiCreatureGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiCreatureGuidMutex);
             return _hiCreatureGuid++;
         }
         case HIGHGUID_PET:
         {
             ASSERT(_hiPetGuid < 0x00FFFFFE && "Pet guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiPetGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiPetGuidMutex);
             return _hiPetGuid++;
         }
         case HIGHGUID_VEHICLE:
         {
             ASSERT(_hiVehicleGuid < 0x00FFFFFF && "Vehicle guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiVehicleGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiVehicleGuidMutex);
             return _hiVehicleGuid++;
         }
         case HIGHGUID_PLAYER:
@@ -6317,25 +6323,25 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
         case HIGHGUID_GAMEOBJECT:
         {
             ASSERT(_hiGoGuid < 0x00FFFFFE && "Gameobject guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiGoGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiGoGuidMutex);
             return _hiGoGuid++;
         }
         case HIGHGUID_CORPSE:
         {
             ASSERT(_hiCorpseGuid < 0xFFFFFFFE && "Corpse guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiCorpseGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiCorpseGuidMutex);
             return _hiCorpseGuid++;
         }
         case HIGHGUID_DYNAMICOBJECT:
         {
             ASSERT(_hiDoGuid < 0xFFFFFFFE && "DynamicObject guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiDoGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiDoGuidMutex);
             return _hiDoGuid++;
         }
         case HIGHGUID_MO_TRANSPORT:
         {
             ASSERT(_hiMoTransGuid < 0xFFFFFFFE && "MO Transport guid overflow!");
-            TRINITY_GUARD(ACE_Thread_Mutex, _hiMoTransGuidMutex);
+            ACORE_GUARD(ACE_Thread_Mutex, _hiMoTransGuidMutex);
             return _hiMoTransGuid++;
         }
         default:
@@ -6821,7 +6827,7 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
 
 uint32 ObjectMgr::GeneratePetNumber()
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, _hiPetNumberMutex);
+    ACORE_GUARD(ACE_Thread_Mutex, _hiPetNumberMutex);
     return ++_hiPetNumber;
 }
 
@@ -7172,7 +7178,7 @@ void ObjectMgr::LoadPointsOfInterest()
         POI.Importance  = fields[5].GetUInt32();
         POI.Name        = fields[6].GetString();
 
-        if (!Trinity::IsValidMapCoord(POI.PositionX, POI.PositionY))
+        if (!acore::IsValidMapCoord(POI.PositionX, POI.PositionY))
         {
             sLog->outErrorDb("Table `points_of_interest` (ID: %u) have invalid coordinates (X: %f Y: %f), ignored.", point_id, POI.PositionX, POI.PositionY);
             continue;
@@ -7718,6 +7724,15 @@ void ObjectMgr::LoadGameObjectForQuests()
                 }
                 break;
             }
+            case GAMEOBJECT_TYPE_SPELL_FOCUS:
+            {
+                if (itr->second.spellFocus.questID > 0)          //quests objects
+                {
+                    itr->second.IsForQuests = true;
+                    ++count;
+                }
+                break;
+            }
             case GAMEOBJECT_TYPE_GOOBER:
             {
                 if (itr->second.goober.questId > 0)              //quests objects
@@ -7736,15 +7751,15 @@ void ObjectMgr::LoadGameObjectForQuests()
     sLog->outString();
 }
 
-bool ObjectMgr::LoadTrinityStrings()
+bool ObjectMgr::LoadAcoreStrings()
 {
     uint32 oldMSTime = getMSTime();
 
-    _trinityStringStore.clear(); // for reload case
-    QueryResult result = WorldDatabase.PQuery("SELECT entry, content_default, content_loc1, content_loc2, content_loc3, content_loc4, content_loc5, content_loc6, content_loc7, content_loc8 FROM trinity_string");
+    _acoreStringStore.clear(); // for reload case
+    QueryResult result = WorldDatabase.PQuery("SELECT entry, content_default, content_loc1, content_loc2, content_loc3, content_loc4, content_loc5, content_loc6, content_loc7, content_loc8 FROM acore_string");
     if (!result)
     {
-        sLog->outString(">> Loaded 0 trinity strings. DB table `trinity_strings` is empty.");
+        sLog->outString(">> Loaded 0 acore strings. DB table `acore_strings` is empty.");
         sLog->outString();
         return false;
     }
@@ -7755,7 +7770,7 @@ bool ObjectMgr::LoadTrinityStrings()
 
         uint32 entry = fields[0].GetUInt32();
 
-        TrinityString& data = _trinityStringStore[entry];
+        AcoreString& data = _acoreStringStore[entry];
 
         data.Content.resize(DEFAULT_LOCALE + 1);
 
@@ -7764,15 +7779,15 @@ bool ObjectMgr::LoadTrinityStrings()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u trinity strings in %u ms", (uint32)_trinityStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u acore strings in %u ms", (uint32)_acoreStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 
     return true;
 }
 
-char const* ObjectMgr::GetTrinityString(uint32 entry, LocaleConstant locale) const
+char const* ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
 {
-    if (TrinityString const* ts = GetTrinityString(entry))
+    if (AcoreString const* ts = GetAcoreString(entry))
     {
         if (ts->Content.size() > size_t(locale) && !ts->Content[locale].empty())
             return ts->Content[locale].c_str();
@@ -8134,7 +8149,7 @@ void ObjectMgr::LoadMailLevelRewards()
 
 void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel)
 {
-    if (entry >= TRINITY_TRAINER_START_REF)
+    if (entry >= ACORE_TRAINER_START_REF)
         return;
 
     CreatureTemplate const* cInfo = GetCreatureTemplate(entry);
@@ -8720,7 +8735,7 @@ void ObjectMgr::LoadBroadcastTexts()
     }
     while (result->NextRow());
 
-    sLog->outString(">> Loaded " SIZEFMTD " broadcast texts in %u ms", _broadcastTextStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded " SZFMTD " broadcast texts in %u ms", _broadcastTextStore.size(), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 

@@ -61,7 +61,7 @@ std::vector<ChatCommand> const& ChatHandler::getCommandTable()
 
 std::string ChatHandler::PGetParseString(uint32 entry, ...) const
 {
-    const char *format = GetTrinityString(entry);
+    const char *format = GetAcoreString(entry);
     char str[1024];
     va_list ap;
     va_start(ap, entry);
@@ -70,9 +70,9 @@ std::string ChatHandler::PGetParseString(uint32 entry, ...) const
     return std::string(str);
 }
 
-char const* ChatHandler::GetTrinityString(uint32 entry) const
+char const* ChatHandler::GetAcoreString(uint32 entry) const
 {
-    return m_session->GetTrinityString(entry);
+    return m_session->GetAcoreString(entry);
 }
 
 bool ChatHandler::isAvailable(ChatCommand const& cmd) const
@@ -211,12 +211,12 @@ void ChatHandler::SendGlobalGMSysMessage(const char *str)
 
 void ChatHandler::SendSysMessage(uint32 entry)
 {
-    SendSysMessage(GetTrinityString(entry));
+    SendSysMessage(GetAcoreString(entry));
 }
 
 void ChatHandler::PSendSysMessage(uint32 entry, ...)
 {
-    const char *format = GetTrinityString(entry);
+    const char *format = GetAcoreString(entry);
     va_list ap;
     char str [2048];
     va_start(ap, entry);
@@ -321,7 +321,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
                     fullcmd.c_str(), player->GetName().c_str(), GUID_LOPART(player->GetGUID()),
                     m_session->GetAccountId(), player->GetPositionX(), player->GetPositionY(),
                     player->GetPositionZ(), player->GetMapId(),
-                    player->GetMap() ? player->GetMap()->GetMapName() : "Unknown",
+                    player->GetMap()->GetMapName(),
                     areaId, areaName.c_str(), zoneName.c_str(),
                     (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
                     GUID_LOPART(guid));
@@ -886,8 +886,8 @@ GameObject* ChatHandler::GetNearbyGameObject()
 
     Player* pl = m_session->GetPlayer();
     GameObject* obj = NULL;
-    Trinity::NearestGameObjectCheck check(*pl);
-    Trinity::GameObjectLastSearcher<Trinity::NearestGameObjectCheck> searcher(pl, obj, check);
+    acore::NearestGameObjectCheck check(*pl);
+    acore::GameObjectLastSearcher<acore::NearestGameObjectCheck> searcher(pl, obj, check);
     pl->VisitNearbyGridObject(SIZE_OF_GRIDS, searcher);
     return obj;
 }
@@ -904,13 +904,13 @@ GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid
     if (!obj && sObjectMgr->GetGOData(lowguid))                   // guid is DB guid of object
     {
         // search near player then
-        CellCoord p(Trinity::ComputeCellCoord(pl->GetPositionX(), pl->GetPositionY()));
+        CellCoord p(acore::ComputeCellCoord(pl->GetPositionX(), pl->GetPositionY()));
         Cell cell(p);
 
-        Trinity::GameObjectWithDbGUIDCheck go_check(lowguid);
-        Trinity::GameObjectSearcher<Trinity::GameObjectWithDbGUIDCheck> checker(pl, obj, go_check);
+        acore::GameObjectWithDbGUIDCheck go_check(lowguid);
+        acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck> checker(pl, obj, go_check);
 
-        TypeContainerVisitor<Trinity::GameObjectSearcher<Trinity::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > object_checker(checker);
+        TypeContainerVisitor<acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > object_checker(checker);
         cell.Visit(p, object_checker, *pl->GetMap(), *pl, pl->GetGridActivationRange());
     }
 
@@ -998,7 +998,7 @@ GameTele const* ChatHandler::extractGameTeleFromLink(char* text)
         return NULL;
 
     // id case (explicit or from shift link)
-    if (cId[0] >= '0' || cId[0] >= '9')
+    if (cId[0] >= '0' || cId[0] <= '9')
         if (uint32 id = atoi(cId))
             return sObjectMgr->GetGameTele(id);
 
@@ -1217,9 +1217,9 @@ std::string ChatHandler::GetNameLink(Player* chr) const
     return playerLink(chr->GetName());
 }
 
-char const* CliHandler::GetTrinityString(uint32 entry) const
+char const* CliHandler::GetAcoreString(uint32 entry) const
 {
-    return sObjectMgr->GetTrinityStringForDBCLocale(entry);
+    return sObjectMgr->GetAcoreStringForDBCLocale(entry);
 }
 
 bool CliHandler::isAvailable(ChatCommand const& cmd) const
@@ -1236,7 +1236,7 @@ void CliHandler::SendSysMessage(const char *str)
 
 std::string CliHandler::GetNameLink() const
 {
-    return GetTrinityString(LANG_CONSOLE_COMMAND);
+    return GetAcoreString(LANG_CONSOLE_COMMAND);
 }
 
 bool CliHandler::needReportToTarget(Player* /*chr*/) const

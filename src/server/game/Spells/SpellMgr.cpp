@@ -351,6 +351,12 @@ SpellMgr::~SpellMgr()
     UnloadSpellInfoStore();
 }
 
+SpellMgr* SpellMgr::instance()
+{
+    static SpellMgr instance;
+    return &instance;
+}
+
 /// Some checks for spells, to prevent adding deprecated/broken spells for trainers, spell book, etc
 bool SpellMgr::ComputeIsSpellValid(SpellInfo const *spellInfo, bool msg)
 {
@@ -1125,7 +1131,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 return false;
 
             Battleground* bg = player->GetBattleground();
-            if (!bg || bg->GetBgTypeID() != BATTLEGROUND_IC)
+            if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_IC)
                 return false;
 
             uint8 nodeType = spellId == 68719 ? NODE_TYPE_REFINERY : NODE_TYPE_QUARRY;
@@ -2795,7 +2801,7 @@ void SpellMgr::LoadSpellCustomAttr()
                     {
                         uint32 enchantId = spellInfo->Effects[j].MiscValue;
                         SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
-                        for (uint8 s = 0; s < MAX_ITEM_ENCHANTMENT_EFFECTS; ++s)
+                        for (uint8 s = 0; s < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++s)
                         {
                             if (enchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
                                 continue;

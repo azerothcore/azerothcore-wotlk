@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_OBJECTDEFINES_H
-#define TRINITY_OBJECTDEFINES_H
+#ifndef ACORE_OBJECTDEFINES_H
+#define ACORE_OBJECTDEFINES_H
 
 #include "Define.h"
 
