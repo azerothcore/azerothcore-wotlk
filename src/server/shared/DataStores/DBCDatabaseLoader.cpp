@@ -39,8 +39,6 @@ DBCDatabaseLoader::DBCDatabaseLoader(char const* tableName, char const* dbcForma
     ASSERT(_recordSize);
 }
 
-static char const* nullStr = "";
-
 char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
 {
     std::string query = acore::StringFormat("SELECT * FROM `%s` ORDER BY `ID` DESC", _sqlTableName);
