@@ -1,6 +1,7 @@
 #include "GameGraveyard.h"
 #include "MapManager.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Log.h"
 
 Graveyard* Graveyard::instance()
