@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_TIMER_H
-#define TRINITY_TIMER_H
+#ifndef ACORE_TIMER_H
+#define ACORE_TIMER_H
 
 #include "ace/OS_NS_sys_time.h"
 #include "Common.h"

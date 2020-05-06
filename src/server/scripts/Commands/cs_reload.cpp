@@ -140,7 +140,7 @@ public:
             { "spell_target_position",        SEC_ADMINISTRATOR, true,  &HandleReloadSpellTargetPositionCommand,        "" },
             { "spell_threats",                SEC_ADMINISTRATOR, true,  &HandleReloadSpellThreatsCommand,               "" },
             { "spell_group_stack_rules",      SEC_ADMINISTRATOR, true,  &HandleReloadSpellGroupStackRulesCommand,       "" },
-            { "trinity_string",               SEC_ADMINISTRATOR, true,  &HandleReloadTrinityStringCommand,              "" },
+            { "acore_string",                 SEC_ADMINISTRATOR, true,  &HandleReloadAcoreStringCommand,              "" },
             { "warden_action",                SEC_ADMINISTRATOR, true,  &HandleReloadWardenactionCommand,               "" },
             { "waypoint_scripts",             SEC_ADMINISTRATOR, true,  &HandleReloadWpScriptsCommand,                  "" },
             { "waypoint_data",                SEC_ADMINISTRATOR, true,  &HandleReloadWpCommand,                         "" },
@@ -179,7 +179,7 @@ public:
         HandleReloadMailLevelRewardCommand(handler, "");
         HandleReloadCommandCommand(handler, "");
         HandleReloadReservedNameCommand(handler, "");
-        HandleReloadTrinityStringCommand(handler, "");
+        HandleReloadAcoreStringCommand(handler, "");
         HandleReloadGameTeleCommand(handler, "");
 
         HandleReloadVehicleAccessoryCommand(handler, "");
@@ -718,11 +718,11 @@ public:
         return true;
     }
 
-    static bool HandleReloadTrinityStringCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAcoreStringCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading trinity_string Table!");
-        sObjectMgr->LoadTrinityStrings();
-        handler->SendGlobalGMSysMessage("DB table `trinity_string` reloaded.");
+        sLog->outString("Re-Loading acore_string Table!");
+        sObjectMgr->LoadAcoreStrings();
+        handler->SendGlobalGMSysMessage("DB table `acore_string` reloaded.");
         return true;
     }
 

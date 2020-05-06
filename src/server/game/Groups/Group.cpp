@@ -349,6 +349,9 @@ Player* Group::GetInvited(const std::string& name) const
 
 bool Group::AddMember(Player* player)
 {
+    if (!player)
+        return false;
+
     // Get first not-full group
     uint8 subGroup = 0;
     if (m_subGroupsCounts)
@@ -379,22 +382,19 @@ bool Group::AddMember(Player* player)
 
     SubGroupCounterIncrease(subGroup);
 
-    //if (player)
+    player->SetGroupInvite(NULL);
+    if (player->GetGroup())
     {
-        player->SetGroupInvite(NULL);
-        if (player->GetGroup())
-        {
-            if (isBGGroup() || isBFGroup()) // if player is in group and he is being added to BG raid group, then call SetBattlegroundRaid()
-                player->SetBattlegroundOrBattlefieldRaid(this, subGroup);
-            else //if player is in bg raid and we are adding him to normal group, then call SetOriginalGroup()
-                player->SetOriginalGroup(this, subGroup);
-        }
-        else //if player is not in group, then call set group
-            player->SetGroup(this, subGroup);
-
-        // if the same group invites the player back, cancel the homebind timer
-        _cancelHomebindIfInstance(player);
+        if (isBGGroup() || isBFGroup()) // if player is in group and he is being added to BG raid group, then call SetBattlegroundRaid()
+            player->SetBattlegroundOrBattlefieldRaid(this, subGroup);
+        else //if player is in bg raid and we are adding him to normal group, then call SetOriginalGroup()
+            player->SetOriginalGroup(this, subGroup);
     }
+    else //if player is not in group, then call set group
+        player->SetGroup(this, subGroup);
+
+    // if the same group invites the player back, cancel the homebind timer
+    _cancelHomebindIfInstance(player);
 
     if (!isRaidGroup())                                      // reset targetIcons for non-raid-groups
     {
@@ -414,10 +414,11 @@ bool Group::AddMember(Player* player)
     }
 
     SendUpdate();
-    sScriptMgr->OnGroupAddMember(this, player->GetGUID());
 
     if (player)
     {
+        sScriptMgr->OnGroupAddMember(this, player->GetGUID());
+
         if (!IsLeader(player->GetGUID()) && !isBGGroup() && !isBFGroup())
         {
             Player::ResetInstances(player->GetGUIDLow(), INSTANCE_RESET_GROUP_JOIN, false);
@@ -554,7 +555,7 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
         }
 
         // Reevaluate group enchanter if the leaving player had enchanting skill or the player is offline
-        if ((player && player->GetSkillValue(SKILL_ENCHANTING)) || !player)
+        if (!player || player->GetSkillValue(SKILL_ENCHANTING))
             ResetMaxEnchantingLevel();
 
         // Remove player from loot rolls
@@ -1827,6 +1828,8 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
     uint32 arenaTeamId = reference->GetArenaTeamId(arenaSlot);
     TeamId teamId = reference->GetTeamId();
 
+    BattlegroundQueueTypeId bgQueueTypeIdRandom = BattlegroundMgr::BGQueueTypeId(BATTLEGROUND_RB, 0);
+
     // check every member of the group to be able to join
     uint32 memberscount = 0;
     for (GroupReference* itr = GetFirstMember(); itr != NULL; itr = itr->next(), ++memberscount)
@@ -1865,6 +1868,18 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         // pussywizard: check for free slot, this is actually ensured before calling this function, but just in case
         if (!member->HasFreeBattlegroundQueueId())
             return ERR_BATTLEGROUND_TOO_MANY_QUEUES;
+
+        // don't let join if someone from the group is in bg queue random
+        if (member->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom))
+            return ERR_IN_RANDOM_BG;
+
+        // don't let join to bg queue random if someone from the group is already in bg queue
+        if (bgTemplate->GetBgTypeID() == BATTLEGROUND_RB && member->InBattlegroundQueue())
+            return ERR_IN_NON_RANDOM_BG;
+
+        // don't let Death Knights join BG queues when they are not allowed to be teleported yet
+        if (member->getClass() == CLASS_DEATH_KNIGHT && member->GetMapId() == 609 && !member->IsGameMaster() && !member->HasSpell(50977))
+            return ERR_GROUP_JOIN_BATTLEGROUND_FAIL;
     }
 
     // for arenas: check party size is proper
@@ -2325,4 +2340,3 @@ void Group::ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply)
     else
         slot->flags &= ~flag;
 }
-

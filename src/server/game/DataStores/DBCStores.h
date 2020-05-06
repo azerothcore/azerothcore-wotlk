@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_DBCSTORES_H
-#define TRINITY_DBCSTORES_H
+#ifndef ACORE_DBCSTORES_H
+#define ACORE_DBCSTORES_H
 
 #include "Common.h"
 #include "DBCStore.h"
@@ -40,6 +40,8 @@ MapDifficulty const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty);
 MapDifficulty const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty &difficulty);
 
 bool IsSharedDifficultyMap(uint32 mapid);
+
+uint32 const* /*[MAX_TALENT_TABS]*/ GetTalentTabPages(uint8 cls);
 
 uint32 GetLiquidFlags(uint32 liquidType);
 

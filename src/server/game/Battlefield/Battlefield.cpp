@@ -396,6 +396,13 @@ void Battlefield::AskToLeaveQueue(Player* player)
     m_PlayersInQueue[player->GetTeamId()].erase(player->GetGUID());
 }
 
+// Called in WorldSession::HandleHearthAndResurrect
+void Battlefield::PlayerAskToLeave(Player* player)
+{
+    // Player leaving Wintergrasp, trigger Hearthstone spell.
+    player->CastSpell(player, 8690, true);
+}
+
 // Called in WorldSession::HandleBfEntryInviteResponse
 void Battlefield::PlayerAcceptInviteToWar(Player* player)
 {
@@ -971,8 +978,8 @@ bool BfCapturePoint::Update(uint32 diff)
     }
 
     std::list<Player*> players;
-    Trinity::AnyPlayerInObjectRangeCheck checker(capturePoint, radius);
-    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(capturePoint, players, checker);
+    acore::AnyPlayerInObjectRangeCheck checker(capturePoint, radius);
+    acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(capturePoint, players, checker);
     capturePoint->VisitNearbyWorldObject(radius, searcher);
 
     for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)

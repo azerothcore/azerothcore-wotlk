@@ -732,7 +732,7 @@ class Spell
 #endif
 };
 
-namespace Trinity
+namespace acore
 {
     struct WorldObjectSpellTargetCheck
     {

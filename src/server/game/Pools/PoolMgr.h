@@ -4,11 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_POOLHANDLER_H
-#define TRINITY_POOLHANDLER_H
+#ifndef ACORE_POOLHANDLER_H
+#define ACORE_POOLHANDLER_H
 
 #include "Define.h"
-#include <ace/Singleton.h>
 #include "Creature.h"
 #include "GameObject.h"
 #include "QuestDef.h"
@@ -92,13 +91,13 @@ typedef std::pair<PooledQuestRelation::iterator, PooledQuestRelation::iterator> 
 
 class PoolMgr
 {
-    friend class ACE_Singleton<PoolMgr, ACE_Null_Mutex>;
-
     private:
         PoolMgr();
         ~PoolMgr() {};
 
     public:
+        static PoolMgr* instance();
+
         void LoadFromDB();
         void LoadQuestPools();
         void SaveQuestsToDB(bool daily, bool weekly, bool other);
@@ -129,12 +128,11 @@ class PoolMgr
         template<typename T>
         void SpawnPool(uint32 pool_id, uint32 db_guid_or_pool_id);
 
-        uint32 max_pool_id;
-        typedef std::vector<PoolTemplateData>       PoolTemplateDataMap;
-        typedef std::vector<PoolGroup<Creature> >   PoolGroupCreatureMap;
-        typedef std::vector<PoolGroup<GameObject> > PoolGroupGameObjectMap;
-        typedef std::vector<PoolGroup<Pool> >       PoolGroupPoolMap;
-        typedef std::vector<PoolGroup<Quest> >      PoolGroupQuestMap;
+        typedef std::unordered_map<uint32, PoolTemplateData>      PoolTemplateDataMap;
+        typedef std::unordered_map<uint32, PoolGroup<Creature>>   PoolGroupCreatureMap;
+        typedef std::unordered_map<uint32, PoolGroup<GameObject>> PoolGroupGameObjectMap;
+        typedef std::unordered_map<uint32, PoolGroup<Pool>>       PoolGroupPoolMap;
+        typedef std::unordered_map<uint32, PoolGroup<Quest>>      PoolGroupQuestMap;
         typedef std::pair<uint32, uint32>           SearchPair;
         typedef std::map<uint32, uint32>            SearchMap;
 
@@ -152,7 +150,7 @@ class PoolMgr
         ActivePoolData mSpawnedData;
 };
 
-#define sPoolMgr ACE_Singleton<PoolMgr, ACE_Null_Mutex>::instance()
+#define sPoolMgr PoolMgr::instance()
 
 // Method that tell if the creature is part of a pool and return the pool id if yes
 template<>

@@ -394,7 +394,7 @@ class spell_entropius_negative_energy : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                Trinity::Containers::RandomResizeList(targets, GetCaster()->GetAI()->GetData(DATA_NEGATIVE_ENERGY_TARGETS));
+                acore::Containers::RandomResizeList(targets, GetCaster()->GetAI()->GetData(DATA_NEGATIVE_ENERGY_TARGETS));
             }
 
             void HandleScriptEffect(SpellEffIndex effIndex)

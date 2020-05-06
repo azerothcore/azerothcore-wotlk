@@ -539,7 +539,7 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                             if (_guardList.empty())
                             {
                                 GetCreatureListWithEntryInGrid(_guardList, me, NPC_SE_KOR_KRON_REAVER, 20.0f);
-                                _guardList.sort(Trinity::ObjectDistanceOrderPred(me));
+                                _guardList.sort(acore::ObjectDistanceOrderPred(me));
                             }
                             uint32 x = 1;
                             for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
@@ -801,7 +801,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                             if (_guardList.empty())
                             {
                                 GetCreatureListWithEntryInGrid(_guardList, me, NPC_SE_SKYBREAKER_MARINE, 20.0f);
-                                _guardList.sort(Trinity::ObjectDistanceOrderPred(me));
+                                _guardList.sort(acore::ObjectDistanceOrderPred(me));
                             }
                             uint32 x = 1;
                             for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
@@ -1240,7 +1240,7 @@ class spell_deathbringer_blood_nova_targeting : public SpellScriptLoader
                 // select one random target, with preference of ranged targets
                 uint32 targetsAtRange = 0;
                 uint32 const minTargets = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 10 : 4);
-                targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster(), false));
+                targets.sort(acore::ObjectDistanceOrderPred(GetCaster(), false));
 
                 // get target count at range
                 for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr, ++targetsAtRange)
@@ -1308,12 +1308,12 @@ class spell_deathbringer_boiling_blood : public SpellScriptLoader
 
                 if (GetSpellInfo()->Id == 72385 || GetSpellInfo()->Id == 72442) // 10n, 10h
                 {
-                    WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+                    WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
                     targets.clear();
                     targets.push_back(target);
                 }
                 else
-                    Trinity::Containers::RandomResizeList(targets, 3);
+                    acore::Containers::RandomResizeList(targets, 3);
             }
 
             void Register()

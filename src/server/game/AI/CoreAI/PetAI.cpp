@@ -87,11 +87,52 @@ void PetAI::_doMeleeAttack()
     DoMeleeAttackIfReady();
 }
 
-bool PetAI::_canMeleeAttack() const
+bool PetAI::_canMeleeAttack()
 {
-    return me->GetEntry() != 416 /*ENTRY_IMP*/ &&
-        me->GetEntry() != 510 /*ENTRY_WATER_ELEMENTAL*/ &&
-        me->GetEntry() != 37994 /*ENTRY_WATER_ELEMENTAL_PERM*/; 
+    combatRange = 0.f;
+    switch (me->GetEntry())
+    {
+        case ENTRY_IMP:
+        case ENTRY_WATER_ELEMENTAL:
+        case ENTRY_WATER_ELEMENTAL_PERM:
+        {
+            for (uint8 i = 0; i < me->GetPetAutoSpellSize(); ++i)
+            {
+                uint32 spellID = me->GetPetAutoSpellOnPos(i);
+                switch (spellID)
+                {
+                    case IMP_FIREBOLT_RANK_1:
+                    case IMP_FIREBOLT_RANK_2:
+                    case IMP_FIREBOLT_RANK_3:
+                    case IMP_FIREBOLT_RANK_4:
+                    case IMP_FIREBOLT_RANK_5:
+                    case IMP_FIREBOLT_RANK_6:
+                    case IMP_FIREBOLT_RANK_7:
+                    case IMP_FIREBOLT_RANK_8:
+                    case IMP_FIREBOLT_RANK_9:
+                    case WATER_ELEMENTAL_WATERBOLT_1:
+                    case WATER_ELEMENTAL_WATERBOLT_2:
+                    {
+                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+                        int32 mana = me->GetPower(POWER_MANA);
+
+                        if (mana >= spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
+                        {
+                            combatRange = spellInfo->GetMaxRange();
+                            return true;
+                        }
+                    }
+                    default:
+                        break;
+                }
+            }
+            return false;
+        }
+        default:
+            break;
+    }
+
+    return true;
 }
 
 void PetAI::UpdateAI(uint32 diff)
@@ -563,7 +604,8 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
         if (chase)
         {
-            me->GetMotionMaster()->MoveChase(target, !_canMeleeAttack() ? 20.0f: 0.0f, me->GetAngle(target));
+            if (_canMeleeAttack())
+                me->GetMotionMaster()->MoveChase(target, combatRange, float(M_PI));
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
         {
