@@ -93,7 +93,7 @@ namespace MMAP
 
     bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
+        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         // make sure the mmap is loaded and ready to load tiles
         if(!loadMapData(mapId))
@@ -161,7 +161,7 @@ namespace MMAP
 
         dtStatus stat;
         {
-            TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
+            ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
             stat = mmap->navMesh->addTile(data, fileHeader.size, DT_TILE_FREE_DATA, 0, &tileRef);
         }
 
@@ -188,7 +188,7 @@ namespace MMAP
 
     bool MMapManager::unloadMap(uint32 mapId, int32 x, int32 y)
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
+        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         // check if we have this map loaded
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
@@ -217,7 +217,7 @@ namespace MMAP
 
         dtStatus status;
         {
-            TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
+            ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
             status = mmap->navMesh->removeTile(tileRef, NULL, NULL);
         }
 
@@ -245,7 +245,7 @@ namespace MMAP
 
     bool MMapManager::unloadMap(uint32 mapId)
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
+        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
         {
@@ -265,7 +265,7 @@ namespace MMAP
 
             dtStatus status;
             {
-                TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
+                ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
                 status = mmap->navMesh->removeTile(i->second, NULL, NULL);
             }
 
@@ -291,7 +291,7 @@ namespace MMAP
 
     bool MMapManager::unloadMapInstance(uint32 mapId, uint32 instanceId)
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
+        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         // check if we have this map loaded
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
@@ -326,7 +326,7 @@ namespace MMAP
     dtNavMesh const* MMapManager::GetNavMesh(uint32 mapId)
     {
         // pussywizard: moved to calling function
-        //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
+        //ACORE_READ_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
             return NULL;
@@ -337,7 +337,7 @@ namespace MMAP
     dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId, uint32 instanceId)
     {
         // pussywizard: moved to calling function
-        //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
+        //ACORE_READ_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
             return NULL;
@@ -346,7 +346,7 @@ namespace MMAP
         if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())
         {
         // pussywizard: different instances of the same map shouldn't access this simultaneously
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
+        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
         // check again after acquiring mutex
         if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())
         {

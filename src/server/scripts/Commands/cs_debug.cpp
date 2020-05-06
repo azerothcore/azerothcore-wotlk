@@ -879,8 +879,8 @@ public:
         else
         {
             Creature* passenger = nullptr;
-            Trinity::AllCreaturesOfEntryInRange check(handler->GetSession()->GetPlayer(), entry, 20.0f);
-            Trinity::CreatureSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(handler->GetSession()->GetPlayer(), passenger, check);
+            acore::AllCreaturesOfEntryInRange check(handler->GetSession()->GetPlayer(), entry, 20.0f);
+            acore::CreatureSearcher<acore::AllCreaturesOfEntryInRange> searcher(handler->GetSession()->GetPlayer(), passenger, check);
             handler->GetSession()->GetPlayer()->VisitNearbyObject(30.0f, searcher);
             if (!passenger || passenger == target)
                 return false;

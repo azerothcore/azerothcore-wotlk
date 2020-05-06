@@ -38,7 +38,7 @@ add_dependencies(authserver revision.h)
 
 if(NOT WIN32)
   set_target_properties(authserver PROPERTIES
-    COMPILE_DEFINITIONS _TRINITY_REALM_CONFIG="${CONF_DIR}/authserver.conf")
+    COMPILE_DEFINITIONS _ACORE_REALM_CONFIG="${CONF_DIR}/authserver.conf")
 endif()
 
 target_link_libraries(authserver

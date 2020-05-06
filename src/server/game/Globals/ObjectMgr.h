@@ -23,7 +23,6 @@
 #include "Map.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
-#include <ace/Singleton.h>
 #include "VehicleDefines.h"
 #include <string>
 #include <map>
@@ -111,7 +110,7 @@ enum ScriptCommands
     SCRIPT_COMMAND_MODEL                 = 32,               // source = Creature, datalong = model id
     SCRIPT_COMMAND_CLOSE_GOSSIP          = 33,               // source = Player
     SCRIPT_COMMAND_PLAYMOVIE             = 34,               // source = Player, datalong = movie id
-    SCRIPT_COMMAND_MOVEMENT              = 35                // soucre = Creature, datalong = MovementType, datalong2 = MovementDistance (spawndist f.ex.), dataint = pathid
+    SCRIPT_COMMAND_MOVEMENT              = 35                // soucre = Creature, datalong = MovementType, datalong2 = MovementDistance (wander_distance f.ex.), dataint = pathid
 };
 
 // Benchmarked: Faster than std::unordered_map (insert/find)
@@ -465,25 +464,27 @@ typedef std::unordered_map<uint32, BroadcastText> BroadcastTextContainer;
 
 typedef std::set<uint32> CellGuidSet;
 typedef std::unordered_map<uint32/*player guid*/, uint32/*instance*/> CellCorpseSet;
+
 struct CellObjectGuids
 {
     CellGuidSet creatures;
     CellGuidSet gameobjects;
     CellCorpseSet corpses;
 };
+
 typedef std::unordered_map<uint32/*cell_id*/, CellObjectGuids> CellObjectGuidsMap;
 typedef std::unordered_map<uint32/*(mapid, spawnMode) pair*/, CellObjectGuidsMap> MapObjectGuids;
 
-// Trinity string ranges
-#define MIN_TRINITY_STRING_ID           1                    // 'trinity_string'
-#define MAX_TRINITY_STRING_ID           2000000000
+// Acore string ranges
+#define MIN_ACORE_STRING_ID           1                    // 'acore_string'
+#define MAX_ACORE_STRING_ID           2000000000
 #define MIN_CREATURE_AI_TEXT_STRING_ID (-1)                 // 'creature_ai_texts'
 #define MAX_CREATURE_AI_TEXT_STRING_ID (-1000000)
 
-// Trinity Trainer Reference start range
-#define TRINITY_TRAINER_START_REF      200000
+// Acore Trainer Reference start range
+#define ACORE_TRAINER_START_REF      200000
 
-struct TrinityString
+struct AcoreString
 {
     StringVector Content;
 };
@@ -501,7 +502,7 @@ typedef std::unordered_map<uint32, QuestOfferRewardLocale> QuestOfferRewardLocal
 typedef std::unordered_map<uint32, QuestRequestItemsLocale> QuestRequestItemsLocaleContainer;
 typedef std::unordered_map<uint32, NpcTextLocale> NpcTextLocaleContainer;
 typedef std::unordered_map<uint32, PageTextLocale> PageTextLocaleContainer;
-typedef std::unordered_map<int32, TrinityString> TrinityStringContainer;
+typedef std::unordered_map<int32, AcoreString> AcoreStringContainer;
 typedef std::unordered_map<uint32, GossipMenuItemsLocale> GossipMenuItemsLocaleContainer;
 typedef std::unordered_map<uint32, PointOfInterestLocale> PointOfInterestLocaleContainer;
 
@@ -686,13 +687,14 @@ class PlayerDumpReader;
 class ObjectMgr
 {
     friend class PlayerDumpReader;
-    friend class ACE_Singleton<ObjectMgr, ACE_Null_Mutex>;
 
     private:
         ObjectMgr();
         ~ObjectMgr();
 
     public:
+        static ObjectMgr* instance();
+
         typedef std::unordered_map<uint32, Item*> ItemMap;
 
         typedef std::unordered_map<uint32, Quest*> QuestMap;
@@ -964,7 +966,7 @@ class ObjectMgr
         void ValidateSpellScripts();
         void InitializeSpellInfoPrecomputedData();
 
-		bool LoadTrinityStrings();
+		bool LoadAcoreStrings();
         void LoadBroadcastTexts();
         void LoadBroadcastTextLocales();
         void LoadCreatureClassLevelStats();
@@ -1216,16 +1218,16 @@ class ObjectMgr
         GameObjectData& NewGOData(uint32 guid) { return _gameObjectDataStore[guid]; }
         void DeleteGOData(uint32 guid);
 
-	    TrinityString const* GetTrinityString(uint32 entry) const
+	    AcoreString const* GetAcoreString(uint32 entry) const
         {
-            TrinityStringContainer::const_iterator itr = _trinityStringStore.find(entry);
-            if (itr == _trinityStringStore.end())
+            AcoreStringContainer::const_iterator itr = _acoreStringStore.find(entry);
+            if (itr == _acoreStringStore.end())
                 return NULL;
 
             return &itr->second;
         }
-        char const* GetTrinityString(uint32 entry, LocaleConstant locale) const;
-        char const* GetTrinityStringForDBCLocale(uint32 entry) const { return GetTrinityString(entry, DBCLocaleIndex); }
+        char const* GetAcoreString(uint32 entry, LocaleConstant locale) const;
+        char const* GetAcoreStringForDBCLocale(uint32 entry) const { return GetAcoreString(entry, DBCLocaleIndex); }
         LocaleConstant GetDBCLocaleIndex() const { return DBCLocaleIndex; }
         void SetDBCLocaleIndex(LocaleConstant locale) { DBCLocaleIndex = locale; }
 
@@ -1478,7 +1480,7 @@ class ObjectMgr
         QuestRequestItemsLocaleContainer _questRequestItemsLocaleStore;
         NpcTextLocaleContainer _npcTextLocaleStore;
         PageTextLocaleContainer _pageTextLocaleStore;
-        TrinityStringContainer _trinityStringStore;
+        AcoreStringContainer _acoreStringStore;
         GossipMenuItemsLocaleContainer _gossipMenuItemsLocaleStore;
         PointOfInterestLocaleContainer _pointOfInterestLocaleStore;
 
@@ -1499,6 +1501,6 @@ class ObjectMgr
         std::set<uint32> _transportMaps; // Helper container storing map ids that are for transports only, loaded from gameobject_template
 };
 
-#define sObjectMgr ACE_Singleton<ObjectMgr, ACE_Null_Mutex>::instance()
+#define sObjectMgr ObjectMgr::instance()
 
 #endif

@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_BYTECONVERTER_H
-#define TRINITY_BYTECONVERTER_H
+#ifndef ACORE_BYTECONVERTER_H
+#define ACORE_BYTECONVERTER_H
 
 /** ByteConverter reverse your byte order.  This is use
     for cross platform where they have different endians.
@@ -32,7 +32,7 @@ namespace ByteConverter
     }
 }
 
-#if TRINITY_ENDIAN == TRINITY_BIGENDIAN
+#if ACORE_ENDIAN == ACORE_BIGENDIAN
 template<typename T> inline void EndianConvert(T& val) { ByteConverter::apply<T>(&val); }
 template<typename T> inline void EndianConvertReverse(T&) { }
 template<typename T> inline void EndianConvertPtr(void* val) { ByteConverter::apply<T>(val); }

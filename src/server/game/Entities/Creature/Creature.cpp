@@ -160,7 +160,7 @@ bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 }
 
 Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_PlayerDamageReq(0), m_lootRecipient(0), m_lootRecipientGroup(0),
-m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_respawnradius(0.0f),
+m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f),
 m_transportCheckTimer(1000), lootPickPocketRestoreTime(0),  m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
 m_DBTableGuid(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false),
 m_AlreadySearchedAssistance(false), m_regenHealth(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
@@ -365,7 +365,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     // Load creature equipment
     if (!data || data->equipmentId == 0)                    // use default from the template
         LoadEquipment();
-    else if (data && data->equipmentId != 0)                // override, 0 means no equipment
+    else
     {
         m_originalEquipmentId = data->equipmentId;
         LoadEquipment(data->equipmentId);
@@ -387,7 +387,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
 
     // checked at loading
     m_defaultMovementType = MovementGeneratorType(cinfo->MovementType);
-    if (!m_respawnradius && m_defaultMovementType == RANDOM_MOTION_TYPE)
+    if (!m_wanderDistance && m_defaultMovementType == RANDOM_MOTION_TYPE)
         m_defaultMovementType = IDLE_MOTION_TYPE;
 
     for (uint8 i=0; i < CREATURE_MAX_SPELLS; ++i)
@@ -759,13 +759,13 @@ void Creature::DoFleeToGetAssistance()
     {
         Creature* creature = NULL;
 
-        CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
+        CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
         Cell cell(p);
         cell.SetNoCreate();
-        Trinity::NearestAssistCreatureInCreatureRangeCheck u_check(this, GetVictim(), radius);
-        Trinity::CreatureLastSearcher<Trinity::NearestAssistCreatureInCreatureRangeCheck> searcher(this, creature, u_check);
+        acore::NearestAssistCreatureInCreatureRangeCheck u_check(this, GetVictim(), radius);
+        acore::CreatureLastSearcher<acore::NearestAssistCreatureInCreatureRangeCheck> searcher(this, creature, u_check);
 
-        TypeContainerVisitor<Trinity::CreatureLastSearcher<Trinity::NearestAssistCreatureInCreatureRangeCheck>, GridTypeMapContainer > grid_creature_searcher(searcher);
+        TypeContainerVisitor<acore::CreatureLastSearcher<acore::NearestAssistCreatureInCreatureRangeCheck>, GridTypeMapContainer > grid_creature_searcher(searcher);
 
         cell.Visit(p, grid_creature_searcher, *GetMap(), *this, radius);
 
@@ -1072,12 +1072,12 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
 
     data.spawntimesecs = m_respawnDelay;
     // prevent add data integrity problems
-    data.spawndist = GetDefaultMovementType() == IDLE_MOTION_TYPE ? 0.0f : m_respawnradius;
+    data.wander_distance = GetDefaultMovementType() == IDLE_MOTION_TYPE ? 0.0f : m_wanderDistance;
     data.currentwaypoint = 0;
     data.curhealth = GetHealth();
     data.curmana = GetPower(POWER_MANA);
     // prevent add data integrity problems
-    data.movementType = !m_respawnradius && GetDefaultMovementType() == RANDOM_MOTION_TYPE
+    data.movementType = !m_wanderDistance && GetDefaultMovementType() == RANDOM_MOTION_TYPE
         ? IDLE_MOTION_TYPE : GetDefaultMovementType();
     data.spawnMask = spawnMask;
     data.npcflag = npcflag;
@@ -1106,7 +1106,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt->setFloat(index++, GetPositionZ());
     stmt->setFloat(index++, GetOrientation());
     stmt->setUInt32(index++, m_respawnDelay);
-    stmt->setFloat(index++, m_respawnradius);
+    stmt->setFloat(index++, m_wanderDistance);
     stmt->setUInt32(index++, 0);
     stmt->setUInt32(index++, GetHealth());
     stmt->setUInt32(index++, GetPower(POWER_MANA));
@@ -1345,7 +1345,7 @@ bool Creature::LoadCreatureFromDB(uint32 guid, Map* map, bool addToMap, bool gri
     //We should set first home position, because then AI calls home movement
     SetHomePosition(data->posX, data->posY, data->posZ, data->orientation);
 
-    m_respawnradius = data->spawndist;
+    m_wanderDistance = data->wander_distance;
 
     m_respawnDelay = data->spawntimesecs;
     m_deathState = ALIVE;
@@ -1846,7 +1846,7 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
 // select nearest hostile unit within the given distance (regardless of threat list).
 Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) const
 { 
-    CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
+    CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
     Cell cell(p);
     cell.SetNoCreate();
 
@@ -1856,11 +1856,11 @@ Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) c
         if (dist == 0.0f)
             dist = MAX_SEARCHER_DISTANCE;
 
-        Trinity::NearestHostileUnitCheck u_check(this, dist, playerOnly);
-        Trinity::UnitLastSearcher<Trinity::NearestHostileUnitCheck> searcher(this, target, u_check);
+        acore::NearestHostileUnitCheck u_check(this, dist, playerOnly);
+        acore::UnitLastSearcher<acore::NearestHostileUnitCheck> searcher(this, target, u_check);
 
-        TypeContainerVisitor<Trinity::UnitLastSearcher<Trinity::NearestHostileUnitCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
-        TypeContainerVisitor<Trinity::UnitLastSearcher<Trinity::NearestHostileUnitCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
+        TypeContainerVisitor<acore::UnitLastSearcher<acore::NearestHostileUnitCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
+        TypeContainerVisitor<acore::UnitLastSearcher<acore::NearestHostileUnitCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
 
         cell.Visit(p, world_unit_searcher, *GetMap(), *this, dist);
         cell.Visit(p, grid_unit_searcher, *GetMap(), *this, dist);
@@ -1872,7 +1872,7 @@ Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) c
 // select nearest hostile unit within the given attack distance (i.e. distance is ignored if > than ATTACK_DISTANCE), regardless of threat list.
 Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
 { 
-    CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
+    CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
     Cell cell(p);
     cell.SetNoCreate();
 
@@ -1884,11 +1884,11 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
         dist = MAX_SEARCHER_DISTANCE;
 
     {
-        Trinity::NearestHostileUnitInAttackDistanceCheck u_check(this, dist);
-        Trinity::UnitLastSearcher<Trinity::NearestHostileUnitInAttackDistanceCheck> searcher(this, target, u_check);
+        acore::NearestHostileUnitInAttackDistanceCheck u_check(this, dist);
+        acore::UnitLastSearcher<acore::NearestHostileUnitInAttackDistanceCheck> searcher(this, target, u_check);
 
-        TypeContainerVisitor<Trinity::UnitLastSearcher<Trinity::NearestHostileUnitInAttackDistanceCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
-        TypeContainerVisitor<Trinity::UnitLastSearcher<Trinity::NearestHostileUnitInAttackDistanceCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
+        TypeContainerVisitor<acore::UnitLastSearcher<acore::NearestHostileUnitInAttackDistanceCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
+        TypeContainerVisitor<acore::UnitLastSearcher<acore::NearestHostileUnitInAttackDistanceCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
 
         cell.Visit(p, world_unit_searcher, *GetMap(), *this, dist);
         cell.Visit(p, grid_unit_searcher, *GetMap(), *this, dist);
@@ -1924,14 +1924,14 @@ void Creature::CallAssistance()
             std::list<Creature*> assistList;
 
             {
-                CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
+                CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
                 Cell cell(p);
                 cell.SetNoCreate();
 
-                Trinity::AnyAssistCreatureInRangeCheck u_check(this, GetVictim(), radius);
-                Trinity::CreatureListSearcher<Trinity::AnyAssistCreatureInRangeCheck> searcher(this, assistList, u_check);
+                acore::AnyAssistCreatureInRangeCheck u_check(this, GetVictim(), radius);
+                acore::CreatureListSearcher<acore::AnyAssistCreatureInRangeCheck> searcher(this, assistList, u_check);
 
-                TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AnyAssistCreatureInRangeCheck>, GridTypeMapContainer >  grid_creature_searcher(searcher);
+                TypeContainerVisitor<acore::CreatureListSearcher<acore::AnyAssistCreatureInRangeCheck>, GridTypeMapContainer >  grid_creature_searcher(searcher);
 
                 cell.Visit(p, grid_creature_searcher, *GetMap(), *this, radius);
             }
@@ -1956,14 +1956,14 @@ void Creature::CallForHelp(float radius)
     if (radius <= 0.0f || !GetVictim() || IsPet() || IsCharmed())
         return;
 
-    CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
+    CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
     Cell cell(p);
     cell.SetNoCreate();
 
-    Trinity::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), radius);
-    Trinity::CreatureWorker<Trinity::CallOfHelpCreatureInRangeDo> worker(this, u_do);
+    acore::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), radius);
+    acore::CreatureWorker<acore::CallOfHelpCreatureInRangeDo> worker(this, u_do);
 
-    TypeContainerVisitor<Trinity::CreatureWorker<Trinity::CallOfHelpCreatureInRangeDo>, GridTypeMapContainer >  grid_creature_searcher(worker);
+    TypeContainerVisitor<acore::CreatureWorker<acore::CallOfHelpCreatureInRangeDo>, GridTypeMapContainer >  grid_creature_searcher(worker);
 
     cell.Visit(p, grid_creature_searcher, *GetMap(), *this, radius);
 }
@@ -2217,7 +2217,11 @@ bool Creature::LoadCreaturesAddon(bool reload)
 
     //Load Path
     if (cainfo->path_id != 0)
+    {
+        if (sWorld->getBoolConfig(CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE))
+            setActive(true);
         m_path_id = cainfo->path_id;
+    }
 
     if (!cainfo->auras.empty())
     {
@@ -2404,7 +2408,7 @@ void Creature::GetRespawnPosition(float &x, float &y, float &z, float* ori, floa
             if (ori)
                 *ori = data->orientation;
             if (dist)
-                *dist = data->spawndist;
+                *dist = data->wander_distance;
 
             return;
         }
@@ -2585,7 +2589,7 @@ std::string const& Creature::GetNameForLocaleIdx(LocaleConstant loc_idx) const
 
 void Creature::SetPosition(float x, float y, float z, float o)
 { 
-    if (!Trinity::IsValidMapCoord(x, y, z, o))
+    if (!acore::IsValidMapCoord(x, y, z, o))
         return;
 
     GetMap()->CreatureRelocation(this, x, y, z, o);

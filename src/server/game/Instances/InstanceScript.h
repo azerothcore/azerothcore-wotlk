@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_INSTANCE_DATA_H
-#define TRINITY_INSTANCE_DATA_H
+#ifndef ACORE_INSTANCE_DATA_H
+#define ACORE_INSTANCE_DATA_H
 
 #include "ZoneScript.h"
 #include "World.h"

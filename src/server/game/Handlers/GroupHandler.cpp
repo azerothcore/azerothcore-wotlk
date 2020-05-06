@@ -1050,25 +1050,25 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket &recvData)
 
     data.put<uint64>(maskPos, auraMask);                    // GROUP_UPDATE_FLAG_AURAS
 
-    if (updateFlags & GROUP_UPDATE_FLAG_PET_GUID)
+    if (pet && (updateFlags & GROUP_UPDATE_FLAG_PET_GUID))
         data << uint64(pet->GetGUID());
 
     data << std::string(pet ? pet->GetName() : "");         // GROUP_UPDATE_FLAG_PET_NAME
     data << uint16(pet ? pet->GetDisplayId() : 0);          // GROUP_UPDATE_FLAG_PET_MODEL_ID
 
-    if (updateFlags & GROUP_UPDATE_FLAG_PET_CUR_HP)
+    if (pet && (updateFlags & GROUP_UPDATE_FLAG_PET_CUR_HP))
         data << uint32(pet->GetHealth());
 
-    if (updateFlags & GROUP_UPDATE_FLAG_PET_MAX_HP)
+    if (pet && (updateFlags & GROUP_UPDATE_FLAG_PET_MAX_HP))
         data << uint32(pet->GetMaxHealth());
 
-    if (updateFlags & GROUP_UPDATE_FLAG_PET_POWER_TYPE)
+    if (pet && (updateFlags & GROUP_UPDATE_FLAG_PET_POWER_TYPE))
         data << (uint8)pet->getPowerType();
 
-    if (updateFlags & GROUP_UPDATE_FLAG_PET_CUR_POWER)
+    if (pet && (updateFlags & GROUP_UPDATE_FLAG_PET_CUR_POWER))
         data << uint16(pet->GetPower(pet->getPowerType()));
 
-    if (updateFlags & GROUP_UPDATE_FLAG_PET_MAX_POWER)
+    if (pet && (updateFlags & GROUP_UPDATE_FLAG_PET_MAX_POWER))
         data << uint16(pet->GetMaxPower(pet->getPowerType()));
 
     uint64 petAuraMask = 0;

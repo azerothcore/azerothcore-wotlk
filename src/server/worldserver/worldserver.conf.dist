@@ -25,6 +25,7 @@
 #    NETWORK CONFIG
 #    CONSOLE AND REMOTE ACCESS
 #    CHARACTER DELETE OPTIONS
+#    ITEM DELETE OPTIONS
 #    CUSTOM SERVER OPTIONS
 #
 ###################################################################################################
@@ -403,7 +404,7 @@ CleanCharacterDB = 0
 #                     Before use this feature, make a backup of your database.
 #
 #        Example:     14 - (CLEANING_FLAG_SKILLS + CLEANING_FLAG_SPELLS + CLEANING_FLAG_TALENTS
-#                           2+4+8 => 14. This will clean up skills, talents and spells will 
+#                           2+4+8 => 14. This will clean up skills, talents and spells will
 #                           remain enabled after the next cleanup)
 #        Default:     0  - (All cleanup methods will be disabled after the next cleanup)
 
@@ -420,6 +421,18 @@ PersistentCharacterCleanFlags = 0
 #                     1 - (Enabled)
 
 PreloadAllNonInstancedMapGrids = 0
+
+#
+#    SetAllCreaturesWithWaypointMovementActive
+#        Description: Set all creatures with waypoint movement active. This means that they will start
+#                     movement once they are loaded (which happens on grid load) and keep moving even
+#                     when no player is near. This will increase CPU usage significantly and can be
+#                     used with enabled "PreloadAllNonInstancedMapGrids" to start waypoint movement on
+#                     server startup.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+SetAllCreaturesWithWaypointMovementActive = 0
 
 #
 ###################################################################################################
@@ -976,6 +989,22 @@ MinCharterName = 2
 MinPetName = 2
 
 #
+#    Guild.CharterCost
+#    ArenaTeam.CharterCost.2v2
+#    ArenaTeam.CharterCost.3v3
+#    ArenaTeam.CharterCost.5v5
+#        Description: Amount of money (in Copper) the petitions costs.
+#        Default:     1000 - (10 Silver)
+#                     800000 - (80 Gold)
+#                     1200000 - (120 Gold)
+#                     2000000 - (200 Gold)
+
+Guild.CharterCost = 1000
+ArenaTeam.CharterCost.2v2 = 800000
+ArenaTeam.CharterCost.3v3 = 1200000
+ArenaTeam.CharterCost.5v5 = 2000000
+
+#
 #    MaxWhoListReturns
 #        Description: Set the max number of players returned in the /who list and interface.
 #        Default:     49 - (stable)
@@ -1326,6 +1355,14 @@ Quests.IgnoreAutoAccept = 0
 Quests.IgnoreAutoComplete = 0
 
 #
+#    Calendar.DeleteOldEventsHour
+#        Description: Hour of the day when the daily deletion of old calendar events occurs.
+#        Range:       0-23
+#        Default:     6 - (06:00 AM)
+
+Calendar.DeleteOldEventsHour = 6
+
+#
 #    Guild.EventLogRecordsCount
 #        Description: Number of log entries for guild events that are stored per guild. Old entries
 #                     will be overwritten if the number of log entries exceed the configured value.
@@ -1456,11 +1493,11 @@ Motd = "Welcome to an AzerothCore server."
 #    All the AzerothCore contributors, as well as its father projects (MaNGOS, TrinityCore, etc..),
 #    have worked for free to provide you this software. Please do not remove the credits.
 #
-#    Changing or removing such hardcoded text is considered a violation of our license 
+#    Changing or removing such hardcoded text is considered a violation of our license
 #    and it's not allowed. We reserve the right to take legal action in case of violations.
 #    Furthermore, any kind of support will be always denied.
 #
-#    All AzerothCore contributors and its father projects are publicly listed in 
+#    All AzerothCore contributors and its father projects are publicly listed in
 #    our official repository. Credits to open source contributions should always be shown.
 #
 
@@ -1899,6 +1936,13 @@ ListenRange.TextEmote = 40
 
 ListenRange.Yell = 300
 
+#    WaypointMovementStopTimeForPlayer
+#        Description: Specifies the time (in seconds) that a creature with waypoint
+#                     movement will wait after a player interacts with it.
+#        default:     120
+
+WaypointMovementStopTimeForPlayer = 120
+
 #
 ###################################################################################################
 
@@ -2278,6 +2322,62 @@ Rate.Drop.Item.Legendary        = 1
 Rate.Drop.Item.Artifact         = 1
 Rate.Drop.Item.Referenced       = 1
 Rate.Drop.Money                 = 1
+
+#
+#    Rate.SellValue.Item.Poor
+#    Rate.SellValue.Item.Normal
+#    Rate.SellValue.Item.Uncommon
+#    Rate.SellValue.Item.Rare
+#    Rate.SellValue.Item.Epic
+#    Rate.SellValue.Item.Legendary
+#    Rate.SellValue.Item.Artifact
+#    Rate.SellValue.Item.Heirloom
+#        Description: Item Sale Value rates based on quality.
+#        Default:     1 - (Rate.SellValue.Item.Poor)
+#                     1 - (Rate.SellValue.Item.Normal)
+#                     1 - (Rate.SellValue.Item.Uncommon)
+#                     1 - (Rate.SellValue.Item.Rare)
+#                     1 - (Rate.SellValue.Item.Epic)
+#                     1 - (Rate.SellValue.Item.Legendary)
+#                     1 - (Rate.SellValue.Item.Artifact)
+#                     1 - (Rate.SellValue.Item.Heirloom)
+
+Rate.SellValue.Item.Poor             = 1
+Rate.SellValue.Item.Normal           = 1
+Rate.SellValue.Item.Uncommon         = 1
+Rate.SellValue.Item.Rare             = 1
+Rate.SellValue.Item.Epic             = 1
+Rate.SellValue.Item.Legendary        = 1
+Rate.SellValue.Item.Artifact         = 1
+Rate.SellValue.Item.Heirloom         = 1
+
+#
+#    Rate.BuyValue.Item.Poor
+#    Rate.BuyValue.Item.Normal
+#    Rate.BuyValue.Item.Uncommon
+#    Rate.BuyValue.Item.Rare
+#    Rate.BuyValue.Item.Epic
+#    Rate.BuyValue.Item.Legendary
+#    Rate.BuyValue.Item.Artifact
+#    Rate.BuyValue.Item.Heirloom
+#        Description: Item Sale Value rates based on quality.
+#        Default:     1 - (Rate.BuyValue.Item.Poor)
+#                     1 - (Rate.BuyValue.Item.Normal)
+#                     1 - (Rate.BuyValue.Item.Uncommon)
+#                     1 - (Rate.BuyValue.Item.Rare)
+#                     1 - (Rate.BuyValue.Item.Epic)
+#                     1 - (Rate.BuyValue.Item.Legendary)
+#                     1 - (Rate.BuyValue.Item.Artifact)
+#                     1 - (Rate.BuyValue.Item.Heirloom)
+
+Rate.BuyValue.Item.Poor             = 1
+Rate.BuyValue.Item.Normal           = 1
+Rate.BuyValue.Item.Uncommon         = 1
+Rate.BuyValue.Item.Rare             = 1
+Rate.BuyValue.Item.Epic             = 1
+Rate.BuyValue.Item.Legendary        = 1
+Rate.BuyValue.Item.Artifact         = 1
+Rate.BuyValue.Item.Heirloom         = 1
 
 #
 #    Rate.Drop.Item.ReferencedAmount
@@ -2967,6 +3067,55 @@ CharDelete.KeepDays = 30
 ###################################################################################################
 
 ###################################################################################################
+# ITEM DELETE OPTIONS
+#
+#    ItemDelete.Method
+#        Description: Item deletion behavior.
+#        Default:     0 - (Completely remove item from the database)
+#                     1 - (Save Item to database)
+
+ItemDelete.Method = 0
+
+#
+#    ItemDelete.Vendor
+#        Description: Saving items into database when the player sells items to vendor
+#        Default:     0 (disabled)
+#                     1 (enabled)
+#
+
+ItemDelete.Vendor = 0
+
+#
+#    ItemDelete.Quality
+#        Description: Saving items into database that have quality greater or equal to ItemDelete.Quality
+#
+#        ID | Color | Quality
+#        0  | Grey  | Poor
+#        1  | White | Common
+#        2  | Green | Uncommon
+#        3  | Blue  | Rare
+#        4  | Purple| Epic
+#        5  | Orange| Legendary
+#        6  | Red   | Artifact
+#        7  | Gold  | Bind to Account
+#
+#        Default:     3
+#
+
+ItemDelete.Quality = 3
+
+#
+#    ItemDelete.ItemLevel
+#        Description: Saving items into database that are Item Levels greater or equal to ItemDelete.ItemLevel
+#        Default:     80
+#
+
+ItemDelete.ItemLevel = 80
+
+#
+###################################################################################################
+
+###################################################################################################
 # CUSTOM SERVER OPTIONS
 #
 #    PlayerStart.AllReputation
@@ -3074,6 +3223,15 @@ Guild.AllowMultipleGuildMaster = 0
 ShowKickInWorld = 0
 
 #
+#     ShowMuteInWorld
+#        Description: Determines whether a message is broadcast to the entire server when a
+#                     player gets muted.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+ShowMuteInWorld = 0
+
+#
 #     ShowBanInWorld
 #        Description: Determines whether a message is broadcast to the entire server when a
 #                     player gets banned.
@@ -3091,6 +3249,7 @@ ShowBanInWorld = 0
 #                     0     - (Disabled)
 
 RecordUpdateTimeDiffInterval = 60000
+
 #
 #     MinRecordUpdateTimeDiff
 #        Description: Only record update time diff which is greater than this value.
@@ -3265,7 +3424,7 @@ Minigob.Manabonk.Enable = 1
 #        Description: Logs actions, e.g. account login and logout to name a few, based on IP of current session.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
- 
+
 Allow.IP.Based.Action.Logging = 0
 
 #     Calculate.Creature.Zone.Area.Data
@@ -3284,8 +3443,8 @@ Calculate.Gameoject.Zone.Area.Data = 0
 #    LFG SETTINGS
 #
 #     Includes satellite to search for work elsewhere LFG
-#        Default: 0 - Disable  
-#                 1 - Enable  
+#        Default: 0 - Disable
+#                 1 - Enable
 
 LFG.Location.All = 0
 
@@ -3315,3 +3474,39 @@ ICC.Buff.Alliance = 73828
 
 #
 ###################################################################################################
+
+###################################################################################################
+#
+# Packet Spoof Protection Settings
+#
+# These settings determine which action to take when harmful packet spoofing is detected.
+#
+#    PacketSpoof.Policy
+#        Description: Determines the course of action when packet spoofing is detected.
+#        Values:     0 - Log only 
+#                    1 - Log + kick
+#                    2 - Log + kick + ban
+
+PacketSpoof.Policy = 1
+
+#
+#    PacketSpoof.BanMode
+#        Description: If PacketSpoof.Policy equals 2, this will determine the ban mode.
+#        Values:     0 - Ban Account
+#                    1 - Ban IP
+#        Note: Banning by character not supported for logical reasons.
+#
+
+PacketSpoof.BanMode = 0
+
+#
+#    PacketSpoof.BanDuration
+#        Description: Duration of the ban in seconds. Only valid if PacketSpoof.Policy is set to 2.
+#                     Set to 0 for permanent ban.
+#        Default:     86400 seconds (1 day)
+#
+
+PacketSpoof.BanDuration = 86400
+
+#
+################################################################################################### 

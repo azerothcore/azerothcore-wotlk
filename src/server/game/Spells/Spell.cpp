@@ -1182,9 +1182,9 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
 
     if (uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList))
     {
-        Trinity::WorldObjectSpellConeTargetCheck check(coneAngle, radius, m_caster, m_spellInfo, selectionType, condList);
-        Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellConeTargetCheck> searcher(m_caster, targets, check, containerTypeMask);
-        SearchTargets<Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellConeTargetCheck> >(searcher, containerTypeMask, m_caster, m_caster, radius);
+        acore::WorldObjectSpellConeTargetCheck check(coneAngle, radius, m_caster, m_spellInfo, selectionType, condList);
+        acore::WorldObjectListSearcher<acore::WorldObjectSpellConeTargetCheck> searcher(m_caster, targets, check, containerTypeMask);
+        SearchTargets<acore::WorldObjectListSearcher<acore::WorldObjectSpellConeTargetCheck> >(searcher, containerTypeMask, m_caster, m_caster, radius);
 
         CallScriptObjectAreaTargetSelectHandlers(targets, effIndex, targetType);
 
@@ -1198,7 +1198,7 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
                     if ((*j)->IsAffectedOnSpell(m_spellInfo))
                         maxTargets += (*j)->GetAmount();
 
-                Trinity::Containers::RandomResizeList(targets, maxTargets);
+                acore::Containers::RandomResizeList(targets, maxTargets);
             }
 
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
@@ -1281,7 +1281,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                 if ((*j)->IsAffectedOnSpell(m_spellInfo))
                     maxTargets += (*j)->GetAmount();
 
-            Trinity::Containers::RandomResizeList(targets, maxTargets);
+            acore::Containers::RandomResizeList(targets, maxTargets);
         }
 
         for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
@@ -1821,13 +1821,13 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
     // xinef: supply correct target type, DEST_DEST and similar are ALWAYS undefined
     // xinef: correct target is stored in TRIGGERED SPELL, however as far as i noticed, all checks are ENTRY, ENEMY
     std::list<WorldObject*> targets;
-    Trinity::WorldObjectSpellTrajTargetCheck check(dist2d, m_targets.GetSrcPos(), m_caster, m_spellInfo, TARGET_CHECK_ENEMY /*targetCheckType*/, m_spellInfo->Effects[effIndex].ImplicitTargetConditions);
-    Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellTrajTargetCheck> searcher(m_caster, targets, check, GRID_MAP_TYPE_MASK_ALL);
-    SearchTargets<Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellTrajTargetCheck> > (searcher, GRID_MAP_TYPE_MASK_ALL, m_caster, m_targets.GetSrcPos(), dist2d);
+    acore::WorldObjectSpellTrajTargetCheck check(dist2d, m_targets.GetSrcPos(), m_caster, m_spellInfo, TARGET_CHECK_ENEMY /*targetCheckType*/, m_spellInfo->Effects[effIndex].ImplicitTargetConditions);
+    acore::WorldObjectListSearcher<acore::WorldObjectSpellTrajTargetCheck> searcher(m_caster, targets, check, GRID_MAP_TYPE_MASK_ALL);
+    SearchTargets<acore::WorldObjectListSearcher<acore::WorldObjectSpellTrajTargetCheck> > (searcher, GRID_MAP_TYPE_MASK_ALL, m_caster, m_targets.GetSrcPos(), dist2d);
     if (targets.empty())
         return;
 
-    targets.sort(Trinity::ObjectDistanceOrderPred(m_caster));
+    targets.sort(acore::ObjectDistanceOrderPred(m_caster));
 
     float b = tangent(m_targets.GetElevation());
     float a = (srcToDestDelta - dist2d * b) / (dist2d * dist2d);
@@ -2096,7 +2096,7 @@ void Spell::SearchTargets(SEARCHER& searcher, uint32 containerMask, Unit* refere
         x = pos->GetPositionX();
         y = pos->GetPositionY();
 
-        CellCoord p(Trinity::ComputeCellCoord(x, y));
+        CellCoord p(acore::ComputeCellCoord(x, y));
         Cell cell(p);
         cell.SetNoCreate();
 
@@ -2121,9 +2121,9 @@ WorldObject* Spell::SearchNearbyTarget(float range, SpellTargetObjectTypes objec
     uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList);
     if (!containerTypeMask)
         return NULL;
-    Trinity::WorldObjectSpellNearbyTargetCheck check(range, m_caster, m_spellInfo, selectionType, condList);
-    Trinity::WorldObjectLastSearcher<Trinity::WorldObjectSpellNearbyTargetCheck> searcher(m_caster, target, check, containerTypeMask);
-    SearchTargets<Trinity::WorldObjectLastSearcher<Trinity::WorldObjectSpellNearbyTargetCheck> > (searcher, containerTypeMask, m_caster, m_caster, range);
+    acore::WorldObjectSpellNearbyTargetCheck check(range, m_caster, m_spellInfo, selectionType, condList);
+    acore::WorldObjectLastSearcher<acore::WorldObjectSpellNearbyTargetCheck> searcher(m_caster, target, check, containerTypeMask);
+    SearchTargets<acore::WorldObjectLastSearcher<acore::WorldObjectSpellNearbyTargetCheck> > (searcher, containerTypeMask, m_caster, m_caster, range);
     return target;
 }
 
@@ -2132,9 +2132,9 @@ void Spell::SearchAreaTargets(std::list<WorldObject*>& targets, float range, Pos
     uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList);
     if (!containerTypeMask)
         return;
-    Trinity::WorldObjectSpellAreaTargetCheck check(range, position, m_caster, referer, m_spellInfo, selectionType, condList);
-    Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellAreaTargetCheck> searcher(m_caster, targets, check, containerTypeMask);
-    SearchTargets<Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellAreaTargetCheck> > (searcher, containerTypeMask, m_caster, position, range);
+    acore::WorldObjectSpellAreaTargetCheck check(range, position, m_caster, referer, m_spellInfo, selectionType, condList);
+    acore::WorldObjectListSearcher<acore::WorldObjectSpellAreaTargetCheck> searcher(m_caster, targets, check, containerTypeMask);
+    SearchTargets<acore::WorldObjectListSearcher<acore::WorldObjectSpellAreaTargetCheck> > (searcher, containerTypeMask, m_caster, position, range);
 }
 
 void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, SpellTargetSelectionCategories  /*selectCategory*/, ConditionList* condList, bool isChainHeal)
@@ -2839,7 +2839,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         }
 
         // Failed Pickpocket, reveal rogue
-        if (missInfo == SPELL_MISS_RESIST && m_spellInfo->HasAttribute(SPELL_ATTR0_CU_PICKPOCKET) && unitTarget->GetTypeId() == TYPEID_UNIT)
+        if (missInfo == SPELL_MISS_RESIST && m_spellInfo->HasAttribute(SPELL_ATTR0_CU_PICKPOCKET) && unitTarget->GetTypeId() == TYPEID_UNIT && m_caster)
         {
             m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
             if (unitTarget->ToCreature()->IsAIEnabled)
@@ -2952,7 +2952,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                 return SPELL_MISS_EVADE;
         }
 
-        if (m_caster->_IsValidAttackTarget(unit, m_spellInfo))
+        if (m_caster->_IsValidAttackTarget(unit, m_spellInfo) && /*Intervene Trigger*/ m_spellInfo->Id != 59667)
         {
             unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
         }
@@ -3011,7 +3011,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
     }
 
     // Xinef: Stealth remove, added UGLY hack for mass dispel... cant find any other solution, ugly hack for Storm, Earth and Fire talent
-    if (m_caster != unit && m_caster->IsHostileTo(unit) && !m_spellInfo->IsPositive() && !m_triggeredByAuraSpell && m_spellInfo->SpellIconID != 2267 && unit->IsControlledByPlayer() && (!m_caster->IsTotem() || m_spellInfo->Id == 64695))
+    if (m_caster != unit && m_caster->IsHostileTo(unit) && !m_spellInfo->IsPositive() && !m_triggeredByAuraSpell && m_spellInfo->SpellIconID != 2267 && unit->IsControlledByPlayer() && (!m_caster->IsTotem() || m_spellInfo->Id == 64695) && /*Intervene Trigger*/ m_spellInfo->Id != 59667)
         unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
 
     if (aura_effmask)
@@ -6633,8 +6633,12 @@ SpellCastResult Spell::CheckRange(bool strict)
             // Xinef: WHAT DA FUCK IS THIS SHIT? Spells with 5yd range can hit target 9yd away? >.>
             if (range_type == SPELL_RANGE_MELEE)
             {
-                // Because of lag, we can not check too strictly here.
-                float real_max_range = m_caster->GetTypeId() == TYPEID_UNIT ? max_range - 2*MIN_MELEE_REACH : max_range - MIN_MELEE_REACH;
+                float real_max_range = max_range;
+                if (m_caster->GetTypeId() != TYPEID_UNIT && m_caster->isMoving() && target->isMoving() && !m_caster->IsWalking() && !target->IsWalking())
+                    real_max_range -= MIN_MELEE_REACH; // Because of lag, we can not check too strictly here (is only used if both caster and target are moving)
+                else
+                    real_max_range -= 2*MIN_MELEE_REACH;
+
                 if (!m_caster->IsWithinMeleeRange(target, std::max(real_max_range, 0.0f)))
                     return SPELL_FAILED_OUT_OF_RANGE;
             }
@@ -6969,7 +6973,7 @@ SpellCastResult Spell::CheckItems()
                 // do not allow adding usable enchantments to items that have use effect already
                 if (enchantEntry)
                 {
-                    for (uint8 s = 0; s < MAX_ITEM_ENCHANTMENT_EFFECTS; ++s)
+                    for (uint8 s = 0; s < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++s)
                     {
                         switch (enchantEntry->type[s])
                         {
@@ -7239,14 +7243,14 @@ SpellCastResult Spell::CheckSpellFocus()
     // check spell focus object
     if (m_spellInfo->RequiresSpellFocus)
     {
-        CellCoord p(Trinity::ComputeCellCoord(m_caster->GetPositionX(), m_caster->GetPositionY()));
+        CellCoord p(acore::ComputeCellCoord(m_caster->GetPositionX(), m_caster->GetPositionY()));
         Cell cell(p);
 
         GameObject* ok = NULL;
-        Trinity::GameObjectFocusCheck go_check(m_caster, m_spellInfo->RequiresSpellFocus);
-        Trinity::GameObjectSearcher<Trinity::GameObjectFocusCheck> checker(m_caster, ok, go_check);
+        acore::GameObjectFocusCheck go_check(m_caster, m_spellInfo->RequiresSpellFocus);
+        acore::GameObjectSearcher<acore::GameObjectFocusCheck> checker(m_caster, ok, go_check);
 
-        TypeContainerVisitor<Trinity::GameObjectSearcher<Trinity::GameObjectFocusCheck>, GridTypeMapContainer > object_checker(checker);
+        TypeContainerVisitor<acore::GameObjectSearcher<acore::GameObjectFocusCheck>, GridTypeMapContainer > object_checker(checker);
         Map& map = *m_caster->GetMap();
         cell.Visit(p, object_checker, map, *m_caster, m_caster->GetVisibilityRange());
 
@@ -8398,7 +8402,7 @@ void Spell::OnSpellLaunch()
 	}
 }
 
-namespace Trinity
+namespace acore
 {
 
 WorldObjectSpellTargetCheck::WorldObjectSpellTargetCheck(Unit* caster, Unit* referer, SpellInfo const* spellInfo,
@@ -8557,5 +8561,5 @@ bool WorldObjectSpellTrajTargetCheck::operator()(WorldObject* target)
     return WorldObjectSpellAreaTargetCheck::operator ()(target);
 }
 
-} //namespace Trinity
+} //namespace acore
 

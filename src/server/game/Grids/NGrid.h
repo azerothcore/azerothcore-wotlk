@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_NGRID_H
-#define TRINITY_NGRID_H
+#ifndef ACORE_NGRID_H
+#define ACORE_NGRID_H
 
 /** NGrid is nothing more than a wrapper of the Grid with an NxN cells
  */

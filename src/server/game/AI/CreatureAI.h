@@ -4,8 +4,8 @@
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
 
-#ifndef TRINITY_CREATUREAI_H
-#define TRINITY_CREATUREAI_H
+#ifndef ACORE_CREATUREAI_H
+#define ACORE_CREATUREAI_H
 
 #include "Creature.h"
 #include "UnitAI.h"

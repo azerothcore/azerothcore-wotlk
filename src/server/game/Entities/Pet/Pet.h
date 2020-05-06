@@ -47,10 +47,10 @@ class Pet : public Guardian
         explicit Pet(Player* owner, PetType type = MAX_PET_TYPE);
         virtual ~Pet();
 
-        void AddToWorld();
-        void RemoveFromWorld();
+        void AddToWorld() override;
+        void RemoveFromWorld() override;
 
-        void SetDisplayId(uint32 modelId);
+        void SetDisplayId(uint32 modelId) override;
 
         PetType getPetType() const { return m_petType; }
         void setPetType(PetType type) { m_petType = type; }
@@ -65,16 +65,16 @@ class Pet : public Guardian
         bool CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask);
         static SpellCastResult TryLoadFromDB(Player* owner, bool current = false, PetType mandatoryPetType = MAX_PET_TYPE);
         static bool LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry = 0, uint32 petnumber = 0, bool current = false, AsynchPetSummon* info = NULL);
-        bool isBeingLoaded() const { return m_loading;}
+        bool isBeingLoaded() const override { return m_loading;}
         void SavePetToDB(PetSaveMode mode, bool logout);
         void Remove(PetSaveMode mode, bool returnreagent = false);
         static void DeleteFromDB(uint32 guidlow);
 
-        void setDeathState(DeathState s, bool despawn = false);                   // overwrite virtual Creature::setDeathState and Unit::setDeathState
-        void Update(uint32 diff);                           // overwrite virtual Creature::Update and Unit::Update
+        void setDeathState(DeathState s, bool despawn = false) override;                   // overwrite virtual Creature::setDeathState and Unit::setDeathState
+        void Update(uint32 diff) override;                           // overwrite virtual Creature::Update and Unit::Update
 
-        uint8 GetPetAutoSpellSize() const { return m_autospells.size(); }
-        uint32 GetPetAutoSpellOnPos(uint8 pos) const
+        uint8 GetPetAutoSpellSize() const override { return m_autospells.size(); }
+        uint32 GetPetAutoSpellOnPos(uint8 pos) const override
         {
             if (pos >= m_autospells.size())
                 return 0;
@@ -105,7 +105,7 @@ class Pet : public Guardian
 
         void ToggleAutocast(SpellInfo const* spellInfo, bool apply);
 
-        bool HasSpell(uint32 spell) const;
+        bool HasSpell(uint32 spell) const override;
 
         void LearnPetPassives();
         void CastPetAuras(bool current);
@@ -178,11 +178,11 @@ class Pet : public Guardian
         uint8 asynchLoadType;
 
     private:
-        void SaveToDB(uint32, uint8, uint32)                // override of Creature::SaveToDB     - must not be called
+        void SaveToDB(uint32, uint8, uint32) override                // override of Creature::SaveToDB     - must not be called
         {
             ABORT();
         }
-        void DeleteFromDB()                                 // override of Creature::DeleteFromDB - must not be called
+        void DeleteFromDB() override                                 // override of Creature::DeleteFromDB - must not be called
         {
             ABORT();
         }

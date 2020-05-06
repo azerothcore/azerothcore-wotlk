@@ -132,6 +132,8 @@ inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
 
 #define STRINGIZE(a) #a
 
+#define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
+
 enum TimeConstants
 {
     MINUTE          = 60,
@@ -193,23 +195,23 @@ typedef std::vector<std::string> StringVector;
 
 #define MAX_QUERY_LEN 32*1024
 
-#define TRINITY_GUARD(MUTEX, LOCK) \
-  ACE_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
-    if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
+#define ACORE_GUARD(MUTEX, LOCK) \
+  ACE_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
+    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 //! For proper implementation of multiple-read, single-write pattern, use
 //! ACE_RW_Mutex as underlying @MUTEX
-# define TRINITY_WRITE_GUARD(MUTEX, LOCK) \
-  ACE_Write_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
-    if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
+# define ACORE_WRITE_GUARD(MUTEX, LOCK) \
+  ACE_Write_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
+    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 //! For proper implementation of multiple-read, single-write pattern, use
 //! ACE_RW_Mutex as underlying @MUTEX
-# define TRINITY_READ_GUARD(MUTEX, LOCK) \
-  ACE_Read_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
-    if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
+# define ACORE_READ_GUARD(MUTEX, LOCK) \
+  ACE_Read_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
+    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
-namespace ACORE
+namespace acore
 {
     template<class ArgumentType, class ResultType>
     struct unary_function

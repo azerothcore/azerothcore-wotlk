@@ -19,7 +19,7 @@ namespace FactorySelector
     CreatureAI* selectAI(Creature* creature)
     {
         const CreatureAICreator* ai_factory = NULL;
-        CreatureAIRegistry& ai_registry(*CreatureAIRepository::instance());
+        CreatureAIRegistry& ai_registry(*CreatureAIRegistry::instance());
 
         // xinef: if we have controlable guardian, define petai for players as they can steer him, otherwise db / normal ai
         // xinef: dont remember why i changed this qq commented out as may break some quests
@@ -92,7 +92,7 @@ namespace FactorySelector
 
     MovementGenerator* selectMovementGenerator(Creature* creature)
     {
-        MovementGeneratorRegistry& mv_registry(*MovementGeneratorRepository::instance());
+        MovementGeneratorRegistry& mv_registry(*MovementGeneratorRegistry::instance());
         ASSERT(creature->GetCreatureTemplate());
         const MovementGeneratorCreator* mv_factory = mv_registry.GetRegistryItem(creature->GetDefaultMovementType());
 
@@ -122,7 +122,7 @@ namespace FactorySelector
     GameObjectAI* SelectGameObjectAI(GameObject* go)
     {
         const GameObjectAICreator* ai_factory = NULL;
-        GameObjectAIRegistry& ai_registry(*GameObjectAIRepository::instance());
+        GameObjectAIRegistry& ai_registry(*GameObjectAIRegistry::instance());
 
         if (GameObjectAI* scriptedAI = sScriptMgr->GetGameObjectAI(go))
             return scriptedAI;
