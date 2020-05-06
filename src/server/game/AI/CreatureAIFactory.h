@@ -3,10 +3,9 @@
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
-#ifndef TRINITY_CREATUREAIFACTORY_H
-#define TRINITY_CREATUREAIFACTORY_H
+#ifndef ACORE_CREATUREAIFACTORY_H
+#define ACORE_CREATUREAIFACTORY_H
 
-//#include "Policies/Singleton.h"
 #include "ObjectRegistry.h"
 #include "FactoryHolder.h"
 #include "GameObjectAI.h"
@@ -36,7 +35,6 @@ CreatureAIFactory<REAL_AI>::Create(void* data) const
 
 typedef FactoryHolder<CreatureAI> CreatureAICreator;
 typedef FactoryHolder<CreatureAI>::FactoryHolderRegistry CreatureAIRegistry;
-typedef FactoryHolder<CreatureAI>::FactoryHolderRepository CreatureAIRepository;
 
 //GO
 struct SelectableGameObjectAI : public FactoryHolder<GameObjectAI>, public Permissible<GameObject>
@@ -64,5 +62,5 @@ GameObjectAIFactory<REAL_GO_AI>::Create(void* data) const
 
 typedef FactoryHolder<GameObjectAI> GameObjectAICreator;
 typedef FactoryHolder<GameObjectAI>::FactoryHolderRegistry GameObjectAIRegistry;
-typedef FactoryHolder<GameObjectAI>::FactoryHolderRepository GameObjectAIRepository;
+
 #endif

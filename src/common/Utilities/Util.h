@@ -9,8 +9,9 @@
 
 #include "Define.h"
 #include "Errors.h"
-
+#include "Containers.h"
 #include <algorithm>
+#include <cctype>
 #include <string>
 #include <vector>
 #include <list>
@@ -81,6 +82,8 @@ double rand_norm();
 /* Return a random double from 0.0 to 100.0 (exclusive). */
 double rand_chance();
 
+uint32 urandweighted(size_t count, double const* chances);
+
 /* Return true if a random roll fits in the specified chance (range 0-100). */
 inline bool roll_chance_f(float chance)
 {
@@ -127,18 +130,21 @@ inline T RoundToInterval(T& num, T floor, T ceil)
 
 // UTF8 handling
 bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr);
+
 // in wsize==max size of buffer, out wsize==real string size
 bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize);
+
 inline bool Utf8toWStr(const std::string& utf8str, wchar_t* wstr, size_t& wsize)
 {
     return Utf8toWStr(utf8str.c_str(), utf8str.size(), wstr, wsize);
 }
 
-bool WStrToUtf8(std::wstring wstr, std::string& utf8str);
+bool WStrToUtf8(std::wstring const& wstr, std::string& utf8str);
 // size==real string size
 bool WStrToUtf8(wchar_t* wstr, size_t size, std::string& utf8str);
 
-size_t utf8length(std::string& utf8str);                    // set string to "" if invalid utf8 sequence
+// set string to "" if invalid utf8 sequence
+size_t utf8length(std::string& utf8str);
 void utf8truncate(std::string& utf8str, size_t len);
 
 inline bool isBasicLatinCharacter(wchar_t wchar)
@@ -308,23 +314,17 @@ inline wchar_t wcharToLower(wchar_t wchar)
     return wchar;
 }
 
-inline void wstrToUpper(std::wstring& str)
-{
-    std::transform( str.begin(), str.end(), str.begin(), wcharToUpper );
-}
+void wstrToUpper(std::wstring& str);
+void wstrToLower(std::wstring& str);
 
-inline void wstrToLower(std::wstring& str)
-{
-    std::transform( str.begin(), str.end(), str.begin(), wcharToLower );
-}
-
-std::wstring GetMainPartOfName(std::wstring wname, uint32 declension);
+std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension);
 
 bool utf8ToConsole(const std::string& utf8str, std::string& conStr);
 bool consoleToUtf8(const std::string& conStr, std::string& utf8str);
-bool Utf8FitTo(const std::string& str, std::wstring search);
+bool Utf8FitTo(const std::string& str, std::wstring const& search);
 void utf8printf(FILE* out, const char *str, ...);
 void vutf8printf(FILE* out, const char *str, va_list* ap);
+bool Utf8ToUpperOnlyLatin(std::string& utf8String);
 
 bool IsIPAddress(char const* ipaddress);
 
@@ -335,8 +335,18 @@ bool IsIPAddrInNetwork(ACE_INET_Addr const& net, ACE_INET_Addr const& addr, ACE_
 std::string GetAddressString(ACE_INET_Addr const& addr);
 
 uint32 CreatePIDFile(const std::string& filename);
+uint32 GetPID();
 
 std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
+void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
+bool StringToBool(std::string const& str);
+
+bool StringContainsStringI(std::string const& haystack, std::string const& needle);
+template <typename T>
+inline bool ValueContainsStringI(std::pair<T, std::string> const& haystack, std::string const& needle)
+{
+    return StringContainsStringI(haystack.second, needle);
+}
 #endif
 
 //handler for operations on large flags
@@ -388,13 +398,6 @@ public:
         part[2] = p3;
     }
 
-    flag96(uint64 p1, uint32 p2)
-    {
-        part[0] = (uint32)(p1 & UI64LIT(0x00000000FFFFFFFF));
-        part[1] = (uint32)((p1 >> 32) & UI64LIT(0x00000000FFFFFFFF));
-        part[2] = p2;
-    }
-
     inline bool IsEqual(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
     {
         return (part[0] == p1 && part[1] == p2 && part[2] == p3);
@@ -412,7 +415,7 @@ public:
         part[2] = p3;
     }
 
-    inline bool operator <(const flag96 &right) const
+    inline bool operator<(flag96 const& right) const
     {
         for (uint8 i = 3; i > 0; --i)
         {
@@ -424,7 +427,7 @@ public:
         return false;
     }
 
-    inline bool operator ==(const flag96 &right) const
+    inline bool operator==(flag96 const& right) const
     {
         return
         (
@@ -434,12 +437,12 @@ public:
         );
     }
 
-    inline bool operator !=(const flag96 &right) const
+    inline bool operator!=(flag96 const& right) const
     {
-        return !this->operator ==(right);
+        return !(*this == right);
     }
 
-    inline flag96 & operator =(const flag96 &right)
+    inline flag96& operator=(flag96 const& right)
     {
         part[0] = right.part[0];
         part[1] = right.part[1];
@@ -447,13 +450,12 @@ public:
         return *this;
     }
 
-    inline flag96 operator &(const flag96 &right) const
+    inline flag96 operator&(flag96 const& right) const
     {
-        return flag96(part[0] & right.part[0], part[1] & right.part[1],
-            part[2] & right.part[2]);
+        return flag96(part[0] & right.part[0], part[1] & right.part[1], part[2] & right.part[2]);
     }
 
-    inline flag96 & operator &=(const flag96 &right)
+    inline flag96& operator&=(flag96 const& right)
     {
         part[0] &= right.part[0];
         part[1] &= right.part[1];
@@ -461,13 +463,12 @@ public:
         return *this;
     }
 
-    inline flag96 operator |(const flag96 &right) const
+    inline flag96 operator|(flag96 const& right) const
     {
-        return flag96(part[0] | right.part[0], part[1] | right.part[1],
-            part[2] | right.part[2]);
+        return flag96(part[0] | right.part[0], part[1] | right.part[1], part[2] | right.part[2]);
     }
 
-    inline flag96 & operator |=(const flag96 &right)
+    inline flag96& operator |=(flag96 const& right)
     {
         part[0] |= right.part[0];
         part[1] |= right.part[1];
@@ -475,18 +476,17 @@ public:
         return *this;
     }
 
-    inline flag96 operator ~() const
+    inline flag96 operator~() const
     {
         return flag96(~part[0], ~part[1], ~part[2]);
     }
 
-    inline flag96 operator ^(const flag96 &right) const
+    inline flag96 operator^(flag96 const& right) const
     {
-        return flag96(part[0] ^ right.part[0], part[1] ^ right.part[1],
-            part[2] ^ right.part[2]);
+        return flag96(part[0] ^ right.part[0], part[1] ^ right.part[1], part[2] ^ right.part[2]);
     }
 
-    inline flag96 & operator ^=(const flag96 &right)
+    inline flag96& operator^=(flag96 const& right)
     {
         part[0] ^= right.part[0];
         part[1] ^= right.part[1];
@@ -501,15 +501,15 @@ public:
 
     inline bool operator !() const
     {
-        return !this->operator bool();
+        return !(bool(*this));
     }
 
-    inline uint32 & operator [](uint8 el)
+    inline uint32& operator[](uint8 el)
     {
         return part[el];
     }
 
-    inline const uint32 & operator [](uint8 el) const
+    inline uint32 const& operator [](uint8 el) const
     {
         return part[el];
     }
@@ -546,6 +546,21 @@ bool CompareValues(ComparisionType type, T val1, T val2)
             return false;
     }
 }
+
+/*
+* SFMT wrapper satisfying UniformRandomNumberGenerator concept for use in <random> algorithms
+*/
+class SFMTEngine
+{
+public:
+    typedef uint32 result_type;
+
+    static constexpr result_type min() { return std::numeric_limits<result_type>::min(); }
+    static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
+    result_type operator()() const { return rand32(); }
+
+    static SFMTEngine& Instance();
+};
 
 class EventMap
 {

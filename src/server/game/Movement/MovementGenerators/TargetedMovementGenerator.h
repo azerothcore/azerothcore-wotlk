@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_TARGETEDMOVEMENTGENERATOR_H
-#define TRINITY_TARGETEDMOVEMENTGENERATOR_H
+#ifndef ACORE_TARGETEDMOVEMENTGENERATOR_H
+#define ACORE_TARGETEDMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
 #include "FollowerReference.h"

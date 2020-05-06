@@ -60,7 +60,7 @@
 #include <signal.h>
 #include <assert.h>
 
-#if PLATFORM == PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #define STRCASECMP stricmp
 #else
 #define STRCASECMP strcasecmp
@@ -86,7 +86,7 @@
 #include <ace/OS_NS_time.h>
 #include <ace/Stack_Trace.h>
 
-#if PLATFORM == PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #  include <ace/config-all.h>
 // XP winver - needed to compile with standard leak check in MemoryLeaks.h
 // uncomment later if needed
@@ -102,7 +102,7 @@
 #  include <netdb.h>
 #endif
 
-#if COMPILER == COMPILER_MICROSOFT
+#if AC_COMPILER == AC_COMPILER_MICROSOFT
 
 #include <float.h>
 
@@ -131,6 +131,8 @@ inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
 #define atol(a) strtoul( a, NULL, 10)
 
 #define STRINGIZE(a) #a
+
+#define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
 
 enum TimeConstants
 {
@@ -193,23 +195,23 @@ typedef std::vector<std::string> StringVector;
 
 #define MAX_QUERY_LEN 32*1024
 
-#define TRINITY_GUARD(MUTEX, LOCK) \
-  ACE_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
-    if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
+#define ACORE_GUARD(MUTEX, LOCK) \
+  ACE_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
+    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 //! For proper implementation of multiple-read, single-write pattern, use
 //! ACE_RW_Mutex as underlying @MUTEX
-# define TRINITY_WRITE_GUARD(MUTEX, LOCK) \
-  ACE_Write_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
-    if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
+# define ACORE_WRITE_GUARD(MUTEX, LOCK) \
+  ACE_Write_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
+    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 //! For proper implementation of multiple-read, single-write pattern, use
 //! ACE_RW_Mutex as underlying @MUTEX
-# define TRINITY_READ_GUARD(MUTEX, LOCK) \
-  ACE_Read_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
-    if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
+# define ACORE_READ_GUARD(MUTEX, LOCK) \
+  ACE_Read_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
+    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
-namespace ACORE
+namespace acore
 {
     template<class ArgumentType, class ResultType>
     struct unary_function

@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_LOOTMGR_H
-#define TRINITY_LOOTMGR_H
+#ifndef ACORE_LOOTMGR_H
+#define ACORE_LOOTMGR_H
 
 #include "ItemEnchantmentMgr.h"
 #include "ByteBuffer.h"

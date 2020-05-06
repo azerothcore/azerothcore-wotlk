@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef __TRINITY_REPUTATION_MGR_H
-#define __TRINITY_REPUTATION_MGR_H
+#ifndef __ACORE_REPUTATION_MGR_H
+#define __ACORE_REPUTATION_MGR_H
 
 #include "Common.h"
 #include "SharedDefines.h"

@@ -116,7 +116,7 @@ void WorldSession::HandleTrainerListOpcode(WorldPacket & recvData)
 
 void WorldSession::SendTrainerList(uint64 guid)
 {
-    std::string str = GetTrinityString(LANG_NPC_TAINER_HELLO);
+    std::string str = GetAcoreString(LANG_NPC_TAINER_HELLO);
     SendTrainerList(guid, str);
 }
 

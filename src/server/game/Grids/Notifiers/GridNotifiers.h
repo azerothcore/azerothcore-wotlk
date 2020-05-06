@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_GRIDNOTIFIERS_H
-#define TRINITY_GRIDNOTIFIERS_H
+#ifndef ACORE_GRIDNOTIFIERS_H
+#define ACORE_GRIDNOTIFIERS_H
 
 #include "ObjectGridLoader.h"
 #include "UpdateData.h"
@@ -24,7 +24,7 @@
 class Player;
 //class Map;
 
-namespace Trinity
+namespace acore
 {
     struct VisibleNotifier
     {
@@ -32,9 +32,10 @@ namespace Trinity
         Player::ClientGUIDs vis_guids;
         std::vector<Unit*> &i_visibleNow;
         bool i_gobjOnly;
+        bool i_largeOnly;
         UpdateData i_data;
 
-        VisibleNotifier(Player &player, bool gobjOnly) : i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly)
+        VisibleNotifier(Player &player, bool gobjOnly, bool largeOnly) : i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
         {
             i_visibleNow.clear();
         }
@@ -57,7 +58,7 @@ namespace Trinity
 
     struct PlayerRelocationNotifier : public VisibleNotifier
     {
-        PlayerRelocationNotifier(Player &player) : VisibleNotifier(player, false) {}
+        PlayerRelocationNotifier(Player &player, bool largeOnly) : VisibleNotifier(player, false, largeOnly) {}
 
         template<class T> void Visit(GridRefManager<T> &m) { VisibleNotifier::Visit(m); }
         void Visit(PlayerMapType &);
@@ -140,19 +141,10 @@ namespace Trinity
     struct ObjectUpdater
     {
         uint32 i_timeDiff;
-        explicit ObjectUpdater(const uint32 diff) : i_timeDiff(diff) {}
+        bool i_largeOnly;
+        explicit ObjectUpdater(const uint32 diff, bool largeOnly) : i_timeDiff(diff), i_largeOnly(largeOnly) {}
         template<class T> void Visit(GridRefManager<T> &m);
         void Visit(PlayerMapType &) {}
-        void Visit(CorpseMapType &) {}
-    };
-
-    struct LargeObjectUpdater
-    {
-        uint32 i_timeDiff;
-        explicit LargeObjectUpdater(const uint32 diff) : i_timeDiff(diff) {}
-        template<class T> void Visit(GridRefManager<T> &m);
-        void Visit(GameObjectMapType &) {}
-        void Visit(DynamicObjectMapType &) {}
         void Visit(CorpseMapType &) {}
     };
 
@@ -1254,6 +1246,23 @@ namespace Trinity
             float _range;
             bool _reqAlive;
             bool _disallowGM;
+    };
+
+    class AnyPlayerExactPositionInGameObjectRangeCheck
+    {
+        public:
+            AnyPlayerExactPositionInGameObjectRangeCheck(GameObject const* go, float range) : _go(go), _range(range) {}
+            bool operator()(Player* u)
+            {
+                if (!_go->IsInRange(u->GetPositionX(), u->GetPositionY(), u->GetPositionZ(), _range))
+                    return false;
+
+                return true;
+            }
+
+        private:
+            GameObject const* _go;
+            float _range;
     };
 
     class NearestPlayerInObjectRangeCheck

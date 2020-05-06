@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_SPELLAURAEFFECTS_H
-#define TRINITY_SPELLAURAEFFECTS_H
+#ifndef ACORE_SPELLAURAEFFECTS_H
+#define ACORE_SPELLAURAEFFECTS_H
 
 class Unit;
 class AuraEffect;
@@ -14,7 +14,6 @@ class SpellInfo;
 
 #include "SpellAuras.h"
 #include "Spell.h"
-#include "SpellInfo.h"
 
 typedef void(AuraEffect::*pAuraEffectHandler)(AuraApplication const* aurApp, uint8 mode, bool apply) const;
 
@@ -35,14 +34,14 @@ class AuraEffect
         SpellModifier* GetSpellModifier() const { return m_spellmod; }
 
         SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
-        uint32 GetId() const { return m_spellInfo->Id; }
+        uint32 GetId() const;
         uint32 GetEffIndex() const { return m_effIndex; }
         int32 GetBaseAmount() const { return m_baseAmount; }
         int32 GetAmplitude() const { return m_amplitude; }
 
-        int32 GetMiscValueB() const { return m_spellInfo->Effects[m_effIndex].MiscValueB; }
-        int32 GetMiscValue() const { return m_spellInfo->Effects[m_effIndex].MiscValue; }
-        AuraType GetAuraType() const { return (AuraType)m_spellInfo->Effects[m_effIndex].ApplyAuraName; }
+        int32 GetMiscValueB() const;
+        int32 GetMiscValue() const;
+        AuraType GetAuraType() const;
         int32 GetAmount() const { return m_isAuraEnabled ? m_amount : 0; }
         int32 GetForcedAmount() const { return m_amount; }
         void SetAmount(int32 amount) { m_amount = amount; m_canBeRecalculated = false;}
@@ -73,7 +72,7 @@ class AuraEffect
         bool IsPeriodic() const { return m_isPeriodic; }
         void SetPeriodic(bool isPeriodic) { m_isPeriodic = isPeriodic; }
         bool IsAffectedOnSpell(SpellInfo const* spell) const;
-        bool HasSpellClassMask() const { return m_spellInfo->Effects[m_effIndex].SpellClassMask; }
+        bool HasSpellClassMask() const;
 
         void SendTickImmune(Unit* target, Unit* caster) const;
         void PeriodicTick(AuraApplication * aurApp, Unit* caster) const;
@@ -321,7 +320,7 @@ class AuraEffect
         void HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
 };
 
-namespace Trinity
+namespace acore
 {
     // Binary predicate for sorting the priority of absorption aura effects
     class AbsorbAuraOrderPred
