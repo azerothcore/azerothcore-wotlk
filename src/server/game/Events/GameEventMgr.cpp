@@ -982,8 +982,8 @@ void GameEventMgr::LoadHolidayDates()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                               0   1         2
-    QueryResult result = WorldDatabase.Query("SELECT id, date_id, date_value FROM holiday_dates");
+    //                                               0   1        2           3
+    QueryResult result = WorldDatabase.Query("SELECT id, date_id, date_value, holiday_duration FROM holiday_dates");
 
     if (!result)
     {
@@ -995,6 +995,7 @@ void GameEventMgr::LoadHolidayDates()
     do
     {
         Field* fields = result->Fetch();
+
         uint32 holidayId = fields[0].GetUInt32();
         HolidaysEntry* entry = const_cast<HolidaysEntry*>(sHolidaysStore.LookupEntry(holidayId));
         if (!entry)
@@ -1002,6 +1003,7 @@ void GameEventMgr::LoadHolidayDates()
             sLog->outErrorDb("holiday_dates entry has invalid holiday id %u.", holidayId);
             continue;
         }
+
         uint8 dateId = fields[1].GetUInt8();
         if (dateId >= MAX_HOLIDAY_DATES)
         {
@@ -1009,6 +1011,10 @@ void GameEventMgr::LoadHolidayDates()
             continue;
         }
         entry->Date[dateId] = fields[2].GetUInt32();
+
+        if (uint32 duration = fields[3].GetUInt32())
+            entry->Duration[0] = duration;
+
         modifiedHolidays.insert(entry->Id);
         ++count;
 
@@ -1301,7 +1307,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
         }
     }
 
-    if (internal_event_id < 0 || internal_event_id >= int32(mGameEventGameobjectGuids.size()))
+    if (internal_event_id >= int32(mGameEventGameobjectGuids.size()))
     {
         sLog->outError("GameEventMgr::GameEventSpawn attempt access to out of range mGameEventGameobjectGuids element %i (size: " SZFMTD ")",
             internal_event_id, mGameEventGameobjectGuids.size());
@@ -1334,7 +1340,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
         }
     }
 
-    if (internal_event_id < 0 || internal_event_id >= int32(mGameEventPoolIds.size()))
+    if (internal_event_id >= int32(mGameEventPoolIds.size()))
     {
         sLog->outError("GameEventMgr::GameEventSpawn attempt access to out of range mGameEventPoolIds element %u (size: " SZFMTD ")",
             internal_event_id, mGameEventPoolIds.size());
@@ -1371,7 +1377,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         }
     }
 
-    if (internal_event_id < 0 || internal_event_id >= int32(mGameEventGameobjectGuids.size()))
+    if (internal_event_id >= int32(mGameEventGameobjectGuids.size()))
     {
         sLog->outError("GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventGameobjectGuids element %i (size: " SZFMTD ")",
             internal_event_id, mGameEventGameobjectGuids.size());
@@ -1392,7 +1398,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
                 pGameobject->AddObjectToRemoveList();
         }
     }
-    if (internal_event_id < 0 || internal_event_id >= int32(mGameEventPoolIds.size()))
+    if (internal_event_id >= int32(mGameEventPoolIds.size()))
     {
         sLog->outError("GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventPoolIds element %u (size: " SZFMTD ")", internal_event_id, mGameEventPoolIds.size());
         return;

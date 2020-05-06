@@ -160,7 +160,10 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
         return PET_LOAD_OK;
     }
 
-    pet->GetCharmInfo()->SetPetNumber(pet_number, pet->IsPermanentPetFor(owner));
+    if (pet->getPetType() == HUNTER_PET || pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON)
+        pet->GetCharmInfo()->SetPetNumber(pet_number, pet->IsPermanentPetFor(owner)); // Show pet details tab (Shift+P) only for hunter pets or demons
+    else
+        pet->GetCharmInfo()->SetPetNumber(pet_number, false);
 
     pet->SetDisplayId(fields[3].GetUInt32());
     pet->SetNativeDisplayId(fields[3].GetUInt32());

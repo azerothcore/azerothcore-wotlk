@@ -149,7 +149,7 @@ public:
             { "model",          SEC_ADMINISTRATOR,  false, &HandleNpcSetModelCommand,          "" },
             { "movetype",       SEC_ADMINISTRATOR,  false, &HandleNpcSetMoveTypeCommand,       "" },
             { "phase",          SEC_ADMINISTRATOR,  false, &HandleNpcSetPhaseCommand,          "" },
-            { "spawndist",      SEC_ADMINISTRATOR,  false, &HandleNpcSetSpawnDistCommand,      "" },
+            { "wanderdistance", SEC_ADMINISTRATOR,  false, &HandleNpcSetWanderDistanceCommand, "" },
             { "spawntime",      SEC_ADMINISTRATOR,  false, &HandleNpcSetSpawnTimeCommand,      "" },
             { "data",           SEC_ADMINISTRATOR,  false, &HandleNpcSetDataCommand,           "" },
             //{ TODO: fix or remove these commands
@@ -295,7 +295,7 @@ public:
             return false;
         }
 
-        uint32 vendor_entry = vendor ? vendor->GetEntry() : 0;
+        uint32 vendor_entry = vendor->GetEntry();
 
         if (!sObjectMgr->IsVendorItemValid(vendor_entry, itemId, maxcount, incrtime, extendedcost, handler->GetSession()->GetPlayer()))
         {
@@ -603,10 +603,11 @@ public:
     static bool HandleNpcSetOriginalFaction(ChatHandler* handler, const char* /*args*/)
     {
         Player* me = handler->GetSession()->GetPlayer();
-        Creature* creature = me->GetSelectedUnit()->ToCreature();
 
         if (!me)
             return false;
+
+        Creature* creature = me->GetSelectedUnit()->ToCreature();
 
         if (!creature)
             return false;
@@ -934,7 +935,7 @@ public:
     * Valid movement types are:
     * <ul>
     * <li> stay - NPC wont move </li>
-    * <li> random - NPC will move randomly according to the spawndist </li>
+    * <li> random - NPC will move randomly according to the wander_distance </li>
     * <li> way - NPC will move with given waypoints set </li>
     * </ul>
     * additional parameter: NODEL - so no waypoints are deleted, if you
@@ -1106,7 +1107,7 @@ public:
     }
 
     //set spawn dist of creature
-    static bool HandleNpcSetSpawnDistCommand(ChatHandler* handler, const char* args)
+    static bool HandleNpcSetWanderDistanceCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
             return false;
@@ -1130,7 +1131,7 @@ public:
         else
             return false;
 
-        creature->SetRespawnRadius((float)option);
+        creature->SetWanderDistance((float)option);
         creature->SetDefaultMovementType(mtype);
         creature->GetMotionMaster()->Initialize();
         if (creature->IsAlive())                                // dead creature will reset movement generator at respawn
@@ -1139,7 +1140,7 @@ public:
             creature->Respawn();
         }
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_DISTANCE);
+        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_WANDER_DISTANCE);
 
         stmt->setFloat(0, option);
         stmt->setUInt8(1, uint8(mtype));
@@ -1147,7 +1148,7 @@ public:
 
         WorldDatabase.Execute(stmt);
 
-        handler->PSendSysMessage(LANG_COMMAND_SPAWNDIST, option);
+        handler->PSendSysMessage(LANG_COMMAND_WANDER_DISTANCE, option);
         return true;
     }
 

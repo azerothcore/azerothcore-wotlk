@@ -316,7 +316,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket & recvData)
                         // Send next quest
                         if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
                         {
-                            if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(quest, false))
+                            if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(nextQuest, false))
                             {
                                 if (nextQuest->IsAutoAccept())
                                     _player->AddQuestAndCheckCompletion(nextQuest, object);
