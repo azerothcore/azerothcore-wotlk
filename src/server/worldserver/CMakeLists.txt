@@ -60,7 +60,7 @@ target_include_directories(worldserver
 target_link_libraries(worldserver
   PRIVATE
     game-interface
-    scripts-interface
+    # scripts-interface
   PUBLIC
     game
     shared
