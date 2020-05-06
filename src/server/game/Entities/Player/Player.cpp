@@ -27594,4 +27594,141 @@ bool Player::IsPetDismissed()
     return false;
 }
 
+uint32 Player::GetSpec(int8 spec)
+{
+    uint32 mostTalentTabId = 0;
+    uint32 mostTalentCount = 0;
+    uint32 specIdx = 0;
+
+    if (m_specsCount) // not all instances of Player have a spec for some reason
+    {
+        if (spec < 0)
+            specIdx = m_activeSpec;
+        else
+            specIdx = spec;
+        // find class talent tabs (all players have 3 talent tabs)
+        uint32 const* talentTabIds = GetTalentTabPages(getClass());
+
+        for (uint8 i = 0; i < MAX_TALENT_TABS; ++i)
+        {
+            uint32 talentCount = 0;
+            uint32 talentTabId = talentTabIds[i];
+            for (uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
+            {
+                TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
+                if (!talentInfo)
+                    continue;
+
+                // skip another tab talents
+                if (talentInfo->TalentTab != talentTabId)
+                    continue;
+
+                // find max talent rank (0~4)
+                int8 curtalent_maxrank = -1;
+                for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
+                {
+                    if (talentInfo->RankID[rank] && HasTalent(talentInfo->RankID[rank], specIdx))
+                    {
+                        curtalent_maxrank = rank;
+                        break;
+                    }
+                }
+
+                // not learned talent
+                if (curtalent_maxrank < 0)
+                    continue;
+
+                talentCount += curtalent_maxrank + 1;
+            }
+
+            if (mostTalentCount < talentCount)
+            {
+                mostTalentCount = talentCount;
+                mostTalentTabId = talentTabId;
+            }
+        }
+    }
+    return mostTalentTabId;
+}
+
+bool Player::HasTankSpec()
+{
+    switch (GetSpec())
+    {
+        case TALENT_TREE_WARRIOR_PROTECTION:
+        case TALENT_TREE_PALADIN_PROTECTION:
+        case TALENT_TREE_DEATH_KNIGHT_BLOOD:
+            return true;
+        case TALENT_TREE_DRUID_FERAL_COMBAT:
+            if (GetShapeshiftForm() == FORM_BEAR || GetShapeshiftForm() == FORM_DIREBEAR)
+                return true;
+            break;
+        default:
+            break;
+    }
+    return false;
+}
+
+bool Player::HasMeleeSpec()
+{
+    switch (GetSpec(GetActiveSpec()))
+    {
+        case TALENT_TREE_WARRIOR_ARMS:
+        case TALENT_TREE_WARRIOR_FURY:
+        case TALENT_TREE_PALADIN_RETRIBUTION:
+        case TALENT_TREE_ROGUE_ASSASSINATION:
+        case TALENT_TREE_ROGUE_COMBAT:
+        case TALENT_TREE_ROGUE_SUBTLETY:
+        case TALENT_TREE_DEATH_KNIGHT_FROST:
+        case TALENT_TREE_DEATH_KNIGHT_UNHOLY:
+        case TALENT_TREE_SHAMAN_ENHANCEMENT:
+            return true;
+        case TALENT_TREE_DRUID_FERAL_COMBAT:
+            if (GetShapeshiftForm() == FORM_CAT)
+                return true;
+        default:
+            break;
+    }
+    return false;
+}
+
+bool Player::HasCasterSpec()
+{
+    switch (GetSpec(GetActiveSpec()))
+    {
+        case TALENT_TREE_PRIEST_SHADOW:
+        case TALENT_TREE_SHAMAN_ELEMENTAL:
+        case TALENT_TREE_MAGE_ARCANE:
+        case TALENT_TREE_MAGE_FIRE:
+        case TALENT_TREE_MAGE_FROST:
+        case TALENT_TREE_WARLOCK_AFFLICTION:
+        case TALENT_TREE_WARLOCK_DEMONOLOGY:
+        case TALENT_TREE_WARLOCK_DESTRUCTION:
+        case TALENT_TREE_DRUID_BALANCE:
+        case TALENT_TREE_HUNTER_BEAST_MASTERY:
+        case TALENT_TREE_HUNTER_MARKSMANSHIP:
+        case TALENT_TREE_HUNTER_SURVIVAL:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
+bool Player::HasHealSpec()
+{
+    switch (GetSpec(GetActiveSpec()))
+    {
+        case TALENT_TREE_PALADIN_HOLY:
+        case TALENT_TREE_PRIEST_DISCIPLINE:
+        case TALENT_TREE_PRIEST_HOLY:
+        case TALENT_TREE_SHAMAN_RESTORATION:
+        case TALENT_TREE_DRUID_RESTORATION:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
 std::unordered_map<int, bgZoneRef> Player::bgZoneIdToFillWorldStates = {};
