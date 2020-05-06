@@ -13,7 +13,7 @@
 #include "SpellMgr.h"
 #include "TransportMgr.h"
 #include "BattlegroundMgr.h"
-#include "GameConfig.h"
+#include "World.h"
 #include <map>
 
 typedef std::map<uint16, uint32> AreaFlagByAreaID;
@@ -803,7 +803,7 @@ uint32 const* GetTalentTabPages(uint8 cls)
 
 bool IsSharedDifficultyMap(uint32 mapid)
 { 
-    return sGameConfig->GetBoolConfig("Instance.SharedNormalHeroicId") && (mapid == 631 || mapid == 724); 
+    return sWorld->getBoolConfig(CONFIG_INSTANCE_SHARED_ID) && (mapid == 631 || mapid == 724);
 }
 
 uint32 GetLiquidFlags(uint32 liquidType)
