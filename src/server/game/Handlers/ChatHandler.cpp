@@ -98,6 +98,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             }
     }
 
+    if (sender->HasAura(1852) && type != CHAT_MSG_WHISPER)
+    {
+        SendNotification(GetAcoreString(LANG_GM_SILENCE), sender->GetName().c_str());
+        recvData.rfinish();
+        return;
+    }
+
     // prevent talking at unknown language (cheating)
     LanguageDesc const* langDesc = GetLanguageDescByID(lang);
     if (!langDesc)
@@ -106,7 +113,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         recvData.rfinish();
         return;
     }
-    
+
     if (langDesc->skill_id != 0 && !sender->HasSkill(langDesc->skill_id))
     {
         // also check SPELL_AURA_COMPREHEND_LANGUAGE (client offers option to speak in that language)
@@ -178,7 +185,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 
 	            break;
             default:
-                sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination", 
+                sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination",
                                                      GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
 
                 recvData.rfinish();
@@ -235,14 +242,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
             sender->UpdateSpeakTime(specialMessageLimit);
     }
-
-    // pussywizard: optimization
-    /*if (sender->HasAura(1852) && type != CHAT_MSG_WHISPER)
-    {
-        SendNotification(GetAcoreString(LANG_GM_SILENCE), sender->GetName().c_str());
-        recvData.rfinish();
-        return;
-    }*/
 
     std::string to, channel, msg;
     bool ignoreChecks = false;
@@ -330,6 +329,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         }
     }
 
+    // prevent crash player
+    if (msg.find("| |Hquest") != std::string::npos) {
+        return;
+    }
+
     sScriptMgr->OnBeforeSendChatMessage(_player, type, lang, msg);
 
     switch (type)
@@ -386,11 +390,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 }
 
             // pussywizard: optimization
-            /*if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
+            if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
             {
                 SendNotification(GetAcoreString(LANG_GM_SILENCE), GetPlayer()->GetName().c_str());
                 return;
-            }*/
+            }
 
             // If player is a Gamemaster and doesn't accept whisper, we auto-whitelist every player that the Gamemaster is talking to
             if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
