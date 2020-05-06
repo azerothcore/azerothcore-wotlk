@@ -416,6 +416,26 @@ void AuraEffect::GetApplicationList(std::list<AuraApplication*> & applicationLis
     }
 }
 
+uint32 AuraEffect::GetId() const
+{
+    return m_spellInfo->Id;
+}
+
+int32 AuraEffect::GetMiscValueB() const
+{
+    return m_spellInfo->Effects[m_effIndex].MiscValueB;
+}
+
+int32 AuraEffect::GetMiscValue() const
+{
+    return m_spellInfo->Effects[m_effIndex].MiscValue;
+}
+
+AuraType AuraEffect::GetAuraType() const
+{
+    return (AuraType)m_spellInfo->Effects[m_effIndex].ApplyAuraName;
+}
+
 int32 AuraEffect::CalculateAmount(Unit* caster)
 {
     int32 amount;
@@ -526,10 +546,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         switch (GetAuraType())
         {
             case SPELL_AURA_PERIODIC_DAMAGE:
-                // xinef: save caster depending auras, always pass 1 as stack amount, effect will be multiplicated at the end of the function by correct value!
-                if (GetBase()->GetType() == UNIT_AURA_TYPE)
-                    amount = caster->SpellDamageBonusDone(GetBase()->GetUnitOwner(), GetSpellInfo(), amount, DOT, GetPctMods(), 1);
-                break;
             case SPELL_AURA_PERIODIC_LEECH:
                 // xinef: save caster depending auras, always pass 1 as stack amount, effect will be multiplicated at the end of the function by correct value!
                 if (GetBase()->GetType() == UNIT_AURA_TYPE)
@@ -1050,6 +1066,11 @@ bool AuraEffect::IsAffectedOnSpell(SpellInfo const* spell) const
     if (m_spellInfo->Effects[m_effIndex].SpellClassMask & spell->SpellFamilyFlags)
         return true;
     return false;
+}
+
+bool AuraEffect::HasSpellClassMask() const
+{
+    return m_spellInfo->Effects[m_effIndex].SpellClassMask;
 }
 
 void AuraEffect::SendTickImmune(Unit* target, Unit* caster) const
@@ -6031,8 +6052,8 @@ void AuraEffect::HandlePeriodicTriggerSpellWithValueAuraTick(Unit* target, Unit*
     else {
 #ifdef ELUNA
         Creature* c = target->ToCreature();
-        if (c && caster && !sEluna->OnDummyEffect(caster, GetId(), SpellEffIndex(GetEffIndex()), target->ToCreature()))
-            return;
+        if (c && caster)
+            sEluna->OnDummyEffect(caster, GetId(), SpellEffIndex(GetEffIndex()), target->ToCreature());
 #endif
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "AuraEffect::HandlePeriodicTriggerSpellWithValueAuraTick: Spell %u has non-existent spell %u in EffectTriggered[%d] and is therefor not triggered.", GetId(), triggerSpellId, GetEffIndex());

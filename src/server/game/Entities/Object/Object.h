@@ -427,6 +427,7 @@ struct Position
     {
         m_positionX = pos->m_positionX; m_positionY = pos->m_positionY; m_positionZ = pos->m_positionZ; m_orientation = pos->m_orientation;
     }
+    void RelocatePolarOffset(float angle, float dist, float z = 0.0f);
     void RelocateOffset(const Position &offset);
     void SetOrientation(float orientation)
     {
@@ -799,7 +800,7 @@ class WorldObject : public Object, public WorldLocation
         virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
         uint32 GetPhaseMask() const { return m_phaseMask; }
         bool InSamePhase(WorldObject const* obj) const { return InSamePhase(obj->GetPhaseMask()); }
-        bool InSamePhase(uint32 phasemask) const { return (GetPhaseMask() & phasemask); }
+        bool InSamePhase(uint32 phasemask) const { return m_useCombinedPhases ? GetPhaseMask() & phasemask : GetPhaseMask() == phasemask; }
 
         virtual uint32 GetZoneId(bool forceRecalc = false) const;
         virtual uint32 GetAreaId(bool forceRecalc = false) const;
@@ -977,7 +978,7 @@ class WorldObject : public Object, public WorldLocation
 
         bool isActiveObject() const { return m_isActive; }
         void setActive(bool isActiveObject);
-        bool IsVisibilityOverridden() const { return m_isVisibilityDistanceOverride || m_isActive; }
+        bool IsVisibilityOverridden() const { return m_isVisibilityDistanceOverride; }
         void SetVisibilityDistanceOverride(bool isVisibilityDistanceOverride);
         void SetWorldObject(bool apply);
         bool IsPermanentWorldObject() const { return m_isWorldObject; }
@@ -1047,6 +1048,8 @@ class WorldObject : public Object, public WorldLocation
         //uint32 m_mapId;                                     // object at map with map_id
         uint32 m_InstanceId;                                // in map copy with instance id
         uint32 m_phaseMask;                                 // in area phase state
+        bool m_useCombinedPhases;                           // true (default): use phaseMask as bit mask combining up to 32 phases
+                                                            // false: use phaseMask to represent single phases only (up to 4294967295 phases)
 
         uint16 m_notifyflags;
         uint16 m_executed_notifies;
