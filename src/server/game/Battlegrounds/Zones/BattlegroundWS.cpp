@@ -443,7 +443,7 @@ void BattlegroundWS::Init()
     _flagState[TEAM_HORDE]          = BG_WS_FLAG_STATE_ON_BASE;
     _lastFlagCaptureTeam            = TEAM_NEUTRAL;
 
-    if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID()))
+    if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
     {
         _reputationCapture = 45;
         _honorWinKills = 3;

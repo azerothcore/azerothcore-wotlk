@@ -766,7 +766,7 @@ class spell_gen_select_target_count : public SpellScriptLoader
             void FilterTargets(std::list<WorldObject*>& targets)
             {
                 targets.remove(GetCaster());
-                Trinity::Containers::RandomResizeList(targets, _count);
+                acore::Containers::RandomResizeList(targets, _count);
             }
 
             void Register()
@@ -1720,8 +1720,8 @@ class spell_gen_cannibalize : public SpellScriptLoader
                 float max_range = GetSpellInfo()->GetMaxRange(false);
                 WorldObject* result = NULL;
                 // search for nearby enemy corpse in range
-                Trinity::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
-                Trinity::WorldObjectSearcher<Trinity::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
+                acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
+                acore::WorldObjectSearcher<acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
                 caster->GetMap()->VisitFirstFound(caster->m_positionX, caster->m_positionY, max_range, searcher);
                 if (!result)
                     return SPELL_FAILED_NO_EDIBLE_CORPSES;
@@ -4766,13 +4766,13 @@ class spell_gen_replenishment : public SpellScriptLoader
                     }
                 }
 
-                targets.remove_if(Trinity::PowerCheck(POWER_MANA, false));
+                targets.remove_if(acore::PowerCheck(POWER_MANA, false));
 
                 uint8 const maxTargets = 10;
 
                 if (targets.size() > maxTargets)
                 {
-                    targets.sort(Trinity::PowerPctOrderPred(POWER_MANA));
+                    targets.sort(acore::PowerPctOrderPred(POWER_MANA));
                     targets.resize(maxTargets);
                 }
             }

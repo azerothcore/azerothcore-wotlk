@@ -365,7 +365,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         }
     }
 
-    if (!_me->IsInWorld() || _me->IsDuringRemoveFromWorld())
+    if (!_me || !_me->IsInWorld() || _me->IsDuringRemoveFromWorld())
         return false;
 
     // Xinef: moved from unit.cpp, if aura passes seatId == -1 (choose automaticly) we wont get appropriate flags
@@ -390,7 +390,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         try
         {
         if (!_me->SetCharmedBy(unit, CHARM_TYPE_VEHICLE))
-            ASSERT(false);
+            ABORT();
         }
         catch (...)
         {

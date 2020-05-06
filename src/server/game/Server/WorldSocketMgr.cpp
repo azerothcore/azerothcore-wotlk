@@ -97,7 +97,7 @@ class ReactorRunnable : protected ACE_Task_Base
 
         int AddSocket (WorldSocket* sock)
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
+            ACORE_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
 
             ++m_Connections;
             sock->AddReference();
@@ -118,7 +118,7 @@ class ReactorRunnable : protected ACE_Task_Base
 
         void AddNewSockets()
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
+            ACORE_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
 
             if (m_NewSockets.empty())
                 return;
@@ -217,6 +217,12 @@ WorldSocketMgr::~WorldSocketMgr()
 {
     delete [] m_NetThreads;
     delete m_Acceptor;
+}
+
+WorldSocketMgr* WorldSocketMgr::instance()
+{
+    static WorldSocketMgr instance;
+    return &instance;
 }
 
 int

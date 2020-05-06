@@ -551,11 +551,14 @@ class boss_essence_of_anger : public CreatureScript
                         events.ScheduleEvent(EVENT_ANGER_SOUL_SCREAM, 10000);
                         break;
                     case EVENT_ANGER_SEETHE:
-                        if (targetGUID && targetGUID != me->GetVictim()->GetGUID())
-                            me->CastSpell(me, SPELL_SEETHE, false);
-                        // victim can be lost
-                        if (me->GetVictim())
-                            targetGUID = me->GetVictim()->GetGUID();
+                        if (Unit* victim = me->GetVictim())
+                        {
+                            uint64 victimGUID = victim->GetGUID();
+                            if (targetGUID && targetGUID != victimGUID)
+                                me->CastSpell(me, SPELL_SEETHE, false);
+                            // victim can be lost
+                            targetGUID = victimGUID;
+                        }     
                         events.ScheduleEvent(EVENT_ANGER_SEETHE, 1000);
                         break;
 
@@ -612,7 +615,7 @@ class spell_reliquary_of_souls_fixate : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
+                targets.sort(acore::ObjectDistanceOrderPred(GetCaster()));
                 WorldObject* target = targets.front();
                 targets.clear();
                 targets.push_back(target);

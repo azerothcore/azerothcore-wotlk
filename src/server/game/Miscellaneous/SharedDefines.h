@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_SHAREDDEFINES_H
-#define TRINITY_SHAREDDEFINES_H
+#ifndef ACORE_SHAREDDEFINES_H
+#define ACORE_SHAREDDEFINES_H
 
 #include "Define.h"
 #include "DetourNavMesh.h"
@@ -3473,6 +3473,23 @@ enum PetNameInvalidReason
     PET_NAME_RUSSIAN_CONSECUTIVE_SILENT_CHARACTERS          = 14,
     PET_NAME_RUSSIAN_SILENT_CHARACTER_AT_BEGINNING_OR_END   = 15,
     PET_NAME_DECLENSION_DOESNT_MATCH_BASE_NAME              = 16
+};
+
+enum PetTameFailure
+{
+    PET_TAME_INVALID_CREATURE       = 1,
+    PET_TAME_TOO_MANY               = 2,
+    PET_TAME_CREATURE_ALREADY_OWNED = 3,
+    PET_TAME_NOT_TAMEABLE           = 4,
+    PET_TAME_ANOTHER_SUMMON_ACTIVE  = 5,
+    PET_TAME_UNITS_CANT_TAME        = 6,
+    PET_TAME_NOPET_AVAILABLE        = 7,
+    PET_TAME_INTERNAL_ERROR         = 8,
+    PET_TAME_TOO_HIGHLEVEL          = 9,
+    PET_TAME_DEAD                   = 10,
+    PET_TAME_NOTDEAD                = 11,
+    PET_TAME_CANT_CONTROL_EXOTIC    = 12,
+    PET_TAME_UNKNOWNERROR           = 13
 };
 
 enum DungeonStatusFlag

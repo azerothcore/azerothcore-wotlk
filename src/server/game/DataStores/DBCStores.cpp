@@ -159,6 +159,9 @@ DBCStorage <TalentEntry> sTalentStore(TalentEntryfmt);
 TalentSpellPosMap sTalentSpellPosMap;
 DBCStorage <TalentTabEntry> sTalentTabStore(TalentTabEntryfmt);
 
+// store absolute bit position for first rank for talent inspect
+static uint32 sTalentTabPages[MAX_CLASSES][3];
+
 DBCStorage <TaxiNodesEntry> sTaxiNodesStore(TaxiNodesEntryfmt);
 TaxiMask sTaxiNodesMask;
 TaxiMask sOldContinentsNodesMask;
@@ -469,6 +472,26 @@ void LoadDBCStores(const std::string& dataPath)
 
     LoadDBC(availableDbcLocales, bad_dbc_files, sTalentTabStore,              dbcPath, "TalentTab.dbc");
 
+    // prepare fast data access to bit pos of talent ranks for use at inspecting
+    {
+        // now have all max ranks (and then bit amount used for store talent ranks in inspect)
+        for (uint32 talentTabId = 1; talentTabId < sTalentTabStore.GetNumRows(); ++talentTabId)
+        {
+            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentTabId);
+            if (!talentTabInfo)
+                continue;
+
+            // prevent memory corruption; otherwise cls will become 12 below
+            if ((talentTabInfo->ClassMask & CLASSMASK_ALL_PLAYABLE) == 0)
+                continue;
+
+            // store class talent tab pages
+            for (uint32 cls = 1; cls < MAX_CLASSES; ++cls)
+                if (talentTabInfo->ClassMask & (1 << (cls - 1)))
+                    sTalentTabPages[cls][talentTabInfo->tabpage] = talentTabId;
+        }
+    }
+
     LoadDBC(availableDbcLocales, bad_dbc_files, sTaxiNodesStore,              dbcPath, "TaxiNodes.dbc");
     LoadDBC(availableDbcLocales, bad_dbc_files, sTaxiPathStore,               dbcPath, "TaxiPath.dbc");
     for (uint32 i = 1; i < sTaxiPathStore.GetNumRows(); ++i)
@@ -752,13 +775,6 @@ MapDifficulty const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty &di
 
 PvPDifficultyEntry const* GetBattlegroundBracketByLevel(uint32 mapid, uint32 level)
 {
-    if (mapid == sBattlegroundMgr->randomBgDifficultyEntry.mapId)
-    {
-        if (level < sBattlegroundMgr->randomBgDifficultyEntry.minLevel)
-            return NULL;
-        return &sBattlegroundMgr->randomBgDifficultyEntry;
-    }
-
     PvPDifficultyEntry const* maxEntry = NULL;              // used for level > max listed level case
     for (uint32 i = 0; i < sPvPDifficultyStore.GetNumRows(); ++i)
     {
@@ -783,13 +799,6 @@ PvPDifficultyEntry const* GetBattlegroundBracketByLevel(uint32 mapid, uint32 lev
 
 PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundBracketId id)
 {
-    if (mapid == sBattlegroundMgr->randomBgDifficultyEntry.mapId)
-    {
-        if (id != sBattlegroundMgr->randomBgDifficultyEntry.bracketId)
-            return NULL;
-        return &sBattlegroundMgr->randomBgDifficultyEntry;
-    }
-
     for (uint32 i = 0; i < sPvPDifficultyStore.GetNumRows(); ++i)
         if (PvPDifficultyEntry const* entry = sPvPDifficultyStore.LookupEntry(i))
             if (entry->mapId == mapid && entry->GetBracketId() == id)
@@ -798,9 +807,14 @@ PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundB
     return NULL;
 }
 
+uint32 const* GetTalentTabPages(uint8 cls)
+{
+    return sTalentTabPages[cls];
+}
+
 bool IsSharedDifficultyMap(uint32 mapid)
-{ 
-    return sWorld->getBoolConfig(CONFIG_INSTANCE_SHARED_ID) && (mapid == 631 || mapid == 724); 
+{
+    return sWorld->getBoolConfig(CONFIG_INSTANCE_SHARED_ID) && (mapid == 631 || mapid == 724);
 }
 
 uint32 GetLiquidFlags(uint32 liquidType)

@@ -416,6 +416,26 @@ void AuraEffect::GetApplicationList(std::list<AuraApplication*> & applicationLis
     }
 }
 
+uint32 AuraEffect::GetId() const
+{
+    return m_spellInfo->Id;
+}
+
+int32 AuraEffect::GetMiscValueB() const
+{
+    return m_spellInfo->Effects[m_effIndex].MiscValueB;
+}
+
+int32 AuraEffect::GetMiscValue() const
+{
+    return m_spellInfo->Effects[m_effIndex].MiscValue;
+}
+
+AuraType AuraEffect::GetAuraType() const
+{
+    return (AuraType)m_spellInfo->Effects[m_effIndex].ApplyAuraName;
+}
+
 int32 AuraEffect::CalculateAmount(Unit* caster)
 {
     int32 amount;
@@ -437,7 +457,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                                 SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(item_rand_suffix->enchant_id[k]);
                                 if (pEnchant)
                                 {
-                                    for (int t = 0; t < MAX_ITEM_ENCHANTMENT_EFFECTS; t++)
+                                    for (int t = 0; t < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; t++)
                                         if (pEnchant->spellid[t] == m_spellInfo->Id)
                                     {
                                         amount = uint32((item_rand_suffix->prefix[k]*castItem->GetItemSuffixFactor()) / 10000);
@@ -526,10 +546,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         switch (GetAuraType())
         {
             case SPELL_AURA_PERIODIC_DAMAGE:
-                // xinef: save caster depending auras, always pass 1 as stack amount, effect will be multiplicated at the end of the function by correct value!
-                if (GetBase()->GetType() == UNIT_AURA_TYPE)
-                    amount = caster->SpellDamageBonusDone(GetBase()->GetUnitOwner(), GetSpellInfo(), amount, DOT, GetPctMods(), 1);
-                break;
             case SPELL_AURA_PERIODIC_LEECH:
                 // xinef: save caster depending auras, always pass 1 as stack amount, effect will be multiplicated at the end of the function by correct value!
                 if (GetBase()->GetType() == UNIT_AURA_TYPE)
@@ -1050,6 +1066,11 @@ bool AuraEffect::IsAffectedOnSpell(SpellInfo const* spell) const
     if (m_spellInfo->Effects[m_effIndex].SpellClassMask & spell->SpellFamilyFlags)
         return true;
     return false;
+}
+
+bool AuraEffect::HasSpellClassMask() const
+{
+    return m_spellInfo->Effects[m_effIndex].SpellClassMask;
 }
 
 void AuraEffect::SendTickImmune(Unit* target, Unit* caster) const
@@ -2333,8 +2354,8 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
         */
 
         UnitList targets;
-        Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(target, target, target->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
-        Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(target, targets, u_check);
+        acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(target, target, target->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
+        acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(target, targets, u_check);
         target->VisitNearbyObject(target->GetVisibilityRange(), searcher); // no VISIBILITY_COMPENSATION, distance is enough
         for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
@@ -3267,7 +3288,7 @@ void AuraEffect::HandleModStateImmunityMask(AuraApplication const* aurApp, uint8
         {
             if (!GetAmount())
             {
-                mechanic_immunity_list = (1 << MECHANIC_CHARM) | (1 << MECHANIC_SNARE) | (1 << MECHANIC_ROOT)
+                mechanic_immunity_list = (1 << MECHANIC_SNARE) | (1 << MECHANIC_ROOT)
                     | (1 << MECHANIC_FEAR) | (1 << MECHANIC_STUN)
                     | (1 << MECHANIC_SLEEP) | (1 << MECHANIC_CHARM)
                     | (1 << MECHANIC_SAPPED) | (1 << MECHANIC_HORROR)
@@ -5061,8 +5082,8 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                                     return;
 
                                 Player* player = NULL;
-                                Trinity::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
-                                Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(target, player, checker);
+                                acore::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
+                                acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(target, player, checker);
                                 target->VisitNearbyWorldObject(10.0f, searcher);
 
                                 if( player && player->GetGUID() != target->GetGUID() )
@@ -6031,8 +6052,8 @@ void AuraEffect::HandlePeriodicTriggerSpellWithValueAuraTick(Unit* target, Unit*
     else {
 #ifdef ELUNA
         Creature* c = target->ToCreature();
-        if (c && caster && !sEluna->OnDummyEffect(caster, GetId(), SpellEffIndex(GetEffIndex()), target->ToCreature()))
-            return;
+        if (c && caster)
+            sEluna->OnDummyEffect(caster, GetId(), SpellEffIndex(GetEffIndex()), target->ToCreature());
 #endif
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "AuraEffect::HandlePeriodicTriggerSpellWithValueAuraTick: Spell %u has non-existent spell %u in EffectTriggered[%d] and is therefor not triggered.", GetId(), triggerSpellId, GetEffIndex());
@@ -6095,7 +6116,7 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
     {
         // xinef: leave only target depending bonuses, rest is handled in calculate amount
-        if (GetBase()->GetType() == DYNOBJ_AURA_TYPE)
+        if (GetBase()->GetType() == DYNOBJ_AURA_TYPE && caster)
             damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, DOT, 0.0f, GetBase()->GetStackAmount());
         damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
 

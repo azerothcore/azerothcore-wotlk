@@ -18,6 +18,8 @@
 #include "Item.h"
 #include "AccountMgr.h"
 
+#define MAX_INBOX_CLIENT_CAPACITY 50
+
 bool WorldSession::CanOpenMailBox(uint64 guid)
 {
     if (guid == _player->GetGUID())
@@ -91,7 +93,7 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
 
     if (player->getLevel() < sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ))
     {
-        SendNotification(GetTrinityString(LANG_MAIL_SENDER_REQ), sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
+        SendNotification(GetAcoreString(LANG_MAIL_SENDER_REQ), sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
         return;
     }
 
@@ -118,7 +120,14 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
         return;
     }
 
-    uint32 cost = items_count ? 30 * items_count : 30;  // price hardcoded in client
+    if (money && COD) // cannot send money in a COD mail
+    {
+        sLog->outError("%s attempt to dupe money!!!.", receiver.c_str());
+        player->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
+        return;
+    }
+
+    uint32 cost = items_count ? 30 * items_count : 30; // price hardcoded in client
 
     uint32 reqmoney = cost + money;
   
@@ -488,7 +497,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recvData)
                 {
                     std::string senderName;
                     if (!sObjectMgr->GetPlayerNameByGUID(sender_guid, senderName))
-                        senderName = sObjectMgr->GetTrinityStringForDBCLocale(LANG_UNKNOWN);
+                        senderName = sObjectMgr->GetAcoreStringForDBCLocale(LANG_UNKNOWN);
                     std::string subj = m->subject;
                     CleanStringForMysqlQuery(subj);
                     CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<COD> %s\", NOW())", GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), player->GetSession()->GetRemoteAddress().c_str(), sender_accId, senderName.c_str(), m->COD, subj.c_str());
@@ -570,9 +579,6 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
     if (!player->m_mailsLoaded)
         player->_LoadMail();
 
-    // client can't work with packets > max int16 value
-    const uint32 maxPacketSize = 32767;
-
     uint32 mailsCount = 0;                                 // real send to client mails amount
     uint32 realCount  = 0;                                 // real mails amount
 
@@ -583,8 +589,8 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
 
     for (PlayerMails::iterator itr = player->GetMailBegin(); itr != player->GetMailEnd(); ++itr)
     {
-        // Only first 50 mails are displayed
-        if (mailsCount >= 50)
+        // prevent client storage overflow
+        if (mailsCount >= MAX_INBOX_CLIENT_CAPACITY)
         {
             realCount += 1;
             continue;
@@ -594,11 +600,11 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
         if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
             continue;
 
-        uint8 item_count = (*itr)->items.size();            // max count is MAX_MAIL_ITEMS (12)
+        uint8 item_count = uint8((*itr)->items.size());            // max count is MAX_MAIL_ITEMS (12)
 
         size_t next_mail_size = 2+4+1+((*itr)->messageType == MAIL_NORMAL ? 8 : 4)+4*8+((*itr)->subject.size()+1)+((*itr)->body.size()+1)+1+item_count*(1+4+4+MAX_INSPECTED_ENCHANTMENT_SLOT*3*4+4+4+4+4+4+4+1);
 
-        if (data.wpos()+next_mail_size > maxPacketSize)
+        if (data.wpos() + next_mail_size > MAX_NETCLIENT_PACKET_SIZE)
         {
             realCount += 1;
             continue;
@@ -643,9 +649,9 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
             data << uint32((item ? item->GetEntry() : 0));
             for (uint8 j = 0; j < MAX_INSPECTED_ENCHANTMENT_SLOT; ++j)
             {
-                data << uint32((item ? item->GetEnchantmentId((EnchantmentSlot)j) : 0));
-                data << uint32((item ? item->GetEnchantmentDuration((EnchantmentSlot)j) : 0));
-                data << uint32((item ? item->GetEnchantmentCharges((EnchantmentSlot)j) : 0));
+                data << uint32(item ? item->GetEnchantmentCharges(EnchantmentSlot(j)) : 0);
+                data << uint32(item ? item->GetEnchantmentDuration(EnchantmentSlot(j)) : 0);
+                data << uint32(item ? item->GetEnchantmentId(EnchantmentSlot(j)) : 0);
             }
             // can be negative
             data << int32((item ? item->GetItemRandomPropertyId() : 0));
@@ -668,7 +674,7 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
     }
 
     data.put<uint32>(0, realCount);                         // this will display warning about undelivered mail to player if realCount > mailsCount
-    data.put<uint8>(4, mailsCount);                        // set real send mails to client
+    data.put<uint8>(4, uint8(mailsCount));                  // set real send mails to client
     SendPacket(&data);
 
     // recalculate m_nextMailDelivereTime and unReadMails
@@ -710,6 +716,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recvData)
         if (!mailTemplateEntry)
         {
             player->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_INTERNAL_ERROR);
+            delete bodyItem;
             return;
         }
 

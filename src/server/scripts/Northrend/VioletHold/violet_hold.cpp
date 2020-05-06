@@ -220,16 +220,20 @@ public:
 
         void JustSummoned(Creature *pSummoned)
         {
-            listOfMobs.Summon(pSummoned);
             if (pSummoned)
+            {
+                listOfMobs.Summon(pSummoned);
                 pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+            }
         }
 
         void SummonedMobDied(Creature *pSummoned)
         {
-            listOfMobs.Despawn(pSummoned);
             if (pSummoned)
+            {
+                listOfMobs.Despawn(pSummoned);
                 pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+            }
         }
     };
 };
