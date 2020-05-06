@@ -4,12 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_CONDITIONMGR_H
-#define TRINITY_CONDITIONMGR_H
+#ifndef ACORE_CONDITIONMGR_H
+#define ACORE_CONDITIONMGR_H
 
 #include "Define.h"
 #include "Errors.h"
-#include <ace/Singleton.h>
 #include <list>
 #include <map>
 
@@ -69,7 +68,7 @@ enum ConditionTypes
     CONDITION_PET_TYPE              = 45,                   // TODO: NOT SUPPORTED YET
     CONDITION_TAXI                  = 46,                   // TODO: NOT SUPPORTED YET
     CONDITION_QUESTSTATE            = 47,                   // TODO: NOT SUPPORTED YET
-    CONDITION_QUEST_OBJECTIVE_COMPLETE = 48,                // don't use on 3.3.5a
+    CONDITION_QUEST_OBJECTIVE_PROGRESS = 48,                // quest_id         objectiveIndex objectiveCount     true if player has reached the specified objectiveCount quest progress for the objectiveIndex for the specified quest
     CONDITION_DIFFICULTY_ID            = 49,                // don't use on 3.3.5a
     CONDITION_TC_END                   = 50,                // placeholder
 
@@ -229,13 +228,13 @@ typedef std::map<uint32, ConditionList> ConditionReferenceContainer;//only used 
 
 class ConditionMgr
 {
-    friend class ACE_Singleton<ConditionMgr, ACE_Null_Mutex>;
-
     private:
         ConditionMgr();
         ~ConditionMgr();
 
     public:
+        static ConditionMgr* instance();
+
         void LoadConditions(bool isReload = false);
         bool isConditionTypeValid(Condition* cond);
         ConditionList GetConditionReferences(uint32 refId);
@@ -271,6 +270,6 @@ class ConditionMgr
         SmartEventConditionContainer      SmartEventConditionStore;
 };
 
-#define sConditionMgr ACE_Singleton<ConditionMgr, ACE_Null_Mutex>::instance()
+#define sConditionMgr ConditionMgr::instance()
 
 #endif

@@ -411,7 +411,7 @@ public:
                     ElementalOne->SetInCombatWithZone();
                     ElementalOne->CombatStart(target);
                     ElementalOne->setFaction(me->getFaction());
-                    ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
+                    ElementalOne->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalOne->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                     ElementalOne->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
@@ -441,7 +441,7 @@ public:
                     ElementalThree->SetInCombatWithZone();
                     ElementalThree->CombatStart(target);
                     ElementalThree->setFaction(me->getFaction());
-                    ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
+                    ElementalThree->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalThree->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                     ElementalThree->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
@@ -456,7 +456,7 @@ public:
                     ElementalFour->SetInCombatWithZone();
                     ElementalFour->CombatStart(target);
                     ElementalFour->setFaction(me->getFaction());
-                    ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
+                    ElementalFour->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalFour->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                     ElementalFour->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }

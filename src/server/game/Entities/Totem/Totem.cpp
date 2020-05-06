@@ -104,37 +104,37 @@ void Totem::UnSummon(uint32 msTime)
     CombatStop();
     RemoveAurasDueToSpell(GetSpell(), GetGUID());
 
-    Unit *m_owner = GetOwner();
+    Unit *owner = GetOwner();
     // clear owner's totem slot
     for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
     {
-        if (m_owner->m_SummonSlot[i] == GetGUID())
+        if (owner->m_SummonSlot[i] == GetGUID())
         {
-            m_owner->m_SummonSlot[i] = 0;
+            owner->m_SummonSlot[i] = 0;
             break;
         }
     }
 
-    m_owner->RemoveAurasDueToSpell(GetSpell(), GetGUID());
+    owner->RemoveAurasDueToSpell(GetSpell(), GetGUID());
 
     // Remove Sentry Totem Aura
     if (GetEntry() == SENTRY_TOTEM_ENTRY)
-        m_owner->RemoveAurasDueToSpell(SENTRY_TOTEM_SPELLID);
+        owner->RemoveAurasDueToSpell(SENTRY_TOTEM_SPELLID);
 
     //remove aura all party members too
-    if (Player* owner = m_owner->ToPlayer())
+    if (Player* player = owner->ToPlayer())
     {
-        owner->SendAutoRepeatCancel(this);
+        player->SendAutoRepeatCancel(this);
 
         if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
-            owner->SendCooldownEvent(spell, 0, NULL, false);
+            player->SendCooldownEvent(spell, 0, NULL, false);
 
-        if (Group* group = owner->GetGroup())
+        if (Group* group = player->GetGroup())
         {
             for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
             {
                 Player* target = itr->GetSource();
-                if (target && target->IsInMap(owner) && group->SameSubGroup(owner, target))
+                if (target && target->IsInMap(player) && group->SameSubGroup(player, target))
                     target->RemoveAurasDueToSpell(GetSpell(), GetGUID());
             }
         }

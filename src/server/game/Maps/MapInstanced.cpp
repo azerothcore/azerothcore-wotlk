@@ -175,20 +175,20 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
 InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty)
 { 
     // load/create a map
-    TRINITY_GUARD(ACE_Thread_Mutex, Lock);
+    ACORE_GUARD(ACE_Thread_Mutex, Lock);
 
     // make sure we have a valid map id
     const MapEntry* entry = sMapStore.LookupEntry(GetId());
     if (!entry)
     {
         sLog->outError("CreateInstance: no entry for map %d", GetId());
-        ASSERT(false);
+        ABORT();
     }
     const InstanceTemplate* iTemplate = sObjectMgr->GetInstanceTemplate(GetId());
     if (!iTemplate)
     {
         sLog->outError("CreateInstance: no instance template for map %d", GetId());
-        ASSERT(false);
+        ABORT();
     }
 
     // some instances only have one difficulty
@@ -218,7 +218,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
 BattlegroundMap* MapInstanced::CreateBattleground(uint32 InstanceId, Battleground* bg)
 { 
     // load/create a map
-    TRINITY_GUARD(ACE_Thread_Mutex, Lock);
+    ACORE_GUARD(ACE_Thread_Mutex, Lock);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_MAPS, "MapInstanced::CreateBattleground: map bg %d for %d created.", InstanceId, GetId());
@@ -272,6 +272,6 @@ bool MapInstanced::DestroyInstance(InstancedMaps::iterator &itr)
 
 bool MapInstanced::CanEnter(Player* /*player*/, bool /*loginCheck*/)
 { 
-    //ASSERT(false);
+    //ABORT();
     return true;
 }

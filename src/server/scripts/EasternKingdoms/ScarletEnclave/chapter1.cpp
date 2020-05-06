@@ -37,7 +37,7 @@ class npc_eye_of_acherus : public CreatureScript
 public:
     npc_eye_of_acherus() : CreatureScript("npc_eye_of_acherus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_eye_of_acherusAI(creature);
     }
@@ -48,7 +48,7 @@ public:
 
         EventMap events;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_REMOVE_CONTROL, 500);
@@ -58,7 +58,7 @@ public:
             me->CastSpell(me, SPELL_EYE_OF_ACHERUS_VISUAL, true);
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == ESCORT_MOTION_TYPE || point !=0)
                 events.ScheduleEvent(EVENT_REGAIN_CONTROL, 1000);
@@ -72,13 +72,13 @@ public:
             player->GetSession()->SendPacket(&data);
         }
 
-        void JustSummoned(Creature* creature)
+        void JustSummoned(Creature* creature) override
         {
             if (Unit* target = creature->SelectNearbyTarget())
                 creature->AI()->AttackStart(target);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -127,19 +127,17 @@ class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScriptLo
                     GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 54522, true);
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript();
         }
 };
-
-#define GOSSIP_ACCEPT_DUEL      "I challenge you, death knight!"
 
 enum deathsChallenge
 {
@@ -197,7 +195,7 @@ public:
                 return true;
 
             if (!creature->AI()->GetData(player->GetGUIDLow()))
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ACCEPT_DUEL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, 9765, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
             SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         }
@@ -385,13 +383,13 @@ class spell_item_gift_of_the_harvester : public SpellScriptLoader
                 return SPELL_CAST_OK;
             }
 
-            void Register()
+            void Register() override
             {
                 OnCheckCast += SpellCheckCastFn(spell_item_gift_of_the_harvester_SpellScript::CheckRequirement);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_item_gift_of_the_harvester_SpellScript();
         }
@@ -412,13 +410,13 @@ class spell_q12698_the_gift_that_keeps_on_giving : public SpellScriptLoader
                     GetOriginalCaster()->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectHitTarget += SpellEffectFn(spell_q12698_the_gift_that_keeps_on_giving_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_q12698_the_gift_that_keeps_on_giving_SpellScript();
         }
@@ -429,7 +427,7 @@ class npc_scarlet_ghoul : public CreatureScript
 public:
     npc_scarlet_ghoul() : CreatureScript("npc_scarlet_ghoul") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_scarlet_ghoulAI(creature);
     }
@@ -443,7 +441,7 @@ public:
         EventMap events;
         uint64 gothikGUID;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             gothikGUID = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -454,20 +452,20 @@ public:
             events.ScheduleEvent(EVENT_GHOUL_RESTORE_STATE, 3500);
         }
 
-        void OwnerAttackedBy(Unit* attacker)
+        void OwnerAttackedBy(Unit* attacker) override
         {
             if (!me->IsInCombat() && me->GetReactState() == REACT_DEFENSIVE)
                 AttackStart(attacker);
         }
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(uint64 guid, int32) override
         {
             gothikGUID = guid;
             events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3000);
             me->GetMotionMaster()->Clear(false);
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == 1)
             {
@@ -476,7 +474,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.GetEvent())
@@ -522,7 +520,7 @@ class npc_dkc1_gothik : public CreatureScript
 public:
     npc_dkc1_gothik() : CreatureScript("npc_dkc1_gothik") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dkc1_gothikAI(creature);
     }
@@ -533,7 +531,7 @@ public:
 
         int32 spoken;
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == SAY_GOTHIK_PIT && spoken <= 0)
             {
@@ -542,7 +540,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             ScriptedAI::MoveInLineOfSight(who);
 
@@ -559,7 +557,7 @@ public:
                     }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (spoken > 0)
                 spoken -= diff;
@@ -574,7 +572,7 @@ class npc_scarlet_cannon : public CreatureScript
 public:
     npc_scarlet_cannon() : CreatureScript("npc_scarlet_cannon") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_scarlet_cannonAI(creature);
     }
@@ -584,12 +582,12 @@ public:
         npc_scarlet_cannonAI(Creature* creature) : VehicleAI(creature) { summonAttackers = 0; }
 
         uint32 summonAttackers;
-        void PassengerBoarded(Unit* /*passenger*/, int8 /*seatId*/, bool apply)
+        void PassengerBoarded(Unit* /*passenger*/, int8 /*seatId*/, bool apply) override
         {
             summonAttackers = apply ? 8000 : 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             VehicleAI::UpdateAI(diff);
 
@@ -679,7 +677,7 @@ class npc_unworthy_initiate : public CreatureScript
 public:
     npc_unworthy_initiate() : CreatureScript("npc_unworthy_initiate") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_unworthy_initiateAI(creature);
     }
@@ -701,7 +699,7 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             anchorGUID = 0;
             phase = PHASE_CHAINED;
@@ -712,7 +710,7 @@ public:
             me->LoadEquipment(0, true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_ICY_TOUCH, 1000, GCD_CAST);
             events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 3000, GCD_CAST);
@@ -720,7 +718,7 @@ public:
             events.ScheduleEvent(EVENT_DEATH_COIL, 5000, GCD_CAST);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -754,7 +752,7 @@ public:
             Talk(SAY_EVENT_START, target);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             switch (phase)
             {
@@ -769,13 +767,13 @@ public:
                     }
 
                     float dist = 99.0f;
-                    GameObject* prison = NULL;
+                    GameObject* prison = nullptr;
 
                     for (uint8 i = 0; i < 12; ++i)
                     {
-                        if (GameObject* temp_prison = me->FindNearestGameObject(acherus_soul_prison[i], 30))
+                        if (GameObject* temp_prison = me->FindNearestGameObject(acherus_soul_prison[i], 100))
                         {
-                            if (me->IsWithinDist(temp_prison, dist, false))
+                            if (temp_prison && me->IsWithinDist(temp_prison, dist, false))
                             {
                                 dist = me->GetDistance2d(temp_prison);
                                 prison = temp_prison;
@@ -865,7 +863,7 @@ class npc_unworthy_initiate_anchor : public CreatureScript
 public:
     npc_unworthy_initiate_anchor() : CreatureScript("npc_unworthy_initiate_anchor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_unworthy_initiate_anchorAI(creature);
     }
@@ -876,13 +874,13 @@ public:
 
         uint64 prisonerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/)
+        void SetGUID(uint64 guid, int32 /*id*/) override
         {
             if (!prisonerGUID)
                 prisonerGUID = guid;
         }
 
-        uint64 GetGUID(int32 /*id*/) const
+        uint64 GetGUID(int32 /*id*/) const override
         {
             return prisonerGUID;
         }
@@ -921,7 +919,7 @@ class npc_scarlet_miner_cart : public CreatureScript
 public:
     npc_scarlet_miner_cart() : CreatureScript("npc_scarlet_miner_cart") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_scarlet_miner_cartAI(creature);
     }
@@ -937,12 +935,12 @@ public:
 
         uint64 minerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/)
+        void SetGUID(uint64 guid, int32 /*id*/) override
         {
             minerGUID = guid;
         }
 
-        void DoAction(int32 /*param*/)
+        void DoAction(int32 /*param*/) override
         {
             if (Creature* miner = ObjectAccessor::GetCreature(*me, minerGUID))
             {
@@ -958,7 +956,7 @@ public:
             }
         }
 
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
             who->SetVisible(!apply);
             if (!apply)
@@ -984,7 +982,7 @@ class npc_scarlet_miner : public CreatureScript
 public:
     npc_scarlet_miner() : CreatureScript("npc_scarlet_miner") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_scarlet_minerAI(creature);
     }
@@ -1000,7 +998,7 @@ public:
         uint32 IntroPhase;
         uint64 carGUID;
 
-        void Reset()
+        void Reset() override
         {
             carGUID = 0;
             IntroTimer = 0;
@@ -1011,32 +1009,39 @@ public:
         {
             AddWaypoint(1, 2389.03f,     -5902.74f,     109.014f, 5000);
             AddWaypoint(2, 2341.812012f, -5900.484863f, 102.619743f);
-            AddWaypoint(3, 2306.561279f, -5901.738281f, 91.792419f);
-            AddWaypoint(4, 2300.098389f, -5912.618652f, 86.014885f);
+            AddWaypoint(3, 2308.34f, -5904.2f, 91.1099f);
+            AddWaypoint(4, 2300.69f, -5912.99f, 86.1572f);
             AddWaypoint(5, 2294.142090f, -5927.274414f, 75.316849f);
             AddWaypoint(6, 2286.984375f, -5944.955566f, 63.714966f);
             AddWaypoint(7, 2280.001709f, -5961.186035f, 54.228283f);
             AddWaypoint(8, 2259.389648f, -5974.197754f, 42.359348f);
             AddWaypoint(9, 2242.882812f, -5984.642578f, 32.827850f);
-            AddWaypoint(10, 2217.265625f, -6028.959473f, 7.675705f);
-            AddWaypoint(11, 2202.595947f, -6061.325684f, 5.882018f);
-            AddWaypoint(12, 2188.974609f, -6080.866699f, 3.370027f);
+            AddWaypoint(10, 2239.79f, -5989.31f, 30.4453f);
+            AddWaypoint(11, 2236.52f, -5994.28f, 27.4829f);
+            AddWaypoint(12, 2232.61f, -6000.23f, 23.1281f);
+            AddWaypoint(13, 2228.69f, -6006.46f, 17.6638f);
+            AddWaypoint(14, 2225.2f, -6012.39f, 12.9487f);
+            AddWaypoint(15, 2217.265625f, -6028.959473f, 7.675705f);
+            AddWaypoint(16, 2202.595947f, -6061.325684f, 5.882018f);
+            AddWaypoint(17, 2188.974609f, -6080.866699f, 3.370027f);
 
             if (urand(0, 1))
             {
-                AddWaypoint(13, 2176.483887f, -6110.407227f, 1.855181f);
-                AddWaypoint(14, 2172.516602f, -6146.752441f, 1.074235f);
-                AddWaypoint(15, 2138.918457f, -6158.920898f, 1.342926f);
-                AddWaypoint(16, 2129.866699f, -6174.107910f, 4.380779f);
-                AddWaypoint(17, 2117.709473f, -6193.830078f, 13.3542f, 10000);
+                AddWaypoint(18, 2176.483887f, -6110.407227f, 1.855181f);
+                AddWaypoint(19, 2172.516602f, -6146.752441f, 1.074235f);
+                AddWaypoint(20, 2138.918457f, -6158.920898f, 1.342926f);
+                AddWaypoint(21, 2129.866699f, -6174.107910f, 4.380779f);
+                AddWaypoint(22, 2125.250001f, -6181.230001f, 9.91997f);
+                AddWaypoint(23, 2117.709473f, -6193.830078f, 13.3542f, 10000);
             }
             else
             {
-                AddWaypoint(13, 2184.190186f, -6166.447266f, 0.968877f);
-                AddWaypoint(14, 2234.265625f, -6163.741211f, 0.916021f);
-                AddWaypoint(15, 2268.071777f, -6158.750977f, 1.822252f);
-                AddWaypoint(16, 2270.028320f, -6176.505859f, 6.340538f);
-                AddWaypoint(17, 2271.739014f, -6195.401855f, 13.3542f, 10000);
+                AddWaypoint(18, 2184.190186f, -6166.447266f, 0.968877f);
+                AddWaypoint(19, 2234.265625f, -6163.741211f, 0.916021f);
+                AddWaypoint(20, 2268.071777f, -6158.750977f, 1.822252f);
+                AddWaypoint(21, 2270.028320f, -6176.505859f, 6.340538f);
+                AddWaypoint(22, 2270.350001f, -6182.410001f, 10.42431f);
+                AddWaypoint(23, 2271.739014f, -6195.401855f, 13.3542f, 10000);
             }
         }
 
@@ -1048,7 +1053,7 @@ public:
             SetDespawnAtFar(false);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -1065,7 +1070,7 @@ public:
                     IntroTimer = 4000;
                     IntroPhase = 1;
                     break;
-                case 17:
+                case 23:
                     if (Creature* car = ObjectAccessor::GetCreature(*me, carGUID))
                     {
                         car->SetPosition(car->GetPositionX(), car->GetPositionY(), me->GetPositionZ() + 1, car->GetOrientation());
@@ -1080,7 +1085,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (IntroPhase)
             {

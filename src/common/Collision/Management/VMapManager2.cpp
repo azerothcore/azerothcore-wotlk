@@ -25,7 +25,6 @@
 #include "WorldModel.h"
 #include <G3D/Vector3.h>
 #include <ace/Null_Mutex.h>
-#include <ace/Singleton.h>
 #include "DisableMgr.h"
 #include "DBCStores.h"
 #include "Log.h"
@@ -262,7 +261,7 @@ namespace VMAP
     WorldModel* VMapManager2::acquireModelInstance(const std::string& basepath, const std::string& filename)
     {
         //! Critical section, thread safe access to iLoadedModelFiles
-        TRINITY_GUARD(ACE_Thread_Mutex, LoadedModelFilesLock);
+        ACORE_GUARD(ACE_Thread_Mutex, LoadedModelFilesLock);
 
         ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
         if (model == iLoadedModelFiles.end())
@@ -287,7 +286,7 @@ namespace VMAP
     void VMapManager2::releaseModelInstance(const std::string &filename)
     {
         //! Critical section, thread safe access to iLoadedModelFiles
-        TRINITY_GUARD(ACE_Thread_Mutex, LoadedModelFilesLock);
+        ACORE_GUARD(ACE_Thread_Mutex, LoadedModelFilesLock);
         ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
         if (model == iLoadedModelFiles.end())
         {

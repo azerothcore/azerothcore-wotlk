@@ -265,6 +265,19 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
     return true;
 }
 
+bool ArenaTeam::SetName(std::string const& name)
+{
+    if (TeamName == name || name.empty() || name.length() > 24 || sObjectMgr->IsReservedName(name) || !ObjectMgr::IsValidCharterName(name))
+        return false;
+
+    TeamName = name;
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_TEAM_NAME);
+    stmt->setString(0, TeamName);
+    stmt->setUInt32(1, GetId());
+    CharacterDatabase.Execute(stmt);
+    return true;
+}
+
 void ArenaTeam::SetCaptain(uint64 guid)
 {
     // Disable remove/promote buttons
@@ -335,6 +348,29 @@ void ArenaTeam::Disband(WorldSession* session)
     {
         BroadcastEvent(ERR_ARENA_TEAM_DISBANDED_S, 0, 2, session->GetPlayerName(), GetName(), "");
     }
+
+    // Update database
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ARENA_TEAM);
+    stmt->setUInt32(0, TeamId);
+    trans->Append(stmt);
+
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ARENA_TEAM_MEMBERS);
+    stmt->setUInt32(0, TeamId);
+    trans->Append(stmt);
+
+    CharacterDatabase.CommitTransaction(trans);
+
+    // Remove arena team from ObjectMgr
+    sArenaTeamMgr->RemoveArenaTeam(TeamId);
+}
+
+void ArenaTeam::Disband()
+{
+    // Remove all members from arena team
+    while (!Members.empty())
+        DelMember(Members.front().Guid, false);
 
     // Update database
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
@@ -587,7 +623,7 @@ uint32 ArenaTeam::GetPoints(uint32 memberRating)
         points *= 0.76f;
     else if (Type == ARENA_TEAM_3v3)
         points *= 0.88f;
-    
+
     points *= sWorld->getRate(RATE_ARENA_POINTS);
 
     return (uint32) points;
@@ -671,7 +707,7 @@ int32 ArenaTeam::GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won 
         if (ownRating < 1300)
         {
             float win_rating_modifier1 = sWorld->getFloatConfig(CONFIG_ARENA_WIN_RATING_MODIFIER_1);
-            
+
             if (ownRating < 1000)
                 mod =  win_rating_modifier1 * (1.0f - chance);
             else

@@ -14,6 +14,8 @@
 
 #define CAST_AI(a, b)   (dynamic_cast<a*>(b))
 
+typedef std::list<WorldObject*> ObjectList;
+
 class InstanceScript;
 
 class SummonList
@@ -105,7 +107,7 @@ public:
 
         // We need to use a copy of SummonList here, otherwise original SummonList would be modified
         StorageType listCopy = storage_;
-        Trinity::Containers::RandomResizeList<uint64, Predicate>(listCopy, predicate, max);
+        acore::Containers::RandomResizeList<uint64, Predicate>(listCopy, predicate, max);
         for (StorageType::iterator i = listCopy.begin(); i != listCopy.end(); ++i)
         {
             Creature* summon = ObjectAccessor::GetCreature(*me, *i);
@@ -236,6 +238,9 @@ struct ScriptedAI : public CreatureAI
 
     //Plays a sound to all nearby players
     void DoPlaySoundToSet(WorldObject* source, uint32 soundId);
+
+    //Plays music for all players in the zone (zone = true) or the area (zone = false)
+    void DoPlayMusic(uint32 soundId, bool zone);
 
     //Drops all threat to 0%. Does not remove players from the threat list
     void DoResetThreat();

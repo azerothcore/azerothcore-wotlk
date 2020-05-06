@@ -4,14 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_OBJECTACCESSOR_H
-#define TRINITY_OBJECTACCESSOR_H
+#ifndef ACORE_OBJECTACCESSOR_H
+#define ACORE_OBJECTACCESSOR_H
 
 #include "Define.h"
 #include "UpdateData.h"
 #include "GridDefines.h"
 #include "Object.h"
-#include <ace/Singleton.h>
 #include <ace/Thread_Mutex.h>
 #include <unordered_map>
 #include <set>
@@ -39,19 +38,19 @@ class HashMapHolder
 
         static void Insert(T* o)
         {
-            TRINITY_WRITE_GUARD(LockType, i_lock);
+            ACORE_WRITE_GUARD(LockType, i_lock);
             m_objectMap[o->GetGUID()] = o;
         }
 
         static void Remove(T* o)
         {
-            TRINITY_WRITE_GUARD(LockType, i_lock);
+            ACORE_WRITE_GUARD(LockType, i_lock);
             m_objectMap.erase(o->GetGUID());
         }
 
         static T* Find(uint64 guid)
         {
-            TRINITY_READ_GUARD(LockType, i_lock);
+            ACORE_READ_GUARD(LockType, i_lock);
             typename MapType::iterator itr = m_objectMap.find(guid);
             return (itr != m_objectMap.end()) ? itr->second : NULL;
         }
@@ -87,7 +86,6 @@ public:
 
 class ObjectAccessor
 {
-    friend class ACE_Singleton<ObjectAccessor, ACE_Null_Mutex>;
     private:
         ObjectAccessor();
         ~ObjectAccessor();
@@ -95,6 +93,7 @@ class ObjectAccessor
         ObjectAccessor& operator=(const ObjectAccessor&);
 
     public:
+        static ObjectAccessor* instance();
         // TODO: override these template functions for each holder type and add assertions
 
         template<class T> static T* GetObjectInOrOutOfWorld(uint64 guid, T* /*typeSpecifier*/)
@@ -149,14 +148,14 @@ class ObjectAccessor
             if (!obj || obj->GetMapId() != mapid)
                 return NULL;
 
-            CellCoord p = Trinity::ComputeCellCoord(x, y);
+            CellCoord p = acore::ComputeCellCoord(x, y);
             if (!p.IsCoordValid())
             {
                 sLog->outError("ObjectAccessor::GetObjectInWorld: invalid coordinates supplied X:%f Y:%f grid cell [%u:%u]", x, y, p.x_coord, p.y_coord);
                 return NULL;
             }
 
-            CellCoord q = Trinity::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
+            CellCoord q = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
             if (!q.IsCoordValid())
             {
                 sLog->outError("ObjectAccessor::GetObjecInWorld: object (GUID: %u TypeId: %u) has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUIDLow(), obj->GetTypeId(), obj->GetPositionX(), obj->GetPositionY(), q.x_coord, q.y_coord);
@@ -227,7 +226,7 @@ class ObjectAccessor
         //non-static functions
         void AddUpdateObject(Object* obj)
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, i_objectLock);
+            ACORE_GUARD(ACE_Thread_Mutex, i_objectLock);
             if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
                 i_objects.insert(obj);
             else
@@ -236,7 +235,7 @@ class ObjectAccessor
 
         void RemoveUpdateObject(Object* obj)
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, i_objectLock);
+            ACORE_GUARD(ACE_Thread_Mutex, i_objectLock);
             if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
                 i_objects.erase(obj);
             else
@@ -277,5 +276,6 @@ class ObjectAccessor
         mutable ACE_Thread_Mutex DelayedCorpseLock;
 };
 
-#define sObjectAccessor ACE_Singleton<ObjectAccessor, ACE_Null_Mutex>::instance()
+#define sObjectAccessor ObjectAccessor::instance()
+
 #endif

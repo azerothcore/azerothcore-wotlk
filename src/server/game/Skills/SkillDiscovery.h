@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_SKILLDISCOVERY_H
-#define TRINITY_SKILLDISCOVERY_H
+#ifndef ACORE_SKILLDISCOVERY_H
+#define ACORE_SKILLDISCOVERY_H
 
 #include "Common.h"
 
