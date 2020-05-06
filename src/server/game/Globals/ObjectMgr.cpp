@@ -1647,7 +1647,7 @@ void ObjectMgr::LoadCreatures()
     uint32 oldMSTime = getMSTime();
 
     //                                               0              1   2    3        4             5           6           7           8            9              10
-    QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, "
+    QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
     //   11               12         13       14            15         16         17          18          19                20                   21
         "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags "
         "FROM creature "
@@ -1685,28 +1685,28 @@ void ObjectMgr::LoadCreatures()
             continue;
         }
 
-        CreatureData& data = _creatureDataStore[guid];
-        data.id             = entry;
-        data.mapid          = fields[2].GetUInt16();
-        data.displayid      = fields[3].GetUInt32();
-        data.equipmentId    = fields[4].GetInt8();
-        data.posX           = fields[5].GetFloat();
-        data.posY           = fields[6].GetFloat();
-        data.posZ           = fields[7].GetFloat();
-        data.orientation    = fields[8].GetFloat();
-        data.spawntimesecs  = fields[9].GetUInt32();
-        data.spawndist      = fields[10].GetFloat();
-        data.currentwaypoint= fields[11].GetUInt32();
-        data.curhealth      = fields[12].GetUInt32();
-        data.curmana        = fields[13].GetUInt32();
-        data.movementType   = fields[14].GetUInt8();
-        data.spawnMask      = fields[15].GetUInt8();
-        data.phaseMask      = fields[16].GetUInt32();
-        int16 gameEvent     = fields[17].GetInt8();
-        uint32 PoolId       = fields[18].GetUInt32();
-        data.npcflag        = fields[19].GetUInt32();
-        data.unit_flags     = fields[20].GetUInt32();
-        data.dynamicflags   = fields[21].GetUInt32();
+        CreatureData& data      = _creatureDataStore[guid];
+        data.id                 = entry;
+        data.mapid              = fields[2].GetUInt16();
+        data.displayid          = fields[3].GetUInt32();
+        data.equipmentId        = fields[4].GetInt8();
+        data.posX               = fields[5].GetFloat();
+        data.posY               = fields[6].GetFloat();
+        data.posZ               = fields[7].GetFloat();
+        data.orientation        = fields[8].GetFloat();
+        data.spawntimesecs      = fields[9].GetUInt32();
+        data.wander_distance    = fields[10].GetFloat();
+        data.currentwaypoint    = fields[11].GetUInt32();
+        data.curhealth          = fields[12].GetUInt32();
+        data.curmana            = fields[13].GetUInt32();
+        data.movementType       = fields[14].GetUInt8();
+        data.spawnMask          = fields[15].GetUInt8();
+        data.phaseMask          = fields[16].GetUInt32();
+        int16 gameEvent         = fields[17].GetInt8();
+        uint32 PoolId           = fields[18].GetUInt32();
+        data.npcflag            = fields[19].GetUInt32();
+        data.unit_flags         = fields[20].GetUInt32();
+        data.dynamicflags       = fields[21].GetUInt32();
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
         if (!mapEntry)
@@ -1752,25 +1752,25 @@ void ObjectMgr::LoadCreatures()
                 sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `creature_template`.`flags_extra` including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.", guid, data.id);
         }
 
-        if (data.spawndist < 0.0f)
+        if (data.wander_distance < 0.0f)
         {
-            sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `spawndist`< 0, set to 0.", guid, data.id);
-            data.spawndist = 0.0f;
+            sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `wander_distance`< 0, set to 0.", guid, data.id);
+            data.wander_distance = 0.0f;
         }
         else if (data.movementType == RANDOM_MOTION_TYPE)
         {
-            if (data.spawndist == 0.0f)
+            if (data.wander_distance == 0.0f)
             {
-                sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=1 (random movement) but with `spawndist`=0, replace by idle movement type (0).", guid, data.id);
+                sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).", guid, data.id);
                 data.movementType = IDLE_MOTION_TYPE;
             }
         }
         else if (data.movementType == IDLE_MOTION_TYPE)
         {
-            if (data.spawndist != 0.0f)
+            if (data.wander_distance != 0.0f)
             {
-                sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=0 (idle) have `spawndist`<>0, set to 0.", guid, data.id);
-                data.spawndist = 0.0f;
+                sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.", guid, data.id);
+                data.wander_distance = 0.0f;
             }
         }
 
@@ -1939,7 +1939,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     data.posZ = z;
     data.orientation = o;
     data.spawntimesecs = spawntimedelay;
-    data.spawndist = 0;
+    data.wander_distance = 0;
     data.currentwaypoint = 0;
     data.curhealth = stats->GenerateHealth(cInfo);
     data.curmana = stats->GenerateMana(cInfo);
@@ -2314,8 +2314,8 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.Flags                     = fields[7].GetUInt32();
         itemTemplate.Flags2                    = fields[8].GetUInt32();
         itemTemplate.BuyCount                  = uint32(fields[9].GetUInt8());
-        itemTemplate.BuyPrice                  = int32(fields[10].GetInt64());
-        itemTemplate.SellPrice                 = fields[11].GetUInt32();
+        itemTemplate.BuyPrice                  = int32(fields[10].GetInt64() * sWorld->getRate((Rates)(RATE_BUYVALUE_ITEM_POOR + itemTemplate.Quality)));
+        itemTemplate.SellPrice                 = uint32(fields[11].GetUInt32() * sWorld->getRate((Rates)(RATE_SELLVALUE_ITEM_POOR + itemTemplate.Quality)));
         itemTemplate.InventoryType             = uint32(fields[12].GetUInt8());
         itemTemplate.AllowableClass            = fields[13].GetInt32();
         itemTemplate.AllowableRace             = fields[14].GetInt32();
