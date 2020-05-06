@@ -104,6 +104,40 @@ struct PlayerTalent
     bool IsInSpec(uint8 spec) { return (specMask & (1<<spec)); }
 };
 
+enum TalentTree // talent tabs
+{
+    TALENT_TREE_WARRIOR_ARMS = 161,
+    TALENT_TREE_WARRIOR_FURY = 164,
+    TALENT_TREE_WARRIOR_PROTECTION = 163,
+    TALENT_TREE_PALADIN_HOLY = 382,
+    TALENT_TREE_PALADIN_PROTECTION = 383,
+    TALENT_TREE_PALADIN_RETRIBUTION = 381,
+    TALENT_TREE_HUNTER_BEAST_MASTERY = 361,
+    TALENT_TREE_HUNTER_MARKSMANSHIP = 363,
+    TALENT_TREE_HUNTER_SURVIVAL = 362,
+    TALENT_TREE_ROGUE_ASSASSINATION = 182,
+    TALENT_TREE_ROGUE_COMBAT = 181,
+    TALENT_TREE_ROGUE_SUBTLETY = 183,
+    TALENT_TREE_PRIEST_DISCIPLINE = 201,
+    TALENT_TREE_PRIEST_HOLY = 202,
+    TALENT_TREE_PRIEST_SHADOW = 203,
+    TALENT_TREE_DEATH_KNIGHT_BLOOD = 398,
+    TALENT_TREE_DEATH_KNIGHT_FROST = 399,
+    TALENT_TREE_DEATH_KNIGHT_UNHOLY = 400,
+    TALENT_TREE_SHAMAN_ELEMENTAL = 261,
+    TALENT_TREE_SHAMAN_ENHANCEMENT = 263,
+    TALENT_TREE_SHAMAN_RESTORATION = 262,
+    TALENT_TREE_MAGE_ARCANE = 81,
+    TALENT_TREE_MAGE_FIRE = 41,
+    TALENT_TREE_MAGE_FROST = 61,
+    TALENT_TREE_WARLOCK_AFFLICTION = 302,
+    TALENT_TREE_WARLOCK_DEMONOLOGY = 303,
+    TALENT_TREE_WARLOCK_DESTRUCTION = 301,
+    TALENT_TREE_DRUID_BALANCE = 283,
+    TALENT_TREE_DRUID_FERAL_COMBAT = 281,
+    TALENT_TREE_DRUID_RESTORATION = 282
+};
+
 #define SPEC_MASK_ALL 255
 
 // Spell modifier (used for modify other spells)
@@ -1729,8 +1763,11 @@ class Player : public Unit, public GridObject<Player>
         void ActivateSpec(uint8 spec);
         void GetTalentTreePoints(uint8 (&specPoints)[3]) const;
         uint8 GetMostPointsTalentTree() const;
-        bool IsHealerTalentSpec() const;
-        bool IsTankTalentSpec() const;
+        bool HasTankSpec();
+        bool HasMeleeSpec();
+        bool HasCasterSpec();
+        bool HasHealSpec();
+        uint32 GetSpec(int8 spec = -1);
 
         void InitGlyphsForLevel();
         void SetGlyphSlot(uint8 slot, uint32 slottype) { SetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot, slottype); }
@@ -2986,7 +3023,7 @@ void RemoveItemsSetItem(Player* player, ItemTemplate const* proto);
 
 // "the bodies of template functions must be made available in a header file"
 template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell* spell, bool temporaryPet)
-{ 
+{
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
         return 0;
