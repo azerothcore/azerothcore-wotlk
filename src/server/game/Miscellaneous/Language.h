@@ -294,7 +294,7 @@ enum AcoreStrings
       // TICKET STRINGS NEED REWRITE // 288-296 FREE
 
       // END
-    LANG_COMMAND_SPAWNDIST              = 297,
+    LANG_COMMAND_WANDER_DISTANCE        = 297,
     LANG_COMMAND_SPAWNTIME              = 298,
     LANG_COMMAND_MODIFY_HONOR           = 299,
 
