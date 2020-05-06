@@ -6633,8 +6633,12 @@ SpellCastResult Spell::CheckRange(bool strict)
             // Xinef: WHAT DA FUCK IS THIS SHIT? Spells with 5yd range can hit target 9yd away? >.>
             if (range_type == SPELL_RANGE_MELEE)
             {
-                // Because of lag, we can not check too strictly here.
-                float real_max_range = m_caster->GetTypeId() == TYPEID_UNIT ? max_range - 2*MIN_MELEE_REACH : max_range - MIN_MELEE_REACH;
+                float real_max_range = max_range;
+                if (m_caster->GetTypeId() != TYPEID_UNIT && m_caster->isMoving() && target->isMoving() && !m_caster->IsWalking() && !target->IsWalking())
+                    real_max_range -= MIN_MELEE_REACH; // Because of lag, we can not check too strictly here (is only used if both caster and target are moving)
+                else
+                    real_max_range -= 2*MIN_MELEE_REACH;
+
                 if (!m_caster->IsWithinMeleeRange(target, std::max(real_max_range, 0.0f)))
                     return SPELL_FAILED_OUT_OF_RANGE;
             }
