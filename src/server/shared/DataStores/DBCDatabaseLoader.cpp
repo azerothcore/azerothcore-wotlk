@@ -45,18 +45,6 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
 {
     std::string query = acore::StringFormat("SELECT * FROM `%s` ORDER BY `ID` DESC", _sqlTableName);
 
-    if (_sqlTableName == "gtbarbershopcostbase_dbc" ||
-        _sqlTableName == "gtchancetomeleecrit_dbc" ||
-        _sqlTableName == "gtchancetomeleecritbase_dbc" ||
-        _sqlTableName == "gtchancetospellcrit_dbc" ||
-        _sqlTableName == "gtchancetospellcritbase_dbc" ||
-        _sqlTableName == "gtcombatratings_dbc" ||
-        _sqlTableName == "gtnpcmanacostscaler_dbc" ||
-        _sqlTableName == "gtoctregenhp_dbc" ||
-        _sqlTableName == "gtregenhpperspt_dbc" ||
-        _sqlTableName == "gtregenmpperspt_dbc")
-        return nullptr;
-
     // no error if empty set
     QueryResult result = WorldDatabase.Query(query.c_str());
     if (!result)

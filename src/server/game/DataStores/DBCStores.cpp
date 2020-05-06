@@ -250,6 +250,7 @@ void LoadDBCStores(const std::string& dataPath)
     uint32 availableDbcLocales = 0xFFFFFFFF;
 
 #define LOAD_DBC(store, file, dbtable) LoadDBC(availableDbcLocales, bad_dbc_files, store, dbcPath, file, dbtable)
+#define LOAD_DBC_NO_DB(store, file) LoadDBC(availableDbcLocales, bad_dbc_files, store, dbcPath, file)
 
     LOAD_DBC(sAreaTableStore,                       "AreaTable.dbc",                        "areatable_dbc");
     LOAD_DBC(sAchievementStore,                     "Achievement.dbc",                      "achievement_dbc");
@@ -285,18 +286,18 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sGemPropertiesStore,                   "GemProperties.dbc",                    "gemproperties_dbc");
     LOAD_DBC(sGlyphPropertiesStore,                 "GlyphProperties.dbc",                  "glyphproperties_dbc");
     LOAD_DBC(sGlyphSlotStore,                       "GlyphSlot.dbc",                        "glyphslot_dbc");
-    LOAD_DBC(sGtBarberShopCostBaseStore,            "gtBarberShopCostBase.dbc",             "gtbarbershopcostbase_dbc");
-    LOAD_DBC(sGtCombatRatingsStore,                 "gtCombatRatings.dbc",                  "gtcombatratings_dbc");
-    LOAD_DBC(sGtChanceToMeleeCritBaseStore,         "gtChanceToMeleeCritBase.dbc",          "gtchancetomeleecritbase_dbc");
-    LOAD_DBC(sGtChanceToMeleeCritStore,             "gtChanceToMeleeCrit.dbc",              "gtchancetomeleecrit_dbc");
-    LOAD_DBC(sGtChanceToSpellCritBaseStore,         "gtChanceToSpellCritBase.dbc",          "gtchancetospellcritbase_dbc");
-    LOAD_DBC(sGtChanceToSpellCritStore,             "gtChanceToSpellCrit.dbc",              "gtchancetospellcrit_dbc");
-    LOAD_DBC(sGtNPCManaCostScalerStore,             "gtNPCManaCostScaler.dbc",              "gtnpcmanacostscaler_dbc");
+    LOAD_DBC_NO_DB(sGtBarberShopCostBaseStore,      "gtBarberShopCostBase.dbc"/*,             "gtbarbershopcostbase_dbc"*/);
+    LOAD_DBC_NO_DB(sGtCombatRatingsStore,           "gtCombatRatings.dbc"/*,                  "gtcombatratings_dbc"*/);
+    LOAD_DBC_NO_DB(sGtChanceToMeleeCritBaseStore,   "gtChanceToMeleeCritBase.dbc"/*,          "gtchancetomeleecritbase_dbc"*/);
+    LOAD_DBC_NO_DB(sGtChanceToMeleeCritStore,       "gtChanceToMeleeCrit.dbc"/*,              "gtchancetomeleecrit_dbc"*/);
+    LOAD_DBC_NO_DB(sGtChanceToSpellCritBaseStore,   "gtChanceToSpellCritBase.dbc"/*,          "gtchancetospellcritbase_dbc"*/);
+    LOAD_DBC_NO_DB(sGtChanceToSpellCritStore,       "gtChanceToSpellCrit.dbc"/*,              "gtchancetospellcrit_dbc"*/);
+    LOAD_DBC_NO_DB(sGtNPCManaCostScalerStore,       "gtNPCManaCostScaler.dbc"/*,              "gtnpcmanacostscaler_dbc"*/);
     LOAD_DBC(sGtOCTClassCombatRatingScalarStore,    "gtOCTClassCombatRatingScalar.dbc",     "gtoctclasscombatratingscalar_dbc");
-    LOAD_DBC(sGtOCTRegenHPStore,                    "gtOCTRegenHP.dbc",                     "gtoctregenhp_dbc");
+    LOAD_DBC_NO_DB(sGtOCTRegenHPStore,                    "gtOCTRegenHP.dbc"/*,                     "gtoctregenhp_dbc"*/);
     //LOAD_DBC(sGtOCTRegenMPStore,                  "gtOCTRegenMP.dbc",                     "gtoctregenmp_dbc");       -- not used currently
-    LOAD_DBC(sGtRegenHPPerSptStore,                 "gtRegenHPPerSpt.dbc",                  "gtregenhpperspt_dbc");
-    LOAD_DBC(sGtRegenMPPerSptStore,                 "gtRegenMPPerSpt.dbc",                  "gtregenmpperspt_dbc");
+    LOAD_DBC_NO_DB(sGtRegenHPPerSptStore,                 "gtRegenHPPerSpt.dbc"/*,                  "gtregenhpperspt_dbc"*/);
+    LOAD_DBC_NO_DB(sGtRegenMPPerSptStore,                 "gtRegenMPPerSpt.dbc"/*,                  "gtregenmpperspt_dbc"*/);
     LOAD_DBC(sHolidaysStore,                        "Holidays.dbc",                         "holidays_dbc");
     LOAD_DBC(sItemBagFamilyStore,                   "ItemBagFamily.dbc",                    "itembagfamily_dbc");
     LOAD_DBC(sItemDisplayInfoStore,                 "ItemDisplayInfo.dbc",                  "itemdisplayinfo_dbc");
@@ -356,6 +357,7 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sWorldMapOverlayStore,                 "WorldMapOverlay.dbc",                  "worldmapoverlay_dbc"); 
 
 #undef LOAD_DBC
+#undef LOAD_DBC_NO_DB
 
     for (CharStartOutfitEntry const* outfit : sCharStartOutfitStore)
         sCharStartOutfitMap[outfit->Race | (outfit->Class << 8) | (outfit->Gender << 16)] = outfit;
