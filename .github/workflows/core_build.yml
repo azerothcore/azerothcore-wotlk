@@ -2,9 +2,12 @@ name: core-build
 on:
   push:
     branches: 
-      - '**'         # matches every branch
-      - '!coverity_scan'   # excludes coverity_scan
+    - '**'
+    - '!coverity_scan'
   pull_request:
+    branches:
+    - '**'
+    - '!coverity_scan'
 
 jobs:
   build:
