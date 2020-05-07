@@ -2,10 +2,10 @@ name: coverity-scan
 on:
   push:
     branches:
-      - coverity_scan
+    - coverity_scan
   pull_request:
     branches:
-      - coverity_scan
+    - coverity_scan
 
 jobs:
   latest:
