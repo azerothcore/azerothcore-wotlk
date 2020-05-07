@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - coverity_scan
+  pull_request:
+    branches:
+      - coverity_scan
 
 jobs:
   latest:
