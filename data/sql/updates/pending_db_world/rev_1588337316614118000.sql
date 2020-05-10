@@ -32,8 +32,7 @@ UPDATE `creature_template` SET `mindmg` = 143, `maxdmg` = 199, `DamageModifier` 
 UPDATE `creature_template` SET `mindmg` = 30, `maxdmg` = 42, `DamageModifier` = 1.03 WHERE `entry` = 6575;
 UPDATE `creature_template` SET `mindmg` = 90, `maxdmg` = 129, `DamageModifier` = 1.03 WHERE `entry` = 4300;
 UPDATE `creature_template` SET `mindmg` = 87, `maxdmg` = 125, `DamageModifier` = 1.03 WHERE `entry` = 4294;
-UPDATE `creature_template` SET `mindmg` = 121, `maxdmg` = 161, `DamageModifier` = 1.03 WHERE `entry` = 4302;
-UPDATE `creature_template` SET `mindmg` = 121, `maxdmg` = 161, `DamageModifier` = 1.03 WHERE `entry` = 4303;
+UPDATE `creature_template` SET `mindmg` = 121, `maxdmg` = 161, `DamageModifier` = 1.03 WHERE `entry` IN (4302, 4303);
 
 /* RARE */
 UPDATE `creature_template` SET `rank` = 2, `mindmg` = 174, `maxdmg` = 224, `DamageModifier` = 1.02 WHERE `entry` IN (6490, 6488);
