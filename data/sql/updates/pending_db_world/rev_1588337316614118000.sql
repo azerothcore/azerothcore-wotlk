@@ -40,8 +40,7 @@ UPDATE `creature_template` SET `rank` = 2, `mindmg` = 166, `maxdmg` = 215, `Dama
 UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 193, `maxdmg` = 249, `DamageModifier` = 1.01 WHERE `entry` IN (3983, 4543, 3974, 6487);
 UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 215, `maxdmg` = 276, `DamageModifier` = 1.01 WHERE `entry` = 3975;
 UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 229, `maxdmg` = 295, `DamageModifier` = 1.01 WHERE `entry` = 4542;
-UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 269, `maxdmg` = 346, `DamageModifier` = 1.01 WHERE `entry` = 3976;
-UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 269, `maxdmg` = 346, `DamageModifier` = 1.01 WHERE `entry` = 3977;
+UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 269, `maxdmg` = 346, `DamageModifier` = 1.01 WHERE `entry` IN (3976, 3977);
 
 /* SMARTSCRIPT */
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 4285;
