@@ -38,12 +38,11 @@ UPDATE `creature_template` SET `rank` = 2, `mindmg` = 276, `maxdmg` = 357, `Dama
 
 /* BOSS */
 UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 187, `maxdmg` = 248, `DamageModifier` = 1.01 WHERE `entry` = 13282;
-UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 292, `maxdmg` = 377, `DamageModifier` = 1.01 WHERE `entry` = 13596;
+UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 292, `maxdmg` = 377, `DamageModifier` = 1.01 WHERE `entry` IN (13596, 12203);
 UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 292, `maxdmg` = 377, `minrangedmg` = 134, `maxrangedmg` = 198, `DamageModifier` = 1.01 WHERE `entry` = 13601;
 UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 276, `maxdmg` = 356, `DamageModifier` = 1.01 WHERE `entry` = 12258;
 UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 269, `maxdmg` = 346, `minrangedmg` = 122, `maxrangedmg` = 180, `DamageModifier` = 1.01 WHERE `entry` = 12236;
 UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 284, `maxdmg` = 366, `DamageModifier` = 1.01 WHERE `entry` = 12225;
-UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 292, `maxdmg` = 377, `DamageModifier` = 1.01 WHERE `entry` = 12203;
 UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 344, `maxdmg` = 444, `DamageModifier` = 1.01 WHERE `entry` = 12201;
 
 /* SMARTSCRIPT */
