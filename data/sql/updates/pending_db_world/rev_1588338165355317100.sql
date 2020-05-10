@@ -72,11 +72,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (10082, 0, 3, 0, 2, 0, 100, 1, 20, 40, 0, 0, 11, 12551, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Zerillis - Between 20-40% Health - Cast \'12551\' (No Repeat)');
 
 /* SPAWN */
+DELETE FROM `creature` WHERE `guid` IN (205800, 205801, 205802);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 
-(205800, 10081, 209, 0, 0, 1, 1, 0, 1, 1863.89, 1151.66, 12.9287, 0.540263, 86400, 0, 0, 5757, 0, 0, 0, 0, 0, '', 0);
-
-INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 
-(205801, 10082, 209, 0, 0, 1, 1, 0, 1, 1674.24, 904.853, 8.92432, 0.304632, 86400, 0, 0, 5544, 0, 0, 0, 0, 0, '', 0);
-
-INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 
+(205800, 10081, 209, 0, 0, 1, 1, 0, 1, 1863.89, 1151.66, 12.9287, 0.540263, 86400, 0, 0, 5757, 0, 0, 0, 0, 0, '', 0),
+(205801, 10082, 209, 0, 0, 1, 1, 0, 1, 1674.24, 904.853, 8.92432, 0.304632, 86400, 0, 0, 5544, 0, 0, 0, 0, 0, '', 0),
 (205802, 10080, 209, 0, 0, 1, 1, 0, 1, 1546.16, 1015.47, 8.87699, 0.202525, 86400, 0, 0, 5544, 0, 0, 0, 0, 0, '', 0);
