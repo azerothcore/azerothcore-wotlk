@@ -72,6 +72,12 @@ class ByteBuffer
             _storage(buf._storage)
         {
         }
+        /* requried as of C++ 11 */
+        #if __cplusplus >= 201103L
+        ByteBuffer(ByteBuffer&&) = default;
+        ByteBuffer& operator=(const ByteBuffer&) = default;
+        ByteBuffer& operator=(ByteBuffer&&) = default;
+        #endif
 
         void clear()
         {
@@ -374,18 +380,18 @@ class ByteBuffer
             return *this;
         }
 
-        uint8 * contents() 
-        { 
+        uint8 * contents()
+        {
             if (_storage.empty())
                 throw ByteBufferException();
-            return &_storage[0]; 
+            return &_storage[0];
         }
 
-        const uint8 *contents() const 
-        { 
+        const uint8 *contents() const
+        {
             if (_storage.empty())
                 throw ByteBufferException();
-            return &_storage[0]; 
+            return &_storage[0];
         }
 
         size_t size() const { return _storage.size(); }
@@ -612,4 +618,3 @@ inline void ByteBuffer::read_skip<std::string>()
 }
 
 #endif
-

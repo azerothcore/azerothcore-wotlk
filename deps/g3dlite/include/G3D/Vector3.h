@@ -1,8 +1,8 @@
 /**
   @file Vector3.h
- 
+
   3D vector class
- 
+
   @maintainer Morgan McGuire, http://graphics.cs.williams.edu
 
   @created 2001-06-02
@@ -36,7 +36,7 @@ class Any;
 /**
   <B>Swizzles</B>
  Vector classes have swizzle operators, e.g. <CODE>v.xy()</CODE>, that
- allow selection of arbitrary sub-fields.  These cannot be used as write 
+ allow selection of arbitrary sub-fields.  These cannot be used as write
  masks.  Examples
 
   <PRE>
@@ -74,7 +74,7 @@ public:
 
     /** \param any Must either Vector3(#, #, #) or Vector3 {x = #, y = #, z = #}*/
     Vector3(const Any& any);
-    
+
     /** Converts the Vector3 to an Any. */
     operator Any() const;
 
@@ -116,6 +116,11 @@ public:
 
     // assignment and comparison
     Vector3& __fastcall operator= (const Vector3& rkVector);
+    /* requried as of C++ 11 */
+    #if __cplusplus >= 201103L
+    Vector3(const Vector3&) = default;
+    Vector3(Vector3&&) = default;
+    #endif
     bool operator== (const Vector3& rkVector) const;
     bool operator!= (const Vector3& rkVector) const;
     size_t hashCode() const;
@@ -130,7 +135,7 @@ public:
 
     /** Returns true if this vector has length ~= 1 */
     bool isUnit() const;
-    
+
     // arithmetic operations
     Vector3 __fastcall operator+ (const Vector3& v) const;
     Vector3 __fastcall operator- (const Vector3& v) const;
@@ -156,7 +161,7 @@ public:
 	float length() const;
 
     float magnitude() const;
-    
+
     /**
      The result is a nan vector if the length is almost zero.
      */
@@ -179,7 +184,7 @@ public:
 
      <PRE>
        V'    N      V
-                 
+
          r   ^   -,
           \  |  /
             \|/
@@ -191,17 +196,17 @@ public:
 
     /**
       See also G3D::Ray::reflect.
-      The length is 1. 
+      The length is 1.
      <PRE>
        V'    N       V
-                 
+
          r   ^    /
           \  |  /
             \|'-
      </PRE>
      */
     Vector3 reflectionDirection(const Vector3& normal) const;
-    
+
 
     /**
      Returns Vector3::zero() if the length is nearly zero, otherwise
@@ -223,7 +228,7 @@ public:
      where iExit is the index of refraction for the
      previous material and iEnter is the index of refraction
      for the new material.  Like Vector3::reflectionDirection,
-     the result has length 1 and is 
+     the result has length 1 and is
      pointed <I>away</I> from the intersection.
 
      Returns Vector3::zero() in the case of total internal refraction.
@@ -237,7 +242,7 @@ public:
      See also G3D::Ray::refract.
      <PRE>
               N      V
-                  
+
               ^    /
               |  /
               |'-
@@ -265,9 +270,9 @@ public:
     float squaredLength() const;
 
     float squaredMagnitude () const;
-	
+
     float __fastcall dot(const Vector3& rkVector) const;
-    
+
     float unitize(float tolerance = 1e-06);
 
     /** Cross product.  Note that two cross products in a row
@@ -319,14 +324,14 @@ public:
      Linear interpolation
      */
     inline Vector3 lerp(const Vector3& v, float alpha) const {
-        return (*this) + (v - *this) * alpha; 
+        return (*this) + (v - *this) * alpha;
     }
 
     /** Gram-Schmidt orthonormalization. */
     static void orthonormalize (Vector3 akVector[3]);
 
-    /** \brief Random unit vector, uniformly distributed on the sphere. 
-    
+    /** \brief Random unit vector, uniformly distributed on the sphere.
+
        Distribution rendered by G3D::DirectionHistogram:
        \image html vector3-random.png
       */
@@ -334,8 +339,8 @@ public:
 
     /** \brief Random unit vector, distributed according to \f$\max(\cos \theta,0)\f$.
 
-        That is, so that the probability of \f$\vec{V}\f$ is proportional 
-        to \f$\max(\vec{v} \cdot \vec{n}, 0)\f$.  Useful in photon mapping for 
+        That is, so that the probability of \f$\vec{V}\f$ is proportional
+        to \f$\max(\vec{v} \cdot \vec{n}, 0)\f$.  Useful in photon mapping for
         Lambertian scattering.
 
         Distribution rendered by G3D::DirectionHistogram:
@@ -372,7 +377,7 @@ public:
 
     /** Input W must be initialize to a nonzero vector, output is {U,V,W}
         an orthonormal basis.  A hint is provided about whether or not W
-        is already unit length. 
+        is already unit length.
         @deprecated Use getTangents
     */
     static void generateOrthonormalBasis (Vector3& rkU, Vector3& rkV,
@@ -394,7 +399,7 @@ public:
     static const Vector3& unitZ();
     static const Vector3& inf();
     static const Vector3& nan();
-    
+
     /** Smallest (most negative) representable vector */
     static const Vector3& minFinite();
 
@@ -405,16 +410,16 @@ public:
     /** Creates two orthonormal tangent vectors X and Y such that
         if Z = this, X x Y = Z.*/
     inline void getTangents(Vector3& X, Vector3& Y) const {
-        debugAssertM(G3D::fuzzyEq(length(), 1.0f), 
+        debugAssertM(G3D::fuzzyEq(length(), 1.0f),
                      "makeAxes requires Z to have unit length");
-        
+
         // Choose another vector not perpendicular
         X = (abs(x) < 0.9f) ? Vector3::unitX() : Vector3::unitY();
-        
+
         // Remove the part that is parallel to Z
         X -= *this * this->dot(X);
         X /= X.length();
-    
+
         Y = this->cross(X);
     }
 
