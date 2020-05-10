@@ -7,8 +7,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1588336883299094900');
 
 /* REGULAR */ 
 UPDATE `creature_template` SET `mindmg` = 60, `maxdmg` = 80, `DamageModifier` = 1.03 WHERE `entry` IN (1707, 1706);
-UPDATE `creature_template` SET `mindmg` = 60, `maxdmg` = 84, `DamageModifier` = 1.03 WHERE `entry` = 1708;
-UPDATE `creature_template` SET `mindmg` = 60, `maxdmg` = 84, `DamageModifier` = 1.03 WHERE `entry` = 1711;
+UPDATE `creature_template` SET `mindmg` = 60, `maxdmg` = 84, `DamageModifier` = 1.03 WHERE `entry` IN (1708, 1711);
 UPDATE `creature_template` SET `mindmg` = 82, `maxdmg` = 109, `DamageModifier` = 1.03 WHERE `entry` = 1715;
 
 /* RARE */
