@@ -13,10 +13,7 @@ UPDATE `creature_template` SET `mindmg` = 44, `maxdmg` = 59, `DamageModifier` = 
 UPDATE `creature_template` SET `mindmg` = 27, `maxdmg` = 38, `DamageModifier` = 1.03 WHERE `entry` = 5053;
 UPDATE `creature_template` SET `mindmg` = 44, `maxdmg` = 59, `DamageModifier` = 1.03 WHERE `entry` = 5761;
 UPDATE `creature_template` SET `mindmg` = 29, `maxdmg` = 38, `DamageModifier` = 1.03 WHERE `entry` = 5055;
-UPDATE `creature_template` SET `mindmg` = 49, `maxdmg` = 65, `DamageModifier` = 1.03 WHERE `entry` = 5756;
-UPDATE `creature_template` SET `mindmg` = 49, `maxdmg` = 65, `DamageModifier` = 1.03 WHERE `entry` = 5056;
-UPDATE `creature_template` SET `mindmg` = 49, `maxdmg` = 65, `DamageModifier` = 1.03 WHERE `entry` = 5048;
-UPDATE `creature_template` SET `mindmg` = 49, `maxdmg` = 65, `DamageModifier` = 1.03 WHERE `entry` = 5755;
+UPDATE `creature_template` SET `mindmg` = 49, `maxdmg` = 65, `DamageModifier` = 1.03 WHERE `entry` IN (5756, 5056, 5048, 5755);
 UPDATE `creature_template` SET `mindmg` = 27, `maxdmg` = 38, `DamageModifier` = 1.03 WHERE `entry` = 8886;
 UPDATE `creature_template` SET `mindmg` = 30, `maxdmg` = 40, `DamageModifier` = 1.03 WHERE `entry` = 5763;
 UPDATE `creature_template` SET `mindmg` = 65, `maxdmg` = 89, `DamageModifier` = 1.03 WHERE `entry` = 5762;
