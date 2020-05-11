@@ -78,9 +78,13 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
         uint32 indexValue = fields[_sqlIndexPos].GetUInt32();
         char* dataValue = indexTable[indexValue];
 
-        // If exist - override
-        newIndexes[newRecords] = indexValue;
-        dataValue = &dataTable[newRecords++ * _recordSize];
+        if (!dataValue)
+        {
+            newIndexes[newRecords] = indexValue;
+            dataValue = &dataTable[newRecords++ * _recordSize];
+        }
+        else
+            continue;
 
         uint32 dataOffset = 0;
         uint32 sqlColumnNumber = 0;
@@ -88,12 +92,6 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
 
         for (; (*dbcFormat); ++dbcFormat)
         {
-            if (!*dbcFormat)
-            {
-                ASSERT(false, "DB and DBC format strings do not have the same length for '%s'", _sqlTableName);
-                return nullptr;
-            }
-
             switch (*dbcFormat)
             {
             case FT_FLOAT:
@@ -117,7 +115,7 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
             case FT_NA:
                 break;
             default:
-                ASSERT(false, "Unsupported data type '%c' marked present in table '%s'", *dbcFormat, _sqlTableName);
+                ASSERT(false, "Unsupported data type '%c' in table '%s'", *dbcFormat, _sqlTableName);
                 return nullptr;
             }
 

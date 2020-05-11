@@ -204,6 +204,13 @@ inline void LoadDBC(uint32& availableDbcLocales, StoreProblemList& errors, DBCSt
 
     ++DBCFileCount;
     std::string dbcFilename = dbcPath + filename;
+    bool existDBData = false;
+
+    if (dbTable)
+        storage.LoadFromDB(dbTable, storage.GetFormat());
+
+    if (storage.GetNumRows())
+        existDBData = true;
 
     if (storage.Load(dbcFilename.c_str()))
     {
@@ -220,11 +227,8 @@ inline void LoadDBC(uint32& availableDbcLocales, StoreProblemList& errors, DBCSt
             if (!storage.LoadStringsFrom(localizedName.c_str()))
                 availableDbcLocales &= ~(1 << i);             // mark as not available for speedup next checks
         }
-
-        if (dbTable)
-            storage.LoadFromDB(dbTable, storage.GetFormat());
     }
-    else
+    else if (!existDBData)
     {
         // sort problematic dbc to (1) non compatible and (2) non-existed
         if (FILE* f = fopen(dbcFilename.c_str(), "rb"))
@@ -286,18 +290,18 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sGemPropertiesStore,                   "GemProperties.dbc",                    "gemproperties_dbc");
     LOAD_DBC(sGlyphPropertiesStore,                 "GlyphProperties.dbc",                  "glyphproperties_dbc");
     LOAD_DBC(sGlyphSlotStore,                       "GlyphSlot.dbc",                        "glyphslot_dbc");
-    LOAD_DBC_NO_DB(sGtBarberShopCostBaseStore,      "gtBarberShopCostBase.dbc"/*,             "gtbarbershopcostbase_dbc"*/);
-    LOAD_DBC_NO_DB(sGtCombatRatingsStore,           "gtCombatRatings.dbc"/*,                  "gtcombatratings_dbc"*/);
-    LOAD_DBC_NO_DB(sGtChanceToMeleeCritBaseStore,   "gtChanceToMeleeCritBase.dbc"/*,          "gtchancetomeleecritbase_dbc"*/);
-    LOAD_DBC_NO_DB(sGtChanceToMeleeCritStore,       "gtChanceToMeleeCrit.dbc"/*,              "gtchancetomeleecrit_dbc"*/);
-    LOAD_DBC_NO_DB(sGtChanceToSpellCritBaseStore,   "gtChanceToSpellCritBase.dbc"/*,          "gtchancetospellcritbase_dbc"*/);
-    LOAD_DBC_NO_DB(sGtChanceToSpellCritStore,       "gtChanceToSpellCrit.dbc"/*,              "gtchancetospellcrit_dbc"*/);
-    LOAD_DBC_NO_DB(sGtNPCManaCostScalerStore,       "gtNPCManaCostScaler.dbc"/*,              "gtnpcmanacostscaler_dbc"*/);
+    LOAD_DBC_NO_DB(sGtBarberShopCostBaseStore,      "gtBarberShopCostBase.dbc"/*,           "gtbarbershopcostbase_dbc"*/);
+    LOAD_DBC_NO_DB(sGtCombatRatingsStore,           "gtCombatRatings.dbc"/*,                "gtcombatratings_dbc"*/);
+    LOAD_DBC_NO_DB(sGtChanceToMeleeCritBaseStore,   "gtChanceToMeleeCritBase.dbc"/*,        "gtchancetomeleecritbase_dbc"*/);
+    LOAD_DBC_NO_DB(sGtChanceToMeleeCritStore,       "gtChanceToMeleeCrit.dbc"/*,            "gtchancetomeleecrit_dbc"*/);
+    LOAD_DBC_NO_DB(sGtChanceToSpellCritBaseStore,   "gtChanceToSpellCritBase.dbc"/*,        "gtchancetospellcritbase_dbc"*/);
+    LOAD_DBC_NO_DB(sGtChanceToSpellCritStore,       "gtChanceToSpellCrit.dbc"/*,            "gtchancetospellcrit_dbc"*/);
+    LOAD_DBC_NO_DB(sGtNPCManaCostScalerStore,       "gtNPCManaCostScaler.dbc"/*,            "gtnpcmanacostscaler_dbc"*/);
     LOAD_DBC(sGtOCTClassCombatRatingScalarStore,    "gtOCTClassCombatRatingScalar.dbc",     "gtoctclasscombatratingscalar_dbc");
-    LOAD_DBC_NO_DB(sGtOCTRegenHPStore,                    "gtOCTRegenHP.dbc"/*,                     "gtoctregenhp_dbc"*/);
+    LOAD_DBC_NO_DB(sGtOCTRegenHPStore,              "gtOCTRegenHP.dbc"/*,                   "gtoctregenhp_dbc"*/);
     //LOAD_DBC(sGtOCTRegenMPStore,                  "gtOCTRegenMP.dbc",                     "gtoctregenmp_dbc");       -- not used currently
-    LOAD_DBC_NO_DB(sGtRegenHPPerSptStore,                 "gtRegenHPPerSpt.dbc"/*,                  "gtregenhpperspt_dbc"*/);
-    LOAD_DBC_NO_DB(sGtRegenMPPerSptStore,                 "gtRegenMPPerSpt.dbc"/*,                  "gtregenmpperspt_dbc"*/);
+    LOAD_DBC_NO_DB(sGtRegenHPPerSptStore,           "gtRegenHPPerSpt.dbc"/*,                "gtregenhpperspt_dbc"*/);
+    LOAD_DBC_NO_DB(sGtRegenMPPerSptStore,           "gtRegenMPPerSpt.dbc"/*,                "gtregenmpperspt_dbc"*/);
     LOAD_DBC(sHolidaysStore,                        "Holidays.dbc",                         "holidays_dbc");
     LOAD_DBC(sItemBagFamilyStore,                   "ItemBagFamily.dbc",                    "itembagfamily_dbc");
     LOAD_DBC(sItemDisplayInfoStore,                 "ItemDisplayInfo.dbc",                  "itemdisplayinfo_dbc");
@@ -434,10 +438,10 @@ void LoadDBCStores(const std::string& dataPath)
         {
             if (spellDiff->SpellID[x] <= 0 || !sSpellStore.LookupEntry(spellDiff->SpellID[x]))
             {
-                if (spellDiff->SpellID[x] > 0)//don't show error if spell is <= 0, not all modes have spells and there are unknown negative values
-                    sLog->outErrorDb("spelldifficulty_dbc: spell %i at field id:%u at spellid%i does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->SpellID[x], spellDiff->ID, x);
+                if (spellDiff->SpellID[x] > 0) // don't show error if spell is <= 0, not all modes have spells and there are unknown negative values
+                    sLog->outErrorDb("spelldifficulty_dbc: spell %i at field id: %u at spellid %i does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->SpellID[x], spellDiff->ID, x);
 
-                newEntry.SpellID[x] = 0;//spell was <= 0 or invalid, set to 0
+                newEntry.SpellID[x] = 0; // spell was <= 0 or invalid, set to 0
             }
             else
                 newEntry.SpellID[x] = spellDiff->SpellID[x];
@@ -598,7 +602,7 @@ void LoadDBCStores(const std::string& dataPath)
         !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a
         !sSpellStore.LookupEntry(80864)            )        // last client known item added in 3.3.5a
     {
-        sLog->outError("You have _outdated_ DBC files. Please extract correct versions from current using client.");
+        sLog->outError("You have _outdated_ DBC data. Please extract correct versions from current using client.");
         exit(1);
     }
 
