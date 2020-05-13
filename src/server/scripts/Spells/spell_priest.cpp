@@ -155,13 +155,13 @@ class spell_pri_circle_of_healing : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
+                targets.remove_if(acore::RaidCheck(GetCaster(), false));
 
                 uint32 const maxTargets = GetCaster()->HasAura(SPELL_PRIEST_GLYPH_OF_CIRCLE_OF_HEALING) ? 6 : 5; // Glyph of Circle of Healing
 
                 if (targets.size() > maxTargets)
                 {
-                    targets.sort(Trinity::HealthPctOrderPred());
+                    targets.sort(acore::HealthPctOrderPred());
                     targets.resize(maxTargets);
                 }
             }
@@ -240,13 +240,13 @@ class spell_pri_divine_hymn : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
+                targets.remove_if(acore::RaidCheck(GetCaster(), false));
 
                 uint32 const maxTargets = 3;
 
                 if (targets.size() > maxTargets)
                 {
-                    targets.sort(Trinity::HealthPctOrderPred());
+                    targets.sort(acore::HealthPctOrderPred());
                     targets.resize(maxTargets);
                 }
             }
@@ -370,14 +370,14 @@ class spell_pri_hymn_of_hope : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::PowerCheck(POWER_MANA, false));
-                targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
+                targets.remove_if(acore::PowerCheck(POWER_MANA, false));
+                targets.remove_if(acore::RaidCheck(GetCaster(), false));
 
                 uint32 const maxTargets = 3;
 
                 if (targets.size() > maxTargets)
                 {
-                    targets.sort(Trinity::PowerPctOrderPred(POWER_MANA));
+                    targets.sort(acore::PowerPctOrderPred(POWER_MANA));
                     targets.resize(maxTargets);
                 }
             }
@@ -562,7 +562,7 @@ class spell_pri_mind_sear : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& unitList)
             {
-                unitList.remove_if(Trinity::ObjectGUIDCheck(GetCaster()->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT), true));
+                unitList.remove_if(acore::ObjectGUIDCheck(GetCaster()->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT), true));
             }
 
             void Register()

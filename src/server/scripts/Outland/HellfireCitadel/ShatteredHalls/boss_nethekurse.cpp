@@ -115,10 +115,7 @@ class boss_grand_warlock_nethekurse : public CreatureScript
 
                 if (me->Attack(who, true))
                 {
-                    if (me->HealthBelowPct(21))
-                        DoStartNoMovement(who);
-                    else
-                        DoStartMovement(who);
+                    DoStartMovement(who);
                 }
             }
 
@@ -131,16 +128,25 @@ class boss_grand_warlock_nethekurse : public CreatureScript
 
             void MoveInLineOfSight(Unit* who)
             {
-                if (EventStage == EVENT_STAGE_NONE && me->IsWithinDistInMap(who, 30.0f))
+                if (me->IsWithinDistInMap(who, 30.0f))
                 {
                     if (who->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    events2.ScheduleEvent(EVENT_INTRO, 90000);
-                    Talk(SAY_INTRO);
-                    EventStage = EVENT_STAGE_INTRO;
-                    instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
-                    me->SetInCombatWithZone();
+                    if (EventStage == EVENT_STAGE_NONE && PeonKilledCount < 4)
+                    {
+                        events2.ScheduleEvent(EVENT_INTRO, 90000);
+                        Talk(SAY_INTRO);
+                        EventStage = EVENT_STAGE_INTRO;
+                        instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
+                        me->SetInCombatWithZone();
+                    }
+                    else if (PeonKilledCount >= 4)
+                    {
+                        events2.ScheduleEvent(EVENT_START_ATTACK, 1000);
+                        instance->SetBossState(DATA_NETHEKURSE, IN_PROGRESS);
+                        me->SetInCombatWithZone();
+                    }
                 }
 
                 if (EventStage < EVENT_STAGE_MAIN)
@@ -198,12 +204,12 @@ class boss_grand_warlock_nethekurse : public CreatureScript
                     case EVENT_SPELL_SHADOW_FISSURE:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                             me->CastSpell(target, SPELL_SHADOW_FISSURE, false);
-                        events.RescheduleEvent(eventId, urand(7500, 10000));
+                        events.RescheduleEvent(EVENT_SPELL_SHADOW_FISSURE, urand(7500, 10000));
                         break;
                     case EVENT_SPELL_DEATH_COIL:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                             me->CastSpell(target, DUNGEON_MODE(SPELL_DEATH_COIL_N, SPELL_DEATH_COIL_H), false);
-                        events.RescheduleEvent(eventId, urand(15000, 20000));
+                        events.RescheduleEvent(EVENT_SPELL_DEATH_COIL, urand(15000, 20000));
                         break;
                     case EVENT_SPELL_CLEAVE:
                         me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_SHADOW_CLEAVE_N, SPELL_SHADOW_SLAM_H), false);
@@ -212,13 +218,13 @@ class boss_grand_warlock_nethekurse : public CreatureScript
                     case EVENT_CHECK_HEALTH:
                         if (me->HealthBelowPct(21))
                         {
-                            me->CastSpell(me, SPELL_DARK_SPIN, true);
                             events.Reset();
-                            events.ScheduleEvent(EVENT_SPELL_CLEAVE, 3000);
-                            me->GetMotionMaster()->Clear();
-                            break;
+                            me->CastSpell(me, SPELL_DARK_SPIN, false);
                         }
-                        events.RescheduleEvent(eventId, 1000);
+                        else
+                        {
+                            events.RescheduleEvent(EVENT_CHECK_HEALTH, 1000);
+                        }
                         break;
                 }
 
@@ -264,8 +270,46 @@ class spell_tsh_shadow_sear : public SpellScriptLoader
         }
 };
 
+class spell_tsh_shadow_bolt : public SpellScriptLoader
+{
+    public:
+        spell_tsh_shadow_bolt() : SpellScriptLoader("spell_tsh_shadow_bolt") { }
+
+        class spell_tsh_shadow_bolt_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_tsh_shadow_bolt_SpellScript);
+
+            void SelectRandomPlayer(WorldObject*& target)
+            {
+                if (Creature* caster = GetCaster()->ToCreature())
+                {
+                    std::list<Player*> playerList;
+                    Map::PlayerList const &players = caster->GetMap()->GetPlayers();
+                    for (auto itr = players.begin(); itr != players.end(); ++itr)
+                        if (Player* player = itr->GetSource()->ToPlayer())
+                            if (player->IsWithinDist(caster, 100.0f) && player->IsAlive())
+                                playerList.push_back(player);
+
+                    if (!playerList.empty())
+                        target = acore::Containers::SelectRandomContainerElement(playerList);
+                }
+            }
+
+            void Register()
+            {
+                OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_tsh_shadow_bolt_SpellScript::SelectRandomPlayer, EFFECT_0, TARGET_UNIT_TARGET_ENEMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_tsh_shadow_bolt_SpellScript();
+        }
+};
+
 void AddSC_boss_grand_warlock_nethekurse()
 {
     new boss_grand_warlock_nethekurse();
     new spell_tsh_shadow_sear();
+    new spell_tsh_shadow_bolt();
 }

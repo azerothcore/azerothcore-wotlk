@@ -1273,7 +1273,7 @@ public:
 
                         Unit::Kill(bird, bird);
                         crunchy->GetMotionMaster()->MovePoint(0, bird->GetPositionX(), bird->GetPositionY(),
-                            bird->GetMap()->GetWaterOrGroundLevel(bird->GetPositionX(), bird->GetPositionY(), bird->GetPositionZ()));
+                            bird->GetMap()->GetWaterOrGroundLevel(bird->GetPhaseMask(), bird->GetPositionX(), bird->GetPositionY(), bird->GetPositionZ()));
                         /// @todo Make crunchy perform emote eat when he reaches the bird
 
                         break;
@@ -1454,10 +1454,10 @@ public:
                 switch (GetSpellInfo()->Id)
                 {
                     case SPELL_CORRECT_TRACKS:
-                        player->MonsterSay(sObjectMgr->GetTrinityStringForDBCLocale(SAY_CORRECT_TRACKS), LANG_UNIVERSAL, player);
+                        player->MonsterSay(sObjectMgr->GetAcoreStringForDBCLocale(SAY_CORRECT_TRACKS), LANG_UNIVERSAL, player);
                         break;
                     case SPELL_INCORRECT_TRACKS:
-                        player->MonsterSay(sObjectMgr->GetTrinityStringForDBCLocale(SAY_INCORRECT_TRACKS), LANG_UNIVERSAL, player);
+                        player->MonsterSay(sObjectMgr->GetAcoreStringForDBCLocale(SAY_INCORRECT_TRACKS), LANG_UNIVERSAL, player);
                         break;
                     default:
                         break;

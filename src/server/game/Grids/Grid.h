@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_GRID_H
-#define TRINITY_GRID_H
+#ifndef ACORE_GRID_H
+#define ACORE_GRID_H
 
 /*
   @class Grid

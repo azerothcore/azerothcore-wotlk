@@ -1,4 +1,5 @@
-# Copyright (C)
+#
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -17,7 +18,7 @@ CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
 if( WIN32 )
-  list(APPEND PRIVATE_SOURCES ${sources_windows})
+  list(APPEND PRIVATE_SOURCES ${winDebugging})
   if ( MSVC )
     list(APPEND PRIVATE_SOURCES authserver.rc)
   endif()
@@ -31,21 +32,18 @@ endif()
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(authserver
-  ${PRIVATE_SOURCES}
-)
+  ${PRIVATE_SOURCES})
 
 add_dependencies(authserver revision.h)
 
-if( NOT WIN32 )
+if(NOT WIN32)
   set_target_properties(authserver PROPERTIES
-    COMPILE_DEFINITIONS _TRINITY_REALM_CONFIG="${CONF_DIR}/authserver.conf"
-  )
+    COMPILE_DEFINITIONS _ACORE_REALM_CONFIG="${CONF_DIR}/authserver.conf")
 endif()
 
 target_link_libraries(authserver
   PUBLIC
-    common
-)
+    shared)
 
 CollectIncludeDirectories(
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -61,7 +59,7 @@ target_include_directories(authserver
 
 set_target_properties(authserver
   PROPERTIES
-      FOLDER
+    FOLDER
       "server")
 
 if( WIN32 )

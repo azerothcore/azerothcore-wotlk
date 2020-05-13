@@ -333,7 +333,7 @@ bool SpellChatLink::ValidateName(char* buffer, const char* context)
             {
                 // found the prefix, remove it to perform spellname validation below
                 // -2 = strlen(": ")
-                uint32 spellNameLength = strlen(buffer) - skillLineNameLength - 2;
+                uint32 spellNameLength = (strlen(buffer) <= skillLineNameLength + 2) ? 0 : strlen(buffer) - skillLineNameLength - 2;
                 memmove(buffer, buffer + skillLineNameLength + 2, spellNameLength + 1);
                 break;
             }
@@ -661,7 +661,7 @@ bool LinkExtractor::IsValidMessage()
             break;
 
         char commandChar;
-        _iss >> commandChar;
+        _iss.get(commandChar);
 
         // | in normal messages is escaped by ||
         if (commandChar != PIPE_CHAR)

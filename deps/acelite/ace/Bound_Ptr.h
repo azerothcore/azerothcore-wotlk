@@ -116,7 +116,7 @@ public:
 
   /// Constructor that initializes an ACE_Strong_Bound_Ptr by stealing
   /// ownership of an object from an auto_ptr.
-  explicit ACE_Strong_Bound_Ptr (auto_ptr<X> p);
+  explicit ACE_Strong_Bound_Ptr (std::unique_ptr<X> p);
 
   /// Copy constructor binds @c this and @a r to the same object.
   ACE_Strong_Bound_Ptr (const ACE_Strong_Bound_Ptr<X, ACE_LOCK> &r);
@@ -217,7 +217,7 @@ public:
   /// Resets the ACE_Strong_Bound_Ptr to refer to a different
   /// underlying object, ownership of which is stolen from the
   /// auto_ptr.
-  void reset (auto_ptr<X> p);
+  void reset (std::unique_ptr<X> p);
 
   /// Allows us to check for NULL on all ACE_Strong_Bound_Ptr
   /// objects.

@@ -10,7 +10,6 @@
 #include "ArenaTeamMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-
 #include "ArenaTeam.h"
 #include "BattlegroundMgr.h"
 #include "Battleground.h"
@@ -134,6 +133,14 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
     // queue result (default ok)
     GroupJoinBattlegroundResult err = GroupJoinBattlegroundResult(bgt->GetBgTypeID());
 
+    if (!sScriptMgr->CanJoinInBattlegroundQueue(_player, guid, bgTypeId, joinAsGroup, err) && err <= 0)
+    {
+        WorldPacket data;
+        sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
+        SendPacket(&data);
+        return;
+    }
+
     // check if player can queue:
     if (!joinAsGroup)
     {
@@ -151,6 +158,9 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
                  _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3) ||
                  _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5)) // can't be already queued for arenas
             err = ERR_BATTLEGROUND_QUEUED_FOR_RATED;
+        // don't let Death Knights join BG queues when they are not allowed to be teleported yet
+        else if (_player->getClass() == CLASS_DEATH_KNIGHT && _player->GetMapId() == 609 && !_player->IsGameMaster() && !_player->HasSpell(50977))
+            err = ERR_BATTLEGROUND_NONE;
 
         if (err <= 0)
         {

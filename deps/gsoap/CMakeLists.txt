@@ -22,10 +22,14 @@ target_include_directories(gsoap
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR})
 
+target_link_libraries(gsoap
+  PRIVATE
+    acore-dependency-interface)
+
 set_target_properties(gsoap
-    PROPERTIES
-      FOLDER
-        "deps")
+  PROPERTIES
+    FOLDER
+      "deps")
 
 if (MSVC)
   # Little fix for MSVC / Windows platforms

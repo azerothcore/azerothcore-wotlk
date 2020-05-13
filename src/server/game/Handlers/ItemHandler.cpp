@@ -277,11 +277,13 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket & recvData)
         return;
     }
 
-    if (pItem->GetTemplate()->Flags & ITEM_PROTO_FLAG_INDESTRUCTIBLE)
+    if (pItem->GetTemplate()->Flags & ITEM_FLAG_NO_USER_DESTROY)
     {
         _player->SendEquipError(EQUIP_ERR_CANT_DROP_SOULBOUND, NULL, NULL);
         return;
     }
+
+    recoveryItem(pItem);
 
     if (count)
     {
@@ -437,7 +439,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recvData)
     {
      std::string Name = pProto->Name1;
      std::string Description = pProto->Description;
-    
+
      int loc_idx = GetSessionDbLocaleIndex();
      if (loc_idx >= 0)
      {
@@ -492,7 +494,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recvData)
          queryData << pProto->Damage[i].DamageMax;
          queryData << pProto->Damage[i].DamageType;
      }
-    
+
      // resistances (7)
      queryData << pProto->Armor;
      queryData << pProto->HolyRes;
@@ -501,11 +503,11 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recvData)
      queryData << pProto->FrostRes;
      queryData << pProto->ShadowRes;
      queryData << pProto->ArcaneRes;
-     
+
      queryData << pProto->Delay;
      queryData << pProto->AmmoType;
      queryData << pProto->RangedModRange;
-    
+
      for (int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)
      {
          // send DBC data for cooldowns in same way as it used in Spell::SendSpellCooldown
@@ -514,11 +516,11 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recvData)
          if (spell)
          {
              bool db_data = pProto->Spells[s].SpellCooldown >= 0 || pProto->Spells[s].SpellCategoryCooldown >= 0;
-    
+
              queryData << pProto->Spells[s].SpellId;
              queryData << pProto->Spells[s].SpellTrigger;
              queryData << uint32(-abs(pProto->Spells[s].SpellCharges));
-    
+
              if (db_data)
              {
                  queryData << uint32(pProto->Spells[s].SpellCooldown);
@@ -676,7 +678,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recvData)
         // prevent selling item for sellprice when the item is still refundable
         // this probably happens when right clicking a refundable item, the client sends both
         // CMSG_SELL_ITEM and CMSG_REFUND_ITEM (unverified)
-        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
+        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
             return; // Therefore, no feedback to client
 
         // special case at auto sell (sell all)
@@ -699,6 +701,9 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recvData)
         {
             if (pProto->SellPrice > 0)
             {
+                if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
+                    recoveryItem(pItem);
+
                 if (count < pItem->GetCount())               // need split items
                 {
                     Item* pNewItem = pItem->CloneItem(count, _player);
@@ -779,6 +784,15 @@ void WorldSession::HandleBuybackItem(WorldPacket & recvData)
         InventoryResult msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, pItem, false);
         if (msg == EQUIP_ERR_OK)
         {
+            if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
+            {
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM);
+                stmt->setUInt32(0, _player->GetGUID());
+                stmt->setUInt32(1, pItem->GetEntry());
+                stmt->setUInt32(2, pItem->GetCount());
+                CharacterDatabase.Execute(stmt);
+            }
+
             _player->ModifyMoney(-(int32)price);
             _player->RemoveItemFromBuyBackSlot(slot, false);
             _player->ItemAddedQuestCheck(pItem->GetEntry(), pItem->GetCount());
@@ -940,7 +954,9 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
                 ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(vendor->GetEntry(), item->item);
                 if (!sConditionMgr->IsObjectMeetToConditions(_player, vendor, conditions))
                 {
-                    sLog->outError("SendListInventory: conditions not met for creature entry %u item %u", vendor->GetEntry(), item->item);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SendListInventory: conditions not met for creature entry %u item %u", vendor->GetEntry(), item->item);
+#endif
                     continue;
                 }
 
@@ -1239,7 +1255,7 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket & recvData)
         if (loc_idx >= 0)
             if (ItemSetNameLocale const* isnl = sObjectMgr->GetItemSetNameLocale(itemid))
                 ObjectMgr::GetLocaleString(isnl->Name, loc_idx, Name);
-        
+
         WorldPacket data(SMSG_ITEM_NAME_QUERY_RESPONSE, (4+Name.size()+1+4));
         data << uint32(itemid);
         data << Name;
@@ -1270,7 +1286,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (!(gift->GetTemplate()->Flags & ITEM_PROTO_FLAG_WRAPPER)) // cheating: non-wrapper wrapper
+    if (!(gift->GetTemplate()->Flags & ITEM_FLAG_IS_WRAPPER)) // cheating: non-wrapper wrapper
     {
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, gift, NULL);
         return;
@@ -1355,7 +1371,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
         case 21830: item->SetEntry(21831); break;
     }
     item->SetUInt64Value(ITEM_FIELD_GIFTCREATOR, _player->GetGUID());
-    item->SetUInt32Value(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED);
+    item->SetUInt32Value(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED);
     item->SetState(ITEM_CHANGED, _player);
 
     // after save it will be impossible to remove the item from the queue
@@ -1455,7 +1471,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
         ItemTemplate const* iGemProto = Gems[i]->GetTemplate();
 
         // unique item (for new and already placed bit removed enchantments
-        if (iGemProto->Flags & ITEM_PROTO_FLAG_UNIQUE_EQUIPPED)
+        if (iGemProto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
         {
             for (int j = 0; j < MAX_GEM_SOCKETS; ++j)
             {
@@ -1630,7 +1646,7 @@ void WorldSession::HandleItemRefund(WorldPacket &recvData)
 #endif
         return;
     }
-  
+
     // Don't try to refund item currently being disenchanted
     if (_player->GetLootGUID() == guid)
         return;
@@ -1684,4 +1700,24 @@ bool WorldSession::CanUseBank(uint64 bankerGUID) const
     }
 
     return true;
+}
+
+bool WorldSession::recoveryItem(Item* pItem)
+{
+    if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_METHOD)
+        && pItem->GetTemplate()->Quality >= sWorld->getIntConfig(CONFIG_ITEMDELETE_QUALITY)
+        && pItem->GetTemplate()->ItemLevel >= sWorld->getIntConfig(CONFIG_ITEMDELETE_ITEM_LEVEL))
+    {
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RECOVERY_ITEM);
+
+        stmt->setUInt32(0, pItem->GetOwnerGUID());
+        stmt->setUInt32(1, pItem->GetTemplate()->ItemId);
+        stmt->setUInt32(2, pItem->GetCount());
+
+        CharacterDatabase.Query(stmt);
+
+        return true;
+    }
+
+    return false;
 }

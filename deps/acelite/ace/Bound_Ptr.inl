@@ -149,7 +149,7 @@ ACE_Strong_Bound_Ptr<X, ACE_LOCK>::ACE_Strong_Bound_Ptr (X *p)
 }
 
 template <class X, class ACE_LOCK> inline
-ACE_Strong_Bound_Ptr<X, ACE_LOCK>::ACE_Strong_Bound_Ptr (auto_ptr<X> p)
+ACE_Strong_Bound_Ptr<X, ACE_LOCK>::ACE_Strong_Bound_Ptr (std::unique_ptr<X> p)
   : counter_ (COUNTER::create_strong ()),
     ptr_ (p.release())
 {
@@ -304,7 +304,7 @@ ACE_Strong_Bound_Ptr<X, ACE_LOCK>::reset (X *p)
 }
 
 template<class X, class ACE_LOCK> inline void
-ACE_Strong_Bound_Ptr<X, ACE_LOCK>::reset (auto_ptr<X> p)
+ACE_Strong_Bound_Ptr<X, ACE_LOCK>::reset(std::unique_ptr<X> p)
 {
   COUNTER *old_counter = this->counter_;
   X_t *old_ptr = this->ptr_;

@@ -2398,8 +2398,8 @@ class spell_q11010_q11102_q11023_choose_loc : public SpellScriptLoader
                 Unit* caster = GetCaster();
                 // Check for player that is in 65 y range
                 std::list<Player*> playerList;
-                Trinity::AnyPlayerInObjectRangeCheck checker(caster, 65.0f);
-                Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(caster, playerList, checker);
+                acore::AnyPlayerInObjectRangeCheck checker(caster, 65.0f);
+                acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(caster, playerList, checker);
                 caster->VisitNearbyWorldObject(65.0f, searcher);
                     for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
                     // Check if found player target is on fly mount or using flying form

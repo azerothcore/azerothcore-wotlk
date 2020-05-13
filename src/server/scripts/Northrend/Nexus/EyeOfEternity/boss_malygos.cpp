@@ -129,6 +129,45 @@ enum MalygosEvents
     EVENT_DISK_MOVE_NEXT_POINT,
 };
 
+enum Texts
+{
+    SAY_INTRO = 0,
+    SAY_PHASE_1,
+    SAY_DEEP_BREATH,
+    SAY_SLAY_P1,
+    SAY_END_P1,
+    SAY_PHASE_2, 
+    SAY_ANTIMAGIC_SHELL,
+    SAY_MAGIC_BLAST,
+    SAY_SLAY_P2,
+    SAY_END_P2,
+    SAY_INTRO_PHASE_3,
+    SAY_PHASE_3, 
+    EMOTE_SURGE_OF_POWER_WARNING_P2,
+    SAY_SURGE_OF_POWER,
+    SAY_BUFFED_BY_SPARK,
+    SAY_SLAY_P3,
+    SAY_SPELL_CASTING_P3,
+    SAY_DEATH,
+    EMOTE_SURGE_OF_POWER_WARNING_P3,
+    EMOTE_BERSERK,
+
+    EMOTE_POWER_SPARK     = 0,
+
+    SAY_ALEXSTRASZA_ONE   = 0,
+    SAY_ALEXSTRASZA_TWO   = 1,
+    SAY_ALEXSTRASZA_THREE = 2,
+    SAY_ALEXSTRASZA_FOUR  = 3,
+};
+
+enum Phases
+{
+    PHASE_NONE = 0,
+    PHASE_ONE,
+    PHASE_TWO,
+    PHASE_THREE
+};
+
 #define MAX_NEXUS_LORDS                 DUNGEON_MODE(2, 4)
 #define MAX_SCIONS_OF_ETERNITY          DUNGEON_MODE(4, 8)
 #define AREA_EYE_OF_ETERNITY            4500
@@ -148,7 +187,7 @@ class boss_malygos : public CreatureScript
 public:
     boss_malygos() : CreatureScript("boss_malygos") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_malygosAI (pCreature);
     }
@@ -168,9 +207,10 @@ public:
         uint8 IntroCounter;
         bool bLockHealthCheck;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
+            events.SetPhase(PHASE_NONE);
             summons.DespawnAll();
 
             timer1 = MalygosIntroIntervals[4];
@@ -193,7 +233,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE)
             {
@@ -260,34 +300,32 @@ public:
             }
         }
 
-        void SpellHit(Unit * /*caster*/, const SpellInfo *spell)
+        void SpellHit(Unit * /*caster*/, const SpellInfo *spell) override
         {
             if (spell->Id == SPELL_POWER_SPARK_MALYGOS_BUFF)
             {
                 if (!bLockHealthCheck)
                 {
-                    me->MonsterYell("I AM UNSTOPPABLE!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_SPARK_BUFF);
+                    Talk(SAY_BUFFED_BY_SPARK);
                 }
                 else
                     me->RemoveAura(SPELL_POWER_SPARK_MALYGOS_BUFF);
             }
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.Reset();
             DoZoneInCombat();
 
-            me->MonsterYell("My patience has reached it's limit, I will be rid of you!", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(SOUND_AGGRO_1);
+            Talk(SAY_PHASE_1);
 
             events.RescheduleEvent(EVENT_INTRO_MOVE_CENTER, 0, 1);
             if (pInstance)
                 pInstance->SetData(DATA_ENCOUNTER_STATUS, IN_PROGRESS);
         }
 
-        void AttackStart(Unit* victim)
+        void AttackStart(Unit* victim) override
         {
             if (!victim)
                 return;
@@ -306,7 +344,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE)) // allow dying only in phase 3!
             {
@@ -321,7 +359,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             HandleIntroSpeech(diff);
 
@@ -339,6 +377,7 @@ public:
                     break;
                 case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
+                    Talk(EMOTE_BERSERK);
                     events.PopEvent();
                     break;
                 case EVENT_INTRO_MOVE_CENTER:
@@ -378,6 +417,7 @@ public:
                         }
                         events.PopEvent();
 
+                        events.SetPhase(PHASE_ONE);
                         events.RescheduleEvent(EVENT_BERSERK, 600000, 0);
                         events.RescheduleEvent(EVENT_SPELL_ARCANE_BREATH, urand(9000,12000), 1);
                         events.RescheduleEvent(EVENT_SPELL_ARCANE_STORM, urand(2000,5000), 1);
@@ -400,16 +440,18 @@ public:
                         if (Creature *c = me->SummonCreature(NPC_PORTAL, FourSidesPos[random], TEMPSUMMON_TIMED_DESPAWN, 6000))
                             c->CastSpell(c, SPELL_PORTAL_BEAM, false);
                         if (Creature* c = me->SummonCreature(NPC_POWER_SPARK, FourSidesPos[random], TEMPSUMMON_MANUAL_DESPAWN, 0))
+                        {
                             c->AI()->DoAction(1);
-                        me->MonsterTextEmote("A Power Spark forms from a nearby rift!", 0, true);
+                            c->AI()->Talk(EMOTE_POWER_SPARK);
+                        }
+                        
                         events.RepeatEvent(urand(20000,30000));
                     }
                     break;
                 case EVENT_START_VORTEX_0:
                     {
                         bLockHealthCheck = true;
-                        me->MonsterYell("Watch helplessly as your hopes are swept away...", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_VORTEX);
+                        Talk(SAY_MAGIC_BLAST);
                         EntryCheckPredicate pred(NPC_POWER_SPARK);
                         summons.DoAction(2, pred); // stop following
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -519,8 +561,8 @@ public:
                     break;
                 }
                 case EVENT_START_PHASE_2:
-                    me->MonsterYell("I had hoped to end your lives quickly, but you have proven more...resilient then I had anticipated. Nonetheless, your efforts are in vain, it is you reckless, careless mortals who are to blame for this war! I do what I must...And if it means your...extinction...THEN SO BE IT!", LANG_UNIVERSAL,0);
-                    me->PlayDirectSound(SOUND_PHASE_1_END);
+                    events.SetPhase(PHASE_TWO);
+                    Talk(SAY_END_P1);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
                     me->SendMeleeAttackStop();
                     me->SetTarget((uint64)0);
@@ -544,8 +586,7 @@ public:
                     break;
                 }
                 case EVENT_START_PHASE_2_MOVE_TO_SIDE:
-                    me->MonsterYell("Few have experienced the pain I will now inflict upon you!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_AGGRO_2);
+                    Talk(SAY_PHASE_2);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
                     me->GetMotionMaster()->MovePoint(MI_POINT_CIRCLE_OUTSIDE_PH_2, Phase2NorthPos);
                     events.RescheduleEvent(EVENT_SPELL_ARCANE_STORM, urand(12000,15000), 1);
@@ -604,8 +645,7 @@ public:
                     break;
                 case EVENT_MOVE_TO_SURGE_OF_POWER:
                     {
-                        me->MonsterYell("You will not succeed while i draw breath!", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_DEEP_BREATH);
+                        Talk(SAY_DEEP_BREATH);
                         float angle = CenterPos.GetAngle(me);
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
@@ -614,7 +654,7 @@ public:
                     }
                     break;
                 case EVENT_SURGE_OF_POWER_WARNING:
-                    me->MonsterTextEmote("Malygos takes a deep breath.", 0, true);
+                    Talk(EMOTE_SURGE_OF_POWER_WARNING_P2);
                     events.PopEvent();
                     events.RescheduleEvent(EVENT_SPELL_SURGE_OF_POWER, 1500, 1);
                     break;
@@ -622,6 +662,7 @@ public:
                     if (Creature* c = me->SummonCreature(NPC_SURGE_OF_POWER, CenterPos, TEMPSUMMON_TIMED_DESPAWN, 10000))
                         me->CastSpell(c, SPELL_SURGE_OF_POWER, false);
                     events.PopEvent();
+                    Talk(SAY_SURGE_OF_POWER);
                     events.RescheduleEvent(EVENT_CLEAR_TARGET, 10000, 1);
                     events.RescheduleEvent(EVENT_RESUME_FLYING_CIRCLES_PH_2, 10000, 1);
                     events.RescheduleEvent(EVENT_SPELL_ARCANE_STORM, urand(17000,25000), 1);
@@ -645,8 +686,7 @@ public:
                             events.CancelEventGroup(1);
                             summons.DespawnAll();
                             // start phase 3
-                            me->MonsterYell("ENOUGH! If you intend to reclaim Azeroth\'s magic, then you shall have it...", LANG_UNIVERSAL,0);
-                            me->PlayDirectSound(SOUND_PHASE_2_END);
+                            Talk(SAY_END_P2);
                             me->GetMotionMaster()->Clear();
                             me->GetMotionMaster()->MoveIdle();
                             me->StopMoving();
@@ -701,12 +741,12 @@ public:
                     }
                     break;
                 case EVENT_SAY_PHASE_3_INTRO:
-                    me->MonsterYell("Now your benefactors make their appearance...But they are too late. The powers contained here are sufficient to destroy the world ten times over! What do you think they will do to you?", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_PHASE_3_START);
+                    Talk(SAY_INTRO_PHASE_3);
                     events.PopEvent();
                     break;
                 case EVENT_START_PHASE_3:
                     events.PopEvent();
+                    events.SetPhase(PHASE_THREE);
                     me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_OBSCURE_ARCANE_RUNES, 1 * IN_MILLISECONDS);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_DISABLE_MOVE);
@@ -730,7 +770,7 @@ public:
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_SPELL_PH3_SURGE_OF_POWER:
-                    me->CastSpell((Unit*)NULL, SPELL_PH3_SURGE_OF_POWER, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_PH3_SURGE_OF_POWER, false);
                     events.RepeatEvent(7000);
                     break;
             }
@@ -738,10 +778,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
-            me->MonsterYell("UNTHINKABLE! The mortals will destroy... e-everything... my sister... what have you-", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(SOUND_DEATH);
+            Talk(SAY_DEATH);
             if (pInstance)
             {
                 pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_MALYGOS, 1);
@@ -749,13 +788,20 @@ public:
             }
         }
 
-        void KilledUnit(Unit *victim)
+        void KilledUnit(Unit *victim) override
         {
             if (victim && victim->GetGUID() == me->GetGUID())
                 return;
+
+            if (events.IsInPhase(PHASE_ONE))
+                Talk(SAY_SLAY_P1);
+            else if (events.IsInPhase(PHASE_TWO))
+                Talk(SAY_SLAY_P2);
+            else
+                Talk(SAY_SLAY_P3);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (!summon)
                 return;
@@ -772,9 +818,9 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_GET_DEFAULT_FOR_MAP, 1*IN_MILLISECONDS);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -789,8 +835,7 @@ public:
             // speech timer
             if (timer1 <= diff)
             {
-                me->PlayDirectSound(MalygosIntroTexts[IntroCounter].sound);
-                me->MonsterYell(MalygosIntroTexts[IntroCounter].text, LANG_UNIVERSAL, 0);
+                Talk(SAY_INTRO);
                 timer1 = MalygosIntroIntervals[IntroCounter];
                 if (++IntroCounter >= 5)
                     IntroCounter = 0;
@@ -825,7 +870,7 @@ class npc_vortex_ride : public CreatureScript
 public:
     npc_vortex_ride() : CreatureScript("npc_vortex_ride") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_vortex_rideAI (pCreature);
     }
@@ -853,7 +898,7 @@ public:
         bool bUpdatedFlying;
         float VORTEX_RADIUS;
 
-        void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply)
+        void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply) override
         {
             if (pass && !apply && pass->GetTypeId() == TYPEID_PLAYER)
             {
@@ -866,7 +911,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             /*      here: if player has some aura that should make him exit vehicle (eg. ice block) -> exit
                     or make it another way (dunno how)                                                          */
@@ -876,7 +921,8 @@ public:
                 despawnTimer = 0;
                 me->UpdatePosition(CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ()+18.0f, 0.0f, true);
                 me->StopMovingOnCurrentPos();
-                me->GetVehicleKit()->RemoveAllPassengers();
+                if (Vehicle* vehicle = me->GetVehicleKit())
+                    vehicle->RemoveAllPassengers();
                 me->DespawnOrUnsummon();
                 return;
             }
@@ -911,9 +957,9 @@ public:
                 timer -= diff;
         }
 
-        void AttackStart(Unit*  /*who*/) {}
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask) { damage = 0; }
+        void AttackStart(Unit*  /*who*/) override {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask) override { damage = 0; }
     };
 };
 
@@ -923,7 +969,7 @@ class npc_power_spark : public CreatureScript
 public:
     npc_power_spark() : CreatureScript("npc_power_spark") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_power_sparkAI (pCreature);
     }
@@ -942,7 +988,7 @@ public:
         uint16 CheckTimer;
         uint16 MoveTimer;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch(param)
             {
@@ -958,7 +1004,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
             {
@@ -978,7 +1024,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                 return;
@@ -1020,7 +1066,7 @@ class npc_nexus_lord : public CreatureScript
 public:
     npc_nexus_lord() : CreatureScript("npc_nexus_lord") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_nexus_lordAI (pCreature);
     }
@@ -1040,7 +1086,7 @@ public:
         EventMap events;
         uint16 timer;
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             DoZoneInCombat();
             events.Reset();
@@ -1048,13 +1094,13 @@ public:
             events.RescheduleEvent(EVENT_NEXUS_LORD_HASTE, urand(8000,14000));
         }
 
-        void AttackStart(Unit* victim)
+        void AttackStart(Unit* victim) override
         {
             if (victim && me->Attack(victim, true))
                 me->GetMotionMaster()->MoveIdle();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (UpdateVictim())
                 if (Unit* victim = me->GetVictim())
@@ -1101,7 +1147,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Vehicle* v = me->GetVehicle())
                 v->RemoveAllPassengers();
@@ -1115,7 +1161,7 @@ class npc_scion_of_eternity : public CreatureScript
 public:
     npc_scion_of_eternity() : CreatureScript("npc_scion_of_eternity") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_scion_of_eternityAI (pCreature);
     }
@@ -1134,7 +1180,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -1171,7 +1217,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (Vehicle* v = me->GetVehicle())
                 v->RemoveAllPassengers();
@@ -1180,8 +1226,8 @@ public:
                 player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void AttackStart(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void AttackStart(Unit*  /*who*/) override {}
     };
 };
 
@@ -1191,7 +1237,7 @@ class npc_hover_disk : public CreatureScript
 public:
     npc_hover_disk() : CreatureScript("npc_hover_disk") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_hover_diskAI (pCreature);
     }
@@ -1207,7 +1253,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void PassengerBoarded(Unit *who, int8  /*seat*/, bool apply)
+        void PassengerBoarded(Unit *who, int8  /*seat*/, bool apply) override
         {
             events.Reset();
             if (!who)
@@ -1250,7 +1296,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -1276,7 +1322,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch(param)
             {
@@ -1310,7 +1356,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -1325,8 +1371,8 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void AttackStart(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void AttackStart(Unit*  /*who*/) override {}
     };
 };
 
@@ -1336,7 +1382,7 @@ class npc_alexstrasza : public CreatureScript
 public:
     npc_alexstrasza() : CreatureScript("npc_alexstrasza") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_alexstraszaAI (pCreature);
     }
@@ -1354,7 +1400,7 @@ public:
 
         EventMap events;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch(events.GetEvent())
@@ -1366,33 +1412,29 @@ public:
                     me->SummonGameObject(ALEXSTRASZA_GIFT, 773.98f, 1285.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
                     me->SummonGameObject(HEART_OF_MAGIC, 773.98f, 1275.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
 
-                    me->PlayDirectSound(14406);
-                    me->MonsterYell("I did what I had to, brother. You gave me no alternative.", LANG_UNIVERSAL, 0);
+                    Talk(SAY_ALEXSTRASZA_ONE);
                     events.PopEvent();
                     events.RescheduleEvent(2, 6000);
                     break;
                 case 2:
-                    me->PlayDirectSound(14407);
-                    me->MonsterYell("And so ends the Nexus War.", LANG_UNIVERSAL, 0);
+                    Talk(SAY_ALEXSTRASZA_TWO);
                     events.PopEvent();
                     events.RescheduleEvent(3, 5000);
                     break;
                 case 3:
-                    me->PlayDirectSound(14408);
-                    me->MonsterYell("This resolution pains me deeply, but the destruction, the monumental loss of life had to end. Regardless of Malygos\' recent transgressions, I will mourn his loss. He was once a guardian, a protector. This day, one of the world\'s mightiest has fallen.", LANG_UNIVERSAL, 0);
+                    Talk(SAY_ALEXSTRASZA_THREE);
                     events.PopEvent();
                     events.RescheduleEvent(4, 22000);
                     break;
                 case 4:
-                    me->PlayDirectSound(14409);
-                    me->MonsterYell("The red dragonflight will take on the burden of mending the devastation wrought on Azeroth. Return home to your people and rest. Tomorrow will bring you new challenges, and you must be ready to face them. Life... goes on.", LANG_UNIVERSAL, 0);
+                    Talk(SAY_ALEXSTRASZA_FOUR);
                     events.PopEvent();
                     break;
             }
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void AttackStart(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void AttackStart(Unit*  /*who*/) override {}
     };
 };
 
@@ -1402,7 +1444,7 @@ class npc_eoe_wyrmrest_skytalon : public CreatureScript
 public:
     npc_eoe_wyrmrest_skytalon() : CreatureScript("npc_eoe_wyrmrest_skytalon") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_eoe_wyrmrest_skytalonAI (pCreature);
     }
@@ -1411,7 +1453,7 @@ public:
     {
         npc_eoe_wyrmrest_skytalonAI(Creature* pCreature) : VehicleAI(pCreature) { }
 
-        void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply)
+        void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply) override
         {
             if (apply)
             {
@@ -1425,7 +1467,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetDisplayId(11686); // prevents nasty falling animation at despawn
             me->DespawnOrUnsummon(1);
@@ -1463,7 +1505,7 @@ class spell_eoe_ph3_surge_of_power : public SpellScriptLoader
 
             uint64 DrakeGUID[3];
 
-            bool Load()
+            bool Load() override
             {
                 memset(&DrakeGUID, 0, sizeof(DrakeGUID));
                 if (Unit* caster = GetCaster())
@@ -1478,11 +1520,7 @@ class spell_eoe_ph3_surge_of_power : public SpellScriptLoader
                             if (Vehicle* v = (*itr)->GetVehicleKit())
                                 if (Unit* p = v->GetPassenger(0))
                                     if (Player* plr = p->ToPlayer())
-                                    {
-                                        WorldPacket data;
-                                        ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, caster, p, "Malygos fixes his eyes on you!");
-                                        plr->GetSession()->SendPacket(&data);
-                                    }
+                                        c->AI()->Talk(EMOTE_SURGE_OF_POWER_WARNING_P3, plr);
                         }
                     }
 
@@ -1501,13 +1539,13 @@ class spell_eoe_ph3_surge_of_power : public SpellScriptLoader
                 }
             }
 
-            void Register()
+            void Register() override
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eoe_ph3_surge_of_power_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_eoe_ph3_surge_of_power_SpellScript();
         }

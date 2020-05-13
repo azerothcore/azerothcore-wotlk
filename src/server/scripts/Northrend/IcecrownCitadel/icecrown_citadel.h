@@ -562,6 +562,11 @@ enum AreaIds
     AREA_THE_FROZEN_THRONE  = 4859,
 };
 
+enum ItemIds
+{
+    ITEM_GOBLIN_ROCKET_PACK = 49278
+};
+
 class spell_trigger_spell_from_caster : public SpellScriptLoader
 {
     public:

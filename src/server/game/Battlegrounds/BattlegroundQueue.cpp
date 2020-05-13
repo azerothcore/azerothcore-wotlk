@@ -16,14 +16,10 @@
 #include "Player.h"
 #include "ChannelMgr.h"
 #include "Channel.h"
+#include "ScriptMgr.h"
 #include <unordered_map>
 
-struct BGSpamProtectionS
-{
-    uint32 last_queue = 0; // CHAT DISABLED BY DEFAULT
-};
-
-std::unordered_map<uint32, BGSpamProtectionS>BGSpamProtection;
+std::unordered_map<uint64, uint32> BGSpamProtection;
 
 /*********************************************************/
 /***            BATTLEGROUND QUEUE SYSTEM              ***/
@@ -152,6 +148,8 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player * leader, Group * grp, PvPDif
     if (ginfo->teamId == TEAM_HORDE)
         index++;
 
+    sScriptMgr->OnAddGroup(this, ginfo, index, leader, grp, bracketEntry, isPremade);
+
     // pussywizard: store indices at which GroupQueueInfo is in m_QueuedGroups
     ginfo->_bracketId = bracketId;
     ginfo->_groupType = index;
@@ -185,40 +183,12 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player * leader, Group * grp, PvPDif
     //add GroupInfo to m_QueuedGroups
     m_QueuedGroups[bracketId][index].push_back(ginfo);
 
-    //announce current queue status
-    if (!isRated && !isPremade && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
-        if (Battleground * bgt = sBattlegroundMgr->GetBattlegroundTemplate(ginfo->BgTypeId))
-        {
-            char const* bgName = bgt->GetName();
-            uint32 MinPlayers = bgt->GetMinPlayersPerTeam();
-            uint32 MaxPlayers = MinPlayers * 2;
-            uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32)80);
-            uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32)80);
-            uint32 qHorde = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_HORDE);
-            uint32 qAlliance = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_ALLIANCE);            
+    Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(ginfo->BgTypeId);
+    if (!bg)
+        return ginfo;
 
-            // Show queue status to player only (when joining battleground queue or Arena and arena world announcer is disabled)
-            if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY) || (bgt->isArena() && !sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE)))
-            {
-                ChatHandler(leader->GetSession()).PSendSysMessage(LANG_BG_QUEUE_ANNOUNCE_SELF, bgName, q_min_level, q_max_level,
-                    qAlliance, (MinPlayers > qAlliance) ? MinPlayers - qAlliance : (uint32)0, qHorde, (MinPlayers > qHorde) ? MinPlayers - qHorde : (uint32)0);
-            }
-            else if (!bgt->isArena()) // Show queue status to server (when joining battleground queue)
-            {
-                if (BGSpamProtection[leader->GetGUID()].last_queue == 0)
-                {
-                    BGSpamProtection[leader->GetGUID()].last_queue = sWorld->GetGameTime();
-                    sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level,
-                        qAlliance + qHorde, MaxPlayers);
-                }
-                else if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()].last_queue >= 30)
-                {
-                    BGSpamProtection[leader->GetGUID()].last_queue = 0;
-                    sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level,
-                        qAlliance + qHorde, MaxPlayers);
-                }
-            }
-        }
+    if (!isRated && !isPremade && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
+        SendMessageQueue(leader, bg, bracketEntry);
 
     return ginfo;
 }
@@ -290,7 +260,7 @@ void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQu
     QueuedPlayersMap::iterator itr = m_QueuedPlayers.find(guid);
     if (itr == m_QueuedPlayers.end())
     {
-        ASSERT(false);
+        ABORT();
         return;
     }
 
@@ -311,7 +281,7 @@ void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQu
     //player can't be in queue without group, but just in case
     if (group_itr == m_QueuedGroups[_bracketId][_groupType].end())
     {
-        ASSERT(false);
+        ABORT();
         return;
     }
 
@@ -400,7 +370,8 @@ bool BattlegroundQueue::GetPlayerGroupInfoData(uint64 guid, GroupQueueInfo * gin
 // this function is filling pools given free slots on both sides, result is ballanced
 void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId bracket_id)
 {
-    UNUSED(bg);
+    if (!sScriptMgr->CanFillPlayersToBG(this, bg, aliFree, hordeFree, bracket_id))
+        return;
 
     // clear selection pools
     m_SelectionPools[TEAM_ALLIANCE].Init();
@@ -424,8 +395,25 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, c
     int32 aliDiff = aliFree - int32(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount());
     int32 hordeDiff = hordeFree - int32(m_SelectionPools[TEAM_HORDE].GetPlayerCount());
 
-    // if free space differs too much, ballance
-    while (abs(aliDiff - hordeDiff) > 1 && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
+    int32 invType = sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE);
+    int32 invDiff = 0;
+
+    // check balance configuration and set the max difference between teams
+    switch (invType)
+    {
+    case BG_QUEUE_INVITATION_TYPE_NO_BALANCE:
+        return;
+    case BG_QUEUE_INVITATION_TYPE_BALANCED:
+        invDiff = 1;
+        break;
+    case BG_QUEUE_INVITATION_TYPE_EVEN:
+        break;
+    default:
+        return;
+    }
+
+    // balance the teams based on the difference allowed
+    while (abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
     {
         // if results in more alliance players than horde:
         if (aliDiff < hordeDiff)
@@ -451,14 +439,15 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, c
         }
 
         // recalculate free space after adding
-        aliDiff = aliFree - int32(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount());
-        hordeDiff = hordeFree - int32(m_SelectionPools[TEAM_HORDE].GetPlayerCount());
+        aliDiff = aliFree - static_cast<int32>(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount());
+        hordeDiff = hordeFree - static_cast<int32>(m_SelectionPools[TEAM_HORDE].GetPlayerCount());
     }
 }
 
-void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId thisBracketId, BattlegroundQueue * specificQueue, BattlegroundBracketId specificBracketId)
+void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId)
 {
-    UNUSED(bg);
+    if (!sScriptMgr->CanFillPlayersToBGWithSpecific(this, bg, aliFree, hordeFree, thisBracketId, specificQueue, specificBracketId))
+        return;
 
     // clear selection pools
     m_SelectionPools[TEAM_ALLIANCE].Init();
@@ -489,8 +478,25 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int3
     int32 aliDiff = aliFree - int32(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount());
     int32 hordeDiff = hordeFree - int32(m_SelectionPools[TEAM_HORDE].GetPlayerCount());
 
+    int32 invType = sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE);
+    int32 invDiff = 0;
+
+    // check balance configuration and set the max difference between teams
+    switch (invType)
+    {
+    case BG_QUEUE_INVITATION_TYPE_NO_BALANCE:
+        return;
+    case BG_QUEUE_INVITATION_TYPE_BALANCED:
+        invDiff = 1;
+        break;
+    case BG_QUEUE_INVITATION_TYPE_EVEN:
+        break;
+    default:
+        return;
+    }
+
     // if free space differs too much, ballance
-    while (abs(aliDiff - hordeDiff) > 1 && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
+    while (abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
     {
         // if results in more alliance players than horde:
         if (aliDiff < hordeDiff)
@@ -502,9 +508,8 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int3
             // kick alliance, returns true if kicked more than needed, so then try to fill up
             if (m_SelectionPools[TEAM_ALLIANCE].KickGroup(hordeDiff - aliDiff))
                 for (; Ali_itr != m_QueuedBoth[TEAM_ALLIANCE].end() && m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), aliFree >= hordeDiff ? aliFree - hordeDiff : 0); ++Ali_itr);
-        }
-        // if results in more horde players than alliance:
-        else
+        }            
+        else // if results in more horde players than alliance:
         {
             // no more horde in pool, invite whatever we can from alliance
             if (!m_SelectionPools[TEAM_HORDE].GetPlayerCount())
@@ -516,8 +521,8 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int3
         }
 
         // recalculate free space after adding
-        aliDiff = aliFree - int32(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount());
-        hordeDiff = hordeFree - int32(m_SelectionPools[TEAM_HORDE].GetPlayerCount());
+        aliDiff = aliFree - static_cast<int32>(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount());
+        hordeDiff = hordeFree - static_cast<int32>(m_SelectionPools[TEAM_HORDE].GetPlayerCount());
     }
 }
 
@@ -579,39 +584,30 @@ bool BattlegroundQueue::CheckPremadeMatch(BattlegroundBracketId bracket_id, uint
 // this method tries to create battleground or arena with MinPlayersPerTeam against MinPlayersPerTeam
 bool BattlegroundQueue::CheckNormalMatch(Battleground * bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers)
 {
-    // if current queue is BATTLEGROUND_QUEUE_RB, then we are trying to create bg using players from 2 queues
-    if (bgTemplate->GetBgTypeID() == BATTLEGROUND_RB)
+    uint32 Coef = 1;
+
+    sScriptMgr->OnCheckNormalMatch(this, Coef, bgTemplate, bracket_id, minPlayers, maxPlayers);
+
+    minPlayers = minPlayers * Coef;
+
+    FillPlayersToBG(bgTemplate, maxPlayers, maxPlayers, bracket_id);
+
+    //allow 1v0 if debug bg
+    if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
+        return true;
+
+    switch (sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE))
     {
-        // specific template
-        Battleground* specificTemplate = sBattlegroundMgr->GetBattlegroundTemplate(sBattlegroundMgr->RandomSystem.GetCurrentRandomBg());
-        if (!specificTemplate)
-            return false;
+    case BG_QUEUE_INVITATION_TYPE_NO_BALANCE: // in this case, as soon as both teams have > mincount, start
+        return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
 
-        // specific bracket id
-        PvPDifficultyEntry const* specificBracket = GetBattlegroundBracketByLevel(specificTemplate->GetMapId(), sBattlegroundMgr->randomBgDifficultyEntry.minLevel);
-        if (!specificBracket || specificBracket->maxLevel < sBattlegroundMgr->randomBgDifficultyEntry.maxLevel)
-            return false;
+    case BG_QUEUE_INVITATION_TYPE_BALANCED: // check difference between selection pools - if = 1 or less start.
+        return abs(static_cast<int32>(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount()) - static_cast<int32>(m_SelectionPools[TEAM_HORDE].GetPlayerCount())) <= 1 && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
 
-        // specific queue
-        BattlegroundQueue & specificQueue = sBattlegroundMgr->GetBattlegroundQueue(BattlegroundMgr::BGQueueTypeId(sBattlegroundMgr->RandomSystem.GetCurrentRandomBg(), 0));
+    case BG_QUEUE_INVITATION_TYPE_EVEN: // if both counts are same then it's an even match
+        return (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() == m_SelectionPools[TEAM_HORDE].GetPlayerCount()) && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
 
-        FillPlayersToBGWithSpecific(specificTemplate, specificTemplate->GetMaxPlayersPerTeam(), specificTemplate->GetMaxPlayersPerTeam(), bracket_id, &specificQueue, BattlegroundBracketId(specificBracket->bracketId));
-
-        //allow 1v0 if debug bg
-        if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
-            return true;
-
-        return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= std::min<uint32>(specificTemplate->GetMinPlayersPerTeam(), 15) && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= std::min<uint32>(specificTemplate->GetMinPlayersPerTeam(), 15);
-    }
-    // if this is not random bg queue - use players only from this queue
-    else
-    {
-        FillPlayersToBG(bgTemplate, maxPlayers, maxPlayers, bracket_id);
-
-        //allow 1v0 if debug bg
-        if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
-            return true;
-
+    default: // same as unbalanced (in case wrong setting is entered...)
         return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
     }
 }
@@ -671,7 +667,7 @@ void BattlegroundQueue::UpdateEvents(uint32 diff)
     m_events.Update(diff);
 }
 
-struct BgEmptinessComp { bool operator()(Battleground* const& bg1, Battleground* const& bg2) { return ((float)bg1->GetMaxFreeSlots() / (float)bg1->GetMaxPlayersPerTeam()) > ((float)bg2->GetMaxFreeSlots() / (float)bg2->GetMaxPlayersPerTeam()); } };
+struct BgEmptinessComp { bool operator()(Battleground* const& bg1, Battleground* const& bg2) const { return ((float)bg1->GetMaxFreeSlots() / (float)bg1->GetMaxPlayersPerTeam()) > ((float)bg2->GetMaxFreeSlots() / (float)bg2->GetMaxPlayersPerTeam()); } };
 typedef std::set<Battleground*, BgEmptinessComp> BattlegroundNeedSet;
 
 void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id, uint8 actionMask, bool isRated, uint32 arenaRatedTeamId)
@@ -698,7 +694,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
         for (BattlegroundContainer::const_iterator itr = bgList.begin(); itr != bgList.end(); ++itr)
         {
             Battleground* bg = itr->second;
-            if (!BattlegroundMgr::IsArenaType(bg->GetBgTypeID()) && (bg->GetBgTypeID() == m_bgTypeId || m_bgTypeId == BATTLEGROUND_RB) &&
+            if (!BattlegroundMgr::IsArenaType(bg->GetBgTypeID()) && (bg->GetBgTypeID(true) == m_bgTypeId || m_bgTypeId == BATTLEGROUND_RB) &&
                 bg->HasFreeSlots() && bg->GetMinLevel() <= bracketEntry->minLevel && bg->GetMaxLevel() >= bracketEntry->maxLevel)
                 bgsToCheck.insert(bg);
         }
@@ -770,22 +766,6 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
             BattlegroundTypeId newBgTypeId = m_bgTypeId;
             uint32 minLvl = bracketEntry->minLevel;
             uint32 maxLvl = bracketEntry->maxLevel;
-
-            // for random bg use values from specific
-            if (m_bgTypeId == BATTLEGROUND_RB)
-            {
-                newBgTypeId = sBattlegroundMgr->RandomSystem.GetCurrentRandomBg();
-                Battleground* specificTemplate = sBattlegroundMgr->GetBattlegroundTemplate(newBgTypeId);
-                if (!specificTemplate)
-                    return;
-                PvPDifficultyEntry const* specificBracket = GetBattlegroundBracketByLevel(specificTemplate->GetMapId(), sBattlegroundMgr->randomBgDifficultyEntry.minLevel);
-                if (!specificBracket)
-                    return;
-                minLvl = specificBracket->minLevel;
-                maxLvl = specificBracket->maxLevel;
-
-                sBattlegroundMgr->RandomSystem.BattlegroundCreated(newBgTypeId);
-            }
 
             // create new battleground
             Battleground* bg = sBattlegroundMgr->CreateNewBattleground(newBgTypeId, minLvl, maxLvl, m_arenaType, false);
@@ -978,6 +958,41 @@ bool BattlegroundQueue::IsAllQueuesEmpty(BattlegroundBracketId bracket_id)
         return true;
 
     return false;
+}
+
+void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
+{
+    if (!sScriptMgr->CanSendMessageQueue(this, leader, bg, bracketEntry))
+        return;
+
+    BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
+    char const* bgName = bg->GetName();
+    uint32 MinPlayers = bg->GetMinPlayersPerTeam();
+    uint32 MaxPlayers = MinPlayers * 2;
+    uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32)80);
+    uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32)80);
+    uint32 qHorde = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_HORDE);
+    uint32 qAlliance = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_ALLIANCE);
+
+    // Show queue status to player only (when joining battleground queue or Arena and arena world announcer is disabled)
+    if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY) || (bg->isArena() && !sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE)))
+    {
+        ChatHandler(leader->GetSession()).PSendSysMessage(LANG_BG_QUEUE_ANNOUNCE_SELF, bgName, q_min_level, q_max_level,
+            qAlliance, (MinPlayers > qAlliance) ? MinPlayers - qAlliance : (uint32)0, qHorde, (MinPlayers > qHorde) ? MinPlayers - qHorde : (uint32)0);
+    }
+    else if (!bg->isArena()) // Show queue status to server (when joining battleground queue)
+    {
+        auto searchGUID = BGSpamProtection.find(leader->GetGUID());
+
+        if (searchGUID == BGSpamProtection.end())
+            BGSpamProtection[leader->GetGUID()] = 0; // Leader GUID not found, initialize with 0
+
+        if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] >= 30)
+        {
+            BGSpamProtection[leader->GetGUID()] = sWorld->GetGameTime();
+            sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
+        }
+    }
 }
 
 /*********************************************************/

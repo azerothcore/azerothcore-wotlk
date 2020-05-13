@@ -1,4 +1,5 @@
-# Copyright (C)
+#
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -30,8 +31,7 @@ endif()
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(common
-  ${PRIVATE_SOURCES}
-)
+  ${PRIVATE_SOURCES})
 
 CollectIncludeDirectories(
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -51,6 +51,7 @@ target_link_libraries(common
   PRIVATE
     game-interface
   PUBLIC
+    acore-core-interface
     ace
     mysql
     g3dlib
@@ -59,7 +60,8 @@ target_link_libraries(common
     utf8cpp
     openssl
     threads
-    jemalloc)
+    jemalloc
+    fmt)
 
 set_target_properties(common
   PROPERTIES
