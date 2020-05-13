@@ -104,6 +104,8 @@ public:
                 Death = true;
             }
 
+            events.Update(diff);
+
             while (uint32 eventid = events.ExecuteEvent())
             {
                 switch (eventid)
