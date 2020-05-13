@@ -108,7 +108,7 @@ public:
                     events.RepeatEvent(urand(10000, 20000));
                     break;
                 case EVENT_SUMMON_SPAWN:
-                    for (int i = 0; i <= urand(0, 2); i++)
+                    for (int i = 0; i <= rand() % 2; i++)
                         SummonSpawn(SelectTarget(SELECT_TARGET_RANDOM, 0));
                     events.RepeatEvent(urand(30000, 60000));
                     break;
