@@ -51,12 +51,11 @@ public:
     {
         boss_fankrissAI(Creature* creature) : ScriptedAI(creature), summoned(me) { }
 
-        void Reset()
-        {
-            events.Reset();
-            summoned.DespawnAll();
-        }
+        void JustDied(Unit* /*who*/) { events.Reset(); summoned.DespawnAll(); }
 
+        void Reset() { events.Reset(); summoned.DespawnAll(); }
+
+        //TODO: Possibly rework this method? I hate it :(
         void SummonSpawn(Unit* victim)
         {
             if (!victim)
