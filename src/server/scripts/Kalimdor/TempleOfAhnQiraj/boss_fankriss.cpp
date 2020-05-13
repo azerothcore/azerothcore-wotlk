@@ -14,6 +14,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
+//TODO: Find what these link to in the database? Surely there's a text line as well...
 #define SOUND_SENTENCE_YOU 8588
 #define SOUND_SERVE_TO     8589
 #define SOUND_LAWS         8590
@@ -51,9 +52,9 @@ public:
     {
         boss_fankrissAI(Creature* creature) : ScriptedAI(creature), summoned(me) { }
 
-        void JustDied(Unit* /*who*/) { events.Reset(); summoned.DespawnAll(); }
+        void JustDied(Unit* /*who*/) override { events.Reset(); summoned.DespawnAll(); }
 
-        void Reset() { events.Reset(); summoned.DespawnAll(); }
+        void Reset() override { events.Reset(); summoned.DespawnAll(); }
 
         //TODO: Possibly rework this method? I hate it :(
         void SummonSpawn(Unit* victim)
@@ -85,14 +86,14 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_MORTALWOUND, urand(10000, 15000));
             events.ScheduleEvent(EVENT_SUMMON_HATCHLINGS, urand(6000, 12000));
             events.ScheduleEvent(EVENT_SUMMON_SPAWN, urand(15000, 45000));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

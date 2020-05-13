@@ -70,7 +70,7 @@ public:
         bool VemDead;
         bool Death;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
 
@@ -78,21 +78,21 @@ public:
             Death = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_KRI_CLEAVE, urand(4000, 8000));
             events.ScheduleEvent(EVENT_KRI_TOXICVOLLEY, urand(6000, 12000));
             events.ScheduleEvent(EVENT_KRI_CHECK, 2000);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 
             instance->SetData(DATA_BUG_TRIO_DEATH, 1);
         }
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -162,14 +162,14 @@ public:
             instance = creature->GetInstanceScript();
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
 
             Enraged = false;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             instance->SetData(DATA_VEM_DEATH, 0);
             if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
@@ -177,14 +177,14 @@ public:
             instance->SetData(DATA_BUG_TRIO_DEATH, 1);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_VEM_CHARGE, urand(15000, 27000));
             events.ScheduleEvent(EVENT_VEM_KNOCKBACK, urand(8000, 20000));
             events.ScheduleEvent(EVENT_VEM_ENRAGE, 120000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -250,14 +250,14 @@ public:
             instance = creature->GetInstanceScript();
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
 
             VemDead = false;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
@@ -273,14 +273,14 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_YAUJ_HEAL, urand(25000, 40000));
             events.ScheduleEvent(EVENT_YAUJ_FEAR, urand(12000, 24000));
             events.ScheduleEvent(EVENT_YAUJ_CHECK, 2000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
