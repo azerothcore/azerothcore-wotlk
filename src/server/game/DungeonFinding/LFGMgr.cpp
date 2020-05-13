@@ -472,6 +472,9 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
     if (grp && (grp->isBGGroup() || grp->isBFGroup()))
         return;
 
+    if (!sScriptMgr->CanJoinLfg(player, roles, dungeons, comment))
+        return;
+    
     // pussywizard: can't join LFG/LFR while using LFR
     if (GetState(player->GetGUID()) == LFG_STATE_RAIDBROWSER)
     {

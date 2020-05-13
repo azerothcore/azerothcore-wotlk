@@ -28,6 +28,7 @@
 #include "Pet.h"
 #include "ReputationMgr.h"
 #include "InstanceScript.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -1745,6 +1746,8 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
         // do not change phase to GM with all phases enabled
         if (player->IsGameMaster())
             newPhase = PHASEMASK_ANYWHERE;
+
+        sScriptMgr->OnPlayerSetPhase(this, aurApp, mode, apply, newPhase);      
 
         player->SetPhaseMask(newPhase, false);
         player->GetSession()->SendSetPhaseShift(newPhase);
@@ -4687,7 +4690,7 @@ void AuraEffect::HandleModDamageDone(AuraApplication const* aurApp, uint8 mode, 
     // with spell->EquippedItemClass and  EquippedItemSubClassMask and EquippedItemInventoryTypeMask
     // GetMiscValue() comparison with item generated damage types
 
-    if ((GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL) != 0)
+    if ((GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL) != 0 && sScriptMgr->CanModAuraEffectDamageDone(this, target, aurApp, mode, apply))
     {
         // apply generic physical damage bonuses including wand case
         if (GetSpellInfo()->EquippedItemClass == -1 || target->GetTypeId() != TYPEID_PLAYER)
@@ -4757,6 +4760,9 @@ void AuraEffect::HandleModDamagePercentDone(AuraApplication const* aurApp, uint8
     if (!target)
         return;
 
+    if (!sScriptMgr->CanModAuraEffectModDamagePercentDone(this, target, aurApp, mode, apply))
+        return;
+    
     if (target->GetTypeId() == TYPEID_PLAYER)
     {
         for (int i = 0; i < MAX_ATTACK; ++i)

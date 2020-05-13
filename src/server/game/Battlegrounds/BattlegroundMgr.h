@@ -121,12 +121,14 @@ class BattlegroundMgr
 
         const BattlegroundContainer& GetBattlegroundList() { return m_Battlegrounds; } // pussywizard
 
-        static std::unordered_map<int, BattlegroundQueueTypeId> bgToQueue;      // BattlegroundTypeId -> BattlegroundQueueTypeId
-        static std::unordered_map<int, BattlegroundTypeId> queueToBg;           // BattlegroundQueueTypeId -> BattlegroundTypeId
-        static std::unordered_map<int, Battleground*> bgtypeToBattleground;     // BattlegroundTypeId -> Battleground*
-        static std::unordered_map<int, bgRef> bgTypeToTemplate;                 // BattlegroundTypeId -> bgRef
-        static std::unordered_map<int, bgMapRef> getBgFromMap;                  // BattlegroundMapID -> bgMapRef
-        static std::unordered_map<int, bgTypeRef> getBgFromTypeID;              // BattlegroundTypeID -> bgTypeRef
+        static std::unordered_map<int, BattlegroundQueueTypeId> bgToQueue;              // BattlegroundTypeId -> BattlegroundQueueTypeId
+        static std::unordered_map<int, BattlegroundTypeId> queueToBg;                   // BattlegroundQueueTypeId -> BattlegroundTypeId
+        static std::unordered_map<int, Battleground*> bgtypeToBattleground;             // BattlegroundTypeId -> Battleground*
+        static std::unordered_map<int, bgRef> bgTypeToTemplate;                         // BattlegroundTypeId -> bgRef
+        static std::unordered_map<int, bgMapRef> getBgFromMap;                          // BattlegroundMapID -> bgMapRef
+        static std::unordered_map<int, bgTypeRef> getBgFromTypeID;                      // BattlegroundTypeID -> bgTypeRef
+        static std::unordered_map<uint32, BattlegroundQueueTypeId> ArenaTypeToQueue;    // ArenaType -> BattlegroundQueueTypeId
+        static std::unordered_map<uint32, ArenaType> QueueToArenaType;                  // BattlegroundQueueTypeId -> ArenaType
 
     private:
         bool CreateBattleground(CreateBattlegroundData& data);

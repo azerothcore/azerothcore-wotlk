@@ -27,6 +27,8 @@
 #include "LFGMgr.h"
 #include "Chat.h"
 #include "AvgDiffTracker.h"
+#include "ScriptMgr.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -151,6 +153,9 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
         return true;
 
     char const* mapName = entry->name[player->GetSession()->GetSessionDbcLocale()];
+    
+    if (!sScriptMgr->CanEnterMap(player, entry, instance, mapDiff, loginCheck))
+        return false;
 
     Group* group = player->GetGroup();
     if (entry->IsRaid())

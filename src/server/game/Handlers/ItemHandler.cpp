@@ -15,6 +15,7 @@
 #include "UpdateData.h"
 #include "ObjectAccessor.h"
 #include "SpellInfo.h"
+#include "ScriptMgr.h" 
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket & recvData)
 {
@@ -654,6 +655,9 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recvData)
     Item* pItem = _player->GetItemByGuid(itemguid);
     if (pItem)
     {
+        if (!sScriptMgr->CanSellItem(_player, pItem, creature))
+            return;
+        
         // prevent sell not owner item
         if (_player->GetGUID() != pItem->GetOwnerGUID())
         {

@@ -763,11 +763,11 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
         sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "UpdateAchievementCriteria: Wrong criteria type %u", type);
         return;
     }
-
+    
     sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::UpdateAchievementCriteria(%u, %u, %u)", type, miscValue1, miscValue2);
 #endif
 
-    AchievementCriteriaEntryList const* achievementCriteriaList = NULL;
+    AchievementCriteriaEntryList const* achievementCriteriaList = nullptr;
 
     switch (type)
     {
@@ -821,17 +821,23 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             break;
     }
 
-    if (!achievementCriteriaList)
+    if (!achievementCriteriaList) 
         return;
+
+    sScriptMgr->OnBeforeCheckCriteria(this, achievementCriteriaList);
 
     for (AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList->begin(); i != achievementCriteriaList->end(); ++i)
     {
         AchievementCriteriaEntry const* achievementCriteria = (*i);
         AchievementEntry const* achievement = sAchievementStore.LookupEntry(achievementCriteria->referredAchievement);
+
         if (!achievement)
             continue;
 
         if (!CanUpdateCriteria(achievementCriteria, achievement))
+            continue;
+
+        if (!sScriptMgr->CanCheckCriteria(this, achievementCriteria))
             continue;
 
         switch (type)
@@ -1758,6 +1764,9 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
     CriteriaProgress const* progress = GetCriteriaProgress(achievementCriteria);
     if (!progress)
         return false;
+    
+    if (!sScriptMgr->IsCompletedCriteria(this, achievementCriteria, achievement, progress))
+        return false;
 
     switch (achievementCriteria->requiredType)
     {
@@ -2162,6 +2171,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 #endif
 
     SendAchievementEarned(achievement);
+    
     CompletedAchievementData& ca = m_completedAchievements[achievement->ID];
     ca.date = time(NULL);
     ca.changed = true;
@@ -2388,6 +2398,9 @@ bool AchievementGlobalMgr::IsRealmCompleted(AchievementEntry const* achievement)
 
     if (itr->second == std::chrono::system_clock::time_point::min())
         return false;
+    
+    if (!sScriptMgr->IsRealmCompleted(this, achievement, itr->second))
+        return false;
 
     if (itr->second == std::chrono::system_clock::time_point::max())
         return true;
@@ -2405,8 +2418,10 @@ void AchievementGlobalMgr::SetRealmCompleted(AchievementEntry const* achievement
 {
     if (IsRealmCompleted(achievement))
         return;
-
+    
     m_allCompletedAchievements[achievement->ID] = std::chrono::system_clock::now();
+
+    sScriptMgr->SetRealmCompleted(achievement);
 }
 
 //==========================================================

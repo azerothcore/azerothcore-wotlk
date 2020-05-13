@@ -111,6 +111,9 @@ class BattlegroundQueue
 
         //one selection pool for horde, other one for alliance
         SelectionPool m_SelectionPools[BG_TEAMS_COUNT];
+        ArenaType GetArenaType() { return m_arenaType; }
+        BattlegroundTypeId GetBGTypeID() { return m_bgTypeId; }
+
     private:
 
         BattlegroundTypeId m_bgTypeId;

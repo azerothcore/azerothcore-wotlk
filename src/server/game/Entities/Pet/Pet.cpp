@@ -22,6 +22,7 @@
 #include "Battleground.h"
 #include "InstanceScript.h"
 #include "ArenaSpectator.h"
+#include "ScriptMgr.h"
 
 #define PET_XP_FACTOR 0.05f
 
@@ -1077,6 +1078,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         }
     }
 
+    sScriptMgr->OnInitStatsForLevel(this, petlevel);
+
     UpdateAllStats();
 
     SetFullHealth();
@@ -1593,11 +1596,10 @@ void Pet::InitLevelupSpellsForLevel()
         for (PetLevelupSpellSet::const_reverse_iterator itr = levelupSpells->rbegin(); itr != levelupSpells->rend(); ++itr)
         {
             // will called first if level down
-            if (itr->first > level)
-                unlearnSpell(itr->second, true);                 // will learn prev rank if any
-            // will called if level up
-            else
-                learnSpell(itr->second);                        // will unlearn prev rank if any
+            if (itr->first > level && sScriptMgr->CanUnlearnSpellSet(this, itr->first, itr->second))
+                unlearnSpell(itr->second, true);        // will learn prev rank if any
+            else // will called if level up
+                learnSpell(itr->second);                // will unlearn prev rank if any
         }
     }
 
@@ -1613,10 +1615,9 @@ void Pet::InitLevelupSpellsForLevel()
                 continue;
 
             // will called first if level down
-            if (spellEntry->SpellLevel > level)
-                unlearnSpell(spellEntry->Id, true);
-            // will called if level up
-            else
+            if (spellEntry->SpellLevel > level && sScriptMgr->CanUnlearnSpellDefault(this, spellEntry))
+                unlearnSpell(spellEntry->Id, true);            
+            else // will called if level up
                 learnSpell(spellEntry->Id);
         }
     }
@@ -1718,6 +1719,9 @@ bool Pet::resetTalents()
     if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
         return false;
 
+    if (!sScriptMgr->CanResetTalents(this))
+        return false;
+
     // not need after this call
     if (owner->ToPlayer()->HasAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS))
         owner->ToPlayer()->RemoveAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS, true);
@@ -1725,6 +1729,7 @@ bool Pet::resetTalents()
     CreatureTemplate const* ci = GetCreatureTemplate();
     if (!ci)
         return false;
+
     // Check pet talent type
     CreatureFamilyEntry const* pet_family = sCreatureFamilyStore.LookupEntry(ci->family);
     if (!pet_family || pet_family->petTalentType < 0)
@@ -1786,6 +1791,7 @@ bool Pet::resetTalents()
 
     if (!m_loading)
         player->PetSpellInitialize();
+
     return true;
 }
 
@@ -1872,15 +1878,16 @@ void Pet::InitTalentForLevel()
 { 
     uint8 level = getLevel();
     uint32 talentPointsForLevel = GetMaxTalentPointsForLevel(level);
+    
+    Unit* owner = GetOwner();
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+    
     // Reset talents in case low level (on level down) or wrong points for level (hunter can unlearn TP increase talent)
     if (talentPointsForLevel == 0 || m_usedTalentCount > talentPointsForLevel)
         resetTalents(); // Remove all talent points
 
     SetFreeTalentPoints(talentPointsForLevel - m_usedTalentCount);
-
-    Unit* owner = GetOwner();
-    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
-        return;
 
     if (!m_loading)
         owner->ToPlayer()->SendTalentsInfoData(true);
@@ -1889,9 +1896,13 @@ void Pet::InitTalentForLevel()
 uint8 Pet::GetMaxTalentPointsForLevel(uint8 level)
 { 
     uint8 points = (level >= 20) ? ((level - 16) / 4) : 0;
+
     // Mod points from owner SPELL_AURA_MOD_PET_TALENT_POINTS
     if (Unit* owner = GetOwner())
         points+=owner->GetTotalAuraModifier(SPELL_AURA_MOD_PET_TALENT_POINTS);
+
+    sScriptMgr->OnCalculateMaxTalentPointsForLevel(this, level, points);
+
     return points;
 }
 

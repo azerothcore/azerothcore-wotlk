@@ -4165,14 +4165,19 @@ Aura* Unit::GetOwnedAura(uint32 spellId, uint64 casterGUID, uint64 itemCasterGUI
 void Unit::RemoveAura(AuraApplicationMap::iterator &i, AuraRemoveMode mode)
 {
     AuraApplication * aurApp = i->second;
+
     // Do not remove aura which is already being removed
     if (aurApp->GetRemoveMode())
         return;
+
     Aura* aura = aurApp->GetBase();
     _UnapplyAura(i, mode);
+
     // Remove aura - for Area and Target auras
     if (aura->GetOwner() == this)
         aura->Remove(mode);
+
+    sScriptMgr->OnAuraRemove(this, aurApp, mode);
 }
 
 void Unit::RemoveAura(uint32 spellId, uint64 caster, uint8 reqEffMask, AuraRemoveMode removeMode)
@@ -9270,6 +9275,12 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
             }
         }
     }
+
+    ReputationRank repRank = REP_HATED;
+
+    if (!sScriptMgr->IfNormalReaction(this, target, repRank))
+        return ReputationRank(repRank);
+    
     // do checks dependant only on our faction
     return GetFactionReactionTo(GetFactionTemplateEntry(), target);
 }
@@ -10351,22 +10362,25 @@ float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, Da
     float DoneTotalMod = 1.0f;
 
     AuraEffectList const& mModDamagePercentDone = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-    for (AuraEffectList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
+    for (auto const& auraEff : mModDamagePercentDone)
     {
-        if (spellProto->EquippedItemClass == -1 && (*i)->GetSpellInfo()->EquippedItemClass != -1 && (*i)->GetMiscValue() == SPELL_SCHOOL_MASK_NORMAL)    //prevent apply mods from weapon specific case to non weapon specific spells (Example: thunder clap and two-handed weapon specialization)
+        if (spellProto->EquippedItemClass == -1 && auraEff->GetSpellInfo()->EquippedItemClass != -1 && auraEff->GetMiscValue() == SPELL_SCHOOL_MASK_NORMAL)    //prevent apply mods from weapon specific case to non weapon specific spells (Example: thunder clap and two-handed weapon specialization)
             continue;
 
-        if (!spellProto->ValidateAttribute6SpellDamageMods(this, *i, damagetype == DOT))
+        if (!spellProto->ValidateAttribute6SpellDamageMods(this, auraEff, damagetype == DOT))
             continue;
 
-        if ((*i)->GetMiscValue() & spellProto->GetSchoolMask())
+        if (!sScriptMgr->IsNeedModSpellDamagePercent(this, auraEff, DoneTotalMod, spellProto))
+            continue;
+
+        if (auraEff->GetMiscValue() & spellProto->GetSchoolMask())
         {
-            if ((*i)->GetSpellInfo()->EquippedItemClass == -1)
-                AddPct(DoneTotalMod, (*i)->GetAmount());
-            else if (!(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_SPECIAL_ITEM_CLASS_CHECK) && ((*i)->GetSpellInfo()->EquippedItemSubClassMask == 0))
-                AddPct(DoneTotalMod, (*i)->GetAmount());
-            else if (ToPlayer() && ToPlayer()->HasItemFitToSpellRequirements((*i)->GetSpellInfo()))
-                AddPct(DoneTotalMod, (*i)->GetAmount());
+            if (auraEff->GetSpellInfo()->EquippedItemClass == -1)
+                AddPct(DoneTotalMod, auraEff->GetAmount());
+            else if (!auraEff->GetSpellInfo()->HasAttribute(SPELL_ATTR5_SPECIAL_ITEM_CLASS_CHECK) && (auraEff->GetSpellInfo()->EquippedItemSubClassMask == 0))
+                AddPct(DoneTotalMod, auraEff->GetAmount());
+            else if (ToPlayer() && ToPlayer()->HasItemFitToSpellRequirements(auraEff->GetSpellInfo()))
+                AddPct(DoneTotalMod, auraEff->GetAmount());
         }
     }
 
@@ -11351,8 +11365,13 @@ float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, D
 
     // Healing done percent
     AuraEffectList const& mHealingDonePct = GetAuraEffectsByType(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
-    for (AuraEffectList::const_iterator i = mHealingDonePct.begin(); i != mHealingDonePct.end(); ++i)
-        AddPct(DoneTotalMod, (*i)->GetAmount());
+    for (auto const& auraEff : mHealingDonePct)
+    {
+        if (!sScriptMgr->IsNeedModHealPercent(this, auraEff, DoneTotalMod, spellProto))
+            continue;
+        
+        AddPct(DoneTotalMod, auraEff->GetAmount());
+    }
 
     // done scripted mod (take it from owner)
     Unit* owner = GetOwner() ? GetOwner() : this;
@@ -11962,19 +11981,22 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
     if (spellProto)
     {
         AuraEffectList const& mModDamagePercentDone = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        for (AuraEffectList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
+        for (auto const& auraEff : mModDamagePercentDone)
         {
-            if (!spellProto->ValidateAttribute6SpellDamageMods(this, *i, false))
+            if (!spellProto->ValidateAttribute6SpellDamageMods(this, auraEff, false))
                 continue;
 
-            if (((*i)->GetMiscValue() & spellProto->GetSchoolMask()) && !((*i)->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL))
+            if (!sScriptMgr->IsNeedModMeleeDamagePercent(this, auraEff, DoneTotalMod, spellProto))
+                continue;
+
+            if ((auraEff->GetMiscValue() & spellProto->GetSchoolMask()) && !(auraEff->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL))
             {
-                if ((*i)->GetSpellInfo()->EquippedItemClass == -1)
-                    AddPct(DoneTotalMod, (*i)->GetAmount());
-                else if (!(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_SPECIAL_ITEM_CLASS_CHECK) && ((*i)->GetSpellInfo()->EquippedItemSubClassMask == 0))
-                    AddPct(DoneTotalMod, (*i)->GetAmount());
-                else if (ToPlayer() && ToPlayer()->HasItemFitToSpellRequirements((*i)->GetSpellInfo()))
-                    AddPct(DoneTotalMod, (*i)->GetAmount());
+                if (auraEff->GetSpellInfo()->EquippedItemClass == -1)
+                    AddPct(DoneTotalMod, auraEff->GetAmount());
+                else if (!auraEff->GetSpellInfo()->HasAttribute(SPELL_ATTR5_SPECIAL_ITEM_CLASS_CHECK) && (auraEff->GetSpellInfo()->EquippedItemSubClassMask == 0))
+                    AddPct(DoneTotalMod, auraEff->GetAmount());
+                else if (ToPlayer() && ToPlayer()->HasItemFitToSpellRequirements(auraEff->GetSpellInfo()))
+                    AddPct(DoneTotalMod, auraEff->GetAmount());
             }
         }
     }
@@ -17658,6 +17680,9 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
         // xinef: ZOMG!, to comment, bellow line should be removed
         // pussywizard: goign to other phase (valithria, algalon) should not remove such auras
         //RemoveNotOwnSingleTargetAuras(newPhaseMask, true);            // we can lost access to caster or target
+        
+        if (!sScriptMgr->CanSetPhaseMask(this, newPhaseMask, update))
+            return;
 
         // modify hostile references for new phasemask, some special cases deal with hostile references themselves
         if (GetTypeId() == TYPEID_UNIT || (!ToPlayer()->IsGameMaster() && !ToPlayer()->GetSession()->PlayerLogout()))
@@ -19491,7 +19516,8 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                         fieldBuffer << (uint32)target->getFaction();
                 }
                 else
-                    fieldBuffer << m_uint32Values[index];
+                    if (!sScriptMgr->IsCustomBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
+                        fieldBuffer << m_uint32Values[index];
             }
             else
                 // send in current format (float as float, uint32 as uint32)

@@ -22,6 +22,8 @@
 #include "GameObjectAI.h"
 #include "SpellAuraEffects.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -344,6 +346,8 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     uint8  castCount, castFlags;
     recvPacket >> castCount >> spellId >> castFlags;
 
+    uint32 oldSpellId = spellId;
+
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: got cast spell packet, castCount: %u, spellId: %u, castFlags: %u, data length = %u", castCount, spellId, castFlags, (uint32)recvPacket.size());
 #endif
@@ -405,6 +409,11 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         }
     }
 
+    sScriptMgr->ValidateSpellAtCastSpell(_player, oldSpellId, spellId, castCount, castFlags);
+
+    if (oldSpellId != spellId)
+        spellInfo = sSpellMgr->GetSpellInfo(spellId);
+
     // Client is resending autoshot cast opcode when other spell is casted during shoot rotation
     // Skip it to prevent "interrupt" message
     if (spellInfo->IsAutoRepeatRangedSpell() && _player->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL)
@@ -444,7 +453,10 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     }
 
     Spell* spell = new Spell(mover, spellInfo, TRIGGERED_NONE, 0, false);
-    spell->m_cast_count = castCount;                       // set count of casts
+
+    sScriptMgr->ValidateSpellAtCastSpellResult(_player, mover, spell, oldSpellId, spellId);
+
+    spell->m_cast_count = castCount; // set count of casts
     spell->prepare(&targets);
 }
 

@@ -1021,6 +1021,8 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket & recvData)
 
     // reputation discount
     float discountMod = _player->GetReputationPriceDiscount(unit);
+    
+    sScriptMgr->OnBeforePlayerDurabilityRepair(_player, npcGUID, itemGUID, discountMod, guildBank);
 
     if (itemGUID)
     {
