@@ -27,6 +27,17 @@ enum Huhuran
     SPELL_ACIDSPIT              = 26050
 };
 
+enum Events
+{
+    EVENT_FRENZY        = 1,
+    EVENT_WYVERN        = 2,
+    EVENT_SPIT          = 3,
+    EVENT_POISONBOLT    = 4,
+    EVENT_NOXIOUSPOISON = 5,
+    EVENT_FRENZYBACK    = 6,
+    EVENT_BERSERK       = 7
+};
+
 class boss_huhuran : public CreatureScript
 {
 public:
@@ -39,91 +50,97 @@ public:
 
     struct boss_huhuranAI : public ScriptedAI
     {
-        boss_huhuranAI(Creature* creature) : ScriptedAI(creature) { }
-
-        uint32 Frenzy_Timer;
-        uint32 Wyvern_Timer;
-        uint32 Spit_Timer;
-        uint32 PoisonBolt_Timer;
-        uint32 NoxiousPoison_Timer;
-        uint32 FrenzyBack_Timer;
-
-        bool Frenzy;
-        bool Berserk;
-
-        void Reset()
+        boss_huhuranAI(Creature* creature) : ScriptedAI(creature)
         {
-            Frenzy_Timer = urand(25000, 35000);
-            Wyvern_Timer = urand(18000, 28000);
-            Spit_Timer = 8000;
-            PoisonBolt_Timer = 4000;
-            NoxiousPoison_Timer = urand(10000, 20000);
-            FrenzyBack_Timer = 15000;
+            Frenzy = false;
+            Berserk = false;
+        }
+
+        void JustDied(Unit* /*killer*/) override { events.Reset(); }
+
+        void Reset() override
+        {
+            events.Reset();
 
             Frenzy = false;
             Berserk = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
+            events.ScheduleEvent(EVENT_FRENZY, urand(25000, 35000));
+            events.ScheduleEvent(EVENT_WYVERN, urand(18000, 28000));
+            events.ScheduleEvent(EVENT_SPIT, 8000);
+            events.ScheduleEvent(EVENT_POISONBOLT, 4000);
+            events.ScheduleEvent(EVENT_NOXIOUSPOISON, urand(10000, 20000));
+            events.ScheduleEvent(EVENT_FRENZYBACK, 15000);
+            events.ScheduleEvent(EVENT_BERSERK, 2000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
                 return;
 
-            //Frenzy_Timer
-            if (!Frenzy && Frenzy_Timer <= diff)
-            {
-                DoCast(me, SPELL_FRENZY);
-                Talk(EMOTE_FRENZY_KILL);
-                Frenzy = true;
-                PoisonBolt_Timer = 3000;
-                Frenzy_Timer = urand(25000, 35000);
-            } else Frenzy_Timer -= diff;
+            events.Update(diff);
 
-            // Wyvern Timer
-            if (Wyvern_Timer <= diff)
+            while (uint32 eventid = events.ExecuteEvent())
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_WYVERNSTING);
-                Wyvern_Timer = urand(15000, 32000);
-            } else Wyvern_Timer -= diff;
-
-            //Spit Timer
-            if (Spit_Timer <= diff)
-            {
-                DoCastVictim(SPELL_ACIDSPIT);
-                Spit_Timer = urand(5000, 10000);
-            } else Spit_Timer -= diff;
-
-            //NoxiousPoison_Timer
-            if (NoxiousPoison_Timer <= diff)
-            {
-                DoCastVictim(SPELL_NOXIOUSPOISON);
-                NoxiousPoison_Timer = urand(12000, 24000);
-            } else NoxiousPoison_Timer -= diff;
-
-            //PoisonBolt only if frenzy or berserk
-            if (Frenzy || Berserk)
-            {
-                if (PoisonBolt_Timer <= diff)
+                switch (eventid)
                 {
-                    DoCastVictim(SPELL_POISONBOLT);
-                    PoisonBolt_Timer = 3000;
-                } else PoisonBolt_Timer -= diff;
+                case EVENT_FRENZY:
+                    if (!Frenzy)
+                    {
+                        DoCast(me, SPELL_FRENZY);
+                        Talk(EMOTE_FRENZY_KILL);
+                        Frenzy = true;
+
+                        events.CancelEvent(EVENT_POISONBOLT);
+                        events.ScheduleEvent(EVENT_POISONBOLT, 3000);
+                    }
+                    events.RepeatEvent(urand(25000, 35000));
+                    break;
+                case EVENT_WYVERN:
+                    if (Unit* pUnit = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        DoCast(pUnit, SPELL_WYVERNSTING);
+                    events.RepeatEvent(urand(15000, 32000));
+                    break;
+                case EVENT_SPIT:
+                    DoCastVictim(SPELL_ACIDSPIT);
+                    events.RepeatEvent(urand(5000, 10000));
+                    break;
+                case EVENT_NOXIOUSPOISON:
+                    DoCastVictim(SPELL_NOXIOUSPOISON);
+                    events.RepeatEvent(urand(12000, 24000));
+                    break;
+                case EVENT_POISONBOLT:
+                    if (Frenzy || Berserk)
+                    {
+                        DoCastVictim(SPELL_POISONBOLT);
+                        events.RepeatEvent(3000);
+                    }
+                    break;
+                case EVENT_FRENZYBACK:
+                    if (Frenzy)
+                    {
+                        me->InterruptNonMeleeSpells(false);
+                        Frenzy = false;
+                        events.RepeatEvent(15000);
+                    }
+                    break;
+                case EVENT_BERSERK:
+                    if (!Berserk && HealthBelowPct(31))
+                    {
+                        me->InterruptNonMeleeSpells(false);
+                        Talk(EMOTE_BERSERK);
+                        DoCast(me, SPELL_BERSERK);
+                        Berserk = true;
+                    }
+                    events.RepeatEvent(2000);
+                    break;
+                }
             }
-
-            //FrenzyBack_Timer
-            if (Frenzy && FrenzyBack_Timer <= diff)
-            {
-                me->InterruptNonMeleeSpells(false);
-                Frenzy = false;
-                FrenzyBack_Timer = 15000;
-            } else FrenzyBack_Timer -= diff;
-
             if (!Berserk && HealthBelowPct(31))
             {
                 me->InterruptNonMeleeSpells(false);
@@ -134,6 +151,11 @@ public:
 
             DoMeleeAttackIfReady();
         }
+    private:
+        EventMap events;
+        bool Frenzy;
+        bool Berserk;
+
     };
 
 };
