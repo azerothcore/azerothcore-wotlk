@@ -68,14 +68,14 @@ public:
 
             switch (rand()%2)
             {
-                case 0: RandX - Rand; break;
+                case 0: RandX -= Rand; break;
                 case 1: RandX = Rand; break;
             }
 
             Rand = 10 + (rand()%10);
             switch (rand()%2)
             {
-                case 0: RandY - Rand; break;
+                case 0: RandY -= Rand; break;
                 case 1: RandY = Rand; break;
             }
 
