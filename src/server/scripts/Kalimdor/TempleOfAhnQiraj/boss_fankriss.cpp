@@ -29,6 +29,14 @@ enum Spells
     SPELL_ENRAGE            = 28798
 };
 
+enum Events
+{
+    EVENT_MORTALWOUND       = 1,
+    EVENT_SUMMON_HATCHLINGS = 2,
+    EVENT_SUMMON_SPAWN      = 3
+};
+
+//TODO: Voice lines haven't been implemented
 class boss_fankriss : public CreatureScript
 {
 public:
@@ -41,23 +49,12 @@ public:
 
     struct boss_fankrissAI : public ScriptedAI
     {
-        boss_fankrissAI(Creature* creature) : ScriptedAI(creature) { }
-
-        uint32 MortalWound_Timer;
-        uint32 SpawnHatchlings_Timer;
-        uint32 SpawnSpawns_Timer;
-        int Rand;
-        float RandX;
-        float RandY;
-
-        Creature* Hatchling;
-        Creature* Spawn;
+        boss_fankrissAI(Creature* creature) : ScriptedAI(creature), summoned(me) { }
 
         void Reset()
         {
-            MortalWound_Timer = urand(10000, 15000);
-            SpawnHatchlings_Timer = urand(6000, 12000);
-            SpawnSpawns_Timer = urand(15000, 45000);
+            events.Reset();
+            summoned.DespawnAll();
         }
 
         void SummonSpawn(Unit* victim)
@@ -65,131 +62,108 @@ public:
             if (!victim)
                 return;
 
-            Rand = 10 + (rand()%10);
+            int Rand = 10 + (rand()%10);
+            int RandX = 0.0f;
+            int RandY = 0.0f;
+
             switch (rand()%2)
             {
-                case 0: RandX = 0.0f - Rand; break;
-                case 1: RandX = 0.0f + Rand; break;
+                case 0: RandX - Rand; break;
+                case 1: RandX = Rand; break;
             }
 
             Rand = 10 + (rand()%10);
             switch (rand()%2)
             {
-                case 0: RandY = 0.0f - Rand; break;
-                case 1: RandY = 0.0f + Rand; break;
+                case 0: RandY - Rand; break;
+                case 1: RandY = Rand; break;
             }
-            Rand = 0;
-            Spawn = DoSpawnCreature(15630, RandX, RandY, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-            if (Spawn)
-                Spawn->AI()->AttackStart(victim);
+
+            if (Creature* pCreature = me->SummonCreature(15630, RandX, RandY, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+            {
+                pCreature->AI()->AttackStart(victim);
+                summoned.Summon(pCreature);
+            }
         }
 
         void EnterCombat(Unit* /*who*/)
         {
+            events.ScheduleEvent(EVENT_MORTALWOUND, urand(10000, 15000));
+            events.ScheduleEvent(EVENT_SUMMON_HATCHLINGS, urand(6000, 12000));
+            events.ScheduleEvent(EVENT_SUMMON_SPAWN, urand(15000, 45000));
         }
 
         void UpdateAI(uint32 diff)
         {
-            //Return since we have no target
             if (!UpdateVictim())
                 return;
 
-            //MortalWound_Timer
-            if (MortalWound_Timer <= diff)
+            while (uint32 eventid = events.ExecuteEvent())
             {
-                DoCastVictim(SPELL_MORTAL_WOUND);
-                MortalWound_Timer = urand(10000, 20000);
-            } else MortalWound_Timer -= diff;
-
-            //Summon 1-3 Spawns of Fankriss at random time.
-            if (SpawnSpawns_Timer <= diff)
-            {
-                switch (urand(0, 2))
+                switch (eventid)
                 {
-                    case 0:
+                case EVENT_MORTALWOUND:
+                    DoCastVictim(SPELL_MORTAL_WOUND);
+                    events.RepeatEvent(urand(10000, 20000));
+                    break;
+                case EVENT_SUMMON_SPAWN:
+                    for (int i = 0; i <= urand(0, 2); i++)
                         SummonSpawn(SelectTarget(SELECT_TARGET_RANDOM, 0));
-                        break;
-                    case 1:
-                        SummonSpawn(SelectTarget(SELECT_TARGET_RANDOM, 0));
-                        SummonSpawn(SelectTarget(SELECT_TARGET_RANDOM, 0));
-                        break;
-                    case 2:
-                        SummonSpawn(SelectTarget(SELECT_TARGET_RANDOM, 0));
-                        SummonSpawn(SelectTarget(SELECT_TARGET_RANDOM, 0));
-                        SummonSpawn(SelectTarget(SELECT_TARGET_RANDOM, 0));
-                        break;
-                }
-                SpawnSpawns_Timer = urand(30000, 60000);
-            } else SpawnSpawns_Timer -= diff;
-
-            // Teleporting Random Target to one of the three tunnels and spawn 4 hatchlings near the gamer.
-            //We will only telport if fankriss has more than 3% of hp so teleported gamers can always loot.
-            if (HealthAbovePct(3))
-            {
-                if (SpawnHatchlings_Timer <= diff)
+                    events.RepeatEvent(urand(30000, 60000));
+                    break;
+                case EVENT_SUMMON_HATCHLINGS:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* pUnit = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     {
-                        DoCast(target, SPELL_ROOT);
+                        DoCast(pUnit, SPELL_ROOT);
 
-                        if (DoGetThreat(target))
-                            DoModifyThreatPercent(target, -100);
+                        if (DoGetThreat(pUnit))
+                            DoModifyThreatPercent(pUnit, -100);
 
                         switch (urand(0, 2))
                         {
-                            case 0:
-                                DoTeleportPlayer(target, -8106.0142f, 1289.2900f, -74.419533f, 5.112f);
-                                Hatchling = me->SummonCreature(15962, target->GetPositionX()-3, target->GetPositionY()-3, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                                if (Hatchling)
-                                    Hatchling->AI()->AttackStart(target);
-                                Hatchling = me->SummonCreature(15962, target->GetPositionX()-3, target->GetPositionY()+3, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                                if (Hatchling)
-                                    Hatchling->AI()->AttackStart(target);
-                                Hatchling = me->SummonCreature(15962, target->GetPositionX()-5, target->GetPositionY()-5, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                                if (Hatchling)
-                                    Hatchling->AI()->AttackStart(target);
-                                Hatchling = me->SummonCreature(15962, target->GetPositionX()-5, target->GetPositionY()+5, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                                if (Hatchling)
-                                    Hatchling->AI()->AttackStart(target);
-                                break;
-                            case 1:
-                                DoTeleportPlayer(target, -7990.135354f, 1155.1907f, -78.849319f, 2.608f);
-                                Hatchling = me->SummonCreature(15962, target->GetPositionX()-3, target->GetPositionY()-3, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                                if (Hatchling)
-                                    Hatchling->AI()->AttackStart(target);
-                                Hatchling = me->SummonCreature(15962, target->GetPositionX()-3, target->GetPositionY()+3, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                                if (Hatchling)
-                                    Hatchling->AI()->AttackStart(target);
-                                Hatchling = me->SummonCreature(15962, target->GetPositionX()-5, target->GetPositionY()-5, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                                if (Hatchling)
-                                    Hatchling->AI()->AttackStart(target);
-                                Hatchling = me->SummonCreature(15962, target->GetPositionX()-5, target->GetPositionY()+5, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                                if (Hatchling)
-                                    Hatchling->AI()->AttackStart(target);
-                                break;
-                            case 2:
-                                DoTeleportPlayer(target, -8159.7753f, 1127.9064f, -76.868660f, 0.675f);
-                                Hatchling = me->SummonCreature(15962, target->GetPositionX()-3, target->GetPositionY()-3, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                                if (Hatchling)
-                                    Hatchling->AI()->AttackStart(target);
-                                Hatchling = me->SummonCreature(15962, target->GetPositionX()-3, target->GetPositionY()+3, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                                if (Hatchling)
-                                    Hatchling->AI()->AttackStart(target);
-                                Hatchling = me->SummonCreature(15962, target->GetPositionX()-5, target->GetPositionY()-5, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                                if (Hatchling)
-                                    Hatchling->AI()->AttackStart(target);
-                                Hatchling = me->SummonCreature(15962, target->GetPositionX()-5, target->GetPositionY()+5, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                                if (Hatchling)
-                                    Hatchling->AI()->AttackStart(target);
-                                break;
+                        case 0:
+                            DoTeleportPlayer(pUnit, -8106.0142f, 1289.2900f, -74.419533f, 5.112f);
+                            break;
+                        case 1:
+                            DoTeleportPlayer(pUnit, -7990.135354f, 1155.1907f, -78.849319f, 2.608f);
+                            break;
+                        case 2:
+                            DoTeleportPlayer(pUnit, -8159.7753f, 1127.9064f, -76.868660f, 0.675f);
                         }
+                        if (Creature* pCreature = me->SummonCreature(15962, pUnit->GetPositionX() - 3, pUnit->GetPositionY() - 3, pUnit->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
+                        {
+                            summoned.Summon(pCreature);
+                            pCreature->AI()->AttackStart(pUnit);
+                        }
+                        if (Creature* pCreature = me->SummonCreature(15962, pUnit->GetPositionX() - 3, pUnit->GetPositionY() + 3, pUnit->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
+                        {
+                            summoned.Summon(pCreature);
+                            pCreature->AI()->AttackStart(pUnit);
+                        }
+                        if (Creature* pCreature = me->SummonCreature(15962, pUnit->GetPositionX() - 5, pUnit->GetPositionY() - 5, pUnit->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
+                        {
+                            summoned.Summon(pCreature);
+                            pCreature->AI()->AttackStart(pUnit);
+                        }
+                        if (Creature* pCreature = me->SummonCreature(15962, pUnit->GetPositionX() - 5, pUnit->GetPositionY() + 5, pUnit->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
+                        {
+                            summoned.Summon(pCreature);
+                            pCreature->AI()->AttackStart(pUnit);
+                        }
+                        break;
                     }
-                    SpawnHatchlings_Timer = urand(45000, 60000);
-                } else SpawnHatchlings_Timer -= diff;
+                    events.RepeatEvent(urand(45000, 60000));
+                    break;
+                }
+                }
             }
 
             DoMeleeAttackIfReady();
         }
+        private:
+            EventMap events;
+            SummonList summoned;
     };
 
 };
