@@ -79,7 +79,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            //Return since we have no target
             if (!UpdateVictim())
                 return;
 

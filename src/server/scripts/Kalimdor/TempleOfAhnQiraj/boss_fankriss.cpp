@@ -7,19 +7,12 @@
 /* ScriptData
 SDName: Boss_Fankriss
 SD%Complete: 100
-SDComment: sound not implemented
+SDComment: None
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-
-//TODO: Find what these link to in the database? Surely there's a text line as well...
-#define SOUND_SENTENCE_YOU 8588
-#define SOUND_SERVE_TO     8589
-#define SOUND_LAWS         8590
-#define SOUND_TRESPASS     8591
-#define SOUND_WILL_BE      8592
 
 enum Spells
 {
@@ -37,7 +30,6 @@ enum Events
     EVENT_SUMMON_SPAWN      = 3
 };
 
-//TODO: Voice lines haven't been implemented
 class boss_fankriss : public CreatureScript
 {
 public:
@@ -56,13 +48,13 @@ public:
 
         void Reset() override { events.Reset(); summoned.DespawnAll(); }
 
-        //TODO: Possibly rework this method? I hate it :(
+        //TODO: Possibly rework this method? I hate it and it's messy :(
         void SummonSpawn(Unit* victim)
         {
             if (!victim)
                 return;
 
-            int Rand = 10 + (rand()%10);
+            int Rand = 10 + (rand()%10)*2;
             int RandX = 0.0f;
             int RandY = 0.0f;
 
@@ -70,13 +62,6 @@ public:
             {
                 case 0: RandX -= Rand; break;
                 case 1: RandX = Rand; break;
-            }
-
-            Rand = 10 + (rand()%10);
-            switch (rand()%2)
-            {
-                case 0: RandY -= Rand; break;
-                case 1: RandY = Rand; break;
             }
 
             if (Creature* pCreature = me->SummonCreature(15630, RandX, RandY, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))

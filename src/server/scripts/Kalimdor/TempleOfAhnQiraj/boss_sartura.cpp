@@ -24,7 +24,7 @@ enum Sartura
     SPELL_ENRAGE        = 28747,            //Not sure if right ID.
     SPELL_ENRAGEHARD    = 28798,
 
-//Guard Spell
+    //Guard Spell
     SPELL_WHIRLWINDADD  = 26038,
     SPELL_KNOCKBACK     = 26027
 };
