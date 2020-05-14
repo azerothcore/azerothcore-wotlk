@@ -78,13 +78,9 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
         uint32 indexValue = fields[_sqlIndexPos].GetUInt32();
         char* dataValue = indexTable[indexValue];
 
-        if (!dataValue)
-        {
-            newIndexes[newRecords] = indexValue;
-            dataValue = &dataTable[newRecords++ * _recordSize];
-        }
-        else
-            continue;
+        // If exist in DBC file override from DB
+        newIndexes[newRecords] = indexValue;
+        dataValue = &dataTable[newRecords++ * _recordSize];
 
         uint32 dataOffset = 0;
         uint32 sqlColumnNumber = 0;

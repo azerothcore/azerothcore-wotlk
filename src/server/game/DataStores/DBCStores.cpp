@@ -206,12 +206,6 @@ inline void LoadDBC(uint32& availableDbcLocales, StoreProblemList& errors, DBCSt
     std::string dbcFilename = dbcPath + filename;
     bool existDBData = false;
 
-    if (dbTable)
-        storage.LoadFromDB(dbTable, storage.GetFormat());
-
-    if (storage.GetNumRows())
-        existDBData = true;
-
     if (storage.Load(dbcFilename.c_str()))
     {
         for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
@@ -228,7 +222,14 @@ inline void LoadDBC(uint32& availableDbcLocales, StoreProblemList& errors, DBCSt
                 availableDbcLocales &= ~(1 << i);             // mark as not available for speedup next checks
         }
     }
-    else if (!existDBData)
+
+    if (dbTable)
+        storage.LoadFromDB(dbTable, storage.GetFormat());
+
+    if (storage.GetNumRows())
+        existDBData = true;
+
+    if (!existDBData)
     {
         // sort problematic dbc to (1) non compatible and (2) non-existed
         if (FILE* f = fopen(dbcFilename.c_str(), "rb"))
@@ -395,12 +396,9 @@ void LoadDBCStores(const std::string& dataPath)
         if (entry->bracketId > MAX_BATTLEGROUND_BRACKETS)
             ASSERT(false && "Need update MAX_BATTLEGROUND_BRACKETS by DBC data");
     
-    for (uint32 i = 1; i < sSpellStore.GetNumRows(); ++i)
-    {
-        SpellEntry const* spell = sSpellStore.LookupEntry(i);
-        if (spell && spell->Category)
-            sSpellsByCategoryStore[spell->Category].insert(i);
-    }
+    for (auto i : sSpellStore)
+        if (i->Category)
+            sSpellsByCategoryStore[i->Category].insert(i->Id);
 
     for (SkillLineAbilityEntry const* skillLine : sSkillLineAbilityStore)
     {
@@ -424,21 +422,17 @@ void LoadDBCStores(const std::string& dataPath)
     }
 
     // Create Spelldifficulty searcher
-    for (uint32 i = 0; i < sSpellDifficultyStore.GetNumRows(); ++i)
+    for (SpellDifficultyEntry const* spellDiff : sSpellDifficultyStore)
     {
-        SpellDifficultyEntry const* spellDiff = sSpellDifficultyStore.LookupEntry(i);
-        if (!spellDiff)
-            continue;
-
         SpellDifficultyEntry newEntry;
 
-        memset(newEntry.SpellID, 0, 4*sizeof(uint32));
+        memset(newEntry.SpellID, 0, 4 * sizeof(uint32));
 
-        for (int x = 0; x < MAX_DIFFICULTY; ++x)
+        for (uint8 x = 0; x < MAX_DIFFICULTY; ++x)
         {
             if (spellDiff->SpellID[x] <= 0 || !sSpellStore.LookupEntry(spellDiff->SpellID[x]))
             {
-                if (spellDiff->SpellID[x] > 0) // don't show error if spell is <= 0, not all modes have spells and there are unknown negative values
+                if (spellDiff->SpellID[x] > 0) //don't show error if spell is <= 0, not all modes have spells and there are unknown negative values
                     sLog->outErrorDb("spelldifficulty_dbc: spell %i at field id: %u at spellid %i does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->SpellID[x], spellDiff->ID, x);
 
                 newEntry.SpellID[x] = 0; // spell was <= 0 or invalid, set to 0
@@ -447,10 +441,10 @@ void LoadDBCStores(const std::string& dataPath)
                 newEntry.SpellID[x] = spellDiff->SpellID[x];
         }
 
-        if (newEntry.SpellID[0] <= 0 || newEntry.SpellID[1] <= 0)//id0-1 must be always set!
+        if (newEntry.SpellID[0] <= 0 || newEntry.SpellID[1] <= 0) // id0-1 must be always set!
             continue;
 
-        for (int x = 0; x < MAX_DIFFICULTY; ++x)
+        for (uint8 x = 0; x < MAX_DIFFICULTY; ++x)
             if (newEntry.SpellID[x])
                 sSpellMgr->SetSpellDifficultyId(uint32(newEntry.SpellID[x]), spellDiff->ID);
     }
