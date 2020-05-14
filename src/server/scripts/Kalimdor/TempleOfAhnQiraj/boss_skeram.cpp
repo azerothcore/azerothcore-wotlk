@@ -122,6 +122,7 @@ class boss_skeram : public CreatureScript
                 events.ScheduleEvent(EVENT_FULLFILMENT, 15000);
                 events.ScheduleEvent(EVENT_BLINK, urand(30000, 45000));
                 events.ScheduleEvent(EVENT_EARTH_SHOCK, 2000);
+                events.ScheduleEvent(EVENT_CHECK, 2000);
 
                 Talk(SAY_AGGRO);
             }
@@ -167,6 +168,7 @@ class boss_skeram : public CreatureScript
 
                             if (me->IsWithinMeleeRange(me->GetVictim()))
                                 events.RescheduleEvent(EVENT_EARTH_SHOCK, 2000);
+                            events.RepeatEvent(2000);
                             break;
                     }
                 }
