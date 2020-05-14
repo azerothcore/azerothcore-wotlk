@@ -70,6 +70,7 @@ public:
         {
             Whirlwind = false;
             Enraged = false;
+            AggroReset = false;
         }
 
         void Reset()
@@ -78,7 +79,7 @@ public:
 
             Whirlwind = false;
             Enraged = false;
-
+            AggroReset = false;
         }
 
         void EnterCombat(Unit* /*who*/)
