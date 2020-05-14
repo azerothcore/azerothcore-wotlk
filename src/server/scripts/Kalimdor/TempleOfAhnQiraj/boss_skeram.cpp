@@ -44,9 +44,8 @@ class boss_skeram : public CreatureScript
 
         struct boss_skeramAI : public BossAI
         {
-            boss_skeramAI(Creature* creature) : BossAI(creature, DATA_SKERAM), Flag()
+            boss_skeramAI(Creature* creature) : BossAI(creature, DATA_SKERAM), Flag(0)
             {
-                Flag = 0;
                 HealthPercent = 0.0f;
             }
 
