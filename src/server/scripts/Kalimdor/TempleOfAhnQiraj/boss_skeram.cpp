@@ -31,7 +31,8 @@ enum Events
     EVENT_ARCANE_EXPLOSION      = 1,
     EVENT_FULLFILMENT           = 2,
     EVENT_BLINK                 = 3,
-    EVENT_EARTH_SHOCK           = 4
+    EVENT_EARTH_SHOCK           = 4,
+    EVENT_CHECK                 = 5
 };
 
 uint32 const BlinkSpells[3] = { 4801, 8195, 20449 };
@@ -43,12 +44,18 @@ class boss_skeram : public CreatureScript
 
         struct boss_skeramAI : public BossAI
         {
-            boss_skeramAI(Creature* creature) : BossAI(creature, DATA_SKERAM) { }
+            boss_skeramAI(Creature* creature) : BossAI(creature, DATA_SKERAM)
+            {
+                Flag = 0;
+                HealthPercent = 0.0f;
+            }
 
             void Reset()
             {
-                _flag = 0;
-                _hpct = 75.0f;
+                events.Reset();
+
+                Flag = 0;
+                HealthPercent = 75.0f;
                 me->SetVisible(true);
             }
 
@@ -60,7 +67,7 @@ class boss_skeram : public CreatureScript
             void EnterEvadeMode()
             {
                 ScriptedAI::EnterEvadeMode();
-                if (me->IsSummon())
+                if (me->IsSummon() == true)
                     ((TempSummon*)me)->UnSummon();
             }
 
@@ -68,22 +75,22 @@ class boss_skeram : public CreatureScript
             {
                 // Shift the boss and images (Get it? *Shift*?)
                 uint8 rand = 0;
-                if (_flag != 0)
+                if (Flag != 0)
                 {
-                    while (_flag & (1 << rand))
+                    while (Flag & (1 << rand))
                         rand = urand(0, 2);
                     DoCast(me, BlinkSpells[rand]);
-                    _flag |= (1 << rand);
-                    _flag |= (1 << 7);
+                    Flag |= (1 << rand);
+                    Flag |= (1 << 7);
                 }
 
-                while (_flag & (1 << rand))
+                while (Flag & (1 << rand))
                     rand = urand(0, 2);
                 creature->CastSpell(creature, BlinkSpells[rand]);
-                _flag |= (1 << rand);
+                Flag |= (1 << rand);
 
-                if (_flag & (1 << 7))
-                    _flag = 0;
+                if (Flag & (1 << 7))
+                    Flag = 0;
 
                 if (Unit* Target = SelectTarget(SELECT_TARGET_RANDOM))
                     creature->AI()->AttackStart(Target);
@@ -111,9 +118,6 @@ class boss_skeram : public CreatureScript
 
             void EnterCombat(Unit* /*who*/)
             {
-                _EnterCombat();
-                events.Reset();
-
                 events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, urand(6000, 12000));
                 events.ScheduleEvent(EVENT_FULLFILMENT, 15000);
                 events.ScheduleEvent(EVENT_BLINK, urand(30000, 45000));
@@ -138,9 +142,7 @@ class boss_skeram : public CreatureScript
                             events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, urand(8000, 18000));
                             break;
                         case EVENT_FULLFILMENT:
-                            /// @todo For some weird reason boss does not cast this
-                            // Spell actually works, tested in duel
-                            DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true), SPELL_TRUE_FULFILLMENT, true);
+                            DoCastVictim(SPELL_TRUE_FULFILLMENT);
                             events.ScheduleEvent(EVENT_FULLFILMENT, urand(20000, 30000));
                             break;
                         case EVENT_BLINK:
@@ -153,28 +155,28 @@ class boss_skeram : public CreatureScript
                             DoCastVictim(SPELL_EARTH_SHOCK);
                             events.ScheduleEvent(EVENT_EARTH_SHOCK, 2000);
                             break;
+                        case EVENT_CHECK:
+                            if (!me->IsSummon() && me->GetHealthPct() < HealthPercent)
+                            {
+                                DoCast(me, SPELL_SUMMON_IMAGES);
+                                Talk(SAY_SPLIT);
+                                HealthPercent -= 25.0f;
+                                me->SetVisible(false);
+                                events.RescheduleEvent(EVENT_BLINK, 2000);
+                            }
+
+                            if (me->IsWithinMeleeRange(me->GetVictim()))
+                                events.RescheduleEvent(EVENT_EARTH_SHOCK, 2000);
+                            break;
                     }
                 }
 
-                if (!me->IsSummon() && me->GetHealthPct() < _hpct)
-                {
-                    DoCast(me, SPELL_SUMMON_IMAGES);
-                    Talk(SAY_SPLIT);
-                    _hpct -= 25.0f;
-                    me->SetVisible(false);
-                    events.RescheduleEvent(EVENT_BLINK, 2000);
-                }
-
-                if (me->IsWithinMeleeRange(me->GetVictim()))
-                {
-                    events.RescheduleEvent(EVENT_EARTH_SHOCK, 2000);
-                    DoMeleeAttackIfReady();
-                }
+                DoMeleeAttackIfReady();
             }
 
         private:
-            float _hpct;
-            uint8 _flag;
+            float HealthPercent;
+            uint8 Flag;
         };
 
     CreatureAI* GetAI(Creature* creature) const
