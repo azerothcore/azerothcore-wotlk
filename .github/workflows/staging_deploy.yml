@@ -20,5 +20,5 @@ jobs:
         proxy_port : ${{ secrets.STAGING_PORT }}
         proxy_key : ${{ secrets.STAGING_KEY }}
         script: |
-          apt install git
+          apt-get install -y git
           git clone "https://github.com/azerothcore/azerothcore-wotlk" -b staging 2> /dev/null || (cd "azerothcore-wotlk" ; git pull)
