@@ -13,6 +13,7 @@ jobs:
     - name: deploy azerothcore staging server
       uses: appleboy/ssh-action@master
       with:
+        username: ${{ secrets.STAGING_USERNAME }}
         host: ${{ secrets.STAGING_HOST }}
         key: ${{ secrets.STAGING_KEY }}
         port: ${{ secrets.STAGING_PORT }}
