@@ -2,7 +2,7 @@ name: remote ssh command
 on:
   push:
     branches: 
-      - staging
+      - staging-1
   pull_request:
 jobs:
 
@@ -17,6 +17,7 @@ jobs:
         key: ${{ secrets.STAGING_KEY }}
         port: ${{ secrets.STAGING_PORT }}
         proxy_port : ${{ secrets.STAGING_PORT }}
+        proxy_key : ${{ secrets.STAGING_KEY }}
         script: |
           apt install git
           git clone "https://github.com/azerothcore/azerothcore-wotlk" -b staging 2> /dev/null || (cd "azerothcore-wotlk" ; git pull)
