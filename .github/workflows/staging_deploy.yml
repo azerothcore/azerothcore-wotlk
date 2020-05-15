@@ -1,0 +1,21 @@
+name: remote ssh command
+on:
+  push:
+    branches: 
+      - staging
+  pull_request:
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: deploy azerothcore staging server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        key: ${{ secrets.STAGING_KEY }}
+        port: ${{ secrets.STAGING_PORT }}
+        script: |
+          apt install git
+          git clone "https://github.com/azerothcore/azerothcore-wotlk" -b staging 2> /dev/null || (cd "azerothcore-wotlk" ; git pull)
