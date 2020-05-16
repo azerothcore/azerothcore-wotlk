@@ -33,6 +33,8 @@ DBCStorageBase::~DBCStorageBase()
 
 bool DBCStorageBase::Load(char const* path, char**& indexTable)
 {
+    indexTable = nullptr;
+
     DBCFileLoader dbc;
     
     // Check if load was sucessful, only then continue
