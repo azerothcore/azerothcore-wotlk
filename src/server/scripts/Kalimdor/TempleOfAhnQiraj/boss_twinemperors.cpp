@@ -111,6 +111,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             pBoss->SetHealth(0);
             pBoss->setDeathState(JUST_DIED);
             pBoss->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            CAST_AI(boss_twinemperorsAI, pBoss->AI())->DontYellWhenDead = true;
         }
 
         if (DontYellWhenDead == false)
