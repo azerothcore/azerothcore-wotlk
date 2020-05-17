@@ -66,7 +66,8 @@ enum Events
     EVENT_ENRAGE = 99,
     EVENT_SCARABS = 100,
     EVENT_TELEPORT = 101,
-    EVENT_TELEPORT_AFTER = 102
+    EVENT_TELEPORT_AFTER = 102,
+    EVENT_HEAL = 103
 };
 
 struct boss_twinemperorsAI : public ScriptedAI
@@ -88,7 +89,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         AfterTeleport = false;
     }
 
-    void DamageTaken(Unit* /*pUnit*/, uint32 &damage, DamageEffectType /*dType*/, SpellSchoolMask /*sMask*/)
+    void DamageTaken(Unit* /*pUnit*/, uint32 &damage, DamageEffectType /*dType*/, SpellSchoolMask /*sMask*/) override
     {
         if (Unit* pBoss = GetOtherBoss())
         {
@@ -104,8 +105,10 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* /*pUnit*/)
+    void JustDied(Unit* /*pUnit*/) override
     {
+        events.Reset();
+
         if (Creature* pBoss = GetOtherBoss())
         {
             pBoss->SetHealth(0);
@@ -123,7 +126,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         DoPlaySoundToSet(me, IAmVeklor() ? SOUND_VL_KILL : SOUND_VN_KILL);
     }
 
-    void EnterCombat(Unit* pUnit)
+    void _EnterCombat(Unit* pUnit)
     {
         DoZoneInCombat();
 
@@ -137,7 +140,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 }
     }
 
-    void SpellHit(Unit* pUnit, const SpellInfo* sEntry)
+    void SpellHit(Unit* pUnit, const SpellInfo* sEntry) override
     {
         if (pUnit == me)
             return;
@@ -174,7 +177,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             return;
 
         if (Unit* pBoss = GetOtherBoss())
-            if (pBoss->IsWithinDist(me, 60))
+            if (pBoss->IsWithinDist(pBoss, 60))
             {
                 DoCast(pBoss, SPELL_HEAL_BROTHER);
             }
@@ -281,23 +284,22 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*pUnit*/)
+        void EnterCombat(Unit* pUnit) override
         {
+            _EnterCombat(pUnit);
+
             events.ScheduleEvent(EVENT_VEKNILASH_UPPERCUT, urand(14000, 29000));
             events.ScheduleEvent(EVENT_VEKNILASH_UNBALANCINGSTRIKE, urand(8000, 18000));
             events.ScheduleEvent(EVENT_SCARABS, urand(7000, 14000));
             events.ScheduleEvent(EVENT_TELEPORT, 30000);
             events.ScheduleEvent(EVENT_ENRAGE, 3600000);
+            events.ScheduleEvent(EVENT_HEAL, 1000);
         }
-
-        void JustDied(Unit* /*pUnit*/) { events.Reset(); }
 
         void UpdateAI(uint32 diff)
         {
             if (UpdateVictim() == false)
                 return;
-
-            HealBrotherIfCan();
 
             events.Update(diff);
 
@@ -305,6 +307,10 @@ public:
             {
                 switch (eventid)
                 {
+                case EVENT_HEAL:
+                    HealBrotherIfCan();
+                    events.RepeatEvent(1000);
+                    break;
                 case EVENT_VEKNILASH_UPPERCUT:
                     if (Unit* pUnit = SelectTarget(SELECT_TARGET_RANDOM, 0, NOMINAL_MELEE_RANGE, true))
                         DoCast(pUnit, SPELL_UPPERCUT);
@@ -376,11 +382,15 @@ public:
             events.Reset();
         }
 
-        void JustDied(Unit* /*pUnit*/) { events.Reset(); }
-
-        void EnterCombat(Unit* /*pUnit*/)
+        void EnterCombat(Unit* pUnit) override
         {
+            _EnterCombat(pUnit);
 
+            events.ScheduleEvent(EVENT_VEKLOR_SHADOWBOLT, IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_VEKLOR_BLIZZARD, urand(15000, 20000));
+            events.ScheduleEvent(EVENT_VEKLOR_ARCANEBURST, 1000);
+            events.ScheduleEvent(EVENT_SCARABS, urand(7000, 14000));
+            events.ScheduleEvent(EVENT_HEAL, 1000);
         }
 
         void UpdateAI(uint32 diff)
@@ -388,14 +398,16 @@ public:
             if (UpdateVictim() == false)
                 return;
 
-            HealBrotherIfCan();
-
             events.Update(diff);
 
             while (uint32 eventid = events.ExecuteEvent())
             {
                 switch (eventid)
                 {
+                case EVENT_HEAL:
+                    HealBrotherIfCan();
+                    events.RepeatEvent(1000);
+                    break;
                 case EVENT_VEKLOR_SHADOWBOLT:
                     if (me->IsWithinDist(me->GetVictim(), 45.0) == false)
                         me->GetMotionMaster()->MoveChase(me->GetVictim(), VEKLOR_DIST, 0);
