@@ -299,6 +299,8 @@ public:
 
             HealBrotherIfCan();
 
+            events.Update(diff);
+
             while (uint32 eventid = events.ExecuteEvent())
             {
                 switch (eventid)
@@ -387,6 +389,8 @@ public:
                 return;
 
             HealBrotherIfCan();
+
+            events.Update(diff);
 
             while (uint32 eventid = events.ExecuteEvent())
             {
