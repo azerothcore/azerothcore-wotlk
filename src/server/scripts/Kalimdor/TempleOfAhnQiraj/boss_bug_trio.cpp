@@ -87,7 +87,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
+            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2) // Prevents the player from looting the boss until all 3 are dead.
                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 
             instance->SetData(DATA_BUG_TRIO_DEATH, 1);
@@ -172,7 +172,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             instance->SetData(DATA_VEM_DEATH, 0);
-            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
+            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2) // Prevents the player from looting the boss until all 3 are dead.
                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             instance->SetData(DATA_BUG_TRIO_DEATH, 1);
         }
@@ -259,7 +259,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
+            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2) // Prevents the player from looting the boss until all 3 are dead.
                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             instance->SetData(DATA_BUG_TRIO_DEATH, 1);
 
