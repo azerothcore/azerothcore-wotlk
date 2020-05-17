@@ -7,3 +7,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-39745, 0, 0, 0, 14, 0, 100, 0, 1000, 40, 4000, 6000, 0, 11, 11642, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Priest - Friendly Missing Health - Cast Heal'),
 (-39745, 0, 1, 0, 0, 0, 100, 0, 0, 3000, 3000, 5000, 0, 11, 9613, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Priest - In Combat - Cast Shadow Bolt'),
 (-39745, 0, 2, 0, 1, 0, 100, 0, 5000, 5000, 5000, 5000, 0, 19, 256, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Priest - Out of Combat - Remove Unit Flags');
+UPDATE `conditions` SET `SourceEntry` = -39745 WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 5269;
