@@ -1,3 +1,19 @@
+-- DB update 2020_05_16_00 -> 2020_05_17_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_05_16_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_05_16_00 2020_05_17_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1586784089061059200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1586784089061059200');
 
 DELETE FROM `gameobject_template` WHERE `entry` = 30;
@@ -9,3 +25,12 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (5271, 30, 571, 0, 0, 1, 1, 5926.17, 689.462, 644.254, 5.85726, -0, -0, -0.211358, 0.977409, 300, 0, 1, '', 0),
 (5272, 30, 571, 0, 0, 1, 1, 5912.04, 683.537, 645.332, 0.842481, -0, -0, -0.408893, -0.912582, 300, 0, 1, '', 0),
 (5273, 30, 571, 0, 0, 1, 1, 5904.01, 672.677, 645.549, 3.96365, -0, -0, -0.916711, 0.39955, 300, 0, 1, '', 0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
