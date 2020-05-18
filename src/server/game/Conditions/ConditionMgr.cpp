@@ -1613,9 +1613,9 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         return false;
     }
     switch (cond->ConditionType) {
-        case CONDITION_TERRAIN_SWAP:
-        case CONDITION_DIFFICULTY_ID:
-            sLog->outErrorDb("SourceEntry %u in `condition` table has a ConditionType that is not supported on 3.3.5a (%u), ignoring.",
+        case CONDITION_PLACEHOLDER_41:
+        case CONDITION_PLACEHOLDER_49:
+            sLog->outErrorDb("SourceEntry %u in `condition` table has a ConditionType that is a placeholder (%u), skipped.",
                              cond->SourceEntry, uint32(cond->ConditionType));
             return false;
         case CONDITION_STAND_STATE:

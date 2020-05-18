@@ -61,7 +61,7 @@ enum ConditionTypes
     CONDITION_HP_PCT                = 38,                   // hpPct            ComparisonType 0                  true if unit's hp matches given pct
     CONDITION_REALM_ACHIEVEMENT     = 39,                   // achievement_id   0              0                  true if realm achievement is complete
     CONDITION_IN_WATER              = 40,                   // 0                0              0                  true if unit in water
-    CONDITION_TERRAIN_SWAP          = 41,                   // don't use on 3.3.5a
+    CONDITION_PLACEHOLDER_41        = 41,                   // placeholder
     CONDITION_STAND_STATE           = 42,                   // TODO: NOT SUPPORTED YET
     CONDITION_DAILY_QUEST_DONE      = 43,                   // TODO: NOT SUPPORTED YET
     CONDITION_CHARMED               = 44,                   // TODO: NOT SUPPORTED YET
@@ -69,7 +69,7 @@ enum ConditionTypes
     CONDITION_TAXI                  = 46,                   // TODO: NOT SUPPORTED YET
     CONDITION_QUESTSTATE            = 47,                   // TODO: NOT SUPPORTED YET
     CONDITION_QUEST_OBJECTIVE_PROGRESS = 48,                // quest_id         objectiveIndex objectiveCount     true if player has reached the specified objectiveCount quest progress for the objectiveIndex for the specified quest
-    CONDITION_DIFFICULTY_ID            = 49,                // don't use on 3.3.5a
+    CONDITION_PLACEHOLDER_49           = 49,                // placeholder
     CONDITION_TC_END                   = 50,                // placeholder
 
     CONDITION_AC_START                 = 100,
