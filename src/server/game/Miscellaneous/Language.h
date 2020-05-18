@@ -1317,6 +1317,9 @@ enum AcoreStrings
     LANG_DEBUG_OPCODE_FILE_MISSING                = 30080,
 
     LANG_BG_SHARE_QUEST_ERROR                     = 30081,
-    LANG_BG_READY_CHECK_ERROR                     = 30082
+    LANG_BG_READY_CHECK_ERROR                     = 30082,
+
+    LANG_REMOVEITEM_FAILURE                       = 30083,
+    LANG_REMOVEITEM_ERROR                         = 30084
 };
 #endif

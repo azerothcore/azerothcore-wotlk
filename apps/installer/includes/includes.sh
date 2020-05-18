@@ -8,12 +8,12 @@ AC_PATH_INSTALLER="$AC_PATH_APPS/installer"
 
 
 J_VER_REQ="v0.8.3"
-J_PATH="$AC_PATH_APPS/drassil/joiner"
+J_PATH="$AC_PATH_APPS/joiner"
 J_PATH_MODULES="$AC_PATH_MODULES"
 
 #install/update and include joiner
 if [ ! -d "$J_PATH/.git" ]; then
-    git clone https://github.com/drassil/joiner "$J_PATH"  -b master
+    git clone https://github.com/azerothcore/joiner "$J_PATH"  -b master
     git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" reset --hard "$J_VER_REQ"
 else
     # legacy code, with new rev of joiner the update process is internally handled
@@ -24,7 +24,7 @@ else
         git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" reset --hard "$J_VER_REQ"
     fi
 fi
-source "$AC_PATH_APPS/drassil/joiner/joiner.sh"
+source "$J_PATH/joiner.sh"
 
 if [ -f "$AC_PATH_INSTALLER/config.sh"  ]; then
     source "$AC_PATH_INSTALLER/config.sh" # should overwrite previous
