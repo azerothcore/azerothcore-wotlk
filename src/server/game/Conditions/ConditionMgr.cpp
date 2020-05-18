@@ -1265,11 +1265,12 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
 
     switch (cond->SourceType)
     {
-        case CONDITION_SOURCE_TYPE_TERRAIN_SWAP:
-        case CONDITION_SOURCE_TYPE_PHASE:
-        case CONDITION_SOURCE_TYPE_GRAVEYARD:
+        case CONDITION_SOURCE_TYPE_UNUSED_20:
+        case CONDITION_SOURCE_TYPE_UNUSED_25:
+        case CONDITION_SOURCE_TYPE_UNUSED_26:
+        case CONDITION_SOURCE_TYPE_UNUSED_27:
         {
-            sLog->outErrorDb("ConditionSourceType %u in `condition` table is not supported on 3.3.5a, ignoring.", uint32(cond->SourceType));
+            sLog->outErrorDb("ConditionSourceType = (%u) in `condition` is not in use. SourceEntry = (%u), skipped", uint32(cond->SourceType), cond->SourceEntry);
             return false;
         }
         case CONDITION_SOURCE_TYPE_CREATURE_LOOT_TEMPLATE:
@@ -1559,9 +1560,6 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
                 return false;
             }
             break;
-        case CONDITION_SOURCE_TYPE_UNUSED_20:
-            sLog->outErrorDb("CONDITION_SOURCE_TYPE_UNUSED_20 is not in use. SourceEntry = (%u), skipped", cond->SourceEntry);
-            break;
         case CONDITION_SOURCE_TYPE_VEHICLE_SPELL:
         case CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT:
             if (!sObjectMgr->GetCreatureTemplate(cond->SourceGroup))
@@ -1613,9 +1611,9 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         return false;
     }
     switch (cond->ConditionType) {
-        case CONDITION_PLACEHOLDER_41:
-        case CONDITION_PLACEHOLDER_49:
-            sLog->outErrorDb("SourceEntry %u in `condition` table has a ConditionType that is a placeholder (%u), skipped.",
+        case CONDITION_UNUSED_41:
+        case CONDITION_UNUSED_49:
+            sLog->outErrorDb("SourceEntry %u in `condition` table has a ConditionType that is a unused (%u), skipped.",
                              cond->SourceEntry, uint32(cond->ConditionType));
             return false;
         case CONDITION_STAND_STATE:
