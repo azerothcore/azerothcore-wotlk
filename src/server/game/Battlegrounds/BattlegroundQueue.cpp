@@ -961,7 +961,7 @@ bool BattlegroundQueue::IsAllQueuesEmpty(BattlegroundBracketId bracket_id)
 
 void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
 {
-    if (!sScriptMgr->CanSendMessageQueue(this, leader, bg, bracketEntry))
+    if (!sScriptMgr->CanSendMessageBGQueue(this, leader, bg, bracketEntry))
         return;
 
     BattlegroundBracketId bracketId = bracketEntry->GetBracketId();

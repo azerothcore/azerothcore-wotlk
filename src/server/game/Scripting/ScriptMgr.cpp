@@ -1620,16 +1620,6 @@ void ScriptMgr::OnPlayerUpdateFaction(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnUpdateFaction(player);
 }
 
-void ScriptMgr::OnPlayerAddToBattleground(Player* player, Battleground *bg)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnAddToBattleground(player, bg);
-}
-
-void ScriptMgr::OnPlayerRemoveFromBattleground(Player* player, Battleground* bg)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnRemoveFromBattleground(player, bg);
-}
-
 void ScriptMgr::OnAchievementComplete(Player* player, AchievementEntry const* achievement)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAchiComplete(player, achievement);
@@ -2620,12 +2610,12 @@ void ScriptMgr::OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battl
     FOREACH_SCRIPT(BGScript)->OnCheckNormalMatch(queue, Coef, bgTemplate, bracket_id, minPlayers, maxPlayers);
 }
 
-bool ScriptMgr::CanSendMessageQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
+bool ScriptMgr::CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
 {
     bool ret = true;
 
     FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanSendMessageQueue(queue, leader, bg, bracketEntry))
+        if (!itr->second->CanSendMessageBGQueue(queue, leader, bg, bracketEntry))
             ret = false; // we change ret value only when scripts return false
 
     return ret;
