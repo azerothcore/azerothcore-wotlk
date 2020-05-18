@@ -276,14 +276,14 @@ public:
         bool IAmVeklor() { return false; }
         boss_veknilashAI(Creature* creature) : boss_twinemperorsAI(creature) { }
 
-        void Reset() override
+        void Reset()
         {
             DoTwinReset();
 
             events.Reset();
         }
 
-        void EnterCombat(Unit* pUnit) override
+        void EnterCombat(Unit* pUnit)
         {
             _EnterCombat(pUnit);
 
@@ -381,7 +381,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* pUnit) override
+        void EnterCombat(Unit* pUnit)
         {
             _EnterCombat(pUnit);
 
@@ -392,7 +392,7 @@ public:
             events.ScheduleEvent(EVENT_HEAL, 1000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (UpdateVictim() == false)
                 return;
@@ -462,7 +462,7 @@ public:
             pCreature->SetFullHealth();
         }
 
-        void AttackStart(Unit* pUnit) override
+        void AttackStart(Unit* pUnit)
         {
             if (!pUnit)
                 return;
