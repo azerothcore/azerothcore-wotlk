@@ -20,7 +20,7 @@ struct GroupQueueInfo                                       // stores informatio
 {
     std::set<uint64> Players;                               // player guid set
     TeamId  teamId;                                         // Player team (TEAM_ALLIANCE/TEAM_HORDE)
-    TeamId  RealTeamID;                                     // Realm player team (TEAM_ALLIANCE/TEAM_HORDE)
+    TeamId  RealTeamID;                                     // Real player team (TEAM_ALLIANCE/TEAM_HORDE)
     BattlegroundTypeId BgTypeId;                            // battleground type id
     bool    IsRated;                                        // rated
     uint8   ArenaType;                                      // 2v2, 3v3, 5v5 or 0 when BG
@@ -72,7 +72,8 @@ class BattlegroundQueue
         uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const;
         uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
         bool IsAllQueuesEmpty(BattlegroundBracketId bracket_id);
-        void SendMessageQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
+        void SendMessageBGQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
+        void SendMessageArenaQueue(GroupQueueInfo* ginfo, bool IsJoin);
 
         void SetBgTypeIdAndArenaType(BattlegroundTypeId b, uint8 a) { m_bgTypeId = b; m_arenaType = ArenaType(a); } // pussywizard
         void AddEvent(BasicEvent* Event, uint64 e_time);

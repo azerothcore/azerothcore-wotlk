@@ -67,8 +67,6 @@ struct OutdoorPvPData;
 struct GroupQueueInfo;
 struct TargetInfo;
 
-enum ArenaTeamInfoType;
-
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
 
 /*
