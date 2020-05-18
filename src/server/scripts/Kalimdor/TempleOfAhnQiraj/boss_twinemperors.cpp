@@ -104,10 +104,8 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* /*pUnit*/)
+    void _JustDied(Unit* /*pUnit*/)
     {
-        events.Reset();
-
         if (Creature* pBoss = GetOtherBoss())
         {
             pBoss->SetHealth(0);
@@ -283,6 +281,13 @@ public:
             events.Reset();
         }
 
+        void JustDied(Unit* pUnit)
+        {
+            _JustDied(pUnit);
+
+            events.Reset();
+        }
+
         void EnterCombat(Unit* pUnit)
         {
             _EnterCombat(pUnit);
@@ -377,6 +382,13 @@ public:
         void Reset() override
         {
             DoTwinReset();
+
+            events.Reset();
+        }
+
+        void JustDied(Unit* pUnit)
+        {
+            _JustDied(pUnit);
 
             events.Reset();
         }
