@@ -80,7 +80,6 @@ struct boss_twinemperorsAI : public ScriptedAI
     }
 
     virtual bool IAmVeklor() = 0;
-    virtual void Reset() = 0;
 
     void DoTwinReset()
     {
