@@ -105,7 +105,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* /*pUnit*/) override
+    void JustDied(Unit* /*pUnit*/)
     {
         events.Reset();
 
@@ -277,7 +277,7 @@ public:
         bool IAmVeklor() { return false; }
         boss_veknilashAI(Creature* creature) : boss_twinemperorsAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             DoTwinReset();
 
@@ -375,7 +375,7 @@ public:
         bool IAmVeklor() { return true; }
         boss_veklorAI(Creature* creature) : boss_twinemperorsAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             DoTwinReset();
 
@@ -393,7 +393,7 @@ public:
             events.ScheduleEvent(EVENT_HEAL, 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (UpdateVictim() == false)
                 return;
@@ -463,7 +463,7 @@ public:
             pCreature->SetFullHealth();
         }
 
-        void AttackStart(Unit* pUnit)
+        void AttackStart(Unit* pUnit) override
         {
             if (!pUnit)
                 return;
