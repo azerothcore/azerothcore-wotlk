@@ -48,7 +48,6 @@ enum Misc
     PULL_RANGE                    = 50,
     ABUSE_BUG_RANGE               = 20,
     VEKLOR_DIST                   = 20,                      // VL will not come to melee when attacking
-    TELEPORTTIME                  = 30000
 };
 
 enum Events
@@ -81,8 +80,9 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     virtual bool IAmVeklor() = 0;
 
-    void DoTwinReset()
+    void Reset() override
     {
+        events.Reset();
         me->ClearUnitState(UNIT_STATE_STUNNED);
         DontYellWhenDead = false;
         AfterTeleport = false;
@@ -104,7 +104,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
     }
 
-    void _JustDied(Unit* /*pUnit*/)
+    void JustDied(Unit* /*pUnit*/) override
     {
         if (Creature* pBoss = GetOtherBoss())
         {
@@ -118,12 +118,12 @@ struct boss_twinemperorsAI : public ScriptedAI
             DoPlaySoundToSet(me, IAmVeklor() ? SOUND_VL_DEATH : SOUND_VN_DEATH);
     }
 
-    void KilledUnit(Unit* /*pUnit*/)
+    void KilledUnit(Unit* /*pUnit*/) override
     {
         DoPlaySoundToSet(me, IAmVeklor() ? SOUND_VL_KILL : SOUND_VN_KILL);
     }
 
-    void _EnterCombat(Unit* pUnit)
+    void EnterCombat(Unit* pUnit) override
     {
         DoZoneInCombat();
 
@@ -240,7 +240,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         return pCreatureNearby;
     }
 
-    void MoveInLineOfSight(Unit* pUnit)
+    void MoveInLineOfSight(Unit* pUnit) override
     {
         if (!pUnit || me->GetVictim())
             return;
@@ -274,24 +274,8 @@ public:
         bool IAmVeklor() { return false; }
         boss_veknilashAI(Creature* creature) : boss_twinemperorsAI(creature) { }
 
-        void Reset()
-        {
-            DoTwinReset();
-
-            events.Reset();
-        }
-
-        void JustDied(Unit* pUnit)
-        {
-            _JustDied(pUnit);
-
-            events.Reset();
-        }
-
         void EnterCombat(Unit* pUnit)
         {
-            _EnterCombat(pUnit);
-
             events.ScheduleEvent(EVENT_VEKNILASH_UPPERCUT, urand(14000, 29000));
             events.ScheduleEvent(EVENT_VEKNILASH_UNBALANCINGSTRIKE, urand(8000, 18000));
             events.ScheduleEvent(EVENT_SCARABS, urand(7000, 14000));
@@ -379,24 +363,8 @@ public:
         bool IAmVeklor() { return true; }
         boss_veklorAI(Creature* creature) : boss_twinemperorsAI(creature) { }
 
-        void Reset() override
-        {
-            DoTwinReset();
-
-            events.Reset();
-        }
-
-        void JustDied(Unit* pUnit)
-        {
-            _JustDied(pUnit);
-
-            events.Reset();
-        }
-
         void EnterCombat(Unit* pUnit)
         {
-            _EnterCombat(pUnit);
-
             events.ScheduleEvent(EVENT_VEKLOR_SHADOWBOLT, IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_VEKLOR_BLIZZARD, urand(15000, 20000));
             events.ScheduleEvent(EVENT_VEKLOR_ARCANEBURST, 1000);
