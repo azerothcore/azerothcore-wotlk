@@ -361,6 +361,12 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                 condMeets = unit->IsInWater();
             break;
         }
+        case CONDITION_DAILY_QUEST_DONE:
+        {
+            if (Player* player = object->ToPlayer())
+                condMeets = player->IsDailyQuestDone(ConditionValue1);
+            break;
+        }
         case CONDITION_QUEST_OBJECTIVE_PROGRESS:
         {
             if (Player* player = object->ToPlayer())
@@ -552,6 +558,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
             break;
         case CONDITION_IN_WATER:
             mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
+            break;
+        case CONDITION_DAILY_QUEST_DONE:
+            mask |= GRID_MAP_TYPE_MASK_PLAYER;
             break;
         case CONDITION_QUEST_OBJECTIVE_PROGRESS:
             mask |= GRID_MAP_TYPE_MASK_PLAYER;
@@ -1619,7 +1628,6 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
                              cond->SourceEntry, uint32(cond->ConditionType));
             return false;
         case CONDITION_STAND_STATE:
-        case CONDITION_DAILY_QUEST_DONE:
         case CONDITION_CHARMED:
         case CONDITION_PET_TYPE:
         case CONDITION_TAXI:
@@ -1756,6 +1764,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         case CONDITION_QUESTTAKEN:
         case CONDITION_QUEST_NONE:
         case CONDITION_QUEST_COMPLETE:
+        case CONDITION_DAILY_QUEST_DONE:
         case CONDITION_QUEST_SATISFY_EXCLUSIVE:
         {
             if (!sObjectMgr->GetQuestTemplate(cond->ConditionValue1))

@@ -63,7 +63,7 @@ enum ConditionTypes
     CONDITION_IN_WATER              = 40,                   // 0                0              0                  true if unit in water
     CONDITION_TERRAIN_SWAP          = 41,                   // don't use on 3.3.5a
     CONDITION_STAND_STATE           = 42,                   // TODO: NOT SUPPORTED YET
-    CONDITION_DAILY_QUEST_DONE      = 43,                   // TODO: NOT SUPPORTED YET
+    CONDITION_DAILY_QUEST_DONE      = 43,                   // quest id         0              0                  true if daily quest has been completed for the day
     CONDITION_CHARMED               = 44,                   // TODO: NOT SUPPORTED YET
     CONDITION_PET_TYPE              = 45,                   // TODO: NOT SUPPORTED YET
     CONDITION_TAXI                  = 46,                   // TODO: NOT SUPPORTED YET
