@@ -1270,7 +1270,7 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
         case CONDITION_SOURCE_TYPE_UNUSED_26:
         case CONDITION_SOURCE_TYPE_UNUSED_27:
         {
-            sLog->outErrorDb("ConditionSourceType = (%u) in `conditions` is not in use. SourceEntry = (%u), skipped", uint32(cond->SourceType), cond->SourceEntry);
+            sLog->outErrorDb("ConditionSourceType = (%u) in `conditions` is a placeholder. SourceEntry = (%u), skipped", uint32(cond->SourceType), cond->SourceEntry);
             return false;
         }
         case CONDITION_SOURCE_TYPE_CREATURE_LOOT_TEMPLATE:
