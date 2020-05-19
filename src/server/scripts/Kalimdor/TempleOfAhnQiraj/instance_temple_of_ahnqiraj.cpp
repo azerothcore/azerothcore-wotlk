@@ -88,6 +88,7 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                     break;
                 case NPC_YAUJ:
                     YaujGUID = creature->GetGUID();
+                    break;
                 }
             }
 
