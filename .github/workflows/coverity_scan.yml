@@ -36,6 +36,7 @@ jobs:
           mkdir build
           cd build
           cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=1 -DUSE_SCRIPTPCH=1 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=0 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug
+          echo "Using # cpu core:"`nproc`
           cov-build --dir cov-int make -j`nproc` -k
 
       - name: Submit the result to Coverity Scan
