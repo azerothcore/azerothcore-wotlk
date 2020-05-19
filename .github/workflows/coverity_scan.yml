@@ -17,7 +17,7 @@ jobs:
       - name: Install deps
         env:
           CONTINUOUS_INTEGRATION: true
-        run: bash ./acore.sh install-deps
+        run: bash ./acore.sh install-dep
 
       - name: Download Coverity Build Tool
         run: |
@@ -30,6 +30,8 @@ jobs:
 
       - name: Build with cov-build
         run: |
+          export CC=/usr/bin/clang
+          export CXX=/usr/bin/clang++
           export PATH=`pwd`/cov-analysis-linux64/bin:$PATH
           mkdir build
           cd build
