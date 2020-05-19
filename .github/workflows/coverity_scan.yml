@@ -19,6 +19,9 @@ jobs:
           CONTINUOUS_INTEGRATION: true
         run: |
           bash ./acore.sh install-deps
+          sudo apt-get upgrade -y
+          sudo apt-get dist-upgrade -y
+          sudo apt-get autoremove-y
 
       - name: Download Coverity Build Tool
         run: |
@@ -36,9 +39,10 @@ jobs:
           export PATH=`pwd`/cov-analysis-linux64/bin:$PATH
           mkdir build
           cd build
-          cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=1 -DUSE_SCRIPTPCH=1 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=0 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Release
+          cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=1 -DUSE_SCRIPTPCH=1 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=0 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug
           echo "Using # cpu core:"`nproc`
           cov-build --dir cov-int make -j`nproc` -k
+          cat cov-int/build-log.txt
 
       - name: Submit the result to Coverity Scan
         run: |
