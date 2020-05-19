@@ -18,6 +18,7 @@ jobs:
         env:
           CONTINUOUS_INTEGRATION: true
         run: bash ./acore.sh install-dep
+        run: sudo apt-get install libreadline-dev
 
       - name: Download Coverity Build Tool
         run: |
