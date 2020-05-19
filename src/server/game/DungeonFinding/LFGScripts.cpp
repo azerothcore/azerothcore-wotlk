@@ -217,8 +217,7 @@ void LFGGroupScript::OnRemoveMember(Group* group, uint64 guid, RemoveMethod meth
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
     {
         // xinef: fixed dungeon deserter
-        if (method != GROUP_REMOVEMETHOD_KICK_LFG && state != LFG_STATE_FINISHED_DUNGEON && 
-            player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN) && players >= LFG_GROUP_KICK_VOTES_NEEDED)
+        if (method != GROUP_REMOVEMETHOD_KICK_LFG && state != LFG_STATE_FINISHED_DUNGEON && players >= LFG_GROUP_KICK_VOTES_NEEDED)
         {
             player->AddAura(LFG_SPELL_DUNGEON_DESERTER, player);
         }
