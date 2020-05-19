@@ -178,5 +178,5 @@ DB_WORLD_NAME="acore_world"
 #
 ##############################################
 
-COVERITY_TOKEN=""
-COVERITY_EMAIL=""
+# COVERITY_TOKEN=""
+# COVERITY_EMAIL=""
