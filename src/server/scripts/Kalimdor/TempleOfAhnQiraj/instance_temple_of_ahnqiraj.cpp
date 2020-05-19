@@ -36,6 +36,7 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
             uint64 SkeramGUID;
             uint64 VemGUID;
             uint64 KriGUID;
+            uint64 YaujGUID;
             uint64 VeklorGUID;
             uint64 VeknilashGUID;
             uint64 ViscidusGUID;
@@ -54,6 +55,7 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                 VemGUID = 0;
                 KriGUID = 0;
                 VeklorGUID = 0;
+                YaujGUID = 0;
                 VeknilashGUID = 0;
                 ViscidusGUID = 0;
 
@@ -84,6 +86,8 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                 case NPC_VISCIDUS:
                     ViscidusGUID = creature->GetGUID();
                     break;
+                case NPC_YAUJ:
+                    YaujGUID = creature->GetGUID();
                 }
             }
 
@@ -137,6 +141,8 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                     return VeknilashGUID;
                 case DATA_VISCIDUS:
                     return ViscidusGUID;
+                case DATA_YAUJ:
+                    return YaujGUID;
                 }
                 return 0;
             }                                                       // end GetData64

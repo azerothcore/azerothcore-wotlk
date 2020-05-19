@@ -123,7 +123,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         DoPlaySoundToSet(me, IAmVeklor() ? SOUND_VL_KILL : SOUND_VN_KILL);
     }
 
-    void EnterCombat(Unit* pUnit) override
+    void AggroTwin(Unit* pUnit)
     {
         DoZoneInCombat();
 
@@ -274,8 +274,10 @@ public:
         bool IAmVeklor() { return false; }
         boss_veknilashAI(Creature* creature) : boss_twinemperorsAI(creature) { }
 
-        void EnterCombat(Unit* /*pUnit*/)
+        void EnterCombat(Unit* pUnit) override
         {
+            AggroTwin(pUnit);
+
             events.ScheduleEvent(EVENT_VEKNILASH_UPPERCUT, urand(14000, 29000));
             events.ScheduleEvent(EVENT_VEKNILASH_UNBALANCINGSTRIKE, urand(8000, 18000));
             events.ScheduleEvent(EVENT_SCARABS, urand(7000, 14000));
@@ -363,8 +365,10 @@ public:
         bool IAmVeklor() { return true; }
         boss_veklorAI(Creature* creature) : boss_twinemperorsAI(creature) { }
 
-        void EnterCombat(Unit* /*pUnit*/)
+        void EnterCombat(Unit* pUnit) override
         {
+            AggroTwin(pUnit);
+
             events.ScheduleEvent(EVENT_VEKLOR_SHADOWBOLT, IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_VEKLOR_BLIZZARD, urand(15000, 20000));
             events.ScheduleEvent(EVENT_VEKLOR_ARCANEBURST, 1000);

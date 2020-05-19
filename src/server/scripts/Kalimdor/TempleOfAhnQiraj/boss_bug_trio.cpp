@@ -47,6 +47,28 @@ enum Events
     EVENT_YAUJ_CHECK      = 3
 };
 
+struct boss_bug_trioAI : public ScriptedAI
+{
+public:
+    boss_bug_trioAI(Creature* creature) : ScriptedAI(creature) { instance = me->GetInstanceScript(); }
+
+    void AggroTrio(Unit* pUnit)
+    {
+        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VEM)))
+            if (vem->GetGUID() != me->GetGUID())
+                vem->GetAI()->AttackStart(pUnit);
+        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KRI)))
+            if (kri->GetGUID() != me->GetGUID())
+                kri->GetAI()->AttackStart(pUnit);
+        if (Creature* yauj = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_YAUJ)))
+            if (yauj->GetGUID() != me->GetGUID())
+                yauj->GetAI()->AttackStart(pUnit);
+    }
+
+private:
+    InstanceScript* instance;
+};
+
 class boss_kri : public CreatureScript
 {
 public:
@@ -57,9 +79,9 @@ public:
         return GetInstanceAI<boss_kriAI>(creature);
     }
 
-    struct boss_kriAI : public ScriptedAI
+    struct boss_kriAI : public boss_bug_trioAI
     {
-        boss_kriAI(Creature* creature) : ScriptedAI(creature)
+        boss_kriAI(Creature* creature) : boss_bug_trioAI(creature)
         {
             VemDead = false;
             Death = false;
@@ -78,8 +100,10 @@ public:
             Death = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* who) override
         {
+            AggroTrio(who);
+
             events.ScheduleEvent(EVENT_KRI_CLEAVE, urand(4000, 8000));
             events.ScheduleEvent(EVENT_KRI_TOXICVOLLEY, urand(6000, 12000));
             events.ScheduleEvent(EVENT_KRI_CHECK, 2000);
@@ -153,9 +177,9 @@ public:
         return GetInstanceAI<boss_vemAI>(creature);
     }
 
-    struct boss_vemAI : public ScriptedAI
+    struct boss_vemAI : public boss_bug_trioAI
     {
-        boss_vemAI(Creature* creature) : ScriptedAI(creature)
+        boss_vemAI(Creature* creature) : boss_bug_trioAI(creature)
         {
             Enraged = false;
 
@@ -177,8 +201,10 @@ public:
             instance->SetData(DATA_BUG_TRIO_DEATH, 1);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* who) override
         {
+            AggroTrio(who);
+
             events.ScheduleEvent(EVENT_VEM_CHARGE, urand(15000, 27000));
             events.ScheduleEvent(EVENT_VEM_KNOCKBACK, urand(8000, 20000));
             events.ScheduleEvent(EVENT_VEM_ENRAGE, 120000);
@@ -241,9 +267,9 @@ public:
         return GetInstanceAI<boss_yaujAI>(creature);
     }
 
-    struct boss_yaujAI : public ScriptedAI
+    struct boss_yaujAI : public boss_bug_trioAI
     {
-        boss_yaujAI(Creature* creature) : ScriptedAI(creature)
+        boss_yaujAI(Creature* creature) : boss_bug_trioAI(creature)
         {
             VemDead = false;
 
@@ -273,8 +299,10 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* who) override
         {
+            AggroTrio(who);
+
             events.ScheduleEvent(EVENT_YAUJ_HEAL, urand(25000, 40000));
             events.ScheduleEvent(EVENT_YAUJ_FEAR, urand(12000, 24000));
             events.ScheduleEvent(EVENT_YAUJ_CHECK, 2000);

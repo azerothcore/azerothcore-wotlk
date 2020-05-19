@@ -172,8 +172,9 @@ public:
                     break;
                 }
 
-                DoMeleeAttackIfReady();
             }
+
+            DoMeleeAttackIfReady();
         }
         private:
             EventMap events;
