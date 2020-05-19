@@ -1,3 +1,19 @@
+-- DB update 2020_05_18_01 -> 2020_05_19_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_05_18_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_05_18_01 2020_05_19_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1587078801729376000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1587078801729376000');
 
 UPDATE `quest_template_addon` SET `PrevQuestID` = 13225 WHERE `ID` = 13300; -- Slaves to Saronite requires The Skybreaker
@@ -69,3 +85,12 @@ INSERT INTO `quest_template_addon` (`ID`, `NextQuestID`, `ExclusiveGroup`) VALUE
 DELETE FROM `disables` WHERE `sourceType` = 1 AND `entry` = 13381;
 INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `comment`) VALUES
 (1, 13381, 0, "Deprecated Quest: Watts My Target");
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
