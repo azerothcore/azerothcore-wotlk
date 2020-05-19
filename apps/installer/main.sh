@@ -19,6 +19,7 @@ options=(
     "client-data: (gd): download client data from github repository (beta)"   # 11
     "run-worldserver (rw): execute a simple restarter for worldserver" # 12
     "run-authserver (ra): execute a simple restarter for authserver" # 13
+    "tools (t): several tools for developers" # 13
     "quit: Exit from this menu"                     # 14
     )
 
@@ -66,7 +67,10 @@ function _switch() {
         ""|"ra"|"run-authserver"|"13")
             inst_simple_restarter authserver
             ;;
-        ""|"quit"|"14")
+        ""|"t"|"tools"|"14")
+            bash "$AC_PATH_APPS/tools/tools.sh" $_opt
+            ;;
+        ""|"quit"|"15")
             echo "Goodbye!"
             exit
             ;;

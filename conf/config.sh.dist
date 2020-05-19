@@ -170,3 +170,13 @@ DB_AUTH_NAME="acore_auth"
 DB_CHARACTERS_NAME="acore_characters"
 
 DB_WORLD_NAME="acore_world"
+
+
+##############################################
+#
+#  TOOLS
+#
+##############################################
+
+COVERITY_TOKEN=""
+COVERITY_EMAIL=""
