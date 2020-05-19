@@ -1,7 +1,11 @@
 FROM ubuntu:bionic
 
+ENV IS_DOCKER_CONTAINER=1
+
 # install the required dependencies to compile AzerothCore
-RUN apt update && apt install -y git cmake make gcc g++ clang libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev libace-6.* libace-dev
+ADD apps /azerothcore/apps
+ADD acore.sh /azerothcore/acore.sh
+RUN bash ./acore.sh install-deps
 
 # copy the sources from the host machine to the Docker container
 ADD .git /azerothcore/.git

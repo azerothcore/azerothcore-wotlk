@@ -3,7 +3,7 @@ UBUNTU_VERSION=$(lsb_release -sr);
 
 sudo apt-get update
 
-if [[ $CONTINUOUS_INTEGRATION ]]; then
+if [[ $CONTINUOUS_INTEGRATION || $IS_DOCKER_CONTAINER ]]; then
   sudo apt-get -y install build-essential libtool make cmake cmake-data clang openssl libgoogle-perftools-dev \
   libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev mysql-client \
   libncurses5-dev
@@ -21,4 +21,4 @@ else
       ;;
   esac
 fi
-  
+
