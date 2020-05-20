@@ -1005,8 +1005,6 @@ void ArenaTeam::CreateTempArenaTeam(std::vector<Player*> playerList, uint8 type,
     Stats.WeekWins = 0;
     Stats.SeasonWins = 0;
 
-    uint32 MinPlayersPerTeam = sBattlegroundMgr->isArenaTesting() ? 1 : GetReqPlayersForType(type);
-
     for (auto const& _player : playerList)
     {
         ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(_player->GetArenaTeamId(GetSlotByType(type)));
