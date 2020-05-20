@@ -197,7 +197,7 @@ class ArenaTeam
         void FinishWeek();
         void FinishGame(int32 mod, const Map* bgMap);
 
-        void CreateTempArenaTeam(std::vector<Player*> playerList, uint8 type, uint8 team, std::string teamName);
+        void CreateTempArenaTeam(std::vector<Player*> playerList, uint8 type, std::string teamName);
 
         // Containers
         static std::unordered_map<uint32, uint8> ArenaSlotByType; // Slot -> Type
