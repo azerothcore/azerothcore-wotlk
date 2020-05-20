@@ -38,11 +38,13 @@ void LFGPlayerScript::OnLogout(Player* player)
     if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
         return;
 
-    if (!player->GetGroup() || !player->GetGroup()->isLFGGroup())
+    Group* group = player->GetGroup();
+
+    if (!group || !group->isLFGGroup())
     {
         player->GetSession()->SendLfgLfrList(false);
         sLFGMgr->LeaveLfg(player->GetGUID());
-        sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), true, player->GetGroup() ? player->GetGroup()->GetGUID() : 0);
+        sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), true, group ? group->GetGUID() : 0);
 
         // pussywizard: after all necessary actions handle raid browser
         // pussywizard: already done above
@@ -88,10 +90,10 @@ void LFGPlayerScript::OnBindToInstance(Player* player, Difficulty difficulty, ui
 void LFGPlayerScript::OnMapChanged(Player* player)
 {
     Map const* map = player->GetMap();
+    Group* group = player->GetGroup();
 
     if (sLFGMgr->inLfgDungeonMap(player->GetGUID(), map->GetId(), map->GetDifficulty()))
     {
-        Group* group = player->GetGroup();
         // This function is also called when players log in
         // if for some reason the LFG system recognises the player as being in a LFG dungeon,
         // but the player was loaded without a valid group, we'll teleport to homebind to prevent
@@ -120,9 +122,8 @@ void LFGPlayerScript::OnMapChanged(Player* player)
         player->RemoveAurasDueToSpell(LFG_SPELL_LUCK_OF_THE_DRAW);
 
         // Xinef: Destroy group if only one player is left
-        if (Group* group = player->GetGroup())
-            if (group->GetMembersCount() <= 1u)
-                group->Disband();
+        if (group && group->GetMembersCount() <= 1u)
+            group->Disband();
     }
 }
 
@@ -216,7 +217,7 @@ void LFGGroupScript::OnRemoveMember(Group* group, uint64 guid, RemoveMethod meth
 
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
     {
-        // xinef: fixed dungeon deserter
+        // Add deserter if any LFG dungeon not finished
         if (method != GROUP_REMOVEMETHOD_KICK_LFG && state != LFG_STATE_FINISHED_DUNGEON && players >= LFG_GROUP_KICK_VOTES_NEEDED)
         {
             player->AddAura(LFG_SPELL_DUNGEON_DESERTER, player);
