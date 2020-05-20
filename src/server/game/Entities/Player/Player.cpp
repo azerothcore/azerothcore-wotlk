@@ -22127,9 +22127,10 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         }
     }
 
-    Item* it = bStore ?
-        StoreNewItem(vDest, item, true) :
-        EquipNewItem(uiDest, item, true);
+    sScriptMgr->OnBeforeStoreOrEquipNewItem(this, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore);
+
+    Item* it = bStore ? StoreNewItem(vDest, item, true) : EquipNewItem(uiDest, item, true);
+    
     if (it)
     {
         uint32 new_count = pVendor->UpdateVendorItemCurrentCount(crItem, pProto->BuyCount * count);
@@ -22155,6 +22156,9 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
             AddRefundReference(it->GetGUIDLow());
         }
     }
+
+    sScriptMgr->OnAfterStoreOrEquipNewItem(this, vendorslot, it, count, bag, slot, pProto, pVendor, crItem, bStore);
+
     return true;
 }
 
