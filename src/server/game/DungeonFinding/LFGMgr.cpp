@@ -428,7 +428,7 @@ void LFGMgr::InitializeLockedDungeons(Player* player, uint8 level /* = 0 */)
         }
 
 
-        sScriptMgr->OnInitializeLockedDungeons(player, level, lockData);
+        sScriptMgr->OnInitializeLockedDungeons(player, level, lockData, dungeon);
 
         /* TODO VoA closed if WG is not under team control (LFG_LOCKSTATUS_RAID_LOCKED)
             lockData = LFG_LOCKSTATUS_TOO_LOW_GEAR_SCORE;
