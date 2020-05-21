@@ -979,7 +979,7 @@ uint8 ArenaTeam::GetReqPlayersForType(uint32 type)
     return ArenaReqPlayersForType[type];
 }
 
-void ArenaTeam::CreateTempArenaTeam(std::vector<Player*> playerList, uint8 type, std::string teamName)
+void ArenaTeam::CreateTempArenaTeam(std::vector<Player*> playerList, uint8 type, std::string const& teamName)
 {
     uint32 PlayerCountInTeam = static_cast<uint32>(playerList.size());
     
