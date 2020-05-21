@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1587689314000956500');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1590099720339762700');
 
 UPDATE `creature_template` SET `AIName`='SmartAI', `ScriptName`='' WHERE `entry`=25623;
 
