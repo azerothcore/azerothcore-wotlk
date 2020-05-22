@@ -12991,7 +12991,7 @@ bool Unit::IsAlwaysDetectableFor(WorldObject const* seer) const
 void Unit::SetVisible(bool x)
 {
     if (!x)
-        m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_GAMEMASTER);
+        m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_TrialGM);
     else
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
 

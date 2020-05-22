@@ -30,13 +30,13 @@ public:
         {
             { "add",            SEC_ADMINISTRATOR,   false, &HandleTeleAddCommand,             "" },
             { "del",            SEC_ADMINISTRATOR,   true,  &HandleTeleDelCommand,             "" },
-            { "name",           SEC_GAMEMASTER,      true,  &HandleTeleNameCommand,            "" },
-            { "group",          SEC_GAMEMASTER,      false, &HandleTeleGroupCommand,           "" },
+            { "name",           SEC_Fulltester,      true,  &HandleTeleNameCommand,            "" },
+            { "group",          SEC_DONATOR,         false, &HandleTeleGroupCommand,           "" },
             { "",               SEC_MODERATOR,       false, &HandleTeleCommand,                "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "tele",           SEC_MODERATOR,      false, nullptr,                            "", teleCommandTable }
+            { "tele",           SEC_Fulltester,      false, nullptr,                            "", teleCommandTable }
         };
         return commandTable;
     }

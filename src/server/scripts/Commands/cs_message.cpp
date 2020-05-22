@@ -26,7 +26,7 @@ public:
     {
         static std::vector<ChatCommand> commandTable =
         {
-            { "nameannounce",   SEC_GAMEMASTER,      true,   &HandleNameAnnounceCommand,         "" },
+            { "nameannounce",   SEC_MODERATOR,       true,   &HandleNameAnnounceCommand,         "" },
             { "gmnameannounce", SEC_GAMEMASTER,      true,   &HandleGMNameAnnounceCommand,       "" },
             { "announce",       SEC_GAMEMASTER,      true,   &HandleAnnounceCommand,             "" },
             { "gmannounce",     SEC_GAMEMASTER,      true,   &HandleGMAnnounceCommand,           "" },

@@ -147,11 +147,23 @@ enum TimeConstants
 
 enum AccountTypes
 {
-    SEC_PLAYER         = 0,
-    SEC_MODERATOR      = 1,
-    SEC_GAMEMASTER     = 2,
-    SEC_ADMINISTRATOR  = 3,
-    SEC_CONSOLE        = 4                                  // must be always last in list, accounts must have less security level always also
+    SEC_PLAYER         = 0,	     //Player
+    SEC_Tester         = 1,	     //Tester
+    SEC_Fulltester     = 2,	     //Fulltester
+    SEC_VIP            = 3,      //VIP Player
+    SEC_DONATOR        = 4,      //Donated or helped contribute to something
+    SEC_TrialGM        = 5,      //TrialGM
+    SEC_MODERATOR      = 6,      //moderator
+    SEC_GM             = 7,      //GM
+	SEC_GAMEMASTER     = 8,      //GAMEMASTER
+	SEC_DEVS           = 9,      //Developer
+	SEC_HEADDEVS	   = 10,     //Head Developer
+	SEC_JRADMIN        = 11,     //Junior Administrator
+	SEC_ADMIN          = 12,     //ADMIN
+	SEC_HEADADMIN	   = 13,     //HEAD ADMIN
+	SEC_COOWNER		   = 14,     //Co-owner
+    SEC_ADMINISTRATOR  = 15,     //ADMINISTRATOR
+    SEC_CONSOLE        = 16      // CLI in mangosd window, or Console  // must be always last in list, accounts must have less security level always also
 };
 
 enum LocaleConstant

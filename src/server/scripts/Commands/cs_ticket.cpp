@@ -29,31 +29,31 @@ public:
     {
         static std::vector<ChatCommand> ticketResponseCommandTable =
         {
-            { "append",         SEC_GAMEMASTER,      true,  &HandleGMTicketResponseAppendCommand,    "" },
-            { "appendln",       SEC_GAMEMASTER,      true,  &HandleGMTicketResponseAppendLnCommand,  "" }
+            { "append",         SEC_TrialGM,      true,  &HandleGMTicketResponseAppendCommand,    "" },
+            { "appendln",       SEC_TrialGM,      true,  &HandleGMTicketResponseAppendLnCommand,  "" }
         };
         static std::vector<ChatCommand> ticketCommandTable =
         {
-            { "assign",         SEC_GAMEMASTER,      true,  &HandleGMTicketAssignToCommand,          "" },
-            { "close",          SEC_GAMEMASTER,      true,  &HandleGMTicketCloseByIdCommand,         "" },
-            { "closedlist",     SEC_GAMEMASTER,      true,  &HandleGMTicketListClosedCommand,        "" },
-            { "comment",        SEC_GAMEMASTER,      true,  &HandleGMTicketCommentCommand,           "" },
-            { "complete",       SEC_GAMEMASTER,      true,  &HandleGMTicketCompleteCommand,          "" },
+            { "assign",         SEC_TrialGM,      true,  &HandleGMTicketAssignToCommand,          "" },
+            { "close",          SEC_TrialGM,      true,  &HandleGMTicketCloseByIdCommand,         "" },
+            { "closedlist",     SEC_TrialGM,      true,  &HandleGMTicketListClosedCommand,        "" },
+            { "comment",        SEC_TrialGM,      true,  &HandleGMTicketCommentCommand,           "" },
+            { "complete",       SEC_TrialGM,      true,  &HandleGMTicketCompleteCommand,          "" },
             { "delete",         SEC_ADMINISTRATOR,   true,  &HandleGMTicketDeleteByIdCommand,        "" },
-            { "escalate",       SEC_GAMEMASTER,      true,  &HandleGMTicketEscalateCommand,          "" },
-            { "escalatedlist",  SEC_GAMEMASTER,      true,  &HandleGMTicketListEscalatedCommand,     "" },
-            { "list",           SEC_GAMEMASTER,      true,  &HandleGMTicketListCommand,              "" },
-            { "onlinelist",     SEC_GAMEMASTER,      true,  &HandleGMTicketListOnlineCommand,        "" },
+            { "escalate",       SEC_TrialGM,      true,  &HandleGMTicketEscalateCommand,          "" },
+            { "escalatedlist",  SEC_TrialGM,      true,  &HandleGMTicketListEscalatedCommand,     "" },
+            { "list",           SEC_TrialGM,      true,  &HandleGMTicketListCommand,              "" },
+            { "onlinelist",     SEC_TrialGM,      true,  &HandleGMTicketListOnlineCommand,        "" },
             { "reset",          SEC_CONSOLE,         true,  &HandleGMTicketResetCommand,             "" },
-            { "response",       SEC_GAMEMASTER,      true,  nullptr,                                 "", ticketResponseCommandTable },
+            { "response",       SEC_TrialGM,      true,  nullptr,                                 "", ticketResponseCommandTable },
             { "togglesystem",   SEC_ADMINISTRATOR,   true,  &HandleToggleGMTicketSystem,             "" },
-            { "unassign",       SEC_GAMEMASTER,      true,  &HandleGMTicketUnAssignCommand,          "" },
-            { "viewid",         SEC_GAMEMASTER,      true,  &HandleGMTicketGetByIdCommand,           "" },
-            { "viewname",       SEC_GAMEMASTER,      true,  &HandleGMTicketGetByNameCommand,         "" }
+            { "unassign",       SEC_TrialGM,      true,  &HandleGMTicketUnAssignCommand,          "" },
+            { "viewid",         SEC_TrialGM,      true,  &HandleGMTicketGetByIdCommand,           "" },
+            { "viewname",       SEC_TrialGM,      true,  &HandleGMTicketGetByNameCommand,         "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "ticket",         SEC_GAMEMASTER,      false, nullptr,                                 "", ticketCommandTable }
+            { "ticket",         SEC_TrialGM,      false, nullptr,                                 "", ticketCommandTable }
         };
         return commandTable;
     }
