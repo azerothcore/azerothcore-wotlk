@@ -218,7 +218,7 @@ void LFGGroupScript::OnRemoveMember(Group* group, uint64 guid, RemoveMethod meth
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
     {
         // Add deserter if any LFG dungeon not finished
-        if (method != GROUP_REMOVEMETHOD_KICK_LFG && state != LFG_STATE_FINISHED_DUNGEON && players >= LFG_GROUP_KICK_VOTES_NEEDED)
+        if (method != GROUP_REMOVEMETHOD_KICK_LFG && state != LFG_STATE_FINISHED_DUNGEON && players >= LFG_MIN_REQUIRED_PLAYERS_TO_FINISH_DUNGEON)
         {
             player->AddAura(LFG_SPELL_DUNGEON_DESERTER, player);
         }
