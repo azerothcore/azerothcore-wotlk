@@ -37,7 +37,7 @@ enum LFGMgrEnum
     LFG_SPELL_DUNGEON_COOLDOWN                   = 71328,
     LFG_SPELL_DUNGEON_DESERTER                   = 71041,
     LFG_SPELL_LUCK_OF_THE_DRAW                   = 72221,
-    LFG_GROUP_KICK_VOTES_NEEDED                  = 3
+    LFG_GROUP_KICK_VOTES_NEEDED                  = 3,
     LFG_MIN_REQUIRED_PLAYERS_TO_FINISH_DUNGEON   = 3
 };
 
