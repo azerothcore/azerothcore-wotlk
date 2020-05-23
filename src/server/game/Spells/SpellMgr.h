@@ -691,6 +691,9 @@ class SpellMgr
         // Talent Additional Set
         bool IsAdditionalTalentSpell(uint32 spellId) const;
 
+    private:
+        SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
+
     // Modifiers
     public:
 
