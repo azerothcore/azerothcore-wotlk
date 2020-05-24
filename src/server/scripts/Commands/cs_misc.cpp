@@ -82,7 +82,6 @@ public:
             { "unstuck",            SEC_GAMEMASTER,         true,  &HandleUnstuckCommand,               "" },
             { "linkgrave",          SEC_ADMINISTRATOR,      false, &HandleLinkGraveCommand,             "" },
             { "neargrave",          SEC_GAMEMASTER,         false, &HandleNearGraveCommand,             "" },
-            { "explorecheat",       SEC_ADMINISTRATOR,      false, &HandleExploreCheatCommand,          "" },
             { "showarea",           SEC_GAMEMASTER,         false, &HandleShowAreaCommand,              "" },
             { "hidearea",           SEC_ADMINISTRATOR,      false, &HandleHideAreaCommand,              "" },
             { "additem",            SEC_GAMEMASTER,         false, &HandleAddItemCommand,               "" },
@@ -1324,45 +1323,6 @@ public:
         return true;
     }
 
-    static bool HandleExploreCheatCommand(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        int32 flag = int32(atoi((char*)args));
-
-        Player* playerTarget = handler->getSelectedPlayer();
-        if (!playerTarget)
-        {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (flag != 0)
-        {
-            handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_ALL, handler->GetNameLink(playerTarget).c_str());
-            if (handler->needReportToTarget(playerTarget))
-                ChatHandler(playerTarget->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL, handler->GetNameLink().c_str());
-        }
-        else
-        {
-            handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_NOTHING, handler->GetNameLink(playerTarget).c_str());
-            if (handler->needReportToTarget(playerTarget))
-                ChatHandler(playerTarget->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING, handler->GetNameLink().c_str());
-        }
-
-        for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
-        {
-            if (flag != 0)
-                handler->GetSession()->GetPlayer()->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
-            else
-                handler->GetSession()->GetPlayer()->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0);
-        }
-
-        return true;
-    }
-
     static bool HandleShowAreaCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
@@ -1506,8 +1466,23 @@ public:
         // Subtract
         if (count < 0)
         {
-            playerTarget->DestroyItemCount(itemId, -count, true, false);
-            handler->PSendSysMessage(LANG_REMOVEITEM, itemId, -count, handler->GetNameLink(playerTarget).c_str());
+            if (!playerTarget->HasItemCount(itemId, 0))
+            {
+                // output that player don't have any items to destroy
+                handler->PSendSysMessage(LANG_REMOVEITEM_FAILURE, handler->GetNameLink(playerTarget).c_str(), itemId);
+            }
+            else if (!playerTarget->HasItemCount(itemId, -count))
+            {
+                // output that player don't have as many items that you want to destroy
+                handler->PSendSysMessage(LANG_REMOVEITEM_ERROR, handler->GetNameLink(playerTarget).c_str(), itemId);
+            }
+            else
+            {
+                // output successful amount of destroyed items
+                playerTarget->DestroyItemCount(itemId, -count, true, false);
+                handler->PSendSysMessage(LANG_REMOVEITEM, itemId, -count, handler->GetNameLink(playerTarget).c_str());
+            }
+
             return true;
         }
 
@@ -2210,7 +2185,7 @@ public:
             return false;
 
         char const* muteReason = strtok(nullptr, "\r");
-        std::string muteReasonStr = "No reason";
+        std::string muteReasonStr = handler->GetAcoreString(LANG_NO_REASON);
         if (muteReason != nullptr)
             muteReasonStr = muteReason;
 
@@ -2238,7 +2213,7 @@ public:
         if (handler->GetSession())
             muteBy = handler->GetSession()->GetPlayerName();
         else
-            muteBy = "Console";
+            muteBy = handler->GetAcoreString(LANG_CONSOLE);
 
         if (target)
         {
@@ -2246,6 +2221,11 @@ public:
             int64 muteTime = time(nullptr) + notSpeakTime * MINUTE;
             target->GetSession()->m_muteTime = muteTime;
             stmt->setInt64(0, muteTime);
+            std::string nameLink = handler->playerLink(targetName);
+
+            if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
+                sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+
             ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notSpeakTime, muteBy.c_str(), muteReasonStr.c_str());
         }
         else
@@ -2255,25 +2235,29 @@ public:
             stmt->setInt64(0, muteTime);
         }
 
-        stmt->setString(1, muteReasonStr.c_str());
-        stmt->setString(2, muteBy.c_str());
+        stmt->setString(1, muteReasonStr);
+        stmt->setString(2, muteBy);
         stmt->setUInt32(3, accountId);
         LoginDatabase.Execute(stmt);
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_MUTE);
         stmt->setUInt32(0, accountId);
         stmt->setUInt32(1, notSpeakTime);
-        stmt->setString(2, muteBy.c_str());
-        stmt->setString(3, muteReasonStr.c_str());
+        stmt->setString(2, muteBy);
+        stmt->setString(3, muteReasonStr);
         LoginDatabase.Execute(stmt);
-
         std::string nameLink = handler->playerLink(targetName);
 
-        // pussywizard: notify all online GMs
-        ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
-        HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();
-        for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
-            if (itr->second->GetSession()->GetSecurity())
-                ChatHandler(itr->second->GetSession()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "Console"), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+        if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD) && !target)
+            sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+        else
+        {
+            // pussywizard: notify all online GMs
+            ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+            HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();
+            for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
+                if (itr->second->GetSession()->GetSecurity())
+                    ChatHandler(itr->second->GetSession()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : handler->GetAcoreString(LANG_CONSOLE)), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+        }
 
         return true;
     }

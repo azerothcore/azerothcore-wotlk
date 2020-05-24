@@ -112,6 +112,10 @@ namespace AccountMgr
         stmt->setUInt32(0, accountId);
         trans->Append(stmt);
 
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_MUTEDEL);
+        stmt->setUInt32(0, accountId);
+        trans->Append(stmt);
+
         LoginDatabase.CommitTransaction(trans);
 
         return AOR_OK;
@@ -268,7 +272,7 @@ namespace AccountMgr
 
     bool IsGMAccount(uint32 gmlevel)
     {
-        return gmlevel >= SEC_GAMEMASTER && gmlevel <= SEC_CONSOLE;
+        return gmlevel >= SEC_MODERATOR && gmlevel <= SEC_CONSOLE;
     }
 
     bool IsAdminAccount(uint32 gmlevel)
