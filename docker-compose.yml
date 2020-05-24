@@ -14,8 +14,6 @@ services:
       - ${DB_EXTERNAL_PORT:-3306}:3306
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-password}
-    volumes:
-      - ac-database:/var/lib/mysql
 
   ac-worldserver:
     stdin_open: true
@@ -67,9 +65,6 @@ services:
         target: /azeroth-server/logs
     depends_on:
       - ac-database
-
-volumes:
-  ac-database:
 
 networks:
   ac-network:
