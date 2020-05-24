@@ -4,6 +4,7 @@ services:
 
   ac-database:
     image: azerothcore/database
+    restart: unless-stopped
     build:
       context: .
       dockerfile: ./docker/database/Dockerfile
@@ -22,6 +23,7 @@ services:
     stdin_open: true
     tty: true
     image: azerothcore/worldserver
+    restart: unless-stopped
     build:
       context: ./docker/worldserver
       dockerfile: Dockerfile
@@ -47,6 +49,7 @@ services:
 
   ac-authserver:
     image: azerothcore/authserver
+    restart: unless-stopped
     build:
       context: ./docker/authserver
       dockerfile: Dockerfile
