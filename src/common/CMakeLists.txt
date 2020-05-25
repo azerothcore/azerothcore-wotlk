@@ -31,7 +31,7 @@ endif()
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(common
-  ${PRIVATE_SOURCES} Database/MySQLHacks.h)
+  ${PRIVATE_SOURCES})
 
 CollectIncludeDirectories(
   ${CMAKE_CURRENT_SOURCE_DIR}

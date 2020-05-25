@@ -17,7 +17,6 @@
   #include <winsock2.h>
 #endif
 #include <mysql.h>
-#include "MySQLHacks.h"
 
 class ResultSet
 {
