@@ -18,6 +18,10 @@
 #endif
 #include <mysql.h>
 
+#if MYSQL_VERSION_ID >= 80001
+typedef bool my_bool;
+#endif
+
 class ResultSet
 {
     public:
