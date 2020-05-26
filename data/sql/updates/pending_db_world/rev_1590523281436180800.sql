@@ -1,5 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1590523281436180800');
 
+-- Replace Knight-Lieutenant Moonstrike to T'Maire Sydes
 UPDATE `creature` SET `id` = 40607, `modelid` = 0 WHERE `guid` = 133917;
 DELETE FROM `npc_vendor` WHERE `entry` = 40607;
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
