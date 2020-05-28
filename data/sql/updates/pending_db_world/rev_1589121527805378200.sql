@@ -35,12 +35,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (7430, 0, 0, 0, 0, 0, 100, 0, 1500, 2000, 10000, 11000, 11, 24331, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Frostsaber Cub - In Combat - Cast \'24331\'');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10738;
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 10199);
+DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 10738);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(10199, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 11, 17205, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'High Chief Winterfall - On Respawn - Cast \'17205\''),
-(10199, 0, 1, 0, 0, 0, 100, 0, 1200, 1400, 8600, 8900, 11, 15793, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'High Chief Winterfall - In Combat - Cast \'15793\''),
-(10199, 0, 2, 0, 0, 0, 100, 0, 6500, 7000, 14200, 16800, 11, 12548, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'High Chief Winterfall - In Combat - Cast \'12548\''),
-(10199, 0, 3, 0, 0, 0, 100, 0, 9400, 9900, 24300, 24900, 11, 8364, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'High Chief Winterfall - In Combat - Cast \'8364\'');
+(10738, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 11, 17205, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'High Chief Winterfall - On Respawn - Cast \'17205\''),
+(10738, 0, 1, 0, 0, 0, 100, 0, 1200, 1400, 8600, 8900, 11, 15793, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'High Chief Winterfall - In Combat - Cast \'15793\''),
+(10738, 0, 2, 0, 0, 0, 100, 0, 6500, 7000, 14200, 16800, 11, 12548, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'High Chief Winterfall - In Combat - Cast \'12548\''),
+(10738, 0, 3, 0, 0, 0, 100, 0, 9400, 9900, 24300, 24900, 11, 8364, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'High Chief Winterfall - In Combat - Cast \'8364\'');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 7439;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 7439);
