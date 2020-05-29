@@ -18,7 +18,7 @@
 #endif
 #include <mysql.h>
 
-#if MYSQL_VERSION_ID >= 80001
+#if !defined(MARIADB_VERSION_ID) && MYSQL_VERSION_ID >= 80001
 typedef bool my_bool;
 #endif
 
