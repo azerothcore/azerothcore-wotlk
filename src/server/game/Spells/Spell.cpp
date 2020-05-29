@@ -3009,7 +3009,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             unit->IncrDiminishing(m_diminishGroup);
     }
 
-    if (!m_spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH))
+    if (m_caster != unit && m_caster->IsHostileTo(unit) && !m_spellInfo->IsPositive() && !m_triggeredByAuraSpell && !m_spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH))
         unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
 
     if (aura_effmask)
