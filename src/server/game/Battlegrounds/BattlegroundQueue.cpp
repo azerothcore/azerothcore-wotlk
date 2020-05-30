@@ -381,16 +381,12 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, c
             return;
 
     // ally: at first fill as much as possible
-    auto Ali_itr = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].begin();
-    for (; Ali_itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].end(); ++Ali_itr)
-        if (!(*Ali_itr)->IsInvitedToBGInstanceGUID)
-            m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), aliFree);
+    for (auto & Ali_itr : m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE])
+        m_SelectionPools[TEAM_ALLIANCE].AddGroup(Ali_itr, aliFree);
 
     // horde: at first fill as much as possible
-    auto Horde_itr = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].begin();
-    for (; Horde_itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].end(); ++Horde_itr)
-        if (!(*Horde_itr)->IsInvitedToBGInstanceGUID)
-            m_SelectionPools[TEAM_HORDE].AddGroup((*Horde_itr), hordeFree);
+    for (auto & Horde_itr : m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE])
+        m_SelectionPools[TEAM_HORDE].AddGroup(Horde_itr, hordeFree);
 
     // calculate free space after adding
     int32 aliDiff = aliFree - int32(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount());
