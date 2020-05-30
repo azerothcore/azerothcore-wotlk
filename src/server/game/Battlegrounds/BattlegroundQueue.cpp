@@ -382,14 +382,12 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, c
 
     // ally: at first fill as much as possible
     auto Ali_itr = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].begin();
-    for (; Ali_itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].end(); ++Ali_itr)
-        m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), aliFree);
+    for (; Ali_itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].end() && m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), aliFree); ++Ali_itr);
 
 
     // horde: at first fill as much as possible
     auto Horde_itr = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].begin();
-    for (; Horde_itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].end() &&, hordeFree); ++Horde_itr)
-        m_SelectionPools[TEAM_HORDE].AddGroup((*Horde_itr);
+    for (; Horde_itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].end() && m_SelectionPools[TEAM_HORDE].AddGroup((*Horde_itr), hordeFree); ++Horde_itr);
 
     // calculate free space after adding
     int32 aliDiff = aliFree - int32(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount());
@@ -508,7 +506,7 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int3
             // kick alliance, returns true if kicked more than needed, so then try to fill up
             if (m_SelectionPools[TEAM_ALLIANCE].KickGroup(hordeDiff - aliDiff))
                 for (; Ali_itr != m_QueuedBoth[TEAM_ALLIANCE].end() && m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), aliFree >= hordeDiff ? aliFree - hordeDiff : 0); ++Ali_itr);
-        }            
+        }
         else // if results in more horde players than alliance:
         {
             // no more horde in pool, invite whatever we can from alliance
@@ -940,7 +938,7 @@ uint32 BattlegroundQueue::GetPlayersCountInGroupsQueue(BattlegroundBracketId bra
     for (auto const& itr : m_QueuedGroups[bracketId][bgqueue])
     if (!itr->IsInvitedToBGInstanceGUID)
         playersCount += static_cast<uint32>(itr->Players.size());
-    
+
     return playersCount;
 }
 
