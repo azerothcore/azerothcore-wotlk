@@ -14,7 +14,7 @@ We support these versions of MySQL:
 | ------------- | ------------------ |
 | 5.6           | :white_check_mark: |
 | 5.7           | :white_check_mark: |
-| 8.0           | :x:                |
+| 8.0           | :white_check_mark: |
 
 We support these versions of MariaDB:
 
