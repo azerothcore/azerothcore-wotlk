@@ -30,8 +30,6 @@ jobs:
           restore-keys: |
             ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
             ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules
-            ccache:${{ matrix.compiler }}
-            ccache
       - name: Configure OS
         run: source ./apps/ci/ci-install.sh
         env:
