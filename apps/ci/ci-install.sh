@@ -31,7 +31,7 @@ case $COMPILER in
     ;;
 
   "clang10" )
-    time sudo apt-get install -y clang-7
+    time sudo apt-get install -y clang-10
     echo "CCOMPILERC=\"clang-10\"" >> ./conf/config.sh
     echo "CCOMPILERCXX=\"clang++-10\"" >> ./conf/config.sh
     ;;
