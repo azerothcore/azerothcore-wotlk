@@ -23,7 +23,7 @@ UPDATE `battleground_template` SET `Comment` = 'Alterac Valley (battleground)' W
 UPDATE `battleground_template` SET `Comment` = 'Warsong Gulch (battleground)' WHERE `ID` = '2';
 UPDATE `battleground_template` SET `Comment` = 'Arathi Basin (battleground)' WHERE `ID` = '3';
 UPDATE `battleground_template` SET `Comment` = 'Nagrand Arena / Ring of Trials (arena)' WHERE `ID` = '4';
-UPDATE `battleground_template` SET `Comment` = 'Blades\'s Edge Arena (arena)' WHERE `ID` = '5';
+UPDATE `battleground_template` SET `Comment` = 'Blades''s Edge Arena (arena)' WHERE `ID` = '5';
 UPDATE `battleground_template` SET `Comment` = 'All Arenas (arena)' WHERE `ID` = '6';
 UPDATE `battleground_template` SET `Comment` = 'Eye of The Storm (battleground)' WHERE `ID` = '7';
 UPDATE `battleground_template` SET `Comment` = 'Ruins of Lordaeron (arena)' WHERE `ID` = '8';
