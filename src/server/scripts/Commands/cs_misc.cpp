@@ -480,15 +480,6 @@ public:
             return false;
         }
 
-        SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
-        uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spellId);
-        if (bounds.first != bounds.second || spellDifficultyId)
-        {
-            handler->PSendSysMessage("Aura %u cannot be applied using a command!", spellId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
         Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, target, target);
 
         return true;
