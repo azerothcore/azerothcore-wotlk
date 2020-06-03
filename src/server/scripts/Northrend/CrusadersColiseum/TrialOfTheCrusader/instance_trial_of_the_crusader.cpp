@@ -59,6 +59,40 @@ public:
         uint64 GO_WebDoorGUID;
         uint64 GO_FloorGUID;
 
+        void SpawnAnubArak()
+        {
+            if (InstanceProgress == INSTANCE_PROGRESS_ANUB_ARAK)
+            {
+                if (Creature* barrett = instance->GetCreature(NPC_BarrettGUID))
+                {
+                    barrett->SetVisible(false);
+                    if (AttemptsLeft)
+                        if (!ObjectAccessor::GetCreature(*barrett, NPC_AnubarakGUID))
+                            barrett->SummonCreature(NPC_ANUBARAK, Locs[LOC_ANUB].GetPositionX(), Locs[LOC_ANUB].GetPositionY(), Locs[LOC_ANUB].GetPositionZ(), Locs[LOC_ANUB].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 630000000);
+                }
+
+                // move corpses
+                const uint64 npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
+                for (const uint64 i : npcs)
+                {
+                    if (Creature* c = instance->GetCreature(i))
+                    {
+                        if (c->GetGUID() == NPC_IcehowlGUID)
+                            c->UpdatePosition(626.57f, 162.8f, 140.25f, 4.44f, true);
+                        else if (c->GetGUID() == NPC_JaraxxusGUID)
+                            c->UpdatePosition(603.92f, 102.61f, 141.85f, 1.4f, true);
+                        else if (c->GetGUID() == NPC_LightbaneGUID)
+                            c->UpdatePosition(634.58f, 147.16f, 140.5f, 3.02f, true);
+                        else if (c->GetGUID() == NPC_DarkbaneGUID)
+                            c->UpdatePosition(630.88f, 131.39f, 140.8f, 3.02f, true);
+
+                        c->StopMovingOnCurrentPos();
+                        c->DestroyForNearbyPlayers();
+                    }
+                }
+            }
+        }
+
         bool IsValidDedicatedInsanityItem(const ItemTemplate* item)
         {
             if (!item) // should not happen, but checked in GetAverageItemLevel()
@@ -230,6 +264,8 @@ public:
                     break;
                 case GO_ARGENT_COLISEUM_FLOOR:
                     GO_FloorGUID = go->GetGUID();
+                    if (InstanceProgress == INSTANCE_PROGRESS_ANUB_ARAK)
+                        go->SetDestructibleState(GO_DESTRUCTIBLE_DAMAGED);
                     break;
                 case GO_SOUTH_PORTCULLIS:
                 case GO_NORTH_PORTCULLIS:
@@ -1301,37 +1337,8 @@ public:
                             if( Creature* t = c->FindNearestCreature(NPC_WORLD_TRIGGER, 500.0f, true) )
                                 t->DespawnOrUnsummon();
 
-                            if( Creature* barrett = instance->GetCreature(NPC_BarrettGUID) )
-                            {
-                                barrett->SetVisible(false);
-                                barrett->SummonCreature(NPC_ANUBARAK, Locs[LOC_ANUB].GetPositionX(), Locs[LOC_ANUB].GetPositionY(), Locs[LOC_ANUB].GetPositionZ(), Locs[LOC_ANUB].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 630000000);
-                            }
-
-                            // move corpses:
-                            if( Creature* c = instance->GetCreature(NPC_IcehowlGUID) )
-                            {
-                                c->UpdatePosition(626.57f, 162.8f, 140.25f, 4.44f, true);
-                                c->StopMovingOnCurrentPos();
-                                c->DestroyForNearbyPlayers();
-                            }
-                            if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
-                            {
-                                c->UpdatePosition(603.92f, 102.61f, 141.85f, 1.4f, true);
-                                c->StopMovingOnCurrentPos();
-                                c->DestroyForNearbyPlayers();
-                            }
-                            if( Creature* c = instance->GetCreature(NPC_LightbaneGUID) )
-                            {
-                                c->UpdatePosition(634.58f, 147.16f, 140.5f, 3.02f, true);
-                                c->StopMovingOnCurrentPos();
-                                c->DestroyForNearbyPlayers();
-                            }
-                            if( Creature* c = instance->GetCreature(NPC_DarkbaneGUID) )
-                            {
-                                c->UpdatePosition(630.88f, 131.39f, 140.8f, 3.02f, true);
-                                c->StopMovingOnCurrentPos();
-                                c->DestroyForNearbyPlayers();
-                            }
+                            InstanceProgress = INSTANCE_PROGRESS_ANUB_ARAK;
+                            SpawnAnubArak();
                         }
                         events.PopEvent();
                         events.RescheduleEvent(EVENT_SCENE_410, 2000);
@@ -1426,6 +1433,9 @@ public:
 
             if( DoNeedCleanup(true) )
                 InstanceCleanup();
+
+            // if missing spawn anub'arak 
+            SpawnAnubArak();
 
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
         }
@@ -1533,14 +1543,23 @@ public:
                     NPC_LightbaneGUID = 0;
                     break;
                 case INSTANCE_PROGRESS_VALKYR_DEAD:
-                    if( GameObject* floor = instance->GetGameObject(GO_FloorGUID) )
-                        floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
-                    if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
+                case INSTANCE_PROGRESS_ANUB_ARAK:
+                    /*if( GameObject* floor = instance->GetGameObject(GO_FloorGUID) )
+                        floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);*/
+                    if (Creature* c = instance->GetCreature(NPC_BarrettGUID))
                     {
-                        c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        c->SetVisible(true);
-                        c->SetFacingTo(c->GetOrientation());
-                        if( Creature* t = c->FindNearestCreature(NPC_WORLD_TRIGGER, 500.0f, true) )
+                        if (InstanceProgress == INSTANCE_PROGRESS_ANUB_ARAK)
+                        {
+                            c->SetVisible(false);
+                            c->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        }
+                        else
+                        {
+                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            c->SetVisible(true);
+                            c->SetFacingTo(c->GetOrientation());
+                        }
+                        if (Creature* t = c->FindNearestCreature(NPC_WORLD_TRIGGER, 500.0f, true))
                             t->DespawnOrUnsummon();
                     }
                     if( Creature* c = instance->GetCreature(NPC_LichKingGUID) )
