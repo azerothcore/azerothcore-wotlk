@@ -30,7 +30,7 @@ case $COMPILER in
     echo "CCOMPILERCXX=\"clang++-6.0\"" >> ./conf/config.sh
     ;;
 
-   "clang9" )
+  "clang9" )
     time sudo apt-get install -y clang-9
     echo "CCOMPILERC=\"clang-9\"" >> ./conf/config.sh
     echo "CCOMPILERCXX=\"clang++-9\"" >> ./conf/config.sh
