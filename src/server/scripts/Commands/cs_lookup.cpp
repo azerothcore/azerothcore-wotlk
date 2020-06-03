@@ -54,7 +54,7 @@ public:
             { "quest",          SEC_MODERATOR,      true,  &HandleLookupQuestCommand,       "" },
             { "skill",          SEC_MODERATOR,      true,  &HandleLookupSkillCommand,       "" },
             { "taxinode",       SEC_MODERATOR,      true,  &HandleLookupTaxiNodeCommand,    "" },
-            { "tele",           SEC_MODERATOR,      true,  &HandleLookupTeleCommand,        "" },
+            { "teleport",       SEC_MODERATOR,      true,  &HandleLookupTeleCommand,        "" },
             { "title",          SEC_MODERATOR,      true,  &HandleLookupTitleCommand,       "" },
             { "map",            SEC_MODERATOR,      true,  &HandleLookupMapCommand,         "" },
             { "player",         SEC_GAMEMASTER,     true,  nullptr, "", lookupPlayerCommandTable },
@@ -1045,7 +1045,7 @@ public:
         return true;
     }
 
-    // Find tele in game_tele order by name
+    // Find teleport in game_tele order by name
     static bool HandleLookupTeleCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
