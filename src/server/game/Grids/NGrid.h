@@ -44,7 +44,6 @@ class NGrid
         }
 
         uint32 GetGridId(void) const { return i_gridId; }
-        void SetGridId(const uint32 id) const { i_gridId = id; }
         int32 getX() const { return i_x; }
         int32 getY() const { return i_y; }
 
