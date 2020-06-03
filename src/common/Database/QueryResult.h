@@ -18,6 +18,10 @@
 #endif
 #include <mysql.h>
 
+#if !defined(MARIADB_VERSION_ID) && MYSQL_VERSION_ID >= 80001
+typedef bool my_bool;
+#endif
+
 class ResultSet
 {
     public:
@@ -28,7 +32,7 @@ class ResultSet
         uint64 GetRowCount() const { return _rowCount; }
         uint32 GetFieldCount() const { return _fieldCount; }
 #ifdef ELUNA
-        char* GetFieldName(uint32 index) const;
+        std::string GetFieldName(uint32 index) const;
 #endif
         Field* Fetch() const { return _currentRow; }
         const Field & operator [] (uint32 index) const
