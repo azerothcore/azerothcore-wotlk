@@ -11,9 +11,6 @@
   All rights reserved.
  */
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-copy"
-
 #ifndef G3D_Vector3_h
 #define G3D_Vector3_h
 
@@ -799,5 +796,3 @@ template<> struct PositionTrait<class G3D::Vector3> {
 
 
 #endif
-
-#pragma clang diagnostic pop
