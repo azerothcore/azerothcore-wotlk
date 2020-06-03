@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [clang6, clang10]
+        compiler: [clang6, clang9, clang10]
         modules: [with, without]
     runs-on: ubuntu-20.04
     name: ${{ matrix.compiler }}-${{ matrix.modules }}-modules
