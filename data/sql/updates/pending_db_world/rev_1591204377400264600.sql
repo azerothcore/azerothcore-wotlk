@@ -22,7 +22,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 (50006, 0, 0, "A key? Ok!", 0, 1, 1, 0, 0, 0, 0, NULL, 0, 0),
 (50002, 0, 0, "Ok, so what is this other way?", 0, 1, 1, 50003, 0, 0, 0, NULL, 0, 0),
 (50001, 0, 0, "But I need to get there, now open the gate!", 0, 1, 1, 50002, 0, 0, 0, NULL, 0, 0),
-(50000, 0, 0, "Open the gate please, i need to get to Searing Gorge", 0, 1, 1, 50001, 0, 0, 0, NULL, 0, 0),
+(50000, 0, 0, "Open the gate please, I need to get to Searing Gorge", 0, 1, 1, 50001, 0, 0, 0, NULL, 0, 0),
 (50000, 1, 0, "Umm... Pebblebitty... the gate is open.", 0, 1, 1, 50007, 0, 0, 0, NULL, 0, 0);
 
 DELETE FROM `npc_text` WHERE `ID`=1839;
