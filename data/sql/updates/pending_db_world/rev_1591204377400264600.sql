@@ -16,13 +16,13 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 
 DELETE FROM `gossip_menu_option` WHERE `MenuID` IN (50000, 50001, 50002, 50003, 50004, 50005, 50006);
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES 
-(50003, 0, 0, "Doesn't matter, i'm invulnerable.", 0, 1, 1, 50004, 0, 0, 0, NULL, 0, 0),
+(50003, 0, 0, "Doesn't matter, i'm invulnerable!", 0, 1, 1, 50004, 0, 0, 0, NULL, 0, 0),
 (50004, 0, 0, "Yes...", 0, 1, 1, 50005, 0, 0, 0, NULL, 0, 0),
 (50005, 0, 0, "Ok, i'll try to remember that.", 0, 1, 1, 50006, 0, 0, 0, NULL, 0, 0),
 (50006, 0, 0, "A key? Ok!", 0, 1, 1, 0, 0, 0, 0, NULL, 0, 0),
 (50002, 0, 0, "Ok, so what is this other way?", 0, 1, 1, 50003, 0, 0, 0, NULL, 0, 0),
-(50001, 0, 0, "But i need to get there, now open the gate!", 0, 1, 1, 50002, 0, 0, 0, NULL, 0, 0),
-(50000, 0, 0, "Open the gate please, i need to get to Searing Gorge", 0, 1, 1, 50001, 0, 0, 0, NULL, 0, 0),
+(50001, 0, 0, "But I need to get there, now open the gate!", 0, 1, 1, 50002, 0, 0, 0, NULL, 0, 0),
+(50000, 0, 0, "Open the gate please, I need to get to Searing Gorge", 0, 1, 1, 50001, 0, 0, 0, NULL, 0, 0),
 (50000, 1, 0, "Umm... Pebblebitty... the gate is open.", 0, 1, 1, 50007, 0, 0, 0, NULL, 0, 0);
 
 DELETE FROM `npc_text` WHERE `ID`=1839;
