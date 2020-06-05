@@ -712,6 +712,12 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
                 for (auto itr : m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups)
                     BattlegroundMgr::InviteGroupToBG(itr, bg, itr->RealTeamID);
         }
+
+        // prevent new BGs to be created if there are some non-empty BGs running
+        // TODO: note that this is a workaround,
+        //  however it shouldn't cause issues as the queue update is constantly called
+        if (!bg_template->isArena() && !bgsToCheck.empty())
+            return;
     }
 
     // finished iterating through battlegrounds with free slots, maybe we need to create a new bg
