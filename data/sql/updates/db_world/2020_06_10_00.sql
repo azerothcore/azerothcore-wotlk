@@ -1,3 +1,19 @@
+-- DB update 2020_06_09_00 -> 2020_06_10_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_06_09_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_06_09_00 2020_06_10_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1588338688279133200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1588338688279133200');
 
 /*
@@ -43,3 +59,12 @@ UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 636, `max
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 1246, `maxdmg` = 1810, `DamageModifier` = 1.01 WHERE `entry` = 18601;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 636, `maxdmg` = 914, `DamageModifier` = 1.01 WHERE `entry` = 17377;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 830, `maxdmg` = 1206, `DamageModifier` = 1.01 WHERE `entry` = 18607;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
