@@ -53,10 +53,7 @@ Examples:
 
 
 
-##### BRANCH(ES):
-<!-- Specify the branch(es) affected by this issue: master. -->
 
-master
 
 ##### AC HASH/COMMIT:
 <!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! NEVER WRITE "LATEST", ALWAYS PUT THE ACTUAL VALUE INSTEAD.
