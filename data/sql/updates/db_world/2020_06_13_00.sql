@@ -1,3 +1,19 @@
+-- DB update 2020_06_12_02 -> 2020_06_13_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_06_12_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_06_12_02 2020_06_13_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1547749843733409700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1547749843733409700');
 
 DELETE FROM `gossip_menu_option_locale` WHERE `Locale` = 'frFR';
@@ -1379,3 +1395,12 @@ INSERT INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `Option
 (21195, 0, 'frFR', ' Faites de cette Auberge ma maison', NULL),
 (21195, 1, 'frFR', 'Je veux parcourir vos biens', NULL),
 (21249, 0, 'frFR', 'Poignée de main', NULL);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

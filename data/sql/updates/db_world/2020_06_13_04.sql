@@ -1,3 +1,19 @@
+-- DB update 2020_06_13_03 -> 2020_06_13_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_06_13_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_06_13_03 2020_06_13_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1547749856254633700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1547749856254633700');
 
 DELETE FROM `achievement_reward_locale` WHERE `locale` = 'frFR';
@@ -105,3 +121,12 @@ INSERT INTO `achievement_reward_locale` (`ID`, `Locale`, `Subject`, `Text`) VALU
 (4603, 'frFR', 'Gloire à l\'écumeur de raids de la Couronne de glace', NULL),
 (4784, 'frFR', '', NULL),
 (4785, 'frFR', '', NULL);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
