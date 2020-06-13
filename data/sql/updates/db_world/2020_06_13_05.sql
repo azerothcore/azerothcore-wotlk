@@ -1,3 +1,19 @@
+-- DB update 2020_06_13_04 -> 2020_06_13_05
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_06_13_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_06_13_04 2020_06_13_05 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1547749858153492300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1547749858153492300');
 
 DELETE FROM `creature_text_locale` WHERE `locale` = 'frFR';
@@ -608,3 +624,12 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 (40429, 5, 0, 'frFR', 'Le commandant des troupes stationnées ici est une brute sauvage appelé Zarithrian, mais je crains que d\'autres puissances soient à l\'œuvre.'),
 (40429, 6, 0, 'frFR', 'Pendant la première attaque, j\'ai brièvement aperçu leur vrai chef, un terrifiant dragon du Crépuscule adulte.'),
 (40429, 7, 0, 'frFR', 'Je ne sais pas ce qu\'ils projettent exactement, héros, mais je sais qu\'il ne faut surtout pas les laisser y parvenir !');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
