@@ -7,11 +7,17 @@ function dbasm_resetExitCode() {
 	exit 0
 }
 
+function dbasm_resetMYSQLPort()
+{
+	MYSQL_PORT=3306
+}
+
 function dbasm_mysqlExec() {
 	confs=$1
 	command=$2
 	options=$3
-
+	
+	dbasm_resetMYSQLPort
 	eval $confs
 
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
@@ -19,9 +25,6 @@ function dbasm_mysqlExec() {
 		MYSQL_PASS=$PROMPT_PASS
 	fi
 
-	if [[ -z ${MYSQL_PORT+x} ]]; then
-		MYSQL_PORT=3306
-	fi
 
 	export MYSQL_PWD=$MYSQL_PASS
 
@@ -248,7 +251,7 @@ function dbasm_db_backup() {
 
     name="DB_"$uc"_NAME"
     dbname=${!name}
-
+	dbasm_resetMYSQLPort
     eval $confs;
 
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
@@ -256,9 +259,6 @@ function dbasm_db_backup() {
 		MYSQL_PASS=$PROMPT_PASS
 	fi
 
-	if [[ -z ${MYSQL_PORT+x} ]]; then
-		MYSQL_PORT=3306
-	fi
 
     export MYSQL_PWD=$MYSQL_PASS
 
@@ -301,16 +301,12 @@ function dbasm_db_import() {
     fi
 
     echo "importing $1 - $2 ..."
-
+	dbasm_resetMYSQLPort
     eval $confs;
 
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
 		MYSQL_USER=$PROMPT_USER
 		MYSQL_PASS=$PROMPT_PASS
-	fi
-
-	if [[ -z ${MYSQL_PORT+x} ]]; then
-		MYSQL_PORT=3306
 	fi
 
     export MYSQL_PWD=$MYSQL_PASS
