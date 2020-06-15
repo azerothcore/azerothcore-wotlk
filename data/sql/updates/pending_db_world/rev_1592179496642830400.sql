@@ -1,10 +1,11 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1592179496642830400');
 
 CREATE TABLE IF NOT EXISTS `world_config` (
+  `type` TINYINT UNSIGNED NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `value` INT UNSIGNED NOT NULL,
   `comment` TEXT,
-   PRIMARY KEY (`name`)
+   PRIMARY KEY (`type`, `name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB3 COMMENT='Holds configs for the World Server';
 
 REPLACE INTO `world_config` (`name`, `value`, `comment`) VALUES
