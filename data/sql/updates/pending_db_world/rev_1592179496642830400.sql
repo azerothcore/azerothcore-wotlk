@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1592179496642830400');
 
 CREATE TABLE IF NOT EXISTS `world_config` (
-  `type` TINYINT UNSIGNED NOT NULL,
+  `type` TINYINT UNSIGNED NOT NULL DEFAULT 50,
   `name` VARCHAR(255) NOT NULL,
   `value` INT UNSIGNED NOT NULL,
   `comment` TEXT,
@@ -29,6 +29,7 @@ Type:
 17 - CUSTOM SERVER SETTINGS (TODO: Can probably fit in other categories or be re-done)
 18 - PACKET SPOOF PROTECTION SETTINGS
 19 - DEBUG
+50 - NO TYPE
 */
 
 
