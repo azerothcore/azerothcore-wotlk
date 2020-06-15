@@ -1,0 +1,8 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1592179496642830400');
+
+CREATE TABLE IF NOT EXISTS `world_config` (
+  `name` VARCHAR(255) NOT NULL,
+  `value` INT UNSIGNED NOT NULL,
+  `comment` TEXT,
+   PRIMARY KEY (`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB3;
