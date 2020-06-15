@@ -33,7 +33,7 @@ Type:
 */
 
 
-REPLACE INTO `world_config` (`name`, `value`, `comment`) VALUES
+REPLACE INTO `world_config` (`type`, `name`, `value`, `comment`) VALUES
 (17, 'ICC.Buff.Horde', 73822, 'Specify ICC buff\r\n
 It is necessary to restart the server after changing the values!\r\n
 Default: ICC.Buff.Horde = 73822\r\n
