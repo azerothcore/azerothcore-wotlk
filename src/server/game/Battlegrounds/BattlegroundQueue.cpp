@@ -668,7 +668,7 @@ void BattlegroundQueue::UpdateEvents(uint32 diff)
 struct BgEmptinessComp { bool operator()(Battleground* const& bg1, Battleground* const& bg2) const { return ((float)bg1->GetMaxFreeSlots() / (float)bg1->GetMaxPlayersPerTeam()) > ((float)bg2->GetMaxFreeSlots() / (float)bg2->GetMaxPlayersPerTeam()); } };
 typedef std::set<Battleground*, BgEmptinessComp> BattlegroundNeedSet;
 
-void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id, uint8 actionMask, bool isRated, uint32 arenaRatedTeamId)
+void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId)
 {
     // if no players in queue - do nothing
     if (IsAllQueuesEmpty(bracket_id))
@@ -683,7 +683,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
         return;
 
     // battlegrounds with free slots should be populated first using players in queue
-    if ((actionMask & 0x01) && !BattlegroundMgr::IsArenaType(m_bgTypeId))
+    if (!BattlegroundMgr::IsArenaType(m_bgTypeId))
     {
         const BattlegroundContainer& bgList = sBattlegroundMgr->GetBattlegroundList();
         BattlegroundNeedSet bgsToCheck;
@@ -708,12 +708,15 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
                 for (auto itr : m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups)
                     BattlegroundMgr::InviteGroupToBG(itr, bg, itr->RealTeamID);
         }
+
+        // prevent new BGs to be created if there are some non-empty BGs running
+        // TODO: note that this is a workaround,
+        //  however it shouldn't cause issues as the queue update is constantly called
+        if (!bg_template->isArena() && !bgsToCheck.empty())
+            return;
     }
 
     // finished iterating through battlegrounds with free slots, maybe we need to create a new bg
-
-    if ((actionMask & 0x02) == 0)
-        return;
 
     // get min and max players per team
     uint32 MinPlayersPerTeam = bg_template->GetMinPlayersPerTeam();
