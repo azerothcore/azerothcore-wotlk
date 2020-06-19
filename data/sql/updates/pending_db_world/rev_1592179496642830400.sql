@@ -3,7 +3,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1592179496642830400');
 CREATE TABLE IF NOT EXISTS `world_config` (
   `type` TINYINT UNSIGNED NOT NULL DEFAULT 50,
   `name` VARCHAR(255) NOT NULL,
-  `value` INT UNSIGNED NOT NULL,
+  `value` VARCHAR(255) NOT NULL,
   `comment` TEXT,
    PRIMARY KEY (`type`, `name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB3 COMMENT='Holds configs for the World Server';
