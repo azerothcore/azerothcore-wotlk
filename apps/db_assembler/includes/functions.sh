@@ -251,7 +251,7 @@ function dbasm_db_backup() {
 
     name="DB_"$uc"_NAME"
     dbname=${!name}
-	dbasm_resetMYSQLPort
+    dbasm_resetMYSQLPort
     eval $confs;
 
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
@@ -301,7 +301,7 @@ function dbasm_db_import() {
     fi
 
     echo "importing $1 - $2 ..."
-	dbasm_resetMYSQLPort
+    dbasm_resetMYSQLPort
     eval $confs;
 
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
