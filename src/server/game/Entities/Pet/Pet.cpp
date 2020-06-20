@@ -2205,8 +2205,8 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
 
         if (info->m_petType == SUMMON_PET)
         {
-            if (pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON)
-                pet->GetCharmInfo()->SetPetNumber(pet_number, true); // Show pet details tab (Shift+P) only for demons
+            if (pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON || pet->GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD)
+                pet->GetCharmInfo()->SetPetNumber(pet_number, true); // Show pet details tab (Shift+P) only for demons & undead
             else
                 pet->GetCharmInfo()->SetPetNumber(pet_number, false);
 
