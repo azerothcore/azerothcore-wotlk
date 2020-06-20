@@ -115,7 +115,7 @@ DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 5601);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (5601, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 7164, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Khan Jehn - On Aggro - Cast \'7164\''),
 (5601, 0, 1, 0, 2, 0, 100, 1, 30, 60, 0, 0, 11, 11972, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Khan Jehn - Between 30-60% Health - Cast \'11972\' (No Repeat)'),
-(5601, 0, 2, 0, 0, 0, 100, 0, 2500, 3000, 8500, 1000, 11, 8380, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Khan Jehn - In Combat - Cast \'8380\'');
+(5601, 0, 2, 0, 0, 0, 100, 0, 2500, 3000, 8500, 10000, 11, 8380, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Khan Jehn - In Combat - Cast \'8380\'');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 6068;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 6068);
