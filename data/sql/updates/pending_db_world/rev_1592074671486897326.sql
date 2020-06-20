@@ -1,4 +1,4 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1592074671486897326');
 
-UPDATE `item_template` SET `RangedModRange` = 100 WHERE `entry` = 42449;
+UPDATE `item_template` SET `RangedModRange` = 100 WHERE `entry` IN (42449, 42512, 42494, 42518, 42484, 42501, 42511, 42446, 42445, 42517, 42447, 42448, 42444);
 
