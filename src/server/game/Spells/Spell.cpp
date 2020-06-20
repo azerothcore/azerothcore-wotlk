@@ -2851,9 +2851,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     {
         if (missInfo != SPELL_MISS_EVADE && !m_caster->IsFriendlyTo(effectUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
         {
-        m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3& SPELL_ATTR3_NO_INITIAL_AGGRO));
+            m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3& SPELL_ATTR3_NO_INITIAL_AGGRO));
 
-        if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_AURA_CC)
             if (!effectUnit->IsStandState())
                 effectUnit->SetStandState(UNIT_STAND_STATE_STAND);
         }
@@ -3010,8 +3009,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             unit->IncrDiminishing(m_diminishGroup);
     }
 
-    // Xinef: Stealth remove, added UGLY hack for mass dispel... cant find any other solution, ugly hack for Storm, Earth and Fire talent
-    if (m_caster != unit && m_caster->IsHostileTo(unit) && !m_spellInfo->IsPositive() && !m_triggeredByAuraSpell && m_spellInfo->SpellIconID != 2267 && unit->IsControlledByPlayer() && (!m_caster->IsTotem() || m_spellInfo->Id == 64695) && /*Intervene Trigger*/ m_spellInfo->Id != 59667)
+    if (m_caster != unit && m_caster->IsHostileTo(unit) && !m_spellInfo->IsPositive() && !m_triggeredByAuraSpell && !m_spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH))
         unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
 
     if (aura_effmask)
