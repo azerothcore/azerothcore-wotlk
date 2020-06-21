@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1592753632765913300');
 
 ALTER TABLE `spell_custom_attr`
-	CHANGE `entry` `spell_id`,
+	CHANGE `entry` `spell_id` MEDIUMINT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'spell id',
 	CHANGE `attributes` `attributes` INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'SpellCustomAttributes';
 	
 SET @SPELL_ATTR0_CU_NEGATIVE_EFF0 = 4096,
