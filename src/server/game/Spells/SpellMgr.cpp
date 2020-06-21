@@ -2768,7 +2768,6 @@ void SpellMgr::LoadSpellCustomAttr()
         sLog->outString(">> Loaded %u spell custom attributes from DB in %u ms", count, GetMSTimeDiffToNow(customAttrTime));
     }
 
-
     // xinef: create talent spells set
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
