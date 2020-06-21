@@ -7,17 +7,13 @@ function dbasm_resetExitCode() {
 	exit 0
 }
 
-function dbasm_resetMYSQLPort()
-{
-	MYSQL_PORT=3306
-}
-
 function dbasm_mysqlExec() {
 	confs=$1
 	command=$2
 	options=$3
 	
-	dbasm_resetMYSQLPort
+    # MYSQL_PORT needs to be reseted as the next eval might not overwite the current value causing the commands to use wrong port
+    MYSQL_PORT=3306
 	eval $confs
 
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
@@ -251,7 +247,9 @@ function dbasm_db_backup() {
 
     name="DB_"$uc"_NAME"
     dbname=${!name}
-    dbasm_resetMYSQLPort
+	
+    # MYSQL_PORT needs to be reseted as the next eval might not overwite the current value causing the commands to use wrong port
+    MYSQL_PORT=3306
     eval $confs;
 
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
@@ -301,7 +299,9 @@ function dbasm_db_import() {
     fi
 
     echo "importing $1 - $2 ..."
-    dbasm_resetMYSQLPort
+    
+    # MYSQL_PORT needs to be reseted as the next eval might not overwite the current value causing the commands to use wrong port
+    MYSQL_PORT=3306
     eval $confs;
 
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
