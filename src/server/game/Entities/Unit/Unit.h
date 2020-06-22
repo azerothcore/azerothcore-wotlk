@@ -657,7 +657,7 @@ enum NPCFlags
     UNIT_NPC_FLAG_GUILD_BANKER          = 0x00800000,       // cause client to send 997 opcode
     UNIT_NPC_FLAG_SPELLCLICK            = 0x01000000,       // cause client to send 1015 opcode (spell click)
     UNIT_NPC_FLAG_PLAYER_VEHICLE        = 0x02000000,       // players with mounts that have vehicle data should have it set
-    UNIT_NPC_FLAG_MAILBOX               = 0x04000000        // 
+    UNIT_NPC_FLAG_MAILBOX               = 0x04000000        //
 };
 
 enum MovementFlags
@@ -1314,6 +1314,12 @@ public:
         _posOwner.Relocate(c._posOwner);
         _posTarget.Relocate(c._posTarget);
     }
+    /* requried as of C++ 11 */
+    #if __cplusplus >= 201103L
+    MMapTargetData(MMapTargetData&&) = default;
+    MMapTargetData& operator=(const MMapTargetData&) = default;
+    MMapTargetData& operator=(MMapTargetData&&) = default;
+    #endif
     bool PosChanged(const Position& o, const Position& t) const
     {
         return _posOwner.GetExactDistSq(&o) > 0.5f*0.5f || _posTarget.GetExactDistSq(&t) > 0.5f*0.5f;
