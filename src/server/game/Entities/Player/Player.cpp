@@ -14951,14 +14951,14 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                 {
                     /// Find localizations from database.
                     if (auto gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, menuId)))
-                        ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, locale, std::string(strOptionText));
+                        ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, locale, strOptionText);
                 }
 
                 if (!boxBroadcastText)
                 {
                     /// Find localizations from database.
                     if (auto gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, menuId)))
-                        ObjectMgr::GetLocaleString(gossipMenuLocale->BoxText, locale, std::string(strBoxText));
+                        ObjectMgr::GetLocaleString(gossipMenuLocale->BoxText, locale, strBoxText);
                 }
             }
 
