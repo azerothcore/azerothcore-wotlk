@@ -14930,8 +14930,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
 
         if (canTalk)
         {
-            auto strOptionText = "";
-            auto strBoxText = "";
+            std::string strOptionText, strBoxText;
             auto optionBroadcastText = sObjectMgr->GetBroadcastText(itr->second.OptionBroadcastTextID);
             auto boxBroadcastText = sObjectMgr->GetBroadcastText(itr->second.BoxBroadcastTextID);
             auto locale = GetSession()->GetSessionDbLocaleIndex();
