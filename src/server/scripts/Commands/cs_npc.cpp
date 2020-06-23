@@ -261,7 +261,7 @@ public:
         if (!*args)
             return false;
 
-        char* pitem  = handler->extractKeyFromLink((char*)args, "Hitem");
+        auto pitem  = handler->extractKeyFromLink((char*)args, "Hitem");
         if (!pitem)
         {
             handler->SendSysMessage(LANG_COMMAND_NEEDITEMSEND);
@@ -269,25 +269,23 @@ public:
             return false;
         }
 
-        int32 item_int = atol(pitem);
-        if (item_int <= 0)
+        auto itemId = atol(pitem);
+        if (itemId <= 0)
             return false;
 
-        uint32 itemId = item_int;
-
-        char* fmaxcount = strtok(nullptr, " ");                    //add maxcount, default: 0
-        uint32 maxcount = 0;
+        auto fmaxcount = strtok(nullptr, " ");                    //add maxcount, default: 0
+        auto maxcount = 0;
         if (fmaxcount)
             maxcount = atol(fmaxcount);
 
-        char* fincrtime = strtok(nullptr, " ");                    //add incrtime, default: 0
-        uint32 incrtime = 0;
+        auto fincrtime = strtok(nullptr, " ");                    //add incrtime, default: 0
+        auto incrtime = 0;
         if (fincrtime)
             incrtime = atol(fincrtime);
 
-        char* fextendedcost = strtok(nullptr, " ");                //add ExtendedCost, default: 0
-        uint32 extendedcost = fextendedcost ? atol(fextendedcost) : 0;
-        Creature* vendor = handler->getSelectedCreature();
+        auto fextendedcost = strtok(nullptr, " ");                //add ExtendedCost, default: 0
+        auto extendedcost = fextendedcost ? atol(fextendedcost) : 0;
+        auto vendor = handler->getSelectedCreature();
         if (!vendor)
         {
             handler->SendSysMessage(LANG_SELECT_CREATURE);
@@ -295,17 +293,16 @@ public:
             return false;
         }
 
-        char* addMulti = strtok(NULL, " ");
-
-        uint32 vendor_entry = addMulti ? handler->GetSession()->GetCurrentVendorEntry() : vendor ? vendor->GetEntry() : 0;
+        auto addMulti = strtok(NULL, " ");
+        auto vendorEntry = addMulti ? handler->GetSession()->GetCurrentVendorEntry() : 0;
         {
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        sObjectMgr->AddVendorItem(vendor_entry, itemId, maxcount, incrtime, extendedcost);
+        sObjectMgr->AddVendorItem(vendorEntry, itemId, maxcount, incrtime, extendedcost);
 
-        ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
+        auto itemTemplate = sObjectMgr->GetItemTemplate(itemId);
 
         handler->PSendSysMessage(LANG_ITEM_ADDED_TO_LIST, itemId, itemTemplate->Name1.c_str(), maxcount, incrtime, extendedcost);
         return true;

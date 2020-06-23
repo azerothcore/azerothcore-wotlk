@@ -13,6 +13,7 @@
 
 #include "Common.h"
 #include "SharedDefines.h"
+#include "ObjectDefines.h"
 #include "AddonMgr.h"
 #include "DatabaseEnv.h"
 #include "World.h"
@@ -22,7 +23,6 @@
 #include "AccountMgr.h"
 #include "BanManager.h"
 #include "Opcodes.h"
-
 class Creature;
 class GameObject;
 class InstanceSave;
