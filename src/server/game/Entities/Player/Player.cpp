@@ -14936,12 +14936,12 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
             auto locale = GetSession()->GetSessionDbLocaleIndex();
 
             if (optionBroadcastText)
-                ObjectMgr::GetLocaleString(getGender() == GENDER_MALE ? optionBroadcastText->MaleText : optionBroadcastText->FemaleText, locale, std::string(strOptionText));
+                ObjectMgr::GetLocaleString(getGender() == GENDER_MALE ? optionBroadcastText->MaleText : optionBroadcastText->FemaleText, locale, strOptionText);
             else
                 strOptionText = itr->second.OptionText.c_str();
 
             if (boxBroadcastText)
-                ObjectMgr::GetLocaleString(getGender() == GENDER_MALE ? boxBroadcastText->MaleText : boxBroadcastText->FemaleText, locale, std::string(strBoxText));
+                ObjectMgr::GetLocaleString(getGender() == GENDER_MALE ? boxBroadcastText->MaleText : boxBroadcastText->FemaleText, locale, strBoxText);
             else
                 strBoxText = itr->second.BoxText.c_str();
 
