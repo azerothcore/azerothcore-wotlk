@@ -887,13 +887,13 @@ void WorldSession::HandleListInventoryOpcode(WorldPacket & recvData)
     SendListInventory(guid);
 }
 
-void WorldSession::SendListInventory(uint64 vendorGuid)
+void WorldSession::SendListInventory(uint64 vendorGuid, uint32 vendorEntry)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_LIST_INVENTORY");
 #endif
 
-    Creature* vendor = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
+    auto vendor = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
     if (!vendor)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -911,10 +911,10 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
     if (vendor->HasUnitState(UNIT_STATE_MOVING))
         vendor->StopMoving();
 
-    VendorItemData const* items = vendor->GetVendorItems();
+    auto items = vendorEntry ? sObjectMgr->GetNpcVendorItemList(vendorEntry) : vendor->GetVendorItems();
     if (!items)
     {
-        WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + 1);
+        auto data = WorldPacket(SMSG_LIST_INVENTORY, 8 + 1 + 1);
         data << uint64(vendorGuid);
         data << uint8(0);                                   // count == 0, next will be error code
         data << uint8(0);                                   // "Vendor has no inventory"
@@ -922,22 +922,23 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
         return;
     }
 
-    uint8 itemCount = items->GetItemCount();
-    uint8 count = 0;
+    SetCurrentVendor(vendorEntry, GUID_LOPART(vendorGuid), GUID_HIPART(vendorGuid));
+    auto itemCount = items->GetItemCount();
+    auto count = 0;
 
-    WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + itemCount * 8 * 4);
+    auto data = WorldPacket(SMSG_LIST_INVENTORY, 8 + 1 + itemCount * 8 * 4);
     data << uint64(vendorGuid);
 
-    size_t countPos = data.wpos();
+    auto countPos = data.wpos();
     data << uint8(count);
 
     float discountMod = _player->GetReputationPriceDiscount(vendor);
 
-    for (uint8 slot = 0; slot < itemCount; ++slot)
+    for (auto slot = 0; slot < itemCount; ++slot)
     {
-        if (VendorItem const* item = items->GetItem(slot))
+        if (auto item = items->GetItem(slot))
         {
-            if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(item->item))
+            if (auto itemTemplate = sObjectMgr->GetItemTemplate(item->item))
             {
                 if (!(itemTemplate->AllowableClass & _player->getClassMask()) && itemTemplate->Bonding == BIND_WHEN_PICKED_UP && !_player->IsGameMaster())
                     continue;
@@ -947,11 +948,11 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
                     continue;
 
                 // Items sold out are not displayed in list
-                uint32 leftInStock = !item->maxcount ? 0xFFFFFFFF : vendor->GetVendorItemCurrentCount(item);
+                auto leftInStock = !item->maxcount ? 0xFFFFFFFF : vendor->GetVendorItemCurrentCount(item);
                 if (!_player->IsGameMaster() && !leftInStock)
                     continue;
 
-                ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(vendor->GetEntry(), item->item);
+                auto conditions = sConditionMgr->GetConditionsForNpcVendorEvent(vendor->GetEntry(), item->item);
                 if (!sConditionMgr->IsObjectMeetToConditions(_player, vendor, conditions))
                 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -961,7 +962,7 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
                 }
 
                 // reputation discount
-                int32 price = item->IsGoldRequired(itemTemplate) ? uint32(floor(itemTemplate->BuyPrice * discountMod)) : 0;
+                auto price = item->IsGoldRequired(itemTemplate) ? uint32(floor(itemTemplate->BuyPrice * discountMod)) : 0;
 
                 data << uint32(slot + 1);       // client expects counting to start at 1
                 data << uint32(item->item);
