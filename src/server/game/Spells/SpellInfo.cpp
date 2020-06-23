@@ -2569,7 +2569,6 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                 case 62344: // Fists of Stone
                 case 61819: // Manabonked! (item)
                 case 61834: // Manabonked! (minigob)
-                case 19451: // Enrage (Magmadar)
                     return true;
                 default:
                     break;
@@ -2865,6 +2864,7 @@ bool SpellInfo::_IsPositiveTarget(uint32 targetA, uint32 targetB)
         case TARGET_UNIT_SRC_AREA_ENEMY:
         case TARGET_UNIT_DEST_AREA_ENEMY:
         case TARGET_UNIT_CONE_ENEMY_24:
+        case TARGET_UNIT_CONE_ENEMY_54:
         case TARGET_UNIT_CONE_ENEMY_104:
         case TARGET_DEST_DYNOBJ_ENEMY:
         case TARGET_DEST_TARGET_ENEMY:
