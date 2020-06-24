@@ -11,4 +11,3 @@ ALTER TABLE `item_template`
 	CHANGE COLUMN `stat_value8` `stat_value8` INT NOT NULL DEFAULT 0 AFTER `stat_type8`,
 	CHANGE COLUMN `stat_value9` `stat_value9` INT NOT NULL DEFAULT 0 AFTER `stat_type9`,
 	CHANGE COLUMN `stat_value10` `stat_value10` INT NOT NULL DEFAULT 0 AFTER `stat_type10`;
-	CHANGE COLUMN `stat_value10` `stat_value10` INT NOT NULL DEFAULT 0 AFTER `stat_type10`;
