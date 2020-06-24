@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1588709577858892600');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1593017539366089800');
 
 ALTER TABLE `item_template`
 	CHANGE COLUMN `stat_value1` `stat_value1` INT NOT NULL DEFAULT 0 AFTER `stat_type1`,
