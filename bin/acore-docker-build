@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# get the absolute resolved path of this current script
+CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# cd back to the root project folder
+cd "$CUR_PATH/../"
+
 docker build -t acbuild -f docker/build/Dockerfile . && docker run \
     -v /$(pwd)/docker/build/cache:/azerothcore/build \
     -v /$(pwd)/docker/worldserver/bin:/binworldserver \
