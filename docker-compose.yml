@@ -3,7 +3,6 @@ version: '3.2'
 services:
 
   ac-database:
-    image: azerothcore/database
     restart: unless-stopped
     build:
       context: .
@@ -22,7 +21,6 @@ services:
   ac-worldserver:
     stdin_open: true
     tty: true
-    image: azerothcore/worldserver
     restart: unless-stopped
     build:
       context: ./docker/worldserver
@@ -49,7 +47,6 @@ services:
       - ac-database
 
   ac-authserver:
-    image: azerothcore/authserver
     restart: unless-stopped
     build:
       context: ./docker/authserver
