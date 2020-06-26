@@ -35,14 +35,15 @@ public:
 
         static std::vector<ChatCommand> characterDeletedCommandTable =
         {
-            { "delete",        SEC_CONSOLE,          true,  &HandleCharacterDeletedDeleteCommand,  "" },
-            { "list",          SEC_ADMINISTRATOR,    true,  &HandleCharacterDeletedListCommand,    "" },
-            { "restore",       SEC_ADMINISTRATOR,    true,  &HandleCharacterDeletedRestoreCommand, "" },
-            { "old",           SEC_CONSOLE,          true,  &HandleCharacterDeletedOldCommand,     "" },
+            { "delete",        SEC_CONSOLE,         true,  &HandleCharacterDeletedDeleteCommand,  "" },
+            { "list",          SEC_ADMINISTRATOR,   true,  &HandleCharacterDeletedListCommand,    "" },
+            { "restore",       SEC_ADMINISTRATOR,   true,  &HandleCharacterDeletedRestoreCommand, "" },
+            { "old",           SEC_CONSOLE,         true,  &HandleCharacterDeletedOldCommand,     "" },
         };
 
         static std::vector<ChatCommand> characterCheckCommandTable =
         {
+            { "bank",       SEC_GAMEMASTER,         false,  &HandleCharacterCheckBankCommand, "" },
             { "bag",        SEC_GAMEMASTER,         false,  &HandleCharacterCheckBagCommand,  "" },
             { "work",       SEC_GAMEMASTER,         false,  &HandleCharacterCheckWorkCommand, "" },
         };
@@ -102,7 +103,7 @@ public:
                 stmt->setUInt32(0, uint32(atoi(searchString.c_str())));
                 result = CharacterDatabase.Query(stmt);
             }
-                // search by name
+            // search by name
             else
             {
                 if (!normalizePlayerName(searchString))
@@ -660,7 +661,7 @@ public:
             if (keepDays < 0)
                 return false;
         }
-            // config option value 0 -> disabled and can't be used
+        // config option value 0 -> disabled and can't be used
         else if (keepDays <= 0)
             return false;
 
@@ -958,6 +959,12 @@ public:
         return true;
     }
 
+    static bool HandleCharacterCheckBankCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        handler->GetSession()->SendShowBank(handler->GetSession()->GetPlayer()->GetGUID());
+        return true;
+    }
+
     static bool HandleCharacterCheckBagCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
@@ -1090,6 +1097,8 @@ public:
                         break;
                     case SKILL_FIRST_AID:
                         handler->PSendSysMessage("%u - First Aid - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    default:
                         break;
                 }
             }
