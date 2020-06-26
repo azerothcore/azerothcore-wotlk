@@ -43,7 +43,6 @@ public:
     {
         boss_pandemoniusAI(Creature* creature) : ScriptedAI(creature)
         {
-            VoidBlastCounter = 0;
         }
 
         EventMap events;
@@ -51,6 +50,7 @@ public:
         void Reset()
         {
             events.Reset();
+            VoidBlastCounter = 0;
         }
 
         void EnterCombat(Unit*)
