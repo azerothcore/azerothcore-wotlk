@@ -43,9 +43,9 @@ public:
 
         static std::vector<ChatCommand> characterCheckCommandTable =
         {
-            { "bank",       SEC_GAMEMASTER,         false,  &HandleCharacterCheckBankCommand, "" },
-            { "bag",        SEC_GAMEMASTER,         false,  &HandleCharacterCheckBagCommand,  "" },
-            { "work",       SEC_GAMEMASTER,         false,  &HandleCharacterCheckWorkCommand, "" },
+            { "bank",          SEC_GAMEMASTER,      false,  &HandleCharacterCheckBankCommand, "" },
+            { "bag",           SEC_GAMEMASTER,      false,  &HandleCharacterCheckBagCommand,  "" },
+            { "profession",    SEC_GAMEMASTER,      false,  &HandleCharacterCheckProfessionCommand, "" },
         };
 
         static std::vector<ChatCommand> characterCommandTable =
@@ -1030,7 +1030,7 @@ public:
         return true;
     }
 
-    static bool HandleCharacterCheckWorkCommand(ChatHandler* handler, char const*)
+    static bool HandleCharacterCheckProfessionCommand(ChatHandler* handler, char const*)
     {
         Player* player = handler->getSelectedPlayerOrSelf();
 
