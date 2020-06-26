@@ -36,7 +36,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToN
     if (!creature)
         creature = me;
 
-    if (!creature->CanHaveThreatList())
+    if (!creature->CanHaveThreatList() || creature->IsInEvadeMode())
         return;
 
     Map* map = creature->GetMap();
@@ -46,8 +46,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToN
         return;
     }
 
-    // Xinef: Skip creatures in evade mode
-    if (!creature->HasReactState(REACT_PASSIVE) && !creature->GetVictim() && !creature->IsInEvadeMode())
+    if (!creature->HasReactState(REACT_PASSIVE) && !creature->GetVictim())
     {
         if (Unit* nearTarget = creature->SelectNearestTarget(maxRangeToNearestTarget))
             creature->AI()->AttackStart(nearTarget);

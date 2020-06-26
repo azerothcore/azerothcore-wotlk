@@ -749,7 +749,7 @@ public:
             {
                 case EVENT_WORGEN_MORTAL:
                 {
-                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_MORTAL_WOUND_H : SPELL_MORTAL_WOUND_H, false);
+                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_MORTAL_WOUND_H : SPELL_MORTAL_WOUND_N, false);
                     events.RepeatEvent(4000 + rand()%3000);
                     break;
                 }

@@ -321,7 +321,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
                     fullcmd.c_str(), player->GetName().c_str(), GUID_LOPART(player->GetGUID()),
                     m_session->GetAccountId(), player->GetPositionX(), player->GetPositionY(),
                     player->GetPositionZ(), player->GetMapId(),
-                    player->GetMap() ? player->GetMap()->GetMapName() : "Unknown",
+                    player->GetMap()->GetMapName(),
                     areaId, areaName.c_str(), zoneName.c_str(),
                     (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
                     GUID_LOPART(guid));
@@ -998,7 +998,7 @@ GameTele const* ChatHandler::extractGameTeleFromLink(char* text)
         return NULL;
 
     // id case (explicit or from shift link)
-    if (cId[0] >= '0' || cId[0] >= '9')
+    if (cId[0] >= '0' || cId[0] <= '9')
         if (uint32 id = atoi(cId))
             return sObjectMgr->GetGameTele(id);
 

@@ -19,8 +19,9 @@ EndScriptData */
 #include "SpellInfo.h"
 #include "Player.h"
 #include "Pet.h"
+#include "PlayerCommand.h"
 
-class learn_commandscript : public CommandScript
+class learn_commandscript : public CommandScript, public PlayerCommand
 {
 public:
     learn_commandscript() : CommandScript("learn_commandscript") { }
@@ -37,7 +38,7 @@ public:
 
         static std::vector<ChatCommand> learnAllCommandTable =
         {
-            { "my",             SEC_GAMEMASTER,  false, nullptr,                                "",  learnAllMyCommandTable },
+            { "my",             SEC_GAMEMASTER,  false, nullptr,                             "", learnAllMyCommandTable },
             { "gm",             SEC_GAMEMASTER,  false, &HandleLearnAllGMCommand,            "" },
             { "crafts",         SEC_GAMEMASTER,  false, &HandleLearnAllCraftsCommand,        "" },
             { "default",        SEC_GAMEMASTER,  false, &HandleLearnAllDefaultCommand,       "" },
@@ -47,13 +48,13 @@ public:
 
         static std::vector<ChatCommand> learnCommandTable =
         {
-            { "all",            SEC_GAMEMASTER,  false, nullptr,                                "",  learnAllCommandTable },
+            { "all",            SEC_GAMEMASTER,  false, nullptr,                             "", learnAllCommandTable },
             { "",               SEC_GAMEMASTER,  false, &HandleLearnCommand,                 "" }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "learn",          SEC_GAMEMASTER,  false, nullptr,                                "", learnCommandTable },
+            { "learn",          SEC_GAMEMASTER,  false, nullptr,                             "", learnCommandTable },
             { "unlearn",        SEC_GAMEMASTER,  false, &HandleUnLearnCommand,               "" }
         };
         return commandTable;
@@ -61,6 +62,9 @@ public:
 
     static bool HandleLearnCommand(ChatHandler* handler, char const* args)
     {
+        if (!*args)
+            return false;
+
         Player* targetPlayer = handler->getSelectedPlayer();
 
         if (!targetPlayer)
@@ -72,56 +76,8 @@ public:
 
         // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
         uint32 spell = handler->extractSpellIdFromLink((char*)args);
-        if (!spell)
-            return false;
-
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell);
-        if (!spellInfo)
-        {
-            handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (!SpellMgr::IsSpellValid(spellInfo))
-        {
-            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spell);
-        uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spell);
-        if (handler->GetSession()->GetSecurity() < SEC_ADMINISTRATOR && (bounds.first != bounds.second || spellDifficultyId))
-        {
-            handler->PSendSysMessage("Spell %u cannot be learnt using a command!", spell);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
         char const* all = strtok(nullptr, " ");
-        bool allRanks = all ? (strncmp(all, "all", strlen(all)) == 0) : false;
-
-        if (!allRanks && targetPlayer->HasSpell(spell))
-        {
-            if (targetPlayer == handler->GetSession()->GetPlayer())
-                handler->SendSysMessage(LANG_YOU_KNOWN_SPELL);
-            else
-                handler->PSendSysMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(targetPlayer).c_str());
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (allRanks)
-            targetPlayer->learnSpellHighRank(spell);
-        else
-            targetPlayer->learnSpell(spell);
-
-        uint32 firstSpell = sSpellMgr->GetFirstSpellInChain(spell);
-        if (GetTalentSpellCost(firstSpell))
-            targetPlayer->SendTalentsInfoData(false);
-
-        return true;
+        return Learn(handler, targetPlayer, spell, all);
     }
 
     static bool HandleLearnAllGMCommand(ChatHandler* handler, char const* /*args*/)
@@ -476,14 +432,6 @@ public:
         if (!*args)
             return false;
 
-        // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r
-        uint32 spellId = handler->extractSpellIdFromLink((char*)args);
-        if (!spellId)
-            return false;
-
-        char const* allStr = strtok(nullptr, " ");
-        bool allRanks = allStr ? (strncmp(allStr, "all", strlen(allStr)) == 0) : false;
-
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
@@ -492,18 +440,10 @@ public:
             return false;
         }
 
-        if (allRanks)
-            spellId = sSpellMgr->GetFirstSpellInChain (spellId);
-
-        if (target->HasSpell(spellId))
-            target->removeSpell(spellId, SPEC_MASK_ALL, false);
-        else
-            handler->SendSysMessage(LANG_FORGET_SPELL);
-
-        if (GetTalentSpellCost(spellId))
-            target->SendTalentsInfoData(false);
-
-        return true;
+        // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r
+        uint32 spellId = handler->extractSpellIdFromLink((char*)args);
+        char const* allStr = strtok(nullptr, " ");
+        return UnLearn(handler, target, spellId, allStr);
     }
 };
 

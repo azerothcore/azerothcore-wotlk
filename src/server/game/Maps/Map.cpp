@@ -876,9 +876,9 @@ void Map::RemovePlayerFromMap(Player* player, bool remove)
     else
         ASSERT(remove); //maybe deleted in logoutplayer when player is not in a map
 
+    sScriptMgr->OnPlayerLeaveMap(this, player);
     if (remove)
     {
-        sScriptMgr->OnPlayerLeaveMap(this, player);
         DeleteFromWorld(player);
     }
 }
@@ -1899,12 +1899,12 @@ GridMap* Map::GetGrid(float x, float y)
     return GridMaps[gx][gy];
 }
 
-float Map::GetWaterOrGroundLevel(float x, float y, float z, float* ground /*= NULL*/, bool /*swim = false*/, float maxSearchDist /*= 50.0f*/) const
+float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground /*= NULL*/, bool /*swim = false*/, float maxSearchDist /*= 50.0f*/) const
 { 
     if (const_cast<Map*>(this)->GetGrid(x, y))
     {
         // we need ground level (including grid height version) for proper return water level in point
-        float ground_z = GetHeight(PHASEMASK_NORMAL, x, y, z, true, maxSearchDist);
+        float ground_z = GetHeight(phasemask, x, y, z, true, maxSearchDist);
         if (ground)
             *ground = ground_z;
 
@@ -2568,6 +2568,8 @@ void InstanceMap::InitVisibilityDistance()
     switch (GetId())
     {
         case 429: // Dire Maul
+        case 550: // The Eye
+        case 578: // The Nexus: The Oculus
             m_VisibleDistance = 175.0f;
             break;
         case 649: // Trial of the Crusader
@@ -2575,10 +2577,6 @@ void InstanceMap::InitVisibilityDistance()
         case 595: // Culling of Startholme
         case 658: // Pit of Saron
             m_VisibleDistance = 150.0f;
-            break;
-        case 550: // The Eye
-        case 578: // The Nexus: The Oculus
-            m_VisibleDistance = 175.0f;
             break;
         case 615: // Obsidian Sanctum
         case 616: // Eye of Eternity

@@ -340,7 +340,7 @@ void BattlegroundEY::Init()
     Battleground::Init();
 
     _bgEvents.Reset();
-    _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID()) ? BG_EY_HONOR_TICK_WEEKEND : BG_EY_HONOR_TICK_NORMAL;
+    _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_EY_HONOR_TICK_WEEKEND : BG_EY_HONOR_TICK_NORMAL;
     _ownedPointsCount[TEAM_ALLIANCE] = 0;
     _ownedPointsCount[TEAM_HORDE] = 0;
     _flagKeeperGUID = 0;

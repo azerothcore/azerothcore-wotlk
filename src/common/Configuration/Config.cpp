@@ -8,6 +8,12 @@
 #include "Errors.h"
 #include "Log.h"
 
+ConfigMgr* ConfigMgr::instance()
+{
+    static ConfigMgr instance;
+    return &instance;
+}
+
 // Defined here as it must not be exposed to end-users.
 bool ConfigMgr::GetValueHelper(const char* name, ACE_TString &result)
 {
@@ -165,7 +171,7 @@ std::list<std::string> ConfigMgr::GetKeysByString(std::string const& name)
         {
             std::string temp = key_name.c_str();
 
-            if (!temp.find(name))
+            if (temp.find(name) != std::string::npos)
                 keys.push_back(temp);
         }
     }

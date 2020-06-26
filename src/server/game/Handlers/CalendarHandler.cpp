@@ -35,6 +35,7 @@ Copied events should probably have a new owner
 #include "ArenaTeamMgr.h"
 #include "WorldSession.h"
 #include "GameEventMgr.h"
+#include "utf8.h"
 
 void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
 {
@@ -207,6 +208,17 @@ void WorldSession::HandleCalendarArenaTeam(WorldPacket& recvData)
         team->MassInviteToEvent(this);
 }
 
+bool validUtf8String(WorldPacket& recvData, std::string& s, std::string action, uint64 playerGUID)
+{
+    if (!utf8::is_valid(s.begin(), s.end()))
+    {
+        sLog->outString("CalendarHandler: Player with guid %lu attempt to %s an event with invalid name or description (packet modification)", playerGUID, action.c_str());
+        recvData.rfinish();
+        return false;
+    }
+    return true;
+}
+
 void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
 {
     uint64 guid = _player->GetGUID();
@@ -226,13 +238,57 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
     recvData.ReadPackedTime(unkPackedTime);
     recvData >> flags;
 
+    // prevent attacks with non-utf8 chars -> with multiple packets it will hang up the db due to errors.
+    if (!validUtf8String(recvData, title, "create", guid) || title.size() > 31 || !validUtf8String(recvData, description, "create", guid) || description.size() > 255)
+        return;
+
     // prevent events in the past
     // To Do: properly handle timezones and remove the "- time_t(86400L)" hack
     if (time_t(eventPackedTime) < (time(NULL) - time_t(86400L)))
     {
         recvData.rfinish();
+        sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_PASSED);
         return;
     }
+
+    // If the event is a guild event, check if the player is in a guild
+    if (CalendarEvent::IsGuildEvent(flags) || CalendarEvent::IsGuildAnnouncement(flags))
+    {
+        if (!_player->GetGuildId())
+        {
+            recvData.rfinish();
+            sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_GUILD_PLAYER_NOT_IN_GUILD);
+            return;
+        }
+    }
+
+    // Check if the player reached the max number of events allowed to create
+    if (CalendarEvent::IsGuildEvent(flags) || CalendarEvent::IsGuildAnnouncement(flags))
+    {
+        if (sCalendarMgr->GetGuildEvents(_player->GetGuildId()).size() >= CALENDAR_MAX_GUILD_EVENTS)
+        {
+            recvData.rfinish();
+            sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_GUILD_EVENTS_EXCEEDED);
+            return;
+        }
+    }
+    else
+    {
+        if (sCalendarMgr->GetEventsCreatedBy(guid).size() >= CALENDAR_MAX_EVENTS)
+        {
+            recvData.rfinish();
+            sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENTS_EXCEEDED);
+            return;
+        }
+    }
+
+    if (GetCalendarEventCreationCooldown() > time(nullptr))
+    {
+        recvData.rfinish();
+        sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_INTERNAL);
+        return;
+    }
+    SetCalendarEventCreationCooldown(time(nullptr) + CALENDAR_CREATE_EVENT_COOLDOWN);
 
     CalendarEvent* calendarEvent = new CalendarEvent(sCalendarMgr->GetFreeEventId(), guid, 0, CalendarEventType(type), dungeonId,
         time_t(eventPackedTime), flags, time_t(unkPackedTime), title, description);
@@ -249,13 +305,10 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
     }
     else
     {
-        // client limits the amount of players to be invited to 100
-        const uint32 MaxPlayerInvites = 100;
-
         uint32 inviteCount;
-        uint64 invitee[MaxPlayerInvites];
-        uint8 status[MaxPlayerInvites];
-        uint8 rank[MaxPlayerInvites];
+        uint64 invitee[CALENDAR_MAX_INVITES];
+        uint8 status[CALENDAR_MAX_INVITES];
+        uint8 rank[CALENDAR_MAX_INVITES];
 
         memset(invitee, 0, sizeof(invitee));
         memset(status, 0, sizeof(status));
@@ -265,7 +318,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
         {
             recvData >> inviteCount;
 
-            for (uint32 i = 0; i < inviteCount && i < MaxPlayerInvites; ++i)
+            for (uint32 i = 0; i < inviteCount && i < CALENDAR_MAX_INVITES; ++i)
             {
                 recvData.readPackGUID(invitee[i]);
                 recvData >> status[i] >> rank[i];
@@ -282,7 +335,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
         if (inviteCount > 1)
             trans = CharacterDatabase.BeginTransaction();
 
-        for (uint32 i = 0; i < inviteCount && i < MaxPlayerInvites; ++i)
+        for (uint32 i = 0; i < inviteCount && i < CALENDAR_MAX_INVITES; ++i)
         {
             // 946684800 is 01/01/2000 00:00:00 - default response time
             CalendarInvite* invite = new CalendarInvite(sCalendarMgr->GetFreeInviteId(), calendarEvent->GetEventId(), invitee[i], guid, 946684800, CalendarInviteStatus(status[i]), CalendarModerationRank(rank[i]), "");
@@ -317,6 +370,10 @@ void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
     recvData.ReadPackedTime(eventPackedTime);
     recvData.ReadPackedTime(timeZoneTime);
     recvData >> flags;
+
+    // prevent attacks with non-utf8 chars -> with multiple packets it will hang up the db due to errors.
+    if (!validUtf8String(recvData, title, "update", guid) || title.size() > 31 || !validUtf8String(recvData, description, "update", guid) || description.size() > 255)
+        return;
 
     // prevent events in the past
     // To Do: properly handle timezones and remove the "- time_t(86400L)" hack
@@ -380,11 +437,55 @@ void WorldSession::HandleCalendarCopyEvent(WorldPacket& recvData)
     if (time_t(eventTime) < (time(NULL) - time_t(86400L)))
     {
         recvData.rfinish();
+        sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_PASSED);
         return;
     }
 
     if (CalendarEvent* oldEvent = sCalendarMgr->GetEvent(eventId))
     {
+        // Ensure that the player has access to the event
+        if (oldEvent->IsGuildEvent() || oldEvent->IsGuildAnnouncement())
+        {
+            if (oldEvent->GetGuildId() != _player->GetGuildId())
+            {
+                sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_INVALID);
+                return;
+            }
+        }
+        else
+        {
+            if (oldEvent->GetCreatorGUID() != guid)
+            {
+                sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_INVALID);
+                return;
+            }
+        }
+
+        // Check if the player reached the max number of events allowed to create
+        if (oldEvent->IsGuildEvent() || oldEvent->IsGuildAnnouncement())
+        {
+            if (sCalendarMgr->GetGuildEvents(_player->GetGuildId()).size() >= CALENDAR_MAX_GUILD_EVENTS)
+            {
+                sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_GUILD_EVENTS_EXCEEDED);
+                return;
+            }
+        }
+        else
+        {
+            if (sCalendarMgr->GetEventsCreatedBy(guid).size() >= CALENDAR_MAX_EVENTS)
+            {
+                sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENTS_EXCEEDED);
+                return;
+            }
+        }
+
+        if (GetCalendarEventCreationCooldown() > time(nullptr))
+        {
+            sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_INTERNAL);
+            return;
+        }
+        SetCalendarEventCreationCooldown(time(nullptr) + CALENDAR_CREATE_EVENT_COOLDOWN);
+
         CalendarEvent* newEvent = new CalendarEvent(*oldEvent, sCalendarMgr->GetFreeEventId());
         newEvent->SetEventTime(time_t(eventTime));
         sCalendarMgr->AddEvent(newEvent, CALENDAR_SENDTYPE_COPY);

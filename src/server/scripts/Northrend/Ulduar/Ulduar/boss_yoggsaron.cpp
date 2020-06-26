@@ -2312,8 +2312,14 @@ class spell_yogg_saron_brain_link : public SpellScriptLoader
             void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 Unit* owner = GetUnitOwner();
+                if (!owner)
+                {
+                    SetDuration(0);
+                    return;
+                }
+
                 Unit* _target = ObjectAccessor::GetUnit(*owner, _targetGUID);
-                if (!owner || !_target || !_target->IsAlive() || fabs(owner->GetPositionZ() - _target->GetPositionZ()) > 10.0f) // Target or owner underground
+                if (!_target || !_target->IsAlive() || fabs(owner->GetPositionZ() - _target->GetPositionZ()) > 10.0f) // Target or owner underground
                 {
                     SetDuration(0);
                     return;

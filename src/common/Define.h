@@ -8,9 +8,11 @@
 #define ACORE_DEFINE_H
 
 #include <cstddef>
+#include <cstdint>
 #include <cinttypes>
 #include <climits>
 #include <cstring>
+#include <sys/types.h>
 #include "CompilerDefs.h"
 
 #if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)

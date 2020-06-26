@@ -219,6 +219,12 @@ WorldSocketMgr::~WorldSocketMgr()
     delete m_Acceptor;
 }
 
+WorldSocketMgr* WorldSocketMgr::instance()
+{
+    static WorldSocketMgr instance;
+    return &instance;
+}
+
 int
 WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 {

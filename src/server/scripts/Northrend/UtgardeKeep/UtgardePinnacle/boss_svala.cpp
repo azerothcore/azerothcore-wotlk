@@ -139,7 +139,7 @@ public:
 
         void SetData(uint32 data, uint32 param)
         {
-            if (data != 1 || param != 1 || Started || instance->GetData(DATA_SVALA_SORROWGRAVE) == DONE)
+            if (data != 1 || param != 1 || Started || (instance && instance->GetData(DATA_SVALA_SORROWGRAVE) == DONE))
                 return;
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);

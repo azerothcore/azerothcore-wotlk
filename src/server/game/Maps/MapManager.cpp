@@ -42,6 +42,12 @@ MapManager::~MapManager()
 {
 }
 
+MapManager* MapManager::instance()
+{
+    static MapManager instance;
+    return &instance;
+}
+
 void MapManager::Initialize()
 {
     int num_threads(sWorld->getIntConfig(CONFIG_NUMTHREADS));

@@ -778,9 +778,12 @@ class spell_oculus_rider_aura : public SpellScriptLoader
             void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 Unit* caster = GetCaster();
+                if (!caster)
+                    return;
+
                 Creature* drake = caster->GetVehicleCreatureBase();
 
-                if (!drake || !caster)
+                if (!drake)
                     return;
 
                 switch (aurEff->GetEffIndex())

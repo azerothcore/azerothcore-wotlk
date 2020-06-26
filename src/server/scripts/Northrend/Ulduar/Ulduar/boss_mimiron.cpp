@@ -395,11 +395,12 @@ public:
             }
 
             // ensure LMK2 is at proper position
-            if (Creature* LMK2 = GetLMK2())
-            {
-                LMK2->UpdatePosition(LMK2->GetHomePosition(), true);
-                LMK2->StopMovingOnCurrentPos();
-            }
+            if (pInstance)
+                if (Creature* LMK2 = GetLMK2())
+                {
+                    LMK2->UpdatePosition(LMK2->GetHomePosition(), true);
+                    LMK2->StopMovingOnCurrentPos();
+                }
 
             if (pInstance && pInstance->GetData(TYPE_MIMIRON) != DONE)
                 pInstance->SetData(TYPE_MIMIRON, IN_PROGRESS);

@@ -784,19 +784,20 @@ void WorldSession::HandleBuybackItem(WorldPacket & recvData)
         InventoryResult msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, pItem, false);
         if (msg == EQUIP_ERR_OK)
         {
-            _player->ModifyMoney(-(int32)price);
-            _player->RemoveItemFromBuyBackSlot(slot, false);
-            _player->ItemAddedQuestCheck(pItem->GetEntry(), pItem->GetCount());
-            _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, pItem->GetEntry(), pItem->GetCount());
-            _player->StoreItem(dest, pItem, true);
-
             if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
             {
                 PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM);
                 stmt->setUInt32(0, _player->GetGUID());
                 stmt->setUInt32(1, pItem->GetEntry());
+                stmt->setUInt32(2, pItem->GetCount());
                 CharacterDatabase.Execute(stmt);
             }
+
+            _player->ModifyMoney(-(int32)price);
+            _player->RemoveItemFromBuyBackSlot(slot, false);
+            _player->ItemAddedQuestCheck(pItem->GetEntry(), pItem->GetCount());
+            _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, pItem->GetEntry(), pItem->GetCount());
+            _player->StoreItem(dest, pItem, true);
         }
         else
             _player->SendEquipError(msg, pItem, NULL);

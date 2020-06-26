@@ -45,6 +45,12 @@ LFGMgr::~LFGMgr()
         delete itr->second;
 }
 
+LFGMgr* LFGMgr::instance()
+{
+    static LFGMgr instance;
+    return &instance;
+}
+
 void LFGMgr::_LoadFromDB(Field* fields, uint64 guid)
 {
     if (!fields)

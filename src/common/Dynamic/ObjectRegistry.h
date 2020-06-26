@@ -8,7 +8,6 @@
 #define ACORE_OBJECTREGISTRY_H
 
 #include "Define.h"
-#include <ace/Singleton.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -27,6 +26,12 @@ class ObjectRegistry
         {
             typename RegistryMapType::const_iterator iter = i_registeredObjects.find(key);
             return( iter == i_registeredObjects.end() ? NULL : iter->second );
+        }
+
+        static ObjectRegistry<T, Key>* instance()
+        {
+            static ObjectRegistry<T, Key>* instance = new ObjectRegistry<T, Key>();
+            return instance;
         }
 
         /// Inserts a registry item

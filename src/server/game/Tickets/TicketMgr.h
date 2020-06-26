@@ -7,10 +7,8 @@
 #ifndef _TICKETMGR_H
 #define _TICKETMGR_H
 
-#include <string>
-#include <ace/Singleton.h>
-
 #include "ObjectMgr.h"
+#include <string>
 
 class ChatHandler;
 
@@ -169,17 +167,18 @@ private:
     std::string _response;
     std::string _chatLog; // No need to store in db, will be refreshed every session client side
 };
+
 typedef std::map<uint32, GmTicket*> GmTicketList;
 
 class TicketMgr
 {
-    friend class ACE_Singleton<TicketMgr, ACE_Null_Mutex>;
-
 private:
     TicketMgr();
     ~TicketMgr();
 
 public:
+    static TicketMgr* instance();
+    
     void LoadTickets();
     void LoadSurveys();
 
@@ -246,6 +245,6 @@ protected:
     uint64 _lastChange;
 };
 
-#define sTicketMgr ACE_Singleton<TicketMgr, ACE_Null_Mutex>::instance()
+#define sTicketMgr TicketMgr::instance()
 
 #endif // _TICKETMGR_H

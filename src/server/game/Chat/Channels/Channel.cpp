@@ -790,7 +790,7 @@ void Channel::Say(uint64 guid, std::string const& what, uint32 lang)
 
     Player* player = pinfo.plrPtr;
 
-    if (player && !player->GetSession()->GetSecurity()) // pussywizard: prevent spam on populated channels
+    if (player && player->GetSession()->GetSecurity() == AccountTypes::SEC_PLAYER) // pussywizard: prevent spam on populated channels
     {
         uint32 speakDelay = 0;
         if (_channelRights.speakDelay > 0)

@@ -16,6 +16,7 @@
 #include "Player.h"
 #include "SpellMgr.h"
 #include "TemporarySummon.h"
+#include "Pet.h"
 
 enum MageSpells
 {
@@ -462,6 +463,36 @@ class spell_mage_brain_freeze : public SpellScriptLoader
         AuraScript* GetAuraScript() const
         {
             return new spell_mage_brain_freeze_AuraScript();
+        }
+};
+
+class spell_mage_glyph_of_eternal_water : public SpellScriptLoader
+{
+    public:
+        spell_mage_glyph_of_eternal_water() : SpellScriptLoader("spell_mage_glyph_of_eternal_water") { }
+
+        class spell_mage_glyph_of_eternal_water_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_mage_glyph_of_eternal_water_AuraScript);
+
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Unit* target = GetTarget())
+                    if (Player* player = target->ToPlayer())
+                        if (Pet* pet = player->GetPet())
+                            if (pet->GetEntry() == NPC_WATER_ELEMENTAL_PERM)
+                                pet->Remove(PET_SAVE_NOT_IN_SLOT);
+            }
+
+            void Register()
+            {
+                OnEffectRemove += AuraEffectRemoveFn(spell_mage_glyph_of_eternal_water_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_mage_glyph_of_eternal_water_AuraScript();
         }
 };
 
@@ -1091,6 +1122,7 @@ void AddSC_mage_spell_scripts()
     new spell_mage_burnout_trigger();
     new spell_mage_pet_scaling();
     new spell_mage_brain_freeze();
+    new spell_mage_glyph_of_eternal_water();
 
     // Theirs
     new spell_mage_blast_wave();

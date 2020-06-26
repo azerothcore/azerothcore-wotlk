@@ -1009,32 +1009,39 @@ public:
         {
             AddWaypoint(1, 2389.03f,     -5902.74f,     109.014f, 5000);
             AddWaypoint(2, 2341.812012f, -5900.484863f, 102.619743f);
-            AddWaypoint(3, 2306.561279f, -5901.738281f, 91.792419f);
-            AddWaypoint(4, 2300.098389f, -5912.618652f, 86.014885f);
+            AddWaypoint(3, 2308.34f, -5904.2f, 91.1099f);
+            AddWaypoint(4, 2300.69f, -5912.99f, 86.1572f);
             AddWaypoint(5, 2294.142090f, -5927.274414f, 75.316849f);
             AddWaypoint(6, 2286.984375f, -5944.955566f, 63.714966f);
             AddWaypoint(7, 2280.001709f, -5961.186035f, 54.228283f);
             AddWaypoint(8, 2259.389648f, -5974.197754f, 42.359348f);
             AddWaypoint(9, 2242.882812f, -5984.642578f, 32.827850f);
-            AddWaypoint(10, 2217.265625f, -6028.959473f, 7.675705f);
-            AddWaypoint(11, 2202.595947f, -6061.325684f, 5.882018f);
-            AddWaypoint(12, 2188.974609f, -6080.866699f, 3.370027f);
+            AddWaypoint(10, 2239.79f, -5989.31f, 30.4453f);
+            AddWaypoint(11, 2236.52f, -5994.28f, 27.4829f);
+            AddWaypoint(12, 2232.61f, -6000.23f, 23.1281f);
+            AddWaypoint(13, 2228.69f, -6006.46f, 17.6638f);
+            AddWaypoint(14, 2225.2f, -6012.39f, 12.9487f);
+            AddWaypoint(15, 2217.265625f, -6028.959473f, 7.675705f);
+            AddWaypoint(16, 2202.595947f, -6061.325684f, 5.882018f);
+            AddWaypoint(17, 2188.974609f, -6080.866699f, 3.370027f);
 
             if (urand(0, 1))
             {
-                AddWaypoint(13, 2176.483887f, -6110.407227f, 1.855181f);
-                AddWaypoint(14, 2172.516602f, -6146.752441f, 1.074235f);
-                AddWaypoint(15, 2138.918457f, -6158.920898f, 1.342926f);
-                AddWaypoint(16, 2129.866699f, -6174.107910f, 4.380779f);
-                AddWaypoint(17, 2117.709473f, -6193.830078f, 13.3542f, 10000);
+                AddWaypoint(18, 2176.483887f, -6110.407227f, 1.855181f);
+                AddWaypoint(19, 2172.516602f, -6146.752441f, 1.074235f);
+                AddWaypoint(20, 2138.918457f, -6158.920898f, 1.342926f);
+                AddWaypoint(21, 2129.866699f, -6174.107910f, 4.380779f);
+                AddWaypoint(22, 2125.250001f, -6181.230001f, 9.91997f);
+                AddWaypoint(23, 2117.709473f, -6193.830078f, 13.3542f, 10000);
             }
             else
             {
-                AddWaypoint(13, 2184.190186f, -6166.447266f, 0.968877f);
-                AddWaypoint(14, 2234.265625f, -6163.741211f, 0.916021f);
-                AddWaypoint(15, 2268.071777f, -6158.750977f, 1.822252f);
-                AddWaypoint(16, 2270.028320f, -6176.505859f, 6.340538f);
-                AddWaypoint(17, 2271.739014f, -6195.401855f, 13.3542f, 10000);
+                AddWaypoint(18, 2184.190186f, -6166.447266f, 0.968877f);
+                AddWaypoint(19, 2234.265625f, -6163.741211f, 0.916021f);
+                AddWaypoint(20, 2268.071777f, -6158.750977f, 1.822252f);
+                AddWaypoint(21, 2270.028320f, -6176.505859f, 6.340538f);
+                AddWaypoint(22, 2270.350001f, -6182.410001f, 10.42431f);
+                AddWaypoint(23, 2271.739014f, -6195.401855f, 13.3542f, 10000);
             }
         }
 
@@ -1063,7 +1070,7 @@ public:
                     IntroTimer = 4000;
                     IntroPhase = 1;
                     break;
-                case 17:
+                case 23:
                     if (Creature* car = ObjectAccessor::GetCreature(*me, carGUID))
                     {
                         car->SetPosition(car->GetPositionX(), car->GetPositionY(), me->GetPositionZ() + 1, car->GetOrientation());

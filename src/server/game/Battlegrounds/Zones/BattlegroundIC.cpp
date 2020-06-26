@@ -352,7 +352,7 @@ void BattlegroundIC::HandleAreaTrigger(Player* player, uint32 trigger)
 
 void BattlegroundIC::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
 {
-    std::map<uint64, BattlegroundScore*>::iterator itr = PlayerScores.find(player->GetGUID());
+    BattlegroundScoreMap::iterator itr = PlayerScores.find(player->GetGUID());
     if (itr == PlayerScores.end())
         return;
 

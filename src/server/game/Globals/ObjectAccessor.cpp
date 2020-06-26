@@ -35,6 +35,12 @@ ObjectAccessor::~ObjectAccessor()
 {
 }
 
+ObjectAccessor* ObjectAccessor::instance()
+{
+    static ObjectAccessor instance;
+    return &instance;
+}
+
 Player* ObjectAccessor::GetObjectInWorld(uint64 guid, Player* /*typeSpecifier*/)
 {
     Player* player = HashMapHolder<Player>::Find(guid);

@@ -168,7 +168,7 @@ public:
                 break;
             case GO_MASSIVE_DOOR:
                 m_uiMassiveDoor = go->GetGUID();
-                if (GetBossState(DATA_ARAN) == !IN_PROGRESS)
+                if (GetBossState(DATA_ARAN) != IN_PROGRESS)
                     go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
                 else
                     go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
@@ -181,7 +181,7 @@ public:
                 break;
             case GO_NETHERSPACE_DOOR:
                 m_uiNetherspaceDoor = go->GetGUID();
-                if (GetBossState(DATA_PRINCE) == !IN_PROGRESS)
+                if (GetBossState(DATA_PRINCE) != IN_PROGRESS)
                     go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
                 else
                     go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);

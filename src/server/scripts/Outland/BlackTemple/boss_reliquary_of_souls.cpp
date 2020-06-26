@@ -551,11 +551,14 @@ class boss_essence_of_anger : public CreatureScript
                         events.ScheduleEvent(EVENT_ANGER_SOUL_SCREAM, 10000);
                         break;
                     case EVENT_ANGER_SEETHE:
-                        if (targetGUID && targetGUID != me->GetVictim()->GetGUID())
-                            me->CastSpell(me, SPELL_SEETHE, false);
-                        // victim can be lost
-                        if (me->GetVictim())
-                            targetGUID = me->GetVictim()->GetGUID();
+                        if (Unit* victim = me->GetVictim())
+                        {
+                            uint64 victimGUID = victim->GetGUID();
+                            if (targetGUID && targetGUID != victimGUID)
+                                me->CastSpell(me, SPELL_SEETHE, false);
+                            // victim can be lost
+                            targetGUID = victimGUID;
+                        }     
                         events.ScheduleEvent(EVENT_ANGER_SEETHE, 1000);
                         break;
 

@@ -27,6 +27,12 @@ WaypointMgr::~WaypointMgr()
     _waypointStore.clear();
 }
 
+WaypointMgr* WaypointMgr::instance()
+{
+    static WaypointMgr instance;
+    return &instance;
+}
+
 void WaypointMgr::Load()
 {
     uint32 oldMSTime = getMSTime();

@@ -470,7 +470,7 @@ class Map : public GridRefManager<NGridType>
         BattlegroundMap* ToBattlegroundMap() { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap*>(this); else return NULL;  }
         const BattlegroundMap* ToBattlegroundMap() const { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap const*>(this); return NULL; }
 
-        float GetWaterOrGroundLevel(float x, float y, float z, float* ground = NULL, bool swim = false, float maxSearchDist = 50.0f) const;
+        float GetWaterOrGroundLevel(uint32 phasemask,float x, float y, float z, float* ground = NULL, bool swim = false, float maxSearchDist = 50.0f) const;
         float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
         bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const;
         void Balance() { _dynamicTree.balance(); }

@@ -187,9 +187,9 @@ public:
             instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, NOT_STARTED);
         }
 
-        void SummonWave(Wave* wave)
+        void SummonWave(Wave* wave, uint32 size)
         {
-            for (uint8 i = 0; i < sizeof(wave); ++i)
+            for (uint8 i = 0; i < size; ++i)
                 me->SummonCreature(wave[i].entry, wave[i].x_pos, wave[i].y_pos, wave[i].z_pos, M_PI);
 
             if (GameObject* waveDoor = me->GetMap()->GetGameObject(waveDoorGUID))
@@ -413,22 +413,22 @@ public:
                             me->SummonCreature(NPC_GYTH, 211.762f, -397.5885f, 111.1817f, 4.747295f);
                             break;
                         case EVENT_WAVE_1:
-                            SummonWave(Wave1);
+                            SummonWave(Wave1,4);
                             break;
                         case EVENT_WAVE_2:
-                            SummonWave(Wave2);
+                            SummonWave(Wave2,3);
                             break;
                         case EVENT_WAVE_3:
-                            SummonWave(Wave3);
+                            SummonWave(Wave3,4);
                             break;
                         case EVENT_WAVE_4:
-                            SummonWave(Wave4);
+                            SummonWave(Wave4,4);
                             break;
                         case EVENT_WAVE_5:
-                            SummonWave(Wave5);
+                            SummonWave(Wave5,5);
                             break;
                         case EVENT_WAVE_6:
-                            SummonWave(Wave6);
+                            SummonWave(Wave6,5);
                             break;
                         default:
                             break;

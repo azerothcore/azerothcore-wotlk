@@ -8,12 +8,9 @@
 
 #include "Common.h"
 #include "Channel.h"
-#include <ace/Singleton.h>
-
+#include "World.h"
 #include <map>
 #include <string>
-
-#include "World.h"
 
 #define MAX_CHANNEL_PASS_STR 31
 

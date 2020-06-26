@@ -18,6 +18,12 @@ AddonHandler::~AddonHandler()
 {
 }
 
+AddonHandler* AddonHandler::instance()
+{
+    static AddonHandler instance;
+    return &instance;
+}
+
 bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 {
     ByteBuffer AddOnPacked;

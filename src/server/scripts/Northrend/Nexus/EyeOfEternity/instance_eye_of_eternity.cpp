@@ -25,7 +25,7 @@ class instance_eye_of_eternity : public InstanceMapScript
 public:
     instance_eye_of_eternity() : InstanceMapScript("instance_eye_of_eternity", 616) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_eye_of_eternity_InstanceMapScript(pMap);
     }
@@ -43,7 +43,7 @@ public:
         uint64 GO_PlatformGUID;
         bool bPokeAchiev;
 
-        void Initialize()
+        void Initialize() override
         {
             EncounterStatus = NOT_STARTED;
 
@@ -54,17 +54,17 @@ public:
             bPokeAchiev = false;
         }
         
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             return EncounterStatus == IN_PROGRESS;
         }
 
-        void OnPlayerEnter(Player* pPlayer)
+        void OnPlayerEnter(Player* pPlayer) override
         {
             if (EncounterStatus == DONE)
             {
                 // destroy platform, hide iris (actually ensure, done at loading, but doesn't always work
-                ProcessEvent(NULL, 20158);
+                ProcessEvent(nullptr, 20158);
                 if (GameObject* go = instance->GetGameObject(GO_IrisGUID))
                     if (go->GetPhaseMask() != 2)
                         go->SetPhaseMask(2, true);
@@ -86,7 +86,7 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch(creature->GetEntry())
             {
@@ -96,7 +96,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch(go->GetEntry())
             {
@@ -113,7 +113,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -138,7 +138,7 @@ public:
                                 go->SetPhaseMask(1, true);
                             if (GameObject* go = instance->GetGameObject(GO_PlatformGUID))
                             {
-                                go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
+                                go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
                                 go->EnableCollision(true);
                             }
                             break;
@@ -173,7 +173,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const
+        uint64 GetData64(uint32 type) const override
         {
             switch(type)
             {
@@ -182,7 +182,7 @@ public:
             return 0;
         }
 
-        void ProcessEvent(WorldObject* /*unit*/, uint32 eventId)
+        void ProcessEvent(WorldObject* /*unit*/, uint32 eventId) override
         {
             switch(eventId)
             {
@@ -197,7 +197,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
             std::ostringstream saveStream;
@@ -207,7 +207,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if( !in )
             {
@@ -232,7 +232,7 @@ public:
                         break;
                     case DONE:
                         // destroy platform, hide iris
-                        ProcessEvent(NULL, 20158);
+                        ProcessEvent(nullptr, 20158);
                         if (GameObject* go = instance->GetGameObject(GO_IrisGUID))
                             go->SetPhaseMask(2, true);
                         break;
@@ -244,7 +244,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
