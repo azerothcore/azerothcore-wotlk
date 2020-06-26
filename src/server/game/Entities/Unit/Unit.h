@@ -2445,8 +2445,6 @@ class Unit : public WorldObject
         // Movement info
         Movement::MoveSpline * movespline;
 
-        virtual void Whisper(std::string const& text, Language language, Player* target, bool isBossWhisper = false);
-
     protected:
         explicit Unit (bool isWorldObject);
 
