@@ -113,6 +113,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     recruiterId(recruiter),
     isRecruiter(isARecruiter),
     m_currentBankerGUID(0),
+    m_currentVendorEntry(0),
     timeWhoCommandAllowed(0),
     _calendarEventCreationCooldown(0)
 {
