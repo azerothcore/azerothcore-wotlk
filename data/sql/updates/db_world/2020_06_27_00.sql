@@ -1,3 +1,19 @@
+-- DB update 2020_06_25_00 -> 2020_06_27_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_06_25_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_06_25_00 2020_06_27_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1589122395528568300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1589122395528568300');
 /*
  * Dungeon: Sethekk Halls
@@ -42,3 +58,12 @@ UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 1246, `maxdmg` = 181
 UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 821, `maxdmg` = 1118, `DamageModifier` = 1.01 WHERE `entry` = 18473;
 UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 1267, `maxdmg` = 1750, `DamageModifier` = 1.01 WHERE `entry` = 20706;
 UPDATE `creature_template` SET `type_flags` = 4, `mindmg` = 1327, `maxdmg` = 1880, `DamageModifier` = 1.01 WHERE `entry` = 23035;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
