@@ -116,6 +116,8 @@ enum WorldBoolConfigs
     CONFIG_DEATH_BONES_BG_OR_ARENA,
     CONFIG_DIE_COMMAND_MODE,
     CONFIG_DECLINED_NAMES_USED,
+    CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG,
+    CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG,
     CONFIG_BATTLEGROUND_CAST_DESERTER,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY,
@@ -135,6 +137,7 @@ enum WorldBoolConfigs
     CONFIG_PVP_TOKEN_ENABLE,
     CONFIG_NO_RESET_TALENT_COST,
     CONFIG_SHOW_KICK_IN_WORLD,
+    CONFIG_SHOW_MUTE_IN_WORLD,
     CONFIG_SHOW_BAN_IN_WORLD,
     CONFIG_CHATLOG_CHANNEL,
     CONFIG_CHATLOG_WHISPER,
@@ -173,6 +176,8 @@ enum WorldBoolConfigs
     CONFIG_ITEMDELETE_METHOD,
     CONFIG_ITEMDELETE_VENDOR,
     CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE,
+    CONFIG_DEBUG_BATTLEGROUND,
+    CONFIG_DEBUG_ARENA,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -316,6 +321,7 @@ enum WorldIntConfigs
     CONFIG_GUILD_BANK_EVENT_LOG_COUNT,
     CONFIG_MIN_LEVEL_STAT_SAVE,
     CONFIG_RANDOM_BG_RESET_HOUR,
+    CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR,
     CONFIG_GUILD_RESET_HOUR,
     CONFIG_CHARDELETE_KEEP_DAYS,
     CONFIG_CHARDELETE_METHOD,
@@ -351,6 +357,17 @@ enum WorldIntConfigs
     CONFIG_ICC_BUFF_ALLIANCE,
     CONFIG_ITEMDELETE_QUALITY,
     CONFIG_ITEMDELETE_ITEM_LEVEL,
+    CONFIG_BG_REWARD_WINNER_HONOR_FIRST,
+    CONFIG_BG_REWARD_WINNER_ARENA_FIRST,
+    CONFIG_BG_REWARD_WINNER_HONOR_LAST,
+    CONFIG_BG_REWARD_WINNER_ARENA_LAST,
+    CONFIG_BG_REWARD_LOSER_HONOR_FIRST,
+    CONFIG_BG_REWARD_LOSER_HONOR_LAST,
+    CONFIG_CHARTER_COST_GUILD,
+    CONFIG_CHARTER_COST_ARENA_2v2,
+    CONFIG_CHARTER_COST_ARENA_3v3,
+    CONFIG_CHARTER_COST_ARENA_5v5,
+    CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -374,7 +391,24 @@ enum Rates
     RATE_DROP_ITEM_LEGENDARY,
     RATE_DROP_ITEM_ARTIFACT,
     RATE_DROP_ITEM_REFERENCED,
+  
     RATE_DROP_ITEM_REFERENCED_AMOUNT,
+    RATE_SELLVALUE_ITEM_POOR,
+    RATE_SELLVALUE_ITEM_NORMAL,
+    RATE_SELLVALUE_ITEM_UNCOMMON,
+    RATE_SELLVALUE_ITEM_RARE,
+    RATE_SELLVALUE_ITEM_EPIC,
+    RATE_SELLVALUE_ITEM_LEGENDARY,
+    RATE_SELLVALUE_ITEM_ARTIFACT,
+    RATE_SELLVALUE_ITEM_HEIRLOOM,
+    RATE_BUYVALUE_ITEM_POOR,
+    RATE_BUYVALUE_ITEM_NORMAL,
+    RATE_BUYVALUE_ITEM_UNCOMMON,
+    RATE_BUYVALUE_ITEM_RARE,
+    RATE_BUYVALUE_ITEM_EPIC,
+    RATE_BUYVALUE_ITEM_LEGENDARY,
+    RATE_BUYVALUE_ITEM_ARTIFACT,
+    RATE_BUYVALUE_ITEM_HEIRLOOM,
     RATE_DROP_MONEY,
     RATE_XP_KILL,
     RATE_XP_BG_KILL,
@@ -493,13 +527,14 @@ enum RealmZone
 
 enum WorldStates
 {
-    WS_ARENA_DISTRIBUTION_TIME  = 20001,                     // Next arena distribution time
-    WS_WEEKLY_QUEST_RESET_TIME  = 20002,                     // Next weekly reset time
-    WS_BG_DAILY_RESET_TIME      = 20003,                     // Next daily BG reset time
-    WS_CLEANING_FLAGS           = 20004,                     // Cleaning Flags
-    WS_DAILY_QUEST_RESET_TIME   = 20005,                     // Next daily reset time
-    WS_GUILD_DAILY_RESET_TIME   = 20006,                     // Next guild cap reset time
-    WS_MONTHLY_QUEST_RESET_TIME = 20007,                     // Next monthly reset time
+    WS_ARENA_DISTRIBUTION_TIME                 = 20001,                     // Next arena distribution time
+    WS_WEEKLY_QUEST_RESET_TIME                 = 20002,                     // Next weekly reset time
+    WS_BG_DAILY_RESET_TIME                     = 20003,                     // Next daily BG reset time
+    WS_CLEANING_FLAGS                          = 20004,                     // Cleaning Flags
+    WS_DAILY_QUEST_RESET_TIME                  = 20005,                     // Next daily reset time
+    WS_GUILD_DAILY_RESET_TIME                  = 20006,                     // Next guild cap reset time
+    WS_MONTHLY_QUEST_RESET_TIME                = 20007,                     // Next monthly reset time
+    WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20008                      // Next daily calendar deletions of old events time
 };
 
 /// Storage class for commands issued for delayed execution
@@ -787,7 +822,7 @@ class World
         char const* GetDBVersion() const { return m_DBVersion.c_str(); }
 
         void LoadAutobroadcasts();
-        
+
         void UpdateAreaDependentAuras();
 
         uint32 GetCleaningFlags() const { return m_CleaningFlags; }
@@ -812,11 +847,13 @@ class World
         void InitWeeklyQuestResetTime();
         void InitMonthlyQuestResetTime();
         void InitRandomBGResetTime();
+        void InitCalendarOldEventsDeletionTime();
         void InitGuildResetTime();
         void ResetDailyQuests();
         void ResetWeeklyQuests();
         void ResetMonthlyQuests();
         void ResetRandomBG();
+        void CalendarDeleteOldEvents();
         void ResetGuildCap();
     private:
         static ACE_Atomic_Op<ACE_Thread_Mutex, bool> m_stopEvent;
@@ -879,6 +916,7 @@ class World
         time_t m_NextWeeklyQuestReset;
         time_t m_NextMonthlyQuestReset;
         time_t m_NextRandomBGReset;
+        time_t m_NextCalendarOldEventsDeletionTime;
         time_t m_NextGuildReset;
 
         //Player Queue
@@ -902,7 +940,7 @@ class World
 
         std::string m_configFileList;
 };
- 
+
 #define sWorld World::instance()
 #endif
 /// @}
