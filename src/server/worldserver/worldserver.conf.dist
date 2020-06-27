@@ -28,6 +28,7 @@
 #    ITEM DELETE OPTIONS
 #    CUSTOM SERVER OPTIONS
 #    PACKET SPOOF PROTECTION SETTINGS
+#    DEBUG
 #
 ###################################################################################################
 
@@ -2778,6 +2779,22 @@ Battleground.ReportAFK.Timer = 4
 
 Battleground.ReportAFK = 3
 
+#    Battleground.DisableQuestShareInBG
+#        Description: Disables the ability to share quests while in a Battleground.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.DisableQuestShareInBG = 0
+
+#
+#    Battleground.DisableReadyCheckInBG
+#        Description: Disables the ability to send a Ready Check survey while in a Battleground.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.DisableReadyCheckInBG = 0
+
+#
 #     Battleground.RewardWinnerHonorFirst
 #     Battleground.RewardWinnerArenaFirst
 #     Battleground.RewardWinnerHonorLast
@@ -3544,6 +3561,27 @@ PacketSpoof.BanMode = 0
 #
 
 PacketSpoof.BanDuration = 86400
+
+#
+###################################################################################################
+
+###################################################################################################
+# DEBUG
+#
+#    Debug.Battleground
+#        Description: Enable or disable Battleground 1v0 mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.Battleground = 0
+
+#
+#    Debug.Arena
+#        Description: Enable or disable Arena 1v1 mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.Arena = 0
 
 #
 ###################################################################################################
