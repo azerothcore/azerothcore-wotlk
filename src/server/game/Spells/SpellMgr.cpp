@@ -1259,8 +1259,8 @@ void SpellMgr::LoadSpellRanks()
 
     uint32 oldMSTime = getMSTime();
 
-    //                                                     0             1      2
-    QueryResult result = WorldDatabase.Query("SELECT first_spell_id, spell_id, rank from spell_ranks ORDER BY first_spell_id, rank");
+    //                                               0               1          2
+    QueryResult result = WorldDatabase.Query("SELECT first_spell_id, spell_id, `rank` from spell_ranks ORDER BY first_spell_id, `rank`");
 
     if (!result)
     {
@@ -2710,6 +2710,49 @@ void SpellMgr::LoadSpellSpecificAndAuraState()
 void SpellMgr::LoadSpellCustomAttr()
 {
     uint32 oldMSTime = getMSTime();
+    uint32 customAttrTime = getMSTime();
+    uint32 count;
+
+    QueryResult result = WorldDatabase.Query("SELECT entry, attributes FROM spell_custom_attr");
+
+    if (!result)
+        sLog->outString(">> Loaded 0 spell custom attributes from DB. DB table `spell_custom_attr` is empty.");
+    else
+    {
+        for (count = 0; result->NextRow(); ++count)
+        {
+            Field* fields = result->Fetch();
+
+            uint32 spellId = fields[0].GetUInt32();
+            uint32 attributes = fields[1].GetUInt32();
+
+            SpellInfo * spellInfo = _GetSpellInfo(spellId);
+            if (!spellInfo)
+            {
+                sLog->outString("Table `spell_custom_attr` has wrong spell (entry: %u), ignored.", spellId);
+                continue;
+            }
+
+            if ((attributes & SPELL_ATTR0_CU_NEGATIVE) != 0)
+            {
+                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                {
+                    if (spellInfo->Effects[i].IsEffect())
+                        continue;
+
+                    if ((attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) != 0)
+                    {
+                        sLog->outString("Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
+                        continue;
+                    }
+                }
+            }
+
+            spellInfo->AttributesCu |= attributes;
+        }
+        sLog->outString(">> Loaded %u spell custom attributes from DB in %u ms", count, GetMSTimeDiffToNow(customAttrTime));
+    }
+
 
     // xinef: create talent spells set
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
@@ -2739,14 +2782,6 @@ void SpellMgr::LoadSpellCustomAttr()
         {
             switch (spellInfo->Effects[j].ApplyAuraName)
             {
-                case SPELL_AURA_MOD_POSSESS:
-                case SPELL_AURA_MOD_CONFUSE:
-                case SPELL_AURA_MOD_CHARM:
-                case SPELL_AURA_AOE_CHARM:
-                case SPELL_AURA_MOD_FEAR:
-                case SPELL_AURA_MOD_STUN:
-                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
-                    break;
                 case SPELL_AURA_PERIODIC_HEAL:
                 case SPELL_AURA_PERIODIC_DAMAGE:
                 case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
@@ -2857,7 +2892,7 @@ void SpellMgr::LoadSpellCustomAttr()
                                 spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DUMMY)
                                 continue;
                         default:
-                            if (spellInfo->Effects[j].CalcValue() || ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_AURA_CC)) && !spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY)))
+                            if (spellInfo->Effects[j].CalcValue() || ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) && !spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY)))
                                 if (spellInfo->Id != 69649 && spellInfo->Id != 71056 && spellInfo->Id != 71057 && spellInfo->Id != 71058 && spellInfo->Id != 73061 && spellInfo->Id != 73062 && spellInfo->Id != 73063 && spellInfo->Id != 73064) // Sindragosa Frost Breath
                                 if (spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || !(spellInfo->SpellFamilyFlags[0] & 0x20)) // frostbolt
                                 if (spellInfo->Id != 55095) // frost fever
@@ -3170,27 +3205,6 @@ void SpellMgr::LoadSpellCustomAttr()
                 break;
             case 44535: // Spirit Heal, abilities also have no cost
                 spellInfo->Effects[EFFECT_0].MiscValue = 127;
-                break;
-        }
-
-        switch (spellInfo->SpellFamilyName)
-        {
-            case SPELLFAMILY_WARRIOR:
-                // Shout / Piercing Howl
-                if (spellInfo->SpellFamilyFlags[0] & 0x20000 || spellInfo->SpellFamilyFlags[1] & 0x20)
-                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
-                break;
-            case SPELLFAMILY_DRUID:
-                // Roar
-                if (spellInfo->SpellFamilyFlags[0] & 0x8)
-                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
-                break;
-            case SPELLFAMILY_GENERIC:
-                // Stoneclaw Totem effect
-                if(spellInfo->Id == 5729)
-                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
-                break;
-            default:
                 break;
         }
     }

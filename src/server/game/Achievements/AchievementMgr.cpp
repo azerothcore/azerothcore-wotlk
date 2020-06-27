@@ -366,7 +366,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 if (source->GetMap()->Is25ManRaid() != ((difficulty.difficulty & RAID_DIFFICULTY_MASK_25MAN) != 0))
                     return false;
 
-            AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(criteria_id); 
+            AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(criteria_id);
             uint8 spawnMode = source->GetMap()->GetSpawnMode();
             // Dungeons completed on heroic mode count towards both in general achievement, but not in statistics.
             return sAchievementMgr->IsStatisticCriteria(criteria) ? spawnMode == difficulty.difficulty : spawnMode >= difficulty.difficulty;
@@ -662,7 +662,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     if (achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
         return;
 
-    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(ACORE_DEBUG) 
+    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(ACORE_DEBUG)
         sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
     #endif
 
@@ -763,7 +763,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
         sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "UpdateAchievementCriteria: Wrong criteria type %u", type);
         return;
     }
-    
+
     sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::UpdateAchievementCriteria(%u, %u, %u)", type, miscValue1, miscValue2);
 #endif
 
@@ -2150,7 +2150,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     if (m_player->IsGameMaster())
     {
         sLog->outString("Not available in GM mode.");
-        ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");        
+        ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");
         return;
     }
 
@@ -2215,12 +2215,27 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
     // mail
     if (reward->sender)
-    {        
+    {
         MailDraft draft(reward->mailTemplate);
 
         if (!reward->mailTemplate)
-            draft = MailDraft(reward->subject, reward->text);
-
+        {
+            std::string subject = reward->subject;
+            std::string text = reward->text;
+            
+            LocaleConstant localeConstant = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
+            if (localeConstant != LOCALE_enUS)
+            {
+                if(AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
+                {
+                    ObjectMgr::GetLocaleString(loc->Subject, localeConstant, subject);
+                    ObjectMgr::GetLocaleString(loc->Text, localeConstant, text);
+                }
+            }
+          
+            draft = MailDraft(subject, text);
+        }
+		
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
         Item* item = reward->itemId ? Item::CreateItem(reward->itemId, 1, GetPlayer()) : NULL;
@@ -2782,35 +2797,35 @@ void AchievementGlobalMgr::LoadRewards()
         AchievementEntry const* achievement = sAchievementStore.LookupEntry(entry);
         if (!achievement)
         {
-            sLog->outErrorDb("Table `achievement_reward` has wrong achievement (Entry: %u), ignore", entry);
+            sLog->outErrorDb("Table `achievement_reward` has wrong achievement (Entry: %u). Ignoring.", entry);
             continue;
         }
 
         AchievementReward reward;
-        reward.titleId[0]   = fields[1].GetUInt32();
-        reward.titleId[1]   = fields[2].GetUInt32();
+        reward.titleId[0]   = fields[1].GetUInt32(); // Alliance title
+        reward.titleId[1]   = fields[2].GetUInt32(); // Horde title
         reward.itemId       = fields[3].GetUInt32();
-        reward.sender       = fields[4].GetUInt32();
+        reward.sender       = fields[4].GetUInt32(); // The sender of the mail (a creature from creature_template)
         reward.subject      = fields[5].GetString();
-        reward.text         = fields[6].GetString();
+        reward.text         = fields[6].GetString(); // Body in DB
         reward.mailTemplate = fields[7].GetUInt32();
 
-        // must be title or mail at least
+        // Must reward a title or send a mail else, skip it.
         if (!reward.titleId[0] && !reward.titleId[1] && !reward.sender)
         {
-            sLog->outErrorDb("Table `achievement_reward` (Entry: %u) not have title or item reward data, ignore.", entry);
+            sLog->outErrorDb("Table `achievement_reward` (Entry: %u) does not have any title or item reward data. Ignoring.", entry);
             continue;
         }
 
         if (achievement->requiredFaction == ACHIEVEMENT_FACTION_ANY && (!reward.titleId[0] ^ !reward.titleId[1]))
-            sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has title (A: %u H: %u) for only one team.", entry, reward.titleId[0], reward.titleId[1]);
+            sLog->outDebug(LOG_FILTER_NONE, "Table `achievement_reward` (Entry: %u) has title (A: %u H: %u) set for only one team.", entry, reward.titleId[0], reward.titleId[1]);
 
         if (reward.titleId[0])
         {
             CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(reward.titleId[0]);
             if (!titleEntry)
             {
-                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has invalid title id (%u) in `title_A`, set to 0", entry, reward.titleId[0]);
+                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has invalid title id (%u) in `title_A`. Setting it to 0.", entry, reward.titleId[0]);
                 reward.titleId[0] = 0;
             }
         }
@@ -2820,51 +2835,52 @@ void AchievementGlobalMgr::LoadRewards()
             CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(reward.titleId[1]);
             if (!titleEntry)
             {
-                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has invalid title id (%u) in `title_H`, set to 0", entry, reward.titleId[1]);
+                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has invalid title id (%u) in `title_H`. Setting it to 0.", entry, reward.titleId[1]);
                 reward.titleId[1] = 0;
             }
         }
 
-        //check mail data before item for report including wrong item case
+        // Check mail data before item for report including wrong item case
         if (reward.sender)
         {
             if (!sObjectMgr->GetCreatureTemplate(reward.sender))
             {
-                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has invalid creature entry %u as sender, mail reward skipped.", entry, reward.sender);
+                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has invalid creature_template entry %u as Sender. Will not send the mail reward.", entry, reward.sender);
                 reward.sender = 0;
             }
         }
         else
         {
             if (reward.itemId)
-                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) does not have sender data but has item reward, item will not be rewarded.", entry);
+                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has itemId reward set but does not have Sender data set. Item will not be sent.", entry);
 
             if (!reward.subject.empty())
-                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) does not have sender data but has mail subject.", entry);
+                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has mail Subject but does not have Sender data set.", entry); // Maybe add "Mail will not be sent." ?
 
             if (!reward.text.empty())
-                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) does not have sender data but has mail text.", entry);
+                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has mail text (Body) set but does not have Sender data set.", entry); // Maybe add "Mail will not be sent." ?
 
             if (reward.mailTemplate)
-                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) does not have sender data but has mailTemplate.", entry);
+                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has mailTemplate set does not have Sender data set.", entry); // Maybe add "Mail will not be sent." ?
         }
 
         if (reward.mailTemplate)
         {
             if (!sMailTemplateStore.LookupEntry(reward.mailTemplate))
             {
-                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has invalid mailTemplate (%u).", entry, reward.mailTemplate);
+                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has invalid mailTemplate (%u) (check the DBC).", entry, reward.mailTemplate);
                 reward.mailTemplate = 0;
             }
             else if (!reward.subject.empty() || !reward.text.empty())
-                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has mailTemplate (%u) and mail subject/text.", entry, reward.mailTemplate);
+                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has mailTemplate (%u) and mail Subject/Body. To use the column mailTemplate, Subject and Body must be empty.", entry, reward.mailTemplate);
         }
 
         if (reward.itemId)
         {
             if (!sObjectMgr->GetItemTemplate(reward.itemId))
             {
-                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has invalid item id %u, reward mail will not contain item.", entry, reward.itemId);
+                // Not sure it's an error, it's probably an outDebug instead, because we can simply send a mail with no reward, right?
+                sLog->outErrorDb("Table `achievement_reward` (Entry: %u) has invalid item_template id %u. Reward mail will not contain any item.", entry, reward.itemId);
                 reward.itemId = 0;
             }
         }
