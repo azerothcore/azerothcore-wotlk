@@ -4075,6 +4075,45 @@ public:
     }
 };
 
+enum Eggnog
+{
+    SPELL_EGG_NOG_REINDEER = 21936,
+    SPELL_EGG_NOG_SNOWMAN  = 21980,
+};
+class spell_item_eggnog : public SpellScriptLoader
+{
+public:
+    spell_item_eggnog() : SpellScriptLoader("spell_item_eggnog") { }
+
+    class spell_item_eggnog_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_eggnog_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_EGG_NOG_REINDEER) || !sSpellMgr->GetSpellInfo(SPELL_EGG_NOG_SNOWMAN))
+                return false;
+            return true;
+        }
+
+        void HandleScript(SpellEffIndex /* effIndex */)
+        {
+            if (roll_chance_i(40))
+                GetCaster()->CastSpell(GetHitUnit(), roll_chance_i(50) ? SPELL_EGG_NOG_REINDEER : SPELL_EGG_NOG_SNOWMAN, GetCastItem());
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_item_eggnog_SpellScript::HandleScript, EFFECT_2, SPELL_EFFECT_INEBRIATE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_item_eggnog_SpellScript();
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // Ours
@@ -4180,4 +4219,5 @@ void AddSC_item_spell_scripts()
     new spell_item_chicken_cover();
     new spell_item_muisek_vessel();
     new spell_item_greatmothers_soulcatcher();
+    new spell_item_eggnog();
 }
