@@ -41,10 +41,8 @@ public:
 
     struct boss_pandemoniusAI : public ScriptedAI
     {
-        boss_pandemoniusAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
-
+        boss_pandemoniusAI(Creature* creature) : ScriptedAI(creature) { }
+        
         EventMap events;
 
         void Reset()
