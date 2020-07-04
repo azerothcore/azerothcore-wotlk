@@ -27,6 +27,7 @@
 #    CHARACTER DELETE OPTIONS
 #    ITEM DELETE OPTIONS
 #    CUSTOM SERVER OPTIONS
+#    DEBUG
 #
 ###################################################################################################
 
@@ -3515,7 +3516,6 @@ ICC.Buff.Alliance = 73828
 ###################################################################################################
 
 ###################################################################################################
-#
 # Packet Spoof Protection Settings
 #
 # These settings determine which action to take when harmful packet spoofing is detected.
@@ -3548,4 +3548,25 @@ PacketSpoof.BanMode = 0
 PacketSpoof.BanDuration = 86400
 
 #
-################################################################################################### 
+###################################################################################################
+
+###################################################################################################
+# DEBUG
+#
+#    Debug.Battleground
+#        Description: Enable or disable Battleground 1v0 mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.Battleground = 0
+
+#
+#    Debug.Arena
+#        Description: Enable or disable Arena 1v1 mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.Arena = 0
+
+#
+###################################################################################################
