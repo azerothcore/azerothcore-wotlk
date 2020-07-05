@@ -20,7 +20,6 @@ We support these versions of MariaDB:
 
 | MariaDB Version | Supported          |
 | --------------- | ------------------ |
-| 10.1            | :white_check_mark: |
 | 10.2            | :white_check_mark: |
 | 10.3            | :white_check_mark: |
 | 10.4            | :white_check_mark: |
