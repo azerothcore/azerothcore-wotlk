@@ -1086,12 +1086,12 @@ public:
         return true;
     }
 
-    static bool HandleSaveCommand(ChatHandler*  handler, char const* /*args*/)
+    static bool HandleSaveCommand(ChatHandler* handler, char const* /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
 
         // save GM account without delay and output message
-        if (handler->GetSession()->GetSecurity() >= SEC_MODERATOR)
+        if (handler->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
         {
             if (Player* target = handler->getSelectedPlayer())
                 target->SaveToDB(true, false);
