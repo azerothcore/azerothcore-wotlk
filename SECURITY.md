@@ -30,4 +30,4 @@ Note: We do not support any repacks that may or may not have been made based on 
 
 We class a vulnerability to be any hack or exploit that has an impact on the server performance or that gives unfair advantages in the game (e.g fly hacking or injection tools).
 
-If a new vulnerability is found you should always create a new [bug report](https://github.com/azerothcore/azerothcore-wotlk/issues/new).
+If a new vulnerability is found you should always create a new [bug report](https://github.com/azerothcore/azerothcore-wotlk/issues/new/choose).
