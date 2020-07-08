@@ -11,9 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [clang6, clang7]
+        compiler: [clang6, clang9, clang10]
         modules: [with, without]
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     name: ${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
       COMPILER: ${{ matrix.compiler }}
@@ -30,8 +30,6 @@ jobs:
           restore-keys: |
             ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
             ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules
-            ccache:${{ matrix.compiler }}
-            ccache
       - name: Configure OS
         run: source ./apps/ci/ci-install.sh
         env:
