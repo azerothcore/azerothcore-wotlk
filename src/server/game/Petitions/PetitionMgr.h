@@ -19,14 +19,6 @@ enum CharterItemIDs
     ARENA_TEAM_CHARTER_5v5  = 23562
 };
 
-enum CharterCosts
-{
-    GUILD_CHARTER_COST          = 1000,
-    ARENA_TEAM_CHARTER_2v2_COST = 800000,
-    ARENA_TEAM_CHARTER_3v3_COST = 1200000,
-    ARENA_TEAM_CHARTER_5v5_COST = 2000000
-};
-
 typedef std::map<uint32, uint32> SignatureMap;
 
 struct Petition
