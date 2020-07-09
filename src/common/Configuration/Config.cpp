@@ -203,7 +203,6 @@ bool ConfigMgr::LoadAppConfigs(std::string const& applicationName /*= "worldserv
     {
         printf("Load config error. Invalid or missing dist configuration file: %s", std::string(_initConfigFile + ".dist").c_str());
         printf("Verify that the file exists and has \'[%s]' written in the top of the file!", applicationName.c_str());
-
         return false;
     }
 
@@ -213,7 +212,6 @@ bool ConfigMgr::LoadAppConfigs(std::string const& applicationName /*= "worldserv
         sLog->outString("");
         sLog->outString("Load config error. Invalid or missing configuration file: %s", _initConfigFile.c_str());
         sLog->outString("Verify that the file exists and has \'[%s]' written in the top of the file!", applicationName.c_str());
-
         return false;
     }
 
@@ -252,9 +250,8 @@ bool ConfigMgr::LoadModulesConfigs()
         // Load .conf.dist config
         if (!sConfigMgr->LoadMore(ConfigFileDist.c_str()))
         {
-            IsExistDistConfig = false;
-
             sLog->outError("> Invalid or missing dist configuration file: %s", ConfigFileDist.c_str());
+            IsExistDistConfig = false;
         }
 
         // Load .conf config
@@ -270,7 +267,7 @@ bool ConfigMgr::LoadModulesConfigs()
             moduleConfigFiles.insert(std::make_pair(moduleName, defaultConfig));
     }
 
-    // If module configs exist and not load all
+    // If module configs not exist - no load
     if (moduleConfigFiles.empty())
         return false;
 
