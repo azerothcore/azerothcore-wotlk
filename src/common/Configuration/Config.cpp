@@ -254,20 +254,12 @@ bool ConfigMgr::LoadModulesConfigs()
         {
             IsExistDistConfig = false;
 
-            sLog->outString("");
-            sLog->outError("Load config error. Invalid or missing dist configuration file: %s", ConfigFileDist.c_str());
-            sLog->outError("Verify that the file exists and has \'[%s]' written in the top of the file!", applicationName.c_str());
+            sLog->outError("> Invalid or missing dist configuration file: %s", ConfigFileDist.c_str());
         }
 
         // Load .conf config
         if (!sConfigMgr->LoadMore(defaultConfig.c_str()))
-        {
             IsExistDefaultConfig = false;
-
-            sLog->outString("");
-            sLog->outString("Load config error. Invalid or missing configuration file: %s", defaultConfig.c_str());
-            sLog->outString("Verify that the file exists and has \'[%s]' written in the top of the file!", applicationName.c_str());
-        } 
 
         // #1 - Not exist .conf and exist .conf.dist
         if (!IsExistDefaultConfig && IsExistDistConfig)
