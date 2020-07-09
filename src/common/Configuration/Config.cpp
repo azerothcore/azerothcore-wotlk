@@ -230,7 +230,6 @@ bool ConfigMgr::LoadModulesConfigs()
     moduleConfigFiles.clear();
 
     std::string configPath = _CONF_DIR;
-    std::string applicationName = "worldserver";
 
     for (auto const& itr : _modulesConfigFiles)
     {
