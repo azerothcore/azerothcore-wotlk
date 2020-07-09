@@ -296,7 +296,7 @@ public:
         }
 
         char* addMulti = strtok(nullptr, " ");
-        uint32 vendor_entry = addMulti ? handler->GetSession()->GetCurrentVendor() : vendor ? vendor->GetEntry() : 0;
+        uint32 vendor_entry = addMulti ? handler->GetSession()->GetCurrentVendor() : vendor->GetEntry();
 
         if (!sObjectMgr->IsVendorItemValid(vendor_entry, itemId, maxcount, incrtime, extendedcost, handler->GetSession()->GetPlayer()))
         {
