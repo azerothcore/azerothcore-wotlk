@@ -124,8 +124,6 @@ World::World()
 
     m_CleaningFlags = 0;
 
-    m_configFileList = "";
-
     memset(rate_values, 0, sizeof(rate_values));
     memset(m_int_configs, 0, sizeof(m_int_configs));
     memset(m_bool_configs, 0, sizeof(m_bool_configs));
@@ -414,46 +412,6 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
     return found;
 }
 
-void World::LoadModuleConfigSettings()
-{
-    Tokenizer configFileList(GetConfigFileList(), ',');
-    for (auto i = configFileList.begin(); i != configFileList.end(); i++)
-    {
-        std::string configFile = (*i) + std::string(".conf");
-
-        std::string conf_path = _CONF_DIR;
-        std::string cfg_file = conf_path + "/" + configFile;
-
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-        cfg_file = configFile;
-#endif
-        std::string cfg_def_file = cfg_file + ".dist";
-
-        // Load .conf.dist config
-        if (!sConfigMgr->LoadMore(cfg_def_file.c_str()))
-        {
-            sLog->outString();
-            sLog->outError("Module config: Invalid or missing configuration (*.conf.dist) file : %s", cfg_def_file.c_str());
-            sLog->outError("Module config: Verify that this file exists and has \'[worldserver]' written at the top of the file!");
-
-            // If .conf exists, it will load it so it will NOT use the default hardcoded settings
-            if (!sConfigMgr->LoadMore(cfg_file.c_str()))
-            {
-                sLog->outError("Module config: Using default hardcoded settings.");
-            }
-            sLog->outString();
-        }
-
-        // Load .conf config
-        if (!sConfigMgr->LoadMore(cfg_file.c_str()))
-        {
-            sLog->outString();
-            sLog->outString("Module config: %s not found (or invalid), using default settings from %s", cfg_file.c_str(), cfg_def_file.c_str());
-            sLog->outString();
-        }
-    }
-}
-
 /// Initialize config values
 void World::LoadConfigSettings(bool reload)
 {
@@ -465,8 +423,6 @@ void World::LoadConfigSettings(bool reload)
             return;
         }
     }
-
-    LoadModuleConfigSettings();
 
 #ifdef ELUNA
     ///- Initialize Lua Engine
@@ -487,6 +443,7 @@ void World::LoadConfigSettings(bool reload)
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)
         SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
+
     Motd::SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to an AzerothCore server"));
 
     ///- Read ticket system setting from the config file
