@@ -2589,9 +2589,9 @@ void ScriptMgr::OnBattlegroundRemovePlayerAtLeave(Battleground* bg, Player* play
     FOREACH_SCRIPT(BGScript)->OnBattlegroundRemovePlayerAtLeave(bg, player);
 }
 
-void ScriptMgr::OnQueueUpdate(BattlegroundQueue* queue, BattlegroundBracketId bracket_id, uint8 actionMask, bool isRated, uint32 arenaRatedTeamId)
+void ScriptMgr::OnQueueUpdate(BattlegroundQueue* queue, BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId)
 {
-    FOREACH_SCRIPT(BGScript)->OnQueueUpdate(queue, bracket_id, actionMask, isRated, arenaRatedTeamId);
+    FOREACH_SCRIPT(BGScript)->OnQueueUpdate(queue, bracket_id, isRated, arenaRatedTeamId);
 }
 
 void ScriptMgr::OnAddGroup(BattlegroundQueue* queue, GroupQueueInfo* ginfo, uint32& index, Player* leader, Group* grp, PvPDifficultyEntry const* bracketEntry, bool isPremade)

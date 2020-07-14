@@ -1286,7 +1286,7 @@ public:
     // Remove player at leave BG
     virtual void OnBattlegroundRemovePlayerAtLeave(Battleground* /*bg*/, Player* /*player*/) { }
 
-    virtual void OnQueueUpdate(BattlegroundQueue* /*queue*/, BattlegroundBracketId /*bracket_id*/, uint8 /*actionMask*/, bool /*isRated*/, uint32 /*arenaRatedTeamId*/) { }
+    virtual void OnQueueUpdate(BattlegroundQueue* /*queue*/, BattlegroundBracketId /*bracket_id*/, bool /*isRated*/, uint32 /*arenaRatedTeamId*/) { }
 
     virtual void OnAddGroup(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/, uint32& /*index*/, Player* /*leader*/, Group* /*grp*/, PvPDifficultyEntry const* /*bracketEntry*/, bool /*isPremade*/) { }
 
@@ -1886,7 +1886,7 @@ class ScriptMgr
         void OnBattlegroundAddPlayer(Battleground* bg, Player* player);
         void OnBattlegroundBeforeAddPlayer(Battleground* bg, Player* player);
         void OnBattlegroundRemovePlayerAtLeave(Battleground* bg, Player* player);
-        void OnQueueUpdate(BattlegroundQueue* queue, BattlegroundBracketId bracket_id, uint8 actionMask, bool isRated, uint32 arenaRatedTeamId);
+        void OnQueueUpdate(BattlegroundQueue* queue, BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId);
         void OnAddGroup(BattlegroundQueue* queue, GroupQueueInfo* ginfo, uint32& index, Player* leader, Group* grp, PvPDifficultyEntry const* bracketEntry, bool isPremade);
         bool CanFillPlayersToBG(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId bracket_id);
         bool CanFillPlayersToBGWithSpecific(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree,

@@ -723,8 +723,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
         MaxPlayersPerTeam = m_arenaType;
     }
 
-    // BattlegroundBracketId bracket_id, uint8 actionMask, bool isRated, uint32 arenaRatedTeamId
-    sScriptMgr->OnQueueUpdate(this, bracket_id, actionMask, isRated, arenaRatedTeamId);
+    sScriptMgr->OnQueueUpdate(this, bracket_id, isRated, arenaRatedTeamId);
 
     // check if can start new premade battleground
     if (bg_template->isBattleground() && m_bgTypeId != BATTLEGROUND_RB)
