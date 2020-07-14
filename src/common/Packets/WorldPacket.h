@@ -22,6 +22,12 @@ class WorldPacket : public ByteBuffer
         WorldPacket(const WorldPacket &packet)              : ByteBuffer(packet), m_opcode(packet.m_opcode)
         {
         }
+        /* requried as of C++ 11 */
+        #if __cplusplus >= 201103L
+        WorldPacket(WorldPacket&&) = default;
+        WorldPacket& operator=(const WorldPacket&) = default;
+        WorldPacket& operator=(WorldPacket&&) = default;
+        #endif
 
         void Initialize(uint16 opcode, size_t newres=200)
         {
@@ -37,4 +43,3 @@ class WorldPacket : public ByteBuffer
         uint16 m_opcode;
 };
 #endif
-
