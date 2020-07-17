@@ -170,3 +170,6 @@ DB_AUTH_NAME="acore_auth"
 DB_CHARACTERS_NAME="acore_characters"
 
 DB_WORLD_NAME="acore_world"
+
+# Branch configuration for installer to pull from
+INSTALLER_PULL_FROM="master"

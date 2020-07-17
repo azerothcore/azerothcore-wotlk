@@ -27,7 +27,9 @@ function inst_configureOS() {
 
 function inst_updateRepo() {
     cd "$AC_PATH_ROOT"
-    git pull origin $(git rev-parse --abbrev-ref HEAD)
+    source "$AC_PATH_CONF/config.sh.dist" #hack to get the parameter for the branch name
+    echo "Pulling from $INSTALLER_PULL_FROM branch defined in config.sh.dist"
+    git pull origin $INSTALLER_PULL_FROM
 }
 
 function inst_resetRepo() {
