@@ -150,7 +150,7 @@ This project exists thanks to:
 ## IMPORTANT LINKS
 
 - [Website](http://www.azerothcore.org/)
-- [AzerothCore catalogue](http://www.azerothcore.org/modules-catalogue/  "Modules, tools, and other things for AzerothCore") (modules, tools etc...)
+- [AzerothCore catalogue](http://www.azerothcore.org/catalogue/  "Modules, tools, and other things for AzerothCore") (modules, tools etc...)
 - [Module template / Module skeleton](https://github.com/azerothcore/skeleton-module/)
 - [Our community hub (Discord)](https://discord.gg/gkt4y2x)
 - [Our wiki](http://www.azerothcore.org/wiki "Easy to use and developed by AzerothCore founder")
