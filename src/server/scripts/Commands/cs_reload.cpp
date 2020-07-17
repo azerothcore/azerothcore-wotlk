@@ -931,7 +931,7 @@ public:
         sLog->outString("Re-Loading Page Texts...");
         sObjectMgr->LoadPageTexts();
         handler->SendGlobalGMSysMessage("DB table `page_texts` reloaded.");
-        handler->SendGlobalGMSysMessage("You will need to delete your client cache to see the changes.");
+        handler->SendNotification("You need to delete your client cache in order to see the changes.");
         return true;
     }
 
