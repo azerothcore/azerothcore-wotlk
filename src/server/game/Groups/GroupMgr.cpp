@@ -92,11 +92,11 @@ void GroupMgr::LoadGroups()
 
         // Delete all groups whose leader does not exist
         CharacterDatabase.DirectExecute("DELETE FROM `groups` WHERE leaderGuid NOT IN (SELECT guid FROM characters)");
-        // Delete all groups with less than 2 members (or less than 1 for lfg groups)
-        // TODO: This query is not allowed in MySQL 8.0
-        CharacterDatabase.DirectExecute("DELETE groups FROM `groups` LEFT JOIN ((SELECT guid, count(*) as cnt FROM group_member GROUP BY guid) t) ON groups.guid = t.guid WHERE t.guid IS NULL OR (t.cnt<=1 AND groups.groupType <> 12)");
+
+        // Delete all groups with less than 2 members
+        CharacterDatabase.DirectExecute("DELETE FROM `groups` WHERE guid NOT IN (SELECT guid FROM group_member GROUP BY guid HAVING COUNT(guid) > 1)");
+        
         // Delete invalid lfg_data
-        // TODO: This query is not allowed in MySQL 8.0
         CharacterDatabase.DirectExecute("DELETE lfg_data FROM lfg_data LEFT JOIN `groups` ON lfg_data.guid = groups.guid WHERE groups.guid IS NULL OR groups.groupType <> 12");
         // CharacterDatabase.DirectExecute("DELETE `groups` FROM `groups` LEFT JOIN lfg_data ON groups.guid = lfg_data.guid WHERE groups.groupType=12 AND lfg_data.guid IS NULL"); // group should be left so binds are cleared when disbanded
 
