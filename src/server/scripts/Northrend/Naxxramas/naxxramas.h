@@ -84,6 +84,11 @@ enum NXGOs
     GO_MAEXXNA_PORTAL               = 181575, //Maexxna portal
     GO_HORSEMAN_PORTAL              = 181578, //Four Horseman portal
 
+    GO_DEATHKNIGHT_EYE_PORTAL       = 181210,
+    GO_PLAGUE_EYE_PORTAL            = 181211,
+    GO_SPIDER_EYE_PORTAL            = 181212,
+    GO_ABOM_EYE_PORTAL              = 181213,
+	
     GO_CONS_NOX_TESLA_STALAGG       = 268049,
     GO_CONS_NOX_TESLA_FEUGEN        = 268050
 };
