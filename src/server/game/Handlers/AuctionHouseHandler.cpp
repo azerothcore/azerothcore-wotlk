@@ -651,7 +651,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recvData)
     uint32 listfrom;
 
     recvData >> guid;
-    recvData >> listfrom;
+    recvData >> listfrom;       // not used in fact (this list does not have page control in client)
 
     // pussywizard:
     const uint32 delay = 4500;

@@ -253,7 +253,7 @@ struct CreatureData
 {
     CreatureData() : id(0), mapid(0), phaseMask(0), displayid(0), equipmentId(0),
                      posX(0.0f), posY(0.0f), posZ(0.0f), orientation(0.0f), spawntimesecs(0),
-                     spawndist(0.0f), currentwaypoint(0), curhealth(0), curmana(0), movementType(0),
+                     wander_distance(0.0f), currentwaypoint(0), curhealth(0), curmana(0), movementType(0),
                      spawnMask(0), npcflag(0), unit_flags(0), dynamicflags(0), dbData(true), overwrittenZ(false) { }
     uint32 id;                                              // entry in creature_template
     uint16 mapid;
@@ -265,7 +265,7 @@ struct CreatureData
     float posZ;
     float orientation;
     uint32 spawntimesecs;
-    float spawndist;
+    float wander_distance;
     uint32 currentwaypoint;
     uint32 curhealth;
     uint32 curmana;
@@ -640,8 +640,8 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         uint32 GetRespawnDelay() const { return m_respawnDelay; }
         void SetRespawnDelay(uint32 delay) { m_respawnDelay = delay; }
 
-        float GetRespawnRadius() const { return m_respawnradius; }
-        void SetRespawnRadius(float dist) { m_respawnradius = dist; }
+        float GetWanderDistance() const { return m_wanderDistance; }
+        void SetWanderDistance(float dist) { m_wanderDistance = dist; }
 
         uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
         uint32 lootingGroupLowGUID;                         // used to find group which is looting corpse
@@ -735,7 +735,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         time_t m_respawnTime;                               // (secs) time of next respawn
         uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
         uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
-        float m_respawnradius;
+        float m_wanderDistance;
         uint16 m_transportCheckTimer;
         uint32 lootPickPocketRestoreTime;
 

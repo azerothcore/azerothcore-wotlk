@@ -18,7 +18,7 @@
 #include "Unit.h"
 #include "Util.h"
 #include "Group.h"
-#include "Opcodes.h"
+#include "WorldSession.h"
 #include "Battleground.h"
 #include "InstanceScript.h"
 #include "ArenaSpectator.h"
@@ -443,6 +443,8 @@ void Pet::Update(uint32 diff)
                     if (!spellInfo)
                         return;
                     float max_range = GetSpellMaxRangeForTarget(tempspellTarget, spellInfo);
+                    if (spellInfo->RangeEntry->type == SPELL_RANGE_MELEE)
+                        max_range -= 2*MIN_MELEE_REACH;
 
                     if (IsWithinLOSInMap(tempspellTarget) && GetDistance(tempspellTarget) < max_range)
                     {
@@ -2203,8 +2205,8 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
 
         if (info->m_petType == SUMMON_PET)
         {
-            if (pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON)
-                pet->GetCharmInfo()->SetPetNumber(pet_number, true); // Show pet details tab (Shift+P) only for demons
+            if (pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON || pet->GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD)
+                pet->GetCharmInfo()->SetPetNumber(pet_number, true); // Show pet details tab (Shift+P) only for demons & undead
             else
                 pet->GetCharmInfo()->SetPetNumber(pet_number, false);
 
