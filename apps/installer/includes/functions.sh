@@ -30,16 +30,16 @@ function inst_updateRepo() {
     AC_REPO_CONFIG="$AC_PATH_CONF/config.sh"
     AC_REPO_CONFIG_DIST="$AC_PATH_CONF/config.sh.dist"
     if [[ -f "$AC_REPO_CONFIG" ]]; then
-	echo "Configuration $AC_REPO_CONFIG found."
-	source "$AC_REPO_CONFIG"
+        echo "Configuration $AC_REPO_CONFIG found."
+        source "$AC_REPO_CONFIG"
     else
-	echo "Configuration $AC_REPO_CONFIG not found. Looking for DIST."
-	if [[ -f "AC_REPO_CONFIG_DIST" ]]; then
-	    echo "Configuration $AC_REPO_CONFIG_DIST found."
+        echo "Configuration $AC_REPO_CONFIG not found. Looking for DIST."
+        if [[ -f "AC_REPO_CONFIG_DIST" ]]; then
+            echo "Configuration $AC_REPO_CONFIG_DIST found."
             source "$AC_REPO_CONFIG_DIST"
-	else
-	    INSTALLER_PULL_FROM="master"
-	fi
+        else
+            INSTALLER_PULL_FROM="master"
+        fi
     fi
     echo "Pulling from $INSTALLER_PULL_FROM branch."
     git pull origin $INSTALLER_PULL_FROM
