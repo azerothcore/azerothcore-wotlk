@@ -27,8 +27,21 @@ function inst_configureOS() {
 
 function inst_updateRepo() {
     cd "$AC_PATH_ROOT"
-    source "$AC_PATH_CONF/config.sh.dist" #hack to get the parameter for the branch name
-    echo "Pulling from $INSTALLER_PULL_FROM branch defined in config.sh.dist"
+    AC_REPO_CONFIG="$AC_PATH_CONF/config.sh"
+    AC_REPO_CONFIG_DIST="$AC_PATH_CONF/config.sh.dist"
+    if [[ -f "$AC_REPO_CONFIG" ]]; then
+	echo "Configuration $AC_REPO_CONFIG found."
+	source "$AC_REPO_CONFIG"
+    else
+	echo "Configuration $AC_REPO_CONFIG not found. Looking for DIST."
+	if [[ -f "AC_REPO_CONFIG_DIST" ]]; then
+	    echo "Configuration $AC_REPO_CONFIG_DIST found."
+            source "$AC_REPO_CONFIG_DIST"
+	else
+	    INSTALLER_PULL_FROM="master"
+	fi
+    fi
+    echo "Pulling from $INSTALLER_PULL_FROM branch."
     git pull origin $INSTALLER_PULL_FROM
 }
 
