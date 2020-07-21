@@ -1131,6 +1131,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             {
                 sLog->outErrorDB("SmartScript: Entry %u SourceType %u use invalid action_type %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.GetActionType())
             }
+            break;
         }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         case SMART_ACTION_FOLLOW:
@@ -1140,7 +1141,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_FLEE_FOR_ASSIST:
         case SMART_ACTION_COMBAT_STOP:
         case SMART_ACTION_DIE:
-        case SMART_ACTION_SET_IN_COMBAT_WITH_ZONE:
         case SMART_ACTION_SET_ACTIVE:
         case SMART_ACTION_WP_RESUME:
         case SMART_ACTION_KILL_UNIT:
