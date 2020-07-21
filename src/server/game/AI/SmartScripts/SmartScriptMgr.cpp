@@ -1127,9 +1127,9 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         }
         case SMART_ACTION_SET_IN_COMBAT_WITH_ZONE:
         {
-            if (e.GetScriptType() != SMART_SCRIPT_TYPE_CREATURE || SMART_SCRIPT_TYPE_TIMED_ACTIONLIST)
+            if (e.GetScriptType() == SMART_SCRIPT_TYPE_GAMEOBJECT)
             {
-                sLog->outErrorDb("SmartScript: Entry %u SourceType %u use invalid action_type %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.GetActionType());
+                sLog->outErrorDb("SmartScript: action_type %u is not allowed with ScriptType %u. Entry %u, skipped.", e.GetActionType(), e.GetScriptType(), e.entryOrGuid);
                 return false;
             }
             break;
