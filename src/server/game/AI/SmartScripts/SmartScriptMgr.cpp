@@ -1125,6 +1125,13 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             }
             break;
         }
+        case SMART_ACTION_SET_IN_COMBAT_WITH_ZONE:
+        {
+            if (!e.GetScriptType() == SMART_SCRIPT_TYPE_CREATURE || !e.GetScriptType() == SMART_SCRIPT_TYPE_TIMED_ACTIONLIST)
+            {
+                sLog->outErrorDB("SmartScript: Entry %u SourceType %u use invalid action_type %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.GetActionType())
+            }
+        }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         case SMART_ACTION_FOLLOW:
         case SMART_ACTION_SET_ORIENTATION:
