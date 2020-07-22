@@ -3,17 +3,17 @@
 AzerothCore is a learning project, and there are lots of different ways to contribute to the project:
 
 * By [testing our fixes](http://www.azerothcore.org/wiki/How-to-test-a-PR) (we can teach you how to correctly use Git to help us but that will also help you out tremendously)
-* By developing directly to the core or to the modules
+* By developing directly to the core or the modules
 * By reporting bugs within the project
 * By [creating new modules](http://www.azerothcore.org/wiki/Create-a-Module)
 * By improving our wiki
-* By providing direct support to our community (on discord, stackoverflow or specialized forums)
+* By providing direct support to our community (on discord, StackOverflow or specialized forums)
 * By making extra content (video tutorial for example)
 * By putting bounties on issues
 
 If you want to contribute to the project, you will find a lot of resources that will guide you in our wiki.
 
-Feel free to join us on [our discord chat server](https://discord.gg/gkt4y2x) where we taught a lot of new people how to get started and who are now important contributors!
+Feel free to join us on [our Discord chat server](https://discord.gg/gkt4y2x) where we taught a lot of new people how to get started and who are now important contributors!
 
 ## AUTHORS & CONTRIBUTORS
 
