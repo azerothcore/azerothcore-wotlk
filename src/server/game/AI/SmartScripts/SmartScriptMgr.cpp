@@ -1129,7 +1129,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         {
             if (e.GetScriptType() == SMART_SCRIPT_TYPE_GAMEOBJECT)
             {
-                sLog->outErrorDb("SmartScript: action_type %u is not allowed with ScriptType %u. Entry %u, skipped.", e.GetActionType(), e.GetScriptType(), e.entryOrGuid);
+                sLog->outErrorDb("SmartScript: action_type %u is not allowed with source_type %u. Entry %u, skipped.", e.GetActionType(), e.GetScriptType(), e.entryOrGuid);
                 return false;
             }
             break;
