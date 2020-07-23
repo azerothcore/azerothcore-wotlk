@@ -28,10 +28,13 @@ enum Yells
     SAY_SYLVANAS_INTRO_6                        = 5,
 
     SAY_JAINA_OUTRO                             = 0,
-    SAY_SYLVANAS_OUTRO                          = 0,
+    SAY_SYLVANAS_OUTRO                          = 0
+};
 
-    GOSSIP_JAINA_INTRO                          = 10943,
-    GOSSIP_SYLVANAS_INTRO                       = 10971,
+enum Gossip
+{
+    GOSSIP_JAINA_INTRO = 10943,
+    GOSSIP_SYLVANAS_INTRO = 10971
 };
 
 class npc_fos_leader : public CreatureScript
