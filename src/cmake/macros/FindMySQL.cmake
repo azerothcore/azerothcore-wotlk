@@ -28,7 +28,7 @@ endif(WIN32)
 # Find MariaDB for Windows
 if (WIN32)
   # Set know versions MariaDB
-  set(_MARIADB_KNOWN_VERSIONS "MariaDB 10.4" "MariaDB 10.3" "MariaDB 10.2" "MariaDB 10.1")
+  set(_MARIADB_KNOWN_VERSIONS "MariaDB 10.4" "MariaDB 10.3" "MariaDB 10.2")
 
   # Set default oprions
   set(MARIADB_FOUND_LIB 0)
