@@ -85,6 +85,57 @@ public:
     }
 };
 
+enum Fizzcrank
+{
+    SAY_AGGRO                       = 1,
+
+    SPELL_RC_TRANSMATTER_INJECTION  = 45980,
+    SPELL_GREATMOTHERS_SOULCATCHER  = 46485,
+
+    NPC_FIZZCRANK_SURVIVOR          = 25773,
+    NPC_GNOME_SOUL                  = 26096
+};
+
+class npc_fizzcrank_mechagnome : public CreatureScript
+{
+public:
+    npc_fizzcrank_mechagnome() : CreatureScript("npc_fizzcrank_mechagnome") { }
+
+    struct npc_fizzcrank_mechagnomeAI : public ScriptedAI
+    {
+        npc_fizzcrank_mechagnomeAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            Talk(SAY_AGGRO);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            // Quest - re-cursive (11712)
+            if (spell->Id == SPELL_RC_TRANSMATTER_INJECTION && caster->GetTypeId() == TYPEID_PLAYER)
+            {
+                if (Player* player = caster->ToPlayer())
+                    player->KilledMonsterCredit(NPC_FIZZCRANK_SURVIVOR, TRIGGERED_NONE);
+            }
+
+            // Quest - Souls of the Decursed (11899)
+            else if (spell->Id == SPELL_GREATMOTHERS_SOULCATCHER && caster->GetTypeId() == TYPEID_PLAYER)
+            { 
+                if (Player* player = caster->ToPlayer())
+                { 
+                    player->KilledMonsterCredit(NPC_GNOME_SOUL, TRIGGERED_NONE);
+                    me->DespawnOrUnsummon(10);
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_fizzcrank_mechagnomeAI(creature);
+    }
+};
 
 // Theirs
 /*######
@@ -1376,6 +1427,7 @@ void AddSC_borean_tundra()
     new spell_q11919_q11940_drake_hunt();
 
     // Theirs
+    new npc_fizzcrank_mechagnome();
     new npc_sinkhole_kill_credit();
     new npc_khunok_the_behemoth();
     new npc_corastrasza();
