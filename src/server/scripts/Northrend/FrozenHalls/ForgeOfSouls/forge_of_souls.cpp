@@ -31,7 +31,7 @@ enum Yells
     SAY_SYLVANAS_OUTRO                          = 0
 };
 
-enum Gossip
+enum FOS_Gossip
 {
     GOSSIP_JAINA_INTRO = 10943,
     GOSSIP_SYLVANAS_INTRO = 10971
