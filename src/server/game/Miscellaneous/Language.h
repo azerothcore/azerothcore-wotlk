@@ -294,7 +294,7 @@ enum AcoreStrings
       // TICKET STRINGS NEED REWRITE // 288-296 FREE
 
       // END
-    LANG_COMMAND_SPAWNDIST              = 297,
+    LANG_COMMAND_WANDER_DISTANCE        = 297,
     LANG_COMMAND_SPAWNTIME              = 298,
     LANG_COMMAND_MODIFY_HONOR           = 299,
 
@@ -1314,6 +1314,15 @@ enum AcoreStrings
     LANG_INSTANT_FLIGHT_ON                        = 30078,
     LANG_INSTANT_FLIGHT_OFF                       = 30079,
 
-    LANG_DEBUG_OPCODE_FILE_MISSING                = 30080
+    LANG_DEBUG_OPCODE_FILE_MISSING                = 30080,
+
+    LANG_REMOVEITEM_FAILURE                       = 30081,
+    LANG_REMOVEITEM_ERROR                         = 30082,
+
+    LANG_BG_SHARE_QUEST_ERROR                     = 30083,
+    LANG_BG_READY_CHECK_ERROR                     = 30084,
+
+    LANG_DEBUG_BG_CONF                            = 30085,
+    LANG_DEBUG_ARENA_CONF                         = 30086
 };
 #endif

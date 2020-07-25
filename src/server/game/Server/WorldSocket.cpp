@@ -676,7 +676,15 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
         switch (opcode)
         {
             case CMSG_PING:
-                return HandlePing (*new_pct);
+            {
+                try
+                {
+                    return HandlePing(*new_pct);
+                }
+                catch (ByteBufferPositionException const&) {}
+                sLog->outError("WorldSocket::ReadDataHandler(): client sent malformed CMSG_PING");
+                return -1;
+            }
             case CMSG_AUTH_SESSION:
                 if (m_Session)
                 {
@@ -687,7 +695,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
             case CMSG_KEEP_ALIVE:           
                 if (m_Session)
                     m_Session->ResetTimeOutTime(true);
-                break;
+                return 0;
             default:
             {
                 ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);

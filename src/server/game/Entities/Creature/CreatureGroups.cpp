@@ -279,9 +279,13 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         // xinef: if we move members to position without taking care of sizes, we should compare distance without sizes
         // xinef: change members speed basing on distance - if too far speed up, if too close slow down
         UnitMoveType mtype = Movement::SelectSpeedType(member->GetUnitMovementFlags());
-        member->SetSpeedRate(mtype, m_leader->GetSpeedRate(mtype) * member->GetExactDist(dx, dy, dz) / pathDist);
+        float speedRate = m_leader->GetSpeedRate(mtype) * member->GetExactDist(dx, dy, dz) / pathDist;
 
-        member->GetMotionMaster()->MovePoint(0, dx, dy, dz);
-        member->SetHomePosition(dx, dy, dz, pathAngle);
+        if (speedRate > 0.01f) // don't move if speed rate is too low
+        {
+            member->SetSpeedRate(mtype, speedRate);
+            member->GetMotionMaster()->MovePoint(0, dx, dy, dz);
+            member->SetHomePosition(dx, dy, dz, pathAngle);
+        }
     }
 }
