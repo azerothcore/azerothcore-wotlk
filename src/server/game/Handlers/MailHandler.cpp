@@ -59,7 +59,7 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
     recvData >> subject;
 
     // prevent client crash
-    if (subject.find("| |") != std::string::npos) {
+    if (subject.find("| |") != std::string::npos || body.find("| |") != std::string::npos) {
         return;
     }
 
@@ -636,10 +636,15 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
                 break;
         }
 
-        std::string subject = (*itr)->subject;
         // prevent client crash
+        std::string subject = (*itr)->subject;
+        std::string body = (*itr)->body;
+
         if (subject.find("| |") != std::string::npos) {
             subject = "";
+        }
+        if (body.find("| |") != std::string::npos) {
+            body = "";
         }
 
         data << uint32((*itr)->COD);                         // COD
@@ -650,7 +655,7 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
         data << float(float((*itr)->expire_time-time(NULL))/DAY); // Time
         data << uint32((*itr)->mailTemplateId);              // mail template (MailTemplate.dbc)
         data << subject;                                     // Subject string - once 00, when mail type = 3, max 256
-        data << (*itr)->body;                                // message? max 8000
+        data << body;                                        // message? max 8000
         data << uint8(item_count);                           // client limit is 0x10
 
         for (uint8 i = 0; i < item_count; ++i)
