@@ -24,8 +24,11 @@ bool WorldSession::CanOpenMailBox(uint64 guid)
 {
     if (guid == _player->GetGUID())
     {
-        sLog->outError("%s attempt open mailbox in cheating way.", _player->GetName().c_str());
-        return false;
+        if (_player->GetSession()->GetSecurity() < SEC_MODERATOR)
+        {
+            sLog->outError("%s attempt open mailbox in cheating way.", _player->GetName().c_str());
+            return false;
+        }
     }
     else if (IS_GAMEOBJECT_GUID(guid))
     {
