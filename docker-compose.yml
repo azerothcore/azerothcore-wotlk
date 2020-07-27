@@ -18,7 +18,8 @@ services:
       - type: volume
         source: ac-database
         target: /var/lib/mysql
-
+      - /etc/localtime:/etc/localtime:ro
+      
   ac-worldserver:
     stdin_open: true
     tty: true
@@ -45,6 +46,7 @@ services:
       - type: bind
         source: ${WORLDSERVER_DATA:-./docker/worldserver/data}
         target: /azeroth-server/data
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - ac-database
 
@@ -68,6 +70,7 @@ services:
       - type: bind
         source: ${AUTHSERVER_LOGS:-./docker/authserver/logs}
         target: /azeroth-server/logs
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - ac-database
 
