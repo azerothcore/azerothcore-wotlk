@@ -436,23 +436,6 @@ public:
     }
 };
 
-// npc_dughal_stormwing
-enum DughalQuests
-{
-    QUEST_JAIL_BREAK                      = 4322
-};
-
-enum MarshalWindsor
-{
-    NPC_REGINALD_WINDSOR            = 9682
-};
-
-enum MarshalReginaldWindor
-{
-    NPC_SHILL_DINGER                = 9678,
-    NPC_CREST_KILLER                = 9680
-};
-
 // npc_rocknot
 enum RocknotSays
 {
