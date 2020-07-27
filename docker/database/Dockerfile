@@ -3,12 +3,6 @@ FROM alpine:3.9 as builder
 # install bash
 RUN apk add --no-cache bash
 
-# install tzdata
-RUN apk add --no-cache tzdata
-
-# set timezone
-ENV TZ America/Los_Angeles
-
 # copy the sources from the host machine
 COPY apps /azerothcore/apps
 COPY bin /azerothcore/bin
