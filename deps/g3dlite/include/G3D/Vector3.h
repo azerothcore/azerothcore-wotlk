@@ -37,7 +37,7 @@ class Any;
 /**
   <B>Swizzles</B>
  Vector classes have swizzle operators, e.g. <CODE>v.xy()</CODE>, that
- allow selection of arbitrary sub-fields.  These cannot be used as write
+ allow selection of arbitrary sub-fields.  These cannot be used as write 
  masks.  Examples
 
   <PRE>
@@ -128,7 +128,7 @@ public:
     Axis primaryAxis() const;
 
     // assignment and comparison
-    Vector3& __fastcall operator= (const Vector3& rkVector);
+    Vector3& operator=(const Vector3& rkVector) = default;
     Vector3& operator=(const Any& a);
     bool operator== (const Vector3& rkVector) const;
     bool operator!= (const Vector3& rkVector) const;
@@ -206,7 +206,7 @@ public:
 
      <PRE>
        V'    N      V
-
+                 
          r   ^   -,
           \  |  /
             \|/
@@ -218,17 +218,17 @@ public:
 
     /**
       See also G3D::Ray::reflect.
-      The length is 1.
+      The length is 1. 
      <PRE>
        V'    N       V
-
+                 
          r   ^    /
           \  |  /
             \|'-
      </PRE>
      */
     Vector3 reflectionDirection(const Vector3& normal) const;
-
+    
 
     /**
      Returns Vector3::zero() if the length is nearly zero, otherwise
@@ -250,7 +250,7 @@ public:
      where iExit is the index of refraction for the
      previous material and iEnter is the index of refraction
      for the new material.  Like Vector3::reflectionDirection,
-     the result has length 1 and is
+     the result has length 1 and is 
      pointed <I>away</I> from the intersection.
 
      Returns Vector3::zero() in the case of total internal refraction.
@@ -264,7 +264,7 @@ public:
      See also G3D::Ray::refract.
      <PRE>
               N      V
-
+                  
               ^    /
               |  /
               |'-
@@ -355,14 +355,14 @@ public:
      Linear interpolation
      */
     inline Vector3 lerp(const Vector3& v, float alpha) const {
-        return (*this) + (v - *this) * alpha;
+        return (*this) + (v - *this) * alpha; 
     }
 
     /** Gram-Schmidt orthonormalization. */
     static void orthonormalize (Vector3 akVector[3]);
 
-    /** \brief Random unit vector, uniformly distributed on the sphere.
-
+    /** \brief Random unit vector, uniformly distributed on the sphere. 
+    
        Distribution rendered by G3D::DirectionHistogram:
        \image html vector3-random.png
       */
@@ -370,8 +370,8 @@ public:
 
     /** \brief Random unit vector, distributed according to \f$\max(\cos \theta,0)\f$.
 
-        That is, so that the probability of \f$\vec{V}\f$ is proportional
-        to \f$\max(\vec{v} \cdot \vec{n}, 0)\f$.  Useful in photon mapping for
+        That is, so that the probability of \f$\vec{V}\f$ is proportional 
+        to \f$\max(\vec{v} \cdot \vec{n}, 0)\f$.  Useful in photon mapping for 
         Lambertian scattering.
 
         Distribution rendered by G3D::DirectionHistogram:
@@ -424,7 +424,7 @@ public:
     static const Vector3& unitZ();
     static const Vector3& inf();
     static const Vector3& nan();
-
+    
     /** Smallest (most negative) representable vector */
     static const Vector3& minFinite();
 
@@ -435,16 +435,16 @@ public:
     /** Creates two orthonormal tangent vectors X and Y such that
         if Z = this, X x Y = Z.*/
     inline void getTangents(Vector3& X, Vector3& Y) const {
-        debugAssertM(G3D::fuzzyEq(length(), 1.0f),
+        debugAssertM(G3D::fuzzyEq(length(), 1.0f), 
                      "makeAxes requires Z to have unit length");
-
+        
         // Choose another vector not perpendicular
         X = (abs(x) < 0.9f) ? Vector3::unitX() : Vector3::unitY();
-
+        
         // Remove the part that is parallel to Z
         X -= *this * this->dot(X);
         X /= X.length();
-
+    
         Y = this->cross(X);
     }
 
@@ -626,14 +626,6 @@ inline float& Vector3::operator[] (int i) {
     return ((float*)this)[i];
 }
 
-
-//----------------------------------------------------------------------------
-inline Vector3& Vector3::operator= (const Vector3& rkVector) {
-    x = rkVector.x;
-    y = rkVector.y;
-    z = rkVector.z;
-    return *this;
-}
 
 //----------------------------------------------------------------------------
 
