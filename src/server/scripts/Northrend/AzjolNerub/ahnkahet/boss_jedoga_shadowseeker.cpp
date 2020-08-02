@@ -5,6 +5,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ahnkahet.h"
+#include "Containers.h"
 
 
 enum Yells
@@ -75,9 +76,9 @@ class boss_jedoga_shadowseeker : public CreatureScript
 public:
     boss_jedoga_shadowseeker() : CreatureScript("boss_jedoga_shadowseeker") { }
 
-    struct boss_jedoga_shadowseekerAI : public ScriptedAI
+    struct boss_jedoga_shadowseekerAI : public BossAI
     {
-        boss_jedoga_shadowseekerAI(Creature* c) : ScriptedAI(c), pInstance(c->GetInstanceScript()), summons(me)
+        boss_jedoga_shadowseekerAI(Creature* c) : BossAI(c, DATA_JEDOGA_SHADOWSEEKER_EVENT), pInstance(c->GetInstanceScript()), summons(me)
         {
         }
 
@@ -93,75 +94,47 @@ public:
         void JustSummoned(Creature *cr) { summons.Summon(cr); }
         void MoveInLineOfSight(Unit *) { }
 
-        void ActivateInitiate()
+        void DoAction(int32 action) override
         {
-            if (!summons.size())
-                return;
-
-            uint8 rnd = urand(0, summons.size()-1);
-            uint8 loop = 0;
-            for (std::list<uint64>::iterator i = summons.begin(); i != summons.end();)
+            switch (action)
             {
-                Creature *summon = ObjectAccessor::GetCreature(*me, *i);
-                if (summon && summon->GetEntry() == NPC_INITIATE && loop >= rnd)
-                {
-                    summon->AI()->DoAction(ACTION_ACTIVATE);
-                    break;
-                }
-
-                ++i;
-                ++loop;
-            }
-
-            return;
-        }
-
-        void ScheduleEvents()
-        {
-            events.RescheduleEvent(EVENT_JEDOGA_CYCLONE, 3000);
-            events.RescheduleEvent(EVENT_JEDOGA_LIGHTNING_BOLT, 7000);
-            events.RescheduleEvent(EVENT_JEDOGA_THUNDERSHOCK, 12000);
-            events.RescheduleEvent(EVENT_JEDOGA_MOVE_UP, urand(20000, 25000));
-        }
-
-        void DoAction(int32 param)
-        {
-            if (param == ACTION_INITIATE_DIED)
+            case ACTION_INITIATE_DIED:
             {
                 // all killed
-                if (initiates++ > 13)
+                if (++initiates > 13)
                 {
                     summons.DespawnAll();
                     MoveDown();
                     initiates = 0;
                 }
-            }
-            else if (param == ACTION_HERALD)
+            }break;
+            case ACTION_HERALD:
             {
-                me->CastSpell(me, SPELL_GIFT_OF_THE_HERALD, true);
+                DoCastSelf(SPELL_GIFT_OF_THE_HERALD, true);
                 events.DelayEvents(1001);
                 events.ScheduleEvent(EVENT_JEDOGA_MOVE_DOWN, 1000);
                 isFlying = false;
-            }
-            else if (param == ACTION_SACRIFICE_FAILED)
+            }break;
+            case ACTION_SACRIFICE_FAILED:
             {
                 events.DelayEvents(1001);
                 events.ScheduleEvent(EVENT_JEDOGA_MOVE_DOWN, 1000);
                 isFlying = false;
                 if (pInstance)
                     pInstance->SetData(DATA_JEDOGA_ACHIEVEMENT, false);
+            }break;
             }
         }
 
         void Reset()
         {
-            if (pInstance)
-            {
-                pInstance->SetData(DATA_JEDOGA_SHADOWSEEKER_EVENT, NOT_STARTED);
-                pInstance->SetData(DATA_JEDOGA_ACHIEVEMENT, true);
-            }
+            instance->SetData(DATA_JEDOGA_ACHIEVEMENT, true);
+            _Reset();
+            events.RescheduleEvent(EVENT_JEDOGA_CYCLONE, 3000);
+            events.RescheduleEvent(EVENT_JEDOGA_LIGHTNING_BOLT, 7000);
+            events.RescheduleEvent(EVENT_JEDOGA_THUNDERSHOCK, 12000);
+            events.RescheduleEvent(EVENT_JEDOGA_MOVE_UP, urand(20000, 25000));
 
-            events.Reset();
             me->SummonCreatureGroup(SUMMON_GROUP_OUT_OF_COMBAT);
             initiates = 0;
             introCheck = 1; // leave 1
@@ -169,19 +142,17 @@ public:
             startFly = false;
 
             MoveUp(true);
-            me->CastSpell(me, SPELL_PINK_SPHERE, true);
-            me->CastSpell(me, SPELL_LIGHTNING_BOLTS, true);
+            DoCastSelf(SPELL_PINK_SPHERE, true);
+            DoCastSelf(SPELL_LIGHTNING_BOLTS, true);
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
-            if (pInstance)
-                pInstance->SetData(DATA_JEDOGA_SHADOWSEEKER_EVENT, IN_PROGRESS);
-
+            _EnterCombat();
             Talk(TEXT_AGGRO);
         }
 
-        void KilledUnit(Unit* Victim)
+        void KilledUnit(Unit* Victim) override
         {
             if (!Victim || Victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -189,13 +160,10 @@ public:
             Talk(TEXT_SLAY);
         }
 
-        void JustDied(Unit* /*Killer*/)
+        void JustDied(Unit* /*Killer*/) override
         {
+            _JustDied();
             Talk(TEXT_DEATH);
-            if (pInstance)
-                pInstance->SetData(DATA_JEDOGA_SHADOWSEEKER_EVENT, DONE);
-
-            summons.DespawnAll();
         }
 
         void MoveDown()
@@ -217,12 +185,14 @@ public:
             me->SetDisableGravity(true);
         }
         
-        void MovementInform(uint32 Type, uint32 PointId)
+        void MovementInform(uint32 type, uint32 pointId) override
         {
-            if (Type != POINT_MOTION_TYPE) 
+            if (type != POINT_MOTION_TYPE) 
                 return;
 
-            if (PointId == POINT_DOWN)
+            switch (pointId)
+            {
+            case POINT_DOWN:
             {
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 me->RemoveAurasDueToSpell(SPELL_PINK_SPHERE);
@@ -234,18 +204,26 @@ public:
                 if (!summons.HasEntry(NPC_INITIATE))
                     me->SummonCreatureGroup(SUMMON_GROUP_IN_COMBAT);
 
-                if (UpdateVictim())
+                if (Unit* victim = me->GetVictim())
                 {
                     me->StopMoving();
-                    ScheduleEvents();
-                    AttackStart(me->GetVictim());
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    AttackStart(victim);
                 }
-            }
-            else if (PointId == POINT_UP)
-                ActivateInitiate();
-            else if (PointId == POINT_RITUAL)
+            }break;
+            case POINT_UP:
+            {
+                if (!summons.empty())
+                {
+                    uint32 const initiateGUID = acore::Containers::SelectRandomContainerElement(summons);
+                    if (Creature* initiate = ObjectAccessor::GetCreature(*me, initiateGUID))
+                        initiate->AI()->DoAction(ACTION_ACTIVATE);
+                }
+            }break;
+            case POINT_RITUAL:
+            {
                 startFly = true;
+            }break;
+            }                
         }
 
         void UpdateAI(uint32 diff)
@@ -289,37 +267,36 @@ public:
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                while (uint32 const eventId = events.ExecuteEvent())
                 {
+                    switch (eventId)
+                    {
                     case EVENT_JEDOGA_CYCLONE:
                     {
                         me->CastSpell(me, IsHeroic() ? SPELL_CYCLONE_STRIKE_H : SPELL_CYCLONE_STRIKE, false);
                         events.RepeatEvent(urand(10000, 14000));
-                        break;
-                    }
+                    }break;
                     case EVENT_JEDOGA_LIGHTNING_BOLT:
                     {
                         if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                             me->CastSpell(pTarget, IsHeroic() ? SPELL_LIGHTNING_BOLT_H : SPELL_LIGHTNING_BOLT, false);
 
                         events.RepeatEvent(urand(11000, 15000));
-                        break;
-                    }
+                    }break;
                     case EVENT_JEDOGA_THUNDERSHOCK:
                     {
                         if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                             me->CastSpell(pTarget, IsHeroic() ? SPELL_THUNDERSHOCK_H : SPELL_THUNDERSHOCK, false);
 
                         events.RepeatEvent(urand(16000, 22000));
-                        break;
-                    }
+                    }break;
                     case EVENT_JEDOGA_MOVE_UP:
                     {
                         events.PopEvent();
                         if (!summons.HasEntry(NPC_INITIATE))
                             break;
 
-                        if (Creature *cr = me->SummonCreature(NPC_JEDOGA_CONTROLLER, 373.48f, -706.00f, -16.18f))
+                        if (Creature* cr = me->SummonCreature(NPC_JEDOGA_CONTROLLER, 373.48f, -706.00f, -16.18f))
                         {
                             cr->CastSpell(cr, SPELL_SACRIFICE_VISUAL, true);
                             summons.Summon(cr);
@@ -338,7 +315,7 @@ public:
                         summons.DespawnEntry(NPC_JEDOGA_CONTROLLER);
                         MoveDown();
                         events.PopEvent();
-                        break;
+                    }break;
                     }
                 }
 
@@ -360,29 +337,25 @@ public:
 
     struct npc_jedoga_initiandAI : public ScriptedAI
     {
-        npc_jedoga_initiandAI(Creature* c) : ScriptedAI(c)
+        npc_jedoga_initiandAI(Creature* c) : ScriptedAI(c), pInstance(c->GetInstanceScript())
         {
-            pInstance = c->GetInstanceScript();
         }
-
-        InstanceScript* pInstance;
-        int32 Timer;
 
         void AttackStart(Unit* who)
         {
-            if (!Timer)
+            if (!activationTimer)
                 ScriptedAI::AttackStart(who);
         }
 
         void MoveInLineOfSight(Unit *who) 
         {
-            if (!Timer)
+            if (!activationTimer)
                 ScriptedAI::MoveInLineOfSight(who);
         }
 
         void Reset()
         {
-            Timer = 0;
+            activationTimer = 0;
 
             if (!pInstance)
                 return;
@@ -408,22 +381,21 @@ public:
             if (!pInstance || Killer == me)
                 return;
 
-            Creature* boss = me->GetMap()->GetCreature(pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER));
-            if (boss)
+            if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER)))
             {
-                if (Timer)
+                if (activationTimer)
                     boss->AI()->DoAction(ACTION_SACRIFICE_FAILED);
                 else
                     boss->AI()->DoAction(ACTION_INITIATE_DIED);
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 action)
         {
-            if (param == ACTION_ACTIVATE)
+            if (action == ACTION_ACTIVATE)
             {
-                Timer = 1500;
-                me->CastSpell(me, SPELL_ACTIVATE_INITIATE, true);
+                activationTimer = 1500;
+                DoCastSelf(SPELL_ACTIVATE_INITIATE, true);
             }
         }
 
@@ -433,18 +405,17 @@ public:
             {
                 Unit::Kill(me, me);
                 me->DespawnOrUnsummon(5000);
-                Creature* boss = me->GetMap()->GetCreature(pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER));
-                if (boss)
+                if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER)))
                     boss->AI()->DoAction(ACTION_HERALD);
             }
         }
 
         void UpdateAI(uint32 diff)
         {
-            if (Timer)
+            if (activationTimer)
             {
-                Timer -= diff;
-                if (Timer <= 0)
+                activationTimer -= diff;
+                if (activationTimer <= 0)
                 {
                     me->CombatStop();
                     me->SetControlled(false, UNIT_STATE_STUNNED);
@@ -452,7 +423,7 @@ public:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     me->SetWalk(true);
 
-                    float distance = me->GetDistance(JedogaPosition[1]);
+                    float const distance = me->GetDistance(JedogaPosition[1]);
 
                     if (distance < 9.0f)
                         me->SetSpeed(MOVE_WALK, 0.5f, true);
@@ -464,7 +435,7 @@ public:
                     me->GetMotionMaster()->Clear(false);
                     me->GetMotionMaster()->MovePoint(POINT_RITUAL, 373.48f, -706.00f, -16.18f);
 
-                    Timer = 10000000;
+                    activationTimer = 10000000;
                 }
 
                 return;
@@ -475,6 +446,10 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        InstanceScript* pInstance;
+        int32 activationTimer;
     };
 
     CreatureAI *GetAI(Creature *creature) const
