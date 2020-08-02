@@ -50,6 +50,9 @@ enum Misc
     NPC_JEDOGA_CONTROLLER                   = 30181,
     NPC_INITIATE                            = 30114,
 
+    SUMMON_GROUP_OUT_OF_COMBAT              = 0,
+    SUMMON_GROUP_IN_COMBAT                  = 1,
+
     ACTION_INITIATE_DIED                    = 1,
     ACTION_ACTIVATE                         = 2,
     ACTION_HERALD                           = 3,
@@ -74,9 +77,8 @@ public:
 
     struct boss_jedoga_shadowseekerAI : public ScriptedAI
     {
-        boss_jedoga_shadowseekerAI(Creature* c) : ScriptedAI(c), summons(me)
+        boss_jedoga_shadowseekerAI(Creature* c) : ScriptedAI(c), pInstance(c->GetInstanceScript()), summons(me)
         {
-            pInstance = c->GetInstanceScript();
         }
 
         InstanceScript* pInstance;
@@ -90,54 +92,6 @@ public:
 
         void JustSummoned(Creature *cr) { summons.Summon(cr); }
         void MoveInLineOfSight(Unit *) { }
-
-        void SpawnInitiate(bool start)
-        {
-            summons.DespawnAll();
-            if (start)
-            {
-                me->SummonCreature(NPC_INITIATE, 362.458f, -714.166f, -16.0964f, 0.977384f);
-                me->SummonCreature(NPC_INITIATE, 368.781f, -713.932f, -16.0964f, 1.46608f);
-                me->SummonCreature(NPC_INITIATE, 364.937f, -716.11f, -16.0964f, 1.25664f);
-                me->SummonCreature(NPC_INITIATE, 362.02f, -719.828f, -16.0964f, 1.20428f);
-                me->SummonCreature(NPC_INITIATE, 368.151f, -719.763f, -16.0964f, 1.53589f);
-                me->SummonCreature(NPC_INITIATE, 392.276f, -695.895f, -16.0964f, 3.40339f);
-                me->SummonCreature(NPC_INITIATE, 387.224f, -698.006f, -16.0964f, 3.36848f);
-                me->SummonCreature(NPC_INITIATE, 389.626f, -702.3f, -16.0964f, 3.07178f);
-                me->SummonCreature(NPC_INITIATE, 383.812f, -700.41f, -16.0964f, 3.15905f);
-                me->SummonCreature(NPC_INITIATE, 385.693f, -694.376f, -16.0964f, 3.59538f);
-                me->SummonCreature(NPC_INITIATE, 379.204f, -716.697f, -16.0964f, 2.1293f);
-                me->SummonCreature(NPC_INITIATE, 375.4f, -711.434f, -16.0964f, 2.09439f);
-                me->SummonCreature(NPC_INITIATE, 382.583f, -711.713f, -16.0964f, 2.53073f);
-                me->SummonCreature(NPC_INITIATE, 379.049f, -712.899f, -16.0964f, 2.28638f);
-                me->SummonCreature(NPC_INITIATE, 378.424f, -708.388f, -16.0964f, 2.58309f);
-            }
-            else
-            {
-                me->SummonCreature(NPC_INITIATE, 394.197f, -701.164f, -16.1797f, 4.09901f);
-                me->SummonCreature(NPC_INITIATE, 391.003f, -697.814f, -16.1797f, 4.11079f);
-                me->SummonCreature(NPC_INITIATE, 386.5f, -694.973f, -16.1797f, 4.12649f);
-                me->SummonCreature(NPC_INITIATE, 381.762f, -692.405f, -16.1797f, 4.12257f);
-                me->SummonCreature(NPC_INITIATE, 377.411f, -691.198f, -16.1797f, 4.6095f);
-                me->SummonCreature(NPC_INITIATE, 395.122f, -686.975f, -16.1797f, 2.72063f);
-                me->SummonCreature(NPC_INITIATE, 398.823f, -692.51f, -16.1797f, 2.72063f);
-                me->SummonCreature(NPC_INITIATE, 399.819f, -698.815f, -16.1797f, 2.72455f);
-                me->SummonCreature(NPC_INITIATE, 395.996f, -705.291f, -16.1309f, 0.376213f);
-                me->SummonCreature(NPC_INITIATE, 391.505f, -710.883f, -16.0589f, 0.376213f);
-                me->SummonCreature(NPC_INITIATE, 387.872f, -716.186f, -16.1797f, 0.376213f);
-                me->SummonCreature(NPC_INITIATE, 383.276f, -722.431f, -16.1797f, 0.376213f);
-                me->SummonCreature(NPC_INITIATE, 377.175f, -730.652f, -16.1797f, 0.376213f);
-                me->SummonCreature(NPC_INITIATE, 371.625f, -735.5f, -16.1797f, 0.376213f);
-                me->SummonCreature(NPC_INITIATE, 364.932f, -735.808f, -16.1797f, 0.376213f);
-                me->SummonCreature(NPC_INITIATE, 358.966f, -733.199f, -16.1797f, 0.376213f);
-                me->SummonCreature(NPC_INITIATE, 376.348f, -725.037f, -16.1797f, 5.65409f);
-                me->SummonCreature(NPC_INITIATE, 371.435f, -723.892f, -16.1797f, 5.65409f);
-                me->SummonCreature(NPC_INITIATE, 366.861f, -721.702f, -16.1797f, 5.65409f);
-                me->SummonCreature(NPC_INITIATE, 362.343f, -718.019f, -16.1797f, 5.51665f);
-                me->SummonCreature(NPC_INITIATE, 358.906f, -714.357f, -16.1797f, 5.35957f);
-
-            }
-        }
 
         void ActivateInitiate()
         {
@@ -208,7 +162,7 @@ public:
             }
 
             events.Reset();
-            SpawnInitiate(true);
+            me->SummonCreatureGroup(SUMMON_GROUP_OUT_OF_COMBAT);
             initiates = 0;
             introCheck = 1; // leave 1
             isFlying = false;
@@ -278,7 +232,7 @@ public:
                 me->SetInCombatWithZone();
                 me->SetDisableGravity(false);
                 if (!summons.HasEntry(NPC_INITIATE))
-                    SpawnInitiate(false);
+                    me->SummonCreatureGroup(SUMMON_GROUP_IN_COMBAT);
 
                 if (UpdateVictim())
                 {
