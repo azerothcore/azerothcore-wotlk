@@ -52,10 +52,16 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
     std::string receiver, subject, body;
     uint32 unk1, unk2, money, COD;
     uint8 unk4;
+
     recvData >> mailbox;
     recvData >> receiver;
 
     recvData >> subject;
+
+    // prevent client crash
+    if (subject.find("| |") != std::string::npos || body.find("| |") != std::string::npos) {
+        return;
+    }
 
     recvData >> body;
 
@@ -133,7 +139,7 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
     uint32 cost = items_count ? 30 * items_count : 30; // price hardcoded in client
 
     uint32 reqmoney = cost + money;
-  
+
     // Check for overflow
     if (reqmoney < money)
     {
@@ -295,7 +301,7 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
 
     // If theres is an item, there is a one hour delivery delay if sent to another account's character.
     uint32 deliver_delay = needItemDelay ? sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY) : 0;
-  
+
     // don't ask for COD if there are no items
     if (items_count == 0)
         COD = 0;
@@ -447,7 +453,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recvData)
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
-  
+
     // verify that the mail has the item to avoid cheaters taking COD items without paying
     bool foundItem = false;
     for (std::vector<MailItemInfo>::const_iterator itr = m->items.begin(); itr != m->items.end(); ++itr)
@@ -630,6 +636,17 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
                 break;
         }
 
+        // prevent client crash
+        std::string subject = (*itr)->subject;
+        std::string body = (*itr)->body;
+
+        if (subject.find("| |") != std::string::npos) {
+            subject = "";
+        }
+        if (body.find("| |") != std::string::npos) {
+            body = "";
+        }
+
         data << uint32((*itr)->COD);                         // COD
         data << uint32(0);                                   // probably changed in 3.3.3
         data << uint32((*itr)->stationery);                  // stationery (Stationery.dbc)
@@ -637,8 +654,8 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
         data << uint32((*itr)->checked);                     // flags
         data << float(float((*itr)->expire_time-time(NULL))/DAY); // Time
         data << uint32((*itr)->mailTemplateId);              // mail template (MailTemplate.dbc)
-        data << (*itr)->subject;                             // Subject string - once 00, when mail type = 3, max 256
-        data << (*itr)->body;                                // message? max 8000
+        data << subject;                                     // Subject string - once 00, when mail type = 3, max 256
+        data << body;                                        // message? max 8000
         data << uint8(item_count);                           // client limit is 0x10
 
         for (uint8 i = 0; i < item_count; ++i)
