@@ -27,6 +27,7 @@
 #    CHARACTER DELETE OPTIONS
 #    ITEM DELETE OPTIONS
 #    CUSTOM SERVER OPTIONS
+#    PACKET SPOOF PROTECTION SETTINGS
 #    DEBUG
 #
 ###################################################################################################
@@ -2764,6 +2765,20 @@ Battleground.TrackDeserters.Enable = 1
 Battleground.InvitationType = 0
 
 #
+#    Battleground.ReportAFK.Timer
+#         Description: After a few minutes that battle started you can report the player.
+#         Default:     4
+
+Battleground.ReportAFK.Timer = 4
+
+#
+#    Battleground.ReportAFK
+#        Description: Number of reports needed to kick someone AFK from Battleground.
+#        Range:       1-9
+#        Default:     3
+
+Battleground.ReportAFK = 3
+
 #    Battleground.DisableQuestShareInBG
 #        Description: Disables the ability to share quests while in a Battleground.
 #        Default:     0 - (Disabled)
@@ -3516,13 +3531,13 @@ ICC.Buff.Alliance = 73828
 ###################################################################################################
 
 ###################################################################################################
-# Packet Spoof Protection Settings
+# PACKET SPOOF PROTECTION SETTINGS
 #
 # These settings determine which action to take when harmful packet spoofing is detected.
 #
 #    PacketSpoof.Policy
 #        Description: Determines the course of action when packet spoofing is detected.
-#        Values:     0 - Log only 
+#        Values:     0 - Log only
 #                    1 - Log + kick
 #                    2 - Log + kick + ban
 
