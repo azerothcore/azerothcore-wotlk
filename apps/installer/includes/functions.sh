@@ -12,6 +12,16 @@ function inst_configureOS() {
                 DISTRO=$(ls -d /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -v "lsb" | cut -d'/' -f3 | cut -d'-' -f1 | cut -d'_' -f1)
             fi
 
+            case $DISTRO in
+            # add here distro that are debian or ubuntu based
+            # TODO: find a better way, maybe checking the existance
+            # of a package manager
+                "neon") # kde neon based on ubuntu
+                    DISTRO="ubuntu"
+                ;;
+            esac
+
+
             DISTRO=${DISTRO,,}
 
             echo "Distro: $DISTRO"
