@@ -5,7 +5,7 @@ function inst_configureOS() {
         darwin*)  source "$AC_PATH_INSTALLER/includes/os_configs/osx.sh" ;;  
         linux*)
             # If $OSDISTRO is set, use this value (from config.sh)
-            if [ -z "$OSDISTRO" ]; then
+            if [ ! -z "$OSDISTRO" ]; then
                 DISTRO=$OSDISTRO
             # If available, use LSB to identify distribution
             elif [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
