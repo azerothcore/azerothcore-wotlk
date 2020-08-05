@@ -19,12 +19,12 @@ function inst_configureOS() {
             # add here distro that are debian or ubuntu based
             # TODO: find a better way, maybe checking the existance
             # of a package manager
-                "neon") # kde neon based on ubuntu
-                "ubuntu")
+                "neon" | "ubuntu")
                     DISTRO="ubuntu"
                 ;;
                 "debian")
                     DISTRO="debian"
+                ;;
                 *)
                     echo "Distro: $DISTRO, is not supported. If your distribution is based on debian or ubuntu,
                         please set the 'OSDISTRO' environment variable to one of these distro (you can use config.sh file)"
