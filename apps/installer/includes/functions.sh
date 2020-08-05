@@ -4,8 +4,11 @@ function inst_configureOS() {
         solaris*) echo "Solaris is not supported yet" ;;
         darwin*)  source "$AC_PATH_INSTALLER/includes/os_configs/osx.sh" ;;  
         linux*)
+            # If $OSDISTRO is set, use this value (from config.sh)
+            if [ -z "$OSDISTRO" ]; then
+                DISTRO=$OSDISTRO
             # If available, use LSB to identify distribution
-            if [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
+            elif [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
                 DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
             # Otherwise, use release info file
             else
@@ -17,7 +20,14 @@ function inst_configureOS() {
             # TODO: find a better way, maybe checking the existance
             # of a package manager
                 "neon") # kde neon based on ubuntu
+                "ubuntu")
                     DISTRO="ubuntu"
+                ;;
+                "debian")
+                    DISTRO="debian"
+                *)
+                    echo "Distro: $DISTRO, is not supported. If your distribution is based on debian or ubuntu,
+                        please set the 'OSDISTRO' environment variable to one of these distro (you can use config.sh file)"
                 ;;
             esac
 
