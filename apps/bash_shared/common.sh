@@ -1,7 +1,7 @@
 function registerHooks() { hwc_event_register_hooks "$@"; }
 function runHooks() { hwc_event_run_hooks "$@"; }
 
-source "$AC_PATH_CONF/config.sh.dist" # "hack" to avoid missing conf variables
+source "$AC_PATH_CONF/dist/config.sh" # include dist to avoid missing conf variables
 
 if [ -f "$AC_PATH_CONF/config.sh"  ]; then
     source "$AC_PATH_CONF/config.sh" # should overwrite previous
