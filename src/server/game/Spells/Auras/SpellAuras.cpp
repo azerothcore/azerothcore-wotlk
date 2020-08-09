@@ -178,8 +178,8 @@ void AuraApplication::_HandleEffect(uint8 effIndex, bool apply)
         SpellGroupStackFlags sFlag = sSpellMgr->GetGroupStackFlags(groupId);
         if (!aurEff->IsPeriodic() && (sFlag & SPELL_GROUP_STACK_FLAG_EFFECT_EXCLUSIVE))
         {
-            AuraApplication* strongestApp = apply ? this : NULL;
-            AuraEffect* strongestEff = apply ? aurEff : NULL;
+            AuraApplication* strongestApp = apply ? this : nullptr;
+            AuraEffect* strongestEff = apply ? aurEff : nullptr;
             int32 amount = apply ? abs(aurEff->GetAmount()) : 0;
             Unit* target = GetTarget();
             Unit::AuraEffectList const& auraList = target->GetAuraEffectsByType(aurEff->GetAuraType());
@@ -323,13 +323,13 @@ Aura* Aura::TryRefreshStackOrCreate(SpellInfo const* spellproto, uint8 tryEffMas
         *refresh = false;
     uint8 effMask = Aura::BuildEffectMaskForOwner(spellproto, tryEffMask, owner);
     if (!effMask)
-        return NULL;
+        return nullptr;
     if (Aura* foundAura = owner->ToUnit()->_TryStackingOrRefreshingExistingAura(spellproto, effMask, caster, baseAmount, castItem, casterGUID, periodicReset))
     {
         // we've here aura, which script triggered removal after modding stack amount
         // check the state here, so we won't create new Aura object
         if (foundAura->IsRemoved())
-            return NULL;
+            return nullptr;
 
         if (refresh)
             *refresh = true;
@@ -347,7 +347,7 @@ Aura* Aura::TryCreate(SpellInfo const* spellproto, uint8 tryEffMask, WorldObject
     ASSERT(tryEffMask <= MAX_EFFECT_MASK);
     uint8 effMask = Aura::BuildEffectMaskForOwner(spellproto, tryEffMask, owner);
     if (!effMask)
-        return NULL;
+        return nullptr;
     return Create(spellproto, effMask, owner, caster, baseAmount, castItem, casterGUID);
 }
 
@@ -374,9 +374,9 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owne
         if (!owner->IsInWorld() || ((Unit*)owner)->IsDuringRemoveFromWorld())
             // owner not in world so don't allow to own not self casted single target auras
             if (casterGUID != owner->GetGUID() && spellproto->IsSingleTarget())
-                return NULL;
+                return nullptr;
 
-    Aura* aura = NULL;
+    Aura* aura = nullptr;
     switch (owner->GetTypeId())
     {
         case TYPEID_UNIT:
@@ -388,11 +388,11 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owne
             break;
         default:
             ABORT();
-            return NULL;
+            return nullptr;
     }
     // aura can be removed in Unit::_AddAura call
     if (aura->IsRemoved())
-        return NULL;
+        return nullptr;
     return aura;
 }
 
@@ -419,7 +419,7 @@ AuraScript* Aura::GetScriptByName(std::string const& scriptName) const
     for (std::list<AuraScript*>::const_iterator itr = m_loadedScripts.begin(); itr != m_loadedScripts.end(); ++itr)
         if ((*itr)->_GetScriptName()->compare(scriptName) == 0)
             return *itr;
-    return NULL;
+    return nullptr;
 }
 
 void Aura::_InitEffects(uint8 effMask, Unit* caster, int32 *baseAmount)
@@ -430,7 +430,7 @@ void Aura::_InitEffects(uint8 effMask, Unit* caster, int32 *baseAmount)
         if (effMask & (uint8(1) << i))
             m_effects[i] = new AuraEffect(this, i, baseAmount ? baseAmount + i : NULL, caster);
         else
-            m_effects[i] = NULL;
+            m_effects[i] = nullptr;
     }
 }
 
@@ -487,7 +487,7 @@ void Aura::_ApplyForTarget(Unit* target, Unit* caster, AuraApplication * auraApp
     {
         if (m_spellInfo->IsCooldownStartedOnEvent())
         {
-            Item* castItem = m_castItemGuid ? caster->ToPlayer()->GetItemByGuid(m_castItemGuid) : NULL;
+            Item* castItem = m_castItemGuid ? caster->ToPlayer()->GetItemByGuid(m_castItemGuid) : nullptr;
             caster->ToPlayer()->AddSpellAndCategoryCooldowns(m_spellInfo, castItem ? castItem->GetEntry() : 0, NULL, true);
         }
     }
@@ -729,8 +729,8 @@ void Aura::UpdateOwner(uint32 diff, WorldObject* owner)
     Unit* caster = GetCaster();
     // Apply spellmods for channeled auras
     // used for example when triggered spell of spell:10 is modded
-    Spell* modSpell = NULL;
-    Player* modOwner = NULL;
+    Spell* modSpell = nullptr;
+    Player* modOwner = nullptr;
     if (caster)
     {
         modOwner = caster->GetSpellModOwner();
@@ -809,7 +809,7 @@ void Aura::Update(uint32 diff, Unit* caster)
 
 int32 Aura::CalcMaxDuration(Unit* caster) const
 {
-    Player* modOwner = NULL;
+    Player* modOwner = nullptr;
     int32 maxDuration;
 
     if (caster)
@@ -1434,7 +1434,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (GetCasterGUID() == target->GetGUID())
                         break;
 
-                    AuraEffect* aurEff = NULL;
+                    AuraEffect* aurEff = nullptr;
                     // Ebon Plaguebringer / Crypt Fever
                     Unit::AuraEffectList const& TalentAuras = caster->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
                     for (Unit::AuraEffectList::const_iterator itr = TalentAuras.begin(); itr != TalentAuras.end(); ++itr)
@@ -1838,7 +1838,7 @@ bool Aura::IsAuraStronger(Aura const* newAura) const
         if (!thisEffect)
             continue;
 
-        AuraEffect* newEffect = NULL;
+        AuraEffect* newEffect = nullptr;
         for (uint8 j = EFFECT_0; j < MAX_SPELL_EFFECTS; ++j)
         {
             newEffect = newAura->GetEffect(j);
@@ -1989,7 +1989,7 @@ bool Aura::CanStackWith(Aura const* existingAura, bool remove) const
 
     if (VehicleAura1 && VehicleAura2)
     {
-        Vehicle* veh = NULL;
+        Vehicle* veh = nullptr;
         if (GetOwner()->ToUnit())
             veh = GetOwner()->ToUnit()->GetVehicleKit();
 
@@ -2112,7 +2112,7 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
             if (eventInfo.GetDamageInfo())
             {
                 WeaponAttackType attType = eventInfo.GetDamageInfo()->GetAttackType();
-                Item* item = NULL;
+                Item* item = nullptr;
                 if (attType == BASE_ATTACK)
                     item = target->ToPlayer()->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
                 else if (attType == OFF_ATTACK)

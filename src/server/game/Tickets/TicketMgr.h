@@ -188,7 +188,7 @@ public:
         if (itr != _ticketList.end())
             return itr->second;
 
-        return NULL;
+        return nullptr;
     }
 
     GmTicket* GetTicketByPlayer(uint64 playerGuid)
@@ -197,7 +197,7 @@ public:
             if (itr->second && itr->second->IsFromPlayer(playerGuid) && !itr->second->IsClosed())
                 return itr->second;
 
-        return NULL;
+        return nullptr;
     }
 
     GmTicket* GetOldestOpenTicket()
@@ -206,7 +206,7 @@ public:
             if (itr->second && !itr->second->IsClosed() && !itr->second->IsCompleted())
                 return itr->second;
 
-        return NULL;
+        return nullptr;
     }
 
     void AddTicket(GmTicket* ticket);

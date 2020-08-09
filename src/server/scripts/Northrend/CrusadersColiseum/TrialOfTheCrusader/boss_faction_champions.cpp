@@ -149,7 +149,7 @@ struct boss_faction_championsAI : public ScriptedAI
     {
         std::list<Creature *> lst = DoFindFriendlyMissingBuff(range, spell);
         if( lst.empty() )
-            return NULL;
+            return nullptr;
         std::list<Creature *>::const_iterator iter = lst.begin();
         uint32 lowestHP = (*iter)->GetMaxHealth() - (*iter)->GetHealth();
         for( std::list<Creature *>::const_iterator itr = lst.begin(); itr != lst.end(); ++itr )
@@ -185,7 +185,7 @@ struct boss_faction_championsAI : public ScriptedAI
             if( target && target->getPowerType() == POWER_MANA && (!casting || target->HasUnitState(UNIT_STATE_CASTING)) && me->GetExactDist(target) <= range )
                 return target;
         }
-        return NULL;
+        return nullptr;
     }
 
     void UpdateAI(uint32 diff)

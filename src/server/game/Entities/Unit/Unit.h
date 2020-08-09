@@ -950,7 +950,7 @@ public:
     uint32 GetSpellTypeMask() const { return _spellTypeMask; }
     uint32 GetSpellPhaseMask() const { return _spellPhaseMask; }
     uint32 GetHitMask() const { return _hitMask; }
-    SpellInfo const* GetSpellInfo() const { return NULL; }
+    SpellInfo const* GetSpellInfo() const { return nullptr; }
     SpellSchoolMask GetSchoolMask() const { return SPELL_SCHOOL_MASK_NONE; }
     DamageInfo* GetDamageInfo() const { return _damageInfo; }
     HealInfo* GetHealInfo() const { return _healInfo; }
@@ -1425,7 +1425,7 @@ class Unit : public WorldObject
             if (!m_attackers.empty())
                 return *(m_attackers.begin());
 
-            return NULL;
+            return nullptr;
         }
         bool Attack(Unit* victim, bool meleeAttack);
         void CastStop(uint32 except_spellid = 0, bool withInstant = true);
@@ -2378,10 +2378,10 @@ class Unit : public WorldObject
         virtual bool isBeingLoaded() const { return false;}
         bool IsDuringRemoveFromWorld() const {return m_duringRemoveFromWorld;}
 
-        Pet* ToPet(){ if (IsPet()) return reinterpret_cast<Pet*>(this); else return NULL; }
-        Totem* ToTotem(){ if (IsTotem()) return reinterpret_cast<Totem*>(this); else return NULL; }
-        TempSummon* ToTempSummon() { if (IsSummon()) return reinterpret_cast<TempSummon*>(this); else return NULL; }
-        const TempSummon* ToTempSummon() const { if (IsSummon()) return reinterpret_cast<const TempSummon*>(this); else return NULL; }
+        Pet* ToPet(){ if (IsPet()) return reinterpret_cast<Pet*>(this); else return nullptr; }
+        Totem* ToTotem(){ if (IsTotem()) return reinterpret_cast<Totem*>(this); else return nullptr; }
+        TempSummon* ToTempSummon() { if (IsSummon()) return reinterpret_cast<TempSummon*>(this); else return nullptr; }
+        const TempSummon* ToTempSummon() const { if (IsSummon()) return reinterpret_cast<const TempSummon*>(this); else return nullptr; }
 
         // pussywizard:
         // MMaps

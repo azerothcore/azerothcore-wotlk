@@ -1281,7 +1281,7 @@ class Player : public Unit, public GridObject<Player>
         inline Item* GetUseableItemByPos(uint8 bag, uint8 slot) const //Does additional check for disarmed weapons
         {
             if (!CanUseAttackType(GetAttackBySlot(slot)))
-                return NULL;
+                return nullptr;
             return GetItemByPos(bag, slot);
         }
         Item* GetWeaponForAttack(WeaponAttackType attackType, bool useable = false) const;
@@ -1400,7 +1400,7 @@ class Player : public Unit, public GridObject<Player>
 
         float GetReputationPriceDiscount(Creature const* creature) const;
 
-        Player* GetTrader() const { return m_trade ? m_trade->GetTrader() : NULL; }
+        Player* GetTrader() const { return m_trade ? m_trade->GetTrader() : nullptr; }
         TradeData* GetTradeData() const { return m_trade; }
         void TradeCancel(bool sendback);
 
@@ -1692,7 +1692,7 @@ class Player : public Unit, public GridObject<Player>
         Item* GetMItem(uint32 id)
         {
             ItemMap::const_iterator itr = mMitems.find(id);
-            return itr != mMitems.end() ? itr->second : NULL;
+            return itr != mMitems.end() ? itr->second : nullptr;
         }
 
         void AddMItem(Item* it)

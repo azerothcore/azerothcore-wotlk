@@ -86,7 +86,7 @@ void BattlegroundMgr::Update(uint32 diff)
         bg->Update(diff);
         if (bg->ToBeDeleted())
         {
-            itrDelete->second = NULL;
+            itrDelete->second = nullptr;
             m_Battlegrounds.erase(itrDelete);
             delete bg;
         }
@@ -407,13 +407,13 @@ void BattlegroundMgr::BuildPlayerJoinedBattlegroundPacket(WorldPacket* data, Pla
 Battleground* BattlegroundMgr::GetBattleground(uint32 instanceId)
 {
     if (!instanceId)
-        return NULL;
+        return nullptr;
 
     BattlegroundContainer::const_iterator itr = m_Battlegrounds.find(instanceId);
     if (itr != m_Battlegrounds.end())
        return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 Battleground* BattlegroundMgr::GetBattlegroundTemplate(BattlegroundTypeId bgTypeId)
@@ -422,7 +422,7 @@ Battleground* BattlegroundMgr::GetBattlegroundTemplate(BattlegroundTypeId bgType
     if (itr != m_BattlegroundTemplates.end())
         return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 uint32 BattlegroundMgr::GetNextClientVisibleInstanceId()
@@ -441,12 +441,12 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
     // get the template BG
     Battleground* bg_template = GetBattlegroundTemplate(bgTypeId);
     if (!bg_template)
-        return NULL;
+        return nullptr;
 
-    Battleground* bg = NULL;
+    Battleground* bg = nullptr;
     // create a copy of the BG template
     if (BattlegroundMgr::bgTypeToTemplate.find(bgTypeId) == BattlegroundMgr::bgTypeToTemplate.end()) {
-        return NULL;
+        return nullptr;
     }
 
     bg = BattlegroundMgr::bgTypeToTemplate[bgTypeId](bg_template);
@@ -491,7 +491,7 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
 bool BattlegroundMgr::CreateBattleground(CreateBattlegroundData& data)
 {
     // Create the BG
-    Battleground* bg = NULL;
+    Battleground* bg = nullptr;
     bg = BattlegroundMgr::bgtypeToBattleground[data.bgTypeId];
 
     if (bg == NULL)

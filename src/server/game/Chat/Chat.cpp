@@ -83,7 +83,7 @@ bool ChatHandler::isAvailable(ChatCommand const& cmd) const
 
 bool ChatHandler::HasLowerSecurity(Player* target, uint64 guid, bool strong)
 {
-    WorldSession* target_session = NULL;
+    WorldSession* target_session = nullptr;
     uint32 target_account = 0;
 
     if (target)
@@ -708,7 +708,7 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
 Player* ChatHandler::getSelectedPlayer()
 {
     if (!m_session)
-        return NULL;
+        return nullptr;
 
     uint64 selected = m_session->GetPlayer()->GetTarget();
     if (!selected)
@@ -720,7 +720,7 @@ Player* ChatHandler::getSelectedPlayer()
 Unit* ChatHandler::getSelectedUnit()
 {
     if (!m_session)
-        return NULL;
+        return nullptr;
 
     if (Unit* selected = m_session->GetPlayer()->GetSelectedUnit())
         return selected;
@@ -731,7 +731,7 @@ Unit* ChatHandler::getSelectedUnit()
 WorldObject* ChatHandler::getSelectedObject()
 {
     if (!m_session)
-        return NULL;
+        return nullptr;
 
     uint64 guid = m_session->GetPlayer()->GetTarget();
 
@@ -744,7 +744,7 @@ WorldObject* ChatHandler::getSelectedObject()
 Creature* ChatHandler::getSelectedCreature()
 {
     if (!m_session)
-        return NULL;
+        return nullptr;
 
     return ObjectAccessor::GetCreatureOrPetOrVehicle(*m_session->GetPlayer(), m_session->GetPlayer()->GetTarget());
 }
@@ -752,7 +752,7 @@ Creature* ChatHandler::getSelectedCreature()
 Player* ChatHandler::getSelectedPlayerOrSelf()
 {
     if (!m_session)
-        return NULL;
+        return nullptr;
 
     uint64 selected = m_session->GetPlayer()->GetTarget();
     if (!selected)
@@ -771,14 +771,14 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* linkType, char** s
 {
     // skip empty
     if (!text)
-        return NULL;
+        return nullptr;
 
     // skip spaces
     while (*text == ' '||*text == '\t'||*text == '\b')
         ++text;
 
     if (!*text)
-        return NULL;
+        return nullptr;
 
     // return non link case
     if (text[0] != '|')
@@ -790,17 +790,17 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* linkType, char** s
 
     char* check = strtok(text, "|");                        // skip color
     if (!check)
-        return NULL;                                        // end of data
+        return nullptr;                                        // end of data
 
     char* cLinkType = strtok(NULL, ":");                    // linktype
     if (!cLinkType)
-        return NULL;                                        // end of data
+        return nullptr;                                        // end of data
 
     if (strcmp(cLinkType, linkType) != 0)
     {
         strtok(NULL, " ");                                  // skip link tail (to allow continue strtok(NULL, s) use after retturn from function
         SendSysMessage(LANG_WRONG_LINK_TYPE);
-        return NULL;
+        return nullptr;
     }
 
     char* cKeys = strtok(NULL, "|");                        // extract keys and values
@@ -819,14 +819,14 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
 {
     // skip empty
     if (!text)
-        return NULL;
+        return nullptr;
 
     // skip spaces
     while (*text == ' '||*text == '\t'||*text == '\b')
         ++text;
 
     if (!*text)
-        return NULL;
+        return nullptr;
 
     // return non link case
     if (text[0] != '|')
@@ -844,7 +844,7 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
     {
         char* check = strtok(text, "|");                    // skip color
         if (!check)
-            return NULL;                                    // end of data
+            return nullptr;                                    // end of data
 
         tail = strtok(NULL, "");                            // tail
     }
@@ -853,7 +853,7 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
 
     char* cLinkType = strtok(tail, ":");                    // linktype
     if (!cLinkType)
-        return NULL;                                        // end of data
+        return nullptr;                                        // end of data
 
     for (int i = 0; linkTypes[i]; ++i)
     {
@@ -876,16 +876,16 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
 
     strtok(NULL, " ");                                      // skip link tail (to allow continue strtok(NULL, s) use after return from function
     SendSysMessage(LANG_WRONG_LINK_TYPE);
-    return NULL;
+    return nullptr;
 }
 
 GameObject* ChatHandler::GetNearbyGameObject()
 {
     if (!m_session)
-        return NULL;
+        return nullptr;
 
     Player* pl = m_session->GetPlayer();
-    GameObject* obj = NULL;
+    GameObject* obj = nullptr;
     acore::NearestGameObjectCheck check(*pl);
     acore::GameObjectLastSearcher<acore::NearestGameObjectCheck> searcher(pl, obj, check);
     pl->VisitNearbyGridObject(SIZE_OF_GRIDS, searcher);
@@ -895,7 +895,7 @@ GameObject* ChatHandler::GetNearbyGameObject()
 GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid, uint32 entry)
 {
     if (!m_session)
-        return NULL;
+        return nullptr;
 
     Player* pl = m_session->GetPlayer();
 
@@ -944,7 +944,7 @@ uint32 ChatHandler::extractSpellIdFromLink(char* text)
     // number or [name] Shift-click form |color|Htalent:talent_id, rank|h[name]|h|r
     // number or [name] Shift-click form |color|Htrade:spell_id, skill_id, max_value, cur_value|h[name]|h|r
     int type = 0;
-    char* param1_str = NULL;
+    char* param1_str = nullptr;
     char* idS = extractKeyFromLink(text, spellKeys, &type, &param1_str);
     if (!idS)
         return 0;
@@ -995,7 +995,7 @@ GameTele const* ChatHandler::extractGameTeleFromLink(char* text)
     // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
     char* cId = extractKeyFromLink(text, "Htele");
     if (!cId)
-        return NULL;
+        return nullptr;
 
     // id case (explicit or from shift link)
     if (cId[0] >= '0' || cId[0] <= '9')
@@ -1146,7 +1146,7 @@ void ChatHandler::extractOptFirstArg(char* args, char** arg1, char** arg2)
     if (!p2)
     {
         p2 = p1;
-        p1 = NULL;
+        p1 = nullptr;
     }
 
     if (arg1)
@@ -1159,7 +1159,7 @@ void ChatHandler::extractOptFirstArg(char* args, char** arg1, char** arg2)
 char* ChatHandler::extractQuotedArg(char* args)
 {
     if (!*args)
-        return NULL;
+        return nullptr;
 
     if (*args == '"')
         return strtok(args+1, "\"");
@@ -1174,7 +1174,7 @@ char* ChatHandler::extractQuotedArg(char* args)
 
         // return NULL if we reached the end of the string
         if (!*args)
-            return NULL;
+            return nullptr;
 
         // since we skipped all spaces, we expect another token now
         if (*args == '"')
@@ -1192,7 +1192,7 @@ char* ChatHandler::extractQuotedArg(char* args)
                 return strtok(args + 1, "\"");
         }
         else
-            return NULL;
+            return nullptr;
     }
 }
 
@@ -1246,7 +1246,7 @@ bool CliHandler::needReportToTarget(Player* /*chr*/) const
 
 bool ChatHandler::GetPlayerGroupAndGUIDByName(const char* cname, Player* &player, Group* &group, uint64 &guid, bool offline)
 {
-    player  = NULL;
+    player  = nullptr;
     guid = 0;
 
     if (cname)

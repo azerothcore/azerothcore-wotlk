@@ -139,7 +139,7 @@ class spell_winter_veil_racer_rocket_slam : public SpellScriptLoader
             PreventHitEffect(EFFECT_1);
 
             std::list<Creature*> unitList;
-            Unit* target = NULL;
+            Unit* target = nullptr;
             caster->GetCreaturesWithEntryInRange(unitList, 30.0f, NPC_BLUE_RACER);
             if (!unitList.empty())
                 for (std::list<Creature*>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)

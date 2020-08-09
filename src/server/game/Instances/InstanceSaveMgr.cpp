@@ -60,19 +60,19 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
     if (!entry)
     {
         sLog->outError("InstanceSaveManager::AddInstanceSave: wrong mapid = %d, instanceid = %d!", mapId, instanceId);
-        return NULL;
+        return nullptr;
     }
 
     if (instanceId == 0)
     {
         sLog->outError("InstanceSaveManager::AddInstanceSave: mapid = %d, wrong instanceid = %d!", mapId, instanceId);
-        return NULL;
+        return nullptr;
     }
 
     if (difficulty >= (entry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
     {
         sLog->outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong dificalty %u!", mapId, instanceId, difficulty);
-        return NULL;
+        return nullptr;
     }
 
     time_t resetTime, extendedResetTime;
@@ -97,7 +97,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
 InstanceSave* InstanceSaveManager::GetInstanceSave(uint32 InstanceId)
 {
     InstanceSaveHashMap::iterator itr = m_instanceSaveById.find(InstanceId);
-    return itr != m_instanceSaveById.end() ? itr->second : NULL;
+    return itr != m_instanceSaveById.end() ? itr->second : nullptr;
 }
 
 bool InstanceSaveManager::DeleteInstanceSaveIfNeeded(uint32 InstanceId, bool skipMapCheck)
@@ -696,20 +696,20 @@ InstancePlayerBind* InstanceSaveManager::PlayerGetBoundInstance(uint32 guidLow, 
 
     MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(mapid, difficulty_fixed);
     if (!mapDiff)
-        return NULL;
+        return nullptr;
 
-    BoundInstancesMapWrapper* w = NULL;
+    BoundInstancesMapWrapper* w = nullptr;
     PlayerBindStorage::const_iterator itr = playerBindStorage.find(guidLow);
     if (itr != playerBindStorage.end())
         w = itr->second;
     else
-        return NULL;
+        return nullptr;
 
     BoundInstancesMap::iterator itr2 = w->m[difficulty_fixed].find(mapid);
     if (itr2 != w->m[difficulty_fixed].end())
         return &itr2->second;
     else
-        return NULL;
+        return nullptr;
 }
 
 bool InstanceSaveManager::PlayerIsPermBoundToInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty)

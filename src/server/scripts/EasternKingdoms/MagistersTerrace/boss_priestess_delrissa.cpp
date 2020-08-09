@@ -206,7 +206,7 @@ public:
                 }
                 case EVENT_SPELL_DISPEL:
                 {
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     switch (urand(0, 2))
                     {
                         case 0: target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true); break;

@@ -270,7 +270,7 @@ public:
                                             inside.push_back(tmp);
                                     }
 
-                        Player* t = NULL;
+                        Player* t = nullptr;
                         if( outside.size() >= uint8(me->GetMap()->Is25ManRaid() ? 9 : 4) )
                             t = outside.at(urand(0, outside.size()-1));
                         else if( !inside.empty() )

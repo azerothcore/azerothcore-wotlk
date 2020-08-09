@@ -51,7 +51,7 @@ bool LoadPetFromDBQueryHolder::Initialize()
     SetSize(MAX_PET_LOAD_QUERY);
 
     bool res = true;
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_AURA);
     stmt->setUInt32(0, m_petNumber);
@@ -411,7 +411,7 @@ void WorldSession::HandlePetAction(WorldPacket & recvData)
     if (!pet->IsAlive())
     {
         // xinef: allow dissmis dead pets
-        SpellInfo const* spell = (flag == ACT_ENABLED || flag == ACT_PASSIVE) ? sSpellMgr->GetSpellInfo(spellid) : NULL;
+        SpellInfo const* spell = (flag == ACT_ENABLED || flag == ACT_PASSIVE) ? sSpellMgr->GetSpellInfo(spellid) : nullptr;
         if ((flag != ACT_COMMAND || spellid != COMMAND_ABANDON) && (!spell || !spell->HasAttribute(SPELL_ATTR0_CASTABLE_WHILE_DEAD)))
             return;
     }
@@ -661,7 +661,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid
         case ACT_PASSIVE:                                   // 0x01
         case ACT_ENABLED:                                   // 0xC1    spell
         {
-            Unit* unit_target = NULL;
+            Unit* unit_target = nullptr;
 
             // do not cast unknown spells
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
@@ -849,7 +849,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid
                         pet->AttackStop();
                     }
                     else
-                        victim = NULL;
+                        victim = nullptr;
 
                     if (pet->GetTypeId() != TYPEID_PLAYER && pet->ToCreature() && pet->ToCreature()->IsAIEnabled)
                     {

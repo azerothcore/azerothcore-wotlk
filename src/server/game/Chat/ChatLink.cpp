@@ -630,12 +630,12 @@ bool LinkExtractor::IsValidMessage()
     std::istringstream::pos_type startPos = 0;
     uint32 color = 0;
 
-    ChatLink* link = NULL;
+    ChatLink* link = nullptr;
     while (!_iss.eof())
     {
         if (validSequence == validSequenceIterator)
         {
-            link = NULL;
+            link = nullptr;
             _iss.ignore(255, PIPE_CHAR);
             startPos = _iss.tellg() - std::istringstream::pos_type(1);
         }

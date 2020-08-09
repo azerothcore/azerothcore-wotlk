@@ -926,7 +926,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     if (uint32 guildId = Player::GetGuildIdFromStorage(pCurrChar->GetGUIDLow()))
     {
         Guild* guild = sGuildMgr->GetGuildById(guildId);
-        Guild::Member const* member = guild ? guild->GetMember(pCurrChar->GetGUID()) : NULL;
+        Guild::Member const* member = guild ? guild->GetMember(pCurrChar->GetGUID()) : nullptr;
         if (member)
         {
             pCurrChar->SetInGuild(guildId);
@@ -1026,7 +1026,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         if (!t->IsInMap(pCurrChar))
         {
             t->RemovePassenger(pCurrChar);
-            pCurrChar->m_transport = NULL;
+            pCurrChar->m_transport = nullptr;
             pCurrChar->m_movementInfo.transport.Reset();
             pCurrChar->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         }
@@ -1976,7 +1976,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket &recvData)
         if (_player->IsInCombat() && i != EQUIPMENT_SLOT_MAINHAND && i != EQUIPMENT_SLOT_OFFHAND && i != EQUIPMENT_SLOT_RANGED)
             continue;
 
-        Item* item = NULL;
+        Item* item = nullptr;
         if (itemGuid > 0)
             item = _player->GetItemByGuid(itemGuid);
 

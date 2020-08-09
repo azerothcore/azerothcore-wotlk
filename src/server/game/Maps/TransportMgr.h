@@ -111,7 +111,7 @@ public:
         TransportTemplates::const_iterator itr = _transportTemplates.find(entry);
         if (itr != _transportTemplates.end())
             return &itr->second;
-        return NULL;
+        return nullptr;
     }
 
     TransportAnimation const* GetTransportAnimInfo(uint32 entry) const
@@ -120,7 +120,7 @@ public:
         if (itr != _transportAnimations.end())
             return &itr->second;
 
-        return NULL;
+        return nullptr;
     }
 
     // Generates and precaches a path for transport to avoid generation each time transport instance is created

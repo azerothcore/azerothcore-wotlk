@@ -706,7 +706,7 @@ class spell_mage_focus_magic : public SpellScriptLoader
 
             bool Load()
             {
-                _procTarget = NULL;
+                _procTarget = nullptr;
                 return true;
             }
 

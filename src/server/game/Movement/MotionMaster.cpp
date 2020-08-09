@@ -104,7 +104,7 @@ void MotionMaster::UpdateMotion(uint32 diff)
         }
 
         delete _expList;
-        _expList = NULL;
+        _expList = nullptr;
 
         if (empty())
             Initialize();
@@ -192,7 +192,7 @@ void MotionMaster::DirectExpireSlot(MovementSlot slot, bool reset)
         MovementGenerator *curr = Impl[slot];
 
         // pussywizard: clear slot AND decrease top immediately to avoid crashes when referencing null top in DirectDelete
-        Impl[slot] = NULL;
+        Impl[slot] = nullptr;
         while (!empty() && !top())
             --_top;
 
@@ -716,7 +716,7 @@ void MotionMaster::Mutate(MovementGenerator *m, MovementSlot slot)
         bool delayed = (_top == slot && (_cleanFlag & MMCF_UPDATE));
 
         // pussywizard: clear slot AND decrease top immediately to avoid crashes when referencing null top in DirectDelete
-        Impl[slot] = NULL;
+        Impl[slot] = nullptr;
         while (!empty() && !top())
             --_top;
 

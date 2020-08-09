@@ -137,7 +137,7 @@ void WorldSocket::CloseSocket(std::string const& reason)
     {
         ACE_GUARD (LockType, Guard, m_SessionLock);
 
-        m_Session = NULL;
+        m_Session = nullptr;
     }
 }
 
@@ -436,7 +436,7 @@ int WorldSocket::handle_close(ACE_HANDLE h, ACE_Reactor_Mask)
     {
         ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
 
-        m_Session = NULL;
+        m_Session = nullptr;
     }
 
     reactor()->remove_handler(this, ACE_Event_Handler::DONT_CALL | ACE_Event_Handler::ALL_EVENTS_MASK);
@@ -480,7 +480,7 @@ int WorldSocket::handle_input_header(void)
 
     if ((header.size < 4) || (header.size > 10240) || (header.cmd  > 10240))
     {
-        Player* _player = m_Session ? m_Session->GetPlayer() : NULL;
+        Player* _player = m_Session ? m_Session->GetPlayer() : nullptr;
         sLog->outError("WorldSocket::handle_input_header(): client (account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)", m_Session ? m_Session->GetAccountId() : 0, _player ? _player->GetGUIDLow() : 0, _player ? _player->GetName().c_str() : "<none>", header.size, header.cmd);
 
         errno = EINVAL;
@@ -517,7 +517,7 @@ int WorldSocket::handle_input_payload(void)
 
     m_RecvPct.base (NULL, 0);
     m_RecvPct.reset();
-    m_RecvWPct = NULL;
+    m_RecvWPct = nullptr;
 
     m_Header.reset();
 

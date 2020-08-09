@@ -302,7 +302,7 @@ Creature* MotionTransport::CreateNPCPassenger(uint32 guid, CreatureData const* d
     if (!creature->LoadCreatureFromDB(guid, map, false))
     {
         delete creature;
-        return NULL;
+        return nullptr;
     }
 
     float x = data->posX;
@@ -327,13 +327,13 @@ Creature* MotionTransport::CreateNPCPassenger(uint32 guid, CreatureData const* d
     {
         sLog->outError("Creature (guidlow %d, entry %d) not created. Suggested coordinates aren't valid (X: %f Y: %f)",creature->GetGUIDLow(),creature->GetEntry(),creature->GetPositionX(),creature->GetPositionY());
         delete creature;
-        return NULL;
+        return nullptr;
     }
 
     if (!map->AddToMap(creature))
     {
         delete creature;
-        return NULL;
+        return nullptr;
     }
 
     _staticPassengers.insert(creature);
@@ -350,7 +350,7 @@ GameObject* MotionTransport::CreateGOPassenger(uint32 guid, GameObjectData const
     if (!go->LoadGameObjectFromDB(guid, map, false))
     {
         delete go;
-        return NULL;
+        return nullptr;
     }
 
     float x = data->posX;
@@ -368,13 +368,13 @@ GameObject* MotionTransport::CreateGOPassenger(uint32 guid, GameObjectData const
     {
         sLog->outError("GameObject (guidlow %d, entry %d) not created. Suggested coordinates aren't valid (X: %f Y: %f)", go->GetGUIDLow(), go->GetEntry(), go->GetPositionX(), go->GetPositionY());
         delete go;
-        return NULL;
+        return nullptr;
     }
 
     if (!map->AddToMap(go))
     {
         delete go;
-        return NULL;
+        return nullptr;
     }
 
     _staticPassengers.insert(go);
@@ -829,7 +829,7 @@ void StaticTransport::Update(uint32 diff)
 
 void StaticTransport::RelocateToProgress(uint32 progress)
 {
-    TransportAnimationEntry const *curr = NULL, *next = NULL;
+    TransportAnimationEntry const *curr = NULL, *next = nullptr;
     float percPos;
     if (m_goValue.Transport.AnimationInfo->GetAnimNode(progress, curr, next, percPos))
     {

@@ -620,7 +620,7 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
     if (m_amplitude <= 0)
         m_amplitude = 1000;
 
-    Player* modOwner = caster ? caster->GetSpellModOwner() : NULL;
+    Player* modOwner = caster ? caster->GetSpellModOwner() : nullptr;
 
     // Apply casting time mods
     if (m_amplitude)
@@ -1441,7 +1441,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
         }
 
         const Unit::AuraEffectList& shapeshifts = target->GetAuraEffectsByType(SPELL_AURA_MOD_SHAPESHIFT);
-        AuraEffect* newAura = NULL;
+        AuraEffect* newAura = nullptr;
         // Iterate through all the shapeshift auras that the target has, if there is another aura with SPELL_AURA_MOD_SHAPESHIFT, then this aura is being removed due to that one being applied
         for (Unit::AuraEffectList::const_iterator itr = shapeshifts.begin(); itr != shapeshifts.end(); ++itr)
         {
@@ -5081,7 +5081,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                                 if( aurApp->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE )
                                     return;
 
-                                Player* player = NULL;
+                                Player* player = nullptr;
                                 acore::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
                                 acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(target, player, checker);
                                 target->VisitNearbyWorldObject(10.0f, searcher);

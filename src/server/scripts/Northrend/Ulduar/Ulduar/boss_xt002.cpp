@@ -481,7 +481,7 @@ public:
 
         void SendEnergyToCorner()
         {
-            Unit* pile = NULL;
+            Unit* pile = nullptr;
             uint8 num = urand(1,4);
             for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))

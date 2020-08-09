@@ -107,7 +107,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         if (!t->IsInMap(_player))
         {
             t->RemovePassenger(_player);
-            _player->m_transport = NULL;
+            _player->m_transport = nullptr;
             _player->m_movementInfo.transport.Reset();
             _player->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         }
@@ -389,7 +389,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
                 if (!foundNewTransport)
                 {
-                    plrMover->m_transport = NULL;
+                    plrMover->m_transport = nullptr;
                     movementInfo.transport.Reset();
                 }
             }
@@ -401,7 +401,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     else if (plrMover && plrMover->GetTransport()) // if we were on a transport, leave
     {
         plrMover->m_transport->RemovePassenger(plrMover);
-        plrMover->m_transport = NULL;
+        plrMover->m_transport = nullptr;
         movementInfo.transport.Reset();
     }
 

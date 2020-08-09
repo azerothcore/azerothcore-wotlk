@@ -365,7 +365,7 @@ public:
             {
                 if (SWPainTimer <= diff)
                 {
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     if (phase == 1)
                         target = me->GetVictim();                  // Target the Tank
                     else                                          // anyone but the tank
@@ -416,7 +416,7 @@ public:
             {
                 if (AmplifyDamageTimer <= diff)
                 {
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
 
                     if (target)

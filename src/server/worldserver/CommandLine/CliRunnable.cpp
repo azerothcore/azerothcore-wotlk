@@ -59,7 +59,7 @@ char* command_finder(const char* text, int state)
 
 char** cli_completion(const char* text, int start, int /*end*/)
 {
-    char** matches = NULL;
+    char** matches = nullptr;
 
     if (start)
         rl_bind_key('\t', rl_abort);

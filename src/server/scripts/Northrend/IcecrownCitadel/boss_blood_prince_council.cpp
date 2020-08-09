@@ -1259,7 +1259,7 @@ class npc_ball_of_flame : public CreatureScript
             {
                 if (action != ACTION_FLAME_BALL_CHASE || me->IsInCombat())
                     return;
-                Player* target = NULL;
+                Player* target = nullptr;
                 if (_chaseGUID)
                     target = ObjectAccessor::GetPlayer(*me, _chaseGUID);
                 if (!target)

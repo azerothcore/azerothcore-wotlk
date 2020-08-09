@@ -32,7 +32,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 #endif
     Player* player = GetPlayer();
     uint64 lguid = player->GetLootGUID();
-    Loot* loot = NULL;
+    Loot* loot = nullptr;
     uint8 lootSlot = 0;
 
     recvData >> lootSlot;
@@ -42,7 +42,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         GameObject* go = player->GetMap()->GetGameObject(lguid);
         // xinef: cheating protection
         //if (player->GetGroup() && player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGUID() != player->GetGroup()->GetMasterLooterGuid())
-        //    go = NULL;
+        //    go = nullptr;
 
         // not check distance for GO in case owned GO (fishing bobber case, for example) or Fishing hole GO
         if (!go || ((go->GetOwnerGUID() != _player->GetGUID() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(_player, INTERACTION_DISTANCE)))
@@ -108,7 +108,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recvData*/)
     if (!guid)
         return;
 
-    Loot* loot = NULL;
+    Loot* loot = nullptr;
     bool shareMoney = true;
 
     switch (GUID_HIPART(guid))
@@ -171,7 +171,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recvData*/)
             Group* group = player->GetGroup();
 
             std::vector<Player*> playersNear;
-            for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* member = itr->GetSource();
                 if (!member)
@@ -442,7 +442,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
-    Loot* loot = NULL;
+    Loot* loot = nullptr;
 
     if (IS_CRE_OR_VEH_GUID(GetPlayer()->GetLootGUID()))
     {

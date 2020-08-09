@@ -1201,7 +1201,7 @@ bool Map::UnloadGrid(NGridType& ngrid)
         MMAP::MMapFactory::createOrGetMMapManager()->unloadMap(GetId(), gx, gy);
     }
 
-    GridMaps[gx][gy] = NULL;
+    GridMaps[gx][gy] = nullptr;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outStaticDebug("Unloading grid[%u, %u] for map %u finished", x, y, GetId());
@@ -1941,7 +1941,7 @@ Transport* Map::GetTransportForPos(uint32 phase, float x, float y, float z, Worl
                         return staticTrans->ToTransport();
             }
 
-    return NULL;
+    return nullptr;
 }
 
 float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
@@ -2555,7 +2555,7 @@ InstanceMap::InstanceMap(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _pa
 InstanceMap::~InstanceMap()
 {
     delete instance_script;
-    instance_script = NULL;
+    instance_script = nullptr;
     sInstanceSaveMgr->DeleteInstanceSaveIfNeeded(GetInstanceId(), true);
 }
 
@@ -2933,7 +2933,7 @@ BattlegroundMap::~BattlegroundMap()
     {
         //unlink to prevent crash, always unlink all pointer reference before destruction
         m_bg->SetBgMap(nullptr);
-        m_bg = NULL;
+        m_bg = nullptr;
     }
 }
 
@@ -3016,10 +3016,10 @@ GameObject* Map::GetGameObject(uint64 guid)
 Transport* Map::GetTransport(uint64 guid)
 { 
     if (GUID_HIPART(guid) != HIGHGUID_MO_TRANSPORT && GUID_HIPART(guid) != HIGHGUID_TRANSPORT)
-        return NULL;
+        return nullptr;
 
     GameObject* go = GetGameObject(guid);
-    return go ? go->ToTransport() : NULL;
+    return go ? go->ToTransport() : nullptr;
 }
 
 DynamicObject* Map::GetDynamicObject(uint64 guid)

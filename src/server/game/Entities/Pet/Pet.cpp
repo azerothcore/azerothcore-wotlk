@@ -463,7 +463,7 @@ void Pet::Update(uint32 diff)
 
                             CastSpell(tempspellTarget, tempspell, true);
                             m_tempspell = 0;
-                            m_tempspellTarget = NULL;
+                            m_tempspellTarget = nullptr;
 
                             if (tempspellIsPositive)
                             {
@@ -489,7 +489,7 @@ void Pet::Update(uint32 diff)
                                     GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
                                 }
 
-                                m_tempoldTarget = NULL;
+                                m_tempoldTarget = nullptr;
                                 m_tempspellIsPositive = false;
                             }
                         }
@@ -498,8 +498,8 @@ void Pet::Update(uint32 diff)
                 else
                 {
                     m_tempspell = 0;
-                    m_tempspellTarget = NULL;
-                    m_tempoldTarget = NULL;
+                    m_tempspellTarget = nullptr;
+                    m_tempoldTarget = nullptr;
                     m_tempspellIsPositive = false;
 
                     Unit* victim = charmer->GetVictim();
@@ -2324,8 +2324,8 @@ void Pet::ClearCastWhenWillAvailable()
 {
     m_tempspellIsPositive = false;
     m_tempspell = 0;
-    m_tempspellTarget = NULL;
-    m_tempoldTarget = NULL;
+    m_tempspellTarget = nullptr;
+    m_tempoldTarget = nullptr;
 }
 
 void Pet::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)

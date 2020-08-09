@@ -53,7 +53,7 @@ TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
     if (itr != spellList.end())
         return &itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 bool VendorItemData::RemoveItem(uint32 item_id)
@@ -77,7 +77,7 @@ VendorItem const* VendorItemData::FindItemCostPair(uint32 item_id, uint32 extend
     for (VendorItemList::const_iterator i = m_items.begin(); i != m_items.end(); ++i)
         if ((*i)->item == item_id && (*i)->ExtendedCost == extendedCost)
             return *i;
-    return NULL;
+    return nullptr;
 }
 
 uint32 CreatureTemplate::GetRandomValidModelId() const
@@ -184,7 +184,7 @@ m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creature
     ResetLootMode(); // restore default loot mode
     TriggerJustRespawned = false;
     m_isTempWorldObject = false;
-    _focusSpell = NULL;
+    _focusSpell = nullptr;
 }
 
 Creature::~Creature()
@@ -192,7 +192,7 @@ Creature::~Creature()
     m_vendorItemCounts.clear();
 
     delete i_AI;
-    i_AI = NULL;
+    i_AI = nullptr;
 
     //if (m_uint32Values)
     //    sLog->outError("Deconstruct Creature Entry = %u", GetEntry());
@@ -757,7 +757,7 @@ void Creature::DoFleeToGetAssistance()
     float radius = sWorld->getFloatConfig(CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS);
     if (radius >0)
     {
-        Creature* creature = NULL;
+        Creature* creature = nullptr;
 
         CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
         Cell cell(p);
@@ -946,14 +946,14 @@ bool Creature::isCanTrainingAndResetTalentsOf(Player* player) const
 Player* Creature::GetLootRecipient() const
 { 
     if (!m_lootRecipient)
-        return NULL;
+        return nullptr;
     return ObjectAccessor::FindPlayerInOrOutOfWorld(m_lootRecipient);
 }
 
 Group* Creature::GetLootRecipientGroup() const
 { 
     if (!m_lootRecipientGroup)
-        return NULL;
+        return nullptr;
     return sGroupMgr->GetGroupByGUID(m_lootRecipientGroup);
 }
 
@@ -1751,7 +1751,7 @@ bool Creature::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) 
 SpellInfo const* Creature::reachWithSpellAttack(Unit* victim)
 { 
     if (!victim)
-        return NULL;
+        return nullptr;
 
     for (uint32 i=0; i < CREATURE_MAX_SPELLS; ++i)
     {
@@ -1793,13 +1793,13 @@ SpellInfo const* Creature::reachWithSpellAttack(Unit* victim)
             continue;
         return spellInfo;
     }
-    return NULL;
+    return nullptr;
 }
 
 SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
 { 
     if (!victim)
-        return NULL;
+        return nullptr;
 
     for (uint32 i=0; i < CREATURE_MAX_SPELLS; ++i)
     {
@@ -1840,7 +1840,7 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
             continue;
         return spellInfo;
     }
-    return NULL;
+    return nullptr;
 }
 
 // select nearest hostile unit within the given distance (regardless of threat list).
@@ -1850,7 +1850,7 @@ Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) c
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* target = NULL;
+    Unit* target = nullptr;
 
     {
         if (dist == 0.0f)
@@ -1876,7 +1876,7 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
     Cell cell(p);
     cell.SetNoCreate();
 
-    Unit* target = NULL;
+    Unit* target = nullptr;
 
     if (dist < ATTACK_DISTANCE)
         dist = ATTACK_DISTANCE;
@@ -2815,7 +2815,7 @@ void Creature::ReleaseFocus(Spell const* focusSpell)
     if (focusSpell != _focusSpell)
         return;
 
-    _focusSpell = NULL;
+    _focusSpell = nullptr;
     if (Unit* victim = GetVictim())
         SetUInt64Value(UNIT_FIELD_TARGET, victim->GetGUID());
     else

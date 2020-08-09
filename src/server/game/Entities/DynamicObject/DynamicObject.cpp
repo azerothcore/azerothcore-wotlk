@@ -193,7 +193,7 @@ void DynamicObject::RemoveAura()
 { 
     ASSERT(_aura && !_removedAura);
     _removedAura = _aura;
-    _aura = NULL;
+    _aura = nullptr;
     if (!_removedAura->IsRemoved())
         _removedAura->_Remove(AURA_REMOVE_BY_DEFAULT);
 }
@@ -229,5 +229,5 @@ void DynamicObject::UnbindFromCaster()
 { 
     ASSERT(_caster);
     _caster->_UnregisterDynObject(this);
-    _caster = NULL;
+    _caster = nullptr;
 }

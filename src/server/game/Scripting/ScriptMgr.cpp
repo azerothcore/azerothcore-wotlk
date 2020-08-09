@@ -1032,7 +1032,7 @@ Battleground* ScriptMgr::CreateBattleground(BattlegroundTypeId /*typeId*/)
 {
     // TODO: Implement script-side battlegrounds.
     ABORT();
-    return NULL;
+    return nullptr;
 }
 
 OutdoorPvP* ScriptMgr::CreateOutdoorPvP(OutdoorPvPData const* data)

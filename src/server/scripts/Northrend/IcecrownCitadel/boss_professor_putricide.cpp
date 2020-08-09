@@ -982,7 +982,7 @@ class spell_putricide_unstable_experiment : public SpellScriptLoader
                 uint8 stage = creature->AI()->GetData(DATA_EXPERIMENT_STAGE);
                 creature->AI()->SetData(DATA_EXPERIMENT_STAGE, stage ? 0 : 1);
 
-                Creature* target = NULL;
+                Creature* target = nullptr;
                 std::list<Creature*> creList;
                 GetCreatureListWithEntryInGrid(creList, GetCaster(), NPC_ABOMINATION_WING_MAD_SCIENTIST_STALKER, 200.0f);
                 for (std::list<Creature*>::iterator itr = creList.begin(); itr != creList.end(); ++itr)
@@ -1094,7 +1094,7 @@ class spell_putricide_ooze_channel : public SpellScriptLoader
             // this will let use safely use ToCreature() casts in entire script
             bool Load()
             {
-                _target = NULL;
+                _target = nullptr;
                 return GetCaster()->GetTypeId() == TYPEID_UNIT;
             }
 

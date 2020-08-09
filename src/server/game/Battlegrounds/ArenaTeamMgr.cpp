@@ -39,7 +39,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamById(uint32 arenaTeamId) const
     if (itr != ArenaTeamStore.end())
         return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(const std::string& arenaTeamName) const
@@ -53,7 +53,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(const std::string& arenaTeamName) co
         if (search == teamName)
             return itr->second;
     }
-    return NULL;
+    return nullptr;
 }
 
 ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid) const
@@ -62,7 +62,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid) const
         if (itr->second->GetCaptain() == guid)
             return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 void ArenaTeamMgr::AddArenaTeam(ArenaTeam* arenaTeam)

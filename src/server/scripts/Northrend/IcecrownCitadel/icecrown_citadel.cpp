@@ -874,7 +874,7 @@ class npc_crok_scourgebane : public CreatureScript
                 {
                     _wipeCheckTimer = 3000;
 
-                    Player* player = NULL;
+                    Player* player = nullptr;
                     acore::AnyPlayerInObjectRangeCheck check(me, 140.0f);
                     acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
                     me->VisitNearbyWorldObject(140.0f, searcher);
@@ -1353,7 +1353,7 @@ class npc_captain_arnath : public CreatureScript
         private:
             Creature* FindFriendlyCreature() const
             {
-                Creature* target = NULL;
+                Creature* target = nullptr;
                 acore::MostHPMissingInRange u_check(me, 60.0f, 0);
                 acore::CreatureLastSearcher<acore::MostHPMissingInRange> searcher(me, target, u_check);
                 me->VisitNearbyGridObject(60.0f, searcher);
@@ -1882,7 +1882,7 @@ class npc_arthas_teleport_visual : public CreatureScript
                 return GetIcecrownCitadelAI<npc_arthas_teleport_visualAI>(creature);
 
             // Default to no script
-            return NULL;
+            return nullptr;
         }
 };
 
@@ -2003,7 +2003,7 @@ class spell_icc_geist_alarm : public SpellScriptLoader
                     if (Creature* l = instance->instance->SummonCreature(NPC_VENGEFUL_FLESHREAPER, p))
                     {
                         bool hasTarget = false;
-                        Unit* target = NULL;
+                        Unit* target = nullptr;
                         if ((target = l->SelectNearestTarget(20.0f)))
                             hasTarget = true;
                         else
@@ -2999,7 +2999,7 @@ public:
 
             if (uint32 e = events.GetEvent())
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 if (sesi_spells[e-1].targetType == 1)
                     target = me->GetVictim();
                 else

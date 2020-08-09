@@ -880,7 +880,7 @@ class spell_gen_proc_once_per_cast : public SpellScriptLoader
 
             bool Load()
             {
-                _spellPointer = NULL;
+                _spellPointer = nullptr;
                 return true;
             }
 
@@ -1718,7 +1718,7 @@ class spell_gen_cannibalize : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
                 float max_range = GetSpellInfo()->GetMaxRange(false);
-                WorldObject* result = NULL;
+                WorldObject* result = nullptr;
                 // search for nearby enemy corpse in range
                 acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
                 acore::WorldObjectSearcher<acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
@@ -4944,7 +4944,7 @@ class spell_gen_eject_all_passengers : public SpellScriptLoader
 
             void RemoveVehicleAuras()
             {
-                Unit* u = NULL;
+                Unit* u = nullptr;
                 if (Vehicle* vehicle = GetHitUnit()->GetVehicleKit())
                 {
                     u = vehicle->GetPassenger(0);

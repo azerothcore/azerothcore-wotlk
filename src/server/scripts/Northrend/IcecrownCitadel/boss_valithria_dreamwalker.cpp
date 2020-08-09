@@ -1196,7 +1196,7 @@ class spell_dreamwalker_nightmare_cloud : public SpellScriptLoader
             bool Load()
             {
                 _instance = GetOwner()->GetInstanceScript();
-                return _instance != NULL;
+                return _instance != nullptr;
             }
 
             void PeriodicTick(AuraEffect const* /*aurEff*/)

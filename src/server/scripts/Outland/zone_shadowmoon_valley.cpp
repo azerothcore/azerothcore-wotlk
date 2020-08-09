@@ -1502,7 +1502,7 @@ void npc_lord_illidan_stormrage::npc_lord_illidan_stormrageAI::SummonNextWave()
 
     for (uint8 i = 0; i < count; ++i)
     {
-        Creature* Spawn = NULL;
+        Creature* Spawn = nullptr;
         float X = SpawnLocation[locIndex + i].x;
         float Y = SpawnLocation[locIndex + i].y;
         float Z = SpawnLocation[locIndex + i].z;
@@ -1684,8 +1684,8 @@ public:
             }
 
             // Spawn Soul on Kill ALWAYS!
-            Creature* Summoned = NULL;
-            Unit* totemOspirits = NULL;
+            Creature* Summoned = nullptr;
+            Unit* totemOspirits = nullptr;
 
             if (entry != 0)
                 Summoned = DoSpawnCreature(entry, 0, 0, 1, 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 5000);

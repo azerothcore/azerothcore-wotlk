@@ -809,7 +809,7 @@ public:
                     break;
                 case EVENT_SHAMAN_SPELL_HEALING_WAVE:
                     {
-                        Unit* target = NULL;
+                        Unit* target = nullptr;
                         if( urand(0,1) )
                         {
                             target = DoSelectLowestHpFriendly(40.0f);

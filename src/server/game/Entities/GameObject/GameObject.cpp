@@ -46,9 +46,9 @@ GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_usetimes = 0;
     m_spellId = 0;
     m_cooldownTime = 0;
-    m_goInfo = NULL;
+    m_goInfo = nullptr;
     m_ritualOwnerGUIDLow = 0;
-    m_goData = NULL;
+    m_goData = nullptr;
     m_packedRotation = 0;
 
     m_DBTableGuid = 0;
@@ -595,7 +595,7 @@ void GameObject::Update(uint32 diff)
 
                     // Type 0 and 1 - trap (type 0 will not get removed after casting a spell)
                     Unit* owner = GetOwner();
-                    Unit* target = NULL;                            // pointer to appropriate target if found any
+                    Unit* target = nullptr;                            // pointer to appropriate target if found any
 
                     // Note: this hack with search required until GO casting not implemented
                     // search unfriendly creature
@@ -611,7 +611,7 @@ void GameObject::Update(uint32 diff)
                     {
                         // environmental damage spells already have around enemies targeting but this not help in case not existed GO casting support
                         // affect only players
-                        Player* player = NULL;
+                        Player* player = nullptr;
                         acore::AnyPlayerInObjectRangeCheck checker(this, radius, true, true);
                         acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
                         VisitNearbyWorldObject(radius, searcher);
@@ -1167,7 +1167,7 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
         range = 5.0f;
 
     // search nearest linked GO
-    GameObject* trapGO = NULL;
+    GameObject* trapGO = nullptr;
     {
         // using original GO distance
         CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
@@ -1188,7 +1188,7 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
 
 GameObject* GameObject::LookupFishingHoleAround(float range)
 { 
-    GameObject* ok = NULL;
+    GameObject* ok = nullptr;
 
     CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
     Cell cell(p);
@@ -1235,7 +1235,7 @@ void GameObject::SetGoArtKit(uint8 kit)
 
 void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid)
 {
-    const GameObjectData* data = NULL;
+    const GameObjectData* data = nullptr;
     if (go)
     {
         go->SetGoArtKit(artkit);
@@ -2287,14 +2287,14 @@ void GameObject::UpdateModel()
 Player* GameObject::GetLootRecipient() const
 { 
     if (!m_lootRecipient)
-        return NULL;
+        return nullptr;
     return ObjectAccessor::FindPlayerInOrOutOfWorld(m_lootRecipient);
 }
 
 Group* GameObject::GetLootRecipientGroup() const
 { 
     if (!m_lootRecipientGroup)
-        return NULL;
+        return nullptr;
     return sGroupMgr->GetGroupByGUID(m_lootRecipientGroup);
 }
 

@@ -147,7 +147,7 @@ World::~World()
         m_offlineSessions.erase(m_offlineSessions.begin());
     }
 
-    CliCommandHolder* command = NULL;
+    CliCommandHolder* command = nullptr;
     while (cliCmdQueue.next(command))
         delete command;
 
@@ -180,7 +180,7 @@ Player* World::FindPlayerInZone(uint32 zone)
         if (player->IsInWorld() && player->GetZoneId() == zone)
             return player;
     }
-    return NULL;
+    return nullptr;
 }
 
 bool World::IsClosed() const
@@ -204,7 +204,7 @@ WorldSession* World::FindSession(uint32 id) const
     if (itr != m_sessions.end())
         return itr->second;                                 // also can return NULL for kicked session
     else
-        return NULL;
+        return nullptr;
 }
 
 WorldSession* World::FindOfflineSession(uint32 id) const
@@ -213,17 +213,17 @@ WorldSession* World::FindOfflineSession(uint32 id) const
     if (itr != m_offlineSessions.end())
         return itr->second;
     else
-        return NULL;
+        return nullptr;
 }
 
 WorldSession* World::FindOfflineSessionForCharacterGUID(uint32 guidLow) const
 {
     if (m_offlineSessions.empty())
-        return NULL;
+        return nullptr;
     for (SessionMap::const_iterator itr = m_offlineSessions.begin(); itr != m_offlineSessions.end(); ++itr)
         if (itr->second->GetGuidLow() == guidLow)
             return itr->second;
-    return NULL;
+    return nullptr;
 }
 
 /// Remove a given session
@@ -2396,7 +2396,7 @@ namespace acore
                     do_helper(data_list, (char*)text);
             }
         private:
-            char* lineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = NULL; return start; }
+            char* lineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
             void do_helper(WorldPacketList& data_list, char* text)
             {
                 char* pos = text;
@@ -2649,7 +2649,7 @@ void World::SendServerMessage(ServerMessageType type, const char *text, Player* 
 void World::UpdateSessions(uint32 diff)
 {
     ///- Add new sessions
-    WorldSession* sess = NULL;
+    WorldSession* sess = nullptr;
     while (addSessQueue.next(sess))
         AddSession_ (sess);
 
@@ -2716,9 +2716,9 @@ void World::UpdateSessions(uint32 diff)
 // This handles the issued and queued CLI commands
 void World::ProcessCliCommands()
 {
-    CliCommandHolder::Print* zprint = NULL;
-    void* callbackArg = NULL;
-    CliCommandHolder* command = NULL;
+    CliCommandHolder::Print* zprint = nullptr;
+    void* callbackArg = nullptr;
+    CliCommandHolder* command = nullptr;
     while (cliCmdQueue.next(command))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -3361,7 +3361,7 @@ GlobalPlayerData const* World::GetGlobalPlayerData(uint32 guid) const
     }
 
     // Player not found
-    return NULL;
+    return nullptr;
 }
 
 uint32 World::GetGlobalPlayerGUID(std::string const& name) const

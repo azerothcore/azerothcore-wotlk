@@ -224,8 +224,8 @@ class Item : public Object
         void SaveRefundDataToDB();
         void DeleteRefundDataFromDB(SQLTransaction* trans);
 
-        Bag* ToBag() { if (IsBag()) return reinterpret_cast<Bag*>(this); else return NULL; }
-        const Bag* ToBag() const { if (IsBag()) return reinterpret_cast<const Bag*>(this); else return NULL; }
+        Bag* ToBag() { if (IsBag()) return reinterpret_cast<Bag*>(this); else return nullptr; }
+        const Bag* ToBag() const { if (IsBag()) return reinterpret_cast<const Bag*>(this); else return nullptr; }
 
         bool IsLocked() const { return !HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_UNLOCKED); }
         bool IsBag() const { return GetTemplate()->InventoryType == INVTYPE_BAG; }
@@ -257,7 +257,7 @@ class Item : public Object
         uint16 GetPos() const { return uint16(GetBagSlot()) << 8 | GetSlot(); }
         void SetContainer(Bag* container) { m_container = container; }
 
-        bool IsInBag() const { return m_container != NULL; }
+        bool IsInBag() const { return m_container != nullptr; }
         bool IsEquipped() const;
 
         uint32 GetSkill();

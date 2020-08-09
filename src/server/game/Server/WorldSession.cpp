@@ -118,7 +118,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
-    _warden = NULL;
+    _warden = nullptr;
     _offlineTime = 0;
     _kicked = false;
     _shouldSetOfflineInDB = true;
@@ -148,17 +148,17 @@ WorldSession::~WorldSession()
     {
         m_Socket->CloseSocket("WorldSession destructor");
         m_Socket->RemoveReference();
-        m_Socket = NULL;
+        m_Socket = nullptr;
     }
 
     if (_warden)
     {
         delete _warden;
-        _warden = NULL;
+        _warden = nullptr;
     }
 
     ///- empty incoming packet queue
-    WorldPacket* packet = NULL;
+    WorldPacket* packet = nullptr;
     while (_recvQueue.next(packet))
         delete packet;
 
@@ -263,10 +263,10 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     HandleTeleportTimeout(updater.ProcessLogout());
 
     uint32 _startMSTime = getMSTime();
-    WorldPacket* packet = NULL;
-    WorldPacket* movementPacket = NULL;
+    WorldPacket* packet = nullptr;
+    WorldPacket* movementPacket = nullptr;
     bool deletePacket = true;
-    WorldPacket* firstDelayedPacket = NULL;
+    WorldPacket* firstDelayedPacket = nullptr;
     uint32 processedPackets = 0;
     time_t currentTime = time(nullptr);
 
@@ -308,7 +308,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                             {
                                 HandleMovementOpcodes(*movementPacket);
                                 delete movementPacket;
-                                movementPacket = NULL;
+                                movementPacket = nullptr;
                             }
                             sScriptMgr->OnPacketReceive(this, *packet);
                             #ifdef ELUNA
@@ -324,7 +324,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                             if (movementPacket)
                             {
                                 delete movementPacket;
-                                movementPacket = NULL;
+                                movementPacket = nullptr;
                             }
                             sScriptMgr->OnPacketReceive(this, *packet);
                             #ifdef ELUNA
@@ -399,7 +399,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         if (m_Socket && m_Socket->IsClosed())
         {
             m_Socket->RemoveReference();
-            m_Socket = NULL;
+            m_Socket = nullptr;
         }
 
         if (!m_Socket)
@@ -414,7 +414,7 @@ bool WorldSession::HandleSocketClosed()
     if (m_Socket && m_Socket->IsClosed() && !IsKicked() && GetPlayer() && !PlayerLogout() && GetPlayer()->m_taxi.empty() && GetPlayer()->IsInWorld() && !World::IsStopped())
     {
         m_Socket->RemoveReference();
-        m_Socket = NULL;
+        m_Socket = nullptr;
         GetPlayer()->TradeCancel(false);
         return true;
     }

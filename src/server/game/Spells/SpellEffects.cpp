@@ -410,7 +410,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 // Conflagrate - consumes Immolate or Shadowflame
                 else if (m_spellInfo->TargetAuraState == AURA_STATE_CONFLAGRATE)
                 {
-                    AuraEffect const* aura = NULL;                // found req. aura for damage calculation
+                    AuraEffect const* aura = nullptr;                // found req. aura for damage calculation
 
                     Unit::AuraEffectList const &mPeriodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
                     for (Unit::AuraEffectList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
@@ -1405,7 +1405,7 @@ void Spell::EffectSendEvent(SpellEffIndex effIndex)
         && effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
-    WorldObject* target = NULL;
+    WorldObject* target = nullptr;
 
     // call events for object target if present
     if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)
@@ -1524,8 +1524,8 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
         {
             Unit::AuraEffectList const& RejorRegr = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_HEAL);
             // find most short by duration
-            AuraEffect* forcedTargetAura = NULL;
-            AuraEffect* targetAura = NULL;
+            AuraEffect* forcedTargetAura = nullptr;
+            AuraEffect* targetAura = nullptr;
             for (Unit::AuraEffectList::const_iterator i = RejorRegr.begin(); i != RejorRegr.end(); ++i)
             {
                 if ((*i)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DRUID
@@ -2245,7 +2245,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
             if (m_CastItem == m_targets.GetItemTarget())
                 m_targets.SetItemTarget(nullptr);
 
-            m_CastItem = NULL;
+            m_CastItem = nullptr;
             m_castItemGUID = 0;
 
             player->StoreItem(dest, pNewItem, true);
@@ -2265,7 +2265,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
             if (m_CastItem == m_targets.GetItemTarget())
                 m_targets.SetItemTarget(nullptr);
 
-            m_CastItem = NULL;
+            m_CastItem = nullptr;
             m_castItemGUID = 0;
 
             player->BankItem(dest, pNewItem, true);
@@ -2288,7 +2288,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
             if (m_CastItem == m_targets.GetItemTarget())
                 m_targets.SetItemTarget(nullptr);
 
-            m_CastItem = NULL;
+            m_CastItem = nullptr;
             m_castItemGUID = 0;
 
             player->EquipItem(dest, pNewItem, true);
@@ -2346,7 +2346,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
     if (Player* modOwner = m_originalCaster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
-    TempSummon* summon = NULL;
+    TempSummon* summon = nullptr;
 
     // determine how many units should be summoned
     uint32 numSummons;
@@ -3757,7 +3757,7 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
         else
         {
             delete linkedGO;
-            linkedGO = NULL;
+            linkedGO = nullptr;
             return;
         }
     }
@@ -3886,7 +3886,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
 
                     uint8 bag = 19;
                     uint8 slot = 0;
-                    Item* item = NULL;
+                    Item* item = nullptr;
 
                     while (bag) // 256 = 0 due to var type
                     {
@@ -5471,7 +5471,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
         else
         {
             delete linkedGO;
-            linkedGO = NULL;
+            linkedGO = nullptr;
             return;
         }
     }
@@ -5968,7 +5968,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
 
     //TempSummonType summonType = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
     Map* map = caster->GetMap();
-    TempSummon* summon = NULL;
+    TempSummon* summon = nullptr;
 
     for (uint32 count = 0; count < numGuardians; ++count)
     {

@@ -439,7 +439,7 @@ void hyjalAI::SummonCreature(uint32 entry, float Base[4][3])
     {
         SpawnLoc[i] = Base[random][i];
     }
-    Creature* creature = NULL;
+    Creature* creature = nullptr;
     switch (entry)
     {
             case 17906:    //GARGOYLE
@@ -828,7 +828,7 @@ void hyjalAI::UpdateAI(uint32 diff)
                 if (me->IsNonMeleeSpellCast(false))
                     me->InterruptNonMeleeSpells(false);
 
-                Unit* target = NULL;
+                Unit* target = nullptr;
 
                 switch (Spells[i].TargetType)
                 {

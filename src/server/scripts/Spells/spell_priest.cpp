@@ -518,7 +518,7 @@ class spell_pri_mana_leech : public SpellScriptLoader
 
             bool Load()
             {
-                _procTarget = NULL;
+                _procTarget = nullptr;
                 return true;
             }
 

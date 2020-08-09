@@ -767,7 +767,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
     sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::UpdateAchievementCriteria(%u, %u, %u)", type, miscValue1, miscValue2);
 #endif
 
-    AchievementCriteriaEntryList const* achievementCriteriaList = NULL;
+    AchievementCriteriaEntryList const* achievementCriteriaList = nullptr;
 
     switch (type)
     {
@@ -1987,7 +1987,7 @@ CriteriaProgress* AchievementMgr::GetCriteriaProgress(AchievementCriteriaEntry c
     CriteriaProgressMap::iterator iter = m_criteriaProgress.find(entry->ID);
 
     if (iter == m_criteriaProgress.end())
-        return NULL;
+        return nullptr;
 
     return &(iter->second);
 }
@@ -2238,7 +2238,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 		
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-        Item* item = reward->itemId ? Item::CreateItem(reward->itemId, 1, GetPlayer()) : NULL;
+        Item* item = reward->itemId ? Item::CreateItem(reward->itemId, 1, GetPlayer()) : nullptr;
         if (item)
         {
             // save new item before send
@@ -2275,7 +2275,7 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket* data, bool inspect) const
 {
     if (!m_completedAchievements.empty())
     {
-        AchievementEntry const* achievement = NULL;
+        AchievementEntry const* achievement = nullptr;
         for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
         {
             // Skip hidden achievements

@@ -18,7 +18,7 @@ namespace FactorySelector
 {
     CreatureAI* selectAI(Creature* creature)
     {
-        const CreatureAICreator* ai_factory = NULL;
+        const CreatureAICreator* ai_factory = nullptr;
         CreatureAIRegistry& ai_registry(*CreatureAIRegistry::instance());
 
         // xinef: if we have controlable guardian, define petai for players as they can steer him, otherwise db / normal ai
@@ -121,7 +121,7 @@ namespace FactorySelector
 
     GameObjectAI* SelectGameObjectAI(GameObject* go)
     {
-        const GameObjectAICreator* ai_factory = NULL;
+        const GameObjectAICreator* ai_factory = nullptr;
         GameObjectAIRegistry& ai_registry(*GameObjectAIRegistry::instance());
 
         if (GameObjectAI* scriptedAI = sScriptMgr->GetGameObjectAI(go))

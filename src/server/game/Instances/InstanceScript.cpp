@@ -233,7 +233,7 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
 std::string InstanceScript::LoadBossState(const char * data)
 {
     if (!data)
-        return NULL;
+        return nullptr;
     std::istringstream loadStream(data);
     uint32 buff;
     uint32 bossId = 0;

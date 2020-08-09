@@ -406,7 +406,7 @@ class spell_item_sleepy_willy : public SpellScriptLoader
 
             void SelectTarget(std::list<WorldObject*>& targets)
             {
-                Creature* target = NULL;
+                Creature* target = nullptr;
                 for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                     if (Creature* creature = (*itr)->ToCreature())
                         if (creature->IsCritter())
@@ -1038,7 +1038,7 @@ class spell_item_fetch_ball : public SpellScriptLoader
 
             void SelectTarget(std::list<WorldObject*>& targets)
             {
-                Creature* target = NULL;
+                Creature* target = nullptr;
                 for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                     if (Creature* creature = (*itr)->ToCreature())
                     {

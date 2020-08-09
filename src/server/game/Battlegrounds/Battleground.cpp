@@ -138,7 +138,7 @@ Battleground::Battleground()
     m_MinPlayersPerTeam = 0;
 
     m_MapId             = 0;
-    m_Map               = NULL;
+    m_Map               = nullptr;
     m_StartMaxDist      = 0.0f;
     ScriptId            = 0;
 
@@ -163,8 +163,8 @@ Battleground::Battleground()
     m_ArenaTeamMMR[TEAM_ALLIANCE]   = 0;
     m_ArenaTeamMMR[TEAM_HORDE]      = 0;
 
-    m_BgRaids[TEAM_ALLIANCE]         = NULL;
-    m_BgRaids[TEAM_HORDE]            = NULL;
+    m_BgRaids[TEAM_ALLIANCE]         = nullptr;
+    m_BgRaids[TEAM_HORDE]            = nullptr;
 
     m_PlayersCount[TEAM_ALLIANCE]    = 0;
     m_PlayersCount[TEAM_HORDE]       = 0;
@@ -217,7 +217,7 @@ Battleground::~Battleground()
         m_Map->SetUnload();
         //unlink to prevent crash, always unlink all pointer reference before destruction
         m_Map->SetBG(nullptr);
-        m_Map = NULL;
+        m_Map = nullptr;
     }
 
     for (BattlegroundScoreMap::const_iterator itr = PlayerScores.begin(); itr != PlayerScores.end(); ++itr)
@@ -329,7 +329,7 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
         {
             for (std::map<uint64, std::vector<uint64> >::iterator itr = m_ReviveQueue.begin(); itr != m_ReviveQueue.end(); ++itr)
             {
-                Creature* sh = NULL;
+                Creature* sh = nullptr;
                 for (std::vector<uint64>::const_iterator itr2 = (itr->second).begin(); itr2 != (itr->second).end(); ++itr2)
                 {
                     Player* player = ObjectAccessor::FindPlayer(*itr2);
@@ -741,8 +741,8 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
     bool bValidArena = isArena() && isRated() && GetStatus() == STATUS_IN_PROGRESS && GetStartTime() >= startDelay+15000; // pussywizard: only if arena lasted at least 15 secs
     SetStatus(STATUS_WAIT_LEAVE);
 
-    ArenaTeam* winnerArenaTeam = NULL;
-    ArenaTeam* loserArenaTeam = NULL;
+    ArenaTeam* winnerArenaTeam = nullptr;
+    ArenaTeam* loserArenaTeam = nullptr;
 
     uint32 loserTeamRating = 0;
     uint32 loserMatchmakerRating = 0;
@@ -770,7 +770,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
     else
         SetWinner(TEAM_NEUTRAL);
 
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
     uint64 battlegroundId = 1;
     if (isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE))
     {
@@ -1482,7 +1482,7 @@ void Battleground::RelocateDeadPlayers(uint64 queueIndex)
     std::vector<uint64>& ghostList = m_ReviveQueue[queueIndex];
     if (!ghostList.empty())
     {
-        GraveyardStruct const* closestGrave = NULL;
+        GraveyardStruct const* closestGrave = nullptr;
         for (std::vector<uint64>::const_iterator itr = ghostList.begin(); itr != ghostList.end(); ++itr)
         {
             Player* player = ObjectAccessor::FindPlayer(*itr);
@@ -1624,7 +1624,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
 
     Map* map = FindBgMap();
     if (!map)
-        return NULL;
+        return nullptr;
 
     if (transport)
     {
@@ -1636,7 +1636,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
             return creature;
         }
 
-        return NULL;
+        return nullptr;
     }
 
     Creature* creature = new Creature();
@@ -1645,7 +1645,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
         sLog->outError("Battleground::AddCreature: cannot create creature (entry: %u) for BG (map: %u, instance id: %u)!",
             entry, m_MapId, m_InstanceID);
         delete creature;
-        return NULL;
+        return nullptr;
     }
 
     creature->SetHomePosition(x, y, z, o);
@@ -1656,7 +1656,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
         sLog->outError("Battleground::AddCreature: creature template (entry: %u) does not exist for BG (map: %u, instance id: %u)!",
             entry, m_MapId, m_InstanceID);
         delete creature;
-        return NULL;
+        return nullptr;
     }
     // Force using DB speeds
     creature->SetSpeed(MOVE_WALK,  cinfo->speed_walk);
@@ -1665,7 +1665,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
     if (!map->AddToMap(creature))
     {
         delete creature;
-        return NULL;
+        return nullptr;
     }
 
     BgCreatures[type] = creature->GetGUID();

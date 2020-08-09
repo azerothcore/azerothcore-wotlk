@@ -331,10 +331,10 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
     {
         setAcceptTradeMode(my_trade, his_trade, myItems, hisItems);
 
-        Spell* my_spell = NULL;
+        Spell* my_spell = nullptr;
         SpellCastTargets my_targets;
 
-        Spell* his_spell = NULL;
+        Spell* his_spell = nullptr;
         SpellCastTargets his_targets;
 
         // not accept if spell can't be casted now (cheating)
@@ -486,9 +486,9 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         // cleanup
         clearAcceptTradeMode(my_trade, his_trade);
         delete _player->m_trade;
-        _player->m_trade = NULL;
+        _player->m_trade = nullptr;
         delete trader->m_trade;
-        trader->m_trade = NULL;
+        trader->m_trade = nullptr;
 
         // desynchronized with the other saves here (SaveInventoryAndGoldToDB() not have own transaction guards)
         SQLTransaction trans = CharacterDatabase.BeginTransaction();

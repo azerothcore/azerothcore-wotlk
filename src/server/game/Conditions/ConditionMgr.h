@@ -170,7 +170,7 @@ struct ConditionSourceInfo
         mConditionTargets[0] = target0;
         mConditionTargets[1] = target1;
         mConditionTargets[2] = target2;
-        mLastFailedCondition = NULL;
+        mLastFailedCondition = nullptr;
     }
 };
 

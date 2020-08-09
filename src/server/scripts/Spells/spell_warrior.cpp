@@ -731,7 +731,7 @@ class spell_warr_sweeping_strikes : public SpellScriptLoader
 
             bool Load()
             {
-                _procTarget = NULL;
+                _procTarget = nullptr;
                 return true;
             }
 
@@ -789,7 +789,7 @@ class spell_warr_vigilance : public SpellScriptLoader
 
             bool Load()
             {
-                _procTarget = NULL;
+                _procTarget = nullptr;
                 return true;
             }
 

@@ -354,7 +354,7 @@ struct VendorItemData
     VendorItem* GetItem(uint32 slot) const
     {
         if (slot >= m_items.size())
-            return NULL;
+            return nullptr;
 
         return m_items[slot];
     }

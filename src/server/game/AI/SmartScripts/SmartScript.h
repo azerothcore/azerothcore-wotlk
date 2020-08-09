@@ -44,7 +44,7 @@ class SmartScript
         uint32 GetPathId() const { return mPathId; }
         WorldObject* GetBaseObject()
         {
-            WorldObject* obj = NULL;
+            WorldObject* obj = nullptr;
             if (me)
                 obj = me;
             else if (go)
@@ -131,7 +131,7 @@ class SmartScript
             ObjectListMap::iterator itr = mTargetStorage->find(id);
             if (itr != mTargetStorage->end())
                 return (*itr).second->GetObjectList();
-            return NULL;
+            return nullptr;
         }
 
         void StoreCounter(uint32 id, uint32 value, uint32 reset)
@@ -160,7 +160,7 @@ class SmartScript
 
         GameObject* FindGameObjectNear(WorldObject* searchObject, uint32 guid) const
         {
-            GameObject* gameObject = NULL;
+            GameObject* gameObject = nullptr;
 
             CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
             Cell cell(p);
@@ -176,7 +176,7 @@ class SmartScript
 
         Creature* FindCreatureNear(WorldObject* searchObject, uint32 guid) const
         {
-            Creature* creature = NULL;
+            Creature* creature = nullptr;
             CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
             Cell cell(p);
 
@@ -199,14 +199,14 @@ class SmartScript
                 if (Creature* m = HashMapHolder<Creature>::Find(meOrigGUID))
                 {
                     me = m;
-                    go = NULL;
+                    go = nullptr;
                 }
             }
             if (goOrigGUID)
             {
                 if (GameObject* o = HashMapHolder<GameObject>::Find(goOrigGUID))
                 {
-                    me = NULL;
+                    me = nullptr;
                     go = o;
                 }
             }

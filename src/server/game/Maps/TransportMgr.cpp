@@ -354,14 +354,14 @@ MotionTransport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/
                 entry = instance->GetGameObjectEntry(0, entry);
 
         if (!entry)
-            return NULL;
+            return nullptr;
     }
 
     TransportTemplate const* tInfo = GetTransportTemplate(entry);
     if (!tInfo)
     {
         sLog->outError("Transport %u will not be loaded, `transport_template` missing", entry);
-        return NULL;
+        return nullptr;
     }
 
     // create transport...
@@ -380,7 +380,7 @@ MotionTransport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/
     if (!trans->CreateMoTrans(guidLow, entry, mapId, x, y, z, o, 255))
     {
         delete trans;
-        return NULL;
+        return nullptr;
     }
 
     if (MapEntry const* mapEntry = sMapStore.LookupEntry(mapId))
@@ -389,7 +389,7 @@ MotionTransport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/
         {
             sLog->outError("Transport %u (name: %s) attempted creation in instance map (id: %u) but it is not an instanced transport!", entry, trans->GetName().c_str(), mapId);
             delete trans;
-            return NULL;
+            return nullptr;
         }
     }
 

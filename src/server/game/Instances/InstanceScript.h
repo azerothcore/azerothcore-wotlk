@@ -189,7 +189,7 @@ class InstanceScript : public ZoneScript
         virtual bool SetBossState(uint32 id, EncounterState state);
         EncounterState GetBossState(uint32 id) const { return id < bosses.size() ? bosses[id].state : TO_BE_DECIDED; }
         static std::string GetBossStateName(uint8 state);
-        BossBoundaryMap const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : NULL; }
+        BossBoundaryMap const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : nullptr; }
         BossInfo const* GetBossInfo(uint32 id) const { return &bosses[id]; } 
 
         // Achievement criteria additional requirements check
@@ -238,7 +238,7 @@ AI* GetInstanceAI(T* obj, char const* scriptName)
             if (instance->GetScriptId() == sObjectMgr->GetScriptId(scriptName))
                 return new AI(obj);
 
-    return NULL;
+    return nullptr;
 };
 
 template<class AI, class T>
@@ -248,7 +248,7 @@ AI* GetInstanceAI(T* obj)
         if (instance->GetInstanceScript())
             return new AI(obj);
 
-    return NULL;
+    return nullptr;
 };
 
 #endif

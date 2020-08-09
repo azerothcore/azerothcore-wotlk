@@ -19,7 +19,7 @@ PacketLog::~PacketLog()
     if (_file)
         fclose(_file);
 
-    _file = NULL;
+    _file = nullptr;
 }
 
 PacketLog* PacketLog::instance()

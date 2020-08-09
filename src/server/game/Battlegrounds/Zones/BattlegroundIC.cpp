@@ -43,8 +43,8 @@ BattlegroundIC::BattlegroundIC()
 
     siegeEngineWorkshopTimer = WORKSHOP_UPDATE_TIME;
 
-    gunshipHorde = NULL;
-    gunshipAlliance = NULL;
+    gunshipHorde = nullptr;
+    gunshipAlliance = nullptr;
     respawnMap.clear();
 }
 
@@ -958,7 +958,7 @@ GraveyardStruct const* BattlegroundIC::GetClosestGraveyard(Player* player)
         if (nodePoint[i].faction == player->GetTeamId() && !nodePoint[i].needChange) // xinef: controlled by faction and not contested!
             nodes.push_back(i);
 
-    GraveyardStruct const* good_entry = NULL;
+    GraveyardStruct const* good_entry = nullptr;
     // If so, select the closest node to place ghost on
     if (!nodes.empty())
     {

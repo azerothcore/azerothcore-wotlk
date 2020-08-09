@@ -141,7 +141,7 @@ public:
         void Reset()
         {
             BossAI::Reset();
-            Creature* member = NULL;
+            Creature* member = nullptr;
             for (uint8 i = 0; i < 4; ++i)
                 if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
                     member->AI()->EnterEvadeMode();
@@ -177,7 +177,7 @@ public:
             }
             else if (param == ACTION_ENRAGE)
             {
-                Creature* member = NULL;
+                Creature* member = nullptr;
                 for (uint8 i = 0; i < 4; ++i)
                     if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
                         member->AI()->DoAction(ACTION_ENRAGE);
@@ -185,7 +185,7 @@ public:
             else if (param == ACTION_END_ENCOUNTER)
             {
                 me->setActive(false);
-                Creature* member = NULL;
+                Creature* member = nullptr;
                 for (uint8 i = 0; i < 4; ++i)
                     if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
                         if (member->IsAlive())

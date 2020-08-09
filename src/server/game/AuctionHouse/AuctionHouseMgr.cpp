@@ -449,7 +449,7 @@ bool AuctionHouseObject::RemoveAuction(AuctionEntry* auction)
 
     // we need to delete the entry, it is not referenced any more
     delete auction;
-    auction = NULL;
+    auction = nullptr;
 
     return wasInMap;
 }
@@ -630,7 +630,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                 // These are found in ItemRandomSuffix.dbc and ItemRandomProperties.dbc
                 //  even though the DBC name seems misleading
 
-                char* const* suffix = NULL;
+                char* const* suffix = nullptr;
 
                 if (propRefID < 0)
                 {

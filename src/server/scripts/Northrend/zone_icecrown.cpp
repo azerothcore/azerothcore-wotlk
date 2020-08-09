@@ -1266,7 +1266,7 @@ class npc_infra_green_bomber_generic : public CreatureScript
             {
                 if (TempSummon* tempSummon = me->ToTempSummon())
                     return tempSummon->GetSummoner();
-                return NULL;
+                return nullptr;
             }
 
             void IsSummonedBy(Unit* summoner)

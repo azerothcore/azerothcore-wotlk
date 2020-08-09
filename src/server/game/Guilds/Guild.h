@@ -354,12 +354,12 @@ public: // pussywizard: public class Member
     inline const Member* GetMember(uint64 guid) const
     {
         Members::const_iterator itr = m_members.find(GUID_LOPART(guid));
-        return itr != m_members.end() ? itr->second : NULL;
+        return itr != m_members.end() ? itr->second : nullptr;
     }
     inline Member* GetMember(uint64 guid)
     {
         Members::iterator itr = m_members.find(GUID_LOPART(guid));
-        return itr != m_members.end() ? itr->second : NULL;
+        return itr != m_members.end() ? itr->second : nullptr;
     }
     inline Member* GetMember(std::string const& name)
     {
@@ -367,7 +367,7 @@ public: // pussywizard: public class Member
             if (itr->second->GetName() == name)
                 return itr->second;
 
-        return NULL;
+        return nullptr;
     }
 
 private:
@@ -548,7 +548,7 @@ private:
         void SetText(std::string const& text);
         void SendText(const Guild* guild, WorldSession* session) const;
 
-        inline Item* GetItem(uint8 slotId) const { return slotId < GUILD_BANK_MAX_SLOTS ?  m_items[slotId] : NULL; }
+        inline Item* GetItem(uint8 slotId) const { return slotId < GUILD_BANK_MAX_SLOTS ?  m_items[slotId] : nullptr; }
         bool SetItem(SQLTransaction& trans, uint8 slotId, Item* pItem);
 
     private:
@@ -776,8 +776,8 @@ protected:
 
 private:
     inline uint8 _GetRanksSize() const { return uint8(m_ranks.size()); }
-    inline const RankInfo* GetRankInfo(uint8 rankId) const { return rankId < _GetRanksSize() ? &m_ranks[rankId] : NULL; }
-    inline RankInfo* GetRankInfo(uint8 rankId) { return rankId < _GetRanksSize() ? &m_ranks[rankId] : NULL; }
+    inline const RankInfo* GetRankInfo(uint8 rankId) const { return rankId < _GetRanksSize() ? &m_ranks[rankId] : nullptr; }
+    inline RankInfo* GetRankInfo(uint8 rankId) { return rankId < _GetRanksSize() ? &m_ranks[rankId] : nullptr; }
     inline bool _HasRankRight(Player* player, uint32 right) const
     {
         if (player)
@@ -789,8 +789,8 @@ private:
     inline uint8 _GetLowestRankId() const { return uint8(m_ranks.size() - 1); }
 
     inline uint8 _GetPurchasedTabsSize() const { return uint8(m_bankTabs.size()); }
-    inline BankTab* GetBankTab(uint8 tabId) { return tabId < m_bankTabs.size() ? m_bankTabs[tabId] : NULL; }
-    inline const BankTab* GetBankTab(uint8 tabId) const { return tabId < m_bankTabs.size() ? m_bankTabs[tabId] : NULL; }
+    inline BankTab* GetBankTab(uint8 tabId) { return tabId < m_bankTabs.size() ? m_bankTabs[tabId] : nullptr; }
+    inline const BankTab* GetBankTab(uint8 tabId) const { return tabId < m_bankTabs.size() ? m_bankTabs[tabId] : nullptr; }
 
     inline void _DeleteMemberFromDB(uint32 lowguid) const
     {

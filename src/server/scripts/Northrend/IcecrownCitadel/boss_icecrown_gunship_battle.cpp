@@ -711,7 +711,7 @@ class npc_gunship : public CreatureScript
         CreatureAI* GetAI(Creature* creature) const
         {
             if (!creature->GetTransport())
-                return NULL;
+                return nullptr;
 
             return GetIcecrownCitadelAI<npc_gunshipAI>(creature);
         }

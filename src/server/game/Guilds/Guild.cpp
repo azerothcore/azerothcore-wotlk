@@ -431,7 +431,7 @@ void Guild::BankTab::Delete(SQLTransaction& trans, bool removeItemsFromDB)
             if (removeItemsFromDB)
                 pItem->DeleteFromDB(trans);
             delete pItem;
-            pItem = NULL;
+            pItem = nullptr;
         }
 }
 
@@ -847,13 +847,13 @@ bool Guild::PlayerMoveItemData::InitItem()
         if (m_pItem->IsNotEmptyBag())
         {
             m_pPlayer->SendEquipError(EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS, m_pItem);
-            m_pItem = NULL;
+            m_pItem = nullptr;
         }
         // Bound items cannot be put into bank.
         else if (!m_pItem->CanBeTraded())
         {
             m_pPlayer->SendEquipError(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, m_pItem);
-            m_pItem = NULL;
+            m_pItem = nullptr;
         }
     }
     return (m_pItem != NULL);
@@ -871,7 +871,7 @@ void Guild::PlayerMoveItemData::RemoveItem(SQLTransaction& trans, MoveItemData* 
     {
         m_pPlayer->MoveItemFromInventory(m_container, m_slotId, true);
         m_pItem->DeleteFromInventoryDB(trans);
-        m_pItem = NULL;
+        m_pItem = nullptr;
     }
 }
 
@@ -938,7 +938,7 @@ void Guild::BankMoveItemData::RemoveItem(SQLTransaction& trans, MoveItemData* pO
     else
     {
         m_pGuild->_RemoveItem(trans, m_container, m_slotId);
-        m_pItem = NULL;
+        m_pItem = nullptr;
     }
     // Decrease amount of player's remaining items (if item is moved to different tab or to player)
     if (!pOther->IsBank() || pOther->GetContainer() != m_container)
@@ -948,11 +948,11 @@ void Guild::BankMoveItemData::RemoveItem(SQLTransaction& trans, MoveItemData* pO
 Item* Guild::BankMoveItemData::StoreItem(SQLTransaction& trans, Item* pItem)
 {
     if (!pItem)
-        return NULL;
+        return nullptr;
 
     BankTab* pTab = m_pGuild->GetBankTab(m_container);
     if (!pTab)
-        return NULL;
+        return nullptr;
 
     Item* pLastItem = pItem;
     for (ItemPosCountVec::const_iterator itr = m_vec.begin(); itr != m_vec.end(); )
@@ -1013,7 +1013,7 @@ Item* Guild::BankMoveItemData::_StoreItem(SQLTransaction& trans, BankTab* pTab, 
     if (pItem && pTab->SetItem(trans, slotId, pItem))
         return pItem;
 
-    return NULL;
+    return nullptr;
 }
 
 // Tries to reserve space for source item.
@@ -1053,7 +1053,7 @@ void Guild::BankMoveItemData::CanStoreItemInTab(Item* pItem, uint8 skipSlotId, b
 
         Item* pItemDest = m_pGuild->_GetItem(m_container, slotId);
         if (pItemDest == pItem)
-            pItemDest = NULL;
+            pItemDest = nullptr;
 
         // If merge skip empty, if not merge skip non-empty
         if ((pItemDest != NULL) != merge)
@@ -1084,7 +1084,7 @@ InventoryResult Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
         Item* pItemDest = m_pGuild->_GetItem(m_container, m_slotId);
         // Ignore swapped item (this slot will be empty after move)
         if ((pItemDest == pItem) || swap)
-            pItemDest = NULL;
+            pItemDest = nullptr;
 
         if (!_ReserveSpace(m_slotId, pItem, pItemDest, count))
             return EQUIP_ERR_ITEM_CANT_STACK;
@@ -1129,18 +1129,18 @@ Guild::~Guild()
 
     // Cleanup
     delete m_eventLog;
-    m_eventLog = NULL;
+    m_eventLog = nullptr;
 
     for (uint8 tabId = 0; tabId <= GUILD_BANK_MAX_TABS; ++tabId)
     {
         delete m_bankEventLog[tabId];
-        m_bankEventLog[tabId] = NULL;
+        m_bankEventLog[tabId] = nullptr;
     }
 
     for (Members::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         delete itr->second;
-        itr->second = NULL;
+        itr->second = nullptr;
     }
 }
 
@@ -2286,8 +2286,8 @@ void Guild::DeleteMember(uint64 guid, bool isDisbanding, bool isKicked, bool can
     // or when he is removed from guild by gm command
     if (m_leaderGuid == guid && !isDisbanding)
     {
-        Member* oldLeader = NULL;
-        Member* newLeader = NULL;
+        Member* oldLeader = nullptr;
+        Member* newLeader = nullptr;
         for (Guild::Members::iterator i = m_members.begin(); i != m_members.end(); ++i)
         {
             if (i->first == lowguid)
@@ -2487,7 +2487,7 @@ void Guild::_DeleteBankItems(SQLTransaction& trans, bool removeItemsFromDB)
     {
         m_bankTabs[tabId]->Delete(trans, removeItemsFromDB);
         delete m_bankTabs[tabId];
-        m_bankTabs[tabId] = NULL;
+        m_bankTabs[tabId] = nullptr;
     }
     m_bankTabs.clear();
 }
@@ -2670,7 +2670,7 @@ inline Item* Guild::_GetItem(uint8 tabId, uint8 slotId) const
 {
     if (const BankTab* tab = GetBankTab(tabId))
         return tab->GetItem(slotId);
-    return NULL;
+    return nullptr;
 }
 
 inline void Guild::_RemoveItem(SQLTransaction& trans, uint8 tabId, uint8 slotId)

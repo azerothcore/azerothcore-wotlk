@@ -329,12 +329,12 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* 
     Mechanic = Mechanics(spellEntry->EffectMechanic[effIndex]);
     TargetA = SpellImplicitTargetInfo(spellEntry->EffectImplicitTargetA[effIndex]);
     TargetB = SpellImplicitTargetInfo(spellEntry->EffectImplicitTargetB[effIndex]);
-    RadiusEntry = spellEntry->EffectRadiusIndex[effIndex] ? sSpellRadiusStore.LookupEntry(spellEntry->EffectRadiusIndex[effIndex]) : NULL;
+    RadiusEntry = spellEntry->EffectRadiusIndex[effIndex] ? sSpellRadiusStore.LookupEntry(spellEntry->EffectRadiusIndex[effIndex]) : nullptr;
     ChainTarget = spellEntry->EffectChainTarget[effIndex];
     ItemType = spellEntry->EffectItemType[effIndex];
     TriggerSpell = spellEntry->EffectTriggerSpell[effIndex];
     SpellClassMask = spellEntry->EffectSpellClassMask[effIndex];
-    ImplicitTargetConditions = NULL;
+    ImplicitTargetConditions = nullptr;
 }
 
 bool SpellEffectInfo::IsEffect() const
@@ -524,7 +524,7 @@ float SpellEffectInfo::CalcDamageMultiplier(Unit* caster, Spell* spell) const
 
 bool SpellEffectInfo::HasRadius() const
 {
-    return RadiusEntry != NULL;
+    return RadiusEntry != nullptr;
 }
 
 float SpellEffectInfo::CalcRadius(Unit* caster, Spell* spell) const
@@ -756,7 +756,7 @@ SpellEffectInfo::StaticData  SpellEffectInfo::_data[TOTAL_SPELL_EFFECTS] =
 SpellInfo::SpellInfo(SpellEntry const* spellEntry)
 {
     Id = spellEntry->Id;
-    CategoryEntry = spellEntry->Category ? sSpellCategoryStore.LookupEntry(spellEntry->Category) : NULL;
+    CategoryEntry = spellEntry->Category ? sSpellCategoryStore.LookupEntry(spellEntry->Category) : nullptr;
     Dispel = spellEntry->Dispel;
     Mechanic = spellEntry->Mechanic;
     Attributes = spellEntry->Attributes;
@@ -782,7 +782,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     TargetAuraSpell = spellEntry->targetAuraSpell;
     ExcludeCasterAuraSpell = spellEntry->excludeCasterAuraSpell;
     ExcludeTargetAuraSpell = spellEntry->excludeTargetAuraSpell;
-    CastTimeEntry = spellEntry->CastingTimeIndex ? sSpellCastTimesStore.LookupEntry(spellEntry->CastingTimeIndex) : NULL;
+    CastTimeEntry = spellEntry->CastingTimeIndex ? sSpellCastTimesStore.LookupEntry(spellEntry->CastingTimeIndex) : nullptr;
     RecoveryTime = spellEntry->RecoveryTime;
     CategoryRecoveryTime = spellEntry->CategoryRecoveryTime;
     StartRecoveryCategory = spellEntry->StartRecoveryCategory;
@@ -796,7 +796,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     MaxLevel = spellEntry->maxLevel;
     BaseLevel = spellEntry->baseLevel;
     SpellLevel = spellEntry->spellLevel;
-    DurationEntry = spellEntry->DurationIndex ? sSpellDurationStore.LookupEntry(spellEntry->DurationIndex) : NULL;
+    DurationEntry = spellEntry->DurationIndex ? sSpellDurationStore.LookupEntry(spellEntry->DurationIndex) : nullptr;
     PowerType = spellEntry->powerType;
     ManaCost = spellEntry->manaCost;
     ManaCostPerlevel = spellEntry->manaCostPerlevel;
@@ -804,7 +804,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     ManaPerSecondPerLevel = spellEntry->manaPerSecondPerLevel;
     ManaCostPercentage = spellEntry->ManaCostPercentage;
     RuneCostID = spellEntry->runeCostID;
-    RangeEntry = spellEntry->rangeIndex ? sSpellRangeStore.LookupEntry(spellEntry->rangeIndex) : NULL;
+    RangeEntry = spellEntry->rangeIndex ? sSpellRangeStore.LookupEntry(spellEntry->rangeIndex) : nullptr;
     Speed = spellEntry->speed;
     StackAmount = spellEntry->StackAmount;
     for (uint8 i = 0; i < 2; ++i)
@@ -837,7 +837,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         Effects[i] = SpellEffectInfo(spellEntry, this, i);
     ExplicitTargetMask = _GetExplicitTargetMask();
-    ChainEntry = NULL;
+    ChainEntry = nullptr;
 
     // Mine
     _isStackableWithRanks = false;
@@ -1404,7 +1404,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
         return SPELL_CAST_OK;
 
     bool actAsShifted = false;
-    SpellShapeshiftEntry const* shapeInfo = NULL;
+    SpellShapeshiftEntry const* shapeInfo = nullptr;
     if (form > 0)
     {
         shapeInfo = sSpellShapeshiftStore.LookupEntry(form);
@@ -2420,7 +2420,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
 
 bool SpellInfo::IsRanked() const
 {
-    return ChainEntry != NULL;
+    return ChainEntry != nullptr;
 }
 
 uint8 SpellInfo::GetRank() const
@@ -2439,19 +2439,19 @@ SpellInfo const* SpellInfo::GetFirstRankSpell() const
 SpellInfo const* SpellInfo::GetLastRankSpell() const
 {
     if (!ChainEntry)
-        return NULL;
+        return nullptr;
     return ChainEntry->last;
 }
 SpellInfo const* SpellInfo::GetNextRankSpell() const
 {
     if (!ChainEntry)
-        return NULL;
+        return nullptr;
     return ChainEntry->next;
 }
 SpellInfo const* SpellInfo::GetPrevRankSpell() const
 {
     if (!ChainEntry)
-        return NULL;
+        return nullptr;
     return ChainEntry->prev;
 }
 
@@ -2478,7 +2478,7 @@ SpellInfo const* SpellInfo::GetAuraRankForLevel(uint8 level) const
     if (!needRankSelection)
         return this;
 
-    for (SpellInfo const* nextSpellInfo = this; nextSpellInfo != NULL; nextSpellInfo = nextSpellInfo->GetPrevRankSpell())
+    for (SpellInfo const* nextSpellInfo = this; nextSpellInfo != nullptr; nextSpellInfo = nextSpellInfo->GetPrevRankSpell())
     {
         // if found appropriate level
         if (uint32(level + 10) >= nextSpellInfo->SpellLevel)
@@ -2488,7 +2488,7 @@ SpellInfo const* SpellInfo::GetAuraRankForLevel(uint8 level) const
     }
 
     // not found
-    return NULL;
+    return nullptr;
 }
 
 bool SpellInfo::IsRankOf(SpellInfo const* spellInfo) const
@@ -2888,7 +2888,7 @@ void SpellInfo::_UnloadImplicitTargetConditionLists()
         for (uint8 j = i; j < MAX_SPELL_EFFECTS; ++j)
         {
             if (Effects[j].ImplicitTargetConditions == cur)
-                Effects[j].ImplicitTargetConditions = NULL;
+                Effects[j].ImplicitTargetConditions = nullptr;
         }
         delete cur;
     }

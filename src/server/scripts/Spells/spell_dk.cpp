@@ -780,7 +780,7 @@ class spell_dk_dancing_rune_weapon : public SpellScriptLoader
 
                 Unit* player = eventInfo.GetActor();
                 Unit* target = eventInfo.GetActionTarget();
-                Unit* dancingRuneWeapon = NULL;
+                Unit* dancingRuneWeapon = nullptr;
                 for (Unit::ControlSet::const_iterator itr = player->m_Controlled.begin(); itr != player->m_Controlled.end(); ++itr)
                     if (int32((*itr)->GetEntry()) == GetSpellInfo()->Effects[EFFECT_0].MiscValue)
                     {
@@ -1267,7 +1267,7 @@ class spell_dk_blood_gorged : public SpellScriptLoader
 
             bool Load()
             {
-                _procTarget = NULL;
+                _procTarget = nullptr;
                 return true;
             }
 
@@ -1345,14 +1345,14 @@ class spell_dk_corpse_explosion : public SpellScriptLoader
 
             bool Load()
             {
-                _target = NULL;
+                _target = nullptr;
                 return true;
             }
 
             void CheckTarget(WorldObject*& target)
             {
                 if (CorpseExplosionCheck(GetCaster()->GetGUID(), true)(target))
-                    target = NULL;
+                    target = nullptr;
 
                 _target = target;
             }
@@ -1693,7 +1693,7 @@ class spell_dk_death_pact : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targetList)
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                 {
                     if (Unit* unit = (*itr)->ToUnit())
@@ -2265,7 +2265,7 @@ class spell_dk_raise_dead : public SpellScriptLoader
             {
                 // Don't add caster to target map, if we found a corpse to raise dead
                 if (_corpse)
-                    target = NULL;
+                    target = nullptr;
             }
 
             void ConsumeReagents()

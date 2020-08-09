@@ -971,7 +971,7 @@ class spell_hun_pet_carrion_feeder : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
                 float max_range = GetSpellInfo()->GetMaxRange(false);
-                WorldObject* result = NULL;
+                WorldObject* result = nullptr;
                 // search for nearby enemy corpse in range
                 acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_ENEMY);
                 acore::WorldObjectSearcher<acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);

@@ -367,7 +367,7 @@ protected:
     /// Will be called when a dialogue step was done
     virtual void JustDidDialogueStep(int32 /*entry*/) { }
     /// Will be called to get a speaker, MUST be implemented if not used in instances
-    virtual Creature* GetSpeakerByEntry(int32 /*entry*/) { return NULL; }
+    virtual Creature* GetSpeakerByEntry(int32 /*entry*/) { return nullptr; }
 
 private:
     void DoNextDialogueStep()
@@ -724,7 +724,7 @@ public:
                 case NPC_PRIESTESS_DATA_2:
                     return me->GetMap()->GetCreature(_secondPriestessGUID);
                 default:
-                    return NULL;
+                    return nullptr;
             }
 
         }

@@ -31,7 +31,7 @@ Warden::~Warden()
 {
     delete[] _module->CompressedData;
     delete _module;
-    _module = NULL;
+    _module = nullptr;
     _initialized = false;
 }
 
