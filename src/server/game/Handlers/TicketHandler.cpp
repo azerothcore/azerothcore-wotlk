@@ -116,7 +116,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
     GMTicketResponse response = GMTICKET_RESPONSE_UPDATE_ERROR;
     if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
     {
-        SQLTransaction trans = SQLTransaction(NULL);
+        SQLTransaction trans = SQLTransaction(nullptr);
         ticket->SetMessage(message);
         ticket->SaveToDB(trans);
 
@@ -237,7 +237,7 @@ void WorldSession::HandleReportLag(WorldPacket& recv_data)
     stmt->setFloat (4, y);
     stmt->setFloat (5, z);
     stmt->setUInt32(6, GetLatency());
-    stmt->setUInt32(7, time(NULL));
+    stmt->setUInt32(7, time(nullptr));
     CharacterDatabase.Execute(stmt);
 }
 

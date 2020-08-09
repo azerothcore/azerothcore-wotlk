@@ -1168,7 +1168,7 @@ class npc_captain_saeed : public CreatureScript
                 if (fight)
                     SetEscortPaused(false);
 
-                SummonsAction(NULL);
+                SummonsAction(nullptr);
                 npc_escortAI::EnterEvadeMode();
             }
 
@@ -1249,7 +1249,7 @@ class npc_captain_saeed : public CreatureScript
                 switch (events.ExecuteEvent())
                 {
                     case EVENT_START_WALK:
-                        SummonsAction(NULL);
+                        SummonsAction(nullptr);
                         SetEscortPaused(false);
                         break;
                     case EVENT_START_FIGHT1:

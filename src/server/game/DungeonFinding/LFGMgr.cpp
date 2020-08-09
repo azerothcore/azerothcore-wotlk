@@ -266,7 +266,7 @@ void LFGMgr::Update(uint32 tdiff, uint8 task)
 
     if (task == 0)
     {
-        time_t currTime = time(NULL);
+        time_t currTime = time(nullptr);
 
         // Remove obsolete role checks
         for (LfgRoleCheckContainer::iterator it = RoleChecksStore.begin(); it != RoleChecksStore.end();)
@@ -656,7 +656,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
         // Create new rolecheck
         LfgRoleCheck& roleCheck = RoleChecksStore[gguid];
         roleCheck.roles.clear(); // pussywizard: NEW rolecheck, not old one with trash data >_>
-        roleCheck.cancelTime = time_t(time(NULL)) + LFG_TIME_ROLECHECK;
+        roleCheck.cancelTime = time_t(time(nullptr)) + LFG_TIME_ROLECHECK;
         roleCheck.state = LFG_ROLECHECK_INITIALITING;
         roleCheck.leader = guid;
         roleCheck.dungeons = dungeons;
@@ -694,7 +694,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
         LfgRolesMap rolesMap;
         rolesMap[guid] = roles;
         LFGQueue& queue = GetQueue(guid);
-        queue.AddQueueData(guid, time(NULL), dungeons, rolesMap);
+        queue.AddQueueData(guid, time(nullptr), dungeons, rolesMap);
 
         if (!isContinue)
         {
@@ -1361,7 +1361,7 @@ void LFGMgr::UpdateRoleCheck(uint64 gguid, uint64 guid /* = 0 */, uint8 roles /*
     {
         SetState(gguid, LFG_STATE_QUEUED);
         LFGQueue& queue = GetQueue(gguid);
-        queue.AddQueueData(gguid, time_t(time(NULL)), roleCheck.dungeons, roleCheck.roles);
+        queue.AddQueueData(gguid, time_t(time(nullptr)), roleCheck.dungeons, roleCheck.roles);
         RoleChecksStore.erase(itRoleCheck);
     }
     else if (roleCheck.state != LFG_ROLECHECK_INITIALITING)
@@ -1638,7 +1638,7 @@ void LFGMgr::UpdateProposal(uint32 proposalId, uint64 guid, bool accept)
 
     bool sendUpdate = proposal.state != LFG_PROPOSAL_SUCCESS;
     proposal.state = LFG_PROPOSAL_SUCCESS;
-    time_t joinTime = time(NULL);
+    time_t joinTime = time(nullptr);
 
     LFGQueue& queue = GetQueue(guid);
     LfgUpdateData updateData = LfgUpdateData(LFG_UPDATETYPE_GROUP_FOUND);
@@ -1824,7 +1824,7 @@ void LFGMgr::InitBoot(uint64 gguid, uint64 kicker, uint64 victim, std::string co
 
     LfgPlayerBoot& boot = BootsStore[gguid];
     boot.inProgress = true;
-    boot.cancelTime = time_t(time(NULL)) + LFG_TIME_BOOT;
+    boot.cancelTime = time_t(time(nullptr)) + LFG_TIME_BOOT;
     boot.reason = reason;
     boot.victim = victim;
 

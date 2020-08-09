@@ -27,7 +27,7 @@ npc_escortAI::npc_escortAI(Creature* creature) : ScriptedAI(creature),
     m_uiPlayerCheckTimer(0),
     m_uiEscortState(STATE_ESCORT_NONE),
     MaxPlayerDistance(DEFAULT_MAX_PLAYER_DISTANCE),
-    m_pQuestForEscort(NULL),
+    m_pQuestForEscort(nullptr),
     m_bIsActiveAttacker(true),
     m_bIsRunning(false),
     m_bCanInstantRespawn(false),
@@ -158,7 +158,7 @@ void npc_escortAI::EnterEvadeMode()
     me->RemoveAllAuras();
     me->DeleteThreatList();
     me->CombatStop(true);
-    me->SetLootRecipient(NULL);
+    me->SetLootRecipient(nullptr);
 
     if (HasEscortState(STATE_ESCORT_ESCORTING))
     {

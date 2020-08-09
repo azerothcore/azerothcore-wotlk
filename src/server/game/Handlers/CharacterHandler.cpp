@@ -109,7 +109,7 @@ bool LoginQueryHolder::Initialize()
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILCOUNT);
     stmt->setUInt32(0, lowGuid);
-    stmt->setUInt64(1, uint64(time(NULL)));
+    stmt->setUInt64(1, uint64(time(nullptr)));
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT, stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILDATE);
@@ -478,7 +478,7 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
             }
 
             _charCreateCallback.NextStage();
-            HandleCharCreateCallback(PreparedQueryResult(NULL), createInfo);   // Will jump to case 3
+            HandleCharCreateCallback(PreparedQueryResult(nullptr), createInfo);   // Will jump to case 3
         }
         break;
         case 3:
@@ -848,7 +848,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recvData)
                 return;
             }
 
-            sess->SetPlayer(NULL);
+            sess->SetPlayer(nullptr);
             SetPlayer(p);
             p->SetSession(this);
             delete p->PlayerTalkClass;
@@ -882,7 +882,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     // "GetAccountId() == db stored account id" checked in LoadFromDB (prevent login not own character using cheating tools)
     if (!pCurrChar->LoadFromDB(GUID_LOPART(playerGuid), holder))
     {
-        SetPlayer(NULL);
+        SetPlayer(nullptr);
         KickPlayer("HandlePlayerLoginFromDB");              // disconnect client, player no set to session and it will not deleted or saved at kick
         delete pCurrChar;                                   // delete it manually
         delete holder;                                      // delete all unprocessed queries
@@ -1017,7 +1017,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         if (mapDiff->resetTime)
             if (time_t timeReset = sInstanceSaveMgr->GetResetTimeFor(pCurrChar->GetMap()->GetId(), pCurrChar->GetMap()->GetDifficulty()))
             {
-                uint32 timeleft = uint32(timeReset - time(NULL));
+                uint32 timeleft = uint32(timeReset - time(nullptr));
                 pCurrChar->SendInstanceResetWarning(pCurrChar->GetMap()->GetId(), pCurrChar->GetMap()->GetDifficulty(), timeleft, true);
             }
 
@@ -1309,7 +1309,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
         if (mapDiff->resetTime)
             if (time_t timeReset = sInstanceSaveMgr->GetResetTimeFor(pCurrChar->GetMap()->GetId(), pCurrChar->GetMap()->GetDifficulty()))
             {
-                uint32 timeleft = uint32(timeReset - time(NULL));
+                uint32 timeleft = uint32(timeReset - time(nullptr));
                 GetPlayer()->SendInstanceResetWarning(pCurrChar->GetMap()->GetId(), pCurrChar->GetMap()->GetDifficulty(), timeleft, true);
             }
 

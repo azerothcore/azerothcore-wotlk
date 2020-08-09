@@ -706,7 +706,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 case 17731:
                 case 69294:
                 {
-                    if( !gameObjTarget || gameObjTarget->GetRespawnTime() > time(NULL) )
+                    if( !gameObjTarget || gameObjTarget->GetRespawnTime() > time(nullptr) )
                         return;
 
                     gameObjTarget->SetRespawnTime(10);
@@ -2243,7 +2243,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
 
             // prevent crash at access and unexpected charges counting with item update queue corrupt
             if (m_CastItem == m_targets.GetItemTarget())
-                m_targets.SetItemTarget(NULL);
+                m_targets.SetItemTarget(nullptr);
 
             m_CastItem = NULL;
             m_castItemGUID = 0;
@@ -2263,7 +2263,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
 
             // prevent crash at access and unexpected charges counting with item update queue corrupt
             if (m_CastItem == m_targets.GetItemTarget())
-                m_targets.SetItemTarget(NULL);
+                m_targets.SetItemTarget(nullptr);
 
             m_CastItem = NULL;
             m_castItemGUID = 0;
@@ -2286,7 +2286,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
 
             // prevent crash at access and unexpected charges counting with item update queue corrupt
             if (m_CastItem == m_targets.GetItemTarget())
-                m_targets.SetItemTarget(NULL);
+                m_targets.SetItemTarget(nullptr);
 
             m_CastItem = NULL;
             m_castItemGUID = 0;
@@ -2859,7 +2859,7 @@ void Spell::EffectEnchantItemPerm(SpellEffIndex effIndex)
         // and add a scroll
         DoCreateItem(effIndex, m_spellInfo->Effects[effIndex].ItemType);
         itemTarget=NULL;
-        m_targets.SetItemTarget(NULL);
+        m_targets.SetItemTarget(nullptr);
     }
     else
     {
@@ -4961,7 +4961,7 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
 
         // charge changes fall time
         if( m_caster->GetTypeId() == TYPEID_PLAYER )
-            m_caster->ToPlayer()->SetFallInformation(time(NULL), m_caster->GetPositionZ());
+            m_caster->ToPlayer()->SetFallInformation(time(nullptr), m_caster->GetPositionZ());
 
         if (m_pathFinder)
         {
@@ -5082,7 +5082,7 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
 
     // xinef: changes fall time
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        m_caster->ToPlayer()->SetFallInformation(time(NULL), m_caster->GetPositionZ());
+        m_caster->ToPlayer()->SetFallInformation(time(nullptr), m_caster->GetPositionZ());
 }
 
 void Spell::EffectQuestClear(SpellEffIndex effIndex)

@@ -173,7 +173,7 @@ enum BattlegroundTeams
 
 struct BattlegroundObjectInfo
 {
-    BattlegroundObjectInfo() : object(NULL), timer(0), spellid(0) {}
+    BattlegroundObjectInfo() : object(nullptr), timer(0), spellid(0) {}
 
     GameObject  *object;
     int32       timer;

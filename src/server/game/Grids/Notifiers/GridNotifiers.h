@@ -977,7 +977,7 @@ namespace acore
     {
         public:
             AnyAoETargetUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range)
-                : i_obj(obj), i_funit(funit), _spellInfo(NULL), i_range(range)
+                : i_obj(obj), i_funit(funit), _spellInfo(nullptr), i_range(range)
             {
                 Unit const* check = i_funit;
                 Unit const* owner = i_funit->GetOwner();

@@ -409,7 +409,7 @@ void hyjalAI::EnterEvadeMode()
     if (me->IsAlive())
         me->GetMotionMaster()->MoveTargetedHome();
 
-    me->SetLootRecipient(NULL);
+    me->SetLootRecipient(nullptr);
 }
 
 void hyjalAI::EnterCombat(Unit* /*who*/)

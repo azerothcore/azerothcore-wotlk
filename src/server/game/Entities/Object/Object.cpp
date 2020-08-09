@@ -950,7 +950,7 @@ void MovementInfo::OutDebug()
     sLog->outString("guid " UI64FMTD, guid);
     sLog->outString("flags %u", flags);
     sLog->outString("flags2 %u", flags2);
-    sLog->outString("time %u current time " UI64FMTD "", flags2, uint64(::time(NULL)));
+    sLog->outString("time %u current time " UI64FMTD "", flags2, uint64(::time(nullptr)));
     sLog->outString("position: `%s`", pos.ToString().c_str());
     if (flags & MOVEMENTFLAG_ONTRANSPORT)
     {
@@ -976,10 +976,10 @@ void MovementInfo::OutDebug()
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
 #ifdef ELUNA
-elunaEvents(NULL),
+elunaEvents(nullptr),
 #endif
-LastUsedScriptID(0), m_name(""), m_isActive(false), m_isVisibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(NULL),
-m_transport(NULL), m_currMap(NULL), m_InstanceId(0),
+LastUsedScriptID(0), m_name(""), m_isActive(false), m_isVisibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
+m_transport(nullptr), m_currMap(nullptr), m_InstanceId(0),
 m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);

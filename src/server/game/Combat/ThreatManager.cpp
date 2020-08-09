@@ -386,7 +386,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
 //=================== ThreatManager ==========================
 //============================================================
 
-ThreatManager::ThreatManager(Unit* owner) : iCurrentVictim(NULL), iOwner(owner), iUpdateTimer(THREAT_UPDATE_INTERVAL)
+ThreatManager::ThreatManager(Unit* owner) : iCurrentVictim(nullptr), iOwner(owner), iUpdateTimer(THREAT_UPDATE_INTERVAL)
 {
 }
 
@@ -544,7 +544,7 @@ void ThreatManager::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStat
             {
                 if (hostilRef == getCurrentVictim())
                 {
-                    setCurrentVictim(NULL);
+                    setCurrentVictim(nullptr);
                     setDirty(true);
                 }
                 if (GetOwner() && GetOwner()->IsInWorld())
@@ -565,7 +565,7 @@ void ThreatManager::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStat
         case UEV_THREAT_REF_REMOVE_FROM_LIST:
             if (hostilRef == getCurrentVictim())
             {
-                setCurrentVictim(NULL);
+                setCurrentVictim(nullptr);
                 setDirty(true);
             }
             iOwner->SendRemoveFromThreatListOpcode(hostilRef);

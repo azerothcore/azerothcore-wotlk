@@ -21,7 +21,7 @@
 #include "WorldModel.h"
 #include "Spell.h"
 
-MotionTransport::MotionTransport() : Transport(), _transportInfo(NULL), _isMoving(true), _pendingStop(false), _triggeredArrivalEvent(false), _triggeredDepartureEvent(false), _passengersLoaded(false), _delayedTeleport(false)
+MotionTransport::MotionTransport() : Transport(), _transportInfo(nullptr), _isMoving(true), _pendingStop(false), _triggeredArrivalEvent(false), _triggeredDepartureEvent(false), _passengersLoaded(false), _delayedTeleport(false)
 {
     m_updateFlag = UPDATEFLAG_TRANSPORT | UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_ROTATION;
 }
@@ -102,7 +102,7 @@ void MotionTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
     {
         WorldObject* obj = *_passengers.begin();
         RemovePassenger(obj);
-        obj->SetTransport(NULL);
+        obj->SetTransport(nullptr);
         obj->m_movementInfo.transport.Reset();
         obj->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
     }
@@ -281,12 +281,12 @@ void MotionTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(ToTransport(), plr);
-            plr->SetFallInformation(time(NULL), plr->GetPositionZ());
+            plr->SetFallInformation(time(nullptr), plr->GetPositionZ());
         }
 
         if (withAll)
         {
-            passenger->SetTransport(NULL);
+            passenger->SetTransport(nullptr);
             passenger->m_movementInfo.flags &= ~MOVEMENTFLAG_ONTRANSPORT;
             passenger->m_movementInfo.transport.guid = 0;
             passenger->m_movementInfo.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
@@ -754,7 +754,7 @@ void StaticTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
     {
         WorldObject* obj = *_passengers.begin();
         RemovePassenger(obj);
-        obj->SetTransport(NULL);
+        obj->SetTransport(nullptr);
         obj->m_movementInfo.transport.Reset();
         obj->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
     }
@@ -955,12 +955,12 @@ void StaticTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(ToTransport(), plr);
-            plr->SetFallInformation(time(NULL), plr->GetPositionZ());
+            plr->SetFallInformation(time(nullptr), plr->GetPositionZ());
         }
 
         if (withAll)
         {
-            passenger->SetTransport(NULL);
+            passenger->SetTransport(nullptr);
             passenger->m_movementInfo.flags &= ~MOVEMENTFLAG_ONTRANSPORT;
             passenger->m_movementInfo.transport.guid = 0;
             passenger->m_movementInfo.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);

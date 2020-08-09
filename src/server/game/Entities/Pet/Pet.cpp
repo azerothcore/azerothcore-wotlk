@@ -28,7 +28,7 @@
 Pet::Pet(Player* owner, PetType type) : Guardian(NULL, owner ? owner->GetGUID() : 0, true),
 m_usedTalentCount(0), m_removed(false), m_owner(owner),
 m_happinessTimer(PET_LOSE_HAPPINES_INTERVAL), m_petType(type), m_duration(0),
-m_auraRaidUpdateMask(0), m_loading(false), m_petRegenTimer(PET_FOCUS_REGEN_INTERVAL), m_declinedname(NULL), m_tempspellTarget(NULL), m_tempoldTarget(NULL), m_tempspellIsPositive(false), m_tempspell(0), asynchLoadType(PET_LOAD_DEFAULT)
+m_auraRaidUpdateMask(0), m_loading(false), m_petRegenTimer(PET_FOCUS_REGEN_INTERVAL), m_declinedname(nullptr), m_tempspellTarget(nullptr), m_tempoldTarget(nullptr), m_tempspellIsPositive(false), m_tempspell(0), asynchLoadType(PET_LOAD_DEFAULT)
 {
     m_unitTypeMask |= UNIT_MASK_PET;
     if (type == HUNTER_PET)
@@ -289,7 +289,7 @@ void Pet::SavePetToDB(PetSaveMode mode, bool logout)
         stmt->setUInt32(12, curhealth);
         stmt->setUInt32(13, curmana);
         stmt->setUInt32(14, GetPower(POWER_HAPPINESS));
-        stmt->setUInt32(15, time(NULL));
+        stmt->setUInt32(15, time(nullptr));
 
         std::ostringstream ss;
         for (uint32 i = ACTION_BAR_INDEX_START; i < ACTION_BAR_INDEX_END; ++i)
@@ -373,7 +373,7 @@ void Pet::Update(uint32 diff)
     {
         case CORPSE:
         {
-            if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= time(NULL))
+            if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= time(nullptr))
             {
                 Remove(PET_SAVE_NOT_IN_SLOT);               //hunters' pets never get removed because of death, NEVER!
                 return;
@@ -1128,7 +1128,7 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
 
     if (result)
     {
-        time_t curTime = time(NULL);
+        time_t curTime = time(nullptr);
 
         PacketCooldowns cooldowns;
         WorldPacket data;
@@ -1174,7 +1174,7 @@ void Pet::_SaveSpellCooldowns(SQLTransaction& trans, bool logout)
     stmt->setUInt32(0, m_charmInfo->GetPetNumber());
     trans->Append(stmt);
 
-    time_t curTime = time(NULL);
+    time_t curTime = time(nullptr);
     uint32 checkTime = World::GetGameTimeMS() + 30*IN_MILLISECONDS;
 
     // remove oudated and save active
@@ -2215,7 +2215,7 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
             pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
             pet->SetFullHealth();
             pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
-            pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL))); // cast can't be helped in this case
+            pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped in this case
         }
 
         map->AddToMap(pet->ToCreature(), true);

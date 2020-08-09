@@ -29,8 +29,8 @@
 PathGenerator::PathGenerator(const Unit* owner) :
     _polyLength(0), _type(PATHFIND_BLANK), _useStraightPath(false),
     _forceDestination(false), _pointPathLimit(MAX_POINT_PATH_LENGTH),
-    _endPosition(G3D::Vector3::zero()), _sourceUnit(owner), _navMesh(NULL),
-    _navMeshQuery(NULL)
+    _endPosition(G3D::Vector3::zero()), _sourceUnit(owner), _navMesh(nullptr),
+    _navMeshQuery(nullptr)
 {
     memset(_pathPolyRefs, 0, sizeof(_pathPolyRefs));
 

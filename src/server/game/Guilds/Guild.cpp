@@ -193,7 +193,7 @@ void Guild::EventLogEntry::WritePacket(WorldPacket& data) const
     if (m_eventType == GUILD_EVENT_LOG_PROMOTE_PLAYER || m_eventType == GUILD_EVENT_LOG_DEMOTE_PLAYER)
         data << uint8(m_newRank);
     // Event timestamp
-    data << uint32(::time(NULL) - m_timestamp);
+    data << uint32(::time(nullptr) - m_timestamp);
 }
 
 // BankEventLogEntry
@@ -243,7 +243,7 @@ void Guild::BankEventLogEntry::WritePacket(WorldPacket& data) const
             data << uint32(m_itemOrMoney);
     }
 
-    data << uint32(time(NULL) - m_timestamp);
+    data << uint32(time(nullptr) - m_timestamp);
 }
 
 // RankInfo
@@ -708,7 +708,7 @@ void Guild::Member::WritePacket(WorldPacket& data, bool sendOfficerNote) const
          << uint32(m_zoneId);
 
     if (!m_flags)
-        data << float(float(::time(NULL) - m_logoutTime) / DAY);
+        data << float(float(::time(nullptr) - m_logoutTime) / DAY);
 
     data << m_publicNote;
 
@@ -1117,14 +1117,14 @@ Guild::Guild():
     m_createdDate(0),
     m_accountsNumber(0),
     m_bankMoney(0),
-    m_eventLog(NULL)
+    m_eventLog(nullptr)
 {
     memset(&m_bankEventLog, 0, (GUILD_BANK_MAX_TABS + 1) * sizeof(LogHolder*));
 }
 
 Guild::~Guild()
 {
-    SQLTransaction temp(NULL);
+    SQLTransaction temp(nullptr);
     _DeleteBankItems(temp);
 
     // Cleanup
@@ -2264,7 +2264,7 @@ bool Guild::AddMember(uint64 guid, uint8 rankId)
         sWorld->UpdateGlobalPlayerGuild(lowguid, m_id);
     }
 
-    SQLTransaction trans(NULL);
+    SQLTransaction trans(nullptr);
     member->SaveToDB(trans);
 
     _UpdateAccountsNumber();

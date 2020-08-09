@@ -136,7 +136,7 @@ void Bag::RemoveItem(uint8 slot, bool /*update*/)
     ASSERT(slot < MAX_BAG_SIZE);
 
     if (m_bagslot[slot])
-        m_bagslot[slot]->SetContainer(NULL);
+        m_bagslot[slot]->SetContainer(nullptr);
 
     m_bagslot[slot] = NULL;
     SetUInt64Value(CONTAINER_FIELD_SLOT_1 + (slot * 2), 0);

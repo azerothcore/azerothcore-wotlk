@@ -642,7 +642,7 @@ void AchievementMgr::LoadFromDB(PreparedQueryResult achievementResult, PreparedQ
                 continue;
             }
 
-            if (criteria->timeLimit && time_t(date + criteria->timeLimit) < time(NULL))
+            if (criteria->timeLimit && time_t(date + criteria->timeLimit) < time(nullptr))
                 continue;
 
             CriteriaProgress& progress = m_criteriaProgress[id];
@@ -701,7 +701,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8+4+8);
     data.append(GetPlayer()->GetPackGUID());
     data << uint32(achievement->ID);
-    data.AppendPackedTime(time(NULL));
+    data.AppendPackedTime(time(nullptr));
     data << uint32(0);
     GetPlayer()->SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
 }
@@ -2043,7 +2043,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     }
 
     progress->changed = true;
-    progress->date = time(NULL); // set the date to the latest update.
+    progress->date = time(nullptr); // set the date to the latest update.
 
     uint32 timeElapsed = 0;
     bool timedCompleted = false;
@@ -2163,7 +2163,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
     SendAchievementEarned(achievement);
     CompletedAchievementData& ca = m_completedAchievements[achievement->ID];
-    ca.date = time(NULL);
+    ca.date = time(nullptr);
     ca.changed = true;
 
     sScriptMgr->OnAchievementComplete(GetPlayer(), achievement);

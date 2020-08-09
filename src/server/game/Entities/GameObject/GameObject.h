@@ -720,7 +720,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         time_t GetRespawnTime() const { return m_respawnTime; }
         time_t GetRespawnTimeEx() const
         {
-            time_t now = time(NULL);
+            time_t now = time(nullptr);
             if (m_respawnTime > now)
                 return m_respawnTime;
             else
@@ -729,7 +729,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
 
         void SetRespawnTime(int32 respawn)
         {
-            m_respawnTime = respawn > 0 ? time(NULL) + respawn : 0;
+            m_respawnTime = respawn > 0 ? time(nullptr) + respawn : 0;
             m_respawnDelayTime = respawn > 0 ? respawn : 0;
         }
         void Respawn();
@@ -800,7 +800,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         bool HasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
         uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
         uint32 lootingGroupLowGUID;                         // used to find group which is looting
-        void SetLootGenerationTime() { m_lootGenerationTime = time(NULL); }
+        void SetLootGenerationTime() { m_lootGenerationTime = time(nullptr); }
         uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
 
         bool hasQuest(uint32 quest_id) const override;

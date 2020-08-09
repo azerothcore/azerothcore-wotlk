@@ -4963,7 +4963,7 @@ void Spell::TakeCastItem()
 
         // prevent crash at access to deleted m_targets.GetItemTarget
         if (m_CastItem == m_targets.GetItemTarget())
-            m_targets.SetItemTarget(NULL);
+            m_targets.SetItemTarget(nullptr);
 
         m_CastItem = NULL;
         m_castItemGUID = 0;
@@ -5222,7 +5222,7 @@ void Spell::TakeReagents()
 
         // if GetItemTarget is also spell reagent
         if (m_targets.GetItemTargetEntry() == itemid)
-            m_targets.SetItemTarget(NULL);
+            m_targets.SetItemTarget(nullptr);
 
         p_caster->DestroyItemCount(itemid, itemcount, true);
     }
@@ -5946,7 +5946,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 {
                     if (m_targets.GetGOTarget() && m_targets.GetGOTarget()->GetEntry() == 179697)
                     {
-                        if (!m_caster->ToPlayer()->CanUseBattlegroundObject(NULL))
+                        if (!m_caster->ToPlayer()->CanUseBattlegroundObject(nullptr))
                             return SPELL_FAILED_TRY_AGAIN;
                     }
                     else if (m_caster->ToPlayer()->InBattleground() && // In Battleground players can use only flags and banners, or Gurubashi chest
@@ -6051,7 +6051,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_BAD_TARGETS;
 
                 // Xinef: Implement summon pending error
-                if (target->GetSummonExpireTimer() > time(NULL))
+                if (target->GetSummonExpireTimer() > time(nullptr))
                     return SPELL_FAILED_SUMMON_PENDING;
 
                 // check if our map is dungeon
@@ -6091,7 +6091,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_BAD_TARGETS;
 
                 // Xinef: Implement summon pending error
-                if (target->GetSummonExpireTimer() > time(NULL))
+                if (target->GetSummonExpireTimer() > time(nullptr))
                     return SPELL_FAILED_SUMMON_PENDING;
 
                 break;

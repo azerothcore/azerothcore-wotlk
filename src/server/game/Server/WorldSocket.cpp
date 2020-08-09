@@ -850,7 +850,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     //! Negative mutetime indicates amount of seconds to be muted effective on next login - which is now.
     if (mutetime < 0)
     {
-        mutetime = time(NULL) + llabs(mutetime);
+        mutetime = time(nullptr) + llabs(mutetime);
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME_LOGIN);
 

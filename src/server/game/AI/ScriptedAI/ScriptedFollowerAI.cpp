@@ -26,7 +26,7 @@ FollowerAI::FollowerAI(Creature* creature) : ScriptedAI(creature),
     m_uiLeaderGUID(0),
     m_uiUpdateFollowTimer(2500),
     m_uiFollowState(STATE_FOLLOW_NONE),
-    m_pQuestForFollow(NULL)
+    m_pQuestForFollow(nullptr)
 {}
 
 void FollowerAI::AttackStart(Unit* who)
@@ -144,7 +144,7 @@ void FollowerAI::EnterEvadeMode()
     me->RemoveAllAuras();
     me->DeleteThreatList();
     me->CombatStop(true);
-    me->SetLootRecipient(NULL);
+    me->SetLootRecipient(nullptr);
 
     if (HasFollowState(STATE_FOLLOW_INPROGRESS))
     {

@@ -168,7 +168,7 @@ void CreatureGroup::RemoveMember(Creature* member)
         m_leader = NULL;
 
     m_members.erase(member);
-    member->SetFormation(NULL);
+    member->SetFormation(nullptr);
 }
 
 void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)

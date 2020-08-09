@@ -106,7 +106,7 @@ m_damageType(_damageType), m_attackType(BASE_ATTACK)
     m_block = 0;
 }
 DamageInfo::DamageInfo(CalcDamageInfo& dmgInfo)
-: m_attacker(dmgInfo.attacker), m_victim(dmgInfo.target), m_damage(dmgInfo.damage), m_spellInfo(NULL), m_schoolMask(SpellSchoolMask(dmgInfo.damageSchoolMask)),
+: m_attacker(dmgInfo.attacker), m_victim(dmgInfo.target), m_damage(dmgInfo.damage), m_spellInfo(nullptr), m_schoolMask(SpellSchoolMask(dmgInfo.damageSchoolMask)),
 m_damageType(DIRECT_DAMAGE), m_attackType(dmgInfo.attackType)
 {
     m_absorb = 0;
@@ -153,9 +153,9 @@ _hitMask(hitMask), _damageInfo(damageInfo), _healInfo(healInfo), _triggeredByAur
 #pragma warning(disable:4355)
 #endif
 Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
-m_movedByPlayer(NULL), m_lastSanctuaryTime(0), IsAIEnabled(false), NeedChangeAI(false),
-m_ControlledByPlayer(false), m_CreatedByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(NULL), i_disabledAI(NULL), m_realRace(0), m_race(0), m_AutoRepeatFirstCast(false), m_procDeep(0), m_removedAurasCount(0),
-i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_ThreatManager(this), m_vehicle(NULL), m_vehicleKit(NULL), m_unitTypeMask(UNIT_MASK_NONE), m_HostileRefManager(this)
+m_movedByPlayer(nullptr), m_lastSanctuaryTime(0), IsAIEnabled(false), NeedChangeAI(false),
+m_ControlledByPlayer(false), m_CreatedByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(nullptr), i_disabledAI(nullptr), m_realRace(0), m_race(0), m_AutoRepeatFirstCast(false), m_procDeep(0), m_removedAurasCount(0),
+i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_ThreatManager(this), m_vehicle(nullptr), m_vehicleKit(nullptr), m_unitTypeMask(UNIT_MASK_NONE), m_HostileRefManager(this)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -5139,7 +5139,7 @@ uint32 Unit::GetDiseasesByCaster(uint64 casterGUID, uint8 mode)
                 {
                     Aura* aura = (*i)->GetBase();
                     if (aura && !aura->IsRemoved() && aura->GetDuration() > 0)
-                        if ((aura->GetApplyTime() + aura->GetMaxDuration()/1000 + 8) > (time(NULL) + aura->GetDuration()/1000))
+                        if ((aura->GetApplyTime() + aura->GetMaxDuration()/1000 + 8) > (time(nullptr) + aura->GetDuration()/1000))
                             aura->SetDuration(aura->GetDuration()+3000);
                 }
             }
@@ -6821,7 +6821,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         if (AuraEffect* aurEff = victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_ROGUE, 0x100000, 0, 0, GetGUID()))
                             if (Aura* aur = aurEff->GetBase())
                                 if (!aur->IsRemoved() && aur->GetDuration() > 0)
-                                    if ((aur->GetApplyTime() + aur->GetMaxDuration()/1000 + 5) > (time(NULL) + aur->GetDuration()/1000) )
+                                    if ((aur->GetApplyTime() + aur->GetMaxDuration()/1000 + 5) > (time(nullptr) + aur->GetDuration()/1000) )
                                     {
                                         aur->SetDuration(aur->GetDuration()+2000);
                                         return true;
@@ -14437,7 +14437,7 @@ void Unit::CleanupsBeforeDelete(bool finalCleanup)
     if (GetTransport())
     {
         GetTransport()->RemovePassenger(this);
-        SetTransport(NULL);
+        SetTransport(nullptr);
         m_movementInfo.transport.Reset();
         m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
     }
@@ -16364,7 +16364,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
     {
         isRewardAllowed = creature->IsDamageEnoughForLootingAndReward();
         if (!isRewardAllowed)
-            creature->SetLootRecipient(NULL);
+            creature->SetLootRecipient(nullptr);
     }
 
     // pussywizard: remade this if section (player is on the same map
@@ -17134,7 +17134,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
                             GetCharmInfo()->SetPetNumber(sObjectMgr->GeneratePetNumber(), true);
 
                         // if charmed two demons the same session, the 2nd gets the 1st one's name
-                        SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL))); // cast can't be helped
+                        SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped
                     }
                 }
                 GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
@@ -18359,7 +18359,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     AddUnitState(UNIT_STATE_MOVE);
 
     if (player)
-        player->SetFallInformation(time(NULL), GetPositionZ());
+        player->SetFallInformation(time(nullptr), GetPositionZ());
     else if (HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
     {
         WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);

@@ -284,9 +284,9 @@ class LootValidatorRefManager : public RefManager<Loot, LootValidatorRef>
         LootValidatorRef* getLast() { return (LootValidatorRef*)RefManager<Loot, LootValidatorRef>::getLast(); }
 
         iterator begin() { return iterator(getFirst()); }
-        iterator end() { return iterator(NULL); }
+        iterator end() { return iterator(nullptr); }
         iterator rbegin() { return iterator(getLast()); }
-        iterator rend() { return iterator(NULL); }
+        iterator rend() { return iterator(nullptr); }
 };
 
 //=====================================================

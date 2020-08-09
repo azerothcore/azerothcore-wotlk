@@ -257,7 +257,7 @@ struct PlayerClassLevelInfo
 
 struct PlayerClassInfo
 {
-    PlayerClassInfo() : levelInfo(NULL) { }
+    PlayerClassInfo() : levelInfo(nullptr) { }
 
     PlayerClassLevelInfo* levelInfo;                        //[level-1] 0..MaxPlayerLevel-1
 };
@@ -286,7 +286,7 @@ typedef std::list<PlayerCreateInfoAction> PlayerCreateInfoActions;
 struct PlayerInfo
 {
                                                             // existence checked by displayId != 0
-    PlayerInfo() : mapId(0), areaId(0), positionX(0.0f), positionY(0.0f), positionZ(0.0f), orientation(0.0f), displayId_m(0), displayId_f(0), levelInfo(NULL) { }
+    PlayerInfo() : mapId(0), areaId(0), positionX(0.0f), positionY(0.0f), positionZ(0.0f), orientation(0.0f), displayId_m(0), displayId_f(0), levelInfo(nullptr) { }
 
     uint32 mapId;
     uint32 areaId;
@@ -316,7 +316,7 @@ struct PvPInfo
 
 struct DuelInfo
 {
-    DuelInfo() : initiator(NULL), opponent(NULL), startTimer(0), startTime(0), outOfBound(0), isMounted(false) {}
+    DuelInfo() : initiator(nullptr), opponent(nullptr), startTimer(0), startTime(0), outOfBound(0), isMounted(false) {}
 
     Player* initiator;
     Player* opponent;
@@ -380,7 +380,7 @@ struct Runes
 
 struct EnchantDuration
 {
-    EnchantDuration() : item(NULL), slot(MAX_ENCHANTMENT_SLOT), leftduration(0) {};
+    EnchantDuration() : item(nullptr), slot(MAX_ENCHANTMENT_SLOT), leftduration(0) {};
     EnchantDuration(Item* _item, EnchantmentSlot _slot, uint32 _leftduration) : item(_item), slot(_slot),
         leftduration(_leftduration){ ASSERT(item); };
 
@@ -1161,14 +1161,14 @@ class Player : public Unit, public GridObject<Player>
 
         void SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay = 0, bool asSpectator = false)
         {
-            m_summon_expire = time(NULL) + (delay ? delay : MAX_PLAYER_SUMMON_DELAY);
+            m_summon_expire = time(nullptr) + (delay ? delay : MAX_PLAYER_SUMMON_DELAY);
             m_summon_mapid = mapid;
             m_summon_x = x;
             m_summon_y = y;
             m_summon_z = z;
             m_summon_asSpectator = asSpectator;
         }
-        bool IsSummonAsSpectator() const { return m_summon_asSpectator && m_summon_expire >= time(NULL); }
+        bool IsSummonAsSpectator() const { return m_summon_asSpectator && m_summon_expire >= time(nullptr); }
         void SetSummonAsSpectator(bool on) { m_summon_asSpectator = on; }
         void SummonIfPossible(bool agree, uint32 summoner_guid);
         time_t GetSummonExpireTimer() const { return m_summon_expire; }

@@ -53,8 +53,8 @@ Loot* Roll::getLoot()
 
 Group::Group() : m_leaderGuid(0), m_leaderName(""), m_groupType(GROUPTYPE_NORMAL),
 m_dungeonDifficulty(DUNGEON_DIFFICULTY_NORMAL), m_raidDifficulty(RAID_DIFFICULTY_10MAN_NORMAL),
- m_bfGroup(NULL), m_bgGroup(NULL), m_lootMethod(FREE_FOR_ALL), m_lootThreshold(ITEM_QUALITY_UNCOMMON), m_looterGuid(0),
-m_masterLooterGuid(0), m_subGroupsCounts(NULL), m_guid(0), m_counter(0), m_maxEnchantingLevel(0), _difficultyChangePreventionTime(0),
+ m_bfGroup(nullptr), m_bgGroup(nullptr), m_lootMethod(FREE_FOR_ALL), m_lootThreshold(ITEM_QUALITY_UNCOMMON), m_looterGuid(0),
+m_masterLooterGuid(0), m_subGroupsCounts(nullptr), m_guid(0), m_counter(0), m_maxEnchantingLevel(0), _difficultyChangePreventionTime(0),
 _difficultyChangePreventionType(DIFFICULTY_PREVENTION_CHANGE_NONE)
 {
     for (uint8 i = 0; i < TARGETICONCOUNT; ++i)
@@ -314,7 +314,7 @@ void Group::RemoveInvite(Player* player)
     {
         if (!m_invitees.empty())
             m_invitees.erase(player);
-        player->SetGroupInvite(NULL);
+        player->SetGroupInvite(nullptr);
     }
 }
 
@@ -322,7 +322,7 @@ void Group::RemoveAllInvites()
 {
     for (InvitesList::iterator itr=m_invitees.begin(); itr != m_invitees.end(); ++itr)
         if (*itr)
-            (*itr)->SetGroupInvite(NULL);
+            (*itr)->SetGroupInvite(nullptr);
 
     m_invitees.clear();
 }
@@ -382,7 +382,7 @@ bool Group::AddMember(Player* player)
 
     SubGroupCounterIncrease(subGroup);
 
-    player->SetGroupInvite(NULL);
+    player->SetGroupInvite(nullptr);
     if (player->GetGroup())
     {
         if (isBGGroup() || isBFGroup()) // if player is in group and he is being added to BG raid group, then call SetBattlegroundRaid()
@@ -522,9 +522,9 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
             // Regular group
             {
                 if (player->GetOriginalGroup() == this)
-                    player->SetOriginalGroup(NULL);
+                    player->SetOriginalGroup(nullptr);
                 else
-                    player->SetGroup(NULL);
+                    player->SetGroup(nullptr);
 
                 // quest related GO state dependent from raid membership
                 player->UpdateForQuestWorldObjects();
@@ -727,9 +727,9 @@ void Group::Disband(bool hideDestroy /* = false */)
         {
             //we can remove player who is in battleground from his original group
             if (player->GetOriginalGroup() == this)
-                player->SetOriginalGroup(NULL);
+                player->SetOriginalGroup(nullptr);
             else
-                player->SetGroup(NULL);
+                player->SetGroup(nullptr);
         }
 
         // quest related GO state dependent from raid membership

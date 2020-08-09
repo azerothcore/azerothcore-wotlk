@@ -119,7 +119,7 @@ void ArenaTeamMgr::LoadArenaTeams()
 
         if (!newArenaTeam->LoadArenaTeamFromDB(result) || !newArenaTeam->LoadMembersFromDB(result2))
         {
-            newArenaTeam->Disband(NULL);
+            newArenaTeam->Disband(nullptr);
             delete newArenaTeam;
             continue;
         }

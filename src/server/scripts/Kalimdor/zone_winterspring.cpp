@@ -323,7 +323,7 @@ public:
     // The array MUST be terminated by {0, 0, 0}
     DialogueHelper(DialogueEntry const* dialogueArray) :
       _dialogueArray(dialogueArray),
-          _currentEntry(NULL),
+          _currentEntry(nullptr),
           _actionTimer(0)
       { }
       // The array MUST be terminated by {0, 0, 0, 0, 0}

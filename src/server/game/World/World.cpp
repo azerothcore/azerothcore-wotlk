@@ -100,7 +100,7 @@ World::World()
     m_allowMovement = true;
     m_ShutdownMask = 0;
     m_ShutdownTimer = 0;
-    m_gameTime = time(NULL);
+    m_gameTime = time(nullptr);
     m_gameMSTime = getMSTime();
     m_startTime = m_gameTime;
     m_maxActiveSessionCount = 0;
@@ -267,7 +267,7 @@ void World::AddSession_(WorldSession* s)
         WorldSession* oldSession = old->second;
 
         if (!RemoveQueuedPlayer(oldSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-            m_disconnects[s->GetAccountId()] = time(NULL);
+            m_disconnects[s->GetAccountId()] = time(nullptr);
 
         // pussywizard:
         if (oldSession->HandleSocketClosed())
@@ -281,7 +281,7 @@ void World::AddSession_(WorldSession* s)
                 tmp->SetShouldSetOfflineInDB(false);
                 delete tmp;
             }
-            oldSession->SetOfflineTime(time(NULL));
+            oldSession->SetOfflineTime(time(nullptr));
             m_offlineSessions[oldSession->GetAccountId()] = oldSession;
         }
         else
@@ -323,7 +323,7 @@ bool World::HasRecentlyDisconnected(WorldSession* session)
     {
         for (DisconnectMap::iterator i = m_disconnects.begin(); i != m_disconnects.end();)
         {
-            if ((time(NULL) - i->second) < tolerance)
+            if ((time(nullptr) - i->second) < tolerance)
             {
                 if (i->first == session->GetAccountId())
                     return true;
@@ -1391,7 +1391,7 @@ void World::SetInitialWorldSettings()
     uint32 startupBegin = getMSTime();
 
     ///- Initialize the random number generator
-    srand((unsigned int)time(NULL));
+    srand((unsigned int)time(nullptr));
 
     ///- Initialize detour memory management
     dtAllocSetCustom(dtCustomAlloc, dtCustomFree);
@@ -1896,7 +1896,7 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize game time and timers
     sLog->outString("Initialize game time and timers");
-    m_gameTime = time(NULL);
+    m_gameTime = time(nullptr);
     m_startTime = m_gameTime;
 
     LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES(%u, %u, 0, '%s')",
@@ -1921,7 +1921,7 @@ void World::SetInitialWorldSettings()
     // our speed up
     m_timers[WUPDATE_5_SECS].SetInterval(5*IN_MILLISECONDS);
 
-    mail_expire_check_timer = time(NULL) + 6*3600;
+    mail_expire_check_timer = time(nullptr) + 6*3600;
 
     ///- Initilize static helper structures
     AIRegistry::Initialize();
@@ -2531,7 +2531,7 @@ void World::KickAllLess(AccountTypes sec)
 void World::_UpdateGameTime()
 {
     ///- update the time
-    time_t thisTime = time(NULL);
+    time_t thisTime = time(nullptr);
     uint32 elapsed = uint32(thisTime - m_gameTime);
     m_gameTime = thisTime;
     m_gameMSTime = getMSTime();
@@ -2667,7 +2667,7 @@ void World::UpdateSessions(uint32 diff)
         if (pSession->HandleSocketClosed())
         {
             if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-                m_disconnects[pSession->GetAccountId()] = time(NULL);
+                m_disconnects[pSession->GetAccountId()] = time(nullptr);
             m_sessions.erase(itr);
             // there should be no offline session if current one is logged onto a character
             SessionMap::iterator iter;
@@ -2678,7 +2678,7 @@ void World::UpdateSessions(uint32 diff)
                 tmp->SetShouldSetOfflineInDB(false);
                 delete tmp;
             }
-            pSession->SetOfflineTime(time(NULL));
+            pSession->SetOfflineTime(time(nullptr));
             m_offlineSessions[pSession->GetAccountId()] = pSession;
             continue;
         }
@@ -2686,7 +2686,7 @@ void World::UpdateSessions(uint32 diff)
         if (!pSession->Update(diff, updater))
         {
             if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-                m_disconnects[pSession->GetAccountId()] = time(NULL);
+                m_disconnects[pSession->GetAccountId()] = time(nullptr);
             m_sessions.erase(itr);
             if (m_offlineSessions.find(pSession->GetAccountId()) != m_offlineSessions.end()) // pussywizard: don't set offline in db because offline session for that acc is present (character is in world)
                 pSession->SetShouldSetOfflineInDB(false);
@@ -2697,7 +2697,7 @@ void World::UpdateSessions(uint32 diff)
     // pussywizard:
     if (m_offlineSessions.empty())
         return;
-    uint32 currTime = time(NULL);
+    uint32 currTime = time(nullptr);
     for (SessionMap::iterator itr = m_offlineSessions.begin(), next; itr != m_offlineSessions.end(); itr = next)
     {
         next = itr;
@@ -2835,7 +2835,7 @@ time_t World::GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour)
 {
     if (hour < 0 || hour > 23)
         hour = 0;
-    time_t curr = time(NULL);
+    time_t curr = time(nullptr);
     tm localTm;
     ACE_OS::localtime_r(&curr, &localTm);
     localTm.tm_hour = hour;
@@ -2856,7 +2856,7 @@ time_t World::GetNextTimeWithMonthAndHour(int8 month, int8 hour)
 {
     if (hour < 0 || hour > 23)
         hour = 0;
-    time_t curr = time(NULL);
+    time_t curr = time(nullptr);
     tm localTm;
     ACE_OS::localtime_r(&curr, &localTm);
     localTm.tm_mday = 1;

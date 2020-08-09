@@ -119,7 +119,7 @@ public:
     void SetMessage(std::string const& message)
     {
         _message = message;
-        _lastModifiedTime = uint64(time(NULL));
+        _lastModifiedTime = uint64(time(nullptr));
     }
     void SetComment(std::string const& comment) { _comment = comment; }
     void SetViewed() { _viewed = true; }
@@ -218,7 +218,7 @@ public:
     void SetStatus(bool status) { _status = status; }
 
     uint64 GetLastChange() const { return _lastChange; }
-    void UpdateLastChange() { _lastChange = uint64(time(NULL)); }
+    void UpdateLastChange() { _lastChange = uint64(time(nullptr)); }
 
     uint32 GenerateTicketId() { return ++_lastTicketId; }
     uint32 GetOpenTicketCount() const { return _openTicketCount; }

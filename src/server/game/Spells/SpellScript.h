@@ -49,7 +49,7 @@ class _SpellScript
         virtual bool _Validate(SpellInfo const* entry);
 
     public:
-        _SpellScript() : m_currentScriptState(SPELL_SCRIPT_STATE_NONE), m_scriptName(NULL), m_scriptSpellId(0) {}
+        _SpellScript() : m_currentScriptState(SPELL_SCRIPT_STATE_NONE), m_scriptName(nullptr), m_scriptSpellId(0) {}
         virtual ~_SpellScript() {}
         virtual void _Register();
         virtual void _Unload();
@@ -619,7 +619,7 @@ class AuraScript : public _SpellScript
         #define PrepareAuraScript(CLASSNAME) AURASCRIPT_FUNCTION_TYPE_DEFINES(CLASSNAME) AURASCRIPT_FUNCTION_CAST_DEFINES(CLASSNAME)
 
     public:
-        AuraScript() : _SpellScript(), m_aura(NULL), m_auraApplication(NULL), m_defaultActionPrevented(false)
+        AuraScript() : _SpellScript(), m_aura(nullptr), m_auraApplication(nullptr), m_defaultActionPrevented(false)
         {}
         bool _Validate(SpellInfo const* entry);
         bool _Load(Aura* aura);

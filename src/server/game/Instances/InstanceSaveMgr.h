@@ -30,7 +30,7 @@ struct InstancePlayerBind
     InstanceSave* save;
     bool perm : 1;
     bool extended : 1;
-    InstancePlayerBind() : save(NULL), perm(false), extended(false) {}
+    InstancePlayerBind() : save(nullptr), perm(false), extended(false) {}
 };
 
 typedef std::unordered_map< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;

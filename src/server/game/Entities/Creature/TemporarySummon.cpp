@@ -406,7 +406,7 @@ void Puppet::RemoveFromWorld()
     if (!IsInWorld())
         return;
 
-    RemoveCharmedBy(NULL);
+    RemoveCharmedBy(nullptr);
     Minion::RemoveFromWorld();
 }
 

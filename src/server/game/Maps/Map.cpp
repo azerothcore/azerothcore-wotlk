@@ -2536,7 +2536,7 @@ template void Map::RemoveFromMap(DynamicObject*, bool);
 InstanceMap::InstanceMap(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent)
   : Map(id, InstanceId, SpawnMode, _parent),
     m_resetAfterUnload(false), m_unloadWhenEmpty(false),
-    instance_script(NULL), i_script_id(0)
+    instance_script(nullptr), i_script_id(0)
 {
     //lets initialize visibility distance for dungeons
     InstanceMap::InitVisibilityDistance();
@@ -2706,7 +2706,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
         // increase current instances (hourly limit)
         // xinef: specific instances are still limited
         if (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance())
-            player->AddInstanceEnterTime(GetInstanceId(), time(NULL));
+            player->AddInstanceEnterTime(GetInstanceId(), time(nullptr));
 
         if (!playerBind->perm && !mapSave->CanReset() && (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance()))
         {
@@ -2921,7 +2921,7 @@ uint32 InstanceMap::GetMaxResetDelay() const
 /* ******* Battleground Instance Maps ******* */
 
 BattlegroundMap::BattlegroundMap(uint32 id, uint32 InstanceId, Map* _parent, uint8 spawnMode)
-  : Map(id, InstanceId, spawnMode, _parent), m_bg(NULL)
+  : Map(id, InstanceId, spawnMode, _parent), m_bg(nullptr)
 {
     //lets initialize visibility distance for BG/Arenas
     BattlegroundMap::InitVisibilityDistance();
@@ -2932,7 +2932,7 @@ BattlegroundMap::~BattlegroundMap()
     if (m_bg)
     {
         //unlink to prevent crash, always unlink all pointer reference before destruction
-        m_bg->SetBgMap(NULL);
+        m_bg->SetBgMap(nullptr);
         m_bg = NULL;
     }
 }
@@ -3052,7 +3052,7 @@ void Map::SaveCreatureRespawnTime(uint32 dbGuid, time_t& respawnTime)
         return;
     }
 
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     if (GetInstanceResetPeriod() > 0 && respawnTime-now+5 >= GetInstanceResetPeriod())
         respawnTime = now+YEAR;
 
@@ -3086,7 +3086,7 @@ void Map::SaveGORespawnTime(uint32 dbGuid, time_t& respawnTime)
         return;
     }
 
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     if (GetInstanceResetPeriod() > 0 && respawnTime-now+5 >= GetInstanceResetPeriod())
         respawnTime = now+YEAR;
 

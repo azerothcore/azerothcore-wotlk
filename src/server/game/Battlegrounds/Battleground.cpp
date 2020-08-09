@@ -216,7 +216,7 @@ Battleground::~Battleground()
     {
         m_Map->SetUnload();
         //unlink to prevent crash, always unlink all pointer reference before destruction
-        m_Map->SetBG(NULL);
+        m_Map->SetBG(nullptr);
         m_Map = NULL;
     }
 
@@ -1956,7 +1956,7 @@ void Battleground::SetBgRaid(TeamId teamId, Group* bg_raid)
 {
     Group*& old_raid = m_BgRaids[teamId];
     if (old_raid)
-        old_raid->SetBattlegroundGroup(NULL);
+        old_raid->SetBattlegroundGroup(nullptr);
     if (bg_raid)
         bg_raid->SetBattlegroundGroup(this);
     old_raid = bg_raid;

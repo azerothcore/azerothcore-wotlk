@@ -30,7 +30,7 @@
 #endif
 
 GameObject::GameObject() : WorldObject(false), MovableMapObject(),
-    m_model(NULL), m_goValue(), m_AI(NULL)
+    m_model(nullptr), m_goValue(), m_AI(nullptr)
 {
     m_objectType |= TYPEMASK_GAMEOBJECT;
     m_objectTypeId = TYPEID_GAMEOBJECT;
@@ -95,7 +95,7 @@ void GameObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
     if (GetTransport() && !ToTransport())
     {
         GetTransport()->RemovePassenger(this);
-        SetTransport(NULL);
+        SetTransport(nullptr);
         m_movementInfo.transport.Reset();
         m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
     }
@@ -390,7 +390,7 @@ void GameObject::Update(uint32 diff)
                 case GAMEOBJECT_TYPE_FISHINGNODE:
                 {
                     // fishing code (bobber ready)
-                    if (time(NULL) > m_respawnTime - FISHING_BOBBER_READY_TIME)
+                    if (time(nullptr) > m_respawnTime - FISHING_BOBBER_READY_TIME)
                     {
                         // splash bobber (bobber ready now)
                         Unit* caster = GetOwner();
@@ -488,7 +488,7 @@ void GameObject::Update(uint32 diff)
         {
             if (m_respawnTime > 0)                          // timer on
             {
-                time_t now = time(NULL);
+                time_t now = time(nullptr);
                 if (m_respawnTime <= now)            // timer expired
                 {
                     uint64 dbtableHighGuid = MAKE_NEW_GUID(m_DBTableGuid, GetEntry(), HIGHGUID_GAMEOBJECT);
@@ -732,7 +732,7 @@ void GameObject::Update(uint32 diff)
                 return;
             }
 
-            m_respawnTime = time(NULL) + m_respawnDelayTime;
+            m_respawnTime = time(nullptr) + m_respawnDelayTime;
 
             // if option not set then object will be saved at grid unload
             if (GetMap()->IsDungeon())
@@ -945,7 +945,7 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
             m_respawnTime = GetMap()->GetGORespawnTime(m_DBTableGuid);
 
             // ready to respawn
-            if (m_respawnTime && m_respawnTime <= time(NULL))
+            if (m_respawnTime && m_respawnTime <= time(nullptr))
             {
                 m_respawnTime = 0;
                 GetMap()->RemoveGORespawnTime(m_DBTableGuid);
@@ -1029,7 +1029,7 @@ Unit* GameObject::GetOwner() const
 
 void GameObject::SaveRespawnTime()
 { 
-    if (m_goData && m_goData->dbData && m_respawnTime > time(NULL) && m_spawnedByDefault)
+    if (m_goData && m_goData->dbData && m_respawnTime > time(nullptr) && m_spawnedByDefault)
         GetMap()->SaveGORespawnTime(m_DBTableGuid, m_respawnTime);
 }
 
@@ -1088,7 +1088,7 @@ void GameObject::Respawn()
 { 
     if (m_spawnedByDefault && m_respawnTime > 0)
     {
-        m_respawnTime = time(NULL);
+        m_respawnTime = time(nullptr);
         GetMap()->RemoveGORespawnTime(m_DBTableGuid);
     }
 }
