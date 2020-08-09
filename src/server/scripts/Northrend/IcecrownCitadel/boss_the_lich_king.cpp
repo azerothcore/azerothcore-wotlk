@@ -2365,7 +2365,7 @@ class npc_raging_spirit : public CreatureScript
                                     if (Player* plr = ScriptedAI::SelectTargetFromPlayerList(100.0f, 0, true))
                                         AttackStart(plr);
                             }
-                            DoZoneInCombat(NULL, 150.0f);
+                            DoZoneInCombat(nullptr, 150.0f);
                         }
                         break;
                     case EVENT_SOUL_SHRIEK:

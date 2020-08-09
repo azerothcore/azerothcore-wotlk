@@ -935,7 +935,7 @@ public:
             _checkTimer += diff;
             if (_checkTimer >= 500 && !_isSummoning)
             {
-                Unit* who = me->SelectNearbyTarget(NULL, 6.0f);
+                Unit* who = me->SelectNearbyTarget(nullptr, 6.0f);
                 if (who && who->GetTypeId() == TYPEID_PLAYER && !me->HasAura(SPELL_SUMMON_GUARDIAN_OF_YS) && !who->HasAura(SPELL_HODIR_FLASH_FREEZE))
                 {
                     _isSummoning = true;

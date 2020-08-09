@@ -108,7 +108,7 @@ class go_witherbark_totem_bundle : public GameObjectScript
                     _timer += diff;
                     if (_timer > 5000)
                     {
-                        go->CastSpell(NULL, 9056);
+                        go->CastSpell(nullptr, 9056);
                         go->DestroyForNearbyPlayers();
                         _timer = 0;
                     }

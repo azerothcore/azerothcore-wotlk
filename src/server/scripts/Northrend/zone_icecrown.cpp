@@ -374,7 +374,7 @@ public:
             if (attackTimer >= 1500)
             {
                 if (!me->IsInCombat())
-                    if (Unit* target = me->SelectNearbyTarget(NULL, 20.0f))
+                    if (Unit* target = me->SelectNearbyTarget(nullptr, 20.0f))
                         AttackStart(target);
                 attackTimer = 0;
             }

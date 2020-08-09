@@ -1105,7 +1105,7 @@ class boss_sister_svalna : public CreatureScript
                 me->SetDisableGravity(false);
                 me->SetHover(false);
                 me->SetReactState(REACT_AGGRESSIVE);
-                DoZoneInCombat(NULL, 150.0f);
+                DoZoneInCombat(nullptr, 150.0f);
             }
 
             void SpellHitTarget(Unit* target, SpellInfo const* spell)

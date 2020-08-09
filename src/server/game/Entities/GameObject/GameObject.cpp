@@ -571,7 +571,7 @@ void GameObject::Update(uint32 diff)
                     if (goInfo->trap.type == 2)
                     {
                         if (goInfo->trap.spellId)
-                            CastSpell(NULL, goInfo->trap.spellId);  // FIXME: null target won't work for target type 1
+                            CastSpell(nullptr, goInfo->trap.spellId);  // FIXME: null target won't work for target type 1
                         SetLootState(GO_JUST_DEACTIVATED);
                         break;
                     }

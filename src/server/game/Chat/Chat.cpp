@@ -553,7 +553,7 @@ bool ChatHandler::ShowHelpForCommand(std::vector<ChatCommand> const& table, cons
                 continue;
 
             // have subcommand
-            char const* subcmd = (*cmd) ? strtok(NULL, " ") : "";
+            char const* subcmd = (*cmd) ? strtok(nullptr, " ") : "";
 
             if (!table[i].ChildCommands.empty() && subcmd && *subcmd)
             {
@@ -792,26 +792,26 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* linkType, char** s
     if (!check)
         return nullptr;                                        // end of data
 
-    char* cLinkType = strtok(NULL, ":");                    // linktype
+    char* cLinkType = strtok(nullptr, ":");                    // linktype
     if (!cLinkType)
         return nullptr;                                        // end of data
 
     if (strcmp(cLinkType, linkType) != 0)
     {
-        strtok(NULL, " ");                                  // skip link tail (to allow continue strtok(NULL, s) use after retturn from function
+        strtok(nullptr, " ");                                  // skip link tail (to allow continue strtok(nullptr, s) use after retturn from function
         SendSysMessage(LANG_WRONG_LINK_TYPE);
         return nullptr;
     }
 
-    char* cKeys = strtok(NULL, "|");                        // extract keys and values
-    char* cKeysTail = strtok(NULL, "");
+    char* cKeys = strtok(nullptr, "|");                        // extract keys and values
+    char* cKeysTail = strtok(nullptr, "");
 
     char* cKey = strtok(cKeys, ":|");                       // extract key
     if (something1)
-        *something1 = strtok(NULL, ":|");                   // extract something
+        *something1 = strtok(nullptr, ":|");                   // extract something
 
     strtok(cKeysTail, "]");                                 // restart scan tail and skip name with possible spaces
-    strtok(NULL, " ");                                      // skip link tail (to allow continue strtok(NULL, s) use after return from function
+    strtok(nullptr, " ");                                      // skip link tail (to allow continue strtok(nullptr, s) use after return from function
     return cKey;
 }
 
@@ -846,7 +846,7 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
         if (!check)
             return nullptr;                                    // end of data
 
-        tail = strtok(NULL, "");                            // tail
+        tail = strtok(nullptr, "");                            // tail
     }
     else
         tail = text+1;                                      // skip first |
@@ -859,22 +859,22 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
     {
         if (strcmp(cLinkType, linkTypes[i]) == 0)
         {
-            char* cKeys = strtok(NULL, "|");                // extract keys and values
-            char* cKeysTail = strtok(NULL, "");
+            char* cKeys = strtok(nullptr, "|");                // extract keys and values
+            char* cKeysTail = strtok(nullptr, "");
 
             char* cKey = strtok(cKeys, ":|");               // extract key
             if (something1)
-                *something1 = strtok(NULL, ":|");           // extract something
+                *something1 = strtok(nullptr, ":|");           // extract something
 
             strtok(cKeysTail, "]");                         // restart scan tail and skip name with possible spaces
-            strtok(NULL, " ");                              // skip link tail (to allow continue strtok(NULL, s) use after return from function
+            strtok(nullptr, " ");                              // skip link tail (to allow continue strtok(nullptr, s) use after return from function
             if (found_idx)
                 *found_idx = i;
             return cKey;
         }
     }
 
-    strtok(NULL, " ");                                      // skip link tail (to allow continue strtok(NULL, s) use after return from function
+    strtok(nullptr, " ");                                      // skip link tail (to allow continue strtok(nullptr, s) use after return from function
     SendSysMessage(LANG_WRONG_LINK_TYPE);
     return nullptr;
 }
@@ -1141,7 +1141,7 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, uint64* playe
 void ChatHandler::extractOptFirstArg(char* args, char** arg1, char** arg2)
 {
     char* p1 = strtok(args, " ");
-    char* p2 = strtok(NULL, " ");
+    char* p2 = strtok(nullptr, " ");
 
     if (!p2)
     {

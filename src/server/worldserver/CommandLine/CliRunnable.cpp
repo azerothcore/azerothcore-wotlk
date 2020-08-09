@@ -180,7 +180,7 @@ void CliRunnable::run()
             }
 
             fflush(stdout);
-            sWorld->QueueCliCommand(new CliCommandHolder(NULL, command.c_str(), &utf8print, &commandFinished));
+            sWorld->QueueCliCommand(new CliCommandHolder(nullptr, command.c_str(), &utf8print, &commandFinished));
 #if AC_PLATFORM != AC_PLATFORM_WINDOWS
             add_history(command.c_str());
             free(command_str);

@@ -229,7 +229,7 @@ _transportsUpdateIter(_transports.end()), i_scriptLock(false), _defaultLight(Get
         {
             //z code
             GridMaps[idx][j] =NULL;
-            setNGrid(NULL, idx, j);
+            setNGrid(nullptr, idx, j);
         }
     }
 
@@ -1184,7 +1184,7 @@ bool Map::UnloadGrid(NGridType& ngrid)
     ASSERT(i_objectsToRemove.empty());
 
     delete &ngrid;
-    setNGrid(NULL, x, y);
+    setNGrid(nullptr, x, y);
 
     int gx = (MAX_NUMBER_OF_GRIDS - 1) - x;
     int gy = (MAX_NUMBER_OF_GRIDS - 1) - y;

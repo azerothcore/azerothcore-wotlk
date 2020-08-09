@@ -1422,7 +1422,7 @@ void Battleground::UpdatePlayerScore(Player* player, uint32 type, uint32 value, 
             {
                 // reward honor instantly
                 if (doAddHonor)
-                    player->RewardHonor(NULL, 1, value);    // RewardHonor calls UpdatePlayerScore with doAddHonor = false
+                    player->RewardHonor(nullptr, 1, value);    // RewardHonor calls UpdatePlayerScore with doAddHonor = false
                 else
                     itr->second->BonusHonor += value;
             }

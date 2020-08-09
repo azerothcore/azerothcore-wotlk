@@ -515,7 +515,7 @@ int WorldSocket::handle_input_payload(void)
 
     const int ret = ProcessIncoming (m_RecvWPct);
 
-    m_RecvPct.base (NULL, 0);
+    m_RecvPct.base (nullptr, 0);
     m_RecvPct.reset();
     m_RecvWPct = nullptr;
 

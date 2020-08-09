@@ -3221,7 +3221,7 @@ void Spell::DoAllEffectOnTarget(GOTargetInfo* target)
 
     for (uint32 effectNumber = 0; effectNumber < MAX_SPELL_EFFECTS; ++effectNumber)
         if (effectMask & (1 << effectNumber))
-            HandleEffects(NULL, NULL, go, effectNumber, SPELL_EFFECT_HANDLE_HIT_TARGET);
+            HandleEffects(nullptr, NULL, go, effectNumber, SPELL_EFFECT_HANDLE_HIT_TARGET);
 
     // xinef: inform ai about spellhit
     go->AI()->SpellHit(m_caster, m_spellInfo);
@@ -3242,7 +3242,7 @@ void Spell::DoAllEffectOnTarget(ItemTargetInfo* target)
 
     for (uint32 effectNumber = 0; effectNumber < MAX_SPELL_EFFECTS; ++effectNumber)
         if (effectMask & (1 << effectNumber))
-            HandleEffects(NULL, target->item, NULL, effectNumber, SPELL_EFFECT_HANDLE_HIT_TARGET);
+            HandleEffects(nullptr, target->item, NULL, effectNumber, SPELL_EFFECT_HANDLE_HIT_TARGET);
 
     CallScriptOnHitHandlers();
 
@@ -3271,7 +3271,7 @@ bool Spell::UpdateChanneledTargetList()
             for(int i = EFFECT_0; i <= EFFECT_2; ++i)
                 if (channelAuraMask & (1<<i) && m_spellInfo->Effects[i].RadiusEntry)
                 {
-                    range = m_spellInfo->Effects[i].CalcRadius(NULL, nullptr);
+                    range = m_spellInfo->Effects[i].CalcRadius(nullptr, nullptr);
                     break;
                 }
 
@@ -4013,7 +4013,7 @@ void Spell::_handle_immediate_phase()
             continue;
 
         // call effect handlers to handle destination hit
-        HandleEffects(NULL, NULL, NULL, j, SPELL_EFFECT_HANDLE_HIT);
+        HandleEffects(nullptr, NULL, NULL, j, SPELL_EFFECT_HANDLE_HIT);
     }
 
     // process items
@@ -7700,7 +7700,7 @@ void Spell::HandleLaunchPhase()
         if (!m_spellInfo->Effects[i].IsEffect())
             continue;
 
-        HandleEffects(NULL, NULL, NULL, i, SPELL_EFFECT_HANDLE_LAUNCH);
+        HandleEffects(nullptr, NULL, NULL, i, SPELL_EFFECT_HANDLE_LAUNCH);
     }
 
     float multiplier[MAX_SPELL_EFFECTS];
@@ -8292,7 +8292,7 @@ void Spell::PrepareTriggersExecutedOnHit()
             // this possibly needs fixing
             int32 auraBaseAmount = (*i)->GetBaseAmount();
             // proc chance is stored in effect amount
-            int32 chance = m_caster->CalculateSpellDamage(NULL, auraSpellInfo, auraSpellIdx, &auraBaseAmount);
+            int32 chance = m_caster->CalculateSpellDamage(nullptr, auraSpellInfo, auraSpellIdx, &auraBaseAmount);
             // build trigger and add to the list
             HitTriggerSpell spellTriggerInfo;
             spellTriggerInfo.triggeredSpell = spellInfo;
@@ -8408,7 +8408,7 @@ WorldObjectSpellTargetCheck::WorldObjectSpellTargetCheck(Unit* caster, Unit* ref
     _targetSelectionType(selectionType), _condList(condList)
 {
     if (condList)
-        _condSrcInfo = new ConditionSourceInfo(NULL, caster);
+        _condSrcInfo = new ConditionSourceInfo(nullptr, caster);
     else
         _condSrcInfo = nullptr;
 }

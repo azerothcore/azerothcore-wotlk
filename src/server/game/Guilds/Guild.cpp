@@ -2832,7 +2832,7 @@ void Guild::_SendBankContentUpdate(MoveItemData* pSrc, MoveItemData* pDest) cons
 
 void Guild::_SendBankContentUpdate(uint8 tabId, SlotIds slots) const
 {
-    _SendBankList(NULL, tabId, false, &slots);
+    _SendBankList(nullptr, tabId, false, &slots);
 }
 
 void Guild::_BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* param1, const char* param2, const char* param3) const

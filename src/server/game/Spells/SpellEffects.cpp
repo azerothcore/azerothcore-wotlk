@@ -2799,7 +2799,7 @@ void Spell::EffectAddHonor(SpellEffIndex /*effIndex*/)
     // not scale value for item based reward (/10 value expected)
     if (m_CastItem)
     {
-        unitTarget->ToPlayer()->RewardHonor(NULL, 1, damage/10, false);
+        unitTarget->ToPlayer()->RewardHonor(nullptr, 1, damage/10, false);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SpellEffect::AddHonor (spell_id %u) rewards %d honor points (item %u) for player: %u", m_spellInfo->Id, damage/10, m_CastItem->GetEntry(), unitTarget->ToPlayer()->GetGUIDLow());
 #endif
@@ -2810,7 +2810,7 @@ void Spell::EffectAddHonor(SpellEffIndex /*effIndex*/)
     if (damage <= 50)
     {
         uint32 honor_reward = acore::Honor::hk_honor_at_level(unitTarget->getLevel(), float(damage));
-        unitTarget->ToPlayer()->RewardHonor(NULL, 1, honor_reward, false);
+        unitTarget->ToPlayer()->RewardHonor(nullptr, 1, honor_reward, false);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SpellEffect::AddHonor (spell_id %u) rewards %u honor points (scale) to player: %u", m_spellInfo->Id, honor_reward, unitTarget->ToPlayer()->GetGUIDLow());
 #endif
@@ -2818,7 +2818,7 @@ void Spell::EffectAddHonor(SpellEffIndex /*effIndex*/)
     else
     {
         //maybe we have correct honor_gain in damage already
-        unitTarget->ToPlayer()->RewardHonor(NULL, 1, damage, false);
+        unitTarget->ToPlayer()->RewardHonor(nullptr, 1, damage, false);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SpellEffect::AddHonor (spell_id %u) rewards %u honor points (non scale) for player: %u", m_spellInfo->Id, damage, unitTarget->ToPlayer()->GetGUIDLow());
 #endif

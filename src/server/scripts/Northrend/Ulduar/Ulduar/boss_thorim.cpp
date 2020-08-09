@@ -1009,7 +1009,7 @@ public:
                 _checkTimer += diff;
                 if ((_checkTimer >= 1000 && _checkTimer < 10000) || _checkTimer >= 60000)
                 {
-                    if (me->SelectNearbyTarget(NULL, 12.0f))
+                    if (me->SelectNearbyTarget(nullptr, 12.0f))
                     {
                         me->CastSpell(me, SPELL_LIGHTNING_FIELD, true);
                         me->CastSpell(me, (me->GetEntry() == 33054 /*NPC_THORIM_TRAP_BUNNY*/ ? SPELL_PARALYTIC_FIELD_FIRST : SPELL_PARALYTIC_FIELD_SECOND), true);

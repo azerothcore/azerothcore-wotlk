@@ -1360,7 +1360,7 @@ class spell_gen_flurry_of_claws : public SpellScriptLoader
             void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
-                if (Unit* target = GetUnitOwner()->SelectNearbyTarget(NULL, 7.0f))
+                if (Unit* target = GetUnitOwner()->SelectNearbyTarget(nullptr, 7.0f))
                     if (target->GetEntry() == NPC_FRENZYHEART_RAVAGER || target->GetEntry() == NPC_FRENZYHEART_HUNTER)
                     {
                         int32 basePoints = irand(1400, 2200);
@@ -4387,7 +4387,7 @@ class spell_gen_summon_elemental : public SpellScriptLoader
                 if (GetCaster())
                     if (Unit* owner = GetCaster()->GetOwner())
                         if (owner->GetTypeId() == TYPEID_PLAYER) /// @todo this check is maybe wrong
-                            owner->ToPlayer()->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
+                            owner->ToPlayer()->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
             }
 
             void Register()

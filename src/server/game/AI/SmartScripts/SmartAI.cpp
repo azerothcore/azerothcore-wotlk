@@ -1190,7 +1190,7 @@ class SmartTrigger : public AreaTriggerScript
             sLog->outDebug(LOG_FILTER_DATABASE_AI, "AreaTrigger %u is using SmartTrigger script", trigger->entry);
 #endif
             SmartScript script;
-            script.OnInitialize(NULL, trigger);
+            script.OnInitialize(nullptr, trigger);
             script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->entry);
             return true;
         }

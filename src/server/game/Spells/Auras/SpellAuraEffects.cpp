@@ -1033,7 +1033,7 @@ float AuraEffect::CalcPeriodicCritChance(Unit const* caster, Unit const* target)
             {
                 if ((*itr)->IsAffectedOnSpell(GetSpellInfo()))
                 {
-                    critChance = modOwner->SpellDoneCritChance(NULL, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), (GetSpellInfo()->DmgClass == SPELL_DAMAGE_CLASS_RANGED ? RANGED_ATTACK : BASE_ATTACK), true);
+                    critChance = modOwner->SpellDoneCritChance(nullptr, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), (GetSpellInfo()->DmgClass == SPELL_DAMAGE_CLASS_RANGED ? RANGED_ATTACK : BASE_ATTACK), true);
                     break;
                 }
             }
@@ -1043,7 +1043,7 @@ float AuraEffect::CalcPeriodicCritChance(Unit const* caster, Unit const* target)
                 // Rupture - since 3.3.3 can crit
                 case SPELLFAMILY_ROGUE:
                     if (GetSpellInfo()->SpellFamilyFlags[0] & 0x100000)
-                        critChance = modOwner->SpellDoneCritChance(NULL, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), BASE_ATTACK, true);
+                        critChance = modOwner->SpellDoneCritChance(nullptr, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), BASE_ATTACK, true);
                     break;
             }
         }
