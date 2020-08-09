@@ -138,3 +138,17 @@ CU_RUN_HOOK("BEFORE_SRC_LOAD")
 add_subdirectory(src)
 
 CU_RUN_HOOK("AFTER_SRC_LOAD")
+
+# we use this to get code coverage
+if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+endif()
+
+include(cmake/googletest.cmake)
+fetch_googletest(
+        ${PROJECT_SOURCE_DIR}/cmake
+        ${PROJECT_BINARY_DIR}/googletest
+)
+
+enable_testing()
+add_subdirectory(test)
