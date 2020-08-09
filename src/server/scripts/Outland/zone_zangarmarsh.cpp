@@ -351,7 +351,7 @@ public:
                 {
                     ItemPosCountVec dest;
                     uint32 itemId = 24573;
-                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1, NULL);
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1, nullptr);
                     if (msg == EQUIP_ERR_OK)
                     {
                         player->StoreNewItem(dest, itemId, true);

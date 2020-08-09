@@ -1084,7 +1084,7 @@ class spell_pal_judgement_of_command : public SpellScriptLoader
             {
                 if (Unit* unitTarget = GetHitUnit())
                     if (SpellInfo const* spell_proto = sSpellMgr->GetSpellInfo(GetEffectValue()))
-                        GetCaster()->CastSpell(unitTarget, spell_proto, true, NULL);
+                        GetCaster()->CastSpell(unitTarget, spell_proto, true, nullptr);
             }
 
             void Register()

@@ -141,7 +141,7 @@ void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket & /*recv_data*/)
         sWorld->SendGMText(LANG_COMMAND_TICKETPLAYERABANDON, GetPlayer()->GetName().c_str(), ticket->GetId());
 
         sTicketMgr->CloseTicket(ticket->GetId(), GetPlayer()->GetGUID());
-        sTicketMgr->SendTicket(this, NULL);
+        sTicketMgr->SendTicket(this, nullptr);
     }
 }
 
@@ -157,7 +157,7 @@ void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket & /*recv_data*/)
             sTicketMgr->SendTicket(this, ticket);
     }
     else
-        sTicketMgr->SendTicket(this, NULL);
+        sTicketMgr->SendTicket(this, nullptr);
 }
 
 void WorldSession::HandleGMTicketSystemStatusOpcode(WorldPacket & /*recv_data*/)
@@ -259,6 +259,6 @@ void WorldSession::HandleGMResponseResolve(WorldPacket& /*recvPacket*/)
         SendPacket(&data2);
 
         sTicketMgr->CloseTicket(ticket->GetId(), GetPlayer()->GetGUID());
-        sTicketMgr->SendTicket(this, NULL);
+        sTicketMgr->SendTicket(this, nullptr);
     }
 }

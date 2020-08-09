@@ -67,12 +67,12 @@ Map* MapManager::CreateBaseMap(uint32 id)
 {
     Map* map = FindBaseMap(id);
 
-    if (map == NULL)
+    if (map == nullptr)
     {
         ACORE_GUARD(ACE_Thread_Mutex, Lock);
 
         map = FindBaseMap(id);
-        if (map == NULL) // pussywizard: check again after acquiring mutex
+        if (map == nullptr) // pussywizard: check again after acquiring mutex
         {
             MapEntry const* entry = sMapStore.LookupEntry(id);
             ASSERT(entry);

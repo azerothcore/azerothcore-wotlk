@@ -271,7 +271,7 @@ class Map : public GridRefManager<NGridType>
 {
     friend class MapReference;
     public:
-        Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent = NULL);
+        Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
         virtual ~Map();
 
         MapEntry const* GetEntry() const { return i_mapEntry; }
@@ -353,7 +353,7 @@ class Map : public GridRefManager<NGridType>
         // can return INVALID_HEIGHT if under z+2 z coord not found height
         float GetHeight(float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
         float GetMinHeight(float x, float y) const;
-        Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = NULL);
+        Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
 
         ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = 0) const;
 
@@ -451,7 +451,7 @@ class Map : public GridRefManager<NGridType>
 
         TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = NULL, uint32 duration = 0, Unit* summoner = NULL, uint32 spellId = 0, uint32 vehId = 0);
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
-        void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = NULL);
+        void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
         Player* GetPlayer(uint64 guid);
         Creature* GetCreature(uint64 guid);
         GameObject* GetGameObject(uint64 guid);
@@ -680,7 +680,7 @@ class InstanceMap : public Map
         void AfterPlayerUnlinkFromMap();
         void Update(const uint32, const uint32, bool thread = true);
         void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
-        bool Reset(uint8 method, std::list<uint32>* globalSkipList = NULL);
+        bool Reset(uint8 method, std::list<uint32>* globalSkipList = nullptr);
         uint32 GetScriptId() { return i_script_id; }
         InstanceScript* GetInstanceScript() { return instance_script; }
         void PermBindAllPlayers();

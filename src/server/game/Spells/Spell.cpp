@@ -2717,7 +2717,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         if (crit)
         {
             procEx |= PROC_EX_CRITICAL_HIT;
-            addhealth = Unit::SpellCriticalHealingBonus(caster, m_spellInfo, addhealth, NULL);
+            addhealth = Unit::SpellCriticalHealingBonus(caster, m_spellInfo, addhealth, nullptr);
         }
         else
             procEx |= PROC_EX_NORMAL_HIT;
@@ -3271,7 +3271,7 @@ bool Spell::UpdateChanneledTargetList()
             for(int i = EFFECT_0; i <= EFFECT_2; ++i)
                 if (channelAuraMask & (1<<i) && m_spellInfo->Effects[i].RadiusEntry)
                 {
-                    range = m_spellInfo->Effects[i].CalcRadius(NULL, NULL);
+                    range = m_spellInfo->Effects[i].CalcRadius(NULL, nullptr);
                     break;
                 }
 
@@ -5292,7 +5292,7 @@ void Spell::HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOT
 #endif
 
     // we do not need DamageMultiplier here.
-    damage = CalculateSpellDamage(i, NULL);
+    damage = CalculateSpellDamage(i, nullptr);
 
     bool preventDefault = CallScriptEffectHandlers((SpellEffIndex)i, mode);
 
@@ -5599,7 +5599,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         m_caster->GetZoneAndAreaId(zone, area);
 
         SpellCastResult locRes= m_spellInfo->CheckLocation(m_caster->GetMapId(), zone, area,
-            m_caster->GetTypeId() == TYPEID_PLAYER ? m_caster->ToPlayer() : NULL);
+            m_caster->GetTypeId() == TYPEID_PLAYER ? m_caster->ToPlayer() : nullptr);
         if (locRes != SPELL_CAST_OK)
             return locRes;
     }

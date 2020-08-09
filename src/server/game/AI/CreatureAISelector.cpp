@@ -84,7 +84,7 @@ namespace FactorySelector
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         // select NullCreatureAI if not another cases
-        ainame = (ai_factory == NULL) ? "NullCreatureAI" : ai_factory->key();
+        ainame = (ai_factory == nullptr) ? "NullCreatureAI" : ai_factory->key();
         sLog->outDebug(LOG_FILTER_TSCR, "Creature %u used AI is %s.", creature->GetGUIDLow(), ainame.c_str());
 #endif
         return (ai_factory == NULL ? new NullCreatureAI(creature) : ai_factory->Create(creature));
@@ -96,7 +96,7 @@ namespace FactorySelector
         ASSERT(creature->GetCreatureTemplate());
         const MovementGeneratorCreator* mv_factory = mv_registry.GetRegistryItem(creature->GetDefaultMovementType());
 
-        /* if (mv_factory == NULL)
+        /* if (mv_factory == nullptr)
         {
             int best_val = -1;
             StringVector l;
@@ -105,7 +105,7 @@ namespace FactorySelector
             {
             const MovementGeneratorCreator *factory = mv_registry.GetRegistryItem((*iter).c_str());
             const SelectableMovement *p = dynamic_cast<const SelectableMovement *>(factory);
-            ASSERT(p != NULL);
+            ASSERT(p != nullptr);
             int val = p->Permit(creature);
             if (val > best_val)
             {

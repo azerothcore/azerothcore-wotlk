@@ -41,7 +41,7 @@ namespace acore
     class BattlegroundChatBuilder
     {
         public:
-            BattlegroundChatBuilder(ChatMsg msgtype, uint32 textId, Player const* source, va_list* args = NULL)
+            BattlegroundChatBuilder(ChatMsg msgtype, uint32 textId, Player const* source, va_list* args = nullptr)
                 : _msgtype(msgtype), _textId(textId), _source(source), _args(args) { }
 
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
@@ -1133,7 +1133,7 @@ void Battleground::RemovePlayerAtLeave(Player* player)
         if (Group* group = GetBgRaid(teamId))
             if (group->IsMember(player->GetGUID()))
                 if (!group->RemoveMember(player->GetGUID())) // group was disbanded
-                    SetBgRaid(teamId, NULL);
+                    SetBgRaid(teamId, nullptr);
 
         // let others know
         sBattlegroundMgr->BuildPlayerLeftBattlegroundPacket(&data, player->GetGUID());

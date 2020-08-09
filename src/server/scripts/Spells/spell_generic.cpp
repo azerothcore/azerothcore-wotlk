@@ -2193,7 +2193,7 @@ class spell_gen_elune_candle : public SpellScriptLoader
                 else
                     spellId = SPELL_ELUNE_CANDLE_NORMAL;
 
-                GetCaster()->CastSpell(GetHitUnit(), spellId, true, NULL);
+                GetCaster()->CastSpell(GetHitUnit(), spellId, true, nullptr);
             }
 
             void Register()

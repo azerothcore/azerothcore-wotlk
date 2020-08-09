@@ -197,7 +197,7 @@ class Item : public Object
 {
     public:
         static Item* CreateItem(uint32 item, uint32 count, Player const* player = NULL, bool clone = false, uint32 randomPropertyId = 0);
-        Item* CloneItem(uint32 count, Player const* player = NULL) const;
+        Item* CloneItem(uint32 count, Player const* player = nullptr) const;
 
         Item();
 
@@ -294,7 +294,7 @@ class Item : public Object
 
         // Update States
         ItemUpdateState GetState() const { return uState; }
-        void SetState(ItemUpdateState state, Player* forplayer = NULL);
+        void SetState(ItemUpdateState state, Player* forplayer = nullptr);
         void AddToUpdateQueueOf(Player* player);
         void RemoveFromUpdateQueueOf(Player* player);
         bool IsInUpdateQueue() const { return uQueuePos != -1; }
@@ -312,7 +312,7 @@ class Item : public Object
         bool IsConjuredConsumable() const { return GetTemplate()->IsConjuredConsumable(); }
 
         // Item Refund system
-        void SetNotRefundable(Player* owner, bool changestate = true, SQLTransaction* trans = NULL);
+        void SetNotRefundable(Player* owner, bool changestate = true, SQLTransaction* trans = nullptr);
         void SetRefundRecipient(uint32 pGuidLow) { m_refundRecipient = pGuidLow; }
         void SetPaidMoney(uint32 money) { m_paidMoney = money; }
         void SetPaidExtendedCost(uint32 iece) { m_paidExtendedCost = iece; }

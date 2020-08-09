@@ -748,7 +748,7 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF+1)
         {
             ItemPosCountVec dest;
-            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30658, 1, NULL);
+            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30658, 1, nullptr);
             if (msg == EQUIP_ERR_OK)
             {
                 player->StoreNewItem(dest, 30658, true);
@@ -758,7 +758,7 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF+2)
         {
             ItemPosCountVec dest;
-            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30659, 1, NULL);
+            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30659, 1, nullptr);
             if (msg == EQUIP_ERR_OK)
             {
                 player->StoreNewItem(dest, 30659, true);

@@ -467,7 +467,7 @@ int WorldSocket::Update(void)
 
 int WorldSocket::handle_input_header(void)
 {
-    ACE_ASSERT (m_RecvWPct == NULL);
+    ACE_ASSERT (m_RecvWPct == nullptr);
 
     ACE_ASSERT (m_Header.length() == sizeof(ClientPktHeader));
 
@@ -511,7 +511,7 @@ int WorldSocket::handle_input_payload(void)
 
     ACE_ASSERT (m_RecvPct.space() == 0);
     ACE_ASSERT (m_Header.space() == 0);
-    ACE_ASSERT (m_RecvWPct != NULL);
+    ACE_ASSERT (m_RecvWPct != nullptr);
 
     const int ret = ProcessIncoming (m_RecvWPct);
 
@@ -700,7 +700,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
             {
                 ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
 
-                if (m_Session != NULL)
+                if (m_Session != nullptr)
                 {
                     // Our Idle timer will reset on any non PING opcodes.
                     // Catches people idling on the login screen and any lingering ingame connections.
@@ -942,7 +942,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     sha.UpdateData ((uint8 *) & t, 4);
     sha.UpdateData ((uint8 *) & clientSeed, 4);
     sha.UpdateData ((uint8 *) & seed, 4);
-    sha.UpdateBigNumbers (&k, NULL);
+    sha.UpdateBigNumbers (&k, nullptr);
     sha.Finalize();
 
     if (memcmp (sha.GetDigest(), digest, 20))

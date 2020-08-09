@@ -2286,7 +2286,7 @@ TempSummon* WorldObject::SummonCreature(uint32 entry, const Position &pos, TempS
 {
     if (Map* map = FindMap())
     {
-        if (TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, isType(TYPEMASK_UNIT) ? (Unit*)this : NULL))
+        if (TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, isType(TYPEMASK_UNIT) ? (Unit*)this : nullptr))
         {
             summon->SetTempSummonType(spwtype);
             return summon;

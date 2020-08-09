@@ -361,7 +361,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
                         break;
                     }
                 }
-                else // pussywizard: nothing found previously was good and enough, this and next entries on the list have less than 110% threat, and currentVictim is present and valid as checked before the loop (otherwise it's NULL), so end now
+                else // pussywizard: nothing found previously was good and enough, this and next entries on the list have less than 110% threat, and currentVictim is present and valid as checked before the loop (otherwise it's nullptr), so end now
                 {
                     currentRef = currentVictim;
                     found = true;

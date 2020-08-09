@@ -573,7 +573,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         else
         {
             InstanceSave* save = GetInstanceSave(map2->GetInstanceId());
-            map2->ToInstanceMap()->Reset(INSTANCE_RESET_GLOBAL, (save ? &(save->m_playerList) : NULL));
+            map2->ToInstanceMap()->Reset(INSTANCE_RESET_GLOBAL, (save ? &(save->m_playerList) : nullptr));
         }
     }
 }
@@ -737,7 +737,7 @@ void InstanceSaveManager::PlayerCreateBoundInstancesMaps(uint32 guidLow)
 InstanceSave* InstanceSaveManager::PlayerGetInstanceSave(uint32 guidLow, uint32 mapid, Difficulty difficulty)
 {
     InstancePlayerBind* pBind = PlayerGetBoundInstance(guidLow, mapid, difficulty);
-    return (pBind ? pBind->save : NULL);
+    return (pBind ? pBind->save : nullptr);
 }
 
 uint32 InstanceSaveManager::PlayerGetDestinationInstanceId(Player* player, uint32 mapid, Difficulty difficulty)

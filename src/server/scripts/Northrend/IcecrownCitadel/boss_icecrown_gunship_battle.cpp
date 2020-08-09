@@ -387,7 +387,7 @@ class PassengerController
 public:
     PassengerController()
     {
-        ResetSlots(TEAM_HORDE, NULL);
+        ResetSlots(TEAM_HORDE, nullptr);
     }
 
     void ResetSlots(TeamId teamId, MotionTransport* t)
@@ -574,7 +574,7 @@ class npc_gunship : public CreatureScript
                     a->SetDuration(0);
 
                 uint32 explosionSpell = isVictory ? SPELL_EXPLOSION_VICTORY : SPELL_EXPLOSION_WIPE;
-                if (MotionTransport* t = (me->GetTransport() ? me->GetTransport()->ToMotionTransport() : NULL))
+                if (MotionTransport* t = (me->GetTransport() ? me->GetTransport()->ToMotionTransport() : nullptr))
                 {
                     Transport::PassengerSet const& passengers = t->GetStaticPassengers();
                     for (Transport::PassengerSet::const_iterator itr = passengers.begin(); itr != passengers.end(); ++itr)
@@ -943,7 +943,7 @@ class npc_high_overlord_saurfang_igb : public CreatureScript
                         _controller.SummonCreatures(me, SLOT_MAGE_1, SLOT_MAGE_2);
                         _controller.SummonCreatures(me, SLOT_MARINE_1, Is25ManRaid() ? SLOT_MARINE_4 : SLOT_MARINE_2);
                         _controller.SummonCreatures(me, SLOT_SERGEANT_1, Is25ManRaid() ? SLOT_SERGEANT_2 : SLOT_SERGEANT_1);
-                        if (MotionTransport* orgrimsHammer = (me->GetTransport() ? me->GetTransport()->ToMotionTransport() : NULL))
+                        if (MotionTransport* orgrimsHammer = (me->GetTransport() ? me->GetTransport()->ToMotionTransport() : nullptr))
                         {
                             float x,y,z,o;
                             OrgrimsHammerTeleportPortal.GetPosition(x,y,z,o);
@@ -1282,7 +1282,7 @@ class npc_muradin_bronzebeard_igb : public CreatureScript
                         _controller.SummonCreatures(me, SLOT_MAGE_1, SLOT_MAGE_2);
                         _controller.SummonCreatures(me, SLOT_MARINE_1, Is25ManRaid() ? SLOT_MARINE_4 : SLOT_MARINE_2);
                         _controller.SummonCreatures(me, SLOT_SERGEANT_1, Is25ManRaid() ? SLOT_SERGEANT_2 : SLOT_SERGEANT_1);
-                        if (MotionTransport* skybreaker = (me->GetTransport() ? me->GetTransport()->ToMotionTransport() : NULL))
+                        if (MotionTransport* skybreaker = (me->GetTransport() ? me->GetTransport()->ToMotionTransport() : nullptr))
                         {
                             float x,y,z,o;
                             SkybreakerTeleportPortal.GetPosition(x,y,z,o);

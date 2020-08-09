@@ -713,7 +713,7 @@ class spell_dk_blood_caked_blade : public SpellScriptLoader
                     {
                         if (soulFragments->GetStackAmount() >= 10)
                         {
-                            eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), SPELL_SHADOWMOURNE_CHAOS_BANE_DAMAGE, true, NULL);
+                            eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), SPELL_SHADOWMOURNE_CHAOS_BANE_DAMAGE, true, nullptr);
                             soulFragments->Remove();
                         }
                     }
@@ -1381,7 +1381,7 @@ class spell_dk_corpse_explosion : public SpellScriptLoader
                 if (effIndex == EFFECT_0)
                     GetCaster()->CastCustomSpell(GetSpellInfo()->Effects[EFFECT_1].CalcValue(), SPELLVALUE_BASE_POINT0, GetEffectValue(), target, true);
                 else if (effIndex == EFFECT_1)
-                    GetCaster()->CastCustomSpell(GetEffectValue(), SPELLVALUE_BASE_POINT0, GetSpell()->CalculateSpellDamage(EFFECT_0, NULL), target, true);
+                    GetCaster()->CastCustomSpell(GetEffectValue(), SPELLVALUE_BASE_POINT0, GetSpell()->CalculateSpellDamage(EFFECT_0, nullptr), target, true);
             }
 
             void HandleCorpseExplosion(SpellEffIndex effIndex)
@@ -2441,7 +2441,7 @@ class spell_dk_scourge_strike : public SpellScriptLoader
                         {
                             if (soulFragments->GetStackAmount() >= 10)
                             {
-                                caster->CastSpell(caster, SPELL_SHADOWMOURNE_CHAOS_BANE_DAMAGE, true, NULL);
+                                caster->CastSpell(caster, SPELL_SHADOWMOURNE_CHAOS_BANE_DAMAGE, true, nullptr);
                                 soulFragments->Remove();
                             }
                         }

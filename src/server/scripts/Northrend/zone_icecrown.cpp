@@ -271,7 +271,7 @@ public:
                             me->MonsterTextEmote("Thane Banahogg appears upon the overlook to the southeast!", NULL, true);
                             break;
                         case QUEST_BFV_FINAL:
-                            me->MonsterYell("Warriors of Jotunheim, I present to you, Blood Prince Sandoval!", LANG_UNIVERSAL, NULL);
+                            me->MonsterYell("Warriors of Jotunheim, I present to you, Blood Prince Sandoval!", LANG_UNIVERSAL, nullptr);
                             me->MonsterTextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", NULL, true);
                             break;
                     }

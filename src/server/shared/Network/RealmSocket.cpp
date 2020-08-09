@@ -261,7 +261,7 @@ int RealmSocket::handle_input(ACE_HANDLE)
 
     input_buffer_.wr_ptr((size_t)n);
 
-    if (session_ != NULL)
+    if (session_ != nullptr)
     {
         session_->OnRead();
         input_buffer_.crunch();

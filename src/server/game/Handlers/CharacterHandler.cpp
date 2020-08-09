@@ -755,7 +755,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recvData)
 {
-    if (PlayerLoading() || GetPlayer() != NULL)
+    if (PlayerLoading() || GetPlayer() != nullptr)
     {
         sLog->outError("Player tries to login again, AccountId = %d", GetAccountId());
         KickPlayer("Player tries to login again");
@@ -1186,7 +1186,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
             if ((isReferrer && pCurrChar->GetSession()->GetAccountId() == itr->second->GetRecruiterId()) || (!isReferrer && pCurrChar->GetSession()->GetRecruiterId() == itr->second->GetAccountId()))
             {
                 Player * rf = itr->second->GetPlayer();
-                if (rf != NULL)
+                if (rf != nullptr)
                 {
                     pCurrChar->SendUpdateToPlayer(rf);
                     rf->SendUpdateToPlayer(pCurrChar);
@@ -1989,7 +1989,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket &recvData)
             if (uItem->IsEquipped()) {
                 msg = _player->CanUnequipItem(dstpos, true);
                 if (msg != EQUIP_ERR_OK) {
-                    _player->SendEquipError(msg, uItem, NULL);
+                    _player->SendEquipError(msg, uItem, nullptr);
                     continue;
                 }
             }
@@ -2004,7 +2004,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket &recvData)
                     _player->StoreItem(sDest, uItem, true);
                 }
                 else
-                    _player->SendEquipError(msg, uItem, NULL);
+                    _player->SendEquipError(msg, uItem, nullptr);
 
                 continue;
             }
@@ -2018,7 +2018,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket &recvData)
                 uint16 _candidatePos;
                 msg = _player->CanEquipItem(NULL_SLOT, _candidatePos, item, true);
                 if (msg != EQUIP_ERR_OK) {
-                    _player->SendEquipError(msg, item, NULL);
+                    _player->SendEquipError(msg, item, nullptr);
                     continue;
                 }
             }

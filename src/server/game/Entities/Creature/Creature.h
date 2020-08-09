@@ -440,7 +440,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
 
         void DisappearAndDie();
 
-        bool Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = NULL);
+        bool Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
         bool LoadCreaturesAddon(bool reload = false);
         void SelectLevel(bool changelevel = true);
         void LoadEquipment(int8 id = 1, bool force = false);
@@ -500,7 +500,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
 
         bool IsInEvadeMode() const { return HasUnitState(UNIT_STATE_EVADE); }
 
-        bool AIM_Initialize(CreatureAI* ai = NULL);
+        bool AIM_Initialize(CreatureAI* ai = nullptr);
         void Motion_Initialize();
 
         CreatureAI* AI() const { return (CreatureAI*)i_AI; }
@@ -719,7 +719,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
 
     protected:
-        bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = NULL);
+        bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
         bool InitEntry(uint32 entry, const CreatureData* data=NULL);
 
         // vendor items

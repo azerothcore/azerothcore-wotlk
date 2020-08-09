@@ -522,7 +522,7 @@ public:
                     return;
             }
 
-            Start(false, true, 0, NULL);
+            Start(false, true, 0, nullptr);
         }
 
         void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)

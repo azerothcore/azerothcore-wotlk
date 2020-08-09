@@ -97,7 +97,7 @@ class spell_mage_deep_freeze : public SpellScriptLoader
             void HandleOnHit()
             {
                 if (Unit* caster = GetCaster())
-                    if (Unit* target = (caster->ToPlayer() ? caster->ToPlayer()->GetSelectedUnit() : NULL))
+                    if (Unit* target = (caster->ToPlayer() ? caster->ToPlayer()->GetSelectedUnit() : nullptr))
                         if (Creature* cTarget = target->ToCreature())
                             if (cTarget->HasMechanicTemplateImmunity(1 << (MECHANIC_STUN - 1)))
                                 caster->CastSpell(cTarget, 71757, true);
@@ -794,7 +794,7 @@ class spell_mage_ice_barrier : public SpellScriptLoader
 
                 if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_SCHOOL_ABSORB, (SpellFamilyNames)GetSpellInfo()->SpellFamilyName, GetSpellInfo()->SpellIconID, EFFECT_0))
                 {
-                    int32 newAmount = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, NULL, NULL);
+                    int32 newAmount = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, NULL, nullptr);
                     newAmount = CalculateSpellAmount(caster, newAmount, GetSpellInfo(), aurEff);
 
                     if (aurEff->GetAmount() > newAmount)

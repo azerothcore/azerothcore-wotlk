@@ -149,7 +149,7 @@ void CliRunnable::run()
         rl_bind_key('\t', rl_complete);
 #endif
 
-        if (command_str != NULL)
+        if (command_str != nullptr)
         {
             for (int x=0; command_str[x]; ++x)
                 if (command_str[x] == '\r' || command_str[x] == '\n')

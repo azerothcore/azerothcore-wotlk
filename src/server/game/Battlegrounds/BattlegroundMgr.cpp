@@ -494,7 +494,7 @@ bool BattlegroundMgr::CreateBattleground(CreateBattlegroundData& data)
     Battleground* bg = nullptr;
     bg = BattlegroundMgr::bgtypeToBattleground[data.bgTypeId];
 
-    if (bg == NULL)
+    if (bg == nullptr)
         return false;
 
     if (data.bgTypeId == BATTLEGROUND_RB)
@@ -542,7 +542,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
 
         uint32 bgTypeId = fields[0].GetUInt32();
 
-        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId, NULL))
+        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId, nullptr))
             continue;
 
         // can be overwrite by values from DB

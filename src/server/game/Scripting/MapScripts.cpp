@@ -854,7 +854,7 @@ void Map::ScriptsProcess()
                 }
 
                 // Insert script into schedule but do not start it
-                ScriptsStart(*datamap, step.script->CallScript.ScriptID, cTarget, NULL);
+                ScriptsStart(*datamap, step.script->CallScript.ScriptID, cTarget, nullptr);
                 break;
             }
 

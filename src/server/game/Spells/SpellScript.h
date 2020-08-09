@@ -623,7 +623,7 @@ class AuraScript : public _SpellScript
         {}
         bool _Validate(SpellInfo const* entry);
         bool _Load(Aura* aura);
-        void _PrepareScriptCall(AuraScriptHookType hookType, AuraApplication const* aurApp = NULL);
+        void _PrepareScriptCall(AuraScriptHookType hookType, AuraApplication const* aurApp = nullptr);
         void _FinishScriptCall();
         bool _IsDefaultActionPrevented();
     private:
@@ -847,7 +847,7 @@ class AuraScript : public _SpellScript
         bool HasEffectType(AuraType type) const;
 
         // AuraScript interface - functions which are redirecting to AuraApplication class
-        // Do not call these in hooks in which AuraApplication is not avalible, otherwise result will differ from expected (the functions will return NULL)
+        // Do not call these in hooks in which AuraApplication is not avalible, otherwise result will differ from expected (the functions will return nullptr)
 
         // returns currently processed target of an aura
         // Return value does not need to be NULL-checked, the only situation this will (always)

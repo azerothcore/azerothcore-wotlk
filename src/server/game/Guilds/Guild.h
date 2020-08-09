@@ -726,7 +726,7 @@ public:
     void MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 maxLevel, uint32 minRank);
 
     template<class Do>
-    void BroadcastWorker(Do& _do, Player* except = NULL)
+    void BroadcastWorker(Do& _do, Player* except = nullptr)
     {
         for (Members::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
             if (Player* player = itr->second->FindPlayer())
@@ -839,8 +839,8 @@ private:
     void _SendBankMoneyUpdate(WorldSession* session) const;
     void _SendBankContentUpdate(MoveItemData* pSrc, MoveItemData* pDest) const;
     void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
-    void _SendBankList(WorldSession* session = NULL, uint8 tabId = 0, bool sendFullSlots = false, SlotIds *slots = NULL) const;
+    void _SendBankList(WorldSession* session = NULL, uint8 tabId = 0, bool sendFullSlots = false, SlotIds *slots = nullptr) const;
 
-    void _BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* param1 = NULL, const char* param2 = NULL, const char* param3 = NULL) const;
+    void _BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* param1 = NULL, const char* param2 = NULL, const char* param3 = nullptr) const;
 };
 #endif

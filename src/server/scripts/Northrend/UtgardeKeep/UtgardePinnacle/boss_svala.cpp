@@ -190,7 +190,7 @@ public:
             if (victim->GetEntry() == NPC_SCOURGE_HULK && instance)
             {
                 instance->SetData(DATA_SVALA_ACHIEVEMENT, true);
-                instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, 26555, 1, NULL);
+                instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, 26555, 1, nullptr);
             }
 
             if (victim->GetTypeId() == TYPEID_PLAYER)

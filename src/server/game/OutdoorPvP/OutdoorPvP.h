@@ -234,7 +234,7 @@ class OutdoorPvP : public ZoneScript
 
         virtual bool CanTalkTo(Player* player, Creature* c, GossipMenuItems const& gso);
 
-        void TeamApplyBuff(TeamId teamId, uint32 spellId, uint32 spellId2 = 0, Player* sameMapPlr = NULL);
+        void TeamApplyBuff(TeamId teamId, uint32 spellId, uint32 spellId2 = 0, Player* sameMapPlr = nullptr);
 
     protected:
 
@@ -274,7 +274,7 @@ class OutdoorPvP : public ZoneScript
 
         bool HasPlayer(Player const* player) const;
 
-        void TeamCastSpell(TeamId team, int32 spellId, Player* sameMapPlr = NULL);
+        void TeamCastSpell(TeamId team, int32 spellId, Player* sameMapPlr = nullptr);
 };
 
 #endif /*OUTDOOR_PVP_H_*/

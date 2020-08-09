@@ -323,7 +323,7 @@ void Map::SwitchGridContainers(Creature* obj, bool on)
     sLog->outStaticDebug("Switch object " UI64FMTD " from grid[%u, %u] %u", obj->GetGUID(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
 #endif
     NGridType *ngrid = getNGrid(cell.GridX(), cell.GridY());
-    ASSERT(ngrid != NULL);
+    ASSERT(ngrid != nullptr);
 
     GridType &grid = ngrid->GetGridType(cell.CellX(), cell.CellY());
 
@@ -360,7 +360,7 @@ void Map::SwitchGridContainers(GameObject* obj, bool on)
 
     //TC_LOG_DEBUG(LOG_FILTER_MAPS, "Switch object " UI64FMTD " from grid[%u, %u] %u", obj->GetGUID(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
     NGridType *ngrid = getNGrid(cell.GridX(), cell.GridY());
-    ASSERT(ngrid != NULL);
+    ASSERT(ngrid != nullptr);
 
     GridType &grid = ngrid->GetGridType(cell.CellX(), cell.CellY());
 
@@ -440,7 +440,7 @@ bool Map::EnsureGridLoaded(const Cell &cell)
     EnsureGridCreated(GridCoord(cell.GridX(), cell.GridY()));
     NGridType *grid = getNGrid(cell.GridX(), cell.GridY());
 
-    ASSERT(grid != NULL);
+    ASSERT(grid != nullptr);
     if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
     {
     //if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
@@ -2759,7 +2759,7 @@ void InstanceMap::AfterPlayerUnlinkFromMap()
 
 void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask)
 { 
-    if (instance_script != NULL)
+    if (instance_script != nullptr)
         return;
 #ifdef ELUNA
     bool isElunaAI = false;
