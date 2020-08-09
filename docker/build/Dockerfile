@@ -6,7 +6,7 @@ RUN apt update && apt install -y git cmake make gcc g++ clang libmysqlclient-dev
 # copy the sources from the host machine to the Docker container
 ADD .git /azerothcore/.git
 ADD deps /azerothcore/deps
-ADD conf/config.cmake.dist /azerothcore/conf/config.cmake.dist
+ADD conf/dist /azerothcore/conf/dist
 ADD src /azerothcore/src
 ADD modules /azerothcore/modules
 ADD CMakeLists.txt /azerothcore/CMakeLists.txt
