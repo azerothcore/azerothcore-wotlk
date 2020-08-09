@@ -295,6 +295,8 @@ enum WorldIntConfigs
     CONFIG_DISABLE_BREATHING,
     CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER,
     CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH,
+    CONFIG_BATTLEGROUND_REPORT_AFK_TIMER,
+    CONFIG_BATTLEGROUND_REPORT_AFK,
     CONFIG_BATTLEGROUND_INVITATION_TYPE,
     CONFIG_ARENA_MAX_RATING_DIFFERENCE,
     CONFIG_ARENA_RATING_DISCARD_TIMER,
@@ -368,6 +370,7 @@ enum WorldIntConfigs
     CONFIG_CHARTER_COST_ARENA_2v2,
     CONFIG_CHARTER_COST_ARENA_3v3,
     CONFIG_CHARTER_COST_ARENA_5v5,
+    CONFIG_MAX_WHO_LIST_RETURN,
     CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER,
     INT_CONFIG_VALUE_COUNT
 };
@@ -702,7 +705,6 @@ class World
 
         void SetInitialWorldSettings();
         void LoadConfigSettings(bool reload = false);
-        void LoadModuleConfigSettings();
 
         void SendWorldText(uint32 string_id, ...);
         void SendGlobalText(const char* text, WorldSession* self);
@@ -836,9 +838,6 @@ class World
         std::string const& GetRealmName() const { return _realmName; } // pussywizard
         void SetRealmName(std::string name) { _realmName = name; } // pussywizard
 
-        std::string GetConfigFileList() { return m_configFileList; }
-        void SetConfigFileList(std::string list) { m_configFileList = list; }
-
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -938,8 +937,6 @@ class World
 
         void ProcessQueryCallbacks();
         ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
-
-        std::string m_configFileList;
 };
 
 #define sWorld World::instance()
