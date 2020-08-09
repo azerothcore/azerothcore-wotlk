@@ -45,7 +45,7 @@ include(deps/drassil/cmake-utils/utils.cmake)
 include(src/cmake/ac_macros.cmake)
 
 # set default buildoptions and print them
-include(conf/config.cmake.dist)
+include(conf/dist/config.cmake)
 
 # load custom configurations for cmake if exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/conf/config.cmake")
