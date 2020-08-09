@@ -151,4 +151,4 @@ fetch_googletest(
 )
 
 enable_testing()
-add_subdirectory(test)
+add_subdirectory(src/test)
