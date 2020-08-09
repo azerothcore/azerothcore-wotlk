@@ -964,7 +964,7 @@ class spell_blood_queen_presence_of_the_darkfallen : public SpellScriptLoader
                     return;
 
                 if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
-                    GetHitUnit()->CastSpell((Unit*)NULL, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, NULL, NULL, instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL));
+                    GetHitUnit()->CastSpell((Unit*)NULL, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL));
             }
 
             void Register()

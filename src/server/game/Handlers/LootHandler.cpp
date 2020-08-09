@@ -487,7 +487,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         else
             _player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
 
-        target->SendEquipError(msg, NULL, NULL, item.itemid);
+        target->SendEquipError(msg, nullptr, nullptr, item.itemid);
         return;
     }
 

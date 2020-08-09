@@ -463,7 +463,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_WARLOCK, 214, 0))
                             {
                                 int32 bp0 = aurEff->GetId() == 54037 ? 4 : 8;
-                                m_caster->CastCustomSpell(m_caster, 54425, &bp0, NULL, NULL, true);
+                                m_caster->CastCustomSpell(m_caster, 54425, &bp0, nullptr, nullptr, true);
                             }
                         }
                     }
@@ -963,7 +963,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
         m_caster->ToPlayer()->RemoveSpellCooldown(spellInfo->Id);
 
     // original caster guid only for GO cast
-    m_caster->CastSpell(targets, spellInfo, &values, TriggerCastFlags(TRIGGERED_FULL_MASK&~TRIGGERED_NO_PERIODIC_RESET), NULL, NULL, m_originalCasterGUID);
+    m_caster->CastSpell(targets, spellInfo, &values, TriggerCastFlags(TRIGGERED_FULL_MASK&~TRIGGERED_NO_PERIODIC_RESET), nullptr, nullptr, m_originalCasterGUID);
 }
 
 void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
@@ -1018,7 +1018,7 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
         m_caster->ToPlayer()->RemoveSpellCooldown(spellInfo->Id);
 
     // original caster guid only for GO cast
-    m_caster->CastSpell(targets, spellInfo, &values, TRIGGERED_FULL_MASK, NULL, NULL, m_originalCasterGUID);
+    m_caster->CastSpell(targets, spellInfo, &values, TRIGGERED_FULL_MASK, nullptr, nullptr, m_originalCasterGUID);
 }
 
 void Spell::EffectForceCast(SpellEffIndex effIndex)
@@ -1050,7 +1050,7 @@ void Spell::EffectForceCast(SpellEffIndex effIndex)
                 break;
             case 52463: // Hide In Mine Car
             case 52349: // Overtake
-                unitTarget->CastCustomSpell(unitTarget, spellInfo->Id, &damage, NULL, NULL, true, NULL, NULL, m_originalCasterGUID);
+                unitTarget->CastCustomSpell(unitTarget, spellInfo->Id, &damage, nullptr, nullptr, true, nullptr, nullptr, m_originalCasterGUID);
                 return;
             case 72378: // Blood Nova
             case 73058: // Blood Nova
@@ -1750,7 +1750,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
         else
         {
             // if not created by another reason from full inventory or unique items amount limitation
-            player->SendEquipError(msg, NULL, NULL, newitemid);
+            player->SendEquipError(msg, nullptr, nullptr, newitemid);
             return;
         }
     }
@@ -2657,11 +2657,11 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
     if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->GetCategory() == SPELLCATEGORY_DEVOUR_MAGIC)
     {
         int32 heal_amount = m_spellInfo->Effects[EFFECT_1].CalcValue();
-        m_caster->CastCustomSpell(m_caster, 19658, &heal_amount, NULL, NULL, true);
+        m_caster->CastCustomSpell(m_caster, 19658, &heal_amount, nullptr, nullptr, true);
         // Glyph of Felhunter
         if (Unit* owner = m_caster->GetOwner())
             if (owner->GetAura(56249))
-                owner->CastCustomSpell(owner, 19658, &heal_amount, NULL, NULL, true);
+                owner->CastCustomSpell(owner, 19658, &heal_amount, nullptr, nullptr, true);
     }
 }
 
@@ -4069,7 +4069,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     // proc a spellcast
                     if (Aura* chargesAura = m_caster->GetAura(59907))
                     {
-                        m_caster->CastSpell(unitTarget, spell_heal, true, NULL, NULL, m_caster->ToTempSummon()->GetSummonerGUID());
+                        m_caster->CastSpell(unitTarget, spell_heal, true, nullptr, nullptr, m_caster->ToTempSummon()->GetSummonerGUID());
                         if (chargesAura->ModCharges(-1))
                             m_caster->ToTempSummon()->UnSummon();
                     }
@@ -4098,14 +4098,14 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         Creature* totem = unitTarget->GetMap()->GetCreature(unitTarget->m_SummonSlot[slot]);
                         if (totem && totem->IsTotem())
                         {
-                            m_caster->CastCustomSpell(totem, 55277, &basepoints0, NULL, NULL, true);
+                            m_caster->CastCustomSpell(totem, 55277, &basepoints0, nullptr, nullptr, true);
                         }
                     }
                     // Glyph of Stoneclaw Totem
                     if (AuraEffect* aur=unitTarget->GetAuraEffect(63298, 0))
                     {
                         basepoints0 *= aur->GetAmount();
-                        m_caster->CastCustomSpell(unitTarget, 55277, &basepoints0, NULL, NULL, true);
+                        m_caster->CastCustomSpell(unitTarget, 55277, &basepoints0, nullptr, nullptr, true);
                     }
                     break;
                 }
@@ -4610,7 +4610,7 @@ void Spell::EffectFeedPet(SpellEffIndex effIndex)
     player->DestroyItemCount(foodItem, count, true);
     // TODO: fix crash when a spell has two effects, both pointed at the same item target
 
-    m_caster->CastCustomSpell(pet, m_spellInfo->Effects[effIndex].TriggerSpell, &benefit, NULL, NULL, true);
+    m_caster->CastCustomSpell(pet, m_spellInfo->Effects[effIndex].TriggerSpell, &benefit, nullptr, nullptr, true);
 }
 
 void Spell::EffectDismissPet(SpellEffIndex effIndex)
@@ -5268,7 +5268,7 @@ void Spell::EffectDestroyAllTotems(SpellEffIndex /*effIndex*/)
     }
     ApplyPct(mana, damage);
     if (mana)
-        m_caster->CastCustomSpell(m_caster, 39104, &mana, NULL, NULL, true);
+        m_caster->CastCustomSpell(m_caster, 39104, &mana, nullptr, nullptr, true);
 }
 
 void Spell::EffectDurabilityDamage(SpellEffIndex effIndex)

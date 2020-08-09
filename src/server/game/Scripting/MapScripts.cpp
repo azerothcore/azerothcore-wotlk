@@ -785,7 +785,7 @@ void Map::ScriptsProcess()
                             pReceiver->SendNewItem(item, step.script->CreateItem.Amount, false, true);
                     }
                     else
-                        pReceiver->SendEquipError(msg, NULL, NULL, step.script->CreateItem.ItemEntry);
+                        pReceiver->SendEquipError(msg, nullptr, nullptr, step.script->CreateItem.ItemEntry);
                 }
                 break;
 

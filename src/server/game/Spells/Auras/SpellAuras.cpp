@@ -1253,7 +1253,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (*itr < 0)
                         target->RemoveAurasDueToSpell(-(*itr));
                     else if (removeMode != AURA_REMOVE_BY_DEATH)
-                        target->CastSpell(target, *itr, true, NULL, NULL, GetCasterGUID());
+                        target->CastSpell(target, *itr, true, nullptr, nullptr, GetCasterGUID());
                 }
             }
             if (std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(GetId() + SPELL_LINK_AURA))
@@ -1383,7 +1383,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         damage = target->SpellHealingBonusTaken(caster, GetSpellInfo(), damage, DOT);
 
                         int32 basepoints0 = damage;
-                        caster->CastCustomSpell(target, 64801, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
+                        caster->CastCustomSpell(target, 64801, &basepoints0, nullptr, nullptr, true, NULL, GetEffect(0));
                     }
                 }
                 break;
@@ -1401,8 +1401,8 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * int32(damage) / 100;
                         int32 heal = int32(CalculatePct(basepoints0, 15));
 
-                        caster->CastCustomSpell(target, 63675, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
-                        caster->CastCustomSpell(caster, 75999, &heal, NULL, NULL, true, NULL, GetEffect(0));
+                        caster->CastCustomSpell(target, 63675, &basepoints0, nullptr, nullptr, true, NULL, GetEffect(0));
+                        caster->CastCustomSpell(caster, 75999, &heal, nullptr, nullptr, true, NULL, GetEffect(0));
                     }
                 }
                 // Power Word: Shield
@@ -1413,7 +1413,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     {
                         // instantly heal m_amount% of the absorb-value
                         int32 heal = glyph->GetAmount() * GetEffect(0)->GetAmount()/100;
-                        caster->CastCustomSpell(GetUnitOwner(), 56160, &heal, NULL, NULL, true, 0, GetEffect(0));
+                        caster->CastCustomSpell(GetUnitOwner(), 56160, &heal, nullptr, nullptr, true, 0, GetEffect(0));
                     }
                 }
                 break;
@@ -1590,7 +1590,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 178, 1))
                     {
                         int32 basepoints0 = aurEff->GetAmount() * caster->GetCreateMana() / 100;
-                        caster->CastCustomSpell(caster, 64103, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
+                        caster->CastCustomSpell(caster, 64103, &basepoints0, nullptr, nullptr, true, NULL, GetEffect(0));
                     }
                 }
                 // Power word: shield
@@ -1623,7 +1623,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 multiplier += 0.5f;
 
                             int32 basepoints0 = int32(CalculatePct(caster->GetMaxPower(POWER_MANA), multiplier));
-                            caster->CastCustomSpell(caster, 47755, &basepoints0, NULL, NULL, true);
+                            caster->CastCustomSpell(caster, 47755, &basepoints0, nullptr, nullptr, true);
                         }
                         // effect on aura target
                         if (AuraEffect const* aurEff = aura->GetEffect(1))
@@ -1637,7 +1637,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 case POWER_MANA:
                                 {
                                     int32 basepoints0 = int32(CalculatePct(target->GetMaxPower(POWER_MANA), 2));
-                                    caster->CastCustomSpell(target, 63654, &basepoints0, NULL, NULL, true);
+                                    caster->CastCustomSpell(target, 63654, &basepoints0, nullptr, nullptr, true);
                                     break;
                                 }
                                 case POWER_RAGE:   triggeredSpellId = 63653; break;

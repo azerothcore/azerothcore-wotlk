@@ -6159,7 +6159,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 67534:
                 {
                     const int32 dmg = (int32)damage;
-                    CastCustomSpell(this, 67535, &dmg, NULL, NULL, true, 0, triggeredByAura, triggeredByAura->GetCasterGUID());
+                    CastCustomSpell(this, 67535, &dmg, nullptr, nullptr, true, 0, triggeredByAura, triggeredByAura->GetCasterGUID());
                     return true;
                 }
                 // Trial of the Crusader, Faction Champions, Retaliation
@@ -6460,10 +6460,10 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             if (target)
                             {
                                 // regen mana for pet
-                                CastCustomSpell(target, 54607, &basepoints0, NULL, NULL, true, castItem, triggeredByAura);
+                                CastCustomSpell(target, 54607, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura);
                             }
                             // regen mana for caster
-                            CastCustomSpell(this, 59117, &basepoints0, NULL, NULL, true, castItem, triggeredByAura);
+                            CastCustomSpell(this, 59117, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura);
                             // Get second aura of spell for replenishment effect on party
                             if (AuraEffect const* aurEff = (*i)->GetBase()->GetEffect(EFFECT_1))
                             {
@@ -6960,13 +6960,13 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!victim)
                         return false;
 
-                    victim->CastSpell(victim, 57894, true, NULL, NULL, GetGUID());
+                    victim->CastSpell(victim, 57894, true, nullptr, nullptr, GetGUID());
                     return true;
                 }
                 // Glyph of Freezing Trap
                 case 56845:
                 {
-                    victim->CastSpell(this, 61394, true, NULL, NULL, victim->GetGUID());
+                    victim->CastSpell(this, 61394, true, nullptr, nullptr, victim->GetGUID());
                     return true;
                 }
             }
@@ -6987,7 +6987,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 basepoints0 = int32(damage);
                 triggered_spell_id = procSpell->IsRankOf(sSpellMgr->GetSpellInfo(635)) ? 53652 : 53654;
 
-                victim->CastCustomSpell(beaconTarget, triggered_spell_id, &basepoints0, NULL, NULL, true, 0, triggeredByAura, victim->GetGUID());
+                victim->CastCustomSpell(beaconTarget, triggered_spell_id, &basepoints0, nullptr, nullptr, true, 0, triggeredByAura, victim->GetGUID());
                 return true;
             }
             // Judgements of the Wise
@@ -7041,7 +7041,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     // 2% of base mana
                     basepoints0 = int32(CalculatePct(victim->GetCreateMana(), 2));
-                    victim->CastCustomSpell(victim, 20268, &basepoints0, NULL, NULL, true, 0, triggeredByAura);
+                    victim->CastCustomSpell(victim, 20268, &basepoints0, nullptr, nullptr, true, 0, triggeredByAura);
                     victim->AddSpellCooldown(20268, 0, 4*IN_MILLISECONDS);
                     return true;
                 }
@@ -7386,7 +7386,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     // Attack Twice
                     for (uint32 i = 0; i < 2; ++i)
-                        CastCustomSpell(victim, triggered_spell_id, &basepoints0, NULL, NULL, true, castItem, triggeredByAura);
+                        CastCustomSpell(victim, triggered_spell_id, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura);
 
                     return true;
                 }
@@ -7442,7 +7442,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     basepoints0 = CalculatePct(int32(damage), triggerAmount);
                     triggered_spell_id = 58879;
                     // Heal wolf
-                    CastCustomSpell(this, triggered_spell_id, &basepoints0, NULL, NULL, true, castItem, triggeredByAura, originalCaster);
+                    CastCustomSpell(this, triggered_spell_id, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura, originalCaster);
                     break;
                 }
                 // Shaman T8 Elemental 4P Bonus
@@ -7556,7 +7556,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 else
                     return false;
 
-                CastCustomSpell(victim, triggered_spell_id, &basepoints0, NULL, NULL, true, castItem, triggeredByAura);
+                CastCustomSpell(victim, triggered_spell_id, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura);
                 return true;
             }
             // Improved Water Shield
@@ -7760,7 +7760,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                 SetCantProc(true);
                 if(basepoints0)
-                    CastCustomSpell(target, triggered_spell_id, &basepoints0, NULL, NULL, true, castItem, triggeredByAura, originalCaster);
+                    CastCustomSpell(target, triggered_spell_id, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura, originalCaster);
                 else
                     CastSpell(target, triggered_spell_id, true, castItem, triggeredByAura, originalCaster);
                 SetCantProc(false);
@@ -7838,7 +7838,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             continue;
 
                         basepoints0 = int32(CalculateSpellDamage(this, procSpell, i) * 0.4f);
-                        CastCustomSpell(this, triggered_spell_id, &basepoints0, NULL, NULL, true, NULL, triggeredByAura);
+                        CastCustomSpell(this, triggered_spell_id, &basepoints0, nullptr, nullptr, true, NULL, triggeredByAura);
                     }
                     return true;
                 }
@@ -7900,7 +7900,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
     }
 
     if(basepoints0)
-        CastCustomSpell(target, triggered_spell_id, &basepoints0, NULL, NULL, true, castItem, triggeredByAura, originalCaster);
+        CastCustomSpell(target, triggered_spell_id, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura, originalCaster);
     else
         CastSpell(target, triggered_spell_id, true, castItem, triggeredByAura, originalCaster);
 
@@ -7961,7 +7961,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
                 case 59906:
                 {
                     int32 bp0 = CalculatePct(GetMaxHealth(), dummySpell->Effects[EFFECT_0]. CalcValue());
-                    CastCustomSpell(this, 59913, &bp0, NULL, NULL, true);
+                    CastCustomSpell(this, 59913, &bp0, nullptr, nullptr, true);
                     *handled = true;
                     break;
                 }
@@ -8000,7 +8000,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
                         return false;
 
                     int32 bp0 = int32(CalculatePct(GetMaxPower(POWER_MANA), spInfo->Effects[0].CalcValue()));
-                    CastCustomSpell(this, 67545, &bp0, NULL, NULL, true, NULL, triggeredByAura->GetEffect(EFFECT_0), GetGUID());
+                    CastCustomSpell(this, 67545, &bp0, nullptr, nullptr, true, NULL, triggeredByAura->GetEffect(EFFECT_0), GetGUID());
                     return true;
                 }
             }
@@ -8074,7 +8074,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
                 case 70844:
                 {
                     int32 basepoints0 = CalculatePct(GetMaxHealth(), dummySpell->Effects[EFFECT_1]. CalcValue());
-                    CastCustomSpell(this, 70845, &basepoints0, NULL, NULL, true);
+                    CastCustomSpell(this, 70845, &basepoints0, nullptr, nullptr, true);
                     break;
                 }
                 default:
@@ -8219,7 +8219,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             int32 value2 = CalculateSpellDamage(this, (*i)->GetSpellInfo(), 2);
                             basepoints0 = int32(CalculatePct(GetMaxPower(POWER_MANA), value2));
                             // Drain Soul
-                            CastCustomSpell(this, 18371, &basepoints0, NULL, NULL, true, castItem, triggeredByAura);
+                            CastCustomSpell(this, 18371, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura);
                             break;
                         }
                     }
@@ -15985,7 +15985,7 @@ void Unit::CastPetAura(PetAura const* aura)
     if (auraId == 35696)                                      // Demonic Knowledge
     {
         int32 basePoints = aura->GetDamage();
-        CastCustomSpell(this, auraId, &basePoints, NULL, NULL, true);
+        CastCustomSpell(this, auraId, &basePoints, nullptr, nullptr, true);
     }
     else
         CastSpell(this, auraId, true);
@@ -16281,7 +16281,7 @@ bool Unit::HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura)
                     if (Unit* target = nearMembers.front())
                     {
                         CastSpell(target, 41637 /*Dummy visual effect triggered by main spell cast*/, true);
-                        CastCustomSpell(target, spellProto->Id, &heal, NULL, NULL, true, NULL, triggeredByAura, caster_guid);
+                        CastCustomSpell(target, spellProto->Id, &heal, nullptr, nullptr, true, NULL, triggeredByAura, caster_guid);
                         if (Aura* aura = target->GetAura(spellProto->Id, caster->GetGUID()))
                             aura->SetCharges(jumps);
                     }
@@ -16291,7 +16291,7 @@ bool Unit::HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura)
     }
 
     // heal
-    CastCustomSpell(this, 33110, &heal, NULL, NULL, true, NULL, NULL, caster_guid);
+    CastCustomSpell(this, 33110, &heal, nullptr, nullptr, true, nullptr, nullptr, caster_guid);
     return true;
 
 }
@@ -18165,7 +18165,7 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
             }
 
             if (IsInMap(caster))
-                caster->CastCustomSpell(itr->second.spellId, SpellValueMod(SPELLVALUE_BASE_POINT0+i), seatId+1, target, GetVehicleKit() ? TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE : TRIGGERED_NONE, NULL, NULL, origCasterGUID);
+                caster->CastCustomSpell(itr->second.spellId, SpellValueMod(SPELLVALUE_BASE_POINT0+i), seatId+1, target, GetVehicleKit() ? TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE : TRIGGERED_NONE, nullptr, nullptr, origCasterGUID);
             else    // This can happen during Player::_LoadAuras
             {
                 int32 bp0[MAX_SPELL_EFFECTS];
@@ -18179,9 +18179,9 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
         else
         {
             if (IsInMap(caster))
-                caster->CastSpell(target, spellEntry, GetVehicleKit() ? TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE : TRIGGERED_NONE, NULL, NULL, origCasterGUID);
+                caster->CastSpell(target, spellEntry, GetVehicleKit() ? TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE : TRIGGERED_NONE, nullptr, nullptr, origCasterGUID);
             else
-                Aura::TryRefreshStackOrCreate(spellEntry, MAX_EFFECT_MASK, this, clicker, NULL, NULL, origCasterGUID);
+                Aura::TryRefreshStackOrCreate(spellEntry, MAX_EFFECT_MASK, this, clicker, nullptr, nullptr, origCasterGUID);
         }
 
         result = true;
@@ -18768,7 +18768,7 @@ class AuraMunchingQueue : public BasicEvent
         {
             if (_owner.IsInWorld() && _owner.FindMap())
                 if (Unit* target = ObjectAccessor::GetUnit(_owner, _targetGUID))
-                    _owner.CastCustomSpell(_spellId, SPELLVALUE_BASE_POINT0, _basePoints, target, TriggerCastFlags(TRIGGERED_FULL_MASK&~TRIGGERED_NO_PERIODIC_RESET), NULL, NULL, _owner.GetGUID());
+                    _owner.CastCustomSpell(_spellId, SPELLVALUE_BASE_POINT0, _basePoints, target, TriggerCastFlags(TRIGGERED_FULL_MASK&~TRIGGERED_NO_PERIODIC_RESET), nullptr, nullptr, _owner.GetGUID());
 
             return true;
         }
@@ -18794,7 +18794,7 @@ void Unit::CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, Aura
 
     // xinef: delay only for casting on different unit
     if (this == caster)
-        caster->CastCustomSpell(spellId, SPELLVALUE_BASE_POINT0, addAmount, this, TriggerCastFlags(TRIGGERED_FULL_MASK&~TRIGGERED_NO_PERIODIC_RESET), NULL, NULL, caster->GetGUID());
+        caster->CastCustomSpell(spellId, SPELLVALUE_BASE_POINT0, addAmount, this, TriggerCastFlags(TRIGGERED_FULL_MASK&~TRIGGERED_NO_PERIODIC_RESET), nullptr, nullptr, caster->GetGUID());
     else
         caster->m_Events.AddEvent(new AuraMunchingQueue(*caster, GetGUID(), addAmount, spellId), caster->m_Events.CalculateQueueTime(400));
 }

@@ -357,7 +357,7 @@ public:
                         player->StoreNewItem(dest, itemId, true);
                     }
                     else
-                        player->SendEquipError(msg, NULL, NULL, itemId);
+                        player->SendEquipError(msg, nullptr, nullptr, itemId);
                 }
                 SendGossipMenuFor(player, 9231, creature->GetGUID());
                 break;

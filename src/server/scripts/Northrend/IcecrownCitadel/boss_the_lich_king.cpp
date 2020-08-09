@@ -1914,7 +1914,7 @@ class spell_the_lich_king_necrotic_plague : public SpellScriptLoader
                 CustomSpellValues values;
                 if (dispel)
                     values.AddSpellMod(SPELLVALUE_BASE_POINT1, AURA_REMOVE_BY_ENEMY_SPELL); // add as marker (spell has no effect 1)
-                GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, NULL, TRIGGERED_FULL_MASK, NULL, NULL, GetCasterGUID());
+                GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, NULL, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
 
                 if (Unit* caster = GetCaster())
                     caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
@@ -2021,7 +2021,7 @@ class spell_the_lich_king_necrotic_plague_jump : public SpellScriptLoader
 
                 CustomSpellValues values;
                 values.AddSpellMod(SPELLVALUE_AURA_STACK, GetStackAmount());
-                GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, NULL, TRIGGERED_FULL_MASK, NULL, NULL, GetCasterGUID());
+                GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, NULL, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
                 if (Unit* caster = GetCaster())
                     caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
             }
@@ -2040,7 +2040,7 @@ class spell_the_lich_king_necrotic_plague_jump : public SpellScriptLoader
                 CustomSpellValues values;
                 values.AddSpellMod(SPELLVALUE_AURA_STACK, GetStackAmount());
                 values.AddSpellMod(SPELLVALUE_BASE_POINT1, AURA_REMOVE_BY_ENEMY_SPELL); // add as marker (spell has no effect 1)
-                GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, NULL, TRIGGERED_FULL_MASK, NULL, NULL, GetCasterGUID());
+                GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, NULL, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
                 if (Unit* caster = GetCaster())
                     caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
 
@@ -2652,7 +2652,7 @@ class npc_valkyr_shadowguard : public CreatureScript
                         break;
                     case EVENT_MOVE_TO_SIPHON_POS:
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); // just in case if passenger disappears so quickly that EVENT_MOVE_TO_DROP_POS is never executed
-                        { int32 bp0 = 80; me->CastCustomSpell(me, 1557, &bp0, NULL, NULL, true); }
+                        { int32 bp0 = 80; me->CastCustomSpell(me, 1557, &bp0, nullptr, nullptr, true); }
                         me->SetDisableGravity(true);
                         me->SetHover(true);
                         me->SetCanFly(true);
@@ -3064,7 +3064,7 @@ class spell_the_lich_king_harvest_soul : public SpellScriptLoader
             {
                 // m_originalCaster to allow stacking from different casters, meh
                 if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                    GetTarget()->CastSpell((Unit*)NULL, SPELL_HARVESTED_SOUL_LK_BUFF, true, NULL, NULL, GetTarget()->GetInstanceScript()->GetData64(DATA_THE_LICH_KING));
+                    GetTarget()->CastSpell((Unit*)NULL, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, GetTarget()->GetInstanceScript()->GetData64(DATA_THE_LICH_KING));
             }
 
             void Register()
@@ -3142,17 +3142,17 @@ class npc_strangulate_vehicle : public CreatureScript
                         if (summoner->GetTypeId() == TYPEID_PLAYER && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
                         {
                             if (buff)
-                                summoner->CastSpell((Unit*)NULL, SPELL_HARVESTED_SOUL_LK_BUFF, true, NULL, NULL, _instance->GetData64(DATA_THE_LICH_KING));
+                                summoner->CastSpell((Unit*)NULL, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, _instance->GetData64(DATA_THE_LICH_KING));
 
                             me->CastSpell(summoner, SPELL_HARVEST_SOUL_TELEPORT_BACK, false);
                         }
                         else if (buff)
-                            me->CastSpell((Unit*)NULL, SPELL_HARVESTED_SOUL_LK_BUFF, true, NULL, NULL, _instance->GetData64(DATA_THE_LICH_KING));
+                            me->CastSpell((Unit*)NULL, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, _instance->GetData64(DATA_THE_LICH_KING));
 
                         summoner->RemoveAurasDueToSpell(IsHeroic() ? SPELL_HARVEST_SOULS_TELEPORT : SPELL_HARVEST_SOUL_TELEPORT);
                     }
                     else
-                        me->CastSpell((Unit*)NULL, SPELL_HARVESTED_SOUL_LK_BUFF, true, NULL, NULL, _instance->GetData64(DATA_THE_LICH_KING));
+                        me->CastSpell((Unit*)NULL, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, _instance->GetData64(DATA_THE_LICH_KING));
                 }
 
                 _events.Reset();

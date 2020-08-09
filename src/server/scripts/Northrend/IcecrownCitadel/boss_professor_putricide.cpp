@@ -417,7 +417,7 @@ class boss_professor_putricide : public CreatureScript
                                 instance->SetBossState(DATA_FESTERGUT, IN_PROGRESS);
                                 me->SetFacingTo(festergutWatchPos.GetOrientation());
                                 DoAction(ACTION_FESTERGUT_GAS);
-                                c->CastSpell(c, SPELL_GASEOUS_BLIGHT_LARGE, true, NULL, NULL, c->GetGUID());
+                                c->CastSpell(c, SPELL_GASEOUS_BLIGHT_LARGE, true, nullptr, nullptr, c->GetGUID());
                             }
                             else 
                             {
@@ -996,7 +996,7 @@ class spell_putricide_unstable_experiment : public SpellScriptLoader
                     if (aura->GetOwner() == target) // avoid assert(false) at any cost
                         aura->UpdateOwner(5000, target); // update whole aura so previous periodic ticks before refreshed by new one
 
-                GetCaster()->CastSpell(target, uint32(GetSpellInfo()->Effects[stage].CalcValue()), true, NULL, NULL, GetCaster()->GetGUID());
+                GetCaster()->CastSpell(target, uint32(GetSpellInfo()->Effects[stage].CalcValue()), true, nullptr, nullptr, GetCaster()->GetGUID());
             }
 
             void Register()
@@ -1218,7 +1218,7 @@ class spell_putricide_mutated_plague : public SpellScriptLoader
                 spell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, GetTarget());
                 int32 healAmount = spell->Effects[EFFECT_0].CalcValue();
                 healAmount *= GetStackAmount();
-                GetTarget()->CastCustomSpell(healSpell, SPELLVALUE_BASE_POINT0, healAmount, GetTarget(), TRIGGERED_FULL_MASK, NULL, NULL, GetCasterGUID());
+                GetTarget()->CastCustomSpell(healSpell, SPELLVALUE_BASE_POINT0, healAmount, GetTarget(), TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
             }
 
             void Register()
@@ -1361,7 +1361,7 @@ class spell_putricide_choking_gas_bomb : public SpellScriptLoader
                         continue;
 
                     uint32 spellId = uint32(GetSpellInfo()->Effects[i].CalcValue());
-                    GetCaster()->CastSpell(GetCaster(), spellId, true, NULL, NULL, GetCaster()->GetGUID());
+                    GetCaster()->CastSpell(GetCaster(), spellId, true, nullptr, nullptr, GetCaster()->GetGUID());
                 }
             }
 

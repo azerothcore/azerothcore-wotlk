@@ -598,7 +598,7 @@ public:
             if (Unit* caster = GetCaster())
             {
                 int32 damage = 100*pow(2.0f, (float)GetStackAmount());
-                caster->CastCustomSpell(GetTarget(), SPELL_SARONITE_VAPORS_DMG, &damage, NULL, NULL, true);
+                caster->CastCustomSpell(GetTarget(), SPELL_SARONITE_VAPORS_DMG, &damage, nullptr, nullptr, true);
             }
         }
 
@@ -630,7 +630,7 @@ public:
                 {
                     int32 mana = GetHitDamage()/2;
                     if (Unit* t = GetHitUnit())
-                        caster->CastCustomSpell(t, SPELL_SARONITE_VAPORS_ENERGIZE, &mana, NULL, NULL, true);
+                        caster->CastCustomSpell(t, SPELL_SARONITE_VAPORS_ENERGIZE, &mana, nullptr, nullptr, true);
                 }
         }
 

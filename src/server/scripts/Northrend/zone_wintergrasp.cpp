@@ -822,7 +822,7 @@ class spell_wintergrasp_force_building : public SpellScriptLoader
             {
                 PreventHitDefaultEffect(effIndex);
                 if (Unit* target = GetHitUnit())
-                    target->CastSpell(target, GetEffectValue(), false, NULL, NULL, target->GetGUID());
+                    target->CastSpell(target, GetEffectValue(), false, nullptr, nullptr, target->GetGUID());
             }
 
             void Register()

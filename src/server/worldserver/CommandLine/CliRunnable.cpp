@@ -112,7 +112,7 @@ int kb_hit_return()
     tv.tv_usec = 0;
     FD_ZERO(&fds);
     FD_SET(STDIN_FILENO, &fds);
-    select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
+    select(STDIN_FILENO+1, &fds, nullptr, nullptr, &tv);
     return FD_ISSET(STDIN_FILENO, &fds);
 }
 #endif

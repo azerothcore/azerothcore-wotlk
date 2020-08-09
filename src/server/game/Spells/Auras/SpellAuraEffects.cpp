@@ -1356,7 +1356,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                     {
                         int32 HotWMod = (*i)->GetAmount() / 2; // For each 2% Intelligence, you get 1% stamina and 1% attack power.
 
-                        target->CastCustomSpell(target, HotWSpellId, &HotWMod, NULL, NULL, true, NULL, this, target->GetGUID());
+                        target->CastCustomSpell(target, HotWSpellId, &HotWMod, nullptr, nullptr, true, NULL, this, target->GetGUID());
                         break;
                     }
                 }
@@ -1386,7 +1386,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                     if (AuraEffect const* aurEff = target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 2851, 0))
                     {
                         int32 bp = aurEff->GetAmount();
-                        target->CastCustomSpell(target, 48420, &bp, NULL, NULL, true);
+                        target->CastCustomSpell(target, 48420, &bp, nullptr, nullptr, true);
                     }
                 break;
                 case FORM_DIREBEAR:
@@ -1395,13 +1395,13 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                     if (AuraEffect const* aurEff = target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 2851, 0))
                     {
                         int32 bp = aurEff->GetAmount();
-                        target->CastCustomSpell(target, 48418, &bp, NULL, NULL, true);
+                        target->CastCustomSpell(target, 48418, &bp, nullptr, nullptr, true);
                     }
                     // Survival of the Fittest
                     if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_DRUID, 961, 0))
                     {
                         int32 bp = aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue();
-                        target->CastCustomSpell(target, 62069, &bp, NULL, NULL, true, 0, this, target->GetGUID());
+                        target->CastCustomSpell(target, 62069, &bp, nullptr, nullptr, true, 0, this, target->GetGUID());
                     }
                 break;
                 case FORM_MOONKIN:
@@ -1409,7 +1409,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                     if (AuraEffect const* aurEff = target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 2851, 0))
                     {
                         int32 bp = aurEff->GetAmount();
-                        target->CastCustomSpell(target, 48421, &bp, NULL, NULL, true);
+                        target->CastCustomSpell(target, 48421, &bp, nullptr, nullptr, true);
                     }
                 break;
                     // Master Shapeshifter - Tree of Life
@@ -1417,7 +1417,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                     if (AuraEffect const* aurEff = target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 2851, 0))
                     {
                         int32 bp = aurEff->GetAmount();
-                        target->CastCustomSpell(target, 48422, &bp, NULL, NULL, true);
+                        target->CastCustomSpell(target, 48422, &bp, nullptr, nullptr, true);
                     }
                 break;
             }
@@ -1906,7 +1906,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                         {
                             int32 basePoints = int32(std::min(oldPower, FurorChance));
                             target->SetPower(POWER_ENERGY, 0);
-                            target->CastCustomSpell(target, 17099, &basePoints, NULL, NULL, true, NULL, this);
+                            target->CastCustomSpell(target, 17099, &basePoints, nullptr, nullptr, true, NULL, this);
                             break;
                         }
                         case FORM_BEAR:
@@ -5137,7 +5137,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                         SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellId);
 
                         for (uint32 i = 0; i < spell->StackAmount; ++i)
-                            caster->CastSpell(target, spell->Id, true, NULL, NULL, GetCasterGUID());
+                            caster->CastSpell(target, spell->Id, true, nullptr, nullptr, GetCasterGUID());
                         break;
                     }
                     target->RemoveAurasDueToSpell(spellId);
@@ -5151,7 +5151,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     {
                         SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellId);
                         for (uint32 i = 0; i < spell->StackAmount; ++i)
-                            caster->CastSpell(target, spell->Id, true, NULL, NULL, GetCasterGUID());
+                            caster->CastSpell(target, spell->Id, true, nullptr, nullptr, GetCasterGUID());
                         break;
                     }
                     target->RemoveAurasDueToSpell(spellId);
@@ -5315,7 +5315,7 @@ void AuraEffect::HandleChannelDeathItem(AuraApplication const* aurApp, uint8 mod
     if (msg != EQUIP_ERR_OK)
     {
         count-=noSpaceForCount;
-        plCaster->SendEquipError(msg, NULL, NULL, GetSpellInfo()->Effects[m_effIndex].ItemType);
+        plCaster->SendEquipError(msg, nullptr, nullptr, GetSpellInfo()->Effects[m_effIndex].ItemType);
         if (count == 0)
             return;
     }
@@ -5477,7 +5477,7 @@ void AuraEffect::HandleAuraLinked(AuraApplication const* aurApp, uint8 mode, boo
                 return;
             // If amount avalible cast with basepoints (Crypt Fever for example)
             if (GetAmount())
-                caster->CastCustomSpell(target, triggeredSpellId, &m_amount, NULL, NULL, true, NULL, this);
+                caster->CastCustomSpell(target, triggeredSpellId, &m_amount, nullptr, nullptr, true, NULL, this);
             else
                 caster->CastSpell(target, triggeredSpellId, true, NULL, this);
         }
@@ -5904,7 +5904,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
         {
             // Mana Tide
             case 16191:
-                target->CastCustomSpell(target, triggerSpellId, &m_amount, NULL, NULL, true, NULL, this);
+                target->CastCustomSpell(target, triggerSpellId, &m_amount, nullptr, nullptr, true, NULL, this);
                 return;
             // Poison (Grobbulus)
             case 28158:
@@ -5933,14 +5933,14 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
             case 69508:
             {
                 if (caster)
-                    caster->CastSpell(target, triggerSpellId, true, NULL, NULL, caster->GetGUID());
+                    caster->CastSpell(target, triggerSpellId, true, nullptr, nullptr, caster->GetGUID());
                 return;
             }
             // Trial of the Crusader, Jaraxxus, Spinning Pain Spike
             case 66283:
                 {
                     const int32 dmg = target->GetMaxHealth()/2;
-                    target->CastCustomSpell(target, 66316, &dmg, NULL, NULL, true);
+                    target->CastCustomSpell(target, 66316, &dmg, nullptr, nullptr, true);
                     return;
                 }
             // Violet Hold, Moragg, Ray of Suffering, Ray of Pain
@@ -5992,7 +5992,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
             case 56654:
             case 58882:
                 int32 amount = int32(target->GetMaxPower(POWER_MANA) * GetAmount() / 100.0f);
-                target->CastCustomSpell(target, triggerSpellId, &amount, NULL, NULL, true);
+                target->CastCustomSpell(target, triggerSpellId, &amount, nullptr, nullptr, true);
                 return;
         }
     }
@@ -6534,7 +6534,7 @@ void AuraEffect::HandlePeriodicManaLeechAuraTick(Unit* target, Unit* caster) con
         if (manaFeedVal > 0)
         {
             int32 feedAmount = CalculatePct(gainedAmount, manaFeedVal);
-            caster->CastCustomSpell(caster, 32554, &feedAmount, NULL, NULL, true, NULL, this);
+            caster->CastCustomSpell(caster, 32554, &feedAmount, nullptr, nullptr, true, NULL, this);
         }
     }
 }
@@ -6691,7 +6691,7 @@ void AuraEffect::HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "AuraEffect::HandleProcTriggerSpellWithValueAuraProc: Triggering spell %u with value %d from aura %u proc", triggeredSpellInfo->Id, basepoints0, GetId());
 #endif
-        triggerCaster->CastCustomSpell(triggerTarget, triggerSpellId, &basepoints0, NULL, NULL, true, NULL, this);
+        triggerCaster->CastCustomSpell(triggerTarget, triggerSpellId, &basepoints0, nullptr, nullptr, true, NULL, this);
     }
     else {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -6800,7 +6800,7 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
 
             if (Unit* triggerTarget = target->GetNextRandomRaidMemberOrPet(radius))
             {
-                target->CastCustomSpell(triggerTarget, GetId(), &value, NULL, NULL, true, NULL, this, GetCasterGUID());
+                target->CastCustomSpell(triggerTarget, GetId(), &value, nullptr, nullptr, true, NULL, this, GetCasterGUID());
                 if (Aura* aura = triggerTarget->GetAura(GetId(), GetCasterGUID()))
                     aura->SetCharges(jumps);
             }
@@ -6810,5 +6810,5 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "AuraEffect::HandleRaidProcFromChargeWithValueAuraProc: Triggering spell %u from aura %u proc", triggerSpellId, GetId());
 #endif
-    target->CastCustomSpell(target, triggerSpellId, &value, NULL, NULL, true, NULL, this, GetCasterGUID());
+    target->CastCustomSpell(target, triggerSpellId, &value, nullptr, nullptr, true, NULL, this, GetCasterGUID());
 }

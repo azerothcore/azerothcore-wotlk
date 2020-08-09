@@ -2577,7 +2577,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         // can't use default call because of threading, do stuff as fast as possible
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             if (farMask & (1 << i))
-                HandleEffects(effectUnit, NULL, NULL, i, SPELL_EFFECT_HANDLE_HIT_TARGET);
+                HandleEffects(effectUnit, nullptr, nullptr, i, SPELL_EFFECT_HANDLE_HIT_TARGET);
         return;
     }
 
@@ -3118,11 +3118,11 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         }
 
         if (effectMask & (1 << effectNumber))
-            HandleEffects(unit, NULL, NULL, effectNumber, SPELL_EFFECT_HANDLE_HIT_TARGET);
+            HandleEffects(unit, nullptr, nullptr, effectNumber, SPELL_EFFECT_HANDLE_HIT_TARGET);
     }
 
     if( sanct_effect >= 0 && (effectMask & (1<<sanct_effect)) )
-        HandleEffects(unit, NULL, NULL, sanct_effect, SPELL_EFFECT_HANDLE_HIT_TARGET);
+        HandleEffects(unit, nullptr, nullptr, sanct_effect, SPELL_EFFECT_HANDLE_HIT_TARGET);
 
     return SPELL_MISS_NONE;
 }
@@ -4013,7 +4013,7 @@ void Spell::_handle_immediate_phase()
             continue;
 
         // call effect handlers to handle destination hit
-        HandleEffects(nullptr, NULL, NULL, j, SPELL_EFFECT_HANDLE_HIT);
+        HandleEffects(nullptr, nullptr, nullptr, j, SPELL_EFFECT_HANDLE_HIT);
     }
 
     // process items
@@ -6036,7 +6036,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                 if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK && strict)                  
                     if (Pet* pet = m_caster->ToPlayer()->GetPet())
-                        pet->CastSpell(pet, 32752, true, NULL, NULL, pet->GetGUID()); //starting cast, trigger pet stun (cast by pet so it doesn't attack player)
+                        pet->CastSpell(pet, 32752, true, nullptr, nullptr, pet->GetGUID()); //starting cast, trigger pet stun (cast by pet so it doesn't attack player)
                 break;
             }
             case SPELL_EFFECT_SUMMON_PLAYER:
@@ -6906,7 +6906,7 @@ SpellCastResult Spell::CheckItems()
                         // TODO: Needs review
                         if (pProto && !(pProto->ItemLimitCategory))
                         {
-                            p_caster->SendEquipError(msg, NULL, NULL, m_spellInfo->Effects[i].ItemType);
+                            p_caster->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
                             return SPELL_FAILED_DONT_REPORT;
                         }
                         else
@@ -6915,7 +6915,7 @@ SpellCastResult Spell::CheckItems()
                                 return SPELL_FAILED_TOO_MANY_OF_ITEM;
                             else if (!(target->ToPlayer()->HasItemCount(m_spellInfo->Effects[i].ItemType)))
                             {
-                                p_caster->SendEquipError(msg, NULL, NULL, m_spellInfo->Effects[i].ItemType);
+                                p_caster->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
                                 return SPELL_FAILED_DONT_REPORT;
                             }
                             else
@@ -6940,7 +6940,7 @@ SpellCastResult Spell::CheckItems()
                     InventoryResult msg = p_caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, m_spellInfo->Effects[i].ItemType, 1);
                     if (msg != EQUIP_ERR_OK)
                     {
-                        p_caster->SendEquipError(msg, NULL, NULL, m_spellInfo->Effects[i].ItemType);
+                        p_caster->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
                         return SPELL_FAILED_DONT_REPORT;
                     }
                 }
@@ -7700,7 +7700,7 @@ void Spell::HandleLaunchPhase()
         if (!m_spellInfo->Effects[i].IsEffect())
             continue;
 
-        HandleEffects(nullptr, NULL, NULL, i, SPELL_EFFECT_HANDLE_LAUNCH);
+        HandleEffects(nullptr, nullptr, nullptr, i, SPELL_EFFECT_HANDLE_LAUNCH);
     }
 
     float multiplier[MAX_SPELL_EFFECTS];
@@ -7775,7 +7775,7 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier,
             m_damage = 0;
             m_healing = 0;
 
-            HandleEffects(unit, NULL, NULL, i, SPELL_EFFECT_HANDLE_LAUNCH_TARGET);
+            HandleEffects(unit, nullptr, nullptr, i, SPELL_EFFECT_HANDLE_LAUNCH_TARGET);
 
             if (m_damage > 0)
             {
@@ -7841,11 +7841,11 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier,
             int32 basepoints = 0;
             m_damage = 0;
 
-            HandleEffects(target, NULL, NULL, ssEffect, SPELL_EFFECT_HANDLE_LAUNCH_TARGET);
+            HandleEffects(target, nullptr, nullptr, ssEffect, SPELL_EFFECT_HANDLE_LAUNCH_TARGET);
 
             basepoints = (targetInfo.crit ? Unit::SpellCriticalDamageBonus(m_caster, m_spellInfo, m_damage, target) : m_damage);
             m_damage = mdmg;
-            m_caster->CastCustomSpell(target, 26654, &basepoints, NULL, NULL, true);
+            m_caster->CastCustomSpell(target, 26654, &basepoints, nullptr, nullptr, true);
 
             if (m_spellInfo->Id != 44949)
                 aur->DropCharge();

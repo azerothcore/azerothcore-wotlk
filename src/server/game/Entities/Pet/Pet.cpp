@@ -1060,7 +1060,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
         // xinef: fixes orc death knight command racial
         if (owner->getRace() == RACE_ORC)
-            CastSpell(this, SPELL_ORC_RACIAL_COMMAND, true, NULL, NULL, owner->GetGUID());
+            CastSpell(this, SPELL_ORC_RACIAL_COMMAND, true, nullptr, nullptr, owner->GetGUID());
 
         // Avoidance, Night of the Dead
         if (Aura *aur = AddAura(SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE, this))
@@ -2157,7 +2157,7 @@ void Pet::HandleAsynchLoadSucceed()
     // Warlock pet exception, check if owner is casting new summon spell
     if (Spell* spell = owner->GetCurrentSpell(CURRENT_GENERIC_SPELL))
         if (spell->GetSpellInfo()->HasEffect(SPELL_EFFECT_SUMMON_PET))
-            CastSpell(this, 32752, true, NULL, NULL, GetGUID());
+            CastSpell(this, 32752, true, nullptr, nullptr, GetGUID());
 
 
     if (owner->NeedSendSpectatorData() && GetCreatureTemplate()->family)

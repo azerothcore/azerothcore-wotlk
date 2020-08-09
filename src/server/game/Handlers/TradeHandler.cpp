@@ -255,8 +255,8 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
     if (!his_trade)
         return;
 
-    Item* myItems[TRADE_SLOT_TRADED_COUNT]  = { NULL, NULL, NULL, NULL, NULL, NULL };
-    Item* hisItems[TRADE_SLOT_TRADED_COUNT] = { NULL, NULL, NULL, NULL, NULL, NULL };
+    Item* myItems[TRADE_SLOT_TRADED_COUNT]  = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+    Item* hisItems[TRADE_SLOT_TRADED_COUNT] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
     bool myCanCompleteTrade = true, hisCanCompleteTrade = true;
 
     // set before checks for propertly undo at problems (it already set in to client)

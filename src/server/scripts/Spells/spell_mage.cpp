@@ -525,7 +525,7 @@ class spell_mage_incanters_absorbtion_base_AuraScript : public AuraScript
                     currentAura->GetBase()->RefreshDuration();
                 }
                 else
-                    target->CastCustomSpell(target, SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
+                    target->CastCustomSpell(target, SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED, &bp, nullptr, nullptr, true, NULL, aurEff);
             }
         }
 };
@@ -657,7 +657,7 @@ class spell_mage_fire_frost_ward : public SpellScriptLoader
                     if (roll_chance_i(chance))
                     {
                         int32 bp = dmgInfo.GetDamage();
-                        target->CastCustomSpell(target, SPELL_MAGE_FROST_WARDING_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
+                        target->CastCustomSpell(target, SPELL_MAGE_FROST_WARDING_TRIGGERED, &bp, nullptr, nullptr, true, NULL, aurEff);
                         absorbAmount = 0;
 
                         // Xinef: trigger Incanters Absorbtion

@@ -1395,7 +1395,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                     {
                         item->is_blocked = false;
                         item->rollWinnerGUID = player->GetGUID();
-                        player->SendEquipError(msg, NULL, NULL, roll->itemid);
+                        player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
                     }
                 }
             }
@@ -1463,7 +1463,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                         {
                             item->is_blocked = false;
                             item->rollWinnerGUID = player->GetGUID();
-                            player->SendEquipError(msg, NULL, NULL, roll->itemid);
+                            player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
                         }
                     }
                     else if (rollvote == DISENCHANT)

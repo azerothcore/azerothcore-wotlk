@@ -988,7 +988,7 @@ class spell_halion_marks : public SpellScriptLoader
                 if (!GetTarget()->GetInstanceScript() || !GetTarget()->GetInstanceScript()->IsEncounterInProgress() || GetTarget()->GetMapId() != 724)
                     return;
 
-                GetTarget()->CastCustomSpell(_summonSpellId, SPELLVALUE_BASE_POINT1, GetAura()->GetStackAmount(), GetTarget(), TRIGGERED_FULL_MASK, NULL, NULL, GetCasterGUID());
+                GetTarget()->CastCustomSpell(_summonSpellId, SPELLVALUE_BASE_POINT1, GetAura()->GetStackAmount(), GetTarget(), TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
             }
 
             void Register()

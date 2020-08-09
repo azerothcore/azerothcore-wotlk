@@ -3101,7 +3101,7 @@ class spell_gen_dummy_trigger : public SpellScriptLoader
                 if (Unit* target = GetHitUnit())
                     if (SpellInfo const* triggeredByAuraSpell = GetTriggeringSpell())
                         if (triggeredByAuraSpell->Id == SPELL_PERSISTANT_SHIELD_TRIGGERED)
-                            caster->CastCustomSpell(target, SPELL_PERSISTANT_SHIELD_TRIGGERED, &damage, NULL, NULL, true);
+                            caster->CastCustomSpell(target, SPELL_PERSISTANT_SHIELD_TRIGGERED, &damage, nullptr, nullptr, true);
             }
 
             void Register()

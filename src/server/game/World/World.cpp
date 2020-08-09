@@ -2403,7 +2403,7 @@ namespace acore
                 while (char* line = lineFromMessage(pos))
                 {
                     WorldPacket* data = new WorldPacket();
-                    ChatHandler::BuildChatPacket(*data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, NULL, NULL, line);
+                    ChatHandler::BuildChatPacket(*data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
                     data_list.push_back(data);
                 }
             }
@@ -2466,7 +2466,7 @@ void World::SendGlobalText(const char* text, WorldSession* self)
 
     while (char* line = ChatHandler::LineFromMessage(pos))
     {
-        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, NULL, NULL, line);
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
         SendGlobalMessage(&data, self);
     }
 
@@ -2500,7 +2500,7 @@ bool World::SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self
 void World::SendZoneText(uint32 zone, const char* text, WorldSession* self, TeamId teamId)
 {
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, NULL, NULL, text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, text);
     SendZoneMessage(zone, &data, self, teamId);
 }
 

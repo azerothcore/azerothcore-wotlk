@@ -1783,7 +1783,7 @@ void Battleground::SendWarningToAll(uint32 entry, ...)
             vsnprintf(str, 1024, format, ap);
             va_end(ap);
 
-            ChatHandler::BuildChatPacket(localizedPackets[itr->second->GetSession()->GetSessionDbLocaleIndex()], CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, NULL, NULL, str);
+            ChatHandler::BuildChatPacket(localizedPackets[itr->second->GetSession()->GetSessionDbLocaleIndex()], CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, nullptr, nullptr, str);
         }
 
         itr->second->SendDirectMessage(&localizedPackets[itr->second->GetSession()->GetSessionDbLocaleIndex()]);

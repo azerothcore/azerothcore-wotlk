@@ -166,7 +166,7 @@ void ChatHandler::SendSysMessage(const char *str)
 
     while (char* line = LineFromMessage(pos))
     {
-        BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, NULL, NULL, line);
+        BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
         m_session->SendPacket(&data);
     }
 
@@ -184,7 +184,7 @@ void ChatHandler::SendGlobalSysMessage(const char *str)
 
     while (char* line = LineFromMessage(pos))
     {
-        BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, NULL, NULL, line);
+        BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
         sWorld->SendGlobalMessage(&data);
     }
 
@@ -202,7 +202,7 @@ void ChatHandler::SendGlobalGMSysMessage(const char *str)
 
     while (char* line = LineFromMessage(pos))
     {
-        BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, NULL, NULL, line);
+        BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
         sWorld->SendGlobalGMMessage(&data);
     }
 

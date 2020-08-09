@@ -364,7 +364,7 @@ class spell_dk_death_and_decay : public SpellScriptLoader
                 if (GetCaster() && GetTarget())
                 {
                     int32 basePoints0 = aurEff->GetAmount();
-                    GetCaster()->CastCustomSpell(GetTarget(), SPELL_DK_DEATH_AND_DECAY_TRIGGER, &basePoints0, NULL, NULL, true, 0, aurEff);
+                    GetCaster()->CastCustomSpell(GetTarget(), SPELL_DK_DEATH_AND_DECAY_TRIGGER, &basePoints0, nullptr, nullptr, true, 0, aurEff);
                 }
             }
 
@@ -1453,13 +1453,13 @@ class spell_dk_death_coil : public SpellScriptLoader
                     if (caster->IsFriendlyTo(target))
                     {
                         int32 bp = int32(damage * 1.5f);
-                        caster->CastCustomSpell(target, SPELL_DK_DEATH_COIL_HEAL, &bp, NULL, NULL, true);
+                        caster->CastCustomSpell(target, SPELL_DK_DEATH_COIL_HEAL, &bp, nullptr, nullptr, true);
                     }
                     else
                     {
                         if (AuraEffect const* auraEffect = caster->GetAuraEffect(SPELL_DK_ITEM_SIGIL_VENGEFUL_HEART, EFFECT_1))
                             damage += auraEffect->GetBaseAmount();
-                        caster->CastCustomSpell(target, SPELL_DK_DEATH_COIL_DAMAGE, &damage, NULL, NULL, true);
+                        caster->CastCustomSpell(target, SPELL_DK_DEATH_COIL_DAMAGE, &damage, nullptr, nullptr, true);
                     }
                 }
             }
@@ -1753,7 +1753,7 @@ class spell_dk_death_strike : public SpellScriptLoader
                     // Improved Death Strike
                     if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, DK_ICON_ID_IMPROVED_DEATH_STRIKE, 0))
                         AddPct(bp, caster->CalculateSpellDamage(caster, aurEff->GetSpellInfo(), 2));
-                    caster->CastCustomSpell(caster, SPELL_DK_DEATH_STRIKE_HEAL, &bp, NULL, NULL, false);
+                    caster->CastCustomSpell(caster, SPELL_DK_DEATH_STRIKE_HEAL, &bp, nullptr, nullptr, false);
                 }
             }
 
@@ -2292,7 +2292,7 @@ class spell_dk_raise_dead : public SpellScriptLoader
                 SpellCastTargets targets;
                 targets.SetDst(*GetHitUnit());
 
-                GetCaster()->CastSpell(targets, spellInfo, NULL, TRIGGERED_FULL_MASK, NULL, NULL, GetCaster()->GetGUID());
+                GetCaster()->CastSpell(targets, spellInfo, NULL, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCaster()->GetGUID());
                 GetCaster()->ToPlayer()->RemoveSpellCooldown(GetSpellInfo()->Id, true);
             }
 
@@ -2429,7 +2429,7 @@ class spell_dk_scourge_strike : public SpellScriptLoader
                 if (Unit *unitTarget = ObjectAccessor::GetUnit(*caster, guid))
                 {
                     int32 bp = GetHitDamage() * multiplier;
-                    caster->CastCustomSpell(unitTarget, SPELL_DK_SCOURGE_STRIKE_TRIGGERED, &bp, NULL, NULL, true);
+                    caster->CastCustomSpell(unitTarget, SPELL_DK_SCOURGE_STRIKE_TRIGGERED, &bp, nullptr, nullptr, true);
 
                     // Xinef: Shadowmourne hack (scourge strike trigger proc disabled...)
                     if (roll_chance_i(75) && caster->FindMap() && !caster->FindMap()->IsBattlegroundOrArena() && caster->HasAura(71903) && !caster->HasAura(SPELL_SHADOWMOURNE_CHAOS_BANE_BUFF))

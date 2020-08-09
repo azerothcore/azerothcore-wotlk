@@ -12480,7 +12480,7 @@ void Player::SetAmmo(uint32 item)
     InventoryResult msg = CanUseAmmo(item);
     if (msg != EQUIP_ERR_OK)
     {
-        SendEquipError(msg, NULL, NULL, item);
+        SendEquipError(msg, nullptr, nullptr, item);
         return;
     }
 
@@ -15079,7 +15079,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             break;
         case GOSSIP_OPTION_SPIRITHEALER:
             if (isDead())
-                source->ToCreature()->CastSpell(source->ToCreature(), 17251, true, NULL, NULL, GetGUID());
+                source->ToCreature()->CastSpell(source->ToCreature(), 17251, true, nullptr, nullptr, GetGUID());
             break;
         case GOSSIP_OPTION_QUESTGIVER:
             PrepareQuestMenu(guid);
@@ -15100,8 +15100,8 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             {
                 // Cast spells that teach dual spec
                 // Both are also ImplicitTarget self and must be cast by player
-                CastSpell(this, 63680, true, NULL, NULL, GetGUID());
-                CastSpell(this, 63624, true, NULL, NULL, GetGUID());
+                CastSpell(this, 63680, true, nullptr, nullptr, GetGUID());
+                CastSpell(this, 63624, true, nullptr, nullptr, GetGUID());
 
                 PrepareGossipMenu(source, menuItemData->GossipActionMenuId);
                 SendPreparedGossip(source);
@@ -15433,7 +15433,7 @@ bool Player::CanAddQuest(Quest const* quest, bool msg)
             return true;
         else if (msg2 != EQUIP_ERR_OK)
         {
-            SendEquipError(msg2, NULL, NULL, srcitem);
+            SendEquipError(msg2, nullptr, nullptr, srcitem);
             return false;
         }
     }
@@ -15559,7 +15559,7 @@ bool Player::CanRewardQuest(Quest const* quest, bool msg)
                 GetItemCount(quest->RequiredItemId[i]) < quest->RequiredItemCount[i])
             {
                 if (msg)
-                    SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL, quest->RequiredItemId[i]);
+                    SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr, quest->RequiredItemId[i]);
                 return false;
             }
         }
@@ -15639,7 +15639,7 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
             InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardChoiceItemId[reward], quest->RewardChoiceItemCount[reward]);
             if (res != EQUIP_ERR_OK)
             {
-                SendEquipError(res, NULL, NULL, quest->RewardChoiceItemId[reward]);
+                SendEquipError(res, nullptr, nullptr, quest->RewardChoiceItemId[reward]);
                 return false;
             }
         }
@@ -15654,7 +15654,7 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
                 InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardItemId[i], quest->RewardItemIdCount[i]);
                 if (res != EQUIP_ERR_OK)
                 {
-                    SendEquipError(res, NULL, NULL, quest->RewardItemId[i]);
+                    SendEquipError(res, nullptr, nullptr, quest->RewardItemId[i]);
                     return false;
                 }
             }
@@ -16505,7 +16505,7 @@ bool Player::GiveQuestSourceItem(Quest const* quest)
         else if (msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
             return true;
         else
-            SendEquipError(msg, NULL, NULL, srcitem);
+            SendEquipError(msg, nullptr, nullptr, srcitem);
         return false;
     }
 
@@ -16534,7 +16534,7 @@ bool Player::TakeQuestSourceItem(uint32 questId, bool msg)
             if (res != EQUIP_ERR_OK)
             {
                 if (msg)
-                    SendEquipError(res, NULL, NULL, srcItemId);
+                    SendEquipError(res, nullptr, nullptr, srcItemId);
                 return false;
             }
 
@@ -21983,7 +21983,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         CanEquipNewItem(slot, uiDest, item, false);
     if (msg != EQUIP_ERR_OK)
     {
-        SendEquipError(msg, NULL, NULL, item);
+        SendEquipError(msg, nullptr, nullptr, item);
         return false;
     }
 
@@ -25174,7 +25174,7 @@ void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore cons
             msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, lootItem->itemid, lootItem->count);
         if (msg != EQUIP_ERR_OK)
         {
-            SendEquipError(msg, NULL, NULL, lootItem->itemid);
+            SendEquipError(msg, nullptr, nullptr, lootItem->itemid);
             continue;
         }
 
@@ -25278,7 +25278,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         sScriptMgr->OnLootItem(this, newitem, item->count, this->GetLootGUID());
     }
     else
-        SendEquipError(msg, NULL, NULL, item->itemid);
+        SendEquipError(msg, nullptr, nullptr, item->itemid);
 }
 
 void Player::UpdateLootAchievements(LootItem *item, Loot* loot)
