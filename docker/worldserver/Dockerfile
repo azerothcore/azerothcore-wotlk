@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:20.04
 
 # install the required dependencies to run the authserver
 RUN apt update && apt install -y libmysqlclient-dev libssl-dev libace-6.* libace-dev libreadline-dev net-tools;
