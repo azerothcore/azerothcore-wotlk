@@ -1552,19 +1552,15 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
             }
             break;
         }
-        case CONDITION_SOURCE_TYPE_QUEST_ACCEPT:
+        case CONDITION_SOURCE_TYPE_QUEST_AVAILABLE:
             if (!sObjectMgr->GetQuestTemplate(cond->SourceEntry))
             {
-                sLog->outErrorDb("CONDITION_SOURCE_TYPE_QUEST_ACCEPT specifies non-existing quest (%u), skipped", cond->SourceEntry);
+                sLog->outErrorDb("CONDITION_SOURCE_TYPE_QUEST_AVAILABLE specifies non-existing quest (%u), skipped", cond->SourceEntry);
                 return false;
             }
             break;
-        case CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK:
-            if (!sObjectMgr->GetQuestTemplate(cond->SourceEntry))
-            {
-                sLog->outErrorDb("CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK specifies non-existing quest (%u), skipped", cond->SourceEntry);
-                return false;
-            }
+        case CONDITION_SOURCE_TYPE_UNUSED_20:
+            sLog->outErrorDb("CONDITION_SOURCE_TYPE_UNUSED_20 is not in use. SourceEntry = (%u), skipped", cond->SourceEntry);
             break;
         case CONDITION_SOURCE_TYPE_VEHICLE_SPELL:
         case CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT:
