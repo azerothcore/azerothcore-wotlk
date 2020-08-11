@@ -57,4 +57,4 @@ jobs:
           ./bin/acore-docker-generate-etc
       - name: Build
         run: |
-          ./bin/acore-docker-build-no-scripts
+          ./bin/acore-docker-build
