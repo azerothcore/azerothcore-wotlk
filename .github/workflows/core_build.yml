@@ -38,11 +38,13 @@ jobs:
         run: source ./apps/ci/ci-import-db.sh
       - name: Build
         run: source ./apps/ci/ci-compile.sh
+      - name: Debug
+        run: ls -al /home/runner/work/azerothcore-wotlk/azerothcore-wotlk/var/build/obj
       - name: Dry run
         run: source ./apps/ci/ci-worldserver-dry-run.sh
       - name: Check startup errors
         run: source ./apps/ci/ci-error-check.sh
-      - name: Check startup errors
+      - name: Run unit tests
         run: source ./apps/ci/ci-run-unit-tests.sh
 
   docker-build:
