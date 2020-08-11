@@ -42,6 +42,8 @@ jobs:
         run: source ./apps/ci/ci-worldserver-dry-run.sh
       - name: Check startup errors
         run: source ./apps/ci/ci-error-check.sh
+      - name: Check startup errors
+        run: source ./apps/ci/ci-run-unit-tests.sh
 
   docker-build:
     strategy:
