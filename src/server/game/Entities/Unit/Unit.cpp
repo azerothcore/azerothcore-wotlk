@@ -501,7 +501,7 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
     // pussywizard: update always! not every 400ms, because movement generators need the actual position
     //m_movesplineTimer.Update(t_diff);
     //if (m_movesplineTimer.Passed() || arrived)
-        UpdateSplinePosition();
+    UpdateSplinePosition();
 }
 
 void Unit::UpdateSplinePosition()
