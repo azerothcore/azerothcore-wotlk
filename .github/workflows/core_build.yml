@@ -55,7 +55,7 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          ./bin/acore-docker-build-no-scripts
+          ./bin/acore-docker-build
 
   docker-worldserver:
     strategy:
