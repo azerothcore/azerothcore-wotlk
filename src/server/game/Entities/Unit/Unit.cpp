@@ -501,7 +501,7 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
     // pussywizard: update always! not every 400ms, because movement generators need the actual position
     //m_movesplineTimer.Update(t_diff);
     //if (m_movesplineTimer.Passed() || arrived)
-        UpdateSplinePosition();
+    UpdateSplinePosition();
 }
 
 void Unit::UpdateSplinePosition()
@@ -15094,7 +15094,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     continue;
                 // Some spells must always trigger
                 //if (isAlwaysTriggeredAura[aurEff->GetAuraType()])
-                    triggerData.effMask |= 1<<i;
+                triggerData.effMask |= 1<<i;
             }
         }
         if (triggerData.effMask)
