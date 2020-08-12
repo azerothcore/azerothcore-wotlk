@@ -83,7 +83,7 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/authserver/
+          docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/authserver
 
   docker-database:
     strategy:
