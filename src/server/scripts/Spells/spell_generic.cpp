@@ -5041,19 +5041,20 @@ public:
 
             if (!caster->GetInstanceScript() || !caster->GetInstanceScript()->IsEncounterInProgress()) //Don't leave combat if you are in combat with a boss
             {
-                if (!instant_exit)
+                if (!instant_exit) {
                     caster->getHostileRefManager().deleteReferences(); // exit combat after 6 seconds
+                }
                 else caster->CombatStop(); // isn't necessary to call AttackStop because is just called in CombatStop
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_gen_shadowmeld_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_gen_shadowmeld_SpellScript();
     }
