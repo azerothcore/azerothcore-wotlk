@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 # List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 # set timezone environment variable
-ENV TZ=America/Los_Angeles
+ENV TZ=Etc/UTC
 
 # set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
