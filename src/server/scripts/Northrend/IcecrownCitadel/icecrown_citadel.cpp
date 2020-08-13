@@ -516,7 +516,16 @@ class npc_highlord_tirion_fordring_lh : public CreatureScript
                         case EVENT_MURADIN_RUN:
                         case EVENT_SAURFANG_RUN:
                             if (Creature* factionNPC = ObjectAccessor::GetCreature(*me, _factionNPC))
-                                factionNPC->GetMotionMaster()->MovePath(factionNPC->GetDBTableGUIDLow()*10, false);
+                            {
+                                factionNPC->GetMotionMaster()->MovePath(factionNPC->GetDBTableGUIDLow() * 10, false);
+                                factionNPC->DespawnOrUnsummon(46500);
+                                std::list<Creature*> followers;
+                                factionNPC->GetCreaturesWithEntryInRange(followers, 30, _instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? NPC_KOR_KRON_GENERAL : NPC_ALLIANCE_COMMANDER);
+                                for (Creature* follower : followers)
+                                {
+                                    follower->DespawnOrUnsummon(46500);
+                                }
+                            }
                             me->setActive(false);
                             _damnedKills = 3;
                             break;
