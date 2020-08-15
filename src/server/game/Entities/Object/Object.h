@@ -913,6 +913,7 @@ class WorldObject : public Object, public WorldLocation
 
         void PlayDistanceSound(uint32 sound_id, Player* target = NULL);
         void PlayDirectSound(uint32 sound_id, Player* target = NULL);
+        void PlayDirectMusic(uint32 music_id, Player* target = NULL);
 
         void SendObjectDeSpawnAnim(uint64 guid);
 
@@ -973,6 +974,8 @@ class WorldObject : public Object, public WorldLocation
         Player* SelectNearestPlayer(float distance = 0) const;
         void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
         void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+
+        void GetPlayerListInGrid(std::list<Player*>& lList, float fMaxSearchRange) const;
 
         void DestroyForNearbyPlayers();
         virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);

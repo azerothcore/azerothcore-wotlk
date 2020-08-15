@@ -1261,6 +1261,366 @@ public:
     }
 };
 
+/*####
+## go_brewfest_music
+####*/
+
+enum BrewfestMusic
+{
+    EVENT_BREWFESTDWARF01 = 11810, // 1.35 min
+    EVENT_BREWFESTDWARF02 = 11812, // 1.55 min
+    EVENT_BREWFESTDWARF03 = 11813, // 0.23 min
+    EVENT_BREWFESTGOBLIN01 = 11811, // 1.08 min
+    EVENT_BREWFESTGOBLIN02 = 11814, // 1.33 min
+    EVENT_BREWFESTGOBLIN03 = 11815 // 0.28 min
+};
+
+enum BrewfestMusicTime
+{
+    EVENT_BREWFESTDWARF01_TIME = 95000,
+    EVENT_BREWFESTDWARF02_TIME = 155000,
+    EVENT_BREWFESTDWARF03_TIME = 23000,
+    EVENT_BREWFESTGOBLIN01_TIME = 68000,
+    EVENT_BREWFESTGOBLIN02_TIME = 93000,
+    EVENT_BREWFESTGOBLIN03_TIME = 28000
+};
+
+enum BrewfestMusicAreas
+{
+    SILVERMOON = 3430, // Horde
+    UNDERCITY = 1497,
+    ORGRIMMAR_1 = 1296,
+    ORGRIMMAR_2 = 14,
+    THUNDERBLUFF = 1638,
+    IRONFORGE_1 = 809, // Alliance
+    IRONFORGE_2 = 1,
+    STORMWIND = 12,
+    EXODAR = 3557,
+    DARNASSUS = 1657,
+    SHATTRATH = 3703 // General
+};
+
+enum BrewfestMusicEvents
+{
+    EVENT_BM_SELECT_MUSIC = 1,
+    EVENT_BM_START_MUSIC = 2
+};
+
+class go_brewfest_music : public GameObjectScript
+{
+public:
+    go_brewfest_music() : GameObjectScript("go_brewfest_music") { }
+
+    struct go_brewfest_musicAI : public GameObjectAI
+    {
+        uint32 rnd = 0;
+
+        go_brewfest_musicAI(GameObject* go) : GameObjectAI(go)
+        {
+            _events.ScheduleEvent(EVENT_BM_SELECT_MUSIC, 1000);
+            _events.ScheduleEvent(EVENT_BM_START_MUSIC, 2000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_BM_SELECT_MUSIC:
+                    if (!IsHolidayActive(HOLIDAY_BREWFEST)) // Check if Brewfest is active
+                        break;
+                    rnd = urand(0, 2); // Select random music sample
+                    _events.ScheduleEvent(EVENT_BM_SELECT_MUSIC, 1000); // Select new song music after play time is over
+                    break;
+                case EVENT_BM_START_MUSIC:
+                    if (!IsHolidayActive(HOLIDAY_BREWFEST)) // Check if Brewfest is active
+                        break;
+
+                    switch (go->GetAreaId())
+                    {
+                        // Horde
+                    case SILVERMOON:
+                    case UNDERCITY:
+                    case ORGRIMMAR_1:
+                    case ORGRIMMAR_2:
+                    case THUNDERBLUFF:
+                        if (rnd == 0)
+                        {
+                            go->PlayDirectMusic(EVENT_BREWFESTGOBLIN01);
+                            _events.ScheduleEvent(EVENT_BREWFESTGOBLIN01, 1000);
+                        }
+                        else if (rnd == 1)
+                        {
+                            go->PlayDirectMusic(EVENT_BREWFESTGOBLIN02);
+                            _events.ScheduleEvent(EVENT_BREWFESTGOBLIN02, 1000);
+                        }
+                        else
+                        {
+                            go->PlayDirectMusic(EVENT_BREWFESTGOBLIN03);
+                            _events.ScheduleEvent(EVENT_BREWFESTGOBLIN03, 1000);
+                        }
+                        break;
+                        // Alliance
+                    case IRONFORGE_1:
+                    case IRONFORGE_2:
+                    case STORMWIND:
+                    case EXODAR:
+                    case DARNASSUS:
+                        if (rnd == 0)
+                        {
+                            go->PlayDirectMusic(EVENT_BREWFESTDWARF01);
+                            _events.ScheduleEvent(EVENT_BREWFESTDWARF01, 1000);
+                        }
+                        else if (rnd == 1)
+                        {
+                            go->PlayDirectMusic(EVENT_BREWFESTDWARF02);
+                            _events.ScheduleEvent(EVENT_BREWFESTDWARF02, 1000);
+                        }
+                        else
+                        {
+                            go->PlayDirectMusic(EVENT_BREWFESTDWARF03);
+                            _events.ScheduleEvent(EVENT_BREWFESTDWARF03, 1000);
+                        }
+                        break;
+                        // Neurtal
+                    case SHATTRATH:
+                        std::list<Player*> playersNearby;
+                        go->GetPlayerListInGrid(playersNearby, go->GetVisibilityRange());
+                        for (Player* player : playersNearby)
+                        {
+                            if (player->GetTeamId() == TEAM_HORDE)
+                            {
+                                if (rnd == 0)
+                                {
+                                    go->PlayDirectMusic(EVENT_BREWFESTGOBLIN01);
+                                    _events.ScheduleEvent(EVENT_BREWFESTGOBLIN01, 1000);
+                                }
+                                else if (rnd == 1)
+                                {
+                                    go->PlayDirectMusic(EVENT_BREWFESTGOBLIN02);
+                                    _events.ScheduleEvent(EVENT_BREWFESTGOBLIN02, 1000);
+                                }
+                                else
+                                {
+                                    go->PlayDirectMusic(EVENT_BREWFESTGOBLIN03);
+                                    _events.ScheduleEvent(EVENT_BREWFESTGOBLIN03, 1000);
+                                }
+                            }
+                            else
+                            {
+                                if (rnd == 0)
+                                {
+                                    go->PlayDirectMusic(EVENT_BREWFESTDWARF01);
+                                    _events.ScheduleEvent(EVENT_BREWFESTDWARF01, 1000);
+                                }
+                                else if (rnd == 1)
+                                {
+                                    go->PlayDirectMusic(EVENT_BREWFESTDWARF02);
+                                    _events.ScheduleEvent(EVENT_BREWFESTDWARF02, 1000);
+                                }
+                                else
+                                {
+                                    go->PlayDirectMusic(EVENT_BREWFESTDWARF03);
+                                    _events.ScheduleEvent(EVENT_BREWFESTDWARF03, 1000);
+                                }
+                            }
+                        }
+                        break;
+                    }
+
+                    _events.ScheduleEvent(EVENT_BM_START_MUSIC, 5000); // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_brewfest_musicAI(go);
+    }
+};
+
+/*####
+## go_midsummer_music
+####*/
+
+enum MidsummerMusic
+{
+    EVENTMIDSUMMERFIREFESTIVAL_A = 12319, // 1.08 min
+    EVENTMIDSUMMERFIREFESTIVAL_H = 12325, // 1.12 min
+};
+
+enum MidsummerMusicEvents
+{
+    EVENT_MM_START_MUSIC = 1
+};
+
+class go_midsummer_music : public GameObjectScript
+{
+public:
+    go_midsummer_music() : GameObjectScript("go_midsummer_music") { }
+
+    struct go_midsummer_musicAI : public GameObjectAI
+    {
+        go_midsummer_musicAI(GameObject* go) : GameObjectAI(go)
+        {
+            _events.ScheduleEvent(EVENT_MM_START_MUSIC, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_MM_START_MUSIC:
+                {
+                    if (!IsHolidayActive(HOLIDAY_FIRE_FESTIVAL))
+                        break;
+
+                    std::list<Player*> playersNearby;
+                    go->GetPlayerListInGrid(playersNearby, go->GetVisibilityRange());
+                    for (Player* player : playersNearby)
+                    {
+                        if (player->GetTeamId() == TEAM_HORDE)
+                            go->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
+                        else
+                            go->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
+                    }
+                    _events.ScheduleEvent(EVENT_MM_START_MUSIC, 5000); // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_midsummer_musicAI(go);
+    }
+};
+
+/*####
+## go_darkmoon_faire_music
+####*/
+
+enum DarkmoonFaireMusic
+{
+    MUSIC_DARKMOON_FAIRE_MUSIC = 8440
+};
+
+enum DarkmoonFaireMusicEvents
+{
+    EVENT_DFM_START_MUSIC = 1
+};
+
+class go_darkmoon_faire_music : public GameObjectScript
+{
+public:
+    go_darkmoon_faire_music() : GameObjectScript("go_darkmoon_faire_music") { }
+
+    struct go_darkmoon_faire_musicAI : public GameObjectAI
+    {
+        go_darkmoon_faire_musicAI(GameObject* go) : GameObjectAI(go)
+        {
+            _events.ScheduleEvent(EVENT_DFM_START_MUSIC, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_DFM_START_MUSIC:
+                    if (!IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_ELWYNN) && !IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_THUNDER) && !IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_SHATTRATH))
+                        break;
+                    go->PlayDirectMusic(MUSIC_DARKMOON_FAIRE_MUSIC);
+                    _events.ScheduleEvent(EVENT_DFM_START_MUSIC, 5000);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_darkmoon_faire_musicAI(go);
+    }
+};
+
+/*####
+## go_pirate_day_music
+####*/
+
+enum PirateDayMusic
+{
+    MUSIC_PIRATE_DAY_MUSIC = 12845
+};
+
+enum PirateDayMusicEvents
+{
+    EVENT_PDM_START_MUSIC = 1
+};
+
+class go_pirate_day_music : public GameObjectScript
+{
+public:
+    go_pirate_day_music() : GameObjectScript("go_pirate_day_music") { }
+
+    struct go_pirate_day_musicAI : public GameObjectAI
+    {
+        go_pirate_day_musicAI(GameObject* go) : GameObjectAI(go)
+        {
+            _events.ScheduleEvent(EVENT_PDM_START_MUSIC, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_PDM_START_MUSIC:
+                    if (!IsHolidayActive(HOLIDAY_PIRATES_DAY))
+                        break;
+                    go->PlayDirectMusic(MUSIC_PIRATE_DAY_MUSIC);
+                    _events.ScheduleEvent(EVENT_PDM_START_MUSIC, 5000);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_pirate_day_musicAI(go);
+    }
+};
+
 void AddSC_go_scripts()
 {
     // Ours
@@ -1300,4 +1660,8 @@ void AddSC_go_scripts()
     new go_hive_pod();
     new go_massive_seaforium_charge();
     new go_veil_skith_cage();
+    new go_brewfest_music();
+    new go_midsummer_music();
+    new go_darkmoon_faire_music();
+    new go_pirate_day_music();
 }
