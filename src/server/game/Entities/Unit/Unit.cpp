@@ -5575,11 +5575,11 @@ void Unit::SendSpellNonMeleeReflectLog(SpellNonMeleeDamage* log, Unit* attacker)
     data.append(log->target->GetPackGUID());
     data.append(attacker->GetPackGUID());
     data << uint32(log->SpellID);
-    data << uint32(damage);                            // damage amount
+    data << uint32(damage);                                 // damage amount
     int32 overkill = damage - log->target->GetHealth();
     data << uint32(overkill > 0 ? overkill : 0);            // overkill
     data << uint8 (log->schoolMask);                        // damage school
-    data << uint32(absorb);                            // AbsorbedDamage
+    data << uint32(absorb);                                 // AbsorbedDamage
     data << uint32(log->resist);                            // resist
     data << uint8 (log->physicalLog);                       // if 1, then client show spell name (example: %s's ranged shot hit %s for %u school or %s suffers %u school damage from %s's spell_name
     data << uint8 (log->unused);                            // unused
@@ -5654,8 +5654,8 @@ void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo)
     data << uint32(aura->GetAuraType());                    // auraId
     switch (aura->GetAuraType())
     {
-    case SPELL_AURA_PERIODIC_DAMAGE:
-    case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+        case SPELL_AURA_PERIODIC_DAMAGE:
+        case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
             {
             //IF we are in cheat mode we swap absorb with damage and set damage to 0, this way we can still debug damage but our hp bar will not drop
             uint32 damage = pInfo->damage;
@@ -5667,10 +5667,10 @@ void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo)
             }
 
 
-            data << uint32(damage);                  // damage
+            data << uint32(damage);                         // damage
             data << uint32(pInfo->overDamage);              // overkill?
             data << uint32(aura->GetSpellInfo()->GetSchoolMask());
-            data << uint32(absorb);                  // absorb
+            data << uint32(absorb);                         // absorb
             data << uint32(pInfo->resist);                  // resist
             data << uint8(pInfo->critical);                 // new 3.1.2 critical tick
             }
@@ -5740,7 +5740,7 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo)
     sLog->outDebug(LOG_FILTER_UNITS, "WORLD: Sending SMSG_ATTACKERSTATEUPDATE");
 #endif
 
-    //IF we are in cheat mode we swap absorb with damage and set daamge to 0, this way we can still debug damage but our hp bar will not drop
+    //IF we are in cheat mode we swap absorb with damage and set damage to 0, this way we can still debug damage but our hp bar will not drop
     uint32 damage = damageInfo->damage;
     uint32 absorb = damageInfo->absorb;
     if (damageInfo->target->GetTypeId() == TYPEID_PLAYER && damageInfo->target->ToPlayer()->GetCommandStatus(CHEAT_GOD))
