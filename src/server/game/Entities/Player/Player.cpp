@@ -2666,6 +2666,21 @@ void Player::Regenerate(Powers power)
     if (!maxValue)
         return;
 
+    //If .cheat power is on alwas have the max power
+    if (GetCommandStatus(CHEAT_POWER))
+    {
+        if (m_regenTimerCount >= 2000)
+        {
+            //Set the value to 0 first then set it to max to force resend of packet as for range clients keeps removing rage
+            if(power == POWER_RAGE || power == POWER_RUNIC_POWER)
+                UpdateUInt32Value(UNIT_FIELD_POWER1 + power, 0);
+
+            SetPower(power, maxValue);
+            return;
+        }
+    }
+
+
     uint32 curValue = GetPower(power);
 
     // TODO: possible use of miscvalueb instead of amount
@@ -25514,7 +25529,7 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 
     //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
     // 14.57 can be calculated by resolving damageperc formula below to 0
-    if (z_diff >= 14.57f && !isDead() && !IsGameMaster() &&
+    if (z_diff >= 14.57f && !isDead() && !IsGameMaster() && !GetCommandStatus(CHEAT_GOD) &&
         !HasAuraType(SPELL_AURA_HOVER) && !HasAuraType(SPELL_AURA_FEATHER_FALL) &&
         !HasAuraType(SPELL_AURA_FLY))
     {
