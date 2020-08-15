@@ -38,7 +38,7 @@ public:
             { "delete",        SEC_CONSOLE,          true,  &HandleCharacterDeletedDeleteCommand,  "" },
             { "list",          SEC_ADMINISTRATOR,    true,  &HandleCharacterDeletedListCommand,    "" },
             { "restore",       SEC_ADMINISTRATOR,    true,  &HandleCharacterDeletedRestoreCommand, "" },
-            { "purge",           SEC_CONSOLE,          true,  &HandleCharacterDeletedOldCommand,     "" },
+            { "purge",         SEC_CONSOLE,          true,  &HandleCharacterDeletedOldCommand,     "" },
         };
 
         static std::vector<ChatCommand> characterCommandTable =
