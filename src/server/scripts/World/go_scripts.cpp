@@ -642,6 +642,60 @@ public:
     }
 };
 
+/*####
+## go_darkmoon_faire_music
+####*/
+enum DarkmoonFaireMusic
+{
+    MUSIC_DARKMOON_FAIRE_MUSIC = 8440
+};
+
+enum DarkmoonFaireMusicEvents
+{
+    EVENT_DFM_START_MUSIC = 1
+};
+
+class go_darkmoon_faire_music : public GameObjectScript
+{
+public:
+    go_darkmoon_faire_music() : GameObjectScript("go_darkmoon_faire_music") { }
+
+    struct go_darkmoon_faire_musicAI : public GameObjectAI
+    {
+        uint32 rnd;
+
+        go_darkmoon_faire_musicAI(GameObject* go) : GameObjectAI(go)
+        {
+            _events.ScheduleEvent(EVENT_DFM_START_MUSIC, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_DFM_START_MUSIC:
+                    if (!IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_ELWYNN) || !IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_THUNDER) || !IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_SHATTRATH))
+                        break;
+                    go->PlayDirectMusic(MUSIC_DARKMOON_FAIRE_MUSIC);
+                    _events.ScheduleEvent(EVENT_DFM_START_MUSIC, 5000);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_darkmoon_faire_musicAI(go);
+    }
+};
 
 /*######
 ## go_cat_figurine
@@ -1512,6 +1566,7 @@ void AddSC_go_scripts()
     // Theirs
     new go_brewfest_music();
     new go_pirate_day_music();
+    new go_darkmoon_faire_music();
     new go_cat_figurine();
     new go_gilded_brazier();
     //new go_shrine_of_the_birds();
