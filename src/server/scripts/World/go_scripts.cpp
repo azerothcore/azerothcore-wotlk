@@ -697,6 +697,79 @@ public:
     }
 };
 
+/*####
+## go_midsummer_music
+####*/
+
+enum MidsummerMusic
+{
+    EVENTMIDSUMMERFIREFESTIVAL_A = 12319, // 1.08 min
+    EVENTMIDSUMMERFIREFESTIVAL_H = 12325, // 1.12 min 
+};
+
+enum MidsummerMusicEvents
+{
+    EVENT_MM_START_MUSIC = 1
+};
+
+class go_midsummer_music : public GameObjectScript
+{
+public:
+    go_midsummer_music() : GameObjectScript("go_midsummer_music") { }
+
+    struct go_midsummer_musicAI : public GameObjectAI
+    {
+        go_midsummer_musicAI(GameObject* go) : GameObjectAI(go)
+        {
+            _events.ScheduleEvent(EVENT_MM_START_MUSIC, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_MM_START_MUSIC:
+                {
+                    if (!IsHolidayActive(HOLIDAY_FIRE_FESTIVAL))
+                        break;
+
+                    Map::PlayerList const& players = go->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    {
+                        if (Player* player = itr->GetSource())
+                        {
+                            if (player->GetTeamId() == TEAM_HORDE)
+                            {
+                                go->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
+                            }
+                            else
+                            {
+                                go->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
+                            }
+                        }
+                    }
+
+                    _events.ScheduleEvent(EVENT_MM_START_MUSIC, 5000); // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_midsummer_musicAI(go);
+    }
+};
+
 /*######
 ## go_cat_figurine
 ######*/
@@ -1567,6 +1640,7 @@ void AddSC_go_scripts()
     new go_brewfest_music();
     new go_pirate_day_music();
     new go_darkmoon_faire_music();
+    new go_midsummer_music();
     new go_cat_figurine();
     new go_gilded_brazier();
     //new go_shrine_of_the_birds();
