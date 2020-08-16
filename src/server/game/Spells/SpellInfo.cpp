@@ -1210,7 +1210,7 @@ bool SpellInfo::CanBeUsedInCombat() const
 
 bool SpellInfo::IsPositive() const
 {
-    return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE);
+    return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE) || (AttributesCu & SPELL_ATTR0_CU_POSITIVE);
 }
 
 bool SpellInfo::IsPositiveEffect(uint8 effIndex) const
@@ -1219,11 +1219,11 @@ bool SpellInfo::IsPositiveEffect(uint8 effIndex) const
     {
         default:
         case 0:
-            return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE_EFF0);
+            return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE_EFF0) || (AttributesCu & SPELL_ATTR0_CU_POSITIVE_EFF0);
         case 1:
-            return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE_EFF1);
+            return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE_EFF1) || (AttributesCu & SPELL_ATTR0_CU_POSITIVE_EFF1);
         case 2:
-            return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE_EFF2);
+            return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE_EFF2) || (AttributesCu & SPELL_ATTR0_CU_POSITIVE_EFF2);
     }
 }
 
@@ -2547,91 +2547,6 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
     // not found a single positive spell with this attribute
     if (Attributes & SPELL_ATTR0_NEGATIVE_1)
         return false;
-
-    switch (SpellFamilyName)
-    {
-        case SPELLFAMILY_GENERIC:
-            switch (Id)
-            {
-                case 11196: // Recently bandaged
-                case 29214: // Wrath of the Plaguebringer
-                case 34700: // Allergic Reaction
-                case 34709: // Shadow Sight (arena stealth detection)
-                case 54836: // Wrath of the Plaguebringer
-                case 58867: // Shaman's Spirit Wolf leap
-                case 61987: // Avenging Wrath Marker
-                case 61988: // Divine Shield exclude aura
-                case 72998: // Shadow Prison (Blood Prince Council, ICC Encounter)
-                    return false;
-                case 30877: // Tag Murloc
-                case 61716: // Rabbit Costume
-                case 61734: // Noblegarden Bunny
-                case 62344: // Fists of Stone
-                case 61819: // Manabonked! (item)
-                case 61834: // Manabonked! (minigob)
-                case 19451: // Enrage (Magmadar)
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        case SPELLFAMILY_MAGE:
-            // Amplify Magic, Dampen Magic
-            if (SpellFamilyFlags[0] == 0x00002000)
-                return true;
-            if (SpellIconID == 242)
-                return true;
-            // Ignite
-            if (SpellIconID == 45)
-                return true;
-            break;
-        case SPELLFAMILY_PRIEST:
-            switch (Id)
-            {
-                case 64844: // Divine Hymn
-                case 64904: // Hymn of Hope
-                case 47585: // Dispersion
-                    return true;
-                default:
-                    break;
-            }
-            // Mind Flay
-            if (SpellFamilyFlags[0] & 0x800000)
-                return false;
-            break;
-        case SPELLFAMILY_HUNTER:
-            // Aspect of the Viper
-            if (Id == 34074)
-                return true;
-            break;
-        case SPELLFAMILY_ROGUE:
-            // Envenom
-           if (SpellIconID == 2237)
-                return true;
-           // Slice and Dice
-           else if (SpellFamilyFlags[0] & 0x40000)
-               return true;
-           // Distract
-           else if (Id == 1725)
-               return true;
-           break;
-        case SPELLFAMILY_SHAMAN:
-            if (Id == 30708)
-                return false;
-            break;
-        case SPELLFAMILY_PALADIN:
-            // Forberance
-            if (Id == 25771)
-                return false;
-            break;
-        case SPELLFAMILY_WARRIOR:
-            // Intervene, Warrior, considered negative due to triggered spell with threat
-            if (Id == 3411)
-                return true;
-            break;
-        default:
-            break;
-    }
 
     switch (Mechanic)
     {
