@@ -2672,8 +2672,10 @@ void Player::Regenerate(Powers power)
         if (m_regenTimerCount >= 2000)
         {
             //Set the value to 0 first then set it to max to force resend of packet as for range clients keeps removing rage
-            if(power == POWER_RAGE || power == POWER_RUNIC_POWER)
+            if (power == POWER_RAGE || power == POWER_RUNIC_POWER)
+            {
                 UpdateUInt32Value(UNIT_FIELD_POWER1 + power, 0);
+            }
 
             SetPower(power, maxValue);
             return;
