@@ -913,6 +913,7 @@ class WorldObject : public Object, public WorldLocation
 
         void PlayDistanceSound(uint32 sound_id, Player* target = NULL);
         void PlayDirectSound(uint32 sound_id, Player* target = NULL);
+        void PlayDirectMusic(uint32 music_id, Player* target = NULL);
 
         void SendObjectDeSpawnAnim(uint64 guid);
 
