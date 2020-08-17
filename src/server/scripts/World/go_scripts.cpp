@@ -489,72 +489,75 @@ public:
                     //Check zone to play correct music
                     if (go->GetAreaId() == SILVERMOON || go->GetAreaId() == UNDERCITY || go->GetAreaId() == ORGRIMMAR_1 || go->GetAreaId() == ORGRIMMAR_2 || go->GetAreaId() == THUNDERBLUFF)
                     {
-                        if (rnd == 0)
+                        switch (rnd)
                         {
+                        case 0:
                             _currentMusicEvent = EVENT_BREWFESTGOBLIN01;
                             musicTime = EVENT_BREWFESTGOBLIN01_TIME;
-                        }
-                        else if (rnd == 1)
-                        {
+                            break;
+                        case 1:
                             _currentMusicEvent = EVENT_BREWFESTGOBLIN02;
                             musicTime = EVENT_BREWFESTGOBLIN02_TIME;
-                        }
-                        else
-                        {
+                            break;
+                        case 2:
                             _currentMusicEvent = EVENT_BREWFESTGOBLIN03;
                             musicTime = EVENT_BREWFESTGOBLIN03_TIME;
+                            break;
+                        default:
+                            break;
                         }
                     }
                     else if (go->GetAreaId() == IRONFORGE_1 || go->GetAreaId() == IRONFORGE_2 || go->GetAreaId() == STORMWIND || go->GetAreaId() == EXODAR || go->GetAreaId() == DARNASSUS)
                     {
-                        if (rnd == 0)
+                        switch (rnd)
                         {
+                        case 0:
                             _currentMusicEvent = EVENT_BREWFESTDWARF01;
                             musicTime = EVENT_BREWFESTDWARF01_TIME;
-                        }
-                        else if (rnd == 1)
-                        {
+                            break;
+                        case 1:
                             _currentMusicEvent = EVENT_BREWFESTDWARF02;
                             musicTime = EVENT_BREWFESTDWARF02_TIME;
-                        }
-                        else
-                        {
+                            break;
+                        case 2:
                             _currentMusicEvent = EVENT_BREWFESTDWARF03;
                             musicTime = EVENT_BREWFESTDWARF03_TIME;
+                            break;
+                        default:
+                            break;
                         }
                     }
                     else if (go->GetAreaId() == SHATTRATH)
                     {
                         rnd = urand(0, 5);
-                        if (rnd == 0)
+                        switch (rnd)
                         {
+                        case 0:
                             _currentMusicEvent = EVENT_BREWFESTGOBLIN01;
                             musicTime = EVENT_BREWFESTGOBLIN01_TIME;
-                        }
-                        else if (rnd == 1)
-                        {
+                            break;
+                        case 1:
                             _currentMusicEvent = EVENT_BREWFESTGOBLIN02;
                             musicTime = EVENT_BREWFESTGOBLIN02_TIME;
-                        }
-                        else if (rnd == 2)
-                        {
+                            break;
+                        case 2:
                             _currentMusicEvent = EVENT_BREWFESTGOBLIN03;
                             musicTime = EVENT_BREWFESTGOBLIN03_TIME;
-                        }
-                        else if (rnd == 3)
-                        {
+                            break;
+                        case 3:
                             _currentMusicEvent = EVENT_BREWFESTDWARF01;
                             musicTime = EVENT_BREWFESTDWARF01_TIME;
-                        }
-                        else if (rnd == 4)
-                        {
+                            break;
+                        case 4:
                             _currentMusicEvent = EVENT_BREWFESTDWARF02;
                             musicTime = EVENT_BREWFESTDWARF02_TIME;
-                        }
-                        else
-                        {
+                            break;
+                        case 5:
                             _currentMusicEvent = EVENT_BREWFESTDWARF03;
                             musicTime = EVENT_BREWFESTDWARF03_TIME;
+                            break;
+                        default:
+                            break;
                         }
                     }
                     _events.ScheduleEvent(EVENT_BM_SELECT_MUSIC, musicTime); // Select new song music after play time is over 
