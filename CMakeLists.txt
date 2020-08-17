@@ -154,4 +154,16 @@ if( UNIT_TESTS )
 
     enable_testing()
     add_subdirectory(src/test)
+
+    add_custom_target(coverage DEPENDS coverage_command)
+
+    add_custom_command(OUTPUT coverage_command
+        # Run unit tests.
+        COMMAND ctest
+        # Run the graphical front-end for code coverage.
+        COMMAND lcov    --directory src --capture --output-file coverage.info
+    	COMMAND lcov    --remove coverage.info '/usr/*' '${CMAKE_BINARY_DIR}/googletest/*' --output-file coverage.info
+        COMMAND genhtml -o ${CMAKE_CURRENT_SOURCE_DIR}/coverage_report coverage.info
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        )
 endif()
