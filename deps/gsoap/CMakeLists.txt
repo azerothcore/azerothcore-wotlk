@@ -1,5 +1,4 @@
-# Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
-# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+# This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -15,21 +14,18 @@ add_library(gsoap STATIC ${sources})
 
 set_target_properties(gsoap PROPERTIES LINKER_LANGUAGE CXX)
 
-# Group sources
-GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
-
 target_include_directories(gsoap
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(gsoap
   PRIVATE
-    acore-dependency-interface)
+    trinity-dependency-interface)
 
 set_target_properties(gsoap
-  PROPERTIES
-    FOLDER
-      "deps")
+    PROPERTIES
+      FOLDER
+        "dep")
 
 if (MSVC)
   # Little fix for MSVC / Windows platforms
