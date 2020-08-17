@@ -140,11 +140,16 @@ add_subdirectory(src)
 CU_RUN_HOOK("AFTER_SRC_LOAD")
 
 if( UNIT_TESTS )
-    # we use this to get code coverage
-    if(CMAKE_CXX_COMPILER_ID MATCHES GNU OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
-        message("Unit tests code coverage: enabling -fprofile-arcs -ftest-coverage")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+    # we use these flags to get code coverage
+    set(UNIT_TEST_CXX_FLAGS "-fprofile-arcs -ftest-coverage -fno-inline")
+
+    # enable additional flags for GCC.
+    if ( CMAKE_CXX_COMPILER_ID MATCHES GNU )
+        set(UNIT_TEST_CXX_FLAGS "${UNIT_TEST_CXX_FLAGS} -fno-inline-small-functions -fno-default-inline")
     endif()
+
+    message("Unit tests code coverage: enabling ${UNIT_TEST_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${UNIT_TEST_CXX_FLAGS}")
 
     include(src/cmake/googletest.cmake)
     fetch_googletest(
