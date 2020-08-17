@@ -45,6 +45,44 @@ jobs:
       - name: Run unit tests
         run: source ./apps/ci/ci-run-unit-tests.sh
 
+build:
+  strategy:
+    fail-fast: false
+    matrix:
+      compiler: [clang6]
+      modules: [without]
+  runs-on: ubuntu-18.04
+  name: ubuntu-18.04-${{ matrix.compiler }}-${{ matrix.modules }}-modules
+  env:
+    COMPILER: ${{ matrix.compiler }}
+  steps:
+    - uses: actions/checkout@v2
+    - name: Checkout modules
+      run: ./apps/ci/ci-install-modules.sh
+      if: matrix.modules == 'with'
+    - name: Cache
+      uses: actions/cache@v1.1.2
+      with:
+        path: /home/runner/.ccache
+        key: ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
+        restore-keys: |
+          ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
+          ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules
+    - name: Configure OS
+      run: source ./apps/ci/ci-install.sh
+      env:
+        CONTINUOUS_INTEGRATION: true
+    - name: Import db
+      run: source ./apps/ci/ci-import-db.sh
+    - name: Build
+      run: source ./apps/ci/ci-compile.sh
+    - name: Dry run
+      run: source ./apps/ci/ci-worldserver-dry-run.sh
+    - name: Check startup errors
+      run: source ./apps/ci/ci-error-check.sh
+    - name: Run unit tests
+      run: source ./apps/ci/ci-run-unit-tests.sh
+
   docker-build:
     strategy:
       fail-fast: true
