@@ -11,9 +11,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
+        os: [ubuntu-20.04]
         compiler: [clang6, clang9, clang10]
         modules: [with, without]
-        os: [ubuntu-20.04]
+        # we can include specific combinations here
+        include:
+          os: ubuntu-18.04
+          compiler: clang
+          modules: without
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
