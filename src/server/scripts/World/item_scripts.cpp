@@ -48,15 +48,15 @@ public:
            case 24538:
                 if (player->GetAreaId() != 3628)
                     disabled = true;
-                    break;
+                break;
            case 34489:
                 if (player->GetZoneId() != 4080)
                     disabled = true;
-                    break;
+                break;
            case 34475:
                 if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ARCANE_CHARGES))
                     Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_ON_GROUND);
-                    break;
+                break;
         }
 
         // allow use in flight only
