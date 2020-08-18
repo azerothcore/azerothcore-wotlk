@@ -8,6 +8,7 @@ CWARNINGS=ON
 CDEBUG=OFF
 CTYPE=Release
 CSCRIPTS=ON
+CUNIT_TESTS=ON
 CSERVERS=ON
 CTOOLS=ON
 CSCRIPTPCH=OFF
@@ -24,6 +25,14 @@ time sudo apt-get install -y git lsb-release sudo ccache
 time ./acore.sh install-deps
 
 case $COMPILER in
+
+  # this is in order to use the "default" clang version of the OS, without forcing a specific version
+  "clang" )
+    time sudo apt-get install -y clang
+    echo "CCOMPILERC=\"clang\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"clang++\"" >> ./conf/config.sh
+    ;;
+
   "clang6" )
     time sudo apt-get install -y clang-6.0
     echo "CCOMPILERC=\"clang-6.0\"" >> ./conf/config.sh
