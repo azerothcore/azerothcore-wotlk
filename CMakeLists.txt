@@ -168,7 +168,7 @@ if( UNIT_TESTS )
         # Run the graphical front-end for code coverage.
         COMMAND lcov    --directory src --capture --output-file coverage.info
         COMMAND lcov    --remove coverage.info '/usr/*' '${CMAKE_BINARY_DIR}/googletest/*' '${CMAKE_CURRENT_SOURCE_DIR}/src/test/*' --output-file coverage.info
-        COMMAND genhtml -o ${CMAKE_CURRENT_SOURCE_DIR}/coverage_report coverage.info
+        COMMAND genhtml -o ${CMAKE_CURRENT_SOURCE_DIR}/coverage-report coverage.info
         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
         )
 endif()

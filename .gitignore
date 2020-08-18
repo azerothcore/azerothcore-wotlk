@@ -62,7 +62,7 @@ nbproject/
 .idea
 cmake-build-debug/*
 cmake-build-debug-coverage/*
-coverage_report/
+coverage-report/
 
 #
 # Eclipse
