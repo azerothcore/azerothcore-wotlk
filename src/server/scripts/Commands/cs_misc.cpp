@@ -1308,7 +1308,7 @@ public:
             //if (team == ~uint32(0))
             //    handler->PSendSysMessage(LANG_COMMAND_ZONENOGRAVEYARDS, zone_id);
             //else
-                handler->PSendSysMessage(LANG_COMMAND_ZONENOGRAFACTION, zone_id, team_name.c_str());
+            handler->PSendSysMessage(LANG_COMMAND_ZONENOGRAFACTION, zone_id, team_name.c_str());
         }
 
         return true;
@@ -3067,7 +3067,7 @@ public:
                 group->SendUpdate();
             }
 
-            return true;
+        return true;
     }
 
     static bool HandleGroupDisbandCommand(ChatHandler* handler, char const* args)
