@@ -26,6 +26,19 @@ time ./acore.sh install-deps
 
 case $COMPILER in
 
+  # this is in order to use the "default" gcc version of the OS, without forcing a specific version
+  "gcc" )
+    time sudo apt-get install -y gcc g++
+    echo "CCOMPILERC=\"gcc\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"g++\"" >> ./conf/config.sh
+    ;;
+
+  "gcc10" )
+    time sudo apt-get install -y gcc-10 g++-10
+    echo "CCOMPILERC=\"gcc-10\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"g++-10\"" >> ./conf/config.sh
+    ;;
+
   # this is in order to use the "default" clang version of the OS, without forcing a specific version
   "clang" )
     time sudo apt-get install -y clang
