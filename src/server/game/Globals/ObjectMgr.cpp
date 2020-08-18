@@ -123,6 +123,9 @@ bool normalizePlayerName(std::string& name)
     if (name.empty())
         return false;
 
+    if (name.find(" ") != std::string::npos)
+        return false;    
+    
     std::wstring tmp;
     if (!Utf8toWStr(name, tmp))
         return false;
@@ -3333,7 +3336,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                int32 amount   = fields[3].GetInt8();
+                int32 amount   = fields[3].GetUInt16();
 
                 if (!amount)
                 {
