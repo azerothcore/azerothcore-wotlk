@@ -2052,8 +2052,13 @@ public:
                         break;
                     case EVENT_AGGRO_JAINA:
                         if (me->GetVictim())
-                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                                jaina->AI()->AttackStart(me->GetVictim()); DoCast(me, SPELL_THUNDER);
+                        {
+                            if (Creature *jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                            {
+                                jaina->AI()->AttackStart(me->GetVictim());
+                            }
+                        }
+                        DoCast(me, SPELL_THUNDER);
                         _events.ScheduleEvent(EVENT_AGGRO_JAINA, 2 * IN_MILLISECONDS);
                         break;
                     case EVENT_WRYNN_BUFF:

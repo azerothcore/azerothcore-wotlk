@@ -169,12 +169,17 @@ Player* ObjectAccessor::FindPlayer(uint64 guid)
 
 Player* ObjectAccessor::FindPlayerInOrOutOfWorld(uint64 guid)
 {
-    return GetObjectInOrOutOfWorld(guid, (Player*)NULL); 
+    return GetObjectInOrOutOfWorld(guid, (Player*)NULL);
 }
 
 Unit* ObjectAccessor::FindUnit(uint64 guid)
 {
     return GetObjectInWorld(guid, (Unit*)NULL);
+}
+
+Player* ObjectAccessor::FindConnectedPlayer(uint64 const& guid)
+{
+    return HashMapHolder<Player>::Find(guid);
 }
 
 Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWorld)
@@ -486,7 +491,7 @@ void ObjectAccessor::Update(uint32 /*diff*/)
 }
 
 void Map::BuildAndSendUpdateForObjects()
-{ 
+{
     UpdateDataMapType update_players;
     UpdatePlayerSet player_set;
 
