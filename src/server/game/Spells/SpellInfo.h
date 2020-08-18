@@ -167,7 +167,7 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_SHARE_DAMAGE                  = 0x00000008,
     SPELL_ATTR0_CU_NO_INITIAL_THREAT             = 0x00000010,
     SPELL_ATTR0_CU_NONE2                         = 0x00000020,   // UNUSED
-    SPELL_ATTR0_CU_AURA_CC                       = 0x00000040,
+    SPELL_ATTR0_CU_DONT_BREAK_STEALTH            = 0x00000040,
     SPELL_ATTR0_CU_NONE3                         = 0x00000080,   // UNUSED
     SPELL_ATTR0_CU_DIRECT_DAMAGE                 = 0x00000100,
     SPELL_ATTR0_CU_CHARGE                        = 0x00000200,
@@ -186,8 +186,12 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_SINGLE_AURA_STACK             = 0x00400000, // pussywizard
     SPELL_ATTR0_CU_SCHOOLMASK_NORMAL_WITH_MAGIC  = 0x00800000,
     SPELL_ATTR0_CU_ENCOUNTER_REWARD              = 0x01000000, // pussywizard
+    SPELL_ATTR0_CU_POSITIVE_EFF0                 = 0x02000000,
+    SPELL_ATTR0_CU_POSITIVE_EFF1                 = 0x04000000,
+    SPELL_ATTR0_CU_POSITIVE_EFF2                 = 0x08000000,
 
     SPELL_ATTR0_CU_NEGATIVE                      = SPELL_ATTR0_CU_NEGATIVE_EFF0 | SPELL_ATTR0_CU_NEGATIVE_EFF1 | SPELL_ATTR0_CU_NEGATIVE_EFF2,
+    SPELL_ATTR0_CU_POSITIVE                      = SPELL_ATTR0_CU_POSITIVE_EFF0 | SPELL_ATTR0_CU_POSITIVE_EFF1 | SPELL_ATTR0_CU_POSITIVE_EFF2,
 };
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType);
