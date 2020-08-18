@@ -2517,7 +2517,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
             // xinef: i think this is wrong, found only 2 vehicles with faction override and one of them should inherit caster faction...
             //uint32 faction = properties->Faction;
             //if (!faction)
-                uint32 faction = m_originalCaster->getFaction();
+            uint32 faction = m_originalCaster->getFaction();
 
             summon->setFaction(faction);
             break;
