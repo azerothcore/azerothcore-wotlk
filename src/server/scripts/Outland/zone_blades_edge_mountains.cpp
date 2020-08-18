@@ -157,7 +157,7 @@ public:
                             me->SummonCreature(NPC_HOUND, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
                         else 
                             me->SummonCreature(NPC_FEL_IMP, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
-                            events.ScheduleEvent(EVENT_PARTY_TIMER, 3000);
+                        events.ScheduleEvent(EVENT_PARTY_TIMER, 3000);
                         break;
                 }
             }
