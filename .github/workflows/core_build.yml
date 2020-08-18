@@ -17,9 +17,9 @@ jobs:
         modules: [with, without]
         # we can include specific combinations here
         include:
-          os: ubuntu-18.04
-          compiler: clang
-          modules: without
+          - os: ubuntu-18.04
+            compiler: clang
+            modules: without
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
