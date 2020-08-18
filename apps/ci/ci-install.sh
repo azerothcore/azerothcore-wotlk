@@ -8,6 +8,7 @@ CWARNINGS=ON
 CDEBUG=OFF
 CTYPE=Release
 CSCRIPTS=ON
+CUNIT_TESTS=ON
 CSERVERS=ON
 CTOOLS=ON
 CSCRIPTPCH=OFF
@@ -24,16 +25,32 @@ time sudo apt-get install -y git lsb-release sudo ccache
 time ./acore.sh install-deps
 
 case $COMPILER in
+
+  # this is in order to use the "default" clang version of the OS, without forcing a specific version
+  "clang" )
+    time sudo apt-get install -y clang
+    echo "CCOMPILERC=\"clang\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"clang++\"" >> ./conf/config.sh
+    ;;
+
   "clang6" )
     time sudo apt-get install -y clang-6.0
     echo "CCOMPILERC=\"clang-6.0\"" >> ./conf/config.sh
     echo "CCOMPILERCXX=\"clang++-6.0\"" >> ./conf/config.sh
     ;;
 
-  "clang7" )
-    time sudo apt-get install -y clang-7
-    echo "CCOMPILERC=\"clang-7\"" >> ./conf/config.sh
-    echo "CCOMPILERCXX=\"clang++-7\"" >> ./conf/config.sh
+  "clang9" )
+    time sudo apt-get install -y clang-9
+    echo "CCOMPILERC=\"clang-9\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"clang++-9\"" >> ./conf/config.sh
+    ;;
+
+  "clang10" )
+    time sudo apt-get install -y clang-10
+    echo "CCOMPILERC=\"clang-10\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"clang++-10\"" >> ./conf/config.sh
+    # disable -Werror for clang-10 TODO: remove when this is fixed https://github.com/azerothcore/azerothcore-wotlk/issues/3108
+    echo "CCUSTOMOPTIONS='-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'" >> ./conf/config.sh
     ;;
 
   * )
