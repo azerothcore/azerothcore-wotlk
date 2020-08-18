@@ -281,7 +281,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         stripLineInvisibleChars(msg);
 
     // pussywizard:
-    if (lang != LANG_ADDON && msg.find("|0") != std::string::npos)
+    if (msg.length() > 255 || (lang != LANG_ADDON && msg.find("|0") != std::string::npos))
         return;
 
     if (!ignoreChecks)
