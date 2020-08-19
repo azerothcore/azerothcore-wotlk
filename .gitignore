@@ -24,7 +24,7 @@ docker/worldserver/logs/
 docker/worldserver/data/
 !docker/build
 .env
-/apps/joiner/
+apps/joiner/
 
 !.gitkeep
 
