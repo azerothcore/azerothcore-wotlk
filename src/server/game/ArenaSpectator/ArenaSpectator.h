@@ -92,7 +92,7 @@ namespace ArenaSpectator
     {
         if (!IS_PLAYER_GUID(targetGUID))
             return;
-        SendCommand(o, "%s0x%" PRIu64 ";%s=%s;", SPECTATOR_ADDON_PREFIX, targetGUID, prefix, c);
+        SendCommand(o, "%s0x%016llX;%s=%s;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, c);
     }
 
     template<class T>
