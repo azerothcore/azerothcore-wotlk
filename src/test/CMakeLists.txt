@@ -10,8 +10,8 @@ add_executable(
 
 target_link_libraries(
         unit_tests
-        gtest_main
         game
+        gtest_main
         game-interface
 )
 
@@ -19,5 +19,5 @@ add_test(
         NAME
         unit
         COMMAND
-        ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/unit_tests
+        ${CMAKE_BINARY_DIR}/src/test/unit_tests
 )
