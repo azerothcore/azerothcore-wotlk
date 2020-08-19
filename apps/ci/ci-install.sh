@@ -32,8 +32,8 @@ case $COMPILER in
 
   "clang6" )
     time sudo apt-get install -y clang-6.0
-    C_COMP=clang-6
-    CPP_COMP=clang++-6
+    C_COMP=clang-6.0
+    CPP_COMP=clang++-6.0
     COMPILATION_OPTIONS="${COMPILATION_OPTIONS} ${ADDITIONAL_OPTIONS}"
     ;;
 
