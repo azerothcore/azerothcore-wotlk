@@ -1,3 +1,19 @@
+-- DB update 2020_08_16_01 -> 2020_08_19_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_08_16_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_08_16_01 2020_08_19_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1593111120831223600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1593111120831223600');
 
 DELETE FROM `gameobject` WHERE `id` IN (185522,185519,185460) AND `map`= 557 AND `spawnMask`=2;
@@ -40,3 +56,12 @@ INSERT INTO `creature_text` (`CreatureId`, `GroupId`, `ID`, `Text`, `type`, `lan
 (@ENTRY, 0, 0, ' I... I am free! Ethereum were planning on torturing me until I gave in to their requests. I fear that, had you not come along, I would have surely given in to their torment.', 12, 0, 100, 0, 0, 0, 'Paxivi', 20633),
 (@ENTRY, 1, 0, ' Know this, $r. Within Shaffar''s chambers at the end of these tombs rests a creature of unimaginable power. It is held in check be the power of the stasis chamber. You must return to Ameer before you venture further if you wish to destroy it!', 12, 0, 100, 0, 0, 0, 'Paxivi', 20634);
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
