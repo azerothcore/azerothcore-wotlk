@@ -739,7 +739,8 @@ namespace MMAP
                         {
                             for (uint32 y = 0; y < tilesY; ++y)
                             {
-                                if ((flags[x + y * tilesX] & 0x0f) != 0x0f) {
+                                if ((flags[x + y * tilesX] & 0x0f) != 0x0f)
+                                {
                                     square = x * tilesY + y;
                                     idx1 = square + x;
                                     idx2 = square + 1 + x;
