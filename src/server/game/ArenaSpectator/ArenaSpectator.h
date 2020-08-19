@@ -135,7 +135,7 @@ namespace ArenaSpectator
     {
         if (!IS_PLAYER_GUID(targetGUID))
             return;
-        SendCommand(o, "%s0x%016llX;%s=%u,%u,%i,%i,%u,%u,%u,0x%016llX;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, remove ? 1 : 0, stack, dur, maxdur, id, dispel, isDebuff ? 1 : 0, caster);
+        SendCommand(o, "%s0x%016llX;%s=%u,%u,%i,%i,%u,%u,%u,0x%016llX;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, remove ? 1 : 0, stack, dur, maxdur, id, dispel, isDebuff ? 1 : 0, (unsigned long long)caster);
     }
 
     void HandleResetCommand(Player* p)
