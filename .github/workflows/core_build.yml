@@ -71,12 +71,10 @@ jobs:
           cmake .. -DCMAKE_INSTALL_PREFIX=../install
           cmake --build . --config Release --parallel 4
           cmake --install . --config Release
-      - name: Dry run
-        run: source ./apps/ci/ci-worldserver-dry-run.sh
-      - name: Check startup errors
-        run: source ./apps/ci/ci-error-check.sh
-      - name: Run unit tests
-        run: source ./apps/ci/ci-run-unit-tests.sh
+      - name: Debug
+        shell: bash
+        run: |
+          tree build
 
   docker-build:
     strategy:
