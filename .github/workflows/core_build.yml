@@ -71,6 +71,8 @@ jobs:
         run: source ./apps/ci/mac/ci-install.sh
       - name: Build
         run: source ./apps/ci/mac/ci-compile.sh
+      - name: Run unit tests
+        run: source ./apps/ci/ci-run-unit-tests.sh
 
   docker-build:
     strategy:
