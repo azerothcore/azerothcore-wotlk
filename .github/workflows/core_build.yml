@@ -66,8 +66,8 @@ jobs:
         run: |
           mkdir build && mkdir install && cd build
           cmake .. -DCMAKE_INSTALL_PREFIX=../install
-          cmake --build build --config Debug --parallel 4
-          cmake --install build --config Debug
+          cmake --build . --config Debug --parallel 4
+          cmake --install . --config Debug
       - name: Run
         run: |
           tree build
