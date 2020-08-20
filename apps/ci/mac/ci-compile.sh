@@ -10,6 +10,7 @@ time cmake ../../../ \
 -DTOOLS=1 \
 -DUNIT_TESTS=1 \
 -DSCRIPTS=1 \
+-DCMAKE_BUILD_TYPE=Debug \
 -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include \
 -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib \
 -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include \
