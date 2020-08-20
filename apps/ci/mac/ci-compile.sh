@@ -17,6 +17,8 @@ time cmake ../../../ \
 -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include \
 -DOPENSSL_SSL_LIBRARIES=/usr/local/opt/openssl/lib/libssl.dylib \
 -DOPENSSL_CRYPTO_LIBRARIES=/usr/local/opt/openssl/lib/libcrypto.dylib \
+-DCMAKE_C_FLAGS="-Werror" \
+-DCMAKE_CXX_FLAGS="-Werror" \
 -DCMAKE_C_COMPILER_LAUNCHER=ccache \
 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
 ;
