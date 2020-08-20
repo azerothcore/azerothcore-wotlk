@@ -14,4 +14,4 @@ time cmake ../../../ \
 -DOPENSSL_SSL_LIBRARIES=/usr/local/opt/openssl/lib/libssl.dylib \
 -DOPENSSL_CRYPTO_LIBRARIES=/usr/local/opt/openssl/lib/libcrypto.dylib;
 
-time make -j $(expr $(sysctl -n hw.ncpu ) + 2)
+time make -j $(($(sysctl -n hw.ncpu ) + 2))
