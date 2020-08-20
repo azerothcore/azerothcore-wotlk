@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd var/build/obj;
+mkdir var/build/obj && cd var/build/obj;
 
 time cmake ../../../ \
 -DTOOLS=1 \
