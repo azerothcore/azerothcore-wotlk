@@ -98,6 +98,7 @@ set(ACE_EXPECTED_VERSION 6.0.3)
 
 find_package(PCHSupport)
 find_package(ACE REQUIRED)
+add_definitions(-DACE_LACKS_AUTO_PTR=1)
 find_package(MySQL REQUIRED)
 
 if(UNIX AND WITH_PERFTOOLS)
