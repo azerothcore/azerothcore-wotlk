@@ -61,7 +61,6 @@ jobs:
       COMPILER: ${{ matrix.compiler }}
     steps:
       - uses: actions/checkout@v2
-      
       - name: Configure OS
         run: choco install --no-progress openssl
       - name: Build
@@ -69,12 +68,14 @@ jobs:
         run: |
           mkdir build && mkdir install && cd build
           cmake .. -DCMAKE_INSTALL_PREFIX=../install
-          cmake --build . --config Release --parallel 4
-          cmake --install . --config Release
+          cmake --build build --config Debug --parallel 4
+          cmake --install build --config Debug
       - name: Run
-        shell: bash
         run: |
           tree build
+          cd build/bin/Debug
+          dir
+          worldserver.exe
 
   docker-build:
     strategy:
