@@ -57,8 +57,6 @@ jobs:
       fail-fast: false
     runs-on: windows-latest
     name: windows-latest
-    env:
-      COMPILER: ${{ matrix.compiler }}
     steps:
       - uses: actions/checkout@v2
       - name: Configure OS
