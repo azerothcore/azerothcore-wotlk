@@ -64,7 +64,7 @@ jobs:
 #      - name: Import db
 #        run: source ./apps/ci/ci-import-db.sh
       - name: Build
-        run: source ./apps/ci/ci-compile.sh
+        run: source ./apps/ci/mac/ci-compile.sh
 #      - name: Dry run
 #        run: source ./apps/ci/ci-worldserver-dry-run.sh
 #      - name: Check startup errors
