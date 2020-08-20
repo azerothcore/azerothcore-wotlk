@@ -52,6 +52,25 @@ jobs:
       - name: Run unit tests
         run: source ./apps/ci/ci-run-unit-tests.sh
 
+  mac-build:
+    strategy:
+      fail-fast: false
+    runs-on: macos-10.15
+    name: macos-10.15
+    steps:
+      - name: Configure OS
+        run: source ./apps/ci/mac/ci-install.sh
+#      - name: Import db
+#        run: source ./apps/ci/ci-import-db.sh
+      - name: Build
+        run: source ./apps/ci/ci-compile.sh
+#      - name: Dry run
+#        run: source ./apps/ci/ci-worldserver-dry-run.sh
+#      - name: Check startup errors
+#        run: source ./apps/ci/ci-error-check.sh
+#      - name: Run unit tests
+#        run: source ./apps/ci/ci-run-unit-tests.sh
+
   docker-build:
     strategy:
       fail-fast: true
