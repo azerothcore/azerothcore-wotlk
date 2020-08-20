@@ -71,7 +71,7 @@ jobs:
           cmake .. -DCMAKE_INSTALL_PREFIX=../install
           cmake --build . --config Release --parallel 4
           cmake --install . --config Release
-      - name: Debug
+      - name: Run
         shell: bash
         run: |
           tree build
