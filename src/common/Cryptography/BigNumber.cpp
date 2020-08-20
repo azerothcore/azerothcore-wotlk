@@ -4,6 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#ifndef ACE_HAS_CPP17
+#define ACE_HAS_CPP17
+#endif
+
 #include <ace/Guard_T.h>
 
 #include "Cryptography/BigNumber.h"
