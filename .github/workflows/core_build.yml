@@ -67,7 +67,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          mkdir build && mkdir install
+          mkdir build && mkdir install && cd build
           cmake .. -DCMAKE_INSTALL_PREFIX=../install
           cmake --build . --config Release --parallel 4
           cmake --install . --config Release
