@@ -52,6 +52,32 @@ jobs:
       - name: Run unit tests
         run: source ./apps/ci/ci-run-unit-tests.sh
 
+  windows-build:
+    strategy:
+      fail-fast: false
+    runs-on: windows-latest
+    name: windows-latest
+    env:
+      COMPILER: ${{ matrix.compiler }}
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Configure OS
+        run: choco install --no-progress openssl
+      - name: Build
+        shell: bash
+        run: |
+          mkdir build && mkdir install
+          cmake .. -DCMAKE_INSTALL_PREFIX=../install
+          cmake --build . --config Release --parallel 4
+          cmake --install . --config Release
+      - name: Dry run
+        run: source ./apps/ci/ci-worldserver-dry-run.sh
+      - name: Check startup errors
+        run: source ./apps/ci/ci-error-check.sh
+      - name: Run unit tests
+        run: source ./apps/ci/ci-run-unit-tests.sh
+
   docker-build:
     strategy:
       fail-fast: true
