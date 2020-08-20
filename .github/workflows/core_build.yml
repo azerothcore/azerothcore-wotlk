@@ -60,6 +60,8 @@ jobs:
     steps:
       - name: Configure OS
         run: source ./apps/ci/mac/ci-install.sh
+        env:
+          CONTINUOUS_INTEGRATION: true
 #      - name: Import db
 #        run: source ./apps/ci/ci-import-db.sh
       - name: Build
