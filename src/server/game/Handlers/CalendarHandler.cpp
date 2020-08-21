@@ -28,7 +28,6 @@ Copied events should probably have a new owner
 #include "Player.h"
 #include "SocialMgr.h"
 #include "CalendarMgr.h"
-#include "ObjectMgr.h"
 #include "ObjectAccessor.h"
 #include "DatabaseEnv.h"
 #include "GuildMgr.h"
@@ -212,7 +211,7 @@ bool validUtf8String(WorldPacket& recvData, std::string& s, std::string action, 
 {
     if (!utf8::is_valid(s.begin(), s.end()))
     {
-        sLog->outString("CalendarHandler: Player with guid %lu attempt to %s an event with invalid name or description (packet modification)", playerGUID, action.c_str());
+        sLog->outString("CalendarHandler: Player with guid %llu attempt to %s an event with invalid name or description (packet modification)", (unsigned long long)playerGUID, action.c_str());
         recvData.rfinish();
         return false;
     }

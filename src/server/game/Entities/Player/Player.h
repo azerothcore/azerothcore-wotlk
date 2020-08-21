@@ -2391,8 +2391,8 @@ class Player : public Unit, public GridObject<Player>
         void StopCastingCharm();
         void StopCastingBindSight();
 
-        //uint32 GetSaveTimer() const { return m_nextSave; }
-        //void   SetSaveTimer(uint32 timer) { m_nextSave = timer; }
+        uint32 GetSaveTimer() const { return m_nextSave; }
+        void SetSaveTimer(uint32 timer) { m_nextSave = timer; }
 
         // Recall position
         uint32 m_recallMap;
