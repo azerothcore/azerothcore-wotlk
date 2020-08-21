@@ -55,16 +55,24 @@ jobs:
   windows-build:
     strategy:
       fail-fast: false
-    runs-on: windows-latest
-    name: windows-latest
+    runs-on: windows-2019
+    name: windows-2019-MSVC16
     steps:
       - uses: actions/checkout@v2
+      - name: Cache
+        uses: actions/cache@v1.1.2
+        with:
+          path: build
+          key: build:windows-2019:MSVC16:${{ github.ref }}:${{ github.sha }}
+          restore-keys: |
+            build:windows-2019:MSVC16:${{ github.ref }}
+            build:windows-2019:MSVC16
       - name: Configure OS
         run: choco install --no-progress openssl
       - name: Build
         shell: bash
         run: |
-          mkdir build && mkdir install && cd build
+          mkdir -p build && cd build
           cmake .. -DTOOLS=ON
           cmake --build . --config Release --parallel 4
       - name: Copy dll files
@@ -76,8 +84,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: binaries
-          path: |
-            build/bin/Release
+          path: build/bin/Release
 
   docker-build:
     strategy:
