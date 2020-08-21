@@ -83,7 +83,7 @@ jobs:
           cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
       - uses: actions/upload-artifact@v2
         with:
-          name: binaries
+          name: binaries-release
           path: build/bin/Release
 
   docker-build:
