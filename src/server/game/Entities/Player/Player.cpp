@@ -715,6 +715,8 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_zoneUpdateId = uint32(-1);
     m_zoneUpdateTimer = 0;
 
+    m_nextSave = sWorld->getIntConfig(CONFIG_INTERVAL_SAVE);
+
     m_areaUpdateId = 0;
     m_team = TEAM_NEUTRAL;
 
@@ -14859,7 +14861,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                     break;
                 case GOSSIP_OPTION_VENDOR:
                 {
-                    VendorItemData const* vendorItems = creature->GetVendorItems();
+                    VendorItemData const* vendorItems = itr->second.ActionMenuID ? sObjectMgr->GetNpcVendorItemList(itr->second.ActionMenuID) : creature->GetVendorItems();
                     if (!vendorItems || vendorItems->Empty())
                     {
                         sLog->outErrorDb("Creature %u (Entry: %u) have UNIT_NPC_FLAG_VENDOR but have empty trading item list.", creature->GetGUIDLow(), creature->GetEntry());
@@ -15087,7 +15089,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             break;
         case GOSSIP_OPTION_VENDOR:
         case GOSSIP_OPTION_ARMORER:
-            GetSession()->SendListInventory(guid);
+            GetSession()->SendListInventory(guid, menuItemData->GossipActionMenuId);
             break;
         case GOSSIP_OPTION_STABLEPET:
             GetSession()->SendStablePet(guid);
@@ -16308,7 +16310,7 @@ bool Player::SatisfyQuestStatus(Quest const* qInfo, bool msg) const
 }
 
 bool Player::SatisfyQuestConditions(Quest const* qInfo, bool msg)
-{ 
+{
     ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_QUEST_AVAILABLE, qInfo->GetQuestId());
     if (!sConditionMgr->IsObjectMeetToConditions(this, conditions))
     {
@@ -18116,6 +18118,10 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     // since last logout (in seconds)
     uint32 time_diff = uint32(now - logoutTime); //uint64 is excessive for a time_diff in seconds.. uint32 allows for 136~ year difference.
 
+    // randomize first save time in range [CONFIG_INTERVAL_SAVE] around [CONFIG_INTERVAL_SAVE]
+    // this must help in case next save after mass player load after server startup
+    m_nextSave = urand(m_nextSave / 2, m_nextSave * 3 / 2);
+
     // set value, including drunk invisibility detection
     // calculate sobering. after 15 minutes logged out, the player will be sober again
     uint8 newDrunkValue = 0;
@@ -19657,6 +19663,9 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
 
 void Player::SaveToDB(bool create, bool logout)
 {
+    // delay auto save at any saves (manual, in code, or autosave)
+    m_nextSave = sWorld->getIntConfig(CONFIG_INTERVAL_SAVE);
+
     //lets allow only players in world to be saved
     if (IsBeingTeleportedFar())
     {
@@ -22089,7 +22098,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         return false;
     }
 
-    VendorItemData const* vItems = creature->GetVendorItems();
+    VendorItemData const* vItems = GetSession()->GetCurrentVendor() ? sObjectMgr->GetNpcVendorItemList(GetSession()->GetCurrentVendor()) : creature->GetVendorItems();
     if (!vItems || vItems->Empty())
     {
         SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, item, 0);
