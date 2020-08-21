@@ -81,6 +81,7 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/Outland/Auchindoun/AuchenaiCrypts/instance_auchenai_crypts.cpp
   ${AC_SCRIPTS_DIR}/Outland/Auchindoun/AuchenaiCrypts/auchenai_crypts.h
   ${AC_SCRIPTS_DIR}/Outland/Auchindoun/ManaTombs/boss_nexusprince_shaffar.cpp
+  ${AC_SCRIPTS_DIR}/Outland/Auchindoun/ManaTombs/boss_pandemonius.cpp
   ${AC_SCRIPTS_DIR}/Outland/Auchindoun/ManaTombs/instance_mana_tombs.cpp
   ${AC_SCRIPTS_DIR}/Outland/Auchindoun/ManaTombs/mana_tombs.h
   ${AC_SCRIPTS_DIR}/Outland/Auchindoun/SethekkHalls/boss_talon_king_ikiss.cpp
