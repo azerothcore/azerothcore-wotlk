@@ -59,12 +59,12 @@ jobs:
     name: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Debug
-        run: |
-          cd C:\
-          tree
       - name: Configure OS
         run: choco install --no-progress openssl
+      - name: Debug
+        shell: bash
+        run: |
+          ls -lah "/c/Program Files/OpenSSL-Win64/bin/"
       - name: Build
         shell: bash
         run: |
@@ -80,6 +80,9 @@ jobs:
           name: binaries
           path: |
             build/bin/Release
+            /c/mysql-5.7.21-winx64/lib/libmysql.dll
+            /c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll
+            /c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll
 
   docker-build:
     strategy:
