@@ -61,15 +61,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Configure OS
         run: choco install --no-progress openssl
-      - name: Debug
-        shell: bash
-        run: |
-          ls -lah "/c/Program Files/OpenSSL-Win64/bin/"
       - name: Build
         shell: bash
         run: |
           mkdir build && mkdir install && cd build
-          cmake ..
+          cmake .. -DTOOLS=ON
           cmake --build . --config Release --parallel 4
       - name: Run
         run: |
