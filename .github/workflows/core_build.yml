@@ -67,10 +67,6 @@ jobs:
           mkdir build && mkdir install && cd build
           cmake .. -DTOOLS=ON
           cmake --build . --config Release --parallel 4
-      - name: Run
-        run: |
-          cd build/bin/Release
-          ./worldserver.exe --version
       - uses: actions/upload-artifact@v2
         with:
           name: binaries
