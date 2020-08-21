@@ -65,7 +65,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p build && cd build
-          cmake .. -DTOOLS=ON -DSCRIPTS=OFF
+          cmake .. -DTOOLS=ON
           cmake --build . --config Release --parallel 4
       - name: Copy dll files
         shell: bash
@@ -75,7 +75,7 @@ jobs:
           cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
       - uses: actions/upload-artifact@v2
         with:
-          name: binaries-release
+          name: windows-2019-MSVC16-release
           path: build/bin/Release
 
   docker-build:
