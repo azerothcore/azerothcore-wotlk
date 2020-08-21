@@ -75,6 +75,8 @@ jobs:
             /c/mysql-5.7.21-winx64/lib/libmysql.dll
             /c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll
             /c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll
+            C:/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll
+            C:/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll
 
   docker-build:
     strategy:
