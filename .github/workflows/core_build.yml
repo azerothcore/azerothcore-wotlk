@@ -59,21 +59,13 @@ jobs:
     name: windows-2019-MSVC16
     steps:
       - uses: actions/checkout@v2
-      - name: Cache
-        uses: actions/cache@v1.1.2
-        with:
-          path: build
-          key: build:windows-2019:MSVC16:${{ github.ref }}:${{ github.sha }}
-          restore-keys: |
-            build:windows-2019:MSVC16:${{ github.ref }}
-            build:windows-2019:MSVC16
       - name: Configure OS
         run: choco install --no-progress openssl
       - name: Build
         shell: bash
         run: |
           mkdir -p build && cd build
-          cmake .. -DTOOLS=ON
+          cmake .. -DTOOLS=ON -DSCRIPTS=OFF
           cmake --build . --config Release --parallel 4
       - name: Copy dll files
         shell: bash
