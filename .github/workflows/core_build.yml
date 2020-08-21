@@ -59,19 +59,27 @@ jobs:
     name: windows-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Debug
+        run: |
+          cd C:\
+          tree
       - name: Configure OS
         run: choco install --no-progress openssl
       - name: Build
         shell: bash
         run: |
           mkdir build && mkdir install && cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=../install
-          cmake --build . --config Debug --parallel 4
-          cmake --install . --config Debug
+          cmake ..
+          cmake --build . --config Release --parallel 4
       - name: Run
         run: |
-          cd build/bin/Debug
+          cd build/bin/Release
           ./worldserver.exe --version
+      - uses: actions/upload-artifact@v2
+        with:
+          name: binaries
+          path: |
+            build/bin/Release
 
   docker-build:
     strategy:
