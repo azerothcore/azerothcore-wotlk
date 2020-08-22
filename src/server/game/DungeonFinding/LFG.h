@@ -349,31 +349,32 @@ public:
     }
 
     bool operator<(const Lfg5Guids& x) const {
-        // not neat, but fast xD
-        if (guid[0]<=x.guid[0]) {
-
+        if (guid[0] <= x.guid[0]) {
             if (guid[0] != x.guid[0]) {
                 return true;
             }
 
-
-                if (guid[1]<=x.guid[1]) {
-                    if (guid[1] == x.guid[1]) {
-                        if (guid[2]<=x.guid[2]) {
-                            if (guid[2] == x.guid[2]) {
-                                if (guid[3]<=x.guid[3]) {
-                                    if (guid[3] == x.guid[3]) {
-                                        if (guid[4]<=x.guid[4]) {
-                                            return !(guid[4] == x.guid[4]);
-                                        }
-                                    } else return true;
-                                }
-                            } else return true;
-                        }
-                    } else return true;
+            if (guid[1] <= x.guid[1]) {
+                if (guid[1] != x.guid[1]) {
+                    return true;
                 }
 
+                if (guid[2] <= x.guid[2]) {
+                    if (guid[2] != x.guid[2]) {
+                        return true;
+                    }
 
+                    if (guid[3] <= x.guid[3]) {
+                        if (guid[3] != x.guid[3]) {
+                            return true;
+                        }
+
+                        if (guid[4] <= x.guid[4]) {
+                            return !(guid[4] == x.guid[4]);
+                        }
+                    }
+                }
+            }
         }
 
         return false;
