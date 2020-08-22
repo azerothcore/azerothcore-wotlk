@@ -148,7 +148,7 @@ class boss_anomalus : public CreatureScript
                         {
                             //First time we reach 51%, the next rift going to be empowered following timings.
                             events.CancelEvent(EVENT_ANOMALUS_SPAWN_RIFT);
-                            events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED, nextNormalRiftTime);
+                            events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED, 1000);
                             break;
                         }
                         events.ScheduleEvent(EVENT_ANOMALUS_HEALTH, 1000);
