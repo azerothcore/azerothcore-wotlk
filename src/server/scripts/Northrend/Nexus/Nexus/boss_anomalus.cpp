@@ -147,12 +147,8 @@ class boss_anomalus : public CreatureScript
                         if (me->HealthBelowPct(51))
                         {
                             //First time we reach 51%, the next rift going to be empowered following timings.
-                            uint32 nextNormalRiftTime = events.GetNextEventTime(EVENT_ANOMALUS_SPAWN_RIFT) - events.GetTimer();
-                            if (nextNormalRiftTime)
-                            {
-                                events.CancelEvent(EVENT_ANOMALUS_SPAWN_RIFT);
-                                events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED, nextNormalRiftTime);
-                            }
+                            events.CancelEvent(EVENT_ANOMALUS_SPAWN_RIFT);
+                            events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED, nextNormalRiftTime);
                             break;
                         }
                         events.ScheduleEvent(EVENT_ANOMALUS_HEALTH, 1000);
