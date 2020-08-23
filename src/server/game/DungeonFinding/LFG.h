@@ -149,10 +149,12 @@ public:
             }
 
             return 3;
-        } else if (guid[1])
+        }
+        else if (guid[1])
         {
             return 2;
-        } else if (guid[0])
+        }
+        else if (guid[0])
         {
             return 1;
         }
