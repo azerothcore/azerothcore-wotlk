@@ -853,7 +853,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 // Activate
                 // xinef: wtf is this shit?
                 (*itr)->ToGameObject()->SetLootState(GO_READY);
-                (*itr)->ToGameObject()->UseDoorOrButton(0, e.action.activateObject.alternative ? true : false, unit);
+                (*itr)->ToGameObject()->UseDoorOrButton(0, !!e.action.activateObject.alternative, unit);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject %u (entry: %u) activated",
                     (*itr)->GetGUIDLow(), (*itr)->GetEntry());
@@ -1513,7 +1513,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
         for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
             if (IsUnit(*itr))
-                (*itr)->ToUnit()->SetVisible(e.action.visibility.state ? true : false);
+                (*itr)->ToUnit()->SetVisible(!!e.action.visibility.state);
 
         delete targets;
         break;
@@ -1525,7 +1525,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             break;
 
         for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
-            (*itr)->setActive(e.action.setActive.state ? true : false);
+            (*itr)->setActive(!!e.action.setActive.state);
 
         delete targets;
         break;

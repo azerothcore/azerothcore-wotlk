@@ -22583,13 +22583,13 @@ bool Player::EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot)
         switch (Condition->Comparator[i])
         {
             case 2:                                         // requires less <color> than (<value> || <comparecolor>) gems
-                activate &= (_cur_gem < _cmp_gem) ? true : false;
+                activate &= (_cur_gem < _cmp_gem);
                 break;
             case 3:                                         // requires more <color> than (<value> || <comparecolor>) gems
-                activate &= (_cur_gem > _cmp_gem) ? true : false;
+                activate &= (_cur_gem > _cmp_gem);
                 break;
             case 5:                                         // requires at least <color> than (<value> || <comparecolor>) gems
-                activate &= (_cur_gem >= _cmp_gem) ? true : false;
+                activate &= (_cur_gem >= _cmp_gem);
                 break;
         }
     }

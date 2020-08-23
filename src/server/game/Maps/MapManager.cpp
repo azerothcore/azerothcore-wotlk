@@ -318,7 +318,7 @@ bool MapManager::IsValidMAP(uint32 mapid, bool startUp)
     MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
 
     if (startUp)
-        return mEntry ? true : false;
+        return !!mEntry;
     else
         return mEntry && (!mEntry->IsDungeon() || sObjectMgr->GetInstanceTemplate(mapid));
 

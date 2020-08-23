@@ -381,7 +381,7 @@ void BattlegroundIC::FillInitialWorldStates(WorldPacket& data)
 
     for (uint8 i = 0; i < MAX_FORTRESS_GATES_SPAWNS; ++i)
     {
-        uint32 uws = GetWorldStateFromGateEntry(BG_IC_ObjSpawnlocs[i].entry, (GateStatus[GetGateIDFromEntry(BG_IC_ObjSpawnlocs[i].entry)] == BG_IC_GATE_DESTROYED ? true : false));
+        uint32 uws = GetWorldStateFromGateEntry(BG_IC_ObjSpawnlocs[i].entry, (GateStatus[GetGateIDFromEntry(BG_IC_ObjSpawnlocs[i].entry)] == BG_IC_GATE_DESTROYED));
         data << uint32(uws) << uint32(1);
     }
 
@@ -515,9 +515,9 @@ void BattlegroundIC::HandleKillUnit(Creature* unit, Player* killer)
     if (unit->IsVehicle())
     {
         killer->CastSpell(killer, SPELL_DESTROYED_VEHICLE_ACHIEVEMENT, true);
-        
+
         // Xinef: Add to respawn list
-        if (entry == NPC_DEMOLISHER || entry == NPC_SIEGE_ENGINE_H || entry == NPC_SIEGE_ENGINE_A || 
+        if (entry == NPC_DEMOLISHER || entry == NPC_SIEGE_ENGINE_H || entry == NPC_SIEGE_ENGINE_A ||
             entry == NPC_GLAIVE_THROWER_A || entry == NPC_GLAIVE_THROWER_H || entry == NPC_CATAPULT)
             respawnMap[unit->GetGUIDLow()] = time(NULL) + VEHICLE_RESPAWN_TIME;
     }
@@ -562,15 +562,15 @@ void BattlegroundIC::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
             // Prevent capturing of keep if none of gates was destroyed
             if (nodePoint[i].gameobject_entry == GO_ALLIANCE_BANNER)
             {
-                if (GateStatus[BG_IC_A_FRONT] != BG_IC_GATE_DESTROYED && 
-                    GateStatus[BG_IC_A_WEST] != BG_IC_GATE_DESTROYED && 
+                if (GateStatus[BG_IC_A_FRONT] != BG_IC_GATE_DESTROYED &&
+                    GateStatus[BG_IC_A_WEST] != BG_IC_GATE_DESTROYED &&
                     GateStatus[BG_IC_A_EAST] != BG_IC_GATE_DESTROYED)
                     return;
             }
             else if (nodePoint[i].gameobject_entry == GO_HORDE_BANNER)
             {
-                if (GateStatus[BG_IC_H_FRONT] != BG_IC_GATE_DESTROYED && 
-                    GateStatus[BG_IC_H_WEST] != BG_IC_GATE_DESTROYED && 
+                if (GateStatus[BG_IC_H_FRONT] != BG_IC_GATE_DESTROYED &&
+                    GateStatus[BG_IC_H_WEST] != BG_IC_GATE_DESTROYED &&
                     GateStatus[BG_IC_H_EAST] != BG_IC_GATE_DESTROYED)
                     return;
             }

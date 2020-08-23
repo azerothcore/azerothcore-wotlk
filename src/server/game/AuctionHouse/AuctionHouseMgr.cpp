@@ -443,7 +443,7 @@ void AuctionHouseObject::AddAuction(AuctionEntry* auction)
 
 bool AuctionHouseObject::RemoveAuction(AuctionEntry* auction)
 {
-    bool wasInMap = AuctionsMap.erase(auction->Id) ? true : false;
+    bool wasInMap = !!AuctionsMap.erase(auction->Id);
 
     sScriptMgr->OnAuctionRemove(this, auction);
 

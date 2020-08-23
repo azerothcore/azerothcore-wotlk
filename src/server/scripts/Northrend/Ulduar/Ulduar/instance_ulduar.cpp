@@ -91,15 +91,15 @@ public:
         uint64 m_algalonTrapdoorGUID;
         uint64 m_brannBronzebeardAlgGUID;
         uint32 m_algalonTimer;
-        
+
         // Shared
         EventMap _events;
         bool m_mimironTramUsed;
         uint64 m_mimironTramGUID;
         uint64 m_keepersgateGUID;
         uint64 m_keepersGossipGUID[4];
-        
-        
+
+
         void Initialize()
         {
             // Bosses
@@ -165,7 +165,7 @@ public:
             m_algalonTrapdoorGUID   = 0;
             m_brannBronzebeardAlgGUID   = 0;
             m_algalonTimer          = 0;
-            
+
             // Shared
             _events.Reset();
             memset(&m_keepersGossipGUID, 0, sizeof(m_keepersGossipGUID));
@@ -380,7 +380,7 @@ public:
             }
 
             bool on = (GetData(type) == DONE && !(GetData(TYPE_WATCHERS) & (1 << (type-TYPE_FREYA))));
-            cr->SetVisible(on ? true : false);
+            cr->SetVisible(on);
         }
 
         void OnGameObjectCreate(GameObject* gameObject)
@@ -710,7 +710,7 @@ public:
                     freya->GetGameObjectListWithEntryInGrid(goList, 190171 /*Lichbloom*/, 333.0f);
                     freya->GetGameObjectListWithEntryInGrid(goList, 190170 /*Talandra's Rose*/, 333.0f);
                     freya->GetGameObjectListWithEntryInGrid(goList, 189973 /*Goldclover*/, 333.0f);
-                    
+
                     for (std::list<GameObject*>::const_iterator itr = goList.begin(); itr != goList.end(); ++itr)
                         (*itr)->SetRespawnTime(7*DAY);
                 }
@@ -961,7 +961,7 @@ public:
                 for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 {
                     loadStream >> m_auiEncounter[i];
-                    
+
                     if (m_auiEncounter[i] == IN_PROGRESS && i != TYPE_WATCHERS)
                         m_auiEncounter[i] = NOT_STARTED;
                 }
@@ -1070,7 +1070,7 @@ public:
     };
 };
 
-const Position vehiclePositions[30] = 
+const Position vehiclePositions[30] =
 {
     // Start Positions
     // Siege
