@@ -104,27 +104,27 @@ class Lfg5Guids
 public:
     uint64 guid[5];
     LfgRolesMap* roles;
-    Lfg5Guids() {
+    Lfg5Guids()
+    {
         memset(&guid, 0, 5*8);
         roles = NULL;
     }
 
-    Lfg5Guids(uint64 g) {
+    Lfg5Guids(uint64 g)
+    {
         memset(&guid, 0, 5*8);
         guid[0] = g;
         roles = NULL;
     }
 
-    Lfg5Guids(Lfg5Guids const& x) {
+    Lfg5Guids(Lfg5Guids const& x)
+    {
         memcpy(guid, x.guid, 5*8);
-        if (x.roles) {
-            roles = new LfgRolesMap(*(x.roles));
-        } else {
-            roles = NULL;
-        }
+        roles = x.roles ? (new LfgRolesMap(*(x.roles))) : NULL;
     }
 
-    Lfg5Guids(Lfg5Guids const& x, bool /*copyRoles*/) {
+    Lfg5Guids(Lfg5Guids const& x, bool /*copyRoles*/)
+    {
         memcpy(guid, x.guid, 5*8);
         roles = NULL;
     }
@@ -135,41 +135,54 @@ public:
     bool empty() const { return guid[0] == 0; }
     uint64 front() const { return guid[0]; }
 
-    uint8 size() const {
-        if (guid[2]) {
-            if (guid[4]) {
+    uint8 size() const
+    {
+        if (guid[2])
+        {
+            if (guid[4])
+            {
                 return 5;
-            } else if (guid[3]) {
+            }
+            else if (guid[3])
+            {
                 return 4;
             }
 
             return 3;
-        } else if (guid[1]) {
+        } else if (guid[1])
+        {
             return 2;
-        } else if (guid[0]) {
+        } else if (guid[0])
+        {
             return 1;
         }
 
         return 0;
     }
 
-    void insert(const uint64& g) {
+    void insert(const uint64& g)
+    {
         // avoid loops for performance
-        if (guid[0] == 0) {
+        if (guid[0] == 0)
+        {
             guid[0] = g;
             return;
         }
 
-        if (g <= guid[0]) {
-            if (guid[3]) {
+        if (g <= guid[0])
+        {
+            if (guid[3])
+            {
                 guid[4] = guid[3];
             }
 
-            if (guid[2]) {
+            if (guid[2])
+            {
                 guid[3] = guid[2];
             }
 
-            if (guid[1]) {
+            if (guid[1])
+            {
                 guid[2] = guid[1];
             }
 
@@ -180,17 +193,21 @@ public:
             return;
         }
 
-        if (guid[1] == 0) {
+        if (guid[1] == 0)
+        {
             guid[1] = g;
             return;
         }
 
-        if (g <= guid[1]) {
-            if (guid[3]) {
+        if (g <= guid[1])
+        {
+            if (guid[3])
+            {
                 guid[4] = guid[3];
             }
 
-            if (guid[2]) {
+            if (guid[2])
+            {
                 guid[3] = guid[2];
             }
 
@@ -200,13 +217,16 @@ public:
             return;
         }
 
-        if (guid[2] == 0) {
+        if (guid[2] == 0)
+        {
             guid[2] = g;
             return;
         }
 
-        if (g <= guid[2]) {
-            if (guid[3]) {
+        if (g <= guid[2])
+        {
+            if (guid[3])
+            {
                 guid[4] = guid[3];
             }
 
@@ -216,12 +236,14 @@ public:
             return;
         }
 
-        if (guid[3] == 0) {
+        if (guid[3] == 0)
+        {
             guid[3] = g;
             return;
         }
 
-        if (g <= guid[3]) {
+        if (g <= guid[3])
+        {
             guid[4] = guid[3];
             guid[3] = g;
             return;
@@ -230,16 +252,20 @@ public:
         guid[4] = g;
     }
 
-    void force_insert_front(const uint64& g) {
-        if (guid[3]) {
+    void force_insert_front(const uint64& g)
+    {
+        if (guid[3])
+        {
             guid[4] = guid[3];
         }
 
-        if (guid[2]) {
+        if (guid[2])
+        {
             guid[3] = guid[2];
         }
 
-        if (guid[1]) {
+        if (guid[1])
+        {
             guid[2] = guid[1];
         }
 
@@ -247,33 +273,47 @@ public:
         guid[0] = g;
     }
 
-    void remove(const uint64& g) {
+    void remove(const uint64& g)
+    {
         // avoid loops for performance
-        if (guid[0] == g) {
-            if (guid[1]) {
+        if (guid[0] == g)
+        {
+            if (guid[1])
+            {
                 guid[0] = guid[1];
-            } else {
+            }
+            else
+            {
                 guid[0] = 0;
                 return;
             }
 
-            if (guid[2]) {
+            if (guid[2])
+            {
                 guid[1] = guid[2];
-            } else {
+            }
+            else
+            {
                 guid[1] = 0;
                 return;
             }
 
-            if (guid[3]) {
+            if (guid[3])
+            {
                 guid[2] = guid[3];
-            } else {
+            }
+            else
+            {
                 guid[2] = 0;
                 return;
             }
 
-            if (guid[4]) {
+            if (guid[4])
+            {
                 guid[3] = guid[4];
-            } else {
+            }
+            else
+            {
                 guid[3] = 0;
                 return;
             }
@@ -282,24 +322,34 @@ public:
             return;
         }
 
-        if (guid[1] == g) {
-            if (guid[2]) {
+        if (guid[1] == g)
+        {
+            if (guid[2])
+            {
                 guid[1] = guid[2];
-            } else {
+            }
+            else
+            {
                 guid[1] = 0;
                 return;
             }
 
-            if (guid[3]) {
+            if (guid[3])
+            {
                 guid[2] = guid[3];
-            } else {
+            }
+            else
+            {
                 guid[2] = 0;
                 return;
             }
 
-            if (guid[4]) {
+            if (guid[4])
+            {
                 guid[3] = guid[4];
-            } else {
+            }
+            else
+            {
                 guid[3] = 0;
                 return;
             }
@@ -308,17 +358,24 @@ public:
             return;
         }
 
-        if (guid[2] == g) {
-            if (guid[3]) {
+        if (guid[2] == g)
+        {
+            if (guid[3])
+            {
                 guid[2] = guid[3];
-            } else {
+            }
+            else
+            {
                 guid[2] = 0;
                 return;
             }
 
-            if (guid[4]) {
+            if (guid[4])
+            {
                 guid[3] = guid[4];
-            } else {
+            }
+            else
+            {
                 guid[3] = 0;
                 return;
             }
@@ -327,10 +384,14 @@ public:
             return;
         }
 
-        if (guid[3] == g) {
-            if (guid[4]) {
+        if (guid[3] == g)
+        {
+            if (guid[4])
+            {
                 guid[3] = guid[4];
-            } else {
+            }
+            else
+            {
                 guid[3] = 0;
                 return;
             }
@@ -339,37 +400,49 @@ public:
             return;
         }
 
-        if (guid[4] == g) {
+        if (guid[4] == g)
+        {
             guid[4] = 0;
         }
     }
 
-    bool hasGuid(const uint64& g) const {
+    bool hasGuid(const uint64& g) const
+    {
         return g && (guid[0] == g || guid[1] == g || guid[2] == g || guid[3] == g || guid[4] == g);
     }
 
-    bool operator<(const Lfg5Guids& x) const {
-        if (guid[0] <= x.guid[0]) {
-            if (guid[0] != x.guid[0]) {
+    bool operator<(const Lfg5Guids& x) const
+    {
+        if (guid[0] <= x.guid[0])
+        {
+            if (guid[0] != x.guid[0])
+            {
                 return true;
             }
 
-            if (guid[1] <= x.guid[1]) {
-                if (guid[1] != x.guid[1]) {
+            if (guid[1] <= x.guid[1])
+            {
+                if (guid[1] != x.guid[1])
+                {
                     return true;
                 }
 
-                if (guid[2] <= x.guid[2]) {
-                    if (guid[2] != x.guid[2]) {
+                if (guid[2] <= x.guid[2])
+                {
+                    if (guid[2] != x.guid[2])
+                    {
                         return true;
                     }
 
-                    if (guid[3] <= x.guid[3]) {
-                        if (guid[3] != x.guid[3]) {
+                    if (guid[3] <= x.guid[3])
+                    {
+                        if (guid[3] != x.guid[3])
+                        {
                             return true;
                         }
 
-                        if (guid[4] <= x.guid[4]) {
+                        if (guid[4] <= x.guid[4])
+                        {
                             return !(guid[4] == x.guid[4]);
                         }
                     }
@@ -380,13 +453,20 @@ public:
         return false;
     }
 
-    bool operator==(const Lfg5Guids& x) const {
+    bool operator==(const Lfg5Guids& x) const
+    {
         return guid[0] == x.guid[0] && guid[1] == x.guid[1] && guid[2] == x.guid[2] && guid[3] == x.guid[3] && guid[4] == x.guid[4];
     }
 
-    void operator=(const Lfg5Guids& x) { memcpy(guid, x.guid, 5*8); delete roles; if (x.roles) roles = new LfgRolesMap(*(x.roles)); else roles = NULL; }
+    void operator=(const Lfg5Guids& x)
+    {
+        memcpy(guid, x.guid, 5*8);
+        delete roles;
+        roles = x.roles ? (new LfgRolesMap(*(x.roles))) : NULL;
+    }
 
-    std::string toString() const { // for debugging
+    std::string toString() const // for debugging
+    {
         std::ostringstream o;
         o << GUID_LOPART(guid[0]) << "," << GUID_LOPART(guid[1]) << "," << GUID_LOPART(guid[2]) << "," << GUID_LOPART(guid[3]) << "," << GUID_LOPART(guid[4]) << ":" << (roles ? 1 : 0);
         return o.str();
