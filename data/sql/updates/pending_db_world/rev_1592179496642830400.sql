@@ -1,15 +1,16 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1592179496642830400');
 
 CREATE TABLE IF NOT EXISTS `world_config` (
-  `type` TINYINT UNSIGNED NOT NULL DEFAULT 50,
-  `name` VARCHAR(255) NOT NULL,
-  `value` VARCHAR(255) NOT NULL,
-  `comment` TEXT,
-   PRIMARY KEY (`type`, `name`)
+  `Index` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `ConfigName` VARCHAR(255) NOT NULL,
+  `Value` VARCHAR(255) NOT NULL,
+  `Comment` TEXT NULL DEFAULT NULL,
+   PRIMARY KEY (`Index`, `ConfigName`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB3 COMMENT='Holds configs for the World Server';
 
 /*
-Type: 
+INDEX:
+0 - UNDEFINED INDEX
 1 - PERFORMANCE SETTINGS
 2 - SERVER LOGGING
 3 - SERVER SETTINGS
@@ -29,11 +30,10 @@ Type:
 17 - CUSTOM SERVER SETTINGS (TODO: Can probably fit in other categories or be re-done)
 18 - PACKET SPOOF PROTECTION SETTINGS
 19 - DEBUG
-50 - NO TYPE
 */
 
 
-REPLACE INTO `world_config` (`type`, `name`, `value`, `comment`) VALUES
+REPLACE INTO `world_config` (`Index`, `ConfigName`, `Value`, `Comment`) VALUES
 (17, 'ICC.Buff.Horde', 73822, 'Specify ICC buff\r\n
 It is necessary to restart the server after changing the values!\r\n
 Default: ICC.Buff.Horde = 73822\r\n
