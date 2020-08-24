@@ -22,69 +22,69 @@ void WorldConfig::CleanAll()
     _stringOptions.clear();
 }
 
-void WorldConfig::AddBoolOption(std::string const& optionName, bool value /*= false*/)
+void WorldConfig::AddBoolOption(std::string const& configName, bool value /*= false*/)
 {
-    auto const& itr = _boolOptions.find(optionName);
+    auto const& itr = _boolOptions.find(configName);
     if (itr != _boolOptions.end())
     {
-        sLog->Error("> Bool option (%s) is exist!", optionName.c_str());
+        sLog->Error("> Bool option (%s) is exist!", configName.c_str());
         return;
     }
 
-    _boolOptions.insert(std::make_pair(optionName, value));
+    _boolOptions.insert(std::make_pair(configName, value));
 }
 
-void WorldConfig::AddIntOption(std::string const& optionName, int32 value /*= 0*/)
+void WorldConfig::AddIntOption(std::string const& configName, int32 value /*= 0*/)
 {
-    auto const& itr = _intOptions.find(optionName);
+    auto const& itr = _intOptions.find(configName);
     if (itr != _intOptions.end())
     {
-        sLog->Error("> Int option (%s) is exist!", optionName.c_str());
+        sLog->Error("> Int option (%s) is exist!", configName.c_str());
         return;
     }
 
-    _intOptions.insert(std::make_pair(optionName, value));
+    _intOptions.insert(std::make_pair(configName, value));
 }
 
-void WorldConfig::AddFloatOption(std::string const& optionName, float value /*= 1.0f*/)
+void WorldConfig::AddFloatOption(std::string const& configName, float value /*= 1.0f*/)
 {
-    auto const& itr = _floatOptions.find(optionName);
+    auto const& itr = _floatOptions.find(configName);
     if (itr != _floatOptions.end())
     {
-        sLog->Error("> Float option (%s) is exist!", optionName.c_str());
+        sLog->Error("> Float option (%s) is exist!", configName.c_str());
         return;
     }
 
-    _floatOptions.insert(std::make_pair(optionName, value));
+    _floatOptions.insert(std::make_pair(configName, value));
 }
 
-void WorldConfig::AddStringOption(std::string const& optionName, std::string const& value /*= ""*/)
+void WorldConfig::AddStringOption(std::string const& configName, std::string const& value /*= ""*/)
 {
-    auto const& itr = _stringOptions.find(optionName);
+    auto const& itr = _stringOptions.find(configName);
     if (itr != _stringOptions.end())
     {
-        sLog->Error("> Int option (%s) is exist!", optionName.c_str());
+        sLog->Error("> Int option (%s) is exist!", configName.c_str());
         return;
     }
 
-    _stringOptions.insert(std::make_pair(optionName, value));
+    _stringOptions.insert(std::make_pair(configName, value));
 }
 
-void WorldConfig::AddOption(std::string const& optionName, WorldConfigType type, std::string const& value, std::string const& defaultValue)
+void WorldConfig::AddOption(std::string const& configName, WorldConfigType type, std::string const& value, std::string const& value)
 {
     switch (type)
     {
     case WorldConfigType::GAME_CONFIG_TYPE_BOOL:
-        AddBoolOption(optionName, value.empty() ? StringToBool(defaultValue) : StringToBool(value));
+        AddBoolOption(configName, value.empty() ? StringToBool(value) : StringToBool(value));
         break;
     case WorldConfigType::GAME_CONFIG_TYPE_INT:
-        AddIntOption(optionName, value.empty() ? std::stoi(defaultValue) : std::stoi(value));
+        AddIntOption(configName, value.empty() ? std::stoi(value) : std::stoi(value));
         break;
     case WorldConfigType::GAME_CONFIG_TYPE_FLOAT:
-        AddFloatOption(optionName, value.empty() ? std::stof(defaultValue) : std::stof(value));
+        AddFloatOption(configName, value.empty() ? std::stof(value) : std::stof(value));
         break;
     case WorldConfigType::GAME_CONFIG_TYPE_STRING:
-        AddStringOption(optionName, value.empty() ? defaultValue : value);
+        AddStringOption(configName, value.empty() ? value : value);
         break;
     default:
         ABORT();
@@ -126,20 +126,19 @@ void WorldConfig::Load()
     {
         Field* fields = result->Fetch();
 
-        std::string const& optionName = fields[0].GetString();
-        std::string const& optionType = fields[1].GetString();
-        std::string const& defaultValue = fields[2].GetString();
-        std::string const& customValue = fields[3].GetString();
+        std::string const& configName = fields[1].GetString();
+        std::string const& optionType = fields[2].GetString();
+        std::string const& value      = fields[3].GetString();
 
         auto _type = GetTypeString(optionType);
 
         if (_type == WorldConfigType::GAME_CONFIG_TYPE_UNKNOWN)
         {
-            sLog->Error("> Don't support type (%s) for option (%s)", optionType.c_str(), optionName.c_str());
+            sLog->Error("> Don't support type (%s) for option (%s)", optionType.c_str(), configName.c_str());
             continue;
         }
 
-        AddOption(optionName, _type, customValue, defaultValue);
+        AddOption(configName, _type, value);
 
         count++;
 
@@ -148,50 +147,50 @@ void WorldConfig::Load()
     TC_LOG_INFO(">> Loaded %u game config option in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
-bool WorldConfig::GetBoolConfig(std::string const& optionName)
+bool WorldConfig::GetBoolConfig(std::string const& configName)
 {
-    auto const& itr = _boolOptions.find(optionName);
+    auto const& itr = _boolOptions.find(configName);
     if (itr == _boolOptions.end())
     {
-        sLog->Error("> Bool option (%s) not found!", optionName.c_str());
+        sLog->Error("> Bool option (%s) not found!", configName.c_str());
         return false;
     }
 
-    return _boolOptions[optionName];
+    return _boolOptions[configName];
 }
 
-int32 WorldConfig::GetIntConfig(std::string const& optionName)
+int32 WorldConfig::GetIntConfig(std::string const& configName)
 {
-    auto const& itr = _intOptions.find(optionName);
+    auto const& itr = _intOptions.find(configName);
     if (itr == _intOptions.end())
     {
-        sLog->Error("> Int option (%s) not found!", optionName.c_str());
+        sLog->Error("> Int option (%s) not found!", configName.c_str());
         return 0;
     }
 
-    return _intOptions[optionName];
+    return _intOptions[configName];
 }
 
-float WorldConfig::GetFloatConfig(std::string const& optionName)
+float WorldConfig::GetFloatConfig(std::string const& configName)
 {
-    auto const& itr = _floatOptions.find(optionName);
+    auto const& itr = _floatOptions.find(configName);
     if (itr == _floatOptions.end())
     {
-        sLog->Error("> Float option (%s) not found!", optionName.c_str());
+        sLog->Error("> Float option (%s) not found!", configName.c_str());
         return 1.0f;
     }
 
-    return _floatOptions[optionName];
+    return _floatOptions[configName];
 }
 
-std::string WorldConfig::GetStringConfig(std::string const& optionName)
+std::string WorldConfig::GetStringConfig(std::string const& configName)
 {
-    auto const& itr = _stringOptions.find(optionName);
+    auto const& itr = _stringOptions.find(configName);
     if (itr == _stringOptions.end())
     {
-        sLog->Error("> String option (%s) not found!", optionName.c_str());
+        sLog->Error("> String option (%s) not found!", configName.c_str());
         return "";
     }
 
-    return _stringOptions[optionName];
+    return _stringOptions[configName];
 }

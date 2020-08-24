@@ -26,19 +26,19 @@ public:
 	void Load();
 
 	// Get config options
-	bool GetBoolConfig(std::string const& optionName);
-	int32 GetIntConfig(std::string const& optionName);
-	float GetFloatConfig(std::string const& optionName);
-	std::string GetStringConfig(std::string const& optionName);
+	bool GetBoolConfig(std::string const& configName);
+	int32 GetIntConfig(std::string const& configName);
+	float GetFloatConfig(std::string const& configName);
+	std::string GetStringConfig(std::string const& configName);
 
 private:
 	// Add config options
-	void AddOption(std::string const& optionName, WorldConfigType type, std::string const& value, std::string const& defaultValue);
+	void AddOption(std::string const& configName, WorldConfigType type, std::string const& value, std::string const& defaultValue);
 
-	void AddBoolOption(std::string const& optionName, bool value = false);
-	void AddIntOption(std::string const& optionName, int32 value = 0);
-	void AddFloatOption(std::string const& optionName, float value = 1.0f);
-	void AddStringOption(std::string const& optionName, std::string const& value = "");
+	void AddBoolOption(std::string const& configName, bool value = false);
+	void AddIntOption(std::string const& configName, int32 value = 0);
+	void AddFloatOption(std::string const& configName, float value = 1.0f);
+	void AddStringOption(std::string const& configName, std::string const& value = "");
 
 	void CleanAll();
 
