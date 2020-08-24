@@ -126,7 +126,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_duskwood.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/ScarletMonastery/instance_scarlet_monastery.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_undercity.cpp
-  ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_loch_modan.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/ShadowfangKeep/instance_shadowfang_keep.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/ShadowfangKeep/shadowfang_keep.h
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_burning_steppes.cpp
