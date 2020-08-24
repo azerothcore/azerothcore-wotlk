@@ -1463,7 +1463,6 @@ class spell_blood_council_shadow_prison_damage : public SpellScriptLoader
                         SetHitDamage(GetHitDamage() + eff->GetAmount());
                     }
                 }
-
             }
 
             void Register()
