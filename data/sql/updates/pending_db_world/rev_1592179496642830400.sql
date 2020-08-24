@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1592179496642830400');
 
-DROP TABLE IF EXIST `world_config`;
+DROP TABLE IF EXISTS `world_config`;
 CREATE TABLE `world_config` (
   `Index` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   `ConfigName` VARCHAR(255) NOT NULL,
