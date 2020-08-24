@@ -27,7 +27,7 @@ void WorldConfig::AddBoolOption(std::string const& configName, bool value /*= fa
     auto const& itr = _boolOptions.find(configName);
     if (itr != _boolOptions.end())
     {
-        sLog->Error("> Bool option (%s) is exist!", configName.c_str());
+        sLog->outError("> Bool option (%s) is exist!", configName.c_str());
         return;
     }
 
@@ -39,7 +39,7 @@ void WorldConfig::AddIntOption(std::string const& configName, int32 value /*= 0*
     auto const& itr = _intOptions.find(configName);
     if (itr != _intOptions.end())
     {
-        sLog->Error("> Int option (%s) is exist!", configName.c_str());
+        sLog->outError("> Int option (%s) is exist!", configName.c_str());
         return;
     }
 
@@ -51,7 +51,7 @@ void WorldConfig::AddFloatOption(std::string const& configName, float value /*= 
     auto const& itr = _floatOptions.find(configName);
     if (itr != _floatOptions.end())
     {
-        sLog->Error("> Float option (%s) is exist!", configName.c_str());
+        sLog->outError("> Float option (%s) is exist!", configName.c_str());
         return;
     }
 
@@ -63,7 +63,7 @@ void WorldConfig::AddStringOption(std::string const& configName, std::string con
     auto const& itr = _stringOptions.find(configName);
     if (itr != _stringOptions.end())
     {
-        sLog->Error("> Int option (%s) is exist!", configName.c_str());
+        sLog->outError("> Int option (%s) is exist!", configName.c_str());
         return;
     }
 
@@ -102,7 +102,7 @@ void WorldConfig::Load()
     PreparedQueryResult result = WorldDatabase.Query(stmt);
     if (!result)
     {
-        TC_LOG_WARN(">> Loaded 0 game config options. DB table `game_config` is empty.");
+        sLog->outError(">> Loaded 0 game config options. DB table `game_config` is empty.");
         return;
     }
 
@@ -134,7 +134,7 @@ void WorldConfig::Load()
 
         if (_type == WorldConfigType::GAME_CONFIG_TYPE_UNKNOWN)
         {
-            sLog->Error("> Don't support type (%s) for option (%s)", optionType.c_str(), configName.c_str());
+            sLog->outError("> Don't support type (%s) for option (%s)", optionType.c_str(), configName.c_str());
             continue;
         }
 
@@ -144,7 +144,7 @@ void WorldConfig::Load()
 
     } while (result->NextRow());
 
-    TC_LOG_INFO(">> Loaded %u game config option in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u game config option in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 bool WorldConfig::GetBoolConfig(std::string const& configName)
@@ -152,7 +152,7 @@ bool WorldConfig::GetBoolConfig(std::string const& configName)
     auto const& itr = _boolOptions.find(configName);
     if (itr == _boolOptions.end())
     {
-        sLog->Error("> Bool option (%s) not found!", configName.c_str());
+        sLog->outError("> Bool option (%s) not found!", configName.c_str());
         return false;
     }
 
@@ -164,7 +164,7 @@ int32 WorldConfig::GetIntConfig(std::string const& configName)
     auto const& itr = _intOptions.find(configName);
     if (itr == _intOptions.end())
     {
-        sLog->Error("> Int option (%s) not found!", configName.c_str());
+        sLog->outError("> Int option (%s) not found!", configName.c_str());
         return 0;
     }
 
@@ -176,7 +176,7 @@ float WorldConfig::GetFloatConfig(std::string const& configName)
     auto const& itr = _floatOptions.find(configName);
     if (itr == _floatOptions.end())
     {
-        sLog->Error("> Float option (%s) not found!", configName.c_str());
+        sLog->outError("> Float option (%s) not found!", configName.c_str());
         return 1.0f;
     }
 
@@ -188,7 +188,7 @@ std::string WorldConfig::GetStringConfig(std::string const& configName)
     auto const& itr = _stringOptions.find(configName);
     if (itr == _stringOptions.end())
     {
-        sLog->Error("> String option (%s) not found!", configName.c_str());
+        sLog->outError("> String option (%s) not found!", configName.c_str());
         return "";
     }
 
