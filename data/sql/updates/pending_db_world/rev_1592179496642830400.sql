@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS `world_config`;
 CREATE TABLE `world_config` (
   `Index` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   `ConfigName` VARCHAR(255) NOT NULL,
-  `Type` varchar(255) NOT NULL COMMENT 'Support types - bool, int, float, string',
+  `Type` varchar(255) NOT NULL COMMENT='Support types - bool, int, float, string',
   `Value` VARCHAR(255) NOT NULL,
   `Comment` TEXT NULL DEFAULT NULL,
    PRIMARY KEY (`Index`, `ConfigName`)
