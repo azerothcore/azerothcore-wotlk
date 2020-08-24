@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS `world_config`;
 CREATE TABLE `world_config` (
   `Index` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   `ConfigName` VARCHAR(255) NOT NULL,
+  `Type` varchar(255) NOT NULL COMMENT='Support types - bool, int, float, string',
   `Value` VARCHAR(255) NOT NULL,
   `Comment` TEXT NULL DEFAULT NULL,
    PRIMARY KEY (`Index`, `ConfigName`)
@@ -32,16 +33,3 @@ INDEX:
 18 - PACKET SPOOF PROTECTION SETTINGS
 19 - DEBUG
 */
-
-
-REPLACE INTO `world_config` (`Index`, `ConfigName`, `Value`, `Comment`) VALUES
-(17, 'ICC.Buff.Horde', 73822, 'Specify ICC buff\r\n
-It is necessary to restart the server after changing the values!\r\n
-Default: ICC.Buff.Horde = 73822\r\n
-Spell IDs for the auras:\r\n
-73816 -  5% buff Horde\r\n
-73818 - 10% buff Horde\r\n
-73819 - 15% buff Horde\r\n
-73820 - 20% buff Horde\r\n
-73821 - 25% buff Horde\r\n
-73822 - 30% buff Horde');
