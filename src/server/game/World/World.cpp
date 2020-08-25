@@ -647,6 +647,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ALLOW_PLAYER_COMMANDS]           = sConfigMgr->GetBoolDefault("AllowPlayerCommands", 1);
     m_bool_configs[CONFIG_PRESERVE_CUSTOM_CHANNELS]        = sConfigMgr->GetBoolDefault("PreserveCustomChannels", false);
     m_int_configs[CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION] = sConfigMgr->GetIntDefault("PreserveCustomChannelDuration", 14);
+    m_int_configs[CONFIG_INTERVAL_SAVE]                    = sConfigMgr->GetIntDefault("PlayerSaveInterval", 15 * MINUTE * IN_MILLISECONDS);
     m_int_configs[CONFIG_INTERVAL_DISCONNECT_TOLERANCE]    = sConfigMgr->GetIntDefault("DisconnectToleranceInterval", 0);
     m_bool_configs[CONFIG_STATS_SAVE_ONLY_ON_LOGOUT]       = sConfigMgr->GetBoolDefault("PlayerSave.Stats.SaveOnlyOnLogout", true);
 
@@ -750,8 +751,11 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_CHARTER_COST_ARENA_3v3] = sConfigMgr->GetIntDefault("ArenaTeam.CharterCost.3v3", 1200000);
     m_int_configs[CONFIG_CHARTER_COST_ARENA_5v5] = sConfigMgr->GetIntDefault("ArenaTeam.CharterCost.5v5", 2000000);
 
+    m_int_configs[CONFIG_MAX_WHO_LIST_RETURN] = sConfigMgr->GetIntDefault("MaxWhoListReturns", 49);
+
     m_int_configs[CONFIG_CHARACTER_CREATING_DISABLED]           = sConfigMgr->GetIntDefault("CharacterCreating.Disabled", 0);
     m_int_configs[CONFIG_CHARACTER_CREATING_DISABLED_RACEMASK]  = sConfigMgr->GetIntDefault("CharacterCreating.Disabled.RaceMask", 0);
+
     m_int_configs[CONFIG_CHARACTER_CREATING_DISABLED_CLASSMASK] = sConfigMgr->GetIntDefault("CharacterCreating.Disabled.ClassMask", 0);
 
     m_int_configs[CONFIG_CHARACTERS_PER_REALM] = sConfigMgr->GetIntDefault("CharactersPerRealm", 10);
