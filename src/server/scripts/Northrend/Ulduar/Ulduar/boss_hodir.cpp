@@ -228,6 +228,8 @@ public:
 
             if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
                 pInstance->SetData(TYPE_HODIR, NOT_STARTED);
+            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
+                    go->SetGoState(GO_STATE_ACTIVE);
         }
 
         void EnterCombat(Unit*  /*pWho*/)
@@ -251,6 +253,8 @@ public:
 
             if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
                 pInstance->SetData(TYPE_HODIR, IN_PROGRESS);
+            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
+                    go->SetGoState(GO_STATE_READY);
         }
 
         void JustReachedHome() { me->setActive(false); }
@@ -319,6 +323,8 @@ public:
                             d->SetLootState(GO_READY);
                             d->UseDoorOrButton(0, false);
                         }
+                    if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
+                        go->SetGoState(GO_STATE_ACTIVE);
 
                     me->MonsterYell(TEXT_HODIR_DEFEATED, LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_HODIR_DEFEATED, 0);
