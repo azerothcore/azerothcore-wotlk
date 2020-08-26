@@ -2520,7 +2520,7 @@ enum ShadowsFate
     SPELL_SOUL_FEAST        = 71203,
 };
 
-enum ExceptionMobs
+enum Creature
 {
     GLUTTONOUS_ABOMINATION = 37886,
     RISEN_ARCHMAGE         = 37868,
@@ -2538,7 +2538,7 @@ class spell_item_unsated_craving : public SpellScriptLoader
         {
             PrepareAuraScript(spell_item_unsated_craving_AuraScript);
 
-            bool ExceptionMobs(Unit* target) const
+            bool IsException(Unit* target) const
             {
                 switch (target->GetEntry())
                 {
@@ -2562,7 +2562,7 @@ class spell_item_unsated_craving : public SpellScriptLoader
                 }
 
                 Unit* target = procInfo.GetActionTarget();
-                if (target && ExceptionMobs(target))
+                if (target && IsException(target))
                 {
                     return true;
                 }
