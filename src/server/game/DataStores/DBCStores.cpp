@@ -633,7 +633,7 @@ WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid
     if (i != sWMOAreaInfoByTripple.end())
         return i->second;
 
-    return i->second;
+    return nullptr;
 }
 
 uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId)
