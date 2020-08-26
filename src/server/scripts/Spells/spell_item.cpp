@@ -2518,7 +2518,6 @@ class spell_item_scroll_of_recall : public SpellScriptLoader
 enum ShadowsFate
 {
     SPELL_SOUL_FEAST        = 71203,
-    NPC_SINDRAGOSA          = 36853
 };
 
 enum ExceptionMobs
@@ -2526,7 +2525,8 @@ enum ExceptionMobs
     GLUTTONOUS_ABOMINATION = 37886,
     RISEN_ARCHMAGE         = 37868,
     BLISTERING_ZOMBIE      = 37934,
-    BLAZING_SKELETON       = 36791
+    BLAZING_SKELETON       = 36791,
+    NPC_SINDRAGOSA         = 36853
 };
 
 class spell_item_unsated_craving : public SpellScriptLoader
@@ -2546,6 +2546,7 @@ class spell_item_unsated_craving : public SpellScriptLoader
                     case RISEN_ARCHMAGE:
                     case BLISTERING_ZOMBIE:
                     case BLAZING_SKELETON:
+                    case NPC_SINDRAGOSA:
                         return true;
                     default:
                         return false;
@@ -2566,7 +2567,7 @@ class spell_item_unsated_craving : public SpellScriptLoader
                     return true;
                 }
 
-                if (!target || target->GetTypeId() != TYPEID_UNIT || target->IsCritter() || (target->GetEntry() != NPC_SINDRAGOSA && target->IsSummon()))
+                if (!target || target->GetTypeId() != TYPEID_UNIT || target->IsCritter() || target->IsSummon())
                 {
                     return false;
                 }
