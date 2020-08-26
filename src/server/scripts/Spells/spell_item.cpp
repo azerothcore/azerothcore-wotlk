@@ -2521,6 +2521,14 @@ enum ShadowsFate
     NPC_SINDRAGOSA          = 36853
 };
 
+enum ExceptionMobs
+{
+    GLUTTONOUS_ABOMINATION = 37886,
+    RISEN_ARCHMAGE         = 37868,
+    BLISTERING_ZOMBIE      = 37934,
+    BLAZING_SKELETON       = 36791
+};
+
 class spell_item_unsated_craving : public SpellScriptLoader
 {
     public:
@@ -2530,15 +2538,38 @@ class spell_item_unsated_craving : public SpellScriptLoader
         {
             PrepareAuraScript(spell_item_unsated_craving_AuraScript);
 
+            bool ExceptionMobs(Unit* target) const
+            {
+                switch (target->GetEntry())
+                {
+                    case GLUTTONOUS_ABOMINATION:
+                    case RISEN_ARCHMAGE:
+                    case BLISTERING_ZOMBIE:
+                    case BLAZING_SKELETON:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
             bool CheckProc(ProcEventInfo& procInfo)
             {
                 Unit* caster = procInfo.GetActor();
                 if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                {
                     return false;
+                }
 
                 Unit* target = procInfo.GetActionTarget();
+                if (target && ExceptionMobs(target))
+                {
+                    return true;
+                }
+
                 if (!target || target->GetTypeId() != TYPEID_UNIT || target->IsCritter() || (target->GetEntry() != NPC_SINDRAGOSA && target->IsSummon()))
+                {
                     return false;
+                }
 
                 return true;
             }
