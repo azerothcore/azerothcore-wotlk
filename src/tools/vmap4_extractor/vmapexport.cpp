@@ -148,7 +148,7 @@ bool ExtractSingleWmo(std::string& fname)
     int p = 0;
     // Select root wmo files
     char const* rchr = strrchr(plain_name, '_');
-    if (rchr != NULL)
+    if (rchr != nullptr)
     {
         char cpy[4];
         memcpy(cpy, rchr, 4);

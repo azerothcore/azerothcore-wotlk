@@ -9,6 +9,7 @@
 
 #include "libmpq/mpq.h"
 #include "Define.h"
+#include "Errors.h"
 #include <string>
 #include <ctype.h>
 #include <vector>
@@ -42,13 +43,13 @@ public:
 
         token = strtok( buffer, seps );
         uint32 counter = 0;
-        while ((token != NULL) && (counter < size)) {
+        while ((token != nullptr) && (counter < size)) {
             //cout << token << endl;
             token[strlen(token) - 1] = 0;
             std::string s = token;
             filelist.push_back(s);
             counter += strlen(token) + 2;
-            token = strtok(NULL, seps);
+            token = strtok(nullptr, seps);
         }
 
         delete[] buffer;
