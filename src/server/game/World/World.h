@@ -116,6 +116,8 @@ enum WorldBoolConfigs
     CONFIG_DEATH_BONES_BG_OR_ARENA,
     CONFIG_DIE_COMMAND_MODE,
     CONFIG_DECLINED_NAMES_USED,
+    CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG,
+    CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG,
     CONFIG_BATTLEGROUND_CAST_DESERTER,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY,
@@ -135,6 +137,7 @@ enum WorldBoolConfigs
     CONFIG_PVP_TOKEN_ENABLE,
     CONFIG_NO_RESET_TALENT_COST,
     CONFIG_SHOW_KICK_IN_WORLD,
+    CONFIG_SHOW_MUTE_IN_WORLD,
     CONFIG_SHOW_BAN_IN_WORLD,
     CONFIG_CHATLOG_CHANNEL,
     CONFIG_CHATLOG_WHISPER,
@@ -173,6 +176,8 @@ enum WorldBoolConfigs
     CONFIG_ITEMDELETE_METHOD,
     CONFIG_ITEMDELETE_VENDOR,
     CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE,
+    CONFIG_DEBUG_BATTLEGROUND,
+    CONFIG_DEBUG_ARENA,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -200,6 +205,7 @@ enum WorldIntConfigs
     CONFIG_INTERVAL_MAPUPDATE,
     CONFIG_INTERVAL_CHANGEWEATHER,
     CONFIG_INTERVAL_DISCONNECT_TOLERANCE,
+    CONFIG_INTERVAL_SAVE,
     CONFIG_PORT_WORLD,
     CONFIG_SOCKET_TIMEOUTTIME,
     CONFIG_SESSION_ADD_DELAY,
@@ -289,6 +295,8 @@ enum WorldIntConfigs
     CONFIG_DISABLE_BREATHING,
     CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER,
     CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH,
+    CONFIG_BATTLEGROUND_REPORT_AFK_TIMER,
+    CONFIG_BATTLEGROUND_REPORT_AFK,
     CONFIG_BATTLEGROUND_INVITATION_TYPE,
     CONFIG_ARENA_MAX_RATING_DIFFERENCE,
     CONFIG_ARENA_RATING_DISCARD_TIMER,
@@ -352,6 +360,17 @@ enum WorldIntConfigs
     CONFIG_ICC_BUFF_ALLIANCE,
     CONFIG_ITEMDELETE_QUALITY,
     CONFIG_ITEMDELETE_ITEM_LEVEL,
+    CONFIG_BG_REWARD_WINNER_HONOR_FIRST,
+    CONFIG_BG_REWARD_WINNER_ARENA_FIRST,
+    CONFIG_BG_REWARD_WINNER_HONOR_LAST,
+    CONFIG_BG_REWARD_WINNER_ARENA_LAST,
+    CONFIG_BG_REWARD_LOSER_HONOR_FIRST,
+    CONFIG_BG_REWARD_LOSER_HONOR_LAST,
+    CONFIG_CHARTER_COST_GUILD,
+    CONFIG_CHARTER_COST_ARENA_2v2,
+    CONFIG_CHARTER_COST_ARENA_3v3,
+    CONFIG_CHARTER_COST_ARENA_5v5,
+    CONFIG_MAX_WHO_LIST_RETURN,
     CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER,
     INT_CONFIG_VALUE_COUNT
 };
@@ -376,6 +395,7 @@ enum Rates
     RATE_DROP_ITEM_LEGENDARY,
     RATE_DROP_ITEM_ARTIFACT,
     RATE_DROP_ITEM_REFERENCED,
+  
     RATE_DROP_ITEM_REFERENCED_AMOUNT,
     RATE_SELLVALUE_ITEM_POOR,
     RATE_SELLVALUE_ITEM_NORMAL,
@@ -685,7 +705,6 @@ class World
 
         void SetInitialWorldSettings();
         void LoadConfigSettings(bool reload = false);
-        void LoadModuleConfigSettings();
 
         void SendWorldText(uint32 string_id, ...);
         void SendGlobalText(const char* text, WorldSession* self);
@@ -806,7 +825,7 @@ class World
         char const* GetDBVersion() const { return m_DBVersion.c_str(); }
 
         void LoadAutobroadcasts();
-        
+
         void UpdateAreaDependentAuras();
 
         uint32 GetCleaningFlags() const { return m_CleaningFlags; }
@@ -818,9 +837,6 @@ class World
 
         std::string const& GetRealmName() const { return _realmName; } // pussywizard
         void SetRealmName(std::string name) { _realmName = name; } // pussywizard
-
-        std::string GetConfigFileList() { return m_configFileList; }
-        void SetConfigFileList(std::string list) { m_configFileList = list; }
 
     protected:
         void _UpdateGameTime();
@@ -921,10 +937,8 @@ class World
 
         void ProcessQueryCallbacks();
         ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
-
-        std::string m_configFileList;
 };
- 
+
 #define sWorld World::instance()
 #endif
 /// @}
