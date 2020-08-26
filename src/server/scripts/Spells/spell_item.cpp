@@ -2520,7 +2520,7 @@ enum ShadowsFate
     SPELL_SOUL_FEAST        = 71203,
 };
 
-enum Creature
+enum ExceptionCreature
 {
     GLUTTONOUS_ABOMINATION = 37886,
     RISEN_ARCHMAGE         = 37868,
