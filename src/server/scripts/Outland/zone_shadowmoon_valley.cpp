@@ -459,7 +459,7 @@ public:
             if (!Tapped)
                 me->setFaction(FACTION_DEFAULT);
 
-            FlyTimer = 10000;
+            FlyTimer = 1000;
             me->SetDisableGravity(false);
             me->SetVisible(true);
         }
@@ -475,7 +475,6 @@ public:
                 PlayerGUID = caster->GetGUID();
 
                 me->setFaction(FACTION_FRIENDLY);
-                DoCast(caster, SPELL_FORCE_OF_NELTHARAKU, true);
 
                 Unit* Dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_SUBJUGATOR, 50);
                 if (Dragonmaw)
@@ -497,19 +496,12 @@ public:
 
             if (id == 1)
             {
-                if (PlayerGUID)
-                {
-                    Unit* player = ObjectAccessor::GetUnit(*me, PlayerGUID);
-                    if (player)
-                        DoCast(player, SPELL_FORCE_OF_NELTHARAKU, true);
-
-                    PlayerGUID = 0;
-                }
                 me->SetVisible(false);
                 me->SetDisableGravity(false);
                 Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
                 me->RemoveCorpse();
             }
+            me->DespawnOrUnsummon(1);
         }
 
         void UpdateAI(uint32 diff)
