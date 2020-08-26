@@ -2538,7 +2538,7 @@ class spell_item_unsated_craving : public SpellScriptLoader
         {
             PrepareAuraScript(spell_item_unsated_craving_AuraScript);
 
-            bool IsException(Unit* target) const
+            bool isException(Unit* target) const
             {
                 switch (target->GetEntry())
                 {
@@ -2562,7 +2562,7 @@ class spell_item_unsated_craving : public SpellScriptLoader
                 }
 
                 Unit* target = procInfo.GetActionTarget();
-                if (target && IsException(target))
+                if (target && isException(target))
                 {
                     return true;
                 }
