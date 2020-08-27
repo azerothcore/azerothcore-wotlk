@@ -19,6 +19,7 @@
 #include <cwchar>
 #include <string>
 #include <random>
+#include <ctime>
 
 typedef ACE_TSS<SFMTRand> SFMTRandTSS;
 static SFMTRandTSS sfmtRand;
@@ -631,3 +632,11 @@ bool StringContainsStringI(std::string const& haystack, std::string const& needl
     return haystack.end() !=
         std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), [](char c1, char c2) { return std::toupper(c1) == std::toupper(c2); });
 }
+
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+struct tm* localtime_r(time_t const* time, struct tm *result)
+{
+    localtime_s(result, time);
+    return result;
+}
+#endif

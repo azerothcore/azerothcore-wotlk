@@ -29,18 +29,6 @@
 #include "LuaEngine.h"
 #endif
 
-#if !HAVE_TIME_R // windows support
-struct tm *localtime_r(time_t *_clock, struct tm *_result)
-{
-  struct tm *p = localtime(_clock);
-
-  if (p)
-    *(_result) = *p;
-
-  return p;
-}
-#endif // !HAVE_TIME_R
-
 GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_model(NULL), m_goValue(), m_AI(NULL)
 {
