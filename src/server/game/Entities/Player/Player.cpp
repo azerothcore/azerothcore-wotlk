@@ -2021,7 +2021,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
     uint32 charFlags = 0;
     uint32 playerFlags = fields[17].GetUInt32();
     uint16 atLoginFlags = fields[18].GetUInt16();
-    uint32 zone = uint32((atLoginFlags & AT_LOGIN_FIRST) != 0 ? 0 : fields[11].GetUInt16()); // if first login do not show the zone
+    uint32 zone = (atLoginFlags & AT_LOGIN_FIRST) != 0 ? 0 : fields[11].GetUInt16(); // if first login do not show the zone
 
     *data << uint8(skin);
     *data << uint8(face);
@@ -2030,7 +2030,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
     *data << uint8(facialStyle);
 
     *data << uint8(fields[10].GetUInt8());                   // level
-    *data << zone;                                           // zone
+    *data << uint32(zone);                                   // zone
     *data << uint32(fields[12].GetUInt16());                 // map
 
     *data << fields[13].GetFloat();                          // x
