@@ -19,7 +19,6 @@
 #include <cwchar>
 #include <string>
 #include <random>
-#include <ctime>
 
 typedef ACE_TSS<SFMTRand> SFMTRandTSS;
 static SFMTRandTSS sfmtRand;

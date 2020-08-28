@@ -4,7 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Util.h"
 #include <G3D/Quat.h>
 #include "GameObjectAI.h"
 #include "BattlegroundAV.h"
@@ -25,7 +24,6 @@
 #include "World.h"
 #include "Transport.h"
 #include "AccountMgr.h"
-
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
