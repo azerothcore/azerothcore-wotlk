@@ -1782,7 +1782,9 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
     {
         event.occurence = 0;
         for (uint8 i = 0; i < MAX_HOLIDAY_DURATIONS && holiday->Duration[i]; ++i)
+        {
             event.occurence += holiday->Duration[i] * HOUR / MINUTE;
+        }
     }
 
     bool singleDate = ((holiday->Date[0] >> 24) & 0x1F) == 31; // Events with fixed date within year have - 1
