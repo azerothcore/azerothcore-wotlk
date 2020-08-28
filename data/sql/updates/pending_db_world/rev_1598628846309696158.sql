@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1596557280688269900');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1598628846309696158');
 /*
  * Zone: Tanaris
  * Update by Knindza | <www.azerothcore.org>
