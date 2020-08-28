@@ -153,7 +153,7 @@ struct CreatureTemplate
     {
         return (type_flags & CREATURE_TYPE_FLAG_EXOTIC_PET) != 0;
     }
-    
+
     bool IsTameable(bool exotic) const
     {
         if (type != CREATURE_TYPE_BEAST || family == 0 || (type_flags & CREATURE_TYPE_FLAG_TAMEABLE_PET) == 0)
@@ -512,6 +512,15 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         bool SetWaterWalking(bool enable, bool packetOnly = false) override;
         bool SetFeatherFall(bool enable, bool packetOnly = false) override;
         bool SetHover(bool enable, bool packetOnly = false) override;
+        bool HasSpellFocus(Spell const* focusSpell = nullptr) const;
+
+        struct
+        {
+            ::Spell const* Spell = nullptr;
+            uint32 Delay = 0;         // ms until the creature's target should snap back (0 = no snapback scheduled)
+            uint64 Target;        // the creature's "real" target while casting
+            float Orientation = 0.0f; // the creature's "real" orientation while casting
+        } _spellFocusInfo;
 
         uint32 GetShieldBlockValue() const override
         {
@@ -714,9 +723,17 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         void FocusTarget(Spell const* focusSpell, WorldObject const* target);
         void ReleaseFocus(Spell const* focusSpell);
 
+        bool IsMovementPreventedByCasting() const;
+
         // Part of Evade mechanics
         time_t GetLastDamagedTime() const { return _lastDamagedTime; }
         void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
+
+        bool IsFreeToMove();
+        static constexpr uint32 MOVE_BACK_CHECK_INTERVAL = 3000;
+        static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
+        uint32 m_moveBackMovementTime = MOVE_BACK_CHECK_INTERVAL;
+        uint32 m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
 
     protected:
         bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = NULL);
@@ -754,7 +771,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
 
         SpellSchoolMask m_meleeDamageSchoolMask;
         uint32 m_originalEntry;
-        
+
         bool m_moveInLineOfSightDisabled;
         bool m_moveInLineOfSightStrictlyDisabled;
 

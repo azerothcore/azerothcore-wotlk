@@ -256,6 +256,37 @@ bool CreatureAI::_EnterEvadeMode()
     return true;
 }
 
+bool CreatureAI::CheckMeleeRepositionRequirements()
+{
+    if (Unit* victim = me->GetVictim())
+    {
+        Position victimPos = victim->GetPosition();
+
+        // If we are closer than 50% of the combat reach we are going to reposition ourself
+        // Dont call if we have more than one attacker because Circling Target will take place.
+        float reach = CalculatePct(me->GetCombatReach() + victim->GetCombatReach(), 50);
+        float moveDist = CalculatePct(me->GetCombatReach() + victim->GetCombatReach(), 100);
+        if (me->IsFreeToMove() && victim->getAttackers().size() == 1 && me->GetDistance(victimPos) < reach)
+        {
+            me->GetMotionMaster()->MoveBackwards(victim, moveDist);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CreatureAI::CheckCircleRepositionRequirements()
+{
+    // if (Unit* victim = me->GetVictim()) {
+    //     if (me->IsFreeToMove() && victim->getAttackers().size() > 1)
+    //     {
+    //         me->GetMotionMaster()->MoveCircleTarget(victim);
+    //         return true;
+    //     }
+    // }
+    return false;
+}
+
 Creature* CreatureAI::DoSummon(uint32 entry, const Position& pos, uint32 despawnTime, TempSummonType summonType)
 {
     return me->SummonCreature(entry, pos, summonType, despawnTime);

@@ -3063,3 +3063,12 @@ uint64 WorldObject::GetTransGUID() const
         return GetTransport()->GetGUID();
     return 0;
 }
+
+float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/, float distanceToSearch/* = DEFAULT_HEIGHT_SEARCH*/) const
+{
+    if (z != MAX_HEIGHT) {
+        z += 50.0f;
+    }
+
+    return GetMap()->GetHeight(GetPhaseMask(), x, y, z, vmap, distanceToSearch);
+}

@@ -320,12 +320,64 @@ void MotionMaster::MoveChase(Unit* target, float dist, float angle)
     }
 }
 
+// void MotionMaster::MoveCircleTarget(Unit* target)
+// {
+//     if (!target) {
+//         return;
+//     }
+
+//     Position point = target->GetMeleeAttackPoint(_owner);
+//     if (point == NULL) {
+//         return;
+//     }
+
+//     if (_owner->IsFlying()) {
+//         // Dont do anything yet might add later.
+//     }
+//     else
+//     {
+//         point.m_positionZ = _owner->GetMapHeight(point.m_positionX, point.m_positionY, point.m_positionZ);
+//     }
+
+//     Movement::MoveSplineInit init(_owner);
+//     init.MoveTo(point.m_positionX, point.m_positionY, point.m_positionZ, true, true);
+//     init.SetFacing(target);
+//     init.Launch();
+// }
+
+void MotionMaster::MoveBackwards(Unit* target, float dist)
+{
+    if (!target) {
+        return;
+    }
+
+    Position const& pos = target->GetPosition();
+    float angle = pos.GetOrientation() + (M_PI*2);
+    G3D::Vector3 point;
+    point.x = pos.m_positionX + dist * cosf(angle);
+    point.y = pos.m_positionY + dist * sinf(angle);
+    point.z = pos.m_positionZ;
+
+    //if (_owner->IsFlying())
+    //    point.z = pos.m_positionZ;
+    //else
+    //    point.z = _owner->GetMapHeight(point.x, point.y, point.z);
+
+    Movement::MoveSplineInit init(_owner);
+    init.MoveTo(point.x, point.y, point.z);
+    init.SetFacing(target);
+    // init.SetBackward();
+    init.Launch();
+}
+
 void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlot slot)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     // ignore movement request if target not exist
     if (!target || target == _owner || _owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+{
         return;
+    }
 
     //_owner->AddUnitState(UNIT_STATE_FOLLOW);
     if (_owner->GetTypeId() == TYPEID_PLAYER)

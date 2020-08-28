@@ -162,6 +162,9 @@ class CreatureAI : public UnitAI
 
         virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
 
+        bool CheckMeleeRepositionRequirements();
+        bool CheckCircleRepositionRequirements();
+
     protected:
         virtual void MoveInLineOfSight(Unit* /*who*/);
 

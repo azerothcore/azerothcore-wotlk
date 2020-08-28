@@ -1232,6 +1232,11 @@ bool SpellInfo::IsChanneled() const
     return (AttributesEx & (SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2));
 }
 
+bool SpellInfo::IsMoveAllowedChannel() const
+{
+    return IsChanneled() && (HasAttribute(SPELL_ATTR5_CAN_CHANNEL_WHEN_MOVING) || (!(ChannelInterruptFlags & (AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING))));
+}
+
 bool SpellInfo::NeedsComboPoints() const
 {
     return (AttributesEx & (SPELL_ATTR1_REQ_COMBO_POINTS1 | SPELL_ATTR1_REQ_COMBO_POINTS2));
@@ -1633,8 +1638,8 @@ bool SpellInfo::IsStrongerAuraActive(Unit const* caster, Unit const* target) con
                     basePoints = player->m_spellModTakingSpell->GetSpellValue()->EffectBasePoints[i];
 
             int32 curValue = abs(Effects[i].CalcValue(caster, &basePoints));
-            int32 auraValue = (sFlag & SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK) ? 
-                abs((*iter)->GetSpellInfo()->Effects[(*iter)->GetEffIndex()].CalcValue((*iter)->GetCaster())) : 
+            int32 auraValue = (sFlag & SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK) ?
+                abs((*iter)->GetSpellInfo()->Effects[(*iter)->GetEffIndex()].CalcValue((*iter)->GetCaster())) :
                 abs((*iter)->GetAmount());
 
             // xinef: for same spells, divide amount by stack amount
@@ -1674,7 +1679,7 @@ bool SpellInfo::IsAuraEffectEqual(SpellInfo const* otherSpellInfo) const
         {
             if (!otherSpellInfo->Effects[j].IsAura())
                 continue;
-            
+
             if (Effects[i].ApplyAuraName != otherSpellInfo->Effects[j].ApplyAuraName || Effects[i].MiscValue != otherSpellInfo->Effects[j].MiscValue)
                 continue;
 
@@ -1697,7 +1702,7 @@ bool SpellInfo::IsAuraEffectEqual(SpellInfo const* otherSpellInfo) const
 
     return matchCount*2 == auraCount;
 }
-    
+
 bool SpellInfo::ValidateAttribute6SpellDamageMods(const Unit* caster, const AuraEffect* auraEffect, bool isDot) const
 {
     // Xinef: no attribute
@@ -1709,7 +1714,7 @@ bool SpellInfo::ValidateAttribute6SpellDamageMods(const Unit* caster, const Aura
     if (Id == 70890 && auraEffect)
     {
         const SpellInfo* auraInfo = auraEffect->GetSpellInfo();
-        return auraInfo->SpellIconID == 3086 || 
+        return auraInfo->SpellIconID == 3086 ||
             (auraInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && (auraInfo->SpellFamilyFlags & flag96(8388608, 64, 16) || auraInfo->SpellIconID == 235 || auraInfo->SpellIconID == 154));
     }
     // Xinef: Necrosis, no profits for done and taken
@@ -2013,10 +2018,10 @@ AuraStateType SpellInfo::LoadAuraState() const
     // Faerie Fire (druid versions)
     if (SpellFamilyName == SPELLFAMILY_DRUID && SpellFamilyFlags[0] & 0x400)
         return AURA_STATE_FAERIE_FIRE;
-    
+
     // Any Spells that prevent spells can be added here.
     uint32 StealthPreventionSpellList[] = { 9991, 35331, 9806, 35325 };
-	
+
     // Goes through each of the spells and identifies them as Stealth Prevention Spell.
     for (uint32 i = 0; i < sizeof(StealthPreventionSpellList) / sizeof(uint32); i++) {
         if (Id == StealthPreventionSpellList[i]) {
