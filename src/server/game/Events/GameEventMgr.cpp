@@ -24,13 +24,6 @@
 #endif
 #include <time.h>
 #include <Util.h>
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-struct tm* localtime_r(time_t const* time, struct tm *result)
-{
-    localtime_s(result, time);
-    return result;
-}
-#endif
 
 GameEventMgr* GameEventMgr::instance()
 {
