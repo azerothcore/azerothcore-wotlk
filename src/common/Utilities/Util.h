@@ -60,6 +60,7 @@ void stripLineInvisibleChars(std::string &src);
 
 int32 MoneyStringToMoney(const std::string& moneyString);
 
+struct tm* localtime_r(time_t const* time, struct tm *result);
 std::string secsToTimeString(uint64 timeInSecs, bool shortText = false);
 uint32 TimeStringToSecs(const std::string& timestring);
 std::string TimeToTimestampStr(time_t t);
