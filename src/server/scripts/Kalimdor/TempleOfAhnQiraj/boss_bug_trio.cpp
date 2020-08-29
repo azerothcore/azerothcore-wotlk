@@ -29,6 +29,46 @@ enum Spells
     SPELL_FEAR         = 19408
 };
 
+enum Events
+{
+    // Kri
+    EVENT_KRI_CLEAVE      = 1,
+    EVENT_KRI_TOXICVOLLEY = 2,
+    EVENT_KRI_CHECK       = 3,
+
+    // Vem
+    EVENT_VEM_CHARGE      = 1,
+    EVENT_VEM_KNOCKBACK   = 2,
+    EVENT_VEM_ENRAGE      = 3,
+
+    // Yauj
+    EVENT_YAUJ_HEAL       = 1,
+    EVENT_YAUJ_FEAR       = 2,
+    EVENT_YAUJ_CHECK      = 3
+};
+
+struct boss_bug_trioAI : public ScriptedAI
+{
+public:
+    boss_bug_trioAI(Creature* creature) : ScriptedAI(creature) { instance = me->GetInstanceScript(); }
+
+    void AggroTrio(Unit* pUnit)
+    {
+        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VEM)))
+            if (vem->GetGUID() != me->GetGUID())
+                vem->GetAI()->AttackStart(pUnit);
+        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KRI)))
+            if (kri->GetGUID() != me->GetGUID())
+                kri->GetAI()->AttackStart(pUnit);
+        if (Creature* yauj = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_YAUJ)))
+            if (yauj->GetGUID() != me->GetGUID())
+                yauj->GetAI()->AttackStart(pUnit);
+    }
+
+private:
+    InstanceScript* instance;
+};
+
 class boss_kri : public CreatureScript
 {
 public:
@@ -39,62 +79,48 @@ public:
         return GetInstanceAI<boss_kriAI>(creature);
     }
 
-    struct boss_kriAI : public ScriptedAI
+    struct boss_kriAI : public boss_bug_trioAI
     {
-        boss_kriAI(Creature* creature) : ScriptedAI(creature)
+        boss_kriAI(Creature* creature) : boss_bug_trioAI(creature)
         {
+            VemDead = false;
+            Death = false;
+
             instance = creature->GetInstanceScript();
         }
-
-        InstanceScript* instance;
-
-        uint32 Cleave_Timer;
-        uint32 ToxicVolley_Timer;
-        uint32 Check_Timer;
 
         bool VemDead;
         bool Death;
 
-        void Reset()
+        void Reset() override
         {
-            Cleave_Timer = urand(4000, 8000);
-            ToxicVolley_Timer = urand(6000, 12000);
-            Check_Timer = 2000;
+            events.Reset();
 
             VemDead = false;
             Death = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* who) override
         {
+            AggroTrio(who);
+
+            events.ScheduleEvent(EVENT_KRI_CLEAVE, urand(4000, 8000));
+            events.ScheduleEvent(EVENT_KRI_TOXICVOLLEY, urand(6000, 12000));
+            events.ScheduleEvent(EVENT_KRI_CHECK, 2000);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
-            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
+            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2) // Prevents the player from looting the boss until all 3 are dead.
                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 
             instance->SetData(DATA_BUG_TRIO_DEATH, 1);
         }
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
                 return;
-
-            //Cleave_Timer
-            if (Cleave_Timer <= diff)
-            {
-                DoCastVictim(SPELL_CLEAVE);
-                Cleave_Timer = urand(5000, 12000);
-            } else Cleave_Timer -= diff;
-
-            //ToxicVolley_Timer
-            if (ToxicVolley_Timer <= diff)
-            {
-                DoCastVictim(SPELL_TOXIC_VOLLEY);
-                ToxicVolley_Timer = urand(10000, 15000);
-            } else ToxicVolley_Timer -= diff;
 
             if (!HealthAbovePct(5) && !Death)
             {
@@ -102,22 +128,41 @@ public:
                 Death = true;
             }
 
-            if (!VemDead)
+            events.Update(diff);
+
+            while (uint32 eventid = events.ExecuteEvent())
             {
-                //Checking if Vem is dead. If yes we will enrage.
-                if (Check_Timer <= diff)
+                switch (eventid)
                 {
-                    if (instance->GetData(DATA_VEMISDEAD))
+                case EVENT_KRI_CLEAVE:
+                    DoCastVictim(SPELL_CLEAVE);
+                    events.RepeatEvent(urand(5000, 12000));
+                    break;
+                case EVENT_KRI_TOXICVOLLEY:
+                    DoCastVictim(SPELL_TOXIC_VOLLEY);
+                    events.RepeatEvent(urand(10000, 15000));
+                    break;
+                case EVENT_KRI_CHECK:
+                    if (!VemDead)
                     {
-                        DoCast(me, SPELL_ENRAGE);
-                        VemDead = true;
+                        if (instance->GetData(DATA_VEMISDEAD))
+                        {
+                            DoCast(me, SPELL_ENRAGE);
+                            VemDead = true;
+                        }
                     }
-                    Check_Timer = 2000;
-                } else Check_Timer -=diff;
+                    events.RepeatEvent(2000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        EventMap events;
+        InstanceScript* instance;
+
     };
 
 };
@@ -132,81 +177,82 @@ public:
         return GetInstanceAI<boss_vemAI>(creature);
     }
 
-    struct boss_vemAI : public ScriptedAI
+    struct boss_vemAI : public boss_bug_trioAI
     {
-        boss_vemAI(Creature* creature) : ScriptedAI(creature)
+        boss_vemAI(Creature* creature) : boss_bug_trioAI(creature)
         {
+            Enraged = false;
+
             instance = creature->GetInstanceScript();
         }
 
-        InstanceScript* instance;
-
-        uint32 Charge_Timer;
-        uint32 KnockBack_Timer;
-        uint32 Enrage_Timer;
-
-        bool Enraged;
-
-        void Reset()
+        void Reset() override
         {
-            Charge_Timer = urand(15000, 27000);
-            KnockBack_Timer = urand(8000, 20000);
-            Enrage_Timer = 120000;
+            events.Reset();
 
             Enraged = false;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             instance->SetData(DATA_VEM_DEATH, 0);
-            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
+            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2) // Prevents the player from looting the boss until all 3 are dead.
                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             instance->SetData(DATA_BUG_TRIO_DEATH, 1);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* who) override
         {
+            AggroTrio(who);
+
+            events.ScheduleEvent(EVENT_VEM_CHARGE, urand(15000, 27000));
+            events.ScheduleEvent(EVENT_VEM_KNOCKBACK, urand(8000, 20000));
+            events.ScheduleEvent(EVENT_VEM_ENRAGE, 120000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
                 return;
 
-            //Charge_Timer
-            if (Charge_Timer <= diff)
+            events.Update(diff);
+
+            while (uint32 eventid = events.ExecuteEvent())
             {
-                Unit* target = NULL;
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                if (target)
+                switch (eventid)
                 {
-                    DoCast(target, SPELL_CHARGE);
-                    //me->SendMonsterMove(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, true, 1);
-                    AttackStart(target);
+                case EVENT_VEM_CHARGE:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    {
+                        DoCast(target, SPELL_CHARGE);
+                        AttackStart(target);
+                    }
+                    events.RepeatEvent(urand(8000, 16000));
+                    break;
+                case EVENT_VEM_KNOCKBACK:
+                    DoCastVictim(SPELL_KNOCKBACK);
+                    if (DoGetThreat(me->GetVictim()))
+                        DoModifyThreatPercent(me->GetVictim(), -80);
+                    events.RepeatEvent(urand(15000, 25000));
+                    break;
+                case EVENT_VEM_ENRAGE:
+                    if (!Enraged)
+                    {
+                        DoCast(me, SPELL_ENRAGE);
+                        Enraged = true;
+                    }
+                    break;
                 }
-
-                Charge_Timer = urand(8000, 16000);
-            } else Charge_Timer -= diff;
-
-            //KnockBack_Timer
-            if (KnockBack_Timer <= diff)
-            {
-                DoCastVictim(SPELL_KNOCKBACK);
-                if (DoGetThreat(me->GetVictim()))
-                    DoModifyThreatPercent(me->GetVictim(), -80);
-                KnockBack_Timer = urand(15000, 25000);
-            } else KnockBack_Timer -= diff;
-
-            //Enrage_Timer
-            if (!Enraged && Enrage_Timer <= diff)
-            {
-                DoCast(me, SPELL_ENRAGE);
-                Enraged = true;
-            } else Charge_Timer -= diff;
+            }
 
             DoMeleeAttackIfReady();
         }
+    private:
+        EventMap events;
+        InstanceScript* instance;
+        bool Enraged;
+
     };
 
 };
@@ -221,33 +267,25 @@ public:
         return GetInstanceAI<boss_yaujAI>(creature);
     }
 
-    struct boss_yaujAI : public ScriptedAI
+    struct boss_yaujAI : public boss_bug_trioAI
     {
-        boss_yaujAI(Creature* creature) : ScriptedAI(creature)
+        boss_yaujAI(Creature* creature) : boss_bug_trioAI(creature)
         {
+            VemDead = false;
+
             instance = creature->GetInstanceScript();
         }
 
-        InstanceScript* instance;
-
-        uint32 Heal_Timer;
-        uint32 Fear_Timer;
-        uint32 Check_Timer;
-
-        bool VemDead;
-
-        void Reset()
+        void Reset() override
         {
-            Heal_Timer = urand(25000, 40000);
-            Fear_Timer = urand(12000, 24000);
-            Check_Timer = 2000;
+            events.Reset();
 
             VemDead = false;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
-            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
+            if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2) // Prevents the player from looting the boss until all 3 are dead.
                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             instance->SetData(DATA_BUG_TRIO_DEATH, 1);
 
@@ -261,61 +299,70 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* who) override
         {
+            AggroTrio(who);
+
+            events.ScheduleEvent(EVENT_YAUJ_HEAL, urand(25000, 40000));
+            events.ScheduleEvent(EVENT_YAUJ_FEAR, urand(12000, 24000));
+            events.ScheduleEvent(EVENT_YAUJ_CHECK, 2000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
                 return;
 
-            //Fear_Timer
-            if (Fear_Timer <= diff)
-            {
-                DoCastVictim(SPELL_FEAR);
-                DoResetThreat();
-                Fear_Timer = 20000;
-            } else Fear_Timer -= diff;
+            events.Update(diff);
 
-            //Casting Heal to other twins or herself.
-            if (Heal_Timer <= diff)
+            while (uint32 eventid = events.ExecuteEvent())
             {
-                switch (urand(0, 2))
+                switch (eventid)
                 {
-                    case 0:
-                        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KRI)))
-                            DoCast(kri, SPELL_HEAL);
-                        break;
-                    case 1:
-                        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VEM)))
-                            DoCast(vem, SPELL_HEAL);
-                        break;
-                    case 2:
-                        DoCast(me, SPELL_HEAL);
-                        break;
-                }
-
-                Heal_Timer = 15000+rand()%15000;
-            } else Heal_Timer -= diff;
-
-            //Checking if Vem is dead. If yes we will enrage.
-            if (Check_Timer <= diff)
-            {
-                if (!VemDead)
-                {
-                    if (instance->GetData(DATA_VEMISDEAD))
+                case EVENT_YAUJ_FEAR:
+                    DoCastVictim(SPELL_FEAR);
+                    DoResetThreat();
+                    events.RepeatEvent(20000);
+                    break;
+                case EVENT_YAUJ_HEAL:
+                    switch (urand(0, 2))
                     {
-                        DoCast(me, SPELL_ENRAGE);
-                        VemDead = true;
+                        case 0:
+                            if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KRI)))
+                                DoCast(kri, SPELL_HEAL);
+                            break;
+                        case 1:
+                            if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VEM)))
+                                DoCast(vem, SPELL_HEAL);
+                            break;
+                        case 2:
+                            DoCast(me, SPELL_HEAL);
+                            break;
                     }
+                    events.RepeatEvent(15000 + rand() % 15000);
+                    break;
+                case EVENT_YAUJ_CHECK:
+                    if (!VemDead)
+                    {
+                        if (instance->GetData(DATA_VEMISDEAD))
+                        {
+                            DoCast(me, SPELL_ENRAGE);
+                            VemDead = true;
+                        }
+                    }
+                    events.RepeatEvent(2000);
+                    break;
                 }
-                Check_Timer = 2000;
-            } else Check_Timer -= diff;
+            }
+
 
             DoMeleeAttackIfReady();
         }
+    private:
+        EventMap events;
+        InstanceScript* instance;
+        bool VemDead;
     };
 
 };

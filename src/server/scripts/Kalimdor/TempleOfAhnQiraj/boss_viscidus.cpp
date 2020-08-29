@@ -84,23 +84,24 @@ class boss_viscidus : public CreatureScript
 
             void Reset()
             {
-                _Reset();
-                _hitcounter = 0;
-                _phase = PHASE_FROST;
+                events.Reset();
+
+                HitCounter = 0;
+                CurrentPhase = PHASE_FROST;
             }
 
             void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
             {
-                if (!attacker || _phase != PHASE_MELEE)
+                if (!attacker || CurrentPhase != PHASE_MELEE)
                     return;
 
-                ++_hitcounter;
+                ++HitCounter;
 
-                if (attacker->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && _hitcounter >= HITCOUNTER_EXPLODE)
+                if (attacker->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && HitCounter >= HITCOUNTER_EXPLODE)
                 {
                     Talk(EMOTE_EXPLODE);
                     events.Reset();
-                    _phase = PHASE_GLOB;
+                    CurrentPhase = PHASE_GLOB;
                     DoCast(me, SPELL_VISCIDUS_EXPLODE);
                     me->SetVisible(false);
                     me->RemoveAura(SPELL_TOXIN);
@@ -114,42 +115,42 @@ class boss_viscidus : public CreatureScript
                         float Y = ViscidusCoord.GetPositionY() + std::sin(Angle) * RoomRadius;
                         float Z = -35.0f;
 
-                        if (TempSummon* Glob = me->SummonCreature(NPC_GLOB_OF_VISCIDUS, X, Y, Z))
+                        if (Creature* pCreature = me->SummonCreature(NPC_GLOB_OF_VISCIDUS, X, Y, Z))
                         {
-                            Glob->UpdateAllowedPositionZ(X, Y, Z);
-                            Glob->NearTeleportTo(X, Y, Z, 0.0f);
-                            Glob->GetMotionMaster()->MovePoint(ROOM_CENTER, ViscidusCoord);
+                            pCreature->UpdateAllowedPositionZ(X, Y, Z);
+                            pCreature->NearTeleportTo(X, Y, Z, 0.0f);
+                            pCreature->GetMotionMaster()->MovePoint(ROOM_CENTER, ViscidusCoord);
                         }
                     }
                 }
-                else if (_hitcounter == HITCOUNTER_SHATTER)
+                else if (HitCounter == HITCOUNTER_SHATTER)
                     Talk(EMOTE_SHATTER);
-                else if (_hitcounter == HITCOUNTER_CRACK)
+                else if (HitCounter == HITCOUNTER_CRACK)
                     Talk(EMOTE_CRACK);
             }
 
             void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
             {
-                if ((spell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && _phase == PHASE_FROST && me->GetHealthPct() > 5.0f)
+                if ((spell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && CurrentPhase == PHASE_FROST && me->GetHealthPct() > 5.0f)
                 {
-                    ++_hitcounter;
+                    ++HitCounter;
 
-                    if (_hitcounter >= HITCOUNTER_FREEZE)
+                    if (HitCounter >= HITCOUNTER_FREEZE)
                     {
-                        _hitcounter = 0;
+                        HitCounter = 0;
                         Talk(EMOTE_FROZEN);
-                        _phase = PHASE_MELEE;
+                        CurrentPhase = PHASE_MELEE;
                         DoCast(me, SPELL_VISCIDUS_FREEZE);
                         me->RemoveAura(SPELL_VISCIDUS_SLOWED_MORE);
                         events.ScheduleEvent(EVENT_RESET_PHASE, 15000);
                     }
-                    else if (_hitcounter >= HITCOUNTER_SLOW_MORE)
+                    else if (HitCounter >= HITCOUNTER_SLOW_MORE)
                     {
                         Talk(EMOTE_FREEZE);
                         me->RemoveAura(SPELL_VISCIDUS_SLOWED);
                         DoCast(me, SPELL_VISCIDUS_SLOWED_MORE);
                     }
-                    else if (_hitcounter >= HITCOUNTER_SLOW)
+                    else if (HitCounter >= HITCOUNTER_SLOW)
                     {
                         Talk(EMOTE_SLOW);
                         DoCast(me, SPELL_VISCIDUS_SLOWED);
@@ -158,13 +159,6 @@ class boss_viscidus : public CreatureScript
             }
 
             void EnterCombat(Unit* /*who*/)
-            {
-                _EnterCombat();
-                events.Reset();
-                InitSpells();
-            }
-
-            void InitSpells()
             {
                 DoCast(me, SPELL_TOXIN);
                 events.ScheduleEvent(EVENT_POISONBOLT_VOLLEY, urand(10000, 15000));
@@ -188,7 +182,7 @@ class boss_viscidus : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-                if (_phase == PHASE_GLOB && summons.empty())
+                if (CurrentPhase == PHASE_GLOB && summons.empty())
                 {
                     DoResetThreat();
                     me->NearTeleportTo(ViscidusCoord.GetPositionX(),
@@ -196,9 +190,11 @@ class boss_viscidus : public CreatureScript
                         ViscidusCoord.GetPositionZ(),
                         ViscidusCoord.GetOrientation());
 
-                    _hitcounter = 0;
-                    _phase = PHASE_FROST;
-                    InitSpells();
+                    HitCounter = 0;
+                    CurrentPhase = PHASE_FROST;
+                    DoCast(me, SPELL_TOXIN);
+                    events.ScheduleEvent(EVENT_POISONBOLT_VOLLEY, urand(10000, 15000));
+                    events.ScheduleEvent(EVENT_POISON_SHOCK, urand(7000, 12000));
                     me->SetVisible(true);
                 }
 
@@ -210,28 +206,28 @@ class boss_viscidus : public CreatureScript
                     {
                         case EVENT_POISONBOLT_VOLLEY:
                             DoCast(me, SPELL_POISONBOLT_VOLLEY);
-                            events.ScheduleEvent(EVENT_POISONBOLT_VOLLEY, urand(10000, 15000));
+                            events.RepeatEvent(urand(10000, 15000));
                             break;
                         case EVENT_POISON_SHOCK:
                             DoCast(me, SPELL_POISON_SHOCK);
-                            events.ScheduleEvent(EVENT_POISON_SHOCK, urand(7000, 12000));
+                            events.RepeatEvent(urand(7000, 12000));
                             break;
                         case EVENT_RESET_PHASE:
-                            _hitcounter = 0;
-                            _phase = PHASE_FROST;
+                            HitCounter = 0;
+                            CurrentPhase = PHASE_FROST;
                             break;
                         default:
                             break;
                     }
                 }
 
-                if (_phase != PHASE_GLOB)
+                if (CurrentPhase != PHASE_GLOB)
                     DoMeleeAttackIfReady();
             }
 
         private:
-            uint8 _hitcounter;
-            Phases _phase;
+            uint8 HitCounter;
+            Phases CurrentPhase;
         };
 
         CreatureAI* GetAI(Creature* creature) const
