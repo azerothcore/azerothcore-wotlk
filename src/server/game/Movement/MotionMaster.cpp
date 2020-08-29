@@ -320,30 +320,30 @@ void MotionMaster::MoveChase(Unit* target, float dist, float angle)
     }
 }
 
-// void MotionMaster::MoveCircleTarget(Unit* target)
-// {
-//     if (!target) {
-//         return;
-//     }
+void MotionMaster::MoveCircleTarget(Unit* target)
+{
+    if (!target) {
+        return;
+    }
 
-//     Position point = target->GetMeleeAttackPoint(_owner);
-//     if (point == NULL) {
-//         return;
-//     }
+    Position* point = target->GetMeleeAttackPoint(_owner);
+    if (point == NULL) {
+        return;
+    }
 
-//     if (_owner->IsFlying()) {
-//         // Dont do anything yet might add later.
-//     }
-//     else
-//     {
-//         point.m_positionZ = _owner->GetMapHeight(point.m_positionX, point.m_positionY, point.m_positionZ);
-//     }
+    if (_owner->IsFlying()) {
+        // Dont do anything yet might add later.
+    }
+    else
+    {
+        point->m_positionZ = _owner->GetMapHeight(point->m_positionX, point->m_positionY, point->m_positionZ);
+    }
 
-//     Movement::MoveSplineInit init(_owner);
-//     init.MoveTo(point.m_positionX, point.m_positionY, point.m_positionZ, true, true);
-//     init.SetFacing(target);
-//     init.Launch();
-// }
+    Movement::MoveSplineInit init(_owner);
+    init.MoveTo(point->m_positionX, point->m_positionY, point->m_positionZ, true, true);
+    init.SetFacing(target);
+    init.Launch();
+}
 
 void MotionMaster::MoveBackwards(Unit* target, float dist)
 {

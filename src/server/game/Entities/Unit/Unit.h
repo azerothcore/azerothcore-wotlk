@@ -1454,7 +1454,7 @@ class Unit : public WorldObject
         void RemoveAllAttackers();
         AttackerSet const& getAttackers() const { return m_attackers; }
         void SetMeleeAttackPoints();
-        Position GetMeleeAttackPoint(Unit* attacker);
+        Position* GetMeleeAttackPoint(Unit* attacker);
         bool isAttackingPlayer() const;
         Unit* GetVictim() const { return m_attacking; }
 

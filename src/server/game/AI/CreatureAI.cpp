@@ -277,13 +277,13 @@ bool CreatureAI::CheckMeleeRepositionRequirements()
 
 bool CreatureAI::CheckCircleRepositionRequirements()
 {
-    // if (Unit* victim = me->GetVictim()) {
-    //     if (me->IsFreeToMove() && victim->getAttackers().size() > 1)
-    //     {
-    //         me->GetMotionMaster()->MoveCircleTarget(victim);
-    //         return true;
-    //     }
-    // }
+    if (Unit* victim = me->GetVictim()) {
+        if (me->IsFreeToMove() && victim->getAttackers().size() > 1)
+        {
+            me->GetMotionMaster()->MoveCircleTarget(victim);
+            return true;
+        }
+    }
     return false;
 }
 

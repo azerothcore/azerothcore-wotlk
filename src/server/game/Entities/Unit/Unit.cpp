@@ -173,11 +173,11 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_vehicle(NULL),
     m_vehicleKit(NULL),
     m_unitTypeMask(UNIT_MASK_NONE),
+    m_attackPosition(NULL),
     m_HostileRefManager(this),
-    m_comboTarget(nullptr),
-    m_comboPoints(0),
     // m_spellHistory(new SpellHistory(this)),
-    m_attackPosition(NULL)
+    m_comboTarget(nullptr),
+    m_comboPoints(0)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -2262,66 +2262,68 @@ void Unit::SetMeleeAttackPoints()
     m_previousPosition = GetPosition();
 }
 
-// Position Unit::GetMeleeAttackPoint(Unit* attacker)
-// {
-//     if (getAttackers().size() <= 1)
-//     {
-//         return NULL;
-//     }
+Position* Unit::GetMeleeAttackPoint(Unit* attacker)
+{
+    if (getAttackers().size() <= 1)
+    {
+        return NULL;
+    }
 
-//     // If already on an attack Position and close to Target abort.
-//     if (attacker->GetDistance(GetPosition()) < GetCombatReach() && !(attacker->m_attackPosition == NULL) && attacker->GetDistance(attacker->m_attackPosition._pos) < 0.25f)
-//     {
-//        return NULL;
-//     }
-//     attacker->m_attackPosition = NULL;
+    // If already on an attack Position and close to Target abort.
+    if (attacker->GetDistance(GetPosition()) < GetCombatReach() && !(attacker->m_attackPosition == 0) && attacker->GetDistance(attacker->m_attackPosition._pos) < 0.25f)
+    {
+       return NULL;
+    }
+    attacker->m_attackPosition = 0;
 
-//     // Get all the distances.
-//     std::vector<AttackDistance> distances;
-//     distances.reserve( attackMeleePositions.size());
-//     for (uint8 i = 0; i < attackMeleePositions.size(); ++i)
-//     {
-//         // If the spot has been taken.
-//         if (!attackMeleePositions[i]._taken)
-//         {
-//             distances.push_back(AttackDistance(i,attackMeleePositions[i]));
-//         }
-//     }
+    // Get all the distances.
+    std::vector<AttackDistance> distances;
+    distances.reserve( attackMeleePositions.size());
+    for (uint8 i = 0; i < attackMeleePositions.size(); ++i)
+    {
+        // If the spot has been taken.
+        if (!attackMeleePositions[i]._taken)
+        {
+            distances.push_back(AttackDistance(i,attackMeleePositions[i]));
+        }
+    }
 
-//     if (distances.size() == 0)
-//     {
-//         return NULL;
-//     }
+    if (distances.size() == 0)
+    {
+        return NULL;
+    }
 
-//     // Get the shortest point.
-//     uint8 shortestIndex = 0;
-//     float shortestLength = 100.0f;
-//     for (uint8 i = 0; i < distances.size(); ++i)
-//     {
-//         float dist = attacker->GetDistance2d(distances[i]._attackPos._pos.m_positionX, distances[i]._attackPos._pos.m_positionY); // +GetDistance(distances[i]._attackPos._pos);
-//         if (shortestLength > dist)
-//         {
-//             shortestLength = dist;
-//             shortestIndex = i;
-//         }
-//     }
+    // Get the shortest point.
+    uint8 shortestIndex = 0;
+    float shortestLength = 100.0f;
+    for (uint8 i = 0; i < distances.size(); ++i)
+    {
+        float dist = attacker->GetDistance2d(distances[i]._attackPos._pos.m_positionX, distances[i]._attackPos._pos.m_positionY); // +GetDistance(distances[i]._attackPos._pos);
+        if (shortestLength > dist)
+        {
+            shortestLength = dist;
+            shortestIndex = i;
+        }
+    }
 
-//     // Create closest Position.
-//     Position closestPos(distances[shortestIndex]._attackPos._pos);
+    // Create closest Position.
+    Position closestPos(distances[shortestIndex]._attackPos._pos);
 
-//     // Too close mark point taken and find another spot.
-//     for (uint8 i = 0; i < attackMeleePositions.size(); ++i)
-//     {
-//         float dist = closestPos.GetExactDist(&attackMeleePositions[i]._pos);
-//         if (dist < GetCombatReach()/2)
-//         {
-//             attackMeleePositions[i]._taken = true;
-//         }
-//     }
-//     attacker->m_attackPosition = distances[shortestIndex]._attackPos;
+    // Too close mark point taken and find another spot.
+    for (uint8 i = 0; i < attackMeleePositions.size(); ++i)
+    {
+        float dist = closestPos.GetExactDist(&attackMeleePositions[i]._pos);
+        if (dist < GetCombatReach()/2)
+        {
+            attackMeleePositions[i]._taken = true;
+        }
+    }
+    attacker->m_attackPosition = distances[shortestIndex]._attackPos;
 
-//     return (bool) closestPos ? closestPos : NULL;
-// }
+    Position* closestP = new Position;
+    *closestP = closestPos;
+    return closestP;
+}
 
 void Unit::HandleProcExtraAttackFor(Unit* victim)
 {
