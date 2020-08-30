@@ -801,7 +801,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     _restBonus = 0;
     ////////////////////Rest System/////////////////////
 
-    m_mailsLoaded = false;
     m_mailsUpdated = false;
     unReadMails = 0;
     m_nextMailDelivereTime = 0;
@@ -955,7 +954,7 @@ Player::~Player()
         delete itr->second;
 
     //all mailed items should be deleted, also all mail should be deallocated
-    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
         delete *itr;
 
     for (ItemMap::iterator iter = mMitems.begin(); iter != mMitems.end(); ++iter)
@@ -3597,12 +3596,12 @@ void Player::SendInitialSpells()
 
 void Player::RemoveMail(uint32 id)
 {
-    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
     {
         if ((*itr)->messageID == id)
         {
             //do not delete item, because Player::removeMail() is called when returning mail to sender.
-            m_mail.erase(itr);
+            m_mailCache.erase(itr);
             return;
         }
     }
@@ -3634,25 +3633,38 @@ void Player::SendNewMail()
 
 void Player::UpdateNextMailTimeAndUnreads()
 {
-    // calculate next delivery time (min. from non-delivered mails
-    // and recalculate unReadMail
+    //Update the next delivery time and unread mails
     time_t cTime = time(NULL);
-    m_nextMailDelivereTime = 0;
-    unReadMails = 0;
-    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
     {
-        if ((*itr)->deliver_time > cTime)
+        //Get the next delivery time
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NEXT_MAIL_DELIVERYTIME);
+        stmt->setUInt64(0, GetGUIDLow());
+        stmt->setUInt64(1, cTime);
+        PreparedQueryResult result = CharacterDatabase.Query(stmt);
+        if (result)
         {
-            if (!m_nextMailDelivereTime || m_nextMailDelivereTime > (*itr)->deliver_time)
-                m_nextMailDelivereTime = (*itr)->deliver_time;
+            Field* fields = result->Fetch();
+            m_nextMailDelivereTime = fields[0].GetUInt64();
         }
-        else if (((*itr)->checked & MAIL_CHECK_MASK_READ) == 0)
-            ++unReadMails;
+    }
+    {
+        //Get unread mails count
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH);
+        stmt->setUInt64(0, GetGUIDLow());
+        stmt->setUInt64(1, cTime);
+        PreparedQueryResult result = CharacterDatabase.Query(stmt);
+        if (result)
+        {
+            Field* fields = result->Fetch();
+            unReadMails = uint8(fields[0].GetUInt64());
+        }
     }
 }
 
 void Player::AddNewMailDeliverTime(time_t deliver_time)
 {
+    ++totalMailCount;
+    sWorld->UpdateGlobalPlayerMails(GetGUIDLow(), totalMailCount, false);
     if (deliver_time <= time(NULL))                          // ready now
     {
         ++unReadMails;
@@ -4567,7 +4579,7 @@ void Player::SetFreeTalentPoints(uint32 points)
 
 Mail* Player::GetMail(uint32 id)
 {
-    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
         if ((*itr)->messageID == id)
             return (*itr);
 
@@ -18261,10 +18273,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 
     // xinef: load mails before inventory, so problematic items can be added to already loaded mails
     // unread mails and next delivery time, actual mails not loaded
-    _LoadMailInit(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT), holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MAIL_DATE));
-
-    // pussywizard:
-    _LoadMailAsynch(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MAIL));
+    _LoadMailInit(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT), holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MAIL_UNREAD_COUNT), holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MAIL_DATE));
 
     _LoadInventory(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_INVENTORY), time_diff);
 
@@ -18944,8 +18953,15 @@ void Player::_LoadMailedItems(Mail* mail)
     while (result->NextRow());
 }
 
-void Player::_LoadMailInit(PreparedQueryResult resultUnread, PreparedQueryResult resultDelivery)
+void Player::_LoadMailInit(PreparedQueryResult resultMailCount, PreparedQueryResult resultUnread, PreparedQueryResult resultDelivery)
 {
+    //Set count for all mails used to display correct size later one
+    if (resultMailCount)
+    {
+        totalMailCount = uint64((*resultMailCount)[0].GetUInt64());
+        sWorld->UpdateGlobalPlayerMails(GetGUIDLow(), totalMailCount, false);
+    }
+
     //set a count of unread mails
     //QueryResult* resultMails = CharacterDatabase.PQuery("SELECT COUNT(id) FROM mail WHERE receiver = '%u' AND (checked & 1)=0 AND deliver_time <= '" UI64FMTD "'", GUID_LOPART(playerGuid), (uint64)cTime);
     if (resultUnread)
@@ -18957,108 +18973,33 @@ void Player::_LoadMailInit(PreparedQueryResult resultUnread, PreparedQueryResult
         m_nextMailDelivereTime = time_t((*resultDelivery)[0].GetUInt32());
 }
 
-void Player::_LoadMailAsynch(PreparedQueryResult result)
-{
-    m_mail.clear();
-    uint32 prevMailID = 0;
-    Mail* m = NULL;
-    if (result)
-    {
-        do
-        {
-            bool has_items = false;
-            Field* fields = result->Fetch();
-            if (fields[14].GetUInt32() != prevMailID)
-            {
-                if (m)
-                    m_mail.push_back(m);
-
-                m = new Mail;
-
-                m->messageID      = fields[14].GetUInt32();
-                m->messageType    = fields[15].GetUInt8();
-                m->sender         = fields[16].GetUInt32();
-                m->receiver       = fields[17].GetUInt32();
-                m->subject        = fields[18].GetString();
-                m->body           = fields[19].GetString();
-                has_items         = fields[20].GetBool();
-                m->expire_time    = time_t(fields[21].GetUInt32());
-                m->deliver_time   = time_t(fields[22].GetUInt32());
-                m->money          = fields[23].GetUInt32();
-                m->COD            = fields[24].GetUInt32();
-                m->checked        = fields[25].GetUInt8();
-                m->stationery     = fields[26].GetUInt8();
-                m->mailTemplateId = fields[27].GetInt16();
-
-                if (m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
-                {
-                    sLog->outError("Player::_LoadMail - Mail (%u) have not existed MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
-                    m->mailTemplateId = 0;
-                }
-
-                m->state = MAIL_STATE_UNCHANGED;
-            }
-
-            if (m && fields[20].GetBool() /*has_items*/ && fields[12].GetUInt32() /*itemEntry*/)
-            {
-                uint32 itemGuid = fields[11].GetUInt32();
-                uint32 itemTemplate = fields[12].GetUInt32();
-
-                m->AddItem(itemGuid, itemTemplate);
-
-                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemTemplate);
-
-                if (!proto)
-                {
-                    sLog->outError("Player %u has unknown item_template (ProtoType) in mailed items(GUID: %u template: %u) in mail (%u), deleted.", GetGUIDLow(), itemGuid, itemTemplate, m->messageID);
-
-                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
-                    stmt->setUInt32(0, itemGuid);
-                    CharacterDatabase.Execute(stmt);
-
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-                    stmt->setUInt32(0, itemGuid);
-                    CharacterDatabase.Execute(stmt);
-                    continue;
-                }
-
-                Item* item = NewItemOrBag(proto);
-
-                if (!item->LoadFromDB(itemGuid, MAKE_NEW_GUID(fields[13].GetUInt32(), 0, HIGHGUID_PLAYER), fields, itemTemplate))
-                {
-                    sLog->outError("Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", m->messageID, itemGuid);
-
-                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM);
-                    stmt->setUInt32(0, itemGuid);
-                    CharacterDatabase.Execute(stmt);
-
-                    item->FSetState(ITEM_REMOVED);
-
-                    SQLTransaction temp = SQLTransaction(NULL);
-                    item->SaveToDB(temp);                               // it also deletes item object !
-                    continue;
-                }
-
-                AddMItem(item);
-            }
-
-            prevMailID = fields[14].GetUInt32();
-        }
-        while (result->NextRow());
-
-        m_mail.push_back(m);
-    }
-    // Xinef: this is stored during storage initialization
-    sWorld->UpdateGlobalPlayerMails(GetGUIDLow(), m_mail.size(), false);
-    m_mailsLoaded = true;
-}
-
 void Player::_LoadMail()
 {
-    m_mail.clear();
+    //In case we are not expecting to receive new mail we just exits, not really necessary to refresh any data
+    if (m_nextMailDelivereTime > time(nullptr))
+        return;
 
+    if (m_mailsUpdated)
+    {
+        //Save changed data to the sql before refreshing so we always get up to date data
+        SQLTransaction saveTransaction = CharacterDatabase.BeginTransaction();
+        _SaveMail(saveTransaction);
+        CharacterDatabase.CommitTransaction(saveTransaction);
+    }
+
+    //Whis should in theory always be < 100
+    for (PlayerMails::iterator itr = GetMailBegin(); itr != GetMailEnd(); ++itr)
+    {
+        delete *itr;
+        m_mailCache.erase(itr);
+        itr = GetMailBegin();
+    }
+
+    //Now load the new ones
+    m_mailCache.clear();
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL);
     stmt->setUInt32(0, GetGUIDLow());
+    stmt->setUInt64(1, time(nullptr));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (result)
@@ -19094,11 +19035,10 @@ void Player::_LoadMail()
             if (has_items)
                 _LoadMailedItems(m);
 
-            m_mail.push_back(m);
+            m_mailCache.push_back(m);
         }
         while (result->NextRow());
     }
-    m_mailsLoaded = true;
 }
 
 void Player::LoadPet()
@@ -19996,12 +19936,13 @@ void Player::_SaveInventory(SQLTransaction& trans)
 
 void Player::_SaveMail(SQLTransaction& trans)
 {
-    if (!m_mailsLoaded)
+    if (!GetMailCacheSize() || !m_mailsUpdated)
         return;
+    
 
     PreparedStatement* stmt = NULL;
 
-    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
     {
         Mail* m = (*itr);
         if (m->state == MAIL_STATE_CHANGED)
@@ -20051,14 +19992,14 @@ void Player::_SaveMail(SQLTransaction& trans)
     }
 
     //deallocate deleted mails...
-    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end();)
+    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end();)
     {
         if ((*itr)->state == MAIL_STATE_DELETED)
         {
             Mail* m = *itr;
-            m_mail.erase(itr);
+            m_mailCache.erase(itr);
             delete m;
-            itr = m_mail.begin();
+            itr = m_mailCache.begin();
         }
         else
             ++itr;
