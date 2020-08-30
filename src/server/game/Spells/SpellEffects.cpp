@@ -4192,7 +4192,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     else
     {
         unitTarget->getHostileRefManager().UpdateVisibility(m_spellInfo->Id == 59646); // Night Elf: Shadowmeld
-        unitTarget->CombatStop(false);
+        unitTarget->CombatStop(true);
     }
 
     UnitList targets;
