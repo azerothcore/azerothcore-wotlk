@@ -2526,7 +2526,7 @@ enum ExceptionCreature
     NPC_RISEN_ARCHMAGE         = 37868,
     NPC_BLISTERING_ZOMBIE      = 37934,
     NPC_BLAZING_SKELETON       = 36791,
-    NPC_SINDRAGOSA         = 36853
+    NPC_SINDRAGOSA             = 36853
 };
 
 class spell_item_unsated_craving : public SpellScriptLoader
