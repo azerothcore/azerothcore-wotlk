@@ -2522,10 +2522,10 @@ enum ShadowsFate
 
 enum ExceptionCreature
 {
-    GLUTTONOUS_ABOMINATION = 37886,
-    RISEN_ARCHMAGE         = 37868,
-    BLISTERING_ZOMBIE      = 37934,
-    BLAZING_SKELETON       = 36791,
+    NPC_GLUTTONOUS_ABOMINATION = 37886,
+    NPC_RISEN_ARCHMAGE         = 37868,
+    NPC_BLISTERING_ZOMBIE      = 37934,
+    NPC_BLAZING_SKELETON       = 36791,
     NPC_SINDRAGOSA         = 36853
 };
 
@@ -2542,10 +2542,10 @@ class spell_item_unsated_craving : public SpellScriptLoader
             {
                 switch (target->GetEntry())
                 {
-                    case GLUTTONOUS_ABOMINATION:
-                    case RISEN_ARCHMAGE:
-                    case BLISTERING_ZOMBIE:
-                    case BLAZING_SKELETON:
+                    case NPC_GLUTTONOUS_ABOMINATION:
+                    case NPC_RISEN_ARCHMAGE:
+                    case NPC_BLISTERING_ZOMBIE:
+                    case NPC_BLAZING_SKELETON:
                     case NPC_SINDRAGOSA:
                         return true;
                     default:
