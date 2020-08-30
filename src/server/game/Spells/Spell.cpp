@@ -2884,7 +2884,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         DoTriggersOnSpellHit(spellHitTarget, mask);
 
         // if target is fallged for pvp also flag caster if a player
-        if (enablePvP) {
+        if (enablePvP) 
+        {
             m_caster->ToPlayer()->UpdatePvP(true);
         }
 
@@ -8630,4 +8631,3 @@ bool WorldObjectSpellTrajTargetCheck::operator()(WorldObject* target)
 }
 
 } //namespace acore
-
