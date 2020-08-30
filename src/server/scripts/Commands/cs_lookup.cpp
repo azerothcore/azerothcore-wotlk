@@ -171,7 +171,7 @@ public:
                 if (creatureLocale->Name.size() > localeIndex && !creatureLocale->Name[localeIndex].empty())
                 {
                     std::string name = creatureLocale->Name[localeIndex];
-            
+
                     if (Utf8FitTo(name, wNamePart))
                     {
                         if (maxResults && count++ == maxResults)
@@ -179,15 +179,15 @@ public:
                             handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
                             return true;
                         }
-            
+
                         if (handler->GetSession())
                             handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str());
                         else
                             handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str());
-            
+
                         if (!found)
                             found = true;
-            
+
                         continue;
                     }
                 }
@@ -409,7 +409,7 @@ public:
                     if (il->Name.size() > ulocaleIndex && !il->Name[ulocaleIndex].empty())
                     {
                         std::string name = il->Name[ulocaleIndex];
-            
+
                         if (Utf8FitTo(name, wNamePart))
                         {
                             if (maxResults && count++ == maxResults)
@@ -417,15 +417,15 @@ public:
                                 handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
                                 return true;
                             }
-            
+
                             if (handler->GetSession())
                                 handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itr->second.ItemId, itr->second.ItemId, name.c_str());
                             else
                                 handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itr->second.ItemId, name.c_str());
-            
+
                             if (!found)
                                 found = true;
-            
+
                             continue;
                         }
                     }
@@ -558,7 +558,7 @@ public:
                 if (objectLocalte->Name.size() > localeIndex && !objectLocalte->Name[localeIndex].empty())
                 {
                     std::string name = objectLocalte->Name[localeIndex];
-            
+
                     if (Utf8FitTo(name, wNamePart))
                     {
                         if (maxResults && count++ == maxResults)
@@ -566,15 +566,15 @@ public:
                             handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
                             return true;
                         }
-            
+
                         if (handler->GetSession())
                             handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, itr->second.entry, itr->second.entry, name.c_str());
                         else
                             handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, itr->second.entry, name.c_str());
-            
+
                         if (!found)
                             found = true;
-            
+
                         continue;
                     }
                 }
@@ -633,6 +633,59 @@ public:
         for (ObjectMgr::QuestMap::const_iterator iter = qTemplates.begin(); iter != qTemplates.end(); ++iter)
         {
             Quest* qInfo = iter->second;
+
+            int localeIndex = handler->GetSessionDbLocaleIndex();
+            if (localeIndex >= 0)
+            {
+                uint8 ulocaleIndex = uint8(localeIndex);
+                if (QuestLocale const* questLocale = sObjectMgr->GetQuestLocale(qInfo->GetQuestId()))
+                {
+                    if (questLocale->Title.size() > ulocaleIndex && !questLocale->Title[ulocaleIndex].empty())
+                    {
+                        std::string title = questLocale->Title[ulocaleIndex];
+
+                        if (Utf8FitTo(title, wNamePart))
+                        {
+                            if (maxResults && count++ == maxResults)
+                            {
+                                handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+                                return true;
+                            }
+
+                            char const* statusStr = "";
+
+                            if (target)
+                            {
+                                QuestStatus status = target->GetQuestStatus(qInfo->GetQuestId());
+
+                                switch (status)
+                                {
+                                    case QUEST_STATUS_COMPLETE:
+                                        statusStr = handler->GetAcoreString(LANG_COMMAND_QUEST_COMPLETE);
+                                        break;
+                                    case QUEST_STATUS_INCOMPLETE:
+                                        statusStr = handler->GetAcoreString(LANG_COMMAND_QUEST_ACTIVE);
+                                        break;
+                                    case QUEST_STATUS_REWARDED:
+                                        statusStr = handler->GetAcoreString(LANG_COMMAND_QUEST_REWARDED);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+
+                            if (handler->GetSession())
+                                handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, qInfo->GetQuestId(), qInfo->GetQuestId(), qInfo->GetQuestLevel(), title.c_str(), statusStr);
+                            else
+                                handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, qInfo->GetQuestId(), title.c_str(), statusStr);
+
+                            if (!found)
+                                found = true;
+                            continue;
+                        }
+                    }
+                }
+            }
 
             std::string title = qInfo->GetTitle();
             if (title.empty())
@@ -965,7 +1018,7 @@ public:
                     found = true;
             }
         }
-        
+
         if (!found)
             handler->SendSysMessage(LANG_COMMAND_NOSPELLFOUND);
 
