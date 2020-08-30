@@ -12617,7 +12617,8 @@ void Unit::ClearInPetCombat()
 {
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LEAVE_COMBAT);
-    if (Unit* owner = GetOwner()) {
+    if (Unit* owner = GetOwner())
+    {
         owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
     }
 }
