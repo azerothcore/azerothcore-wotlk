@@ -112,7 +112,7 @@ class boss_supremus : public CreatureScript
 
             Unit* FindHatefulStrikeTarget()
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i != threatlist.end(); ++i)
                 {

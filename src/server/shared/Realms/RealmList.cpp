@@ -48,10 +48,10 @@ void RealmList::UpdateRealm(uint32 id, const std::string& name, ACE_INET_Addr co
 void RealmList::UpdateIfNeed()
 {
     // maybe disabled or updated recently
-    if (!m_UpdateInterval || m_NextUpdateTime > time(NULL))
+    if (!m_UpdateInterval || m_NextUpdateTime > time(nullptr))
         return;
 
-    m_NextUpdateTime = time(NULL) + m_UpdateInterval;
+    m_NextUpdateTime = time(nullptr) + m_UpdateInterval;
 
     // Clears Realm list
     m_realms.clear();
