@@ -27,7 +27,7 @@ class PacketLog
         static PacketLog* instance();
 
         void Initialize();
-        bool CanLogPacket() const { return (_file != NULL); }
+        bool CanLogPacket() const { return (_file != nullptr); }
         void LogPacket(WorldPacket const& packet, Direction direction);
 
     private:

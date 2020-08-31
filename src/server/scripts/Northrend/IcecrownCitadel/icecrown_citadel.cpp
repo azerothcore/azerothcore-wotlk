@@ -516,7 +516,16 @@ class npc_highlord_tirion_fordring_lh : public CreatureScript
                         case EVENT_MURADIN_RUN:
                         case EVENT_SAURFANG_RUN:
                             if (Creature* factionNPC = ObjectAccessor::GetCreature(*me, _factionNPC))
-                                factionNPC->GetMotionMaster()->MovePath(factionNPC->GetDBTableGUIDLow()*10, false);
+                            {
+                                factionNPC->GetMotionMaster()->MovePath(factionNPC->GetDBTableGUIDLow() * 10, false);
+                                factionNPC->DespawnOrUnsummon(46500);
+                                std::list<Creature*> followers;
+                                factionNPC->GetCreaturesWithEntryInRange(followers, 30, _instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? NPC_KOR_KRON_GENERAL : NPC_ALLIANCE_COMMANDER);
+                                for (Creature* follower : followers)
+                                {
+                                    follower->DespawnOrUnsummon(46500);
+                                }
+                            }
                             me->setActive(false);
                             _damnedKills = 3;
                             break;
@@ -874,7 +883,7 @@ class npc_crok_scourgebane : public CreatureScript
                 {
                     _wipeCheckTimer = 3000;
 
-                    Player* player = NULL;
+                    Player* player = nullptr;
                     acore::AnyPlayerInObjectRangeCheck check(me, 140.0f);
                     acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
                     me->VisitNearbyWorldObject(140.0f, searcher);
@@ -1105,7 +1114,7 @@ class boss_sister_svalna : public CreatureScript
                 me->SetDisableGravity(false);
                 me->SetHover(false);
                 me->SetReactState(REACT_AGGRESSIVE);
-                DoZoneInCombat(NULL, 150.0f);
+                DoZoneInCombat(nullptr, 150.0f);
             }
 
             void SpellHitTarget(Unit* target, SpellInfo const* spell)
@@ -1353,7 +1362,7 @@ class npc_captain_arnath : public CreatureScript
         private:
             Creature* FindFriendlyCreature() const
             {
-                Creature* target = NULL;
+                Creature* target = nullptr;
                 acore::MostHPMissingInRange u_check(me, 60.0f, 0);
                 acore::CreatureLastSearcher<acore::MostHPMissingInRange> searcher(me, target, u_check);
                 me->VisitNearbyGridObject(60.0f, searcher);
@@ -1882,7 +1891,7 @@ class npc_arthas_teleport_visual : public CreatureScript
                 return GetIcecrownCitadelAI<npc_arthas_teleport_visualAI>(creature);
 
             // Default to no script
-            return NULL;
+            return nullptr;
         }
 };
 
@@ -2003,7 +2012,7 @@ class spell_icc_geist_alarm : public SpellScriptLoader
                     if (Creature* l = instance->instance->SummonCreature(NPC_VENGEFUL_FLESHREAPER, p))
                     {
                         bool hasTarget = false;
-                        Unit* target = NULL;
+                        Unit* target = nullptr;
                         if ((target = l->SelectNearestTarget(20.0f)))
                             hasTarget = true;
                         else
@@ -2999,7 +3008,7 @@ public:
 
             if (uint32 e = events.GetEvent())
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 if (sesi_spells[e-1].targetType == 1)
                     target = me->GetVictim();
                 else

@@ -168,7 +168,7 @@ class npc_millhouse_manastorm : public CreatureScript
                         break;
                     case EVENT_SEARCH_FIGHT:
                         if (!me->IsInCombat() && !me->IsInEvadeMode())
-                            if (Unit* target = me->SelectNearbyTarget(NULL, 30.0f))
+                            if (Unit* target = me->SelectNearbyTarget(nullptr, 30.0f))
                                 AttackStart(target);
                         events2.ScheduleEvent(EVENT_SEARCH_FIGHT, 1000);
                         break;

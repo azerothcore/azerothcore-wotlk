@@ -20,6 +20,7 @@
 #include "BattlegroundAV.h"
 #include "ScriptMgr.h"
 #include "GameObjectAI.h"
+#include "Language.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -90,7 +91,7 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket & recvData)
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
     // Stop the npc if moving
     //if (!creature->GetTransport()) // pussywizard: reverted with new spline (old: without this check, npc would stay in place and the transport would continue moving, so the npc falls off. NPCs on transports don't have waypoints, so stopmoving is not needed)
-        creature->StopMoving();
+    creature->StopMoving();
 
 #ifdef ELUNA
         if (sEluna->OnGossipHello(_player, creature))
@@ -167,7 +168,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket & recvData)
             {
                 if (Group* group = _player->GetGroup())
                 {
-                    for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                     {
                         Player* itrPlayer = itr->GetSource();
                         if (!itrPlayer || itrPlayer == _player || !itrPlayer->IsAtGroupRewardDistance(_player) || itrPlayer->HasPendingBind()) // xinef: check range
@@ -477,7 +478,7 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recvData)
                     return;
 
         if (_player->CanAddQuest(quest, true))
-            _player->AddQuestAndCheckCompletion(quest, NULL); // NULL, this prevent DB script from duplicate running
+            _player->AddQuestAndCheckCompletion(quest, nullptr); // NULL, this prevent DB script from duplicate running
 
         _player->SetDivider(0);
     }
@@ -555,7 +556,7 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
     {
         if (Group* group = _player->GetGroup())
         {
-            for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* player = itr->GetSource();
 
@@ -584,6 +585,17 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
                 {
                     _player->SendPushToPartyResponse(player, QUEST_PARTY_MSG_LOG_FULL);
                     continue;
+                }
+
+                // Check if Quest Share in BG is enabled
+                if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG))
+                {
+                    // Check if player is in BG
+                    if (_player->InBattleground())
+                        {
+                            _player->GetSession()->SendNotification(LANG_BG_SHARE_QUEST_ERROR);
+                            continue;
+                        }
                 }
 
                 if (player->GetDivider() != 0)
