@@ -813,7 +813,7 @@ class spell_reflective_shield : public SpellScriptLoader
                     if( GetOwner() && attacker->GetGUID() != GetOwner()->GetGUID() )
                     {
                         int32 damage = (int32)(absorbAmount*0.25f);
-                        GetOwner()->ToUnit()->CastCustomSpell(attacker, 33619, &damage, NULL, NULL, true);
+                        GetOwner()->ToUnit()->CastCustomSpell(attacker, 33619, &damage, nullptr, nullptr, true);
                     }
             }
 

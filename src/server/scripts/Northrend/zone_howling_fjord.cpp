@@ -101,7 +101,7 @@ public:
 
         void setphase(short phase)
         {
-            Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummoner() : NULL;
+            Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummoner() : nullptr;
             if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
                 return;
 

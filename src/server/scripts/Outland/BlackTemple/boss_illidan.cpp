@@ -445,7 +445,7 @@ class boss_illidan_stormrage : public CreatureScript
                         events2.ScheduleEvent(EVENT_OUTRO_3, 17000);
                         break;
                     case EVENT_OUTRO_3:
-                        Unit::Kill(NULL, me);
+                        Unit::Kill(nullptr, me);
                         break;
                 }
 

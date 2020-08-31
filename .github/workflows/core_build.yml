@@ -30,7 +30,7 @@ jobs:
         run: ./apps/ci/ci-install-modules.sh
         if: matrix.modules == 'with'
       - name: Cache
-        uses: actions/cache@v1.1.2
+        uses: actions/cache@v2
         with:
           path: /home/runner/.ccache
           key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
@@ -52,6 +52,54 @@ jobs:
       - name: Run unit tests
         run: source ./apps/ci/ci-run-unit-tests.sh
 
+  mac-build:
+    strategy:
+      fail-fast: false
+    runs-on: macos-10.15
+    name: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache
+        uses: actions/cache@v1.1.2
+        with:
+          path: /Users/runner/.ccache
+          key: ccache:macos-10.15:${{ github.ref }}:${{ github.sha }}
+          restore-keys: |
+            ccache:macos-10.15:${{ github.ref }}
+            ccache:macos-10.15
+      - name: Configure OS
+        run: source ./apps/ci/mac/ci-install.sh
+      - name: Build
+        run: source ./apps/ci/mac/ci-compile.sh
+      - name: Run unit tests
+        run: source ./apps/ci/ci-run-unit-tests.sh
+
+  windows-build:
+    strategy:
+      fail-fast: false
+    runs-on: windows-2019
+    name: windows-2019-MSVC16
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure OS
+        run: choco install --no-progress openssl
+      - name: Build
+        shell: bash
+        run: |
+          mkdir -p build && cd build
+          cmake .. -DTOOLS=ON
+          cmake --build . --config Release --parallel 4
+      - name: Copy dll files
+        shell: bash
+        run: |
+          cp "/c/mysql-5.7.21-winx64/lib/libmysql.dll" "build/bin/Release/"
+          cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "build/bin/Release/"
+          cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
+      - uses: actions/upload-artifact@v2
+        with:
+          name: windows-2019-MSVC16-release
+          path: build/bin/Release
+
   docker-build:
     strategy:
       fail-fast: true
@@ -64,7 +112,7 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          ./bin/acore-docker-build
+          ./bin/acore-docker-build-no-scripts
 
   docker-worldserver:
     strategy:

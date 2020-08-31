@@ -374,8 +374,8 @@ class boss_halion : public CreatureScript
                         events.ScheduleEvent(EVENT_BREATH, urand(10000, 12000));
                         break;
                     case EVENT_ACTIVATE_FIREWALL:
-                        instance->HandleGameObject(instance->GetData64(GO_FLAME_RING), false, NULL);
-                        instance->HandleGameObject(instance->GetData64(GO_TWILIGHT_FLAME_RING), false, NULL);
+                        instance->HandleGameObject(instance->GetData64(GO_FLAME_RING), false, nullptr);
+                        instance->HandleGameObject(instance->GetData64(GO_TWILIGHT_FLAME_RING), false, nullptr);
                         break;
                     case EVENT_METEOR_STRIKE:
                         _livingEmberCount = summons.GetEntryCount(NPC_LIVING_EMBER);
@@ -988,7 +988,7 @@ class spell_halion_marks : public SpellScriptLoader
                 if (!GetTarget()->GetInstanceScript() || !GetTarget()->GetInstanceScript()->IsEncounterInProgress() || GetTarget()->GetMapId() != 724)
                     return;
 
-                GetTarget()->CastCustomSpell(_summonSpellId, SPELLVALUE_BASE_POINT1, GetAura()->GetStackAmount(), GetTarget(), TRIGGERED_FULL_MASK, NULL, NULL, GetCasterGUID());
+                GetTarget()->CastCustomSpell(_summonSpellId, SPELLVALUE_BASE_POINT1, GetAura()->GetStackAmount(), GetTarget(), TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
             }
 
             void Register()
