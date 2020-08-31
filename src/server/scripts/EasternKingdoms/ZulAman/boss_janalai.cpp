@@ -184,7 +184,7 @@ class boss_janalai : public CreatureScript
             void FireWall()
             {
                 uint8 WallNum;
-                Creature* wall = NULL;
+                Creature* wall = nullptr;
                 for (uint8 i = 0; i < 4; ++i)
                 {
                     if (i == 0 || i == 2)
