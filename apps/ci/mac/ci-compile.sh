@@ -2,6 +2,7 @@
 
 export CCACHE_CPP2=true
 export CCACHE_MAXSIZE='5G'
+export CCACHE_COMPRESS=1
 ccache -s
 
 mkdir var/build/obj && cd var/build/obj;
