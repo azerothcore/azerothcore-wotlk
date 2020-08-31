@@ -497,7 +497,7 @@ public:
                 m_pInstance->SetData(TYPE_FREYA, IN_PROGRESS);
 
             // HARD MODE CHECKS
-            Creature* elder = NULL;
+            Creature* elder = nullptr;
             elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_ELDER_STONEBARK));
             if (elder && elder->IsAlive())
             {
