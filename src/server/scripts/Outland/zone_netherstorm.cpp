@@ -1168,7 +1168,7 @@ class npc_captain_saeed : public CreatureScript
                 if (fight)
                     SetEscortPaused(false);
 
-                SummonsAction(NULL);
+                SummonsAction(nullptr);
                 npc_escortAI::EnterEvadeMode();
             }
 
@@ -1178,7 +1178,7 @@ class npc_captain_saeed : public CreatureScript
                 for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
                     if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
                     {
-                        if (who == NULL)
+                        if (who == nullptr)
                         {
                             cr->GetMotionMaster()->Clear(false);
                             cr->GetMotionMaster()->MoveFollow(me, 2.0f, M_PI/2.0f + (i / summons.size() * M_PI));
@@ -1249,7 +1249,7 @@ class npc_captain_saeed : public CreatureScript
                 switch (events.ExecuteEvent())
                 {
                     case EVENT_START_WALK:
-                        SummonsAction(NULL);
+                        SummonsAction(nullptr);
                         SetEscortPaused(false);
                         break;
                     case EVENT_START_FIGHT1:

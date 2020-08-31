@@ -77,7 +77,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
         return;
 
     // chosen battleground type is disabled
-    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId_, NULL))
+    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId_, nullptr))
     {
         ChatHandler(this).PSendSysMessage(LANG_BG_DISABLED);
         return;
@@ -196,7 +196,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
         std::set<uint32> leaderQueueTypeIds;
         for (uint32 i=0; i<PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
             leaderQueueTypeIds.insert((uint32)_player->GetBattlegroundQueueTypeId(i));
-        for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
             if (Player* member = itr->GetSource())
                 for (uint32 i=0; i<PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
                     if (BattlegroundQueueTypeId mqtid = member->GetBattlegroundQueueTypeId(i))
@@ -239,7 +239,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
         }
 
         WorldPacket data;
-        for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* member = itr->GetSource();
             if (!member)
@@ -277,8 +277,8 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvDa
         return;
 
     uint32 flagCarrierCount = 0;
-    Player* allianceFlagCarrier = NULL;
-    Player* hordeFlagCarrier = NULL;
+    Player* allianceFlagCarrier = nullptr;
+    Player* hordeFlagCarrier = nullptr;
 
     if (uint64 guid = bg->GetFlagPickerGUID(TEAM_ALLIANCE))
     {
@@ -609,7 +609,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
         return;
 
     // arenas disabled
-    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, BATTLEGROUND_AA, NULL))
+    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, BATTLEGROUND_AA, nullptr))
     {
         ChatHandler(this).PSendSysMessage(LANG_ARENA_DISABLED);
         return;
@@ -695,7 +695,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
         std::set<uint32> leaderQueueTypeIds;
         for (uint32 i=0; i<PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
             leaderQueueTypeIds.insert((uint32)_player->GetBattlegroundQueueTypeId(i));
-        for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
             if (Player* member = itr->GetSource())
                 for (uint32 i=0; i<PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
                     if (BattlegroundQueueTypeId mqtid = member->GetBattlegroundQueueTypeId(i))
@@ -755,7 +755,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
         }
 
         WorldPacket data;
-        for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* member = itr->GetSource();
             if (!member)
