@@ -24,3 +24,5 @@ COPY --from=builder /azerothcore/env/dist/sql /sql
 # adding the "generate-databases.sh" to the directory "/docker-entrypoint-initdb.d"
 # because all scripts included in that directory will automatically be executed when the docker container starts
 COPY docker/database/generate-databases.sh /docker-entrypoint-initdb.d
+
+HEALTHCHECK --interval=5s --timeout=15s --start-period=30s --retries=3 CMD mysqladmin -uroot -p$MYSQL_ROOT_PASSWORD ping -h localhost

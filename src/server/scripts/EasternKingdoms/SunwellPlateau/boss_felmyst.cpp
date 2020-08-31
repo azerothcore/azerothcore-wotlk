@@ -12,13 +12,13 @@
 
 enum Yells
 {
-    YELL_BIRTH                                  = 0,
-    YELL_KILL                                   = 1,
-    YELL_BREATH                                 = 2,
-    YELL_TAKEOFF                                = 3,
-    YELL_BERSERK                                = 4,
-    YELL_DEATH                                  = 5,
-    EMOTE_BREATH                                = 6
+    YELL_BIRTH                                  = 0, // Glory to Kil'jaeden! Death to all who oppose!
+    YELL_KILL                                   = 1, // I kill for the master! OR The end has come!
+    YELL_BREATH                                 = 2, // Choke on your final breath
+    YELL_TAKEOFF                                = 3, // I am stronger than ever before!
+    YELL_BERSERK                                = 4, // No more hesitation! Your fates are written!
+    YELL_DEATH                                  = 5, // Kil'jaeden will... prevail!  AND Kalecgos line
+    EMOTE_BREATH                                = 6  // Felmyst takes a deep breath...
 };
 
 enum Spells
@@ -343,6 +343,7 @@ public:
                     Talk(EMOTE_BREATH);
                     break;
                 case EVENT_CORRUPT_TRIGGERS:
+                    Talk(YELL_BREATH);
                     me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(0));
                     me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(500));
                     me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(1000));
@@ -508,6 +509,7 @@ class spell_felmyst_fog_of_corruption_charm : public SpellScriptLoader
 
             void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
+                GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM);
                 GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM2);
                 Unit::Kill(GetCaster(), GetTarget(), false);
             }
