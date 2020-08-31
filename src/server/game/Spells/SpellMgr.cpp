@@ -2713,7 +2713,7 @@ void SpellMgr::LoadSpellCustomAttr()
     uint32 customAttrTime = getMSTime();
     uint32 count;
 
-    QueryResult result = WorldDatabase.Query("SELECT entry, attributes FROM spell_custom_attr");
+    QueryResult result = WorldDatabase.Query("SELECT spell_id, attributes FROM spell_custom_attr");
 
     if (!result)
         sLog->outString(">> Loaded 0 spell custom attributes from DB. DB table `spell_custom_attr` is empty.");
@@ -2729,7 +2729,7 @@ void SpellMgr::LoadSpellCustomAttr()
             SpellInfo * spellInfo = _GetSpellInfo(spellId);
             if (!spellInfo)
             {
-                sLog->outString("Table `spell_custom_attr` has wrong spell (entry: %u), ignored.", spellId);
+                sLog->outString("Table `spell_custom_attr` has wrong spell (spell_id: %u), ignored.", spellId);
                 continue;
             }
 
@@ -2742,7 +2742,22 @@ void SpellMgr::LoadSpellCustomAttr()
 
                     if ((attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) != 0)
                     {
-                        sLog->outString("Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
+                        sLog->outErrorDb("Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
+                        continue;
+                    }
+                }
+            }
+
+            if ((attributes & SPELL_ATTR0_CU_POSITIVE) != 0)
+            {
+                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                {
+                    if (spellInfo->Effects[i].IsEffect())
+                        continue;
+
+                    if ((attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)) != 0)
+                    {
+                        sLog->outErrorDb("Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_POSITIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
                         continue;
                     }
                 }
@@ -2752,7 +2767,6 @@ void SpellMgr::LoadSpellCustomAttr()
         }
         sLog->outString(">> Loaded %u spell custom attributes from DB in %u ms", count, GetMSTimeDiffToNow(customAttrTime));
     }
-
 
     // xinef: create talent spells set
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
@@ -3163,6 +3177,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 34655: // Snake Trap, Deadly Poison
             case 11971: // Sunder Armor
             case 58567: // Player Sunder Armor
+            case 12579: // Player Winter's Chill
             case 29306: // Naxxramas(Gluth's Zombies): Infected Wound
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
                 break;
