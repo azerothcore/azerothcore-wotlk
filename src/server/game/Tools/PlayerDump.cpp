@@ -253,8 +253,8 @@ void StoreGUID(QueryResult result, uint32 data, uint32 field, std::set<uint32>& 
 // Writing - High-level functions
 bool PlayerDumpWriter::DumpTable(std::string& dump, uint32 guid, char const*tableFrom, char const*tableTo, DumpTableType type)
 {
-    GUIDs const* guids = NULL;
-    char const* fieldname = NULL;
+    GUIDs const* guids = nullptr;
+    char const* fieldname = nullptr;
 
     switch (type)
     {

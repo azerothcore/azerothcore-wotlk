@@ -102,7 +102,7 @@ public:
             //ChangeTarget_Timer
             if (Submerged && ChangeTarget_Timer <= diff)
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 target = SelectTarget(SELECT_TARGET_RANDOM, 0);
 
                 if (target)

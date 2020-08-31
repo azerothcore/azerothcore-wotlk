@@ -545,7 +545,7 @@ class npc_minigob_manabonk : public CreatureScript
                             PlayerInDalaranList.push_back(player);
 
                 if (PlayerInDalaranList.empty())
-                    return NULL;
+                    return nullptr;
                 return acore::Containers::SelectRandomContainerElement(PlayerInDalaranList);
             }
 

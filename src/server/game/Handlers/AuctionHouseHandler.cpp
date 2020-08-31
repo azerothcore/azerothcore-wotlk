@@ -278,7 +278,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recvData)
             AH->bidder = 0;
             AH->bid = 0;
             AH->buyout = buyout;
-            AH->expire_time = time(NULL) + auctionTime;
+            AH->expire_time = time(nullptr) + auctionTime;
             AH->deposit = deposit;
             AH->auctionHouseEntry = auctionHouseEntry;
 
@@ -320,7 +320,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recvData)
             AH->bidder = 0;
             AH->bid = 0;
             AH->buyout = buyout;
-            AH->expire_time = time(NULL) + auctionTime;
+            AH->expire_time = time(nullptr) + auctionTime;
             AH->deposit = deposit;
             AH->auctionHouseEntry = auctionHouseEntry;
 
