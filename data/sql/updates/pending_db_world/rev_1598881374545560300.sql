@@ -8,7 +8,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1598881374545560300');
 /* Content 3.3.5 */
 
 -- NPC entry 40405 Kieupid, Pet Trainer in Silvermoon City (map: 530, zone ID 0, area ID 0)
-SET @CGUID = 248570;
+SET @CGUID = 248600;
 
 DELETE FROM `creature` WHERE `id` = 40405;
 INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
