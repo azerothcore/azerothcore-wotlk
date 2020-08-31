@@ -82,7 +82,7 @@ struct boss_faction_championsAI : public ScriptedAI
         const float dist_factor = (mAIType == AI_MELEE || mAIType == AI_PET ? 15.0f : 25.0f);
         float mod_dist = dist_factor/(dist_factor + dist); // 0.2 .. 1.0
         float mod_health = health > 40000 ? 2.0f : (60000-health)/10000.0f; // 2.0 .. 6.0
-        float mod_armor = (mAIType == AI_MELEE || mAIType == AI_PET) ? Unit::CalcArmorReducedDamage(me, target, 10000, NULL)/10000.0f : 1.0f;
+        float mod_armor = (mAIType == AI_MELEE || mAIType == AI_PET) ? Unit::CalcArmorReducedDamage(me, target, 10000, nullptr)/10000.0f : 1.0f;
         return mod_dist * mod_health * mod_armor;
     }
 
@@ -149,7 +149,7 @@ struct boss_faction_championsAI : public ScriptedAI
     {
         std::list<Creature *> lst = DoFindFriendlyMissingBuff(range, spell);
         if( lst.empty() )
-            return NULL;
+            return nullptr;
         std::list<Creature *>::const_iterator iter = lst.begin();
         uint32 lowestHP = (*iter)->GetMaxHealth() - (*iter)->GetHealth();
         for( std::list<Creature *>::const_iterator itr = lst.begin(); itr != lst.end(); ++itr )
@@ -185,7 +185,7 @@ struct boss_faction_championsAI : public ScriptedAI
             if( target && target->getPowerType() == POWER_MANA && (!casting || target->HasUnitState(UNIT_STATE_CASTING)) && me->GetExactDist(target) <= range )
                 return target;
         }
-        return NULL;
+        return nullptr;
     }
 
     void UpdateAI(uint32 diff)

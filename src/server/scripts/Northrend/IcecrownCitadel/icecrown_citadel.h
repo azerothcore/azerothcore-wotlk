@@ -615,7 +615,7 @@ CreatureAI* GetIcecrownCitadelAI(Creature* creature)
         if (instance->GetInstanceScript())
             if (instance->GetScriptId() == sObjectMgr->GetScriptId(ICCScriptName))
                 return new AI(creature);
-    return NULL;
+    return nullptr;
 }
 
 #endif // ICECROWN_CITADEL_H_

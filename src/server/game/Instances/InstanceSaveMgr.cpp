@@ -60,19 +60,19 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
     if (!entry)
     {
         sLog->outError("InstanceSaveManager::AddInstanceSave: wrong mapid = %d, instanceid = %d!", mapId, instanceId);
-        return NULL;
+        return nullptr;
     }
 
     if (instanceId == 0)
     {
         sLog->outError("InstanceSaveManager::AddInstanceSave: mapid = %d, wrong instanceid = %d!", mapId, instanceId);
-        return NULL;
+        return nullptr;
     }
 
     if (difficulty >= (entry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
     {
         sLog->outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong dificalty %u!", mapId, instanceId, difficulty);
-        return NULL;
+        return nullptr;
     }
 
     time_t resetTime, extendedResetTime;
@@ -83,7 +83,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
     }
     else
     {
-        resetTime = time(NULL) + 3*DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
+        resetTime = time(nullptr) + 3*DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
         extendedResetTime = 0;
     }
     InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, resetTime, extendedResetTime);
@@ -97,7 +97,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
 InstanceSave* InstanceSaveManager::GetInstanceSave(uint32 InstanceId)
 {
     InstanceSaveHashMap::iterator itr = m_instanceSaveById.find(InstanceId);
-    return itr != m_instanceSaveById.end() ? itr->second : NULL;
+    return itr != m_instanceSaveById.end() ? itr->second : nullptr;
 }
 
 bool InstanceSaveManager::DeleteInstanceSaveIfNeeded(uint32 InstanceId, bool skipMapCheck)
@@ -245,7 +245,7 @@ void InstanceSaveManager::LoadInstances()
 
 void InstanceSaveManager::LoadResetTimes()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     time_t today = (now / DAY) * DAY;
 
     // load the global respawn times for raid/heroic instances
@@ -410,7 +410,7 @@ void InstanceSaveManager::ScheduleReset(time_t time, InstResetEvent event)
 
 void InstanceSaveManager::Update()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     time_t t;
     bool resetOccurred = false;
 
@@ -509,7 +509,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
     if (!mapEntry->Instanceable())
         return;
 
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
 
     if (!warn)
     {
@@ -573,7 +573,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         else
         {
             InstanceSave* save = GetInstanceSave(map2->GetInstanceId());
-            map2->ToInstanceMap()->Reset(INSTANCE_RESET_GLOBAL, (save ? &(save->m_playerList) : NULL));
+            map2->ToInstanceMap()->Reset(INSTANCE_RESET_GLOBAL, (save ? &(save->m_playerList) : nullptr));
         }
     }
 }
@@ -696,20 +696,20 @@ InstancePlayerBind* InstanceSaveManager::PlayerGetBoundInstance(uint32 guidLow, 
 
     MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(mapid, difficulty_fixed);
     if (!mapDiff)
-        return NULL;
+        return nullptr;
 
-    BoundInstancesMapWrapper* w = NULL;
+    BoundInstancesMapWrapper* w = nullptr;
     PlayerBindStorage::const_iterator itr = playerBindStorage.find(guidLow);
     if (itr != playerBindStorage.end())
         w = itr->second;
     else
-        return NULL;
+        return nullptr;
 
     BoundInstancesMap::iterator itr2 = w->m[difficulty_fixed].find(mapid);
     if (itr2 != w->m[difficulty_fixed].end())
         return &itr2->second;
     else
-        return NULL;
+        return nullptr;
 }
 
 bool InstanceSaveManager::PlayerIsPermBoundToInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty)
@@ -737,7 +737,7 @@ void InstanceSaveManager::PlayerCreateBoundInstancesMaps(uint32 guidLow)
 InstanceSave* InstanceSaveManager::PlayerGetInstanceSave(uint32 guidLow, uint32 mapid, Difficulty difficulty)
 {
     InstancePlayerBind* pBind = PlayerGetBoundInstance(guidLow, mapid, difficulty);
-    return (pBind ? pBind->save : NULL);
+    return (pBind ? pBind->save : nullptr);
 }
 
 uint32 InstanceSaveManager::PlayerGetDestinationInstanceId(Player* player, uint32 mapid, Difficulty difficulty)
