@@ -170,7 +170,7 @@ class boss_akilzon : public CreatureScript
                         if (Unit* target = (*i))
                         {
                             if (Cloud && !Cloud->IsWithinDist(target, 6, false))
-                                Cloud->CastCustomSpell(target, SPELL_ZAP, &bp0, NULL, NULL, true, 0, 0, me->GetGUID());
+                                Cloud->CastCustomSpell(target, SPELL_ZAP, &bp0, nullptr, nullptr, true, 0, 0, me->GetGUID());
                         }
                     }
 
@@ -188,7 +188,7 @@ class boss_akilzon : public CreatureScript
                             trigger->SetHealth(100000);
                             trigger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             if (Cloud)
-                                Cloud->CastCustomSpell(trigger, /*43661*/SPELL_ZAP, &bp0, NULL, NULL, true, 0, 0, Cloud->GetGUID());
+                                Cloud->CastCustomSpell(trigger, /*43661*/SPELL_ZAP, &bp0, nullptr, nullptr, true, 0, 0, Cloud->GetGUID());
                         }
                     }
                 }
