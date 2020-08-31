@@ -97,7 +97,7 @@ class spell_mage_deep_freeze : public SpellScriptLoader
             void HandleOnHit()
             {
                 if (Unit* caster = GetCaster())
-                    if (Unit* target = (caster->ToPlayer() ? caster->ToPlayer()->GetSelectedUnit() : NULL))
+                    if (Unit* target = (caster->ToPlayer() ? caster->ToPlayer()->GetSelectedUnit() : nullptr))
                         if (Creature* cTarget = target->ToCreature())
                             if (cTarget->HasMechanicTemplateImmunity(1 << (MECHANIC_STUN - 1)))
                                 caster->CastSpell(cTarget, 71757, true);
@@ -525,7 +525,7 @@ class spell_mage_incanters_absorbtion_base_AuraScript : public AuraScript
                     currentAura->GetBase()->RefreshDuration();
                 }
                 else
-                    target->CastCustomSpell(target, SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
+                    target->CastCustomSpell(target, SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED, &bp, nullptr, nullptr, true, NULL, aurEff);
             }
         }
 };
@@ -657,7 +657,7 @@ class spell_mage_fire_frost_ward : public SpellScriptLoader
                     if (roll_chance_i(chance))
                     {
                         int32 bp = dmgInfo.GetDamage();
-                        target->CastCustomSpell(target, SPELL_MAGE_FROST_WARDING_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
+                        target->CastCustomSpell(target, SPELL_MAGE_FROST_WARDING_TRIGGERED, &bp, nullptr, nullptr, true, NULL, aurEff);
                         absorbAmount = 0;
 
                         // Xinef: trigger Incanters Absorbtion
@@ -706,7 +706,7 @@ class spell_mage_focus_magic : public SpellScriptLoader
 
             bool Load()
             {
-                _procTarget = NULL;
+                _procTarget = nullptr;
                 return true;
             }
 
@@ -794,7 +794,7 @@ class spell_mage_ice_barrier : public SpellScriptLoader
 
                 if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_SCHOOL_ABSORB, (SpellFamilyNames)GetSpellInfo()->SpellFamilyName, GetSpellInfo()->SpellIconID, EFFECT_0))
                 {
-                    int32 newAmount = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, NULL, NULL);
+                    int32 newAmount = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, NULL, nullptr);
                     newAmount = CalculateSpellAmount(caster, newAmount, GetSpellInfo(), aurEff);
 
                     if (aurEff->GetAmount() > newAmount)

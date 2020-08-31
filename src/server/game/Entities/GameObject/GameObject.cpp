@@ -30,7 +30,7 @@
 #endif
 
 GameObject::GameObject() : WorldObject(false), MovableMapObject(),
-    m_model(NULL), m_goValue(), m_AI(NULL)
+    m_model(nullptr), m_goValue(), m_AI(nullptr)
 {
     m_objectType |= TYPEMASK_GAMEOBJECT;
     m_objectTypeId = TYPEID_GAMEOBJECT;
@@ -46,9 +46,9 @@ GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_usetimes = 0;
     m_spellId = 0;
     m_cooldownTime = 0;
-    m_goInfo = NULL;
+    m_goInfo = nullptr;
     m_ritualOwnerGUIDLow = 0;
-    m_goData = NULL;
+    m_goData = nullptr;
     m_packedRotation = 0;
 
     m_DBTableGuid = 0;
@@ -95,7 +95,7 @@ void GameObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
     if (GetTransport() && !ToTransport())
     {
         GetTransport()->RemovePassenger(this);
-        SetTransport(NULL);
+        SetTransport(nullptr);
         m_movementInfo.transport.Reset();
         m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
     }
@@ -390,7 +390,7 @@ void GameObject::Update(uint32 diff)
                 case GAMEOBJECT_TYPE_FISHINGNODE:
                 {
                     // fishing code (bobber ready)
-                    if (time(NULL) > m_respawnTime - FISHING_BOBBER_READY_TIME)
+                    if (time(nullptr) > m_respawnTime - FISHING_BOBBER_READY_TIME)
                     {
                         // splash bobber (bobber ready now)
                         Unit* caster = GetOwner();
@@ -488,7 +488,7 @@ void GameObject::Update(uint32 diff)
         {
             if (m_respawnTime > 0)                          // timer on
             {
-                time_t now = time(NULL);
+                time_t now = time(nullptr);
                 if (m_respawnTime <= now)            // timer expired
                 {
                     uint64 dbtableHighGuid = MAKE_NEW_GUID(m_DBTableGuid, GetEntry(), HIGHGUID_GAMEOBJECT);
@@ -571,7 +571,7 @@ void GameObject::Update(uint32 diff)
                     if (goInfo->trap.type == 2)
                     {
                         if (goInfo->trap.spellId)
-                            CastSpell(NULL, goInfo->trap.spellId);  // FIXME: null target won't work for target type 1
+                            CastSpell(nullptr, goInfo->trap.spellId);  // FIXME: null target won't work for target type 1
                         SetLootState(GO_JUST_DEACTIVATED);
                         break;
                     }
@@ -595,7 +595,7 @@ void GameObject::Update(uint32 diff)
 
                     // Type 0 and 1 - trap (type 0 will not get removed after casting a spell)
                     Unit* owner = GetOwner();
-                    Unit* target = NULL;                            // pointer to appropriate target if found any
+                    Unit* target = nullptr;                            // pointer to appropriate target if found any
 
                     // Note: this hack with search required until GO casting not implemented
                     // search unfriendly creature
@@ -611,7 +611,7 @@ void GameObject::Update(uint32 diff)
                     {
                         // environmental damage spells already have around enemies targeting but this not help in case not existed GO casting support
                         // affect only players
-                        Player* player = NULL;
+                        Player* player = nullptr;
                         acore::AnyPlayerInObjectRangeCheck checker(this, radius, true, true);
                         acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
                         VisitNearbyWorldObject(radius, searcher);
@@ -732,7 +732,7 @@ void GameObject::Update(uint32 diff)
                 return;
             }
 
-            m_respawnTime = time(NULL) + m_respawnDelayTime;
+            m_respawnTime = time(nullptr) + m_respawnDelayTime;
 
             // if option not set then object will be saved at grid unload
             if (GetMap()->IsDungeon())
@@ -945,7 +945,7 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
             m_respawnTime = GetMap()->GetGORespawnTime(m_DBTableGuid);
 
             // ready to respawn
-            if (m_respawnTime && m_respawnTime <= time(NULL))
+            if (m_respawnTime && m_respawnTime <= time(nullptr))
             {
                 m_respawnTime = 0;
                 GetMap()->RemoveGORespawnTime(m_DBTableGuid);
@@ -1029,7 +1029,7 @@ Unit* GameObject::GetOwner() const
 
 void GameObject::SaveRespawnTime()
 { 
-    if (m_goData && m_goData->dbData && m_respawnTime > time(NULL) && m_spawnedByDefault)
+    if (m_goData && m_goData->dbData && m_respawnTime > time(nullptr) && m_spawnedByDefault)
         GetMap()->SaveGORespawnTime(m_DBTableGuid, m_respawnTime);
 }
 
@@ -1088,7 +1088,7 @@ void GameObject::Respawn()
 { 
     if (m_spawnedByDefault && m_respawnTime > 0)
     {
-        m_respawnTime = time(NULL);
+        m_respawnTime = time(nullptr);
         GetMap()->RemoveGORespawnTime(m_DBTableGuid);
     }
 }
@@ -1167,7 +1167,7 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
         range = 5.0f;
 
     // search nearest linked GO
-    GameObject* trapGO = NULL;
+    GameObject* trapGO = nullptr;
     {
         // using original GO distance
         CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
@@ -1188,7 +1188,7 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
 
 GameObject* GameObject::LookupFishingHoleAround(float range)
 { 
-    GameObject* ok = NULL;
+    GameObject* ok = nullptr;
 
     CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
     Cell cell(p);
@@ -1235,7 +1235,7 @@ void GameObject::SetGoArtKit(uint8 kit)
 
 void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid)
 {
-    const GameObjectData* data = NULL;
+    const GameObjectData* data = nullptr;
     if (go)
     {
         go->SetGoArtKit(artkit);
@@ -2265,7 +2265,7 @@ void GameObject::EnableCollision(bool enable)
         GetMap()->InsertGameObjectModel(*m_model);*/
 
     uint32 phaseMask = 0;
-    if (enable && !DisableMgr::IsDisabledFor(DISABLE_TYPE_GO_LOS, GetEntry(), NULL))
+    if (enable && !DisableMgr::IsDisabledFor(DISABLE_TYPE_GO_LOS, GetEntry(), nullptr))
         phaseMask = GetPhaseMask();
 
     m_model->enable(phaseMask);
@@ -2287,14 +2287,14 @@ void GameObject::UpdateModel()
 Player* GameObject::GetLootRecipient() const
 { 
     if (!m_lootRecipient)
-        return NULL;
+        return nullptr;
     return ObjectAccessor::FindPlayerInOrOutOfWorld(m_lootRecipient);
 }
 
 Group* GameObject::GetLootRecipientGroup() const
 { 
     if (!m_lootRecipientGroup)
-        return NULL;
+        return nullptr;
     return sGroupMgr->GetGroupByGUID(m_lootRecipientGroup);
 }
 
