@@ -449,7 +449,7 @@ public:
 
         Creature* GetHelper(uint8 index)
         {
-            return (Helpers[index] ? ObjectAccessor::GetCreature(*me, Helpers[index]) : NULL);
+            return (Helpers[index] ? ObjectAccessor::GetCreature(*me, Helpers[index]) : nullptr);
         }
 
         void SpawnHelpers()
