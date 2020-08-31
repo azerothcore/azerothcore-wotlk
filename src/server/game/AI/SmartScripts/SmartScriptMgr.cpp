@@ -1125,6 +1125,15 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             }
             break;
         }
+        case SMART_ACTION_SET_IN_COMBAT_WITH_ZONE:
+        {
+            if (e.GetScriptType() == SMART_SCRIPT_TYPE_GAMEOBJECT)
+            {
+                sLog->outErrorDb("SmartScript: action_type %u is not allowed with source_type %u. Entry %u, skipped.", e.GetActionType(), e.GetScriptType(), e.entryOrGuid);
+                return false;
+            }
+            break;
+        }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         case SMART_ACTION_FOLLOW:
         case SMART_ACTION_SET_ORIENTATION:
@@ -1133,7 +1142,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_FLEE_FOR_ASSIST:
         case SMART_ACTION_COMBAT_STOP:
         case SMART_ACTION_DIE:
-        case SMART_ACTION_SET_IN_COMBAT_WITH_ZONE:
         case SMART_ACTION_SET_ACTIVE:
         case SMART_ACTION_WP_RESUME:
         case SMART_ACTION_KILL_UNIT:
