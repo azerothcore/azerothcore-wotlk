@@ -209,7 +209,7 @@ bool ConfigMgr::LoadAppConfigs(std::string const& applicationName /*= "worldserv
     // #2 - Load .conf file
     if (!sConfigMgr->LoadMore(_initConfigFile))
     {
-        sLog->outString("");
+        sLog->outString();
         sLog->outString("Load config error. Invalid or missing configuration file: %s", _initConfigFile.c_str());
         sLog->outString("Verify that the file exists and has \'[%s]' written in the top of the file!", applicationName.c_str());
         return false;

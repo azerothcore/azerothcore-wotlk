@@ -2517,7 +2517,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
             // xinef: i think this is wrong, found only 2 vehicles with faction override and one of them should inherit caster faction...
             //uint32 faction = properties->Faction;
             //if (!faction)
-                uint32 faction = m_originalCaster->getFaction();
+            uint32 faction = m_originalCaster->getFaction();
 
             summon->setFaction(faction);
             break;
@@ -4192,7 +4192,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     else
     {
         unitTarget->getHostileRefManager().UpdateVisibility(m_spellInfo->Id == 59646); // Night Elf: Shadowmeld
-        unitTarget->CombatStop(false);
+        unitTarget->CombatStop(true);
     }
 
     UnitList targets;

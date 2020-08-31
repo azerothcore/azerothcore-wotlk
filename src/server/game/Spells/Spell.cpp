@@ -2831,9 +2831,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         if (canEffectTrigger)
         {
             caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell);
-            // Xinef: eg. rogue poisions can proc off cheap shot, etc. so this block should be here also
+            // Xinef: eg. rogue poisons can proc off cheap shot, etc. so this block should be here also
             // Xinef: ofc count only spells that HIT the target, little hack used to fool the system
-            if (((procEx & PROC_EX_NORMAL_HIT)|PROC_EX_CRITICAL_HIT) && caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_STOP_ATTACK_TARGET) == 0 &&
+            if ((procEx & PROC_EX_NORMAL_HIT || procEx & PROC_EX_CRITICAL_HIT) && caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_STOP_ATTACK_TARGET) == 0 &&
                 m_spellInfo->HasAttribute(SPELL_ATTR4_CANT_TRIGGER_ITEM_SPELLS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
                 caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim|PROC_FLAG_TAKEN_DAMAGE, procEx);
         }
@@ -6166,26 +6166,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         switch (m_spellInfo->Effects[i].ApplyAuraName)
         {
             case SPELL_AURA_DUMMY:
-            {
-                //custom check
-                switch (m_spellInfo->Id)
-                {
-                    // Living Bomb
-                    case 44457:
-                    case 55359:
-                    case 55360:
-                    {
-                        if( Unit *target = m_targets.GetUnitTarget() )
-                            if( target->HasAura(m_spellInfo->Id, m_caster->GetGUID()) )
-                                return SPELL_FAILED_AURA_BOUNCED;
-
-                        break;
-                    }
-                    default:
-                        break;
-                }
                 break;
-            }
             case SPELL_AURA_MOD_POSSESS_PET:
             {
                 if (m_caster->GetTypeId() != TYPEID_PLAYER)
