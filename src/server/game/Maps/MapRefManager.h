@@ -23,11 +23,11 @@ class MapRefManager : public RefManager<Map, Player>
         MapReference const* getLast() const { return (MapReference const*)RefManager<Map, Player>::getLast(); }
 
         iterator begin() { return iterator(getFirst()); }
-        iterator end() { return iterator(NULL); }
+        iterator end() { return iterator(nullptr); }
         iterator rbegin() { return iterator(getLast()); }
-        iterator rend() { return iterator(NULL); }
+        iterator rend() { return iterator(nullptr); }
         const_iterator begin() const { return const_iterator(getFirst()); }
-        const_iterator end() const  { return const_iterator(NULL); }
+        const_iterator end() const  { return const_iterator(nullptr); }
 };
 #endif
 

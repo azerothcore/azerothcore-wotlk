@@ -453,7 +453,7 @@ class boss_hexlord_malacrass : public CreatureScript
             void UseAbility()
             {
                 uint8 random = urand(0, 2);
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 switch (PlayerAbility[PlayerClass][random].target)
                 {
                     case ABILITY_TARGET_SELF:
