@@ -437,7 +437,7 @@ class spell_sha_ancestral_awakening_proc : public SpellScriptLoader
             {
                 int32 damage = GetEffectValue();
                 if (GetHitUnit())
-                    GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_SHAMAN_ANCESTRAL_AWAKENING_PROC, &damage, NULL, NULL, true);
+                    GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_SHAMAN_ANCESTRAL_AWAKENING_PROC, &damage, nullptr, nullptr, true);
             }
 
             void Register()
@@ -612,7 +612,7 @@ class spell_sha_cleansing_totem_pulse : public SpellScriptLoader
             {
                 int32 bp = 1;
                 if (GetCaster() && GetHitUnit() && GetOriginalCaster())
-                    GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_SHAMAN_CLEANSING_TOTEM_EFFECT, NULL, &bp, NULL, true, NULL, NULL, GetOriginalCaster()->GetGUID());
+                    GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_SHAMAN_CLEANSING_TOTEM_EFFECT, NULL, &bp, NULL, true, nullptr, nullptr, GetOriginalCaster()->GetGUID());
             }
 
             void Register()
@@ -1270,7 +1270,7 @@ class spell_sha_mana_tide_totem : public SpellScriptLoader
                                     effValue += dummy->GetAmount();
                             // Regenerate 6% of Total Mana Every 3 secs
                             int32 effBasePoints0 = int32(CalculatePct(unitTarget->GetMaxPower(POWER_MANA), effValue));
-                            caster->CastCustomSpell(unitTarget, SPELL_SHAMAN_MANA_TIDE_TOTEM, &effBasePoints0, NULL, NULL, true, NULL, NULL, GetOriginalCaster()->GetGUID());
+                            caster->CastCustomSpell(unitTarget, SPELL_SHAMAN_MANA_TIDE_TOTEM, &effBasePoints0, nullptr, nullptr, true, nullptr, nullptr, GetOriginalCaster()->GetGUID());
                         }
                     }
             }

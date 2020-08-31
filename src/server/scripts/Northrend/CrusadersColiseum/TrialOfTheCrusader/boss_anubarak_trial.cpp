@@ -376,7 +376,7 @@ public:
                 pInstance->SetData(TYPE_ANUBARAK, DONE);
 
 
-            Player* plr = NULL;
+            Player* plr = nullptr;
             if( !pInstance->instance->GetPlayers().isEmpty() )
                 plr = pInstance->instance->GetPlayers().begin()->GetSource();
 

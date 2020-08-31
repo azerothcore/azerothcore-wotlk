@@ -104,10 +104,10 @@ class Lfg5Guids
 public:
     uint64 guid[5];
     LfgRolesMap* roles;
-    Lfg5Guids() { memset(&guid, 0, 5*8); roles = NULL; }
-    Lfg5Guids(uint64 g) { memset(&guid, 0, 5*8); guid[0] = g; roles = NULL; }
-    Lfg5Guids(Lfg5Guids const& x) { memcpy(guid, x.guid, 5*8); if (x.roles) roles = new LfgRolesMap(*(x.roles)); else roles = NULL; }
-    Lfg5Guids(Lfg5Guids const& x, bool /*copyRoles*/) { memcpy(guid, x.guid, 5*8); roles = NULL; }
+    Lfg5Guids() { memset(&guid, 0, 5*8); roles = nullptr; }
+    Lfg5Guids(uint64 g) { memset(&guid, 0, 5*8); guid[0] = g; roles = nullptr; }
+    Lfg5Guids(Lfg5Guids const& x) { memcpy(guid, x.guid, 5*8); if (x.roles) roles = new LfgRolesMap(*(x.roles)); else roles = nullptr; }
+    Lfg5Guids(Lfg5Guids const& x, bool /*copyRoles*/) { memcpy(guid, x.guid, 5*8); roles = nullptr; }
     ~Lfg5Guids() { delete roles; }
     void addRoles(LfgRolesMap const& r) { roles = new LfgRolesMap(r); }
     void clear() { memset(&guid, 0, 5*8); }
@@ -182,7 +182,7 @@ public:
     {
         return guid[0] == x.guid[0] && guid[1] == x.guid[1] && guid[2] == x.guid[2] && guid[3] == x.guid[3] && guid[4] == x.guid[4];
     }
-    void operator=(const Lfg5Guids& x) { memcpy(guid, x.guid, 5*8); delete roles; if (x.roles) roles = new LfgRolesMap(*(x.roles)); else roles = NULL; }
+    void operator=(const Lfg5Guids& x) { memcpy(guid, x.guid, 5*8); delete roles; if (x.roles) roles = new LfgRolesMap(*(x.roles)); else roles = nullptr; }
     std::string toString() const // for debugging
     {
         std::ostringstream o;

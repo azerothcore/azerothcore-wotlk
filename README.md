@@ -115,7 +115,7 @@ AzerothCore is a learning project, and there are lots of different ways to contr
 
 If you want to contribute to the project, you will find a lot of resources that will guide you in our wiki.
 
-Feel free to join us on [our discord chat server][discord] where we taught a lot of new people how to get started and who are now important contributors!
+Feel free to join us on [our discord chat server][https://discord.com/invite/gkt4y2x] where we taught a lot of new people how to get started and who are now important contributors!
 
 <!-- TO UNCOMMENT LATER -->
 <!-- As we put a big emphasis on community, there are also special rewards for contributors such as reputation ranks (displayed in our discord and our website), reputation badges (to display on your project/portfolio), premium software licenses, private modules access, private tools access and a lot of small private repositories access. -->

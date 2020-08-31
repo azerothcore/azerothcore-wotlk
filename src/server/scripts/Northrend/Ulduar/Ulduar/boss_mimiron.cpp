@@ -453,7 +453,7 @@ public:
                 case EVENT_SPAWN_FLAMES_INITIAL:
                     {
                         if (changeAllowedFlameSpreadTime)
-                            allowedFlameSpreadTime = time(NULL);
+                            allowedFlameSpreadTime = time(nullptr);
 
                         std::vector<Player*> pg;
                         Map::PlayerList const &pl = me->GetMap()->GetPlayers();
@@ -489,9 +489,9 @@ public:
                     break;
                 case EVENT_BERSERK_2:
                     {
-                        Creature* VX001 = NULL;
-                        Creature* LMK2 = NULL;
-                        Creature* ACU = NULL;
+                        Creature* VX001 = nullptr;
+                        Creature* LMK2 = nullptr;
+                        Creature* ACU = nullptr;
                         if ((VX001 = GetVX001()))
                             VX001->CastSpell(VX001, SPELL_BERSERK, true);
                         if ((LMK2 = GetLMK2()))
@@ -1158,7 +1158,7 @@ public:
                     break;
                 case EVENT_SPELL_NAPALM_SHELL:
                     {
-                        Player* pTarget = NULL;
+                        Player* pTarget = nullptr;
                         std::vector<Player*> pList;
                         Map::PlayerList const &pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
@@ -1793,7 +1793,7 @@ public:
                         float y = victim->GetPositionY() + 15.0f*sin(angle);
 
                         // check if there's magnetic core in line of movement
-                        Creature* mc = NULL;
+                        Creature* mc = nullptr;
                         std::list<Creature*> cl;
                         me->GetCreaturesWithEntryInRange(cl, me->GetExactDist2d(victim), NPC_MAGNETIC_CORE);
                         for( std::list<Creature*>::iterator itr = cl.begin(); itr != cl.end(); ++itr )
@@ -2316,7 +2316,7 @@ public:
     {
         npc_ulduar_flames_initialAI(Creature *pCreature) : NullCreatureAI(pCreature)
         {
-            CreateTime = time(NULL);
+            CreateTime = time(nullptr);
             events.Reset();
             events.ScheduleEvent(EVENT_FLAMES_SPREAD, 5750);
             if( Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, me->GetPositionX(), me->GetPositionY(), 364.32f, 0.0f) )
@@ -2397,7 +2397,7 @@ public:
                         if( last )
                         {
                             float prevdist = 100.0f;
-                            Player* target = NULL;
+                            Player* target = nullptr;
 
                             Map::PlayerList const &pl = me->GetMap()->GetPlayers();
                             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
