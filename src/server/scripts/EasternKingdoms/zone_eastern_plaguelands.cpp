@@ -287,7 +287,7 @@ public:
             timer += diff;
             if (timer >= 4000)
             {
-                Unit* target = _targetGUID ? ObjectAccessor::GetUnit(*me, _targetGUID) : NULL;
+                Unit* target = _targetGUID ? ObjectAccessor::GetUnit(*me, _targetGUID) : nullptr;
                 if (!target)
                     target = me->FindNearestCreature(NPC_INJURED_PEASANT, 60.0f);
 
