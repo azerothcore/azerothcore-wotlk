@@ -18,8 +18,8 @@ class Transport : public GameObject, public TransportBase
 {
 public:
     Transport() : GameObject() {}
-    void CalculatePassengerPosition(float& x, float& y, float& z, float* o = NULL) const { TransportBase::CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
-    void CalculatePassengerOffset(float& x, float& y, float& z, float* o = NULL) const { TransportBase::CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
+    void CalculatePassengerPosition(float& x, float& y, float& z, float* o = nullptr) const { TransportBase::CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
+    void CalculatePassengerOffset(float& x, float& y, float& z, float* o = nullptr) const { TransportBase::CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
 
     typedef std::set<WorldObject*> PassengerSet;
     virtual void AddPassenger(WorldObject* passenger, bool withAll = false) = 0;
