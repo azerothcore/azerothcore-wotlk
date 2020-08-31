@@ -435,7 +435,7 @@ public:
                 SetEscortPaused(false);
                 SetRun(false);
 
-                Creature* cr = NULL;
+                Creature* cr = nullptr;
                 if ((cr = me->SummonCreature(NPC_CITY_MAN3, EventPos[EVENT_SRC_HALL_CITYMAN1])))
                     cr->AI()->DoAction(ACTION_FORCE_CHANGE_LOCK);
                 if ((cr = me->SummonCreature(NPC_CITY_MAN4, EventPos[EVENT_SRC_HALL_CITYMAN2])))
@@ -1197,7 +1197,7 @@ Creature* npc_arthas::npc_arthasAI::GetEventNpc(uint32 entry)
             ++i;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void npc_arthas::npc_arthasAI::ScheduleNextEvent(uint32 currentEvent, uint32 time)
