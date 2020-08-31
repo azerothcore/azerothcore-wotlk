@@ -841,7 +841,7 @@ public:
 
                     if (!fixingGUID)
                     {
-                        Creature* razorscale = NULL;
+                        Creature* razorscale = nullptr;
                         if( uint64 rsGUID = pInstance->GetData64(TYPE_RAZORSCALE) )
                             razorscale = ObjectAccessor::GetCreature(*me, rsGUID);
 
@@ -890,7 +890,7 @@ public:
         if( !pInstance )
             return true;
 
-        Creature* rs = NULL;
+        Creature* rs = nullptr;
         if( uint64 rsGUID = pInstance->GetData64(TYPE_RAZORSCALE) )
             rs = ObjectAccessor::GetCreature(*go, rsGUID);
 
