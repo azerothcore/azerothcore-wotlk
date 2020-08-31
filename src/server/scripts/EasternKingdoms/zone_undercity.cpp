@@ -1010,7 +1010,7 @@ public:
         {
             me->DeleteThreatList();
             me->CombatStop(true);
-            me->SetLootRecipient(NULL);
+            me->SetLootRecipient(nullptr);
 
             if (HasEscortState(STATE_ESCORT_ESCORTING))
             {
@@ -2052,8 +2052,13 @@ public:
                         break;
                     case EVENT_AGGRO_JAINA:
                         if (me->GetVictim())
-                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                                jaina->AI()->AttackStart(me->GetVictim()); DoCast(me, SPELL_THUNDER);
+                        {
+                            if (Creature *jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                            {
+                                jaina->AI()->AttackStart(me->GetVictim());
+                            }
+                        }
+                        DoCast(me, SPELL_THUNDER);
                         _events.ScheduleEvent(EVENT_AGGRO_JAINA, 2 * IN_MILLISECONDS);
                         break;
                     case EVENT_WRYNN_BUFF:
@@ -2351,7 +2356,7 @@ public:
             me->RemoveAura(SPELL_HEROIC_VANGUARD);
             me->DeleteThreatList();
             me->CombatStop(true);
-            me->SetLootRecipient(NULL);
+            me->SetLootRecipient(nullptr);
 
             if (HasEscortState(STATE_ESCORT_ESCORTING))
             {
