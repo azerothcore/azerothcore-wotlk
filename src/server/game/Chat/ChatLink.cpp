@@ -186,7 +186,7 @@ bool ItemChatLink::ValidateName(char* buffer, const char* context)
 {
     ChatLink::ValidateName(buffer, context);
 
-    char* const* suffixStrings = _suffix ? _suffix->nameSuffix : (_property ? _property->nameSuffix : NULL);
+    char* const* suffixStrings = _suffix ? _suffix->nameSuffix : (_property ? _property->nameSuffix : nullptr);
 
     bool res = (FormatName(LOCALE_enUS, NULL, suffixStrings) == buffer);
 
@@ -259,6 +259,14 @@ bool QuestChatLink::ValidateName(char* buffer, const char* context)
     ChatLink::ValidateName(buffer, context);
 
     bool res = (_quest->GetTitle() == buffer);
+    if (!res)
+        if (QuestLocale const* ql = sObjectMgr->GetQuestLocale(_quest->GetQuestId()))
+            for (uint8 i = 0; i < ql->Title.size(); i++)
+                if (ql->Title[i] == buffer)
+                {
+                    res = true;
+                    break;
+                }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     if (!res)
@@ -630,12 +638,12 @@ bool LinkExtractor::IsValidMessage()
     std::istringstream::pos_type startPos = 0;
     uint32 color = 0;
 
-    ChatLink* link = NULL;
+    ChatLink* link = nullptr;
     while (!_iss.eof())
     {
         if (validSequence == validSequenceIterator)
         {
-            link = NULL;
+            link = nullptr;
             _iss.ignore(255, PIPE_CHAR);
             startPos = _iss.tellg() - std::istringstream::pos_type(1);
         }
