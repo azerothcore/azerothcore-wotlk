@@ -44,7 +44,7 @@ ObjectAccessor* ObjectAccessor::instance()
 Player* ObjectAccessor::GetObjectInWorld(uint64 guid, Player* /*typeSpecifier*/)
 {
     Player* player = HashMapHolder<Player>::Find(guid);
-    return player && player->IsInWorld() ? player : NULL;
+    return player && player->IsInWorld() ? player : nullptr;
 }
 
 WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, uint64 guid)
@@ -60,7 +60,7 @@ WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, uint64 guid)
         case HIGHGUID_PET:           return GetPet(p, guid);
         case HIGHGUID_DYNAMICOBJECT: return GetDynamicObject(p, guid);
         case HIGHGUID_CORPSE:        return GetCorpse(p, guid);
-        default:                     return NULL;
+        default:                     return nullptr;
     }
 }
 
@@ -99,7 +99,7 @@ Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const& p, uint64 guid, u
             break;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 Corpse* ObjectAccessor::GetCorpse(WorldObject const& u, uint64 guid)
@@ -115,10 +115,10 @@ GameObject* ObjectAccessor::GetGameObject(WorldObject const& u, uint64 guid)
 Transport* ObjectAccessor::GetTransport(WorldObject const& u, uint64 guid)
 {
     if (GUID_HIPART(guid) != HIGHGUID_MO_TRANSPORT && GUID_HIPART(guid) != HIGHGUID_TRANSPORT)
-        return NULL;
+        return nullptr;
 
     GameObject* go = GetGameObject(u, guid);
-    return go ? go->ToTransport() : NULL;
+    return go ? go->ToTransport() : nullptr;
 }
 
 DynamicObject* ObjectAccessor::GetDynamicObject(WorldObject const& u, uint64 guid)
@@ -154,7 +154,7 @@ Creature* ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const& u, uint64
     if (IS_CRE_OR_VEH_GUID(guid))
         return GetCreature(u, guid);
 
-    return NULL;
+    return nullptr;
 }
 
 Pet* ObjectAccessor::FindPet(uint64 guid)
@@ -169,12 +169,17 @@ Player* ObjectAccessor::FindPlayer(uint64 guid)
 
 Player* ObjectAccessor::FindPlayerInOrOutOfWorld(uint64 guid)
 {
-    return GetObjectInOrOutOfWorld(guid, (Player*)NULL); 
+    return GetObjectInOrOutOfWorld(guid, (Player*)NULL);
 }
 
 Unit* ObjectAccessor::FindUnit(uint64 guid)
 {
     return GetObjectInWorld(guid, (Unit*)NULL);
+}
+
+Player* ObjectAccessor::FindConnectedPlayer(uint64 const& guid)
+{
+    return HashMapHolder<Player>::Find(guid);
 }
 
 Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWorld)
@@ -201,7 +206,7 @@ Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWo
         if (!checkInWorld || itr->second->IsInWorld())
             return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 void ObjectAccessor::SaveAllPlayers()
@@ -218,7 +223,7 @@ Corpse* ObjectAccessor::GetCorpseForPlayerGUID(uint64 guid)
 
     Player2CorpsesMapType::iterator iter = i_player2corpse.find(guid);
     if (iter == i_player2corpse.end())
-        return NULL;
+        return nullptr;
 
     ASSERT(iter->second->GetType() != CORPSE_BONES);
 
@@ -316,7 +321,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
     {
         //in fact this function is called from several places
         //even when player doesn't have a corpse, not an error
-        return NULL;
+        return nullptr;
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -335,7 +340,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
     corpse->DeleteFromDB(trans);
     CharacterDatabase.CommitTransaction(trans);
 
-    Corpse* bones = NULL;
+    Corpse* bones = nullptr;
     // create the bones only if the map and the grid is loaded at the corpse's location
     // ignore bones creating option in case insignia
 
@@ -387,7 +392,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
 
 void ObjectAccessor::RemoveOldCorpses()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     Player2CorpsesMapType::iterator next;
     for (Player2CorpsesMapType::iterator itr = i_player2corpse.begin(); itr != i_player2corpse.end(); itr = next)
     {
@@ -486,7 +491,7 @@ void ObjectAccessor::Update(uint32 /*diff*/)
 }
 
 void Map::BuildAndSendUpdateForObjects()
-{ 
+{
     UpdateDataMapType update_players;
     UpdatePlayerSet player_set;
 
