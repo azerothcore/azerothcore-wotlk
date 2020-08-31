@@ -77,7 +77,7 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
             else // No more vacant places
             {
                 // TODO: Send a packet to announce it to player
-                m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(NULL) + (player->IsGameMaster() ? 30*MINUTE : 10);
+                m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(nullptr) + (player->IsGameMaster() ? 30*MINUTE : 10);
                 InvitePlayerToQueue(player);
             }
         }
@@ -167,7 +167,7 @@ bool Battlefield::Update(uint32 diff)
         // Kick players who chose not to accept invitation to the battle
         if (m_uiKickDontAcceptTimer <= diff)
         {
-            time_t now = time(NULL);
+            time_t now = time(nullptr);
             for (int team = 0; team < 2; team++)
                 for (PlayerTimerMap::iterator itr = m_InvitedPlayers[team].begin(); itr != m_InvitedPlayers[team].end(); ++itr)
                     if (itr->second <= now)
@@ -253,7 +253,7 @@ void Battlefield::InvitePlayersInZoneToWar()
                 if (m_PlayersInWar[player->GetTeamId()].size() + m_InvitedPlayers[player->GetTeamId()].size() < m_MaxPlayer)
                     InvitePlayerToWar(player);
                 else if (m_PlayersWillBeKick[player->GetTeamId()].count(player->GetGUID()) == 0)// Battlefield is full of players
-                    m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(NULL) + 10;
+                    m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(nullptr) + 10;
             }
         }
 }
@@ -277,7 +277,7 @@ void Battlefield::InvitePlayerToWar(Player* player)
     if (player->getLevel() < m_MinLevel)
     {
         if (m_PlayersWillBeKick[player->GetTeamId()].count(player->GetGUID()) == 0)
-            m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(NULL) + 10;
+            m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(nullptr) + 10;
         return;
     }
 
@@ -286,7 +286,7 @@ void Battlefield::InvitePlayerToWar(Player* player)
         return;
 
     m_PlayersWillBeKick[player->GetTeamId()].erase(player->GetGUID());
-    m_InvitedPlayers[player->GetTeamId()][player->GetGUID()] = time(NULL) + m_TimeForAcceptInvite;
+    m_InvitedPlayers[player->GetTeamId()][player->GetGUID()] = time(nullptr) + m_TimeForAcceptInvite;
     player->GetSession()->SendBfInvitePlayerToWar(m_BattleId, m_ZoneId, m_TimeForAcceptInvite);
 }
 
@@ -523,7 +523,7 @@ Group* Battlefield::GetFreeBfRaid(TeamId TeamId)
             if (!group->IsFull())
                 return group;
 
-    return NULL;
+    return nullptr;
 }
 
 Group* Battlefield::GetGroupPlayer(uint64 guid, TeamId TeamId)
@@ -533,7 +533,7 @@ Group* Battlefield::GetGroupPlayer(uint64 guid, TeamId TeamId)
             if (group->IsMember(guid))
                 return group;
 
-    return NULL;
+    return nullptr;
 }
 
 bool Battlefield::AddOrSetPlayerToCorrectBfGroup(Player* player)
@@ -588,12 +588,12 @@ BfGraveyard* Battlefield::GetGraveyardById(uint32 id) const
     else
         sLog->outError("Battlefield::GetGraveyardById Id:%u cant be found", id);
 
-    return NULL;
+    return nullptr;
 }
 
 GraveyardStruct const * Battlefield::GetClosestGraveyard(Player* player)
 {
-    BfGraveyard* closestGY = NULL;
+    BfGraveyard* closestGY = nullptr;
     float maxdist = -1;
     for (uint8 i = 0; i < m_GraveyardList.size(); i++)
     {
@@ -614,7 +614,7 @@ GraveyardStruct const * Battlefield::GetClosestGraveyard(Player* player)
     if (closestGY)
         return sGraveyard->GetGraveyard(closestGY->GetGraveyardId());
 
-    return NULL;
+    return nullptr;
 }
 
 void Battlefield::AddPlayerToResurrectQueue(uint64 npcGuid, uint64 playerGuid)
@@ -752,7 +752,7 @@ void BfGraveyard::GiveControlTo(TeamId team)
 
 void BfGraveyard::RelocateDeadPlayers()
 {
-    GraveyardStruct const* closestGrave = NULL;
+    GraveyardStruct const* closestGrave = nullptr;
     for (GuidSet::const_iterator itr = m_ResurrectQueue.begin(); itr != m_ResurrectQueue.end(); ++itr)
     {
         Player* player = ObjectAccessor::FindPlayer(*itr);
@@ -796,7 +796,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
     {
         sLog->outError("Battlefield::SpawnCreature: Can't create creature entry: %u", entry);
         delete creature;
-        return NULL;
+        return nullptr;
     }
 
     creature->setFaction(BattlefieldFactions[teamId]);
@@ -806,7 +806,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
     if (!cinfo)
     {
         sLog->outErrorDb("Battlefield::SpawnCreature: entry %u does not exist.", entry);
-        return NULL;
+        return nullptr;
     }
     // force using DB speeds -- do we really need this?
     creature->SetSpeed(MOVE_WALK, cinfo->speed_walk);
@@ -833,7 +833,7 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
         sLog->outErrorDb("Battlefield::SpawnGameObject: Gameobject template %u not found in database! Battlefield not created!", entry);
         sLog->outError("Battlefield::SpawnGameObject: Cannot create gameobject template %u! Battlefield not created!", entry);
         delete go;
-        return NULL;
+        return nullptr;
     }
 
     // Add to world
