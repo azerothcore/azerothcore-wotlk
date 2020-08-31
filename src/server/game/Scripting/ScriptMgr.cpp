@@ -661,7 +661,7 @@ InstanceScript* ScriptMgr::CreateInstanceScript(InstanceMap* map)
 {
     ASSERT(map);
 
-    GET_SCRIPT_RET(InstanceMapScript, map->GetScriptId(), tmpscript, NULL);
+    GET_SCRIPT_RET(InstanceMapScript, map->GetScriptId(), tmpscript, nullptr);
     return tmpscript->GetInstanceScript(map);
 }
 
@@ -867,7 +867,7 @@ CreatureAI* ScriptMgr::GetCreatureAI(Creature* creature)
         return luaAI;
 #endif
 
-    GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, NULL);
+    GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, nullptr);
     return tmpscript->GetAI(creature);
 }
 
@@ -1012,7 +1012,7 @@ GameObjectAI* ScriptMgr::GetGameObjectAI(GameObject* go)
     sEluna->OnSpawn(go);
 #endif
 
-    GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, NULL);
+    GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, nullptr);
     return tmpscript->GetAI(go);
 }
 
@@ -1032,14 +1032,14 @@ Battleground* ScriptMgr::CreateBattleground(BattlegroundTypeId /*typeId*/)
 {
     // TODO: Implement script-side battlegrounds.
     ABORT();
-    return NULL;
+    return nullptr;
 }
 
 OutdoorPvP* ScriptMgr::CreateOutdoorPvP(OutdoorPvPData const* data)
 {
     ASSERT(data);
 
-    GET_SCRIPT_RET(OutdoorPvPScript, data->ScriptId, tmpscript, NULL);
+    GET_SCRIPT_RET(OutdoorPvPScript, data->ScriptId, tmpscript, nullptr);
     return tmpscript->GetOutdoorPvP();
 }
 

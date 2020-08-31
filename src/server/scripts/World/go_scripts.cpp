@@ -108,7 +108,7 @@ class go_witherbark_totem_bundle : public GameObjectScript
                     _timer += diff;
                     if (_timer > 5000)
                     {
-                        go->CastSpell(NULL, 9056);
+                        go->CastSpell(nullptr, 9056);
                         go->DestroyForNearbyPlayers();
                         _timer = 0;
                     }
@@ -931,7 +931,7 @@ class go_inconspicuous_landmark : public GameObjectScript
     public:
         go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark")
         {
-            _lastUsedTime = time(NULL);
+            _lastUsedTime = time(nullptr);
         }
 
         bool OnGossipHello(Player* player, GameObject* /*go*/) override
@@ -939,10 +939,10 @@ class go_inconspicuous_landmark : public GameObjectScript
             if (player->HasItemCount(ITEM_CUERGOS_KEY))
                 return true;
 
-            if (_lastUsedTime > time(NULL))
+            if (_lastUsedTime > time(nullptr))
                 return true;
 
-            _lastUsedTime = time(NULL) + MINUTE;
+            _lastUsedTime = time(nullptr) + MINUTE;
             player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
             return true;
         }
