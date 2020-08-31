@@ -89,7 +89,7 @@ public:
     struct netherspite_infernalAI : public ScriptedAI
     {
         netherspite_infernalAI(Creature* creature) : ScriptedAI(creature),
-            HellfireTimer(0), CleanupTimer(0), malchezaar(0), point(NULL) { }
+            HellfireTimer(0), CleanupTimer(0), malchezaar(0), point(nullptr) { }
 
         uint32 HellfireTimer;
         uint32 CleanupTimer;
@@ -365,7 +365,7 @@ public:
             {
                 if (SWPainTimer <= diff)
                 {
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     if (phase == 1)
                         target = me->GetVictim();                  // Target the Tank
                     else                                          // anyone but the tank
@@ -416,7 +416,7 @@ public:
             {
                 if (AmplifyDamageTimer <= diff)
                 {
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
 
                     if (target)
