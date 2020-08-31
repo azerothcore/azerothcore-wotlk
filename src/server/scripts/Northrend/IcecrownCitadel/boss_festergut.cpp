@@ -206,7 +206,7 @@ class boss_festergut : public CreatureScript
                             // just cast and dont bother with target, conditions will handle it
                             ++_inhaleCounter;
                             if (_inhaleCounter < 3)
-                                me->CastSpell(me, gaseousBlight[_inhaleCounter], true, NULL, NULL, me->GetGUID());
+                                me->CastSpell(me, gaseousBlight[_inhaleCounter], true, nullptr, nullptr, me->GetGUID());
                         }
 
                         events.ScheduleEvent(EVENT_INHALE_BLIGHT, 34000);

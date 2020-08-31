@@ -92,7 +92,7 @@ namespace ArenaSpectator
     {
         if (!IS_PLAYER_GUID(targetGUID))
             return;
-        SendCommand(o, "%s0x%016lX;%s=%s;", SPECTATOR_ADDON_PREFIX, targetGUID, prefix, c);
+        SendCommand(o, "%s0x%016llX;%s=%s;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, c);
     }
 
     template<class T>
@@ -100,7 +100,7 @@ namespace ArenaSpectator
     {
         if (!IS_PLAYER_GUID(targetGUID))
             return;
-        SendCommand(o, "%s0x%016lX;%s=%u;", SPECTATOR_ADDON_PREFIX, targetGUID, prefix, t);
+        SendCommand(o, "%s0x%016llX;%s=%u;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, t);
     }
 
     template<class T>
@@ -108,7 +108,7 @@ namespace ArenaSpectator
     {
         if (!IS_PLAYER_GUID(targetGUID))
             return;
-        SendCommand(o, "%s0x%016lX;%s=0x%016lX;", SPECTATOR_ADDON_PREFIX, targetGUID, prefix, t);
+        SendCommand(o, "%s0x%016llX;%s=0x%016llX;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, (unsigned long long)t);
     }
 
     template<class T>
@@ -116,7 +116,7 @@ namespace ArenaSpectator
     {
         if (!IS_PLAYER_GUID(targetGUID))
             return;
-        SendCommand(o, "%s0x%016lX;%s=%u,%i;", SPECTATOR_ADDON_PREFIX, targetGUID, prefix, id, casttime);
+        SendCommand(o, "%s0x%016llX;%s=%u,%i;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, id, casttime);
     }
 
     template<class T>
@@ -127,7 +127,7 @@ namespace ArenaSpectator
         if (const SpellInfo* si = sSpellMgr->GetSpellInfo(id))
             if (si->SpellIconID == 1)
                 return;
-        SendCommand(o, "%s0x%016lX;%s=%u,%u,%u;", SPECTATOR_ADDON_PREFIX, targetGUID, prefix, id, dur, maxdur);
+        SendCommand(o, "%s0x%016llX;%s=%u,%u,%u;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, id, dur, maxdur);
     }
 
     template<class T>
@@ -135,7 +135,7 @@ namespace ArenaSpectator
     {
         if (!IS_PLAYER_GUID(targetGUID))
             return;
-        SendCommand(o, "%s0x%016lX;%s=%u,%u,%i,%i,%u,%u,%u,0x%016lX;", SPECTATOR_ADDON_PREFIX, targetGUID, prefix, remove ? 1 : 0, stack, dur, maxdur, id, dispel, isDebuff ? 1 : 0, caster);
+        SendCommand(o, "%s0x%016llX;%s=%u,%u,%i,%i,%u,%u,%u,0x%016llX;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, remove ? 1 : 0, stack, dur, maxdur, id, dispel, isDebuff ? 1 : 0, (unsigned long long)caster);
     }
 
     void HandleResetCommand(Player* p)
@@ -197,7 +197,7 @@ namespace ArenaSpectator
         if (aura->GetSpellInfo()->SpellIconID == 1 || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR1_DONT_DISPLAY_IN_AURA_BAR))
             return false;
 
-        if (remove || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_AURA_CC) || aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_GENERIC)
+        if (remove || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH) || aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_GENERIC)
             return true;
 
         for(uint8 i=EFFECT_0; i<MAX_SPELL_EFFECTS; ++i)
