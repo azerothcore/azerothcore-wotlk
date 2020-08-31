@@ -84,7 +84,7 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
 bool Channel::IsBanned(uint64 guid) const
 {
     BannedContainer::const_iterator itr = bannedStore.find(GUID_LOPART(guid));
-    return itr != bannedStore.end() && itr->second > time(NULL);
+    return itr != bannedStore.end() && itr->second > time(nullptr);
 }
 
 void Channel::UpdateChannelInDB() const
@@ -417,8 +417,8 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     {
         if (!IsBanned(victim))
         {
-            bannedStore[GUID_LOPART(victim)] = time(NULL) + CHANNEL_BAN_DURATION;
-            AddChannelBanToDB(GUID_LOPART(victim), time(NULL) + CHANNEL_BAN_DURATION);
+            bannedStore[GUID_LOPART(victim)] = time(nullptr) + CHANNEL_BAN_DURATION;
+            AddChannelBanToDB(GUID_LOPART(victim), time(nullptr) + CHANNEL_BAN_DURATION);
 
             if (notify)
             {

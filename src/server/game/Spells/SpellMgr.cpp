@@ -548,7 +548,7 @@ SpellChainNode const* SpellMgr::GetSpellChainNode(uint32 spell_id) const
 {
     SpellChainMap::const_iterator itr = mSpellChains.find(spell_id);
     if (itr == mSpellChains.end())
-        return NULL;
+        return nullptr;
 
     return &itr->second;
 }
@@ -639,7 +639,7 @@ SpellLearnSkillNode const* SpellMgr::GetSpellLearnSkill(uint32 spell_id) const
     if (itr != mSpellLearnSkills.end())
         return &itr->second;
     else
-        return NULL;
+        return nullptr;
 }
 
 SpellTargetPosition const* SpellMgr::GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const
@@ -647,7 +647,7 @@ SpellTargetPosition const* SpellMgr::GetSpellTargetPosition(uint32 spell_id, Spe
     SpellTargetPositionMap::const_iterator itr = mSpellTargetPositions.find(std::make_pair(spell_id, effIndex));
     if (itr != mSpellTargetPositions.end())
         return &itr->second;
-    return NULL;
+    return nullptr;
 }
 
 SpellGroupStackFlags SpellMgr::GetGroupStackFlags(uint32 groupid) const
@@ -723,7 +723,7 @@ SpellProcEventEntry const* SpellMgr::GetSpellProcEvent(uint32 spellId) const
     SpellProcEventMap::const_iterator itr = mSpellProcEventMap.find(spellId);
     if (itr != mSpellProcEventMap.end())
         return &itr->second;
-    return NULL;
+    return nullptr;
 }
 
 bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellInfo const* procSpell, uint32 procFlags, uint32 procExtra, bool active) const
@@ -788,7 +788,7 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
         procEvent_procEx = spellProcEvent->procEx;
 
         // For melee triggers
-        if (procSpell == NULL)
+        if (procSpell == nullptr)
         {
             // Check (if set) for school (melee attack have Normal school)
             if (spellProcEvent->schoolMask && (spellProcEvent->schoolMask & SPELL_SCHOOL_MASK_NORMAL) == 0)
@@ -859,7 +859,7 @@ SpellProcEntry const* SpellMgr::GetSpellProcEntry(uint32 spellId) const
     SpellProcMap::const_iterator itr = mSpellProcMap.find(spellId);
     if (itr != mSpellProcMap.end())
         return &itr->second;
-    return NULL;
+    return nullptr;
 }
 
 bool SpellMgr::CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const
@@ -940,7 +940,7 @@ SpellBonusEntry const* SpellMgr::GetSpellBonusData(uint32 spellId) const
         if (itr2 != mSpellBonusMap.end())
             return &itr2->second;
     }
-    return NULL;
+    return nullptr;
 }
 
 SpellThreatEntry const* SpellMgr::GetSpellThreatEntry(uint32 spellID) const
@@ -955,7 +955,7 @@ SpellThreatEntry const* SpellMgr::GetSpellThreatEntry(uint32 spellID) const
         if (itr != mSpellThreatMap.end())
             return &itr->second;
     }
-    return NULL;
+    return nullptr;
 }
 
 float SpellMgr::GetSpellMixologyBonus(uint32 spellId) const
@@ -978,7 +978,7 @@ PetAura const* SpellMgr::GetPetAura(uint32 spell_id, uint8 eff) const
     if (itr != mSpellPetAuraMap.end())
         return &itr->second;
     else
-        return NULL;
+        return nullptr;
 }
 
 SpellEnchantProcEntry const* SpellMgr::GetSpellEnchantProcEvent(uint32 enchId) const
@@ -986,7 +986,7 @@ SpellEnchantProcEntry const* SpellMgr::GetSpellEnchantProcEvent(uint32 enchId) c
     SpellEnchantProcEventMap::const_iterator itr = mSpellEnchantProcEventMap.find(enchId);
     if (itr != mSpellEnchantProcEventMap.end())
         return &itr->second;
-    return NULL;
+    return nullptr;
 }
 
 bool SpellMgr::IsArenaAllowedEnchancment(uint32 ench_id) const
@@ -997,7 +997,7 @@ bool SpellMgr::IsArenaAllowedEnchancment(uint32 ench_id) const
 const std::vector<int32>* SpellMgr::GetSpellLinked(int32 spell_id) const
 {
     SpellLinkedMap::const_iterator itr = mSpellLinkedMap.find(spell_id);
-    return itr != mSpellLinkedMap.end() ? &(itr->second) : NULL;
+    return itr != mSpellLinkedMap.end() ? &(itr->second) : nullptr;
 }
 
 PetLevelupSpellSet const* SpellMgr::GetPetLevelupSpellList(uint32 petFamily) const
@@ -1006,7 +1006,7 @@ PetLevelupSpellSet const* SpellMgr::GetPetLevelupSpellList(uint32 petFamily) con
     if (itr != mPetLevelupSpellMap.end())
         return &itr->second;
     else
-        return NULL;
+        return nullptr;
 }
 
 PetDefaultSpellsEntry const* SpellMgr::GetPetDefaultSpellsEntry(int32 id) const
@@ -1014,7 +1014,7 @@ PetDefaultSpellsEntry const* SpellMgr::GetPetDefaultSpellsEntry(int32 id) const
     PetDefaultSpellsMap::const_iterator itr = mPetDefaultSpellsMap.find(id);
     if (itr != mPetDefaultSpellsMap.end())
         return &itr->second;
-    return NULL;
+    return nullptr;
 }
 
 SpellAreaMapBounds SpellMgr::GetSpellAreaMapBounds(uint32 spell_id) const
@@ -1186,7 +1186,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
 void SpellMgr::UnloadSpellInfoChains()
 {
     for (SpellChainMap::iterator itr = mSpellChains.begin(); itr != mSpellChains.end(); ++itr)
-        mSpellInfoMap[itr->first]->ChainEntry = NULL;
+        mSpellInfoMap[itr->first]->ChainEntry = nullptr;
 
     mSpellChains.clear();
 }
@@ -1202,7 +1202,7 @@ void SpellMgr::LoadSpellTalentRanks()
         if (!talentInfo)
             continue;
 
-        SpellInfo const* lastSpell = NULL;
+        SpellInfo const* lastSpell = nullptr;
         for (uint8 rank = MAX_TALENT_RANK - 1; rank > 0; --rank)
         {
             if (talentInfo->RankID[rank])
@@ -1222,7 +1222,7 @@ void SpellMgr::LoadSpellTalentRanks()
             continue;
         }
 
-        SpellInfo const* prevSpell = NULL;
+        SpellInfo const* prevSpell = nullptr;
         for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
         {
             uint32 spellId = talentInfo->RankID[rank];
@@ -1242,7 +1242,7 @@ void SpellMgr::LoadSpellTalentRanks()
             node.rank  = rank + 1;
 
             node.prev = prevSpell;
-            node.next = node.rank < MAX_TALENT_RANK ? GetSpellInfo(talentInfo->RankID[node.rank]) : NULL;
+            node.next = node.rank < MAX_TALENT_RANK ? GetSpellInfo(talentInfo->RankID[node.rank]) : nullptr;
 
             mSpellChains[spellId] = node;
             mSpellInfoMap[spellId]->ChainEntry = &mSpellChains[spellId];
@@ -1351,7 +1351,7 @@ void SpellMgr::LoadSpellRanks()
             ++itr;
             if (itr == rankChain.end())
             {
-                mSpellChains[addedSpell].next = NULL;
+                mSpellChains[addedSpell].next = nullptr;
                 break;
             }
             else
@@ -2329,7 +2329,7 @@ bool LoadPetDefaultSpells_helper(CreatureTemplate const* cInfo, PetDefaultSpells
         return false;
 
     // remove duplicates with levelupSpells if any
-    if (PetLevelupSpellSet const* levelupSpells = cInfo->family ? sSpellMgr->GetPetLevelupSpellList(cInfo->family) : NULL)
+    if (PetLevelupSpellSet const* levelupSpells = cInfo->family ? sSpellMgr->GetPetLevelupSpellList(cInfo->family) : nullptr)
     {
         for (uint8 j = 0; j < MAX_CREATURE_SPELL_DATA_SLOT; ++j)
         {
@@ -2658,7 +2658,7 @@ void SpellMgr::LoadSpellInfoStore()
     uint32 oldMSTime = getMSTime();
 
     UnloadSpellInfoStore();
-    mSpellInfoMap.resize(sSpellStore.GetNumRows(), NULL);
+    mSpellInfoMap.resize(sSpellStore.GetNumRows(), nullptr);
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
@@ -2693,7 +2693,7 @@ void SpellMgr::LoadSpellSpecificAndAuraState()
 {
     uint32 oldMSTime = getMSTime();
 
-    SpellInfo* spellInfo = NULL;
+    SpellInfo* spellInfo = nullptr;
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         spellInfo = mSpellInfoMap[i];
@@ -2785,7 +2785,7 @@ void SpellMgr::LoadSpellCustomAttr()
                                     mTalentSpellAdditionalSet.insert(learnSpell->Id);
     }
 
-    SpellInfo* spellInfo = NULL;
+    SpellInfo* spellInfo = nullptr;
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         spellInfo = mSpellInfoMap[i];
@@ -3268,7 +3268,7 @@ void SpellMgr::LoadDbcDataCorrections()
 {
     uint32 oldMSTime = getMSTime();
 
-    SpellEntry* spellInfo = NULL;
+    SpellEntry* spellInfo = nullptr;
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);

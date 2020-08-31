@@ -168,7 +168,7 @@ class boss_kelidan_the_breaker : public CreatureScript
                     if (channeler && channeler->isDead())
                     {
                         channeler->DespawnOrUnsummon(1);
-                        channeler = NULL;
+                        channeler = nullptr;
                     }
                     if (!channeler)
                         channeler = me->SummonCreature(NPC_CHANNELER, ShadowmoonChannelers[i][0], ShadowmoonChannelers[i][1], ShadowmoonChannelers[i][2], ShadowmoonChannelers[i][3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000);
@@ -293,7 +293,7 @@ class npc_shadowmoon_channeler : public CreatureScript
             {
                 if (me->GetInstanceScript())
                     return ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_KELIDAN));
-                return NULL;
+                return nullptr;
             }
 
             void EnterCombat(Unit*  /*who*/)

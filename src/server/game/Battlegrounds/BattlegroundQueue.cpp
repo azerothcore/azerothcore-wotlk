@@ -113,7 +113,7 @@ bool BattlegroundQueue::SelectionPool::AddGroup(GroupQueueInfo * ginfo, uint32 d
 /***               BATTLEGROUND QUEUES                 ***/
 /*********************************************************/
 
-// add group or player (grp == NULL) to bg queue with the given leader and bg specifications
+// add group or player (grp == nullptr) to bg queue with the given leader and bg specifications
 GroupQueueInfo* BattlegroundQueue::AddGroup(Player * leader, Group * grp, PvPDifficultyEntry const* bracketEntry, bool isRated, bool isPremade, uint32 ArenaRating, uint32 MatchmakerRating, uint32 arenateamid)
 {
     BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
