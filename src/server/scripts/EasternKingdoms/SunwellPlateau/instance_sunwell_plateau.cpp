@@ -71,7 +71,7 @@ class instance_sunwell_plateau : public InstanceMapScript
                 //else
                 //    TC_LOG_DEBUG("scripts", "Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
 
-                return NULL;
+                return nullptr;
             }
 
             void OnCreatureCreate(Creature* creature)
