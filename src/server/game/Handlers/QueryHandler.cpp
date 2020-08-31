@@ -43,7 +43,7 @@ void WorldSession::SendNameQueryOpcode(uint64 guid)
 
     // pussywizard: optimization
     /*Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
-    if (DeclinedName const* names = (player ? player->GetDeclinedNames() : NULL))
+    if (DeclinedName const* names = (player ? player->GetDeclinedNames() : nullptr))
     {
         data << uint8(1);                           // Name is declined
         for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
@@ -74,8 +74,8 @@ void WorldSession::HandleQueryTimeOpcode(WorldPacket & /*recvData*/)
 void WorldSession::SendQueryTimeResponse()
 {
     WorldPacket data(SMSG_QUERY_TIME_RESPONSE, 4+4);
-    data << uint32(time(NULL));
-    data << uint32(sWorld->GetNextDailyQuestsResetTime() - time(NULL));
+    data << uint32(time(nullptr));
+    data << uint32(sWorld->GetNextDailyQuestsResetTime() - time(nullptr));
     SendPacket(&data);
 }
 
