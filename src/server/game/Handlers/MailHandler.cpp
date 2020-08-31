@@ -383,7 +383,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recvData)
 
     Player* player = _player;
     Mail* m = player->GetMail(mailId);
-    if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(NULL))
+    if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(nullptr))
     {
         player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
         return;
@@ -448,7 +448,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recvData)
     Player* player = _player;
 
     Mail* m = player->GetMail(mailId);
-    if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(NULL))
+    if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(nullptr))
     {
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_INTERNAL_ERROR);
         return;
@@ -548,7 +548,7 @@ void WorldSession::HandleMailTakeMoney(WorldPacket& recvData)
     Player* player = _player;
 
     Mail* m = player->GetMail(mailId);
-    if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(NULL))
+    if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(nullptr))
     {
         player->SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_ERR_INTERNAL_ERROR);
         return;
@@ -594,7 +594,7 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
     WorldPacket data(SMSG_MAIL_LIST_RESULT, (200));         // guess size
     data << uint32(0);                                      // real mail's count
     data << uint8(0);                                       // mail's count
-    time_t cur_time = time(NULL);
+    time_t cur_time = time(nullptr);
 
     for (PlayerMails::iterator itr = player->GetMailBegin(); itr != player->GetMailEnd(); ++itr)
     {
@@ -652,7 +652,7 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
         data << uint32((*itr)->stationery);                  // stationery (Stationery.dbc)
         data << uint32((*itr)->money);                       // Gold
         data << uint32((*itr)->checked);                     // flags
-        data << float(float((*itr)->expire_time-time(NULL))/DAY); // Time
+        data << float(float((*itr)->expire_time-time(nullptr))/DAY); // Time
         data << uint32((*itr)->mailTemplateId);              // mail template (MailTemplate.dbc)
         data << subject;                                     // Subject string - once 00, when mail type = 3, max 256
         data << body;                                        // message? max 8000
@@ -716,7 +716,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recvData)
     Player* player = _player;
 
     Mail* m = player->GetMail(mailId);
-    if (!m || (m->body.empty() && !m->mailTemplateId) || m->state == MAIL_STATE_DELETED || m->deliver_time > time(NULL) || (m->checked & MAIL_CHECK_MASK_COPIED))
+    if (!m || (m->body.empty() && !m->mailTemplateId) || m->state == MAIL_STATE_DELETED || m->deliver_time > time(nullptr) || (m->checked & MAIL_CHECK_MASK_COPIED))
     {
         player->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_INTERNAL_ERROR);
         return;
@@ -784,7 +784,7 @@ void WorldSession::HandleQueryNextMailTime(WorldPacket & /*recvData*/)
         data << uint32(0);                                 // count
 
         uint32 count = 0;
-        time_t now = time(NULL);
+        time_t now = time(nullptr);
         std::set<uint32> sentSenders;
         for (PlayerMails::iterator itr = _player->GetMailBegin(); itr != _player->GetMailEnd(); ++itr)
         {
