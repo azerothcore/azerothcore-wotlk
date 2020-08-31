@@ -68,20 +68,20 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     if (glyphIndex >= MAX_GLYPH_SLOT_INDEX)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL);
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, nullptr);
         return;
     }
 
     Item* pItem = pUser->GetUseableItemByPos(bagIndex, slot);
     if (!pItem)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL);
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, nullptr);
         return;
     }
 
     if (pItem->GetGUID() != itemGUID)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL);
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, nullptr);
         return;
     }
 
@@ -92,35 +92,35 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     ItemTemplate const* proto = pItem->GetTemplate();
     if (!proto)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, NULL);
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
         return;
     }
 
     // some item classes can be used only in equipped state
     if (proto->InventoryType != INVTYPE_NON_EQUIP && !pItem->IsEquipped())
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, NULL);
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
         return;
     }
 
     InventoryResult msg = pUser->CanUseItem(pItem);
     if (msg != EQUIP_ERR_OK)
     {
-        pUser->SendEquipError(msg, pItem, NULL);
+        pUser->SendEquipError(msg, pItem, nullptr);
         return;
     }
 
     // only allow conjured consumable, bandage, poisons (all should have the 2^21 item flag set in DB)
     if (proto->Class == ITEM_CLASS_CONSUMABLE && !(proto->Flags & ITEM_FLAG_IGNORE_DEFAULT_ARENA_RESTRICTIONS) && pUser->InArena())
     {
-        pUser->SendEquipError(EQUIP_ERR_NOT_DURING_ARENA_MATCH, pItem, NULL);
+        pUser->SendEquipError(EQUIP_ERR_NOT_DURING_ARENA_MATCH, pItem, nullptr);
         return;
     }
 
     // don't allow items banned in arena
     if (proto->Flags & ITEM_FLAG_NOT_USEABLE_IN_ARENA && pUser->InArena())
     {
-        pUser->SendEquipError(EQUIP_ERR_NOT_DURING_ARENA_MATCH, pItem, NULL);
+        pUser->SendEquipError(EQUIP_ERR_NOT_DURING_ARENA_MATCH, pItem, nullptr);
         return;
     }
 
@@ -132,7 +132,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
             {
                 if (!spellInfo->CanBeUsedInCombat())
                 {
-                    pUser->SendEquipError(EQUIP_ERR_NOT_IN_COMBAT, pItem, NULL);
+                    pUser->SendEquipError(EQUIP_ERR_NOT_IN_COMBAT, pItem, nullptr);
                     return;
                 }
             }
@@ -177,7 +177,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     // xinef: additional check, client outputs message on its own
     if (!pUser->IsAlive())
     {
-        pUser->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, NULL, NULL);
+        pUser->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, NULL, nullptr);
         return;
     }
 
@@ -192,21 +192,21 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     Item* item = pUser->GetItemByPos(bagIndex, slot);
     if (!item)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL);
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, nullptr);
         return;
     }
 
     ItemTemplate const* proto = item->GetTemplate();
     if (!proto)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, item, NULL);
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, item, nullptr);
         return;
     }
 
     // Verify that the bag is an actual bag or wrapped item that can be used "normally"
     if (!(proto->Flags & ITEM_FLAG_HAS_LOOT) && !item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
     {
-        pUser->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, NULL);
+        pUser->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
         sLog->outError("Possible hacking attempt: Player %s [guid: %u] tried to open item [guid: %u, entry: %u] which is not openable!",
                 pUser->GetName().c_str(), pUser->GetGUIDLow(), item->GetGUIDLow(), proto->ItemId);
         return;
@@ -220,7 +220,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 
         if (!lockInfo)
         {
-            pUser->SendEquipError(EQUIP_ERR_ITEM_LOCKED, item, NULL);
+            pUser->SendEquipError(EQUIP_ERR_ITEM_LOCKED, item, nullptr);
             sLog->outError("WORLD::OpenItem: item [guid = %u] has an unknown lockId: %u!", item->GetGUIDLow(), lockId);
             return;
         }
@@ -228,7 +228,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
         // was not unlocked yet
         if (item->IsLocked())
         {
-            pUser->SendEquipError(EQUIP_ERR_ITEM_LOCKED, item, NULL);
+            pUser->SendEquipError(EQUIP_ERR_ITEM_LOCKED, item, nullptr);
             return;
         }
     }
