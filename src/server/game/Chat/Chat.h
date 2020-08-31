@@ -53,7 +53,7 @@ class ChatHandler
         // Builds chat packet and returns receiver guid position in the packet to substitute in whisper builders
         static size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string const& message, uint32 achievementId = 0, std::string const& channelName = "", LocaleConstant locale = DEFAULT_LOCALE);
 
-        static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = NULL; return start; }
+        static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
 
         // function with different implementation for chat/console
         virtual char const* GetAcoreString(uint32 entry) const;
@@ -91,8 +91,8 @@ class ChatHandler
         // Returns either the selected player or self if there is no selected player
         Player*   getSelectedPlayerOrSelf();
 
-        char*     extractKeyFromLink(char* text, char const* linkType, char** something1 = NULL);
-        char*     extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = NULL);
+        char*     extractKeyFromLink(char* text, char const* linkType, char** something1 = nullptr);
+        char*     extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = nullptr);
 
         // if args have single value then it return in arg2 and arg1 == NULL
         void      extractOptFirstArg(char* args, char** arg1, char** arg2);
@@ -104,7 +104,7 @@ class ChatHandler
         bool GetPlayerGroupAndGUIDByName(const char* cname, Player* &player, Group* &group, uint64 &guid, bool offline = false);
         std::string extractPlayerNameFromLink(char* text);
         // select by arg (name/link) or in-game selection online/offline player
-        bool extractPlayerTarget(char* args, Player** player, uint64* player_guid = NULL, std::string* player_name = NULL);
+        bool extractPlayerTarget(char* args, Player** player, uint64* player_guid = NULL, std::string* player_name = nullptr);
 
         std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
         std::string GetNameLink(Player* chr) const;
@@ -118,7 +118,7 @@ class ChatHandler
 
         bool ShowHelpForCommand(std::vector<ChatCommand> const& table, const char* cmd);
     protected:
-        explicit ChatHandler() : m_session(NULL), sentErrorMessage(false) {}      // for CLI subclass
+        explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false) {}      // for CLI subclass
         static bool SetDataForCommandInTable(std::vector<ChatCommand>& table, const char* text, uint32 securityLevel, std::string const& help, std::string const& fullcommand);
         bool ExecuteCommandInTable(std::vector<ChatCommand> const& table, const char* text, std::string const& fullcmd);
         bool ShowHelpForSubCommands(std::vector<ChatCommand> const& table, char const* cmd, char const* subcmd);
