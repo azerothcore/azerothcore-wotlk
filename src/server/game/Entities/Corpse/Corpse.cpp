@@ -23,9 +23,9 @@ Corpse::Corpse(CorpseType type) : WorldObject(type != CORPSE_BONES), m_type(type
 
     m_valuesCount = CORPSE_END;
 
-    m_time = time(NULL);
+    m_time = time(nullptr);
 
-    lootRecipient = NULL;
+    lootRecipient = nullptr;
 }
 
 Corpse::~Corpse()
@@ -116,7 +116,7 @@ void Corpse::SaveToDB()
 
 void Corpse::DeleteFromDB(SQLTransaction& trans)
 { 
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
     if (GetType() == CORPSE_BONES)
     {
         // Only specific bones

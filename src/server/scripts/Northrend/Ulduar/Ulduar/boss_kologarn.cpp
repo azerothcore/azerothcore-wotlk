@@ -432,7 +432,7 @@ public:
                 case EVENT_FOCUSED_EYEBEAM:
                 {
                     events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 13000+rand()%5000);
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
                     for(auto itr = pList.begin(); itr != pList.end(); ++itr)
                     {

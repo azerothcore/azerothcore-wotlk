@@ -685,11 +685,14 @@ class SpellMgr
         SpellAreaForAreaMapBounds GetSpellAreaForAreaMapBounds(uint32 area_id) const;
 
         // SpellInfo object management
-        SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : NULL; }
+        SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : nullptr; }
         uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
 
         // Talent Additional Set
         bool IsAdditionalTalentSpell(uint32 spellId) const;
+
+    private:
+        SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
 
     // Modifiers
     public:

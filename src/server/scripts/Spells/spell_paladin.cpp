@@ -249,7 +249,7 @@ class spell_pal_sacred_shield_base : public SpellScriptLoader
                         if (AuraEffect const* aurEffect = caster->GetAuraEffect(67191, EFFECT_0))
                             AddPct(basepoints, aurEffect->GetAmount());
 
-                        caster->CastCustomSpell(eventInfo.GetActionTarget(), 66922, &basepoints, NULL, NULL, true, 0, aurEff, caster->GetGUID());
+                        caster->CastCustomSpell(eventInfo.GetActionTarget(), 66922, &basepoints, nullptr, nullptr, true, 0, aurEff, caster->GetGUID());
                         return;
                     }
 
@@ -269,7 +269,7 @@ class spell_pal_sacred_shield_base : public SpellScriptLoader
                         cooldown = aurEffect->GetAmount()*IN_MILLISECONDS;
 
                 eventInfo.GetActionTarget()->AddSpellCooldown(triggered_spell_id, 0, cooldown);
-                eventInfo.GetActionTarget()->CastCustomSpell(eventInfo.GetActionTarget(), triggered_spell_id, &basepoints, NULL, NULL, true, NULL, aurEff, eventInfo.GetActionTarget()->GetGUID());
+                eventInfo.GetActionTarget()->CastCustomSpell(eventInfo.GetActionTarget(), triggered_spell_id, &basepoints, nullptr, nullptr, true, NULL, aurEff, eventInfo.GetActionTarget()->GetGUID());
             }
 
             void Register()
@@ -672,7 +672,7 @@ class spell_pal_divine_storm_dummy : public SpellScriptLoader
                     return;
 
                 int32 heal = GetEffectValue() / _targetCount;
-                GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_PALADIN_DIVINE_STORM_HEAL, &heal, NULL, NULL, true);
+                GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_PALADIN_DIVINE_STORM_HEAL, &heal, nullptr, nullptr, true);
             }
         private:
             uint32 _targetCount;
@@ -1084,7 +1084,7 @@ class spell_pal_judgement_of_command : public SpellScriptLoader
             {
                 if (Unit* unitTarget = GetHitUnit())
                     if (SpellInfo const* spell_proto = sSpellMgr->GetSpellInfo(GetEffectValue()))
-                        GetCaster()->CastSpell(unitTarget, spell_proto, true, NULL);
+                        GetCaster()->CastSpell(unitTarget, spell_proto, true, nullptr);
             }
 
             void Register()
