@@ -359,6 +359,34 @@ void SendPacketToPlayers(WorldPacket const* data, Unit* source)
 }
 
 
+struct ShadowTrapLKTargetSelector : public acore::unary_function<Unit*, bool>
+{
+public:
+    ShadowTrapLKTargetSelector(Creature* source, bool playerOnly = true, bool reqLOS = false, float maxDist = 0.0f) : _source(source), _playerOnly(playerOnly), _reqLOS(reqLOS), _maxDist(maxDist) { }
+    bool operator()(Unit const* target) const
+    {
+        if (!target)
+            return false;
+        if (!target->IsAlive())
+            return false;
+        if (_playerOnly && target->GetTypeId() != TYPEID_PLAYER)
+            return false;
+        if (_maxDist && _source->GetExactDist(target) > _maxDist)
+            return false;
+        if (_reqLOS && !_source->IsWithinLOSInMap(target))
+            return false;
+        return true;
+    }
+
+private:
+    Creature const* _source;
+    bool _playerOnly;
+    bool _reqLOS;
+    float _maxDist;
+};
+
+
+
 struct NonTankLKTargetSelector : public acore::unary_function<Unit*, bool>
 {
 public:
@@ -1033,7 +1061,7 @@ class boss_the_lich_king : public CreatureScript
                             events.ScheduleEvent(EVENT_NECROTIC_PLAGUE, 5000, EVENT_GROUP_ABILITIES);
                         break;
                     case EVENT_SHADOW_TRAP:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankLKTargetSelector(me, true, true, 100.0f)))
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, ShadowTrapLKTargetSelector(me, true, true, 100.0f)))
                             me->CastSpell(target, SPELL_SHADOW_TRAP, false);
                         events.ScheduleEvent(EVENT_SHADOW_TRAP, 15500, EVENT_GROUP_ABILITIES);
                         break;
@@ -1041,7 +1069,7 @@ class boss_the_lich_king : public CreatureScript
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                         {
                             //events.DelayEventsToMax(500, EVENT_GROUP_ABILITIES);
-                            me->SetOrientation(me->GetAngle(target));
+                            me->SetFacingTo(me->GetAngle(target));
                             me->CastSpell(target, SPELL_PAIN_AND_SUFFERING, false);
                         }
                         events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, (IsHeroic() ? urand(1250, 1750) : urand(1750, 2250)), EVENT_GROUP_ABILITIES);
