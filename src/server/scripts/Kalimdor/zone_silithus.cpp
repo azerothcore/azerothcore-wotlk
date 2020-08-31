@@ -638,7 +638,7 @@ public:
                     case 51:
                     {
                         uint32 entries[4] = { 15423, 15424, 15414, 15422 };
-                        Unit* mob = NULL;
+                        Unit* mob = nullptr;
                         for (uint8 i = 0; i < 4; ++i)
                         {
                             mob = player->FindNearestCreature(entries[i], 50, me);
@@ -806,7 +806,7 @@ public:
             }
             if (!hasTarget)
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 if (me->GetEntry() == 15424 || me->GetEntry() == 15422 || me->GetEntry() == 15414)
                     target = me->FindNearestCreature(15423, 20, true);
                 if (me->GetEntry() == 15423)
@@ -926,7 +926,7 @@ public:
 
             if (Group* EventGroup = player->GetGroup())
             {
-                Player* groupMember = NULL;
+                Player* groupMember = nullptr;
 
                 uint8 GroupMemberCount = 0;
                 uint8 DeadMemberCount = 0;
