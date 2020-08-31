@@ -522,7 +522,7 @@ public:
                     return;
             }
 
-            Start(false, true, 0, NULL);
+            Start(false, true, 0, nullptr);
         }
 
         void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
@@ -809,7 +809,7 @@ public:
                     break;
                 case EVENT_SHAMAN_SPELL_HEALING_WAVE:
                     {
-                        Unit* target = NULL;
+                        Unit* target = nullptr;
                         if( urand(0,1) )
                         {
                             target = DoSelectLowestHpFriendly(40.0f);
