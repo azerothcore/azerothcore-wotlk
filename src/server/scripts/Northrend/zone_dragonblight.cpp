@@ -366,7 +366,7 @@ public:
                     if (phase)
                         randomWhisper();
 
-                    Creature* cr = NULL;
+                    Creature* cr = nullptr;
                     float x, y, z;
                     if (phase < 3)
                     {

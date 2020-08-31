@@ -106,7 +106,7 @@ class boss_warbringer_omrogg : public CreatureScript
 
             void KilledUnit(Unit* /*victim*/)
             {
-                Creature* head = NULL;
+                Creature* head = nullptr;
                 uint32 eventId = EVENT_KILL_YELL_LEFT;
                 if (urand(0, 1))
                 {

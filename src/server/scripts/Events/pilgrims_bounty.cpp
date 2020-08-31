@@ -115,7 +115,7 @@ class npc_pilgrims_bounty_chair : public CreatureScript
             uint32 timerSpawnPlate;
             uint32 timerRotateChair;
 
-            Creature* GetPlate() { return plateGUID ? ObjectAccessor::GetCreature(*me, plateGUID) : NULL; }
+            Creature* GetPlate() { return plateGUID ? ObjectAccessor::GetCreature(*me, plateGUID) : nullptr; }
 
             void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
             {
