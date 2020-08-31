@@ -3,7 +3,6 @@
 #include "ObjectMgr.h"
 #include "Chat.h"
 #include "AccountMgr.h"
-#include "Language.h"
 #include "World.h"
 #include "Player.h"
 #include "Opcodes.h"

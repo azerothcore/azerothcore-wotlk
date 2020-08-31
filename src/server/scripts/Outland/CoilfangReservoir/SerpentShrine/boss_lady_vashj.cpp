@@ -476,7 +476,7 @@ class spell_lady_vashj_spore_drop_effect : public SpellScriptLoader
             {
                 PreventHitDefaultEffect(effIndex);
                 if (Unit* target = GetHitUnit())
-                    target->CastSpell(target, SPELL_TOXIC_SPORES, true, NULL, NULL, GetCaster()->GetGUID());
+                    target->CastSpell(target, SPELL_TOXIC_SPORES, true, nullptr, nullptr, GetCaster()->GetGUID());
             }
 
             void Register()

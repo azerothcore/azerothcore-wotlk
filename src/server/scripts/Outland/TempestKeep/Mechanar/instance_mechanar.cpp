@@ -81,7 +81,7 @@ class instance_mechanar : public InstanceMapScript
                     if (Player* player = itr->GetSource())
                         if (player->GetPositionX() < x && player->GetPositionZ() > 24.0f && player->GetPositionY() > -30.0f)
                             return player;
-                return NULL;
+                return nullptr;
             }
 
             void DoSummonAction(Creature* summon, Player* player)
