@@ -47,7 +47,7 @@ class CreatureGroup
         typedef std::map<Creature*, FormationInfo*>  CreatureGroupMemberType;
 
         //Group cannot be created empty
-        explicit CreatureGroup(uint32 id) : m_leader(NULL), m_groupID(id), m_Formed(false) {}
+        explicit CreatureGroup(uint32 id) : m_leader(nullptr), m_groupID(id), m_Formed(false) {}
         ~CreatureGroup() {}
 
         Creature* getLeader() const { return m_leader; }

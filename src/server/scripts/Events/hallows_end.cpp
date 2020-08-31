@@ -148,8 +148,8 @@ class spell_hallows_end_trick_or_treat : public SpellScriptLoader
         {
             if (Player* target = GetHitPlayer())
             {
-                GetCaster()->CastSpell(target, roll_chance_i(50) ? SPELL_TRICK : SPELL_TREAT, true, NULL);
-                GetCaster()->CastSpell(target, SPELL_TRICKED_OR_TREATED, true, NULL);
+                GetCaster()->CastSpell(target, roll_chance_i(50) ? SPELL_TRICK : SPELL_TREAT, true, nullptr);
+                GetCaster()->CastSpell(target, SPELL_TRICKED_OR_TREATED, true, nullptr);
             }
         }
 
@@ -187,7 +187,7 @@ class spell_hallows_end_candy : public SpellScriptLoader
             if (Player* target = GetHitPlayer())
             {
                 uint32 spellId = SPELL_HALLOWS_END_CANDY_1+urand(0,3);
-                GetCaster()->CastSpell(target, spellId, true, NULL);
+                GetCaster()->CastSpell(target, spellId, true, nullptr);
             }
         }
 
@@ -709,7 +709,7 @@ class npc_hallows_end_soh : public CreatureScript
                             tmpList.push_back(c);
 
                 if (tmpList.empty())
-                    return NULL;
+                    return nullptr;
 
                 std::list<Unit*>::const_iterator it2 = tmpList.begin();
                 std::advance(it2, urand(0, tmpList.size() - 1));
@@ -989,7 +989,7 @@ class boss_headless_horseman : public CreatureScript
                 }
             }
 
-            Player* GetRhymePlayer() { return playerGUID ? ObjectAccessor::GetPlayer(*me, playerGUID) : NULL; }
+            Player* GetRhymePlayer() { return playerGUID ? ObjectAccessor::GetPlayer(*me, playerGUID) : nullptr; }
 
             void EnterCombat(Unit*) { me->SetInCombatWithZone(); }
             void MoveInLineOfSight(Unit*  /*who*/) {}
@@ -1229,7 +1229,7 @@ class boss_headless_horseman_head : public CreatureScript
                 if (me->ToTempSummon())
                     return me->ToTempSummon()->GetSummoner();
 
-                return NULL;
+                return nullptr;
             }
 
             void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
