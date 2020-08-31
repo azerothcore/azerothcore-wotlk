@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 export CCACHE_CPP2=true
-export CCACHE_MAXSIZE='500MB'
+export CCACHE_MAXSIZE='5G'
 ccache -s
 
 mkdir var/build/obj && cd var/build/obj;
