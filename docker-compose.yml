@@ -4,6 +4,7 @@ services:
 
   ac-database:
     image: azerothcore/database
+    restart: unless-stopped
     build:
       context: .
       dockerfile: ./docker/database/Dockerfile
@@ -13,11 +14,16 @@ services:
       - ${DB_EXTERNAL_PORT:-3306}:3306
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-password}
+    volumes:
+      - type: volume
+        source: ac-database
+        target: /var/lib/mysql
 
   ac-worldserver:
     stdin_open: true
     tty: true
     image: azerothcore/worldserver
+    restart: unless-stopped
     build:
       context: ./docker/worldserver
       dockerfile: Dockerfile
@@ -25,6 +31,7 @@ services:
       - ac-network
     ports:
       - ${WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
       - type: bind
         source: ./docker/worldserver/bin
@@ -43,6 +50,7 @@ services:
 
   ac-authserver:
     image: azerothcore/authserver
+    restart: unless-stopped
     build:
       context: ./docker/authserver
       dockerfile: Dockerfile
@@ -62,6 +70,9 @@ services:
         target: /azeroth-server/logs
     depends_on:
       - ac-database
+
+volumes:
+  ac-database:
 
 networks:
   ac-network:
