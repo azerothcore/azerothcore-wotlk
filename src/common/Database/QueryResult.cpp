@@ -186,7 +186,7 @@ bool PreparedResultSet::_NextRow()
 }
 
 #ifdef ELUNA
-char* ResultSet::GetFieldName(uint32 index) const
+std::string ResultSet::GetFieldName(uint32 index) const
 {
     ASSERT(index < _fieldCount);
     return _fields[index].name;

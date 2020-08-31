@@ -19,7 +19,7 @@ If you just want to install the whole AzerothCore quickly using Docker Compose, 
 To build the container image you have to be in the **main** folder of your local AzerothCore sources directory.
 
 ```
-docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/authserver/
+docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/authserver
 ```
 
 *For more information about the `docker build` command, check the [docker build doc](https://docs.docker.com/engine/reference/commandline/build/).*
