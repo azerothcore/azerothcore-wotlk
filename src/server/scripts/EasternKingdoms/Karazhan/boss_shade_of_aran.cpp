@@ -391,10 +391,10 @@ public:
             {
                 ElementalsSpawned = true;
 
-                Creature* ElementalOne = NULL;
-                Creature* ElementalTwo = NULL;
-                Creature* ElementalThree = NULL;
-                Creature* ElementalFour = NULL;
+                Creature* ElementalOne = nullptr;
+                Creature* ElementalTwo = nullptr;
+                Creature* ElementalThree = nullptr;
+                Creature* ElementalFour = nullptr;
 
                 ElementalOne = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11168.1f, -1939.29f, 232.092f, 1.46f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
                 ElementalTwo = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11138.2f, -1915.38f, 232.092f, 3.00f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
