@@ -30,7 +30,7 @@ jobs:
         run: ./apps/ci/ci-install-modules.sh
         if: matrix.modules == 'with'
       - name: Cache
-        uses: actions/cache@v1.1.2
+        uses: actions/cache@v2
         with:
           path: /home/runner/.ccache
           key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
