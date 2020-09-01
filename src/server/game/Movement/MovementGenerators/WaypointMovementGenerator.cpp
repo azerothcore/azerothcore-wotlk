@@ -72,7 +72,7 @@ void WaypointMovementGenerator<Creature>::OnArrived(Creature* creature)
         sLog->outDebug(LOG_FILTER_MAPSCRIPTS, "Creature movement start script %u at point %u for " UI64FMTD ".", i_path->at(i_currentNode)->event_id, i_currentNode, creature->GetGUID());
 #endif
         creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
-        creature->GetMap()->ScriptsStart(sWaypointScripts, i_path->at(i_currentNode)->event_id, creature, NULL);
+        creature->GetMap()->ScriptsStart(sWaypointScripts, i_path->at(i_currentNode)->event_id, creature, nullptr);
     }
 
     // Inform script
@@ -114,7 +114,7 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
                 creature->SetHomePosition(x, y, z, o);
             else
             {
-                if (Transport* trans = (creature->GetTransport() ? creature->GetTransport()->ToMotionTransport() : NULL))
+                if (Transport* trans = (creature->GetTransport() ? creature->GetTransport()->ToMotionTransport() : nullptr))
                 {
                     o -= trans->GetOrientation();
                     creature->SetTransportHomePosition(x, y, z, o);
@@ -317,7 +317,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
         // this prevent cheating with landing  point at lags
         // when client side flight end early in comparison server side
         player->StopMoving();
-        player->SetFallInformation(time(NULL), player->GetPositionZ());
+        player->SetFallInformation(time(nullptr), player->GetPositionZ());
     }
 
     player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_TAXI_BENCHMARK);
@@ -409,7 +409,7 @@ bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
             if (i_currentNode >= i_path.size() - 1)
             {
                 player->CleanupAfterTaxiFlight();
-                player->SetFallInformation(time(NULL), player->GetPositionZ());
+                player->SetFallInformation(time(nullptr), player->GetPositionZ());
                 if (player->pvpInfo.IsHostile)
                     player->CastSpell(player, 2479, true);
 
