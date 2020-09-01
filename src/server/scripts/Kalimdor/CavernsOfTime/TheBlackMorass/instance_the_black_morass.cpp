@@ -228,7 +228,7 @@ public:
 
         void SummonPortalKeeper()
         {
-            Creature* rift = NULL;
+            Creature* rift = nullptr;
             for (std::set<uint64>::const_iterator itr = encounterNPCs.begin(); itr != encounterNPCs.end(); ++itr)
                 if (Creature* summon = instance->GetCreature(*itr))
                     if (summon->GetEntry() == NPC_TIME_RIFT)
