@@ -83,7 +83,7 @@
 #include "LuaEngine.h"
 #endif
 
-ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
+std::atomic_long World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
 uint32 World::m_gameMSTime = 0;
@@ -2616,7 +2616,7 @@ void World::ShutdownMsg(bool show, Player* player)
 void World::ShutdownCancel()
 {
     // nothing cancel or too later
-    if (!m_ShutdownTimer || m_stopEvent.value())
+    if (!m_ShutdownTimer || m_stopEvent)
         return;
 
     ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_CANCELLED : SERVER_MSG_SHUTDOWN_CANCELLED;
