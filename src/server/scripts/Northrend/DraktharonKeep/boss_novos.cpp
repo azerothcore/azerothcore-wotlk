@@ -174,17 +174,17 @@ class boss_novos : public CreatureScript
                 {
                     case EVENT_SUMMON_FETID_TROLL:
                         if (Creature* trigger = summons.GetCreatureWithEntry(NPC_CRYSTAL_CHANNEL_TARGET))
-                            trigger->CastSpell(trigger, SPELL_SUMMON_FETID_TROLL_CORPSE, true, NULL, NULL, me->GetGUID());
+                            trigger->CastSpell(trigger, SPELL_SUMMON_FETID_TROLL_CORPSE, true, nullptr, nullptr, me->GetGUID());
                         events.ScheduleEvent(EVENT_SUMMON_FETID_TROLL, 3000);
                         break;
                     case EVENT_SUMMON_HULKING_CORPSE:
                         if (Creature* trigger = summons.GetCreatureWithEntry(NPC_CRYSTAL_CHANNEL_TARGET))
-                            trigger->CastSpell(trigger, SPELL_SUMMON_HULKING_CORPSE, true, NULL, NULL, me->GetGUID());
+                            trigger->CastSpell(trigger, SPELL_SUMMON_HULKING_CORPSE, true, nullptr, nullptr, me->GetGUID());
                         events.ScheduleEvent(EVENT_SUMMON_HULKING_CORPSE, 30000);
                         break;
                     case EVENT_SUMMON_SHADOWCASTER:
                         if (Creature* trigger = summons.GetCreatureWithEntry(NPC_CRYSTAL_CHANNEL_TARGET))
-                            trigger->CastSpell(trigger, SPELL_SUMMON_RISEN_SHADOWCASTER, true, NULL, NULL, me->GetGUID());
+                            trigger->CastSpell(trigger, SPELL_SUMMON_RISEN_SHADOWCASTER, true, nullptr, nullptr, me->GetGUID());
                         events.ScheduleEvent(EVENT_SUMMON_SHADOWCASTER, 10000);
                         break;
                     case EVENT_SUMMON_CRYSTAL_HANDLER:
@@ -193,7 +193,7 @@ class boss_novos : public CreatureScript
                             Talk(SAY_SUMMONING_ADDS);
                             Talk(EMOTE_SUMMONING_ADDS);
                             if (Creature* target = ObjectAccessor::GetCreature(*me, _stage ? _summonTargetLeftGUID : _summonTargetRightGUID))
-                                target->CastSpell(target, SPELL_SUMMON_CRYSTAL_HANDLER, true, NULL, NULL, me->GetGUID());
+                                target->CastSpell(target, SPELL_SUMMON_CRYSTAL_HANDLER, true, nullptr, nullptr, me->GetGUID());
                             _stage = _stage ? 0 : 1;
                             events.ScheduleEvent(EVENT_SUMMON_CRYSTAL_HANDLER, 20000);
                         }

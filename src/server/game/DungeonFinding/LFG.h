@@ -107,26 +107,26 @@ public:
     Lfg5Guids()
     {
         memset(&guid, 0, 5*8);
-        roles = NULL;
+        roles = nullptr;
     }
 
     Lfg5Guids(uint64 g)
     {
         memset(&guid, 0, 5*8);
         guid[0] = g;
-        roles = NULL;
+        roles = nullptr;
     }
 
     Lfg5Guids(Lfg5Guids const& x)
     {
         memcpy(guid, x.guid, 5*8);
-        roles = x.roles ? (new LfgRolesMap(*(x.roles))) : NULL;
+        roles = x.roles ? (new LfgRolesMap(*(x.roles))) : nullptr;
     }
 
     Lfg5Guids(Lfg5Guids const& x, bool /*copyRoles*/)
     {
         memcpy(guid, x.guid, 5*8);
-        roles = NULL;
+        roles = nullptr;
     }
 
     ~Lfg5Guids() { delete roles; }
@@ -464,7 +464,7 @@ public:
     {
         memcpy(guid, x.guid, 5*8);
         delete roles;
-        roles = x.roles ? (new LfgRolesMap(*(x.roles))) : NULL;
+        roles = x.roles ? (new LfgRolesMap(*(x.roles))) : nullptr;
     }
 
     std::string toString() const // for debugging

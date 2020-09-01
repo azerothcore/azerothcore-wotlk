@@ -131,7 +131,7 @@ public:
                 return;
 
             CrystalGUID = 0;
-            Unit* crystal = NULL;
+            Unit* crystal = nullptr;
             for (SummonList::const_iterator i = summons.begin(); i != summons.end(); )
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, *i++))
                     if (!crystal || me->GetDistanceOrder(summon, crystal, false))

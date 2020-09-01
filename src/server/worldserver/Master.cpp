@@ -183,7 +183,7 @@ int Master::Run()
     acore::Thread worldThread(new WorldRunnable);
     worldThread.setPriority(acore::Priority_Highest);
 
-    acore::Thread* cliThread = NULL;
+    acore::Thread* cliThread = nullptr;
 
 #ifdef _WIN32
     if (sConfigMgr->GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -271,7 +271,7 @@ int Master::Run()
 #endif
 
     // Start soap serving thread
-    acore::Thread* soapThread = NULL;
+    acore::Thread* soapThread = nullptr;
     if (sConfigMgr->GetBoolDefault("SOAP.Enabled", false))
     {
         ACSoapRunnable* runnable = new ACSoapRunnable();
@@ -280,7 +280,7 @@ int Master::Run()
     }
 
     // Start up freeze catcher thread
-    acore::Thread* freezeThread = NULL;
+    acore::Thread* freezeThread = nullptr;
     if (uint32 freezeDelay = sConfigMgr->GetIntDefault("MaxCoreStuckTime", 0))
     {
         FreezeDetectorRunnable* runnable = new FreezeDetectorRunnable(freezeDelay*1000);
