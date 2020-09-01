@@ -91,7 +91,7 @@ class MailSender
 class MailReceiver
 {
     public:                                                 // Constructors
-        explicit MailReceiver(uint32 receiver_lowguid) : m_receiver(NULL), m_receiver_lowguid(receiver_lowguid) {}
+        explicit MailReceiver(uint32 receiver_lowguid) : m_receiver(nullptr), m_receiver_lowguid(receiver_lowguid) {}
         MailReceiver(Player* receiver);
         MailReceiver(Player* receiver, uint32 receiver_lowguid);
     public:                                                 // Accessors

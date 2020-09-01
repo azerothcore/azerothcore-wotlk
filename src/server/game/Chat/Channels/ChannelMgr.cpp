@@ -120,7 +120,7 @@ Channel* ChannelMgr::GetChannel(std::string const& name, Player* player, bool pk
             player->GetSession()->SendPacket(&data);
         }
 
-        return NULL;
+        return nullptr;
     }
 
     return i->second;

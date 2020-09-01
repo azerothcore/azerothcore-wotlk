@@ -139,7 +139,7 @@ class spell_winter_veil_racer_rocket_slam : public SpellScriptLoader
             PreventHitEffect(EFFECT_1);
 
             std::list<Creature*> unitList;
-            Unit* target = NULL;
+            Unit* target = nullptr;
             caster->GetCreaturesWithEntryInRange(unitList, 30.0f, NPC_BLUE_RACER);
             if (!unitList.empty())
                 for (std::list<Creature*>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
@@ -257,17 +257,17 @@ class spell_winter_veil_shoot_air_rifle : public SpellScriptLoader
             if (GetSpellInfo()->Id == SPELL_AIR_RIFLE_HIT_TRIGGER)
             {
                 if (!caster->IsFriendlyTo(target))
-                    caster->CastSpell(target, SPELL_AIR_RIFLE_PELTED_DAMAGE, true, NULL, NULL, caster->GetGUID());
+                    caster->CastSpell(target, SPELL_AIR_RIFLE_PELTED_DAMAGE, true, nullptr, nullptr, caster->GetGUID());
             }
             else
             {
                 uint8 rand = urand(0, 99);
                 if (rand < 15)
-                    caster->CastSpell(caster, SPELL_AIR_RIFLE_RIGHT_IN_THE_EYE, true, NULL, NULL, caster->GetGUID());
+                    caster->CastSpell(caster, SPELL_AIR_RIFLE_RIGHT_IN_THE_EYE, true, nullptr, nullptr, caster->GetGUID());
                 else if (rand < 35)
-                    caster->CastSpell(target, SPELL_AIR_RIFLE_STARLED, true, NULL, NULL, caster->GetGUID());
+                    caster->CastSpell(target, SPELL_AIR_RIFLE_STARLED, true, nullptr, nullptr, caster->GetGUID());
                 else
-                    caster->CastSpell(target, SPELL_AIR_RIFLE_HIT, true, NULL, NULL, caster->GetGUID());
+                    caster->CastSpell(target, SPELL_AIR_RIFLE_HIT, true, nullptr, nullptr, caster->GetGUID());
             }
         }
 
