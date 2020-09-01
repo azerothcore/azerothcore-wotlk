@@ -347,7 +347,7 @@ void PetAI::UpdateAI(uint32 diff)
 void PetAI::UpdateAllies()
 {
     Unit* owner = me->GetCharmerOrOwner();
-    Group* group = NULL;
+    Group* group = nullptr;
 
     m_updateAlliesTimer = 10*IN_MILLISECONDS;                //update friendly targets every 10 seconds, lesser checks increase performance
 
@@ -367,7 +367,7 @@ void PetAI::UpdateAllies()
     m_AllySet.insert(me->GetGUID());
     if (group)                                              //add group
     {
-        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* Target = itr->GetSource();
             if (!Target || !Target->IsInMap(owner) || !group->SameSubGroup(owner->ToPlayer(), Target))
@@ -470,7 +470,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
 
     // Passive pets don't do next target selection
     if (me->HasReactState(REACT_PASSIVE))
-        return NULL;
+        return nullptr;
 
     // Check pet attackers first so we don't drag a bunch of targets to the owner
     if (Unit* myAttacker = me->getAttackerForHelper())
@@ -491,7 +491,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
     // Not sure why we wouldn't have an owner but just in case...
     Unit* owner = me->GetCharmerOrOwner();
     if (!owner)
-        return NULL;
+        return nullptr;
 
     // Check owner attackers
     if (Unit* ownerAttacker = owner->getAttackerForHelper())
@@ -513,7 +513,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
                 return nearTarget;
 
     // Default - no valid targets
-    return NULL;
+    return nullptr;
 }
 
 void PetAI::HandleReturnMovement()
@@ -703,7 +703,7 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
     if (me->GetVictim() && me->GetVictim() != target)
     {
         // Check if our owner selected this target and clicked "attack"
-        Unit* ownerTarget = NULL;
+        Unit* ownerTarget = nullptr;
         if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
             ownerTarget = owner->GetSelectedUnit();
         else

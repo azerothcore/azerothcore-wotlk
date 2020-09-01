@@ -225,7 +225,7 @@ Unit* Vehicle::GetPassenger(int8 seatId) const
 {
     SeatMap::const_iterator seat = Seats.find(seatId);
     if (seat == Seats.end())
-        return NULL;
+        return nullptr;
 
     return ObjectAccessor::GetUnit(*GetBase(), seat->second.Passenger.Guid);
 }
@@ -587,7 +587,7 @@ VehicleSeatEntry const* Vehicle::GetSeatForPassenger(Unit const* passenger)
         if (itr->second.Passenger.Guid == passenger->GetGUID())
             return itr->second.SeatInfo;
 
-    return NULL;
+    return nullptr;
 }
 
 SeatMap::iterator Vehicle::GetSeatIteratorForPassenger(Unit* passenger)
