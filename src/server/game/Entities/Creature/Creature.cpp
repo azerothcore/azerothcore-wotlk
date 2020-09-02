@@ -2423,7 +2423,7 @@ bool Creature::HasSpell(uint32 spellID) const
 }
 
 time_t Creature::GetRespawnTimeEx() const
-{ 
+{
     time_t now = time(nullptr);
     if (m_respawnTime > now)
         return m_respawnTime;
