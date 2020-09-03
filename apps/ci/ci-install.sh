@@ -3,7 +3,7 @@
 set -e
 
 cat >>conf/config.sh <<CONFIG_SH
-MTHREADS=$(expr $(grep -c ^processor /proc/cpuinfo) + 2)
+MTHREADS=$(($(grep -c ^processor /proc/cpuinfo) + 2))
 CWARNINGS=ON
 CDEBUG=OFF
 CTYPE=Release
