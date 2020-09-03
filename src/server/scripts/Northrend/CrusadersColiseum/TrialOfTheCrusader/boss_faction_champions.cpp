@@ -292,7 +292,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -421,7 +421,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -544,7 +544,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -677,7 +677,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -800,7 +800,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -960,13 +960,13 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_SPELL_SUMMON_FELHUNTER:
                     DoSummon(35465, *me);
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_SPELL_HELLFIRE:
                     if( EnemiesInRange(9.0f) >= 3 )
@@ -1097,7 +1097,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -1251,13 +1251,13 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_SPELL_CALL_PET:
                     DoSummon(35610, *me);
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_SPELL_AIMED_SHOT:
                     if( me->GetVictim() )
@@ -1404,7 +1404,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -1543,7 +1543,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -1735,7 +1735,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -1892,7 +1892,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -2051,7 +2051,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -2190,7 +2190,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -2335,7 +2335,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -2410,7 +2410,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;

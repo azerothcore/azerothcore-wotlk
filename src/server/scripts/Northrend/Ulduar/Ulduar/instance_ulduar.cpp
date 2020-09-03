@@ -995,12 +995,11 @@ public:
                 return;
 
             _events.Update(diff);
-            switch (_events.GetEvent())
+            switch (_events.ExecuteEvent())
             {
                 case EVENT_UPDATE_ALGALON_TIMER:
                     if (m_algalonTimer == TIMER_ALGALON_DEFEATED)
                     {
-                        _events.PopEvent();
                         return;
                     }
 
@@ -1012,7 +1011,6 @@ public:
                         return;
                     }
 
-                    _events.PopEvent();
                     SetData(DATA_ALGALON_DEFEATED, 1);
                     if (Creature* algalon = instance->GetCreature(m_uiAlgalonGUID))
                         algalon->AI()->DoAction(ACTION_DESPAWN_ALGALON);

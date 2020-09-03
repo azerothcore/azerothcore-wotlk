@@ -721,18 +721,6 @@ class EventMap
         }
 
         /**
-        * @name PopEvent
-        * @brief Remove the first event in the map.
-        */
-        void PopEvent()
-        {
-            if (!Empty())
-            {
-                _eventMap.erase(_eventMap.begin());
-            }
-        }
-
-        /**
         * @name ExecuteEvent
         * @brief Returns the next event to execute and removes it from map.
         * @return Id of the event to execute.
@@ -757,35 +745,6 @@ class EventMap
                     _lastEvent = itr->second;
                     _eventMap.erase(itr);
                     return eventId;
-                }
-            }
-
-            return 0;
-        }
-
-        /**
-        * @name GetEvent
-        * @brief Returns the next event to execute.
-        * @return Id of the event to execute.
-        */
-        uint32 GetEvent()
-        {
-            while (!Empty())
-            {
-                EventStore::iterator itr = _eventMap.begin();
-
-                if (itr->first > _time)
-                {
-                    return 0;
-                }
-                else if (_phase && (itr->second & 0xFF000000) && !(itr->second & (_phase << 24)))
-                {
-                    _eventMap.erase(itr);
-                }
-                else
-                {
-                    _lastEvent = itr->second;
-                    return itr->second & 0x0000FFFF;
                 }
             }
 

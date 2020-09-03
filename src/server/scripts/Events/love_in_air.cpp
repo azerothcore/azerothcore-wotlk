@@ -353,20 +353,20 @@ class npc_love_in_air_hummel : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_CALL_BAXTER:
                     {
                         EntryCheckPredicate pred(NPC_APOTHECARY_BAXTER);
                         summons.DoAction(ACTION_RELEASE_HELPER, pred);
-                        events.PopEvent();
+                        
                         break;
                     }
                     case EVENT_CALL_FRYE:
                     {
                         EntryCheckPredicate pred(NPC_APOTHECARY_FRYE);
                         summons.DoAction(ACTION_RELEASE_HELPER, pred);
-                        events.PopEvent();
+                        
                         break;
                     }
                     case EVENT_SPELL_PERFUME_SPRAY:
@@ -447,7 +447,7 @@ class npc_love_in_air_hummel_helper : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_SPELL_PERFUME_SPRAY:
                         me->CastSpell(me->GetVictim(), SPELL_COLOGNE_SPRAY, false);

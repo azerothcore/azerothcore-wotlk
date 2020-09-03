@@ -101,7 +101,7 @@ class boss_archavon : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_ROCK_SHARDS:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
@@ -127,12 +127,10 @@ class boss_archavon : public CreatureScript
                     }
                     case EVENT_IMPALE:
                         me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_IMPALE_10, SPELL_IMPALE_25), false);
-                        events.PopEvent();
                         break;
                     case EVENT_BERSERK:
                         me->CastSpell(me, SPELL_BERSERK, true);
                         Talk(EMOTE_BERSERK);
-                        events.PopEvent();
                         break;
                     default:
                         break;

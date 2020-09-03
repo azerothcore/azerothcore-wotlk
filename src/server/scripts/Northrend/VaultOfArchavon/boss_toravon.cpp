@@ -114,7 +114,7 @@ class boss_toravon : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_FREEZING_GROUND:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
@@ -141,7 +141,6 @@ class boss_toravon : public CreatureScript
                         }
                         if (summons.empty())
                         {
-                            events.PopEvent();
                             me->CastSpell(me, SPELL_WHITEOUT, false);
                             break;
                         }

@@ -120,7 +120,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SUMMON_SPORE:
                     me->CastSpell(me, SPELL_SUMMON_SPORE, true);
@@ -140,7 +140,7 @@ public:
                     break;
                 case EVENT_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    events.PopEvent();
+                    
                     break;
             }
 

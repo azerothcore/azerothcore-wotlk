@@ -91,7 +91,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -101,7 +101,6 @@ public:
                     break;
                 case EVENT_SPELL_ARCANE_BUFFET:
                     me->CastSpell(me->GetVictim(), SPELL_ARCANE_BUFFET, false);
-                    events.PopEvent();
                     break;
                 case EVENT_SUMMON_SPHERES:
                     {

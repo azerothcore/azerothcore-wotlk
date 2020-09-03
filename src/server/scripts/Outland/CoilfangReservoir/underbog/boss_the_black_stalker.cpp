@@ -101,7 +101,7 @@ public:
                 return;
 
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_CHECK:
                     float x, y, z, o;
@@ -149,7 +149,6 @@ public:
                             events.ScheduleEvent(EVENT_LEVITATE_TARGET_2, 1500);
                         }
                     }
-                    events.PopEvent();
                     break;
                 case EVENT_LEVITATE_TARGET_2:
                     if (Unit* target = ObjectAccessor::GetUnit(*me, lTarget))
@@ -162,7 +161,6 @@ public:
                             lTarget = 0;
                         }
                     }
-                    events.PopEvent();
                     break;
             }
 

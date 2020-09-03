@@ -105,7 +105,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -119,7 +119,7 @@ public:
                     break;
                 case EVENT_UNROOT:
                     me->SetControlled(false, UNIT_STATE_ROOT);
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_SPELL_BLIZZARD:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true))

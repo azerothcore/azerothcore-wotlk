@@ -162,11 +162,11 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_SPELL_ENRAGE:
                     Talk(EMOTE_ENRAGE);

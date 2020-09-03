@@ -199,7 +199,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_YMIRON_HEALTH_CHECK:
                 {
@@ -268,7 +268,6 @@ public:
                         }
                     }
 
-                    events.PopEvent();
                     break;
                 }
                 case EVENT_YMIRON_BJORN_ABILITY:
@@ -281,7 +280,6 @@ public:
                         sf->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         sf->GetMotionMaster()->MoveFollow(me->GetVictim(), 0, rand_norm()*M_PI*2);
                     }
-                    events.PopEvent();
                     break;
                 }
                 case EVENT_YMIRON_HALDOR_ABILITY:
