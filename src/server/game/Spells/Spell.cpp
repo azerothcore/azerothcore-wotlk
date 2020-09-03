@@ -2861,6 +2861,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     if (missInfo != SPELL_MISS_EVADE && effectUnit != m_caster && m_caster->IsFriendlyTo(effectUnit) && m_spellInfo->IsPositive() && effectUnit->IsInCombat())
         m_caster->SetInCombatWith(effectUnit);
 
+    // Check for SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER
+    if (m_spellInfo->HasAttribute(SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER) && effectUnit->GetTypeId() != TYPEID_PLAYER)
+        caster->CastSpell(effectUnit, SPELL_INTERRUPT_NONPLAYER, true);
+
     if (spellHitTarget)
     {
         //AI functions
