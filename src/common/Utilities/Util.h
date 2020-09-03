@@ -762,8 +762,8 @@ class EventMap
                     _eventMap.erase(itr);
                 else
                 {
-                    _lastEvent = (itr->second & 0x0000FFFF);
-                    return _lastEvent;
+                    _lastEvent = itr->second;
+                    return itr->second & 0x0000FFFF;
                 }
             }
 
