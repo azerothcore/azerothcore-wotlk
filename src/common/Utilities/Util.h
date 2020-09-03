@@ -635,9 +635,13 @@ class EventMap
         void SetPhase(uint8 phase)
         {
             if (!phase)
+            {
                 _phase = 0;
+            }
             else if (phase <= 8)
+            {
                 _phase = (1 << (phase - 1));
+            }
         }
 
         /**
@@ -648,7 +652,9 @@ class EventMap
         void AddPhase(uint8 phase)
         {
             if (phase && phase <= 8)
+            {
                 _phase |= (1 << (phase - 1));
+            }
         }
 
         /**
@@ -659,7 +665,9 @@ class EventMap
         void RemovePhase(uint8 phase)
         {
             if (phase && phase <= 8)
+            {
                 _phase &= ~(1 << (phase - 1));
+            }
         }
 
         /**
@@ -673,10 +681,14 @@ class EventMap
         void ScheduleEvent(uint32 eventId, uint32 time, uint32 group = 0, uint32 phase = 0)
         {
             if (group && group <= 8)
+            {
                 eventId |= (1 << (group + 15));
+            }
 
             if (phase && phase <= 8)
+            {
                 eventId |= (1 << (phase + 23));
+            }
 
             _eventMap.insert(EventStore::value_type(_time + time, eventId));
         }
@@ -715,7 +727,9 @@ class EventMap
         void PopEvent()
         {
             if (!Empty())
+            {
                 _eventMap.erase(_eventMap.begin());
+            }
         }
 
         /**
@@ -730,9 +744,13 @@ class EventMap
                 EventStore::iterator itr = _eventMap.begin();
 
                 if (itr->first > _time)
+                {
                     return 0;
+                }
                 else if (_phase && (itr->second & 0xFF000000) && !((itr->second >> 24) & _phase))
+                {
                     _eventMap.erase(itr);
+                }
                 else
                 {
                     uint32 eventId = (itr->second & 0x0000FFFF);
@@ -757,9 +775,13 @@ class EventMap
                 EventStore::iterator itr = _eventMap.begin();
 
                 if (itr->first > _time)
+                {
                     return 0;
+                }
                 else if (_phase && (itr->second & 0xFF000000) && !(itr->second & (_phase << 24)))
+                {
                     _eventMap.erase(itr);
+                }
                 else
                 {
                     _lastEvent = itr->second;
@@ -791,7 +813,9 @@ class EventMap
                     itr = _eventMap.begin();
                 }
                 else
+                {
                     ++itr;
+                }
             }
         }
 
@@ -804,7 +828,9 @@ class EventMap
         void DelayEvents(uint32 delay, uint32 group)
         {
             if (group > 8 || Empty())
+            {
                 return;
+            }
 
             EventStore delayed;
 
@@ -816,7 +842,9 @@ class EventMap
                     _eventMap.erase(itr++);
                 }
                 else
+                {
                     ++itr;
+                }
             }
 
             _eventMap.insert(delayed.begin(), delayed.end());
@@ -830,14 +858,20 @@ class EventMap
         void CancelEvent(uint32 eventId)
         {
             if (Empty())
+            {
                 return;
+            }
 
             for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
             {
                 if (eventId == (itr->second & 0x0000FFFF))
+                {
                     _eventMap.erase(itr++);
+                }
                 else
+                {
                     ++itr;
+                }
             }
         }
 
@@ -849,7 +883,9 @@ class EventMap
         void CancelEventGroup(uint32 group)
         {
             if (!group || group > 8 || Empty())
+            {
                 return;
+            }
 
             uint32 groupMask = (1 << (group + 15));
             for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
@@ -860,7 +896,9 @@ class EventMap
                     itr = _eventMap.begin();
                 }
                 else
+                {
                     ++itr;
+                }
             }
         }
 
@@ -873,11 +911,17 @@ class EventMap
         uint32 GetNextEventTime(uint32 eventId) const
         {
             if (Empty())
+            {
                 return 0;
+            }
 
             for (EventStore::const_iterator itr = _eventMap.begin(); itr != _eventMap.end(); ++itr)
+            {
                 if (eventId == (itr->second & 0x0000FFFF))
+                {
                     return itr->first;
+                }
+            }
 
             return 0;
         }
