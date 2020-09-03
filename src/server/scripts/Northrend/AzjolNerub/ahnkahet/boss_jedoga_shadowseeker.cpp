@@ -78,18 +78,9 @@ public:
 
     struct boss_jedoga_shadowseekerAI : public BossAI
     {
-        boss_jedoga_shadowseekerAI(Creature* c) : BossAI(c, DATA_JEDOGA_SHADOWSEEKER_EVENT), pInstance(c->GetInstanceScript()), summons(me)
+        boss_jedoga_shadowseekerAI(Creature* pCreature) : BossAI(pCreature, DATA_JEDOGA_SHADOWSEEKER_EVENT), pInstance(pCreature->GetInstanceScript())
         {
         }
-
-        InstanceScript* pInstance;
-        EventMap events;
-        SummonList summons;
-
-        uint8 initiates;
-        uint32 introCheck;
-        bool isFlying;
-        bool startFly;
 
         void JustSummoned(Creature *cr) { summons.Summon(cr); }
         void MoveInLineOfSight(Unit *) { }
@@ -322,6 +313,14 @@ public:
                 DoMeleeAttackIfReady();
             }
         }
+    private:
+        InstanceScript* pInstance;
+        EventMap events;
+
+        uint8 initiates;
+        uint32 introCheck;
+        bool isFlying;
+        bool startFly;
     };
 
     CreatureAI *GetAI(Creature *creature) const
@@ -337,7 +336,7 @@ public:
 
     struct npc_jedoga_initiandAI : public ScriptedAI
     {
-        npc_jedoga_initiandAI(Creature* c) : ScriptedAI(c), pInstance(c->GetInstanceScript())
+        npc_jedoga_initiandAI(Creature* c) : ScriptedAI(c), pInstance(c->GetInstanceScript()), activationTimer(0)
         {
         }
 

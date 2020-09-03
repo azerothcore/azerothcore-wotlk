@@ -17,22 +17,7 @@ public:
     {
         instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
 
-        uint64 Elder_Nadox;
-        uint64 Prince_Taldaram;
-        uint64 Jedoga_Shadowseeker;
-        uint64 Herald_Volazj;
-        uint64 Amanitar;
-
-        uint64 Prince_TaldaramPlatform;
-        uint64 Prince_TaldaramGate;
-
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-        uint32 spheres;
-
-        bool nadoxAchievement;
-        bool jedogaAchievement;
-
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -50,7 +35,7 @@ public:
             jedogaAchievement = false;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS) return true;
@@ -58,7 +43,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* pCreature)
+        void OnCreatureCreate(Creature* pCreature) override
         {
             switch(pCreature->GetEntry())
             {
@@ -80,7 +65,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* pGo)
+        void OnGameObjectCreate(GameObject* pGo) override
         {
             switch(pGo->GetEntry())
             {
@@ -119,7 +104,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier) const
+        uint64 GetData64(uint32 identifier) const override
         {
             switch(identifier)
             {
@@ -134,7 +119,7 @@ public:
             return 0;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -146,7 +131,7 @@ public:
             return false;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -177,7 +162,7 @@ public:
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch(type)
             {
@@ -195,7 +180,7 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -208,7 +193,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -242,6 +227,22 @@ public:
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }
+
+    private:
+        uint64 Elder_Nadox;
+        uint64 Prince_Taldaram;
+        uint64 Jedoga_Shadowseeker;
+        uint64 Herald_Volazj;
+        uint64 Amanitar;
+
+        uint64 Prince_TaldaramPlatform;
+        uint64 Prince_TaldaramGate;
+
+        uint32 m_auiEncounter[MAX_ENCOUNTER];
+        uint32 spheres;
+
+        bool nadoxAchievement;
+        bool jedogaAchievement;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap *map) const
@@ -269,18 +270,19 @@ class spell_shadow_sickle_periodic_damage : public SpellScriptLoader
                     PlayerList.clear();
 
                     Map::PlayerList const &players = caster->GetMap()->GetPlayers();
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (Player* player = itr->GetSource()->ToPlayer())
-                            if (player->IsWithinDist(caster, 40.0f) && player->IsAlive()) // SPELL_SHADOW_SICKLE_H & SPELL_SHADOW_SICKLE range is 40 yards
-                                PlayerList.push_back(player);
+                    for (auto const& itr : players)
+                    {
+                        Player* player = itr.GetSource();
+                        if (player && player->IsWithinDist(caster, 40.0f) && player->IsAlive()) // SPELL_SHADOW_SICKLE_H & SPELL_SHADOW_SICKLE range is 40 yards
+                            PlayerList.push_back(player);
+                    }
 
                     if (!PlayerList.empty())
                         caster->CastSpell(acore::Containers::SelectRandomContainerElement(PlayerList), caster->GetMap()->IsHeroic() ? SPELL_SHADOW_SICKLE_H : SPELL_SHADOW_SICKLE, true);
-
                 }
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadow_sickle_periodic_damage_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
             }

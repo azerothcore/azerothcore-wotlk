@@ -62,18 +62,144 @@ public:
 
     struct boss_elder_nadoxAI : public ScriptedAI
     {
-        boss_elder_nadoxAI(Creature *c) : ScriptedAI(c), summons(me)
-        {
-            pInstance = c->GetInstanceScript();
+        boss_elder_nadoxAI(Creature* creature) : ScriptedAI(creature), pInstance(creature->GetInstanceScript()), summons(creature)
+        {      
         }
 
+        void Reset() override
+        {
+            events.Reset();
+            summons.DespawnAll();
+
+            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+            events.ScheduleEvent(EVENT_SWARMER, 10000);
+            events.ScheduleEvent(EVENT_CHECK_HOME, 2000);
+            events.ScheduleEvent(EVENT_PLAGUE, 5000 + rand() % 3000);
+            events.ScheduleEvent(EVENT_BROOD_RAGE, 5000);
+
+            if (pInstance)
+            {
+                pInstance->SetData(DATA_ELDER_NADOX_EVENT, NOT_STARTED);
+                pInstance->SetData(DATA_NADOX_ACHIEVEMENT, true);
+            }
+        }
+
+        void EnterCombat(Unit * /*who*/) override
+        {
+            Talk(SAY_AGGRO);
+
+            if (pInstance)
+                pInstance->SetData(DATA_ELDER_NADOX_EVENT, IN_PROGRESS);
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_GUARDIAN_DIED && pInstance)
+                pInstance->SetData(DATA_NADOX_ACHIEVEMENT, false);
+        }
+
+        void KilledUnit(Unit* victim) override
+        {
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                Talk(SAY_SLAY);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            events.Reset();
+            summons.DespawnAll();
+            
+            Talk(SAY_DEATH);
+
+            if (pInstance)
+                pInstance->SetData(DATA_ELDER_NADOX_EVENT, DONE);
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            if (summon)
+            {
+                if (summon->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY )
+                    Talk(SAY_EGG_SAC);
+                
+                summons.Summon(summon);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if( me->HasUnitState(UNIT_STATE_CASTING) )
+                return;
+
+            while (uint32 const eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHECK_HEALTH:
+                {
+                    events.RepeatEvent(1000);
+                    if (HealthBelowPct(50))
+                    {
+                        events.CancelEvent(EVENT_CHECK_HEALTH);
+                        events.ScheduleEvent(EVENT_SUMMON_GUARD, 100);
+                    }
+                }break;
+                case EVENT_SUMMON_GUARD:
+                {
+                    Talk(EMOTE_HATCHES, me);
+                    SummonHelpers(false);
+                    events.PopEvent();
+                }break;
+                case EVENT_BROOD_RAGE:
+                {
+                    if (Creature* pSwarmer = me->FindNearestCreature(NPC_AHNKAHAR_SWARMER, 40, true))
+                        DoCast(pSwarmer, SPELL_BROOD_RAGE_H, true);
+
+                    events.RepeatEvent(10000);
+                }break;
+                case EVENT_PLAGUE:
+                {
+                    DoCastVictim(DUNGEON_MODE(SPELL_BROOD_PLAGUE, SPELL_BROOD_PLAGUE_H), false);
+                    events.RepeatEvent(12000 + rand() % 5000); 
+                }break;
+                case EVENT_SWARMER:
+                {
+                    SummonHelpers(true);
+                    events.RepeatEvent(10000); 
+                }break;
+                case EVENT_CHECK_HOME:
+                {
+                    if (me->HasAura(SPELL_ENRAGE))
+                        break;
+
+                    if (me->GetPositionZ() < 24)
+                    {
+                        DoCastSelf(SPELL_ENRAGE, true);
+                        events.PopEvent();
+                        break;
+                    }
+
+                    events.RepeatEvent(2000);
+                }break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+
+    private:
         EventMap events;
-        InstanceScript *pInstance;
+        InstanceScript* pInstance;
         SummonList summons;
 
         void SummonHelpers(bool swarm)
         {
-            Creature *cr;
+            Creature* cr;
             if (swarm)
             {
                 if ((cr = me->SummonCreature(NPC_AHNKAHAR_SWARMER, 640.425f, -919.544f, 25.8701f, 2.56563f)))
@@ -86,138 +212,6 @@ public:
                 if ((cr = me->SummonCreature(NPC_AHNKAHAR_GUARDIAN_ENTRY, 658.677f, -934.332f, 25.6978f, 3.03687f)))
                     summons.Summon(cr);
             }
-        }
-
-        void Reset()
-        {
-            events.Reset();
-            summons.DespawnAll();
-
-            if (pInstance)
-            {
-                pInstance->SetData(DATA_ELDER_NADOX_EVENT, NOT_STARTED);
-                pInstance->SetData(DATA_NADOX_ACHIEVEMENT, true);
-            }
-        }
-
-        void EnterCombat(Unit * /*who*/)
-        {
-            Talk(SAY_AGGRO);
-
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-            events.ScheduleEvent(EVENT_SWARMER, 10000);
-            events.ScheduleEvent(EVENT_CHECK_HOME, 2000);
-            events.ScheduleEvent(EVENT_PLAGUE, 5000+rand()%3000);
-            events.ScheduleEvent(EVENT_BROOD_RAGE, 5000);
-
-            if (pInstance)
-                pInstance->SetData(DATA_ELDER_NADOX_EVENT, IN_PROGRESS);
-        }
-
-        void DoAction(int32 param)
-        {
-            if (param == ACTION_GUARDIAN_DIED)
-            {
-                if (pInstance)
-                    pInstance->SetData(DATA_NADOX_ACHIEVEMENT, false);
-            }
-        }
-
-        void KilledUnit(Unit* victim)
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/)
-        {
-            events.Reset();
-            summons.DespawnAll();
-            
-            Talk(SAY_DEATH);
-
-            if (pInstance)
-                pInstance->SetData(DATA_ELDER_NADOX_EVENT, DONE);
-        }
-
-        void JustSummoned(Creature* cr)
-        {
-            if (cr)
-            {
-                if (cr->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY )
-                    Talk(SAY_EGG_SAC);
-                
-                summons.Summon(cr);
-            }
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
-                return;
-
-            switch ( events.GetEvent() )
-            {
-                case EVENT_CHECK_HEALTH:
-                {
-                    events.RepeatEvent(1000);
-                    if (HealthBelowPct(50))
-                    {
-                        events.CancelEvent(EVENT_CHECK_HEALTH);
-                        events.ScheduleEvent(EVENT_SUMMON_GUARD, 100);
-                    }
-                    break;
-                }
-                case EVENT_SUMMON_GUARD:
-                {
-                    Talk(EMOTE_HATCHES, me);
-                    SummonHelpers(false);
-                    events.PopEvent();
-                    break;
-                }
-                case EVENT_BROOD_RAGE:
-                {
-                    if (Creature *pSwarmer = me->FindNearestCreature(NPC_AHNKAHAR_SWARMER, 40, true))
-                        me->CastSpell(pSwarmer, SPELL_BROOD_RAGE_H, true);
-                    
-                    events.RepeatEvent(10000);
-                    break;
-                }
-                case EVENT_PLAGUE:
-                {
-                    me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_BROOD_PLAGUE, SPELL_BROOD_PLAGUE_H), false);
-                    events.RepeatEvent(12000+rand()%5000);
-                    break;
-                }
-                case EVENT_SWARMER:
-                {
-                    SummonHelpers(true);
-                    events.RepeatEvent(10000);
-                    break;
-                }
-                case EVENT_CHECK_HOME:
-                {
-                    if (me->HasAura(SPELL_ENRAGE))
-                        break;
-
-                    if (me->GetPositionZ() < 24)
-                    {
-                        me->CastSpell(me, SPELL_ENRAGE, true);
-                        events.PopEvent();
-                        break;
-                    }
-
-                    events.RepeatEvent(2000);
-                    break;
-                }
-            }
-
-            DoMeleeAttackIfReady();
         }
     };
 
@@ -236,14 +230,12 @@ public:
     {
         npc_ahnkahar_nerubianAI(Creature *c) : ScriptedAI(c) { }
 
-        
-        uint32 uiSprintTimer;
         void Reset()
         {
             if (me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
-                me->CastSpell(me, SPELL_GUARDIAN_AURA, true);
+                DoCastSelf(SPELL_GUARDIAN_AURA, true);
             else // Swarmers
-                me->CastSpell(me, SPELL_SWARMER_AURA, true);
+                DoCastSelf(SPELL_SWARMER_AURA, true);
             
             if (me->GetEntry() == NPC_AHNKAHAR_SWARMER || me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
                 me->SetInCombatWithZone();
@@ -270,7 +262,7 @@ public:
 
             if (uiSprintTimer <= diff)
             {
-                me->CastSpell(me, SPELL_SPRINT, false);
+                DoCastSelf(SPELL_SPRINT, false);
                 uiSprintTimer = 15000;
             }
             else 
@@ -278,6 +270,9 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        uint32 uiSprintTimer;
     };
 
     CreatureAI *GetAI(Creature *creature) const

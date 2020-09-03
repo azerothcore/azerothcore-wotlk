@@ -62,18 +62,11 @@ public:
 
     struct boss_taldaramAI : public ScriptedAI
     {
-        boss_taldaramAI(Creature *c) : ScriptedAI(c), summons(me)
-        {
-            pInstance = c->GetInstanceScript();
+        boss_taldaramAI(Creature *pCreature) : ScriptedAI(pCreature), pInstance(pCreature->GetInstanceScript()), summons(pCreature)
+        {         
         }
 
-        InstanceScript* pInstance;
-        EventMap events;
-        SummonList summons;
-        uint64 vanishTarget;
-        uint32 vanishDamage;
-
-        void Reset()
+        void Reset() override
         {
             if (me->GetPositionZ() > 15.0f)
                 me->CastSpell(me, SPELL_BEAM_VISUAL, true);
@@ -93,7 +86,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_FREE)
             {
@@ -109,7 +102,40 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*school*/) override
+        {
+            if (vanishTarget)
+            {
+                vanishDamage += damage;
+                if (vanishDamage > (uint32)DUNGEON_MODE(DATA_EMBRACE_DMG, DATA_EMBRACE_DMG_H))
+                {
+                    ScheduleEvents();
+                    me->CastStop();
+                }
+            }
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            summons.DespawnAll();
+            Talk(SAY_DEATH);
+
+            if (pInstance)
+                pInstance->SetData(DATA_PRINCE_TALDARAM_EVENT, DONE);
+        }
+
+        void KilledUnit(Unit* victim) override
+        {
+            if (urand(0, 1))
+                return;
+
+            if (vanishTarget && victim->GetGUID() == vanishTarget)
+                ScheduleEvents();
+
+            Talk(SAY_SLAY);
+        }
+
+        void EnterCombat(Unit* /*who*/) override
         {
             if (pInstance)
                 pInstance->SetData(DATA_PRINCE_TALDARAM_EVENT, IN_PROGRESS);
@@ -121,22 +147,13 @@ public:
             me->InterruptNonMeleeSpells(true);
         }
 
-        void ScheduleEvents()
-        {
-            events.Reset();
-            events.ScheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10000);
-            events.ScheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10000);
-            vanishTarget = 0;
-            vanishDamage = 0;
-        }
-
-        void SpellHitTarget(Unit *, const SpellInfo *spellInfo)
+        void SpellHitTarget(Unit* /*target*/, const SpellInfo *spellInfo)
         {
             if (spellInfo->Id == SPELL_CONJURE_FLAME_SPHERE)
                 summons.DoAction(ACTION_SPHERE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -145,41 +162,41 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
+                switch (events.GetEvent())
+                {
                 case EVENT_PRINCE_BLOODTHIRST:
                 {
                     me->CastSpell(me->GetVictim(), SPELL_BLOODTHIRST, false);
                     events.RepeatEvent(10000);
-                    break;
-                }
+                }break;
                 case EVENT_PRINCE_FLAME_SPHERES:
                 {
                     me->CastSpell(me->GetVictim(), SPELL_CONJURE_FLAME_SPHERE, false);
                     events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
-                    Creature *cr;
-                    if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*IN_MILLISECONDS)))
+                    Creature* cr;
+                    if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * IN_MILLISECONDS)))
                         summons.Summon(cr);
 
                     if (me->GetMap()->IsHeroic())
                     {
-                        if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*IN_MILLISECONDS)))
+                        if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * IN_MILLISECONDS)))
                             summons.Summon(cr);
 
-                        if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*IN_MILLISECONDS)))
+                        if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * IN_MILLISECONDS)))
                             summons.Summon(cr);
                     }
                     events.RepeatEvent(15000);
-                    break;
-                }
+                }break;
                 case EVENT_PRINCE_VANISH:
                 {
                     events.PopEvent();
                     //Count alive players
                     uint8 count = 0;
-                    Unit *pTarget;
-                    std::list<HostileReference *> t_list = me->getThreatManager().getThreatList();
-                    for (std::list<HostileReference *>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
+                    Unit* pTarget;
+                    std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
+                    for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
                     {
                         pTarget = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
                         if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
@@ -189,7 +206,7 @@ public:
                     if (count > 2)
                     {
                         Talk(SAY_VANISH);
-                        me->CastSpell(me, SPELL_VANISH, false);
+                        DoCastSelf(SPELL_VANISH, false);
 
                         events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
                         events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
@@ -197,11 +214,10 @@ public:
                         if (Unit* pEmbraceTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                             vanishTarget = pEmbraceTarget->GetGUID();
                     }
-                    break;
-                }
+                }break;
                 case EVENT_PRINCE_VANISH_RUN:
                 {
-                    if (Unit *vT = ObjectAccessor::GetUnit(*me, vanishTarget))
+                    if (Unit* vT = ObjectAccessor::GetUnit(*me, vanishTarget))
                     {
                         me->UpdatePosition(vT->GetPositionX(), vT->GetPositionY(), vT->GetPositionZ(), me->GetAngle(vT), true);
                         me->CastSpell(vT, SPELL_EMBRACE_OF_THE_VAMPYR, false);
@@ -210,13 +226,12 @@ public:
 
                     events.PopEvent();
                     events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20000);
-                    break;
-                }
+                }break;
                 case EVENT_PRINCE_RESCHEDULE:
                 {
                     events.PopEvent();
                     ScheduleEvents();
-                    break;
+                }break;
                 }
             }
 
@@ -224,37 +239,20 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+    private:
+        InstanceScript* pInstance;
+        EventMap events;
+        SummonList summons;
+        uint64 vanishTarget;
+        uint32 vanishDamage;
+
+        void ScheduleEvents()
         {
-            if (vanishTarget)
-            {
-                vanishDamage += damage;
-                if (vanishDamage > (uint32) DUNGEON_MODE(DATA_EMBRACE_DMG, DATA_EMBRACE_DMG_H))
-                {
-                    ScheduleEvents();
-                    me->CastStop();
-                }
-            }
-        }
-
-        void JustDied(Unit* /*killer*/)
-        {
-            summons.DespawnAll();
-            Talk(SAY_DEATH);
-
-            if (pInstance)
-                pInstance->SetData(DATA_PRINCE_TALDARAM_EVENT, DONE);
-        }
-
-        void KilledUnit(Unit * victim)
-        {
-            if (urand(0,1))
-                return;
-
-            if (vanishTarget && victim->GetGUID() == vanishTarget)
-                ScheduleEvents();
-
-            Talk(SAY_SLAY);
+            events.Reset();
+            events.ScheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10000);
+            events.ScheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10000);
+            vanishTarget = 0;
+            vanishDamage = 0;
         }
     };
 
@@ -271,53 +269,56 @@ public:
 
     struct npc_taldaram_flamesphereAI : public ScriptedAI
     {
-        npc_taldaram_flamesphereAI(Creature *c) : ScriptedAI(c)
+        npc_taldaram_flamesphereAI(Creature *pCreature) : ScriptedAI(pCreature), uiDespawnTimer(13 * IN_MILLISECONDS)
         {
         }
 
-        uint32 uiDespawnTimer;
-
-        void DoAction(int32 param)
+        void DoAction(int32 action) override
         {
-            if (param == ACTION_SPHERE)
+            if (action == ACTION_SPHERE)
             {
-                me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_FLAME_SPHERE_PERIODIC_H : SPELL_FLAME_SPHERE_PERIODIC, true);
+                DoCastSelf(DUNGEON_MODE(SPELL_FLAME_SPHERE_PERIODIC, SPELL_FLAME_SPHERE_PERIODIC_H), true);
 
                 float angle = rand_norm()*2*M_PI;
                 float x = me->GetPositionX() + DATA_SPHERE_DISTANCE * cos(angle);
                 float y = me->GetPositionY() + DATA_SPHERE_DISTANCE * sin(angle);
-                me->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
+                me->GetMotionMaster()->MovePoint(1, x, y, me->GetPositionZ());
             }
         }
 
-        void MovementInform(uint32  /*type*/, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
-            if (id == 0)
+            if (type == POINT_MOTION_TYPE && id == 1)
                 me->DisappearAndDie();
         }
 
-        void Reset()
+        void Reset() override
         {
-            me->CastSpell(me, SPELL_FLAME_SPHERE_SPAWN_EFFECT, true);
-            me->CastSpell(me, SPELL_FLAME_SPHERE_VISUAL, true);
+            DoCastSelf(SPELL_FLAME_SPHERE_SPAWN_EFFECT, true);
+            DoCastSelf(SPELL_FLAME_SPHERE_VISUAL, true);
+
+            // TODO: replace with DespawnOrUnsummon
             uiDespawnTimer = 13*IN_MILLISECONDS;
         }
 
-        void EnterCombat(Unit * /*who*/) {}
-        void MoveInLineOfSight(Unit * /*who*/) {}
+        void EnterCombat(Unit * /*who*/) override {}
+        void MoveInLineOfSight(Unit * /*who*/) override {}
 
-        void JustDied(Unit* /*who*/)
+        void JustDied(Unit* /*who*/) override
         {
-            me->CastSpell(me, SPELL_FLAME_SPHERE_DEATH_EFFECT, true);
+            DoCastSelf(SPELL_FLAME_SPHERE_DEATH_EFFECT, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (uiDespawnTimer <= diff)
                 me->DisappearAndDie();
             else
                 uiDespawnTimer -= diff;
         }
+
+    private:
+        uint32 uiDespawnTimer;
     };
 
     CreatureAI *GetAI(Creature *creature) const

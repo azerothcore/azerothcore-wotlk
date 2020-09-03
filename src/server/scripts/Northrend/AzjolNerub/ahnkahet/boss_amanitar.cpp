@@ -35,25 +35,27 @@ enum Events
 class boss_amanitar : public CreatureScript
 {
 public:
-    boss_amanitar() : CreatureScript("boss_amanitar") { }
+    boss_amanitar() : CreatureScript("boss_amanitar")
+    {
+    }
 
     struct boss_amanitarAI : public ScriptedAI
     {
-        boss_amanitarAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_amanitarAI(Creature *creature) : ScriptedAI(creature), pInstance(creature->GetInstanceScript()), summons(creature)
         {
-            pInstance = c->GetInstanceScript();
-            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
+            creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
         }
 
-        InstanceScript* pInstance;
-        EventMap events;
-        SummonList summons;
-
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
             me->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
+
+            events.ScheduleEvent(EVENT_AMANITAR_ROOTS, urand(5000, 9000));
+            events.ScheduleEvent(EVENT_AMANITAR_BASH, urand(10000, 14000));
+            events.ScheduleEvent(EVENT_AMANITAR_BOLT, urand(15000, 20000));
+            events.ScheduleEvent(EVENT_AMANITAR_SPAWN, 0);
 
             if (pInstance)
             {
@@ -62,7 +64,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*Killer*/)
+        void JustDied(Unit* /*Killer*/) override
         {
             summons.DespawnAll();
             if (pInstance)
@@ -72,45 +74,20 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (pInstance)
                 pInstance->SetData(DATA_AMANITAR_EVENT, IN_PROGRESS);
 
-            me->CastSpell(me, SPELL_MINI, false);
-
-            events.ScheduleEvent(EVENT_AMANITAR_ROOTS, urand(5000, 9000));
-            events.ScheduleEvent(EVENT_AMANITAR_BASH, urand(10000, 14000));
-            events.ScheduleEvent(EVENT_AMANITAR_BOLT, urand(15000, 20000));
-            events.ScheduleEvent(EVENT_AMANITAR_SPAWN, 0);
+            DoCastSelf(SPELL_MINI, false);
         }
 
-        void JustSummoned(Creature *cr) { summons.Summon(cr); }
-
-        void SpawnAdds()
+        void JustSummoned(Creature* summon) override
         {
-            summons.DespawnAll();
-            Position center;
-            center.Relocate(362.6f, -870, -75);
-
-            for (uint8 i = 0; i < 25; ++i)
-            {
-                float orientation = 2*rand_norm()*M_PI;
-                float x = center.GetPositionX() + i*2*cos(orientation);
-                float y = center.GetPositionY() + i*2*sin(orientation);
-                me->SummonCreature(NPC_POISONOUS_MUSHROOM, x, y, me->GetMap()->GetHeight(x, y, MAX_HEIGHT));
-            }
-
-            for (uint8 i = 0; i < 25; ++i)
-            {
-                float orientation = 2*rand_norm()*M_PI;
-                float x = center.GetPositionX() + i*2*cos(orientation);
-                float y = center.GetPositionY() + i*2*sin(orientation);
-                me->SummonCreature(NPC_HEALTHY_MUSHROOM, x, y, me->GetMap()->GetHeight(x, y, MAX_HEIGHT));
-            }
+            summons.Summon(summon);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -120,39 +97,66 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
+                switch (eventId)
+                {
                 case EVENT_AMANITAR_SPAWN:
                 {
                     SpawnAdds();
                     events.RepeatEvent(urand(35000, 40000));
-                    break;
-                }
+                }break;
                 case EVENT_AMANITAR_ROOTS:
                 {
-                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        me->CastSpell(pTarget, SPELL_ENTANGLING_ROOTS, false);
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        DoCast(pTarget, SPELL_ENTANGLING_ROOTS, false);
 
                     events.RepeatEvent(urand(15000, 20000));
-                    break;
-                }
+                }break;
                 case EVENT_AMANITAR_BASH:
                 {
-                    me->CastSpell(me->GetVictim(), SPELL_BASH, false);
+                    DoCastVictim(SPELL_BASH, false);
                     events.RepeatEvent(urand(15000, 20000));
-                    break;
-                }
+                }break;
                 case EVENT_AMANITAR_BOLT:
                 {
-                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        me->CastSpell(pTarget, SPELL_VENOM_BOLT_VOLLEY, false);
-                    
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        DoCast(pTarget, SPELL_VENOM_BOLT_VOLLEY, false);
+
                     events.RepeatEvent(urand(15000, 20000));
-                    break;
+                }break;
                 }
             }
 
             DoMeleeAttackIfReady();
+        }
+
+    private:
+        InstanceScript* pInstance;
+        EventMap events;
+        SummonList summons;
+
+        void SpawnAdds()
+        {
+            summons.DespawnAll();
+            Position center;
+            center.Relocate(362.6f, -870, -75);
+
+            for (uint8 i = 0; i < 25; ++i)
+            {
+                float orientation = 2 * rand_norm() * M_PI;
+                float x = center.GetPositionX() + i * 2 * cos(orientation);
+                float y = center.GetPositionY() + i * 2 * sin(orientation);
+                me->SummonCreature(NPC_POISONOUS_MUSHROOM, x, y, me->GetMap()->GetHeight(x, y, MAX_HEIGHT));
+            }
+
+            for (uint8 i = 0; i < 25; ++i)
+            {
+                float orientation = 2 * rand_norm() * M_PI;
+                float x = center.GetPositionX() + i * 2 * cos(orientation);
+                float y = center.GetPositionY() + i * 2 * sin(orientation);
+                me->SummonCreature(NPC_HEALTHY_MUSHROOM, x, y, me->GetMap()->GetHeight(x, y, MAX_HEIGHT));
+            }
         }
     };
 
@@ -172,6 +176,7 @@ public:
         npc_amanitar_mushroomsAI(Creature* c) : ScriptedAI(c)
         {
             SetCombatMovement(false);
+            //TODO: this prolly needs to be done in database
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }

@@ -59,22 +59,16 @@ public:
 
     struct boss_volazjAI : public ScriptedAI
     {
-        boss_volazjAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+        boss_volazjAI(Creature* pCreature) : ScriptedAI(pCreature), pInstance(pCreature->GetInstanceScript()), summons(pCreature)
         {
-            pInstance = pCreature->GetInstanceScript();
         }
 
-        InstanceScript *pInstance;
-        EventMap events;
-        SummonList summons;
-        uint8 insanityTimes;
-        uint8 insanityHandled;
-
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            insanityTimes = insanityHandled = 0;
+            insanityTimes = 0;
+            insanityHandled = 0;
 
             // Visible for all players in insanity
             me->SetPhaseMask((1|16|32|64|128|256), true);
@@ -89,7 +83,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* pTarget, const SpellInfo *spell)
+        void SpellHitTarget(Unit* pTarget, const SpellInfo *spell) override
         {
             if (spell->Id == SPELL_INSANITY)
             {
@@ -101,24 +95,24 @@ public:
                 if (!insanityHandled)
                 {
                     me->RemoveAllAuras();
-                    me->CastSpell(me, INSANITY_VISUAL, true);
+                    DoCastSelf(INSANITY_VISUAL, true);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->SetControlled(true, UNIT_STATE_STUNNED);
                 }
 
                 // phase mask
-                pTarget->CastSpell(pTarget, SPELL_INSANITY_TARGET+insanityHandled, true);
+                pTarget->CastSpell(pTarget, SPELL_INSANITY_TARGET + insanityHandled, true);
                 
                 // summon twisted party members for this target
                 Map::PlayerList const &players = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                for (auto const& i : players)
                 {
-                    Player *plr = i->GetSource();
+                    Player *plr = i.GetSource();
                     if (!plr || !plr->IsAlive() || pTarget->GetGUID() == plr->GetGUID())
                         continue;
 
                     // Summon clone
-                    if (Unit* summon = me->SummonCreature(NPC_TWISTED_VISAGE, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), plr->GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 0))
+                    if (Unit* summon = me->SummonCreature(NPC_TWISTED_VISAGE, *plr, TEMPSUMMON_CORPSE_DESPAWN, 0))
                     {
                         summon->AddThreat(pTarget, 0.0f);
                         summon->SetInCombatWith(pTarget);
@@ -135,18 +129,7 @@ public:
             }
         }
 
-        void ResetPlayersPhaseMask()
-        {
-            Map::PlayerList const &players = me->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-            {
-                if (Player* pPlayer = i->GetSource())
-                    if (uint32 spellId = GetSpellForPhaseMask(pPlayer->GetPhaseMask()))
-                        pPlayer->RemoveAurasDueToSpell(spellId);
-            }
-        }
-
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8000);
             events.ScheduleEvent(EVENT_HERALD_SHADOW, 5000);
@@ -164,60 +147,30 @@ public:
             me->SetInCombatWithZone();
         }
 
-        void JustSummoned(Creature *summon) { summons.Summon(summon); }
-
-        uint32 GetSpellForPhaseMask(uint32 phase)
+        void JustSummoned(Creature *summon) override
         {
-            uint32 spell = 0;
-            switch (phase)
-            {
-                case 16:
-                    spell = SPELL_INSANITY_PHASING_1;
-                    break;
-                case 32:
-                    spell = SPELL_INSANITY_PHASING_2;
-                    break;
-                case 64:
-                    spell = SPELL_INSANITY_PHASING_3;
-                    break;
-                case 128:
-                    spell = SPELL_INSANITY_PHASING_4;
-                    break;
-                case 256:
-                    spell = SPELL_INSANITY_PHASING_5;
-                    break;
-            }
-            return spell;
+            summons.Summon(summon);
         }
 
-        bool CheckPhaseMinions()
+        void JustDied(Unit* /*killer*/) override
         {
-            summons.RemoveNotExisting();
-            if (summons.empty())
-            {
-                ResetPlayersPhaseMask();
-                return true;
-            }
+            Talk(SAY_DEATH);
 
-            uint16 phase = 1;
-            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-            {
-                if (Creature *summon = ObjectAccessor::GetCreature(*me, *itr))
-                    phase |= summon->GetPhaseMask();
-            }
+            if (pInstance)
+                pInstance->SetData(DATA_HERALD_VOLAZJ, DONE);
 
-            Map::PlayerList const &players = me->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-            {
-                if (Player* pPlayer = i->GetSource())
-                    if ((pPlayer->GetPhaseMask() & phase) == 0)
-                        pPlayer->RemoveAurasDueToSpell(GetSpellForPhaseMask(pPlayer->GetPhaseMask()));
-            }
-
-            return false;
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetControlled(false, UNIT_STATE_STUNNED);
+            summons.DespawnAll();
+            ResetPlayersPhaseMask();
         }
 
-        void UpdateAI(uint32 diff)
+        void KilledUnit(Unit* /*victim*/) override
+        {
+            Talk(SAY_SLAY);
+        }
+
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -238,65 +191,120 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
+                switch (eventId)
+                {
                 case EVENT_HERALD_HEALTH:
                 {
-                    if (insanityTimes == 0 && me->GetHealthPct() <= 66)
+                    // TODO: move this to DamageTaken event
+                    switch (insanityTimes)
                     {
-                        me->CastSpell(me, SPELL_INSANITY, false);
-                        insanityTimes++;
-                    }
-                    else if (insanityTimes == 1 && me->GetHealthPct() <= 33)
+                    case 0: // First insanity
                     {
-                        me->CastSpell(me, SPELL_INSANITY, false);
-                        insanityTimes++;
-                    }
+                        if (me->GetHealthPct() <= 66)
+                        {
+                            DoCastSelf(SPELL_INSANITY, false);
+                            ++insanityTimes;
+                        }
 
-                    events.RepeatEvent(1000);
-                    break;
-                }
+                        events.RepeatEvent(1000);
+                    }break;
+                    case 1: // Second insanity
+                    {
+                        if (me->GetHealthPct() <= 66)
+                        {
+                            DoCastSelf(SPELL_INSANITY, false);
+                            ++insanityTimes;
+                        }
+                    }break;
+                    }
+                }break;
                 case EVENT_HERALD_MIND_FLAY:
                 {
-                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_MIND_FLAY_H : SPELL_MIND_FLAY, false);
+                    DoCastVictim(DUNGEON_MODE(SPELL_MIND_FLAY, SPELL_MIND_FLAY_H), false);
                     events.RepeatEvent(20000);
-                    break;
-                }
+                }break;
                 case EVENT_HERALD_SHADOW:
                 {
-                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_SHADOW_BOLT_VOLLEY_H : SPELL_SHADOW_BOLT_VOLLEY, false);
+                    DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_BOLT_VOLLEY, SPELL_SHADOW_BOLT_VOLLEY_H), false);
                     events.RepeatEvent(5000);
-                    break;
-                }
+                }break;
                 case EVENT_HERALD_SHIVER:
                 {
-                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        me->CastSpell(pTarget, IsHeroic() ? SPELL_SHIVER_H : SPELL_SHIVER, false);
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        DoCast(pTarget, DUNGEON_MODE(SPELL_SHIVER, SPELL_SHIVER_H), false);
 
                     events.RepeatEvent(15000);
-                    break;
+                }break;
                 }
             }
 
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+    private:
+        InstanceScript* pInstance;
+        EventMap events;
+        SummonList summons;
+        uint8 insanityTimes;
+        uint8 insanityHandled;
+
+        uint32 GetSpellForPhaseMask(uint32 phase) const
         {
-            Talk(SAY_DEATH);
+            switch (phase)
+            {
+            case 16:
+                return SPELL_INSANITY_PHASING_1;
+            case 32:
+                return SPELL_INSANITY_PHASING_2;
+            case 64:
+                return SPELL_INSANITY_PHASING_3;
+            case 128:
+                return SPELL_INSANITY_PHASING_4;
+            case 256:
+                return SPELL_INSANITY_PHASING_5;
+            }
 
-            if (pInstance)
-                pInstance->SetData(DATA_HERALD_VOLAZJ, DONE);
-
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            me->SetControlled(false, UNIT_STATE_STUNNED);
-            summons.DespawnAll();
-            ResetPlayersPhaseMask();
+            return 0;
         }
 
-        void KilledUnit(Unit * /*victim*/)
+        void ResetPlayersPhaseMask()
         {
-            Talk(SAY_SLAY);
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+            for (auto const& i : players)
+            {
+                if (Player* pPlayer = i.GetSource())
+                    if (uint32 const spellId = GetSpellForPhaseMask(pPlayer->GetPhaseMask()))
+                        pPlayer->RemoveAurasDueToSpell(spellId);
+            }
+        }
+
+        bool CheckPhaseMinions()
+        {
+            summons.RemoveNotExisting();
+            if (summons.empty())
+            {
+                ResetPlayersPhaseMask();
+                return true;
+            }
+
+            uint16 phase = 1;
+            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
+            {
+                if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                    phase |= summon->GetPhaseMask();
+            }
+
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+            {
+                if (Player* pPlayer = i->GetSource())
+                    if ((pPlayer->GetPhaseMask() & phase) == 0)
+                        pPlayer->RemoveAurasDueToSpell(GetSpellForPhaseMask(pPlayer->GetPhaseMask()));
+            }
+
+            return false;
         }
     };
 
