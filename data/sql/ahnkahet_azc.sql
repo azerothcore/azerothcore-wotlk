@@ -1,3 +1,17 @@
+-- Amanitar encounter
+DELETE FROM `spell_script_names` WHERE `spell_id`=57283 AND `ScriptName`='spell_amanitar_remove_mushroom_power';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(57283, 'spell_amanitar_remove_mushroom_power');
+DELETE FROM `spell_script_names` WHERE `spell_id`=56648;
+DELETE FROM `spell_group_stack_rules` WHERE `group_id`=1113;
+INSERT INTO `spell_group_stack_rules` (`group_id`, `stack_rule`, `description`) VALUES
+(1113, 8, 'Ahn\'kahet - Potent Fogus and Mini');
+DELETE FROM `spell_group` WHERE `id`=1113;
+INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
+(1113, 57055, 0),
+(1113, 56648, 0);
+
+-- Jedoga encounter
 DELETE FROM `creature_summon_groups` WHERE `summonerId`=29310 AND `summonerType`=0;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES
 -- non combat

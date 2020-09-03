@@ -2,20 +2,18 @@
 #ifndef DEF_AHNKAHET_H
 #define DEF_AHNKAHET_H
 
-#define MAX_ENCOUNTER           5
-
 enum Data64
 {
-    DATA_ELDER_NADOX,
+    // Main encounters
+    DATA_ELDER_NADOX            = 0,
     DATA_PRINCE_TALDARAM,
     DATA_JEDOGA_SHADOWSEEKER,
     DATA_HERALD_VOLAZJ,
     DATA_AMANITAR,
-    DATA_PRINCE_TALDARAM_PLATFORM,
-};
+    MAX_ENCOUNTER,
 
-enum Data
-{
+    // Rest dungeon data
+    DATA_PRINCE_TALDARAM_PLATFORM,
     DATA_ELDER_NADOX_EVENT,
     DATA_PRINCE_TALDARAM_EVENT,
     DATA_JEDOGA_SHADOWSEEKER_EVENT,
@@ -40,4 +38,4 @@ enum Npc
     SPELL_SHADOW_SICKLE_H           = 59104  // Shadow Sickle Heroic
 };
 
-#endif
+#endif // DEF_AHNKAHET_H
