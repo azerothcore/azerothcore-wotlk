@@ -242,7 +242,7 @@ void ThreatContainer::clearReferences()
 HostileReference* ThreatContainer::getReferenceByTarget(Unit* victim) const
 {
     if (!victim)
-        return NULL;
+        return nullptr;
 
     uint64 const guid = victim->GetGUID();
     for (ThreatContainer::StorageType::const_iterator i = iThreatList.begin(); i != iThreatList.end(); ++i)
@@ -252,7 +252,7 @@ HostileReference* ThreatContainer::getReferenceByTarget(Unit* victim) const
             return ref;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 //============================================================
@@ -293,7 +293,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
 {
     // pussywizard: pretty much remade this whole function
 
-    HostileReference* currentRef = NULL;
+    HostileReference* currentRef = nullptr;
     bool found = false;
     bool noPriorityTargetFound = false;
     uint32 currTime = sWorld->GetGameTime();
@@ -303,9 +303,9 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
     {
         Unit* cvUnit = currentVictim->getTarget();
         if (!attacker->_CanDetectFeignDeathOf(cvUnit) || !attacker->CanCreatureAttack(cvUnit) || attacker->isTargetNotAcceptableByMMaps(cvUnit->GetGUID(), currTime, cvUnit)) // pussywizard: if currentVictim is not valid => don't compare the threat with it, just take the highest threat valid target
-            currentVictim = NULL;
+            currentVictim = nullptr;
         else if (cvUnit->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || cvUnit->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE)) // pussywizard: no 10%/30% if currentVictim is immune to damage or has auras breakable by damage
-            currentVictim = NULL;
+            currentVictim = nullptr;
     }
 
     ThreatContainer::StorageType::const_iterator lastRef = iThreatList.end();
@@ -361,7 +361,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
                         break;
                     }
                 }
-                else // pussywizard: nothing found previously was good and enough, this and next entries on the list have less than 110% threat, and currentVictim is present and valid as checked before the loop (otherwise it's NULL), so end now
+                else // pussywizard: nothing found previously was good and enough, this and next entries on the list have less than 110% threat, and currentVictim is present and valid as checked before the loop (otherwise it's nullptr), so end now
                 {
                     currentRef = currentVictim;
                     found = true;
@@ -377,7 +377,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
         ++iter;
     }
     if (!found)
-        currentRef = NULL;
+        currentRef = nullptr;
 
     return currentRef;
 }
@@ -386,7 +386,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
 //=================== ThreatManager ==========================
 //============================================================
 
-ThreatManager::ThreatManager(Unit* owner) : iCurrentVictim(NULL), iOwner(owner), iUpdateTimer(THREAT_UPDATE_INTERVAL)
+ThreatManager::ThreatManager(Unit* owner) : iCurrentVictim(nullptr), iOwner(owner), iUpdateTimer(THREAT_UPDATE_INTERVAL)
 {
 }
 
@@ -396,7 +396,7 @@ void ThreatManager::clearReferences()
 {
     iThreatContainer.clearReferences();
     iThreatOfflineContainer.clearReferences();
-    iCurrentVictim = NULL;
+    iCurrentVictim = nullptr;
     iUpdateTimer = THREAT_UPDATE_INTERVAL;
 }
 
@@ -461,7 +461,7 @@ Unit* ThreatManager::getHostilTarget()
     iThreatContainer.update();
     HostileReference* nextVictim = iThreatContainer.selectNextVictim(GetOwner()->ToCreature(), getCurrentVictim());
     setCurrentVictim(nextVictim);
-    return getCurrentVictim() != NULL ? getCurrentVictim()->getTarget() : NULL;
+    return getCurrentVictim() != NULL ? getCurrentVictim()->getTarget() : nullptr;
 }
 
 //============================================================
@@ -544,7 +544,7 @@ void ThreatManager::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStat
             {
                 if (hostilRef == getCurrentVictim())
                 {
-                    setCurrentVictim(NULL);
+                    setCurrentVictim(nullptr);
                     setDirty(true);
                 }
                 if (GetOwner() && GetOwner()->IsInWorld())
@@ -565,7 +565,7 @@ void ThreatManager::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStat
         case UEV_THREAT_REF_REMOVE_FROM_LIST:
             if (hostilRef == getCurrentVictim())
             {
-                setCurrentVictim(NULL);
+                setCurrentVictim(nullptr);
                 setDirty(true);
             }
             iOwner->SendRemoveFromThreatListOpcode(hostilRef);
