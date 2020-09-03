@@ -33,12 +33,18 @@ enum Creatures
 
 enum Events
 {
-    EVENT_RESPAWN           = 1,
-    EVENT_ROOTS,
-    EVENT_BASH,
-    EVENT_BOLT,
-    EVENT_REMOVE_MUSHROOM_POWER,
-    EVENT_MINI,
+    // Boss
+    EVENT_RESPAWN                           = 1,
+    EVENT_ROOTS                             = 2,
+    EVENT_BASH                              = 3,
+    EVENT_BOLT                              = 4,
+    EVENT_REMOVE_MUSHROOM_POWER             = 5,
+    EVENT_MINI                              = 6,
+
+    // Mushroom
+    EVENT_GROW                              = 7,
+    EVENT_CHECK_PLAYER                      = 8,
+    EVENT_KILLSELF                          = 9,
 };
 
 enum Misc
@@ -145,39 +151,51 @@ public:
                     SummonMushroom(_mushroomsDeque.front());
                     _mushroomsDeque.pop_front();
                 }
+
                 events.RepeatEvent(urand(40000, 60000));
-            }break;
+                break;
+            }
             case EVENT_ROOTS:
             {
                 if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                {
                     DoCast(pTarget, SPELL_ENTANGLING_ROOTS, false);
+                }
 
                 events.RepeatEvent(urand(10000, 15000));
-            }break;
+                break;
+            }
             case EVENT_BASH:
             {
                 DoCastVictim(SPELL_BASH, false);
                 events.RepeatEvent(urand(15000, 20000));
-            }break;
+                break;
+            }
             case EVENT_BOLT:
             {
                 if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                {
                     DoCast(pTarget, SPELL_VENOM_BOLT_VOLLEY, false);
+                }
 
                 events.RepeatEvent(urand(15000, 20000));
-            }break;
+                break;
+            }
             case EVENT_REMOVE_MUSHROOM_POWER:
             {
                 DoCastAOE(SPELL_REMOVE_MUSHROOM_POWER, true);
                 events.RescheduleEvent(EVENT_MINI, 1000);
-            }break;
+                break;
+            }
             case EVENT_MINI:
             {
                 if (!mushroomsSummoned)
                 {
                     mushroomsSummoned = true;
                     for (uint8 i = 0; i < MAX_MUSHROOMS_COUNT; ++i)
+                    {
                         SummonMushroom(MushroomPositions[i]);
+                    }
                 }
 
                 if (SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_MINI))
@@ -187,8 +205,12 @@ public:
                     events.RescheduleEvent(EVENT_REMOVE_MUSHROOM_POWER, 29000);
                 }
                 else
+                {
                     events.RepeatEvent(1000);
-            }break;
+                }
+
+                break;
+            }
             }
         }
 
@@ -215,11 +237,7 @@ public:
 
     struct npc_amanitar_mushroomsAI : public ScriptedAI
     {
-        npc_amanitar_mushroomsAI(Creature* pCreature) : ScriptedAI(pCreature),
-            growTimer(800),
-            shrinkTimer(0),
-            killSelfTimer(0),
-            plrCheckTimer(pCreature->GetEntry() == NPC_POISONOUS_MUSHROOM ? 250 : 0)
+        npc_amanitar_mushroomsAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             SetCombatMovement(false);
 
@@ -240,80 +258,71 @@ public:
             DoCastSelf(SPELL_PUTRID_MUSHROOM);
 
             if (me->GetEntry() == NPC_POISONOUS_MUSHROOM)
+            {
                 DoCastSelf(SPELL_POISONOUS_MUSHROOM_VISUAL_AURA, true);
+            }
             else
+            {
                 DoCastSelf(SPELL_HEALTHY_MUSHROOM_VISUAL_AURA, true);
+            }
 
-            me->SetReactState(REACT_PASSIVE);
+            events.ScheduleEvent(EVENT_GROW, 800);
+
+            if (me->GetEntry() == NPC_POISONOUS_MUSHROOM)
+            {
+                events.ScheduleEvent(EVENT_CHECK_PLAYER, 250);
+            }
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
-            if (damage >= me->GetHealth() && me->GetEntry() == NPC_HEALTHY_MUSHROOM)
+            if (me->GetEntry() == NPC_HEALTHY_MUSHROOM && damage >= me->GetHealth())
+            {
                 DoCastSelf(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS, true);
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (growTimer)
+            events.Update(diff);
+            while (uint32 const eventId = events.ExecuteEvent())
             {
-                if (growTimer <= diff)
+                switch (eventId)
+                {
+                case EVENT_GROW:
                 {
                     DoCastSelf(SPELL_GROW);
-                    growTimer = 0;
+                    me->SetObjectScale(1.0f);
+                    break;
                 }
-                else
-                    growTimer -= diff;
-            }
-
-            if (plrCheckTimer)
-            {
-                if (plrCheckTimer <= diff)
+                case EVENT_CHECK_PLAYER:
                 {
                     if (Player* plr = me->SelectNearestPlayer(2.0f))
                     {
                         plr->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
                         DoCastSelf(SPELL_POISONOUS_MUSHROOM_VISUAL_AREA);
                         DoCastSelf(SPELL_POISONOUS_MUSHROOM_POISON_CLOUD);
-
-                        plrCheckTimer = 0;
+                        DoCastSelf(SPELL_SHRINK);
+                        events.ScheduleEvent(EVENT_KILLSELF, 4000);
                     }
                     else
-                        plrCheckTimer = 250;
-                }
-                else
-                    plrCheckTimer -= diff;
-            }
+                    {
+                        events.RepeatEvent(250);
+                    }
 
-            if (shrinkTimer)
-            {
-                if (shrinkTimer <= diff)
-                {
-                    DoCastSelf(SPELL_SHRINK, true);
-                    killSelfTimer = 4000;
-                    shrinkTimer = 0;
+                    break;
                 }
-                else
-                    shrinkTimer -= diff;
-            }
-
-            if (killSelfTimer)
-            {
-                if (killSelfTimer <= diff)
+                case EVENT_KILLSELF:
                 {
                     me->DisappearAndDie();
-                    killSelfTimer = 0;
+                    break;
                 }
-                else
-                    killSelfTimer -= diff;
+                }
             }
         }
 
     private:
-        uint32 growTimer;
-        uint32 shrinkTimer;
-        uint32 killSelfTimer;
-        uint32 plrCheckTimer;
+        EventMap events;
     };
 
     CreatureAI *GetAI(Creature *creature) const
@@ -332,13 +341,6 @@ public:
     {
         PrepareAuraScript(spell_amanitar_remove_mushroom_power_AuraScript);
 
-        /*
-                // executed when aura effect is applied with specified mode to target
-        // should be used when when effect handler preventing/replacing is needed, do not use this hook for triggering spellcasts/removing auras etc - may be unsafe
-        // example: OnEffectApply += AuraEffectApplyFn(class::function, EffectIndexSpecifier, EffectAuraNameSpecifier, AuraEffectHandleModes);
-        // where function is: void function (AuraEffect const* aurEff, AuraEffectHandleModes mode);
-        HookList<EffectApplyHandler> OnEffectApply;
-        */
         void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
         {
             Unit* target = GetTarget();
