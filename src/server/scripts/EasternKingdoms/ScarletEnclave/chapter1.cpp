@@ -29,6 +29,9 @@ enum eyeOfAcherus
     EYE_TEXT_LAUNCH                 = 0,
     EYE_TEXT_CONTROL                = 1,
 
+    EYE_POINT_DESTINATION_1         = 0,
+    EYE_POINT_DESTINATION_2         = 1,
+
     SPELL_EYE_OF_ACHERUS_VISUAL     = 51892,
 };
 
@@ -51,6 +54,7 @@ public:
         void InitializeAI() override
         {
             events.Reset();
+
             events.ScheduleEvent(EVENT_REMOVE_CONTROL, 500);
             events.ScheduleEvent(EVENT_SPEAK_1, 4000);
             events.ScheduleEvent(EVENT_LAUNCH, 7000);
@@ -60,8 +64,10 @@ public:
 
         void MovementInform(uint32 type, uint32 point) override
         {
-            if (type == ESCORT_MOTION_TYPE || point !=0)
+            if (type == POINT_MOTION_TYPE && point == EYE_POINT_DESTINATION_2)
+            {
                 events.ScheduleEvent(EVENT_REGAIN_CONTROL, 1000);
+            }
         }
 
         void SetControl(Player* player, bool on)
@@ -85,23 +91,31 @@ public:
             {
                 case EVENT_REMOVE_CONTROL:
                     if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    {
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
                         SetControl(player, false);
+                    }
                     break;
                 case EVENT_SPEAK_1:
                     Talk(EYE_TEXT_LAUNCH, me->GetCharmerOrOwnerPlayerOrPlayerItself());
                     break;
                 case EVENT_LAUNCH:
                 {
-                    Movement::PointsArray path;
-                    path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                    path.push_back(G3D::Vector3(me->GetPositionX()-40.0f, me->GetPositionY(), me->GetPositionZ()+10.0f));
-                    path.push_back(G3D::Vector3(1768.0f, -5876.0f, 153.0f));
-                    me->GetMotionMaster()->MoveSplinePath(&path);
+                    me->SetSpeed(MOVE_FLIGHT, 5.0f, true);
+
+                    const Position EYE_DESTINATION_1 = { me->GetPositionX()-40.0f, me->GetPositionY(), me->GetPositionZ()+10.0f, 0.0f };
+                    const Position EYE_DESTINATION_2 = { 1768.0f, -5876.0f, 153.0f, 0.0f };
+
+                    me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_1);
+                    me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_2);
                     break;
                 }
                 case EVENT_REGAIN_CONTROL:
                     if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                        me->SetSpeed(MOVE_FLIGHT, 3.3f, true);
+
                         SetControl(player, true);
                         Talk(EYE_TEXT_CONTROL, player);
                     }
