@@ -572,7 +572,7 @@ class EventMap
     typedef std::multimap<uint32, uint32> EventStore;
 
     public:
-        EventMap() : _time(0), _phase(0) { }
+        EventMap() : _time(0), _phase(0), _lastEvent(0) { }
 
         /**
         * @name Reset
@@ -705,12 +705,7 @@ class EventMap
         */
         void RepeatEvent(uint32 time)
         {
-            if (Empty())
-                return;
-
-            uint32 eventId = _eventMap.begin()->second;
-            _eventMap.erase(_eventMap.begin());
-            ScheduleEvent(eventId, time);
+            _eventMap.insert(EventStore::value_type(_time + time, _lastEvent));
         }
 
         /**
@@ -741,6 +736,7 @@ class EventMap
                 else
                 {
                     uint32 eventId = (itr->second & 0x0000FFFF);
+                    _lastEvent = itr->second;
                     _eventMap.erase(itr);
                     return eventId;
                 }
@@ -906,6 +902,7 @@ class EventMap
     private:
         uint32 _time;
         uint32 _phase;
+        uint32 _lastEvent;
 
         EventStore _eventMap;
 };
