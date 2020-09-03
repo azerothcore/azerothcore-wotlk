@@ -319,7 +319,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
                         break;
                     case EVENT_VAMPIRIC_BITE:
                         {
-                            Player* target = NULL;
+                            Player* target = nullptr;
                             float maxThreat = 0.0f;
                             const Map::PlayerList &pl = me->GetMap()->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
@@ -396,7 +396,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
                     case EVENT_DELIRIOUS_SLASH:
                         if (!me->HasReactState(REACT_PASSIVE))
                         {
-                            Unit* target = NULL;
+                            Unit* target = nullptr;
                             if (_offtankGUID)
                                 if (Unit* t = ObjectAccessor::GetUnit(*me, _offtankGUID))
                                     if (t->IsAlive() && t->GetDistance(me) < 10.0f)
@@ -964,7 +964,7 @@ class spell_blood_queen_presence_of_the_darkfallen : public SpellScriptLoader
                     return;
 
                 if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
-                    GetHitUnit()->CastSpell((Unit*)NULL, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, NULL, NULL, instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL));
+                    GetHitUnit()->CastSpell((Unit*)NULL, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL));
             }
 
             void Register()

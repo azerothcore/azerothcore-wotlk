@@ -17,7 +17,7 @@
 OutdoorPvPNA::OutdoorPvPNA()
 {
     m_TypeId = OUTDOOR_PVP_NA;
-    m_obj = NULL;
+    m_obj = nullptr;
 }
 
 void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
@@ -69,7 +69,7 @@ TeamId OPvPCapturePointNA::GetControllingFaction() const
 
 void OPvPCapturePointNA::SpawnNPCsForTeam(TeamId teamId)
 {
-    const creature_type * creatures = NULL;
+    const creature_type * creatures = nullptr;
     if (teamId == TEAM_ALLIANCE)
         creatures=AllianceControlNPCs;
     else if (teamId == TEAM_HORDE)
@@ -88,7 +88,7 @@ void OPvPCapturePointNA::DeSpawnNPCs()
 
 void OPvPCapturePointNA::SpawnGOsForTeam(TeamId teamId)
 {
-    const go_type * gos = NULL;
+    const go_type * gos = nullptr;
     if (teamId == TEAM_ALLIANCE)
         gos=AllianceControlGOs;
     else if (teamId == TEAM_HORDE)
@@ -398,7 +398,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, uint64 guid)
     int32 retval = OPvPCapturePoint::HandleOpenGo(player, guid);
     if (retval >= 0)
     {
-        const go_type * gos = NULL;
+        const go_type * gos = nullptr;
         if (m_ControllingFaction == TEAM_ALLIANCE)
             gos=AllianceControlGOs;
         else if (m_ControllingFaction == TEAM_HORDE)
