@@ -219,7 +219,7 @@ public:
             growTimer(800),
             shrinkTimer(0),
             killSelfTimer(0),
-            isActivated(false),
+            plrCheckTimer(pCreature->GetEntry() == NPC_POISONOUS_MUSHROOM ? 250 : 0)
         {
             SetCombatMovement(false);
 
@@ -245,22 +245,6 @@ public:
                 DoCastSelf(SPELL_HEALTHY_MUSHROOM_VISUAL_AURA, true);
 
             me->SetReactState(REACT_PASSIVE);
-            me->SetDisplayId(me->GetCreatureTemplate()->Modelid2);
-            isActivated = false;
-        }
-
-        void MoveInLineOfSight(Unit* target) override
-        {
-            if (me->GetEntry() != NPC_POISONOUS_MUSHROOM || isActivated || target->GetTypeId() != TYPEID_PLAYER || target->GetDistance(me) <= 2.0f)
-                return;
-
-            isActivated = true;
-
-            target->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
-            DoCastSelf(SPELL_POISONOUS_MUSHROOM_VISUAL_AREA);
-            DoCastSelf(SPELL_POISONOUS_MUSHROOM_POISON_CLOUD);
-
-            shrinkTimer = 1000;
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
@@ -275,11 +259,30 @@ public:
             {
                 if (growTimer <= diff)
                 {
-                    DoCastSelf(SPELL_GROW, true);
+                    DoCastSelf(SPELL_GROW);
                     growTimer = 0;
                 }
                 else
                     growTimer -= diff;
+            }
+
+            if (plrCheckTimer)
+            {
+                if (plrCheckTimer <= diff)
+                {
+                    if (Player* plr = me->SelectNearestPlayer(2.0f))
+                    {
+                        plr->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
+                        DoCastSelf(SPELL_POISONOUS_MUSHROOM_VISUAL_AREA);
+                        DoCastSelf(SPELL_POISONOUS_MUSHROOM_POISON_CLOUD);
+
+                        plrCheckTimer = 0;
+                    }
+                    else
+                        plrCheckTimer = 250;
+                }
+                else
+                    plrCheckTimer -= diff;
             }
 
             if (shrinkTimer)
@@ -311,7 +314,6 @@ public:
         uint32 shrinkTimer;
         uint32 killSelfTimer;
         uint32 plrCheckTimer;
-        bool isActivated;
     };
 
     CreatureAI *GetAI(Creature *creature) const
