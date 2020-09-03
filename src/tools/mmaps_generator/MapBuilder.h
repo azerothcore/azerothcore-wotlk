@@ -10,7 +10,6 @@
 #include <list>
 #include <vector>
 #include <set>
-#include <list>
 #include <atomic>
 #include <map>
 #include <thread>
