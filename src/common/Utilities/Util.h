@@ -761,7 +761,10 @@ class EventMap
                 else if (_phase && (itr->second & 0xFF000000) && !(itr->second & (_phase << 24)))
                     _eventMap.erase(itr);
                 else
-                    return (itr->second & 0x0000FFFF);
+                {
+                    _lastEvent = (itr->second & 0x0000FFFF);
+                    return _lastEvent;
+                }
             }
 
             return 0;
