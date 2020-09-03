@@ -1,0 +1,13 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Website
+    url: http://www.azerothcore.org
+  - name: Wiki
+    url: azerothcore.org/wiki
+    about: You can find plenty of information on our Wiki.
+  - name: How to ask for help
+    url: https://www.azerothcore.org/wiki/How-to-ask-for-help
+    about: Before submitting an issue we'd love if you take a minute to read this.
+  - name: Discord
+    url: https://discord.gg/gkt4y2x
+    about: Join the discussions over at our Discord Server.
