@@ -1,5 +1,5 @@
 -- Amanitar encounter
-DELETE FROM `spell_script_names` WHERE `spell_id`=57283 AND `ScriptName`='spell_amanitar_remove_mushroom_power';
+DELETE FROM `spell_script_names` WHERE `spell_id`=57283;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (57283, 'spell_amanitar_remove_mushroom_power');
 DELETE FROM `spell_script_names` WHERE `spell_id`=56648;
@@ -10,6 +10,11 @@ DELETE FROM `spell_group` WHERE `id`=1113;
 INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 (1113, 57055, 0),
 (1113, 56648, 0);
+
+-- Teldram
+delete from `spell_script_names` where `spell_id`=55931;
+insert into `spell_script_names` (`spell_id`, `ScriptName`) values
+('55931','spell_prince_taldaram_conjure_flame_sphere');
 
 -- Jedoga encounter
 DELETE FROM `creature_summon_groups` WHERE `summonerId`=29310 AND `summonerType`=0;

@@ -12,6 +12,9 @@ enum Spells
     SPELL_BLOODTHIRST                       = 55968, //Trigger Spell + add aura
     SPELL_CONJURE_FLAME_SPHERE              = 55931,
     SPELL_FLAME_SPHERE_SPAWN_EFFECT         = 55891,
+    SPELL_FLAME_SPHERE_SUMMON_1             = 55895, // 1x 30106
+    SPELL_FLAME_SPHERE_SUMMON_2             = 59511, // 1x 31686
+    SPELL_FLAME_SPHERE_SUMMON_3             = 59512, // 1x 31687
     SPELL_FLAME_SPHERE_VISUAL               = 55928,
     SPELL_FLAME_SPHERE_PERIODIC             = 55926,
     SPELL_FLAME_SPHERE_PERIODIC_H           = 59508,
@@ -357,9 +360,60 @@ public:
     }
 };
 
+// 55931 - Conjure Flame Sphere
+class spell_prince_taldaram_conjure_flame_sphere : public SpellScriptLoader
+{
+public:
+    spell_prince_taldaram_conjure_flame_sphere() : SpellScriptLoader("spell_prince_taldaram_conjure_flame_sphere") { }
+
+    class spell_prince_taldaram_conjure_flame_sphere_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_prince_taldaram_conjure_flame_sphere_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_FLAME_SPHERE_SUMMON_1))
+                return false;
+
+            if (!sSpellMgr->GetSpellInfo(SPELL_FLAME_SPHERE_SUMMON_2))
+                return false;
+
+            if (!sSpellMgr->GetSpellInfo(SPELL_FLAME_SPHERE_SUMMON_3))
+                return false;
+
+            return true;
+        }
+
+        void HandleScript(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            caster->CastSpell(caster, SPELL_FLAME_SPHERE_SUMMON_1, true);
+
+            if (caster->GetMap()->IsHeroic())
+            {
+                caster->CastSpell(caster, SPELL_FLAME_SPHERE_SUMMON_2, true);
+                caster->CastSpell(caster, SPELL_FLAME_SPHERE_SUMMON_3, true);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_prince_taldaram_conjure_flame_sphere_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_prince_taldaram_conjure_flame_sphere_SpellScript();
+    }
+};
+
 void AddSC_boss_taldaram()
 {
     new boss_taldaram();
     new npc_taldaram_flamesphere();
     new go_prince_taldaram_sphere();
+
+    // Spells
+    new spell_prince_taldaram_conjure_flame_sphere();
 }
