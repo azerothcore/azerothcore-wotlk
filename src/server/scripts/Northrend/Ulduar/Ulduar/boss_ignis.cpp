@@ -387,7 +387,7 @@ public:
 
                         std::vector<uint64> playerGUIDs;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                        Player* temp = NULL;
+                        Player* temp = nullptr;
 
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                         {
