@@ -1973,7 +1973,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             target->GetPosition(x, y, z);
             if (e.action.MoveToPos.ContactDistance > 0)
                 target->GetContactPoint(me, x, y, z, e.action.MoveToPos.ContactDistance);
-            me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+            me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
         }
         break;
     }
