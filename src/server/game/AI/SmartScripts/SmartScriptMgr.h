@@ -1711,7 +1711,7 @@ class ObjectGuidList
 public:
     ObjectGuidList(ObjectList* objectList, WorldObject* baseObject)
     {
-        ASSERT(objectList != NULL);
+        ASSERT(objectList != nullptr);
         m_objectList = objectList;
         m_baseObject = baseObject;
         m_guidList = new GuidList();

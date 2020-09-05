@@ -169,7 +169,7 @@ class boss_the_lurker_below : public CreatureScript
                 if (me->getStandState() != UNIT_STAND_STATE_STAND || !me->isAttackReady() || me->GetReactState() != REACT_AGGRESSIVE)
                     return;
 
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 if (me->IsWithinMeleeRange(me->GetVictim()))
                     target = me->GetVictim();
                 else
