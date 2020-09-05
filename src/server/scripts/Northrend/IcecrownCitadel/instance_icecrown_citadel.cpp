@@ -39,6 +39,17 @@ enum TimedEvents
     EVENT_RESPAWN_GUNSHIP       = 4
 };
 
+enum Spells
+{
+    SPELL_GAS_VARIABLE      = 74119,
+    SPELL_OOZE_VARIABLE     = 74118,
+    BLOOD_BEAM_VISUAL_RHAND = 72304,
+    BLOOD_BEAM_VISUAL_LHAND = 72303,
+    BLOOD_BEAM_VISUAL_LLEG  = 72302,
+    BLOOD_BEAM_VISUAL_RLEG  = 72301,
+    VOID_ZONE_VISUAL        = 69422
+};
+
 DoorData const doorData[] =
 {
     {GO_LORD_MARROWGAR_S_ENTRANCE,           DATA_LORD_MARROWGAR,        DOOR_TYPE_ROOM,       BOUNDARY_N   },
@@ -244,8 +255,8 @@ class instance_icecrown_citadel : public InstanceMapScript
                     TeamIdInInstance = player->GetTeamId();
 
                 // for professor putricide hc
-                DoRemoveAurasDueToSpellOnPlayers(74119 /*SPELL_GAS_VARIABLE*/);
-                DoRemoveAurasDueToSpellOnPlayers(74118 /*SPELL_OOZE_VARIABLE*/);
+                DoRemoveAurasDueToSpellOnPlayers(SPELL_GAS_VARIABLE);
+                DoRemoveAurasDueToSpellOnPlayers(SPELL_OOZE_VARIABLE);
 
                 if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                     SpawnGunship();
@@ -472,13 +483,13 @@ class instance_icecrown_citadel : public InstanceMapScript
                         {
                             uint32 spellId = 0;
                             if (creature->GetPositionY() > 2790.0f && creature->GetPositionZ() > 420.0f)
-                                spellId = 72304;
+                                spellId = BLOOD_BEAM_VISUAL_RHAND;
                             else if (creature->GetPositionY() < 2790.0f && creature->GetPositionZ() > 420.0f)
-                                spellId = 72303;
+                                spellId = BLOOD_BEAM_VISUAL_LHAND;
                             else if (creature->GetPositionY() < 2790.0f && creature->GetPositionZ() < 420.0f)
-                                spellId = 72302;
+                                spellId = BLOOD_BEAM_VISUAL_LLEG;
                             else
-                                spellId = 72301;
+                                spellId = BLOOD_BEAM_VISUAL_RLEG;
                             creature->m_Events.AddEvent(new DelayedCastMincharEvent(creature, spellId), creature->m_Events.CalculateTime(1000));
                         }
                         break;
@@ -637,7 +648,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                     case NPC_DEATHSPEAKER_SERVANT:
                         if (Creature* c = unit->SummonCreature(WORLD_TRIGGER, *unit, TEMPSUMMON_TIMED_DESPAWN, 10000))
                         {
-                            c->CastSpell(c, 69422, true);
+                            c->CastSpell(c, VOID_ZONE_VISUAL, true);
                             unit->SummonCreature(NPC_RISEN_DEATHSPEAKER_SERVANT, *unit, TEMPSUMMON_MANUAL_DESPAWN);
                             unit->ToCreature()->DespawnOrUnsummon(3000);
                         }
