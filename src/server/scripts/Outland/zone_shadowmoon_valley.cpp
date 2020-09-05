@@ -459,7 +459,7 @@ public:
             if (!Tapped)
                 me->setFaction(FACTION_DEFAULT);
 
-            FlyTimer = 10000;
+            FlyTimer = 1000;
             me->SetDisableGravity(false);
             me->SetVisible(true);
         }
@@ -475,7 +475,6 @@ public:
                 PlayerGUID = caster->GetGUID();
 
                 me->setFaction(FACTION_FRIENDLY);
-                DoCast(caster, SPELL_FORCE_OF_NELTHARAKU, true);
 
                 Unit* Dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_SUBJUGATOR, 50);
                 if (Dragonmaw)
@@ -497,19 +496,12 @@ public:
 
             if (id == 1)
             {
-                if (PlayerGUID)
-                {
-                    Unit* player = ObjectAccessor::GetUnit(*me, PlayerGUID);
-                    if (player)
-                        DoCast(player, SPELL_FORCE_OF_NELTHARAKU, true);
-
-                    PlayerGUID = 0;
-                }
                 me->SetVisible(false);
                 me->SetDisableGravity(false);
                 Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
                 me->RemoveCorpse();
             }
+            me->DespawnOrUnsummon(1);
         }
 
         void UpdateAI(uint32 diff)
@@ -748,7 +740,7 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF+1)
         {
             ItemPosCountVec dest;
-            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30658, 1, NULL);
+            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30658, 1, nullptr);
             if (msg == EQUIP_ERR_OK)
             {
                 player->StoreNewItem(dest, 30658, true);
@@ -758,7 +750,7 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF+2)
         {
             ItemPosCountVec dest;
-            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30659, 1, NULL);
+            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30659, 1, nullptr);
             if (msg == EQUIP_ERR_OK)
             {
                 player->StoreNewItem(dest, 30659, true);
@@ -1502,7 +1494,7 @@ void npc_lord_illidan_stormrage::npc_lord_illidan_stormrageAI::SummonNextWave()
 
     for (uint8 i = 0; i < count; ++i)
     {
-        Creature* Spawn = NULL;
+        Creature* Spawn = nullptr;
         float X = SpawnLocation[locIndex + i].x;
         float Y = SpawnLocation[locIndex + i].y;
         float Z = SpawnLocation[locIndex + i].z;
@@ -1684,8 +1676,8 @@ public:
             }
 
             // Spawn Soul on Kill ALWAYS!
-            Creature* Summoned = NULL;
-            Unit* totemOspirits = NULL;
+            Creature* Summoned = nullptr;
+            Unit* totemOspirits = nullptr;
 
             if (entry != 0)
                 Summoned = DoSpawnCreature(entry, 0, 0, 1, 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 5000);

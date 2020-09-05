@@ -33,8 +33,8 @@ set(AC_PATH_ROOT "${CMAKE_SOURCE_DIR}")
 
 # set macro-directory
 list(APPEND CMAKE_MODULE_PATH
-  "${CMAKE_SOURCE_DIR}/src/cmake/macros"
-  "${CMAKE_SOURCE_DIR}/deps/cotire/CMake")
+        "${CMAKE_SOURCE_DIR}/src/cmake/macros"
+        "${CMAKE_SOURCE_DIR}/deps/cotire/CMake")
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
@@ -45,11 +45,11 @@ include(deps/drassil/cmake-utils/utils.cmake)
 include(src/cmake/ac_macros.cmake)
 
 # set default buildoptions and print them
-include(conf/config.cmake.dist)
+include(conf/dist/config.cmake)
 
 # load custom configurations for cmake if exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/conf/config.cmake")
-  include(conf/config.cmake)
+    include(conf/config.cmake)
 endif()
 
 #
@@ -63,7 +63,7 @@ FOREACH(subdir ${sub_DIRS})
     get_filename_component(MODULENAME ${subdir} NAME)
 
     if (";${DISABLED_AC_MODULES};" MATCHES ";${MODULENAME};")
-       continue()
+        continue()
     endif()
 
     STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
@@ -77,13 +77,13 @@ CU_RUN_HOOK("AFTER_LOAD_CONF")
 
 # build in Release-mode by default if not explicitly set
 if( NOT CMAKE_BUILD_TYPE )
-  set(CMAKE_BUILD_TYPE "Release")
+    set(CMAKE_BUILD_TYPE "Release")
 endif()
 
 # turn off PCH totally if enabled (hidden setting, mainly for devs)
 if( NOPCH )
-  set(USE_COREPCH 0)
-  set(USE_SCRIPTPCH 0)
+    set(USE_COREPCH 0)
+    set(USE_SCRIPTPCH 0)
 endif()
 
 include(ConfigureBaseTargets)
@@ -98,14 +98,17 @@ set(ACE_EXPECTED_VERSION 6.0.3)
 
 find_package(PCHSupport)
 find_package(ACE REQUIRED)
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    add_definitions(-DACE_LACKS_AUTO_PTR=1)
+endif()
 find_package(MySQL REQUIRED)
 
 if(UNIX AND WITH_PERFTOOLS)
-  find_package(Gperftools)
+    find_package(Gperftools)
 endif()
 
 if(NOT WITHOUT_GIT)
-  find_package(Git)
+    find_package(Git)
 endif()
 
 # Find revision ID and hash of the sourcetree
@@ -121,11 +124,11 @@ include(src/cmake/showoptions.cmake)
 add_subdirectory(deps)
 
 if( SERVERS OR TOOLS)
-  add_subdirectory(src/common)
+    add_subdirectory(src/common)
 endif()
 
 if( TOOLS )
-  add_subdirectory(src/tools)
+    add_subdirectory(src/tools)
 endif()
 
 #
@@ -138,3 +141,37 @@ CU_RUN_HOOK("BEFORE_SRC_LOAD")
 add_subdirectory(src)
 
 CU_RUN_HOOK("AFTER_SRC_LOAD")
+
+if( UNIT_TESTS )
+    # we use these flags to get code coverage
+    set(UNIT_TEST_CXX_FLAGS "-fprofile-arcs -ftest-coverage -fno-inline")
+
+    # enable additional flags for GCC.
+    if ( CMAKE_CXX_COMPILER_ID MATCHES GNU )
+        set(UNIT_TEST_CXX_FLAGS "${UNIT_TEST_CXX_FLAGS} -fno-inline-small-functions -fno-default-inline")
+    endif()
+
+    message("Unit tests code coverage: enabling ${UNIT_TEST_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${UNIT_TEST_CXX_FLAGS}")
+
+    include(src/cmake/googletest.cmake)
+    fetch_googletest(
+            ${PROJECT_SOURCE_DIR}/src/cmake
+            ${PROJECT_BINARY_DIR}/googletest
+    )
+
+    enable_testing()
+    add_subdirectory(src/test)
+
+    add_custom_target(coverage DEPENDS coverage_command)
+
+    add_custom_command(OUTPUT coverage_command
+        # Run unit tests.
+        COMMAND ctest
+        # Run the graphical front-end for code coverage.
+        COMMAND lcov    --directory src --capture --output-file coverage.info
+        COMMAND lcov    --remove coverage.info '/usr/*' '${CMAKE_BINARY_DIR}/googletest/*' '${CMAKE_CURRENT_SOURCE_DIR}/src/test/*' --output-file coverage.info
+        COMMAND genhtml -o ${CMAKE_CURRENT_SOURCE_DIR}/coverage-report coverage.info
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        )
+endif()
