@@ -185,7 +185,7 @@ public:
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << "A K " << spheres[0] << ' ' << spheres[1];
+            saveStream << "A K " << GetBossSaveData() << spheres[0] << ' ' << spheres[1];
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
@@ -202,18 +202,26 @@ public:
             OUT_LOAD_INST_DATA(in);
 
             char dataHead1, dataHead2;
-            uint32 data0, data1;
 
             std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2 >> data0 >> data1;
+            loadStream >> dataHead1 >> dataHead2;
 
             if (dataHead1 == 'A' && dataHead2 == 'K')
             {
-                spheres[0] = data0;
-                spheres[1] = data1;
+                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
 
+                    SetBossState(i, EncounterState(tmpState));
+                }
+
+                loadStream >> spheres[0] >> spheres[1];
             }
-            else OUT_LOAD_INST_DATA_FAIL;
+            else
+                OUT_LOAD_INST_DATA_FAIL;
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }
