@@ -169,11 +169,13 @@ public:
         uint32_t statesize = SFMT_N*4;      // Size of state vector
 
         // Fill state vector with random numbers from seed
+        #pragma GCC diagnostic ignored "-Wstrict-aliasing"
         ((uint32_t*)state)[0] = y;
         const uint32_t factor = 1812433253U;// Multiplication factor
 
         for (i = 1; i < statesize; i++) {
             y = factor * (y ^ (y >> 30)) + i;
+            #pragma GCC diagnostic ignored "-Wstrict-aliasing"
             ((uint32_t*)state)[i] = y;
         }
 
