@@ -49,7 +49,6 @@ enum Events
     EVENT_HERALD_MIND_FLAY                  = 1,
     EVENT_HERALD_SHADOW                     = 2,
     EVENT_HERALD_SHIVER                     = 3,
-    EVENT_HERALD_HEALTH                     = 4,
 };
 
 class boss_volazj : public CreatureScript
@@ -166,6 +165,32 @@ public:
                 Talk(SAY_SLAY);
         }
 
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+        {
+            // TODO: move this to DamageTaken event
+            switch (insanityTimes)
+            {
+            case 0: // First insanity
+            {
+                if (me->HealthBelowPctDamaged(66, damage))
+                {
+                    DoCastSelf(SPELL_INSANITY, false);
+                    ++insanityTimes;
+                }
+
+                events.RepeatEvent(1000);
+            }break;
+            case 1: // Second insanity
+            {
+                if (me->HealthBelowPctDamaged(33, damage))
+                {
+                    DoCastSelf(SPELL_INSANITY, false);
+                    ++insanityTimes;
+                }
+            }break;
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
@@ -191,31 +216,6 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_HERALD_HEALTH:
-                {
-                    // TODO: move this to DamageTaken event
-                    switch (insanityTimes)
-                    {
-                    case 0: // First insanity
-                    {
-                        if (me->GetHealthPct() <= 66)
-                        {
-                            DoCastSelf(SPELL_INSANITY, false);
-                            ++insanityTimes;
-                        }
-
-                        events.RepeatEvent(1000);
-                    }break;
-                    case 1: // Second insanity
-                    {
-                        if (me->GetHealthPct() <= 66)
-                        {
-                            DoCastSelf(SPELL_INSANITY, false);
-                            ++insanityTimes;
-                        }
-                    }break;
-                    }
-                }break;
                 case EVENT_HERALD_MIND_FLAY:
                 {
                     DoCastVictim(DUNGEON_MODE(SPELL_MIND_FLAY, SPELL_MIND_FLAY_H), false);
