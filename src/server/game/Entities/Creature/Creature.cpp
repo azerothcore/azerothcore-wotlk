@@ -579,14 +579,7 @@ void Creature::Update(uint32 diff)
             }
 
             // Moving back from the target.
-            if (diff >= m_moveBackMovementTime)
-            {
-                AI()->CheckMeleeRepositionRequirements();
-                m_moveBackMovementTime = MOVE_BACK_CHECK_INTERVAL;
-            }
-            else {
-                m_moveBackMovementTime -= diff;
-            }
+            m_moveBackMovementTime -= diff;
 
             // Circling the target.
             if (diff >= m_moveCircleMovementTime)
