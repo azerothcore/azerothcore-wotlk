@@ -56,7 +56,7 @@ public:
                     break;
                 case NPC_RELAY:
                     m_uiRelayGUID = creature->GetGUID();
-                    break
+                    break;
             }
         }
 
