@@ -57,16 +57,15 @@ class boss_volazj : public CreatureScript
 public:
     boss_volazj() : CreatureScript("boss_volazj") { }
 
-    struct boss_volazjAI : public ScriptedAI
+    struct boss_volazjAI : public BossAI
     {
-        boss_volazjAI(Creature* pCreature) : ScriptedAI(pCreature), pInstance(pCreature->GetInstanceScript()), summons(pCreature)
+        boss_volazjAI(Creature* pCreature) : BossAI(pCreature, DATA_HERALD_VOLAZJ)
         {
         }
 
         void Reset() override
         {
-            events.Reset();
-            summons.DespawnAll();
+            _Reset();
             insanityTimes = 0;
             insanityHandled = 0;
 
@@ -76,11 +75,15 @@ public:
             me->SetControlled(false, UNIT_STATE_STUNNED);
             ResetPlayersPhaseMask();
 
-            if (pInstance)
+            if (instance)
             {
-                pInstance->SetData(DATA_HERALD_VOLAZJ, NOT_STARTED);
-                pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
+                instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
             }
+
+            events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8000);
+            events.ScheduleEvent(EVENT_HERALD_SHADOW, 5000);
+            events.ScheduleEvent(EVENT_HERALD_SHIVER, 15000);
+            events.ScheduleEvent(EVENT_HERALD_HEALTH, 1000);
         }
 
         void SpellHitTarget(Unit* pTarget, const SpellInfo *spell) override
@@ -131,17 +134,12 @@ public:
 
         void EnterCombat(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8000);
-            events.ScheduleEvent(EVENT_HERALD_SHADOW, 5000);
-            events.ScheduleEvent(EVENT_HERALD_SHIVER, 15000);
-            events.ScheduleEvent(EVENT_HERALD_HEALTH, 1000);
-
+            _EnterCombat();
             Talk(SAY_AGGRO);
 
-            if (pInstance)
+            if (instance)
             {
-                pInstance->SetData(DATA_HERALD_VOLAZJ, IN_PROGRESS);
-                pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
+                instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
             }
 
             me->SetInCombatWithZone();
@@ -154,20 +152,18 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
+            _JustDied();
             Talk(SAY_DEATH);
-
-            if (pInstance)
-                pInstance->SetData(DATA_HERALD_VOLAZJ, DONE);
 
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
-            summons.DespawnAll();
             ResetPlayersPhaseMask();
         }
 
-        void KilledUnit(Unit* /*victim*/) override
+        void KilledUnit(Unit* victim) override
         {
-            Talk(SAY_SLAY);
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                Talk(SAY_SLAY);
         }
 
         void UpdateAI(uint32 diff) override
@@ -244,9 +240,6 @@ public:
         }
 
     private:
-        InstanceScript* pInstance;
-        EventMap events;
-        SummonList summons;
         uint8 insanityTimes;
         uint8 insanityHandled;
 
