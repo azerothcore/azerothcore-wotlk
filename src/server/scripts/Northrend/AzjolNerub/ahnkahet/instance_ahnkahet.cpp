@@ -16,45 +16,41 @@ public:
 
     struct instance_ahnkahet_InstanceScript : public InstanceScript
     {
-        instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
-
-        void Initialize() override
+        instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap),
+            elderNadox_GUID(0),
+            princeTaldaram_GUID(0),
+            jedogaShadowseeker_GUID(0),
+            heraldVolazj_GUID(0),
+            amanitar_GUID(0),
+            taldaramPlatform_GUID(0),
+            taldaramGate_GUID(0),
+            nadoxAchievement(false),
+            jedogaAchievement(false)
         {
             SetBossNumber(MAX_ENCOUNTER);
-
-            elderNadox_GUID = 0;
-            princeTaldaram_GUID = 0;
-            jedogaShadowseeker_GUID = 0;
-            heraldVolazj_GUID = 0;
-            amanitar_GUID = 0;
-
-            Prince_TaldaramPlatform = 0;
-            Prince_TaldaramGate = 0;
-            spheres[0] = spheres[1] = NOT_STARTED;
-
-            nadoxAchievement = false;
-            jedogaAchievement = false;
-        }
+            spheres[0] = NOT_STARTED;
+            spheres[1] = NOT_STARTED;
+        };
 
         void OnCreatureCreate(Creature* pCreature) override
         {
             switch(pCreature->GetEntry())
             {
-                case NPC_ELDER_NADOX:
-                    elderNadox_GUID = pCreature->GetGUID();
-                    break;
-                case NPC_PRINCE_TALDARAM:
-                    princeTaldaram_GUID = pCreature->GetGUID();
-                    break;
-                case NPC_JEDOGA_SHADOWSEEKER:
-                    jedogaShadowseeker_GUID = pCreature->GetGUID();
-                    break;
-                case NPC_HERALD_JOLAZJ:
-                    heraldVolazj_GUID = pCreature->GetGUID();
-                    break;
-                case NPC_AMANITAR:
-                    amanitar_GUID = pCreature->GetGUID();
-                    break;
+            case NPC_ELDER_NADOX:
+                elderNadox_GUID = pCreature->GetGUID();
+                break;
+            case NPC_PRINCE_TALDARAM:
+                princeTaldaram_GUID = pCreature->GetGUID();
+                break;
+            case NPC_JEDOGA_SHADOWSEEKER:
+                jedogaShadowseeker_GUID = pCreature->GetGUID();
+                break;
+            case NPC_HERALD_JOLAZJ:
+                heraldVolazj_GUID = pCreature->GetGUID();
+                break;
+            case NPC_AMANITAR:
+                amanitar_GUID = pCreature->GetGUID();
+                break;
             }
         }
 
@@ -64,7 +60,7 @@ public:
             {
                 case GO_TELDARAM_PLATFORM:
                 {
-                    Prince_TaldaramPlatform = pGo->GetGUID();
+                    taldaramPlatform_GUID = pGo->GetGUID();
                     if (GetBossState(DATA_PRINCE_TALDARAM) == DONE)
                     {
                         HandleGameObject(0, true, pGo);
@@ -89,7 +85,7 @@ public:
                 }
                 case GO_TELDARAM_DOOR:
                 {
-                    Prince_TaldaramGate = pGo->GetGUID(); // Web gate past Prince Taldaram
+                    taldaramGate_GUID = pGo->GetGUID(); // Web gate past Prince Taldaram
                     if (GetBossState(DATA_PRINCE_TALDARAM) == DONE)
                     {
                         HandleGameObject(0, true, pGo);
@@ -98,21 +94,6 @@ public:
                     break;
                 }
             }
-        }
-
-        uint64 GetData64(uint32 identifier) const override
-        {
-            switch(identifier)
-            {
-                case DATA_ELDER_NADOX:                return elderNadox_GUID;
-                case DATA_PRINCE_TALDARAM:            return princeTaldaram_GUID;
-                case DATA_JEDOGA_SHADOWSEEKER:        return jedogaShadowseeker_GUID;
-                case DATA_HERALD_VOLAZJ:              return heraldVolazj_GUID;
-                case DATA_AMANITAR:                   return amanitar_GUID;
-                case DATA_PRINCE_TALDARAM_PLATFORM:   return Prince_TaldaramPlatform;
-            }
-
-            return 0;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
@@ -134,14 +115,14 @@ public:
 
             switch (type)
             {
-            case DATA_PRINCE_TALDARAM_EVENT:
-            {
-                if (state == DONE)
+                case DATA_PRINCE_TALDARAM:
                 {
-                    HandleGameObject(Prince_TaldaramGate, true);
+                    if (state == DONE)
+                    {
+                        HandleGameObject(taldaramGate_GUID, true);
+                    }
+                    break;
                 }
-                break;
-            }
             }
         }
 
@@ -151,9 +132,11 @@ public:
             {
                 case DATA_TELDRAM_SPHERE1:
                     spheres[0] = data;
+                    SaveToDB();
                     break;
                 case DATA_TELDRAM_SPHERE2:
                     spheres[1] = data;
+                    SaveToDB();
                     break;
                 case DATA_NADOX_ACHIEVEMENT:
                     nadoxAchievement = (bool)data;
@@ -162,9 +145,6 @@ public:
                     jedogaAchievement = (bool)data;
                     return;
             }
-
-            if (data == DONE)
-                SaveToDB();
         }
 
         uint32 GetData(uint32 type) const override
@@ -176,7 +156,24 @@ public:
                 case DATA_TELDRAM_SPHERE2:
                     return spheres[1];
             }
+            return 0;
+        }
 
+        uint64 GetData64(uint32 type) const override
+        {
+            switch (type)
+            {
+                case DATA_ELDER_NADOX:
+                    return elderNadox_GUID;
+                case DATA_PRINCE_TALDARAM:
+                    return princeTaldaram_GUID;
+                case DATA_JEDOGA_SHADOWSEEKER:
+                    return jedogaShadowseeker_GUID;
+                case DATA_HERALD_VOLAZJ:
+                    return heraldVolazj_GUID;
+                case DATA_AMANITAR:
+                    return amanitar_GUID;
+            }
             return 0;
         }
 
@@ -233,9 +230,9 @@ public:
         uint64 heraldVolazj_GUID;
         uint64 amanitar_GUID;
 
-        uint64 Prince_TaldaramPlatform;
-        uint64 Prince_TaldaramGate;
-
+        // Teldaram related
+        uint64 taldaramPlatform_GUID;
+        uint64 taldaramGate_GUID;
         std::array<uint32, 2> spheres;
 
         bool nadoxAchievement;
