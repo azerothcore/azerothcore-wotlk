@@ -238,7 +238,10 @@ public:
                 {
                     instance->LoadGrid(instancePositions[2].GetPositionX(), instancePositions[2].GetPositionY());
                     if (Creature* drake = instance->SummonCreature(NPC_LIEUTENANT_DRAKE, instancePositions[2]))
+                    {
                         drake->AI()->Talk(0);
+                    }
+                    break;
                 }
                 case EVENT_THRALL_REPOSITION:
                 {

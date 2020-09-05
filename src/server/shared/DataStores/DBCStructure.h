@@ -45,7 +45,7 @@ struct AchievementEntry
 
 struct AchievementCategoryEntry
 {
-    uint32    ID;                                           // 0
+    int32    ID;                                           // 0
     int32    parentCategory;                               // 1 -1 for main category
     //char *name[16];                                       // 2-17
     //uint32 name_flags;                                    // 18
