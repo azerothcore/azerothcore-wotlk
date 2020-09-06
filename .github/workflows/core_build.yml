@@ -29,8 +29,7 @@ jobs:
         if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Checkout modules
         run: ./apps/ci/ci-install-modules.sh
-        if: matrix.modules == 'with'
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
+        if: matrix.modules == 'with' && github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Cache
         uses: actions/cache@v2
         if: github.repository == 'azerothcore/azerothcore-wotlk' 
