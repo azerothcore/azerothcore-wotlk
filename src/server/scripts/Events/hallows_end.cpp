@@ -408,8 +408,8 @@ public:
             {
                 allowQuest = true;
                 eventStarted = 1;
-                float x, y, z, o;
-                uint32 path;
+                float x = 0, y = 0, z = 0, o = 0;
+                uint32 path = 0;
                 GetInitXYZ(x, y, z, o, path);
                 if (Creature* cr = me->SummonCreature(NPC_SHADE_OF_HORSEMAN, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                 {
