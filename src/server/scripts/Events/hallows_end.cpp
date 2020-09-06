@@ -602,6 +602,7 @@ class npc_hallows_end_soh : public CreatureScript
                     case 235434: x = 360.9f; y = -4735.5f; z = 11.773f; break;
                     case 235435: x = 2229.4f; y = 263.1f; z = 36.13f; break;
                     case 235436: x = 9532.9f; y = -6833.8f; z = 18.5f; break;
+                    default: x = 0; y = 0; z = 0; break;
                 }
             }
 
@@ -732,7 +733,7 @@ class npc_hallows_end_soh : public CreatureScript
                 {
                     me->MonsterYell("My flames have died, left not a spark! I shall send you now to the lifeless dark!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(11968);
-                    float x = 0, y = 0, z = 0;
+                    float x, y, z;
                     GetPosToLand(x, y, z);
                     me->GetMotionMaster()->MovePoint(8, x, y, z);
                 }
