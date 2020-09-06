@@ -18967,7 +18967,6 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
     {
         do
         {
-            bool has_items = false;
             Field* fields = result->Fetch();
             if (fields[14].GetUInt32() != prevMailID)
             {
@@ -18982,7 +18981,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
                 m->receiver       = fields[17].GetUInt32();
                 m->subject        = fields[18].GetString();
                 m->body           = fields[19].GetString();
-                has_items         = fields[20].GetBool();
+//                has_items         = fields[20].GetBool();
                 m->expire_time    = time_t(fields[21].GetUInt32());
                 m->deliver_time   = time_t(fields[22].GetUInt32());
                 m->money          = fields[23].GetUInt32();
