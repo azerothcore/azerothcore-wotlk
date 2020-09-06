@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - master
-      - update-github-actions
 
 jobs:
   import-pending-sql:
