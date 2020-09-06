@@ -26,13 +26,11 @@ jobs:
       COMPILER: ${{ matrix.compiler }}
     steps:
       - uses: actions/checkout@v2
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Checkout modules
         run: ./apps/ci/ci-install-modules.sh
-        if: matrix.modules == 'with' && github.repository == 'azerothcore/azerothcore-wotlk'
+        if: matrix.modules == 'with'
       - name: Cache
         uses: actions/cache@v2
-        if: github.repository == 'azerothcore/azerothcore-wotlk' 
         with:
           path: /home/runner/.ccache
           key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
@@ -41,24 +39,18 @@ jobs:
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
       - name: Configure OS
         run: source ./apps/ci/ci-install.sh
-        if: github.repository == 'azerothcore/azerothcore-wotlk' 
         env:
           CONTINUOUS_INTEGRATION: true
       - name: Import db
         run: source ./apps/ci/ci-import-db.sh
-        if: github.repository == 'azerothcore/azerothcore-wotlk' 
       - name: Build
         run: source ./apps/ci/ci-compile.sh
-        if: github.repository == 'azerothcore/azerothcore-wotlk' 
       - name: Dry run
         run: source ./apps/ci/ci-worldserver-dry-run.sh
-        if: github.repository == 'azerothcore/azerothcore-wotlk' 
       - name: Check startup errors
         run: source ./apps/ci/ci-error-check.sh
-        if: github.repository == 'azerothcore/azerothcore-wotlk' 
       - name: Run unit tests
         run: source ./apps/ci/ci-run-unit-tests.sh
-        if: github.repository == 'azerothcore/azerothcore-wotlk' 
 
   mac-build:
     strategy:
@@ -67,10 +59,8 @@ jobs:
     name: macos-10.15
     steps:
       - uses: actions/checkout@v2
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Cache
         uses: actions/cache@v1.1.2
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
         with:
           path: /Users/runner/.ccache
           key: ccache:macos-10.15:${{ github.ref }}:${{ github.sha }}
@@ -79,13 +69,10 @@ jobs:
             ccache:macos-10.15
       - name: Configure OS
         run: source ./apps/ci/mac/ci-install.sh
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Build
         run: source ./apps/ci/mac/ci-compile.sh
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Run unit tests
         run: source ./apps/ci/ci-run-unit-tests.sh
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
 
   windows-build:
     strategy:
@@ -94,26 +81,21 @@ jobs:
     name: windows-2019-MSVC16
     steps:
       - uses: actions/checkout@v2
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Configure OS
         run: choco install --no-progress openssl
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Build
         shell: bash
         run: |
           mkdir -p build && cd build
           cmake .. -DTOOLS=ON
           cmake --build . --config Release --parallel 4
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Copy dll files
         shell: bash
         run: |
           cp "/c/mysql-5.7.21-winx64/lib/libmysql.dll" "build/bin/Release/"
           cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "build/bin/Release/"
           cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - uses: actions/upload-artifact@v2
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
         with:
           name: windows-2019-MSVC16-release
           path: build/bin/Release
@@ -124,16 +106,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Configure
         run: |
           docker --version
           docker-compose --version
-        if: github.repository == 'azerothcore/azerothcore-wotlk' 
       - name: Build
         run: |
           ./bin/acore-docker-build-no-scripts
-        if: github.repository == 'azerothcore/azerothcore-wotlk' 
 
   docker-worldserver:
     strategy:
@@ -141,16 +120,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Configure
         run: |
           docker --version
           docker-compose --version
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Build
         run: |
           docker build -t azerothcore/worldserver -f docker/worldserver/Dockerfile docker/worldserver
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
 
   docker-authserver:
     strategy:
@@ -158,16 +134,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Configure
         run: |
           docker --version
           docker-compose --version
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Build
         run: |
           docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/authserver
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
 
   docker-database:
     strategy:
@@ -175,13 +148,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Configure
         run: |
           docker --version
           docker-compose --version
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
       - name: Build
         run: |
           docker build -t azerothcore/database -f docker/database/Dockerfile .
-        if: github.repository == 'azerothcore/azerothcore-wotlk'
