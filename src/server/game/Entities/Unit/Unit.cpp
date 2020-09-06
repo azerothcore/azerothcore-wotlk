@@ -2911,8 +2911,11 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
             return MeleeSpellHitResult(victim, spell);
         case SPELL_DAMAGE_CLASS_NONE:
         {
+            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             if (spell->SpellFamilyName)
+            {
                 return SPELL_MISS_NONE;
+            }
             // Xinef: apply DAMAGE_CLASS_MAGIC conditions to damaging DAMAGE_CLASS_NONE spells
             for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
                 if (spell->Effects[i].Effect && spell->Effects[i].Effect != SPELL_EFFECT_SCHOOL_DAMAGE)

@@ -7489,6 +7489,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             }
             break;
         /*case SPELL_EFFECT_CHARGE:
+            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             if (MMAP::MMapFactory::IsPathfindingEnabled(m_caster->FindMap()))
                 break;*/
             // else no break intended

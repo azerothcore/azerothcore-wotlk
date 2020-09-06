@@ -414,6 +414,7 @@ void GameObject::Update(uint32 diff)
                 }
                 case GAMEOBJECT_TYPE_SUMMONING_RITUAL:
                 {
+                    #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                     if (World::GetGameTimeMS() < m_cooldownTime)
                         return;
                     GameObjectTemplate const* info = GetGOInfo();

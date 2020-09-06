@@ -44,6 +44,7 @@ class instance_gruuls_lair : public InstanceMapScript
                 switch (creature->GetEntry())
                 {
                     case NPC_MAULGAR:
+                        #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                         _maulgarGUID = creature->GetGUID();
                         // no break;
                     case NPC_KROSH_FIREHAND:

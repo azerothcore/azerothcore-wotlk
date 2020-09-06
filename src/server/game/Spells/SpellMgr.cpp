@@ -4785,6 +4785,7 @@ void SpellMgr::LoadDbcDataCorrections()
             break;
         // Arcane Overload
         case 56430:
+            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
             spellInfo->EffectTriggerSpell[0] = 56429;
             // no break intended
@@ -5152,6 +5153,7 @@ void SpellMgr::LoadDbcDataCorrections()
             break;
         // Trial of the Crusader, Gormok, Fire Bomb
         case 66313:
+            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
             spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_TARGET_ANY;
             spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;

@@ -522,8 +522,11 @@ public:
                     DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_RETREATING_TIMED_EVENT);
                     break;
                 case ACTION_STOP_LK_FIGHT:
+                    #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                     if (!IsDuringLKFight)
+                    {
                         break;
+                    }
                     instance->LoadGrid(LeaderEscapePos.GetPositionX(), LeaderEscapePos.GetPositionY());
                     if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                     {
