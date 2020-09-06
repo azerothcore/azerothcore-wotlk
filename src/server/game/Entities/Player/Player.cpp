@@ -15822,14 +15822,14 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
     {
-        if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
+        if (sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
         {
             DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true);
         }
     }
     for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
     {
-        if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->ItemDrop[i]))
+        if (sObjectMgr->GetItemTemplate(quest->ItemDrop[i]))
         {
             DestroyItemCount(quest->ItemDrop[i], quest->ItemDropQuantity[i], true);
         }
