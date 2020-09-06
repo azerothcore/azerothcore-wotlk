@@ -199,7 +199,7 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
             m_Team_QuestStatus[teamId][4] += 10; //you can turn in 10 or 1 item..
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             if (m_Team_QuestStatus[teamId][4] >= 200)
-                sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here", questid);
+                sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here)", questid);
 #endif
             break;
         case AV_QUEST_A_BOSS2:
