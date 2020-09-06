@@ -1031,6 +1031,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
             SavedAddon const* savedAddon = AddonMgr::GetAddonInfo(addonName);
             if (savedAddon)
             {
+                #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
                 bool match = true;
 
                 if (addon.CRC != savedAddon->CRC)
