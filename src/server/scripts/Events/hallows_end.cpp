@@ -732,7 +732,7 @@ class npc_hallows_end_soh : public CreatureScript
                 {
                     me->MonsterYell("My flames have died, left not a spark! I shall send you now to the lifeless dark!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(11968);
-                    float x, y, z;
+                    float x = 0, y = 0, z = 0;
                     GetPosToLand(x, y, z);
                     me->GetMotionMaster()->MovePoint(8, x, y, z);
                 }
