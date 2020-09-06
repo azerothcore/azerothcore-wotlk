@@ -26,11 +26,13 @@ jobs:
       COMPILER: ${{ matrix.compiler }}
     steps:
       - uses: actions/checkout@v2
+        if: github.repository == "azerothcore/azerothcore-wotlk"
       - name: Checkout modules
         run: ./apps/ci/ci-install-modules.sh
         if: matrix.modules == 'with'
       - name: Cache
         uses: actions/cache@v2
+        if: github.repository == "azerothcore/azerothcore-wotlk"
         with:
           path: /home/runner/.ccache
           key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
@@ -59,8 +61,10 @@ jobs:
     name: macos-10.15
     steps:
       - uses: actions/checkout@v2
+        if: github.repository == "azerothcore/azerothcore-wotlk"
       - name: Cache
         uses: actions/cache@v1.1.2
+        if: github.repository == "azerothcore/azerothcore-wotlk"
         with:
           path: /Users/runner/.ccache
           key: ccache:macos-10.15:${{ github.ref }}:${{ github.sha }}
@@ -81,6 +85,7 @@ jobs:
     name: windows-2019-MSVC16
     steps:
       - uses: actions/checkout@v2
+        if: github.repository == "azerothcore/azerothcore-wotlk"
       - name: Configure OS
         run: choco install --no-progress openssl
       - name: Build
@@ -96,6 +101,7 @@ jobs:
           cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "build/bin/Release/"
           cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
       - uses: actions/upload-artifact@v2
+        if: github.repository == "azerothcore/azerothcore-wotlk"
         with:
           name: windows-2019-MSVC16-release
           path: build/bin/Release
@@ -106,6 +112,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+        if: github.repository == "azerothcore/azerothcore-wotlk"
       - name: Configure
         run: |
           docker --version
@@ -120,6 +127,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+        if: github.repository == "azerothcore/azerothcore-wotlk"
       - name: Configure
         run: |
           docker --version
@@ -134,6 +142,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+        if: github.repository == "azerothcore/azerothcore-wotlk"
       - name: Configure
         run: |
           docker --version
@@ -148,6 +157,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+        if: github.repository == "azerothcore/azerothcore-wotlk"
       - name: Configure
         run: |
           docker --version
