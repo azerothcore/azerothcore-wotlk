@@ -15,6 +15,8 @@ SplineBase::EvaluationMethtod SplineBase::evaluators[SplineBase::ModesEnd] =
     &SplineBase::EvaluateLinear,
     &SplineBase::EvaluateCatmullRom,
     &SplineBase::EvaluateBezier3,
+    // not sure about this, may be a mistake
+    #pragma GCC diagnostic ignored "-Wcast-function-type"
     (EvaluationMethtod)&SplineBase::UninitializedSpline,
 };
 
@@ -23,6 +25,8 @@ SplineBase::EvaluationMethtod SplineBase::derivative_evaluators[SplineBase::Mode
     &SplineBase::EvaluateDerivativeLinear,
     &SplineBase::EvaluateDerivativeCatmullRom,
     &SplineBase::EvaluateDerivativeBezier3,
+    // not sure about this, may be a mistake
+    #pragma GCC diagnostic ignored "-Wcast-function-type"
     (EvaluationMethtod)&SplineBase::UninitializedSpline,
 };
 
