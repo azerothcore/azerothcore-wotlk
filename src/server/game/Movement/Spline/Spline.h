@@ -73,7 +73,7 @@ protected:
 
     void UninitializedSplineEvaluationMethod(index_type, float, Vector3&) const { ABORT(); }
     float UninitializedSplineSegLenghtMethod(index_type) const { ABORT(); }
-    void UninitializedSplineInitMethod(Vector3 const*, index_type, index_type) { ABORT(); }
+    void UninitializedSplineInitMethod(Vector3 const*, index_type, bool, index_type) { ABORT(); }
 
 public:
 
