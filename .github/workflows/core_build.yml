@@ -4,7 +4,9 @@ on:
     branches: 
       - '**'         # matches every branch
       - '!coverity_scan'   # excludes coverity_scan
+  if: github.repository == 'azerothcore/azerothcore-wotlk'
   pull_request:
+  if: github.repository == 'azerothcore/azerothcore-wotlk'
 
 jobs:
   build:
