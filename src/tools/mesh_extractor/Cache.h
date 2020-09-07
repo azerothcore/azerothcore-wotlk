@@ -24,7 +24,7 @@ public:
 
     void Insert(K key, T* val)
     {
-        RETURN_GUAD(mutex,false);
+        std::lock_guard<std::mutex> guard(_mutex);
 
         if (_items.size() > FlushLimit)
             Clear();
