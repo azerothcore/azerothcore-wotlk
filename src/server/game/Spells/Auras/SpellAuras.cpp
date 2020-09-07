@@ -1559,6 +1559,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_WARRIOR:
                 if (!caster)
                     break;
+                break;
             case SPELLFAMILY_WARLOCK:
                 if (!caster)
                     break;
@@ -2636,6 +2637,7 @@ void UnitAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* caster)
                         break;
                     }
                     case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+                        #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                         targetList.push_back(GetUnitOwner());
                     case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
                     {
