@@ -12,6 +12,7 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "Player.h"
+#include "PathGenerator.h"
 
 //----- Point Movement Generator
 template<class T>

@@ -8,10 +8,7 @@
 #define TRINITYSERVER_MOVESPLINEINIT_H
 
 #include "MoveSplineInitArgs.h"
-#include "PathGenerator.h"
-#include "Unit.h"
 
-enum UnitMoveType;
 class Unit;
 
 namespace Movement

@@ -7,11 +7,11 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "MovementPacketBuilder.h"
-#include "Unit.h"
 #include "Transport.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
+#include "PathGenerator.h"
 
 namespace Movement
 {

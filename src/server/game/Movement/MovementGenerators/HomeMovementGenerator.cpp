@@ -10,6 +10,7 @@
 #include "WorldPacket.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
+#include "PathGenerator.h"
 
 void HomeMovementGenerator<Creature>::DoInitialize(Creature* owner)
 {
