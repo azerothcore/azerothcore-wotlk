@@ -730,7 +730,6 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
 
         bool IsFreeToMove();
-        static constexpr uint32 MOVE_BACK_CHECK_INTERVAL = 3000;
         static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
         uint32 m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
 
