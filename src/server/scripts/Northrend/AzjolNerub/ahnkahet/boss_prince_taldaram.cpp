@@ -364,13 +364,11 @@ public:
     bool OnGossipHello(Player * pPlayer, GameObject *go) override
     {
         if (pPlayer && pPlayer->IsInCombat())
-        {
-            return false;
-        }
+            return true;
 
         InstanceScript *pInstance = go->GetInstanceScript();
         if (!pInstance)
-            return false;
+            return true;
 
         go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
         go->SetGoState(GO_STATE_ACTIVE);
@@ -385,10 +383,9 @@ public:
             }
 
             pInstance->SetData(objectIndex, DONE);
-            return true;
         }
 
-        return false;
+        return true;
     }
 };
 
