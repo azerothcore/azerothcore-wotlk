@@ -448,6 +448,34 @@ public:
     }
 };
 
+// 55895, 59511, 59512 - Flame Sphere Summon
+class spell_prince_taldaram_flame_sphere_summon : public SpellScriptLoader
+{
+    public:
+        spell_prince_taldaram_flame_sphere_summon() : SpellScriptLoader("spell_prince_taldaram_flame_sphere_summon") { }
+
+        class spell_prince_taldaram_flame_sphere_summon_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_prince_taldaram_flame_sphere_summon_SpellScript);
+
+            void SetDest(SpellDestination& dest)
+            {
+                Position offset = { 0.0f, 0.0f, 5.5f, 0.0f };
+                dest.RelocateOffset(offset);
+            }
+
+            void Register() override
+            {
+                OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_prince_taldaram_flame_sphere_summon_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_prince_taldaram_flame_sphere_summon_SpellScript();
+        }
+};
+
 void AddSC_boss_taldaram()
 {
     new boss_taldaram();
@@ -456,4 +484,5 @@ void AddSC_boss_taldaram()
 
     // Spells
     new spell_prince_taldaram_conjure_flame_sphere();
+    new spell_prince_taldaram_flame_sphere_summon();
 }

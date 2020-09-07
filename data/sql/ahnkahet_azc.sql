@@ -12,9 +12,13 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 (1113, 56648, 0);
 
 -- Teldaram
-delete from `spell_script_names` where `spell_id`=55931;
-insert into `spell_script_names` (`spell_id`, `ScriptName`) values
-('55931','spell_prince_taldaram_conjure_flame_sphere');
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (55931, 55895, 59511, 59512);
+INSERT INTO `spell_script_names` (`spell_id` ,`ScriptName`) VALUES
+(55931, 'spell_prince_taldaram_conjure_flame_sphere'),
+(55895, 'spell_prince_taldaram_flame_sphere_summon'),
+(59511, 'spell_prince_taldaram_flame_sphere_summon'),
+(59512, 'spell_prince_taldaram_flame_sphere_summon');
+
 UPDATE `creature_text` SET `TextRange`='3',`comment`='prince taldaram SAY_SPHERE_ACTIVATED' WHERE  `CreatureID`=29308 AND `GroupID`=0 AND `ID`=0;
 UPDATE `creature_text` SET `TextRange`='3',`comment`='prince taldaram SAY_REMOVE_PRISON'  WHERE  `CreatureID`=29308 AND `GroupID`=1 AND `ID`=0;
 update creature_template set flags_extra=flags_extra&~512 where entry in (29308, 31469);
