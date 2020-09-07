@@ -863,7 +863,9 @@ bool MotionMaster::GetDestination(float &x, float &y, float &z)
 void MotionMaster::LaunchCustomSpline(Movement::MoveSplineInit& init, uint32 id, MovementSlot slot)
 {
     if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+    {
         return;
+    }
 
     init.Launch();
     Mutate(new EffectMovementGenerator(id), slot);
