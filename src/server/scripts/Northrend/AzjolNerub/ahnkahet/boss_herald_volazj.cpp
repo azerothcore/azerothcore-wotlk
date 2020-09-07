@@ -92,7 +92,9 @@ public:
             {
                 // Not good target or too many players
                 if (pTarget->GetTypeId() != TYPEID_PLAYER || insanityHandled > 4)
+                {
                     return;
+                }
 
                 // First target - start channel visual and set self as unnattackable
                 if (!insanityHandled)
@@ -112,7 +114,9 @@ public:
                 {
                     Player *plr = i.GetSource();
                     if (!plr || !plr->IsAlive() || pTarget->GetGUID() == plr->GetGUID())
+                    {
                         continue;
+                    }
 
                     // Summon clone
                     if (Unit* summon = me->SummonCreature(NPC_TWISTED_VISAGE, *plr, TEMPSUMMON_CORPSE_DESPAWN, 0))
@@ -163,7 +167,9 @@ public:
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
+            {
                 Talk(SAY_SLAY);
+            }
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
@@ -180,7 +186,8 @@ public:
                 }
 
                 events.RepeatEvent(1000);
-            }break;
+                break;
+            }
             case 1: // Second insanity
             {
                 if (me->HealthBelowPctDamaged(33, damage))
@@ -188,7 +195,8 @@ public:
                     DoCastSelf(SPELL_INSANITY, false);
                     ++insanityTimes;
                 }
-            }break;
+                break;
+            }
             }
         }
 
@@ -196,12 +204,16 @@ public:
         {
             //Return since we have no target
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             if (insanityHandled)
             {
                 if (!CheckPhaseMinions())
+                {
                     return;
+                }
 
                 insanityHandled = 0;
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -211,7 +223,9 @@ public:
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
             while (uint32 const eventId = events.ExecuteEvent())
             {
@@ -269,8 +283,12 @@ public:
             for (auto const& i : players)
             {
                 if (Player* pPlayer = i.GetSource())
+                {
                     if (uint32 const spellId = GetSpellForPhaseMask(pPlayer->GetPhaseMask()))
+                    {
                         pPlayer->RemoveAurasDueToSpell(spellId);
+                    }
+                }
             }
         }
 
@@ -287,15 +305,19 @@ public:
             for (uint64 const summonGUID : summons)
             {
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, summonGUID))
+                {
                     phase |= summon->GetPhaseMask();
+                }
             }
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             for (auto const& i : players)
             {
                 Player* pPlayer = i.GetSource();
-                if (pPlayer && (pPlayer->GetPhaseMask() & phase) == 0)
+                if (pPlayer && !(pPlayer->GetPhaseMask() & phase))
+                {
                     pPlayer->RemoveAurasDueToSpell(GetSpellForPhaseMask(pPlayer->GetPhaseMask()));
+                }
             }
 
             return false;

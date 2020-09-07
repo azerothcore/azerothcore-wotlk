@@ -89,19 +89,25 @@ public:
             Talk(SAY_AGGRO);
 
             if (pInstance)
+            {
                 pInstance->SetData(DATA_ELDER_NADOX_EVENT, IN_PROGRESS);
+            }
         }
 
         void DoAction(int32 action) override
         {
             if (action == ACTION_GUARDIAN_DIED && pInstance)
+            {
                 pInstance->SetData(DATA_NADOX_ACHIEVEMENT, false);
+            }
         }
 
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
+            {
                 Talk(SAY_SLAY);
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -112,7 +118,9 @@ public:
             Talk(SAY_DEATH);
 
             if (pInstance)
+            {
                 pInstance->SetData(DATA_ELDER_NADOX_EVENT, DONE);
+            }
         }
 
         void JustSummoned(Creature* summon) override
@@ -148,34 +156,41 @@ public:
                         events.CancelEvent(EVENT_CHECK_HEALTH);
                         events.ScheduleEvent(EVENT_SUMMON_GUARD, 100);
                     }
-                }break;
+                    break;
+                }
                 case EVENT_SUMMON_GUARD:
                 {
                     Talk(EMOTE_HATCHES, me);
                     SummonHelpers(false);
                     events.PopEvent();
-                }break;
+                    break;
+                }
                 case EVENT_BROOD_RAGE:
                 {
                     if (Creature* pSwarmer = me->FindNearestCreature(NPC_AHNKAHAR_SWARMER, 40, true))
                         DoCast(pSwarmer, SPELL_BROOD_RAGE_H, true);
 
                     events.RepeatEvent(10000);
-                }break;
+                    break;
+                }
                 case EVENT_PLAGUE:
                 {
                     DoCastVictim(DUNGEON_MODE(SPELL_BROOD_PLAGUE, SPELL_BROOD_PLAGUE_H), false);
-                    events.RepeatEvent(12000 + rand() % 5000); 
-                }break;
+                    events.RepeatEvent(12000 + rand() % 5000);
+                    break;
+                }
                 case EVENT_SWARMER:
                 {
                     SummonHelpers(true);
-                    events.RepeatEvent(10000); 
-                }break;
+                    events.RepeatEvent(10000);
+                    break;
+                }
                 case EVENT_CHECK_HOME:
                 {
                     if (me->HasAura(SPELL_ENRAGE))
+                    {
                         break;
+                    }
 
                     if (me->GetPositionZ() < 24)
                     {
@@ -203,14 +218,20 @@ public:
             if (swarm)
             {
                 if ((cr = me->SummonCreature(NPC_AHNKAHAR_SWARMER, 640.425f, -919.544f, 25.8701f, 2.56563f)))
+                {
                     summons.Summon(cr);
+                }
                 if ((cr = me->SummonCreature(NPC_AHNKAHAR_SWARMER, 655.891f, -930.445f, 25.6978f, 3.64774f)))
+                {
                     summons.Summon(cr);
+                }
             }
             else
             {
                 if ((cr = me->SummonCreature(NPC_AHNKAHAR_GUARDIAN_ENTRY, 658.677f, -934.332f, 25.6978f, 3.03687f)))
+                {
                     summons.Summon(cr);
+                }
             }
         }
     };
@@ -233,12 +254,18 @@ public:
         void Reset()
         {
             if (me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
+            {
                 DoCastSelf(SPELL_GUARDIAN_AURA, true);
+            }
             else // Swarmers
+            {
                 DoCastSelf(SPELL_SWARMER_AURA, true);
+            }
             
             if (me->GetEntry() == NPC_AHNKAHAR_SWARMER || me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
+            {
                 me->SetInCombatWithZone();
+            }
 
             uiSprintTimer = 10000;
         }
@@ -248,8 +275,10 @@ public:
             if (me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
             {
                 if (InstanceScript *pInstance = me->GetInstanceScript()) 
+                {
                     if (Creature *nadox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_ELDER_NADOX)))
                         nadox->AI()->DoAction(ACTION_GUARDIAN_DIED);
+                }
 
                 me->RemoveAllAuras();
             }
@@ -300,24 +329,39 @@ class spell_ahn_kahet_swarmer_aura : public SpellScriptLoader
 
                 std::list<Creature*>::const_iterator itr;
                 for (itr = swarm.begin(); itr != swarm.end(); ++itr)
+                {
                     if ((*itr)->IsAlive())
-                        aliveCount++;
+                    {
+                        ++aliveCount;
+                    }
+                }
                 for (itr = swarm2.begin(); itr != swarm2.end(); ++itr)
+                {
                     if ((*itr)->IsAlive())
-                        aliveCount++;
+                    {
+                        ++aliveCount;
+                    }
+                }
 
                 if (Aura *aur = caster->GetAura(56281))
                 {
                     if (aliveCount > 0)
+                    {
                         aur->SetStackAmount(aliveCount);
+                    }
                     else
+                    {
                         aur->Remove();
+                    }
                 }
                 else if (aliveCount > 0)
                 {
+                    // TODO: move spell id to enum
                     caster->CastCustomSpell(caster, 56281, &aliveCount, &aliveCount, &aliveCount, true);
                     if (Aura *aur = caster->GetAura(56281))
+                    {
                         aur->SetStackAmount(aliveCount);
+                    }
                 }
             }
 
@@ -337,5 +381,7 @@ void AddSC_boss_elder_nadox()
 {
     new boss_elder_nadox();
     new npc_ahnkahar_nerubian();
+
+    // Spells
     new spell_ahn_kahet_swarmer_aura();
 }

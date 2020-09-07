@@ -110,7 +110,9 @@ public:
         bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
+            {
                 return false;
+            }
 
             switch (type)
             {
@@ -143,7 +145,9 @@ public:
 
                         Creature* teldaram = instance->GetCreature(princeTaldaram_GUID);
                         if (teldaram && teldaram->IsAlive())
+                        {
                             teldaram->AI()->DoAction(ACTION_REMOVE_PRISON);
+                        }
                     }
                     break;
                 }
@@ -219,7 +223,9 @@ public:
                     uint32 tmpState;
                     loadStream >> tmpState;
                     if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                    {
                         tmpState = NOT_STARTED;
+                    }
 
                     SetBossState(i, EncounterState(tmpState));
                 }

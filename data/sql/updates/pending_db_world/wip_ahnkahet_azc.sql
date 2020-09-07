@@ -1,8 +1,8 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1599510903096685100');
-
+-- Change this back to INSERT once rewrite is complete
+REPLACE INTO `version_db_world` (`sql_rev`) VALUES ('1599510903096685100');
 
 -- Amanitar encounter
-DELETE FROM `spell_script_names` WHERE `spell_id`=57283;
+DELETE FROM `spell_script_names` WHERE `spell_id`=57283 AND `ScriptName`='spell_amanitar_remove_mushroom_power';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (57283, 'spell_amanitar_remove_mushroom_power');
 DELETE FROM `spell_script_names` WHERE `spell_id`=56648;
@@ -15,7 +15,8 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 (1113, 56648, 0);
 
 -- Teldaram
-DELETE FROM `spell_script_names` WHERE `spell_id` IN (55931, 55895, 59511, 59512);
+DELETE FROM `spell_script_names` WHERE `spell_id` = 55931 AND `ScriptName`='spell_prince_taldaram_conjure_flame_sphere';
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (55895, 59511, 59512) and `ScriptName` = 'spell_prince_taldaram_flame_sphere_summon';
 INSERT INTO `spell_script_names` (`spell_id` ,`ScriptName`) VALUES
 (55931, 'spell_prince_taldaram_conjure_flame_sphere'),
 (55895, 'spell_prince_taldaram_flame_sphere_summon'),

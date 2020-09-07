@@ -81,7 +81,7 @@ enum Phases
 
 enum Actions
 {
-    ACTION_ACTIVATE                         = 1,
+    ACTION_RITUAL_BEGIN                         = 1,
 };
 
 const Position JedogaPosition[3] =
@@ -298,7 +298,7 @@ public:
                     {
                         Talk(TEXT_SACRIFICE_1);
                         choosenInitiate_GUID = initiate->GetGUID();
-                        initiate->AI()->DoAction(ACTION_ACTIVATE);
+                        initiate->AI()->DoAction(ACTION_RITUAL_BEGIN);
 
                         if (Creature* ritualTrigger = me->SummonCreature(NPC_JEDOGA_CONTROLLER, JedogaPosition[2]))
                         {
@@ -416,7 +416,7 @@ public:
         {
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!activationTimer)
             {
@@ -424,7 +424,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit *who) 
+        void MoveInLineOfSight(Unit *who) override
         {
             if (!activationTimer)
             {
@@ -432,7 +432,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             activationTimer = 0;
 
@@ -464,14 +464,14 @@ public:
 
         void DoAction(int32 action) override
         {
-            if (action == ACTION_ACTIVATE)
+            if (action == ACTION_RITUAL_BEGIN)
             {
                 activationTimer = 1500;
                 DoCastSelf(SPELL_ACTIVATE_INITIATE, true);
             }
         }
 
-        void MovementInform(uint32 Type, uint32 PointId)
+        void MovementInform(uint32 Type, uint32 PointId) override
         {
             if (Type == POINT_MOTION_TYPE && PointId == POINT_RITUAL)
             {
@@ -482,12 +482,12 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (activationTimer)
             {
                 activationTimer -= diff;
-                if (activationTimer <= 0)
+                if (activationTimer <= diff)
                 {
                     me->CombatStop();
                     me->SetControlled(false, UNIT_STATE_STUNNED);
@@ -520,12 +520,10 @@ public:
                 return;
             }
 
-            if (!UpdateVictim())
+            if (UpdateVictim() && !me->HasAura(SPELL_WHITE_SPHERE))
             {
-                return;
-            }
-
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
+            }           
         }
 
     private:
