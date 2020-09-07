@@ -2229,6 +2229,7 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
                 case SPELL_AURA_AOE_CHARM:
                     return SPELL_SPECIFIC_CHARM;
                 case SPELL_AURA_TRACK_CREATURES:
+                    #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                     /// @workaround For non-stacking tracking spells (We need generic solution)
                     if (Id == 30645) // Gas Cloud Tracking
                         return SPELL_SPECIFIC_NORMAL;
