@@ -578,9 +578,6 @@ void Creature::Update(uint32 diff)
                 SelectVictim();
             }
 
-            // Moving back from the target.
-            m_moveBackMovementTime -= diff;
-
             // Circling the target.
             if (diff >= m_moveCircleMovementTime)
             {
