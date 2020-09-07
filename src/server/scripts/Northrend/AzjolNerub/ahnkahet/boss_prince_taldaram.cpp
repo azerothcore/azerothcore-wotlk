@@ -44,7 +44,7 @@ enum Misc
 
 enum Actions
 {
-    ACTION_REMOVE_PRISON                             = 1,
+    ACTION_REMOVE_PRISON_AT_RESET           = 1,
     ACTION_SPHERE                           = 2,
 };
 
@@ -57,17 +57,17 @@ enum Event
     EVENT_PRINCE_RESCHEDULE                 = 5,
 };
 
-#define DATA_GROUND_POSITION_Z             11.4f
+constexpr float DATA_GROUND_POSITION_Z     = 11.308135f;
 
 enum Yells
 {
-    SAY_1                                         = 0,
-    SAY_WARNING                                   = 1,
-    SAY_AGGRO                                     = 2,
-    SAY_SLAY                                      = 3,
-    SAY_DEATH                                     = 4,
-    SAY_FEED                                      = 5,
-    SAY_VANISH                                    = 6,
+    SAY_1                                   = 0,
+    SAY_WARNING                             = 1,
+    SAY_AGGRO                               = 2,
+    SAY_SLAY                                = 3,
+    SAY_DEATH                               = 4,
+    SAY_FEED                                = 5,
+    SAY_VANISH                              = 6,
 };
 
 class boss_taldaram : public CreatureScript
@@ -87,35 +87,48 @@ public:
         {
             _Reset();
 
-            if (me->GetPositionZ() > 15.0f)
-                DoCastSelf(SPELL_BEAM_VISUAL, true);
-
             vanishDamage = 0;
             vanishTarget = 0;
 
             // Event not started
             if (instance->GetData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetData(DATA_TELDRAM_SPHERE2) == DONE)
             {
-                DoAction(ACTION_REMOVE_PRISON);
+                DoAction(ACTION_REMOVE_PRISON_AT_RESET);
+            }
+            else
+            {
+                me->SetDisableGravity(true);
+                me->SetHover(true);
+                DoCastSelf(SPELL_BEAM_VISUAL, true);
             }
         }
 
         void DoAction(int32 action) override
         {
-            if (action != ACTION_REMOVE_PRISON)
+            if (action == ACTION_REMOVE_PRISON || action == ACTION_REMOVE_PRISON_AT_RESET)
             {
-                return;
+                me->SetDisableGravity(false);
+                me->SetHover(false);
+                me->RemoveAllAuras();
+                me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+
+                me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation());
+                me->SetDisableGravity(false);
+                me->SetHover(false);
+                if (action == ACTION_REMOVE_PRISON)
+                {
+                    DoCastSelf(SPELL_HOVER_FALL);
+                    me->GetMotionMaster()->MoveTargetedHome();
+                }
+                // Teleport instantly
+                else
+                {
+                    me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation());
+                }
+
+                instance->HandleGameObject(instance->GetData64(DATA_PRINCE_TALDARAM_PLATFORM), true);
             }
-
-            me->RemoveAllAuras();
-            me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-
-            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation());
-            DoCastSelf(SPELL_HOVER_FALL);
-            me->GetMotionMaster()->MoveTargetedHome();
-
-            instance->HandleGameObject(instance->GetData64(DATA_PRINCE_TALDARAM_PLATFORM), true);
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*school*/) override

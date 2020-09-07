@@ -49,4 +49,9 @@ enum AhnkahetObjects
     GO_TELDARAM_PLATFORM            = 193564,
 };
 
+enum AhnKahetActions
+{
+    ACTION_REMOVE_PRISON            = -1
+};
+
 #endif // DEF_AHNKAHET_H

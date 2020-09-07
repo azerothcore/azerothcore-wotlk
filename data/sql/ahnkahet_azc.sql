@@ -57,3 +57,9 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 (29310, 0, 1, 30114, 366.861, -721.702, -16.1797, 5.65409, 8, 0),
 (29310, 0, 1, 30114, 362.343, -718.019, -16.1797, 5.51665, 8, 0),
 (29310, 0, 1, 30114, 358.906, -714.357, -16.1797, 5.35957, 8, 0);
+
+-- Trash npcs
+-- Eye of Teldaram
+DELETE FROM `creature_template_addon` WHERE `entry`=31457;
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES
+(31457, 0, 0, 0, 0, 0, 0, '56572');

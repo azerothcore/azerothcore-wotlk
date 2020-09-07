@@ -28,8 +28,8 @@ public:
             jedogaAchievement(false)
         {
             SetBossNumber(MAX_ENCOUNTER);
-            spheres[0] = NOT_STARTED;
-            spheres[1] = NOT_STARTED;
+            teldaramSpheres[0] = NOT_STARTED;
+            teldaramSpheres[1] = NOT_STARTED;
         };
 
         void OnCreatureCreate(Creature* pCreature) override
@@ -61,7 +61,7 @@ public:
                 case GO_TELDARAM_PLATFORM:
                 {
                     taldaramPlatform_GUID = pGo->GetGUID();
-                    if (GetBossState(DATA_PRINCE_TALDARAM) == DONE)
+                    if (IsAllSpheresActivated())
                     {
                         HandleGameObject(0, true, pGo);
                     }
@@ -71,7 +71,7 @@ public:
                 case GO_TELDARAM_SPHERE1:
                 case GO_TELDARAM_SPHERE2:
                 {
-                    if (spheres[pGo->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1] == DONE)
+                    if (teldaramSpheres[pGo->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1] == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
                         pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
@@ -130,16 +130,22 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_TELDRAM_SPHERE1:
-                    spheres[0] = data;
-                    SaveToDB();
-                    break;
                 case DATA_TELDRAM_SPHERE2:
-                    spheres[1] = data;
+                {
+                    teldaramSpheres[type == DATA_TELDRAM_SPHERE1 ? 0 : 1] = data;
                     SaveToDB();
+
+                    if (IsAllSpheresActivated())
+                    {
+                        Creature* teldaram = instance->GetCreature(princeTaldaram_GUID);
+                        if (teldaram && teldaram->IsAlive())
+                            teldaram->AI()->DoAction(ACTION_REMOVE_PRISON);
+                    }
                     break;
+                }
                 case DATA_NADOX_ACHIEVEMENT:
                     nadoxAchievement = (bool)data;
                     return;
@@ -154,9 +160,9 @@ public:
             switch(type)
             {
                 case DATA_TELDRAM_SPHERE1:
-                    return spheres[0];
+                    return teldaramSpheres[0];
                 case DATA_TELDRAM_SPHERE2:
-                    return spheres[1];
+                    return teldaramSpheres[1];
             }
             return 0;
         }
@@ -184,7 +190,7 @@ public:
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << "A K " << GetBossSaveData() << spheres[0] << ' ' << spheres[1];
+            saveStream << "A K " << GetBossSaveData() << teldaramSpheres[0] << ' ' << teldaramSpheres[1];
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
@@ -217,7 +223,7 @@ public:
                     SetBossState(i, EncounterState(tmpState));
                 }
 
-                loadStream >> spheres[0] >> spheres[1];
+                loadStream >> teldaramSpheres[0] >> teldaramSpheres[1];
             }
             else
                 OUT_LOAD_INST_DATA_FAIL;
@@ -235,10 +241,16 @@ public:
         // Teldaram related
         uint64 taldaramPlatform_GUID;
         uint64 taldaramGate_GUID;
-        std::array<uint32, 2> spheres;
+        uint32 teldaramSpheres[2];  // Used to identify for sphere activation
 
         bool nadoxAchievement;
         bool jedogaAchievement;
+
+
+        bool IsAllSpheresActivated() const
+        {
+            return teldaramSpheres[0] == DONE && teldaramSpheres[1] == DONE;
+        }
     };
 
     InstanceScript* GetInstanceScript(InstanceMap *map) const
