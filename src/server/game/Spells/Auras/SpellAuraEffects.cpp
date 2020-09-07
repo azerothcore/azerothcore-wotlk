@@ -3599,7 +3599,7 @@ void AuraEffect::HandleModMechanicImmunity(AuraApplication const* aurApp, uint8 
         return;
 
     Unit* target = aurApp->GetTarget();
-    uint32 mechanic;
+    uint32 mechanic = 0;
 
     switch (GetId())
     {
