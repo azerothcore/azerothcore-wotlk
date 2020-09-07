@@ -60,7 +60,7 @@ public:
                 case GO_TELDARAM_PLATFORM:
                 {
                     taldaramPlatform_GUID = pGo->GetGUID();
-                    if (IsAllSpheresActivated())
+                    if (IsAllSpheresActivated() || GetBossState(DATA_PRINCE_TALDARAM))
                     {
                         HandleGameObject(0, true, pGo);
                     }
@@ -70,7 +70,7 @@ public:
                 case GO_TELDARAM_SPHERE1:
                 case GO_TELDARAM_SPHERE2:
                 {
-                    if (teldaramSpheres[pGo->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1] == DONE)
+                    if (teldaramSpheres[pGo->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1] == DONE || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
                         pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
@@ -97,7 +97,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 7317: // Respect Your Elders (2038)
                     return nadoxAchievement;

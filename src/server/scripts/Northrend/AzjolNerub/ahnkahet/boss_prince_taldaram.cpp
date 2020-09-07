@@ -208,6 +208,10 @@ public:
     {
         boss_taldaramAI(Creature* pCreature) : BossAI(pCreature, DATA_PRINCE_TALDARAM)
         {
+            if (instance->GetData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetData(DATA_TELDRAM_SPHERE2) == DONE)
+            {
+                DoAction(ACTION_REMOVE_PRISON_AT_RESET);
+            }
         }
 
         void Reset() override
@@ -218,16 +222,15 @@ public:
             vanishTarget_GUID = 0;
 
             // Event not started
-            if (instance->GetData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetData(DATA_TELDRAM_SPHERE2) == DONE)
-            {
-                DoAction(ACTION_REMOVE_PRISON_AT_RESET);
-            }
-            else
+            if (instance->GetData(DATA_TELDRAM_SPHERE1) != DONE || instance->GetData(DATA_TELDRAM_SPHERE2) != DONE)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetDisableGravity(true);
                 me->SetHover(true);
-                DoCastSelf(SPELL_BEAM_VISUAL, true);
+                if (!me->HasAura(SPELL_BEAM_VISUAL))
+                {
+                    DoCastSelf(SPELL_BEAM_VISUAL, true);
+                }
             }
         }
 
