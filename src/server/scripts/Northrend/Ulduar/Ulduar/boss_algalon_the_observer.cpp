@@ -504,11 +504,7 @@ class boss_algalon_the_observer : public CreatureScript
                 }
                 else if (movementType == POINT_MOTION_TYPE)
                 {
-                    if (pointId == POINT_ALGALON_LAND)
-                    {
-                        me->SetDisableGravity(false);
-                    }
-                    else if (pointId == POINT_ALGALON_OUTRO)
+                    if (pointId == POINT_ALGALON_OUTRO)
                     {
                         me->SetFacingTo(1.605703f);
                         events.ScheduleEvent(EVENT_OUTRO_3, 1200);
