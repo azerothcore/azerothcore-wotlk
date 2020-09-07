@@ -3565,6 +3565,7 @@ void Spell::cancel(bool bySelf)
     switch (oldState)
     {
         case SPELL_STATE_PREPARING:
+            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             CancelGlobalCooldown();
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
