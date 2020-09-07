@@ -129,8 +129,6 @@ public:
                 {
                     me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation(), true);
                 }
-
-
             }
         }
 

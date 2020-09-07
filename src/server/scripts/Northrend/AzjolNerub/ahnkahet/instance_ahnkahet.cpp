@@ -140,6 +140,8 @@ public:
 
                     if (IsAllSpheresActivated())
                     {
+                        HandleGameObject(taldaramPlatform_GUID, true, nullptr);
+
                         Creature* teldaram = instance->GetCreature(princeTaldaram_GUID);
                         if (teldaram && teldaram->IsAlive())
                             teldaram->AI()->DoAction(ACTION_REMOVE_PRISON);
