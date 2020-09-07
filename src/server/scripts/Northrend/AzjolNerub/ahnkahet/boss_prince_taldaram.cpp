@@ -224,6 +224,7 @@ public:
             }
             else
             {
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetDisableGravity(true);
                 me->SetHover(true);
                 DoCastSelf(SPELL_BEAM_VISUAL, true);
@@ -249,7 +250,7 @@ public:
                     me->SetDisableGravity(false);
                     me->SetHover(false);
                     me->RemoveAllAuras();
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
                     me->UpdatePosition(me->GetHomePosition(), true);
                 }
             }
@@ -332,6 +333,7 @@ public:
             }
             summons.Summon(summon);
         }
+    
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
