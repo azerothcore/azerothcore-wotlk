@@ -6,7 +6,8 @@
 #include "ScriptedCreature.h"
 #include "ahnkahet.h"
 #include "Containers.h"
-
+#include "ObjectAccessor.h"
+#include "SpellScript.h"
 
 enum Yells
 {
@@ -361,13 +362,17 @@ public:
 
             if (pInstance->GetData(DATA_JEDOGA_SHADOWSEEKER_EVENT) != IN_PROGRESS)
             {
-                me->SetControlled(false, UNIT_STATE_STUNNED);
+                me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+                me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, false);
                 me->RemoveAurasDueToSpell(SPELL_WHITE_SPHERE);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             }
             else
             {
-                me->SetOrientation(me->GetAngle(372.6f, -705.12f));
+                if (Creature* jedoga = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER)))
+                {
+                    me->SetFacingToObject(jedoga);
+                }
                 me->SendMovementFlagUpdate();
                 me->CastSpell(me, SPELL_WHITE_SPHERE, false);
                 me->SetControlled(true, UNIT_STATE_STUNNED);
@@ -457,8 +462,39 @@ public:
     }
 };
 
+// 56328 - Random Lightning Visual Effect
+class spell_random_lightning_visual_effect : public SpellScriptLoader
+{
+    public:
+        spell_random_lightning_visual_effect() : SpellScriptLoader("spell_random_lightning_visual_effect") { }
+
+    class spell_random_lightning_visual_effect_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_random_lightning_visual_effect_SpellScript);
+
+        void ModDestHeight(SpellDestination& dest)
+        {
+            Position const offset = { frand(-15.0f, 15.0f), frand(-15.0f, 15.0f), -19.0f, 0.0f };
+            dest.RelocateOffset(offset);
+        }
+
+        void Register() override
+        {
+            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_random_lightning_visual_effect_SpellScript::ModDestHeight, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_random_lightning_visual_effect_SpellScript();
+    }
+};
+
 void AddSC_boss_jedoga_shadowseeker()
 {
     new boss_jedoga_shadowseeker();
     new npc_jedoga_initiand();
+
+    // Spells
+    new spell_random_lightning_visual_effect();
 }

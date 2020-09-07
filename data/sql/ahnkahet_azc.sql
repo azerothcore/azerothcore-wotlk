@@ -24,6 +24,10 @@ update creature_template set flags_extra=flags_extra&~512 where entry in (29308,
 update creature_template set modelid2=19725, flags_extra=flags_extra|64|128 where entry in (30106, 31458);
 
 -- Jedoga encounter
+DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_random_lightning_visual_effect';
+INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
+(56328,'spell_random_lightning_visual_effect');
+
 DELETE FROM `creature_summon_groups` WHERE `summonerId`=29310 AND `summonerType`=0;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES
 -- non combat
@@ -72,6 +76,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 (31457, 0, 0, 0, 0, 0, 0, '56572');
 
 -- Visuals
+-- Special thanks for Docmin for base data
 DELETE FROM `disables` WHERE `sourceType`=0 AND `entry` IN (56711, 56713);
 INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `params_0`, `params_1`, `comment`) VALUES
 (0, 56711, 64, '', '', 'Disable LOS for Image Channel'),
