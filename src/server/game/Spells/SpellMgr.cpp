@@ -2898,6 +2898,7 @@ void SpellMgr::LoadSpellCustomAttr()
                         case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
                         case SPELL_EFFECT_APPLY_AREA_AURA_PET:
                         case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
+                            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                             if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE ||
                                 spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE_PERCENT ||
                                 spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_DUMMY ||
