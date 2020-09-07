@@ -732,7 +732,6 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         bool IsFreeToMove();
         static constexpr uint32 MOVE_BACK_CHECK_INTERVAL = 3000;
         static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
-        uint32 m_moveBackMovementTime = MOVE_BACK_CHECK_INTERVAL;
         uint32 m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
 
     protected:
