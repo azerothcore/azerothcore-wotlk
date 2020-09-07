@@ -17,8 +17,6 @@
 #include "WaypointMovementGenerator.h"
 #include "RandomMovementGenerator.h"
 #include "EscortMovementGenerator.h"
-#include "MoveSpline.h"
-#include "MoveSplineInit.h"
 #include <cassert>
 
 inline bool isStatic(MovementGenerator *mv)
@@ -860,4 +858,13 @@ bool MotionMaster::GetDestination(float &x, float &y, float &z)
     y = dest.y;
     z = dest.z;
     return true;
+}
+
+void MotionMaster::LaunchCustomSpline(Movement::MoveSplineInit& init, uint32 id, MovementSlot slot)
+{
+    if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+        return;
+
+    init.Launch();
+    Mutate(new EffectMovementGenerator(id), slot);
 }

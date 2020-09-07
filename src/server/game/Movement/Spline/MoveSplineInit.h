@@ -11,6 +11,7 @@
 #include "PathGenerator.h"
 #include "Unit.h"
 
+enum UnitMoveType;
 class Unit;
 
 namespace Movement

@@ -12,6 +12,7 @@
 #include "SharedDefines.h"
 #include "Object.h"
 #include "Spline/MoveSpline.h"
+#include "Spline/MoveSplineInit.h"
 
 class MovementGenerator;
 class Unit;
@@ -201,6 +202,8 @@ class MotionMaster //: private std::stack<MovementGenerator *>
         void ReinitializeMovement();
 
         bool GetDestination(float &x, float &y, float &z);
+
+        void LaunchCustomSpline(Movement::MoveSplineInit& init, uint32 id, MovementSlot slot = MOTION_SLOT_ACTIVE);
     private:
         void Mutate(MovementGenerator *m, MovementSlot slot);                  // use Move* functions instead
 

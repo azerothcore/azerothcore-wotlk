@@ -391,12 +391,12 @@ class boss_algalon_the_observer : public CreatureScript
                         me->SetDisableGravity(true);
                         me->CastSpell(me, SPELL_ARRIVAL, true);
                         me->CastSpell(me, SPELL_RIDE_THE_LIGHTNING, true);
-                        me->GetMotionMaster()->MovePoint(POINT_ALGALON_LAND, AlgalonLandPos);
                         me->SetHomePosition(AlgalonLandPos);
                         Movement::MoveSplineInit init(me);
                         init.MoveTo(AlgalonLandPos.GetPositionX(), AlgalonLandPos.GetPositionY(), AlgalonLandPos.GetPositionZ());
                         init.SetOrientationFixed(true);
-                        init.Launch();
+                        me->GetMotionMaster()->LaunchCustomSpline(init, POINT_ALGALON_LAND, MOTION_SLOT_ACTIVE);
+
                         events.Reset();
                         events.SetPhase(PHASE_ROLE_PLAY);
                         events.ScheduleEvent(EVENT_INTRO_1, 5000, 0, PHASE_ROLE_PLAY);
@@ -495,23 +495,32 @@ class boss_algalon_the_observer : public CreatureScript
 
             void MovementInform(uint32 movementType, uint32 pointId)
             {
-                if (movementType != POINT_MOTION_TYPE)
-                    return;
-
-                if (pointId == POINT_ALGALON_LAND)
-                    me->SetDisableGravity(false);
-                else if (pointId == POINT_ALGALON_OUTRO)
+                if (movementType == EFFECT_MOTION_TYPE)
                 {
-                    me->SetFacingTo(1.605703f);
-                    events.ScheduleEvent(EVENT_OUTRO_3, 1200);
-                    events.ScheduleEvent(EVENT_OUTRO_4, 2400);
-                    events.ScheduleEvent(EVENT_OUTRO_5, 8500);
-                    events.ScheduleEvent(EVENT_OUTRO_6, 15500);
-                    events.ScheduleEvent(EVENT_OUTRO_7, 55500);
-                    events.ScheduleEvent(EVENT_OUTRO_8, 73500);
-                    events.ScheduleEvent(EVENT_OUTRO_9, 85500);
-                    events.ScheduleEvent(EVENT_OUTRO_10, 101500);
-                    events.ScheduleEvent(EVENT_OUTRO_11, 117500);
+                    if (pointId == POINT_ALGALON_LAND)
+                    {
+                        me->SetDisableGravity(false);
+                    }
+                }
+                else if (movementType == POINT_MOTION_TYPE)
+                {
+                    if (pointId == POINT_ALGALON_LAND)
+                    {
+                        me->SetDisableGravity(false);
+                    }
+                    else if (pointId == POINT_ALGALON_OUTRO)
+                    {
+                        me->SetFacingTo(1.605703f);
+                        events.ScheduleEvent(EVENT_OUTRO_3, 1200);
+                        events.ScheduleEvent(EVENT_OUTRO_4, 2400);
+                        events.ScheduleEvent(EVENT_OUTRO_5, 8500);
+                        events.ScheduleEvent(EVENT_OUTRO_6, 15500);
+                        events.ScheduleEvent(EVENT_OUTRO_7, 55500);
+                        events.ScheduleEvent(EVENT_OUTRO_8, 73500);
+                        events.ScheduleEvent(EVENT_OUTRO_9, 85500);
+                        events.ScheduleEvent(EVENT_OUTRO_10, 101500);
+                        events.ScheduleEvent(EVENT_OUTRO_11, 117500);
+                    }
                 }
             }
 
