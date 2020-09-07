@@ -61,8 +61,8 @@ constexpr float DATA_GROUND_POSITION_Z     = 11.308135f;
 
 enum Yells
 {
-    SAY_1                                   = 0,
-    SAY_WARNING                             = 1,
+    SAY_SPHERE_ACTIVATED                    = 0,
+    SAY_REMOVE_PRISON                       = 1,
     SAY_AGGRO                               = 2,
     SAY_SLAY                                = 3,
     SAY_DEATH                               = 4,
@@ -116,18 +116,21 @@ public:
                 me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation());
                 me->SetDisableGravity(false);
                 me->SetHover(false);
+                instance->HandleGameObject(instance->GetData64(DATA_PRINCE_TALDARAM_PLATFORM), true);
+
                 if (action == ACTION_REMOVE_PRISON)
                 {
                     DoCastSelf(SPELL_HOVER_FALL);
-                    me->GetMotionMaster()->MoveTargetedHome();
+                    me->GetMotionMaster()->MoveFall();
+                    Talk(SAY_REMOVE_PRISON);
                 }
                 // Teleport instantly
                 else
                 {
-                    me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation());
+                    me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation(), true);
                 }
 
-                instance->HandleGameObject(instance->GetData64(DATA_PRINCE_TALDARAM_PLATFORM), true);
+
             }
         }
 
@@ -372,23 +375,23 @@ public:
         if (!pInstance)
             return false;
 
-        Creature *pPrinceTaldaram = ObjectAccessor::GetCreature(*go, pInstance->GetData64(DATA_PRINCE_TALDARAM));
-        if (pPrinceTaldaram && pPrinceTaldaram->IsAlive())
-        {
-            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-            go->SetGoState(GO_STATE_ACTIVE);
+        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+        go->SetGoState(GO_STATE_ACTIVE);
 
-            uint32 const objectIndex = go->GetEntry() == GO_TELDARAM_SPHERE1 ? DATA_TELDRAM_SPHERE1 : DATA_TELDRAM_SPHERE2;
-            if (pInstance->GetData(objectIndex) == NOT_STARTED)
+        uint32 const objectIndex = go->GetEntry() == GO_TELDARAM_SPHERE1 ? DATA_TELDRAM_SPHERE1 : DATA_TELDRAM_SPHERE2;
+        if (pInstance->GetData(objectIndex) == NOT_STARTED)
+        {
+            Creature* taldaram = ObjectAccessor::GetCreature(*go, pInstance->GetData64(DATA_PRINCE_TALDARAM));
+            if (taldaram && taldaram->IsAlive())
             {
-                pInstance->SetData(objectIndex, DONE);
-                return true;
+                taldaram->AI()->Talk(SAY_SPHERE_ACTIVATED);
             }
 
-            pPrinceTaldaram->AI()->DoAction(ACTION_REMOVE_PRISON);
+            pInstance->SetData(objectIndex, DONE);
+            return true;
         }
 
-        return true;
+        return false;
     }
 };
 

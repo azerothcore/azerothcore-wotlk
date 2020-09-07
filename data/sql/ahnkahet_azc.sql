@@ -11,10 +11,12 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 (1113, 57055, 0),
 (1113, 56648, 0);
 
--- Teldram
+-- Teldaram
 delete from `spell_script_names` where `spell_id`=55931;
 insert into `spell_script_names` (`spell_id`, `ScriptName`) values
 ('55931','spell_prince_taldaram_conjure_flame_sphere');
+UPDATE `creature_text` SET `TextRange`='3',`comment`='prince taldaram SAY_SPHERE_ACTIVATED' WHERE  `CreatureID`=29308 AND `GroupID`=0 AND `ID`=0;
+UPDATE `creature_text` SET `TextRange`='3',`comment`='prince taldaram SAY_REMOVE_PRISON'  WHERE  `CreatureID`=29308 AND `GroupID`=1 AND `ID`=0;
 
 -- Jedoga encounter
 DELETE FROM `creature_summon_groups` WHERE `summonerId`=29310 AND `summonerType`=0;
