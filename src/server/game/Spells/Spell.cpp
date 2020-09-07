@@ -1379,8 +1379,8 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
             if (!m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) || (pos.GetPositionZ() - ground < distance))
             {
-                float tstX, tstY, tstZ, prevX, prevY, prevZ;
-                float tstZ1, tstZ2, tstZ3, destz1, destz2, destz3, srange, srange1, srange2, srange3;
+                float tstX = 0, tstY = 0, tstZ = 0, prevX = 0, prevY = 0, prevZ = 0;
+                float tstZ1 = 0, tstZ2 = 0, tstZ3 = 0, destz1 = 0, destz2 = 0, destz3 = 0, srange = 0, srange1 = 0, srange2 = 0, srange3 = 0;
                 float maxtravelDistZ = 2.65f;
                 float overdistance = 0.0f;
                 float totalpath = 0.0f;
