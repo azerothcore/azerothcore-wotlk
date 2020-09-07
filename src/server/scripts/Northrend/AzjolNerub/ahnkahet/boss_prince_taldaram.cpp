@@ -80,7 +80,7 @@ public:
     struct boss_taldaramAI : public BossAI
     {
         boss_taldaramAI(Creature* pCreature) : BossAI(pCreature, DATA_PRINCE_TALDARAM)
-        {         
+        {
         }
 
         void Reset() override
@@ -110,7 +110,6 @@ public:
                 me->SetDisableGravity(false);
                 me->SetHover(false);
                 me->RemoveAllAuras();
-                me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
 
                 me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation());
@@ -121,7 +120,8 @@ public:
                 if (action == ACTION_REMOVE_PRISON)
                 {
                     DoCastSelf(SPELL_HOVER_FALL);
-                    me->GetMotionMaster()->MoveFall();
+                    me->GetMotionMaster()->MoveLand(0, me->GetHomePosition(), 1.0f);
+
                     Talk(SAY_REMOVE_PRISON);
                 }
                 // Teleport instantly
@@ -184,6 +184,7 @@ public:
                 return;
 
             events.Update(diff);
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -271,8 +272,8 @@ public:
         void ScheduleCombatEvents()
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10000);
-            events.ScheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10000);
+            events.RescheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10000);
+            events.RescheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10000);
             vanishTarget = 0;
             vanishDamage = 0;
         }
