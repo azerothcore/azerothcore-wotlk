@@ -6,7 +6,6 @@
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "Player.h"
-#include <array>
 #include "ahnkahet.h"
 
 class instance_ahnkahet : public InstanceMapScript

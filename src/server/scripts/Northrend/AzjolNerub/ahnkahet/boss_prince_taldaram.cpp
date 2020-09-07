@@ -7,6 +7,7 @@
 #include "ahnkahet.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "Player.h"
 
 enum Spells
 {
@@ -57,8 +58,6 @@ enum Event
     EVENT_PRINCE_RESCHEDULE                 = 5,
 };
 
-constexpr float DATA_GROUND_POSITION_Z     = 11.308135f;
-
 enum Yells
 {
     SAY_SPHERE_ACTIVATED                    = 0,
@@ -69,6 +68,13 @@ enum Yells
     SAY_FEED                                = 5,
     SAY_VANISH                              = 6,
 };
+
+enum Points
+{
+    POINT_LAND                              = 1,
+};
+
+constexpr float DATA_GROUND_POSITION_Z     = 11.308135f;
 
 class boss_taldaram : public CreatureScript
 {
@@ -107,19 +113,13 @@ public:
         {
             if (action == ACTION_REMOVE_PRISON || action == ACTION_REMOVE_PRISON_AT_RESET)
             {
-                me->SetDisableGravity(false);
-                me->SetHover(false);
-                me->RemoveAllAuras();
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-
                 me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation());
                 instance->HandleGameObject(instance->GetData64(DATA_PRINCE_TALDARAM_PLATFORM), true);
 
                 if (action == ACTION_REMOVE_PRISON)
                 {
                     DoCastSelf(SPELL_HOVER_FALL);
-                    me->GetMotionMaster()->MoveLand(0, me->GetHomePosition(), 1.0f);
-
+                    me->GetMotionMaster()->MoveLand(POINT_LAND, me->GetHomePosition(), 8.0f);
                     Talk(SAY_REMOVE_PRISON);
                 }
                 // Teleport instantly
@@ -127,6 +127,17 @@ public:
                 {
                     me->UpdatePosition(me->GetHomePosition(), true);
                 }
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == EFFECT_MOTION_TYPE && id == POINT_LAND)
+            {
+                me->SetDisableGravity(false);
+                me->SetHover(false);
+                me->RemoveAllAuras();
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             }
         }
 
