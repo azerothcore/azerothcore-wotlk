@@ -58,7 +58,9 @@ public:
 
     struct boss_volazjAI : public BossAI
     {
-        boss_volazjAI(Creature* pCreature) : BossAI(pCreature, DATA_HERALD_VOLAZJ)
+        boss_volazjAI(Creature* pCreature) : BossAI(pCreature, DATA_HERALD_VOLAZJ),
+            insanityTimes(0),
+            insanityHandled(0)
         {
         }
 
@@ -82,7 +84,6 @@ public:
             events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8000);
             events.ScheduleEvent(EVENT_HERALD_SHADOW, 5000);
             events.ScheduleEvent(EVENT_HERALD_SHIVER, 15000);
-            events.ScheduleEvent(EVENT_HERALD_HEALTH, 1000);
         }
 
         void SpellHitTarget(Unit* pTarget, const SpellInfo *spell) override
@@ -283,18 +284,18 @@ public:
             }
 
             uint16 phase = 1;
-            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
+            for (uint64 const summonGUID : summons)
             {
-                if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                if (Creature* summon = ObjectAccessor::GetCreature(*me, summonGUID))
                     phase |= summon->GetPhaseMask();
             }
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+            for (auto const& i : players)
             {
-                if (Player* pPlayer = i->GetSource())
-                    if ((pPlayer->GetPhaseMask() & phase) == 0)
-                        pPlayer->RemoveAurasDueToSpell(GetSpellForPhaseMask(pPlayer->GetPhaseMask()));
+                Player* pPlayer = i.GetSource();
+                if (pPlayer && (pPlayer->GetPhaseMask() & phase) == 0)
+                    pPlayer->RemoveAurasDueToSpell(GetSpellForPhaseMask(pPlayer->GetPhaseMask()));
             }
 
             return false;

@@ -113,8 +113,6 @@ public:
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
 
                 me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation());
-                me->SetDisableGravity(false);
-                me->SetHover(false);
                 instance->HandleGameObject(instance->GetData64(DATA_PRINCE_TALDARAM_PLATFORM), true);
 
                 if (action == ACTION_REMOVE_PRISON)
@@ -127,7 +125,7 @@ public:
                 // Teleport instantly
                 else
                 {
-                    me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation(), true);
+                    me->UpdatePosition(me->GetHomePosition(), true);
                 }
             }
         }
