@@ -486,7 +486,6 @@ public:
         {
             if (activationTimer)
             {
-                activationTimer -= diff;
                 if (activationTimer <= diff)
                 {
                     me->CombatStop();
@@ -516,6 +515,8 @@ public:
 
                     activationTimer = 10000000;
                 }
+                else
+                    activationTimer -= diff;
 
                 return;
             }
