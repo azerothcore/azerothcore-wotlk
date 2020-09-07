@@ -74,7 +74,7 @@ FILE* MPQManager::GetFile(const std::string& path )
     RETURN_GUAD(mutex, false);
     MPQFile file(path.c_str());
     if (file.isEof())
-        return nullptrptr;
+        return nullptr;
     return file.GetFileStream();
 }
 
