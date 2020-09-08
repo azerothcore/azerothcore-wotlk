@@ -920,6 +920,12 @@ int ACE_POSIX_AIOCB_Proactor::delete_result_aiocb_list (void)
 
 void ACE_POSIX_AIOCB_Proactor::check_max_aio_num ()
 {
+#if !defined (ACE_ANDROID)
+  // Android API 23 introduced a define _POSIX_AIO_MAX 1 which gets used by _SC_AIO_MAX.
+  // Previously, without the define, the value returned was -1, which got ignored.
+  // Officially, the Android OS does not support AIO so if ACE_HAS_AIO_CALLS is defined
+  // then a 3rd party library must be in use and this check is invalid.
+
   long max_os_aio_num = ACE_OS::sysconf (_SC_AIO_MAX);
 
   // Define max limit AIO's for concrete OS
@@ -929,6 +935,7 @@ void ACE_POSIX_AIOCB_Proactor::check_max_aio_num ()
   if (max_os_aio_num > 0 &&
       aiocb_list_max_size_ > (unsigned long) max_os_aio_num)
      aiocb_list_max_size_ = max_os_aio_num;
+#endif
 
 #if defined (HPUX) || defined (__FreeBSD__)
   // Although HPUX 11.00 allows to start 2048 AIO's for all process in
@@ -967,40 +974,6 @@ void ACE_POSIX_AIOCB_Proactor::check_max_aio_num ()
   ACELIB_DEBUG ((LM_DEBUG,
              "(%P | %t) ACE_POSIX_AIOCB_Proactor::Max Number of AIOs=%d\n",
               aiocb_list_max_size_));
-
-#if defined(__sgi)
-
-   ACELIB_DEBUG((LM_DEBUG,
-              ACE_TEXT( "SGI IRIX specific: aio_init!\n")));
-
-//typedef struct aioinit {
-//    int aio_threads;  /* The number of aio threads to start (5) */
-//    int aio_locks;    /* Initial number of preallocated locks (3) */
-//    int aio_num;      /* estimated total simultanious aiobc structs (1000) */
-//    int aio_usedba;   /* Try to use DBA for raw I/O in lio_listio (0) */
-//    int aio_debug;    /* turn on debugging (0) */
-//    int aio_numusers; /* max number of user sprocs making aio_* calls (5) */
-//    int aio_reserved[3];
-//} aioinit_t;
-
-    aioinit_t  aioinit;
-
-    aioinit.aio_threads = 10; /* The number of aio threads to start (5) */
-    aioinit.aio_locks = 20;   /* Initial number of preallocated locks (3) */
-                       /* estimated total simultaneous aiobc structs (1000) */
-    aioinit.aio_num = aiocb_list_max_size_;
-    aioinit.aio_usedba = 0;   /* Try to use DBA for raw IO in lio_listio (0) */
-    aioinit.aio_debug = 0;    /* turn on debugging (0) */
-    aioinit.aio_numusers = 100; /* max number of user sprocs making aio_* calls (5) */
-    aioinit.aio_reserved[0] = 0;
-    aioinit.aio_reserved[1] = 0;
-    aioinit.aio_reserved[2] = 0;
-
-    aio_sgi_init (&aioinit);
-
-#endif
-
-    return;
 }
 
 void
@@ -1019,7 +992,6 @@ ACE_POSIX_AIOCB_Proactor::delete_notify_manager (void)
 {
   // We are responsible for delete as all pointers set to 0 after
   // delete, it is save to delete twice
-
   delete aiocb_notify_pipe_manager_;
   aiocb_notify_pipe_manager_ = 0;
 }
