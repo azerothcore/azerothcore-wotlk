@@ -6814,6 +6814,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 triggered_spell_id = isWrathSpell ? 48518 : 48517;
                 break;
             }
+            break;
         }
         case SPELLFAMILY_ROGUE:
         {
