@@ -11203,6 +11203,7 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
                        }
                     break;
                 }
+            break;
         case SPELL_DAMAGE_CLASS_RANGED:
         {
             // flat aura mods
