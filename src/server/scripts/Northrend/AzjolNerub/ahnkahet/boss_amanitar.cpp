@@ -252,7 +252,7 @@ public:
         void AttackStart(Unit* /*victim*/) override {}
         void EnterEvadeMode() override {}
 
-        void Reset()
+        void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
             DoCastSelf(SPELL_PUTRID_MUSHROOM);
