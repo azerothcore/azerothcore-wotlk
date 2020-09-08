@@ -416,7 +416,7 @@ class Battlefield : public ZoneScript
             Battlefield::BfCapturePointMap::const_iterator itr = m_capturePoints.find(lowguid);
             if (itr != m_capturePoints.end())
                 return itr->second;
-            return NULL;
+            return nullptr;
         }
 
         void RegisterZone(uint32 zoneid);

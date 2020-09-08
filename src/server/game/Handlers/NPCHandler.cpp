@@ -447,7 +447,7 @@ void WorldSession::SendSpiritResurrect()
     _player->DurabilityLossAll(0.25f, true);
 
     // get corpse nearest graveyard
-    GraveyardStruct const* corpseGrave = NULL;
+    GraveyardStruct const* corpseGrave = nullptr;
     Corpse* corpse = _player->GetCorpse();
     if (corpse)
         corpseGrave = sGraveyard->GetClosestGraveyard(corpse->GetPositionX(), corpse->GetPositionY(), corpse->GetPositionZ(), corpse->GetMapId(), _player->GetTeamId());

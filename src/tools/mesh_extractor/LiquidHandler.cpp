@@ -33,7 +33,7 @@ void LiquidHandler::HandleNewLiquid()
         if (h.LayerCount == 0)
         {
             // Need to fill in missing data with dummies.
-            MCNKData.push_back(MCNKLiquidData(NULL, H2ORenderMask()));
+            MCNKData.push_back(MCNKLiquidData(nullptr, H2ORenderMask()));
             continue;
         }
         fseek(stream, chunk->Offset + h.OffsetInformation, SEEK_SET);
