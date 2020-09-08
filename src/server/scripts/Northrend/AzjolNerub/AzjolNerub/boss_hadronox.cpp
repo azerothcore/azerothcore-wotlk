@@ -172,8 +172,8 @@ class boss_hadronox : public CreatureScript
                         events.ScheduleEvent(EVENT_HADRONOX_GRAB, 25000);
                         break;
                     case EVENT_HADRONOX_MOVE4:
-                        #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                         me->CastSpell(me, SPELL_WEB_FRONT_DOORS, true);
+                        [[fallthrough]]; // note: not sure if it's intended here
                     case EVENT_HADRONOX_MOVE1:
                     case EVENT_HADRONOX_MOVE2:
                     case EVENT_HADRONOX_MOVE3:

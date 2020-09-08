@@ -372,9 +372,8 @@ void WorldSession::SendLfgUpdateParty(lfg::LfgUpdateData const& updateData)
     switch (updateData.updateType)
     {
         case lfg::LFG_UPDATETYPE_ADDED_TO_QUEUE:                // Rolecheck Success
-            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             queued = true;
-            // no break on purpose
+            [[fallthrough]];
         case lfg::LFG_UPDATETYPE_PROPOSAL_BEGIN:
             join = true;
             break;

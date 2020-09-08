@@ -27,14 +27,13 @@ void LfgGroupData::SetState(LfgState state)
     switch (state)
     {
         case LFG_STATE_NONE:
-            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             m_Dungeon = 0;
             m_KicksLeft = LFG_GROUP_MAX_KICKS;
+            [[fallthrough]];
         case LFG_STATE_FINISHED_DUNGEON:
         case LFG_STATE_DUNGEON:
-            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             m_OldState = state;
-            // No break on purpose
+            [[fallthrough]];
         default:
             m_State = state;
     }

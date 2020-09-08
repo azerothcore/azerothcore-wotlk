@@ -10016,13 +10016,12 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
                 break;
             // Wintergrasp
             case 4197:
-                #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                 if (bf && bf->GetTypeId() == BATTLEFIELD_WG)
                 {
                     bf->FillInitialWorldStates(data);
                     break;
                 }
-            // No break here, intended.
+                [[fallthrough]];
             default:
                 data << uint32(0x914) << uint32(0x0);           // 7
                 data << uint32(0x913) << uint32(0x0);           // 8

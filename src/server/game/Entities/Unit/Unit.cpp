@@ -2911,7 +2911,6 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
             return MeleeSpellHitResult(victim, spell);
         case SPELL_DAMAGE_CLASS_NONE:
         {
-            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             if (spell->SpellFamilyName)
             {
                 return SPELL_MISS_NONE;
@@ -2921,7 +2920,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
                 if (spell->Effects[i].Effect && spell->Effects[i].Effect != SPELL_EFFECT_SCHOOL_DAMAGE)
                     if (spell->Effects[i].ApplyAuraName != SPELL_AURA_PERIODIC_DAMAGE)
                         return SPELL_MISS_NONE;
-            // no break intended
+            [[fallthrough]];
         }
         case SPELL_DAMAGE_CLASS_MAGIC:
             return MagicSpellHitResult(victim, spell);

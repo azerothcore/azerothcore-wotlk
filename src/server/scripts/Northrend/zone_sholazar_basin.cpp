@@ -1259,7 +1259,6 @@ public:
             {
                 case EVENT_MISS_BIRD:
                 {
-                    #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                     Creature* crunchy = shooter->FindNearestCreature(NPC_CRUNCHY, 30);
                     Creature* bird = shooter->FindNearestCreature(NPC_THICKBIRD, 30);
 
@@ -1279,6 +1278,7 @@ public:
 
                         break;
                     }
+                    [[fallthrough]];
                 }
                 case EVENT_MISS:
                 {

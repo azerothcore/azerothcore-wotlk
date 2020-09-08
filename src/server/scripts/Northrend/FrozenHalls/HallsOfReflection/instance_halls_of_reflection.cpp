@@ -522,7 +522,6 @@ public:
                     DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_RETREATING_TIMED_EVENT);
                     break;
                 case ACTION_STOP_LK_FIGHT:
-                    #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                     if (!IsDuringLKFight)
                     {
                         break;
@@ -571,7 +570,7 @@ public:
                     IsDuringLKFight = false;
                     outroTimer = 0;
                     outroStep = 0;
-                    // no break intended
+                    [[fallthrough]];
                 case ACTION_DELETE_ICE_WALL:
                     HandleGameObject(GO_IceWallGUID, true);
                     GO_IceWallGUID = 0;

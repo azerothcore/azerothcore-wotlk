@@ -1095,14 +1095,13 @@ class instance_icecrown_citadel : public InstanceMapScript
                         switch (state)
                         {
                             case DONE:
-                                #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                                 if (GameObject* loot = instance->GetGameObject(DeathbringersCacheGUID))
                                 {
                                     if (Creature* deathbringer = instance->GetCreature(DeathbringerSaurfangGUID))
                                         loot->SetLootRecipient(deathbringer->GetLootRecipient());
                                     loot->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
                                 }
-                                // no break
+                                [[fallthrough]];
                             case NOT_STARTED:
                                 if (GameObject* teleporter = instance->GetGameObject(SaurfangTeleportGUID))
                                 {
@@ -1460,12 +1459,11 @@ class instance_icecrown_citadel : public InstanceMapScript
                 switch (bossId)
                 {
                     case DATA_THE_LICH_KING:
-                        #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                         if (GetBossState(DATA_PROFESSOR_PUTRICIDE) != DONE)
                         {
                             return false;
                         }
-                        // no break
+                        [[fallthrough]];
                     case DATA_PROFESSOR_PUTRICIDE:
                         if (GetBossState(DATA_FESTERGUT) != DONE || GetBossState(DATA_ROTFACE) != DONE)
                             return false;
@@ -1482,12 +1480,11 @@ class instance_icecrown_citadel : public InstanceMapScript
                 switch (bossId)
                 {
                     case DATA_THE_LICH_KING:
-                        #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                         if (GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != DONE)
                         {
                             return false;
                         }
-                        // no break
+                        [[fallthrough]];
                     case DATA_BLOOD_QUEEN_LANA_THEL:
                         if (GetBossState(DATA_BLOOD_PRINCE_COUNCIL) != DONE)
                             return false;
@@ -1504,12 +1501,11 @@ class instance_icecrown_citadel : public InstanceMapScript
                 switch (bossId)
                 {
                     case DATA_THE_LICH_KING:
-                        #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                         if (GetBossState(DATA_SINDRAGOSA) != DONE)
                         {
                             return false;
                         }
-                        // no break
+                        [[fallthrough]];
                     case DATA_SINDRAGOSA:
                         if (GetBossState(DATA_VALITHRIA_DREAMWALKER) != DONE)
                         {
@@ -1539,33 +1535,29 @@ class instance_icecrown_citadel : public InstanceMapScript
                     case DATA_BLOOD_PRINCE_COUNCIL:
                     case DATA_ROTFACE:
                     case DATA_FESTERGUT:
-                        #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                         if (GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE)
                         {
                             return false;
                         }
-                        // no break
+                        [[fallthrough]];
                     case DATA_DEATHBRINGER_SAURFANG:
-                        #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                         if (GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                         {
                             return false;
                         }
-                        // no break
+                        [[fallthrough]];
                     case DATA_ICECROWN_GUNSHIP_BATTLE:
-                        #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                         if (GetBossState(DATA_LADY_DEATHWHISPER) != DONE)
                         {
                             return false;
                         }
-                        // no break
+                        [[fallthrough]];
                     case DATA_LADY_DEATHWHISPER:
-                        #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                         if (GetBossState(DATA_LORD_MARROWGAR) != DONE)
                         {
                             return false;
                         }
-                        // no break
+                        [[fallthrough]];
                     case DATA_LORD_MARROWGAR:
                     default:
                         break;
@@ -1776,12 +1768,11 @@ class instance_icecrown_citadel : public InstanceMapScript
                         }
                         break;
                     case EVENT_ENEMY_GUNSHIP_COMBAT:
-                        #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                         if (Creature* captain = source->FindNearestCreature(TeamIdInInstance == TEAM_HORDE ? NPC_IGB_HIGH_OVERLORD_SAURFANG : NPC_IGB_MURADIN_BRONZEBEARD, 200.0f))
                         {
                             captain->AI()->DoAction(ACTION_ENEMY_GUNSHIP_TALK);
                         }
-                        // no break;
+                        [[fallthrough]];
                     case EVENT_PLAYERS_GUNSHIP_SPAWN:
                     case EVENT_PLAYERS_GUNSHIP_COMBAT:
                         if (GameObject* go = source->ToGameObject())

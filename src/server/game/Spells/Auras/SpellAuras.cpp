@@ -2637,8 +2637,8 @@ void UnitAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* caster)
                         break;
                     }
                     case SPELL_EFFECT_APPLY_AREA_AURA_PET:
-                        #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                         targetList.push_back(GetUnitOwner());
+                        [[fallthrough]]; // note: not sure if it's intended here
                     case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
                     {
                         if (Unit* owner = GetUnitOwner()->GetCharmerOrOwner())

@@ -590,10 +590,10 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
      switch (GetAuraType())
     {
         case SPELL_AURA_OBS_MOD_POWER:
-            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             // 3 spells have no amplitude set
             if (!m_amplitude)
                 m_amplitude = 1 * IN_MILLISECONDS;
+            [[fallthrough]]; // note: not sure if it's intended here
         case SPELL_AURA_PERIODIC_DAMAGE:
         case SPELL_AURA_PERIODIC_HEAL:
         case SPELL_AURA_OBS_MOD_HEALTH:

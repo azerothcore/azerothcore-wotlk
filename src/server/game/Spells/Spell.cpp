@@ -3565,13 +3565,13 @@ void Spell::cancel(bool bySelf)
     switch (oldState)
     {
         case SPELL_STATE_PREPARING:
-            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             CancelGlobalCooldown();
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
                 if (m_caster->ToPlayer()->NeedSendSpectatorData())
                     ArenaSpectator::SendCommand_Spell(m_caster->FindMap(), m_caster->GetGUID(), "SPE", m_spellInfo->Id, bySelf ? 99998 : 99999);
             }
+            [[fallthrough]]; // note: not sure if it's intended here
         case SPELL_STATE_DELAYED:
             SendInterrupted(0);
             // xinef: fixes bugged gcd reset in some cases
@@ -7490,10 +7490,10 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             }
             break;
         /*case SPELL_EFFECT_CHARGE:
-            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             if (MMAP::MMapFactory::IsPathfindingEnabled(m_caster->FindMap()))
-                break;*/
-            // else no break intended
+                break;
+            [[fallthrough]];
+        */
 
         case SPELL_EFFECT_SUMMON_RAF_FRIEND:
             if (m_caster->GetTypeId() != TYPEID_PLAYER || target->GetTypeId() != TYPEID_PLAYER)

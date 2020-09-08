@@ -643,11 +643,11 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid
             switch (spellid)
             {
                 case REACT_PASSIVE:                         //passive
-                    #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                     pet->AttackStop();
                     if (pet->ToPet())
                         pet->ToPet()->ClearCastWhenWillAvailable();
                     pet->ClearInPetCombat();
+                    [[fallthrough]]; // note: not sure if it's intended here
 
                 case REACT_DEFENSIVE:                       //recovery
                 case REACT_AGGRESSIVE:                      //activete

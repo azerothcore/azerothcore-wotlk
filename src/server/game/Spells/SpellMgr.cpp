@@ -2898,7 +2898,6 @@ void SpellMgr::LoadSpellCustomAttr()
                         case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
                         case SPELL_EFFECT_APPLY_AREA_AURA_PET:
                         case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
-                            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
                             if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE ||
                                 spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE_PERCENT ||
                                 spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_DUMMY ||
@@ -2906,6 +2905,7 @@ void SpellMgr::LoadSpellCustomAttr()
                                 spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_HEALTH_FUNNEL ||
                                 spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DUMMY)
                                 continue;
+                            [[fallthrough]]; // note: not sure if it's intended here
                         default:
                             if (spellInfo->Effects[j].CalcValue() || ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) && !spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY)))
                                 if (spellInfo->Id != 69649 && spellInfo->Id != 71056 && spellInfo->Id != 71057 && spellInfo->Id != 71058 && spellInfo->Id != 73061 && spellInfo->Id != 73062 && spellInfo->Id != 73063 && spellInfo->Id != 73064) // Sindragosa Frost Breath
@@ -4786,10 +4786,9 @@ void SpellMgr::LoadDbcDataCorrections()
             break;
         // Arcane Overload
         case 56430:
-            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
             spellInfo->EffectTriggerSpell[0] = 56429;
-            // no break intended
+            [[fallthrough]];
         case 56429:
             spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
             spellInfo->EffectImplicitTargetB[0] = 0;
@@ -5154,13 +5153,12 @@ void SpellMgr::LoadDbcDataCorrections()
             break;
         // Trial of the Crusader, Gormok, Fire Bomb
         case 66313:
-            #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
             spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
             spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_TARGET_ANY;
             spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;
             spellInfo->EffectImplicitTargetB[1] = TARGET_DEST_TARGET_ANY;
             spellInfo->Effect[1] = 0;
-            // no break intended
+            [[fallthrough]];
         case 66317:
             spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
             spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
