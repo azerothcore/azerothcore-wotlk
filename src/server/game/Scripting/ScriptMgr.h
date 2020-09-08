@@ -787,13 +787,16 @@ class AchievementCriteriaScript : public ScriptObject
 
         bool IsDatabaseBound() const { return true; }
 
+// TODO: manually silencing this warning, but it should properly fixed
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
         // Called when an additional criteria is checked.
-        #pragma GCC diagnostic ignored "-Woverloaded-virtual"
         virtual bool OnCheck(Player* source, Unit* target, uint32 /*criteria_id*/) {
             return OnCheck(source, target);
         }
         // deprecated/legacy
         virtual bool OnCheck(Player* /*source*/, Unit* /*target*/) { return true; };
+#pragma GCC diagnostic pop
 };
 
 class PlayerScript : public ScriptObject
