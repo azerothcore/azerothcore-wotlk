@@ -11092,9 +11092,9 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
                     switch ((*i)->GetMiscValue())
                     {
                         // Shatter
-                        case  911: modChance+= 16;
-                        case  910: modChance+= 17;
-                        case  849: modChance+= 17;
+                        case 911: modChance+= 16; [[fallthrough]];
+                        case 910: modChance+= 17; [[fallthrough]];
+                        case 849: modChance+= 17;
                             if (!HasAuraState(AURA_STATE_FROZEN, spellProto, caster))
                                 break;
                             crit_chance+=modChance;
