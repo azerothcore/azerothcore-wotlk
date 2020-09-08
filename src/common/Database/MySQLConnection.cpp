@@ -4,18 +4,7 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-
 #include "Common.h"
-
-#ifdef _WIN32
-  #include <winsock2.h>
-#endif
-#include <mysql.h>
-#include <mysqld_error.h>
-#include <errmsg.h>
-#include <chrono>
-#include <thread>
-
 #include "MySQLConnection.h"
 #include "MySQLThreading.h"
 #include "QueryResult.h"
@@ -24,9 +13,15 @@
 #include "DatabaseWorker.h"
 #include "Timer.h"
 #include "Log.h"
+#include "Duration.h"
+#include <mysql.h>
+#include <mysqld_error.h>
+#include <errmsg.h>
+#include <thread>
 
-using namespace std::this_thread;
-using namespace std::chrono;
+#ifdef _WIN32
+#include <winsock2.h>
+#endif
 
 MySQLConnection::MySQLConnection(MySQLConnectionInfo& connInfo) :
 m_reconnecting(false),
@@ -113,7 +108,6 @@ bool MySQLConnection::Open()
 
     // Possible improvement for future: make ATTEMPTS and SECONDS configurable values
     uint32 const ATTEMPTS = 180;
-    uint32 const SECONDS = 10;
 
     uint32 count = 0;
     do {
@@ -153,7 +147,7 @@ bool MySQLConnection::Open()
             count++;
             sLog->outError("Could not connect to MySQL database at %s: %s\n", m_connectionInfo.host.c_str(), mysql_error(mysqlInit));
             sLog->outError("Retrying in 10 seconds...\n\n");
-            sleep_for(seconds(SECONDS));
+            std::this_thread::sleep_for(10s);
         }
     } while (!m_Mysql && count < ATTEMPTS);
 
@@ -537,7 +531,7 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo)
             }
 
             uint32 lErrno = mysql_errno(GetHandle());   // It's possible this attempted reconnect throws 2006 at us. To prevent crazy recursive calls, sleep here.
-            ACE_OS::sleep(3);                           // Sleep 3 seconds
+            std::this_thread::sleep_for(3s);            // Sleep 3 seconds
             return _HandleMySQLErrno(lErrno);           // Call self (recursive)
         }
 
@@ -552,12 +546,12 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo)
         case ER_BAD_FIELD_ERROR:
         case ER_NO_SUCH_TABLE:
             sLog->outError("Your database structure is not up to date. Please make sure you've executed all queries in the sql/updates folders.");
-            ACE_OS::sleep(10);
+            std::this_thread::sleep_for(10s);
             std::abort();
             return false;
         case ER_PARSE_ERROR:
             sLog->outError("Error while parsing SQL. Core fix required.");
-            ACE_OS::sleep(10);
+            std::this_thread::sleep_for(10s);
             std::abort();
             return false;
         default:

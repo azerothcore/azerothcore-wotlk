@@ -340,7 +340,7 @@ std::string Log::GetTimestampStr()
 {
     time_t t = time(NULL);
     tm aTm;
-    ACE_OS::localtime_r(&t, &aTm);
+    localtime_r(&t, &aTm);
     //       YYYY   year
     //       MM     month (2 digits 01-12)
     //       DD     day (2 digits 01-31)

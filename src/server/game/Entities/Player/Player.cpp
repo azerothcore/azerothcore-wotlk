@@ -27409,7 +27409,7 @@ void Player::_LoadBrewOfTheMonth(PreparedQueryResult result)
 
     time_t curtime = time(nullptr);
     tm localTime;
-    ACE_OS::localtime_r(&curtime, &localTime);
+    localtime_r(&curtime, &localTime);
 
     uint16 month = uint16(localTime.tm_mon);
     uint16 eventId = month;

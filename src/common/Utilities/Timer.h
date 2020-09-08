@@ -7,13 +7,23 @@
 #ifndef ACORE_TIMER_H
 #define ACORE_TIMER_H
 
-#include "ace/OS_NS_sys_time.h"
 #include "Common.h"
+#include "Duration.h"
+
+inline TimePoint GetApplicationStartTime()
+{
+    using namespace std::chrono;
+
+    static const steady_clock::time_point ApplicationStartTime = steady_clock::now();
+
+    return ApplicationStartTime;
+}
 
 inline uint32 getMSTime()
 {
-    static const ACE_Time_Value ApplicationStartTime = ACE_OS::gettimeofday();
-    return (ACE_OS::gettimeofday() - ApplicationStartTime).msec();
+    using namespace std::chrono;
+
+    return uint32(duration_cast<milliseconds>(steady_clock::now() - GetApplicationStartTime()).count());
 }
 
 inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
@@ -23,6 +33,14 @@ inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
         return (0xFFFFFFFF - oldMSTime) + newMSTime;
     else
         return newMSTime - oldMSTime;
+}
+
+inline uint32 getMSTimeDiff(uint32 oldMSTime, TimePoint newTime)
+{
+    using namespace std::chrono;
+
+    uint32 newMSTime = uint32(duration_cast<milliseconds>(newTime - GetApplicationStartTime()).count());
+    return getMSTimeDiff(oldMSTime, newMSTime);
 }
 
 inline uint32 GetMSTimeDiffToNow(uint32 oldMSTime)
