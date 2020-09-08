@@ -13,7 +13,7 @@ jobs:
       matrix:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
         os: [ubuntu-20.04]
-        compiler: [clang6, clang9, clang10, gcc, gcc10]
+        compiler: [clang6, clang9, clang10]
         modules: [with, without]
         # we can include specific combinations here
         include:
@@ -21,7 +21,13 @@ jobs:
             compiler: clang
             modules: without
           - os: ubuntu-18.04
-            compiler: gcc
+            compiler: gcc # default in 18.04 is 7
+            modules: without
+          - os: ubuntu-20.04
+            compiler: gcc # default in 20.04 is 9
+            modules: without
+          - os: ubuntu-20.04
+            compiler: gcc10
             modules: without
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
