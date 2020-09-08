@@ -241,7 +241,7 @@ public:
                     {
                         drake->AI()->Talk(0);
                     }
-                    break;
+                    [[fallthrough]]; // note: not sure if it's intended here
                 }
                 case EVENT_THRALL_REPOSITION:
                 {
