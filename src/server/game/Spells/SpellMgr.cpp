@@ -4376,6 +4376,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 57619: // WintergraspDemolisher - Spell Hourl Boulder - EffectRadiusIndex
         case 57610: // Cannon (Siege Turret)
             spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_25_YARDS; // SPELL_EFFECT_WMO_DAMAGE
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 51422: // WintergraspCannon - Spell Fire Cannon - EffectRadiusIndex
             spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS; // SPELL_EFFECT_SCHOOL_DAMAGE
             break;
