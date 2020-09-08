@@ -556,7 +556,7 @@ class spell_jedoga_sacrafice_beam : public SpellScriptLoader
     {
         PrepareAuraScript(spell_jedoga_sacrafice_beam_AuraScript);
 
-        void HandleRemoval(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+        void HandleRemoval(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT)
             {
@@ -569,7 +569,7 @@ class spell_jedoga_sacrafice_beam : public SpellScriptLoader
 
         void Register() override
         {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_jedoga_sacrafice_beam_AuraScript::HandleRemoval, EFFECT_0, SPELL_AURA_DUMMY, AuraEffectHandleModes::AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_jedoga_sacrafice_beam_AuraScript::HandleRemoval, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
