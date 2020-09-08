@@ -6814,7 +6814,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 triggered_spell_id = isWrathSpell ? 48518 : 48517;
                 break;
             }
-            [[fallthrough]]; // note: not sure if it's intended here
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         }
         case SPELLFAMILY_ROGUE:
         {
@@ -8596,7 +8596,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
 
             target = this;
             trigger_spell_id = 22588;
-            [[fallthrough]]; // note: not sure if it's intended here
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         }
         // Bonus Healing (Crystal Spire of Karabor mace)
         case 40971:
@@ -11203,7 +11203,7 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
                        }
                     break;
                 }
-            [[fallthrough]]; // note: not sure if it's intended here
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case SPELL_DAMAGE_CLASS_RANGED:
         {
             // flat aura mods
