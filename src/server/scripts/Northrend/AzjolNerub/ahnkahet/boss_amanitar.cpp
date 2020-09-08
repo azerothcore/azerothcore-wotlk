@@ -6,6 +6,7 @@
 #include "ScriptedCreature.h"
 #include "ahnkahet.h"
 #include "Player.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -364,9 +365,9 @@ public:
 
 void AddSC_boss_amanitar()
 {
-    new boss_amanitar;
-    new npc_amanitar_mushrooms;
+    new boss_amanitar();
+    new npc_amanitar_mushrooms();
 
     // Spells
-    new spell_amanitar_remove_mushroom_power;
+    new spell_amanitar_remove_mushroom_power();
 }
