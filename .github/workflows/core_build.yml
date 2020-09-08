@@ -20,15 +20,6 @@ jobs:
           - os: ubuntu-18.04
             compiler: clang
             modules: without
-          - os: ubuntu-18.04
-            compiler: gcc # default in 18.04 is 7
-            modules: without
-          - os: ubuntu-20.04
-            compiler: gcc # default in 20.04 is 9
-            modules: without
-          - os: ubuntu-20.04
-            compiler: gcc10
-            modules: without
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
