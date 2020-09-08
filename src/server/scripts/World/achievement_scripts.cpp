@@ -20,15 +20,11 @@ class achievement_resilient_victory : public AchievementCriteriaScript
     public:
         achievement_resilient_victory() : AchievementCriteriaScript("achievement_resilient_victory") { }
 
-// TODO: manually silencing this warning, but it should properly fixed
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Woverloaded-virtual"
         bool OnCheck(Player* source, Unit* /*target*/)
         {
             Battleground* bg = source->GetBattleground();
             return bg && bg->GetBgTypeID(true) == BATTLEGROUND_AB && bg->ToBattlegroundAB()->IsTeamScores500Disadvantage(source->GetTeamId());
         }
-#pragma GCC diagnostic pop
 };
 
 class achievement_bg_control_all_nodes : public AchievementCriteriaScript
