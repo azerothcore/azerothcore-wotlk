@@ -32,6 +32,15 @@ DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_random_lightning_visu
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
 (56328,'spell_random_lightning_visual_effect');
 
+DELETE FROM `spell_script_names` WHERE `spell_id`=56150 AND `ScriptName`='spell_jedoga_sacrafice_beam';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(56150, 'spell_jedoga_sacrafice_beam');
+
+DELETE FROM `creature_text` WHERE `CreatureID`=30385;
+INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES
+(30385,0,0,'I have been chosen!',14,0,100,0,0,0,31179,0,'SAY_CHOSEN'),
+(30385,1,0,'I give myself to the master!',14,0,100,0,0,0,30863,0,'SAY_SACRIFICED');
+
 DELETE FROM `creature_summon_groups` WHERE `summonerId`=29310 AND `summonerType`=0;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES
 -- non combat
