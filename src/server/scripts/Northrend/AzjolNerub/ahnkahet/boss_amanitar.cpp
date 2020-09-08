@@ -5,6 +5,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ahnkahet.h"
+#include "Player.h"
 
 enum Spells
 {
@@ -292,7 +293,6 @@ public:
                 case EVENT_GROW:
                 {
                     DoCastSelf(SPELL_GROW);
-                    me->SetObjectScale(1.0f);
                     break;
                 }
                 case EVENT_CHECK_PLAYER:
