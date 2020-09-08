@@ -341,7 +341,7 @@ public:
     {
         PrepareAuraScript(spell_amanitar_remove_mushroom_power_AuraScript);
 
-        void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+        void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
             if (!target)

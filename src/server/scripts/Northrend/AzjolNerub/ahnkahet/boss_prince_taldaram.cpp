@@ -310,7 +310,7 @@ public:
             me->InterruptNonMeleeSpells(true);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo *spellInfo) override
+        void SpellHitTarget(Unit* /*target*/, const SpellInfo *spellInfo) override
         {
             if (spellInfo->Id == SPELL_CONJURE_FLAME_SPHERE)
             {

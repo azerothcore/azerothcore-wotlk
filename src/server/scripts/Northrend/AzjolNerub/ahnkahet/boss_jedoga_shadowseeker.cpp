@@ -529,7 +529,7 @@ public:
 
     private:
         InstanceScript* pInstance;
-        int32 activationTimer;
+        uint32 activationTimer;
     };
 
     CreatureAI *GetAI(Creature *creature) const
