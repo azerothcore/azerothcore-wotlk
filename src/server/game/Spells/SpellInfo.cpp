@@ -165,7 +165,7 @@ uint32 SpellImplicitTargetInfo::GetExplicitTargetMask(bool& srcSet, bool& dstSet
                                 targetMask = TARGET_FLAG_UNIT_PASSENGER;
                                 break;
                             case TARGET_CHECK_RAID_CLASS:
-                                // nobreak;
+                                [[fallthrough]];
                             default:
                                 targetMask = TARGET_FLAG_UNIT;
                                 break;
