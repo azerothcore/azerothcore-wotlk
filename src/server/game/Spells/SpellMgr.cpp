@@ -5265,6 +5265,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 67274: // light surge 1
             spellInfo->excludeTargetAuraSpell = 67222;
             break;
