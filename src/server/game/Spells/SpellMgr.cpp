@@ -5274,6 +5274,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 67275: // light surge 2
             spellInfo->excludeTargetAuraSpell = 67223;
             break;
@@ -5282,6 +5283,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 67276: // light surge 3
             spellInfo->excludeTargetAuraSpell = 67224;
             break;
@@ -5290,6 +5292,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 65769: // dark surge 0
             spellInfo->excludeTargetAuraSpell = 65684;
             break;
@@ -5298,6 +5301,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 67265: // dark surge 1
             spellInfo->excludeTargetAuraSpell = 67176;
             break;
@@ -5306,6 +5310,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 67266: // dark surge 2
             spellInfo->excludeTargetAuraSpell = 67177;
             break;
@@ -5314,6 +5319,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 67267: // dark surge 3
             spellInfo->excludeTargetAuraSpell = 67178;
             break;
