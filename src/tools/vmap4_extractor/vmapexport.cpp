@@ -148,7 +148,7 @@ bool ExtractSingleWmo(std::string& fname)
     int p = 0;
     // Select root wmo files
     char const* rchr = strrchr(plain_name, '_');
-    if (rchr != NULL)
+    if (rchr != nullptr)
     {
         char cpy[4];
         memcpy(cpy, rchr, 4);
@@ -185,10 +185,15 @@ bool ExtractSingleWmo(std::string& fname)
         for (uint32 i = 0; i < froot.nGroups; ++i)
         {
             char temp[1024];
-            strcpy(temp, fname.c_str());
+            strncpy(temp, fname.c_str(), 1024);
             temp[fname.length()-4] = 0;
             char groupFileName[1024];
-            sprintf(groupFileName, "%s_%03u.wmo", temp, i);
+            int ret = snprintf(groupFileName, 1024, "%s_%03u.wmo", temp, i);
+            if (ret < 0)
+            {
+                printf("Error when formatting string");
+                return false;
+            }
             //printf("Trying to open groupfile %s\n",groupFileName);
 
             string s = groupFileName;
@@ -340,7 +345,12 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
 
     // now, scan for the patch levels in the core dir
     printf("Scanning patch levels from data directory.\n");
-    sprintf(path, "%spatch", input_path);
+    int ret = snprintf(path, 512, "%spatch", input_path);
+    if (ret < 0)
+    {
+        printf("Error when formatting string");
+        return false;
+    }
     if (!scan_patches(path, pArchiveNames))
         return(false);
 
@@ -350,7 +360,12 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
     for (std::vector<std::string>::iterator i = locales.begin(); i != locales.end(); ++i)
     {
         printf("Locale: %s\n", i->c_str());
-        sprintf(path, "%s%s/patch-%s", input_path, i->c_str(), i->c_str());
+        int ret2 = snprintf(path, 512, "%s%s/patch-%s", input_path, i->c_str(), i->c_str());
+        if (ret2 < 0)
+        {
+            printf("Error when formatting string");
+            return false;
+        }
         if(scan_patches(path, pArchiveNames))
             foundOne = true;
     }
