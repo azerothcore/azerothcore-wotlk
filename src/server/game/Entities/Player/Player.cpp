@@ -3637,29 +3637,28 @@ void Player::UpdateNextMailTimeAndUnreads()
 {
     //Update the next delivery time and unread mails
     time_t cTime = time(nullptr);
+    //Update the next delivery time and unread mails
+    time_t cTime = time(nullptr);
+    //Get the next delivery time
+    PreparedStatement* stmtNextDeliveryTime = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NEXT_MAIL_DELIVERYTIME);
+    stmtNextDeliveryTime->setUInt64(0, GetGUIDLow());
+    stmtNextDeliveryTime->setUInt64(1, cTime);
+    PreparedQueryResult resultNextDeliveryTime = CharacterDatabase.Query(stmtNextDeliveryTime);
+    if (resultNextDeliveryTime)
     {
-        //Get the next delivery time
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NEXT_MAIL_DELIVERYTIME);
-        stmt->setUInt64(0, GetGUIDLow());
-        stmt->setUInt64(1, cTime);
-        PreparedQueryResult result = CharacterDatabase.Query(stmt);
-        if (result)
-        {
-            Field* fields = result->Fetch();
-            m_nextMailDelivereTime = fields[0].GetUInt64();
-        }
+        Field* fields = resultNextDeliveryTime->Fetch();
+        m_nextMailDelivereTime = fields[0].GetUInt64();
     }
+
+    //Get unread mails count
+    PreparedStatement* stmtUnreadAmount = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH);
+    stmtUnreadAmount->setUInt64(0, GetGUIDLow());
+    stmtUnreadAmount->setUInt64(1, cTime);
+    PreparedQueryResult resultUnreadAmount = CharacterDatabase.Query(stmtUnreadAmount);
+    if (resultUnreadAmount)
     {
-        //Get unread mails count
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH);
-        stmt->setUInt64(0, GetGUIDLow());
-        stmt->setUInt64(1, cTime);
-        PreparedQueryResult result = CharacterDatabase.Query(stmt);
-        if (result)
-        {
-            Field* fields = result->Fetch();
-            unReadMails = uint8(fields[0].GetUInt64());
-        }
+        Field* fields = resultUnreadAmount->Fetch();
+        unReadMails = uint8(fields[0].GetUInt64());
     }
 }
 
