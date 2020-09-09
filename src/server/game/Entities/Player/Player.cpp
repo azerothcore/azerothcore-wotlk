@@ -955,7 +955,9 @@ Player::~Player()
 
     //all mailed items should be deleted, also all mail should be deallocated
     for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
+    {
         delete *itr;
+    }
 
     for (ItemMap::iterator iter = mMitems.begin(); iter != mMitems.end(); ++iter)
         delete iter->second;                                //if item is duplicated... then server may crash ... but that item should be deallocated
@@ -4580,9 +4582,12 @@ void Player::SetFreeTalentPoints(uint32 points)
 Mail* Player::GetMail(uint32 id)
 {
     for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
+    {
         if ((*itr)->messageID == id)
+        {
             return (*itr);
-
+        }
+    }
     return nullptr;
 }
 
@@ -18977,7 +18982,9 @@ void Player::_LoadMail()
 {
     //In case we are not expecting to receive new mail we just exits, not really necessary to refresh any data
     if (m_nextMailDelivereTime > time(nullptr))
+    {
         return;
+    }
 
     if (m_mailsUpdated)
     {
@@ -19937,8 +19944,9 @@ void Player::_SaveInventory(SQLTransaction& trans)
 void Player::_SaveMail(SQLTransaction& trans)
 {
     if (!GetMailCacheSize() || !m_mailsUpdated)
+    {
         return;
-    
+    }    
 
     PreparedStatement* stmt = nullptr;
 
