@@ -115,7 +115,7 @@ AzerothCore is a learning project, and there are lots of different ways to contr
 
 If you want to contribute to the project, you will find a lot of resources that will guide you in our wiki.
 
-Feel free to join us on [our discord chat server][discord] where we taught a lot of new people how to get started and who are now important contributors!
+Feel free to join us on [our discord chat server][https://discord.com/invite/gkt4y2x] where we taught a lot of new people how to get started and who are now important contributors!
 
 <!-- TO UNCOMMENT LATER -->
 <!-- As we put a big emphasis on community, there are also special rewards for contributors such as reputation ranks (displayed in our discord and our website), reputation badges (to display on your project/portfolio), premium software licenses, private modules access, private tools access and a lot of small private repositories access. -->
@@ -150,7 +150,7 @@ This project exists thanks to:
 ## IMPORTANT LINKS
 
 - [Website](http://www.azerothcore.org/)
-- [AzerothCore catalogue](http://www.azerothcore.org/modules-catalogue/  "Modules, tools, and other things for AzerothCore") (modules, tools etc...)
+- [AzerothCore catalogue](http://www.azerothcore.org/catalogue/  "Modules, tools, and other things for AzerothCore") (modules, tools etc...)
 - [Module template / Module skeleton](https://github.com/azerothcore/skeleton-module/)
 - [Our community hub (Discord)](https://discord.gg/gkt4y2x)
 - [Our wiki](http://www.azerothcore.org/wiki "Easy to use and developed by AzerothCore founder")
