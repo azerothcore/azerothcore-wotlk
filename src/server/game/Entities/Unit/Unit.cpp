@@ -17747,7 +17747,7 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
 
     if (!player)
     {
-        GetMotionMaster()->MoveKnockbackFrom(0, x, y, speedXY, speedZ);
+        GetMotionMaster()->MoveKnockbackFrom(x, y, speedXY, speedZ);
     }
     else
     {

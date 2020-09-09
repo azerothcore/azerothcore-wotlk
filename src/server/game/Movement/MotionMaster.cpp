@@ -442,7 +442,7 @@ void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed
     MoveTakeoff(id, pos, speed);
 }
 
-void MotionMaster::MoveKnockbackFrom(uint32 id, float srcX, float srcY, float speedXY, float speedZ)
+void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ, uint32 id /* = EVENT_KNOCKBACK_FORM*/)
 {
     //this function may make players fall below map
     if (_owner->GetTypeId() == TYPEID_PLAYER)
