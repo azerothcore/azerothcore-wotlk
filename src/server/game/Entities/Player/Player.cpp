@@ -3637,8 +3637,6 @@ void Player::UpdateNextMailTimeAndUnreads()
 {
     //Update the next delivery time and unread mails
     time_t cTime = time(nullptr);
-    //Update the next delivery time and unread mails
-    time_t cTime = time(nullptr);
     //Get the next delivery time
     PreparedStatement* stmtNextDeliveryTime = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NEXT_MAIL_DELIVERYTIME);
     stmtNextDeliveryTime->setUInt64(0, GetGUIDLow());
