@@ -89,7 +89,7 @@ class boss_renataki : public CreatureScript
                 {
                     if (Ambush_Timer <= diff)
                     {
-                        Unit* target = NULL;
+                        Unit* target = nullptr;
                         target = SelectTarget(SELECT_TARGET_RANDOM, 0);
                         if (target)
                         {
@@ -123,7 +123,7 @@ class boss_renataki : public CreatureScript
                 {
                     if (Aggro_Timer <= diff)
                     {
-                        Unit* target = NULL;
+                        Unit* target = nullptr;
                         target = SelectTarget(SELECT_TARGET_RANDOM, 1);
 
                         if (DoGetThreat(me->GetVictim()))

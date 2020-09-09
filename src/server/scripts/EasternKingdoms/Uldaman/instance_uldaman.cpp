@@ -72,8 +72,8 @@ class instance_uldaman : public InstanceMapScript
                         break;
                     case DATA_ARCHAEDAS:
                         _encounters[type] = data;
-                        HandleGameObject(ancientVaultDoorGUID, data == DONE, NULL);
-                        HandleGameObject(archaedasTempleDoorGUID, data != IN_PROGRESS, NULL);
+                        HandleGameObject(ancientVaultDoorGUID, data == DONE, nullptr);
+                        HandleGameObject(archaedasTempleDoorGUID, data != IN_PROGRESS, nullptr);
                         break;
                 }
 

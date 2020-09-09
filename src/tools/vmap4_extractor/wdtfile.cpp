@@ -13,12 +13,12 @@ char * wdtGetPlainName(char * FileName)
 {
     char * szTemp;
 
-    if((szTemp = strrchr(FileName, '\\')) != NULL)
+    if((szTemp = strrchr(FileName, '\\')) != nullptr)
         FileName = szTemp + 1;
     return FileName;
 }
 
-WDTFile::WDTFile(char* file_name, char* file_name1) : WDT(file_name), gWmoInstansName(NULL), gnWMO(0)
+WDTFile::WDTFile(char* file_name, char* file_name1) : WDT(file_name), gWmoInstansName(nullptr), gnWMO(0)
 {
     filename.append(file_name1,strlen(file_name1));
 }
@@ -109,7 +109,7 @@ WDTFile::~WDTFile(void)
 ADTFile* WDTFile::GetMap(int x, int z)
 {
     if(!(x>=0 && z >= 0 && x<64 && z<64))
-        return NULL;
+        return nullptr;
 
     char name[512];
 
