@@ -8,7 +8,7 @@
 #include "DBC.h"
 #include "Define.h"
 
-DBC::DBC( FILE* stream ) : StringBlock(NULL), StringBlockSize(0), IsFaulty(true)
+DBC::DBC( FILE* stream ) : StringBlock(nullptr), StringBlockSize(0), IsFaulty(true)
 {
     char magic[5];
     uint32 count = 0;
@@ -72,5 +72,5 @@ Record* DBC::GetRecordById( int id )
     for (std::vector<Record*>::iterator itr = Records.begin(); itr != Records.end(); ++itr)
         if ((*itr)->Values[0] == id)
             return *itr;
-    return NULL;
+    return nullptr;
 }
