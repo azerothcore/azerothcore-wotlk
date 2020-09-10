@@ -184,7 +184,7 @@ public:
                 }
                 case EVENT_CHECK_HOME:
                 {
-                    if (!me->HasAura(SPELL_ENRAGE) && me->GetPositionZ() < 24)
+                    if (!me->HasAura(SPELL_ENRAGE) && (me->GetPositionZ() < 24.0f || !me->GetHomePosition().IsInDist(*me, 110.0f)))
                     {
                         DoCastSelf(SPELL_ENRAGE, true);
                         events.PopEvent();
@@ -216,7 +216,7 @@ public:
                 }
 
                 // Make a copy of guid list
-                std::list<uint64> swarmEggs2(warmEggs);
+                std::list<uint64> swarmEggs2 = swarmEggs;
 
                 // Remove previous egg
                 if (previousSwarmEgg_GUID)
