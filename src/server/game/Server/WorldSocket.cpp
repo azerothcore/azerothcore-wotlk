@@ -1023,7 +1023,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // Sleep this Network thread for
     uint32 sleepTime = sWorld->getIntConfig(CONFIG_SESSION_ADD_DELAY);
-    std::this_thread::sleep_for(Milliseconds(sleepTime));
+    std::this_thread::sleep_for(Microseconds(sleepTime));
 
     sWorld->AddSession(m_Session);
 

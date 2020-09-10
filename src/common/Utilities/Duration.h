@@ -8,6 +8,9 @@
 
 #include <chrono>
 
+/// Microseconds shorthand typedef.
+typedef std::chrono::microseconds Microseconds;
+
 /// Milliseconds shorthand typedef.
 typedef std::chrono::milliseconds Milliseconds;
 
