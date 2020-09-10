@@ -21,8 +21,8 @@ enum Spells
     SPELL_BROOD_PLAGUE_H            = 59467,
     SPELL_BROOD_RAGE_H              = 59465,
     SPELL_ENRAGE                    = 26662, // Enraged if too far away from home
-    //SPELL_SUMMON_SWARMERS         = 56119, //2x 30178  -- 2x every 10secs, spell works fine but i need specific coords
-    //SPELL_SUMMON_SWARM_GUARD      = 56120, //1x 30176  -- at 50%hp, spell works fine but i need specific coords
+    SPELL_SUMMON_SWARMERS           = 56119, //2x NPC_AHNKAHAR_SWARMER
+    SPELL_SUMMON_SWARM_GUARD        = 56120, //1x NPC_AHNKAHAR_GUARDIAN_ENTRY  -- at 50%hp
 
     // ADDS
     SPELL_SPRINT                    = 56354,
@@ -34,25 +34,25 @@ enum Creatures
 {
     NPC_AHNKAHAR_SWARMER            = 30178,
     NPC_AHNKAHAR_GUARDIAN_ENTRY     = 30176,
+    NPC_AHNKAHAR_SWARM_EGG          = 30172,
+    NPC_AHNKAHAR_GUARDIAN_EGG       = 30173,
 };
 
 enum Events
 {
-    EVENT_CHECK_HEALTH              = 1,
-    EVENT_CHECK_HOME                = 2,
-    EVENT_PLAGUE                    = 3,
-    EVENT_BROOD_RAGE                = 4,
-    EVENT_SWARMER                   = 5,
-    EVENT_SUMMON_GUARD              = 6,
+    EVENT_CHECK_HOME                = 1,
+    EVENT_PLAGUE                    = 2,
+    EVENT_BROOD_RAGE                = 3,
+    EVENT_SWARMER                   = 4,
 };
 
 enum Yells
 {
-    SAY_AGGRO       = 0,
-    SAY_SLAY        = 1,
-    SAY_DEATH       = 2,
-    SAY_EGG_SAC     = 3,
-    EMOTE_HATCHES   = 4
+    SAY_AGGRO                       = 0,
+    SAY_SLAY                        = 1,
+    SAY_DEATH                       = 2,
+    SAY_EGG_SAC                     = 3,
+    EMOTE_HATCHES                   = 4
 };
 
 class boss_elder_nadox : public CreatureScript
@@ -60,46 +60,62 @@ class boss_elder_nadox : public CreatureScript
 public:
     boss_elder_nadox() : CreatureScript("boss_elder_nadox") { }
 
-    struct boss_elder_nadoxAI : public ScriptedAI
+    struct boss_elder_nadoxAI : public BossAI
     {
-        boss_elder_nadoxAI(Creature* creature) : ScriptedAI(creature), pInstance(creature->GetInstanceScript()), summons(creature)
+        boss_elder_nadoxAI(Creature* creature) : BossAI(creature, DATA_PRINCE_TALDARAM),
+            previousSwarmEgg_GUID(0),
+            guardianSummoned(false)
         {      
         }
 
         void Reset() override
         {
-            events.Reset();
-            summons.DespawnAll();
-
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+            guardianSummoned = false;
+            _Reset();
             events.ScheduleEvent(EVENT_SWARMER, 10000);
             events.ScheduleEvent(EVENT_CHECK_HOME, 2000);
-            events.ScheduleEvent(EVENT_PLAGUE, 5000 + rand() % 3000);
+            events.ScheduleEvent(EVENT_PLAGUE, urand(5000, 8000));
             events.ScheduleEvent(EVENT_BROOD_RAGE, 5000);
 
-            if (pInstance)
+            // Cache eggs
+            swarmEggs.clear();
+            guardianEggs.clear();
+            previousSwarmEgg_GUID = 0;
+
+            std::list<Creature*> eggs;
+            // Swarm eggs
+            me->GetCreatureListWithEntryInGrid(eggs, NPC_AHNKAHAR_SWARM_EGG, 250.0f);
+            if (eggs.empty())
             {
-                pInstance->SetData(DATA_ELDER_NADOX_EVENT, NOT_STARTED);
-                pInstance->SetData(DATA_NADOX_ACHIEVEMENT, true);
+                for (Creature* const egg : eggs)
+                {
+                    if (egg)
+                    {
+                        swarmEggs.push_back(egg->GetGUID());
+                    }
+                }
             }
+
+            eggs.clear();
+
+             // Guardian eggs
+            me->GetCreatureListWithEntryInGrid(eggs, NPC_AHNKAHAR_GUARDIAN_EGG, 250.0f);
+            if (eggs.empty())
+            {
+                for (Creature* const egg : eggs)
+                {
+                    if (egg)
+                    {
+                        guardianEggs.push_back(egg->GetGUID());
+                    }
+                }
+            }           
         }
 
         void EnterCombat(Unit * /*who*/) override
         {
+            _EnterCombat();
             Talk(SAY_AGGRO);
-
-            if (pInstance)
-            {
-                pInstance->SetData(DATA_ELDER_NADOX_EVENT, IN_PROGRESS);
-            }
-        }
-
-        void DoAction(int32 action) override
-        {
-            if (action == ACTION_GUARDIAN_DIED && pInstance)
-            {
-                pInstance->SetData(DATA_NADOX_ACHIEVEMENT, false);
-            }
         }
 
         void KilledUnit(Unit* victim) override
@@ -112,25 +128,28 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            events.Reset();
-            summons.DespawnAll();
-            
+            _JustDied();
             Talk(SAY_DEATH);
-
-            if (pInstance)
-            {
-                pInstance->SetData(DATA_ELDER_NADOX_EVENT, DONE);
-            }
         }
 
         void JustSummoned(Creature* summon) override
         {
-            if (summon)
+            if (summon->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
             {
-                if (summon->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY )
-                    Talk(SAY_EGG_SAC);
+                Talk(SAY_EGG_SAC);
+            }
                 
-                summons.Summon(summon);
+            BossAI::JustSummoned(summon);
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*school*/) override
+        {
+            if (!guardianSummoned && me->HealthBelowPctDamaged(55, damage))
+            {
+                Talk(EMOTE_HATCHES, me);
+                SummonHelpers(false);
+
+                guardianSummoned = true;
             }
         }
 
@@ -144,27 +163,10 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            while (uint32 const eventId = events.ExecuteEvent())
+            while (uint32 const eventId = events.GetEvent())
             {
                 switch (eventId)
                 {
-                case EVENT_CHECK_HEALTH:
-                {
-                    events.RepeatEvent(1000);
-                    if (HealthBelowPct(50))
-                    {
-                        events.CancelEvent(EVENT_CHECK_HEALTH);
-                        events.ScheduleEvent(EVENT_SUMMON_GUARD, 100);
-                    }
-                    break;
-                }
-                case EVENT_SUMMON_GUARD:
-                {
-                    Talk(EMOTE_HATCHES, me);
-                    SummonHelpers(false);
-                    events.PopEvent();
-                    break;
-                }
                 case EVENT_BROOD_RAGE:
                 {
                     if (Creature* pSwarmer = me->FindNearestCreature(NPC_AHNKAHAR_SWARMER, 40, true))
@@ -187,12 +189,7 @@ public:
                 }
                 case EVENT_CHECK_HOME:
                 {
-                    if (me->HasAura(SPELL_ENRAGE))
-                    {
-                        break;
-                    }
-
-                    if (me->GetPositionZ() < 24)
+                    if (!me->HasAura(SPELL_ENRAGE) && me->GetPositionZ() < 24)
                     {
                         DoCastSelf(SPELL_ENRAGE, true);
                         events.PopEvent();
@@ -208,29 +205,57 @@ public:
         }
 
     private:
-        EventMap events;
-        InstanceScript* pInstance;
-        SummonList summons;
+        
+        std::list<uint64> swarmEggs;
+        std::list<uint64> guardianEggs;
+        uint64 previousSwarmEgg_GUID;   // This will prevent casting summoning spells on same egg twice
+        bool guardianSummoned;
 
         void SummonHelpers(bool swarm)
         {
-            Creature* cr;
             if (swarm)
             {
-                if ((cr = me->SummonCreature(NPC_AHNKAHAR_SWARMER, 640.425f, -919.544f, 25.8701f, 2.56563f)))
+                if (swarmEggs.empty())
                 {
-                    summons.Summon(cr);
+                    return;
                 }
-                if ((cr = me->SummonCreature(NPC_AHNKAHAR_SWARMER, 655.891f, -930.445f, 25.6978f, 3.64774f)))
+
+                // Make a copy of guid list
+                std::list<uint64> swarmEggs2(swarmEggs);
+
+                // Remove previous egg
+                if (previousSwarmEgg_GUID)
                 {
-                    summons.Summon(cr);
+                    std::list<uint64>::iterator itr = std::find(swarmEggs2.begin(), swarmEggs2.end(), previousSwarmEgg_GUID);
+                    if (itr != swarmEggs2.end())
+                    {
+                        swarmEggs2.erase(itr);
+                    }
+                }
+
+                if (swarmEggs2.empty())
+                {
+                    return;
+                }
+
+                previousSwarmEgg_GUID = acore::Containers::SelectRandomContainerElement(swarmEggs2);
+
+                if (Creature* egg = ObjectAccessor::GetCreature(*me, previousSwarmEgg_GUID))
+                {
+                    egg->CastSpell(egg, SPELL_SUMMON_SWARMERS, false, nullptr, nullptr, me->GetGUID());
                 }
             }
             else
             {
-                if ((cr = me->SummonCreature(NPC_AHNKAHAR_GUARDIAN_ENTRY, 658.677f, -934.332f, 25.6978f, 3.03687f)))
+                if (guardianEggs.empty())
                 {
-                    summons.Summon(cr);
+                    return;
+                }
+
+                uint64 const guardianEggGUID = acore::Containers::SelectRandomContainerElement(guardianEggs);
+                if (Creature* egg = ObjectAccessor::GetCreature(*me, guardianEggGUID))
+                {
+                    egg->CastSpell(egg, SPELL_SUMMON_SWARM_GUARD, false, nullptr, nullptr, me->GetGUID());
                 }
             }
         }

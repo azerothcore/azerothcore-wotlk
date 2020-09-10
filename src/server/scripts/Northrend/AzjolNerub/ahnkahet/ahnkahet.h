@@ -14,10 +14,7 @@ enum AhnkahetData
 
     // Rest dungeon data
     DATA_ELDER_NADOX_EVENT,
-    DATA_PRINCE_TALDARAM_EVENT,
-    DATA_JEDOGA_SHADOWSEEKER_EVENT,
     DATA_HERALD_VOLAZJ_EVENT,
-    DATA_AMANITAR_EVENT,
 
     // Teldram encounter related
     DATA_PRINCE_TALDARAM_PLATFORM,

@@ -144,7 +144,7 @@ public:
 
     struct boss_jedoga_shadowseekerAI : public BossAI
     {
-        boss_jedoga_shadowseekerAI(Creature* pCreature) : BossAI(pCreature, DATA_JEDOGA_SHADOWSEEKER_EVENT),
+        boss_jedoga_shadowseekerAI(Creature* pCreature) : BossAI(pCreature, DATA_JEDOGA_SHADOWSEEKER),
             combatSummonsSummoned(false),
             ritualTriggered(false),
             volunteerWork(true)
