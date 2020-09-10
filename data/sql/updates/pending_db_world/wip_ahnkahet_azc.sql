@@ -28,6 +28,16 @@ UPDATE `creature_text` SET `TextRange`=3,`comment`='prince taldaram SAY_REMOVE_P
 UPDATE `creature_template` SET `flags_extra`=`flags_extra` &~ 512 WHERE `entry` IN (29308, 31469);
 UPDATE `creature_template` SET `modelid2` = 19725, `flags_extra` = `flags_extra` |64|128 WHERE `entry` IN (30106, 31458);
 
+DELETE FROM `creature_summon_groups` WHERE `summonerId`=29308 AND `summonerType`=0;
+INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES
+(29308, 0, 0, 30181, 519.146, -792.274, 49.4627, 4.15388, 8, 0),
+(29308, 0, 0, 30181, 542.994, -762.115, 36.0509, 1.32645, 8, 0),
+(29308, 0, 0, 30181, 599.617, -762.315, 35.3111, 1.71042, 8, 0),
+(29308, 0, 0, 30181, 506.573, -890.563, 45.1763, 3.35103, 8, 0),
+(29308, 0, 0, 30181, 632.232, -774.304, 34.0595, 0.750492, 8, 0),
+(29308, 0, 0, 30181, 489.944, -851.356, 52.09, 4.95674, 8, 0),
+(29308, 0, 0, 30181, 655.409, -814.264, 35.2257, 0.436332, 8, 0);
+
 -- Jedoga encounter
 DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=7359;
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES

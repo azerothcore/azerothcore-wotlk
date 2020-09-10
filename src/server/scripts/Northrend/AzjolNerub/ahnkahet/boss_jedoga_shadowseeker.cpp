@@ -63,7 +63,6 @@ enum Events
 
 enum Creatures
 {
-    NPC_JEDOGA_CONTROLLER                   = 30181,
     NPC_TWILIGHT_INITIATE                   = 30114,
     NPC_TWILIGHT_VOLUNTEER                  = 30385,
 };

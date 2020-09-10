@@ -38,8 +38,10 @@ enum Creatures
 
 enum Misc
 {
-    DATA_EMBRACE_DMG                        = 20000,
-    DATA_EMBRACE_DMG_H                      = 40000,
+    MAX_EMBRACE_DMG                         = 20000,
+    MAX_EMBRACE_DMG_H                       = 40000,
+
+    SUMMON_GROUP_TRIGGERS                   = 0,
 };
 
 enum Actions
@@ -231,6 +233,8 @@ public:
                 {
                     DoCastSelf(SPELL_BEAM_VISUAL, true);
                 }
+
+                me->SummonCreatureGroup(SUMMON_GROUP_TRIGGERS);
             }
         }
 
@@ -244,6 +248,7 @@ public:
                 if (action == ACTION_REMOVE_PRISON)
                 {
                     DoCastSelf(SPELL_HOVER_FALL);
+                    me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveLand(POINT_LAND, me->GetHomePosition(), 8.0f);
                     Talk(SAY_REMOVE_PRISON);
                 }
@@ -256,6 +261,7 @@ public:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
                     me->UpdatePosition(me->GetHomePosition(), true);
                 }
+                summons.DespawnEntry(NPC_JEDOGA_CONTROLLER);
             }
         }
 
@@ -275,7 +281,7 @@ public:
             if (vanishTarget_GUID)
             {
                 vanishDamage += damage;
-                if (vanishDamage > DUNGEON_MODE<uint32>(DATA_EMBRACE_DMG, DATA_EMBRACE_DMG_H))
+                if (vanishDamage > DUNGEON_MODE<uint32>(MAX_EMBRACE_DMG, MAX_EMBRACE_DMG_H))
                 {
                     ScheduleCombatEvents();
                     me->CastStop();
@@ -331,6 +337,11 @@ public:
                         summonAI->SetVictimPos(victimSperePos);
                     }
                         
+                    break;
+                }
+                case NPC_JEDOGA_CONTROLLER:
+                {
+                    summon->CastSpell(nullptr, SPELL_BEAM_VISUAL);
                     break;
                 }
             }
