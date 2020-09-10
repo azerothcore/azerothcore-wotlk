@@ -344,54 +344,41 @@ class spell_ahn_kahet_swarmer_aura : public SpellScriptLoader
         {
             PrepareSpellScript(spell_ahn_kahet_swarmer_aura_SpellScript)
 
+            void CountTargets(std::list<WorldObject*>& targets)
+            {
+                _targetCount = static_cast<uint32>(targets.size());
+            }
+
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
                 Unit* caster = GetCaster();
-                std::list<Creature*> swarm, swarm2;
-                caster->GetCreaturesWithEntryInRange(swarm, 40.0f, 30338);
-                caster->GetCreaturesWithEntryInRange(swarm2, 40.0f, 30178);
-                int32 aliveCount = -1; // minus self
-
-                std::list<Creature*>::const_iterator itr;
-                for (itr = swarm.begin(); itr != swarm.end(); ++itr)
+                if (_targetCount)
                 {
-                    if ((*itr)->IsAlive())
+                    if (Aura *aur = caster->GetAura(SPELL_SWARM))
                     {
-                        ++aliveCount;
+                        aur->SetStackAmount(static_cast<uint8>(_targetCount));
+                    }
+                    else if (_targetCount)
+                    {
+                        // TODO: move spell id to enum
+                        caster->CastCustomSpell(SPELL_SWARM, SPELLVALUE_AURA_STACK, _targetCount, caster, true);
+                        if (Aura *aur = caster->GetAura(SPELL_SWARM))
+                        {
+                            aur->SetStackAmount(static_cast<uint8>(_targetCount));
+                        }
                     }
                 }
-                for (itr = swarm2.begin(); itr != swarm2.end(); ++itr)
+                else
                 {
-                    if ((*itr)->IsAlive())
-                    {
-                        ++aliveCount;
-                    }
-                }
-
-                if (Aura *aur = caster->GetAura(56281))
-                {
-                    if (aliveCount > 0)
-                    {
-                        aur->SetStackAmount(aliveCount);
-                    }
-                    else
-                    {
-                        aur->Remove();
-                    }
-                }
-                else if (aliveCount > 0)
-                {
-                    // TODO: move spell id to enum
-                    caster->CastCustomSpell(caster, 56281, &aliveCount, &aliveCount, &aliveCount, true);
-                    if (Aura *aur = caster->GetAura(56281))
-                    {
-                        aur->SetStackAmount(aliveCount);
-                    }
+                    caster->RemoveAurasDueToSpell(SPELL_SWARM);
                 }
             }
 
+            uint32 _targetCount;
+
             void Register()
             {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ahn_kahet_swarmer_aura_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
                 OnEffectHitTarget += SpellEffectFn(spell_ahn_kahet_swarmer_aura_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
