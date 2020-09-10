@@ -8,7 +8,6 @@
 #include "Map.h"
 #include "LFGMgr.h"
 #include "AvgDiffTracker.h"
-#include <thread>
 
 class UpdateRequest
 {

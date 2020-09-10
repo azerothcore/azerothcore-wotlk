@@ -5,6 +5,7 @@
 #include "PCQueue.h"
 #include <condition_variable>
 #include <mutex>
+#include <thread>
 
 class Map;
 class UpdateRequest;
