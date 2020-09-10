@@ -77,15 +77,22 @@ public:
             events.ScheduleEvent(EVENT_PLAGUE, urand(5000, 8000));
             events.ScheduleEvent(EVENT_BROOD_RAGE, 5000);
 
-            // Cache eggs
+            // Clear eggs data
             swarmEggs.clear();
             guardianEggs.clear();
             previousSwarmEgg_GUID = 0;
+        }
 
+        void EnterCombat(Unit * /*who*/) override
+        {
+            _EnterCombat();
+            Talk(SAY_AGGRO);
+
+            // Cache eggs
             std::list<Creature*> eggs;
             // Swarm eggs
             me->GetCreatureListWithEntryInGrid(eggs, NPC_AHNKAHAR_SWARM_EGG, 250.0f);
-            if (eggs.empty())
+            if (!eggs.empty())
             {
                 for (Creature* const egg : eggs)
                 {
@@ -100,7 +107,7 @@ public:
 
              // Guardian eggs
             me->GetCreatureListWithEntryInGrid(eggs, NPC_AHNKAHAR_GUARDIAN_EGG, 250.0f);
-            if (eggs.empty())
+            if (!eggs.empty())
             {
                 for (Creature* const egg : eggs)
                 {
@@ -109,13 +116,7 @@ public:
                         guardianEggs.push_back(egg->GetGUID());
                     }
                 }
-            }           
-        }
-
-        void EnterCombat(Unit * /*who*/) override
-        {
-            _EnterCombat();
-            Talk(SAY_AGGRO);
+            }
         }
 
         void KilledUnit(Unit* victim) override
@@ -156,12 +157,16 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
             while (uint32 const eventId = events.GetEvent())
             {
@@ -221,7 +226,7 @@ public:
                 }
 
                 // Make a copy of guid list
-                std::list<uint64> swarmEggs2(swarmEggs);
+                std::list<uint64> swarmEggs2(warmEggs);
 
                 // Remove previous egg
                 if (previousSwarmEgg_GUID)
@@ -242,7 +247,7 @@ public:
 
                 if (Creature* egg = ObjectAccessor::GetCreature(*me, previousSwarmEgg_GUID))
                 {
-                    egg->CastSpell(egg, SPELL_SUMMON_SWARMERS, false, nullptr, nullptr, me->GetGUID());
+                    egg->CastSpell(egg, SPELL_SUMMON_SWARMERS, true, nullptr, nullptr, me->GetGUID());
                 }
             }
             else
@@ -255,7 +260,7 @@ public:
                 uint64 const guardianEggGUID = acore::Containers::SelectRandomContainerElement(guardianEggs);
                 if (Creature* egg = ObjectAccessor::GetCreature(*me, guardianEggGUID))
                 {
-                    egg->CastSpell(egg, SPELL_SUMMON_SWARM_GUARD, false, nullptr, nullptr, me->GetGUID());
+                    egg->CastSpell(egg, SPELL_SUMMON_SWARM_GUARD, true, nullptr, nullptr, me->GetGUID());
                 }
             }
         }
