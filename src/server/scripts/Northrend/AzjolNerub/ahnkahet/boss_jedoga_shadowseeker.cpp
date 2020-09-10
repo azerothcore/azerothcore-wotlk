@@ -539,7 +539,7 @@ public:
             {
                 case POINT_INITIAL:
                 {
-                    me->SetFacingTo(me->GetAngle(&JedogaPosition[2]));
+                    me->SetFacingTo(me->GetAngle(&JedogaPosition[0]));
                     me->SendMovementFlagUpdate();
                     DoCastSelf(SPELL_WHITE_SPHERE, false);
                     me->SetControlled(true, UNIT_STATE_STUNNED);

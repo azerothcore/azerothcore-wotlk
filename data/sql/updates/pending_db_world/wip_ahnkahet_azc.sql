@@ -1,5 +1,6 @@
 -- Change this back to INSERT once rewrite is complete
-REPLACE INTO `version_db_world` (`sql_rev`) VALUES ('1599510903096685100');
+REPLACE INTO `version_db_world` (`sql_rev`) VALUES
+('1599510903096685100');
 
 -- Amanitar encounter
 DELETE FROM `spell_script_names` WHERE `spell_id`=57283 AND `ScriptName`='spell_amanitar_remove_mushroom_power';
@@ -22,8 +23,8 @@ INSERT INTO `spell_script_names` (`spell_id` ,`ScriptName`) VALUES
 (55895, 'spell_prince_taldaram_flame_sphere_summon'),
 (59511, 'spell_prince_taldaram_flame_sphere_summon'),
 (59512, 'spell_prince_taldaram_flame_sphere_summon');
-UPDATE `creature_text` SET `TextRange`='3',`comment`='prince taldaram SAY_SPHERE_ACTIVATED' WHERE  `CreatureID`=29308 AND `GroupID`=0 AND `ID`=0;
-UPDATE `creature_text` SET `TextRange`='3',`comment`='prince taldaram SAY_REMOVE_PRISON'  WHERE  `CreatureID`=29308 AND `GroupID`=1 AND `ID`=0;
+UPDATE `creature_text` SET `TextRange`=3,`comment`='prince taldaram SAY_SPHERE_ACTIVATED' WHERE  `CreatureID`=29308 AND `GroupID`=0 AND `ID`=0;
+UPDATE `creature_text` SET `TextRange`=3,`comment`='prince taldaram SAY_REMOVE_PRISON'  WHERE  `CreatureID`=29308 AND `GroupID`=1 AND `ID`=0;
 UPDATE `creature_template` SET `flags_extra`=`flags_extra` &~ 512 WHERE `entry` IN (29308, 31469);
 UPDATE `creature_template` SET `modelid2` = 19725, `flags_extra` = `flags_extra` |64|128 WHERE `entry` IN (30106, 31458);
 
