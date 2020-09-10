@@ -21,7 +21,7 @@ class Field
 
         bool GetBool() const // Wrapper, actually gets integer
         {
-            return GetUInt8() == 1 ? true : false;
+            return (GetUInt8() == 1);
         }
 
         uint8 GetUInt8() const

@@ -177,7 +177,7 @@ class ByteBuffer
 
         ByteBuffer &operator>>(bool &value)
         {
-            value = read<char>() > 0 ? true : false;
+            value = (read<char>() > 0);
             return *this;
         }
 
