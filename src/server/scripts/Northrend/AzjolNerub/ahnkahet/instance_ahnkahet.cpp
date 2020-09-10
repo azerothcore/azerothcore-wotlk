@@ -22,9 +22,7 @@ public:
             heraldVolazj_GUID(0),
             amanitar_GUID(0),
             taldaramPlatform_GUID(0),
-            taldaramGate_GUID(0),
-            nadoxAchievement(false),
-            jedogaAchievement(false)
+            taldaramGate_GUID(0)
         {
             SetBossNumber(MAX_ENCOUNTER);
             teldaramSpheres[0] = NOT_STARTED;
@@ -95,18 +93,6 @@ public:
             }
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
-        {
-            switch (criteria_id)
-            {
-                case 7317: // Respect Your Elders (2038)
-                    return nadoxAchievement;
-                case 7359: // Volunteer Work (2056)
-                    return jedogaAchievement;
-            }
-            return false;
-        }
-
         bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
@@ -151,12 +137,6 @@ public:
                     }
                     break;
                 }
-                case DATA_NADOX_ACHIEVEMENT:
-                    nadoxAchievement = (bool)data;
-                    return;
-                case DATA_JEDOGA_ACHIEVEMENT:
-                    jedogaAchievement = (bool)data;
-                    return;
             }
         }
 
@@ -249,10 +229,6 @@ public:
         uint64 taldaramPlatform_GUID;
         uint64 taldaramGate_GUID;
         uint32 teldaramSpheres[2];  // Used to identify for sphere activation
-
-        bool nadoxAchievement;
-        bool jedogaAchievement;
-
 
         bool IsAllSpheresActivated() const
         {

@@ -12,17 +12,10 @@ enum AhnkahetData
     DATA_AMANITAR,
     MAX_ENCOUNTER,
 
-    // Rest dungeon data
-    DATA_ELDER_NADOX_EVENT,
-    DATA_HERALD_VOLAZJ_EVENT,
-
     // Teldram encounter related
     DATA_PRINCE_TALDARAM_PLATFORM,
     DATA_TELDRAM_SPHERE1,
     DATA_TELDRAM_SPHERE2,
-
-    DATA_NADOX_ACHIEVEMENT,
-    DATA_JEDOGA_ACHIEVEMENT,
 };
 
 enum AhnKahetCreatures

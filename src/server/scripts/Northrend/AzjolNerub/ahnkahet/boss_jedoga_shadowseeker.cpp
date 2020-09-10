@@ -156,8 +156,6 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
 
-            instance->SetData(DATA_JEDOGA_ACHIEVEMENT, true);
-
             _Reset();
             events.SetPhase(PHASE_NORMAL);
             ReschedulleCombatEvents();

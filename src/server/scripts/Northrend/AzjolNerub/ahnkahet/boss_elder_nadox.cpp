@@ -11,7 +11,7 @@
 enum Misc
 {
     // ACTIONS
-    ACTION_GUARDIAN_DIED            = 1,
+    DATA_RESPECT_YOUR_ELDERS        = 1,
 };
 
 enum Spells
@@ -23,6 +23,7 @@ enum Spells
     SPELL_ENRAGE                    = 26662, // Enraged if too far away from home
     SPELL_SUMMON_SWARMERS           = 56119, //2x NPC_AHNKAHAR_SWARMER
     SPELL_SUMMON_SWARM_GUARD        = 56120, //1x NPC_AHNKAHAR_GUARDIAN_ENTRY  -- at 50%hp
+    SPELL_SWARM                     = 56281,
 
     // ADDS
     SPELL_SPRINT                    = 56354,
@@ -33,7 +34,7 @@ enum Spells
 enum Creatures
 {
     NPC_AHNKAHAR_SWARMER            = 30178,
-    NPC_AHNKAHAR_GUARDIAN_ENTRY     = 30176,
+    NPC_AHNKAHAR_GUARDIAN           = 30176,
     NPC_AHNKAHAR_SWARM_EGG          = 30172,
     NPC_AHNKAHAR_GUARDIAN_EGG       = 30173,
 };
@@ -64,7 +65,8 @@ public:
     {
         boss_elder_nadoxAI(Creature* creature) : BossAI(creature, DATA_PRINCE_TALDARAM),
             previousSwarmEgg_GUID(0),
-            guardianSummoned(false)
+            guardianSummoned(false),
+            respectYourElders(true)
         {      
         }
 
@@ -81,6 +83,7 @@ public:
             guardianEggs.clear();
             previousSwarmEgg_GUID = 0;
             guardianSummoned = false;
+            respectYourElders = true;
         }
 
         void EnterCombat(Unit * /*who*/) override
@@ -119,6 +122,14 @@ public:
             }
         }
 
+        void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+        {
+            if (summon->GetEntry() == NPC_AHNKAHAR_GUARDIAN)
+            {
+                respectYourElders = false;
+            }
+        }
+
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
@@ -137,11 +148,19 @@ public:
         {
             if (!guardianSummoned && me->HealthBelowPctDamaged(55, damage))
             {
-                Talk(EMOTE_HATCHES, me);
                 SummonHelpers(false);
-
                 guardianSummoned = true;
             }
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == DATA_RESPECT_YOUR_ELDERS)
+            {
+                return respectYourElders ? 1 : 0;
+            }
+
+            return 0;
         }
 
         void UpdateAI(uint32 diff) override
@@ -184,7 +203,7 @@ public:
                 }
                 case EVENT_CHECK_HOME:
                 {
-                    if (!me->HasAura(SPELL_ENRAGE) && (me->GetPositionZ() < 24.0f || !me->GetHomePosition().IsInDist(*me, 110.0f)))
+                    if (!me->HasAura(SPELL_ENRAGE) && (me->GetPositionZ() < 24.0f || !me->GetHomePosition().IsInDist(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 110.0f)))
                     {
                         DoCastSelf(SPELL_ENRAGE, true);
                         events.PopEvent();
@@ -205,6 +224,7 @@ public:
         std::list<uint64> guardianEggs;
         uint64 previousSwarmEgg_GUID;   // This will prevent casting summoning spells on same egg twice
         bool guardianSummoned;
+        bool respectYourElders;
 
         void SummonHelpers(bool swarm)
         {
@@ -258,6 +278,8 @@ public:
                     egg->CastSpell(egg, SPELL_SUMMON_SWARM_GUARD, true, nullptr, nullptr, me->GetGUID());
                 }
 
+                Talk(EMOTE_HATCHES, me);
+
                 if (roll_chance_f(33))
                 {
                     Talk(SAY_EGG_SAC);
@@ -283,22 +305,8 @@ public:
 
         void Reset()
         {
-            DoCastSelf(me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY ? SPELL_GUARDIAN_AURA : SPELL_SWARMER_AURA, true);
+            DoCastSelf(me->GetEntry() == NPC_AHNKAHAR_GUARDIAN ? SPELL_GUARDIAN_AURA : SPELL_SWARMER_AURA, true);
             uiSprintTimer = 10000;
-        }
-
-        void JustDied(Unit * /*killer*/)
-        {
-            if (me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
-            {
-                if (InstanceScript *pInstance = me->GetInstanceScript()) 
-                {
-                    if (Creature *nadox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_ELDER_NADOX)))
-                        nadox->AI()->DoAction(ACTION_GUARDIAN_DIED);
-                }
-
-                me->RemoveAllAuras();
-            }
         }
 
         void UpdateAI(uint32 diff)
@@ -394,11 +402,27 @@ class spell_ahn_kahet_swarmer_aura : public SpellScriptLoader
         }
 };
 
+// 7317 - Respect Your Elders (2038)
+class achievement_respect_your_elders : public AchievementCriteriaScript
+{
+    public:
+        achievement_respect_your_elders() : AchievementCriteriaScript("achievement_respect_your_elders") { }
+
+        bool OnCheck(Player* /*player*/, Unit* target) override
+        {
+            return target && target->GetAI()->GetData(DATA_RESPECT_YOUR_ELDERS);
+        }
+};
+
 void AddSC_boss_elder_nadox()
 {
+    // Creatures
     new boss_elder_nadox();
     new npc_ahnkahar_nerubian();
 
     // Spells
     new spell_ahn_kahet_swarmer_aura();
+
+    // Achievements
+    new achievement_respect_your_elders();
 }

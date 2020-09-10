@@ -105,6 +105,13 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 (29310, 0, 1, 30181, 402.7893, -748.5251, 29.39399, 2.024582, 8, 0 ),
 (29310, 0, 1, 30181, 420.1999, -727.0132, 28.88036, 2.042035, 8, 0 );
 
+-- Elder Nadox
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=7317;
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES
+(7317, 11, 0, 0, 'achievement_respect_your_elders'),
+(7317, 12, 1, 0, '');
+
+
 -- Trash npcs
 -- Eye of Teldaram
 DELETE FROM `creature_template_addon` WHERE `entry`=31457;
