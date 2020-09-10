@@ -28,13 +28,14 @@ enum Yells
 enum Spells
 {
     // VISUALS
-    SPELL_PINK_SPHERE                       = 56075,
+    SPELL_SPHERE_VISUAL                     = 56075,
     SPELL_WHITE_SPHERE                      = 56102,
     SPELL_LIGHTNING_BOLTS                   = 56327,
     SPELL_ACTIVATE_INITIATE                 = 56868,
     SPELL_SACRIFICE_VISUAL                  = 56133,
     SPELL_SACRIFICE_BEAM                    = 56150,
     SPELL_HOVER_FALL                        = 56100,
+    SPELL_BEAM_VISUAL_JEDOGA                = 56312,
 
     // FIGHT
     SPELL_GIFT_OF_THE_HERALD                = 56219,
@@ -63,7 +64,8 @@ enum Events
 enum Creatures
 {
     NPC_JEDOGA_CONTROLLER                   = 30181,
-    NPC_INITIATE                            = 30114,
+    NPC_TWILIGHT_INITIATE                   = 30114,
+    NPC_TWILIGHT_VOLUNTEER                  = 30385,
 };
 
 enum Misc
@@ -74,7 +76,8 @@ enum Misc
 
 enum SummonGroups
 {
-    SUMMON_GROUP_OUT_OF_COMBAT              = 0,
+    SUMMON_GROUP_OOC                        = 0,
+    SUMMON_GROUP_OOC_TRIGGERS               = 1,
 };
 
 enum Points
@@ -93,8 +96,8 @@ enum Phases
 
 enum Actions
 {
-    ACTION_RITUAL_BEGIN                         = 1,
-    ACTION_SACRAFICE                            = 2,
+    ACTION_RITUAL_BEGIN                     = 1,
+    ACTION_SACRAFICE                        = 2,
 };
 
 const Position JedogaPosition[3] =
@@ -160,20 +163,9 @@ public:
             events.SetPhase(PHASE_NORMAL);
             ReschedulleCombatEvents();
 
-            if (!oocSummons.empty())
-            {
-                for (uint64 const guid : oocSummons)
-                {
-                    if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
-                    {
-                        summon->DespawnOrUnsummon();
-                    }
-                }
-                oocSummons.clear();
-            }
-
+            DespawnOOCSummons();
             std::list<TempSummon*> tempOOCSummons;
-            me->SummonCreatureGroup(SUMMON_GROUP_OUT_OF_COMBAT, &tempOOCSummons);
+            me->SummonCreatureGroup(SUMMON_GROUP_OOC, &tempOOCSummons);
             if (!tempOOCSummons.empty())
             {
                 for (TempSummon* summon : tempOOCSummons)
@@ -186,6 +178,20 @@ public:
                         summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                         summon->SetStandState(UNIT_STAND_STATE_KNEEL);
                         oocSummons.push_back(summon->GetGUID());
+                    }
+                }
+            }
+
+            tempOOCSummons.clear();
+
+            me->SummonCreatureGroup(SUMMON_GROUP_OOC_TRIGGERS, &tempOOCSummons);
+            if (!tempOOCSummons.empty())
+            {
+                for (TempSummon* trigger : tempOOCSummons)
+                {
+                    if (trigger)
+                    {
+                        oocTriggers.push_back(trigger->GetGUID());
                     }
                 }
             }
@@ -206,52 +212,63 @@ public:
 
         void SummonedCreatureDies(Creature* summon, Unit* killer) override
         {
-            if (summon->GetEntry() == NPC_INITIATE)
+            switch (summon->GetEntry())
             {
-                if (sacraficeTarget_GUID && summon->GetGUID() == sacraficeTarget_GUID)
+                case NPC_TWILIGHT_INITIATE:
                 {
-                    if (killer != me && killer->GetGUID() != sacraficeTarget_GUID)
+                    if (!oocSummons.empty())
                     {
-                        volunteerWork = false;
-                    }
-                    else
-                    {
-                        DoCastSelf(SPELL_GIFT_OF_THE_HERALD, true);
-                    }
-                    events.ScheduleEvent(EVENT_JEDOGA_MOVE_DOWN, 1000, 0, PHASE_RITUAL);
-                }
-                else if (!oocSummons.empty() && instance->GetBossState(DATA_JEDOGA_SHADOWSEEKER) != IN_PROGRESS)
-                {
-                    std::list<uint64>::iterator itr = std::find(oocSummons.begin(), oocSummons.end(), summon->GetGUID());
-                    if (itr != oocSummons.end())
-                    {
-                        oocSummons.erase(itr);
-                        if (oocSummons.empty())
+                        std::list<uint64>::iterator itr = std::find(oocSummons.begin(), oocSummons.end(), summon->GetGUID());
+                        if (itr != oocSummons.end())
                         {
-                            DoCastSelf(SPELL_HOVER_FALL);
-                            me->GetMotionMaster()->MoveIdle();
-                            me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], false);
-
-                            if (!combatSummonsSummoned)
+                            oocSummons.erase(itr);
+                            if (oocSummons.empty())
                             {
-                                summons.DespawnEntry(NPC_INITIATE);
-                                for (uint8 i = 0; i < MAX_COMBAT_INITIATES; ++i)
-                                {
-                                    if (TempSummon* summon = me->SummonCreature(NPC_INITIATE, VolunteerSpotPositions[i][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
-                                    {
-                                        summon->GetMotionMaster()->MovePoint(POINT_INITIAL, VolunteerSpotPositions[i][1]);
-                                        summon->SetReactState(REACT_PASSIVE);
-                                        summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC );
-                                        summons.Summon(summon);
-                                    }
-                                }
+                                DespawnOOCSummons();
 
-                                combatSummonsSummoned = true;
+                                DoCastSelf(SPELL_HOVER_FALL);
+                                me->GetMotionMaster()->MoveIdle();
+                                me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], false);
+
+                                if (!combatSummonsSummoned)
+                                {
+                                    summons.DespawnEntry(NPC_TWILIGHT_VOLUNTEER);
+                                    for (uint8 i = 0; i < MAX_COMBAT_INITIATES; ++i)
+                                    {
+                                        if (TempSummon* summon = me->SummonCreature(NPC_TWILIGHT_VOLUNTEER, VolunteerSpotPositions[i][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+                                        {
+                                            summon->GetMotionMaster()->MovePoint(POINT_INITIAL, VolunteerSpotPositions[i][1]);
+                                            summon->SetReactState(REACT_PASSIVE);
+                                            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC );
+                                            summons.Summon(summon);
+                                        }
+                                    }
+
+                                    combatSummonsSummoned = true;
+                                }
                             }
                         }
                     }
+                    break;
+                }
+                case NPC_TWILIGHT_VOLUNTEER:
+                {
+                    if (sacraficeTarget_GUID && summon->GetGUID() == sacraficeTarget_GUID)
+                    {
+                        if (killer != me && killer->GetGUID() != sacraficeTarget_GUID)
+                        {
+                            volunteerWork = false;
+                        }
+                        else
+                        {
+                            DoCastSelf(SPELL_GIFT_OF_THE_HERALD, true);
+                        }
+                        events.ScheduleEvent(EVENT_JEDOGA_MOVE_DOWN, 1000, 0, PHASE_RITUAL);
+                    }
+                    break;
                 }
             }
+
             summons.Despawn(summon);
         }
 
@@ -268,6 +285,7 @@ public:
                 events.SetPhase(PHASE_RITUAL);
                 events.ScheduleEvent(EVENT_JEDOGA_PREPARE_RITUAL, 1000, 0, PHASE_RITUAL);
                 ritualTriggered = true;
+                return;
             }
 
             if (events.IsInPhase(PHASE_RITUAL))
@@ -325,7 +343,7 @@ public:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
 
-                    me->RemoveAurasDueToSpell(SPELL_PINK_SPHERE);
+                    me->RemoveAurasDueToSpell(SPELL_SPHERE_VISUAL);
                     me->RemoveAurasDueToSpell(SPELL_LIGHTNING_BOLTS);
                     me->RemoveAurasDueToSpell(SPELL_HOVER_FALL);
                     SetCombatMovement(true);
@@ -346,11 +364,11 @@ public:
                     if (!summons.empty())
                     {
                         sacraficeTarget_GUID = acore::Containers::SelectRandomContainerElement(summons);
-                        if (Creature* initiate = ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
+                        if (Creature* volunteer = ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
                         {
                             Talk(TEXT_SACRIFICE_1);
-                            sacraficeTarget_GUID = initiate->GetGUID();
-                            initiate->AI()->DoAction(ACTION_RITUAL_BEGIN);
+                            sacraficeTarget_GUID = volunteer->GetGUID();
+                            volunteer->AI()->DoAction(ACTION_RITUAL_BEGIN);
                         }
                         // Something failed, let players continue but do not grant achievement
                         else
@@ -373,8 +391,18 @@ public:
                 case POINT_INITIAL:
                 {
                     me->SetFacingTo(5.66f);
-                    DoCastSelf(SPELL_PINK_SPHERE, true);
+                    DoCastSelf(SPELL_SPHERE_VISUAL, true);
                     DoCastSelf(SPELL_LIGHTNING_BOLTS, true);
+                    if (!oocTriggers.empty())
+                    {
+                        for (uint64 const guid : oocTriggers)
+                        {
+                            if (Creature* trigger = ObjectAccessor::GetCreature(*me, guid))
+                            {
+                                trigger->CastSpell(nullptr, SPELL_BEAM_VISUAL_JEDOGA);
+                            }
+                        }
+                    }
                     break;
                 }
             }
@@ -458,6 +486,8 @@ public:
 
     private:
         std::list<uint64> oocSummons;
+        std::list<uint64> oocTriggers;
+
         uint64 sacraficeTarget_GUID;
 
         bool combatSummonsSummoned;
@@ -471,6 +501,33 @@ public:
             events.RescheduleEvent(EVENT_JEDOGA_LIGHTNING_BOLT, 7000, 0, PHASE_NORMAL);
             events.RescheduleEvent(EVENT_JEDOGA_THUNDERSHOCK, 12000, 0, PHASE_NORMAL);
         }
+
+        void DespawnOOCSummons()
+        {
+            if (!oocTriggers.empty())
+            {
+                for (uint64 const guid : oocTriggers)
+                {
+                    if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+                    {
+                        summon->DespawnOrUnsummon();
+                    }
+                }
+                oocTriggers.clear();
+            }
+
+            if (!oocSummons.empty())
+            {
+                for (uint64 const guid : oocSummons)
+                {
+                    if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+                    {
+                        summon->DespawnOrUnsummon();
+                    }
+                }
+                oocSummons.clear();
+            }
+        }
     };
 
     CreatureAI *GetAI(Creature *creature) const
@@ -479,14 +536,14 @@ public:
     }
 };
 
-class npc_jedoga_initiand : public CreatureScript
+class npc_twilight_volunteer : public CreatureScript
 {
 public:
-    npc_jedoga_initiand() : CreatureScript("npc_jedoga_initiand") { }
+    npc_twilight_volunteer() : CreatureScript("npc_twilight_volunteer") { }
 
-    struct npc_jedoga_initiandAI : public ScriptedAI
+    struct npc_twilight_volunteerAI : public ScriptedAI
     {
-        npc_jedoga_initiandAI(Creature* pCreature) : ScriptedAI(pCreature),
+        npc_twilight_volunteerAI(Creature* pCreature) : ScriptedAI(pCreature),
             pInstance(pCreature->GetInstanceScript()),
             isSacraficeTarget(false)
         {
@@ -595,7 +652,7 @@ public:
 
     CreatureAI *GetAI(Creature *creature) const
     {
-        return new npc_jedoga_initiandAI(creature);
+        return new npc_twilight_volunteerAI(creature);
     }
 };
 
@@ -666,7 +723,7 @@ class spell_jedoga_sacrafice_beam : public SpellScriptLoader
 void AddSC_boss_jedoga_shadowseeker()
 {
     new boss_jedoga_shadowseeker();
-    new npc_jedoga_initiand();
+    new npc_twilight_volunteer();
 
     // Spells
     new spell_random_lightning_visual_effect();
