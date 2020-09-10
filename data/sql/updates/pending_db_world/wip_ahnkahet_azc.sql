@@ -29,6 +29,11 @@ UPDATE `creature_template` SET `flags_extra`=`flags_extra` &~ 512 WHERE `entry` 
 UPDATE `creature_template` SET `modelid2` = 19725, `flags_extra` = `flags_extra` |64|128 WHERE `entry` IN (30106, 31458);
 
 -- Jedoga encounter
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=7359;
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES
+(7359, 11, 0, 0, 'achievement_volunteer_work'),
+(7359, 12, 1, 0, '');
+
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry`=56312;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 56312, 0, 0, 31, 0, 3, 29310, 0, 0, 0, 0, '', 'Spell \'Beam Visual\' targets Jedoga Shadowseeker');
@@ -36,6 +41,24 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 UPDATE `creature_template` SET `ScriptName`='' WHERE `ScriptName` = 'npc_jedoga_initiand';
 UPDATE `creature_template` SET `ScriptName`='npc_twilight_volunteer' WHERE `entry` = 30385;
 update `creature_template` SET `modelid1`=169, `modelid2`=11686, `flags_extra`=`flags_extra`|128 WHERE `entry`=30181;
+-- "...Immune to all kinds of Crowd Control..."
+UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|
+    1| -- CHARM
+    2| -- MECHANIC_DISORIENTED
+    8| -- MECHANIC_CHARM
+    16| -- MECHANIC_FEAR
+    32| -- MECHANIC_GRIP
+    64| -- MECHANIC_ROOT
+    512| -- MECHANIC_SLEEP
+    1024| -- MECHANIC_SNARE
+    2048| -- MECHANIC_STUN
+    4096| -- MECHANIC_FREEZE
+    8192| -- MECHANIC_KNOCKOUT
+    65536| -- MECHANIC_POLYMORPH
+    8388608| -- MECHANIC_HORROR
+    67108864| -- MECHANIC_DAZE
+    536870912 -- MECHANIC_SAPPED
+WHERE `entry` IN (30385, 31474);
 
 DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_random_lightning_visual_effect';
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES

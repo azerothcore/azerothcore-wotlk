@@ -71,7 +71,7 @@ enum Creatures
 enum Misc
 {
     MAX_COMBAT_INITIATES                    = 25,
-    DATA_SACRAFICE_TARGET                   = 1,
+    DATA_VOLUNTEER_WORK                     = 1,
 };
 
 enum SummonGroups
@@ -207,7 +207,14 @@ public:
         }
 
         // Disabled events
-        void JustSummoned(Creature* /*summon*/) override {}
+        void JustSummoned(Creature* summon) override
+        {
+            if (summon->GetEntry() == NPC_JEDOGA_CONTROLLER)
+            {
+                summons.Summon(summon);
+            }
+        }
+
         void MoveInLineOfSight(Unit* /*who*/) override {}
 
         void SummonedCreatureDies(Creature* summon, Unit* killer) override
@@ -216,55 +223,57 @@ public:
             {
                 case NPC_TWILIGHT_INITIATE:
                 {
+                    std::list<uint64>::iterator itr = std::find(oocSummons.begin(), oocSummons.end(), summon->GetGUID());
+                    if (itr == oocSummons.end())
+                    {
+                        break;
+                    }
+
+                    oocSummons.erase(itr);
                     if (!oocSummons.empty())
                     {
-                        std::list<uint64>::iterator itr = std::find(oocSummons.begin(), oocSummons.end(), summon->GetGUID());
-                        if (itr != oocSummons.end())
+                        break;
+                    }
+
+                    DespawnOOCSummons();
+                    DoCastSelf(SPELL_HOVER_FALL);
+                    me->GetMotionMaster()->MoveIdle();
+                    me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], false);
+
+                    if (!combatSummonsSummoned)
+                    {
+                        summons.DespawnEntry(NPC_TWILIGHT_VOLUNTEER);
+                        for (uint8 i = 0; i < MAX_COMBAT_INITIATES; ++i)
                         {
-                            oocSummons.erase(itr);
-                            if (oocSummons.empty())
+                            if (TempSummon* summon = me->SummonCreature(NPC_TWILIGHT_VOLUNTEER, VolunteerSpotPositions[i][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                             {
-                                DespawnOOCSummons();
-
-                                DoCastSelf(SPELL_HOVER_FALL);
-                                me->GetMotionMaster()->MoveIdle();
-                                me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], false);
-
-                                if (!combatSummonsSummoned)
-                                {
-                                    summons.DespawnEntry(NPC_TWILIGHT_VOLUNTEER);
-                                    for (uint8 i = 0; i < MAX_COMBAT_INITIATES; ++i)
-                                    {
-                                        if (TempSummon* summon = me->SummonCreature(NPC_TWILIGHT_VOLUNTEER, VolunteerSpotPositions[i][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
-                                        {
-                                            summon->GetMotionMaster()->MovePoint(POINT_INITIAL, VolunteerSpotPositions[i][1]);
-                                            summon->SetReactState(REACT_PASSIVE);
-                                            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC );
-                                            summons.Summon(summon);
-                                        }
-                                    }
-
-                                    combatSummonsSummoned = true;
-                                }
+                                summon->GetMotionMaster()->MovePoint(POINT_INITIAL, VolunteerSpotPositions[i][1]);
+                                summon->SetReactState(REACT_PASSIVE);
+                                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC );
+                                summons.Summon(summon);
                             }
                         }
+                        combatSummonsSummoned = true;
                     }
+
                     break;
                 }
                 case NPC_TWILIGHT_VOLUNTEER:
                 {
-                    if (sacraficeTarget_GUID && summon->GetGUID() == sacraficeTarget_GUID)
+                    if (sacraficeTarget_GUID && summon->GetGUID() != sacraficeTarget_GUID)
                     {
-                        if (killer != me && killer->GetGUID() != sacraficeTarget_GUID)
-                        {
-                            volunteerWork = false;
-                        }
-                        else
-                        {
-                            DoCastSelf(SPELL_GIFT_OF_THE_HERALD, true);
-                        }
-                        events.ScheduleEvent(EVENT_JEDOGA_MOVE_DOWN, 1000, 0, PHASE_RITUAL);
+                        break;
                     }
+
+                    if (killer != me && killer->GetGUID() != sacraficeTarget_GUID)
+                    {
+                        volunteerWork = false;
+                    }
+                    else
+                    {
+                        DoCastSelf(SPELL_GIFT_OF_THE_HERALD, true);
+                    }
+                    events.ScheduleEvent(EVENT_JEDOGA_MOVE_DOWN, 1000, 0, PHASE_RITUAL);
                     break;
                 }
             }
@@ -461,7 +470,6 @@ public:
                     }
                     case EVENT_JEDOGA_MOVE_UP:
                     {
-                        me->SetStandState(UNIT_STAND_STATE_STAND);  
                         me->GetMotionMaster()->Clear(true);
                         me->SetDisableGravity(true);
                         me->SetHover(true);
@@ -482,6 +490,16 @@ public:
             }
 
             DoMeleeAttackIfReady();
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == DATA_VOLUNTEER_WORK)
+            {
+                return volunteerWork ? 1 : 0;
+            }
+
+            return 0;
         }
 
     private:
@@ -591,34 +609,29 @@ public:
             {
                 return;
             }
-
-            switch (id)
+            
+            if (id == POINT_INITIAL)
             {
-                case POINT_INITIAL:
+                me->SetFacingTo(me->GetAngle(&JedogaPosition[0]));
+                me->SendMovementFlagUpdate();
+                DoCastSelf(SPELL_WHITE_SPHERE, false);
+                me->SetControlled(true, UNIT_STATE_STUNNED);
+                me->SetStandState(UNIT_STAND_STATE_KNEEL);
+            }
+            else if (id == POINT_RITUAL)
+            {
+                if (Creature* jedoga = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER)))
                 {
-                    me->SetFacingTo(me->GetAngle(&JedogaPosition[0]));
-                    me->SendMovementFlagUpdate();
-                    DoCastSelf(SPELL_WHITE_SPHERE, false);
-                    me->SetControlled(true, UNIT_STATE_STUNNED);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                    break;
-                }
-                case POINT_RITUAL:
-                {
-                    if (Creature* jedoga = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER)))
+                    jedoga->AI()->Talk(TEXT_SACRIFICE_2);
+                    jedoga->CastSpell(nullptr, SPELL_SACRIFICE_BEAM);
+                    if (Creature* ritualTrigger = jedoga->SummonCreature(NPC_JEDOGA_CONTROLLER, JedogaPosition[2], TEMPSUMMON_TIMED_DESPAWN, 5000))
                     {
-                        jedoga->AI()->Talk(TEXT_SACRIFICE_2);
-                        jedoga->CastSpell(nullptr, SPELL_SACRIFICE_BEAM);
-                        if (Creature* ritualTrigger = jedoga->SummonCreature(NPC_JEDOGA_CONTROLLER, JedogaPosition[2], TEMPSUMMON_MANUAL_DESPAWN, 5000))
-                        {
-                            ritualTrigger->CastSpell(ritualTrigger, SPELL_SACRIFICE_VISUAL);
-                        }
+                        ritualTrigger->CastSpell(ritualTrigger, SPELL_SACRIFICE_VISUAL);
                     }
-
-                    Talk(SAY_SACRIFICED);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                    break;
                 }
+
+                Talk(SAY_SACRIFICED);
+                me->SetStandState(UNIT_STAND_STATE_KNEEL);
             }
         }
 
@@ -627,8 +640,9 @@ public:
             events.Update(diff);
             if (events.GetEvent() == EVENT_RITUAL_BEGIN_MOVE)
             {
+                me->GetMotionMaster()->Clear();
+                me->SetHomePosition(JedogaPosition[2]);
                 me->SetWalk(true);
-                me->GetMotionMaster()->Clear(false);
                 me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[2], false);
                 events.PopEvent();
             }
@@ -720,12 +734,35 @@ class spell_jedoga_sacrafice_beam : public SpellScriptLoader
     }
 };
 
+// CriteriaID 7359, Volunteer Work (2056)
+class achievement_volunteer_work : public AchievementCriteriaScript
+{
+    public:
+        achievement_volunteer_work() : AchievementCriteriaScript("achievement_volunteer_work")
+        {
+        }
+
+        bool OnCheck(Player* /*player*/, Unit* target) override
+        {
+            if (Creature const* jedoga = target ? target->ToCreature() : nullptr)
+            {
+                return jedoga->AI()->GetData(DATA_VOLUNTEER_WORK) == 1;
+            }
+
+            return false;
+        }
+};
+
 void AddSC_boss_jedoga_shadowseeker()
 {
+    // Creatures
     new boss_jedoga_shadowseeker();
     new npc_twilight_volunteer();
 
     // Spells
     new spell_random_lightning_visual_effect();
     new spell_jedoga_sacrafice_beam();
+
+    // Achievements
+    new achievement_volunteer_work();
 }
