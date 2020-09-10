@@ -67,6 +67,10 @@ public:
         void Reset() override
         {
             _Reset();
+            events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8000);
+            events.ScheduleEvent(EVENT_HERALD_SHADOW, 5000);
+            events.ScheduleEvent(EVENT_HERALD_SHIVER, 15000);
+
             insanityTimes = 0;
             insanityHandled = 0;
 
@@ -75,15 +79,7 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
             ResetPlayersPhaseMask();
-
-            if (instance)
-            {
-                instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
-            }
-
-            events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8000);
-            events.ScheduleEvent(EVENT_HERALD_SHADOW, 5000);
-            events.ScheduleEvent(EVENT_HERALD_SHIVER, 15000);
+            instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
         }
 
         void SpellHitTarget(Unit* pTarget, const SpellInfo *spell) override
@@ -113,7 +109,7 @@ public:
                 for (auto const& i : players)
                 {
                     Player *plr = i.GetSource();
-                    if (!plr || !plr->IsAlive() || pTarget->GetGUID() == plr->GetGUID())
+                    if (!plr || !plr->IsAlive() || plr->IsGameMaster() || pTarget->GetGUID() == plr->GetGUID())
                     {
                         continue;
                     }
@@ -140,12 +136,7 @@ public:
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
-
-            if (instance)
-            {
-                instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
-            }
-
+            instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
             me->SetInCombatWithZone();
         }
 
