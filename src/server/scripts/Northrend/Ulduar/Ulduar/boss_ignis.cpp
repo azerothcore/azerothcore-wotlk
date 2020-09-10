@@ -209,7 +209,7 @@ public:
             counter = 0;
             bShattered = false;
             lastShatterMSTime = 0;
-            
+
             if( InstanceScript* m_pInstance = me->GetInstanceScript() )
             {
                 m_pInstance->SetData(TYPE_IGNIS, NOT_STARTED);
@@ -555,7 +555,7 @@ class achievement_ignis_shattered : public AchievementCriteriaScript
         {
             if (!target || target->GetTypeId() != TYPEID_UNIT)
                 return false;
-            return (target->ToCreature()->AI()->GetData(1337) ? true : false);
+            return !!target->ToCreature()->AI()->GetData(1337);
         }
 };
 
