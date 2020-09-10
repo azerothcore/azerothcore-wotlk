@@ -70,7 +70,6 @@ public:
 
         void Reset() override
         {
-            guardianSummoned = false;
             _Reset();
             events.ScheduleEvent(EVENT_SWARMER, 10000);
             events.ScheduleEvent(EVENT_CHECK_HOME, 2000);
@@ -81,6 +80,7 @@ public:
             swarmEggs.clear();
             guardianEggs.clear();
             previousSwarmEgg_GUID = 0;
+            guardianSummoned = false;
         }
 
         void EnterCombat(Unit * /*who*/) override
@@ -131,16 +131,6 @@ public:
         {
             _JustDied();
             Talk(SAY_DEATH);
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            if (summon->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
-            {
-                Talk(SAY_EGG_SAC);
-            }
-                
-            BossAI::JustSummoned(summon);
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*school*/) override
@@ -249,6 +239,11 @@ public:
                 {
                     egg->CastSpell(egg, SPELL_SUMMON_SWARMERS, true, nullptr, nullptr, me->GetGUID());
                 }
+
+                if (roll_chance_f(33))
+                {
+                    Talk(SAY_EGG_SAC);
+                }
             }
             else
             {
@@ -261,6 +256,11 @@ public:
                 if (Creature* egg = ObjectAccessor::GetCreature(*me, guardianEggGUID))
                 {
                     egg->CastSpell(egg, SPELL_SUMMON_SWARM_GUARD, true, nullptr, nullptr, me->GetGUID());
+                }
+
+                if (roll_chance_f(33))
+                {
+                    Talk(SAY_EGG_SAC);
                 }
             }
         }
@@ -283,20 +283,7 @@ public:
 
         void Reset()
         {
-            if (me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
-            {
-                DoCastSelf(SPELL_GUARDIAN_AURA, true);
-            }
-            else // Swarmers
-            {
-                DoCastSelf(SPELL_SWARMER_AURA, true);
-            }
-            
-            if (me->GetEntry() == NPC_AHNKAHAR_SWARMER || me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
-            {
-                me->SetInCombatWithZone();
-            }
-
+            DoCastSelf(me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY ? SPELL_GUARDIAN_AURA : SPELL_SWARMER_AURA, true);
             uiSprintTimer = 10000;
         }
 
