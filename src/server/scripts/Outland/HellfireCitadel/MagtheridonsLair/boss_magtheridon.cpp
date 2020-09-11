@@ -74,7 +74,7 @@ public:
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
     {
         if (Unit* target = ObjectAccessor::GetUnit(_owner, _targetGUID))
-            target->CastSpell(target, SPELL_DEBRIS_DAMAGE, true, NULL, NULL, _owner.GetGUID());
+            target->CastSpell(target, SPELL_DEBRIS_DAMAGE, true, nullptr, nullptr, _owner.GetGUID());
         return true;
     }
 
@@ -236,7 +236,7 @@ class boss_magtheridon : public CreatureScript
                     case EVENT_DEBRIS:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                         {
-                            target->CastSpell(target, SPELL_DEBRIS_VISUAL, true, NULL, NULL, me->GetGUID());
+                            target->CastSpell(target, SPELL_DEBRIS_VISUAL, true, nullptr, nullptr, me->GetGUID());
                             me->m_Events.AddEvent(new DealDebrisDamage(*me, target->GetGUID()), me->m_Events.CalculateTime(5000));
                         }
                         events.ScheduleEvent(EVENT_DEBRIS, 20000);

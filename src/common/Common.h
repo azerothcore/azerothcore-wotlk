@@ -83,7 +83,6 @@
 #include <ace/Guard_T.h>
 #include <ace/RW_Thread_Mutex.h>
 #include <ace/Thread_Mutex.h>
-#include <ace/OS_NS_time.h>
 #include <ace/Stack_Trace.h>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS

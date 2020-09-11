@@ -193,7 +193,7 @@ void Guild::EventLogEntry::WritePacket(WorldPacket& data) const
     if (m_eventType == GUILD_EVENT_LOG_PROMOTE_PLAYER || m_eventType == GUILD_EVENT_LOG_DEMOTE_PLAYER)
         data << uint8(m_newRank);
     // Event timestamp
-    data << uint32(::time(NULL) - m_timestamp);
+    data << uint32(::time(nullptr) - m_timestamp);
 }
 
 // BankEventLogEntry
@@ -243,7 +243,7 @@ void Guild::BankEventLogEntry::WritePacket(WorldPacket& data) const
             data << uint32(m_itemOrMoney);
     }
 
-    data << uint32(time(NULL) - m_timestamp);
+    data << uint32(time(nullptr) - m_timestamp);
 }
 
 // RankInfo
@@ -431,7 +431,7 @@ void Guild::BankTab::Delete(SQLTransaction& trans, bool removeItemsFromDB)
             if (removeItemsFromDB)
                 pItem->DeleteFromDB(trans);
             delete pItem;
-            pItem = NULL;
+            pItem = nullptr;
         }
 }
 
@@ -708,7 +708,7 @@ void Guild::Member::WritePacket(WorldPacket& data, bool sendOfficerNote) const
          << uint32(m_zoneId);
 
     if (!m_flags)
-        data << float(float(::time(NULL) - m_logoutTime) / DAY);
+        data << float(float(::time(nullptr) - m_logoutTime) / DAY);
 
     data << m_publicNote;
 
@@ -847,16 +847,16 @@ bool Guild::PlayerMoveItemData::InitItem()
         if (m_pItem->IsNotEmptyBag())
         {
             m_pPlayer->SendEquipError(EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS, m_pItem);
-            m_pItem = NULL;
+            m_pItem = nullptr;
         }
         // Bound items cannot be put into bank.
         else if (!m_pItem->CanBeTraded())
         {
             m_pPlayer->SendEquipError(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, m_pItem);
-            m_pItem = NULL;
+            m_pItem = nullptr;
         }
     }
-    return (m_pItem != NULL);
+    return (m_pItem != nullptr);
 }
 
 void Guild::PlayerMoveItemData::RemoveItem(SQLTransaction& trans, MoveItemData* /*pOther*/, uint32 splitedAmount)
@@ -871,7 +871,7 @@ void Guild::PlayerMoveItemData::RemoveItem(SQLTransaction& trans, MoveItemData* 
     {
         m_pPlayer->MoveItemFromInventory(m_container, m_slotId, true);
         m_pItem->DeleteFromInventoryDB(trans);
-        m_pItem = NULL;
+        m_pItem = nullptr;
     }
 }
 
@@ -900,7 +900,7 @@ inline InventoryResult Guild::PlayerMoveItemData::CanStore(Item* pItem, bool swa
 bool Guild::BankMoveItemData::InitItem()
 {
     m_pItem = m_pGuild->_GetItem(m_container, m_slotId);
-    return (m_pItem != NULL);
+    return (m_pItem != nullptr);
 }
 
 bool Guild::BankMoveItemData::HasStoreRights(MoveItemData* pOther) const
@@ -938,7 +938,7 @@ void Guild::BankMoveItemData::RemoveItem(SQLTransaction& trans, MoveItemData* pO
     else
     {
         m_pGuild->_RemoveItem(trans, m_container, m_slotId);
-        m_pItem = NULL;
+        m_pItem = nullptr;
     }
     // Decrease amount of player's remaining items (if item is moved to different tab or to player)
     if (!pOther->IsBank() || pOther->GetContainer() != m_container)
@@ -948,11 +948,11 @@ void Guild::BankMoveItemData::RemoveItem(SQLTransaction& trans, MoveItemData* pO
 Item* Guild::BankMoveItemData::StoreItem(SQLTransaction& trans, Item* pItem)
 {
     if (!pItem)
-        return NULL;
+        return nullptr;
 
     BankTab* pTab = m_pGuild->GetBankTab(m_container);
     if (!pTab)
-        return NULL;
+        return nullptr;
 
     Item* pLastItem = pItem;
     for (ItemPosCountVec::const_iterator itr = m_vec.begin(); itr != m_vec.end(); )
@@ -1013,7 +1013,7 @@ Item* Guild::BankMoveItemData::_StoreItem(SQLTransaction& trans, BankTab* pTab, 
     if (pItem && pTab->SetItem(trans, slotId, pItem))
         return pItem;
 
-    return NULL;
+    return nullptr;
 }
 
 // Tries to reserve space for source item.
@@ -1053,10 +1053,10 @@ void Guild::BankMoveItemData::CanStoreItemInTab(Item* pItem, uint8 skipSlotId, b
 
         Item* pItemDest = m_pGuild->_GetItem(m_container, slotId);
         if (pItemDest == pItem)
-            pItemDest = NULL;
+            pItemDest = nullptr;
 
         // If merge skip empty, if not merge skip non-empty
-        if ((pItemDest != NULL) != merge)
+        if ((pItemDest != nullptr) != merge)
             continue;
 
         _ReserveSpace(slotId, pItem, pItemDest, count);
@@ -1084,7 +1084,7 @@ InventoryResult Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
         Item* pItemDest = m_pGuild->_GetItem(m_container, m_slotId);
         // Ignore swapped item (this slot will be empty after move)
         if ((pItemDest == pItem) || swap)
-            pItemDest = NULL;
+            pItemDest = nullptr;
 
         if (!_ReserveSpace(m_slotId, pItem, pItemDest, count))
             return EQUIP_ERR_ITEM_CANT_STACK;
@@ -1117,30 +1117,30 @@ Guild::Guild():
     m_createdDate(0),
     m_accountsNumber(0),
     m_bankMoney(0),
-    m_eventLog(NULL)
+    m_eventLog(nullptr)
 {
     memset(&m_bankEventLog, 0, (GUILD_BANK_MAX_TABS + 1) * sizeof(LogHolder*));
 }
 
 Guild::~Guild()
 {
-    SQLTransaction temp(NULL);
+    SQLTransaction temp(nullptr);
     _DeleteBankItems(temp);
 
     // Cleanup
     delete m_eventLog;
-    m_eventLog = NULL;
+    m_eventLog = nullptr;
 
     for (uint8 tabId = 0; tabId <= GUILD_BANK_MAX_TABS; ++tabId)
     {
         delete m_bankEventLog[tabId];
-        m_bankEventLog[tabId] = NULL;
+        m_bankEventLog[tabId] = nullptr;
     }
 
     for (Members::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         delete itr->second;
-        itr->second = NULL;
+        itr->second = nullptr;
     }
 }
 
@@ -2264,7 +2264,7 @@ bool Guild::AddMember(uint64 guid, uint8 rankId)
         sWorld->UpdateGlobalPlayerGuild(lowguid, m_id);
     }
 
-    SQLTransaction trans(NULL);
+    SQLTransaction trans(nullptr);
     member->SaveToDB(trans);
 
     _UpdateAccountsNumber();
@@ -2286,8 +2286,8 @@ void Guild::DeleteMember(uint64 guid, bool isDisbanding, bool isKicked, bool can
     // or when he is removed from guild by gm command
     if (m_leaderGuid == guid && !isDisbanding)
     {
-        Member* oldLeader = NULL;
-        Member* newLeader = NULL;
+        Member* oldLeader = nullptr;
+        Member* newLeader = nullptr;
         for (Guild::Members::iterator i = m_members.begin(); i != m_members.end(); ++i)
         {
             if (i->first == lowguid)
@@ -2386,7 +2386,7 @@ void Guild::SetBankTabText(uint8 tabId, std::string const& text)
     if (BankTab* pTab = GetBankTab(tabId))
     {
         pTab->SetText(text);
-        pTab->SendText(this, NULL);
+        pTab->SendText(this, nullptr);
     }
 }
 
@@ -2487,7 +2487,7 @@ void Guild::_DeleteBankItems(SQLTransaction& trans, bool removeItemsFromDB)
     {
         m_bankTabs[tabId]->Delete(trans, removeItemsFromDB);
         delete m_bankTabs[tabId];
-        m_bankTabs[tabId] = NULL;
+        m_bankTabs[tabId] = nullptr;
     }
     m_bankTabs.clear();
 }
@@ -2670,13 +2670,13 @@ inline Item* Guild::_GetItem(uint8 tabId, uint8 slotId) const
 {
     if (const BankTab* tab = GetBankTab(tabId))
         return tab->GetItem(slotId);
-    return NULL;
+    return nullptr;
 }
 
 inline void Guild::_RemoveItem(SQLTransaction& trans, uint8 tabId, uint8 slotId)
 {
     if (BankTab* pTab = GetBankTab(tabId))
-        pTab->SetItem(trans, slotId, NULL);
+        pTab->SetItem(trans, slotId, nullptr);
 }
 
 void Guild::_MoveItems(MoveItemData* pSrc, MoveItemData* pDest, uint32 splitedAmount)
@@ -2717,7 +2717,7 @@ void Guild::_MoveItems(MoveItemData* pSrc, MoveItemData* pDest, uint32 splitedAm
     }
     else // 6. No split
     {
-        // 6.1. Try to merge items in destination (pDest->GetItem() == NULL)
+        // 6.1. Try to merge items in destination (pDest->GetItem() == nullptr)
         if (!_DoItemsMove(pSrc, pDest, false)) // Item could not be merged
         {
             // 6.2. Try to swap items
@@ -2732,7 +2732,7 @@ void Guild::_MoveItems(MoveItemData* pSrc, MoveItemData* pDest, uint32 splitedAm
             if (!pDest->HasWithdrawRights(pSrc))
                 return; // Player has no rights to withdraw item from destination (opposite direction)
 
-            // 6.2.3. Swap items (pDest->GetItem() != NULL)
+            // 6.2.3. Swap items (pDest->GetItem() != nullptr)
             _DoItemsMove(pSrc, pDest, true);
         }
     }
@@ -2743,7 +2743,7 @@ void Guild::_MoveItems(MoveItemData* pSrc, MoveItemData* pDest, uint32 splitedAm
 bool Guild::_DoItemsMove(MoveItemData* pSrc, MoveItemData* pDest, bool sendError, uint32 splitedAmount)
 {
     Item* pDestItem = pDest->GetItem();
-    bool swap = (pDestItem != NULL);
+    bool swap = (pDestItem != nullptr);
 
     Item* pSrcItem = pSrc->GetItem(splitedAmount);
     // 1. Can store source item in destination
@@ -2832,7 +2832,7 @@ void Guild::_SendBankContentUpdate(MoveItemData* pSrc, MoveItemData* pDest) cons
 
 void Guild::_SendBankContentUpdate(uint8 tabId, SlotIds slots) const
 {
-    _SendBankList(NULL, tabId, false, &slots);
+    _SendBankList(nullptr, tabId, false, &slots);
 }
 
 void Guild::_BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* param1, const char* param2, const char* param3) const

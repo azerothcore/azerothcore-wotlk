@@ -36,7 +36,7 @@ public:
         bool bAmberVoid;
         bool bEmeraldVoid;
         bool bRubyVoid;
-        
+
         void Initialize()
         {
             EregosCacheGUID = 0;
@@ -52,7 +52,7 @@ public:
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             memset(&DragonCageDoorGUID, 0, sizeof(DragonCageDoorGUID));
         }
-        
+
         void OnCreatureCreate(Creature* pCreature)
         {
             switch( pCreature->GetEntry() )
@@ -118,7 +118,7 @@ public:
             if (unit->GetEntry() == NPC_CENTRIFUGE_CONSTRUCT)
                 SetData(DATA_CC_COUNT, DONE);
         }
-        
+
         void SetData(uint32 type, uint32 data)
         {
             switch( type )
@@ -170,20 +170,20 @@ public:
                         }
                     break;
                 case DATA_AMBER_VOID:
-                    bAmberVoid = data ? true : false;
+                    bAmberVoid = !!data;
                     break;
                 case DATA_EMERALD_VOID:
-                    bEmeraldVoid = data ? true : false;
+                    bEmeraldVoid = !!data;
                     break;
                 case DATA_RUBY_VOID:
-                    bRubyVoid = data ? true : false;
+                    bRubyVoid = !!data;
                     break;
             }
 
             if( data == DONE )
                 SaveToDB();
         }
-        
+
         uint32 GetData(uint32 type) const
         {
             switch( type )
@@ -199,7 +199,7 @@ public:
 
             return 0;
         }
-        
+
         uint64 GetData64(uint32 identifier) const
         {
             switch( identifier )
@@ -221,7 +221,7 @@ public:
             return 0;
         }
 
-        
+
         std::string GetSaveData()
         {
             OUT_SAVE_INST_DATA;

@@ -91,15 +91,15 @@ public:
         uint64 m_algalonTrapdoorGUID;
         uint64 m_brannBronzebeardAlgGUID;
         uint32 m_algalonTimer;
-        
+
         // Shared
         EventMap _events;
         bool m_mimironTramUsed;
         uint64 m_mimironTramGUID;
         uint64 m_keepersgateGUID;
         uint64 m_keepersGossipGUID[4];
-        
-        
+
+
         void Initialize()
         {
             // Bosses
@@ -165,7 +165,7 @@ public:
             m_algalonTrapdoorGUID   = 0;
             m_brannBronzebeardAlgGUID   = 0;
             m_algalonTimer          = 0;
-            
+
             // Shared
             _events.Reset();
             memset(&m_keepersGossipGUID, 0, sizeof(m_keepersGossipGUID));
@@ -380,7 +380,7 @@ public:
             }
 
             bool on = (GetData(type) == DONE && !(GetData(TYPE_WATCHERS) & (1 << (type-TYPE_FREYA))));
-            cr->SetVisible(on ? true : false);
+            cr->SetVisible(on);
         }
 
         void OnGameObjectCreate(GameObject* gameObject)
@@ -624,7 +624,7 @@ public:
                     {
                         instance->LoadGrid(364.0f, -16.0f); //make sure leviathan is loaded
                         m_leviathanTowers[type-EVENT_TOWER_OF_LIFE_DESTROYED] = data;
-                        GameObject* gobj = NULL;
+                        GameObject* gobj = nullptr;
                         if ((gobj = instance->GetGameObject(m_leviathanVisualTowers[type-EVENT_TOWER_OF_LIFE_DESTROYED][0])))
                             gobj->SetGoState(GO_STATE_ACTIVE);
                         if ((gobj = instance->GetGameObject(m_leviathanVisualTowers[type-EVENT_TOWER_OF_LIFE_DESTROYED][1])))
@@ -710,7 +710,7 @@ public:
                     freya->GetGameObjectListWithEntryInGrid(goList, 190171 /*Lichbloom*/, 333.0f);
                     freya->GetGameObjectListWithEntryInGrid(goList, 190170 /*Talandra's Rose*/, 333.0f);
                     freya->GetGameObjectListWithEntryInGrid(goList, 189973 /*Goldclover*/, 333.0f);
-                    
+
                     for (std::list<GameObject*>::const_iterator itr = goList.begin(); itr != goList.end(); ++itr)
                         (*itr)->SetRespawnTime(7*DAY);
                 }
@@ -896,10 +896,10 @@ public:
             }
             else if (unit->GetTypeId() == TYPEID_UNIT && unit->GetAreaId() == 4656 /*Conservatory of Life*/)
             {
-                if (time(NULL) > (m_conspeedatoryAttempt + DAY))
+                if (time(nullptr) > (m_conspeedatoryAttempt + DAY))
                 {
                     DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21597 /*CON-SPEED-ATORY_TIMED_CRITERIA*/);
-                    m_conspeedatoryAttempt = time(NULL);
+                    m_conspeedatoryAttempt = time(nullptr);
                     SaveToDB();
                 }
             }
@@ -961,7 +961,7 @@ public:
                 for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 {
                     loadStream >> m_auiEncounter[i];
-                    
+
                     if (m_auiEncounter[i] == IN_PROGRESS && i != TYPE_WATCHERS)
                         m_auiEncounter[i] = NOT_STARTED;
                 }
@@ -1070,7 +1070,7 @@ public:
     };
 };
 
-const Position vehiclePositions[30] = 
+const Position vehiclePositions[30] =
 {
     // Start Positions
     // Siege
@@ -1127,7 +1127,7 @@ void instance_ulduar::instance_ulduar_InstanceMapScript::SpawnLeviathanEncounter
 
     if (mode < VEHICLE_POS_NONE)
     {
-        TempSummon* veh = NULL;
+        TempSummon* veh = nullptr;
         for (uint8 i = 0; i < (instance->Is25ManRaid() ? 5 : 2); ++i)
         {
             if ((veh = instance->SummonCreature(NPC_SALVAGED_SIEGE_ENGINE, vehiclePositions[15*mode+i])))

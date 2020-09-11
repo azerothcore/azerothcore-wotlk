@@ -39,6 +39,17 @@ enum TimedEvents
     EVENT_RESPAWN_GUNSHIP       = 4
 };
 
+enum Spells
+{
+    SPELL_GAS_VARIABLE      = 74119,
+    SPELL_OOZE_VARIABLE     = 74118,
+    BLOOD_BEAM_VISUAL_RHAND = 72304,
+    BLOOD_BEAM_VISUAL_LHAND = 72303,
+    BLOOD_BEAM_VISUAL_LLEG  = 72302,
+    BLOOD_BEAM_VISUAL_RLEG  = 72301,
+    VOID_ZONE_VISUAL        = 69422
+};
+
 DoorData const doorData[] =
 {
     {GO_LORD_MARROWGAR_S_ENTRANCE,           DATA_LORD_MARROWGAR,        DOOR_TYPE_ROOM,       BOUNDARY_N   },
@@ -212,11 +223,14 @@ class instance_icecrown_citadel : public InstanceMapScript
 
             void FillInitialWorldStates(WorldPacket& data)
             {
-                data << uint32(WORLDSTATE_SHOW_TIMER)         << uint32(BloodQuickeningState == IN_PROGRESS);
-                data << uint32(WORLDSTATE_EXECUTION_TIME)     << uint32(BloodQuickeningMinutes);
-                data << uint32(WORLDSTATE_SHOW_ATTEMPTS)      << uint32(1);
-                data << uint32(WORLDSTATE_ATTEMPTS_REMAINING) << uint32(HeroicAttempts);
-                data << uint32(WORLDSTATE_ATTEMPTS_MAX)       << uint32(MaxHeroicAttempts);
+                if (instance->IsHeroic())
+                {
+                    data << uint32(WORLDSTATE_SHOW_TIMER) << uint32(BloodQuickeningState == IN_PROGRESS);
+                    data << uint32(WORLDSTATE_EXECUTION_TIME) << uint32(BloodQuickeningMinutes);
+                    data << uint32(WORLDSTATE_SHOW_ATTEMPTS) << uint32(1);
+                    data << uint32(WORLDSTATE_ATTEMPTS_REMAINING) << uint32(HeroicAttempts);
+                    data << uint32(WORLDSTATE_ATTEMPTS_MAX) << uint32(MaxHeroicAttempts);
+                }
             }
 
             void OnPlayerAreaUpdate(Player* player, uint32  /*oldArea*/, uint32 newArea)
@@ -230,7 +244,9 @@ class instance_icecrown_citadel : public InstanceMapScript
                     player->SendInitWorldStates(player->GetZoneId(), player->GetAreaId());
                 }
                 else
+                {
                     player->SendUpdateWorldState(WORLDSTATE_SHOW_ATTEMPTS, 0);
+                }
             }
 
             void OnPlayerEnter(Player* player)
@@ -239,8 +255,8 @@ class instance_icecrown_citadel : public InstanceMapScript
                     TeamIdInInstance = player->GetTeamId();
 
                 // for professor putricide hc
-                DoRemoveAurasDueToSpellOnPlayers(74119 /*SPELL_GAS_VARIABLE*/);
-                DoRemoveAurasDueToSpellOnPlayers(74118 /*SPELL_OOZE_VARIABLE*/);
+                DoRemoveAurasDueToSpellOnPlayers(SPELL_GAS_VARIABLE);
+                DoRemoveAurasDueToSpellOnPlayers(SPELL_OOZE_VARIABLE);
 
                 if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                     SpawnGunship();
@@ -467,13 +483,13 @@ class instance_icecrown_citadel : public InstanceMapScript
                         {
                             uint32 spellId = 0;
                             if (creature->GetPositionY() > 2790.0f && creature->GetPositionZ() > 420.0f)
-                                spellId = 72304;
+                                spellId = BLOOD_BEAM_VISUAL_RHAND;
                             else if (creature->GetPositionY() < 2790.0f && creature->GetPositionZ() > 420.0f)
-                                spellId = 72303;
+                                spellId = BLOOD_BEAM_VISUAL_LHAND;
                             else if (creature->GetPositionY() < 2790.0f && creature->GetPositionZ() < 420.0f)
-                                spellId = 72302;
+                                spellId = BLOOD_BEAM_VISUAL_LLEG;
                             else
-                                spellId = 72301;
+                                spellId = BLOOD_BEAM_VISUAL_RLEG;
                             creature->m_Events.AddEvent(new DelayedCastMincharEvent(creature, spellId), creature->m_Events.CalculateTime(1000));
                         }
                         break;
@@ -632,7 +648,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                     case NPC_DEATHSPEAKER_SERVANT:
                         if (Creature* c = unit->SummonCreature(WORLD_TRIGGER, *unit, TEMPSUMMON_TIMED_DESPAWN, 10000))
                         {
-                            c->CastSpell(c, 69422, true);
+                            c->CastSpell(c, VOID_ZONE_VISUAL, true);
                             unit->SummonCreature(NPC_RISEN_DEATHSPEAKER_SERVANT, *unit, TEMPSUMMON_MANUAL_DESPAWN);
                             unit->ToCreature()->DespawnOrUnsummon(3000);
                         }
@@ -1027,7 +1043,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                     if (theLichKing->IsAlive())
                         theLichKing->SetVisible(false);
             }
-            
+
             void RemoveBackPack()
             {
                 for (auto const& itr : instance->GetPlayers())
@@ -1192,7 +1208,7 @@ class instance_icecrown_citadel : public InstanceMapScript
 
                  return true;
             }
-  
+
             void SpawnGunship()
             {
                 if (!GunshipGUID && instance->HavePlayers())
@@ -1212,7 +1228,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                 switch (type)
                 {
                     case DATA_BUFF_AVAILABLE:
-                        IsBuffAvailable = (data ? true : false);
+                        IsBuffAvailable = !!data;
                         if (!IsBuffAvailable)
                         {
                             Map::PlayerList const& plrList = instance->GetPlayers();
@@ -1294,16 +1310,16 @@ class instance_icecrown_citadel : public InstanceMapScript
                         }
                         return;
                     case DATA_BONED_ACHIEVEMENT:
-                        IsBonedEligible = data ? true : false;
+                        IsBonedEligible = !!data;
                         break;
                     case DATA_OOZE_DANCE_ACHIEVEMENT:
-                        IsOozeDanceEligible = data ? true : false;
+                        IsOozeDanceEligible = !!data;
                         break;
                     case DATA_NAUSEA_ACHIEVEMENT:
-                        IsNauseaEligible = data ? true : false;
+                        IsNauseaEligible = !!data;
                         break;
                     case DATA_ORB_WHISPERER_ACHIEVEMENT:
-                        IsOrbWhispererEligible = data ? true : false;
+                        IsOrbWhispererEligible = !!data;
                         break;
                     case DATA_SINDRAGOSA_FROSTWYRMS:
                         FrostwyrmGUIDs.insert(data);
@@ -1560,7 +1576,7 @@ class instance_icecrown_citadel : public InstanceMapScript
 
                 std::ostringstream saveStream;
                 saveStream << "I C " << GetBossSaveData() << HeroicAttempts << ' '
-                    << ColdflameJetsState << ' ' << BloodQuickeningState << ' ' << BloodQuickeningMinutes << ' ' << WeeklyQuestId10 << ' ' << PutricideEventProgress << ' ' 
+                    << ColdflameJetsState << ' ' << BloodQuickeningState << ' ' << BloodQuickeningMinutes << ' ' << WeeklyQuestId10 << ' ' << PutricideEventProgress << ' '
                     << uint32(LichKingHeroicAvailable ? 1 : 0) << ' ' << BloodPrinceTrashCount << ' ' << uint32(IsBuffAvailable ? 1 : 0);
 
 
@@ -1612,10 +1628,10 @@ class instance_icecrown_citadel : public InstanceMapScript
                     loadStream >> WeeklyQuestId10;
                     loadStream >> PutricideEventProgress; PutricideEventProgress &= ~PUTRICIDE_EVENT_FLAG_TRAP_INPROGRESS;
                     loadStream >> temp;
-                    LichKingHeroicAvailable = temp ? true : false;
+                    LichKingHeroicAvailable = !!temp;
                     loadStream >> BloodPrinceTrashCount;
                     loadStream >> temp;
-                    SetData(DATA_BUFF_AVAILABLE, temp ? true : false);
+                    SetData(DATA_BUFF_AVAILABLE, !!temp);
                 }
                 else
                     OUT_LOAD_INST_DATA_FAIL;
