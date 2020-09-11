@@ -15,9 +15,11 @@
 #include "Log.h"
 #include "RASocket.h"
 #include "Util.h"
+#include "Duration.h"
 #include "World.h"
 #include "SHA1.h"
 #include "ServerMotd.h"
+#include <thread>
 
 RASocket::RASocket()
 {
@@ -49,7 +51,7 @@ int RASocket::handle_close(ACE_HANDLE /*handle*/, ACE_Reactor_Mask /*mask*/)
     // RASocket::commandfinished to be completed. Calling destroy() before the latter function ends
     // will lead to using a freed pointer -> crash.
     while (_commandExecuting)
-        ACE_OS::sleep(1);
+        std::this_thread::sleep_for(1s);
 
     destroy();
     return 0;
