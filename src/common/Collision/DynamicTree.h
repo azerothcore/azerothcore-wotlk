@@ -20,7 +20,7 @@ struct DynTreeImpl;
 
 class DynamicMapTree
 {
-    DynTreeImpl *impl;
+    DynTreeImpl* impl;
 
 public:
 
