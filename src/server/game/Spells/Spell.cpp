@@ -4291,60 +4291,93 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
     switch (result)
     {
         case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
+        {
             data << uint32(spellInfo->RequiresSpellFocus);  // SpellFocusObject.dbc id
             break;
+        }
         case SPELL_FAILED_REQUIRES_AREA:                    // AreaTable.dbc id
+        {
             // hardcode areas limitation case
             switch (spellInfo->Id)
             {
                 case 41617:                                 // Cenarion Mana Salve
                 case 41619:                                 // Cenarion Healing Salve
+                {
                     data << uint32(3905);
                     break;
+                }
                 case 41618:                                 // Bottled Nethergon Energy
                 case 41620:                                 // Bottled Nethergon Vapor
+                {
                     data << uint32(3842);
                     break;
+                }
                 case 45373:                                 // Bloodberry Elixir
+                {
                     data << uint32(4075);
                     break;
+                }
                 default:                                    // default case (don't must be)
+                {
                     data << uint32(0);
                     break;
+                }
             }
             break;
+        }
         case SPELL_FAILED_TOTEMS:
             if (spellInfo->Totem[0])
+            {
                 data << uint32(spellInfo->Totem[0]);
+            }
+
             if (spellInfo->Totem[1])
+            {
                 data << uint32(spellInfo->Totem[1]);
+            }
             break;
         case SPELL_FAILED_TOTEM_CATEGORY:
             if (spellInfo->TotemCategory[0])
+            {
                 data << uint32(spellInfo->TotemCategory[0]);
+            }
+
             if (spellInfo->TotemCategory[1])
+            {
                 data << uint32(spellInfo->TotemCategory[1]);
+            }
             break;
         case SPELL_FAILED_EQUIPPED_ITEM_CLASS:
         case SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND:
         case SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND:
+        {
             data << uint32(spellInfo->EquippedItemClass);
             data << uint32(spellInfo->EquippedItemSubClassMask);
             break;
+        }
         case SPELL_FAILED_TOO_MANY_OF_ITEM:
         {
              uint32 item = 0;
              for (int8 eff = 0; eff < MAX_SPELL_EFFECTS; eff++)
+             {
                  if (spellInfo->Effects[eff].ItemType)
+                 {
                      item = spellInfo->Effects[eff].ItemType;
-             ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item);
-             if (proto && proto->ItemLimitCategory)
-                 data << uint32(proto->ItemLimitCategory);
-             break;
+                 }
+
+                 ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item);
+                 if (proto && proto->ItemLimitCategory)
+                 {
+                     data << uint32(proto->ItemLimitCategory);
+                 }
+                 break;
+             }
         }
         case SPELL_FAILED_CUSTOM_ERROR:
+        {
             data << uint32(customError);
             break;
+        }
         case SPELL_FAILED_REAGENTS:
         {
             uint32 missingItem = 0;
@@ -4367,22 +4400,32 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
             break;
         }
         case SPELL_FAILED_PREVENTED_BY_MECHANIC:
+        {
             data << uint32(spellInfo->Mechanic);
             break;
+        }
         case SPELL_FAILED_NEED_EXOTIC_AMMO:
+        {
             data << uint32(spellInfo->EquippedItemSubClassMask);
             break;
+        }
         case SPELL_FAILED_NEED_MORE_ITEMS:
+        {
             data << uint32(0); // Item entry
             data << uint32(0); // Count
             break;
+        }
         case SPELL_FAILED_MIN_SKILL:
+        {
             data << uint32(0); // SkillLine.dbc Id
             data << uint32(0); // Amount
             break;
+        }
         case SPELL_FAILED_FISHING_TOO_LOW:
+        {
             data << uint32(0); // Skill level
             break;
+        }
         default:
             break;
     }
@@ -4391,7 +4434,9 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
 void Spell::SendCastResult(Player* caster, SpellInfo const* spellInfo, uint8 castCount, SpellCastResult result, SpellCustomErrors customError /*= SPELL_CUSTOM_ERROR_NONE*/)
 {
     if (result == SPELL_CAST_OK)
+    {
         return;
+    }
 
     WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1);
     WriteCastResultInfo(data, caster, spellInfo, castCount, result, customError);
@@ -4402,17 +4447,25 @@ void Spell::SendCastResult(Player* caster, SpellInfo const* spellInfo, uint8 cas
 void Spell::SendCastResult(SpellCastResult result)
 {
     if (result == SPELL_CAST_OK)
+    {
         return;
+    }
 
     if (m_caster->GetTypeId() != TYPEID_PLAYER || m_caster->IsCharmed())
+    {
         return;
+    }
 
     if (m_caster->ToPlayer()->GetSession()->PlayerLoading())  // don't send cast results at loading time
+    {
         return;
+    }
 
     // Xinef: override every possible result, except for gm fail result... breaks many things and goes unnoticed because of this and makes me rage when i find this out
     if ((_triggeredCastFlags & TRIGGERED_DONT_REPORT_CAST_ERROR) && result != SPELL_FAILED_BM_OR_INVISGOD)
+    {
         result = SPELL_FAILED_DONT_REPORT;
+    }
 
     SendCastResult(m_caster->ToPlayer(), m_spellInfo, m_cast_count, result, m_customError);
 }
@@ -4420,15 +4473,21 @@ void Spell::SendCastResult(SpellCastResult result)
 void Spell::SendPetCastResult(SpellCastResult result)
 {
     if (result == SPELL_CAST_OK)
+    {
         return;
+    }
 
     Unit* owner = m_caster->GetCharmerOrOwner();
     if (!owner)
+    {
         return;
+    }
 
     Player* player = owner->ToPlayer();
     if (!player)
+    {
         return;
+    }
 
     WorldPacket data(SMSG_PET_CAST_FAILED, 1 + 4 + 1);
     WriteCastResultInfo(data, player, m_spellInfo, m_cast_count, result, m_customError);
@@ -4439,32 +4498,45 @@ void Spell::SendPetCastResult(SpellCastResult result)
 void Spell::SendSpellStart()
 {
     if (!IsNeedSendToClient(false))
+    {
         return;
+    }
 
     //sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
 
     uint32 castFlags = CAST_FLAG_UNKNOWN_2;
 
     if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_spellInfo->IsChanneled())
+    {
         castFlags |= CAST_FLAG_PENDING;
+    }
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_REQ_AMMO) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
     {
         castFlags |= CAST_FLAG_AMMO;
     }
+
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
         (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
-         && m_spellInfo->PowerType != POWER_HEALTH)
+        && m_spellInfo->PowerType != POWER_HEALTH)
+    {
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+    }
 
     if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNE)
+    {
         castFlags |= CAST_FLAG_NO_GCD; // not needed, but Blizzard sends it
+    }
 
     WorldPacket data(SMSG_SPELL_START, (8+8+4+4+2));
     if (m_CastItem)
+    {
         data.append(m_CastItem->GetPackGUID());
+    }
     else
+    {
         data.append(m_caster->GetPackGUID());
+    }
 
     data.append(m_caster->GetPackGUID());
     data << uint8(m_cast_count);                            // pending spell cast?
@@ -4475,10 +4547,14 @@ void Spell::SendSpellStart()
     m_targets.Write(data);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
+    {
         data << uint32(m_caster->GetPower((Powers)m_spellInfo->PowerType));
+    }
 
     if (castFlags & CAST_FLAG_AMMO)
+    {
         WriteAmmoToPacket(&data);
+    }
 
     if (castFlags & CAST_FLAG_UNKNOWN_23)
     {
@@ -4489,14 +4565,18 @@ void Spell::SendSpellStart()
     m_caster->SendMessageToSet(&data, true);
 
     if (!m_spellInfo->IsChanneled() && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->NeedSendSpectatorData())
+    {
         ArenaSpectator::SendCommand_Spell(m_caster->FindMap(), m_caster->GetGUID(), "SPE", m_spellInfo->Id, m_timer);
+    }
 }
 
 void Spell::SendSpellGo()
 {
     // not send invisible spell casting
     if (!IsNeedSendToClient(true))
+    {
         return;
+    }
 
     //sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Sending SMSG_SPELL_GO id=%u", m_spellInfo->Id);
 
@@ -4504,7 +4584,9 @@ void Spell::SendSpellGo()
 
     // triggered spells with spell visual != 0
     if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_spellInfo->IsChanneled())
+    {
         castFlags |= CAST_FLAG_PENDING;
+    }
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_REQ_AMMO) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
     {
@@ -4514,7 +4596,9 @@ void Spell::SendSpellGo()
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
         (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
         && m_spellInfo->PowerType != POWER_HEALTH)
+    {
         castFlags |= CAST_FLAG_POWER_LEFT_SELF; // should only be sent to self, but the current messaging doesn't make that possible
+    }
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
         && (m_caster->getClass() == CLASS_DEATH_KNIGHT)
@@ -4526,20 +4610,30 @@ void Spell::SendSpellGo()
     }
 
     if (m_spellInfo->HasEffect(SPELL_EFFECT_ACTIVATE_RUNE))
+    {
         castFlags |= CAST_FLAG_RUNE_LIST;                    // rune cooldowns list
+    }
 
     if (m_targets.HasTraj())
+    {
         castFlags |= CAST_FLAG_ADJUST_MISSILE;
+    }
 
     if (!m_spellInfo->StartRecoveryTime)
+    {
         castFlags |= CAST_FLAG_NO_GCD;
+    }
 
     WorldPacket data(SMSG_SPELL_GO, 150);                    // guess size
 
     if (m_CastItem)
+    {
         data.append(m_CastItem->GetPackGUID());
+    }
     else
+    {
         data.append(m_caster->GetPackGUID());
+    }
 
     data.append(m_caster->GetPackGUID());
     data << uint8(m_cast_count);                            // pending spell cast?
@@ -4552,7 +4646,9 @@ void Spell::SendSpellGo()
     m_targets.Write(data);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
+    {
         data << uint32(m_caster->GetPower((Powers)m_spellInfo->PowerType));
+    }
 
     if (castFlags & CAST_FLAG_RUNE_LIST)                   // rune cooldowns list
     {
