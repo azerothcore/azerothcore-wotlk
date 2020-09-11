@@ -14,8 +14,8 @@
 /// Command Line Interface handling thread
 class CliRunnable : public acore::Runnable
 {
-    public:
-        void run();
+public:
+    void run();
 };
 
 #endif
