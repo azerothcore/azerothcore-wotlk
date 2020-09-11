@@ -1399,7 +1399,7 @@ class ScriptMgr
 
     public: /* AchievementCriteriaScript */
 
-        bool OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id);
+        bool OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target);
 
     public: /* PlayerScript */
 
