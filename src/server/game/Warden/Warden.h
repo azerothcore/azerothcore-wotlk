@@ -38,7 +38,7 @@ enum WardenCheckType
     PAGE_CHECK_A            = 0xB2, // 178: uint Seed + byte[20] SHA1 + uint Addr + byte Len (scans all pages for specified hash)
     PAGE_CHECK_B            = 0xBF, // 191: uint Seed + byte[20] SHA1 + uint Addr + byte Len (scans only pages starts with MZ+PE headers for specified hash)
     MPQ_CHECK               = 0x98, // 152: byte fileNameIndex (check to ensure MPQ file isn't modified)
-    LUA_STR_CHECK           = 0x8B, // 139: byte luaNameIndex (check to ensure LUA string isn't used)
+    LUA_EVAL_CHECK          = 139,  // evaluate arbitrary Lua check
     DRIVER_CHECK            = 0x71, // 113: uint Seed + byte[20] SHA1 + byte driverNameIndex (check to ensure driver isn't loaded)
     TIMING_CHECK            = 0x57, //  87: empty (check to ensure GetTickCount() isn't detoured)
     PROC_CHECK              = 0x7E, // 126: uint Seed + byte[20] SHA1 + byte moluleNameIndex + byte procNameIndex + uint Offset + byte Len (check to ensure proc isn't detoured)
@@ -104,6 +104,10 @@ class Warden
         virtual void HandleHashResult(ByteBuffer &buff) = 0;
         virtual void RequestData() = 0;
         virtual void HandleData(ByteBuffer &buff) = 0;
+        bool ProcessLuaCheckResponse(std::string const& msg);
+
+        // If nullptr is passed, the default action from config is executed
+        void ApplyPenalty(WardenCheck const* check);
 
         void SendModuleToClient();
         void RequestModule();

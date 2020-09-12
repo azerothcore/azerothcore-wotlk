@@ -22,6 +22,13 @@
 #include "WardenCheckMgr.h"
 #include "AccountMgr.h"
 
+// GUILD is the shortest string that has no client validation (RAID only sends if in a raid group)
+static constexpr char _luaEvalPrefix[] = "local S,T,R=SendAddonMessage,function()";
+static constexpr char _luaEvalMidfix[] = " end R=S and T()if R then S('_TW',";
+static constexpr char _luaEvalPostfix[] = ",'GUILD')end";
+
+static_assert((sizeof(_luaEvalPrefix)-1 + sizeof(_luaEvalMidfix)-1 + sizeof(_luaEvalPostfix)-1 + WARDEN_MAX_LUA_CHECK_LENGTH) == 255);
+
 WardenWin::WardenWin() : Warden(), _serverTicks(0) { }
 
 WardenWin::~WardenWin()
@@ -116,7 +123,7 @@ void WardenWin::InitializeModule()
     Request.Unk3 = 4;
     Request.Unk4 = 0;
     Request.String_library2 = 0;
-    Request.Function2 = 0x00419D40;                         // 0x00400000 + 0x00419D40 FrameScript::GetText
+    Request.Function2 = 0x00419210;                         // 0x00400000 + 0x00419210 FrameScript::Execute
     Request.Function2_set = 1;
     Request.CheckSumm2 = BuildChecksum(&Request.Unk2, 8);
 
@@ -247,7 +254,7 @@ void WardenWin::RequestData()
             switch (wd->Type)
             {
                 case MPQ_CHECK:
-                case LUA_STR_CHECK:
+                case LUA_EVAL_CHECK:
                 case DRIVER_CHECK:
                     buff << uint8(wd->Str.size());
                     buff.append(wd->Str.c_str(), wd->Str.size());
@@ -289,7 +296,7 @@ void WardenWin::RequestData()
                 break;
             }
             case MPQ_CHECK:
-            case LUA_STR_CHECK:
+            case LUA_EVAL_CHECK:
             {
                 buff << uint8(index++);
                 break;
@@ -477,36 +484,16 @@ void WardenWin::HandleData(ByteBuffer &buff)
 #endif
                 break;
             }
-            case LUA_STR_CHECK:
+            case LUA_EVAL_CHECK:
             {
-                uint8 Lua_Result;
-                buff >> Lua_Result;
-
-                if (Lua_Result != 0)
+                uint8 const result = buff.read<uint8>();
+                if (result == 0)
                 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_WARDEN, "RESULT LUA_STR_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
-#endif
-                    checkFailed = *itr;
-                    continue;
+                    buff.read_skip(buff.read<uint8>()); // discard attached string
                 }
 
-                uint8 luaStrLen;
-                buff >> luaStrLen;
-
-                if (luaStrLen != 0)
-                {
-                    char *str = new char[luaStrLen + 1];
-                    memcpy(str, buff.contents() + buff.rpos(), luaStrLen);
-                    str[luaStrLen] = '\0'; // null terminator
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_WARDEN, "Lua string: %s", str);
-#endif
-                    delete[] str;
-                }
-                buff.rpos(buff.rpos() + luaStrLen);         // Skip string
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_WARDEN, "RESULT LUA_STR_CHECK passed, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                sLog->outDebug(LOG_FILTER_WARDEN, "LUA_EVAL_CHECK CheckId %u account Id %u got in-warden dummy response", *itr, _session->GetAccountId()/* , result */);
 #endif
                 break;
             }

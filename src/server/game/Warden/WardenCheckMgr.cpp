@@ -78,6 +78,12 @@ void WardenCheckMgr::LoadWardenChecks()
         wardenCheck->Type = checkType;
         wardenCheck->CheckId = id;
 
+        if ((checkType == LUA_EVAL_CHECK) && (id > 9999))
+        {
+            sLog->outError("sql.sql: Warden Lua check with id %u found in `warden_checks`. Lua checks may have four-digit IDs at most. Skipped.", id);
+            continue;
+        }
+
         // Initialize action with default action from config
         wardenCheck->Action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
 
@@ -97,9 +103,13 @@ void WardenCheckMgr::LoadWardenChecks()
         }
 
         if (checkType == MEM_CHECK || checkType == MODULE_CHECK)
+        {
             MemChecksIdPool.push_back(id);
+        }
         else
+        {
             OtherChecksIdPool.push_back(id);
+        }
 
         if (checkType == MEM_CHECK || checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == PROC_CHECK)
         {
@@ -108,8 +118,10 @@ void WardenCheckMgr::LoadWardenChecks()
         }
 
         // PROC_CHECK support missing
-        if (checkType == MEM_CHECK || checkType == MPQ_CHECK || checkType == LUA_STR_CHECK || checkType == DRIVER_CHECK || checkType == MODULE_CHECK)
+        if (checkType == MEM_CHECK || checkType == MPQ_CHECK || checkType == LUA_EVAL_CHECK || checkType == DRIVER_CHECK || checkType == MODULE_CHECK)
+        {
             wardenCheck->Str = str;
+        }
 
         CheckStore[id] = wardenCheck;
 
@@ -134,6 +146,19 @@ void WardenCheckMgr::LoadWardenChecks()
             wardenCheck->Comment = "Undocumented Check";
         else
             wardenCheck->Comment = comment;
+
+        if (checkType == LUA_EVAL_CHECK)
+        {
+            if (wardenCheck->Length > WARDEN_MAX_LUA_CHECK_LENGTH)
+            {
+                sLog->outError("sql.sql: Found over-long Lua check for Warden check with id %u in `warden_checks`. Max length is %u. Skipped.", id, WARDEN_MAX_LUA_CHECK_LENGTH);
+                continue;
+            }
+
+            std::string str = fmt::sprintf("%04u", id);
+            ASSERT(str.size() == 4);
+            std::copy(str.begin(), str.end(), wardenCheck->Str.begin());
+        }
 
         ++count;
     }
@@ -207,3 +232,10 @@ WardenCheckResult* WardenCheckMgr::GetWardenResultById(uint16 Id)
         return itr->second;
     return nullptr;
 }
+
+WardenCheck const& WardenCheckMgr::GetCheckData(uint16 Id) const
+{
+    ASSERT(Id < _checks.size(), "Requested Warden data for invalid check ID %u", uint32(Id));
+    return _checks[Id];
+}
+
