@@ -1,3 +1,19 @@
+-- DB update 2020_09_10_02 -> 2020_09_12_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_09_10_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_09_10_02 2020_09_12_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1598238244990167657'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1598238244990167657');
 
 UPDATE `creature_template` SET `faction` = 21 WHERE `entry` = 14688;
@@ -26,3 +42,12 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 	(14688, 0, 20, 21, 61, 0, 100, 0, 0, 0, 0, 0, 0, 28, 61144, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Prince Sandoval - Out of Combat - Remove Aura \'Fire Shield\''),
 	(14688, 0, 21, 22, 61, 0, 100, 0, 0, 0, 0, 0, 0, 28, 61145, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Prince Sandoval - Out of Combat - Remove Aura \'Ember Shower\''),
 	(14688, 0, 22, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Prince Sandoval - Out of Combat - Set Rooted Off');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
