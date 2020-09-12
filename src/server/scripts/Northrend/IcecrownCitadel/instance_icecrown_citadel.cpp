@@ -1043,7 +1043,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                     if (theLichKing->IsAlive())
                         theLichKing->SetVisible(false);
             }
-            
+
             void RemoveBackPack()
             {
                 for (auto const& itr : instance->GetPlayers())
@@ -1208,7 +1208,7 @@ class instance_icecrown_citadel : public InstanceMapScript
 
                  return true;
             }
-  
+
             void SpawnGunship()
             {
                 if (!GunshipGUID && instance->HavePlayers())
@@ -1228,7 +1228,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                 switch (type)
                 {
                     case DATA_BUFF_AVAILABLE:
-                        IsBuffAvailable = (data ? true : false);
+                        IsBuffAvailable = !!data;
                         if (!IsBuffAvailable)
                         {
                             Map::PlayerList const& plrList = instance->GetPlayers();
@@ -1310,16 +1310,16 @@ class instance_icecrown_citadel : public InstanceMapScript
                         }
                         return;
                     case DATA_BONED_ACHIEVEMENT:
-                        IsBonedEligible = data ? true : false;
+                        IsBonedEligible = !!data;
                         break;
                     case DATA_OOZE_DANCE_ACHIEVEMENT:
-                        IsOozeDanceEligible = data ? true : false;
+                        IsOozeDanceEligible = !!data;
                         break;
                     case DATA_NAUSEA_ACHIEVEMENT:
-                        IsNauseaEligible = data ? true : false;
+                        IsNauseaEligible = !!data;
                         break;
                     case DATA_ORB_WHISPERER_ACHIEVEMENT:
-                        IsOrbWhispererEligible = data ? true : false;
+                        IsOrbWhispererEligible = !!data;
                         break;
                     case DATA_SINDRAGOSA_FROSTWYRMS:
                         FrostwyrmGUIDs.insert(data);
@@ -1576,7 +1576,7 @@ class instance_icecrown_citadel : public InstanceMapScript
 
                 std::ostringstream saveStream;
                 saveStream << "I C " << GetBossSaveData() << HeroicAttempts << ' '
-                    << ColdflameJetsState << ' ' << BloodQuickeningState << ' ' << BloodQuickeningMinutes << ' ' << WeeklyQuestId10 << ' ' << PutricideEventProgress << ' ' 
+                    << ColdflameJetsState << ' ' << BloodQuickeningState << ' ' << BloodQuickeningMinutes << ' ' << WeeklyQuestId10 << ' ' << PutricideEventProgress << ' '
                     << uint32(LichKingHeroicAvailable ? 1 : 0) << ' ' << BloodPrinceTrashCount << ' ' << uint32(IsBuffAvailable ? 1 : 0);
 
 
@@ -1628,10 +1628,10 @@ class instance_icecrown_citadel : public InstanceMapScript
                     loadStream >> WeeklyQuestId10;
                     loadStream >> PutricideEventProgress; PutricideEventProgress &= ~PUTRICIDE_EVENT_FLAG_TRAP_INPROGRESS;
                     loadStream >> temp;
-                    LichKingHeroicAvailable = temp ? true : false;
+                    LichKingHeroicAvailable = !!temp;
                     loadStream >> BloodPrinceTrashCount;
                     loadStream >> temp;
-                    SetData(DATA_BUFF_AVAILABLE, temp ? true : false);
+                    SetData(DATA_BUFF_AVAILABLE, !!temp);
                 }
                 else
                     OUT_LOAD_INST_DATA_FAIL;

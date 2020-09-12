@@ -9,8 +9,8 @@
 #include "Log.h"
 
 PreparedStatement::PreparedStatement(uint32 index) :
-m_stmt(NULL),
-m_index(index)
+    m_stmt(NULL),
+    m_index(index)
 {
 }
 
@@ -68,17 +68,17 @@ void PreparedStatement::BindParameters()
                 break;
         }
     }
-    #ifdef _DEBUG
+#ifdef _DEBUG
     if (i < m_stmt->m_paramCount)
         sLog->outSQLDriver("[WARNING]: BindParameters() for statement %u did not bind all allocated parameters", m_index);
-    #endif
+#endif
 }
 
 //- Bind to buffer
 void PreparedStatement::setBool(const uint8 index, const bool value)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].data.boolean = value;
     statement_data[index].type = TYPE_BOOL;
@@ -87,7 +87,7 @@ void PreparedStatement::setBool(const uint8 index, const bool value)
 void PreparedStatement::setUInt8(const uint8 index, const uint8 value)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].data.ui8 = value;
     statement_data[index].type = TYPE_UI8;
@@ -96,7 +96,7 @@ void PreparedStatement::setUInt8(const uint8 index, const uint8 value)
 void PreparedStatement::setUInt16(const uint8 index, const uint16 value)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].data.ui16 = value;
     statement_data[index].type = TYPE_UI16;
@@ -105,7 +105,7 @@ void PreparedStatement::setUInt16(const uint8 index, const uint16 value)
 void PreparedStatement::setUInt32(const uint8 index, const uint32 value)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].data.ui32 = value;
     statement_data[index].type = TYPE_UI32;
@@ -114,7 +114,7 @@ void PreparedStatement::setUInt32(const uint8 index, const uint32 value)
 void PreparedStatement::setUInt64(const uint8 index, const uint64 value)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].data.ui64 = value;
     statement_data[index].type = TYPE_UI64;
@@ -123,7 +123,7 @@ void PreparedStatement::setUInt64(const uint8 index, const uint64 value)
 void PreparedStatement::setInt8(const uint8 index, const int8 value)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].data.i8 = value;
     statement_data[index].type = TYPE_I8;
@@ -132,7 +132,7 @@ void PreparedStatement::setInt8(const uint8 index, const int8 value)
 void PreparedStatement::setInt16(const uint8 index, const int16 value)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].data.i16 = value;
     statement_data[index].type = TYPE_I16;
@@ -141,7 +141,7 @@ void PreparedStatement::setInt16(const uint8 index, const int16 value)
 void PreparedStatement::setInt32(const uint8 index, const int32 value)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].data.i32 = value;
     statement_data[index].type = TYPE_I32;
@@ -150,7 +150,7 @@ void PreparedStatement::setInt32(const uint8 index, const int32 value)
 void PreparedStatement::setInt64(const uint8 index, const int64 value)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].data.i64 = value;
     statement_data[index].type = TYPE_I64;
@@ -159,7 +159,7 @@ void PreparedStatement::setInt64(const uint8 index, const int64 value)
 void PreparedStatement::setFloat(const uint8 index, const float value)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].data.f = value;
     statement_data[index].type = TYPE_FLOAT;
@@ -168,7 +168,7 @@ void PreparedStatement::setFloat(const uint8 index, const float value)
 void PreparedStatement::setDouble(const uint8 index, const double value)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].data.d = value;
     statement_data[index].type = TYPE_DOUBLE;
@@ -177,7 +177,7 @@ void PreparedStatement::setDouble(const uint8 index, const double value)
 void PreparedStatement::setString(const uint8 index, const std::string& value)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].str = value;
     statement_data[index].type = TYPE_STRING;
@@ -186,15 +186,15 @@ void PreparedStatement::setString(const uint8 index, const std::string& value)
 void PreparedStatement::setNull(const uint8 index)
 {
     if (index >= statement_data.size())
-        statement_data.resize(index+1);
+        statement_data.resize(index + 1);
 
     statement_data[index].type = TYPE_NULL;
 }
 
 MySQLPreparedStatement::MySQLPreparedStatement(MYSQL_STMT* stmt) :
-m_stmt(NULL),
-m_Mstmt(stmt),
-m_bind(NULL)
+    m_stmt(NULL),
+    m_Mstmt(stmt),
+    m_bind(NULL)
 {
     /// Initialize variable parameters
     m_paramCount = mysql_stmt_param_count(stmt);
@@ -221,7 +221,7 @@ MySQLPreparedStatement::~MySQLPreparedStatement()
 
 void MySQLPreparedStatement::ClearParameters()
 {
-    for (uint32 i=0; i < m_paramCount; ++i)
+    for (uint32 i = 0; i < m_paramCount; ++i)
     {
         delete m_bind[i].length;
         m_bind[i].length = NULL;
@@ -339,12 +339,12 @@ void MySQLPreparedStatement::setString(const uint8 index, const char* value)
     MYSQL_BIND* param = &m_bind[index];
     size_t len = strlen(value) + 1;
     param->buffer_type = MYSQL_TYPE_VAR_STRING;
-    delete [] static_cast<char *>(param->buffer);
+    delete [] static_cast<char*>(param->buffer);
     param->buffer = new char[len];
     param->buffer_length = len;
     param->is_null_value = 0;
     delete param->length;
-    param->length = new unsigned long(len-1);
+    param->length = new unsigned long(len - 1);
 
     memcpy(param->buffer, value, len);
 }
@@ -355,7 +355,7 @@ void MySQLPreparedStatement::setNull(const uint8 index)
     m_paramsSet[index] = true;
     MYSQL_BIND* param = &m_bind[index];
     param->buffer_type = MYSQL_TYPE_NULL;
-    delete [] static_cast<char *>(param->buffer);
+    delete [] static_cast<char*>(param->buffer);
     param->buffer = NULL;
     param->buffer_length = 0;
     param->is_null_value = 1;
@@ -366,7 +366,7 @@ void MySQLPreparedStatement::setNull(const uint8 index)
 void MySQLPreparedStatement::setValue(MYSQL_BIND* param, enum_field_types type, const void* value, uint32 len, bool isUnsigned)
 {
     param->buffer_type = type;
-    delete [] static_cast<char *>(param->buffer);
+    delete [] static_cast<char*>(param->buffer);
     param->buffer = new char[len];
     param->buffer_length = 0;
     param->is_null_value = 0;
@@ -439,15 +439,15 @@ std::string MySQLPreparedStatement::getQueryString(std::string const& sqlPattern
 
 //- Execution
 PreparedStatementTask::PreparedStatementTask(PreparedStatement* stmt) :
-m_stmt(stmt),
-m_has_result(false)
+    m_stmt(stmt),
+    m_has_result(false)
 {
 }
 
 PreparedStatementTask::PreparedStatementTask(PreparedStatement* stmt, PreparedQueryResultFuture result) :
-m_stmt(stmt),
-m_has_result(true),
-m_result(result)
+    m_stmt(stmt),
+    m_has_result(true),
+    m_result(result)
 {
 }
 
