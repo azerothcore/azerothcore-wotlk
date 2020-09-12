@@ -341,7 +341,7 @@ class npc_wg_queue : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (CONFIG_WINTERGRASP_ENABLE == false)
+                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE))
                     return;
 
                 ScriptedAI::UpdateAI(diff);
