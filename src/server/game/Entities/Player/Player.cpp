@@ -2018,6 +2018,11 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
     uint8 hairColor = fields[8].GetUInt8();
     uint8 facialStyle = fields[9].GetUInt8();
 
+    uint32 charFlags = 0;
+    uint32 playerFlags = fields[17].GetUInt32();
+    uint16 atLoginFlags = fields[18].GetUInt16();
+    uint32 zone = (atLoginFlags & AT_LOGIN_FIRST) != 0 ? 0 : fields[11].GetUInt16(); // if first login do not show the zone
+
     *data << uint8(skin);
     *data << uint8(face);
     *data << uint8(hairStyle);
@@ -2025,7 +2030,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
     *data << uint8(facialStyle);
 
     *data << uint8(fields[10].GetUInt8());                   // level
-    *data << uint32(fields[11].GetUInt16());                 // zone
+    *data << uint32(zone);                                   // zone
     *data << uint32(fields[12].GetUInt16());                 // map
 
     *data << fields[13].GetFloat();                          // x
@@ -2034,9 +2039,6 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
 
     *data << uint32(fields[16].GetUInt32());                 // guild id
 
-    uint32 charFlags = 0;
-    uint32 playerFlags = fields[17].GetUInt32();
-    uint16 atLoginFlags = fields[18].GetUInt16();
     if (playerFlags & PLAYER_FLAGS_HIDE_HELM)
         charFlags |= CHARACTER_FLAG_HIDE_HELM;
     if (playerFlags & PLAYER_FLAGS_HIDE_CLOAK)
@@ -22582,13 +22584,13 @@ bool Player::EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot)
         switch (Condition->Comparator[i])
         {
             case 2:                                         // requires less <color> than (<value> || <comparecolor>) gems
-                activate &= (_cur_gem < _cmp_gem) ? true : false;
+                activate &= (_cur_gem < _cmp_gem);
                 break;
             case 3:                                         // requires more <color> than (<value> || <comparecolor>) gems
-                activate &= (_cur_gem > _cmp_gem) ? true : false;
+                activate &= (_cur_gem > _cmp_gem);
                 break;
             case 5:                                         // requires at least <color> than (<value> || <comparecolor>) gems
-                activate &= (_cur_gem >= _cmp_gem) ? true : false;
+                activate &= (_cur_gem >= _cmp_gem);
                 break;
         }
     }
@@ -27408,7 +27410,7 @@ void Player::_LoadBrewOfTheMonth(PreparedQueryResult result)
 
     time_t curtime = time(nullptr);
     tm localTime;
-    ACE_OS::localtime_r(&curtime, &localTime);
+    localtime_r(&curtime, &localTime);
 
     uint16 month = uint16(localTime.tm_mon);
     uint16 eventId = month;
