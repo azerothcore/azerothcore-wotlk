@@ -18,19 +18,16 @@ jobs:
         # we can include specific combinations here
         include:
           - os: ubuntu-20.04
-            compiler: clang6
-            modules: without
-          - os: ubuntu-20.04
             compiler: clang9
             modules: without
           - os: ubuntu-18.04
-            compiler: clang
+            compiler: clang # default in 18.04 is clang 6
             modules: without
           - os: ubuntu-18.04
-            compiler: gcc # default in 18.04 is 7
+            compiler: gcc # default in 18.04 is gcc 7
             modules: without
           - os: ubuntu-20.04
-            compiler: gcc # default in 20.04 is 9
+            compiler: gcc # default in 20.04 is gcc 9
             modules: without
           - os: ubuntu-20.04
             compiler: gcc10
