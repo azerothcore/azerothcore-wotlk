@@ -1949,34 +1949,35 @@ class spell_icc_sprit_alarm : public SpellScriptLoader
             void HandleEvent(SpellEffIndex effIndex)
             {
                 PreventHitDefaultEffect(effIndex);
-                float range = 0.0f;
+                uint32 trapId = 0;
                 switch (GetSpellInfo()->Effects[effIndex].MiscValue)
                 {
                     case EVENT_AWAKEN_WARD_1:
+                        trapId = GO_SPIRIT_ALARM_1;
+                        break;
                     case EVENT_AWAKEN_WARD_2:
-                        range = 100.0f;
+                        trapId = GO_SPIRIT_ALARM_2;
                         break;
                     case EVENT_AWAKEN_WARD_3:
+                        trapId = GO_SPIRIT_ALARM_3;
+                        break;
                     case EVENT_AWAKEN_WARD_4:
-                        range = 50.0f;
+                        trapId = GO_SPIRIT_ALARM_4;
                         break;
                     default:
                         return;
                 }
 
                 std::list<Creature*> wards;
-                GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, range);
+                GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, 150.0f);
                 wards.sort(acore::ObjectDistanceOrderPred(GetCaster()));
                 for (std::list<Creature*>::iterator itr = wards.begin(); itr != wards.end(); ++itr)
                 {
                     if ((*itr)->IsAlive() && (*itr)->HasAura(SPELL_STONEFORM))
                     {
-                        if (Player* target = (*itr)->SelectNearestPlayer(150.0f))
-                        {
-                            (*itr)->AI()->Talk(SAY_TRAP_ACTIVATE);
-                            (*itr)->RemoveAurasDueToSpell(SPELL_STONEFORM);
-                            (*itr)->AI()->AttackStart(target);
-                        }
+                        (*itr)->AI()->Talk(SAY_TRAP_ACTIVATE);
+                        (*itr)->RemoveAurasDueToSpell(SPELL_STONEFORM);
+                        (*itr)->AI()->SetData(1, 1);
                         break;
                     }
                 }
