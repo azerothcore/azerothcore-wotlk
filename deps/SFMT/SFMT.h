@@ -168,9 +168,6 @@ public:
         uint32_t y = seed;                  // Temporary
         uint32_t statesize = SFMT_N*4;      // Size of state vector
 
-// TODO: manually silencing this warning, but it should properly fixed
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
         // Fill state vector with random numbers from seed
         uint32_t* s = (uint32_t*)&state;
         s[0] = y;
@@ -180,7 +177,6 @@ public:
             y = factor * (y ^ (y >> 30)) + i;
             ((uint32_t*)state)[i] = y;
         }
-#pragma GCC diagnostic pop
 
         // Further initialization and period certification
         Init2();
