@@ -45,7 +45,7 @@ struct AchievementEntry
 
 struct AchievementCategoryEntry
 {
-    uint32    ID;                                           // 0
+    int32    ID;                                           // 0
     int32    parentCategory;                               // 1 -1 for main category
     //char *name[16];                                       // 2-17
     //uint32 name_flags;                                    // 18
@@ -1075,7 +1075,7 @@ struct HolidaysEntry
     //uint32 holidayDescriptionId;                          // 50       m_holidayDescriptionID (HolidayDescriptions.dbc)
     char* TextureFilename;                                  // 51       m_textureFilename
     uint32 Priority;                                        // 52       m_priority
-    uint32 CalendarFilterType;                              // 53       m_calendarFilterType (-1 = Fishing Contest, 0 = Unk, 1 = Darkmoon Festival, 2 = Yearly holiday)
+    int32 CalendarFilterType;                              // 53       m_calendarFilterType (-1 = Fishing Contest, 0 = Unk, 1 = Darkmoon Festival, 2 = Yearly holiday)
     //uint32 flags;                                         // 54       m_flags (0 = Darkmoon Faire, Fishing Contest and Wotlk Launch, rest is 1)
 };
 
