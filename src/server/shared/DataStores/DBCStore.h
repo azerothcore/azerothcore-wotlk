@@ -12,7 +12,7 @@
 #include "Errors.h"
 #include <vector>
 
- /// Interface class for common access
+/// Interface class for common access
 class DBCStorageBase
 {
 public:
