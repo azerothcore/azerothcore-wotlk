@@ -8593,6 +8593,8 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
 
             target = this;
             trigger_spell_id = 22588;
+
+            break;
         }
         // Bonus Healing (Crystal Spire of Karabor mace)
         case 40971:
