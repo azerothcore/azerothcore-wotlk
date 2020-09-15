@@ -19,7 +19,7 @@ static void lockingCallback(int mode, int type, char const* /*file*/, int /*line
     else
         cryptoLocks[type]->unlock();
 }
-static void threadIdCallback(CRYPTO_THREADID * id)
+static void threadIdCallback(CRYPTO_THREADID* id)
 {
     (void)id;
     CRYPTO_THREADID_set_numeric(id, std::hash<std::thread::id>()(std::this_thread::get_id()));

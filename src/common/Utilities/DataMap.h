@@ -26,7 +26,8 @@ public:
     /**
      * Returns a pointer to object of requested type stored with given key or nullptr
      */
-    template<class T> T* Get(std::string const & k) const {
+    template<class T> T* Get(std::string const& k) const
+    {
         static_assert(std::is_base_of<Base, T>::value, "T must derive from Base");
         if (Container.empty())
             return nullptr;
@@ -36,13 +37,14 @@ public:
             return dynamic_cast<T*>(it->second.get());
         return nullptr;
     }
-    
+
     /**
      * Returns a pointer to object of requested type stored with given key
      * or default constructs one and returns that one
      */
     template<class T, typename std::enable_if<std::is_default_constructible<T>::value, int>::type = 0>
-    T* GetDefault(std::string const & k) {
+    T * GetDefault(std::string const& k)
+    {
         static_assert(std::is_base_of<Base, T>::value, "T must derive from Base");
         if (T* v = Get<T>(k))
             return v;
@@ -50,16 +52,16 @@ public:
         Container.emplace(k, std::unique_ptr<T>(v));
         return v;
     }
-    
+
     /**
      * Stores a new object that inherits the Base class with the given key
      */
-    void Set(std::string const & k, Base* v) { Container[k] = std::unique_ptr<Base>(v); }
+    void Set(std::string const& k, Base* v) { Container[k] = std::unique_ptr<Base>(v); }
 
     /**
      * Removes objects with given key and returns true if one was removed, false otherwise
      */
-    bool Erase(std::string const & k) { return Container.erase(k) != 0; }
+    bool Erase(std::string const& k) { return Container.erase(k) != 0; }
 
 private:
     std::unordered_map<std::string, std::unique_ptr<Base>> Container;
