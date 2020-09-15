@@ -149,6 +149,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction: Invoker: %s (guidlow: %u)", tempInvoker->GetName().c_str(), tempInvoker->GetGUIDLow());
 #endif
 
+    bool isControlled = e.action.MoveToPos.controlled > 0;
+
     switch (e.GetActionType())
     {
     case SMART_ACTION_TALK:
@@ -1933,7 +1935,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     randomPoint.m_positionZ,
                     true,
                     true,
-                    e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
+                    isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
                 );
             }
 
@@ -1963,7 +1965,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (TransportBase* trans = me->GetDirectTransport())
                     trans->CalculatePassengerPosition(dest.x, dest.y, dest.z);
 
-            me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, dest.x, dest.y, dest.z, true, true, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+            me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, dest.x, dest.y, dest.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
         }
         else // Xinef: we can use dest.x, dest.y, dest.z to make offset
         {
@@ -1971,7 +1973,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             target->GetPosition(x, y, z);
             if (e.action.MoveToPos.ContactDistance > 0)
                 target->GetContactPoint(me, x, y, z, e.action.MoveToPos.ContactDistance);
-            me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+            me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
         }
         break;
     }
@@ -1986,7 +1988,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (IsCreature(*itr))
             {
                 Creature* target = (*itr)->ToCreature();
-                target->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, e.target.x, e.target.y, e.target.z, true, true, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+                target->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, e.target.x, e.target.y, e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
             }
         }
 
