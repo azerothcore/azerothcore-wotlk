@@ -91,6 +91,7 @@ class spell_dru_t10_balance_4p_bonus : public SpellScriptLoader
         }
 };
 
+// -33872 - Nurturing Instinct
 class spell_dru_nurturing_instinct : public SpellScriptLoader
 {
     public:
@@ -100,16 +101,17 @@ class spell_dru_nurturing_instinct : public SpellScriptLoader
         {
             PrepareAuraScript(spell_dru_nurturing_instinct_AuraScript);
 
-            void AfterApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
-                if (Player* player = GetTarget()->ToPlayer())
-                    player->addSpell(GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2, SPEC_MASK_ALL, false, true);
+                Unit* target = GetTarget();
+                uint32 spellId = GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2;
+                target->CastSpell(target, spellId, aurEff);
             }
 
             void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                if (Player* player = GetTarget()->ToPlayer())
-                    player->removeSpell(GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2, SPEC_MASK_ALL, true);
+                uint32 spellId = GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2;
+                GetTarget()->RemoveAurasDueToSpell(spellId);
             }
 
             void Register()
