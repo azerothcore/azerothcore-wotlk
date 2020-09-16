@@ -1867,20 +1867,20 @@ class instance_icecrown_citadel : public InstanceMapScript
 
                 switch (go->GetEntry())
                 {
-                case GO_SPIRIT_ALARM_1:
-                    trapPositions = GoSpiritAlarm_1;
-                    break;
-                case GO_SPIRIT_ALARM_2:
-                    trapPositions = GoSpiritAlarm_2;
-                    break;
-                case GO_SPIRIT_ALARM_3:
-                    trapPositions = GoSpiritAlarm_3;
-                    break;
-                case GO_SPIRIT_ALARM_4:
-                    trapPositions = GoSpiritAlarm_4;
-                    break;
-                default:
-                    return;
+                    case GO_SPIRIT_ALARM_1:
+                        trapPositions = GoSpiritAlarm_1;
+                        break;
+                    case GO_SPIRIT_ALARM_2:
+                        trapPositions = GoSpiritAlarm_2;
+                        break;
+                    case GO_SPIRIT_ALARM_3:
+                        trapPositions = GoSpiritAlarm_3;
+                        break;
+                    case GO_SPIRIT_ALARM_4:
+                        trapPositions = GoSpiritAlarm_4;
+                        break;
+                    default:
+                        return;
                 }
 
                 go->Relocate(acore::Containers::SelectRandomContainerElement(trapPositions));
