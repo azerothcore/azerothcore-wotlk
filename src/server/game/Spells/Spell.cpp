@@ -4291,10 +4291,8 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
     switch (result)
     {
         case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
-        {
             data << uint32(spellInfo->RequiresSpellFocus);  // SpellFocusObject.dbc id
             break;
-        }
         case SPELL_FAILED_REQUIRES_AREA:                    // AreaTable.dbc id
         {
             // hardcode areas limitation case
@@ -4302,26 +4300,18 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
             {
                 case 41617:                                 // Cenarion Mana Salve
                 case 41619:                                 // Cenarion Healing Salve
-                {
                     data << uint32(3905);
                     break;
-                }
                 case 41618:                                 // Bottled Nethergon Energy
                 case 41620:                                 // Bottled Nethergon Vapor
-                {
                     data << uint32(3842);
                     break;
-                }
                 case 45373:                                 // Bloodberry Elixir
-                {
                     data << uint32(4075);
                     break;
-                }
                 default:                                    // default case (don't must be)
-                {
                     data << uint32(0);
                     break;
-                }
             }
             break;
         }
@@ -4350,11 +4340,9 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
         case SPELL_FAILED_EQUIPPED_ITEM_CLASS:
         case SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND:
         case SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND:
-        {
             data << uint32(spellInfo->EquippedItemClass);
             data << uint32(spellInfo->EquippedItemSubClassMask);
             break;
-        }
         case SPELL_FAILED_TOO_MANY_OF_ITEM:
         {
              uint32 item = 0;
@@ -4374,10 +4362,8 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
              }
         }
         case SPELL_FAILED_CUSTOM_ERROR:
-        {
             data << uint32(customError);
             break;
-        }
         case SPELL_FAILED_REAGENTS:
         {
             uint32 missingItem = 0;
@@ -4400,32 +4386,22 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
             break;
         }
         case SPELL_FAILED_PREVENTED_BY_MECHANIC:
-        {
             data << uint32(spellInfo->Mechanic);
             break;
-        }
         case SPELL_FAILED_NEED_EXOTIC_AMMO:
-        {
             data << uint32(spellInfo->EquippedItemSubClassMask);
             break;
-        }
         case SPELL_FAILED_NEED_MORE_ITEMS:
-        {
             data << uint32(0); // Item entry
             data << uint32(0); // Count
             break;
-        }
         case SPELL_FAILED_MIN_SKILL:
-        {
             data << uint32(0); // SkillLine.dbc Id
             data << uint32(0); // Amount
             break;
-        }
         case SPELL_FAILED_FISHING_TOO_LOW:
-        {
             data << uint32(0); // Skill level
             break;
-        }
         default:
             break;
     }
