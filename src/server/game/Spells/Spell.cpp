@@ -4315,14 +4315,9 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
             break;
         case SPELL_FAILED_TOTEMS:
             if (spellInfo->Totem[0])
-            {
                 data << uint32(spellInfo->Totem[0]);
-            }
-
             if (spellInfo->Totem[1])
-            {
                 data << uint32(spellInfo->Totem[1]);
-            }
             break;
         case SPELL_FAILED_TOTEM_CATEGORY:
             if (spellInfo->TotemCategory[0])
