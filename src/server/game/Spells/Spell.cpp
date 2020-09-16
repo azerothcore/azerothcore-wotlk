@@ -4294,7 +4294,6 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
             data << uint32(spellInfo->RequiresSpellFocus);  // SpellFocusObject.dbc id
             break;
         case SPELL_FAILED_REQUIRES_AREA:                    // AreaTable.dbc id
-        {
             // hardcode areas limitation case
             switch (spellInfo->Id)
             {
@@ -4314,7 +4313,6 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
                     break;
             }
             break;
-        }
         case SPELL_FAILED_TOTEMS:
             if (spellInfo->Totem[0])
             {
