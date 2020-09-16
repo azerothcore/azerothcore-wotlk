@@ -12,7 +12,7 @@
 #if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x10100000L
 HMAC_CTX* HMAC_CTX_new()
 {
-    HMAC_CTX *ctx = new HMAC_CTX();
+    HMAC_CTX* ctx = new HMAC_CTX();
     HMAC_CTX_init(ctx);
     return ctx;
 }
