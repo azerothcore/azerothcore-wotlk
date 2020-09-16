@@ -443,13 +443,13 @@ void AuctionHouseObject::AddAuction(AuctionEntry* auction)
 
 bool AuctionHouseObject::RemoveAuction(AuctionEntry* auction)
 {
-    bool wasInMap = AuctionsMap.erase(auction->Id) ? true : false;
+    bool wasInMap = !!AuctionsMap.erase(auction->Id);
 
     sScriptMgr->OnAuctionRemove(this, auction);
 
     // we need to delete the entry, it is not referenced any more
     delete auction;
-    auction = NULL;
+    auction = nullptr;
 
     return wasInMap;
 }
@@ -630,7 +630,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                 // These are found in ItemRandomSuffix.dbc and ItemRandomProperties.dbc
                 //  even though the DBC name seems misleading
 
-                char* const* suffix = NULL;
+                char* const* suffix = nullptr;
 
                 if (propRefID < 0)
                 {
@@ -701,7 +701,7 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
     data << uint32(bid ? GetAuctionOutBid() : 0);
     // Minimal outbid
     data << uint32(buyout);                                         // Auction->buyout
-    data << uint32((expire_time - time(NULL)) * IN_MILLISECONDS);   // time left
+    data << uint32((expire_time - time(nullptr)) * IN_MILLISECONDS);   // time left
     data << uint64(bidder);                                         // auction->bidder current
     data << uint32(bid);                                            // current bid
     return true;

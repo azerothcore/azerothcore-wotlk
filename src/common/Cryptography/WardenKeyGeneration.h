@@ -14,7 +14,7 @@ class SHA1Randx
 public:
     SHA1Randx(uint8* buff, uint32 size)
     {
-        uint32 taken = size/2;
+        uint32 taken = size / 2;
 
         sh.Initialize();
         sh.UpdateData(buff, taken);

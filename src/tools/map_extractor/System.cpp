@@ -99,8 +99,12 @@ void CreateDir( const std::string& Path )
 {
     if(chdir(Path.c_str()) == 0)
     {
-            chdir("../");
-            return;
+        int ret = chdir("../");
+        if (ret < 0)
+        {
+            printf("Error while executing chdir");
+        }
+        return;
     }
 
     int ret;

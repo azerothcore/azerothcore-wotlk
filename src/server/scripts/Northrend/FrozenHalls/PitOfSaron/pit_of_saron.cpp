@@ -130,11 +130,11 @@ public:
                                 n2->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                             }
                             // TODO This spell check is invalid
-                            if (SPELL_NECROLYTE_CHANNELING)
-                            {
+//                            if (SPELL_NECROLYTE_CHANNELING)
+//                            {
                                 n1->RemoveAura(SPELL_NECROLYTE_CHANNELING);
                                 n2->RemoveAura(SPELL_NECROLYTE_CHANNELING);
-                            }
+//                            }
 
                             for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
                                 if (Creature* c = pInstance->instance->GetCreature(*itr))
@@ -401,13 +401,17 @@ public:
                     isInvincible = true;
 
                     // TODO This spell check is invalid
-                    if (SPELL_NECROLYTE_CHANNELING)
-                        me->CastSpell(me, SPELL_NECROLYTE_CHANNELING, false);
+//                    if (SPELL_NECROLYTE_CHANNELING)
+                    me->CastSpell(me, SPELL_NECROLYTE_CHANNELING, false);
 
                     if (me->GetPositionY() < 206.0f)
+                    {
                         pInstance->SetData64(DATA_NECROLYTE_1_GUID, me->GetGUID());
+                    }
                     else
+                    {
                         pInstance->SetData64(DATA_NECROLYTE_2_GUID, me->GetGUID());
+                    }
                 }
             }
         }
@@ -421,8 +425,8 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             // TODO This spell check is invalid
-            if (SPELL_NECROLYTE_CHANNELING)
-                me->RemoveAura(SPELL_NECROLYTE_CHANNELING);
+//            if (SPELL_NECROLYTE_CHANNELING)
+            me->RemoveAura(SPELL_NECROLYTE_CHANNELING);
             events.Reset();
             events.RescheduleEvent(1, 0);
             events.RescheduleEvent(2, urand(5000,9000));
@@ -1115,7 +1119,7 @@ public:
             me->DeleteThreatList();
             me->CombatStop(true);
             me->LoadCreaturesAddon(true);
-            me->SetLootRecipient(NULL);
+            me->SetLootRecipient(nullptr);
             me->ResetPlayerDamageReq();
             me->SetLastDamagedTime(0);
         }

@@ -13,7 +13,6 @@
 
 #include "Common.h"
 #include "Timer.h"
-#include <ace/Atomic_Op.h>
 #include "SharedDefines.h"
 #include "QueryResult.h"
 #include "Callback.h"
@@ -21,6 +20,7 @@
 #include <map>
 #include <set>
 #include <list>
+#include <atomic>
 
 class Object;
 class WorldPacket;
@@ -205,6 +205,7 @@ enum WorldIntConfigs
     CONFIG_INTERVAL_MAPUPDATE,
     CONFIG_INTERVAL_CHANGEWEATHER,
     CONFIG_INTERVAL_DISCONNECT_TOLERANCE,
+    CONFIG_INTERVAL_SAVE,
     CONFIG_PORT_WORLD,
     CONFIG_SOCKET_TIMEOUTTIME,
     CONFIG_SESSION_ADD_DELAY,
@@ -369,6 +370,7 @@ enum WorldIntConfigs
     CONFIG_CHARTER_COST_ARENA_2v2,
     CONFIG_CHARTER_COST_ARENA_3v3,
     CONFIG_CHARTER_COST_ARENA_5v5,
+    CONFIG_MAX_WHO_LIST_RETURN,
     CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER,
     INT_CONFIG_VALUE_COUNT
 };
@@ -393,7 +395,7 @@ enum Rates
     RATE_DROP_ITEM_LEGENDARY,
     RATE_DROP_ITEM_ARTIFACT,
     RATE_DROP_ITEM_REFERENCED,
-  
+
     RATE_DROP_ITEM_REFERENCED_AMOUNT,
     RATE_SELLVALUE_ITEM_POOR,
     RATE_SELLVALUE_ITEM_NORMAL,
@@ -711,17 +713,17 @@ class World
         void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
         bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
         void SendZoneText(uint32 zone, const char *text, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
-        void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = NULL);
+        void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = nullptr);
 
         /// Are we in the middle of a shutdown?
         bool IsShuttingDown() const { return m_ShutdownTimer > 0; }
         uint32 GetShutDownTimeLeft() const { return m_ShutdownTimer; }
         void ShutdownServ(uint32 time, uint32 options, uint8 exitcode);
         void ShutdownCancel();
-        void ShutdownMsg(bool show = false, Player* player = NULL);
+        void ShutdownMsg(bool show = false, Player* player = nullptr);
         static uint8 GetExitCode() { return m_ExitCode; }
         static void StopNow(uint8 exitcode) { m_stopEvent = true; m_ExitCode = exitcode; }
-        static bool IsStopped() { return m_stopEvent.value(); }
+        static bool IsStopped() { return m_stopEvent; }
 
         void Update(uint32 diff);
 
@@ -854,7 +856,7 @@ class World
         void CalendarDeleteOldEvents();
         void ResetGuildCap();
     private:
-        static ACE_Atomic_Op<ACE_Thread_Mutex, bool> m_stopEvent;
+        static std::atomic_long m_stopEvent;
         static uint8 m_ExitCode;
         uint32 m_ShutdownTimer;
         uint32 m_ShutdownMask;
