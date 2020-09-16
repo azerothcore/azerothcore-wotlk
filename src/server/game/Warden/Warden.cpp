@@ -311,7 +311,6 @@ void Warden::ApplyPenalty(WardenCheck const* check)
     // return EnumUtils::ToTitle(action);
 }
 
-
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
 {
     if (!_warden || recvData.empty())
