@@ -5,7 +5,9 @@
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "zulfarrak.h"
-//#include "Player.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "Player.h"
 #include "TemporarySummon.h"
 
 class instance_zulfarrak : public InstanceMapScript
@@ -139,7 +141,7 @@ class spell_zulfarrak_unlocking : public SpellScriptLoader
                 std::list<WorldObject*> cagesList;
                 acore::AllWorldObjectsInRange objects(GetCaster(), 15.0f);
                 acore::WorldObjectListSearcher<acore::AllWorldObjectsInRange> searcher(GetCaster(), cagesList, objects);
-//                GetCaster()->VisitNearbyObject(15.0f, searcher);
+                GetCaster()->VisitNearbyObject(15.0f, searcher);
                 for (std::list<WorldObject*>::const_iterator itr = cagesList.begin(); itr != cagesList.end(); ++itr)
                 {
                     if (GameObject* go = (*itr)->ToGameObject())
