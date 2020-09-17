@@ -101,17 +101,16 @@ class spell_dru_nurturing_instinct : public SpellScriptLoader
         {
             PrepareAuraScript(spell_dru_nurturing_instinct_AuraScript);
 
-            void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                Unit* target = GetTarget();
-                uint32 spellId = GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2;
-                target->CastSpell(target, spellId, aurEff);
+                if (Player* player = GetTarget()->ToPlayer())
+                    player->addSpell(GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2, SPEC_MASK_ALL, false, true);
             }
 
             void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                uint32 spellId = GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2;
-                GetTarget()->RemoveAurasDueToSpell(spellId);
+                if (Player* player = GetTarget()->ToPlayer())
+                    player->removeSpell(GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2, SPEC_MASK_ALL, true);
             }
 
             void Register()
