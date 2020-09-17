@@ -13,7 +13,7 @@ jobs:
       matrix:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
         os: [ubuntu-20.04]
-        compiler: [clang10]
+        compiler: [clang]
         modules: [with, without]
         # we can include specific combinations here
         include:
