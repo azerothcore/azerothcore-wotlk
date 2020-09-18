@@ -168,7 +168,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket & recvData)
             {
                 if (Group* group = _player->GetGroup())
                 {
-                    for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                     {
                         Player* itrPlayer = itr->GetSource();
                         if (!itrPlayer || itrPlayer == _player || !itrPlayer->IsAtGroupRewardDistance(_player) || itrPlayer->HasPendingBind()) // xinef: check range
@@ -478,7 +478,7 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recvData)
                     return;
 
         if (_player->CanAddQuest(quest, true))
-            _player->AddQuestAndCheckCompletion(quest, NULL); // NULL, this prevent DB script from duplicate running
+            _player->AddQuestAndCheckCompletion(quest, nullptr); // NULL, this prevent DB script from duplicate running
 
         _player->SetDivider(0);
     }
@@ -556,7 +556,7 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
     {
         if (Group* group = _player->GetGroup())
         {
-            for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* player = itr->GetSource();
 

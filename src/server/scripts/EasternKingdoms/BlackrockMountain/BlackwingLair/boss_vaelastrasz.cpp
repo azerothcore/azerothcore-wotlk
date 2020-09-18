@@ -171,7 +171,7 @@ public:
                         break;
                     case EVENT_BURNINGADRENALINE_CASTER:
                         {
-                            Unit* target = NULL;
+                            Unit* target = nullptr;
 
                             uint8 i = 0;
                             while (i < 3)   // max 3 tries to get a random target with power_mana
