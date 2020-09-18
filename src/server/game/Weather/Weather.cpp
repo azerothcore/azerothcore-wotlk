@@ -84,7 +84,7 @@ bool Weather::ReGenerate()
     // season source http://aa.usno.navy.mil/data/docs/EarthSeasons.html
     time_t gtime = sWorld->GetGameTime();
     struct tm ltime;
-    ACE_OS::localtime_r(&gtime, &ltime);
+    localtime_r(&gtime, &ltime);
     uint32 season = ((ltime.tm_yday - 78 + 365)/91)%4;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -210,6 +210,7 @@ bool Weather::UpdateWeather()
     if (!sWorld->SendZoneMessage(m_zone, &data))
         return false;
 
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     ///- Log the event
     char const* wthstr;
     switch (state)
@@ -255,7 +256,7 @@ bool Weather::UpdateWeather()
             wthstr = "fine";
             break;
     }
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+
     sLog->outDetail("Change the weather of zone %u to %s.", m_zone, wthstr);
 #endif
     sScriptMgr->OnWeatherChange(this, state, m_grade);

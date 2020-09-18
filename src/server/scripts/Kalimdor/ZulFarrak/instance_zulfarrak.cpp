@@ -5,6 +5,8 @@
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "zulfarrak.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Player.h"
 #include "TemporarySummon.h"
 
