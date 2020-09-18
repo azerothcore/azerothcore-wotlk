@@ -43,8 +43,8 @@ BattlegroundIC::BattlegroundIC()
 
     siegeEngineWorkshopTimer = WORKSHOP_UPDATE_TIME;
 
-    gunshipHorde = NULL;
-    gunshipAlliance = NULL;
+    gunshipHorde = nullptr;
+    gunshipAlliance = nullptr;
     respawnMap.clear();
 }
 
@@ -127,7 +127,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                             {
                                 // Check if creature respawn time is properly saved
                                 RespawnMap::iterator itr = respawnMap.find(catapult->GetGUIDLow());
-                                if (itr == respawnMap.end() || time(NULL) < itr->second)
+                                if (itr == respawnMap.end() || time(nullptr) < itr->second)
                                     continue;
 
                                 catapult->Relocate(BG_IC_DocksVehiclesCatapults[j].GetPositionX(), BG_IC_DocksVehiclesCatapults[j].GetPositionY(), BG_IC_DocksVehiclesCatapults[j].GetPositionZ(), BG_IC_DocksVehiclesCatapults[j].GetOrientation());
@@ -145,7 +145,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                             {
                                 // Check if creature respawn time is properly saved
                                 RespawnMap::iterator itr = respawnMap.find(glaiveThrower->GetGUIDLow());
-                                if (itr == respawnMap.end() || time(NULL) < itr->second)
+                                if (itr == respawnMap.end() || time(nullptr) < itr->second)
                                     continue;
 
                                 glaiveThrower->Relocate(BG_IC_DocksVehiclesGlaives[j].GetPositionX(), BG_IC_DocksVehiclesGlaives[j].GetPositionY(), BG_IC_DocksVehiclesGlaives[j].GetPositionZ(), BG_IC_DocksVehiclesGlaives[j].GetOrientation());
@@ -174,7 +174,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                         {
                             // Check if creature respawn time is properly saved
                             RespawnMap::iterator itr = respawnMap.find(siege->GetGUIDLow());
-                            if (itr == respawnMap.end() || time(NULL) < itr->second)
+                            if (itr == respawnMap.end() || time(nullptr) < itr->second)
                                 continue;
 
                             siege->Relocate(BG_IC_WorkshopVehicles[4].GetPositionX(), BG_IC_WorkshopVehicles[4].GetPositionY(), BG_IC_WorkshopVehicles[4].GetPositionZ(), BG_IC_WorkshopVehicles[4].GetOrientation());
@@ -191,7 +191,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                             {
                                 // Check if creature respawn time is properly saved
                                 RespawnMap::iterator itr = respawnMap.find(demolisher->GetGUIDLow());
-                                if (itr == respawnMap.end() || time(NULL) < itr->second)
+                                if (itr == respawnMap.end() || time(nullptr) < itr->second)
                                     continue;
 
                                 demolisher->Relocate(BG_IC_WorkshopVehicles[u].GetPositionX(), BG_IC_WorkshopVehicles[u].GetPositionY(), BG_IC_WorkshopVehicles[u].GetPositionZ(), BG_IC_WorkshopVehicles[u].GetOrientation());
@@ -381,7 +381,7 @@ void BattlegroundIC::FillInitialWorldStates(WorldPacket& data)
 
     for (uint8 i = 0; i < MAX_FORTRESS_GATES_SPAWNS; ++i)
     {
-        uint32 uws = GetWorldStateFromGateEntry(BG_IC_ObjSpawnlocs[i].entry, (GateStatus[GetGateIDFromEntry(BG_IC_ObjSpawnlocs[i].entry)] == BG_IC_GATE_DESTROYED ? true : false));
+        uint32 uws = GetWorldStateFromGateEntry(BG_IC_ObjSpawnlocs[i].entry, (GateStatus[GetGateIDFromEntry(BG_IC_ObjSpawnlocs[i].entry)] == BG_IC_GATE_DESTROYED));
         data << uint32(uws) << uint32(1);
     }
 
@@ -515,11 +515,11 @@ void BattlegroundIC::HandleKillUnit(Creature* unit, Player* killer)
     if (unit->IsVehicle())
     {
         killer->CastSpell(killer, SPELL_DESTROYED_VEHICLE_ACHIEVEMENT, true);
-        
+
         // Xinef: Add to respawn list
-        if (entry == NPC_DEMOLISHER || entry == NPC_SIEGE_ENGINE_H || entry == NPC_SIEGE_ENGINE_A || 
+        if (entry == NPC_DEMOLISHER || entry == NPC_SIEGE_ENGINE_H || entry == NPC_SIEGE_ENGINE_A ||
             entry == NPC_GLAIVE_THROWER_A || entry == NPC_GLAIVE_THROWER_H || entry == NPC_CATAPULT)
-            respawnMap[unit->GetGUIDLow()] = time(NULL) + VEHICLE_RESPAWN_TIME;
+            respawnMap[unit->GetGUIDLow()] = time(nullptr) + VEHICLE_RESPAWN_TIME;
     }
 }
 
@@ -562,15 +562,15 @@ void BattlegroundIC::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
             // Prevent capturing of keep if none of gates was destroyed
             if (nodePoint[i].gameobject_entry == GO_ALLIANCE_BANNER)
             {
-                if (GateStatus[BG_IC_A_FRONT] != BG_IC_GATE_DESTROYED && 
-                    GateStatus[BG_IC_A_WEST] != BG_IC_GATE_DESTROYED && 
+                if (GateStatus[BG_IC_A_FRONT] != BG_IC_GATE_DESTROYED &&
+                    GateStatus[BG_IC_A_WEST] != BG_IC_GATE_DESTROYED &&
                     GateStatus[BG_IC_A_EAST] != BG_IC_GATE_DESTROYED)
                     return;
             }
             else if (nodePoint[i].gameobject_entry == GO_HORDE_BANNER)
             {
-                if (GateStatus[BG_IC_H_FRONT] != BG_IC_GATE_DESTROYED && 
-                    GateStatus[BG_IC_H_WEST] != BG_IC_GATE_DESTROYED && 
+                if (GateStatus[BG_IC_H_FRONT] != BG_IC_GATE_DESTROYED &&
+                    GateStatus[BG_IC_H_WEST] != BG_IC_GATE_DESTROYED &&
                     GateStatus[BG_IC_H_EAST] != BG_IC_GATE_DESTROYED)
                     return;
             }
@@ -866,7 +866,7 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint* nodePoint, bool recapture)
                                 if (!siegeVehicle->IsVehicleInUse())
                                     Unit::Kill(siegeEngine, siegeEngine);
 
-                        respawnMap[siegeEngine->GetGUIDLow()] = time(NULL) + VEHICLE_RESPAWN_TIME;
+                        respawnMap[siegeEngine->GetGUIDLow()] = time(nullptr) + VEHICLE_RESPAWN_TIME;
                     }
                 }
 
@@ -958,7 +958,7 @@ GraveyardStruct const* BattlegroundIC::GetClosestGraveyard(Player* player)
         if (nodePoint[i].faction == player->GetTeamId() && !nodePoint[i].needChange) // xinef: controlled by faction and not contested!
             nodes.push_back(i);
 
-    GraveyardStruct const* good_entry = NULL;
+    GraveyardStruct const* good_entry = nullptr;
     // If so, select the closest node to place ghost on
     if (!nodes.empty())
     {
