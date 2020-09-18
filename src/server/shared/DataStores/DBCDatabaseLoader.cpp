@@ -14,10 +14,10 @@
 
 DBCDatabaseLoader::DBCDatabaseLoader(char const* tableName, char const* dbcFormatString, std::vector<char*>& stringPool)
     : _sqlTableName(tableName),
-    _dbcFormat(dbcFormatString),
-    _sqlIndexPos(0),
-    _recordSize(0),
-    _stringPool(stringPool)
+      _dbcFormat(dbcFormatString),
+      _sqlIndexPos(0),
+      _recordSize(0),
+      _stringPool(stringPool)
 {
     // Get sql index position
     int32 indexPos = -1;
@@ -47,7 +47,7 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
     uint32 indexTableSize = std::max(records, (*result)[_sqlIndexPos].GetUInt32() + 1);
     if (indexTableSize > records)
     {
-        char** tmpIdxTable = new char*[indexTableSize];
+        char** tmpIdxTable = new char* [indexTableSize];
         memset(tmpIdxTable, 0, indexTableSize * sizeof(char*));
         memcpy(tmpIdxTable, indexTable, records * sizeof(char*));
         delete[] indexTable;
@@ -77,29 +77,29 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
         {
             switch (*dbcFormat)
             {
-            case FT_FLOAT:
-                *reinterpret_cast<float*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetFloat();
-                dataOffset += sizeof(float);
-                break;
-            case FT_IND:
-            case FT_INT:
-                *reinterpret_cast<uint32*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetUInt32();
-                dataOffset += sizeof(uint32);
-                break;
-            case FT_BYTE:
-                *reinterpret_cast<uint8*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetUInt8();
-                dataOffset += sizeof(uint8);
-                break;
-            case FT_STRING:
-                *reinterpret_cast<char**>(&dataValue[dataOffset]) = CloneStringToPool(fields[sqlColumnNumber].GetString());
-                dataOffset += sizeof(char*);
-                break;
-            case FT_SORT:
-            case FT_NA:
-                break;
-            default:
-                ASSERT(false, "Unsupported data type '%c' in table '%s'", *dbcFormat, _sqlTableName);
-                return nullptr;
+                case FT_FLOAT:
+                    *reinterpret_cast<float*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetFloat();
+                    dataOffset += sizeof(float);
+                    break;
+                case FT_IND:
+                case FT_INT:
+                    *reinterpret_cast<uint32*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetUInt32();
+                    dataOffset += sizeof(uint32);
+                    break;
+                case FT_BYTE:
+                    *reinterpret_cast<uint8*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetUInt8();
+                    dataOffset += sizeof(uint8);
+                    break;
+                case FT_STRING:
+                    *reinterpret_cast<char**>(&dataValue[dataOffset]) = CloneStringToPool(fields[sqlColumnNumber].GetString());
+                    dataOffset += sizeof(char*);
+                    break;
+                case FT_SORT:
+                case FT_NA:
+                    break;
+                default:
+                    ASSERT(false, "Unsupported data type '%c' in table '%s'", *dbcFormat, _sqlTableName);
+                    return nullptr;
             }
 
             ++sqlColumnNumber;

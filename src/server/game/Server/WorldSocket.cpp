@@ -32,6 +32,8 @@
 #include "PacketLog.h"
 #include "ScriptMgr.h"
 #include "AccountMgr.h"
+#include <thread>
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -90,7 +92,7 @@ struct ClientPktHeader
 #endif
 
 WorldSocket::WorldSocket(void): WorldHandler(),
-m_LastPingTime(ACE_Time_Value::zero), m_OverSpeedPings(0), m_Session(0),
+m_LastPingTime(SystemTimePoint::min()), m_OverSpeedPings(0), m_Session(0),
 m_RecvWPct(0), m_RecvPct(), m_Header(sizeof (ClientPktHeader)),
 m_OutBuffer(0), m_OutBufferSize(65536), m_OutActive(false),
 m_Seed(static_cast<uint32> (rand32()))
@@ -1021,9 +1023,9 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // Sleep this Network thread for
     uint32 sleepTime = sWorld->getIntConfig(CONFIG_SESSION_ADD_DELAY);
-    ACE_OS::sleep (ACE_Time_Value (0, sleepTime));
+    std::this_thread::sleep_for(Microseconds(sleepTime));
 
-    sWorld->AddSession (m_Session);
+    sWorld->AddSession(m_Session);
 
     return 0;
 }
@@ -1037,20 +1039,19 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
     recvPacket >> ping;
     recvPacket >> latency;
 
-    if (m_LastPingTime == ACE_Time_Value::zero)
-        m_LastPingTime = ACE_OS::gettimeofday(); // for 1st ping
+    if (m_LastPingTime == SystemTimePoint::min())
+        m_LastPingTime = std::chrono::system_clock::now(); // for 1st ping
     else
     {
-        ACE_Time_Value cur_time = ACE_OS::gettimeofday();
-        ACE_Time_Value diff_time (cur_time);
-        diff_time -= m_LastPingTime;
-        m_LastPingTime = cur_time;
+        auto now = std::chrono::system_clock::now();
+        Seconds seconds = std::chrono::duration_cast<Seconds>(now - m_LastPingTime);        
+        m_LastPingTime = now;
 
-        if (diff_time < ACE_Time_Value (27))
+        if (seconds.count() < 27)
         {
             ++m_OverSpeedPings;
 
-            uint32 max_count = sWorld->getIntConfig (CONFIG_MAX_OVERSPEED_PINGS);
+            uint32 max_count = sWorld->getIntConfig(CONFIG_MAX_OVERSPEED_PINGS);
 
             if (max_count && m_OverSpeedPings > max_count)
             {
