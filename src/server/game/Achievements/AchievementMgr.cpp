@@ -359,7 +359,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 return false;
             return target->getGender() == gender.gender;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT:
-            return sScriptMgr->OnCriteriaCheck(ScriptId, const_cast<Player*>(source), const_cast<Unit*>(target), criteria_id);
+            return sScriptMgr->OnCriteriaCheck(ScriptId, const_cast<Player*>(source), const_cast<Unit*>(target));
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY:
         {
             if (source->GetMap()->IsRaid())
@@ -428,7 +428,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
         {
             time_t birthday_start = time_t(sWorld->getIntConfig(CONFIG_BIRTHDAY_TIME));
             tm birthday_tm;
-            ACE_OS::localtime_r(&birthday_start, &birthday_tm);
+            localtime_r(&birthday_start, &birthday_tm);
 
             // exactly N birthday
             birthday_tm.tm_year += birthday_login.nth_birthday;

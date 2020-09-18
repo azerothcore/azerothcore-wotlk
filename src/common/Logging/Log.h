@@ -58,7 +58,7 @@ enum LogTypes
     LOG_TYPE_CRASH  = 9,
     LOG_TYPE_CHAT   = 10,
     LOG_TYPE_PERF   = 11,
-    LOG_TYPE_MULTITH= 12,
+    LOG_TYPE_MULTITH = 12,
     MAX_LOG_TYPES
 };
 
@@ -70,7 +70,7 @@ enum LogLevel
     LOGL_DEBUG
 };
 
-const int LogLevels = int(LOGL_DEBUG)+1;
+const int LogLevels = int(LOGL_DEBUG) + 1;
 
 enum ColorTypes
 {
@@ -91,110 +91,110 @@ enum ColorTypes
     WHITE
 };
 
-const int Colors = int(WHITE)+1;
+const int Colors = int(WHITE) + 1;
 
 class Log
 {
-    private:
-        Log();
-        ~Log();
-        Log(Log const&) = delete;
-        Log(Log&&) = delete;
-        Log& operator=(Log const&) = delete;
-        Log& operator=(Log&&) = delete;
+private:
+    Log();
+    ~Log();
+    Log(Log const&) = delete;
+    Log(Log&&) = delete;
+    Log& operator=(Log const&) = delete;
+    Log& operator=(Log&&) = delete;
 
-    public:
-        static Log* instance();
-        
-        void Initialize();
+public:
+    static Log* instance();
 
-        void ReloadConfig();
+    void Initialize();
 
-        void InitColors(const std::string& init_str);
-        void SetColor(bool stdout_stream, ColorTypes color);
-        void ResetColor(bool stdout_stream);
+    void ReloadConfig();
 
-        void outDB(LogTypes type, const char * str);
-        void outString(const char * str, ...)                   ATTR_PRINTF(2, 3);
-        void outString();
-        void outStringInLine(const char * str, ...)             ATTR_PRINTF(2, 3);
-        void outError(const char * err, ...)                    ATTR_PRINTF(2, 3);
-        void outCrash(const char * err, ...)                    ATTR_PRINTF(2, 3);
-        void outBasic(const char * str, ...)                    ATTR_PRINTF(2, 3);
-        void outDetail(const char * str, ...)                   ATTR_PRINTF(2, 3);
-        void outSQLDev(const char * str, ...)                   ATTR_PRINTF(2, 3);
-        void outDebug(DebugLogFilters f, const char* str, ...)  ATTR_PRINTF(3, 4);
-        void outStaticDebug(const char * str, ...)              ATTR_PRINTF(2, 3);
-        void outErrorDb(const char * str, ...)                  ATTR_PRINTF(2, 3);
-        void outChar(const char * str, ...)                     ATTR_PRINTF(2, 3);
-        void outCommand(uint32 account, const char * str, ...)  ATTR_PRINTF(3, 4);
-        void outChat(const char * str, ...)                     ATTR_PRINTF(2, 3);
-        void outRemote(const char * str, ...)                   ATTR_PRINTF(2, 3);
-        void outSQLDriver(const char* str, ...)                 ATTR_PRINTF(2, 3);
-        void outMisc(const char * str, ...)                     ATTR_PRINTF(2, 3); // pussywizard
-        void outCharDump(const char * str, uint32 account_id, uint32 guid, const char * name);
+    void InitColors(const std::string& init_str);
+    void SetColor(bool stdout_stream, ColorTypes color);
+    void ResetColor(bool stdout_stream);
 
-        static void outTimestamp(FILE* file);
-        static std::string GetTimestampStr();
+    void outDB(LogTypes type, const char* str);
+    void outString(const char* str, ...)                   ATTR_PRINTF(2, 3);
+    void outString();
+    void outStringInLine(const char* str, ...)             ATTR_PRINTF(2, 3);
+    void outError(const char* err, ...)                    ATTR_PRINTF(2, 3);
+    void outCrash(const char* err, ...)                    ATTR_PRINTF(2, 3);
+    void outBasic(const char* str, ...)                    ATTR_PRINTF(2, 3);
+    void outDetail(const char* str, ...)                   ATTR_PRINTF(2, 3);
+    void outSQLDev(const char* str, ...)                   ATTR_PRINTF(2, 3);
+    void outDebug(DebugLogFilters f, const char* str, ...)  ATTR_PRINTF(3, 4);
+    void outStaticDebug(const char* str, ...)              ATTR_PRINTF(2, 3);
+    void outErrorDb(const char* str, ...)                  ATTR_PRINTF(2, 3);
+    void outChar(const char* str, ...)                     ATTR_PRINTF(2, 3);
+    void outCommand(uint32 account, const char* str, ...)  ATTR_PRINTF(3, 4);
+    void outChat(const char* str, ...)                     ATTR_PRINTF(2, 3);
+    void outRemote(const char* str, ...)                   ATTR_PRINTF(2, 3);
+    void outSQLDriver(const char* str, ...)                 ATTR_PRINTF(2, 3);
+    void outMisc(const char* str, ...)                     ATTR_PRINTF(2, 3);  // pussywizard
+    void outCharDump(const char* str, uint32 account_id, uint32 guid, const char* name);
 
-        void SetLogLevel(char * Level);
-        void SetLogFileLevel(char * Level);
-        void SetSQLDriverQueryLogging(bool newStatus) { m_sqlDriverQueryLogging = newStatus; }
-        void SetRealmID(uint32 id) { realm = id; }
+    static void outTimestamp(FILE* file);
+    static std::string GetTimestampStr();
 
-        bool IsOutDebug() const { return m_logLevel > 2 || (m_logFileLevel > 2 && logfile); }
-        bool IsOutCharDump() const { return m_charLog_Dump; }
+    void SetLogLevel(char* Level);
+    void SetLogFileLevel(char* Level);
+    void SetSQLDriverQueryLogging(bool newStatus) { m_sqlDriverQueryLogging = newStatus; }
+    void SetRealmID(uint32 id) { realm = id; }
 
-        bool GetLogDB() const { return m_enableLogDB; }
-        void SetLogDB(bool enable) { m_enableLogDB = enable; }
-        bool GetSQLDriverQueryLogging() const { return m_sqlDriverQueryLogging; }
-    private:
-        FILE* openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode);
-        FILE* openGmlogPerAccount(uint32 account);
+    bool IsOutDebug() const { return m_logLevel > 2 || (m_logFileLevel > 2 && logfile); }
+    bool IsOutCharDump() const { return m_charLog_Dump; }
 
-        FILE* raLogfile;
-        FILE* logfile;
-        FILE* gmLogfile;
-        FILE* charLogfile;
-        FILE* dberLogfile;
-        FILE* chatLogfile;
-        FILE* sqlLogFile;
-        FILE* sqlDevLogFile;
-        FILE* miscLogFile;
+    bool GetLogDB() const { return m_enableLogDB; }
+    void SetLogDB(bool enable) { m_enableLogDB = enable; }
+    bool GetSQLDriverQueryLogging() const { return m_sqlDriverQueryLogging; }
+private:
+    FILE* openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode);
+    FILE* openGmlogPerAccount(uint32 account);
 
-        // cache values for after initilization use (like gm log per account case)
-        std::string m_logsDir;
-        std::string m_logsTimestamp;
+    FILE* raLogfile;
+    FILE* logfile;
+    FILE* gmLogfile;
+    FILE* charLogfile;
+    FILE* dberLogfile;
+    FILE* chatLogfile;
+    FILE* sqlLogFile;
+    FILE* sqlDevLogFile;
+    FILE* miscLogFile;
 
-        // gm log control
-        bool m_gmlog_per_account;
-        std::string m_gmlog_filename_format;
+    // cache values for after initilization use (like gm log per account case)
+    std::string m_logsDir;
+    std::string m_logsTimestamp;
 
-        bool m_enableLogDB;
-        uint32 realm;
+    // gm log control
+    bool m_gmlog_per_account;
+    std::string m_gmlog_filename_format;
 
-        // log coloring
-        bool m_colored;
-        ColorTypes m_colors[4];
+    bool m_enableLogDB;
+    uint32 realm;
 
-        // log levels:
-        // false: errors only, true: full query logging
-        bool m_sqlDriverQueryLogging;
+    // log coloring
+    bool m_colored;
+    ColorTypes m_colors[4];
 
-        // log levels:
-        // 0 minimum/string, 1 basic/error, 2 detail, 3 full/debug
-        uint8 m_dbLogLevel;
-        uint8 m_logLevel;
-        uint8 m_logFileLevel;
-        bool m_dbChar;
-        bool m_dbRA;
-        bool m_dbGM;
-        bool m_dbChat;
-        bool m_charLog_Dump;
-        bool m_charLog_Dump_Separate;
-        std::string m_dumpsDir;
+    // log levels:
+    // false: errors only, true: full query logging
+    bool m_sqlDriverQueryLogging;
 
-        DebugLogFilters m_DebugLogMask;
+    // log levels:
+    // 0 minimum/string, 1 basic/error, 2 detail, 3 full/debug
+    uint8 m_dbLogLevel;
+    uint8 m_logLevel;
+    uint8 m_logFileLevel;
+    bool m_dbChar;
+    bool m_dbRA;
+    bool m_dbGM;
+    bool m_dbChat;
+    bool m_charLog_Dump;
+    bool m_charLog_Dump_Separate;
+    std::string m_dumpsDir;
+
+    DebugLogFilters m_DebugLogMask;
 };
 
 #define sLog Log::instance()
