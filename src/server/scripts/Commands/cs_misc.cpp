@@ -2370,7 +2370,7 @@ public:
             char buffer[80];
 
             // set it to string
-            ACE_OS::localtime_r(&sqlTime, &timeInfo);
+            localtime_r(&sqlTime, &timeInfo);
             strftime(buffer, sizeof(buffer), "%Y-%m-%d %I:%M%p", &timeInfo);
 
             handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY_OUTPUT, buffer, fields[1].GetUInt32(), fields[2].GetCString(), fields[3].GetCString());

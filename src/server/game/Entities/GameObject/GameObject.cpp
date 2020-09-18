@@ -483,6 +483,7 @@ void GameObject::Update(uint32 diff)
             }
 
             // NO BREAK for switch (m_lootState)
+            [[fallthrough]];
         }
         case GO_READY:
         {
