@@ -16,15 +16,15 @@
 /// Start the server
 class Master
 {
-    public:
-        static Master* instance();
-        int Run();
+public:
+    static Master* instance();
+    int Run();
 
-    private:
-        bool _StartDB();
-        void _StopDB();
+private:
+    bool _StartDB();
+    void _StopDB();
 
-        void ClearOnlineAccounts();
+    void ClearOnlineAccounts();
 };
 
 #define sMaster Master::instance()
