@@ -121,13 +121,13 @@ void InstanceScript::UpdateDoorState(GameObject* door)
         switch (info.type)
         {
             case DOOR_TYPE_ROOM:
-                open &= (info.bossInfo->state != IN_PROGRESS) ? true : false;
+                open &= (info.bossInfo->state != IN_PROGRESS);
                 break;
             case DOOR_TYPE_PASSAGE:
-                open &= (info.bossInfo->state == DONE) ? true : false;
+                open &= (info.bossInfo->state == DONE);
                 break;
             case DOOR_TYPE_SPAWN_HOLE:
-                open &= (info.bossInfo->state == IN_PROGRESS) ? true : false;
+                open &= (info.bossInfo->state == IN_PROGRESS);
                 break;
             default:
                 break;

@@ -83,7 +83,7 @@
 #include "LuaEngine.h"
 #endif
 
-ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
+std::atomic_long World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
 uint32 World::m_gameMSTime = 0;
@@ -2616,7 +2616,7 @@ void World::ShutdownMsg(bool show, Player* player)
 void World::ShutdownCancel()
 {
     // nothing cancel or too later
-    if (!m_ShutdownTimer || m_stopEvent.value())
+    if (!m_ShutdownTimer || m_stopEvent)
         return;
 
     ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_CANCELLED : SERVER_MSG_SHUTDOWN_CANCELLED;
@@ -2838,7 +2838,7 @@ time_t World::GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour)
         hour = 0;
     time_t curr = time(nullptr);
     tm localTm;
-    ACE_OS::localtime_r(&curr, &localTm);
+    localtime_r(&curr, &localTm);
     localTm.tm_hour = hour;
     localTm.tm_min  = 0;
     localTm.tm_sec  = 0;
@@ -2859,7 +2859,7 @@ time_t World::GetNextTimeWithMonthAndHour(int8 month, int8 hour)
         hour = 0;
     time_t curr = time(nullptr);
     tm localTm;
-    ACE_OS::localtime_r(&curr, &localTm);
+    localtime_r(&curr, &localTm);
     localTm.tm_mday = 1;
     localTm.tm_hour = hour;
     localTm.tm_min  = 0;
