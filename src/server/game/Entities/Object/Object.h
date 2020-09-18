@@ -401,10 +401,10 @@ struct Position
         Position* m_pos;
     };
 
-    float m_positionX;
-    float m_positionY;
-    float m_positionZ;
-    float m_orientation;
+    float m_positionX = 0;
+    float m_positionY = 0;
+    float m_positionZ = 0;
+    float m_orientation = 0;
 
     bool operator==(Position const &a);
 
@@ -913,6 +913,7 @@ class WorldObject : public Object, public WorldLocation
 
         void PlayDistanceSound(uint32 sound_id, Player* target = nullptr);
         void PlayDirectSound(uint32 sound_id, Player* target = nullptr);
+        void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
 
         void SendObjectDeSpawnAnim(uint64 guid);
 

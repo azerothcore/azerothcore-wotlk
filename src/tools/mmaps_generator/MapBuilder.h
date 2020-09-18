@@ -7,31 +7,27 @@
 #ifndef _MAP_BUILDER_H
 #define _MAP_BUILDER_H
 
+#include <list>
 #include <vector>
 #include <set>
 #include <atomic>
 #include <map>
-#include <list>
+#include <thread>
 
 #include "TerrainBuilder.h"
 #include "IntermediateValues.h"
 
 #include "Recast.h"
 #include "DetourNavMesh.h"
-
-#include <ace/Task.h>
-#include <ace/Activation_Queue.h>
-#include <ace/Method_Request.h>
+#include "PCQueue.h"
 
 using namespace VMAP;
-
-// G3D namespace typedefs conflicts with ACE typedefs
 
 namespace MMAP
 {
     struct MapTiles
     {
-        MapTiles() : m_mapId(uint32(-1)), m_tiles(NULL) {}
+        MapTiles() : m_mapId(uint32(-1)), m_tiles(nullptr) {}
 
         MapTiles(uint32 id, std::set<uint32>* tiles) : m_mapId(id), m_tiles(tiles) {}
         ~MapTiles() {}
@@ -49,7 +45,7 @@ namespace MMAP
 
     struct Tile
     {
-        Tile() : chf(NULL), solid(NULL), cset(NULL), pmesh(NULL), dmesh(NULL) {}
+        Tile() : chf(nullptr), solid(nullptr), cset(nullptr), pmesh(nullptr), dmesh(nullptr) {}
         ~Tile()
         {
             rcFreeCompactHeightfield(chf);
@@ -75,7 +71,7 @@ namespace MMAP
                 bool skipBattlegrounds   = false,
                 bool debugOutput         = false,
                 bool bigBaseUnit         = false,
-                const char* offMeshFilePath = NULL);
+                const char* offMeshFilePath = nullptr);
 
             ~MapBuilder();
 
@@ -87,7 +83,9 @@ namespace MMAP
             void buildSingleTile(uint32 mapID, uint32 tileX, uint32 tileY);
 
             // builds list of maps, then builds all of mmap tiles (based on the skip settings)
-            void buildAllMaps(int threads);
+            void buildAllMaps(unsigned int threads);
+
+            void WorkerThread();
 
         private:
             // detect maps and tiles
@@ -131,68 +129,15 @@ namespace MMAP
             float m_maxWalkableAngle;
             bool m_bigBaseUnit;
             // percentageDone - variables to calculate percentage
-            uint32 m_totalTiles;
+            std::atomic<uint32> m_totalTiles;
             std::atomic<uint32> m_totalTilesBuilt;
 
             // build performance - not really used for now
             rcContext* m_rcContext;
-    };
 
-    class MapBuildRequest : public ACE_Method_Request
-    {
-        public:
-            MapBuildRequest(uint32 mapId) : _mapId(mapId) {}
-
-            virtual int call()
-            {
-                /// @ Actually a creative way of unabstracting the class and returning a member variable
-                return (int)_mapId;
-            }
-
-        private:
-            uint32 _mapId;
-    };
-
-    class BuilderThread : public ACE_Task_Base
-    {
-    private:
-        MapBuilder* _builder;
-        ACE_Activation_Queue* _queue;
-
-    public:
-        BuilderThread(MapBuilder* builder, ACE_Activation_Queue* queue) : _builder(builder), _queue(queue) { activate(); }
-
-        int svc()
-        {
-            /// @ Set a timeout for dequeue attempts (only used when the queue is empty) as it will never get populated after thread starts
-            ACE_Time_Value timeout(5);
-            ACE_Method_Request* request = NULL;
-            while ((request = _queue->dequeue(&timeout)) != NULL)
-            {
-                _builder->buildMap(request->call());
-                delete request;
-                request = NULL;
-            }
-
-            return 0;
-        }
-    };
-
-    class BuilderThreadPool
-    {
-        public:
-            BuilderThreadPool() : _queue(new ACE_Activation_Queue()) {}
-            ~BuilderThreadPool() { _queue->queue()->close(); delete _queue; }
-
-            void Enqueue(MapBuildRequest* request)
-            {
-                _queue->enqueue(request);
-            }
-
-            ACE_Activation_Queue* Queue() { return _queue; }
-
-        private:
-            ACE_Activation_Queue* _queue;
+            std::vector<std::thread> _workerThreads;
+            ProducerConsumerQueue<uint32> _queue;
+            std::atomic<bool> _cancelationToken;
     };
 }
 

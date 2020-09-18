@@ -84,7 +84,7 @@ bool DBCFileLoader::Load(char const* filename, char const* fmt)
     }
 
     data = new unsigned char[recordSize * recordCount + stringSize];
-    stringTable = data + recordSize*recordCount;
+    stringTable = data + recordSize * recordCount;
 
     if (fread(data, recordSize * recordCount + stringSize, 1, f) != 1)
     {
@@ -210,7 +210,7 @@ char* DBCFileLoader::AutoProduceData(char const* format, uint32& records, char**
         else
             indexTable[y] = &dataTable[offset];
 
-        for (uint32 x=0; x < fieldCount; ++x)
+        for (uint32 x = 0; x < fieldCount; ++x)
         {
             switch (format[x])
             {
@@ -275,17 +275,17 @@ char* DBCFileLoader::AutoProduceStrings(char const* format, char* dataTable)
                     offset += sizeof(uint8);
                     break;
                 case FT_STRING:
-                {
-                    // fill only not filled entries
-                    char** slot = (char**)(&dataTable[offset]);
-                    if (!*slot || !**slot)
                     {
-                        const char * st = getRecord(y).getString(x);
-                        *slot = stringPool + (st - (char const*)stringTable);
+                        // fill only not filled entries
+                        char** slot = (char**)(&dataTable[offset]);
+                        if (!*slot || !** slot)
+                        {
+                            const char* st = getRecord(y).getString(x);
+                            *slot = stringPool + (st - (char const*)stringTable);
+                        }
+                        offset += sizeof(char*);
+                        break;
                     }
-                    offset += sizeof(char*);
-                    break;
-                }
                 case FT_LOGIC:
                     ASSERT(false && "Attempted to load DBC files that does not have field types that match what is in the core. Check DBCfmt.h or your DBC files.");
                     break;
