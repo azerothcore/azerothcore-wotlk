@@ -508,7 +508,7 @@ public:
 
             _events.Update(diff);
 
-            switch (uint32 eventId = _events.ExecuteEvent())
+            switch (_events.ExecuteEvent())
             {
                 case EVENT_SPELL_ISHANAH_HOLY_SMITE:
                     me->CastSpell(me->GetVictim(), HOLY_SMITE_ISHANAH, false);

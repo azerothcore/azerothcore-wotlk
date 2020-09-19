@@ -57,34 +57,34 @@ namespace MMAP
     // holds all all access to mmap loading unloading and meshes
     class MMapManager
     {
-        public:
-            MMapManager() : loadedTiles(0) {}
-            ~MMapManager();
+    public:
+        MMapManager() : loadedTiles(0) {}
+        ~MMapManager();
 
-            bool loadMap(uint32 mapId, int32 x, int32 y);
-            bool unloadMap(uint32 mapId, int32 x, int32 y);
-            bool unloadMap(uint32 mapId);
-            bool unloadMapInstance(uint32 mapId, uint32 instanceId);
+        bool loadMap(uint32 mapId, int32 x, int32 y);
+        bool unloadMap(uint32 mapId, int32 x, int32 y);
+        bool unloadMap(uint32 mapId);
+        bool unloadMapInstance(uint32 mapId, uint32 instanceId);
 
-            // the returned [dtNavMeshQuery const*] is NOT threadsafe
-            dtNavMeshQuery const* GetNavMeshQuery(uint32 mapId, uint32 instanceId);
-            dtNavMesh const* GetNavMesh(uint32 mapId);
+        // the returned [dtNavMeshQuery const*] is NOT threadsafe
+        dtNavMeshQuery const* GetNavMeshQuery(uint32 mapId, uint32 instanceId);
+        dtNavMesh const* GetNavMesh(uint32 mapId);
 
-            uint32 getLoadedTilesCount() const { return loadedTiles; }
-            uint32 getLoadedMapsCount() const { return loadedMMaps.size(); }
+        uint32 getLoadedTilesCount() const { return loadedTiles; }
+        uint32 getLoadedMapsCount() const { return loadedMMaps.size(); }
 
-            ACE_RW_Thread_Mutex& GetMMapLock(uint32 mapId);
-            ACE_RW_Thread_Mutex& GetMMapGeneralLock() { return MMapLock; } // pussywizard: in case a per-map mutex can't be found, should never happen
-            ACE_RW_Thread_Mutex& GetManagerLock() { return MMapManagerLock; }
-        private:
-            bool loadMapData(uint32 mapId);
-            uint32 packTileID(int32 x, int32 y);
+        ACE_RW_Thread_Mutex& GetMMapLock(uint32 mapId);
+        ACE_RW_Thread_Mutex& GetMMapGeneralLock() { return MMapLock; } // pussywizard: in case a per-map mutex can't be found, should never happen
+        ACE_RW_Thread_Mutex& GetManagerLock() { return MMapManagerLock; }
+    private:
+        bool loadMapData(uint32 mapId);
+        uint32 packTileID(int32 x, int32 y);
 
-            MMapDataSet loadedMMaps;
-            uint32 loadedTiles;
+        MMapDataSet loadedMMaps;
+        uint32 loadedTiles;
 
-            ACE_RW_Thread_Mutex MMapManagerLock;
-            ACE_RW_Thread_Mutex MMapLock; // pussywizard: in case a per-map mutex can't be found, should never happen
+        ACE_RW_Thread_Mutex MMapManagerLock;
+        ACE_RW_Thread_Mutex MMapLock; // pussywizard: in case a per-map mutex can't be found, should never happen
     };
 }
 
