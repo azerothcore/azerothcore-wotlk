@@ -426,32 +426,28 @@ class instance_stratholme : public InstanceMapScript
                     }
                 }
 
-                int gate = 1;
+                const int GATE1 = 0;
+                const int GATE2 = 1;
+
                 switch (events.ExecuteEvent())
                 {
                     case EVENT_GATE1_TRAP:
-                        gate = 0;
+                        _gateTrapsCooldown[GATE1] = false;
+                        break;
                     case EVENT_GATE2_TRAP:
-                        _gateTrapsCooldown[gate] = false;
+                        _gateTrapsCooldown[GATE2] = false;
                         break;
                     case EVENT_GATE1_DELAY:
-                        gate = 0;
+                        gate_delay(GATE1);
+                        break;
                     case EVENT_GATE2_DELAY:
-                        if (_trapGatesGUIDs[2 * gate])
-                            DoUseDoorOrButton(_trapGatesGUIDs[2 * gate]);
-                        if (_trapGatesGUIDs[2 * gate + 1])
-                            DoUseDoorOrButton(_trapGatesGUIDs[2 * gate + 1]);
+                        gate_delay(GATE2);
                         break;
                     case EVENT_GATE1_CRITTER_DELAY:
-                        gate = 0;
+                        gate_critter_delay(GATE1);
+                        break;
                     case EVENT_GATE2_CRITTER_DELAY:
-                        if (_trappedPlayerGUID)
-                        {
-                            if (Player* pPlayer = instance->GetPlayer(_trappedPlayerGUID))
-                            {
-                                DoSpawnPlaguedCritters(gate, pPlayer);
-                            }
-                        }
+                        gate_critter_delay(GATE2);
                         break;
                     case EVENT_BARON_TIME:
                     {
@@ -565,7 +561,31 @@ class instance_stratholme : public InstanceMapScript
             bool _gateTrapsCooldown[2];
             uint64 _trappedPlayerGUID;
             uint64 _trapGatesGUIDs[4];
+
+            void gate_delay(int gate)
+            {
+                if (_trapGatesGUIDs[2 * gate])
+                {
+                    DoUseDoorOrButton(_trapGatesGUIDs[2 * gate]);
+                }
+                if (_trapGatesGUIDs[2 * gate + 1])
+                {
+                    DoUseDoorOrButton(_trapGatesGUIDs[2 * gate + 1]);
+                }
+            }
+
+            void gate_critter_delay(int gate)
+            {
+                if (_trappedPlayerGUID)
+                {
+                    if (Player* pPlayer = instance->GetPlayer(_trappedPlayerGUID))
+                    {
+                        DoSpawnPlaguedCritters(gate, pPlayer);
+                    }
+                }
+            }
         };
+
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const
         {
