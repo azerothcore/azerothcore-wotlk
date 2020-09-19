@@ -67,12 +67,12 @@ Map* MapManager::CreateBaseMap(uint32 id)
 {
     Map* map = FindBaseMap(id);
 
-    if (map == NULL)
+    if (map == nullptr)
     {
         ACORE_GUARD(ACE_Thread_Mutex, Lock);
 
         map = FindBaseMap(id);
-        if (map == NULL) // pussywizard: check again after acquiring mutex
+        if (map == nullptr) // pussywizard: check again after acquiring mutex
         {
             MapEntry const* entry = sMapStore.LookupEntry(id);
             ASSERT(entry);
@@ -97,7 +97,7 @@ Map* MapManager::FindBaseNonInstanceMap(uint32 mapId) const
 {
     Map* map = FindBaseMap(mapId);
     if (map && map->Instanceable())
-        return NULL;
+        return nullptr;
     return map;
 }
 
@@ -115,10 +115,10 @@ Map* MapManager::FindMap(uint32 mapid, uint32 instanceId) const
 {
     Map* map = FindBaseMap(mapid);
     if (!map)
-        return NULL;
+        return nullptr;
 
     if (!map->Instanceable())
-        return instanceId == 0 ? map : NULL;
+        return instanceId == 0 ? map : nullptr;
 
     return ((MapInstanced*)map)->FindInstanceMap(instanceId);
 }
@@ -318,7 +318,7 @@ bool MapManager::IsValidMAP(uint32 mapid, bool startUp)
     MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
 
     if (startUp)
-        return mEntry ? true : false;
+        return !!mEntry;
     else
         return mEntry && (!mEntry->IsDungeon() || sObjectMgr->GetInstanceTemplate(mapid));
 

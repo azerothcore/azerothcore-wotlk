@@ -406,7 +406,7 @@ class spell_item_sleepy_willy : public SpellScriptLoader
 
             void SelectTarget(std::list<WorldObject*>& targets)
             {
-                Creature* target = NULL;
+                Creature* target = nullptr;
                 for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                     if (Creature* creature = (*itr)->ToCreature())
                         if (creature->IsCritter())
@@ -919,9 +919,9 @@ class spell_item_gnomish_shrink_ray : public SpellScriptLoader
                 if (Unit* target = GetHitUnit())
                 {
                     if (urand(0, 99) < 15)
-                        caster->CastSpell(caster, SPELL_GNOMISH_SHRINK_RAY_SELF, true, NULL);
+                        caster->CastSpell(caster, SPELL_GNOMISH_SHRINK_RAY_SELF, true, nullptr);
                     else
-                        caster->CastSpell(target, SPELL_GNOMISH_SHRINK_RAY_TARGET, true, NULL);
+                        caster->CastSpell(target, SPELL_GNOMISH_SHRINK_RAY_TARGET, true, nullptr);
                 }
             }
 
@@ -1038,7 +1038,7 @@ class spell_item_fetch_ball : public SpellScriptLoader
 
             void SelectTarget(std::list<WorldObject*>& targets)
             {
-                Creature* target = NULL;
+                Creature* target = nullptr;
                 for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                     if (Creature* creature = (*itr)->ToCreature())
                     {
@@ -1880,7 +1880,7 @@ class spell_item_deviate_fish : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
                 uint32 spellId = urand(SPELL_SLEEPY, SPELL_HEALTHY_SPIRIT);
-                caster->CastSpell(caster, spellId, true, NULL);
+                caster->CastSpell(caster, spellId, true, nullptr);
             }
 
             void Register()
@@ -2023,7 +2023,7 @@ class spell_item_flask_of_the_north : public SpellScriptLoader
                         break;
                 }
 
-                caster->CastSpell(caster, possibleSpells[irand(0, (possibleSpells.size() - 1))], true, NULL);
+                caster->CastSpell(caster, possibleSpells[irand(0, (possibleSpells.size() - 1))], true, nullptr);
             }
 
             void Register()
@@ -2068,9 +2068,9 @@ class spell_item_gnomish_death_ray : public SpellScriptLoader
                 if (Unit* target = GetHitUnit())
                 {
                     if (urand(0, 99) < 15)
-                        caster->CastSpell(caster, SPELL_GNOMISH_DEATH_RAY_SELF, true, NULL);    // failure
+                        caster->CastSpell(caster, SPELL_GNOMISH_DEATH_RAY_SELF, true, nullptr);    // failure
                     else
-                        caster->CastSpell(target, SPELL_GNOMISH_DEATH_RAY_TARGET, true, NULL);
+                        caster->CastSpell(target, SPELL_GNOMISH_DEATH_RAY_TARGET, true, nullptr);
                 }
             }
 
@@ -2129,7 +2129,7 @@ class spell_item_make_a_wish : public SpellScriptLoader
                     case 3: spellId = SPELL_SUMMON_FURIOUS_MR_PINCHY; break;
                     case 4: spellId = SPELL_TINY_MAGICAL_CRAWDAD; break;
                 }
-                caster->CastSpell(caster, spellId, true, NULL);
+                caster->CastSpell(caster, spellId, true, nullptr);
             }
 
             void Register()
@@ -2283,7 +2283,7 @@ class spell_item_net_o_matic : public SpellScriptLoader
                     else if (roll < 4)                       // 2% for 20 sec root, charge to target (off-like chance unknown)
                         spellId = SPELL_NET_O_MATIC_TRIGGERED2;
 
-                    GetCaster()->CastSpell(target, spellId, true, NULL);
+                    GetCaster()->CastSpell(target, spellId, true, nullptr);
                 }
             }
 
@@ -2339,7 +2339,7 @@ class spell_item_noggenfogger_elixir : public SpellScriptLoader
                     case 2: spellId = SPELL_NOGGENFOGGER_ELIXIR_TRIGGERED2; break;
                 }
 
-                caster->CastSpell(caster, spellId, true, NULL);
+                caster->CastSpell(caster, spellId, true, nullptr);
             }
 
             void Register()
@@ -2426,7 +2426,7 @@ class spell_item_savory_deviate_delight : public SpellScriptLoader
                     // Yaaarrrr - pirate
                     case 2: spellId = (caster->getGender() == GENDER_MALE ? SPELL_YAAARRRR_MALE : SPELL_YAAARRRR_FEMALE); break;
                 }
-                caster->CastSpell(caster, spellId, true, NULL);
+                caster->CastSpell(caster, spellId, true, nullptr);
             }
 
             void Register()
@@ -2518,7 +2518,15 @@ class spell_item_scroll_of_recall : public SpellScriptLoader
 enum ShadowsFate
 {
     SPELL_SOUL_FEAST        = 71203,
-    NPC_SINDRAGOSA          = 36853
+};
+
+enum ExceptionCreature
+{
+    NPC_GLUTTONOUS_ABOMINATION = 37886,
+    NPC_RISEN_ARCHMAGE         = 37868,
+    NPC_BLISTERING_ZOMBIE      = 37934,
+    NPC_BLAZING_SKELETON       = 36791,
+    NPC_SINDRAGOSA             = 36853
 };
 
 class spell_item_unsated_craving : public SpellScriptLoader
@@ -2530,15 +2538,39 @@ class spell_item_unsated_craving : public SpellScriptLoader
         {
             PrepareAuraScript(spell_item_unsated_craving_AuraScript);
 
+            bool isException(Unit* target) const
+            {
+                switch (target->GetEntry())
+                {
+                    case NPC_GLUTTONOUS_ABOMINATION:
+                    case NPC_RISEN_ARCHMAGE:
+                    case NPC_BLISTERING_ZOMBIE:
+                    case NPC_BLAZING_SKELETON:
+                    case NPC_SINDRAGOSA:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
             bool CheckProc(ProcEventInfo& procInfo)
             {
                 Unit* caster = procInfo.GetActor();
                 if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                {
                     return false;
+                }
 
                 Unit* target = procInfo.GetActionTarget();
-                if (!target || target->GetTypeId() != TYPEID_UNIT || target->IsCritter() || (target->GetEntry() != NPC_SINDRAGOSA && target->IsSummon()))
+                if (target && isException(target))
+                {
+                    return true;
+                }
+
+                if (!target || target->GetTypeId() != TYPEID_UNIT || target->IsCritter() || target->IsSummon())
+                {
                     return false;
+                }
 
                 return true;
             }
@@ -3210,7 +3242,7 @@ class spell_item_purify_helboar_meat : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /* effIndex */)
             {
                 Unit* caster = GetCaster();
-                caster->CastSpell(caster, roll_chance_i(50) ? SPELL_SUMMON_PURIFIED_HELBOAR_MEAT : SPELL_SUMMON_TOXIC_HELBOAR_MEAT, true, NULL);
+                caster->CastSpell(caster, roll_chance_i(50) ? SPELL_SUMMON_PURIFIED_HELBOAR_MEAT : SPELL_SUMMON_TOXIC_HELBOAR_MEAT, true, nullptr);
             }
 
             void Register()
@@ -3251,7 +3283,7 @@ class spell_item_crystal_prison_dummy_dnd : public SpellScriptLoader
                 if (Creature* target = GetHitCreature())
                     if (target->isDead() && !target->IsPet())
                     {
-                        GetCaster()->SummonGameObject(OBJECT_IMPRISONED_DOOMGUARD, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0, 0, 0, 0, uint32(target->GetRespawnTime()-time(NULL)));
+                        GetCaster()->SummonGameObject(OBJECT_IMPRISONED_DOOMGUARD, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0, 0, 0, 0, uint32(target->GetRespawnTime()-time(nullptr)));
                         target->DespawnOrUnsummon();
                     }
             }
@@ -3564,7 +3596,7 @@ class spell_item_complete_raptor_capture : public SpellScriptLoader
                     GetHitCreature()->DespawnOrUnsummon();
 
                     //cast spell Raptor Capture Credit
-                    caster->CastSpell(caster, SPELL_RAPTOR_CAPTURE_CREDIT, true, NULL);
+                    caster->CastSpell(caster, SPELL_RAPTOR_CAPTURE_CREDIT, true, nullptr);
                 }
             }
 
@@ -3820,7 +3852,7 @@ class spell_item_rocket_boots : public SpellScriptLoader
                     bg->EventPlayerDroppedFlag(caster);
 
                 caster->RemoveSpellCooldown(SPELL_ROCKET_BOOTS_PROC);
-                caster->CastSpell(caster, SPELL_ROCKET_BOOTS_PROC, true, NULL);
+                caster->CastSpell(caster, SPELL_ROCKET_BOOTS_PROC, true, nullptr);
             }
 
             SpellCastResult CheckCast()

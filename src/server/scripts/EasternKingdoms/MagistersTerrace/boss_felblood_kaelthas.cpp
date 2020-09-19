@@ -171,9 +171,9 @@ public:
                     if (action == ACTION_TELEPORT_PLAYERS)
                         me->CastSpell(player, SPELL_GRAVITY_LAPSE_PLAYER+counter, true);
                     else if (action == ACTION_KNOCKUP)
-                        player->CastSpell(player, SPELL_GRAVITY_LAPSE_DOT, true, NULL, NULL, me->GetGUID());
+                        player->CastSpell(player, SPELL_GRAVITY_LAPSE_DOT, true, nullptr, nullptr, me->GetGUID());
                     else if (action == ACTION_ALLOW_FLY)
-                        player->CastSpell(player, SPELL_GRAVITY_LAPSE_FLY, true, NULL, NULL, me->GetGUID());
+                        player->CastSpell(player, SPELL_GRAVITY_LAPSE_FLY, true, nullptr, nullptr, me->GetGUID());
                     else if (action == ACTION_REMOVE_FLY)
                     {
                         player->RemoveAurasDueToSpell(SPELL_GRAVITY_LAPSE_FLY);

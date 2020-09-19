@@ -42,19 +42,21 @@ public:
         {
             switch (creature->GetEntry())
             {
-            case NPC_KILREK:
-                m_uiKilrekGUID = creature->GetGUID();
-                break;
-            case NPC_TERESTIAN_ILLHOOF:
-                m_uiTerestianGUID = creature->GetGUID();
-                break;
-            case NPC_MOROES:
-                m_uiMoroesGUID = creature->GetGUID();
-                break;
-            case NPC_NIGHTBANE:
-                m_uiNightBaneGUID = creature->GetGUID();
-            case NPC_RELAY:
-                m_uiRelayGUID = creature->GetGUID();
+                case NPC_KILREK:
+                    m_uiKilrekGUID = creature->GetGUID();
+                    break;
+                case NPC_TERESTIAN_ILLHOOF:
+                    m_uiTerestianGUID = creature->GetGUID();
+                    break;
+                case NPC_MOROES:
+                    m_uiMoroesGUID = creature->GetGUID();
+                    break;
+                case NPC_NIGHTBANE:
+                    m_uiNightBaneGUID = creature->GetGUID();
+                    break;
+                case NPC_RELAY:
+                    m_uiRelayGUID = creature->GetGUID();
+                    break;
             }
         }
 

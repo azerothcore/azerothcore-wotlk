@@ -1077,10 +1077,11 @@ public:
                     break;
                 case EVENT_ARGENT_CHALLENGE_MOVE_FORWARD:
                     {
-                    if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID))
+                    if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID)) {
                         boss->GetMotionMaster()->MovePoint(0, 746.881f, 635.263f, 411.7f);
-                        events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_ATTACK, 3000);
-                        events.PopEvent();
+                    }
+                    events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_ATTACK, 3000);
+                    events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_ATTACK:
@@ -1152,8 +1153,8 @@ public:
                                             bk->ToCreature()->SetReactState(REACT_PASSIVE);
                                     }
 
-                                    announcer->SetFacingToObject(bk_vehicle);
-                                    announcer->AI()->Talk(TEXT_BK_RAFTERS);
+                                announcer->SetFacingToObject(bk_vehicle);
+                                announcer->AI()->Talk(TEXT_BK_RAFTERS);
                             }
                         events.PopEvent();
                     }

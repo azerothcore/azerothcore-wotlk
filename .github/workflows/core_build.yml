@@ -11,10 +11,29 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [clang6, clang9, clang10]
+        # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
+        os: [ubuntu-20.04]
+        compiler: [clang]
         modules: [with, without]
-    runs-on: ubuntu-20.04
-    name: ${{ matrix.compiler }}-${{ matrix.modules }}-modules
+        # we can include specific combinations here
+        include:
+          - os: ubuntu-20.04
+            compiler: clang9
+            modules: without
+          - os: ubuntu-18.04
+            compiler: clang # default in 18.04 is clang 6
+            modules: without
+          - os: ubuntu-18.04
+            compiler: gcc # default in 18.04 is gcc 7
+            modules: without
+          - os: ubuntu-20.04
+            compiler: gcc # default in 20.04 is gcc 9
+            modules: without
+          - os: ubuntu-20.04
+            compiler: gcc10
+            modules: without
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
       COMPILER: ${{ matrix.compiler }}
     steps:
@@ -23,13 +42,13 @@ jobs:
         run: ./apps/ci/ci-install-modules.sh
         if: matrix.modules == 'with'
       - name: Cache
-        uses: actions/cache@v1.1.2
+        uses: actions/cache@v2
         with:
           path: /home/runner/.ccache
-          key: ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
+          key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
-            ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
-            ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules
+            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
+            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
       - name: Configure OS
         run: source ./apps/ci/ci-install.sh
         env:
@@ -42,19 +61,109 @@ jobs:
         run: source ./apps/ci/ci-worldserver-dry-run.sh
       - name: Check startup errors
         run: source ./apps/ci/ci-error-check.sh
+      - name: Run unit tests
+        run: source ./apps/ci/ci-run-unit-tests.sh
+
+  mac-build:
+    strategy:
+      fail-fast: false
+    runs-on: macos-10.15
+    name: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache
+        uses: actions/cache@v1.1.2
+        with:
+          path: /Users/runner/.ccache
+          key: ccache:macos-10.15:${{ github.ref }}:${{ github.sha }}
+          restore-keys: |
+            ccache:macos-10.15:${{ github.ref }}
+            ccache:macos-10.15
+      - name: Configure OS
+        run: source ./apps/ci/mac/ci-install.sh
+      - name: Build
+        run: source ./apps/ci/mac/ci-compile.sh
+      - name: Run unit tests
+        run: source ./apps/ci/ci-run-unit-tests.sh
+
+  windows-build:
+    strategy:
+      fail-fast: false
+    runs-on: windows-2019
+    name: windows-2019-MSVC16
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure OS
+        run: choco install --no-progress openssl
+      - name: Build
+        shell: bash
+        run: |
+          mkdir -p build && cd build
+          cmake .. -DTOOLS=ON
+          cmake --build . --config Release --parallel 4
+      - name: Copy dll files
+        shell: bash
+        run: |
+          cp "/c/mysql-5.7.21-winx64/lib/libmysql.dll" "build/bin/Release/"
+          cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "build/bin/Release/"
+          cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
+      - uses: actions/upload-artifact@v2
+        with:
+          name: windows-2019-MSVC16-release
+          path: build/bin/Release
 
   docker-build:
     strategy:
-      fail-fast: false
-    runs-on: ubuntu-18.04
+      fail-fast: true
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Configure
         run: |
           docker --version
           docker-compose --version
-          ./apps/ci/docker/ci-docker-config.sh
-          ./bin/acore-docker-generate-etc
       - name: Build
         run: |
           ./bin/acore-docker-build-no-scripts
+
+  docker-worldserver:
+    strategy:
+      fail-fast: true
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure
+        run: |
+          docker --version
+          docker-compose --version
+      - name: Build
+        run: |
+          docker build -t azerothcore/worldserver -f docker/worldserver/Dockerfile docker/worldserver
+
+  docker-authserver:
+    strategy:
+      fail-fast: true
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure
+        run: |
+          docker --version
+          docker-compose --version
+      - name: Build
+        run: |
+          docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/authserver
+
+  docker-database:
+    strategy:
+      fail-fast: true
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure
+        run: |
+          docker --version
+          docker-compose --version
+      - name: Build
+        run: |
+          docker build -t azerothcore/database -f docker/database/Dockerfile .
