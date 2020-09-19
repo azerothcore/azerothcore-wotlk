@@ -164,7 +164,7 @@ bool BattlegroundSA::ResetObjs()
     //Graveyards!
     for (uint8 i = 0;i < BG_SA_MAX_GY; i++)
     {
-        GraveyardStruct const* sg = NULL;
+        GraveyardStruct const* sg = nullptr;
         sg = sGraveyard->GetGraveyard(BG_SA_GYEntries[i]);
 
         if (!sg)
@@ -624,7 +624,7 @@ void BattlegroundSA::EventPlayerDamagedGO(Player* /*player*/, GameObject* go, ui
             case BG_SA_BLUE_GATE:
             case BG_SA_GREEN_GATE:
             {
-                GameObject* go = NULL;
+                GameObject* go = nullptr;
                 if ((go = GetBGObject(BG_SA_RED_GATE)))
                     go->SetDestructibleBuildingModifyState(true);
                 if ((go = GetBGObject(BG_SA_PURPLE_GATE)))
@@ -764,7 +764,7 @@ void BattlegroundSA::DestroyGate(Player* player, GameObject* go)
 
 GraveyardStruct const* BattlegroundSA::GetClosestGraveyard(Player* player)
 {
-    GraveyardStruct const* closest = NULL;
+    GraveyardStruct const* closest = nullptr;
     float mindist = 999999.0f;
     float x, y;
 
@@ -813,16 +813,22 @@ bool BattlegroundSA::CanInteractWithObject(uint32 objectId)
     {
         case BG_SA_TITAN_RELIC:
             if (GateStatus[BG_SA_ANCIENT_GATE] != BG_SA_GATE_DESTROYED || GateStatus[BG_SA_YELLOW_GATE] != BG_SA_GATE_DESTROYED)
+            {
                 return false;
-            // no break
+            }
+            [[fallthrough]];
         case BG_SA_CENTRAL_FLAG:
             if (GateStatus[BG_SA_RED_GATE] != BG_SA_GATE_DESTROYED && GateStatus[BG_SA_PURPLE_GATE] != BG_SA_GATE_DESTROYED)
+            {
                 return false;
-            // no break
+            }
+            [[fallthrough]];
         case BG_SA_LEFT_FLAG:
         case BG_SA_RIGHT_FLAG:
             if (GateStatus[BG_SA_GREEN_GATE] != BG_SA_GATE_DESTROYED && GateStatus[BG_SA_BLUE_GATE] != BG_SA_GATE_DESTROYED)
+            {
                 return false;
+            }
             break;
         default:
             ABORT();
@@ -884,7 +890,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player *Source)
     std::vector<uint64> ghost_list = m_ReviveQueue[BgCreatures[BG_SA_MAXNPC + i]];
     if (!ghost_list.empty())
     {
-        GraveyardStruct const* ClosestGrave = NULL;
+        GraveyardStruct const* ClosestGrave = nullptr;
         for (std::vector<uint64>::const_iterator itr = ghost_list.begin(); itr != ghost_list.end(); ++itr)
         {
             Player* player = ObjectAccessor::FindPlayer(*itr);

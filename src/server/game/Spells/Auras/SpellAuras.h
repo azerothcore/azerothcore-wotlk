@@ -171,8 +171,8 @@ class Aura
         // Helpers for targets
         ApplicationMap const & GetApplicationMap() {return m_applications;}
         void GetApplicationList(std::list<AuraApplication*> & applicationList) const;
-        const AuraApplication * GetApplicationOfTarget (uint64 guid) const { ApplicationMap::const_iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return NULL; }
-        AuraApplication * GetApplicationOfTarget (uint64 guid) { ApplicationMap::iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return NULL; }
+        const AuraApplication * GetApplicationOfTarget (uint64 guid) const { ApplicationMap::const_iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return nullptr; }
+        AuraApplication * GetApplicationOfTarget (uint64 guid) { ApplicationMap::iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return nullptr; }
         bool IsAppliedOnTarget(uint64 guid) const { return m_applications.find(guid) != m_applications.end(); }
 
         void SetNeedClientUpdateForTargets() const;

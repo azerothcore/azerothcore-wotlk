@@ -88,7 +88,7 @@ public:
                 //}
                 //else
                 //{
-                    HandOfThaurissan_Timer = 5000;
+                HandOfThaurissan_Timer = 5000;
                     //Counter = 0;
                 //}
             } else HandOfThaurissan_Timer -= diff;

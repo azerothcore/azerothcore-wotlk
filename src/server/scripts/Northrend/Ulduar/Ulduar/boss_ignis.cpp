@@ -209,7 +209,7 @@ public:
             counter = 0;
             bShattered = false;
             lastShatterMSTime = 0;
-            
+
             if( InstanceScript* m_pInstance = me->GetInstanceScript() )
             {
                 m_pInstance->SetData(TYPE_IGNIS, NOT_STARTED);
@@ -387,7 +387,7 @@ public:
 
                         std::vector<uint64> playerGUIDs;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                        Player* temp = NULL;
+                        Player* temp = nullptr;
 
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                         {
@@ -555,7 +555,7 @@ class achievement_ignis_shattered : public AchievementCriteriaScript
         {
             if (!target || target->GetTypeId() != TYPEID_UNIT)
                 return false;
-            return (target->ToCreature()->AI()->GetData(1337) ? true : false);
+            return !!target->ToCreature()->AI()->GetData(1337);
         }
 };
 

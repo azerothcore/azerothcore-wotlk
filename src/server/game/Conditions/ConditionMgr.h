@@ -165,12 +165,12 @@ struct ConditionSourceInfo
 {
     WorldObject* mConditionTargets[MAX_CONDITION_TARGETS]; // an array of targets available for conditions
     Condition* mLastFailedCondition;
-    ConditionSourceInfo(WorldObject* target0, WorldObject* target1 = NULL, WorldObject* target2 = NULL)
+    ConditionSourceInfo(WorldObject* target0, WorldObject* target1 = NULL, WorldObject* target2 = nullptr)
     {
         mConditionTargets[0] = target0;
         mConditionTargets[1] = target1;
         mConditionTargets[2] = target2;
-        mLastFailedCondition = NULL;
+        mLastFailedCondition = nullptr;
     }
 };
 

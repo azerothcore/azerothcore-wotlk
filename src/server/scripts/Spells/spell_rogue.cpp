@@ -730,7 +730,7 @@ class spell_rog_tricks_of_the_trade : public SpellScriptLoader
 
             bool Load()
             {
-                _redirectTarget = NULL;
+                _redirectTarget = nullptr;
                 return true;
             }
 
