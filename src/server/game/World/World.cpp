@@ -2838,7 +2838,7 @@ time_t World::GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour)
         hour = 0;
     time_t curr = time(nullptr);
     tm localTm;
-    ACE_OS::localtime_r(&curr, &localTm);
+    localtime_r(&curr, &localTm);
     localTm.tm_hour = hour;
     localTm.tm_min  = 0;
     localTm.tm_sec  = 0;
@@ -2859,7 +2859,7 @@ time_t World::GetNextTimeWithMonthAndHour(int8 month, int8 hour)
         hour = 0;
     time_t curr = time(nullptr);
     tm localTm;
-    ACE_OS::localtime_r(&curr, &localTm);
+    localtime_r(&curr, &localTm);
     localTm.tm_mday = 1;
     localTm.tm_hour = hour;
     localTm.tm_min  = 0;

@@ -10023,7 +10023,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
                     bf->FillInitialWorldStates(data);
                     break;
                 }
-            // No break here, intended.
+                [[fallthrough]];
             default:
                 data << uint32(0x914) << uint32(0x0);           // 7
                 data << uint32(0x913) << uint32(0x0);           // 8
@@ -15823,14 +15823,14 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
     {
-        if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
+        if (sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
         {
             DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true);
         }
     }
     for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
     {
-        if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->ItemDrop[i]))
+        if (sObjectMgr->GetItemTemplate(quest->ItemDrop[i]))
         {
             DestroyItemCount(quest->ItemDrop[i], quest->ItemDropQuantity[i], true);
         }
@@ -18968,7 +18968,6 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
     {
         do
         {
-            bool has_items = false;
             Field* fields = result->Fetch();
             if (fields[14].GetUInt32() != prevMailID)
             {
@@ -18983,7 +18982,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
                 m->receiver       = fields[17].GetUInt32();
                 m->subject        = fields[18].GetString();
                 m->body           = fields[19].GetString();
-                has_items         = fields[20].GetBool();
+//                has_items         = fields[20].GetBool();
                 m->expire_time    = time_t(fields[21].GetUInt32());
                 m->deliver_time   = time_t(fields[22].GetUInt32());
                 m->money          = fields[23].GetUInt32();
@@ -27411,7 +27410,7 @@ void Player::_LoadBrewOfTheMonth(PreparedQueryResult result)
 
     time_t curtime = time(nullptr);
     tm localTime;
-    ACE_OS::localtime_r(&curtime, &localTime);
+    localtime_r(&curtime, &localTime);
 
     uint16 month = uint16(localTime.tm_mon);
     uint16 eventId = month;
