@@ -23,6 +23,7 @@ We support these versions of MariaDB:
 | 10.2            | :white_check_mark: |
 | 10.3            | :white_check_mark: |
 | 10.4            | :white_check_mark: |
+| 10.5            | :white_check_mark: |
 
 Note: We do not support any repacks that may or may not have been made based on AzerothCore.
 

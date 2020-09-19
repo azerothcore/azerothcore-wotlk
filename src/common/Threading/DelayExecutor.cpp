@@ -10,7 +10,7 @@ DelayExecutor* DelayExecutor::instance()
 }
 
 DelayExecutor::DelayExecutor()
-    : pre_svc_hook_(0), post_svc_hook_(0), activated_(false), mqueue_(1*1024*1024, 1*1024*1024), queue_(&mqueue_)
+    : pre_svc_hook_(0), post_svc_hook_(0), activated_(false), mqueue_(1 * 1024 * 1024, 1 * 1024 * 1024), queue_(&mqueue_)
 {
 }
 
