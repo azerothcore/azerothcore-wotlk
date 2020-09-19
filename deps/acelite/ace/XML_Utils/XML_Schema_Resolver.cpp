@@ -6,6 +6,7 @@
 #include "XercesString.h"
 
 #include "ace/Env_Value_T.h"
+#include "ace/SString.h"
 
 #include <iostream>
 
@@ -41,10 +42,10 @@ namespace XML
   Environment_Resolver::add_path (const ACE_TCHAR *variable,
                                   const ACE_TCHAR *relpath)
   {
-    ACE_Env_Value <const ACE_TCHAR *> path_env (variable,
-                                                ACE_TEXT(""));
+    ACE_Env_Value <ACE_TString> path_env (variable,
+                                          ACE_TEXT(""));
 
-    XStr xpath (path_env);
+    XStr xpath (static_cast<ACE_TString>(path_env).c_str());
     XStr xrelpath (relpath);
 
     xpath.append (xrelpath);

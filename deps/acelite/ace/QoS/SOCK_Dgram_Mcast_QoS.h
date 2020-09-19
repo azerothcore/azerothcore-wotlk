@@ -30,9 +30,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  */
 class ACE_QoS_Export ACE_SOCK_Dgram_Mcast_QoS : public ACE_SOCK_Dgram_Mcast
 {
-
 public:
-  // = Initialization routines.
   /// Ctor, has same defaults as ACE_SOCK_Dgram_Mcast
   ACE_SOCK_Dgram_Mcast_QoS (options opts = DEFOPTS);
 

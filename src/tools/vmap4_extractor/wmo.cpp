@@ -494,7 +494,7 @@ WMOInstance::WMOInstance(MPQFile& f, char const* WmoInstName, uint32 mapID, uint
     //-----------add_in _dir_file----------------
 
     char tempname[512];
-    sprintf(tempname, "%s/%s", szWorkDirWmo, WmoInstName);
+    snprintf(tempname, sizeof(tempname), "%s/%s", szWorkDirWmo, WmoInstName);
     FILE *input;
     input = fopen(tempname, "r+b");
 

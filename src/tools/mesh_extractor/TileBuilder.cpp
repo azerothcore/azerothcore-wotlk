@@ -378,7 +378,7 @@ void TileBuilder::OutputDebugVertices()
     if (Constants::Debug)
     {
         char buff[100];
-        sprintf(buff, "mmaps/%s_%02u%02u.obj", World.c_str(), Y, X);
+        snprintf(buff, sizeof(buff), "mmaps/%s_%02u%02u.obj", World.c_str(), Y, X);
         FILE* debug = fopen(buff, "wb");
         for (uint32 i = 0; i < _Geometry->Vertices.size(); ++i)
         {

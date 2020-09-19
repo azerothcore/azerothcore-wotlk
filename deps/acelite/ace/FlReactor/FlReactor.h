@@ -8,7 +8,7 @@
  *  @author Based in part in the ACE_XtReactor implementation by
  *  @author Eric C. Newton's <ecn@clark.net>
  *  @author Kirill Rybaltchenko <Kirill.Rybaltchenko@cern.ch>
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -45,7 +45,6 @@ class ACE_FlReactor_Export ACE_FlReactor : public ACE_Select_Reactor
 {
 
 public:
-  // = Initialization and termination methods.
   ACE_FlReactor (size_t size = DEFAULT_SIZE,
                  bool restart = false,
                  ACE_Sig_Handler * = 0);

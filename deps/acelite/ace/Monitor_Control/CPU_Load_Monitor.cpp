@@ -10,6 +10,9 @@
 #include "ace/OS_NS_stdio.h"
 #endif
 
+#include "ace/Log_Msg.h"
+#include "ace/OS_NS_string.h"
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 namespace ACE

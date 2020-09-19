@@ -4,6 +4,8 @@
 #include "XercesString.h"
 #include "xercesc/util/PlatformUtils.hpp"
 
+#include "ace/Truncate.h"
+
 using xercesc::XMLString;
 using xercesc::XMLPlatformUtils;
 
@@ -62,8 +64,8 @@ namespace XML
 
   bool XStr::append(const XMLCh *tail)
   {
-    int iTailLen = XMLString::stringLen(tail);
-    int iWorkLen = XMLString::stringLen(_wstr);
+    XMLSize_t iTailLen = XMLString::stringLen(tail);
+    XMLSize_t iWorkLen = XMLString::stringLen(_wstr);
 
     XMLSize_t bytes = (iWorkLen + iTailLen + 1) * sizeof (XMLCh);
     void *tmp = XMLPlatformUtils::fgMemoryManager->allocate (bytes);
@@ -112,7 +114,7 @@ namespace XML
 
   int XStr::size () const
   {
-    return XMLString::stringLen(_wstr);
+    return ACE_Utils::truncate_cast<int> (XMLString::stringLen(_wstr));
   }
 
   XMLCh XStr::operator [] (const int i)

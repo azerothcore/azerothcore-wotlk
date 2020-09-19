@@ -433,7 +433,7 @@ int main(int argc, char* argv[])
             for (int j = 0; j <= 32; ++j)
             {
                 char buff[100];
-                sprintf(buff, "mmaps/001%02i%02i.mmtile", i, j);
+                snprintf(buff, sizeof(buff), "mmaps/001%02i%02i.mmtile", i, j);
                 LoadTile(navMesh, buff);
             }
         }

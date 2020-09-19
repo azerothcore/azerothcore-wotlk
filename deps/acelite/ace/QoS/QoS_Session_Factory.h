@@ -38,16 +38,12 @@ class ACE_QoS_Session;
  */
 class ACE_QoS_Export ACE_QoS_Session_Factory
 {
-
 public :
-
-  // = Initialization and termination methods.
   /// Default constructor.
   ACE_QoS_Session_Factory (void);
 
   /// Default destructor.
   ~ACE_QoS_Session_Factory (void);
-
 
   /// Types of sessions for this factory to manage.
   enum ACE_QoS_Session_Type

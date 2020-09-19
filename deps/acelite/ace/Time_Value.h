@@ -4,7 +4,7 @@
 /**
  *  @file    Time_Value.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -53,7 +53,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_Time_Value
 {
 public:
-
   /// Constant "0".
   static const ACE_Time_Value zero;
 
@@ -66,8 +65,6 @@ public:
    * class.
    */
   static const ACE_Time_Value max_time;
-
-  // = Initialization methods.
 
   /// Default Constructor.
   ACE_Time_Value (void);
@@ -84,6 +81,9 @@ public:
   explicit ACE_Time_Value (const timespec_t &t);
 
 #if defined (ACE_HAS_CPP11)
+  ACE_Time_Value (const ACE_Time_Value&) = default;
+  ACE_Time_Value (ACE_Time_Value&&) = default;
+
   /// Construct the ACE_Time_Value object from a chrono duration.
   template< class Rep, class Period >
   explicit ACE_Time_Value (const std::chrono::duration<Rep, Period>& duration)
@@ -94,6 +94,9 @@ public:
 
   /// Destructor
   virtual ~ACE_Time_Value ();
+
+  /// Declare the dynamic allocation hooks.
+  ACE_ALLOC_HOOK_DECLARE;
 
 # if defined (ACE_WIN32)
   /// Construct the ACE_Time_Value object from a Win32 FILETIME
@@ -261,8 +264,11 @@ public:
   /// Add @a tv to this.
   ACE_Time_Value &operator += (time_t tv);
 
+#if defined (ACE_HAS_CPP11)
   /// Assign @a tv to this
-  ACE_Time_Value &operator = (const ACE_Time_Value &tv);
+  ACE_Time_Value &operator = (const ACE_Time_Value &) = default;
+  ACE_Time_Value &operator = (ACE_Time_Value &&)  = default;
+#endif /* ACE_HAS_CPP11 */
 
   /// Assign @a tv to this
   ACE_Time_Value &operator = (time_t tv);

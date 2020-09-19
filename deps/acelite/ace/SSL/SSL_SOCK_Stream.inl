@@ -59,7 +59,7 @@ ACE_SSL_SOCK_Stream::send_i (const void *buf,
 
     case SSL_ERROR_SYSCALL:
       if (bytes_sent == 0)
-        // An EOF occured but the SSL "close_notify" message was not
+        // An EOF occurred but the SSL "close_notify" message was not
         // sent.  This is a protocol error, but we ignore it.
         return 0;
 
@@ -101,7 +101,6 @@ ACE_SSL_SOCK_Stream::recv_i (void *buf,
   ACE_TRACE ("ACE_SSL_SOCK_Stream::recv_i");
 
   // NOTE: Caller must provide thread-synchronization.
-
   int bytes_read = 0;
   ACE_HANDLE const handle = this->get_handle ();
 
@@ -165,7 +164,7 @@ ACE_SSL_SOCK_Stream::recv_i (void *buf,
                                        timeout,
                                        status == SSL_ERROR_WANT_READ,
                                        status == SSL_ERROR_WANT_WRITE,
-                                       0);
+                                       false);
           if (substat == 1)   // Now ready to proceed
             {
               retry = true;
@@ -187,7 +186,7 @@ ACE_SSL_SOCK_Stream::recv_i (void *buf,
 
         case SSL_ERROR_SYSCALL:
           if (bytes_read == 0)
-            // An EOF occured but the SSL "close_notify" message was not
+            // An EOF occurred but the SSL "close_notify" message was not
             // sent.  This is a protocol error, but we ignore it.
             break;
 

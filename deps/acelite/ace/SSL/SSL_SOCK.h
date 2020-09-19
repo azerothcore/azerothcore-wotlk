@@ -39,7 +39,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_SSL_Export ACE_SSL_SOCK : public ACE_SOCK
 {
 public:
-
   /**
    * Override ACE_SOCK base class implementations with these SSL
    * specific ones.
@@ -61,7 +60,6 @@ public:
   //@}
 
 protected:
-
   /// Default constructor is private to prevent instances of this class
   /// from being defined.
   ACE_SSL_SOCK (void);
@@ -73,7 +71,6 @@ protected:
    * ACE_SSL_SOCK pointer/reference.
    */
   ~ACE_SSL_SOCK (void);
-
 };
 
 ACE_END_VERSIONED_NAMESPACE_DECL

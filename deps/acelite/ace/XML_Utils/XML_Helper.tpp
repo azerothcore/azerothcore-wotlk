@@ -310,13 +310,13 @@ namespace XML
         serializer->release ();
         return retn;
 #else
-        std::unique_ptr <XERCES_CPP_NAMESPACE::DOMWriter> writer (impl_->createDOMWriter());
+        std::auto_ptr <XERCES_CPP_NAMESPACE::DOMWriter> writer (impl_->createDOMWriter());
 
         if (writer->canSetFeature (XMLUni::fgDOMWRTFormatPrettyPrint,
                                     true))
           writer->setFeature (XMLUni::fgDOMWRTFormatPrettyPrint, true);
 
-        std::unique_ptr <xercesc::XMLFormatTarget> ft (new xercesc::LocalFileFormatTarget(ACE_TEXT_ALWAYS_CHAR (file)));
+        std::auto_ptr <xercesc::XMLFormatTarget> ft (new xercesc::LocalFileFormatTarget(ACE_TEXT_ALWAYS_CHAR (file)));
         retn = writer->writeNode(ft.get (), *doc);
 
         return retn;

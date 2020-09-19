@@ -8,6 +8,8 @@
 #include "ace/ETCL/ETCL_Constraint.inl"
 #endif /* __ACE_INLINE__ */
 
+#include "ace/OS_NS_string.h"
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 ETCL_Constraint::ETCL_Constraint (void)

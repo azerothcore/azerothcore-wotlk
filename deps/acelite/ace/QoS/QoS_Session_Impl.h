@@ -93,10 +93,10 @@ public:
   /// Get the RAPI file descriptor for RSVP events.
   virtual ACE_HANDLE rsvp_events_handle (void);
 
-  ///Set the RAPI event that last occured
+  ///Set the RAPI event that last occurred
   virtual void  rsvp_event_type (RSVP_Event_Type event_type);
 
-  ///Get the RAPI event that last occured
+  ///Get the RAPI event that last occurred
   virtual RSVP_Event_Type rsvp_event_type (void);
 
   /// Get the destination address for this RAPI session.
@@ -233,10 +233,10 @@ public:
   virtual ACE_HANDLE rsvp_events_handle (void);
 
   virtual void  rsvp_event_type (RSVP_Event_Type event_type);
-  ///Set the RAPI event that last occured
+  ///Set the RAPI event that last occurred
 
   virtual RSVP_Event_Type rsvp_event_type (void);
-  ///Get the RAPI event that last occured
+  ///Get the RAPI event that last occurred
 
   /// GQoS version.
   virtual int version ();

@@ -5,7 +5,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 ACE_ALLOC_HOOK_DEFINE (ACE_QtReactor)
 
 // Must be called with lock held
-
 ACE_QtReactor::ACE_QtReactor (QApplication *qapp ,
     ACE_Sig_Handler *sh,
     ACE_Timer_Queue *tq,
@@ -125,12 +124,28 @@ ACE_QtReactor::timeout_event (void)
   this->reset_timeout ();
 }
 
+#ifdef ACE_HAS_QT5
+ACE_HANDLE
+ACE_QtReactor::handle_from_sender () const
+{
+  // The argument passed to the Qt slot method is ignored due to this bug:
+  // https://bugreports.qt.io/browse/QTBUG-70441
+  QSocketNotifier *const notifier = dynamic_cast<QSocketNotifier *> (this->sender ());
+  return notifier ? ACE_HANDLE (notifier->socket ()) : ACE_INVALID_HANDLE;
+}
+#endif
+
 void
-ACE_QtReactor::read_event (int p_handle)
+ACE_QtReactor::read_event (ACE_QT_HANDLE_TYPE p_handle)
 {
   ACE_TRACE ("ACE_QtReactor::read_event");
 
+#ifdef ACE_HAS_QT5
+  ACE_UNUSED_ARG (p_handle);
+  ACE_HANDLE const handle = this->handle_from_sender ();
+#else
   ACE_HANDLE handle = ACE_HANDLE( p_handle );
+#endif
 
 #ifdef ACE_QTREACTOR_CLEAR_PENDING_EVENTS
   // disable socket notifier to clear pending events
@@ -156,11 +171,16 @@ ACE_QtReactor::read_event (int p_handle)
 }
 
 void
-ACE_QtReactor::write_event (int p_handle)
+ACE_QtReactor::write_event (ACE_QT_HANDLE_TYPE p_handle)
 {
   ACE_TRACE ("ACE_QtReactor::write_event");
 
+#ifdef ACE_HAS_QT5
+  ACE_UNUSED_ARG (p_handle);
+  ACE_HANDLE const handle = this->handle_from_sender ();
+#else
   ACE_HANDLE handle = ACE_HANDLE( p_handle );
+#endif
 
 #ifdef ACE_QTREACTOR_CLEAR_PENDING_EVENTS
   // disable socket notifier to clear pending events
@@ -185,12 +205,16 @@ ACE_QtReactor::write_event (int p_handle)
 }
 
 void
-ACE_QtReactor::exception_event (int p_handle)
+ACE_QtReactor::exception_event (ACE_QT_HANDLE_TYPE p_handle)
 {
   ACE_TRACE ("ACE_QtReactor::exception_event");
 
+#ifdef ACE_HAS_QT5
+  ACE_UNUSED_ARG (p_handle);
+  ACE_HANDLE const handle = this->handle_from_sender ();
+#else
   ACE_HANDLE handle = ACE_HANDLE( p_handle );
-
+#endif
 
 #ifdef ACE_QTREACTOR_CLEAR_PENDING_EVENTS
   // disable socket notifier to clear pending events
@@ -320,13 +344,18 @@ ACE_QtReactor::create_notifiers_for_handle (ACE_HANDLE handle)
                qsock_notifier) == -1) )
     {
         ACE_NEW (qsock_notifier,
-            QSocketNotifier (int(handle), QSocketNotifier::Read, this));
+            QSocketNotifier (ACE_QT_HANDLE_TYPE(handle), QSocketNotifier::Read, this));
         this->read_notifier_.bind (handle,
             qsock_notifier);
+
+#ifdef ACE_HAS_QT5
+        QObject::connect (qsock_notifier, &QSocketNotifier::activated, this, &ACE_QtReactor::read_event);
+#else
         QObject::connect (qsock_notifier,
-            SIGNAL (activated (int)),
+            SIGNAL (activated (ACE_QT_HANDLE_TYPE)),
             this,
-            SLOT (read_event (int))) ;
+            SLOT (read_event (ACE_QT_HANDLE_TYPE))) ;
+#endif
         // disable; it will be enabled by the regular register_handler_i if
         // necessary
         qsock_notifier->setEnabled (0);
@@ -341,15 +370,19 @@ ACE_QtReactor::create_notifiers_for_handle (ACE_HANDLE handle)
              qsock_notifier) == -1))
     {
         ACE_NEW (qsock_notifier,
-            QSocketNotifier (int(handle), QSocketNotifier::Write, this));
+            QSocketNotifier (ACE_QT_HANDLE_TYPE(handle), QSocketNotifier::Write, this));
 
         this->write_notifier_.bind (handle,
             qsock_notifier);
 
+#ifdef ACE_HAS_QT5
+        QObject::connect (qsock_notifier, &QSocketNotifier::activated, this, &ACE_QtReactor::write_event);
+#else
         QObject::connect (qsock_notifier,
-            SIGNAL (activated (int)),
+            SIGNAL (activated (ACE_QT_HANDLE_TYPE)),
             this,
-            SLOT (write_event (int)));
+            SLOT (write_event (ACE_QT_HANDLE_TYPE)));
+#endif
         // disable; it will be enabled by the regular register_handler_i if
         // necessary
         qsock_notifier->setEnabled (0);
@@ -365,15 +398,19 @@ ACE_QtReactor::create_notifiers_for_handle (ACE_HANDLE handle)
     {
 
         ACE_NEW (qsock_notifier,
-            QSocketNotifier (int(handle), QSocketNotifier::Exception, this));
+            QSocketNotifier (ACE_QT_HANDLE_TYPE(handle), QSocketNotifier::Exception, this));
 
         this->exception_notifier_.bind (handle,
             qsock_notifier);
 
+#ifdef ACE_HAS_QT5
+        QObject::connect (qsock_notifier, &QSocketNotifier::activated, this, &ACE_QtReactor::exception_event);
+#else
         QObject::connect (qsock_notifier,
-            SIGNAL (activated (int)),
+            SIGNAL (activated (ACE_QT_HANDLE_TYPE)),
             this,
-            SLOT (exception_event (int))) ;
+            SLOT (exception_event (ACE_QT_HANDLE_TYPE))) ;
+#endif
         // disable; it will be enabled by the regular register_handler_i if
         // necessary
         qsock_notifier->setEnabled (0);
@@ -592,7 +629,7 @@ ACE_QtReactor::QtWaitForMultipleEvents (int width,
 #endif
 
   // Reset the width, in case it changed during the upcalls.
-  width = handler_rep_.max_handlep1 ();
+  width = static_cast<int> (handler_rep_.max_handlep1 ());
 
   // Now actually read the result needed by the <Select_Reactor> using
   // <select>.
@@ -620,7 +657,7 @@ ACE_QtReactor::wait_for_multiple_events (
     handle_set.wr_mask_ = this->wait_set_.wr_mask_;
     handle_set.ex_mask_ = this->wait_set_.ex_mask_;
 
-    nfound = QtWaitForMultipleEvents (width,
+    nfound = QtWaitForMultipleEvents (static_cast<int> (width),
                                       handle_set,
                                       max_wait_time);
 

@@ -62,7 +62,6 @@ public:
   ETCL_Literal_Constraint (void);
 
   // = Constructors for each of the various types of literals.
-
   explicit ETCL_Literal_Constraint (ACE_CDR::ULong uinteger);
   explicit ETCL_Literal_Constraint (ACE_CDR::Long integer);
   explicit ETCL_Literal_Constraint (ACE_CDR::Boolean boolean);

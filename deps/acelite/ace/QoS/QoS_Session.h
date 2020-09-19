@@ -115,10 +115,10 @@ public:
   virtual ACE_HANDLE rsvp_events_handle (void) = 0;
 
   virtual void  rsvp_event_type (RSVP_Event_Type event_type) = 0;
-  ///Set the RAPI event that last occured
+  ///Set the RAPI event that last occurred
 
   virtual RSVP_Event_Type rsvp_event_type (void) = 0;
-  ///Get the RAPI event that last occured
+  ///Get the RAPI event that last occurred
 
 
   /// Get the destination address for this session.
@@ -171,7 +171,7 @@ protected:
   ACE_End_Point_Type flags_;
 
   RSVP_Event_Type rsvp_event_type_;
-  //Has the last rsvp event that occured
+  //Has the last rsvp event that occurred
 
 };
 

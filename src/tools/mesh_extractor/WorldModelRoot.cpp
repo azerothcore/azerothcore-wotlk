@@ -30,7 +30,7 @@ void WorldModelRoot::ReadGroups()
     for (uint32 i = 0; i < Header.CountGroups; i++)
     {
         char name[200];
-        sprintf(name, "%s_%03u.wmo", pathBase.c_str(), i);
+        snprintf(name, sizeof(name), "%s_%03u.wmo", pathBase.c_str(), i);
         WorldModelGroup group(name, i);
         if (!group.IsBad)
             Groups.push_back(group);

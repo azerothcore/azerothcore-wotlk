@@ -1,5 +1,3 @@
-
-
 ACE QoS API (AQoSA)
 ===================
 
@@ -42,7 +40,6 @@ PLATFORM_RAPI_LDFLAGS += -L[path to RAPI library files]
 More information about RAPI can be found at:
 
 http://www.opengroup.org/onlinepubs/9619099/toc.htm
-http://www.cs.wustl.edu/~vishal/qos.html
 http://www.sun.com/software/bandwidth/rsvp/docs/
 http://www.tru64unix.compaq.com/faqs/publications/base_doc/DOCUMENTATION/V51_HTML/ARH9UCTE/TOC.HTM#RSVPCHXX
 

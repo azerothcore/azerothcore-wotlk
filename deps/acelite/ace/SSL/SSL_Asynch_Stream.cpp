@@ -256,7 +256,6 @@ ACE_SSL_Asynch_Stream::open (ACE_Handler & handler,
         ACE_TEXT ("- invalid handle")),
        -1);
 
-
   // Get a proactor for/from the user.
   this->proactor_    = this->get_proactor (proactor, handler);
   this->ext_handler_ = & handler;
@@ -407,8 +406,7 @@ ACE_SSL_Asynch_Stream::do_SSL_state_machine (void)
 {
   // this protected member should be called
   // with locked mutex_
-
-  int retval = this->do_SSL_handshake ();
+  int const retval = this->do_SSL_handshake ();
 
   if (retval == 0)          // handshake in progress ?
     return 0;
@@ -451,7 +449,7 @@ ACE_SSL_Asynch_Stream::do_SSL_shutdown (void)
 
   int retval = ::SSL_shutdown (this->ssl_);
 
-  int status = ::SSL_get_error (this->ssl_, retval);
+  int const status = ::SSL_get_error (this->ssl_, retval);
 
   switch (status)
     {
@@ -527,7 +525,7 @@ ACE_SSL_Asynch_Stream::do_SSL_handshake (void)
          -1);
     }
 
-  int status = ::SSL_get_error (this->ssl_, retval);
+  int const status = ::SSL_get_error (this->ssl_, retval);
 
   switch (status)
     {
@@ -551,7 +549,6 @@ ACE_SSL_Asynch_Stream::do_SSL_handshake (void)
 
   return 1;
 }
-
 
 bool
 ACE_SSL_Asynch_Stream::post_handshake_check (void)

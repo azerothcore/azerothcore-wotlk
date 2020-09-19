@@ -43,7 +43,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ETCL_Parser_Export ETCL_Interpreter
 {
 protected:
-  // = Initialization and termination methods.
   /// Constructor.
   ETCL_Interpreter (void);
 

@@ -69,6 +69,4 @@ namespace XMLSchema
   }
 }
 
-#include <ace/XML_Utils/XMLSchema/Traversal.ipp>
-
 #endif  // XMLSCHEMA_TRAVERSAL_HPP

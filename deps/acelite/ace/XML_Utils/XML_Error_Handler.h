@@ -34,9 +34,7 @@ namespace XML
     : public xercesc::ErrorHandler
   {
   public:
-
     XML_Error_Handler (void);
-
     ~XML_Error_Handler (void);
 
     void warning(const SAXParseException& toCatch);

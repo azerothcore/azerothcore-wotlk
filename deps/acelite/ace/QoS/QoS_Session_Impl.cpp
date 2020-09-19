@@ -286,14 +286,14 @@ ACE_RAPI_Session::close (void)
   return 0;
 }
 
-//Get the most recent RSVP event that occured
+//Get the most recent RSVP event that occurred
 ACE_QoS_Session::RSVP_Event_Type
 ACE_RAPI_Session::rsvp_event_type (void)
 {
   return this->rsvp_event_type_;
 }
 
-//Set the most recent RSVP event that occured
+//Set the most recent RSVP event that occurred
 void
 ACE_RAPI_Session::rsvp_event_type (ACE_QoS_Session::RSVP_Event_Type event_type)
 {
@@ -697,14 +697,14 @@ ACE_GQoS_Session::update_qos (void)
   return 0;
 }
 
-//Get the most recent RSVP event that occured
+//Get the most recent RSVP event that occurred
 ACE_QoS_Session::RSVP_Event_Type
 ACE_GQoS_Session::rsvp_event_type (void)
 {
   return this->rsvp_event_type_;
 }
 
-//Set the most recent RSVP event that occured
+//Set the most recent RSVP event that occurred
 void
 ACE_GQoS_Session::rsvp_event_type (ACE_QoS_Session::RSVP_Event_Type event_type)
 {

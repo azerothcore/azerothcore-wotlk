@@ -1,0 +1,4097 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{B1F27843-FECA-1BAD-6757-8A6300006755}</UniqueIdentifier>
+      <Extensions>cpp;cxx;cc;c;C</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{06319535-FECA-1BAD-6757-8A6300006755}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hh</Extensions>
+    </Filter>
+    <Filter Include="Build Files">
+      <UniqueIdentifier>{A1909F1C-FECA-1BAD-6757-8A6300006755}</UniqueIdentifier>
+      <Extensions>mpc;mpb;mwc</Extensions>
+    </Filter>
+    <Filter Include="Installdata Files">
+      <UniqueIdentifier>{B0B7506A-FECA-1BAD-6757-8A6300006755}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pkgconfig Files">
+      <UniqueIdentifier>{8441A3A3-FECA-1BAD-6757-8A6300006755}</UniqueIdentifier>
+      <Extensions>pcin</Extensions>
+    </Filter>
+    <Filter Include="Inline Files">
+      <UniqueIdentifier>{763028EF-FECA-1BAD-6757-8A6300006755}</UniqueIdentifier>
+      <Extensions>i;ipp;inl</Extensions>
+    </Filter>
+    <Filter Include="Template Files">
+      <UniqueIdentifier>{5635C877-FECA-1BAD-6757-8A6300006755}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Documentation">
+      <UniqueIdentifier>{B14BBA74-FECA-1BAD-6757-8A6300006755}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{502A2050-FECA-1BAD-6757-8A6300006755}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ACE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ACE_crc32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ACE_crc_ccitt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ace_wchar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Activation_Queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Active_Map_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Argv_Type_Converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Asynch_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Asynch_IO_Impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Asynch_Pseudo_Task.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ATM_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ATM_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ATM_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ATM_Params.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ATM_QoS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ATM_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Atomic_Op.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Atomic_Op_Sparc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Barrier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Base_Thread_Adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Based_Pointer_Repository.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Basic_Stats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Basic_Types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Capabilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDR_Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDR_Size.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDR_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cleanup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Codecs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Codeset_IBM1047.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Codeset_Registry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Codeset_Registry_db.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Condition_Attributes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Condition_Recursive_Thread_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Condition_Thread_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Configuration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Configuration_Import_Export.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Connection_Recycling_Strategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Containers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Copy_Disabled.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Date_Time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DEV.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DEV_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DEV_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DEV_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dev_Poll_Reactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dirent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dirent_Selector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DLL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DLL_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dump.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamic_Message_Strategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamic_Service_Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamic_Service_Dependency.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Encoding_Converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Encoding_Converter_Factory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Event_Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Event_Handler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Event_Handler_Handle_Timeout_Upcall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FIFO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FIFO_Recv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FIFO_Recv_Msg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FIFO_Send.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FIFO_Send_Msg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FILE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FILE_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FILE_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FILE_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="File_Lock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Filecache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Flag_Manip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework_Component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Functor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Functor_String.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Get_Opt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Handle_Ops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Handle_Set.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hashable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="High_Res_Timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ICMP_Socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="INET_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Init_ACE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IO_Cntl_Msg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IO_SAP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPC_SAP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib_Find.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Local_Memory_Pool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Local_Name_Space.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Local_Tokens.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Log_Category.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Log_Msg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Log_Msg_Android_Logcat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Log_Msg_Backend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Log_Msg_Callback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Log_Msg_IPC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Log_Msg_NT_Event_Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Log_Msg_UNIX_Syslog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Log_Record.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging_Strategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LSOCK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LSOCK_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LSOCK_CODgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LSOCK_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LSOCK_Dgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LSOCK_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Malloc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Malloc_Allocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MEM_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MEM_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MEM_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MEM_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mem_Map.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MEM_SAP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MEM_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Message_Block.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Message_Queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Message_Queue_NT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Message_Queue_Vx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Method_Request.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MMAP_Memory_Pool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Monitor_Admin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Monitor_Admin_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Monitor_Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Monitor_Control_Action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Monitor_Control_Types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Monitor_Point_Registry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Monitor_Size.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Monotonic_Time_Policy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MQX_Filesystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Msg_WFMO_Reactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Multihomed_INET_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Name_Proxy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Name_Request_Reply.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Name_Space.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Naming_Context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Netlink_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Notification_Queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Notification_Strategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NT_Service.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Null_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Obchunk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Object_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Object_Manager_Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Obstack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_Errno.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_Log_Msg_Attributes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_arpa_inet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_ctype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_devctl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_dirent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_dlfcn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_errno.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_fcntl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_netdb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_poll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_pwd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_regex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_signal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_stdio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_stdlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_string.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_strings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_stropts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_sys_mman.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_sys_msg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_sys_resource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_sys_select.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_sys_sendfile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_sys_shm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_sys_socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_sys_stat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_sys_time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_sys_uio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_sys_utsname.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_sys_wait.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_unistd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_wchar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_NS_wctype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_QoS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_Thread_Adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS_TLI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pagefile_Memory_Pool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Parse_Node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PI_Malloc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ping_Socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pipe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="POSIX_Asynch_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="POSIX_CB_Proactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="POSIX_Proactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Priority_Reactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor_Impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Process.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Process_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Process_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Process_Semaphore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Profile_Timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor_Impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor_Notification_Strategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor_Timer_Interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Read_Buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Recursive_Thread_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Recyclable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Registry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Registry_Name_Space.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Remote_Name_Space.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Remote_Tokens.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rtems_init.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RW_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RW_Process_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RW_Thread_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample_History.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sbrk_Memory_Pool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sched_Params.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Select_Reactor_Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Semaphore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Service_Config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Service_Gestalt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Service_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Service_Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Service_Repository.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Service_Types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared_Memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared_Memory_MM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared_Memory_Pool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared_Memory_SV.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared_Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sig_Adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sig_Handler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Signal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK_CODgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sock_Connect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK_Dgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK_Dgram_Bcast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK_Dgram_Mcast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK_Netlink.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK_SEQPACK_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK_SEQPACK_Association.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK_SEQPACK_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SOCK_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPIPE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPIPE_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPIPE_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPIPE_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPIPE_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stack_Trace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="String_Base_Const.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SUN_Proactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SV_Message.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SV_Message_Queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SV_Semaphore_Complex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SV_Semaphore_Simple.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SV_Shared_Memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Svc_Conf_Lexer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Svc_Conf_y.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Synch_Options.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="System_Time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Task.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread_Adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread_Control.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread_Exit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread_Hook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread_Semaphore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Throughput_Stats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Time_Policy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Time_Value.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timeprobe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TLI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TLI_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TLI_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TLI_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Token.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Token_Collection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Token_Invariants.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Token_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Token_Request_Reply.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TP_Reactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Trace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TSS_Adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TTY_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UNIX_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UPIPE_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UPIPE_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UPIPE_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UTF16_Encoding_Converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UTF32_Encoding_Converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UTF8_Encoding_Converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UUID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WFMO_Reactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WIN32_Asynch_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WIN32_Proactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XML_Svc_Conf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XTI_ATM_Mcast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Abstract_Timer_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ACE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ACE_export.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ace_wchar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Activation_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Active_Map_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Active_Map_Manager_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Arg_Shifter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ARGV.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Argv_Type_Converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Array_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Array_Map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asynch_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asynch_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asynch_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asynch_IO_Impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asynch_Pseudo_Task.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ATM_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ATM_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ATM_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ATM_Params.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ATM_QoS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ATM_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Atomic_Op.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Atomic_Op_GCC_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Atomic_Op_Sparc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Atomic_Op_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Auto_Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Auto_Functor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Auto_IncDec_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Auto_Ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Barrier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Base_Thread_Adapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Based_Pointer_Repository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Based_Pointer_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Basic_Stats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Basic_Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bound_Ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cache_Map_Manager_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cached_Connect_Strategy_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Caching_Strategies_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Caching_Utility_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Capabilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDR_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDR_Size.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDR_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CE_Screen_Output.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="checked_iterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cleanup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cleanup_Strategies_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Codecs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Codeset_IBM1047.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Codeset_Registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Codeset_Symbols.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Condition_Attributes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Condition_Recursive_Thread_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Condition_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Condition_Thread_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-aix-5.x.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-aix-7.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-all.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-android.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-cygwin32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-face-conftest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-face-safety.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-freebsd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-g++-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-hpux-11.00.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-icc-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-integritySCA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-kfreebsd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-linux-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-linux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-lite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-lynxos-178.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-lynxos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-elcapitan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-highsierra.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-iOS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-jaguar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-leopard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-lion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-mavericks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-mojave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-mountainlion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-panther.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-sierra.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-snowleopard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-tiger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx-yosemite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macosx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-mqx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-netbsd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-openbsd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-openvms.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-pharlap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-posix-nonetworking.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-posix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-qnx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-rtems.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-suncc-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-sunos5.10.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-sunos5.11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-sunos5.4-g++.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-sunos5.4-sunc++-4.x.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-sunos5.5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-sunos5.6.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-sunos5.7.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-sunos5.8.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-sunos5.9.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-vxworks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-vxworks6.4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-vxworks6.5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-vxworks6.6.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-vxworks6.7.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-vxworks6.8.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-vxworks6.9.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-vxworks7.0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-borland.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-cegcc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-dmc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-interix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-mingw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-mingw64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-msvc-10.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-msvc-11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-msvc-12.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-msvc-14.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-msvc-141.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-msvc-142.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-msvc-7.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-msvc-8.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-msvc-9.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32-msvc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-win32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-WinCE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config-windows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Configuration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Configuration_Import_Export.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Connection_Recycling_Strategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Copy_Disabled.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CORBA_macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Countdown_Time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Countdown_Time_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Date_Time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Default_Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DEV.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DEV_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DEV_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DEV_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dev_Poll_Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dirent_Selector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DLL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DLL_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dump.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dump_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamic_Message_Strategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamic_Service.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamic_Service_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamic_Service_Dependency.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Encoding_Converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Encoding_Converter_Factory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Env_Value_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Event_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Event_Handler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Event_Handler_Handle_Timeout_Upcall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Event_Handler_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FIFO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FIFO_Recv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FIFO_Recv_Msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FIFO_Send.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FIFO_Send_Msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FILE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FILE_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FILE_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FILE_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="File_Lock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Filecache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Flag_Manip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework_Component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework_Component_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Free_List.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Functor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Functor_String.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Functor_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Future.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Future_Set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Get_Opt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Global_Macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Guard_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Handle_Gobbler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Handle_Ops.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Handle_Set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hash_Cache_Map_Manager_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hash_Map_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hash_Map_Manager_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hash_Map_With_Allocator_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hash_Multi_Map_Manager_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hashable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="High_Res_Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ICMP_Socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="If_Then_Else.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="INET_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Init_ACE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Intrusive_Auto_Ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Intrusive_List.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Intrusive_List_Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IO_Cntl_Msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IO_SAP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="iosfwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IOStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IOStream_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IPC_SAP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib_Find.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Local_Memory_Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Local_Name_Space.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Local_Name_Space_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Local_Tokens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lock_Adapter_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LOCK_SOCK_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log_Category.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log_Msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log_Msg_Android_Logcat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log_Msg_Backend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log_Msg_Callback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log_Msg_IPC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log_Msg_NT_Event_Log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log_Msg_UNIX_Syslog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log_Priority.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log_Record.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging_Strategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LSOCK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LSOCK_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LSOCK_CODgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LSOCK_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LSOCK_Dgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LSOCK_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Malloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Malloc_Allocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Malloc_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Malloc_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Managed_Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Manual_Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Map_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Map_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MEM_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MEM_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MEM_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MEM_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mem_Map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MEM_SAP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MEM_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory_Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Message_Block.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Message_Block_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Message_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Message_Queue_NT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Message_Queue_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Message_Queue_Vx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Method_Request.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Metrics_Cache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Metrics_Cache_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Min_Max.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MMAP_Memory_Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Module.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Monitor_Admin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Monitor_Admin_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Monitor_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Monitor_Control_Action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Monitor_Control_Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Monitor_Point_Registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Monitor_Size.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Monotonic_Time_Policy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MQX_Filesystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Msg_WFMO_Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Multihomed_INET_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Name_Proxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Name_Request_Reply.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Name_Space.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Naming_Context.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Netlink_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Notification_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Notification_Strategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NT_Service.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Null_Barrier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Null_Condition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Null_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Null_Semaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numeric_Limits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Obchunk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Object_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Object_Manager_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Obstack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Obstack_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_Errno.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\arpa\os_inet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\net\os_if.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\netinet\os_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\netinet\os_tcp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_aio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_assert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_byteswap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_complex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_cpio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_ctype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_dlfcn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_errno.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_fcntl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_fenv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_float.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_fmtmsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_fnmatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_ftw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_glob.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_grp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_iconv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_ifaddrs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_intrin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_inttypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_iso646.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_kstat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_langinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_libgen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_limits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_monetary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_mqueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_ndbm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_netdb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_nl_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_pdh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_pdhmsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_poll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_pthread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_pwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_regex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_sched.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_search.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_semaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_setjmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_signal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_spawn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_stdarg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_stdbool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_stddef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_stdint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_stdio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_stdlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_strings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_stropts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_syslog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_tar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_termios.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_tgmath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_trace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_typeinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_ucontext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_ulimit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_unistd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_utime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_utmpx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_wchar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_wctype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\os_wordexp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_ipc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_loadavg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_mman.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_pstat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_select.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_sem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_shm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_stat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_statvfs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_sysctl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_sysinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_timeb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_times.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_uio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_un.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_utsname.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_include\sys\os_wait.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_Log_Msg_Attributes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_Memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_arpa_inet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_ctype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_devctl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_dlfcn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_errno.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_fcntl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_netdb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_poll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_pwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_regex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_signal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_stdio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_stdlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_strings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_stropts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_sys_mman.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_sys_msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_sys_resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_sys_select.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_sys_sendfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_sys_shm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_sys_socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_sys_stat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_sys_time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_sys_uio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_sys_utsname.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_sys_wait.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_unistd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_wchar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_NS_wctype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_QoS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_Thread_Adapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS_TLI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Pagefile_Memory_Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Pair_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Parse_Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PI_Malloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ping_Socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Pipe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="POSIX_Asynch_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="POSIX_CB_Proactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="POSIX_Proactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="post.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pre.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Priority_Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor_Impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Process.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Process_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Process_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Process_Semaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Profile_Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RB_Tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor_Impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor_Notification_Strategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor_Timer_Interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor_Token_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Read_Buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Recursive_Thread_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Recyclable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Refcountable_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Refcounted_Auto_Ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Registry_Name_Space.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Remote_Name_Space.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Remote_Tokens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reverse_Lock_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RW_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RW_Process_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RW_Thread_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample_History.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sbrk_Memory_Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sched_Params.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Select_Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Select_Reactor_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Select_Reactor_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Semaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Service_Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Service_Gestalt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Service_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Service_Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Service_Repository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Service_Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared_Memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared_Memory_MM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared_Memory_Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared_Memory_SV.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared_Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sig_Adapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sig_Handler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Signal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK_CODgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sock_Connect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK_Dgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK_Dgram_Bcast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK_Dgram_Mcast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK_Netlink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK_SEQPACK_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK_SEQPACK_Association.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK_SEQPACK_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SOCK_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIPE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIPE_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIPE_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIPE_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIPE_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SStringfwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Stack_Trace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Static_Object_Lock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Stats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Strategies_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Stream_Modules.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="streams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="String_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="String_Base_Const.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SUN_Proactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SV_Message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SV_Message_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SV_Semaphore_Complex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SV_Semaphore_Simple.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SV_Shared_Memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Svc_Conf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Svc_Conf_Lexer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Svc_Conf_Param.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Svc_Conf_Token_Table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Svc_Conf_Tokens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="svc_export.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Svc_Handler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Synch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Synch_Options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Synch_Traits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="System_Time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Task.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Ex_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Test_and_Set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread_Adapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread_Control.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread_Exit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread_Hook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread_Semaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Throughput_Stats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Time_Policy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Time_Policy_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Time_Value.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Time_Value_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timeprobe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timeprobe_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_Hash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_Hash_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_Heap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_Heap_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_List.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_List_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_Queue_Adapters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_Queue_Iterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_Queue_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_Queuefwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_Wheel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer_Wheel_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TLI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TLI_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TLI_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TLI_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Token.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Token_Collection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Token_Invariants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Token_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Token_Request_Reply.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tokenizer_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TP_Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Trace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Truncate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TSS_Adapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TSS_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TTY_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Typed_SV_Message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Typed_SV_Message_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Unbounded_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Unbounded_Set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Unbounded_Set_Ex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UNIX_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UPIPE_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UPIPE_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UPIPE_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UPIPE_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UTF16_Encoding_Converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UTF32_Encoding_Converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UTF8_Encoding_Converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UUID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Value_Ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Versioned_Namespace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WFMO_Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WIN32_Asynch_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WIN32_Proactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XML_Svc_Conf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XTI_ATM_Mcast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ace.mpc">
+      <Filter>Build Files</Filter>
+    </None>
+    <None Include="ace.mwc">
+      <Filter>Build Files</Filter>
+    </None>
+    <None Include="ace_for_tao.mpc">
+      <Filter>Build Files</Filter>
+    </None>
+    <None Include="codecs.mpb">
+      <Filter>Build Files</Filter>
+    </None>
+    <None Include="filecache.mpb">
+      <Filter>Build Files</Filter>
+    </None>
+    <None Include="other.mpb">
+      <Filter>Build Files</Filter>
+    </None>
+    <None Include="svcconf.mpb">
+      <Filter>Build Files</Filter>
+    </None>
+    <None Include="svcconfgen.mpc">
+      <Filter>Build Files</Filter>
+    </None>
+    <None Include="token.mpb">
+      <Filter>Build Files</Filter>
+    </None>
+    <None Include="uuid.mpb">
+      <Filter>Build Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\AUTHORS">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\bin\ace_install_pkgconfig.pl">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\bin\add_rel_link.sh">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\bin\DependencyGenerator">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\bin\depgen.pl">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\bin\generate_export_file.pl">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\bin\MakeProjectCreator">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\bin\mpc.pl">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\bin\mwc.pl">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\COPYING">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\docs">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\include\makeinclude">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\NEWS">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\PROBLEM-REPORT-FORM">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\README">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\THANKS">
+      <Filter>Installdata Files</Filter>
+    </None>
+    <None Include="..\VERSION.txt">
+      <Filter>Installdata Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ACE.pc.in">
+      <Filter>Pkgconfig Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ACE.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="ace_wchar.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Activation_Queue.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Active_Map_Manager.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Active_Map_Manager_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="ARGV.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Argv_Type_Converter.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Array_Base.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Array_Map.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Asynch_IO_Impl.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="ATM_Acceptor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="ATM_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="ATM_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="ATM_Params.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="ATM_QoS.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="ATM_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Atomic_Op.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Atomic_Op_GCC_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Atomic_Op_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Auto_Event.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Auto_Functor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Auto_IncDec_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Auto_Ptr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Barrier.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Base_Thread_Adapter.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Based_Pointer_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Basic_Stats.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Bound_Ptr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Cache_Map_Manager_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Caching_Strategies_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Capabilities.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="CDR_Base.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="CDR_Size.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="CDR_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Cleanup.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Codeset_Registry.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Condition_Attributes.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Condition_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Condition_Thread_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Configuration.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Containers.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Containers_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Countdown_Time_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Date_Time.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="DEV.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="DEV_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="DEV_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="DEV_IO.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Dev_Poll_Reactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Dirent.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Dirent_Selector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Dynamic.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Dynamic_Message_Strategy.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Dynamic_Service.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Env_Value_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Event.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Event_Base.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Event_Handler.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Event_Handler_Handle_Timeout_Upcall.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Event_Handler_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="FIFO.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="FIFO_Recv.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="FIFO_Recv_Msg.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="FIFO_Send.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="FIFO_Send_Msg.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="FILE.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="FILE_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="FILE_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="FILE_IO.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="File_Lock.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Flag_Manip.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Framework_Component.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Functor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Functor_String.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Functor_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Get_Opt.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Guard_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Handle_Gobbler.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Handle_Set.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Hash_Cache_Map_Manager_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Hash_Map_Manager_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Hash_Map_With_Allocator_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Hash_Multi_Map_Manager_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Hashable.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="High_Res_Timer.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="INET_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Intrusive_Auto_Ptr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Intrusive_List.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Intrusive_List_Node.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="IO_Cntl_Msg.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="IO_SAP.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="IOStream_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="IPC_SAP.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Local_Tokens.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Lock.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Lock_Adapter_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Log_Category.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Log_Msg.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Log_Record.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="LSOCK.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="LSOCK_CODgram.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="LSOCK_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="LSOCK_Dgram.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="LSOCK_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Malloc.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Malloc_Allocator.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Malloc_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Managed_Object.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Manual_Event.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Map_Manager.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Map_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="MEM_Acceptor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="MEM_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="MEM_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="MEM_IO.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Mem_Map.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="MEM_SAP.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="MEM_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Message_Block.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Message_Block_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Message_Queue.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Message_Queue_NT.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Message_Queue_Vx.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Metrics_Cache_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="MMAP_Memory_Pool.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Module.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Monitor_Base.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Monotonic_Time_Policy.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Msg_WFMO_Reactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Multihomed_INET_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Naming_Context.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Netlink_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Notification_Queue.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Notification_Strategy.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="NT_Service.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Obchunk.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Object_Manager.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Obstack_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_Errno.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_Log_Msg_Attributes.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_arpa_inet.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_ctype.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_devctl.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_dirent.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_dlfcn.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_errno.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_fcntl.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_math.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_netdb.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_poll.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_pwd.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_regex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_signal.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_stdio.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_stdlib.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_string.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_strings.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_stropts.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_sys_mman.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_sys_msg.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_sys_resource.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_sys_select.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_sys_sendfile.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_sys_shm.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_sys_socket.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_sys_stat.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_sys_time.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_sys_uio.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_sys_wait.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_Thread.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_time.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_unistd.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_wchar.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_NS_wctype.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="OS_TLI.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Pagefile_Memory_Pool.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Pair_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="PI_Malloc.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Ping_Socket.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Pipe.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="POSIX_Proactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Proactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Process.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Process_Manager.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Process_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Process_Semaphore.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Profile_Timer.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="RB_Tree.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Reactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Reactor_Notification_Strategy.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Read_Buffer.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Recursive_Thread_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Recyclable.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Refcountable_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Refcounted_Auto_Ptr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Remote_Tokens.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Reverse_Lock_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="RW_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="RW_Process_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="RW_Thread_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Sample_History.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Sched_Params.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Select_Reactor_Base.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Select_Reactor_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Semaphore.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Service_Config.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Service_Gestalt.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Service_Object.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Service_Repository.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Service_Types.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Shared_Memory_MM.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Shared_Memory_SV.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Shared_Object.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Sig_Handler.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Signal.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Singleton.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK_Acceptor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK_CODgram.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK_Dgram.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK_Dgram_Bcast.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK_Dgram_Mcast.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK_IO.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK_Netlink.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK_SEQPACK_Acceptor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK_SEQPACK_Association.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK_SEQPACK_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SOCK_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SPIPE.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SPIPE_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SPIPE_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SPIPE_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SString.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Stats.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Strategies_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="String_Base.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SV_Message.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SV_Message_Queue.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SV_Semaphore_Complex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SV_Semaphore_Simple.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SV_Shared_Memory.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Task.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Task_Ex_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Task_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Thread.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Thread_Adapter.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Thread_Control.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Thread_Manager.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Thread_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Thread_Semaphore.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Time_Policy.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Time_Policy_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Time_Value.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Time_Value_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Timeprobe.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Timer_Queue_Adapters.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Timer_Queue_Iterator.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Timer_Queue_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="TLI.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="TLI_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="TLI_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Token.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Token_Collection.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Token_Manager.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Token_Request_Reply.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="TP_Reactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="TSS_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Typed_SV_Message.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Typed_SV_Message_Queue.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Unbounded_Queue.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Unbounded_Set.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Unbounded_Set_Ex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="UNIX_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="UPIPE_Acceptor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="UPIPE_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="UPIPE_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="UTF16_Encoding_Converter.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="UUID.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="Vector_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="WFMO_Reactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="XTI_ATM_Mcast.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Abstract_Timer_Queue.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Acceptor.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Active_Map_Manager_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Arg_Shifter.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ARGV.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Array_Base.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Array_Map.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Asynch_Acceptor.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Asynch_Connector.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Atomic_Op_GCC_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Atomic_Op_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Auto_Event.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Auto_Functor.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Auto_IncDec_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Auto_Ptr.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Based_Pointer_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Bound_Ptr.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cache_Map_Manager_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cached_Connect_Strategy_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Caching_Strategies_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Caching_Utility_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cleanup_Strategies_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Condition_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Connector.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Containers_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Countdown_Time_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dump_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamic_Service.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Env_Value_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Event.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Event_Handler_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework_Component_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Free_List.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Functor_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Future.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Future_Set.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Guard_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hash_Cache_Map_Manager_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hash_Map_Manager_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hash_Map_With_Allocator_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hash_Multi_Map_Manager_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Intrusive_Auto_Ptr.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Intrusive_List.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Intrusive_List_Node.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOStream_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Local_Name_Space_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lock_Adapter_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LOCK_SOCK_Acceptor.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Malloc_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Managed_Object.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Manual_Event.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Map_Manager.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Map_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Message_Block_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Message_Queue_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Metrics_Cache_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Module.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Obstack_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pair_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RB_Tree.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor_Token_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Refcountable_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Refcounted_Auto_Ptr.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Reverse_Lock_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Select_Reactor_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Singleton.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Strategies_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stream.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stream_Modules.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="String_Base.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Svc_Handler.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Task_Ex_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Task_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Test_and_Set.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Time_Policy_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Time_Value_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timeprobe_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer_Hash_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer_Heap_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer_List_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer_Queue_Adapters.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer_Queue_Iterator.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer_Queue_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer_Wheel_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tokenizer_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TSS_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Typed_SV_Message.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Typed_SV_Message_Queue.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Unbounded_Queue.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Unbounded_Set.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Unbounded_Set_Ex.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector_T.cpp">
+      <Filter>Template Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="README">
+      <Filter>Documentation</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ace.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

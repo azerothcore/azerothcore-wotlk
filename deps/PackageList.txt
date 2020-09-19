@@ -2,7 +2,7 @@ AzerothCore uses (parts of or in whole) the following opensource software :
 
 ACE (ADAPTIVE Communication Environment)
   http://www.cs.wustl.edu/~schmidt/ACE.html
-  Version: 6.1.4
+Version: 6.5.10, released Wed Jul 01 09:54:36 CEST 2020
 
 bzip2 (a freely available, patent free, high-quality data compressor)
   http://www.bzip.org/

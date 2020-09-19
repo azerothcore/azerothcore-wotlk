@@ -13,12 +13,14 @@ ACE_SSL_SOCK_Acceptor::ACE_SSL_SOCK_Acceptor (const ACE_Addr &local_sap,
                                               int reuse_addr,
                                               int protocol_family,
                                               int backlog,
-                                              int protocol)
+                                              int protocol,
+                                              int ipv6_only)
   : acceptor_ (local_sap,
                reuse_addr,
                protocol_family,
                backlog,
-               protocol)
+               protocol,
+               ipv6_only)
 {
   ACE_TRACE ("ACE_SSL_SOCK_Acceptor::ACE_SSL_SOCK_Acceptor");
 
@@ -33,7 +35,8 @@ ACE_SSL_SOCK_Acceptor::ACE_SSL_SOCK_Acceptor (const ACE_Addr &local_sap,
                                               int reuse_addr,
                                               int protocol_family,
                                               int backlog,
-                                              int protocol)
+                                              int protocol,
+                                              int ipv6_only)
   : acceptor_ (local_sap,
                protocolinfo,
                g,
@@ -41,7 +44,8 @@ ACE_SSL_SOCK_Acceptor::ACE_SSL_SOCK_Acceptor (const ACE_Addr &local_sap,
                reuse_addr,
                protocol_family,
                backlog,
-               protocol)
+               protocol,
+               ipv6_only)
 {
   ACE_TRACE ("ACE_SSL_SOCK_Acceptor::ACE_SSL_SOCK_Acceptor");
 
@@ -53,14 +57,16 @@ ACE_SSL_SOCK_Acceptor::open (const ACE_Addr &local_sap,
                              int reuse_addr,
                              int protocol_family,
                              int backlog,
-                             int protocol)
+                             int protocol,
+                             int ipv6_only)
 {
   ACE_TRACE ("ACE_SSL_SOCK_Acceptor::open");
   if (this->acceptor_.open (local_sap,
                             reuse_addr,
                             protocol_family,
                             backlog,
-                            protocol) != 0)
+                            protocol,
+                            ipv6_only) != 0)
     return -1;
   else
     this->set_handle (this->acceptor_.get_handle ());

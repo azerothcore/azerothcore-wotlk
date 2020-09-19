@@ -23,7 +23,6 @@ ACE_SSL_SOCK_Acceptor::~ACE_SSL_SOCK_Acceptor (void)
   ACE_TRACE ("ACE_SSL_SOCK_Acceptor::~ACE_SSL_SOCK_Acceptor");
 }
 
-
 int
 ACE_SSL_SOCK_Acceptor::ssl_accept (ACE_SSL_SOCK_Stream &new_stream,
                                    ACE_Time_Value *timeout) const

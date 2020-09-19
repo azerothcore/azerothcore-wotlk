@@ -48,7 +48,6 @@ enum ACE_CompressorId
 class ACE_Compression_Export ACE_Compressor
 {
 public:
-
   ACE_CompressorId    get_compressor_id(void) const;
 
   ACE_UINT32          get_compression_level(void) const;

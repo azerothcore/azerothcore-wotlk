@@ -1,10 +1,9 @@
 %{
-// $Id$
 // ========================================================================
 //
 // = LIBRARY
 //   orbsvcs / Extended Trader Constraint Language parser.
-// 
+//
 // = FILENAME
 //   ETCL.yy
 //
@@ -38,48 +37,48 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 %}
 
-%token ETCL_GT 
-%token ETCL_GE 
-%token ETCL_LT 
+%token ETCL_GT
+%token ETCL_GE
+%token ETCL_LT
 %token ETCL_LE
-%token ETCL_EQ 
+%token ETCL_EQ
 %token ETCL_NE
-%token ETCL_EXIST 
+%token ETCL_EXIST
 %token ETCL_DEFAULT
-%token ETCL_AND 
-%token ETCL_OR 
+%token ETCL_AND
+%token ETCL_OR
 %token ETCL_NOT
-%token ETCL_IN 
+%token ETCL_IN
 %token ETCL_TWIDDLE
 %token ETCL_BOOLEAN
-%token ETCL_PLUS 
-%token ETCL_MINUS 
-%token ETCL_MULT 
+%token ETCL_PLUS
+%token ETCL_MINUS
+%token ETCL_MULT
 %token ETCL_DIV
 %token ETCL_UMINUS
-%token ETCL_INTEGER 
-%token ETCL_FLOAT  
+%token ETCL_INTEGER
+%token ETCL_FLOAT
 %token ETCL_STRING
-%token ETCL_RPAREN 
+%token ETCL_RPAREN
 %token ETCL_LPAREN
-%token ETCL_RBRA 
+%token ETCL_RBRA
 %token ETCL_LBRA
 %token ETCL_IDENT
-%token ETCL_UNSIGNED 
-%token ETCL_SIGNED 
+%token ETCL_UNSIGNED
+%token ETCL_SIGNED
 %token ETCL_DOUBLE
-%token ETCL_CONSTRAINT 
-%token ETCL_COMPONENT 
-%token ETCL_WITH 
-%token ETCL_MAX 
+%token ETCL_CONSTRAINT
+%token ETCL_COMPONENT
+%token ETCL_WITH
+%token ETCL_MAX
 %token ETCL_MIN
-%token ETCL_FIRST 
+%token ETCL_FIRST
 %token ETCL_RANDOM
-%token ETCL_DOLLAR 
+%token ETCL_DOLLAR
 %token ETCL_DOT
-%token ETCL_DISCRIMINANT 
+%token ETCL_DISCRIMINANT
 %token ETCL_LENGTH
-%token ETCL_TYPE_ID 
+%token ETCL_TYPE_ID
 %token ETCL_REPOS_ID
 
 
@@ -89,7 +88,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 %type <constraint> ETCL_FLOAT
 %type <constraint> ETCL_INTEGER
 %type <constraint> expr_in
-%type <constraint> constraint preference bool_or bool_and bool_compare 
+%type <constraint> constraint preference bool_or bool_and bool_compare
 %type <constraint> expr_in expr_twiddle expr term factor_not factor
 %type <constraint> union_pos union_val component_array
 %type <constraint> component_array component_assoc component_pos

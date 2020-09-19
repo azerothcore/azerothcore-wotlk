@@ -38,7 +38,7 @@ public:
         printf("[%02i,%02i] Building tile\n", X, Y);
         TileBuilder builder(cBuilder, Continent, X, Y, MapId);
         char buff[100];
-        sprintf(buff, "mmaps/%03u%02i%02i.mmtile", MapId, Y, X);
+        snprintf(buff, sizeof(buff), "mmaps/%03u%02i%02i.mmtile", MapId, Y, X);
         FILE* f = fopen(buff, "r");
         if (f) // Check if file already exists.
         {
@@ -105,7 +105,7 @@ void ContinentBuilder::CalculateTileBounds()
 void ContinentBuilder::Build()
 {
     char buff[50];
-    sprintf(buff, "mmaps/%03u.mmap", MapId);
+    snprintf(buff, sizeof(buff), "mmaps/%03u.mmap", MapId);
     FILE* mmap = fopen(buff, "wb");
     if (!mmap)
     {
@@ -139,7 +139,7 @@ void ContinentBuilder::Build()
             fclose(mmap);
 
             char buff[100];
-            sprintf(buff, "mmaps/%03u%02i%02i.mmtile", MapId, 0, 0);
+            snprintf(buff, sizeof(buff), "mmaps/%03u%02i%02i.mmtile", MapId, 0, 0);
             FILE* f = fopen(buff, "wb");
             if (!f)
             {

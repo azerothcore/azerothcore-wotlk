@@ -41,6 +41,7 @@ extern "C"
 
 #define BIO_TYPE_ACE  ( 21 | BIO_TYPE_SOURCE_SINK )
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 static BIO_METHOD methods_ACE =
   {
     BIO_TYPE_ACE, // BIO_TYPE_PROXY_SERVER,
@@ -54,13 +55,44 @@ static BIO_METHOD methods_ACE =
     ACE_ASYNCH_BIO_FREE_NAME,
     0
   };
+# define BIO_set_init(b, val) b->init = val
+# define BIO_set_data(b, val) b->ptr = val
+# define BIO_set_num(b, val) b->num = val
+# if !defined (BIO_set_flags)
+#  define BIO_set_flags(b, val) b->flags = val
+# endif /* !BIO_set_flags */
+# define BIO_set_shutdown(b, val) b->shutdown = val
+# define BIO_get_init(b) b->init
+# define BIO_get_data(b) b->ptr
+# define BIO_get_shutdown(b) b->shutdown
+#else
+static BIO_METHOD* methods_ACE;
+# define BIO_set_num(b, val)
+#endif /* OPENSSL_VERSION_NUMBER < 0x10100000L */
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 BIO *
 ACE_SSL_make_BIO (void * ssl_asynch_stream)
 {
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
   BIO * const pBIO = BIO_new (&methods_ACE);
+#else
+  if (!methods_ACE)
+  {
+    methods_ACE = BIO_meth_new(BIO_TYPE_ACE, "ACE_Asynch_BIO");
+    if (methods_ACE)
+    {
+      BIO_meth_set_write(methods_ACE, ACE_ASYNCH_BIO_WRITE_NAME);
+      BIO_meth_set_read(methods_ACE, ACE_ASYNCH_BIO_READ_NAME);
+      BIO_meth_set_puts(methods_ACE, ACE_ASYNCH_BIO_PUTS_NAME);
+      BIO_meth_set_ctrl(methods_ACE, ACE_ASYNCH_BIO_CTRL_NAME);
+      BIO_meth_set_create(methods_ACE, ACE_ASYNCH_BIO_NEW_NAME);
+      BIO_meth_set_destroy(methods_ACE, ACE_ASYNCH_BIO_FREE_NAME);
+    }
+  }
+  BIO * const pBIO = BIO_new (methods_ACE);
+#endif
 
   if (pBIO)
     BIO_ctrl (pBIO,
@@ -107,10 +139,10 @@ ACE_END_VERSIONED_NAMESPACE_DECL
 int
 ACE_ASYNCH_BIO_NEW_NAME (BIO * pBIO)
 {
-  pBIO->init  = 0;    // not initialized
-  pBIO->num   = 0;    // still zero ( we can use it )
-  pBIO->ptr   = 0;    // will be pointer to ACE_SSL_Asynch_Stream
-  pBIO->flags = 0;    //
+  BIO_set_init(pBIO, 0); // not initialized
+  BIO_set_num(pBIO, 0); // still zero ( we can use it )
+  BIO_set_data(pBIO, 0); // will be pointer to ACE_SSL_Asynch_Stream
+  BIO_set_flags(pBIO, 0);
 
   return 1;
 }
@@ -118,12 +150,12 @@ ACE_ASYNCH_BIO_NEW_NAME (BIO * pBIO)
 int
 ACE_ASYNCH_BIO_FREE_NAME (BIO * pBIO)
 {
-  if (pBIO && pBIO->shutdown)
+  if (pBIO && BIO_get_shutdown(pBIO))
     {
-      pBIO->ptr   = 0;
-      pBIO->init  = 0;
-      pBIO->num   = 0;
-      pBIO->flags = 0;
+      BIO_set_data(pBIO, 0);
+      BIO_set_init(pBIO, 0);
+      BIO_set_num(pBIO, 0);
+      BIO_set_flags(pBIO, 0);
 
       return 1;
     }
@@ -137,9 +169,9 @@ ACE_ASYNCH_BIO_READ_NAME (BIO * pBIO, char * buf, int len)
   BIO_clear_retry_flags (pBIO);
 
   ACE_SSL_Asynch_Stream * const p_stream =
-    static_cast<ACE_SSL_Asynch_Stream *> (pBIO->ptr);
+    static_cast<ACE_SSL_Asynch_Stream *> (BIO_get_data(pBIO));
 
-  if (pBIO->init == 0 || p_stream == 0 || buf == 0 || len <= 0)
+  if (BIO_get_init(pBIO) == 0 || p_stream == 0 || buf == 0 || len <= 0)
     return -1;
 
   BIO_clear_retry_flags (pBIO);
@@ -167,9 +199,9 @@ ACE_ASYNCH_BIO_WRITE_NAME (BIO * pBIO, const char * buf, int len)
   BIO_clear_retry_flags (pBIO);
 
   ACE_SSL_Asynch_Stream * p_stream =
-    static_cast<ACE_SSL_Asynch_Stream *> (pBIO->ptr);
+    static_cast<ACE_SSL_Asynch_Stream *> (BIO_get_data(pBIO));
 
-  if (pBIO->init == 0 || p_stream == 0 || buf == 0 || len <= 0)
+  if (BIO_get_init(pBIO) == 0 || p_stream == 0 || buf == 0 || len <= 0)
     return -1;
 
   BIO_clear_retry_flags (pBIO);
@@ -199,9 +231,9 @@ ACE_ASYNCH_BIO_CTRL_NAME (BIO * pBIO, int cmd, long num, void *ptr)
   switch (cmd)
     {
     case BIO_C_SET_FILE_PTR:
-      pBIO->shutdown = static_cast<int> (num);
-      pBIO->ptr = ptr;
-      pBIO->init = 1;
+      BIO_set_shutdown(pBIO, static_cast<int> (num));
+      BIO_set_data(pBIO, ptr);
+      BIO_set_init(pBIO, 1);
       break;
 
     case BIO_CTRL_INFO:
@@ -209,11 +241,11 @@ ACE_ASYNCH_BIO_CTRL_NAME (BIO * pBIO, int cmd, long num, void *ptr)
       break;
 
     case BIO_CTRL_GET_CLOSE:
-      ret = pBIO->shutdown;
+      ret = BIO_get_shutdown(pBIO);
       break;
 
     case BIO_CTRL_SET_CLOSE:
-      pBIO->shutdown = static_cast<int> (num);
+      BIO_set_shutdown(pBIO, static_cast<int> (num));
       break;
 
     case BIO_CTRL_PENDING:
@@ -244,5 +276,4 @@ ACE_ASYNCH_BIO_PUTS_NAME (BIO *pBIO, const char *str)
                                     ACE_Utils::truncate_cast<int> (n));
 }
 
-#endif  /* OPENSSL_VERSION_NUMBER > 0x0090581fL && (ACE_WIN32 ||
-           ACE_HAS_AIO_CALLS) */
+#endif  /* OPENSSL_VERSION_NUMBER > 0x0090581fL && (ACE_WIN32 || ACE_HAS_AIO_CALLS) */

@@ -175,7 +175,7 @@ public:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 55.0f, true) )
                     {
                         char buffer[100];
-                        sprintf(buffer, "Eadric the Pure targets %s with the Hammer of the Righteous!", target->GetName().c_str());
+                        snprintf(buffer, sizeof(buffer), "Eadric the Pure targets %s with the Hammer of the Righteous!", target->GetName().c_str());
                         me->MonsterTextEmote(buffer, 0, true);
                         Talk(TEXT_EADRIC_HAMMER);
                         me->CastSpell(target, SPELL_HAMMER_JUSTICE, true);

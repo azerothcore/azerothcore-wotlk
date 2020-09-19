@@ -13,5 +13,6 @@
 #include "ace/Guard_T.h"
 #include "ace/Unbounded_Queue.h"
 #include "ace/Message_Block.h"
+#include "ace/Time_Policy.h"
 
 #endif

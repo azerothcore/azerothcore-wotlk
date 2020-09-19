@@ -37,7 +37,7 @@ public:
   /// Default constructor
   ACE_SSL_Data_File (void);
 
-  /// Contructor from a file name and the file type.
+  /// Constructor from a file name and the file type.
   ACE_SSL_Data_File (const char *file_name,
                      int type = SSL_FILETYPE_PEM);
 
@@ -104,26 +104,9 @@ public:
 
   enum {
     INVALID_METHOD = -1,
-#if !defined (OPENSSL_NO_SSL2)
-    SSLv2_client = 1,
-    SSLv2_server,
-    SSLv2,
-#endif /* !OPENSSL_NO_SSL2 */
-    SSLv3_client = 4,
-    SSLv3_server,
-    SSLv3,
     SSLv23_client,
     SSLv23_server,
-    SSLv23,
-    TLSv1_client,
-    TLSv1_server,
-    TLSv1,
-    TLSv1_1_client,
-    TLSv1_1_server,
-    TLSv1_1,
-    TLSv1_2_client,
-    TLSv1_2_server,
-    TLSv1_2
+    SSLv23
   };
 
   /// Constructor
@@ -135,6 +118,9 @@ public:
   /// The Singleton context, the SSL components use the singleton if
   /// nothing else is available.
   static ACE_SSL_Context *instance (void);
+
+  /// Explicitly delete the Singleton context.
+  static void close (void);
 
   /**
    * Set the CTX mode.  The mode can be set only once, afterwards the
@@ -408,11 +394,11 @@ private:
   /// count of successful CA load attempts
   int have_ca_;
 
-#ifdef ACE_HAS_THREADS
+#if defined(ACE_HAS_THREADS) && (OPENSSL_VERSION_NUMBER < 0x10100000L)
   /// Array of mutexes used internally by OpenSSL when the SSL
   /// application is multithreaded.
   static lock_type * locks_;
-#endif  /* ACE_HAS_THREADS */
+#endif /* ACE_HAS_THREADS && OPENSSL_VERSION_NUMBER < 0x10100000L */
 };
 
 ACE_END_VERSIONED_NAMESPACE_DECL

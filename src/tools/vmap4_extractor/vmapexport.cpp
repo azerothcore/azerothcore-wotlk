@@ -139,8 +139,8 @@ bool ExtractSingleWmo(std::string& fname)
 
     char szLocalFile[1024];
     const char * plain_name = GetPlainName(fname.c_str());
-    sprintf(szLocalFile, "%s/%s", szWorkDirWmo, plain_name);
-    fixnamen(szLocalFile,strlen(szLocalFile));
+    snprintf(szLocalFile, sizeof(szLocalFile), "%s/%s", szWorkDirWmo, plain_name);
+    fixnamen(szLocalFile, strlen(szLocalFile));
 
     if (FileExists(szLocalFile))
         return true;
@@ -226,8 +226,8 @@ void ParsMapFiles()
     char id[10];
     for (unsigned int i=0; i<map_count; ++i)
     {
-        sprintf(id,"%03u",map_ids[i].id);
-        sprintf(fn,"World\\Maps\\%s\\%s.wdt", map_ids[i].name, map_ids[i].name);
+        snprintf(id, sizeof(id), "%03u", map_ids[i].id);
+        snprintf(fn, sizeof(fn), "World\\Maps\\%s\\%s.wdt", map_ids[i].name, map_ids[i].name);
         WDTFile WDT(fn,map_ids[i].name);
         if(WDT.init(id, map_ids[i].id))
         {
@@ -238,7 +238,7 @@ void ParsMapFiles()
                 {
                     if (ADTFile *ADT = WDT.GetMap(x,y))
                     {
-                        //sprintf(id_filename,"%02u %02u %03u",x,y,map_ids[i].id);//!!!!!!!!!
+                        //snprintf(id_filename, sizeof(id_filename), "%02u %02u %03u", x, y, map_ids[i].id);//!!!!!!!!!
                         ADT->init(map_ids[i].id, x, y);
                         delete ADT;
                     }
@@ -269,11 +269,11 @@ bool scan_patches(char* scanmatch, std::vector<std::string>& pArchiveNames)
     {
         if (i != 1)
         {
-            sprintf(path, "%s-%d.MPQ", scanmatch, i);
+            snprintf(path, sizeof(path), "%s-%d.MPQ", scanmatch, i);
         }
         else
         {
-            sprintf(path, "%s.MPQ", scanmatch);
+            snprintf(path, sizeof(path), "%s.MPQ", scanmatch);
         }
 #ifdef __linux__
         if(FILE* h = fopen64(path, "rb"))

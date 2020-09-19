@@ -28,7 +28,6 @@ namespace XSCRT
   class Type
   {
   public:
-
     virtual ~Type (void)
     {
     }
@@ -149,11 +148,14 @@ namespace XSCRT
     {
       if (map_.get () == 0)
       {
+#if defined (ACE_HAS_CPP11)
         map_ = std::unique_ptr<Map_> (new Map_);
+#else
+        map_ = std::auto_ptr<Map_> (new Map_);
+#endif /* ACE_HAS_CPP11 */
       }
 
-      if (!map_->insert (
-            std::pair<IdentityProvider const*, Type*> (&id, t)).second)
+      if (!map_->insert (std::pair<IdentityProvider const*, Type*> (&id, t)).second)
       {
         throw 1;
       }
@@ -197,12 +199,24 @@ namespace XSCRT
       return 0;
     }
 
-    //Get and set methods for the idref_map_ data member
+    /// Get and set methods for the idref_map_ data member
     Type* get_idref (const char* name)
     {
       std::basic_string<ACE_TCHAR> name_string (ACE_TEXT_CHAR_TO_TCHAR(name));
-      std::map<std::basic_string<ACE_TCHAR>, XSCRT::Type*>::iterator i =
-          this->idref_map_.find(name_string);
+      std::map<std::basic_string<ACE_TCHAR>, XSCRT::Type*>::iterator i = this->idref_map_.find(name_string);
+      if (i != idref_map_.end())
+      {
+        return i->second;
+      }
+      else
+      {
+        return 0;
+      }
+    }
+
+    Type* get_idref (const std::basic_string<ACE_TCHAR>& name)
+    {
+      std::map<std::basic_string<ACE_TCHAR>, XSCRT::Type*>::iterator i = this->idref_map_.find(name);
       if (i != idref_map_.end())
       {
         return i->second;
@@ -216,8 +230,7 @@ namespace XSCRT
     Type* get_idref (const wchar_t *name)
     {
       std::basic_string<ACE_TCHAR> name_string (ACE_TEXT_WCHAR_TO_TCHAR(name));
-      std::map<std::basic_string<ACE_TCHAR>, XSCRT::Type*>::iterator i =
-          this->idref_map_.find(name_string);
+      std::map<std::basic_string<ACE_TCHAR>, XSCRT::Type*>::iterator i = this->idref_map_.find(name_string);
       if (i != idref_map_.end())
       {
         return i->second;
@@ -228,16 +241,14 @@ namespace XSCRT
       }
     }
 
-
-    void set_idref (std::basic_string<ACE_TCHAR> name, Type* new_idref)
+    void set_idref (const std::basic_string<ACE_TCHAR>& name, Type* new_idref)
     {
       this->idref_map_.insert(std::pair<std::basic_string<ACE_TCHAR>,Type*>(name, new_idref));
-      return;
     }
 
   private:
 
-    //Data member to handle unbounded IDREF attributes and elements
+    // Data member to handle unbounded IDREF attributes and elements
     std::map<std::basic_string<ACE_TCHAR>, XSCRT::Type*> idref_map_;
 
     Type* container_;
@@ -255,7 +266,11 @@ namespace XSCRT
     std::map<IdentityProvider const*, Type*, IdentityComparator>
     Map_;
 
+#if defined (ACE_HAS_CPP11)
     std::unique_ptr<Map_> map_;
+#else
+    std::auto_ptr<Map_> map_;
+#endif /* ACE_HAS_CPP11 */
   };
 
   // Fundamental types template.
@@ -267,9 +282,6 @@ namespace XSCRT
   public:
     // Trait for marshaling a FundamentalType X
     typedef X CDR_Type__;
-#if !defined (__BORLANDC__) || (__BORLANDC__ >= 0x620)
-    typedef ACE_Refcounted_Auto_Ptr < FundamentalType, ACE_Null_Mutex > _ptr;
-#endif /* !__BORLANDC__ */
 
     FundamentalType ()
     {
@@ -317,13 +329,6 @@ namespace XSCRT
   protected:
     X x_;
   };
-
-#if !((defined (__GNUC__) && (__GNUC__ == 3 && (__GNUC_MINOR__ < 3))) || \
- (defined (__BORLANDC__) && (__BORLANDC__ < 0x620)) || \
- (defined (__SUNPRO_CC) && (__SUNPRO_CC <= 0x5100)))
-
-  // Stuff for normal compilers.
-  //
 
   // Specialization for `signed char'
   //
@@ -390,137 +395,6 @@ namespace XSCRT
 
     x_ = static_cast<unsigned char> (t);
   }
-
-#else
-
-  // Stuff for broken VC6 & gcc < 3.3. Don't like what you see - use better
-  // compiler!
-  //
-
-  // Specialization for signed char.
-  //
-  template <>
-  class FundamentalType<signed char> : public Type
-  {
-  public:
-    FundamentalType ()
-    {
-    }
-
-    template<typename C>
-    FundamentalType (XML::Element<C> const& e)
-    {
-      std::basic_stringstream<C> s;
-      s << e.value ();
-
-      short t;
-      s >> t;
-
-      x_ = static_cast<signed char> (t);
-    }
-
-    template<typename C>
-    FundamentalType (XML::Attribute<C> const& a)
-    {
-      std::basic_stringstream<C> s;
-      s << a.value ();
-
-      short t;
-      s >> t;
-
-      x_ = static_cast<signed char> (t);
-    }
-
-    FundamentalType (signed char const& x)
-        : x_ (x)
-    {
-    }
-
-    FundamentalType&
-    operator= (signed char const& x)
-    {
-      x_ = x;
-      return *this;
-    }
-
-  public:
-    operator signed char const& () const
-    {
-      return x_;
-    }
-
-    operator signed char& ()
-    {
-      return x_;
-    }
-
-  protected:
-    signed char x_;
-  };
-
-  // Specialization for unsigned char.
-  //
-  template <>
-  class FundamentalType<unsigned char> : public Type
-  {
-  public:
-    FundamentalType ()
-    {
-    }
-
-    template<typename C>
-    FundamentalType (XML::Element<C> const& e)
-    {
-      std::basic_stringstream<C> s;
-      s << e.value ();
-
-      unsigned short t;
-      s >> t;
-
-      x_ = static_cast<unsigned char> (t);
-    }
-
-    template<typename C>
-    FundamentalType (XML::Attribute<C> const& a)
-    {
-      std::basic_stringstream<C> s;
-      s << a.value ();
-
-      unsigned short t;
-      s >> t;
-
-      x_ = static_cast<unsigned char> (t);
-    }
-
-    FundamentalType (unsigned char const& x)
-        : x_ (x)
-    {
-    }
-
-    FundamentalType&
-    operator= (unsigned char const& x)
-    {
-      x_ = x;
-      return *this;
-    }
-
-  public:
-    operator unsigned char const& () const
-    {
-      return x_;
-    }
-
-    operator unsigned char& ()
-    {
-      return x_;
-    }
-
-  protected:
-    unsigned char x_;
-  };
-
-#endif
-
 
   // Specialization for bool.
   //

@@ -124,7 +124,7 @@ namespace MMAP
             std::set<uint32>* tiles = (*itr).m_tiles;
             mapID = (*itr).m_mapId;
 
-            sprintf(filter, "%03u*.vmtile", mapID);
+            snprintf(filter, sizeof(filter), "%03u*.vmtile", mapID);
             files.clear();
             getDirContents(files, "vmaps", filter);
             for (uint32 i = 0; i < files.size(); ++i)
@@ -137,7 +137,7 @@ namespace MMAP
                 count++;
             }
 
-            sprintf(filter, "%03u*", mapID);
+            snprintf(filter, sizeof(filter), "%03u*", mapID);
             files.clear();
             getDirContents(files, "maps", filter);
             for (uint32 i = 0; i < files.size(); ++i)
@@ -538,14 +538,14 @@ namespace MMAP
         }
 
         char fileName[25];
-        sprintf(fileName, "mmaps/%03u.mmap", mapID);
+        snprintf(fileName, sizeof(fileName), "mmaps/%03u.mmap", mapID);
 
         FILE* file = fopen(fileName, "wb");
         if (!file)
         {
             dtFreeNavMesh(navMesh);
             char message[1024];
-            sprintf(message, "[Map %03i] Failed to open %s for writing!\n", mapID, fileName);
+            snprintf(message, sizeof(message), "[Map %03i] Failed to open %s for writing!\n", mapID, fileName);
             perror(message);
             return;
         }
@@ -562,7 +562,7 @@ namespace MMAP
     {
         // console output
         char tileString[20];
-        sprintf(tileString, "[Map %03i] [%02i,%02i]: ", mapID, tileX, tileY);
+        snprintf(tileString, sizeof(tileString), "[Map %03i] [%02i,%02i]: ", mapID, tileX, tileY);
         printf("%s Building movemap tiles...\n", tileString);
 
         IntermediateValues iv;
@@ -856,12 +856,12 @@ namespace MMAP
 
             // file output
             char fileName[255];
-            sprintf(fileName, "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
+            snprintf(fileName, sizeof(fileName), "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
             FILE* file = fopen(fileName, "wb");
             if (!file)
             {
                 char message[1024];
-                sprintf(message, "[Map %03i] Failed to open %s for writing!\n", mapID, fileName);
+                snprintf(message, sizeof(message), "[Map %03i] Failed to open %s for writing!\n", mapID, fileName);
                 perror(message);
                 navMesh->removeTile(tileRef, nullptr, nullptr);
                 break;
@@ -1015,7 +1015,7 @@ namespace MMAP
     bool MapBuilder::shouldSkipTile(uint32 mapID, uint32 tileX, uint32 tileY)
     {
         char fileName[255];
-        sprintf(fileName, "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
+        snprintf(fileName, sizeof(fileName), "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
         FILE* file = fopen(fileName, "rb");
         if (!file)
             return false;

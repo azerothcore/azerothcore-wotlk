@@ -1,7 +1,7 @@
 #include "RLECompressor.h"
 #include "ace/OS_NS_string.h"
 
-#if defined (__BORLANDC__) && (__BORLANDC__ >= 0x660) && (__BORLANDC__ <= 0x680)
+#if defined (__BORLANDC__) && (__BORLANDC__ >= 0x660) && (__BORLANDC__ <= 0x750)
 #  pragma option push -w-8072
 #endif
 
@@ -140,6 +140,6 @@ ACE_SINGLETON_TEMPLATE_INSTANTIATE(ACE_Singleton, ACE_RLECompressor, ACE_SYNCH_M
 // Close versioned namespace, if enabled by the user.
 ACE_END_VERSIONED_NAMESPACE_DECL
 
-#if defined (__BORLANDC__) && (__BORLANDC__ >= 0x660) && (__BORLANDC__ <= 0x680)
+#if defined (__BORLANDC__) && (__BORLANDC__ >= 0x660) && (__BORLANDC__ <= 0x750)
 # pragma option pop
 #endif

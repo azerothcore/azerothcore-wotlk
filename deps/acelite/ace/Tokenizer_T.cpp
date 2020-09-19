@@ -4,8 +4,8 @@
 #include "ace/ACE.h"
 #include "ace/Malloc_Base.h"
 #include "ace/String_Base.h"
-#include "ace/Auto_Ptr.h"
 #include "ace/OS_NS_string.h"
+#include "ace/Tokenizer_T.h"
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 

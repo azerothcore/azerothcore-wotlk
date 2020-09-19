@@ -6,7 +6,7 @@
  *
  *  @author Eric C. Newton <ecn@clark.net>
  *  @author Kirill Rybaltchenko <Kirill.Rybaltchenko@cern.ch>
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -55,7 +55,6 @@ public:
 class ACE_XtReactor_Export ACE_XtReactor : public ACE_Select_Reactor
 {
 public:
-  // = Initialization and termination methods.
   ACE_XtReactor (XtAppContext context = 0,
                  size_t size = DEFAULT_SIZE,
                  bool restart = false,

@@ -25,7 +25,7 @@ int
 ACE_SSL_Initializer::fini (void)
 {
   // Explicitly close the ACE_SSL_Context singleton.
-  ACE_Unmanaged_Singleton<ACE_SSL_Context, ACE_SYNCH_MUTEX>::close();
+  ACE_SSL_Context::close ();
 
   return 0;
 }

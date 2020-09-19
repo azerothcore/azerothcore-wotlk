@@ -45,7 +45,7 @@ inline LPTSTR ErrorMessage(DWORD dw)
     else
     {
         LPTSTR msgBuf = (LPTSTR)LocalAlloc(LPTR, 30);
-        sprintf(msgBuf, "Unknown error: %u", dw);
+        snprintf(msgBuf, sizeof(msgBuf), "Unknown error: %u", dw);
         return msgBuf;
     }
 
@@ -131,7 +131,7 @@ LONG WINAPI WheatyExceptionReport::WheatyUnhandledExceptionFilter(
     ++pos;
 
     TCHAR crash_folder_path[MAX_PATH];
-    sprintf_s(crash_folder_path, "%s\\%s", module_folder_name, CrashFolder);
+    snprintf(crash_folder_path, sizeof(crash_folder_path), "%s\\%s", module_folder_name, CrashFolder);
     if (!CreateDirectory(crash_folder_path, NULL))
     {
         if (GetLastError() != ERROR_ALREADY_EXISTS)
@@ -140,10 +140,10 @@ LONG WINAPI WheatyExceptionReport::WheatyUnhandledExceptionFilter(
 
     SYSTEMTIME systime;
     GetLocalTime(&systime);
-    sprintf(m_szDumpFileName, "%s\\%s_%s_[%u-%u_%u-%u-%u].dmp",
+    snprintf(m_szDumpFileName, sizeof(m_szDumpFileName), "%s\\%s_%s_[%u-%u_%u-%u-%u].dmp",
             crash_folder_path, GitRevision::GetHash(), pos, systime.wDay, systime.wMonth, systime.wHour, systime.wMinute, systime.wSecond);
 
-    sprintf(m_szLogFileName, "%s\\%s_%s_[%u-%u_%u-%u-%u].txt",
+    snprintf(m_szLogFileName, sizeof(m_szLogFileName), "%s\\%s_%s_[%u-%u_%u-%u-%u].txt",
             crash_folder_path, GitRevision::GetHash(), pos, systime.wDay, systime.wMonth, systime.wHour, systime.wMinute, systime.wSecond);
 
     m_hDumpFile = CreateFile(m_szDumpFileName,
@@ -1302,50 +1302,50 @@ void WheatyExceptionReport::FormatOutputValue(char* pszCurrBuffer,
                     else
                         length = strlen((char*)pAddress);
                     if (length > bufferSize - 6)
-                        pszCurrBuffer += sprintf(pszCurrBuffer, "\"%.*s...\"", (DWORD)(bufferSize - 6), (char*)pAddress);
+                        pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "\"%.*s...\"", (DWORD)(bufferSize - 6), (char*)pAddress);
                     else
-                        pszCurrBuffer += sprintf(pszCurrBuffer, "\"%.*s\"", (DWORD)length, (char*)pAddress);
+                        pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "\"%.*s\"", (DWORD)length, (char*)pAddress);
                     break;
                 }
             case btStdString:
                 {
                     std::string* value = static_cast<std::string*>(pAddress);
                     if (value->length() > bufferSize - 6)
-                        pszCurrBuffer += sprintf(pszCurrBuffer, "\"%.*s...\"", (DWORD)(bufferSize - 6), value->c_str());
+                        pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "\"%.*s...\"", (DWORD)(bufferSize - 6), value->c_str());
                     else
-                        pszCurrBuffer += sprintf(pszCurrBuffer, "\"%s\"", value->c_str());
+                        pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "\"%s\"", value->c_str());
                     break;
                 }
             default:
                 // Format appropriately (assuming it's a 1, 2, or 4 bytes (!!!)
                 if (length == 1)
-                    pszCurrBuffer += sprintf(pszCurrBuffer, "0x%X", *(PBYTE)pAddress);
+                    pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "0x%X", *(PBYTE)pAddress);
                 else if (length == 2)
-                    pszCurrBuffer += sprintf(pszCurrBuffer, "0x%X", *(PWORD)pAddress);
+                    pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "0x%X", *(PWORD)pAddress);
                 else if (length == 4)
                 {
                     if (basicType == btFloat)
-                        pszCurrBuffer += sprintf(pszCurrBuffer, "%f", *(PFLOAT)pAddress);
+                        pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "%f", *(PFLOAT)pAddress);
                     else
-                        pszCurrBuffer += sprintf(pszCurrBuffer, "0x%X", *(PDWORD)pAddress);
+                        pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "0x%X", *(PDWORD)pAddress);
                 }
                 else if (length == 8)
                 {
                     if (basicType == btFloat)
                     {
-                        pszCurrBuffer += sprintf(pszCurrBuffer, "%f",
+                        pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "%f",
                                                  *(double*)pAddress);
                     }
                     else
-                        pszCurrBuffer += sprintf(pszCurrBuffer, "0x%I64X",
+                        pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "0x%I64X",
                                                  *(DWORD64*)pAddress);
                 }
                 else
                 {
 #if _WIN64
-                    pszCurrBuffer += sprintf(pszCurrBuffer, "0x%I64X", (DWORD64)pAddress);
+                    pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "0x%I64X", (DWORD64)pAddress);
 #else
-                    pszCurrBuffer += sprintf(pszCurrBuffer, "0x%X", (DWORD)pAddress);
+                    pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "0x%X", (DWORD)pAddress);
 #endif
                 }
                 break;
@@ -1354,9 +1354,9 @@ void WheatyExceptionReport::FormatOutputValue(char* pszCurrBuffer,
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
 #if _WIN64
-        pszCurrBuffer += sprintf(pszCurrBuffer, "0x%I64X <Unable to read memory>", (DWORD64)pAddress);
+        pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "0x%I64X <Unable to read memory>", (DWORD64)pAddress);
 #else
-        pszCurrBuffer += sprintf(pszCurrBuffer, "0x%X <Unable to read memory>", (DWORD)pAddress);
+        pszCurrBuffer += snprintf(pszCurrBuffer, sizeof(pszCurrBuffer), "0x%X <Unable to read memory>", (DWORD)pAddress);
 #endif
     }
 }

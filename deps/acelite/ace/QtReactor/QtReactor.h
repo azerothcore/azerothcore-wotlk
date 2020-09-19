@@ -28,7 +28,13 @@
 #endif
 
 // QT toolkit specific includes.
+#ifdef ACE_HAS_QT5
+#include /**/ <QtWidgets/QApplication>
+#define ACE_QT_HANDLE_TYPE qintptr
+#else
 #include /**/ <QtGui/QApplication>
+#define ACE_QT_HANDLE_TYPE int
+#endif
 #include /**/ <QtCore/QObject>
 #include /**/ <QtCore/QSocketNotifier>
 #include /**/ <QtCore/QTimer>
@@ -42,7 +48,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  * dispatcher that uses the Qt Library. This class declaration
  * also uses the extension facilities  provided by the Qt. So,
  * readers  of the class declaration should not be upset with
- * the appearence of the Keywords like Q_OBJECT, private slots
+ * the appearance of the Keywords like Q_OBJECT, private slots
  * etc. They are specific to Qt which uses these as a call back
  * methods implementation mechanism.
  *
@@ -87,14 +93,13 @@ class ACE_QtReactor_Export ACE_QtReactor
   : public QObject,
     public ACE_Select_Reactor
 {
-
     Q_OBJECT
 
 public:
     /** \brief Constructor follows  @ACE_Select_Reactor
         \param QApplication *qapp, qapplication which runs events loop
     */
-    ACE_QtReactor (QApplication *qapp = 0,
+    explicit ACE_QtReactor (QApplication *qapp = 0,
         ACE_Sig_Handler * = 0,
         ACE_Timer_Queue * = 0,
         int disable_notify_pipe = 0,
@@ -105,7 +110,7 @@ public:
     /** \brief Constructor follows @ACE_Select_Reactor
         \param QApplication *qapp, qapplication which runs events loop
     */
-    ACE_QtReactor (size_t size,
+    explicit ACE_QtReactor (size_t size,
         QApplication *qapp = 0,
         bool restart = false,
         ACE_Sig_Handler * = 0,
@@ -133,9 +138,6 @@ public:
         int dont_call_handle_close = 1);
 
 protected:
-
-    // = Register timers/handles with Qt
-
     /// Register a single @a handler.
     virtual int register_handler_i (ACE_HANDLE handle,
         ACE_Event_Handler *handler,
@@ -189,7 +191,7 @@ protected:
     /// An exception notifier
     MAP exception_notifier_;
 
-    /// The timer class that would provide timer-sgnals & single-shot timers
+    /// The timer class that would provide timer-signals & single-shot timers
     QTimer *qtime_ ;
 
 private:
@@ -198,21 +200,27 @@ private:
     void reset_timeout (void);
     /// reopens notification pipe to create SocketNotifier for it
     void reopen_notification_pipe(void);
+
+#ifdef ACE_HAS_QT5
+    /// Recover the socket's ACE_HANDLE based on the sender of the Qt signal.
+    /// Must be called from a Qt slot method.
+    ACE_HANDLE handle_from_sender () const;
+#endif
+
     /// Deny access since member-wise won't work...
     ACE_QtReactor (const ACE_QtReactor &);
     ACE_QtReactor &operator= (const ACE_QtReactor &);
 
 private slots:
-
     // These are all part of the communication mechanism adopted in Qt.
     /// Dispatch a Read Event
-    void read_event (int FD);
+    void read_event (ACE_QT_HANDLE_TYPE p_handle);
 
     /// Dispatch a Write Event
-    void write_event (int FD);
+    void write_event (ACE_QT_HANDLE_TYPE p_handle);
 
     /// Dispatch an exception event
-    void exception_event (int FD);
+    void exception_event (ACE_QT_HANDLE_TYPE p_handle);
 
     /// Dispatch a timeout event
     void timeout_event (void);

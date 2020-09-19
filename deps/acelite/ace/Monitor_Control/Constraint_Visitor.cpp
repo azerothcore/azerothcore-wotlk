@@ -5,6 +5,8 @@
 #include "ace/ETCL/ETCL_y.h"
 #include "ace/ETCL/ETCL_Constraint.h"
 
+#include "ace/OS_NS_string.h"
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 namespace ACE

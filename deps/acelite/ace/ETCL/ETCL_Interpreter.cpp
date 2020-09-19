@@ -1,6 +1,7 @@
 // -*- C++ -*-
 #include "ace/Guard_T.h"
 #include "ace/Truncate.h"
+#include "ace/OS_NS_string.h"
 
 #include "ace/ETCL/ETCL_Interpreter.h"
 #include "ace/ETCL/ETCL_Constraint.h"

@@ -53,9 +53,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  */
 class ACE_SSL_Export ACE_SSL_SOCK_Connector
 {
-
 public:
-
   /// Default constructor.
   ACE_SSL_SOCK_Connector (void);
 
@@ -292,17 +290,14 @@ public:
   ACE_ALLOC_HOOK_DECLARE;
 
 protected:
-
   /// Complete non-blocking SSL active connection.
   int ssl_connect (ACE_SSL_SOCK_Stream &new_stream,
                    const ACE_Time_Value *timeout);
 
 private:
-
   /// The class that does all of the non-secure socket connection.
-  /// It is default contructed, and subsequently used by connect().
+  /// It is default constructed, and subsequently used by connect().
   ACE_SOCK_Connector connector_;
-
 };
 
 ACE_END_VERSIONED_NAMESPACE_DECL

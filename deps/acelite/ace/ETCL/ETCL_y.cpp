@@ -487,9 +487,9 @@ __yy_memcpy (to, from, count)
      char *from;
      unsigned int count;
 {
-  ACE_REGISTER char *f = from;
-  ACE_REGISTER char *t = to;
-  ACE_REGISTER int i = count;
+  char *f = from;
+  char *t = to;
+  int i = count;
 
   while (i-- > 0)
     *t++ = *f++;
@@ -502,9 +502,9 @@ __yy_memcpy (to, from, count)
 static void
 __yy_memcpy (char *to, char *from, unsigned int count)
 {
-  ACE_REGISTER char *t = to;
-  ACE_REGISTER char *f = from;
-  ACE_REGISTER int i = count;
+  char *t = to;
+  char *f = from;
+  int i = count;
 
   while (i-- > 0)
     *t++ = *f++;
@@ -547,10 +547,10 @@ int
 yyparse(YYPARSE_PARAM_ARG)
      YYPARSE_PARAM_DECL
 {
-  ACE_REGISTER int yystate;
-  ACE_REGISTER int yyn;
-  ACE_REGISTER short *yyssp;
-  ACE_REGISTER YYSTYPE *yyvsp;
+  int yystate;
+  int yyn;
+  short *yyssp;
+  YYSTYPE *yyvsp;
   int yyerrstatus;  /*  number of tokens to shift before error messages enabled */
   int yychar1 = 0;    /*  lookahead token as an internal (translated) token number */
 
@@ -623,7 +623,7 @@ yynewstate:
 #endif
 
       /* Get the current used size of the three stacks, in elements.  */
-      int size = yyssp - yyss + 1;
+      int size = (int)(yyssp - yyss + 1);
 
 #ifdef yyoverflow
       /* Each stack pointer address is followed by the size of

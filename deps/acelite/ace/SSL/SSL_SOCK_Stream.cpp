@@ -102,7 +102,7 @@ ACE_SSL_SOCK_Stream::sendv (const iovec iov[],
           // amount of data sent was less than the amount data given.
           // This avoids a subtle problem where "holes" in the data
           // stream would occur if partial sends of a given buffer in
-          // the iovec array occured.
+          // the iovec array occurred.
           if (static_cast<size_t> (result) < static_cast<size_t> (iov[i].iov_len))
             break;
         }
@@ -254,7 +254,7 @@ ACE_SSL_SOCK_Stream::send (size_t n, ...) const
           // amount of data sent was less than the amount of data
           // given.  This avoids a subtle problem where "holes" in the
           // data stream would occur if partial sends of a given
-          // buffer in the varargs occured.
+          // buffer in the varargs occurred.
           if (result < data_len)
             break;
 
@@ -308,7 +308,7 @@ ACE_SSL_SOCK_Stream::recv (size_t n, ...) const
           // amount of data received was less than the amount of data
           // desired.  This avoids a subtle problem where "holes" in
           // the data stream would occur if partial receives of a
-          // given buffer in the varargs occured.
+          // given buffer in the varargs occurred.
           if (result < data_len)
             {
               break;
@@ -563,7 +563,6 @@ ACE_SSL_SOCK_Stream::get_remote_addr (ACE_Addr &addr) const
   // complete.  Despite that fact, the SSL connection may not have
   // been completed.  In such a case, a successful return from
   // get_remote_addr() would be misleading.
-
   if (SSL_is_init_finished (this->ssl_))
     {
       return this->ACE_SSL_SOCK::get_remote_addr (addr);

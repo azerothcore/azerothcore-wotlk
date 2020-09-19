@@ -373,7 +373,6 @@ private:
   ACE_SSL_Asynch_Stream & operator= (ACE_SSL_Asynch_Stream const &);
 
 protected:
-
   /// Stream Type ST_CLIENT/ST_SERVER
   Stream_Type type_;
 
@@ -447,7 +446,6 @@ protected:
 
   /// Mutex to protect work
   ACE_SYNCH_MUTEX mutex_;
-
 };
 
 ACE_END_VERSIONED_NAMESPACE_DECL

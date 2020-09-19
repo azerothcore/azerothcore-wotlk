@@ -83,7 +83,11 @@ namespace XML
   private:
     bool initialized_;
     XERCES_CPP_NAMESPACE::DOMImplementation *impl_;
+#if defined (ACE_HAS_CPP11)
     mutable std::unique_ptr<XERCES_CPP_NAMESPACE::XercesDOMParser> parser_;
+#else
+    mutable std::auto_ptr<XERCES_CPP_NAMESPACE::XercesDOMParser> parser_;
+#endif /* ACE_HAS_CPP11 */
 
     Resolver *resolver_;
     bool release_resolver_;

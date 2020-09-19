@@ -46,7 +46,7 @@ namespace XML
     /// This function is called by the Xerces infrastructure to
     /// actually resolve the location of a schema.
     virtual InputSource * resolveEntity (const XMLCh *const publicId,
-                                          const XMLCh *const systemId);
+                                         const XMLCh *const systemId);
 
     Resolver &get_resolver (void);
 
