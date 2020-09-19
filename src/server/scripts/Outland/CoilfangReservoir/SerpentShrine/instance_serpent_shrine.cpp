@@ -313,7 +313,7 @@ class spell_serpentshrine_cavern_infection : public SpellScriptLoader
                     values.AddSpellMod(SPELLVALUE_MAX_TARGETS, 1);
                     values.AddSpellMod(SPELLVALUE_BASE_POINT0, aurEff->GetAmount()+500);
                     values.AddSpellMod(SPELLVALUE_BASE_POINT1, aurEff->GetAmount()+500);
-                    GetTarget()->CastCustomSpell(SPELL_RAMPART_INFECTION, values, GetTarget(), TRIGGERED_FULL_MASK, NULL);
+                    GetTarget()->CastCustomSpell(SPELL_RAMPART_INFECTION, values, GetTarget(), TRIGGERED_FULL_MASK, nullptr);
                 }
             }
 

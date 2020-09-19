@@ -86,7 +86,6 @@ public:
             { "hidearea",           SEC_ADMINISTRATOR,      false, &HandleHideAreaCommand,              "" },
             { "additem",            SEC_GAMEMASTER,         false, &HandleAddItemCommand,               "" },
             { "additemset",         SEC_GAMEMASTER,         false, &HandleAddItemSetCommand,            "" },
-            { "bank",               SEC_ADMINISTRATOR,      false, &HandleBankCommand,                  "" },
             { "wchange",            SEC_ADMINISTRATOR,      false, &HandleChangeWeather,                "" },
             { "maxskill",           SEC_GAMEMASTER,         false, &HandleMaxSkillCommand,              "" },
             { "setskill",           SEC_GAMEMASTER,         false, &HandleSetSkillCommand,              "" },
@@ -1086,9 +1085,32 @@ public:
         return true;
     }
 
-    static bool HandleSaveCommand(ChatHandler*  /*handler*/, char const* /*args*/)
+    static bool HandleSaveCommand(ChatHandler* handler, char const* /*args*/)
     {
-        // pussywizard: fully disabled on 28.12.2011, but disabled it "silently"
+        Player* player = handler->GetSession()->GetPlayer();
+
+        // save GM account without delay and output message
+        if (handler->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+        {
+            if (Player* target = handler->getSelectedPlayer())
+            {
+                target->SaveToDB(true, false);
+            }
+            else
+            {
+                player->SaveToDB(true, false);
+            }
+            handler->SendSysMessage(LANG_PLAYER_SAVED);
+            return true;
+        }
+
+        // save if the player has last been saved over 20 seconds ago
+        uint32 saveInterval = sWorld->getIntConfig(CONFIG_INTERVAL_SAVE);
+        if (saveInterval == 0 || (saveInterval > 20 * IN_MILLISECONDS && player->GetSaveTimer() <= saveInterval - 20 * IN_MILLISECONDS))
+        {
+            player->SaveToDB(true, false);
+        }
+
         return true;
     }
 
@@ -1308,7 +1330,7 @@ public:
             //if (team == ~uint32(0))
             //    handler->PSendSysMessage(LANG_COMMAND_ZONENOGRAVEYARDS, zone_id);
             //else
-                handler->PSendSysMessage(LANG_COMMAND_ZONENOGRAFACTION, zone_id, team_name.c_str());
+            handler->PSendSysMessage(LANG_COMMAND_ZONENOGRAFACTION, zone_id, team_name.c_str());
         }
 
         return true;
@@ -1586,12 +1608,6 @@ public:
             return false;
         }
 
-        return true;
-    }
-
-    static bool HandleBankCommand(ChatHandler* handler, char const* /*args*/)
-    {
-        handler->GetSession()->SendShowBank(handler->GetSession()->GetPlayer()->GetGUID());
         return true;
     }
 
@@ -2354,7 +2370,7 @@ public:
             char buffer[80];
 
             // set it to string
-            ACE_OS::localtime_r(&sqlTime, &timeInfo);
+            localtime_r(&sqlTime, &timeInfo);
             strftime(buffer, sizeof(buffer), "%Y-%m-%d %I:%M%p", &timeInfo);
 
             handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY_OUTPUT, buffer, fields[1].GetUInt32(), fields[2].GetCString(), fields[3].GetCString());
@@ -3067,7 +3083,7 @@ public:
                 group->SendUpdate();
             }
 
-            return true;
+        return true;
     }
 
     static bool HandleGroupDisbandCommand(ChatHandler* handler, char const* args)
