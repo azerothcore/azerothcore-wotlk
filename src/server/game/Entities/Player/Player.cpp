@@ -19007,7 +19007,8 @@ void Player::_LoadMail()
     stmt->setUInt32(0, GetGUIDLow());
     stmt->setUInt64(1, time(nullptr));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    uint32 prevMailID = 0;
+    Mail* m = nullptr;
     if (result)
     {
         do
