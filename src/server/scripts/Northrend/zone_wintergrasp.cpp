@@ -294,7 +294,7 @@ class npc_wg_queue : public CreatureScript
             else
             {
                 uint32 timer = wintergrasp->GetTimer() / 1000;
-                player->SendUpdateWorldState(4354, time(NULL) + timer);
+                player->SendUpdateWorldState(4354, time(nullptr) + timer);
                 if (timer < 15 * MINUTE)
                 {
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Queue for Wintergrasp.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
@@ -341,7 +341,7 @@ class npc_wg_queue : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (CONFIG_WINTERGRASP_ENABLE == false)
+                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE))
                     return;
 
                 ScriptedAI::UpdateAI(diff);
@@ -769,7 +769,7 @@ class go_wg_vehicle_teleporter : public GameObjectScript
                                 if (Creature* teleportTrigger = passenger->SummonTrigger(go->GetPositionX()-60.0f, go->GetPositionY(), go->GetPositionZ()+1.0f, cVeh->GetOrientation(), 1000))
                                     return teleportTrigger;
 
-                return NULL;
+                return nullptr;
             }
 
             void UpdateAI(uint32 diff)
@@ -822,7 +822,7 @@ class spell_wintergrasp_force_building : public SpellScriptLoader
             {
                 PreventHitDefaultEffect(effIndex);
                 if (Unit* target = GetHitUnit())
-                    target->CastSpell(target, GetEffectValue(), false, NULL, NULL, target->GetGUID());
+                    target->CastSpell(target, GetEffectValue(), false, nullptr, nullptr, target->GetGUID());
             }
 
             void Register()

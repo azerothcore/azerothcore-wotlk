@@ -148,8 +148,8 @@ class spell_hallows_end_trick_or_treat : public SpellScriptLoader
         {
             if (Player* target = GetHitPlayer())
             {
-                GetCaster()->CastSpell(target, roll_chance_i(50) ? SPELL_TRICK : SPELL_TREAT, true, NULL);
-                GetCaster()->CastSpell(target, SPELL_TRICKED_OR_TREATED, true, NULL);
+                GetCaster()->CastSpell(target, roll_chance_i(50) ? SPELL_TRICK : SPELL_TREAT, true, nullptr);
+                GetCaster()->CastSpell(target, SPELL_TRICKED_OR_TREATED, true, nullptr);
             }
         }
 
@@ -187,7 +187,7 @@ class spell_hallows_end_candy : public SpellScriptLoader
             if (Player* target = GetHitPlayer())
             {
                 uint32 spellId = SPELL_HALLOWS_END_CANDY_1+urand(0,3);
-                GetCaster()->CastSpell(target, spellId, true, NULL);
+                GetCaster()->CastSpell(target, spellId, true, nullptr);
             }
         }
 
@@ -408,8 +408,8 @@ public:
             {
                 allowQuest = true;
                 eventStarted = 1;
-                float x, y, z, o;
-                uint32 path;
+                float x = 0, y = 0, z = 0, o = 0;
+                uint32 path = 0;
                 GetInitXYZ(x, y, z, o, path);
                 if (Creature* cr = me->SummonCreature(NPC_SHADE_OF_HORSEMAN, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                 {
@@ -602,6 +602,7 @@ class npc_hallows_end_soh : public CreatureScript
                     case 235434: x = 360.9f; y = -4735.5f; z = 11.773f; break;
                     case 235435: x = 2229.4f; y = 263.1f; z = 36.13f; break;
                     case 235436: x = 9532.9f; y = -6833.8f; z = 18.5f; break;
+                    default: x = 0; y = 0; z = 0; break;
                 }
             }
 
@@ -709,7 +710,7 @@ class npc_hallows_end_soh : public CreatureScript
                             tmpList.push_back(c);
 
                 if (tmpList.empty())
-                    return NULL;
+                    return nullptr;
 
                 std::list<Unit*>::const_iterator it2 = tmpList.begin();
                 std::advance(it2, urand(0, tmpList.size() - 1));
@@ -989,7 +990,7 @@ class boss_headless_horseman : public CreatureScript
                 }
             }
 
-            Player* GetRhymePlayer() { return playerGUID ? ObjectAccessor::GetPlayer(*me, playerGUID) : NULL; }
+            Player* GetRhymePlayer() { return playerGUID ? ObjectAccessor::GetPlayer(*me, playerGUID) : nullptr; }
 
             void EnterCombat(Unit*) { me->SetInCombatWithZone(); }
             void MoveInLineOfSight(Unit*  /*who*/) {}
@@ -1229,7 +1230,7 @@ class boss_headless_horseman_head : public CreatureScript
                 if (me->ToTempSummon())
                     return me->ToTempSummon()->GetSummoner();
 
-                return NULL;
+                return nullptr;
             }
 
             void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
