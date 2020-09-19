@@ -1704,7 +1704,7 @@ class Player : public Unit, public GridObject<Player>
 
         bool RemoveMItem(uint32 id)
         {
-            return mMitems.erase(id) ? true : false;
+            return !!mMitems.erase(id);
         }
 
         void PetSpellInitialize();
@@ -2539,7 +2539,7 @@ class Player : public Unit, public GridObject<Player>
         void SetLastUsedRune(RuneType type) { m_runes->lastUsedRune = type; }
         void SetBaseRune(uint8 index, RuneType baseRune) { m_runes->runes[index].BaseRune = baseRune; }
         void SetCurrentRune(uint8 index, RuneType currentRune) { m_runes->runes[index].CurrentRune = currentRune; }
-        void SetRuneCooldown(uint8 index, uint32 cooldown) { m_runes->runes[index].Cooldown = cooldown; m_runes->SetRuneState(index, (cooldown == 0) ? true : false); }
+        void SetRuneCooldown(uint8 index, uint32 cooldown) { m_runes->runes[index].Cooldown = cooldown; m_runes->SetRuneState(index, (cooldown == 0)); }
         void SetGracePeriod(uint8 index, uint32 period) { m_runes->runes[index].GracePeriod = period; }
         void SetRuneConvertAura(uint8 index, AuraEffect const* aura) { m_runes->runes[index].ConvertAura = aura; }
         void AddRuneByAuraEffect(uint8 index, RuneType newType, AuraEffect const* aura) { SetRuneConvertAura(index, aura); ConvertRune(index, newType); }
