@@ -30,7 +30,7 @@ struct InstancePlayerBind
     InstanceSave* save;
     bool perm : 1;
     bool extended : 1;
-    InstancePlayerBind() : save(NULL), perm(false), extended(false) {}
+    InstancePlayerBind() : save(nullptr), perm(false), extended(false) {}
 };
 
 typedef std::unordered_map< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
@@ -163,16 +163,16 @@ class InstanceSaveManager
 
         InstanceSave* GetInstanceSave(uint32 InstanceId);
 
-        InstancePlayerBind* PlayerBindToInstance(uint32 guidLow, InstanceSave* save, bool permanent, Player* player = NULL);
-        void PlayerUnbindInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player = NULL);
-        void PlayerUnbindInstanceNotExtended(uint32 guidLow, uint32 mapid, Difficulty difficulty, Player* player = NULL);
+        InstancePlayerBind* PlayerBindToInstance(uint32 guidLow, InstanceSave* save, bool permanent, Player* player = nullptr);
+        void PlayerUnbindInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player = nullptr);
+        void PlayerUnbindInstanceNotExtended(uint32 guidLow, uint32 mapid, Difficulty difficulty, Player* player = nullptr);
         InstancePlayerBind* PlayerGetBoundInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty);
         bool PlayerIsPermBoundToInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty);
         BoundInstancesMap const& PlayerGetBoundInstances(uint32 guidLow, Difficulty difficulty);
         void PlayerCreateBoundInstancesMaps(uint32 guidLow);
         InstanceSave* PlayerGetInstanceSave(uint32 guidLow, uint32 mapid, Difficulty difficulty);
         uint32 PlayerGetDestinationInstanceId(Player* player, uint32 mapid, Difficulty difficulty);
-        void CopyBinds(uint32 from, uint32 to, Player* toPlr = NULL);
+        void CopyBinds(uint32 from, uint32 to, Player* toPlr = nullptr);
         void UnbindAllFor(InstanceSave* save);
 
     protected:

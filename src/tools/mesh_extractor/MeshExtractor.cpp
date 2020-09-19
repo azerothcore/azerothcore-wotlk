@@ -252,7 +252,7 @@ void ExtractGameobjectModels()
 
 bool HandleArgs(int argc, char** argv, uint32& threads, std::set<uint32>& mapList, bool& debugOutput, uint32& extractFlags)
 {
-    char* param = NULL;
+    char* param = nullptr;
     extractFlags = 0;
 
     for (int i = 1; i < argc; ++i)
@@ -277,7 +277,7 @@ bool HandleArgs(int argc, char** argv, uint32& threads, std::set<uint32>& mapLis
             while (token)
             {
                 mapList.insert(atoi(token));
-                token = strtok(NULL, ",");
+                token = strtok(nullptr, ",");
             }
             
             free(copy);
@@ -345,7 +345,7 @@ void LoadTile(dtNavMesh*& navMesh, const char* tile)
     if (fread(nav, header.size, 1, f) != 1)
         return;
 
-    navMesh->addTile(nav, header.size, DT_TILE_FREE_DATA, 0, NULL);
+    navMesh->addTile(nav, header.size, DT_TILE_FREE_DATA, 0, nullptr);
 
     fclose(f);
 }

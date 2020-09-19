@@ -203,7 +203,7 @@ public:
 
             outroTimer = 0;
             outroStep = 0;
-            T1 = NULL;
+            T1 = nullptr;
         }
 
         bool IsEncounterInProgress() const
@@ -523,7 +523,9 @@ public:
                     break;
                 case ACTION_STOP_LK_FIGHT:
                     if (!IsDuringLKFight)
+                    {
                         break;
+                    }
                     instance->LoadGrid(LeaderEscapePos.GetPositionX(), LeaderEscapePos.GetPositionY());
                     if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                     {
@@ -568,7 +570,7 @@ public:
                     IsDuringLKFight = false;
                     outroTimer = 0;
                     outroStep = 0;
-                    // no break intended
+                    [[fallthrough]];
                 case ACTION_DELETE_ICE_WALL:
                     HandleGameObject(GO_IceWallGUID, true);
                     GO_IceWallGUID = 0;
@@ -759,7 +761,7 @@ public:
                 if (unit->GetEntry() == NPC_WAVE_MERCENARY || unit->GetEntry() == NPC_WAVE_FOOTMAN || unit->GetEntry() == NPC_WAVE_RIFLEMAN || unit->GetEntry() == NPC_WAVE_PRIEST || unit->GetEntry() == NPC_WAVE_MAGE)
                     if ((--reqKillCount) == 0 && WaveNumber%5 && NextWaveTimer > 5000)
                         NextWaveTimer = 5000;
-            
+
             if (unit->GetEntry() == NPC_QUEL_DELAR)
                 if (Creature* c = instance->GetCreature(NPC_UtherGUID))
                 {
@@ -812,7 +814,7 @@ public:
                     for (uint8 i=0; i<num_to_activate; ++i)
                     {
                         uint32 entry = chosenComposition[WaveNumber][i];
-                        bool forward = urand(0,1) ? true : false;
+                        bool forward = !!urand(0,1);
                         for (int8 j = (forward ? 0 : NUM_OF_TRASH-1); (forward ? j<NUM_OF_TRASH : j>=0); (forward ? ++j : --j))
                             if (!TrashActive[j])
                                 if (Creature* c = instance->GetCreature(NPC_TrashGUID[j]))
@@ -892,7 +894,7 @@ public:
                 for (uint8 i=0; i<num_to_activate; ++i)
                 {
                     uint32 entry = chosenComposition[WaveNumber-(WaveNumber > 5 ? 2 : 1)][i];
-                    bool forward = urand(0,1) ? true : false;
+                    bool forward = !!urand(0,1);
                     for (int8 j = (forward ? 0 : NUM_OF_TRASH-1); (forward ? j<NUM_OF_TRASH : j>=0); (forward ? ++j : --j))
                         if (!TrashActive[j])
                             if (Creature* c = instance->GetCreature(NPC_TrashGUID[j]))
@@ -978,7 +980,7 @@ public:
                     }
                     else if (!ResumeFirstEventTimer)
                     {
-                        bool allInRangeAndAlive = (instance->GetPlayersCountExceptGMs() > 0 ? true : false);
+                        bool allInRangeAndAlive = (instance->GetPlayersCountExceptGMs() > 0);
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
                                 if (!p->IsGameMaster() && (p->GetExactDist2d(&CenterPos) > MAX_DIST_FROM_CENTER_TO_START || !p->IsAlive()))

@@ -81,7 +81,7 @@ class boss_curator : public CreatureScript
             void JustSummoned(Creature* summon)
             {
                 summons.Summon(summon);
-                if (Unit* target = summon->SelectNearbyTarget(NULL, 40.0f))
+                if (Unit* target = summon->SelectNearbyTarget(nullptr, 40.0f))
                 {
                     summon->AI()->AttackStart(target);
                     summon->AddThreat(target, 1000.0f);
