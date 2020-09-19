@@ -548,7 +548,7 @@ SpellChainNode const* SpellMgr::GetSpellChainNode(uint32 spell_id) const
 {
     SpellChainMap::const_iterator itr = mSpellChains.find(spell_id);
     if (itr == mSpellChains.end())
-        return NULL;
+        return nullptr;
 
     return &itr->second;
 }
@@ -639,7 +639,7 @@ SpellLearnSkillNode const* SpellMgr::GetSpellLearnSkill(uint32 spell_id) const
     if (itr != mSpellLearnSkills.end())
         return &itr->second;
     else
-        return NULL;
+        return nullptr;
 }
 
 SpellTargetPosition const* SpellMgr::GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const
@@ -647,7 +647,7 @@ SpellTargetPosition const* SpellMgr::GetSpellTargetPosition(uint32 spell_id, Spe
     SpellTargetPositionMap::const_iterator itr = mSpellTargetPositions.find(std::make_pair(spell_id, effIndex));
     if (itr != mSpellTargetPositions.end())
         return &itr->second;
-    return NULL;
+    return nullptr;
 }
 
 SpellGroupStackFlags SpellMgr::GetGroupStackFlags(uint32 groupid) const
@@ -723,7 +723,7 @@ SpellProcEventEntry const* SpellMgr::GetSpellProcEvent(uint32 spellId) const
     SpellProcEventMap::const_iterator itr = mSpellProcEventMap.find(spellId);
     if (itr != mSpellProcEventMap.end())
         return &itr->second;
-    return NULL;
+    return nullptr;
 }
 
 bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellInfo const* procSpell, uint32 procFlags, uint32 procExtra, bool active) const
@@ -788,7 +788,7 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
         procEvent_procEx = spellProcEvent->procEx;
 
         // For melee triggers
-        if (procSpell == NULL)
+        if (procSpell == nullptr)
         {
             // Check (if set) for school (melee attack have Normal school)
             if (spellProcEvent->schoolMask && (spellProcEvent->schoolMask & SPELL_SCHOOL_MASK_NORMAL) == 0)
@@ -859,7 +859,7 @@ SpellProcEntry const* SpellMgr::GetSpellProcEntry(uint32 spellId) const
     SpellProcMap::const_iterator itr = mSpellProcMap.find(spellId);
     if (itr != mSpellProcMap.end())
         return &itr->second;
-    return NULL;
+    return nullptr;
 }
 
 bool SpellMgr::CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const
@@ -940,7 +940,7 @@ SpellBonusEntry const* SpellMgr::GetSpellBonusData(uint32 spellId) const
         if (itr2 != mSpellBonusMap.end())
             return &itr2->second;
     }
-    return NULL;
+    return nullptr;
 }
 
 SpellThreatEntry const* SpellMgr::GetSpellThreatEntry(uint32 spellID) const
@@ -955,7 +955,7 @@ SpellThreatEntry const* SpellMgr::GetSpellThreatEntry(uint32 spellID) const
         if (itr != mSpellThreatMap.end())
             return &itr->second;
     }
-    return NULL;
+    return nullptr;
 }
 
 float SpellMgr::GetSpellMixologyBonus(uint32 spellId) const
@@ -978,7 +978,7 @@ PetAura const* SpellMgr::GetPetAura(uint32 spell_id, uint8 eff) const
     if (itr != mSpellPetAuraMap.end())
         return &itr->second;
     else
-        return NULL;
+        return nullptr;
 }
 
 SpellEnchantProcEntry const* SpellMgr::GetSpellEnchantProcEvent(uint32 enchId) const
@@ -986,7 +986,7 @@ SpellEnchantProcEntry const* SpellMgr::GetSpellEnchantProcEvent(uint32 enchId) c
     SpellEnchantProcEventMap::const_iterator itr = mSpellEnchantProcEventMap.find(enchId);
     if (itr != mSpellEnchantProcEventMap.end())
         return &itr->second;
-    return NULL;
+    return nullptr;
 }
 
 bool SpellMgr::IsArenaAllowedEnchancment(uint32 ench_id) const
@@ -997,7 +997,7 @@ bool SpellMgr::IsArenaAllowedEnchancment(uint32 ench_id) const
 const std::vector<int32>* SpellMgr::GetSpellLinked(int32 spell_id) const
 {
     SpellLinkedMap::const_iterator itr = mSpellLinkedMap.find(spell_id);
-    return itr != mSpellLinkedMap.end() ? &(itr->second) : NULL;
+    return itr != mSpellLinkedMap.end() ? &(itr->second) : nullptr;
 }
 
 PetLevelupSpellSet const* SpellMgr::GetPetLevelupSpellList(uint32 petFamily) const
@@ -1006,7 +1006,7 @@ PetLevelupSpellSet const* SpellMgr::GetPetLevelupSpellList(uint32 petFamily) con
     if (itr != mPetLevelupSpellMap.end())
         return &itr->second;
     else
-        return NULL;
+        return nullptr;
 }
 
 PetDefaultSpellsEntry const* SpellMgr::GetPetDefaultSpellsEntry(int32 id) const
@@ -1014,7 +1014,7 @@ PetDefaultSpellsEntry const* SpellMgr::GetPetDefaultSpellsEntry(int32 id) const
     PetDefaultSpellsMap::const_iterator itr = mPetDefaultSpellsMap.find(id);
     if (itr != mPetDefaultSpellsMap.end())
         return &itr->second;
-    return NULL;
+    return nullptr;
 }
 
 SpellAreaMapBounds SpellMgr::GetSpellAreaMapBounds(uint32 spell_id) const
@@ -1186,7 +1186,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
 void SpellMgr::UnloadSpellInfoChains()
 {
     for (SpellChainMap::iterator itr = mSpellChains.begin(); itr != mSpellChains.end(); ++itr)
-        mSpellInfoMap[itr->first]->ChainEntry = NULL;
+        mSpellInfoMap[itr->first]->ChainEntry = nullptr;
 
     mSpellChains.clear();
 }
@@ -1202,7 +1202,7 @@ void SpellMgr::LoadSpellTalentRanks()
         if (!talentInfo)
             continue;
 
-        SpellInfo const* lastSpell = NULL;
+        SpellInfo const* lastSpell = nullptr;
         for (uint8 rank = MAX_TALENT_RANK - 1; rank > 0; --rank)
         {
             if (talentInfo->RankID[rank])
@@ -1222,7 +1222,7 @@ void SpellMgr::LoadSpellTalentRanks()
             continue;
         }
 
-        SpellInfo const* prevSpell = NULL;
+        SpellInfo const* prevSpell = nullptr;
         for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
         {
             uint32 spellId = talentInfo->RankID[rank];
@@ -1242,7 +1242,7 @@ void SpellMgr::LoadSpellTalentRanks()
             node.rank  = rank + 1;
 
             node.prev = prevSpell;
-            node.next = node.rank < MAX_TALENT_RANK ? GetSpellInfo(talentInfo->RankID[node.rank]) : NULL;
+            node.next = node.rank < MAX_TALENT_RANK ? GetSpellInfo(talentInfo->RankID[node.rank]) : nullptr;
 
             mSpellChains[spellId] = node;
             mSpellInfoMap[spellId]->ChainEntry = &mSpellChains[spellId];
@@ -1351,7 +1351,7 @@ void SpellMgr::LoadSpellRanks()
             ++itr;
             if (itr == rankChain.end())
             {
-                mSpellChains[addedSpell].next = NULL;
+                mSpellChains[addedSpell].next = nullptr;
                 break;
             }
             else
@@ -2329,7 +2329,7 @@ bool LoadPetDefaultSpells_helper(CreatureTemplate const* cInfo, PetDefaultSpells
         return false;
 
     // remove duplicates with levelupSpells if any
-    if (PetLevelupSpellSet const* levelupSpells = cInfo->family ? sSpellMgr->GetPetLevelupSpellList(cInfo->family) : NULL)
+    if (PetLevelupSpellSet const* levelupSpells = cInfo->family ? sSpellMgr->GetPetLevelupSpellList(cInfo->family) : nullptr)
     {
         for (uint8 j = 0; j < MAX_CREATURE_SPELL_DATA_SLOT; ++j)
         {
@@ -2658,7 +2658,7 @@ void SpellMgr::LoadSpellInfoStore()
     uint32 oldMSTime = getMSTime();
 
     UnloadSpellInfoStore();
-    mSpellInfoMap.resize(sSpellStore.GetNumRows(), NULL);
+    mSpellInfoMap.resize(sSpellStore.GetNumRows(), nullptr);
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
@@ -2693,7 +2693,7 @@ void SpellMgr::LoadSpellSpecificAndAuraState()
 {
     uint32 oldMSTime = getMSTime();
 
-    SpellInfo* spellInfo = NULL;
+    SpellInfo* spellInfo = nullptr;
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         spellInfo = mSpellInfoMap[i];
@@ -2713,7 +2713,7 @@ void SpellMgr::LoadSpellCustomAttr()
     uint32 customAttrTime = getMSTime();
     uint32 count;
 
-    QueryResult result = WorldDatabase.Query("SELECT entry, attributes FROM spell_custom_attr");
+    QueryResult result = WorldDatabase.Query("SELECT spell_id, attributes FROM spell_custom_attr");
 
     if (!result)
         sLog->outString(">> Loaded 0 spell custom attributes from DB. DB table `spell_custom_attr` is empty.");
@@ -2729,7 +2729,7 @@ void SpellMgr::LoadSpellCustomAttr()
             SpellInfo * spellInfo = _GetSpellInfo(spellId);
             if (!spellInfo)
             {
-                sLog->outString("Table `spell_custom_attr` has wrong spell (entry: %u), ignored.", spellId);
+                sLog->outString("Table `spell_custom_attr` has wrong spell (spell_id: %u), ignored.", spellId);
                 continue;
             }
 
@@ -2742,7 +2742,22 @@ void SpellMgr::LoadSpellCustomAttr()
 
                     if ((attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) != 0)
                     {
-                        sLog->outString("Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
+                        sLog->outErrorDb("Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
+                        continue;
+                    }
+                }
+            }
+
+            if ((attributes & SPELL_ATTR0_CU_POSITIVE) != 0)
+            {
+                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                {
+                    if (spellInfo->Effects[i].IsEffect())
+                        continue;
+
+                    if ((attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)) != 0)
+                    {
+                        sLog->outErrorDb("Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_POSITIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
                         continue;
                     }
                 }
@@ -2752,7 +2767,6 @@ void SpellMgr::LoadSpellCustomAttr()
         }
         sLog->outString(">> Loaded %u spell custom attributes from DB in %u ms", count, GetMSTimeDiffToNow(customAttrTime));
     }
-
 
     // xinef: create talent spells set
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
@@ -2771,7 +2785,7 @@ void SpellMgr::LoadSpellCustomAttr()
                                     mTalentSpellAdditionalSet.insert(learnSpell->Id);
     }
 
-    SpellInfo* spellInfo = NULL;
+    SpellInfo* spellInfo = nullptr;
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         spellInfo = mSpellInfoMap[i];
@@ -2891,6 +2905,7 @@ void SpellMgr::LoadSpellCustomAttr()
                                 spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_HEALTH_FUNNEL ||
                                 spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DUMMY)
                                 continue;
+                            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                         default:
                             if (spellInfo->Effects[j].CalcValue() || ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) && !spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY)))
                                 if (spellInfo->Id != 69649 && spellInfo->Id != 71056 && spellInfo->Id != 71057 && spellInfo->Id != 71058 && spellInfo->Id != 73061 && spellInfo->Id != 73062 && spellInfo->Id != 73063 && spellInfo->Id != 73064) // Sindragosa Frost Breath
@@ -3163,6 +3178,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 34655: // Snake Trap, Deadly Poison
             case 11971: // Sunder Armor
             case 58567: // Player Sunder Armor
+            case 12579: // Player Winter's Chill
             case 29306: // Naxxramas(Gluth's Zombies): Infected Wound
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
                 break;
@@ -3253,7 +3269,7 @@ void SpellMgr::LoadDbcDataCorrections()
 {
     uint32 oldMSTime = getMSTime();
 
-    SpellEntry* spellInfo = NULL;
+    SpellEntry* spellInfo = nullptr;
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
@@ -4360,6 +4376,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 57619: // WintergraspDemolisher - Spell Hourl Boulder - EffectRadiusIndex
         case 57610: // Cannon (Siege Turret)
             spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_25_YARDS; // SPELL_EFFECT_WMO_DAMAGE
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 51422: // WintergraspCannon - Spell Fire Cannon - EffectRadiusIndex
             spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS; // SPELL_EFFECT_SCHOOL_DAMAGE
             break;
@@ -4772,7 +4789,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 56430:
             spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
             spellInfo->EffectTriggerSpell[0] = 56429;
-            // no break intended
+            [[fallthrough]];
         case 56429:
             spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
             spellInfo->EffectImplicitTargetB[0] = 0;
@@ -5142,7 +5159,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;
             spellInfo->EffectImplicitTargetB[1] = TARGET_DEST_TARGET_ANY;
             spellInfo->Effect[1] = 0;
-            // no break intended
+            [[fallthrough]];
         case 66317:
             spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
             spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
@@ -5239,6 +5256,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 65767: // light surge 0
             spellInfo->excludeTargetAuraSpell = 65686;
             break;
@@ -5247,6 +5265,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 67274: // light surge 1
             spellInfo->excludeTargetAuraSpell = 67222;
             break;
@@ -5255,6 +5274,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 67275: // light surge 2
             spellInfo->excludeTargetAuraSpell = 67223;
             break;
@@ -5263,6 +5283,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 67276: // light surge 3
             spellInfo->excludeTargetAuraSpell = 67224;
             break;
@@ -5271,6 +5292,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 65769: // dark surge 0
             spellInfo->excludeTargetAuraSpell = 65684;
             break;
@@ -5279,6 +5301,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 67265: // dark surge 1
             spellInfo->excludeTargetAuraSpell = 67176;
             break;
@@ -5287,6 +5310,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 67266: // dark surge 2
             spellInfo->excludeTargetAuraSpell = 67177;
             break;
@@ -5295,6 +5319,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[0] = 6;
             spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case 67267: // dark surge 3
             spellInfo->excludeTargetAuraSpell = 67178;
             break;
@@ -6347,6 +6372,14 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ANY;
             spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_UNIT_TARGET_ANY;
             spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_TARGET_ANY;
+            break;
+        // Check for SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER
+        case 47476: // Deathknight - Strangulate
+        case 15487: // Priest - Silence
+        case 5211:  // Druid - Bash  - R1
+        case 6798:  // Druid - Bash  - R2
+        case 8983:  // Druid - Bash  - R3
+            spellInfo->AttributesEx7 |= SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER;
             break;
         }
 

@@ -13,7 +13,6 @@
 #include <ace/os_include/sys/os_socket.h>
 #include <ace/OS_NS_string.h>
 #include <ace/Reactor.h>
-#include <ace/Auto_Ptr.h>
 
 #include "WorldSocket.h"
 #include "Common.h"
@@ -33,6 +32,8 @@
 #include "PacketLog.h"
 #include "ScriptMgr.h"
 #include "AccountMgr.h"
+#include <thread>
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -91,7 +92,7 @@ struct ClientPktHeader
 #endif
 
 WorldSocket::WorldSocket(void): WorldHandler(),
-m_LastPingTime(ACE_Time_Value::zero), m_OverSpeedPings(0), m_Session(0),
+m_LastPingTime(SystemTimePoint::min()), m_OverSpeedPings(0), m_Session(0),
 m_RecvWPct(0), m_RecvPct(), m_Header(sizeof (ClientPktHeader)),
 m_OutBuffer(0), m_OutBufferSize(65536), m_OutActive(false),
 m_Seed(static_cast<uint32> (rand32()))
@@ -137,7 +138,7 @@ void WorldSocket::CloseSocket(std::string const& reason)
     {
         ACE_GUARD (LockType, Guard, m_SessionLock);
 
-        m_Session = NULL;
+        m_Session = nullptr;
     }
 }
 
@@ -436,7 +437,7 @@ int WorldSocket::handle_close(ACE_HANDLE h, ACE_Reactor_Mask)
     {
         ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
 
-        m_Session = NULL;
+        m_Session = nullptr;
     }
 
     reactor()->remove_handler(this, ACE_Event_Handler::DONT_CALL | ACE_Event_Handler::ALL_EVENTS_MASK);
@@ -467,7 +468,7 @@ int WorldSocket::Update(void)
 
 int WorldSocket::handle_input_header(void)
 {
-    ACE_ASSERT (m_RecvWPct == NULL);
+    ACE_ASSERT (m_RecvWPct == nullptr);
 
     ACE_ASSERT (m_Header.length() == sizeof(ClientPktHeader));
 
@@ -480,7 +481,7 @@ int WorldSocket::handle_input_header(void)
 
     if ((header.size < 4) || (header.size > 10240) || (header.cmd  > 10240))
     {
-        Player* _player = m_Session ? m_Session->GetPlayer() : NULL;
+        Player* _player = m_Session ? m_Session->GetPlayer() : nullptr;
         sLog->outError("WorldSocket::handle_input_header(): client (account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)", m_Session ? m_Session->GetAccountId() : 0, _player ? _player->GetGUIDLow() : 0, _player ? _player->GetName().c_str() : "<none>", header.size, header.cmd);
 
         errno = EINVAL;
@@ -511,13 +512,13 @@ int WorldSocket::handle_input_payload(void)
 
     ACE_ASSERT (m_RecvPct.space() == 0);
     ACE_ASSERT (m_Header.space() == 0);
-    ACE_ASSERT (m_RecvWPct != NULL);
+    ACE_ASSERT (m_RecvWPct != nullptr);
 
     const int ret = ProcessIncoming (m_RecvWPct);
 
-    m_RecvPct.base (NULL, 0);
+    m_RecvPct.base (nullptr, 0);
     m_RecvPct.reset();
-    m_RecvWPct = NULL;
+    m_RecvWPct = nullptr;
 
     m_Header.reset();
 
@@ -660,7 +661,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     ACE_ASSERT (new_pct);
 
     // manage memory ;)
-    ACE_Auto_Ptr<WorldPacket> aptr (new_pct);
+    std::unique_ptr<WorldPacket> aptr (new_pct);
 
     const uint16 opcode = new_pct->GetOpcode();
 
@@ -700,7 +701,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
             {
                 ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
 
-                if (m_Session != NULL)
+                if (m_Session != nullptr)
                 {
                     // Our Idle timer will reset on any non PING opcodes.
                     // Catches people idling on the login screen and any lingering ingame connections.
@@ -850,7 +851,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     //! Negative mutetime indicates amount of seconds to be muted effective on next login - which is now.
     if (mutetime < 0)
     {
-        mutetime = time(NULL) + llabs(mutetime);
+        mutetime = time(nullptr) + llabs(mutetime);
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME_LOGIN);
 
@@ -942,7 +943,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     sha.UpdateData ((uint8 *) & t, 4);
     sha.UpdateData ((uint8 *) & clientSeed, 4);
     sha.UpdateData ((uint8 *) & seed, 4);
-    sha.UpdateBigNumbers (&k, NULL);
+    sha.UpdateBigNumbers (&k, nullptr);
     sha.Finalize();
 
     if (memcmp (sha.GetDigest(), digest, 20))
@@ -1022,9 +1023,9 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // Sleep this Network thread for
     uint32 sleepTime = sWorld->getIntConfig(CONFIG_SESSION_ADD_DELAY);
-    ACE_OS::sleep (ACE_Time_Value (0, sleepTime));
+    std::this_thread::sleep_for(Microseconds(sleepTime));
 
-    sWorld->AddSession (m_Session);
+    sWorld->AddSession(m_Session);
 
     return 0;
 }
@@ -1038,20 +1039,19 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
     recvPacket >> ping;
     recvPacket >> latency;
 
-    if (m_LastPingTime == ACE_Time_Value::zero)
-        m_LastPingTime = ACE_OS::gettimeofday(); // for 1st ping
+    if (m_LastPingTime == SystemTimePoint::min())
+        m_LastPingTime = std::chrono::system_clock::now(); // for 1st ping
     else
     {
-        ACE_Time_Value cur_time = ACE_OS::gettimeofday();
-        ACE_Time_Value diff_time (cur_time);
-        diff_time -= m_LastPingTime;
-        m_LastPingTime = cur_time;
+        auto now = std::chrono::system_clock::now();
+        Seconds seconds = std::chrono::duration_cast<Seconds>(now - m_LastPingTime);        
+        m_LastPingTime = now;
 
-        if (diff_time < ACE_Time_Value (27))
+        if (seconds.count() < 27)
         {
             ++m_OverSpeedPings;
 
-            uint32 max_count = sWorld->getIntConfig (CONFIG_MAX_OVERSPEED_PINGS);
+            uint32 max_count = sWorld->getIntConfig(CONFIG_MAX_OVERSPEED_PINGS);
 
             if (max_count && m_OverSpeedPings > max_count)
             {

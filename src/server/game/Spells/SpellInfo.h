@@ -186,8 +186,12 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_SINGLE_AURA_STACK             = 0x00400000, // pussywizard
     SPELL_ATTR0_CU_SCHOOLMASK_NORMAL_WITH_MAGIC  = 0x00800000,
     SPELL_ATTR0_CU_ENCOUNTER_REWARD              = 0x01000000, // pussywizard
+    SPELL_ATTR0_CU_POSITIVE_EFF0                 = 0x02000000,
+    SPELL_ATTR0_CU_POSITIVE_EFF1                 = 0x04000000,
+    SPELL_ATTR0_CU_POSITIVE_EFF2                 = 0x08000000,
 
     SPELL_ATTR0_CU_NEGATIVE                      = SPELL_ATTR0_CU_NEGATIVE_EFF0 | SPELL_ATTR0_CU_NEGATIVE_EFF1 | SPELL_ATTR0_CU_NEGATIVE_EFF2,
+    SPELL_ATTR0_CU_POSITIVE                      = SPELL_ATTR0_CU_POSITIVE_EFF0 | SPELL_ATTR0_CU_POSITIVE_EFF1 | SPELL_ATTR0_CU_POSITIVE_EFF2,
 };
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType);
@@ -250,10 +254,10 @@ public:
     flag96    SpellClassMask;
     std::list<Condition*>* ImplicitTargetConditions;
 
-    SpellEffectInfo() : _spellInfo(NULL), _effIndex(0), Effect(0), ApplyAuraName(0), Amplitude(0), DieSides(0),
+    SpellEffectInfo() : _spellInfo(nullptr), _effIndex(0), Effect(0), ApplyAuraName(0), Amplitude(0), DieSides(0),
                         RealPointsPerLevel(0), BasePoints(0), PointsPerComboPoint(0), ValueMultiplier(0), DamageMultiplier(0),
-                        BonusMultiplier(0), MiscValue(0), MiscValueB(0), Mechanic(MECHANIC_NONE), RadiusEntry(NULL), ChainTarget(0),
-                        ItemType(0), TriggerSpell(0), ImplicitTargetConditions(NULL) {}
+                        BonusMultiplier(0), MiscValue(0), MiscValueB(0), Mechanic(MECHANIC_NONE), RadiusEntry(nullptr), ChainTarget(0),
+                        ItemType(0), TriggerSpell(0), ImplicitTargetConditions(nullptr) {}
     SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex);
 
     bool IsEffect() const;
@@ -266,13 +270,13 @@ public:
     bool IsFarDestTargetEffect() const;
     bool IsUnitOwnedAuraEffect() const;
 
-    int32 CalcValue(Unit const* caster = NULL, int32 const* basePoints = NULL, Unit const* target = NULL) const;
+    int32 CalcValue(Unit const* caster = NULL, int32 const* basePoints = NULL, Unit const* target = nullptr) const;
     int32 CalcBaseValue(int32 value) const;
-    float CalcValueMultiplier(Unit* caster, Spell* spell = NULL) const;
-    float CalcDamageMultiplier(Unit* caster, Spell* spell = NULL) const;
+    float CalcValueMultiplier(Unit* caster, Spell* spell = nullptr) const;
+    float CalcDamageMultiplier(Unit* caster, Spell* spell = nullptr) const;
 
     bool HasRadius() const;
-    float CalcRadius(Unit* caster = NULL, Spell* = NULL) const;
+    float CalcRadius(Unit* caster = NULL, Spell* = nullptr) const;
 
     uint32 GetProvidedTargetMask() const;
     uint32 GetMissingTargetMask(bool srcSet = false, bool destSet = false, uint32 mask = 0) const;
@@ -449,9 +453,9 @@ public:
     bool IsAuraExclusiveBySpecificPerCasterWith(SpellInfo const* spellInfo) const;
 
     SpellCastResult CheckShapeshift(uint32 form) const;
-    SpellCastResult CheckLocation(uint32 map_id, uint32 zone_id, uint32 area_id, Player const* player = NULL) const;
+    SpellCastResult CheckLocation(uint32 map_id, uint32 zone_id, uint32 area_id, Player const* player = nullptr) const;
     SpellCastResult CheckTarget(Unit const* caster, WorldObject const* target, bool implicit = true) const;
-    SpellCastResult CheckExplicitTarget(Unit const* caster, WorldObject const* target, Item const* itemTarget = NULL) const;
+    SpellCastResult CheckExplicitTarget(Unit const* caster, WorldObject const* target, Item const* itemTarget = nullptr) const;
     bool CheckTargetCreatureType(Unit const* target) const;
 
     // xinef: aura stacking
@@ -473,17 +477,17 @@ public:
     SpellSpecificType GetSpellSpecific() const;
 
     float GetMinRange(bool positive = false) const;
-    float GetMaxRange(bool positive = false, Unit* caster = NULL, Spell* spell = NULL) const;
+    float GetMaxRange(bool positive = false, Unit* caster = NULL, Spell* spell = nullptr) const;
 
     int32 GetDuration() const;
     int32 GetMaxDuration() const;
 
     uint32 GetMaxTicks() const;
 
-    uint32 CalcCastTime(Unit* caster = NULL, Spell* spell = NULL) const;
+    uint32 CalcCastTime(Unit* caster = NULL, Spell* spell = nullptr) const;
     uint32 GetRecoveryTime() const;
 
-    int32 CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, Spell* spell = NULL) const;
+    int32 CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, Spell* spell = nullptr) const;
 
     bool IsRanked() const;
     uint8 GetRank() const;
