@@ -772,7 +772,6 @@ void WorldSession::HandleQueryNextMailTime(WorldPacket & /*recvData*/)
 
     if (_player->unReadMails > 0)
     {
-
         data << float(0);                                  // float
         data << uint32(0);                                 // count
 
