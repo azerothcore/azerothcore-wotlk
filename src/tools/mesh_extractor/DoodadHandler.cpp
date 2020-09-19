@@ -11,7 +11,7 @@
 #include "G3D/Matrix4.h"
 
 DoodadHandler::DoodadHandler( ADT* adt ) : 
-    ObjectDataHandler(adt), _definitions(NULL), _paths(NULL)
+    ObjectDataHandler(adt), _definitions(nullptr), _paths(nullptr)
 {
     Chunk* mddf = adt->ObjectData->GetChunkByName("MDDF");
     if (mddf)
