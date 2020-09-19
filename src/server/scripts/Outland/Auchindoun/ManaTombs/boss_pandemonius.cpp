@@ -42,7 +42,7 @@ public:
     struct boss_pandemoniusAI : public ScriptedAI
     {
         boss_pandemoniusAI(Creature* creature) : ScriptedAI(creature) { }
-        
+
         EventMap events;
 
         void Reset()
@@ -83,43 +83,43 @@ public:
 
             switch (events.GetEvent())
             {
-            case EVENT_VOID_BLAST:
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
-                {
-                    DoCast(target, SPELL_VOID_BLAST);
-                    ++VoidBlastCounter;
-                }
+                case EVENT_VOID_BLAST:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    {
+                        DoCast(target, SPELL_VOID_BLAST);
+                        ++VoidBlastCounter;
+                    }
 
-                if (VoidBlastCounter == 5)
-                {
-                    VoidBlastCounter = 0;
-                    events.RescheduleEvent(EVENT_VOID_BLAST, urand(15000, 25000));
-                }
-                else
-                {
-                    events.RescheduleEvent(EVENT_VOID_BLAST, 500);
-                    events.DelayEvents(EVENT_DARK_SHELL, 500);
-                }
-                break;
-            case EVENT_DARK_SHELL:
-                if (me->IsNonMeleeSpellCast(false))
-                {
-                    me->InterruptNonMeleeSpells(true);
-                }
+                    if (VoidBlastCounter == 5)
+                    {
+                        VoidBlastCounter = 0;
+                        events.RescheduleEvent(EVENT_VOID_BLAST, urand(15000, 25000));
+                    }
+                    else
+                    {
+                        events.RescheduleEvent(EVENT_VOID_BLAST, 500);
+                        events.DelayEvents(EVENT_DARK_SHELL, 500);
+                    }
+                    break;
+                case EVENT_DARK_SHELL:
+                    if (me->IsNonMeleeSpellCast(false))
+                    {
+                        me->InterruptNonMeleeSpells(true);
+                    }
 
-                Talk(EMOTE_DARK_SHELL);
-                DoCast(me, SPELL_DARK_SHELL);
-                events.RescheduleEvent(EVENT_DARK_SHELL, 20000);
-                break;
-            default:
-                break;
+                    Talk(EMOTE_DARK_SHELL);
+                    DoCast(me, SPELL_DARK_SHELL);
+                    events.RescheduleEvent(EVENT_DARK_SHELL, 20000);
+                    break;
+                default:
+                    break;
             }
 
             DoMeleeAttackIfReady();
         }
 
-        private:
-            uint32 VoidBlastCounter;
+    private:
+        uint32 VoidBlastCounter;
     };
 };
 

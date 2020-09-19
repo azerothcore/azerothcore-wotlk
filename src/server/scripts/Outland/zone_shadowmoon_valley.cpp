@@ -38,52 +38,52 @@ EndContentData */
 // Ours
 class spell_q10612_10613_the_fel_and_the_furious : public SpellScriptLoader
 {
-    public:
-        spell_q10612_10613_the_fel_and_the_furious() : SpellScriptLoader("spell_q10612_10613_the_fel_and_the_furious") { }
+public:
+    spell_q10612_10613_the_fel_and_the_furious() : SpellScriptLoader("spell_q10612_10613_the_fel_and_the_furious") { }
 
-        class spell_q10612_10613_the_fel_and_the_furious_SpellScript : public SpellScript
+    class spell_q10612_10613_the_fel_and_the_furious_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_q10612_10613_the_fel_and_the_furious_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
         {
-            PrepareSpellScript(spell_q10612_10613_the_fel_and_the_furious_SpellScript);
+            Player* charmer = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
+            if (!charmer)
+                return;
 
-            void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
+            std::list<GameObject*> gList;
+            GetCaster()->GetGameObjectListWithEntryInGrid(gList, 184979, 30.0f);
+            uint8 counter = 0;
+            for (std::list<GameObject*>::const_iterator itr = gList.begin(); itr != gList.end(); ++itr, ++counter)
             {
-                Player* charmer = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
-                if (!charmer)
-                    return;
-
-                std::list<GameObject*> gList;
-                GetCaster()->GetGameObjectListWithEntryInGrid(gList, 184979, 30.0f);
-                uint8 counter = 0;
-                for (std::list<GameObject*>::const_iterator itr = gList.begin(); itr != gList.end(); ++itr, ++counter)
+                if (counter >= 10)
+                    break;
+                GameObject* go = *itr;
+                if (!go->isSpawned())
+                    continue;
+                Creature* cr2 = go->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 2.0f, 0.0f, 100);
+                if (cr2)
                 {
-                    if (counter >= 10)
-                        break;
-                    GameObject* go = *itr;
-                    if (!go->isSpawned())
-                        continue;
-                    Creature* cr2 = go->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ()+2.0f, 0.0f, 100);
-                    if (cr2)
-                    {
-                        cr2->setFaction(14);
-                        cr2->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
-                        GetCaster()->CastSpell(cr2, 38083, true);
-                    }
-
-                    go->SetLootState(GO_JUST_DEACTIVATED);
-                    charmer->KilledMonsterCredit(21959, 0);
+                    cr2->setFaction(14);
+                    cr2->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                    GetCaster()->CastSpell(cr2, 38083, true);
                 }
-            }
 
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_q10612_10613_the_fel_and_the_furious_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+                go->SetLootState(GO_JUST_DEACTIVATED);
+                charmer->KilledMonsterCredit(21959, 0);
             }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_q10612_10613_the_fel_and_the_furious_SpellScript();
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_q10612_10613_the_fel_and_the_furious_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_q10612_10613_the_fel_and_the_furious_SpellScript();
+    }
 };
 
 class spell_q10563_q10596_to_legion_hold : public SpellScriptLoader
@@ -95,7 +95,7 @@ public:
     {
         PrepareAuraScript(spell_q10563_q10596_to_legion_hold_AuraScript)
 
-        void HandleEffectRemove(AuraEffect const * /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (Player* player = GetTarget()->ToPlayer())
             {
@@ -104,7 +104,7 @@ public:
             }
         }
 
-        void HandleEffectApply(AuraEffect const * /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (Player* player = GetTarget()->ToPlayer())
             {
@@ -182,16 +182,16 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_CAST_SUMMON_INFERNAL:
-                {
-                    if (Unit* infernal = ObjectAccessor::GetUnit(*me, infernalGUID))
-                        if (infernal->GetDisplayId() == MODEL_INVISIBLE)
-                            me->CastSpell(infernal, SPELL_SUMMON_INFERNAL, true);
-                    events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, 12000);
-                    break;
-                }
-                default:
-                    break;
+                    case EVENT_CAST_SUMMON_INFERNAL:
+                        {
+                            if (Unit* infernal = ObjectAccessor::GetUnit(*me, infernalGUID))
+                                if (infernal->GetDisplayId() == MODEL_INVISIBLE)
+                                    me->CastSpell(infernal, SPELL_SUMMON_INFERNAL, true);
+                            events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, 12000);
+                            break;
+                        }
+                    default:
+                        break;
                 }
             }
         }
@@ -394,7 +394,7 @@ public:
                 else
                     EatTimer -= diff;
 
-            return;
+                return;
             }
 
             if (!UpdateVictim())
@@ -404,7 +404,8 @@ public:
             {
                 DoCastVictim(SPELL_NETHER_BREATH);
                 CastTimer = 5000;
-            } else CastTimer -= diff;
+            }
+            else CastTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -540,7 +541,8 @@ public:
                                 me->GetMotionMaster()->MovePoint(1, pos);
                             }
                         }
-                    } else FlyTimer -= diff;
+                    }
+                    else FlyTimer -= diff;
                 }
                 return;
             }
@@ -651,39 +653,39 @@ public:
             {
                 switch (events.ExecuteEvent())
                 {
-                case EVENT_WALK_TO_MUTTON:
-                    me->SetWalk(true);
-                    me->GetMotionMaster()->MovePoint(1, x, y, z, true);
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-                    break;
-                case EVENT_POISONED:
-                    if (GameObject* food = me->FindNearestGameObject(DELICIOUS_MUTTON, 5.0f))
-                        food->RemoveFromWorld();
-                    if (roll_chance_i(20))
-                        Talk(SAY_POISONED_1);
-                    CreditPlayer();
-                    me->CastSpell(me, SPELL_VOMIT);
-                    events.ScheduleEvent(EVENT_KILL, 5000);
-                    break;
-                case EVENT_KILL:
-                    Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-                    break;
+                    case EVENT_WALK_TO_MUTTON:
+                        me->SetWalk(true);
+                        me->GetMotionMaster()->MovePoint(1, x, y, z, true);
+                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
+                        break;
+                    case EVENT_POISONED:
+                        if (GameObject* food = me->FindNearestGameObject(DELICIOUS_MUTTON, 5.0f))
+                            food->RemoveFromWorld();
+                        if (roll_chance_i(20))
+                            Talk(SAY_POISONED_1);
+                        CreditPlayer();
+                        me->CastSpell(me, SPELL_VOMIT);
+                        events.ScheduleEvent(EVENT_KILL, 5000);
+                        break;
+                    case EVENT_KILL:
+                        Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                        break;
                 }
                 return;
             }
 
             switch (events.ExecuteEvent())
             {
-            case EVENT_KICK:
-                if (me->GetVictim()->HasUnitState(SPELL_STATE_CASTING))
-                    DoCastVictim(SPELL_KICK);
-                events.RepeatEvent(urand(5000, 10000));
-                break;
-            case EVENT_SUNDER:
-                DoCastVictim(SPELL_SUNDER);
-                events.RepeatEvent(urand(5000, 10000));
-                break;
+                case EVENT_KICK:
+                    if (me->GetVictim()->HasUnitState(SPELL_STATE_CASTING))
+                        DoCastVictim(SPELL_KICK);
+                    events.RepeatEvent(urand(5000, 10000));
+                    break;
+                case EVENT_SUNDER:
+                    DoCastVictim(SPELL_SUNDER);
+                    events.RepeatEvent(urand(5000, 10000));
+                    break;
             }
 
             DoMeleeAttackIfReady();
@@ -737,7 +739,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             ItemPosCountVec dest;
             uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30658, 1, nullptr);
@@ -747,7 +749,7 @@ public:
                 ClearGossipMenuFor(player);
             }
         }
-        if (action == GOSSIP_ACTION_INFO_DEF+2)
+        if (action == GOSSIP_ACTION_INFO_DEF + 2)
         {
             ItemPosCountVec dest;
             uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 30659, 1, nullptr);
@@ -763,9 +765,9 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(10583) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(30658, 1, true))
-            AddGossipItemFor(player, 0, GOSSIP_HSK1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, 0, GOSSIP_HSK1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         if (player->GetQuestStatus(10601) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(30659, 1, true))
-            AddGossipItemFor(player, 0, GOSSIP_HSK2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+            AddGossipItemFor(player, 0, GOSSIP_HSK2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
@@ -789,19 +791,19 @@ enum Karynaku
 
 class npc_karynaku : public CreatureScript
 {
-    public:
-        npc_karynaku() : CreatureScript("npc_karynaku") { }
+public:
+    npc_karynaku() : CreatureScript("npc_karynaku") { }
 
-        bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
-        {
-            if (quest->GetQuestId() == QUEST_ALLY_OF_NETHER)
-                player->ActivateTaxiPathTo(TAXI_PATH_ID);
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == QUEST_ALLY_OF_NETHER)
+            player->ActivateTaxiPathTo(TAXI_PATH_ID);
 
-            if (quest->GetQuestId() == QUEST_ZUHULED_THE_WACK)
-                creature->SummonCreature(NPC_ZUHULED_THE_WACKED, -4204.94f, 316.397f, 122.508f, 1.309f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);
+        if (quest->GetQuestId() == QUEST_ZUHULED_THE_WACK)
+            creature->SummonCreature(NPC_ZUHULED_THE_WACKED, -4204.94f, 316.397f, 122.508f, 1.309f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);
 
-            return true;
-        }
+        return true;
+    }
 };
 
 /*####
@@ -941,7 +943,7 @@ public:
         void EnterCombat(Unit* who)
         {
             //don't always use
-            if (rand()%5)
+            if (rand() % 5)
                 return;
 
             //only aggro text if not player
@@ -997,7 +999,7 @@ struct TorlothCinematic
 };
 
 // Creature 0 - Torloth, 1 - Illidan
-static TorlothCinematic TorlothAnim[]=
+static TorlothCinematic TorlothAnim[] =
 {
     {0, 2000},
     {1, 7000},
@@ -1014,7 +1016,7 @@ struct Location
 };
 
 //Cordinates for Spawns
-static Location SpawnLocation[]=
+static Location SpawnLocation[] =
 {
     //Cords used for:
     {-4615.8556f, 1342.2532f, 139.9f, 1.612f}, //Illidari Soldier
@@ -1041,7 +1043,7 @@ struct WaveData
     uint32 CreatureId, SpawnTimer, YellTimer;
 };
 
-static WaveData WavesInfo[]=
+static WaveData WavesInfo[] =
 {
     {9, 0, 22075, 10000, 7000},   //Illidari Soldier
     {2, 9, 22074, 10000, 7000},   //Illidari Mind Breaker
@@ -1051,10 +1053,10 @@ static WaveData WavesInfo[]=
 
 struct SpawnSpells
 {
- uint32 Timer1, Timer2, SpellId;
+    uint32 Timer1, Timer2, SpellId;
 };
 
-static SpawnSpells SpawnCast[]=
+static SpawnSpells SpawnCast[] =
 {
     {10000, 15000, 35871},  // Illidari Soldier Cast - Spellbreaker
     {10000, 10000, 38985},  // Illidari Mind Breake Cast - Focused Bursts
@@ -1125,31 +1127,31 @@ public:
 
             switch (AnimationCount)
             {
-            case 0:
-                me->SetUInt32Value(UNIT_FIELD_BYTES_1, 8);
-                break;
-            case 3:
-                me->RemoveFlag(UNIT_FIELD_BYTES_1, 8);
-                break;
-            case 5:
-                if (Player* AggroTarget = ObjectAccessor::GetPlayer(*me, AggroTargetGUID))
-                {
-                    me->SetTarget(AggroTarget->GetGUID());
-                    me->AddThreat(AggroTarget, 1);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-                }
-                break;
-            case 6:
-                if (Player* AggroTarget = ObjectAccessor::GetPlayer(*me, AggroTargetGUID))
-                {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->ClearUnitState(UNIT_STATE_ROOT);
+                case 0:
+                    me->SetUInt32Value(UNIT_FIELD_BYTES_1, 8);
+                    break;
+                case 3:
+                    me->RemoveFlag(UNIT_FIELD_BYTES_1, 8);
+                    break;
+                case 5:
+                    if (Player* AggroTarget = ObjectAccessor::GetPlayer(*me, AggroTargetGUID))
+                    {
+                        me->SetTarget(AggroTarget->GetGUID());
+                        me->AddThreat(AggroTarget, 1);
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                    }
+                    break;
+                case 6:
+                    if (Player* AggroTarget = ObjectAccessor::GetPlayer(*me, AggroTargetGUID))
+                    {
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->ClearUnitState(UNIT_STATE_ROOT);
 
-                    float x, y, z;
-                    AggroTarget->GetPosition(x, y, z);
-                    me->GetMotionMaster()->MovePoint(0, x, y, z);
-                }
-                break;
+                        float x, y, z;
+                        AggroTarget->GetPosition(x, y, z);
+                        me->GetMotionMaster()->MovePoint(0, x, y, z);
+                    }
+                    break;
             }
             ++AnimationCount;
         }
@@ -1161,13 +1163,15 @@ public:
                 if (AnimationTimer <= diff)
                 {
                     HandleAnimation();
-                } else AnimationTimer -= diff;
+                }
+                else AnimationTimer -= diff;
             }
 
             if (AnimationCount < 6)
             {
                 me->CombatStop();
-            } else if (!Timers)
+            }
+            else if (!Timers)
             {
                 SpellTimer1 = SpawnCast[6].Timer1;
                 SpellTimer2 = SpawnCast[7].Timer1;
@@ -1180,20 +1184,23 @@ public:
                 if (SpellTimer1 <= diff)
                 {
                     DoCastVictim(SpawnCast[6].SpellId);//Cleave
-                    SpellTimer1 = SpawnCast[6].Timer2 + (rand()%10 * 1000);
-                } else SpellTimer1 -= diff;
+                    SpellTimer1 = SpawnCast[6].Timer2 + (rand() % 10 * 1000);
+                }
+                else SpellTimer1 -= diff;
 
                 if (SpellTimer2 <= diff)
                 {
                     DoCastVictim(SpawnCast[7].SpellId);//Shadowfury
-                    SpellTimer2 = SpawnCast[7].Timer2 + (rand()%5 * 1000);
-                } else SpellTimer2 -= diff;
+                    SpellTimer2 = SpawnCast[7].Timer2 + (rand() % 5 * 1000);
+                }
+                else SpellTimer2 -= diff;
 
                 if (SpellTimer3 <= diff)
                 {
                     DoCast(me, SpawnCast[8].SpellId);
-                    SpellTimer3 = SpawnCast[8].Timer2 + (rand()%7 * 1000);//Spell Reflection
-                } else SpellTimer3 -= diff;
+                    SpellTimer3 = SpawnCast[8].Timer2 + (rand() % 7 * 1000); //Spell Reflection
+                }
+                else SpellTimer3 -= diff;
             }
 
             DoMeleeAttackIfReady();
@@ -1292,7 +1299,7 @@ public:
 
                 Group::MemberSlotList const& members = EventGroup->GetMemberSlots();
 
-                for (Group::member_citerator itr = members.begin(); itr!= members.end(); ++itr)
+                for (Group::member_citerator itr = members.begin(); itr != members.end(); ++itr)
                 {
                     Player* GroupMember = ObjectAccessor::GetPlayer(*me, itr->guid);
                     if (!GroupMember)
@@ -1315,7 +1322,7 @@ public:
 
                 if (GroupMemberCount == DeadMemberCount)
                 {
-                    for (Group::member_citerator itr = members.begin(); itr!= members.end(); ++itr)
+                    for (Group::member_citerator itr = members.begin(); itr != members.end(); ++itr)
                     {
                         if (Player* groupMember = ObjectAccessor::GetPlayer(*me, itr->guid))
                             if (groupMember->GetQuestStatus(QUEST_BATTLE_OF_THE_CRIMSON_WATCH) == QUEST_STATUS_INCOMPLETE)
@@ -1323,7 +1330,8 @@ public:
                     }
                     Failed = true;
                 }
-            } else if (player->isDead() || !player->IsWithinDistInMap(me, EVENT_AREA_RADIUS))
+            }
+            else if (player->isDead() || !player->IsWithinDistInMap(me, EVENT_AREA_RADIUS))
             {
                 player->FailQuest(QUEST_BATTLE_OF_THE_CRIMSON_WATCH);
                 Failed = true;
@@ -1413,18 +1421,18 @@ public:
             {
                 if (me->GetEntry() == 22075)//Illidari Soldier
                 {
-                    SpellTimer1 = SpawnCast[0].Timer1 + (rand()%4 * 1000);
+                    SpellTimer1 = SpawnCast[0].Timer1 + (rand() % 4 * 1000);
                 }
                 if (me->GetEntry() == 22074)//Illidari Mind Breaker
                 {
-                    SpellTimer1 = SpawnCast[1].Timer1 + (rand()%10 * 1000);
-                    SpellTimer2 = SpawnCast[2].Timer1 + (rand()%4 * 1000);
-                    SpellTimer3 = SpawnCast[3].Timer1 + (rand()%4 * 1000);
+                    SpellTimer1 = SpawnCast[1].Timer1 + (rand() % 10 * 1000);
+                    SpellTimer2 = SpawnCast[2].Timer1 + (rand() % 4 * 1000);
+                    SpellTimer3 = SpawnCast[3].Timer1 + (rand() % 4 * 1000);
                 }
                 if (me->GetEntry() == 19797)// Illidari Highlord
                 {
-                    SpellTimer1 = SpawnCast[4].Timer1 + (rand()%4 * 1000);
-                    SpellTimer2 = SpawnCast[5].Timer1 + (rand()%4 * 1000);
+                    SpellTimer1 = SpawnCast[4].Timer1 + (rand() % 4 * 1000);
+                    SpellTimer2 = SpawnCast[5].Timer1 + (rand() % 4 * 1000);
                 }
                 Timers = true;
             }
@@ -1434,8 +1442,9 @@ public:
                 if (SpellTimer1 <= diff)
                 {
                     DoCastVictim(SpawnCast[0].SpellId);//Spellbreaker
-                    SpellTimer1 = SpawnCast[0].Timer2 + (rand()%5 * 1000);
-                } else SpellTimer1 -= diff;
+                    SpellTimer1 = SpawnCast[0].Timer2 + (rand() % 5 * 1000);
+                }
+                else SpellTimer1 -= diff;
             }
             //Illidari Mind Breaker
             if (me->GetEntry() == 22074)
@@ -1447,22 +1456,26 @@ public:
                         if (target->GetTypeId() == TYPEID_PLAYER)
                         {
                             DoCast(target, SpawnCast[1].SpellId); //Focused Bursts
-                            SpellTimer1 = SpawnCast[1].Timer2 + (rand()%5 * 1000);
-                        } else SpellTimer1 = 2000;
+                            SpellTimer1 = SpawnCast[1].Timer2 + (rand() % 5 * 1000);
+                        }
+                        else SpellTimer1 = 2000;
                     }
-                } else SpellTimer1 -= diff;
+                }
+                else SpellTimer1 -= diff;
 
                 if (SpellTimer2 <= diff)
                 {
                     DoCastVictim(SpawnCast[2].SpellId);//Psychic Scream
-                    SpellTimer2 = SpawnCast[2].Timer2 + (rand()%13 * 1000);
-                } else SpellTimer2 -= diff;
+                    SpellTimer2 = SpawnCast[2].Timer2 + (rand() % 13 * 1000);
+                }
+                else SpellTimer2 -= diff;
 
                 if (SpellTimer3 <= diff)
                 {
                     DoCastVictim(SpawnCast[3].SpellId);//Mind Blast
-                    SpellTimer3 = SpawnCast[3].Timer2 + (rand()%8 * 1000);
-                } else SpellTimer3 -= diff;
+                    SpellTimer3 = SpawnCast[3].Timer2 + (rand() % 8 * 1000);
+                }
+                else SpellTimer3 -= diff;
             }
             //Illidari Highlord
             if (me->GetEntry() == 19797)
@@ -1470,14 +1483,16 @@ public:
                 if (SpellTimer1 <= diff)
                 {
                     DoCastVictim(SpawnCast[4].SpellId);//Curse Of Flames
-                    SpellTimer1 = SpawnCast[4].Timer2 + (rand()%10 * 1000);
-                } else SpellTimer1 -= diff;
+                    SpellTimer1 = SpawnCast[4].Timer2 + (rand() % 10 * 1000);
+                }
+                else SpellTimer1 -= diff;
 
                 if (SpellTimer2 <= diff)
                 {
                     DoCastVictim(SpawnCast[5].SpellId);//Flamestrike
-                    SpellTimer2 = SpawnCast[5].Timer2 + (rand()%7 * 13000);
-                } else SpellTimer2 -= diff;
+                    SpellTimer2 = SpawnCast[5].Timer2 + (rand() % 7 * 13000);
+                }
+                else SpellTimer2 -= diff;
             }
 
             DoMeleeAttackIfReady();
@@ -1506,7 +1521,7 @@ void npc_lord_illidan_stormrage::npc_lord_illidan_stormrageAI::SummonNextWave()
         {
             if (WaveCount == 0)//1 Wave
             {
-                if (rand()%3 == 1 && FelguardCount<2)
+                if (rand() % 3 == 1 && FelguardCount < 2)
                 {
                     Spawn->SetDisplayId(18654);
                     ++FelguardCount;
@@ -1516,7 +1531,7 @@ void npc_lord_illidan_stormrage::npc_lord_illidan_stormrageAI::SummonNextWave()
                     Spawn->SetDisplayId(19991);
                     ++DreadlordCount;
                 }
-                else if (FelguardCount<2)
+                else if (FelguardCount < 2)
                 {
                     Spawn->SetDisplayId(18654);
                     ++FelguardCount;
@@ -1569,10 +1584,10 @@ public:
             {
                 CAST_AI(npc_lord_illidan_stormrage::npc_lord_illidan_stormrageAI, Illidan->AI())->PlayerGUID = player->GetGUID();
                 CAST_AI(npc_lord_illidan_stormrage::npc_lord_illidan_stormrageAI, Illidan->AI())->LiveCount = 0;
-                CAST_AI(npc_lord_illidan_stormrage::npc_lord_illidan_stormrageAI, Illidan->AI())->EventStarted=true;
+                CAST_AI(npc_lord_illidan_stormrage::npc_lord_illidan_stormrageAI, Illidan->AI())->EventStarted = true;
             }
         }
-     return true;
+        return true;
     }
 };
 
@@ -1582,7 +1597,7 @@ public:
 
 enum Enraged_Dpirits
 {
-// QUESTS
+    // QUESTS
     QUEST_ENRAGED_SPIRITS_FIRE_EARTH        = 10458,
     QUEST_ENRAGED_SPIRITS_AIR               = 10481,
     QUEST_ENRAGED_SPIRITS_WATER             = 10480,
@@ -1630,7 +1645,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-    return new npc_enraged_spiritAI(creature);
+        return new npc_enraged_spiritAI(creature);
     }
 
     struct npc_enraged_spiritAI : public ScriptedAI
@@ -1651,22 +1666,22 @@ public:
 
             switch (me->GetEntry())
             {
-                  case NPC_ENRAGED_FIRE_SPIRIT:
+                case NPC_ENRAGED_FIRE_SPIRIT:
                     entry  = NPC_FIERY_SOUL;
                     //credit = SPELL_FIERY_SOUL_CAPTURED_CREDIT;
                     credit = NPC_CREDIT_FIRE;
                     break;
-                  case NPC_ENRAGED_EARTH_SPIRIT:
+                case NPC_ENRAGED_EARTH_SPIRIT:
                     entry  = NPC_EARTHEN_SOUL;
                     //credit = SPELL_EARTHEN_SOUL_CAPTURED_CREDIT;
                     credit = NPC_CREDIT_EARTH;
                     break;
-                  case NPC_ENRAGED_AIR_SPIRIT:
+                case NPC_ENRAGED_AIR_SPIRIT:
                     entry  = NPC_ENRAGED_AIRY_SOUL;
                     //credit = SPELL_AIRY_SOUL_CAPTURED_CREDIT;
                     credit = NPC_CREDIT_AIR;
                     break;
-                  case NPC_ENRAGED_WATER_SPIRIT:
+                case NPC_ENRAGED_WATER_SPIRIT:
                     entry  = NPC_ENRAGED_WATERY_SOUL;
                     //credit = SPELL_WATERY_SOUL_CAPTURED_CREDIT;
                     credit = NPC_CREDIT_WATER;
@@ -1685,17 +1700,17 @@ public:
             // FIND TOTEM, PROCESS QUEST
             if (Summoned)
             {
-                 totemOspirits = me->FindNearestCreature(ENTRY_TOTEM_OF_SPIRITS, RADIUS_TOTEM_OF_SPIRITS);
-                 if (totemOspirits)
-                 {
-                     Summoned->setFaction(FACTION_ENRAGED_SOUL_FRIENDLY);
-                     Summoned->GetMotionMaster()->MovePoint(0, totemOspirits->GetPositionX(), totemOspirits->GetPositionY(), Summoned->GetPositionZ());
+                totemOspirits = me->FindNearestCreature(ENTRY_TOTEM_OF_SPIRITS, RADIUS_TOTEM_OF_SPIRITS);
+                if (totemOspirits)
+                {
+                    Summoned->setFaction(FACTION_ENRAGED_SOUL_FRIENDLY);
+                    Summoned->GetMotionMaster()->MovePoint(0, totemOspirits->GetPositionX(), totemOspirits->GetPositionY(), Summoned->GetPositionZ());
 
-                     if (Unit* owner = totemOspirits->GetOwner())
-                         if (Player* player = owner->ToPlayer())
-                             player->KilledMonsterCredit(credit, 0);
-                     DoCast(totemOspirits, SPELL_SOUL_CAPTURED);
-                 }
+                    if (Unit* owner = totemOspirits->GetOwner())
+                        if (Player* player = owner->ToPlayer())
+                            player->KilledMonsterCredit(credit, 0);
+                    DoCast(totemOspirits, SPELL_SOUL_CAPTURED);
+                }
             }
         }
     };
@@ -1770,7 +1785,7 @@ public:
                     // Respawn the tuber
                     if (tuberGUID)
                         if (GameObject* tuber = ObjectAccessor::GetGameObject(*me, tuberGUID))
-                        // @Workaround: find how to properly respawn the GO
+                            // @Workaround: find how to properly respawn the GO
                             tuber->SetPhaseMask(1, true);
 
                     Reset();

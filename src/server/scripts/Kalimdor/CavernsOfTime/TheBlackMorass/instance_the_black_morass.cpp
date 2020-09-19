@@ -11,7 +11,7 @@
 #include "ScriptedCreature.h"
 
 
-const Position PortalLocation[4]=
+const Position PortalLocation[4] =
 {
     {-2041.06f, 7042.08f, 29.99f, 1.30f},
     {-1968.18f, 7042.11f, 21.93f, 2.12f},
@@ -138,26 +138,26 @@ public:
             switch (type)
             {
                 case TYPE_AEONUS:
-                {
-                    encounters[type] = DONE;
-                    SaveToDB();
+                    {
+                        encounters[type] = DONE;
+                        SaveToDB();
 
-                    if (Creature* medivh = instance->GetCreature(_medivhGUID))
-                        medivh->AI()->DoAction(ACTION_OUTRO);
+                        if (Creature* medivh = instance->GetCreature(_medivhGUID))
+                            medivh->AI()->DoAction(ACTION_OUTRO);
 
-                    Map::PlayerList const& players = instance->GetPlayers();
-                    if (!players.isEmpty())
-                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                            if (Player* player = itr->GetSource())
-                            {
-                                if (player->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
-                                    player->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);
+                        Map::PlayerList const& players = instance->GetPlayers();
+                        if (!players.isEmpty())
+                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                                if (Player* player = itr->GetSource())
+                                {
+                                    if (player->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
+                                        player->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);
 
-                                if (player->GetQuestStatus(QUEST_MASTER_TOUCH) == QUEST_STATUS_INCOMPLETE)
-                                    player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
-                            }
-                    break;
-                }
+                                    if (player->GetQuestStatus(QUEST_MASTER_TOUCH) == QUEST_STATUS_INCOMPLETE)
+                                        player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
+                                }
+                        break;
+                    }
                 case TYPE_CHRONO_LORD_DEJA:
                 case TYPE_TEMPORUS:
                     encounters[type] = DONE;
@@ -243,19 +243,27 @@ public:
             int32 entry = 0;
             switch (_currentRift)
             {
-                case 6: entry = GetData(TYPE_CHRONO_LORD_DEJA) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_CHRONO_LORD : -NPC_CHRONO_LORD_DEJA) : NPC_CHRONO_LORD_DEJA; break;
-                case 12: entry = GetData(TYPE_TEMPORUS) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_TIMEREAVER : -NPC_TEMPORUS) : NPC_TEMPORUS; break;
-                case 18: entry = NPC_AEONUS; break;
-                default: entry = RAND(NPC_RIFT_KEEPER_WARLOCK, NPC_RIFT_KEEPER_MAGE, NPC_RIFT_LORD, NPC_RIFT_LORD_2); break;
+                case 6:
+                    entry = GetData(TYPE_CHRONO_LORD_DEJA) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_CHRONO_LORD : -NPC_CHRONO_LORD_DEJA) : NPC_CHRONO_LORD_DEJA;
+                    break;
+                case 12:
+                    entry = GetData(TYPE_TEMPORUS) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_TIMEREAVER : -NPC_TEMPORUS) : NPC_TEMPORUS;
+                    break;
+                case 18:
+                    entry = NPC_AEONUS;
+                    break;
+                default:
+                    entry = RAND(NPC_RIFT_KEEPER_WARLOCK, NPC_RIFT_KEEPER_MAGE, NPC_RIFT_LORD, NPC_RIFT_LORD_2);
+                    break;
             }
 
             Position pos;
-            rift->GetNearPosition(pos, 10.0f, 2*M_PI*rand_norm());
+            rift->GetNearPosition(pos, 10.0f, 2 * M_PI * rand_norm());
 
             if (TempSummon* summon = instance->SummonCreature(abs(entry), pos))
             {
                 summon->SetTempSummonType(TEMPSUMMON_CORPSE_TIMED_DESPAWN);
-                summon->SetTimer(3*MINUTE*IN_MILLISECONDS);
+                summon->SetTimer(3 * MINUTE * IN_MILLISECONDS);
 
                 if (entry < 0)
                     summon->SetLootMode(0);
@@ -283,7 +291,7 @@ public:
 
                     if (instance->GetCreature(_medivhGUID))
                     {
-                        uint8 position = (_currentRift-1)%4;
+                        uint8 position = (_currentRift - 1) % 4;
                         instance->SummonCreature(NPC_TIME_RIFT, PortalLocation[position]);
                     }
                     break;
@@ -329,8 +337,8 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        protected:
-            EventMap Events;
+    protected:
+        EventMap Events;
     };
 
 };

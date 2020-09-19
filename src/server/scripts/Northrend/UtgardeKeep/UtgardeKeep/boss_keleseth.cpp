@@ -55,7 +55,7 @@ public:
 
     struct npc_frost_tombAI : public NullCreatureAI
     {
-        npc_frost_tombAI(Creature *c) : NullCreatureAI(c), PrisonerGUID(0)
+        npc_frost_tombAI(Creature* c) : NullCreatureAI(c), PrisonerGUID(0)
         {
             if (TempSummon* t = c->ToTempSummon())
                 if (Unit* s = t->GetSummoner())
@@ -113,7 +113,7 @@ public:
 
     struct boss_kelesethAI : public ScriptedAI
     {
-        boss_kelesethAI(Creature *c) : ScriptedAI(c)
+        boss_kelesethAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -172,7 +172,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
@@ -182,7 +182,7 @@ public:
                     break;
                 case EVENT_SPELL_SHADOWBOLT:
                     me->CastSpell(me->GetVictim(), SPELL_SHADOWBOLT, false);
-                    events.RepeatEvent(urand(4000,5000));
+                    events.RepeatEvent(urand(4000, 5000));
                     break;
                 case EVENT_FROST_TOMB:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
@@ -200,9 +200,9 @@ public:
                     Talk(SAY_SUMMON_SKELETONS);
                     for (uint8 i = 0; i < 5; ++i)
                     {
-                        float dist = rand_norm()*4+3.0f;
-                        float angle = rand_norm()*2*M_PI;
-                        if( Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f+cos(angle)*dist, 259.1f+sin(angle)*dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000) )
+                        float dist = rand_norm() * 4 + 3.0f;
+                        float angle = rand_norm() * 2 * M_PI;
+                        if( Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000) )
                             if( Unit* target = c->SelectNearestTarget(250.0f) )
                             {
                                 c->AddThreat(target, 5.0f);
@@ -243,23 +243,23 @@ public:
 
     struct npc_vrykul_skeletonAI : public ScriptedAI
     {
-        npc_vrykul_skeletonAI(Creature *c) : ScriptedAI(c)
+        npc_vrykul_skeletonAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
 
-        InstanceScript *pInstance;
+        InstanceScript* pInstance;
         EventMap events;
 
         void Reset()
         {
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_DECREPIFY, urand(10000,20000));
+            events.RescheduleEvent(EVENT_SPELL_DECREPIFY, urand(10000, 20000));
             if( IsHeroic() )
-                events.RescheduleEvent(EVENT_SPELL_BONE_ARMOR, urand(25000,120000));
+                events.RescheduleEvent(EVENT_SPELL_BONE_ARMOR, urand(25000, 120000));
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             if (damage >= me->GetHealth())
             {
@@ -303,12 +303,12 @@ public:
                 case EVENT_SPELL_DECREPIFY:
                     if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
                         me->CastSpell(me->GetVictim(), SPELL_DECREPIFY, false);
-                    events.RepeatEvent(urand(15000,25000));
+                    events.RepeatEvent(urand(15000, 25000));
                     break;
                 case EVENT_SPELL_BONE_ARMOR:
                     if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
                         me->CastSpell((Unit*)NULL, SPELL_BONE_ARMOR, false);
-                    events.RepeatEvent(urand(40000,120000));
+                    events.RepeatEvent(urand(40000, 120000));
                     break;
                 case EVENT_RESURRECT:
                     events.PopEvent();
@@ -337,31 +337,31 @@ public:
 
 class spell_frost_tomb : public SpellScriptLoader
 {
-    public:
-        spell_frost_tomb() : SpellScriptLoader("spell_frost_tomb") { }
+public:
+    spell_frost_tomb() : SpellScriptLoader("spell_frost_tomb") { }
 
-        class spell_frost_tombAuraScript : public AuraScript
+    class spell_frost_tombAuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_frost_tombAuraScript);
+
+        void HandleEffectPeriodic(AuraEffect const* aurEff)
         {
-            PrepareAuraScript(spell_frost_tombAuraScript);
-
-            void HandleEffectPeriodic(AuraEffect const* aurEff)
-            {
-                PreventDefaultAction();
-                if (aurEff->GetTickNumber()==1)
-                    if( Unit* target = GetTarget() )
-                        target->CastSpell((Unit*)NULL, SPELL_FROST_TOMB_SUMMON, true);
-            }
-
-            void Register()
-            {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_frost_tombAuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_frost_tombAuraScript();
+            PreventDefaultAction();
+            if (aurEff->GetTickNumber() == 1)
+                if( Unit* target = GetTarget() )
+                    target->CastSpell((Unit*)NULL, SPELL_FROST_TOMB_SUMMON, true);
         }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_frost_tombAuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_frost_tombAuraScript();
+    }
 };
 
 void AddSC_boss_keleseth()
