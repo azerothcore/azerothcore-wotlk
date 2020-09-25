@@ -31,7 +31,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (23486, 0, 2, 3, 62, 0, 100, 0, 10603, 0, 0, 0, 0, 11, 66592, 1, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, "Goldark Snipehunter - On Gossip Option 0 Selected - Cast \"Create Item - Synthebrew Goggles\""),
 (23486, 0, 3, 0, 61, 0, 100, 0, 10603, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, "Goldark Snipehunter - On Gossip Option 0 Selected - Close Gossip");
 
-DELETE FROM `gossip_menu_option` WHERE `MenuID` IN (10603,10604) AND `OptionID`= 0 ;
+DELETE FROM `gossip_menu_option` WHERE `MenuID` IN (10603,10604) AND `OptionID`= 0;
 INSERT INTO `gossip_menu_option` (`MenuID`,`OptionID`,`OptionIcon`,`OptionText`,`OptionBroadcastTextID`,`OptionType`,`OptionNpcFlag`,`ActionMenuID`,`ActionPoiID`,`BoxCoded`,`BoxMoney`,`BoxText`,`BoxBroadcastTextID`,`VerifiedBuild`) VALUES 
 (10603, 0, 0, "I\d like a pair of Synthebrew Goggles.", 35220, 1, 1, 0, 0, 0, 0, "", 0, 0),
 (10604, 0, 0, "I\d like a pair of Synthebrew Goggles.", 35220, 1, 1, 0, 0, 0, 0, "", 0, 0);
