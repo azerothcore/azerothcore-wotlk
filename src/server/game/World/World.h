@@ -13,8 +13,6 @@
 
 #include "Common.h"
 #include "Timer.h"
-#include <ace/Singleton.h>
-#include <ace/Atomic_Op.h>
 #include "SharedDefines.h"
 #include "QueryResult.h"
 #include "Callback.h"
@@ -22,6 +20,7 @@
 #include <map>
 #include <set>
 #include <list>
+#include <atomic>
 
 class Object;
 class WorldPacket;
@@ -91,7 +90,6 @@ enum WorldBoolConfigs
     CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND,
     CONFIG_ALLOW_TWO_SIDE_TRADE,
     CONFIG_ALL_TAXI_PATHS,
-    CONFIG_INSTANT_TAXI,
     CONFIG_INSTANCE_IGNORE_LEVEL,
     CONFIG_INSTANCE_IGNORE_RAID,
     CONFIG_INSTANCE_GMSUMMON_PLAYER,
@@ -118,6 +116,8 @@ enum WorldBoolConfigs
     CONFIG_DEATH_BONES_BG_OR_ARENA,
     CONFIG_DIE_COMMAND_MODE,
     CONFIG_DECLINED_NAMES_USED,
+    CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG,
+    CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG,
     CONFIG_BATTLEGROUND_CAST_DESERTER,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY,
@@ -137,6 +137,7 @@ enum WorldBoolConfigs
     CONFIG_PVP_TOKEN_ENABLE,
     CONFIG_NO_RESET_TALENT_COST,
     CONFIG_SHOW_KICK_IN_WORLD,
+    CONFIG_SHOW_MUTE_IN_WORLD,
     CONFIG_SHOW_BAN_IN_WORLD,
     CONFIG_CHATLOG_CHANNEL,
     CONFIG_CHATLOG_WHISPER,
@@ -170,6 +171,13 @@ enum WorldBoolConfigs
     CONFIG_CHECK_GOBJECT_LOS,
     CONFIG_CLOSE_IDLE_CONNECTIONS,
     CONFIG_LFG_LOCATION_ALL, // Player can join LFG anywhere
+    CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS,
+    CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE,
+    CONFIG_ITEMDELETE_METHOD,
+    CONFIG_ITEMDELETE_VENDOR,
+    CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE,
+    CONFIG_DEBUG_BATTLEGROUND,
+    CONFIG_DEBUG_ARENA,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -197,6 +205,7 @@ enum WorldIntConfigs
     CONFIG_INTERVAL_MAPUPDATE,
     CONFIG_INTERVAL_CHANGEWEATHER,
     CONFIG_INTERVAL_DISCONNECT_TOLERANCE,
+    CONFIG_INTERVAL_SAVE,
     CONFIG_PORT_WORLD,
     CONFIG_SOCKET_TIMEOUTTIME,
     CONFIG_SESSION_ADD_DELAY,
@@ -270,7 +279,7 @@ enum WorldIntConfigs
     CONFIG_CHAT_CHANNEL_LEVEL_REQ,
     CONFIG_CHAT_WHISPER_LEVEL_REQ,
     CONFIG_CHAT_SAY_LEVEL_REQ,
-	CONFIG_PARTY_LEVEL_REQ,
+    CONFIG_PARTY_LEVEL_REQ,
     CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN,
     CONFIG_TRADE_LEVEL_REQ,
     CONFIG_TICKET_LEVEL_REQ,
@@ -286,6 +295,9 @@ enum WorldIntConfigs
     CONFIG_DISABLE_BREATHING,
     CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER,
     CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH,
+    CONFIG_BATTLEGROUND_REPORT_AFK_TIMER,
+    CONFIG_BATTLEGROUND_REPORT_AFK,
+    CONFIG_BATTLEGROUND_INVITATION_TYPE,
     CONFIG_ARENA_MAX_RATING_DIFFERENCE,
     CONFIG_ARENA_RATING_DISCARD_TIMER,
     CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,
@@ -312,6 +324,7 @@ enum WorldIntConfigs
     CONFIG_GUILD_BANK_EVENT_LOG_COUNT,
     CONFIG_MIN_LEVEL_STAT_SAVE,
     CONFIG_RANDOM_BG_RESET_HOUR,
+    CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR,
     CONFIG_GUILD_RESET_HOUR,
     CONFIG_CHARDELETE_KEEP_DAYS,
     CONFIG_CHARDELETE_METHOD,
@@ -330,6 +343,9 @@ enum WorldIntConfigs
     CONFIG_WINTERGRASP_BATTLETIME,
     CONFIG_WINTERGRASP_NOBATTLETIME,
     CONFIG_WINTERGRASP_RESTART_AFTER_CRASH,
+    CONFIG_PACKET_SPOOF_POLICY,
+    CONFIG_PACKET_SPOOF_BANMODE,
+    CONFIG_PACKET_SPOOF_BANDURATION,
     CONFIG_WARDEN_CLIENT_RESPONSE_DELAY,
     CONFIG_WARDEN_CLIENT_CHECK_HOLDOFF,
     CONFIG_WARDEN_CLIENT_FAIL_ACTION,
@@ -338,6 +354,24 @@ enum WorldIntConfigs
     CONFIG_WARDEN_NUM_OTHER_CHECKS,
     CONFIG_BIRTHDAY_TIME,
     CONFIG_SOCKET_TIMEOUTTIME_ACTIVE,
+    CONFIG_INSTANT_TAXI,
+    CONFIG_AFK_PREVENT_LOGOUT,
+    CONFIG_ICC_BUFF_HORDE,
+    CONFIG_ICC_BUFF_ALLIANCE,
+    CONFIG_ITEMDELETE_QUALITY,
+    CONFIG_ITEMDELETE_ITEM_LEVEL,
+    CONFIG_BG_REWARD_WINNER_HONOR_FIRST,
+    CONFIG_BG_REWARD_WINNER_ARENA_FIRST,
+    CONFIG_BG_REWARD_WINNER_HONOR_LAST,
+    CONFIG_BG_REWARD_WINNER_ARENA_LAST,
+    CONFIG_BG_REWARD_LOSER_HONOR_FIRST,
+    CONFIG_BG_REWARD_LOSER_HONOR_LAST,
+    CONFIG_CHARTER_COST_GUILD,
+    CONFIG_CHARTER_COST_ARENA_2v2,
+    CONFIG_CHARTER_COST_ARENA_3v3,
+    CONFIG_CHARTER_COST_ARENA_5v5,
+    CONFIG_MAX_WHO_LIST_RETURN,
+    CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -361,7 +395,24 @@ enum Rates
     RATE_DROP_ITEM_LEGENDARY,
     RATE_DROP_ITEM_ARTIFACT,
     RATE_DROP_ITEM_REFERENCED,
+
     RATE_DROP_ITEM_REFERENCED_AMOUNT,
+    RATE_SELLVALUE_ITEM_POOR,
+    RATE_SELLVALUE_ITEM_NORMAL,
+    RATE_SELLVALUE_ITEM_UNCOMMON,
+    RATE_SELLVALUE_ITEM_RARE,
+    RATE_SELLVALUE_ITEM_EPIC,
+    RATE_SELLVALUE_ITEM_LEGENDARY,
+    RATE_SELLVALUE_ITEM_ARTIFACT,
+    RATE_SELLVALUE_ITEM_HEIRLOOM,
+    RATE_BUYVALUE_ITEM_POOR,
+    RATE_BUYVALUE_ITEM_NORMAL,
+    RATE_BUYVALUE_ITEM_UNCOMMON,
+    RATE_BUYVALUE_ITEM_RARE,
+    RATE_BUYVALUE_ITEM_EPIC,
+    RATE_BUYVALUE_ITEM_LEGENDARY,
+    RATE_BUYVALUE_ITEM_ARTIFACT,
+    RATE_BUYVALUE_ITEM_HEIRLOOM,
     RATE_DROP_MONEY,
     RATE_XP_KILL,
     RATE_XP_BG_KILL,
@@ -480,13 +531,14 @@ enum RealmZone
 
 enum WorldStates
 {
-    WS_ARENA_DISTRIBUTION_TIME  = 20001,                     // Next arena distribution time
-    WS_WEEKLY_QUEST_RESET_TIME  = 20002,                     // Next weekly reset time
-    WS_BG_DAILY_RESET_TIME      = 20003,                     // Next daily BG reset time
-    WS_CLEANING_FLAGS           = 20004,                     // Cleaning Flags
-    WS_DAILY_QUEST_RESET_TIME   = 20005,                     // Next daily reset time
-    WS_GUILD_DAILY_RESET_TIME   = 20006,                     // Next guild cap reset time
-    WS_MONTHLY_QUEST_RESET_TIME = 20007,                     // Next monthly reset time
+    WS_ARENA_DISTRIBUTION_TIME                 = 20001,                     // Next arena distribution time
+    WS_WEEKLY_QUEST_RESET_TIME                 = 20002,                     // Next weekly reset time
+    WS_BG_DAILY_RESET_TIME                     = 20003,                     // Next daily BG reset time
+    WS_CLEANING_FLAGS                          = 20004,                     // Cleaning Flags
+    WS_DAILY_QUEST_RESET_TIME                  = 20005,                     // Next daily reset time
+    WS_GUILD_DAILY_RESET_TIME                  = 20006,                     // Next guild cap reset time
+    WS_MONTHLY_QUEST_RESET_TIME                = 20007,                     // Next monthly reset time
+    WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20008                      // Next daily calendar deletions of old events time
 };
 
 /// Storage class for commands issued for delayed execution
@@ -553,10 +605,12 @@ struct PetitionData
 class World
 {
     public:
-        static uint32 m_worldLoopCounter;
-
         World();
         ~World();
+
+        static World* instance();
+
+        static uint32 m_worldLoopCounter;
 
         WorldSession* FindSession(uint32 id) const;
         WorldSession* FindOfflineSession(uint32 id) const;
@@ -651,7 +705,6 @@ class World
 
         void SetInitialWorldSettings();
         void LoadConfigSettings(bool reload = false);
-        void LoadModuleConfigSettings();
 
         void SendWorldText(uint32 string_id, ...);
         void SendGlobalText(const char* text, WorldSession* self);
@@ -660,17 +713,17 @@ class World
         void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
         bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
         void SendZoneText(uint32 zone, const char *text, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
-        void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = NULL);
+        void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = nullptr);
 
         /// Are we in the middle of a shutdown?
         bool IsShuttingDown() const { return m_ShutdownTimer > 0; }
         uint32 GetShutDownTimeLeft() const { return m_ShutdownTimer; }
         void ShutdownServ(uint32 time, uint32 options, uint8 exitcode);
         void ShutdownCancel();
-        void ShutdownMsg(bool show = false, Player* player = NULL);
+        void ShutdownMsg(bool show = false, Player* player = nullptr);
         static uint8 GetExitCode() { return m_ExitCode; }
         static void StopNow(uint8 exitcode) { m_stopEvent = true; m_ExitCode = exitcode; }
-        static bool IsStopped() { return m_stopEvent.value(); }
+        static bool IsStopped() { return m_stopEvent; }
 
         void Update(uint32 diff);
 
@@ -772,7 +825,7 @@ class World
         char const* GetDBVersion() const { return m_DBVersion.c_str(); }
 
         void LoadAutobroadcasts();
-        
+
         void UpdateAreaDependentAuras();
 
         uint32 GetCleaningFlags() const { return m_CleaningFlags; }
@@ -785,9 +838,6 @@ class World
         std::string const& GetRealmName() const { return _realmName; } // pussywizard
         void SetRealmName(std::string name) { _realmName = name; } // pussywizard
 
-        std::string GetConfigFileList() { return m_configFileList; }
-        void SetConfigFileList(std::string list) { m_configFileList = list; }
-
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -797,14 +847,16 @@ class World
         void InitWeeklyQuestResetTime();
         void InitMonthlyQuestResetTime();
         void InitRandomBGResetTime();
+        void InitCalendarOldEventsDeletionTime();
         void InitGuildResetTime();
         void ResetDailyQuests();
         void ResetWeeklyQuests();
         void ResetMonthlyQuests();
         void ResetRandomBG();
+        void CalendarDeleteOldEvents();
         void ResetGuildCap();
     private:
-        static ACE_Atomic_Op<ACE_Thread_Mutex, bool> m_stopEvent;
+        static std::atomic_long m_stopEvent;
         static uint8 m_ExitCode;
         uint32 m_ShutdownTimer;
         uint32 m_ShutdownMask;
@@ -864,6 +916,7 @@ class World
         time_t m_NextWeeklyQuestReset;
         time_t m_NextMonthlyQuestReset;
         time_t m_NextRandomBGReset;
+        time_t m_NextCalendarOldEventsDeletionTime;
         time_t m_NextGuildReset;
 
         //Player Queue
@@ -884,10 +937,8 @@ class World
 
         void ProcessQueryCallbacks();
         ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
-
-        std::string m_configFileList;
 };
 
-#define sWorld ACE_Singleton<World, ACE_Null_Mutex>::instance()
+#define sWorld World::instance()
 #endif
 /// @}

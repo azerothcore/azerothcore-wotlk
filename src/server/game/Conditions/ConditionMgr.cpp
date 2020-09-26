@@ -49,7 +49,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             {
                 // don't allow 0 items (it's checked during table load)
                 ASSERT(ConditionValue2);
-                bool checkBank = ConditionValue3 ? true : false;
+                bool checkBank = !!ConditionValue3;
                 condMeets = player->HasItemCount(ConditionValue1, ConditionValue2, checkBank);
             }
             break;
@@ -207,12 +207,12 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         }
         case CONDITION_NEAR_CREATURE:
         {
-            condMeets = GetClosestCreatureWithEntry(object, ConditionValue1, (float)ConditionValue2, !ConditionValue3) ? true : false;
+            condMeets = !!GetClosestCreatureWithEntry(object, ConditionValue1, (float)ConditionValue2, !ConditionValue3);
             break;
         }
         case CONDITION_NEAR_GAMEOBJECT:
         {
-            condMeets = GetClosestGameObjectWithEntry(object, ConditionValue1, (float)ConditionValue2) ? true : false;
+            condMeets = !!GetClosestGameObjectWithEntry(object, ConditionValue1, (float)ConditionValue2);
             break;
         }
         case CONDITION_OBJECT_ENTRY_GUID:
@@ -359,6 +359,19 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         {
             if (Unit* unit = object->ToUnit())
                 condMeets = unit->IsInWater();
+            break;
+        }
+        case CONDITION_QUEST_OBJECTIVE_PROGRESS:
+        {
+            if (Player* player = object->ToPlayer())
+            {
+                const Quest* quest = ASSERT_NOTNULL(sObjectMgr->GetQuestTemplate(ConditionValue1));
+                uint16 log_slot = player->FindQuestSlot(quest->GetQuestId());
+                if (log_slot >= MAX_QUEST_LOG_SIZE)
+                    break;
+                if (player->GetQuestSlotCounter(log_slot, ConditionValue2) == ConditionValue3)
+                    condMeets = true;
+            }
             break;
         }
         case CONDITION_HAS_AURA_TYPE:
@@ -540,6 +553,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         case CONDITION_IN_WATER:
             mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
             break;
+        case CONDITION_QUEST_OBJECTIVE_PROGRESS:
+            mask |= GRID_MAP_TYPE_MASK_PLAYER;
+            break;
         case CONDITION_HAS_AURA_TYPE:
             mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
             break;
@@ -579,6 +595,12 @@ ConditionMgr::ConditionMgr()
 ConditionMgr::~ConditionMgr()
 {
     Clean();
+}
+
+ConditionMgr* ConditionMgr::instance()
+{
+    static ConditionMgr instance;
+    return &instance;
 }
 
 ConditionList ConditionMgr::GetConditionReferences(uint32 refId)
@@ -1225,7 +1247,8 @@ bool ConditionMgr::addToSpellImplicitTargetConditions(Condition* cond)
                 if (!assigned)
                     delete sharedList;
             }
-            sharedList->push_back(cond);
+            if (sharedList)
+                sharedList->push_back(cond);
             break;
         }
     }
@@ -1529,33 +1552,17 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
             }
             break;
         }
-        case CONDITION_SOURCE_TYPE_QUEST_ACCEPT:
+        case CONDITION_SOURCE_TYPE_QUEST_AVAILABLE:
             if (!sObjectMgr->GetQuestTemplate(cond->SourceEntry))
             {
-                sLog->outErrorDb("CONDITION_SOURCE_TYPE_QUEST_ACCEPT specifies non-existing quest (%u), skipped", cond->SourceEntry);
+                sLog->outErrorDb("CONDITION_SOURCE_TYPE_QUEST_AVAILABLE specifies non-existing quest (%u), skipped", cond->SourceEntry);
                 return false;
             }
             break;
-        case CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK:
-            if (!sObjectMgr->GetQuestTemplate(cond->SourceEntry))
-            {
-                sLog->outErrorDb("CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK specifies non-existing quest (%u), skipped", cond->SourceEntry);
-                return false;
-            }
+        case CONDITION_SOURCE_TYPE_UNUSED_20:
+            sLog->outErrorDb("CONDITION_SOURCE_TYPE_UNUSED_20 is not in use. SourceEntry = (%u), skipped", cond->SourceEntry);
             break;
         case CONDITION_SOURCE_TYPE_VEHICLE_SPELL:
-            if (!sObjectMgr->GetCreatureTemplate(cond->SourceGroup))
-            {
-                sLog->outErrorDb("SourceEntry %u in `condition` table, does not exist in `creature_template`, ignoring.", cond->SourceGroup);
-                return false;
-            }
-
-            if (!sSpellMgr->GetSpellInfo(cond->SourceEntry))
-            {
-                sLog->outErrorDb("SourceEntry %u in `condition` table, does not exist in `spell.dbc`, ignoring.", cond->SourceEntry);
-                return false;
-            }
-            break;
         case CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT:
             if (!sObjectMgr->GetCreatureTemplate(cond->SourceGroup))
             {
@@ -1607,7 +1614,6 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     }
     switch (cond->ConditionType) {
         case CONDITION_TERRAIN_SWAP:
-        case CONDITION_QUEST_OBJECTIVE_COMPLETE:
         case CONDITION_DIFFICULTY_ID:
             sLog->outErrorDb("SourceEntry %u in `condition` table has a ConditionType that is not supported on 3.3.5a (%u), ignoring.",
                              cond->SourceEntry, uint32(cond->ConditionType));
@@ -2155,6 +2161,34 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         }
         case CONDITION_IN_WATER:
         {
+            break;
+        }
+        case CONDITION_QUEST_OBJECTIVE_PROGRESS:
+        {
+            const Quest* quest = sObjectMgr->GetQuestTemplate(cond->ConditionValue1);
+            if (!quest)
+            {
+                sLog->outErrorDb("CONDITION_QUEST_OBJECTIVE_PROGRESS points to non-existing quest (%u), skipped.", cond->ConditionValue1);
+                return false;
+            }
+
+            if (cond->ConditionValue2 > 3)
+            {
+                sLog->outErrorDb("CONDITION_QUEST_OBJECTIVE_PROGRESS has out-of-range quest objective index specified (%u), it must be a number between 0 and 3. skipped.", cond->ConditionValue2);
+                return false;
+            }
+
+            if (quest->RequiredNpcOrGo[cond->ConditionValue2] == 0)
+            {
+                sLog->outErrorDb("CONDITION_QUEST_OBJECTIVE_PROGRESS has quest objective %u for quest %u, but the field RequiredNPCOrGo%u is 0, skipped.", cond->ConditionValue2, cond->ConditionValue1, cond->ConditionValue2);
+                return false;
+            }
+
+            if (cond->ConditionValue3 > quest->RequiredNpcOrGoCount[cond->ConditionValue2])
+            {
+                sLog->outErrorDb("CONDITION_QUEST_OBJECTIVE_PROGRESS has quest objective count %u in value3, but quest %u has a maximum objective count of %u in RequiredNPCOrGOCount%u, skipped.", cond->ConditionValue3, cond->ConditionValue2, quest->RequiredNpcOrGoCount[cond->ConditionValue2], cond->ConditionValue2);
+                return false;
+            }
             break;
         }
         case CONDITION_HAS_AURA_TYPE:

@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_PASSIVEAI_H
-#define TRINITY_PASSIVEAI_H
+#ifndef ACORE_PASSIVEAI_H
+#define ACORE_PASSIVEAI_H
 
 #include "CreatureAI.h"
 //#include "CreatureAIImpl.h"

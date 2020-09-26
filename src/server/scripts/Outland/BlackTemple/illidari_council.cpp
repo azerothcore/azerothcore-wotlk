@@ -86,7 +86,7 @@ enum Misc
     EVENT_KILL_TALK                     = 100
 };
 
-struct HammerOfJusticeSelector : public std::unary_function<Unit*, bool>
+struct HammerOfJusticeSelector : public acore::unary_function<Unit*, bool>
 {
     Unit const* _me;
     HammerOfJusticeSelector(Unit* me) : _me(me) { }
@@ -141,7 +141,7 @@ public:
         void Reset()
         {
             BossAI::Reset();
-            Creature* member = NULL;
+            Creature* member = nullptr;
             for (uint8 i = 0; i < 4; ++i)
                 if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
                     member->AI()->EnterEvadeMode();
@@ -177,7 +177,7 @@ public:
             }
             else if (param == ACTION_ENRAGE)
             {
-                Creature* member = NULL;
+                Creature* member = nullptr;
                 for (uint8 i = 0; i < 4; ++i)
                     if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
                         member->AI()->DoAction(ACTION_ENRAGE);
@@ -185,7 +185,7 @@ public:
             else if (param == ACTION_END_ENCOUNTER)
             {
                 me->setActive(false);
-                Creature* member = NULL;
+                Creature* member = nullptr;
                 for (uint8 i = 0; i < 4; ++i)
                     if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
                         if (member->IsAlive())
@@ -657,7 +657,7 @@ class spell_illidari_council_reflective_shield : public SpellScriptLoader
                     return;
 
                 int32 bp = absorbAmount / 2;
-                target->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_REFLECTIVE_SHIELD_T, &bp, NULL, NULL, true, NULL, aurEff);
+                target->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_REFLECTIVE_SHIELD_T, &bp, nullptr, nullptr, true, NULL, aurEff);
             }
 
             void Register()

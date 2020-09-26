@@ -49,7 +49,7 @@ enum Misc
     EVENT_TALK_KILL                 = 10
 };
 
-struct ShadowOfDeathSelector : public std::unary_function<Unit*, bool>
+struct ShadowOfDeathSelector : public acore::unary_function<Unit*, bool>
 {
     bool operator()(Unit const* target) const
     {
@@ -263,7 +263,7 @@ class spell_teron_gorefiend_spiritual_vengeance : public SpellScriptLoader
 
             void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                Unit::Kill(NULL, GetTarget());
+                Unit::Kill(nullptr, GetTarget());
             }
 
             void Register()

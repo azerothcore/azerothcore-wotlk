@@ -636,7 +636,7 @@ public:
                         orb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         if (Creature* trigger = me->SummonTrigger(orb->GetPositionX(), orb->GetPositionY(), orb->GetPositionZ(), 0, 10*MINUTE*IN_MILLISECONDS))
                         {
-                            trigger->CastSpell(trigger, SPELL_RING_OF_BLUE_FLAMES, true, NULL, NULL, trigger->GetGUID());
+                            trigger->CastSpell(trigger, SPELL_RING_OF_BLUE_FLAMES, true, nullptr, nullptr, trigger->GetGUID());
                             if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KILJAEDEN_CONTROLLER)))
                                 controller->AI()->JustSummoned(trigger);
                         }
@@ -1053,7 +1053,7 @@ class spell_kiljaeden_sinister_reflection : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
+                targets.remove_if(acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
             }
 
             void HandleScriptEffect(SpellEffIndex effIndex)
@@ -1090,7 +1090,7 @@ class spell_kiljaeden_sinister_reflection_clone : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
+                targets.sort(acore::ObjectDistanceOrderPred(GetCaster()));
                 WorldObject* target = targets.front();
                 
                 targets.clear();
@@ -1300,7 +1300,7 @@ class spell_kiljaeden_dragon_breath : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
+                targets.remove_if(acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
             }
 
             void Register()

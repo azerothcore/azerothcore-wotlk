@@ -180,8 +180,8 @@ class npc_belnistrasz : public CreatureScript
                             DoCast(me, SPELL_IDOM_ROOM_CAMERA_SHAKE);
                             me->SummonGameObject(GO_BELNISTRASZS_BRAZIER, 2577.196f, 947.0781f, 53.16757f, 2.356195f, 0, 0, 0.9238796f, 0.3826832f, 3600);
                             std::list<WorldObject*> ClusterList;
-                            Trinity::AllWorldObjectsInRange objects(me, 50.0f);
-                            Trinity::WorldObjectListSearcher<Trinity::AllWorldObjectsInRange> searcher(me, ClusterList, objects);
+                            acore::AllWorldObjectsInRange objects(me, 50.0f);
+                            acore::WorldObjectListSearcher<acore::AllWorldObjectsInRange> searcher(me, ClusterList, objects);
                             me->VisitNearbyObject(50.0f, searcher);
                             for (std::list<WorldObject*>::const_iterator itr = ClusterList.begin(); itr != ClusterList.end(); ++itr)
                             {

@@ -42,6 +42,12 @@ MapManager::~MapManager()
 {
 }
 
+MapManager* MapManager::instance()
+{
+    static MapManager instance;
+    return &instance;
+}
+
 void MapManager::Initialize()
 {
     int num_threads(sWorld->getIntConfig(CONFIG_NUMTHREADS));
@@ -61,12 +67,12 @@ Map* MapManager::CreateBaseMap(uint32 id)
 {
     Map* map = FindBaseMap(id);
 
-    if (map == NULL)
+    if (map == nullptr)
     {
-        TRINITY_GUARD(ACE_Thread_Mutex, Lock);
+        ACORE_GUARD(ACE_Thread_Mutex, Lock);
 
         map = FindBaseMap(id);
-        if (map == NULL) // pussywizard: check again after acquiring mutex
+        if (map == nullptr) // pussywizard: check again after acquiring mutex
         {
             MapEntry const* entry = sMapStore.LookupEntry(id);
             ASSERT(entry);
@@ -91,7 +97,7 @@ Map* MapManager::FindBaseNonInstanceMap(uint32 mapId) const
 {
     Map* map = FindBaseMap(mapId);
     if (map && map->Instanceable())
-        return NULL;
+        return nullptr;
     return map;
 }
 
@@ -109,10 +115,10 @@ Map* MapManager::FindMap(uint32 mapid, uint32 instanceId) const
 {
     Map* map = FindBaseMap(mapid);
     if (!map)
-        return NULL;
+        return nullptr;
 
     if (!map->Instanceable())
-        return instanceId == 0 ? map : NULL;
+        return instanceId == 0 ? map : nullptr;
 
     return ((MapInstanced*)map)->FindInstanceMap(instanceId);
 }
@@ -154,7 +160,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
         {
             // probably there must be special opcode, because client has this string constant in GlobalStrings.lua
             // TODO: this is not a good place to send the message
-            player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetTrinityString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
+            player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetAcoreString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_MAPS, "MAP: Player '%s' must be in a raid group to enter instance '%s'", player->GetName().c_str(), mapName);
 #endif
@@ -299,7 +305,7 @@ void MapManager::DoDelayedMovesAndRemoves()
 
 bool MapManager::ExistMapAndVMap(uint32 mapid, float x, float y)
 {
-    GridCoord p = Trinity::ComputeGridCoord(x, y);
+    GridCoord p = acore::ComputeGridCoord(x, y);
 
     int gx=63-p.x_coord;
     int gy=63-p.y_coord;
@@ -312,7 +318,7 @@ bool MapManager::IsValidMAP(uint32 mapid, bool startUp)
     MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
 
     if (startUp)
-        return mEntry ? true : false;
+        return !!mEntry;
     else
         return mEntry && (!mEntry->IsDungeon() || sObjectMgr->GetInstanceTemplate(mapid));
 

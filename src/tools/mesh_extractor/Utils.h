@@ -16,13 +16,11 @@
 #include "Define.h"
 #include "Constants.h"
 
-#include <ace/Stack_Trace.h>
-
 struct WorldModelDefinition;
 class DoodadDefinition;
 class DoodadInstance;
 
-#define ASSERT(assertion) { if (!(assertion)) { ACE_Stack_Trace st; fprintf(stderr, "\n%s:%i in %s ASSERTION FAILED:\n  %s\n%s\n", __FILE__, __LINE__, __FUNCTION__, #assertion, st.c_str()); *((volatile int*)NULL) = 0; } }
+#define ASSERT(assertion) { if (!(assertion)) {fprintf(stderr, "\n%s:%i in %s ASSERTION FAILED:\n  %s\n%s\n", __FILE__, __LINE__, __FUNCTION__, #assertion, st.c_str()); *((volatile int*)nullptr) = 0; } }
 
 struct Vector3
 {
@@ -340,7 +338,7 @@ public:
 };
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 9
+#define MMAP_VERSION 10
 
 struct MmapTileHeader
 {

@@ -15,14 +15,14 @@
 #include "AutoPtr.h"
 #include "Player.h"
 #include "WorldPacket.h"
-#include "Opcodes.h"
+#include "WorldSession.h"
 
 namespace WeatherMgr
 {
 
 namespace
 {
-    typedef std::unordered_map<uint32, Trinity::AutoPtr<Weather, ACE_Null_Mutex> > WeatherMap;
+    typedef std::unordered_map<uint32, acore::AutoPtr<Weather, ACE_Null_Mutex> > WeatherMap;
     typedef std::unordered_map<uint32, WeatherData> WeatherZoneMap;
 
     WeatherMap m_weathers;
@@ -31,7 +31,7 @@ namespace
     WeatherData const* GetWeatherData(uint32 zone_id)
     {
         WeatherZoneMap::const_iterator itr = mWeatherZoneMap.find(zone_id);
-        return (itr != mWeatherZoneMap.end()) ? &itr->second : NULL;
+        return (itr != mWeatherZoneMap.end()) ? &itr->second : nullptr;
     }
 }
 
@@ -59,7 +59,7 @@ Weather* AddWeather(uint32 zone_id)
 
     // zone does not have weather, ignore
     if (!weatherChances)
-        return NULL;
+        return nullptr;
 
     Weather* w = new Weather(zone_id, weatherChances);
     m_weathers[w->GetZone()].reset(w);

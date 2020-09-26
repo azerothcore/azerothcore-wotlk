@@ -87,11 +87,52 @@ void PetAI::_doMeleeAttack()
     DoMeleeAttackIfReady();
 }
 
-bool PetAI::_canMeleeAttack() const
+bool PetAI::_canMeleeAttack()
 {
-    return me->GetEntry() != 416 /*ENTRY_IMP*/ &&
-        me->GetEntry() != 510 /*ENTRY_WATER_ELEMENTAL*/ &&
-        me->GetEntry() != 37994 /*ENTRY_WATER_ELEMENTAL_PERM*/; 
+    combatRange = 0.f;
+    switch (me->GetEntry())
+    {
+        case ENTRY_IMP:
+        case ENTRY_WATER_ELEMENTAL:
+        case ENTRY_WATER_ELEMENTAL_PERM:
+        {
+            for (uint8 i = 0; i < me->GetPetAutoSpellSize(); ++i)
+            {
+                uint32 spellID = me->GetPetAutoSpellOnPos(i);
+                switch (spellID)
+                {
+                    case IMP_FIREBOLT_RANK_1:
+                    case IMP_FIREBOLT_RANK_2:
+                    case IMP_FIREBOLT_RANK_3:
+                    case IMP_FIREBOLT_RANK_4:
+                    case IMP_FIREBOLT_RANK_5:
+                    case IMP_FIREBOLT_RANK_6:
+                    case IMP_FIREBOLT_RANK_7:
+                    case IMP_FIREBOLT_RANK_8:
+                    case IMP_FIREBOLT_RANK_9:
+                    case WATER_ELEMENTAL_WATERBOLT_1:
+                    case WATER_ELEMENTAL_WATERBOLT_2:
+                    {
+                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+                        int32 mana = me->GetPower(POWER_MANA);
+
+                        if (mana >= spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
+                        {
+                            combatRange = spellInfo->GetMaxRange();
+                            return true;
+                        }
+                    }
+                    default:
+                        break;
+                }
+            }
+            return false;
+        }
+        default:
+            break;
+    }
+
+    return true;
 }
 
 void PetAI::UpdateAI(uint32 diff)
@@ -306,7 +347,7 @@ void PetAI::UpdateAI(uint32 diff)
 void PetAI::UpdateAllies()
 {
     Unit* owner = me->GetCharmerOrOwner();
-    Group* group = NULL;
+    Group* group = nullptr;
 
     m_updateAlliesTimer = 10*IN_MILLISECONDS;                //update friendly targets every 10 seconds, lesser checks increase performance
 
@@ -326,7 +367,7 @@ void PetAI::UpdateAllies()
     m_AllySet.insert(me->GetGUID());
     if (group)                                              //add group
     {
-        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* Target = itr->GetSource();
             if (!Target || !Target->IsInMap(owner) || !group->SameSubGroup(owner->ToPlayer(), Target))
@@ -429,7 +470,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
 
     // Passive pets don't do next target selection
     if (me->HasReactState(REACT_PASSIVE))
-        return NULL;
+        return nullptr;
 
     // Check pet attackers first so we don't drag a bunch of targets to the owner
     if (Unit* myAttacker = me->getAttackerForHelper())
@@ -450,7 +491,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
     // Not sure why we wouldn't have an owner but just in case...
     Unit* owner = me->GetCharmerOrOwner();
     if (!owner)
-        return NULL;
+        return nullptr;
 
     // Check owner attackers
     if (Unit* ownerAttacker = owner->getAttackerForHelper())
@@ -472,7 +513,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
                 return nearTarget;
 
     // Default - no valid targets
-    return NULL;
+    return nullptr;
 }
 
 void PetAI::HandleReturnMovement()
@@ -563,7 +604,8 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
         if (chase)
         {
-            me->GetMotionMaster()->MoveChase(target, !_canMeleeAttack() ? 20.0f: 0.0f, me->GetAngle(target));
+            if (_canMeleeAttack())
+                me->GetMotionMaster()->MoveChase(target, combatRange, float(M_PI));
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
         {
@@ -661,7 +703,7 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
     if (me->GetVictim() && me->GetVictim() != target)
     {
         // Check if our owner selected this target and clicked "attack"
-        Unit* ownerTarget = NULL;
+        Unit* ownerTarget = nullptr;
         if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
             ownerTarget = owner->GetSelectedUnit();
         else

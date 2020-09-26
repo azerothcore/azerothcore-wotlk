@@ -15,6 +15,7 @@
 #include "Item.h"
 #include "AuctionHouseMgr.h"
 #include "CalendarMgr.h"
+#include "ScriptMgr.h"
 
 MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
 {
@@ -165,8 +166,16 @@ void MailDraft::SendReturnToSender(uint32  /*sender_acc*/, uint32 sender_guid, u
     SendMailTo(trans, MailReceiver(receiver, receiver_guid), MailSender(MAIL_NORMAL, sender_guid), MAIL_CHECK_MASK_RETURNED, 0);
 }
 
-void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked, uint32 deliver_delay, uint32 custom_expiration)
+void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked, uint32 deliver_delay, uint32 custom_expiration, bool deleteMailItemsFromDB, bool sendMail)
 {
+    sScriptMgr->OnBeforeMailDraftSendMailTo(this, receiver, sender, checked, deliver_delay, custom_expiration, deleteMailItemsFromDB, sendMail);
+
+    if (deleteMailItemsFromDB) // can be changed in the hook
+        deleteIncludedItems(trans, true);
+
+    if (!sendMail) // can be changed in the hook
+        return;
+
     Player* pReceiver = receiver.GetPlayer();               // can be NULL
     Player* pSender = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(sender.GetSenderId(), 0, HIGHGUID_PLAYER));
 
@@ -175,7 +184,7 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
 
     uint32 mailId = sObjectMgr->GenerateMailID();
 
-    time_t deliver_time = time(NULL) + deliver_delay;
+    time_t deliver_time = time(nullptr) + deliver_delay;
 
     //expire time if COD 3 days, if no COD 30 days, if auction sale pending 1 hour
     uint32 expire_delay;
@@ -271,13 +280,13 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
         }
         else if (!m_items.empty())
         {
-            SQLTransaction temp = SQLTransaction(NULL);
+            SQLTransaction temp = SQLTransaction(nullptr);
             deleteIncludedItems(temp);
         }
     }
     else if (!m_items.empty())
     {
-        SQLTransaction temp = SQLTransaction(NULL);
+        SQLTransaction temp = SQLTransaction(nullptr);
         deleteIncludedItems(temp);
     }
 }

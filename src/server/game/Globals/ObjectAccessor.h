@@ -4,14 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_OBJECTACCESSOR_H
-#define TRINITY_OBJECTACCESSOR_H
+#ifndef ACORE_OBJECTACCESSOR_H
+#define ACORE_OBJECTACCESSOR_H
 
 #include "Define.h"
 #include "UpdateData.h"
 #include "GridDefines.h"
 #include "Object.h"
-#include <ace/Singleton.h>
 #include <ace/Thread_Mutex.h>
 #include <unordered_map>
 #include <set>
@@ -39,21 +38,21 @@ class HashMapHolder
 
         static void Insert(T* o)
         {
-            TRINITY_WRITE_GUARD(LockType, i_lock);
+            ACORE_WRITE_GUARD(LockType, i_lock);
             m_objectMap[o->GetGUID()] = o;
         }
 
         static void Remove(T* o)
         {
-            TRINITY_WRITE_GUARD(LockType, i_lock);
+            ACORE_WRITE_GUARD(LockType, i_lock);
             m_objectMap.erase(o->GetGUID());
         }
 
         static T* Find(uint64 guid)
         {
-            TRINITY_READ_GUARD(LockType, i_lock);
+            ACORE_READ_GUARD(LockType, i_lock);
             typename MapType::iterator itr = m_objectMap.find(guid);
-            return (itr != m_objectMap.end()) ? itr->second : NULL;
+            return (itr != m_objectMap.end()) ? itr->second : nullptr;
         }
 
         static MapType& GetContainer() { return m_objectMap; }
@@ -87,7 +86,6 @@ public:
 
 class ObjectAccessor
 {
-    friend class ACE_Singleton<ObjectAccessor, ACE_Null_Mutex>;
     private:
         ObjectAccessor();
         ~ObjectAccessor();
@@ -95,6 +93,7 @@ class ObjectAccessor
         ObjectAccessor& operator=(const ObjectAccessor&);
 
     public:
+        static ObjectAccessor* instance();
         // TODO: override these template functions for each holder type and add assertions
 
         template<class T> static T* GetObjectInOrOutOfWorld(uint64 guid, T* /*typeSpecifier*/)
@@ -140,27 +139,27 @@ class ObjectAccessor
             if (T * obj = GetObjectInWorld(guid, (T*)NULL))
                 if (obj->GetMap() == map)
                     return obj;
-            return NULL;
+            return nullptr;
         }
 
         template<class T> static T* GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/)
         {
             T* obj = HashMapHolder<T>::Find(guid);
             if (!obj || obj->GetMapId() != mapid)
-                return NULL;
+                return nullptr;
 
-            CellCoord p = Trinity::ComputeCellCoord(x, y);
+            CellCoord p = acore::ComputeCellCoord(x, y);
             if (!p.IsCoordValid())
             {
                 sLog->outError("ObjectAccessor::GetObjectInWorld: invalid coordinates supplied X:%f Y:%f grid cell [%u:%u]", x, y, p.x_coord, p.y_coord);
-                return NULL;
+                return nullptr;
             }
 
-            CellCoord q = Trinity::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
+            CellCoord q = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
             if (!q.IsCoordValid())
             {
                 sLog->outError("ObjectAccessor::GetObjecInWorld: object (GUID: %u TypeId: %u) has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUIDLow(), obj->GetTypeId(), obj->GetPositionX(), obj->GetPositionY(), q.x_coord, q.y_coord);
-                return NULL;
+                return nullptr;
             }
 
             int32 dx = int32(p.x_coord) - int32(q.x_coord);
@@ -169,7 +168,7 @@ class ObjectAccessor
             if (dx > -2 && dx < 2 && dy > -2 && dy < 2)
                 return obj;
             else
-                return NULL;
+                return nullptr;
         }
 
         // these functions return objects only if in map of specified object
@@ -189,8 +188,10 @@ class ObjectAccessor
         // ACCESS LIKE THAT IS NOT THREAD SAFE
         static Pet* FindPet(uint64);
         static Player* FindPlayer(uint64);
-        static Player* FindPlayerInOrOutOfWorld(uint64 m_guid); 
+        static Player* FindPlayerInOrOutOfWorld(uint64 m_guid);
+
         static Unit* FindUnit(uint64);
+        static Player* FindConnectedPlayer(uint64 const&);
         static Player* FindPlayerByName(std::string const& name, bool checkInWorld = true);
         static std::map<std::string, Player*> playerNameToPlayerPointer; // pussywizard: optimization
 
@@ -227,7 +228,7 @@ class ObjectAccessor
         //non-static functions
         void AddUpdateObject(Object* obj)
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, i_objectLock);
+            ACORE_GUARD(ACE_Thread_Mutex, i_objectLock);
             if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
                 i_objects.insert(obj);
             else
@@ -236,7 +237,7 @@ class ObjectAccessor
 
         void RemoveUpdateObject(Object* obj)
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, i_objectLock);
+            ACORE_GUARD(ACE_Thread_Mutex, i_objectLock);
             if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
                 i_objects.erase(obj);
             else
@@ -277,5 +278,6 @@ class ObjectAccessor
         mutable ACE_Thread_Mutex DelayedCorpseLock;
 };
 
-#define sObjectAccessor ACE_Singleton<ObjectAccessor, ACE_Null_Mutex>::instance()
+#define sObjectAccessor ObjectAccessor::instance()
+
 #endif

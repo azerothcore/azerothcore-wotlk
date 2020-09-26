@@ -293,7 +293,7 @@ class spell_sha_feral_spirit_scaling : public SpellScriptLoader
 
             void Register()
             {
-                if (m_scriptSpellId == 35675 || m_scriptSpellId == 35675)
+                if (m_scriptSpellId == 35675)
                     DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_feral_spirit_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
 
                 if (m_scriptSpellId == 35674)
@@ -426,7 +426,7 @@ class spell_sha_ancestral_awakening_proc : public SpellScriptLoader
                 if (targets.size() < 2)
                     return;
 
-                targets.sort(Trinity::HealthPctOrderPred());
+                targets.sort(acore::HealthPctOrderPred());
 
                 WorldObject* target = targets.front();
                 targets.clear();
@@ -437,7 +437,7 @@ class spell_sha_ancestral_awakening_proc : public SpellScriptLoader
             {
                 int32 damage = GetEffectValue();
                 if (GetHitUnit())
-                    GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_SHAMAN_ANCESTRAL_AWAKENING_PROC, &damage, NULL, NULL, true);
+                    GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_SHAMAN_ANCESTRAL_AWAKENING_PROC, &damage, nullptr, nullptr, true);
             }
 
             void Register()
@@ -518,8 +518,8 @@ class spell_sha_bloodlust : public SpellScriptLoader
 
             void RemoveInvalidTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_SHAMAN_SATED));
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_SHAMAN_EXHAUSTION));
+                targets.remove_if(acore::UnitAuraCheck(true, SPELL_SHAMAN_SATED));
+                targets.remove_if(acore::UnitAuraCheck(true, SPELL_SHAMAN_EXHAUSTION));
             }
 
             void ApplyDebuff()
@@ -612,7 +612,7 @@ class spell_sha_cleansing_totem_pulse : public SpellScriptLoader
             {
                 int32 bp = 1;
                 if (GetCaster() && GetHitUnit() && GetOriginalCaster())
-                    GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_SHAMAN_CLEANSING_TOTEM_EFFECT, NULL, &bp, NULL, true, NULL, NULL, GetOriginalCaster()->GetGUID());
+                    GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_SHAMAN_CLEANSING_TOTEM_EFFECT, NULL, &bp, NULL, true, nullptr, nullptr, GetOriginalCaster()->GetGUID());
             }
 
             void Register()
@@ -981,8 +981,8 @@ class spell_sha_heroism : public SpellScriptLoader
 
             void RemoveInvalidTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_SHAMAN_EXHAUSTION));
-                targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_SHAMAN_SATED));
+                targets.remove_if(acore::UnitAuraCheck(true, SPELL_SHAMAN_EXHAUSTION));
+                targets.remove_if(acore::UnitAuraCheck(true, SPELL_SHAMAN_SATED));
             }
 
             void ApplyDebuff()
@@ -1270,7 +1270,7 @@ class spell_sha_mana_tide_totem : public SpellScriptLoader
                                     effValue += dummy->GetAmount();
                             // Regenerate 6% of Total Mana Every 3 secs
                             int32 effBasePoints0 = int32(CalculatePct(unitTarget->GetMaxPower(POWER_MANA), effValue));
-                            caster->CastCustomSpell(unitTarget, SPELL_SHAMAN_MANA_TIDE_TOTEM, &effBasePoints0, NULL, NULL, true, NULL, NULL, GetOriginalCaster()->GetGUID());
+                            caster->CastCustomSpell(unitTarget, SPELL_SHAMAN_MANA_TIDE_TOTEM, &effBasePoints0, nullptr, nullptr, true, nullptr, nullptr, GetOriginalCaster()->GetGUID());
                         }
                     }
             }

@@ -26,13 +26,13 @@ class DynamicObject : public WorldObject, public GridObject<DynamicObject>, publ
         DynamicObject(bool isWorldObject);
         ~DynamicObject();
 
-        void AddToWorld();
-        void RemoveFromWorld();
+        void AddToWorld() override;
+        void RemoveFromWorld() override;
   
-        void CleanupsBeforeDelete(bool finalCleanup = true);
+        void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
         bool CreateDynamicObject(uint32 guidlow, Unit* caster, uint32 spellId, Position const& pos, float radius, DynamicObjectType type);
-        void Update(uint32 p_time);
+        void Update(uint32 p_time) override;
         void Remove();
         void SetDuration(int32 newDuration);
         int32 GetDuration() const;

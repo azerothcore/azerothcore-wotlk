@@ -24,6 +24,7 @@
 #include <ace/os_include/sys/os_types.h>
 #include <ace/os_include/sys/os_socket.h>
 
+#include <atomic>
 #include <set>
 
 #include "Log.h"
@@ -92,12 +93,12 @@ class ReactorRunnable : protected ACE_Task_Base
 
         long Connections()
         {
-            return static_cast<long> (m_Connections);
+            return m_Connections;
         }
 
         int AddSocket (WorldSocket* sock)
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
+            ACORE_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
 
             ++m_Connections;
             sock->AddReference();
@@ -118,7 +119,7 @@ class ReactorRunnable : protected ACE_Task_Base
 
         void AddNewSockets()
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
+            ACORE_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
 
             if (m_NewSockets.empty())
                 return;
@@ -217,6 +218,12 @@ WorldSocketMgr::~WorldSocketMgr()
 {
     delete [] m_NetThreads;
     delete m_Acceptor;
+}
+
+WorldSocketMgr* WorldSocketMgr::instance()
+{
+    static WorldSocketMgr instance;
+    return &instance;
 }
 
 int

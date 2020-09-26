@@ -12,7 +12,6 @@ SDCategory: Thousand Needles
 EndScriptData */
 
 /* ContentData
-npc_kanati
 npc_lakota_windsong
 npc_swiftmountain
 npc_plucky
@@ -25,74 +24,6 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Player.h"
-
-/*#####
-# npc_kanati
-######*/
-
-enum Kanati
-{
-    SAY_KAN_START              = 0,
-
-    QUEST_PROTECT_KANATI        = 4966,
-    NPC_GALAK_ASS               = 10720
-};
-
-Position const GalakLoc = {-4867.387695f, -1357.353760f, -48.226f, 0.0f};
-
-class npc_kanati : public CreatureScript
-{
-public:
-    npc_kanati() : CreatureScript("npc_kanati") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
-    {
-        if (quest->GetQuestId() == QUEST_PROTECT_KANATI)
-            if (npc_kanatiAI* pEscortAI = CAST_AI(npc_kanati::npc_kanatiAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), quest, true);
-
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_kanatiAI(creature);
-    }
-
-    struct npc_kanatiAI : public npc_escortAI
-    {
-        npc_kanatiAI(Creature* creature) : npc_escortAI(creature) { }
-
-        void Reset() { }
-
-        void WaypointReached(uint32 waypointId)
-        {
-            switch (waypointId)
-            {
-                case 0:
-                    Talk(SAY_KAN_START);
-                    DoSpawnGalak();
-                    break;
-                case 1:
-                    if (Player* player = GetPlayerForEscort())
-                        player->GroupEventHappens(QUEST_PROTECT_KANATI, me);
-                    break;
-            }
-        }
-
-        void DoSpawnGalak()
-        {
-            for (int i = 0; i < 3; ++i)
-                me->SummonCreature(NPC_GALAK_ASS, GalakLoc, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-        }
-
-        void JustSummoned(Creature* summoned)
-        {
-            summoned->AI()->AttackStart(me);
-        }
-    };
-
-};
 
 /*######
 # npc_lakota_windsong
@@ -442,7 +373,6 @@ public:
 
 void AddSC_thousand_needles()
 {
-    new npc_kanati();
     new npc_lakota_windsong();
     new npc_paoka_swiftmountain();
     new npc_plucky();

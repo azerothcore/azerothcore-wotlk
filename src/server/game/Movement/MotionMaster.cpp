@@ -104,7 +104,7 @@ void MotionMaster::UpdateMotion(uint32 diff)
         }
 
         delete _expList;
-        _expList = NULL;
+        _expList = nullptr;
 
         if (empty())
             Initialize();
@@ -192,7 +192,7 @@ void MotionMaster::DirectExpireSlot(MovementSlot slot, bool reset)
         MovementGenerator *curr = Impl[slot];
 
         // pussywizard: clear slot AND decrease top immediately to avoid crashes when referencing null top in DirectDelete
-        Impl[slot] = NULL;
+        Impl[slot] = nullptr;
         while (!empty() && !top())
             --_top;
 
@@ -217,7 +217,7 @@ void MotionMaster::MoveIdle()
         Mutate(&si_idleMovement, MOTION_SLOT_IDLE);
 }
 
-void MotionMaster::MoveRandom(float spawndist)
+void MotionMaster::MoveRandom(float wanderDistance)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
@@ -228,7 +228,7 @@ void MotionMaster::MoveRandom(float spawndist)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outStaticDebug("Creature (GUID: %u) start moving random", _owner->GetGUIDLow());
 #endif
-        Mutate(new RandomMovementGenerator<Creature>(spawndist), MOTION_SLOT_IDLE);
+        Mutate(new RandomMovementGenerator<Creature>(wanderDistance), MOTION_SLOT_IDLE);
     }
 }
 
@@ -535,7 +535,7 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
     {
         _owner->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
         _owner->m_movementInfo.SetFallTime(0);
-        _owner->ToPlayer()->SetFallInformation(time(NULL), _owner->GetPositionZ());
+        _owner->ToPlayer()->SetFallInformation(time(nullptr), _owner->GetPositionZ());
     }
     else if (_owner->GetTypeId() == TYPEID_UNIT && addFlagForNPC) // pussywizard
     {
@@ -716,7 +716,7 @@ void MotionMaster::Mutate(MovementGenerator *m, MovementSlot slot)
         bool delayed = (_top == slot && (_cleanFlag & MMCF_UPDATE));
 
         // pussywizard: clear slot AND decrease top immediately to avoid crashes when referencing null top in DirectDelete
-        Impl[slot] = NULL;
+        Impl[slot] = nullptr;
         while (!empty() && !top())
             --_top;
 

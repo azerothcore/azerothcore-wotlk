@@ -40,8 +40,8 @@ class Corpse : public WorldObject, public GridObject<Corpse>
         explicit Corpse(CorpseType type = CORPSE_BONES);
         ~Corpse();
 
-        void AddToWorld();
-        void RemoveFromWorld();
+        void AddToWorld() override;
+        void RemoveFromWorld() override;
 
         bool Create(uint32 guidlow, Map* map);
         bool Create(uint32 guidlow, Player* owner);
@@ -54,7 +54,7 @@ class Corpse : public WorldObject, public GridObject<Corpse>
         uint64 GetOwnerGUID() const { return GetUInt64Value(CORPSE_FIELD_OWNER); }
 
         time_t const& GetGhostTime() const { return m_time; }
-        void ResetGhostTime() { m_time = time(NULL); }
+        void ResetGhostTime() { m_time = time(nullptr); }
         CorpseType GetType() const { return m_type; }
 
         GridCoord const& GetGridCoord() const { return _gridCoord; }

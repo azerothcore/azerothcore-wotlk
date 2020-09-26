@@ -48,6 +48,13 @@ class spell_item_massive_seaforium_charge : public SpellScriptLoader
         }
 };
 
+enum TitaniumSealOfDalaran
+{
+    TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FLIP      = 32638,
+    TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_HEADS_UP  = 32663,
+    TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FACE_DOWN = 32664
+};
+
 class spell_item_titanium_seal_of_dalaran : public SpellScriptLoader
 {
     public:
@@ -64,12 +71,19 @@ class spell_item_titanium_seal_of_dalaran : public SpellScriptLoader
                 Unit* caster = GetCaster();
                 if (Player* player = caster->ToPlayer())
                 {
-                    std::string name = player->GetName();
-                    player->TextEmote("casually flips his Titanium Seal of Dalaran");
+                    LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FLIP))
+                        player->TextEmote(bct->GetText(loc_idx, player->getGender()));
                     if (urand(0,1))
-                        player->TextEmote("finds the coin face down for tails!");
+                    {
+                        if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_FACE_DOWN))
+                            player->TextEmote(bct->GetText(loc_idx, player->getGender()));
+                    }
                     else
-                        player->TextEmote("catches the coin heads up!");
+                    {
+                        if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TITANIUM_SEAL_OF_DALARAN_BROADCAST_TEXT_ID_HEADS_UP))
+                            player->TextEmote(bct->GetText(loc_idx, player->getGender()));
+                    }
                 }
             }
 
@@ -392,7 +406,7 @@ class spell_item_sleepy_willy : public SpellScriptLoader
 
             void SelectTarget(std::list<WorldObject*>& targets)
             {
-                Creature* target = NULL;
+                Creature* target = nullptr;
                 for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                     if (Creature* creature = (*itr)->ToCreature())
                         if (creature->IsCritter())
@@ -734,14 +748,27 @@ public:
     }
 };
 
-class spell_item_fish_feast : public SpellScriptLoader
+enum Feast
+{
+    SPELL_GREAT_FEAST                        = 57301,
+    SPELL_FISH_FEAST                         = 57426,
+    SPELL_SMALL_FEAST                        = 58474,
+    SPELL_GIGANTIC_FEAST                     = 58465,
+
+    GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE    = 31843,
+    FISH_FEAST_BROADCAST_TEXT_ID_PREPARE     = 31844,
+    SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE    = 31845,
+    GIGANTIC_FEAST_BROADCAST_TEXT_ID_PREPARE = 31846
+};
+
+class spell_item_feast : public SpellScriptLoader
 {
     public:
-        spell_item_fish_feast() : SpellScriptLoader("spell_item_fish_feast") {}
+        spell_item_feast() : SpellScriptLoader("spell_item_feast") {}
 
-        class spell_item_fish_feast_SpellScript : public SpellScript
+        class spell_item_feast_SpellScript : public SpellScript
         {
-            PrepareSpellScript(spell_item_fish_feast_SpellScript);
+            PrepareSpellScript(spell_item_feast_SpellScript);
 
             bool Load()
             {
@@ -751,18 +778,43 @@ class spell_item_fish_feast : public SpellScriptLoader
             void HandleScriptEffect(SpellEffIndex effIndex)
             {
                 PreventHitDefaultEffect(effIndex);
-                GetCaster()->ToPlayer()->TextEmote("prepares a Fish Feast!");
+
+                Unit* caster = GetCaster();
+                if (Player* player = caster->ToPlayer())
+                {
+                    LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+
+                    switch(GetSpellInfo()->Id)
+                    {
+                        case SPELL_GREAT_FEAST:
+                            if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE))
+                                player->MonsterTextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player, false);
+                            break;
+                        case SPELL_FISH_FEAST:
+                            if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(FISH_FEAST_BROADCAST_TEXT_ID_PREPARE))
+                                player->MonsterTextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player, false);
+                            break;
+                        case SPELL_SMALL_FEAST:
+                            if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE))
+                                player->MonsterTextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player, false);
+                            break;
+                        case SPELL_GIGANTIC_FEAST:
+                            if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GIGANTIC_FEAST_BROADCAST_TEXT_ID_PREPARE))
+                                player->MonsterTextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player, false);
+                            break;
+                    }
+                }
             }
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_item_fish_feast_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+                OnEffectHitTarget += SpellEffectFn(spell_item_feast_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
         SpellScript* GetSpellScript() const
         {
-            return new spell_item_fish_feast_SpellScript();
+            return new spell_item_feast_SpellScript();
         }
 };
 
@@ -867,9 +919,9 @@ class spell_item_gnomish_shrink_ray : public SpellScriptLoader
                 if (Unit* target = GetHitUnit())
                 {
                     if (urand(0, 99) < 15)
-                        caster->CastSpell(caster, SPELL_GNOMISH_SHRINK_RAY_SELF, true, NULL);
+                        caster->CastSpell(caster, SPELL_GNOMISH_SHRINK_RAY_SELF, true, nullptr);
                     else
-                        caster->CastSpell(target, SPELL_GNOMISH_SHRINK_RAY_TARGET, true, NULL);
+                        caster->CastSpell(target, SPELL_GNOMISH_SHRINK_RAY_TARGET, true, nullptr);
                 }
             }
 
@@ -986,7 +1038,7 @@ class spell_item_fetch_ball : public SpellScriptLoader
 
             void SelectTarget(std::list<WorldObject*>& targets)
             {
-                Creature* target = NULL;
+                Creature* target = nullptr;
                 for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                     if (Creature* creature = (*itr)->ToCreature())
                     {
@@ -1055,15 +1107,6 @@ class spell_item_oracle_ablutions : public SpellScriptLoader
                         break;
                     default:
                         break;
-                }
-                if (Player* player = caster->ToPlayer())
-                {
-                    std::string name = player->GetName();
-                    player->TextEmote("casually flips his Titanium Seal of Dalaran");
-                    if (urand(0,1))
-                        player->TextEmote("finds the coin face down for tails!");
-                    else
-                        player->TextEmote("catches the coin heads up!");
                 }
             }
 
@@ -1386,6 +1429,74 @@ class spell_item_direbrew_remote : public SpellScriptLoader
         }
 };
 
+enum EyeOfGruul
+{
+    SPELL_DRUID_ITEM_HEALING_TRANCE   = 37721,
+    SPELL_PALADIN_ITEM_HEALING_TRANCE = 37723,
+    SPELL_PRIEST_ITEM_HEALING_TRANCE  = 37706,
+    SPELL_SHAMAN_ITEM_HEALING_TRANCE  = 37722
+};
+
+// 37705 - Healing Discount
+class spell_item_eye_of_gruul_healing_discount : public SpellScriptLoader
+{
+    public:
+        spell_item_eye_of_gruul_healing_discount() : SpellScriptLoader("spell_item_eye_of_gruul_healing_discount") { }
+
+        class spell_item_eye_of_gruul_healing_discount_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_item_eye_of_gruul_healing_discount_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_ITEM_HEALING_TRANCE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_PALADIN_ITEM_HEALING_TRANCE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_PRIEST_ITEM_HEALING_TRANCE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_SHAMAN_ITEM_HEALING_TRANCE))
+                    return false;
+                return true;
+            }
+
+            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+            {
+                PreventDefaultAction();
+                if (Unit* unitTarget = GetTarget())
+                {
+                    uint32 spell_id = 0;
+                    switch (unitTarget->getClass())
+                    {
+                        case CLASS_DRUID:
+                            spell_id = SPELL_DRUID_ITEM_HEALING_TRANCE;
+                            break;
+                        case CLASS_PALADIN:
+                            spell_id = SPELL_PALADIN_ITEM_HEALING_TRANCE;
+                            break;
+                        case CLASS_PRIEST:
+                            spell_id = SPELL_PRIEST_ITEM_HEALING_TRANCE;
+                            break;
+                        case CLASS_SHAMAN:
+                            spell_id = SPELL_SHAMAN_ITEM_HEALING_TRANCE;
+                            break;
+                        default:
+                            return; // ignore for non-healing classes
+                    }
+
+                    unitTarget->CastSpell(unitTarget, spell_id, true, NULL, aurEff);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectProc += AuraEffectProcFn(spell_item_eye_of_gruul_healing_discount_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_item_eye_of_gruul_healing_discount_AuraScript();
+        }
+};
+
 enum eArgentKnight
 {
     SPELL_SUMMON_ARGENT_KNIGHT_ALLIANCE = 54296
@@ -1428,7 +1539,6 @@ class spell_item_summon_argent_knight :  public SpellScriptLoader
             return new spell_item_summon_argent_knight_SpellScript();
         }
 };
-
 
 // Theirs
 // Generic script for handling item dummy effects which trigger another spell.
@@ -1770,7 +1880,7 @@ class spell_item_deviate_fish : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
                 uint32 spellId = urand(SPELL_SLEEPY, SPELL_HEALTHY_SPIRIT);
-                caster->CastSpell(caster, spellId, true, NULL);
+                caster->CastSpell(caster, spellId, true, nullptr);
             }
 
             void Register()
@@ -1800,7 +1910,7 @@ class spell_item_echoes_of_light : public SpellScriptLoader
                 if (targets.size() < 2)
                     return;
 
-                targets.sort(Trinity::HealthPctOrderPred());
+                targets.sort(acore::HealthPctOrderPred());
 
                 WorldObject* target = targets.front();
                 targets.clear();
@@ -1913,7 +2023,7 @@ class spell_item_flask_of_the_north : public SpellScriptLoader
                         break;
                 }
 
-                caster->CastSpell(caster, possibleSpells[irand(0, (possibleSpells.size() - 1))], true, NULL);
+                caster->CastSpell(caster, possibleSpells[irand(0, (possibleSpells.size() - 1))], true, nullptr);
             }
 
             void Register()
@@ -1958,9 +2068,9 @@ class spell_item_gnomish_death_ray : public SpellScriptLoader
                 if (Unit* target = GetHitUnit())
                 {
                     if (urand(0, 99) < 15)
-                        caster->CastSpell(caster, SPELL_GNOMISH_DEATH_RAY_SELF, true, NULL);    // failure
+                        caster->CastSpell(caster, SPELL_GNOMISH_DEATH_RAY_SELF, true, nullptr);    // failure
                     else
-                        caster->CastSpell(target, SPELL_GNOMISH_DEATH_RAY_TARGET, true, NULL);
+                        caster->CastSpell(target, SPELL_GNOMISH_DEATH_RAY_TARGET, true, nullptr);
                 }
             }
 
@@ -2019,7 +2129,7 @@ class spell_item_make_a_wish : public SpellScriptLoader
                     case 3: spellId = SPELL_SUMMON_FURIOUS_MR_PINCHY; break;
                     case 4: spellId = SPELL_TINY_MAGICAL_CRAWDAD; break;
                 }
-                caster->CastSpell(caster, spellId, true, NULL);
+                caster->CastSpell(caster, spellId, true, nullptr);
             }
 
             void Register()
@@ -2173,7 +2283,7 @@ class spell_item_net_o_matic : public SpellScriptLoader
                     else if (roll < 4)                       // 2% for 20 sec root, charge to target (off-like chance unknown)
                         spellId = SPELL_NET_O_MATIC_TRIGGERED2;
 
-                    GetCaster()->CastSpell(target, spellId, true, NULL);
+                    GetCaster()->CastSpell(target, spellId, true, nullptr);
                 }
             }
 
@@ -2229,7 +2339,7 @@ class spell_item_noggenfogger_elixir : public SpellScriptLoader
                     case 2: spellId = SPELL_NOGGENFOGGER_ELIXIR_TRIGGERED2; break;
                 }
 
-                caster->CastSpell(caster, spellId, true, NULL);
+                caster->CastSpell(caster, spellId, true, nullptr);
             }
 
             void Register()
@@ -2316,7 +2426,7 @@ class spell_item_savory_deviate_delight : public SpellScriptLoader
                     // Yaaarrrr - pirate
                     case 2: spellId = (caster->getGender() == GENDER_MALE ? SPELL_YAAARRRR_MALE : SPELL_YAAARRRR_FEMALE); break;
                 }
-                caster->CastSpell(caster, spellId, true, NULL);
+                caster->CastSpell(caster, spellId, true, nullptr);
             }
 
             void Register()
@@ -2408,7 +2518,15 @@ class spell_item_scroll_of_recall : public SpellScriptLoader
 enum ShadowsFate
 {
     SPELL_SOUL_FEAST        = 71203,
-    NPC_SINDRAGOSA          = 36853
+};
+
+enum ExceptionCreature
+{
+    NPC_GLUTTONOUS_ABOMINATION = 37886,
+    NPC_RISEN_ARCHMAGE         = 37868,
+    NPC_BLISTERING_ZOMBIE      = 37934,
+    NPC_BLAZING_SKELETON       = 36791,
+    NPC_SINDRAGOSA             = 36853
 };
 
 class spell_item_unsated_craving : public SpellScriptLoader
@@ -2420,15 +2538,39 @@ class spell_item_unsated_craving : public SpellScriptLoader
         {
             PrepareAuraScript(spell_item_unsated_craving_AuraScript);
 
+            bool isException(Unit* target) const
+            {
+                switch (target->GetEntry())
+                {
+                    case NPC_GLUTTONOUS_ABOMINATION:
+                    case NPC_RISEN_ARCHMAGE:
+                    case NPC_BLISTERING_ZOMBIE:
+                    case NPC_BLAZING_SKELETON:
+                    case NPC_SINDRAGOSA:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
             bool CheckProc(ProcEventInfo& procInfo)
             {
                 Unit* caster = procInfo.GetActor();
                 if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                {
                     return false;
+                }
 
                 Unit* target = procInfo.GetActionTarget();
-                if (!target || target->GetTypeId() != TYPEID_UNIT || target->IsCritter() || (target->GetEntry() != NPC_SINDRAGOSA && target->IsSummon()))
+                if (target && isException(target))
+                {
+                    return true;
+                }
+
+                if (!target || target->GetTypeId() != TYPEID_UNIT || target->IsCritter() || target->IsSummon())
+                {
                     return false;
+                }
 
                 return true;
             }
@@ -3100,7 +3242,7 @@ class spell_item_purify_helboar_meat : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /* effIndex */)
             {
                 Unit* caster = GetCaster();
-                caster->CastSpell(caster, roll_chance_i(50) ? SPELL_SUMMON_PURIFIED_HELBOAR_MEAT : SPELL_SUMMON_TOXIC_HELBOAR_MEAT, true, NULL);
+                caster->CastSpell(caster, roll_chance_i(50) ? SPELL_SUMMON_PURIFIED_HELBOAR_MEAT : SPELL_SUMMON_TOXIC_HELBOAR_MEAT, true, nullptr);
             }
 
             void Register()
@@ -3141,7 +3283,7 @@ class spell_item_crystal_prison_dummy_dnd : public SpellScriptLoader
                 if (Creature* target = GetHitCreature())
                     if (target->isDead() && !target->IsPet())
                     {
-                        GetCaster()->SummonGameObject(OBJECT_IMPRISONED_DOOMGUARD, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0, 0, 0, 0, uint32(target->GetRespawnTime()-time(NULL)));
+                        GetCaster()->SummonGameObject(OBJECT_IMPRISONED_DOOMGUARD, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0, 0, 0, 0, uint32(target->GetRespawnTime()-time(nullptr)));
                         target->DespawnOrUnsummon();
                     }
             }
@@ -3454,7 +3596,7 @@ class spell_item_complete_raptor_capture : public SpellScriptLoader
                     GetHitCreature()->DespawnOrUnsummon();
 
                     //cast spell Raptor Capture Credit
-                    caster->CastSpell(caster, SPELL_RAPTOR_CAPTURE_CREDIT, true, NULL);
+                    caster->CastSpell(caster, SPELL_RAPTOR_CAPTURE_CREDIT, true, nullptr);
                 }
             }
 
@@ -3710,7 +3852,7 @@ class spell_item_rocket_boots : public SpellScriptLoader
                     bg->EventPlayerDroppedFlag(caster);
 
                 caster->RemoveSpellCooldown(SPELL_ROCKET_BOOTS_PROC);
-                caster->CastSpell(caster, SPELL_ROCKET_BOOTS_PROC, true, NULL);
+                caster->CastSpell(caster, SPELL_ROCKET_BOOTS_PROC, true, nullptr);
             }
 
             SpellCastResult CheckCast()
@@ -3965,6 +4107,45 @@ public:
     }
 };
 
+enum Eggnog
+{
+    SPELL_EGG_NOG_REINDEER = 21936,
+    SPELL_EGG_NOG_SNOWMAN  = 21980,
+};
+class spell_item_eggnog : public SpellScriptLoader
+{
+public:
+    spell_item_eggnog() : SpellScriptLoader("spell_item_eggnog") { }
+
+    class spell_item_eggnog_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_eggnog_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_EGG_NOG_REINDEER) || !sSpellMgr->GetSpellInfo(SPELL_EGG_NOG_SNOWMAN))
+                return false;
+            return true;
+        }
+
+        void HandleScript(SpellEffIndex /* effIndex */)
+        {
+            if (roll_chance_i(40))
+                GetCaster()->CastSpell(GetHitUnit(), roll_chance_i(50) ? SPELL_EGG_NOG_REINDEER : SPELL_EGG_NOG_SNOWMAN, GetCastItem());
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_item_eggnog_SpellScript::HandleScript, EFFECT_2, SPELL_EFFECT_INEBRIATE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_item_eggnog_SpellScript();
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // Ours
@@ -3987,7 +4168,7 @@ void AddSC_item_spell_scripts()
     new spell_item_crazy_alchemists_potion();
     new spell_item_skull_of_impeding_doom();
     new spell_item_carrot_on_a_stick();
-    new spell_item_fish_feast();
+    new spell_item_feast();
     new spell_item_gnomish_universal_remote();
     new spell_item_strong_anti_venom();
     new spell_item_gnomish_shrink_ray();
@@ -4003,6 +4184,7 @@ void AddSC_item_spell_scripts()
     new spell_item_summon_or_dismiss();
     new spell_item_draenic_pale_ale();
     new spell_item_direbrew_remote();
+    new spell_item_eye_of_gruul_healing_discount();
     new spell_item_summon_argent_knight();
 
     // Theirs
@@ -4069,4 +4251,5 @@ void AddSC_item_spell_scripts()
     new spell_item_chicken_cover();
     new spell_item_muisek_vessel();
     new spell_item_greatmothers_soulcatcher();
+    new spell_item_eggnog();
 }

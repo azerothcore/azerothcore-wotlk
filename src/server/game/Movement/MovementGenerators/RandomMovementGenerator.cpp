@@ -54,7 +54,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         Map* map = creature->GetMap();
         float x = _destinationPoints[newPoint].x, y = _destinationPoints[newPoint].y, z = _destinationPoints[newPoint].z;
         // invalid coordinates
-        if (!Trinity::IsValidMapCoord(x, y))
+        if (!acore::IsValidMapCoord(x, y))
         {
             _validPointsVector[_currentPoint].erase(randomIter);
             _preComputedPaths.erase(pathIdx);
@@ -62,7 +62,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         }
 
         float ground = INVALID_HEIGHT;
-        float levelZ = map->GetWaterOrGroundLevel(x, y, z+4.0f, &ground);
+        float levelZ = map->GetWaterOrGroundLevel(creature->GetPhaseMask(), x, y, z+4.0f, &ground);
         float newZ = INVALID_HEIGHT;
 
         // flying creature
@@ -202,10 +202,10 @@ void RandomMovementGenerator<Creature>::DoInitialize(Creature* creature)
         return;
 
     if (!_wanderDistance)
-        _wanderDistance = creature->GetRespawnRadius();
+        _wanderDistance = creature->GetWanderDistance();
 
-    _nextMoveTime.Reset(creature->GetDBTableGUIDLow() && creature->GetRespawnRadius() == _wanderDistance ? urand(1, 5000) : 0);
-    _wanderDistance = std::max((creature->GetRespawnRadius() == _wanderDistance && creature->GetInstanceId() == 0) ? (creature->CanFly() ? MIN_WANDER_DISTANCE_AIR : MIN_WANDER_DISTANCE_GROUND) : 0.0f, _wanderDistance);
+    _nextMoveTime.Reset(creature->GetDBTableGUIDLow() && creature->GetWanderDistance() == _wanderDistance ? urand(1, 5000) : 0);
+    _wanderDistance = std::max((creature->GetWanderDistance() == _wanderDistance && creature->GetInstanceId() == 0) ? (creature->CanFly() ? MIN_WANDER_DISTANCE_AIR : MIN_WANDER_DISTANCE_GROUND) : 0.0f, _wanderDistance);
 
     if (G3D::fuzzyEq(_initialPosition.GetExactDist2d(0.0f, 0.0f), 0.0f))
     {

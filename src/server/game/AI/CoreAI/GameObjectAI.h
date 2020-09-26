@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_GAMEOBJECTAI_H
-#define TRINITY_GAMEOBJECTAI_H
+#ifndef ACORE_GAMEOBJECTAI_H
+#define ACORE_GAMEOBJECTAI_H
 
 #include "Define.h"
 #include <list>

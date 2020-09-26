@@ -227,7 +227,14 @@ public:
             addSpawnTimer = 5000;
 
             if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
+            {
                 pInstance->SetData(TYPE_HODIR, NOT_STARTED);
+            }
+
+            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
+            {
+                go->SetGoState(GO_STATE_ACTIVE);
+            }
         }
 
         void EnterCombat(Unit*  /*pWho*/)
@@ -250,7 +257,14 @@ public:
             me->PlayDirectSound(SOUND_HODIR_AGGRO, 0);
 
             if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
+            {
                 pInstance->SetData(TYPE_HODIR, IN_PROGRESS);
+            }
+
+            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
+            {
+                go->SetGoState(GO_STATE_READY);
+            }
         }
 
         void JustReachedHome() { me->setActive(false); }
@@ -307,18 +321,27 @@ public:
                     events.Reset();
                     summons.DespawnAll();
 
-                    if( GameObject* d = me->FindNearestGameObject(GO_HODIR_FROZEN_DOOR, 250.0f) )
+                    if( GameObject* d = me->FindNearestGameObject(GO_HODIR_FROZEN_DOOR, 250.0f))
+                    {
                         if( d->GetGoState() != GO_STATE_ACTIVE )
                         {
                             d->SetLootState(GO_READY);
                             d->UseDoorOrButton(0, false);
                         }
-                    if( GameObject* d = me->FindNearestGameObject(GO_HODIR_DOOR, 250.0f) )
+                    }
+                    if (GameObject* d = me->FindNearestGameObject(GO_HODIR_DOOR, 250.0f))
+                    {
                         if( d->GetGoState() != GO_STATE_ACTIVE )
                         {
                             d->SetLootState(GO_READY);
                             d->UseDoorOrButton(0, false);
                         }
+                    }
+                        
+                    if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
+                    {
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    }
 
                     me->MonsterYell(TEXT_HODIR_DEFEATED, LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_HODIR_DEFEATED, 0);
@@ -398,9 +421,9 @@ public:
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             targets.push_back(itr->GetSource());
-                        targets.remove_if(Trinity::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-                        targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-                        Trinity::Containers::RandomResizeList(targets, 2);
+                        targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+                        targets.remove_if(acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+                        acore::Containers::RandomResizeList(targets, 2);
                         for (std::list<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                         {
                             float prevZ = (*itr)->GetPositionZ();
@@ -449,7 +472,7 @@ public:
 
         Creature* GetHelper(uint8 index)
         {
-            return (Helpers[index] ? ObjectAccessor::GetCreature(*me, Helpers[index]) : NULL);
+            return (Helpers[index] ? ObjectAccessor::GetCreature(*me, Helpers[index]) : nullptr);
         }
 
         void SpawnHelpers()
@@ -1232,9 +1255,9 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(Trinity::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-            Trinity::Containers::RandomResizeList(targets, 1);
+            targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+            targets.remove_if(acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+            acore::Containers::RandomResizeList(targets, 1);
         }
 
         void Register()

@@ -4,14 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_BAG_H
-#define TRINITY_BAG_H
+#ifndef ACORE_BAG_H
+#define ACORE_BAG_H
 
 // Maximum 36 Slots ((CONTAINER_END - CONTAINER_FIELD_SLOT_1)/2
 #define MAX_BAG_SIZE 36                                     // 2.0.12
 
 #include "Item.h"
-#include "ItemPrototype.h"
+#include "ItemTemplate.h"
 
 class Bag : public Item
 {
@@ -30,8 +30,8 @@ class Bag : public Item
         void RemoveItem(uint8 slot, bool update);
 
         Item* GetItemByPos(uint8 slot) const;
-        uint32 GetItemCount(uint32 item, Item* eItem = NULL) const;
-        uint32 GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = NULL) const;
+        uint32 GetItemCount(uint32 item, Item* eItem = nullptr) const;
+        uint32 GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = nullptr) const;
 
         uint8 GetSlotByItemGUID(uint64 guid) const;
         bool IsEmpty() const;

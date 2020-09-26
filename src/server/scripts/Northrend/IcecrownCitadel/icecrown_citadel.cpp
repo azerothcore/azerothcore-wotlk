@@ -516,7 +516,16 @@ class npc_highlord_tirion_fordring_lh : public CreatureScript
                         case EVENT_MURADIN_RUN:
                         case EVENT_SAURFANG_RUN:
                             if (Creature* factionNPC = ObjectAccessor::GetCreature(*me, _factionNPC))
-                                factionNPC->GetMotionMaster()->MovePath(factionNPC->GetDBTableGUIDLow()*10, false);
+                            {
+                                factionNPC->GetMotionMaster()->MovePath(factionNPC->GetDBTableGUIDLow() * 10, false);
+                                factionNPC->DespawnOrUnsummon(46500);
+                                std::list<Creature*> followers;
+                                factionNPC->GetCreaturesWithEntryInRange(followers, 30, _instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? NPC_KOR_KRON_GENERAL : NPC_ALLIANCE_COMMANDER);
+                                for (Creature* follower : followers)
+                                {
+                                    follower->DespawnOrUnsummon(46500);
+                                }
+                            }
                             me->setActive(false);
                             _damnedKills = 3;
                             break;
@@ -831,7 +840,7 @@ class npc_crok_scourgebane : public CreatureScript
                     // get all nearby vrykul
                     std::list<Creature*> temp;
                     FrostwingVrykulSearcher check(me, 150.0f);
-                    Trinity::CreatureListSearcher<FrostwingVrykulSearcher> searcher(me, temp, check);
+                    acore::CreatureListSearcher<FrostwingVrykulSearcher> searcher(me, temp, check);
                     me->VisitNearbyGridObject(150.0f, searcher);
 
                     _aliveTrash.clear();
@@ -874,16 +883,16 @@ class npc_crok_scourgebane : public CreatureScript
                 {
                     _wipeCheckTimer = 3000;
 
-                    Player* player = NULL;
-                    Trinity::AnyPlayerInObjectRangeCheck check(me, 140.0f);
-                    Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
+                    Player* player = nullptr;
+                    acore::AnyPlayerInObjectRangeCheck check(me, 140.0f);
+                    acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
                     me->VisitNearbyWorldObject(140.0f, searcher);
                     // wipe
                     if (!player || me->GetExactDist(4357.0f, 2606.0f, 350.0f) > 125.0f)
                     {
                         //Talk(SAY_CROK_DEATH);
                         FrostwingGauntletRespawner respawner;
-                        Trinity::CreatureWorker<FrostwingGauntletRespawner> worker(me, respawner);
+                        acore::CreatureWorker<FrostwingGauntletRespawner> worker(me, respawner);
                         me->VisitNearbyGridObject(333.0f, worker);
                         return;
                     }
@@ -1105,7 +1114,7 @@ class boss_sister_svalna : public CreatureScript
                 me->SetDisableGravity(false);
                 me->SetHover(false);
                 me->SetReactState(REACT_AGGRESSIVE);
-                DoZoneInCombat(NULL, 150.0f);
+                DoZoneInCombat(nullptr, 150.0f);
             }
 
             void SpellHitTarget(Unit* target, SpellInfo const* spell)
@@ -1330,7 +1339,7 @@ class npc_captain_arnath : public CreatureScript
                     {
                         std::list<Creature*> targets = DoFindFriendlyMissingBuff(40.0f, SPELL_POWER_WORD_SHIELD);
                         if (!targets.empty())
-                            DoCast(Trinity::Containers::SelectRandomContainerElement(targets), SPELL_POWER_WORD_SHIELD);
+                            DoCast(acore::Containers::SelectRandomContainerElement(targets), SPELL_POWER_WORD_SHIELD);
                         Events.ScheduleEvent(EVENT_ARNATH_PW_SHIELD, urand(15000, 20000));
                         break;
                     }
@@ -1353,9 +1362,9 @@ class npc_captain_arnath : public CreatureScript
         private:
             Creature* FindFriendlyCreature() const
             {
-                Creature* target = NULL;
-                Trinity::MostHPMissingInRange u_check(me, 60.0f, 0);
-                Trinity::CreatureLastSearcher<Trinity::MostHPMissingInRange> searcher(me, target, u_check);
+                Creature* target = nullptr;
+                acore::MostHPMissingInRange u_check(me, 60.0f, 0);
+                acore::CreatureLastSearcher<acore::MostHPMissingInRange> searcher(me, target, u_check);
                 me->VisitNearbyGridObject(60.0f, searcher);
                 return target;
             }
@@ -1882,7 +1891,7 @@ class npc_arthas_teleport_visual : public CreatureScript
                 return GetIcecrownCitadelAI<npc_arthas_teleport_visualAI>(creature);
 
             // Default to no script
-            return NULL;
+            return nullptr;
         }
 };
 
@@ -1957,7 +1966,7 @@ class spell_icc_sprit_alarm : public SpellScriptLoader
 
                 std::list<Creature*> wards;
                 GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, range);
-                wards.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
+                wards.sort(acore::ObjectDistanceOrderPred(GetCaster()));
                 for (std::list<Creature*>::iterator itr = wards.begin(); itr != wards.end(); ++itr)
                 {
                     if ((*itr)->IsAlive() && (*itr)->HasAura(SPELL_STONEFORM))
@@ -2003,7 +2012,7 @@ class spell_icc_geist_alarm : public SpellScriptLoader
                     if (Creature* l = instance->instance->SummonCreature(NPC_VENGEFUL_FLESHREAPER, p))
                     {
                         bool hasTarget = false;
-                        Unit* target = NULL;
+                        Unit* target = nullptr;
                         if ((target = l->SelectNearestTarget(20.0f)))
                             hasTarget = true;
                         else
@@ -2056,8 +2065,8 @@ class spell_frost_giant_death_plague : public SpellScriptLoader
             // First effect
             void CountTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-                targets.remove_if(Trinity::ObjectGUIDCheck(GetCaster()->GetGUID(), true));
+                targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+                targets.remove_if(acore::ObjectGUIDCheck(GetCaster()->GetGUID(), true));
 
                 bool kill = true;
                 for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
@@ -2150,7 +2159,7 @@ class spell_svalna_revive_champion : public SpellScriptLoader
             void RemoveAliveTarget(std::list<WorldObject*>& targets)
             {
                 targets.remove_if(AliveCheck());
-                Trinity::Containers::RandomResizeList(targets, 2);
+                acore::Containers::RandomResizeList(targets, 2);
             }
 
             void Land(SpellEffIndex /*effIndex*/)
@@ -2265,7 +2274,7 @@ class at_icc_saurfang_portal : public AreaTriggerScript
                 instance->SetData(DATA_COLDFLAME_JETS, IN_PROGRESS);
                 std::list<Creature*> traps;
                 GetCreatureListWithEntryInGrid(traps, player, NPC_FROST_FREEZE_TRAP, 120.0f);
-                traps.sort(Trinity::ObjectDistanceOrderPred(player));
+                traps.sort(acore::ObjectDistanceOrderPred(player));
                 bool instant = false;
                 for (std::list<Creature*>::iterator itr = traps.begin(); itr != traps.end(); ++itr)
                 {
@@ -2323,7 +2332,7 @@ class at_icc_start_frostwing_gauntlet : public AreaTriggerScript
                         if (!crok->IsAlive())
                         {
                             FrostwingGauntletRespawner respawner;
-                            Trinity::CreatureWorker<FrostwingGauntletRespawner> worker(crok, respawner);
+                            acore::CreatureWorker<FrostwingGauntletRespawner> worker(crok, respawner);
                             crok->VisitNearbyGridObject(333.0f, worker);
                             return true;
                         }
@@ -2999,7 +3008,7 @@ public:
 
             if (uint32 e = events.GetEvent())
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 if (sesi_spells[e-1].targetType == 1)
                     target = me->GetVictim();
                 else

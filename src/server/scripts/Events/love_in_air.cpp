@@ -462,7 +462,7 @@ class npc_love_in_air_hummel_helper : public CreatureScript
                         {
                             Position pos(*me);
                             me->Relocate(target);
-                            me->CastSpell(me, RAND(SPELL_THROW_COLOGNE, SPELL_THROW_PERFUME), true, NULL, NULL, me->GetGUID());
+                            me->CastSpell(me, RAND(SPELL_THROW_COLOGNE, SPELL_THROW_PERFUME), true, nullptr, nullptr, me->GetGUID());
                             me->Relocate(pos);
                         }
                         events.RepeatEvent(10000);
@@ -553,7 +553,7 @@ class spell_love_in_air_periodic_perfumes : public SpellScriptLoader
                     if (target->IsImmunedToSpell(sSpellMgr->GetSpellInfo(spellId)))
                         return;
 
-                    target->CastSpell(target, spellId, true, NULL, NULL, guid);
+                    target->CastSpell(target, spellId, true, nullptr, nullptr, guid);
                 }
             }
 
@@ -667,8 +667,8 @@ class spell_love_is_in_the_air_romantic_picnic : public SpellScriptLoader
                 // For nearby players, check if they have the same aura. If so, cast Romantic Picnic (45123)
                 // required by achievement and "hearts" visual
                 std::list<Player*> playerList;
-                Trinity::AnyPlayerInObjectRangeCheck checker(target, INTERACTION_DISTANCE*2);
-                Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(target, playerList, checker);
+                acore::AnyPlayerInObjectRangeCheck checker(target, INTERACTION_DISTANCE*2);
+                acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(target, playerList, checker);
                 target->VisitNearbyWorldObject(INTERACTION_DISTANCE*2, searcher);
                 for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
                 {

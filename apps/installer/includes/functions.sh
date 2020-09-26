@@ -4,13 +4,33 @@ function inst_configureOS() {
         solaris*) echo "Solaris is not supported yet" ;;
         darwin*)  source "$AC_PATH_INSTALLER/includes/os_configs/osx.sh" ;;  
         linux*)
+            # If $OSDISTRO is set, use this value (from config.sh)
+            if [ ! -z "$OSDISTRO" ]; then
+                DISTRO=$OSDISTRO
             # If available, use LSB to identify distribution
-            if [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
+            elif [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
                 DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
             # Otherwise, use release info file
             else
                 DISTRO=$(ls -d /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -v "lsb" | cut -d'/' -f3 | cut -d'-' -f1 | cut -d'_' -f1)
             fi
+
+            case $DISTRO in
+            # add here distro that are debian or ubuntu based
+            # TODO: find a better way, maybe checking the existance
+            # of a package manager
+                "neon" | "ubuntu")
+                    DISTRO="ubuntu"
+                ;;
+                "debian")
+                    DISTRO="debian"
+                ;;
+                *)
+                    echo "Distro: $DISTRO, is not supported. If your distribution is based on debian or ubuntu,
+                        please set the 'OSDISTRO' environment variable to one of these distro (you can use config.sh file)"
+                ;;
+            esac
+
 
             DISTRO=${DISTRO,,}
 
@@ -202,6 +222,6 @@ function inst_download_client_data {
     local path="$AC_BINPATH_FULL"
 
     echo "Downloading client data in: $path/data.zip ..."
-    curl -L https://github.com/wowgaming/client-data/releases/download/v6/data.zip > "$path/data.zip" \
+    curl -L https://github.com/wowgaming/client-data/releases/download/v7/data.zip > "$path/data.zip" \
         && unzip -o "$path/data.zip" -d "$path/" && rm "$path/data.zip"
 }

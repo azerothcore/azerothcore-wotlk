@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_CONFUSEDGENERATOR_H
-#define TRINITY_CONFUSEDGENERATOR_H
+#ifndef ACORE_CONFUSEDGENERATOR_H
+#define ACORE_CONFUSEDGENERATOR_H
 
 #include "MovementGenerator.h"
 #include "Timer.h"

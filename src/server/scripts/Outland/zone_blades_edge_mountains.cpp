@@ -157,7 +157,7 @@ public:
                             me->SummonCreature(NPC_HOUND, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
                         else 
                             me->SummonCreature(NPC_FEL_IMP, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
-                            events.ScheduleEvent(EVENT_PARTY_TIMER, 3000);
+                        events.ScheduleEvent(EVENT_PARTY_TIMER, 3000);
                         break;
                 }
             }
@@ -692,8 +692,8 @@ class npc_simon_bunny : public CreatureScript
                 me->SetObjectScale(large ? 2.0f : 1.0f);
 
                 std::list<WorldObject*> ClusterList;
-                Trinity::AllWorldObjectsInRange objects(me, searchDistance);
-                Trinity::WorldObjectListSearcher<Trinity::AllWorldObjectsInRange> searcher(me, ClusterList, objects);
+                acore::AllWorldObjectsInRange objects(me, searchDistance);
+                acore::WorldObjectListSearcher<acore::AllWorldObjectsInRange> searcher(me, ClusterList, objects);
                 me->VisitNearbyObject(searchDistance, searcher);
 
                 for (std::list<WorldObject*>::const_iterator i = ClusterList.begin(); i != ClusterList.end(); ++i)
@@ -963,7 +963,7 @@ class npc_simon_bunny : public CreatureScript
                 if (spell->Id == SPELL_BAD_PRESS_TRIGGER)
                 {
                     int32 bp = (int32)((float)(fails)*0.33f*target->GetMaxHealth());
-                    target->CastCustomSpell(target, SPELL_BAD_PRESS_DAMAGE, &bp, NULL, NULL, true);
+                    target->CastCustomSpell(target, SPELL_BAD_PRESS_DAMAGE, &bp, nullptr, nullptr, true);
                 }
             }
 

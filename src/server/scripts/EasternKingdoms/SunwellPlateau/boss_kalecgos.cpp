@@ -27,7 +27,7 @@ enum Yells
     SAY_GOOD_AGGRO                              = 0,
     SAY_GOOD_NEAR_DEATH                         = 1,
     SAY_GOOD_NEAR_DEATH2                        = 2,
-    SAY_GOOD_MADRIGOSA                          = 3
+    SAY_GOOD_MADRIGOSA                          = 3 // Madrigosa deserved a far better fate. You did what had to be done, but this battle is far from over!
 };
 
 enum Spells
@@ -627,7 +627,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(SpectralBlastCheck(GetCaster()->GetVictim()));
-            Trinity::Containers::RandomResizeList(targets, 1);
+            acore::Containers::RandomResizeList(targets, 1);
         }           
         
         void HandleDummy(SpellEffIndex effIndex)

@@ -166,7 +166,7 @@ public:
         switch (mode)
         {
             case BAN_ACCOUNT:
-                if (!AccountMgr::normalizeString(nameOrIP))
+                if (!Utf8ToUpperOnlyLatin(nameOrIP))
                 {
                     handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, nameOrIP.c_str());
                     handler->SetSentErrorMessage(true);
@@ -198,6 +198,7 @@ public:
             banReturn = sBan->BanAccountByPlayerName(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "");
             break;
         case BAN_IP:
+        default:
             banReturn = sBan->BanIP(nameOrIP, durationStr, reasonStr, handler->GetSession() ? handler->GetSession()->GetPlayerName() : "");
             break;
         }
@@ -253,7 +254,7 @@ public:
             return false;
 
         std::string accountName = nameStr;
-        if (!AccountMgr::normalizeString(accountName))
+        if (!Utf8ToUpperOnlyLatin(accountName))
         {
             handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
             handler->SetSentErrorMessage(true);
@@ -289,9 +290,9 @@ public:
             if (fields[2].GetBool() && (fields[1].GetUInt64() == uint64(0) || unbanDate >= time(nullptr)))
                 active = true;
             bool permanent = (fields[1].GetUInt64() == uint64(0));
-            std::string banTime = permanent ? handler->GetTrinityString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].GetUInt64(), true);
+            std::string banTime = permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].GetUInt64(), true);
             handler->PSendSysMessage(LANG_BANINFO_HISTORYENTRY,
-                fields[0].GetCString(), banTime.c_str(), active ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO), fields[4].GetCString(), fields[5].GetCString());
+                fields[0].GetCString(), banTime.c_str(), active ? handler->GetAcoreString(LANG_YES) : handler->GetAcoreString(LANG_NO), fields[4].GetCString(), fields[5].GetCString());
         }
         while (result->NextRow());
 
@@ -337,9 +338,9 @@ public:
             if (fields[2].GetUInt8() && (!fields[1].GetUInt32() || unbanDate >= time(nullptr)))
                 active = true;
             bool permanent = (fields[1].GetUInt32() == uint32(0));
-            std::string banTime = permanent ? handler->GetTrinityString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].GetUInt64(), true);
+            std::string banTime = permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].GetUInt64(), true);
             handler->PSendSysMessage(LANG_BANINFO_HISTORYENTRY,
-                fields[0].GetCString(), banTime.c_str(), active ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO), fields[4].GetCString(), fields[5].GetCString());
+                fields[0].GetCString(), banTime.c_str(), active ? handler->GetAcoreString(LANG_YES) : handler->GetAcoreString(LANG_NO), fields[4].GetCString(), fields[5].GetCString());
         }
         while (result->NextRow());
 
@@ -371,8 +372,8 @@ public:
         Field* fields = result->Fetch();
         bool permanent = !fields[6].GetUInt64();
         handler->PSendSysMessage(LANG_BANINFO_IPENTRY,
-            fields[0].GetCString(), fields[1].GetCString(), permanent ? handler->GetTrinityString(LANG_BANINFO_NEVER) : fields[2].GetCString(),
-            permanent ? handler->GetTrinityString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[3].GetUInt64(), true).c_str(), fields[4].GetCString(), fields[5].GetCString());
+            fields[0].GetCString(), fields[1].GetCString(), permanent ? handler->GetAcoreString(LANG_BANINFO_NEVER) : fields[2].GetCString(),
+            permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[3].GetUInt64(), true).c_str(), fields[4].GetCString(), fields[5].GetCString());
 
 
         return true;
@@ -460,7 +461,7 @@ public:
                     {
                         time_t timeBan = time_t(fields2[0].GetUInt32());
                         tm tmBan;
-                        ACE_OS::localtime_r(&timeBan, &tmBan);
+                        localtime_r(&timeBan, &tmBan);
 
                         if (fields2[0].GetUInt32() == fields2[1].GetUInt32())
                         {
@@ -472,7 +473,7 @@ public:
                         {
                             time_t timeUnban = time_t(fields2[1].GetUInt32());
                             tm tmUnban;
-                            ACE_OS::localtime_r(&timeUnban, &tmUnban);
+                            localtime_r(&timeUnban, &tmUnban);
                             handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|%02d-%02d-%02d %02d:%02d|%-15.15s|%-15.15s|",
                                 accountName.c_str(), tmBan.tm_year%100, tmBan.tm_mon+1, tmBan.tm_mday, tmBan.tm_hour, tmBan.tm_min,
                                 tmUnban.tm_year%100, tmUnban.tm_mon+1, tmUnban.tm_mday, tmUnban.tm_hour, tmUnban.tm_min,
@@ -549,7 +550,7 @@ public:
                     {
                         time_t timeBan = time_t(banFields[0].GetUInt32());
                         tm tmBan;
-                        ACE_OS::localtime_r(&timeBan, &tmBan);
+                        localtime_r(&timeBan, &tmBan);
 
                         if (banFields[0].GetUInt32() == banFields[1].GetUInt32())
                         {
@@ -561,7 +562,7 @@ public:
                         {
                             time_t timeUnban = time_t(banFields[1].GetUInt32());
                             tm tmUnban;
-                            ACE_OS::localtime_r(&timeUnban, &tmUnban);
+                            localtime_r(&timeUnban, &tmUnban);
                             handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|%02d-%02d-%02d %02d:%02d|%-15.15s|%-15.15s|",
                                 char_name.c_str(), tmBan.tm_year%100, tmBan.tm_mon+1, tmBan.tm_mday, tmBan.tm_hour, tmBan.tm_min,
                                 tmUnban.tm_year%100, tmUnban.tm_mon+1, tmUnban.tm_mday, tmUnban.tm_hour, tmUnban.tm_min,
@@ -630,7 +631,7 @@ public:
                 Field* fields = result->Fetch();
                 time_t timeBan = time_t(fields[1].GetUInt32());
                 tm tmBan;
-                ACE_OS::localtime_r(&timeBan, &tmBan);
+                localtime_r(&timeBan, &tmBan);
                 if (fields[1].GetUInt32() == fields[2].GetUInt32())
                 {
                     handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|   permanent  |%-15.15s|%-15.15s|",
@@ -641,7 +642,7 @@ public:
                 {
                     time_t timeUnban = time_t(fields[2].GetUInt32());
                     tm tmUnban;
-                    ACE_OS::localtime_r(&timeUnban, &tmUnban);
+                    localtime_r(&timeUnban, &tmUnban);
                     handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|%02d-%02d-%02d %02d:%02d|%-15.15s|%-15.15s|",
                         fields[0].GetCString(), tmBan.tm_year%100, tmBan.tm_mon+1, tmBan.tm_mday, tmBan.tm_hour, tmBan.tm_min,
                         tmUnban.tm_year%100, tmUnban.tm_mon+1, tmUnban.tm_mday, tmUnban.tm_hour, tmUnban.tm_min,
@@ -713,7 +714,7 @@ public:
         switch (mode)
         {
             case BAN_ACCOUNT:
-                if (!AccountMgr::normalizeString(nameOrIP))
+                if (!Utf8ToUpperOnlyLatin(nameOrIP))
                 {
                     handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, nameOrIP.c_str());
                     handler->SetSentErrorMessage(true);

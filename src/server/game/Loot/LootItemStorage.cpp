@@ -16,6 +16,12 @@ LootItemStorage::~LootItemStorage()
 {
 }
 
+LootItemStorage* LootItemStorage::instance()
+{
+    static LootItemStorage instance;
+    return &instance;
+}
+
 void LootItemStorage::LoadStorageFromDB()
 {
     uint32 oldMSTime = getMSTime();
@@ -66,7 +72,7 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
     }
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
 
     StoredLootItemList& itemList = lootItemStore[loot->containerId];
 

@@ -348,6 +348,10 @@ if (MINGW) # GCC ignores "#prama comment"
   target_link_libraries(ace ws2_32 iphlpapi netapi32 mswsock)
 endif()
 
+target_link_libraries(ace
+  PRIVATE
+    acore-dependency-interface)
+
 # Generate precompiled header
 if(USE_COREPCH)
   add_cxx_pch(ace ${PRIVATE_PCH_HEADER})

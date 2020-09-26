@@ -12,11 +12,11 @@
 
 namespace VMAP
 {
-    const char VMAP_MAGIC[] = "VMAP_4.3";
-    const char RAW_VMAP_MAGIC[] = "VMAP043";                // used in extracted vmap files with raw data
+    const char VMAP_MAGIC[] = "VMAP_4.4";
+    const char RAW_VMAP_MAGIC[] = "VMAP044";                // used in extracted vmap files with raw data
     const char GAMEOBJECT_MODELS[] = "GameObjectModels.dtree";
 
     // defined in TileAssembler.cpp currently...
-    bool readChunk(FILE* rf, char *dest, const char *compare, uint32 len);
+    bool readChunk(FILE* rf, char* dest, const char* compare, uint32 len);
 }
 #endif

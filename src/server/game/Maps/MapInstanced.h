@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_MAP_INSTANCED_H
-#define TRINITY_MAP_INSTANCED_H
+#ifndef ACORE_MAP_INSTANCED_H
+#define ACORE_MAP_INSTANCED_H
 
 #include "Map.h"
 #include "InstanceSaveMgr.h"

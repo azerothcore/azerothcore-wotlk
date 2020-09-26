@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_MAP_H
-#define TRINITY_MAP_H
+#ifndef ACORE_MAP_H
+#define ACORE_MAP_H
 
 // Pathfinding
 #include "DetourAlloc.h"
@@ -27,7 +27,6 @@
 #include "GameObjectModel.h"
 #include "Log.h"
 #include "DataMap.h"
-
 #include <bitset>
 #include <list>
 
@@ -51,7 +50,11 @@ class BattlegroundMap;
 class Transport;
 class StaticTransport;
 class MotionTransport;
-namespace Trinity { struct ObjectUpdater; }
+namespace acore
+{
+    struct ObjectUpdater;
+    struct LargeObjectUpdater;
+}
 
 struct ScriptAction
 {
@@ -268,7 +271,7 @@ class Map : public GridRefManager<NGridType>
 {
     friend class MapReference;
     public:
-        Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent = NULL);
+        Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
         virtual ~Map();
 
         MapEntry const* GetEntry() const { return i_mapEntry; }
@@ -292,7 +295,15 @@ class Map : public GridRefManager<NGridType>
         template<class T> bool AddToMap(T *, bool checkTransport = false);
         template<class T> void RemoveFromMap(T *, bool);
 
-        void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor, TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor);
+        void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor);
+        void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &gridVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &worldVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer> &largeGridVisitor,
+            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer> &largeWorldVisitor);
+            
         virtual void Update(const uint32, const uint32, bool thread = true);
 
         float GetVisibilityRange() const { return m_VisibleDistance; }
@@ -309,16 +320,17 @@ class Map : public GridRefManager<NGridType>
 
         bool IsRemovalGrid(float x, float y) const
         {
-            GridCoord p = Trinity::ComputeGridCoord(x, y);
+            GridCoord p = acore::ComputeGridCoord(x, y);
             return !getNGrid(p.x_coord, p.y_coord);
         }
 
         bool IsGridLoaded(float x, float y) const
         {
-            return IsGridLoaded(Trinity::ComputeGridCoord(x, y));
+            return IsGridLoaded(acore::ComputeGridCoord(x, y));
         }
 
         void LoadGrid(float x, float y);
+        void LoadAllCells();
         bool UnloadGrid(NGridType& ngrid);
         virtual void UnloadAll();
 
@@ -341,7 +353,7 @@ class Map : public GridRefManager<NGridType>
         // can return INVALID_HEIGHT if under z+2 z coord not found height
         float GetHeight(float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
         float GetMinHeight(float x, float y) const;
-        Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = NULL);
+        Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
 
         ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = 0) const;
 
@@ -401,6 +413,9 @@ class Map : public GridRefManager<NGridType>
         void resetMarkedCells() { marked_cells.reset(); }
         bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
         void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
+        void resetMarkedCellsLarge() { marked_cells_large.reset(); }
+        bool isCellMarkedLarge(uint32 pCellId) { return marked_cells_large.test(pCellId); }
+        void markCellLarge(uint32 pCellId) { marked_cells_large.set(pCellId); }
 
         bool HavePlayers() const { return !m_mapRefManager.isEmpty(); }
         uint32 GetPlayersCountExceptGMs() const;
@@ -436,7 +451,7 @@ class Map : public GridRefManager<NGridType>
 
         TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = NULL, uint32 duration = 0, Unit* summoner = NULL, uint32 spellId = 0, uint32 vehId = 0);
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
-        void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = NULL);
+        void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
         Player* GetPlayer(uint64 guid);
         Creature* GetCreature(uint64 guid);
         GameObject* GetGameObject(uint64 guid);
@@ -445,16 +460,16 @@ class Map : public GridRefManager<NGridType>
         Pet* GetPet(uint64 guid);
         Corpse* GetCorpse(uint64 guid);
 
-        MapInstanced* ToMapInstanced(){ if (Instanceable())  return reinterpret_cast<MapInstanced*>(this); else return NULL;  }
-        const MapInstanced* ToMapInstanced() const { if (Instanceable())  return (const MapInstanced*)((MapInstanced*)this); else return NULL;  }
+        MapInstanced* ToMapInstanced(){ if (Instanceable())  return reinterpret_cast<MapInstanced*>(this); else return nullptr;  }
+        const MapInstanced* ToMapInstanced() const { if (Instanceable())  return (const MapInstanced*)((MapInstanced*)this); else return nullptr;  }
 
-        InstanceMap* ToInstanceMap(){ if (IsDungeon())  return reinterpret_cast<InstanceMap*>(this); else return NULL;  }
-        const InstanceMap* ToInstanceMap() const { if (IsDungeon())  return (const InstanceMap*)((InstanceMap*)this); else return NULL;  }
+        InstanceMap* ToInstanceMap(){ if (IsDungeon())  return reinterpret_cast<InstanceMap*>(this); else return nullptr;  }
+        const InstanceMap* ToInstanceMap() const { if (IsDungeon())  return (const InstanceMap*)((InstanceMap*)this); else return nullptr;  }
 
-        BattlegroundMap* ToBattlegroundMap() { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap*>(this); else return NULL;  }
-        const BattlegroundMap* ToBattlegroundMap() const { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap const*>(this); return NULL; }
+        BattlegroundMap* ToBattlegroundMap() { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap*>(this); else return nullptr;  }
+        const BattlegroundMap* ToBattlegroundMap() const { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap const*>(this); return nullptr; }
 
-        float GetWaterOrGroundLevel(float x, float y, float z, float* ground = NULL, bool swim = false, float maxSearchDist = 50.0f) const;
+        float GetWaterOrGroundLevel(uint32 phasemask,float x, float y, float z, float* ground = NULL, bool swim = false, float maxSearchDist = 50.0f) const;
         float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
         bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const;
         void Balance() { _dynamicTree.balance(); }
@@ -600,6 +615,7 @@ class Map : public GridRefManager<NGridType>
         NGridType* i_grids[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
         GridMap* GridMaps[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
         std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP*TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
+        std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP*TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells_large;
 
         bool i_scriptLock;
         std::unordered_set<WorldObject*> i_objectsToRemove;
@@ -664,7 +680,7 @@ class InstanceMap : public Map
         void AfterPlayerUnlinkFromMap();
         void Update(const uint32, const uint32, bool thread = true);
         void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
-        bool Reset(uint8 method, std::list<uint32>* globalSkipList = NULL);
+        bool Reset(uint8 method, std::list<uint32>* globalSkipList = nullptr);
         uint32 GetScriptId() { return i_script_id; }
         InstanceScript* GetInstanceScript() { return instance_script; }
         void PermBindAllPlayers();
@@ -721,7 +737,7 @@ inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& vis
 template<class NOTIFIER>
 inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER& notifier)
 { 
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
 
@@ -735,7 +751,7 @@ inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER
 template<class NOTIFIER>
 inline void Map::VisitFirstFound(const float &x, const float &y, float radius, NOTIFIER &notifier)
 { 
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
 
@@ -751,7 +767,7 @@ inline void Map::VisitFirstFound(const float &x, const float &y, float radius, N
 template<class NOTIFIER>
 inline void Map::VisitWorld(const float &x, const float &y, float radius, NOTIFIER &notifier)
 { 
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
 
@@ -762,7 +778,7 @@ inline void Map::VisitWorld(const float &x, const float &y, float radius, NOTIFI
 template<class NOTIFIER>
 inline void Map::VisitGrid(const float &x, const float &y, float radius, NOTIFIER &notifier)
 { 
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     cell.SetNoCreate();
 

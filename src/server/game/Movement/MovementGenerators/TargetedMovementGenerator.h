@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_TARGETEDMOVEMENTGENERATOR_H
-#define TRINITY_TARGETEDMOVEMENTGENERATOR_H
+#ifndef ACORE_TARGETEDMOVEMENTGENERATOR_H
+#define ACORE_TARGETEDMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
 #include "FollowerReference.h"
@@ -29,7 +29,7 @@ class TargetedMovementGeneratorMedium : public MovementGeneratorMedium< T, D >, 
 {
     protected:
         TargetedMovementGeneratorMedium(Unit* target, float offset, float angle) :
-            TargetedMovementGeneratorBase(target), i_path(NULL), lastPathingFailMSTime(0),
+            TargetedMovementGeneratorBase(target), i_path(nullptr), lastPathingFailMSTime(0),
             i_recheckDistance(0), i_recheckDistanceForced(2500), i_offset(offset), i_angle(angle),
             i_recalculateTravel(false), i_targetReached(false)
         {

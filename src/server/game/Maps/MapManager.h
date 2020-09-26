@@ -4,11 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_MAPMANAGER_H
-#define TRINITY_MAPMANAGER_H
+#ifndef ACORE_MAPMANAGER_H
+#define ACORE_MAPMANAGER_H
 
 #include "Define.h"
-#include <ace/Singleton.h>
 #include <ace/Thread_Mutex.h>
 #include "Common.h"
 #include "Map.h"
@@ -22,9 +21,9 @@ struct TransportCreatureProto;
 
 class MapManager
 {
-    friend class ACE_Singleton<MapManager, ACE_Thread_Mutex>;
-
     public:
+        static MapManager* instance();
+
         Map* CreateBaseMap(uint32 mapId);
         Map* FindBaseNonInstanceMap(uint32 mapId) const;
         Map* CreateMap(uint32 mapId, Player* player);
@@ -72,17 +71,17 @@ class MapManager
 
         static bool IsValidMapCoord(uint32 mapid, float x, float y)
         {
-            return IsValidMAP(mapid, false) && Trinity::IsValidMapCoord(x, y);
+            return IsValidMAP(mapid, false) && acore::IsValidMapCoord(x, y);
         }
 
         static bool IsValidMapCoord(uint32 mapid, float x, float y, float z)
         {
-            return IsValidMAP(mapid, false) && Trinity::IsValidMapCoord(x, y, z);
+            return IsValidMAP(mapid, false) && acore::IsValidMapCoord(x, y, z);
         }
 
         static bool IsValidMapCoord(uint32 mapid, float x, float y, float z, float o)
         {
-            return IsValidMAP(mapid, false) && Trinity::IsValidMapCoord(x, y, z, o);
+            return IsValidMAP(mapid, false) && acore::IsValidMapCoord(x, y, z, o);
         }
 
         static bool IsValidMapCoord(WorldLocation const& loc)
@@ -140,5 +139,7 @@ class MapManager
         uint32 _nextInstanceId;
         MapUpdater m_updater;
 };
-#define sMapMgr ACE_Singleton<MapManager, ACE_Thread_Mutex>::instance()
+
+#define sMapMgr MapManager::instance()
+
 #endif

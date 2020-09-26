@@ -473,7 +473,7 @@ WMOGroup::~WMOGroup()
 }
 
 WMOInstance::WMOInstance(MPQFile& f, char const* WmoInstName, uint32 mapID, uint32 tileX, uint32 tileY, FILE* pDirfile)
-    : currx(0), curry(0), wmo(NULL), doodadset(0), pos(), indx(0), id(0), d2(0), d3(0)
+    : currx(0), curry(0), wmo(nullptr), doodadset(0), pos(), indx(0), id(0), d2(0), d3(0)
 {
     float ff[3];
     f.read(&id, 4);

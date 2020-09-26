@@ -35,10 +35,16 @@ ObjectAccessor::~ObjectAccessor()
 {
 }
 
+ObjectAccessor* ObjectAccessor::instance()
+{
+    static ObjectAccessor instance;
+    return &instance;
+}
+
 Player* ObjectAccessor::GetObjectInWorld(uint64 guid, Player* /*typeSpecifier*/)
 {
     Player* player = HashMapHolder<Player>::Find(guid);
-    return player && player->IsInWorld() ? player : NULL;
+    return player && player->IsInWorld() ? player : nullptr;
 }
 
 WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, uint64 guid)
@@ -54,7 +60,7 @@ WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, uint64 guid)
         case HIGHGUID_PET:           return GetPet(p, guid);
         case HIGHGUID_DYNAMICOBJECT: return GetDynamicObject(p, guid);
         case HIGHGUID_CORPSE:        return GetCorpse(p, guid);
-        default:                     return NULL;
+        default:                     return nullptr;
     }
 }
 
@@ -93,7 +99,7 @@ Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const& p, uint64 guid, u
             break;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 Corpse* ObjectAccessor::GetCorpse(WorldObject const& u, uint64 guid)
@@ -109,10 +115,10 @@ GameObject* ObjectAccessor::GetGameObject(WorldObject const& u, uint64 guid)
 Transport* ObjectAccessor::GetTransport(WorldObject const& u, uint64 guid)
 {
     if (GUID_HIPART(guid) != HIGHGUID_MO_TRANSPORT && GUID_HIPART(guid) != HIGHGUID_TRANSPORT)
-        return NULL;
+        return nullptr;
 
     GameObject* go = GetGameObject(u, guid);
-    return go ? go->ToTransport() : NULL;
+    return go ? go->ToTransport() : nullptr;
 }
 
 DynamicObject* ObjectAccessor::GetDynamicObject(WorldObject const& u, uint64 guid)
@@ -148,7 +154,7 @@ Creature* ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const& u, uint64
     if (IS_CRE_OR_VEH_GUID(guid))
         return GetCreature(u, guid);
 
-    return NULL;
+    return nullptr;
 }
 
 Pet* ObjectAccessor::FindPet(uint64 guid)
@@ -163,7 +169,7 @@ Player* ObjectAccessor::FindPlayer(uint64 guid)
 
 Player* ObjectAccessor::FindPlayerInOrOutOfWorld(uint64 guid)
 {
-    return GetObjectInOrOutOfWorld(guid, (Player*)NULL); 
+    return GetObjectInOrOutOfWorld(guid, (Player*)NULL);
 }
 
 Unit* ObjectAccessor::FindUnit(uint64 guid)
@@ -171,9 +177,14 @@ Unit* ObjectAccessor::FindUnit(uint64 guid)
     return GetObjectInWorld(guid, (Unit*)NULL);
 }
 
+Player* ObjectAccessor::FindConnectedPlayer(uint64 const& guid)
+{
+    return HashMapHolder<Player>::Find(guid);
+}
+
 Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWorld)
 {
-    /*TRINITY_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+    /*ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
     std::string nameStr = name;
     std::transform(nameStr.begin(), nameStr.end(), nameStr.begin(), ::tolower);
     HashMapHolder<Player>::MapType const& m = GetPlayers();
@@ -195,12 +206,12 @@ Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWo
         if (!checkInWorld || itr->second->IsInWorld())
             return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 void ObjectAccessor::SaveAllPlayers()
 {
-    TRINITY_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+    ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
     HashMapHolder<Player>::MapType const& m = GetPlayers();
     for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
         itr->second->SaveToDB(false, false);
@@ -208,11 +219,11 @@ void ObjectAccessor::SaveAllPlayers()
 
 Corpse* ObjectAccessor::GetCorpseForPlayerGUID(uint64 guid)
 {
-    TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    ACORE_READ_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
 
     Player2CorpsesMapType::iterator iter = i_player2corpse.find(guid);
     if (iter == i_player2corpse.end())
-        return NULL;
+        return nullptr;
 
     ASSERT(iter->second->GetType() != CORPSE_BONES);
 
@@ -225,7 +236,7 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse, bool final)
 
     if (!final)
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
         Player2CorpsesMapType::iterator iter = i_player2corpse.find(corpse->GetOwnerGUID());
         if (iter == i_player2corpse.end())
             return;
@@ -252,10 +263,10 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse, bool final)
 
     // Critical section
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
 
         // build mapid*cellid -> guid_set map
-        CellCoord cellCoord = Trinity::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
+        CellCoord cellCoord = acore::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
         sObjectMgr->DeleteCorpseCellData(corpse->GetMapId(), cellCoord.GetId(), GUID_LOPART(corpse->GetOwnerGUID()));
     }
 
@@ -268,20 +279,20 @@ void ObjectAccessor::AddCorpse(Corpse* corpse)
 
     // Critical section
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
 
         ASSERT(i_player2corpse.find(corpse->GetOwnerGUID()) == i_player2corpse.end());
         i_player2corpse[corpse->GetOwnerGUID()] = corpse;
 
         // build mapid*cellid -> guid_set map
-        CellCoord cellCoord = Trinity::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
+        CellCoord cellCoord = acore::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
         sObjectMgr->AddCorpseCellData(corpse->GetMapId(), cellCoord.GetId(), GUID_LOPART(corpse->GetOwnerGUID()), corpse->GetInstanceId());
     }
 }
 
 void ObjectAccessor::AddCorpsesToGrid(GridCoord const& gridpair, GridType& grid, Map* map)
 {
-    TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    ACORE_READ_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
 
     for (Player2CorpsesMapType::iterator iter = i_player2corpse.begin(); iter != i_player2corpse.end(); ++iter)
     {
@@ -310,7 +321,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
     {
         //in fact this function is called from several places
         //even when player doesn't have a corpse, not an error
-        return NULL;
+        return nullptr;
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -329,7 +340,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
     corpse->DeleteFromDB(trans);
     CharacterDatabase.CommitTransaction(trans);
 
-    Corpse* bones = NULL;
+    Corpse* bones = nullptr;
     // create the bones only if the map and the grid is loaded at the corpse's location
     // ignore bones creating option in case insignia
 
@@ -369,7 +380,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
         }
 
         // pussywizard: for deleting bones
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
         i_playerBones.push_back(bones->GetGUID());
     }
 
@@ -381,7 +392,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
 
 void ObjectAccessor::RemoveOldCorpses()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     Player2CorpsesMapType::iterator next;
     for (Player2CorpsesMapType::iterator itr = i_player2corpse.begin(); itr != i_player2corpse.end(); itr = next)
     {
@@ -396,7 +407,7 @@ void ObjectAccessor::RemoveOldCorpses()
 
     // pussywizard: for deleting bones
     std::list<uint64>::iterator next2;
-    TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
     for (std::list<uint64>::iterator itr = i_playerBones.begin(); itr != i_playerBones.end(); itr = next2)
     {
         next2 = itr;
@@ -429,13 +440,13 @@ void ObjectAccessor::RemoveOldCorpses()
 
 void ObjectAccessor::AddDelayedCorpseAction(Corpse* corpse, uint8 action, uint32 mapId, uint32 instanceId)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, DelayedCorpseLock);
+    ACORE_GUARD(ACE_Thread_Mutex, DelayedCorpseLock);
     i_delayedCorpseActions.push_back(DelayedCorpseAction(corpse, action, mapId, instanceId));
 }
 
 void ObjectAccessor::ProcessDelayedCorpseActions()
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, DelayedCorpseLock);
+    ACORE_GUARD(ACE_Thread_Mutex, DelayedCorpseLock);
     for (std::list<DelayedCorpseAction>::iterator itr = i_delayedCorpseActions.begin(); itr != i_delayedCorpseActions.end(); ++itr)
     {
         DelayedCorpseAction a = (*itr);
@@ -480,7 +491,7 @@ void ObjectAccessor::Update(uint32 /*diff*/)
 }
 
 void Map::BuildAndSendUpdateForObjects()
-{ 
+{
     UpdateDataMapType update_players;
     UpdatePlayerSet player_set;
 

@@ -310,7 +310,7 @@ bool BattlegroundEY::SetupBattleground()
         AddObject(BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER + i * 3 + 2, Buff_Entries[2], at->x, at->y, at->z, 0.907571f, 0, 0, 0.438371f, 0.898794f, RESPAWN_ONE_DAY);
     }
 
-    GraveyardStruct const* sg = NULL;
+    GraveyardStruct const* sg = nullptr;
     sg = sGraveyard->GetGraveyard(BG_EY_GRAVEYARD_MAIN_ALLIANCE);
     AddSpiritGuide(BG_EY_SPIRIT_MAIN_ALLIANCE, sg->x, sg->y, sg->z, 3.124139f, TEAM_ALLIANCE);
 
@@ -340,7 +340,7 @@ void BattlegroundEY::Init()
     Battleground::Init();
 
     _bgEvents.Reset();
-    _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID()) ? BG_EY_HONOR_TICK_WEEKEND : BG_EY_HONOR_TICK_NORMAL;
+    _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_EY_HONOR_TICK_WEEKEND : BG_EY_HONOR_TICK_NORMAL;
     _ownedPointsCount[TEAM_ALLIANCE] = 0;
     _ownedPointsCount[TEAM_HORDE] = 0;
     _flagKeeperGUID = 0;

@@ -4,11 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_SPELLAURAS_H
-#define TRINITY_SPELLAURAS_H
+#ifndef ACORE_SPELLAURAS_H
+#define ACORE_SPELLAURAS_H
 
 #include "SpellAuraDefines.h"
-#include "SpellInfo.h"
 #include "Unit.h"
 
 class Unit;
@@ -23,9 +22,6 @@ class Aura;
 class DynamicObject;
 class AuraScript;
 class ProcInfo;
-
-// update aura target map every 500 ms instead of every update - reduce amount of grid searcher calls
-#define UPDATE_TARGET_MAP_INTERVAL 500
 
 class AuraApplication
 {
@@ -93,7 +89,7 @@ class Aura
         virtual ~Aura();
 
         SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
-        uint32 GetId() const{ return GetSpellInfo()->Id; }
+        uint32 GetId() const;
 
         uint64 GetCastItemGUID() const { return m_castItemGuid; }
         uint32 GetCastItemEntry() const { return m_castItemEntry; }
@@ -151,7 +147,7 @@ class Aura
         bool IsArea() const;
         bool IsPassive() const;
         bool IsDeathPersistent() const;
-        bool IsRemovedOnShapeLost(Unit* target) const { return (GetCasterGUID() == target->GetGUID() && m_spellInfo->Stances && !m_spellInfo->HasAttribute(SPELL_ATTR2_NOT_NEED_SHAPESHIFT) && !m_spellInfo->HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFT)); }
+        bool IsRemovedOnShapeLost(Unit* target) const;
         bool CanBeSaved() const;
         bool IsRemoved() const { return m_isRemoved; }
         bool CanBeSentToClient() const;
@@ -175,8 +171,8 @@ class Aura
         // Helpers for targets
         ApplicationMap const & GetApplicationMap() {return m_applications;}
         void GetApplicationList(std::list<AuraApplication*> & applicationList) const;
-        const AuraApplication * GetApplicationOfTarget (uint64 guid) const { ApplicationMap::const_iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return NULL; }
-        AuraApplication * GetApplicationOfTarget (uint64 guid) { ApplicationMap::iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return NULL; }
+        const AuraApplication * GetApplicationOfTarget (uint64 guid) const { ApplicationMap::const_iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return nullptr; }
+        AuraApplication * GetApplicationOfTarget (uint64 guid) { ApplicationMap::iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return nullptr; }
         bool IsAppliedOnTarget(uint64 guid) const { return m_applications.find(guid) != m_applications.end(); }
 
         void SetNeedClientUpdateForTargets() const;

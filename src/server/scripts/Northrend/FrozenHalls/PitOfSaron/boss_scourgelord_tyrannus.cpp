@@ -62,6 +62,7 @@ public:
 
         void Reset()
         {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
             if (me->HasReactState(REACT_AGGRESSIVE)) // Reset() called by EnterEvadeMode()
             {
@@ -92,7 +93,6 @@ public:
             if (param == 1)
             {
                 Position exitPos = {1023.46f, 159.12f, 628.2f, 5.23f};
-                me->RemoveAllAuras();
                 if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_RIMEFANG_GUID)))
                 {
                     c->RemoveAura(46598);
@@ -103,6 +103,8 @@ public:
                 me->GetMotionMaster()->MoveJump(exitPos, 10.0f, 2.0f);
 
                 // start real fight
+                me->RemoveAllAuras();
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 DoZoneInCombat();
                 me->CastSpell(me, 43979, true);
                 Talk(SAY_AGGRO);

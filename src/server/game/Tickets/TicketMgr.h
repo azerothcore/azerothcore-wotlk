@@ -7,10 +7,8 @@
 #ifndef _TICKETMGR_H
 #define _TICKETMGR_H
 
-#include <string>
-#include <ace/Singleton.h>
-
 #include "ObjectMgr.h"
+#include <string>
 
 class ChatHandler;
 
@@ -121,7 +119,7 @@ public:
     void SetMessage(std::string const& message)
     {
         _message = message;
-        _lastModifiedTime = uint64(time(NULL));
+        _lastModifiedTime = uint64(time(nullptr));
     }
     void SetComment(std::string const& comment) { _comment = comment; }
     void SetViewed() { _viewed = true; }
@@ -169,17 +167,18 @@ private:
     std::string _response;
     std::string _chatLog; // No need to store in db, will be refreshed every session client side
 };
+
 typedef std::map<uint32, GmTicket*> GmTicketList;
 
 class TicketMgr
 {
-    friend class ACE_Singleton<TicketMgr, ACE_Null_Mutex>;
-
 private:
     TicketMgr();
     ~TicketMgr();
 
 public:
+    static TicketMgr* instance();
+    
     void LoadTickets();
     void LoadSurveys();
 
@@ -189,7 +188,7 @@ public:
         if (itr != _ticketList.end())
             return itr->second;
 
-        return NULL;
+        return nullptr;
     }
 
     GmTicket* GetTicketByPlayer(uint64 playerGuid)
@@ -198,7 +197,7 @@ public:
             if (itr->second && itr->second->IsFromPlayer(playerGuid) && !itr->second->IsClosed())
                 return itr->second;
 
-        return NULL;
+        return nullptr;
     }
 
     GmTicket* GetOldestOpenTicket()
@@ -207,7 +206,7 @@ public:
             if (itr->second && !itr->second->IsClosed() && !itr->second->IsCompleted())
                 return itr->second;
 
-        return NULL;
+        return nullptr;
     }
 
     void AddTicket(GmTicket* ticket);
@@ -219,7 +218,7 @@ public:
     void SetStatus(bool status) { _status = status; }
 
     uint64 GetLastChange() const { return _lastChange; }
-    void UpdateLastChange() { _lastChange = uint64(time(NULL)); }
+    void UpdateLastChange() { _lastChange = uint64(time(nullptr)); }
 
     uint32 GenerateTicketId() { return ++_lastTicketId; }
     uint32 GetOpenTicketCount() const { return _openTicketCount; }
@@ -246,6 +245,6 @@ protected:
     uint64 _lastChange;
 };
 
-#define sTicketMgr ACE_Singleton<TicketMgr, ACE_Null_Mutex>::instance()
+#define sTicketMgr TicketMgr::instance()
 
 #endif // _TICKETMGR_H

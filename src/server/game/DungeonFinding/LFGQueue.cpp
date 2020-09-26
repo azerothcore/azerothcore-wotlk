@@ -172,7 +172,7 @@ uint8 LFGQueue::FindGroups()
 {
     //sLog->outString("FIND GROUPS!");
     uint8 newGroupsProcessed = 0;
-    while (!newToQueueStore.empty())
+    if (!newToQueueStore.empty())
     {
         ++newGroupsProcessed;
         uint64 newGuid = newToQueueStore.front();
@@ -207,7 +207,7 @@ LfgCompatibility LFGQueue::FindNewGroups(const uint64& newGuid)
         {
             // unset roles here so they are not copied, restore after insertion
             LfgRolesMap* r = it->roles; 
-            it->roles = NULL;
+            it->roles = nullptr;
             currentCompatibles.insert(*it);
             it->roles = r;
         }
@@ -409,10 +409,10 @@ LfgCompatibility LFGQueue::CheckCompatibility(Lfg5Guids const& checkWith, const 
         return LFG_COMPATIBILITY_PENDING;
 
     // Create a new proposal
-    proposal.cancelTime = time(NULL) + LFG_TIME_PROPOSAL;
+    proposal.cancelTime = time(nullptr) + LFG_TIME_PROPOSAL;
     proposal.state = LFG_PROPOSAL_INITIATING;
     proposal.leader = 0;
-    proposal.dungeonId = Trinity::Containers::SelectRandomContainerElement(proposalDungeons);
+    proposal.dungeonId = acore::Containers::SelectRandomContainerElement(proposalDungeons);
 
     bool leader = false;
     for (LfgRolesMap::const_iterator itRoles = proposalRoles.begin(); itRoles != proposalRoles.end(); ++itRoles)
@@ -445,7 +445,7 @@ LfgCompatibility LFGQueue::CheckCompatibility(Lfg5Guids const& checkWith, const 
 
 void LFGQueue::UpdateQueueTimers(uint32 diff)
 {
-    time_t currTime = time(NULL);
+    time_t currTime = time(nullptr);
     bool sendQueueStatus = false;
 
     if (m_QueueStatusTimer > LFG_QUEUEUPDATE_INTERVAL)

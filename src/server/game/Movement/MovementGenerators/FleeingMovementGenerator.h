@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_FLEEINGMOVEMENTGENERATOR_H
-#define TRINITY_FLEEINGMOVEMENTGENERATOR_H
+#ifndef ACORE_FLEEINGMOVEMENTGENERATOR_H
+#define ACORE_FLEEINGMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
 

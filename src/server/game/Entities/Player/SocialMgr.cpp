@@ -7,7 +7,7 @@
 #include "SocialMgr.h"
 
 #include "DatabaseEnv.h"
-#include "Opcodes.h"
+#include "WorldSession.h"
 #include "WorldPacket.h"
 #include "Player.h"
 #include "ObjectMgr.h"
@@ -196,6 +196,12 @@ SocialMgr::~SocialMgr()
 {
 }
 
+SocialMgr* SocialMgr::instance()
+{
+    static SocialMgr instance;
+    return &instance;
+}
+
 void SocialMgr::GetFriendInfo(Player* player, uint32 friendGUID, FriendInfo &friendInfo)
 {
     if (!player)
@@ -221,7 +227,7 @@ void SocialMgr::GetFriendInfo(Player* player, uint32 friendGUID, FriendInfo &fri
 
     // PLAYER see his team only and PLAYER can't see MODERATOR, GAME MASTER, ADMINISTRATOR characters
     // MODERATOR, GAME MASTER, ADMINISTRATOR can see all
-    if (pFriend && (!AccountMgr::IsPlayerAccount(security) || ((pFriend->GetTeamId() == teamId || allowTwoSideWhoList) && pFriend->GetSession()->GetSecurity() <= gmLevelInWhoList)) && pFriend->IsVisibleGloballyFor(player))
+    if ((!AccountMgr::IsPlayerAccount(security) || ((pFriend->GetTeamId() == teamId || allowTwoSideWhoList) && pFriend->GetSession()->GetSecurity() <= gmLevelInWhoList)) && pFriend->IsVisibleGloballyFor(player))
     {
         friendInfo.Status = FRIEND_STATUS_ONLINE;
         if (pFriend->isAFK())

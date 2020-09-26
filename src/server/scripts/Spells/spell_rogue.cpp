@@ -399,7 +399,7 @@ class spell_rog_killing_spree : public SpellScriptLoader
             {
                 while (!_targets.empty())
                 {
-                    uint64 guid = Trinity::Containers::SelectRandomContainerElement(_targets);
+                    uint64 guid = acore::Containers::SelectRandomContainerElement(_targets);
                     if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
                     {
                         // xinef: target may be no longer valid
@@ -730,7 +730,7 @@ class spell_rog_tricks_of_the_trade : public SpellScriptLoader
 
             bool Load()
             {
-                _redirectTarget = NULL;
+                _redirectTarget = nullptr;
                 return true;
             }
 

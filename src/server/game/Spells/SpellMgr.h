@@ -9,7 +9,6 @@
 
 // For static or at-server-startup loaded spell data
 
-#include <ace/Singleton.h>
 #include "Common.h"
 #include "SharedDefines.h"
 #include "Unit.h"
@@ -354,8 +353,6 @@ struct SpellStackInfo
 typedef std::map<uint32, SpellStackInfo> SpellGroupMap;
 typedef std::map<uint32, SpellGroupStackFlags> SpellGroupStackMap;
 
-
-
 struct SpellThreatEntry
 {
     int32       flatMod;                                    // flat threat-value for this Spell  - default: 0
@@ -491,6 +488,13 @@ class PetAura
 };
 typedef std::map<uint32, PetAura> SpellPetAuraMap;
 
+enum ICCBuff
+{
+    ICC_AREA              = 4812,
+    ICC_RACEMASK_HORDE    =  690,
+    ICC_RACEMASK_ALLIANCE = 1101
+};
+
 struct SpellArea
 {
     uint32 spellId;
@@ -596,7 +600,6 @@ typedef std::set<uint32> TalentAdditionalSet;
 
 class SpellMgr
 {
-    friend class ACE_Singleton<SpellMgr, ACE_Null_Mutex>;
     // Constructors
     private:
         SpellMgr();
@@ -604,6 +607,8 @@ class SpellMgr
 
     // Accessors (const or static functions)
     public:
+        static SpellMgr* instance();
+
         // Spell correctness for client using
         static bool ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg = true);
         static bool IsSpellValid(SpellInfo const* spellInfo);
@@ -680,11 +685,14 @@ class SpellMgr
         SpellAreaForAreaMapBounds GetSpellAreaForAreaMapBounds(uint32 area_id) const;
 
         // SpellInfo object management
-        SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : NULL; }
+        SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : nullptr; }
         uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
 
         // Talent Additional Set
         bool IsAdditionalTalentSpell(uint32 spellId) const;
+
+    private:
+        SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
 
     // Modifiers
     public:
@@ -748,6 +756,6 @@ class SpellMgr
         TalentAdditionalSet        mTalentSpellAdditionalSet;
 };
 
-#define sSpellMgr ACE_Singleton<SpellMgr, ACE_Null_Mutex>::instance()
+#define sSpellMgr SpellMgr::instance()
 
 #endif

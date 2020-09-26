@@ -31,12 +31,15 @@ public:
         uint64 goSjonnirDoorGUID;
         uint64 goLeftPipeGUID;
         uint64 goRightPipeGUID;
+        uint64 goTribunalDoorGUID;
 
         uint64 SjonnirGUID;
         uint64 BrannGUID;
 
         bool brannAchievement;
         bool sjonnirAchievement;
+        bool isMaidenOfGriefDead;
+        bool isKrystalusDead;
 
         void Initialize()
         {
@@ -51,12 +54,15 @@ public:
             goSjonnirDoorGUID = 0;
             goLeftPipeGUID = 0;
             goRightPipeGUID = 0;
+            goTribunalDoorGUID = 0;
 
             SjonnirGUID = 0;
             BrannGUID = 0;
 
             brannAchievement = false;
             sjonnirAchievement = false;
+            isMaidenOfGriefDead = false;
+            isKrystalusDead = false;
         }
 
         bool IsEncounterInProgress() const
@@ -86,6 +92,10 @@ public:
                     break;
                 case GO_TRIBUNAL_CONSOLE: 
                     goTribunalConsoleGUID = go->GetGUID(); 
+                    break;
+                case GO_TRIBUNAL_ACCESS_DOOR:
+                    goTribunalDoorGUID = go->GetGUID();
+                    go->SetGoState(GO_STATE_READY);
                     break;
                 case GO_SKY_FLOOR: 
                     goSkyRoomFloorGUID = go->GetGUID();
@@ -128,6 +138,7 @@ public:
             switch(id)
             {
                 case GO_TRIBUNAL_CONSOLE:       return goTribunalConsoleGUID;
+                case GO_TRIBUNAL_ACCESS_DOOR:   return goTribunalDoorGUID;
                 case GO_SJONNIR_CONSOLE:        return goSjonnirConsoleGUID;
                 case GO_SJONNIR_DOOR:           return goSjonnirDoorGUID;
                 case GO_LEFT_PIPE:              return goLeftPipeGUID;
@@ -172,6 +183,16 @@ public:
         {
             if (type < MAX_ENCOUNTER)
                 Encounter[type] = data;
+
+            if (data == DONE)
+            {
+                isMaidenOfGriefDead = (type == BOSS_MAIDEN_OF_GRIEF ? true : isMaidenOfGriefDead);
+                isKrystalusDead = (type == BOSS_KRYSTALLUS ? true : isKrystalusDead);
+            }
+
+            if (isMaidenOfGriefDead && isKrystalusDead)
+                if (GameObject* tribunalDoor = instance->GetGameObject(goTribunalDoorGUID))
+                    tribunalDoor->SetGoState(GO_STATE_ACTIVE);
 
             if (type == BOSS_TRIBUNAL_OF_AGES && data == DONE)
             {

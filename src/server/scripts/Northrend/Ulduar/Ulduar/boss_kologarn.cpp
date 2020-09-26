@@ -432,7 +432,7 @@ public:
                 case EVENT_FOCUSED_EYEBEAM:
                 {
                     events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 13000+rand()%5000);
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
                     for(auto itr = pList.begin(); itr != pList.end(); ++itr)
                     {
@@ -639,7 +639,7 @@ public:
 
 
 // predicate function to select non main tank target
-class StoneGripTargetSelector : public std::unary_function<Unit*, bool>
+class StoneGripTargetSelector : public acore::unary_function<Unit*, bool>
 {
     public:
         StoneGripTargetSelector(Creature* me, Unit const* victim) : _me(me), _victim(victim) {}

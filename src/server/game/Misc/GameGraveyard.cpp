@@ -1,7 +1,14 @@
 #include "GameGraveyard.h"
 #include "MapManager.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Log.h"
+
+Graveyard* Graveyard::instance()
+{
+    static Graveyard instance;
+    return &instance;
+}
 
 void Graveyard::LoadGraveyardFromDB()
 {
@@ -56,7 +63,7 @@ GraveyardStruct const* Graveyard::GetGraveyard(uint32 ID) const
     if (itr != _graveyardStore.end())
         return &itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 GraveyardStruct const* Graveyard::GetDefaultGraveyard(TeamId teamId)
@@ -104,15 +111,15 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
     // at corpse map
     bool foundNear = false;
     float distNear = 10000;
-    GraveyardStruct const* entryNear = NULL;
+    GraveyardStruct const* entryNear = nullptr;
 
     // at entrance map for corpse map
     bool foundEntr = false;
     float distEntr = 10000;
-    GraveyardStruct const* entryEntr = NULL;
+    GraveyardStruct const* entryEntr = nullptr;
 
     // some where other
-    GraveyardStruct const* entryFar = NULL;
+    GraveyardStruct const* entryFar = nullptr;
 
     MapEntry const* mapEntry = sMapStore.LookupEntry(MapId);
 
@@ -203,7 +210,7 @@ GraveyardData const* Graveyard::FindGraveyardData(uint32 id, uint32 zoneId)
             return &data;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool Graveyard::AddGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool persist /*= true*/)
@@ -352,13 +359,13 @@ GraveyardStruct const* Graveyard::GetGraveyard(const std::string& name) const
     // explicit name case
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
-        return NULL;
+        return nullptr;
 
     // converting string that we try to find to lower case
     wstrToLower(wname);
 
     // Alternative first GameTele what contains wnameLow as substring in case no GameTele location found
-    const GraveyardStruct* alt = NULL;
+    const GraveyardStruct* alt = nullptr;
     for (GraveyardContainer::const_iterator itr = _graveyardStore.begin(); itr != _graveyardStore.end(); ++itr)
     {
         if (itr->second.wnameLow == wname)

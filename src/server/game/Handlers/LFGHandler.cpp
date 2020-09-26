@@ -199,7 +199,7 @@ void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*
     {
         data << uint32(*it);                               // Dungeon Entry (id + type)
         lfg::LfgReward const* reward = sLFGMgr->GetRandomDungeonReward(*it, level);
-        Quest const* quest = NULL;
+        Quest const* quest = nullptr;
         bool done = false;
         if (reward)
         {
@@ -259,7 +259,7 @@ void WorldSession::HandleLfgPartyLockInfoRequestOpcode(WorldPacket&  /*recvData*
 
     // Get the locked dungeons of the other party members
     lfg::LfgLockPartyMap lockMap;
-    for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* plrg = itr->GetSource();
         if (!plrg)
@@ -373,7 +373,7 @@ void WorldSession::SendLfgUpdateParty(lfg::LfgUpdateData const& updateData)
     {
         case lfg::LFG_UPDATETYPE_ADDED_TO_QUEUE:                // Rolecheck Success
             queued = true;
-            // no break on purpose
+            [[fallthrough]];
         case lfg::LFG_UPDATETYPE_PROPOSAL_BEGIN:
             join = true;
             break;
@@ -548,7 +548,7 @@ void WorldSession::SendLfgBootProposalUpdate(lfg::LfgPlayerBoot const& boot)
     lfg::LfgAnswer playerVote = boot.votes.find(guid)->second;
     uint8 votesNum = 0;
     uint8 agreeNum = 0;
-    uint32 secsleft = boot.cancelTime - time(NULL);
+    uint32 secsleft = boot.cancelTime - time(nullptr);
     for (lfg::LfgAnswerContainer::const_iterator it = boot.votes.begin(); it != boot.votes.end(); ++it)
     {
         if (it->second != lfg::LFG_ANSWER_PENDING)

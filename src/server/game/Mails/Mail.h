@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_MAIL_H
-#define TRINITY_MAIL_H
+#ifndef ACORE_MAIL_H
+#define ACORE_MAIL_H
 
 #include "Common.h"
 #include <map>
@@ -91,7 +91,7 @@ class MailSender
 class MailReceiver
 {
     public:                                                 // Constructors
-        explicit MailReceiver(uint32 receiver_lowguid) : m_receiver(NULL), m_receiver_lowguid(receiver_lowguid) {}
+        explicit MailReceiver(uint32 receiver_lowguid) : m_receiver(nullptr), m_receiver_lowguid(receiver_lowguid) {}
         MailReceiver(Player* receiver);
         MailReceiver(Player* receiver, uint32 receiver_lowguid);
     public:                                                 // Accessors
@@ -126,7 +126,7 @@ class MailDraft
 
     public:                                                 // finishers
         void SendReturnToSender(uint32 sender_acc, uint32 sender_guid, uint32 receiver_guid, SQLTransaction& trans);
-        void SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 custom_expiration = 0);
+        void SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 custom_expiration = 0, bool deleteMailItemsFromDB = false, bool sendMail = true);
 
     private:
         void deleteIncludedItems(SQLTransaction& trans, bool inDB = false);

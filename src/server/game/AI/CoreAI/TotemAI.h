@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_TOTEMAI_H
-#define TRINITY_TOTEMAI_H
+#ifndef ACORE_TOTEMAI_H
+#define ACORE_TOTEMAI_H
 
 #include "CreatureAI.h"
 #include "Timer.h"

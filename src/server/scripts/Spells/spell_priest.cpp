@@ -155,13 +155,13 @@ class spell_pri_circle_of_healing : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
+                targets.remove_if(acore::RaidCheck(GetCaster(), false));
 
                 uint32 const maxTargets = GetCaster()->HasAura(SPELL_PRIEST_GLYPH_OF_CIRCLE_OF_HEALING) ? 6 : 5; // Glyph of Circle of Healing
 
                 if (targets.size() > maxTargets)
                 {
-                    targets.sort(Trinity::HealthPctOrderPred());
+                    targets.sort(acore::HealthPctOrderPred());
                     targets.resize(maxTargets);
                 }
             }
@@ -240,13 +240,13 @@ class spell_pri_divine_hymn : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
+                targets.remove_if(acore::RaidCheck(GetCaster(), false));
 
                 uint32 const maxTargets = 3;
 
                 if (targets.size() > maxTargets)
                 {
-                    targets.sort(Trinity::HealthPctOrderPred());
+                    targets.sort(acore::HealthPctOrderPred());
                     targets.resize(maxTargets);
                 }
             }
@@ -341,7 +341,7 @@ class spell_pri_guardian_spirit : public SpellScriptLoader
                 int32 healAmount = int32(target->CountPctFromMaxHealth(healPct));
                 // remove the aura now, we don't want 40% healing bonus
                 Remove(AURA_REMOVE_BY_ENEMY_SPELL);
-                target->CastCustomSpell(target, SPELL_PRIEST_GUARDIAN_SPIRIT_HEAL, &healAmount, NULL, NULL, true);
+                target->CastCustomSpell(target, SPELL_PRIEST_GUARDIAN_SPIRIT_HEAL, &healAmount, nullptr, nullptr, true);
                 absorbAmount = dmgInfo.GetDamage();
             }
 
@@ -370,14 +370,14 @@ class spell_pri_hymn_of_hope : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(Trinity::PowerCheck(POWER_MANA, false));
-                targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
+                targets.remove_if(acore::PowerCheck(POWER_MANA, false));
+                targets.remove_if(acore::RaidCheck(GetCaster(), false));
 
                 uint32 const maxTargets = 3;
 
                 if (targets.size() > maxTargets)
                 {
-                    targets.sort(Trinity::PowerPctOrderPred(POWER_MANA));
+                    targets.sort(acore::PowerPctOrderPred(POWER_MANA));
                     targets.resize(maxTargets);
                 }
             }
@@ -518,7 +518,7 @@ class spell_pri_mana_leech : public SpellScriptLoader
 
             bool Load()
             {
-                _procTarget = NULL;
+                _procTarget = nullptr;
                 return true;
             }
 
@@ -562,7 +562,7 @@ class spell_pri_mind_sear : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& unitList)
             {
-                unitList.remove_if(Trinity::ObjectGUIDCheck(GetCaster()->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT), true));
+                unitList.remove_if(acore::ObjectGUIDCheck(GetCaster()->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT), true));
             }
 
             void Register()
@@ -767,7 +767,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
                         int32 bp = CalculatePct(absorbAmount, talentAurEff->GetAmount());
                         // xinef: prevents infinite loop!
                         if (!dmgInfo.GetSpellInfo() || dmgInfo.GetSpellInfo()->Id != SPELL_PRIEST_REFLECTIVE_SHIELD_TRIGGERED)
-                            target->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_PRIEST_REFLECTIVE_SHIELD_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
+                            target->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_PRIEST_REFLECTIVE_SHIELD_TRIGGERED, &bp, nullptr, nullptr, true, NULL, aurEff);
                     }
             }
 
@@ -796,7 +796,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 
                 if (AuraEffect* aurEff = target->GetAuraEffect(SPELL_AURA_SCHOOL_ABSORB, (SpellFamilyNames)GetSpellInfo()->SpellFamilyName, GetSpellInfo()->SpellIconID, EFFECT_0))
                 {
-                    int32 newAmount = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, NULL, NULL);
+                    int32 newAmount = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, NULL, nullptr);
                     newAmount = CalculateSpellAmount(caster, newAmount, GetSpellInfo(), aurEff);
 
                     if (aurEff->GetAmount() > newAmount)
@@ -879,7 +879,7 @@ class spell_pri_renew : public SpellScriptLoader
                         heal = GetTarget()->SpellHealingBonusTaken(caster, GetSpellInfo(), heal, DOT);
 
                         int32 basepoints0 = empoweredRenewAurEff->GetAmount() * GetEffect(EFFECT_0)->GetTotalTicks() * int32(heal) / 100;
-                        caster->CastCustomSpell(GetTarget(), SPELL_PRIEST_EMPOWERED_RENEW, &basepoints0, NULL, NULL, true, NULL, aurEff);
+                        caster->CastCustomSpell(GetTarget(), SPELL_PRIEST_EMPOWERED_RENEW, &basepoints0, nullptr, nullptr, true, NULL, aurEff);
                     }
                 }
             }
@@ -953,9 +953,9 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
                         if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
                         {
                             int32 damage = aurEff->GetBaseAmount();
-                            damage = aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster, &damage, NULL) * 8;
+                            damage = aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster, &damage, nullptr) * 8;
                             // backfire damage
-                            caster->CastCustomSpell(target, SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL, &damage, NULL, NULL, true, NULL, aurEff);
+                            caster->CastCustomSpell(target, SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL, &damage, nullptr, nullptr, true, NULL, aurEff);
                         }
             }
 

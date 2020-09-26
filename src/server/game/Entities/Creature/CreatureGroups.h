@@ -28,10 +28,12 @@ typedef std::unordered_map<uint32/*memberDBGUID*/, FormationInfo*>   CreatureGro
 
 class FormationMgr
 {
-    friend class ACE_Singleton<FormationMgr, ACE_Null_Mutex>;
     public:
         FormationMgr() { }
         ~FormationMgr();
+        
+        static FormationMgr* instance();
+        
         void AddCreatureToGroup(uint32 group_id, Creature* creature);
         void RemoveCreatureFromGroup(CreatureGroup* group, Creature* creature);
         void LoadCreatureFormations();
@@ -45,7 +47,7 @@ class CreatureGroup
         typedef std::map<Creature*, FormationInfo*>  CreatureGroupMemberType;
 
         //Group cannot be created empty
-        explicit CreatureGroup(uint32 id) : m_leader(NULL), m_groupID(id), m_Formed(false) {}
+        explicit CreatureGroup(uint32 id) : m_leader(nullptr), m_groupID(id), m_Formed(false) {}
         ~CreatureGroup() {}
 
         Creature* getLeader() const { return m_leader; }
@@ -69,6 +71,6 @@ class CreatureGroup
         bool m_Formed;
 };
 
-#define sFormationMgr ACE_Singleton<FormationMgr, ACE_Null_Mutex>::instance()
+#define sFormationMgr FormationMgr::instance()
 
 #endif

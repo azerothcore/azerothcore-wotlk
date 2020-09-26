@@ -12,13 +12,13 @@
 
 class CharacterDatabaseConnection : public MySQLConnection
 {
-    public:
-        //- Constructors for sync and async connections
-        CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
-        CharacterDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
+public:
+    //- Constructors for sync and async connections
+    CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
+    CharacterDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
 
-        //- Loads database type specific prepared statements
-        void DoPrepareStatements();
+    //- Loads database type specific prepared statements
+    void DoPrepareStatements();
 };
 
 typedef DatabaseWorkerPool<CharacterDatabaseConnection> CharacterDatabaseWorkerPool;
@@ -499,6 +499,9 @@ enum CharacterDatabaseStatements
     CHAR_UPD_QUEST_TRACK_GM_COMPLETE,
     CHAR_UPD_QUEST_TRACK_COMPLETE_TIME,
     CHAR_UPD_QUEST_TRACK_ABANDON_TIME,
+
+    CHAR_INS_RECOVERY_ITEM,
+    CHAR_DEL_RECOVERY_ITEM,
 
     MAX_CHARACTERDATABASE_STATEMENTS
 };

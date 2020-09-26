@@ -20,6 +20,7 @@
 #include "Util.h"
 #include "SpellAuras.h"
 #include "Vehicle.h"
+#include "Language.h"
 
 class Aura;
 
@@ -742,6 +743,17 @@ void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recvData)
             return;
         /********************/
 
+        // Check if Ready Check in BG is enabled
+        if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG))
+        {
+            // Check if player is in BG
+            if (_player->InBattleground())
+                {
+                    _player->GetSession()->SendNotification(LANG_BG_READY_CHECK_ERROR);
+                    return;
+                }
+        }
+
         // everything's fine, do it
         WorldPacket data(MSG_RAID_READY_CHECK, 8);
         data << GetPlayer()->GetGUID();
@@ -854,7 +866,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
     {
         uint64 auramask = player->GetAuraUpdateMaskForRaid();
         *data << uint64(auramask);
-        for (uint32 i = 0; i < MAX_AURAS; ++i)
+        for (uint32 i = 0; i < MAX_AURAS_GROUP_UPDATE; ++i)
         {
             if (auramask & (uint64(1) << i))
             {
@@ -936,7 +948,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
         {
             uint64 auramask = pet->GetAuraUpdateMaskForRaid();
             *data << uint64(auramask);
-            for (uint32 i = 0; i < MAX_AURAS; ++i)
+            for (uint32 i = 0; i < MAX_AURAS_GROUP_UPDATE; ++i)
             {
                 if (auramask & (uint64(1) << i))
                 {
@@ -1038,7 +1050,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket &recvData)
     uint64 auraMask = 0;
     size_t maskPos = data.wpos();
     data << uint64(auraMask);                               // placeholder
-    for (uint8 i = 0; i < MAX_AURAS; ++i)
+    for (uint8 i = 0; i < MAX_AURAS_GROUP_UPDATE; ++i)
     {
         if (AuraApplication const* aurApp = player->GetVisibleAura(i))
         {
@@ -1050,25 +1062,25 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket &recvData)
 
     data.put<uint64>(maskPos, auraMask);                    // GROUP_UPDATE_FLAG_AURAS
 
-    if (updateFlags & GROUP_UPDATE_FLAG_PET_GUID)
+    if (pet && (updateFlags & GROUP_UPDATE_FLAG_PET_GUID))
         data << uint64(pet->GetGUID());
 
     data << std::string(pet ? pet->GetName() : "");         // GROUP_UPDATE_FLAG_PET_NAME
     data << uint16(pet ? pet->GetDisplayId() : 0);          // GROUP_UPDATE_FLAG_PET_MODEL_ID
 
-    if (updateFlags & GROUP_UPDATE_FLAG_PET_CUR_HP)
+    if (pet && (updateFlags & GROUP_UPDATE_FLAG_PET_CUR_HP))
         data << uint32(pet->GetHealth());
 
-    if (updateFlags & GROUP_UPDATE_FLAG_PET_MAX_HP)
+    if (pet && (updateFlags & GROUP_UPDATE_FLAG_PET_MAX_HP))
         data << uint32(pet->GetMaxHealth());
 
-    if (updateFlags & GROUP_UPDATE_FLAG_PET_POWER_TYPE)
+    if (pet && (updateFlags & GROUP_UPDATE_FLAG_PET_POWER_TYPE))
         data << (uint8)pet->getPowerType();
 
-    if (updateFlags & GROUP_UPDATE_FLAG_PET_CUR_POWER)
+    if (pet && (updateFlags & GROUP_UPDATE_FLAG_PET_CUR_POWER))
         data << uint16(pet->GetPower(pet->getPowerType()));
 
-    if (updateFlags & GROUP_UPDATE_FLAG_PET_MAX_POWER)
+    if (pet && (updateFlags & GROUP_UPDATE_FLAG_PET_MAX_POWER))
         data << uint16(pet->GetMaxPower(pet->getPowerType()));
 
     uint64 petAuraMask = 0;
@@ -1076,7 +1088,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket &recvData)
     data << uint64(petAuraMask);                            // placeholder
     if (pet)
     {
-        for (uint8 i = 0; i < MAX_AURAS; ++i)
+        for (uint8 i = 0; i < MAX_AURAS_GROUP_UPDATE; ++i)
         {
             if (AuraApplication const* aurApp = pet->GetVisibleAura(i))
             {

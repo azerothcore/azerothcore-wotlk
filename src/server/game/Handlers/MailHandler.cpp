@@ -18,12 +18,17 @@
 #include "Item.h"
 #include "AccountMgr.h"
 
+#define MAX_INBOX_CLIENT_CAPACITY 50
+
 bool WorldSession::CanOpenMailBox(uint64 guid)
 {
     if (guid == _player->GetGUID())
     {
-        sLog->outError("%s attempt open mailbox in cheating way.", _player->GetName().c_str());
-        return false;
+        if (_player->GetSession()->GetSecurity() < SEC_MODERATOR)
+        {
+            sLog->outError("%s attempt open mailbox in cheating way.", _player->GetName().c_str());
+            return false;
+        }
     }
     else if (IS_GAMEOBJECT_GUID(guid))
     {
@@ -47,10 +52,16 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
     std::string receiver, subject, body;
     uint32 unk1, unk2, money, COD;
     uint8 unk4;
+
     recvData >> mailbox;
     recvData >> receiver;
 
     recvData >> subject;
+
+    // prevent client crash
+    if (subject.find("| |") != std::string::npos || body.find("| |") != std::string::npos) {
+        return;
+    }
 
     recvData >> body;
 
@@ -91,7 +102,7 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
 
     if (player->getLevel() < sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ))
     {
-        SendNotification(GetTrinityString(LANG_MAIL_SENDER_REQ), sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
+        SendNotification(GetAcoreString(LANG_MAIL_SENDER_REQ), sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
         return;
     }
 
@@ -118,10 +129,17 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
         return;
     }
 
-    uint32 cost = items_count ? 30 * items_count : 30;  // price hardcoded in client
+    if (money && COD) // cannot send money in a COD mail
+    {
+        sLog->outError("%s attempt to dupe money!!!.", receiver.c_str());
+        player->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
+        return;
+    }
+
+    uint32 cost = items_count ? 30 * items_count : 30; // price hardcoded in client
 
     uint32 reqmoney = cost + money;
-  
+
     // Check for overflow
     if (reqmoney < money)
     {
@@ -169,7 +187,7 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
         if (item)
         {
             ItemTemplate const* itemProto = item->GetTemplate();
-            if (!itemProto || !(itemProto->Flags & ITEM_PROTO_FLAG_BIND_TO_ACCOUNT))
+            if (!itemProto || !(itemProto->Flags & ITEM_FLAG_IS_BOUND_TO_ACCOUNT))
             {
                 accountBound = false;
                 break;
@@ -218,13 +236,13 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
             return;
         }
 
-        if (item->GetTemplate()->Flags & ITEM_PROTO_FLAG_CONJURED || item->GetUInt32Value(ITEM_FIELD_DURATION))
+        if (item->GetTemplate()->Flags & ITEM_FLAG_CONJURED || item->GetUInt32Value(ITEM_FIELD_DURATION))
         {
             player->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_MAIL_BOUND_ITEM);
             return;
         }
 
-        if (COD && item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))
+        if (COD && item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
         {
             player->SendMailResult(0, MAIL_SEND, MAIL_ERR_CANT_SEND_WRAPPED_COD);
             return;
@@ -283,7 +301,7 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
 
     // If theres is an item, there is a one hour delivery delay if sent to another account's character.
     uint32 deliver_delay = needItemDelay ? sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY) : 0;
-  
+
     // don't ask for COD if there are no items
     if (items_count == 0)
         COD = 0;
@@ -365,7 +383,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recvData)
 
     Player* player = _player;
     Mail* m = player->GetMail(mailId);
-    if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(NULL))
+    if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(nullptr))
     {
         player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
         return;
@@ -430,12 +448,12 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recvData)
     Player* player = _player;
 
     Mail* m = player->GetMail(mailId);
-    if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(NULL))
+    if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(nullptr))
     {
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
-  
+
     // verify that the mail has the item to avoid cheaters taking COD items without paying
     bool foundItem = false;
     for (std::vector<MailItemInfo>::const_iterator itr = m->items.begin(); itr != m->items.end(); ++itr)
@@ -488,7 +506,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recvData)
                 {
                     std::string senderName;
                     if (!sObjectMgr->GetPlayerNameByGUID(sender_guid, senderName))
-                        senderName = sObjectMgr->GetTrinityStringForDBCLocale(LANG_UNKNOWN);
+                        senderName = sObjectMgr->GetAcoreStringForDBCLocale(LANG_UNKNOWN);
                     std::string subj = m->subject;
                     CleanStringForMysqlQuery(subj);
                     CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<COD> %s\", NOW())", GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), player->GetSession()->GetRemoteAddress().c_str(), sender_accId, senderName.c_str(), m->COD, subj.c_str());
@@ -530,7 +548,7 @@ void WorldSession::HandleMailTakeMoney(WorldPacket& recvData)
     Player* player = _player;
 
     Mail* m = player->GetMail(mailId);
-    if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(NULL))
+    if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(nullptr))
     {
         player->SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_ERR_INTERNAL_ERROR);
         return;
@@ -570,21 +588,18 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
     if (!player->m_mailsLoaded)
         player->_LoadMail();
 
-    // client can't work with packets > max int16 value
-    const uint32 maxPacketSize = 32767;
-
     uint32 mailsCount = 0;                                 // real send to client mails amount
     uint32 realCount  = 0;                                 // real mails amount
 
     WorldPacket data(SMSG_MAIL_LIST_RESULT, (200));         // guess size
     data << uint32(0);                                      // real mail's count
     data << uint8(0);                                       // mail's count
-    time_t cur_time = time(NULL);
+    time_t cur_time = time(nullptr);
 
     for (PlayerMails::iterator itr = player->GetMailBegin(); itr != player->GetMailEnd(); ++itr)
     {
-        // Only first 50 mails are displayed
-        if (mailsCount >= 50)
+        // prevent client storage overflow
+        if (mailsCount >= MAX_INBOX_CLIENT_CAPACITY)
         {
             realCount += 1;
             continue;
@@ -594,11 +609,11 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
         if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
             continue;
 
-        uint8 item_count = (*itr)->items.size();            // max count is MAX_MAIL_ITEMS (12)
+        uint8 item_count = uint8((*itr)->items.size());            // max count is MAX_MAIL_ITEMS (12)
 
         size_t next_mail_size = 2+4+1+((*itr)->messageType == MAIL_NORMAL ? 8 : 4)+4*8+((*itr)->subject.size()+1)+((*itr)->body.size()+1)+1+item_count*(1+4+4+MAX_INSPECTED_ENCHANTMENT_SLOT*3*4+4+4+4+4+4+4+1);
 
-        if (data.wpos()+next_mail_size > maxPacketSize)
+        if (data.wpos() + next_mail_size > MAX_NETCLIENT_PACKET_SIZE)
         {
             realCount += 1;
             continue;
@@ -621,15 +636,26 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
                 break;
         }
 
+        // prevent client crash
+        std::string subject = (*itr)->subject;
+        std::string body = (*itr)->body;
+
+        if (subject.find("| |") != std::string::npos) {
+            subject = "";
+        }
+        if (body.find("| |") != std::string::npos) {
+            body = "";
+        }
+
         data << uint32((*itr)->COD);                         // COD
         data << uint32(0);                                   // probably changed in 3.3.3
         data << uint32((*itr)->stationery);                  // stationery (Stationery.dbc)
         data << uint32((*itr)->money);                       // Gold
         data << uint32((*itr)->checked);                     // flags
-        data << float(float((*itr)->expire_time-time(NULL))/DAY); // Time
+        data << float(float((*itr)->expire_time-time(nullptr))/DAY); // Time
         data << uint32((*itr)->mailTemplateId);              // mail template (MailTemplate.dbc)
-        data << (*itr)->subject;                             // Subject string - once 00, when mail type = 3, max 256
-        data << (*itr)->body;                                // message? max 8000
+        data << subject;                                     // Subject string - once 00, when mail type = 3, max 256
+        data << body;                                        // message? max 8000
         data << uint8(item_count);                           // client limit is 0x10
 
         for (uint8 i = 0; i < item_count; ++i)
@@ -643,9 +669,9 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
             data << uint32((item ? item->GetEntry() : 0));
             for (uint8 j = 0; j < MAX_INSPECTED_ENCHANTMENT_SLOT; ++j)
             {
-                data << uint32((item ? item->GetEnchantmentId((EnchantmentSlot)j) : 0));
-                data << uint32((item ? item->GetEnchantmentDuration((EnchantmentSlot)j) : 0));
-                data << uint32((item ? item->GetEnchantmentCharges((EnchantmentSlot)j) : 0));
+                data << uint32(item ? item->GetEnchantmentCharges(EnchantmentSlot(j)) : 0);
+                data << uint32(item ? item->GetEnchantmentDuration(EnchantmentSlot(j)) : 0);
+                data << uint32(item ? item->GetEnchantmentId(EnchantmentSlot(j)) : 0);
             }
             // can be negative
             data << int32((item ? item->GetItemRandomPropertyId() : 0));
@@ -668,7 +694,7 @@ void WorldSession::HandleGetMailList(WorldPacket & recvData)
     }
 
     data.put<uint32>(0, realCount);                         // this will display warning about undelivered mail to player if realCount > mailsCount
-    data.put<uint8>(4, mailsCount);                        // set real send mails to client
+    data.put<uint8>(4, uint8(mailsCount));                  // set real send mails to client
     SendPacket(&data);
 
     // recalculate m_nextMailDelivereTime and unReadMails
@@ -690,7 +716,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recvData)
     Player* player = _player;
 
     Mail* m = player->GetMail(mailId);
-    if (!m || (m->body.empty() && !m->mailTemplateId) || m->state == MAIL_STATE_DELETED || m->deliver_time > time(NULL) || (m->checked & MAIL_CHECK_MASK_COPIED))
+    if (!m || (m->body.empty() && !m->mailTemplateId) || m->state == MAIL_STATE_DELETED || m->deliver_time > time(nullptr) || (m->checked & MAIL_CHECK_MASK_COPIED))
     {
         player->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_INTERNAL_ERROR);
         return;
@@ -710,6 +736,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recvData)
         if (!mailTemplateEntry)
         {
             player->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_INTERNAL_ERROR);
+            delete bodyItem;
             return;
         }
 
@@ -757,7 +784,7 @@ void WorldSession::HandleQueryNextMailTime(WorldPacket & /*recvData*/)
         data << uint32(0);                                 // count
 
         uint32 count = 0;
-        time_t now = time(NULL);
+        time_t now = time(nullptr);
         std::set<uint32> sentSenders;
         for (PlayerMails::iterator itr = _player->GetMailBegin(); itr != _player->GetMailEnd(); ++itr)
         {

@@ -94,7 +94,7 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
             data << uint32(item->GetTemplate()->DisplayInfoID);// display id
             data << uint32(item->GetCount());               // stack count
                                                             // wrapped: hide stats but show giftcreator name
-            data << uint32(item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED) ? 1 : 0);
+            data << uint32(item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED) ? 1 : 0);
             data << uint64(item->GetUInt64Value(ITEM_FIELD_GIFTCREATOR));
                                                             // perm. enchantment and gems
             data << uint32(item->GetEnchantmentId(PERM_ENCHANTMENT_SLOT));
@@ -148,7 +148,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
 #endif
 
                 // adjust time (depends on /played)
-                if (myItems[i]->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE))
+                if (myItems[i]->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
                     myItems[i]->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, trader->GetTotalPlayedTime()-(_player->GetTotalPlayedTime()-myItems[i]->GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME)));
                 // store
                 trader->MoveItemToInventory(traderDst, myItems[i], true, true);
@@ -161,7 +161,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
 #endif
 
                 // adjust time (depends on /played)
-                if (hisItems[i]->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE))
+                if (hisItems[i]->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
                     hisItems[i]->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, _player->GetTotalPlayedTime()-(trader->GetTotalPlayedTime()-hisItems[i]->GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME)));
                 // store
                 _player->MoveItemToInventory(playerDst, hisItems[i], true, true);
@@ -255,8 +255,8 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
     if (!his_trade)
         return;
 
-    Item* myItems[TRADE_SLOT_TRADED_COUNT]  = { NULL, NULL, NULL, NULL, NULL, NULL };
-    Item* hisItems[TRADE_SLOT_TRADED_COUNT] = { NULL, NULL, NULL, NULL, NULL, NULL };
+    Item* myItems[TRADE_SLOT_TRADED_COUNT]  = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+    Item* hisItems[TRADE_SLOT_TRADED_COUNT] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
     bool myCanCompleteTrade = true, hisCanCompleteTrade = true;
 
     // set before checks for propertly undo at problems (it already set in to client)
@@ -280,14 +280,14 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
 
     if (_player->GetMoney() >= uint32(MAX_MONEY_AMOUNT) - his_trade->GetMoney())
     {
-        _player->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, NULL, NULL);
+        _player->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, NULL, nullptr);
         my_trade->SetAccepted(false, true);
         return;
     }
 
     if (trader->GetMoney() >= uint32(MAX_MONEY_AMOUNT) - my_trade->GetMoney())
     {
-        trader->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, NULL, NULL);
+        trader->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, NULL, nullptr);
         his_trade->SetAccepted(false, true);
         return;
     }
@@ -331,10 +331,10 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
     {
         setAcceptTradeMode(my_trade, his_trade, myItems, hisItems);
 
-        Spell* my_spell = NULL;
+        Spell* my_spell = nullptr;
         SpellCastTargets my_targets;
 
-        Spell* his_spell = NULL;
+        Spell* his_spell = nullptr;
         SpellCastTargets his_targets;
 
         // not accept if spell can't be casted now (cheating)
@@ -486,9 +486,9 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         // cleanup
         clearAcceptTradeMode(my_trade, his_trade);
         delete _player->m_trade;
-        _player->m_trade = NULL;
+        _player->m_trade = nullptr;
         delete trader->m_trade;
-        trader->m_trade = NULL;
+        trader->m_trade = nullptr;
 
         // desynchronized with the other saves here (SaveInventoryAndGoldToDB() not have own transaction guards)
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
@@ -571,7 +571,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
 
     if (GetPlayer()->getLevel() < sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ))
     {
-        SendNotification(GetTrinityString(LANG_TRADE_REQ), sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ));
+        SendNotification(GetAcoreString(LANG_TRADE_REQ), sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ));
         return;
     }
 
@@ -636,7 +636,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
 
     if (pOther->getLevel() < sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ))
     {
-        SendNotification(GetTrinityString(LANG_TRADE_OTHER_REQ), sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ));
+        SendNotification(GetAcoreString(LANG_TRADE_OTHER_REQ), sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ));
         return;
     }
 
@@ -718,5 +718,5 @@ void WorldSession::HandleClearTradeItemOpcode(WorldPacket& recvPacket)
     if (tradeSlot >= TRADE_SLOT_COUNT)
         return;
 
-    my_trade->SetItem(TradeSlots(tradeSlot), NULL);
+    my_trade->SetItem(TradeSlots(tradeSlot), nullptr);
 }

@@ -105,7 +105,7 @@ int MapUpdater::deactivate()
 
 int MapUpdater::wait()
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    ACORE_GUARD(ACE_Thread_Mutex, m_mutex);
 
     while (pending_requests > 0)
         m_condition.wait();
@@ -115,7 +115,7 @@ int MapUpdater::wait()
 
 int MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    ACORE_GUARD(ACE_Thread_Mutex, m_mutex);
 
     ++pending_requests;
 
@@ -132,7 +132,7 @@ int MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
 
 int MapUpdater::schedule_lfg_update(uint32 diff)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    ACORE_GUARD(ACE_Thread_Mutex, m_mutex);
 
     ++pending_requests;
 
@@ -154,7 +154,7 @@ bool MapUpdater::activated()
 
 void MapUpdater::update_finished()
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    ACORE_GUARD(ACE_Thread_Mutex, m_mutex);
 
     if (pending_requests == 0)
     {

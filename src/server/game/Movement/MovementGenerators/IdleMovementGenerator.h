@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_IDLEMOVEMENTGENERATOR_H
-#define TRINITY_IDLEMOVEMENTGENERATOR_H
+#ifndef ACORE_IDLEMOVEMENTGENERATOR_H
+#define ACORE_IDLEMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
 

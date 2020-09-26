@@ -270,7 +270,7 @@ uint32 Quest::CalculateHonorGain(uint8 level) const
         honor = uint32(tc->value * GetRewHonorMultiplier() * 0.1000000014901161);
 
         // Xinef: exactly this is calculated above, however with higher precision...
-        //honor += Trinity::Honor::hk_honor_at_level(level, GetRewHonorMultiplier());
+        //honor += acore::Honor::hk_honor_at_level(level, GetRewHonorMultiplier());
         honor += GetRewHonorAddition();
     }
 

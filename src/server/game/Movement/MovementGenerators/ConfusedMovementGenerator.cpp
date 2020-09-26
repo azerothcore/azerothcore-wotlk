@@ -37,8 +37,8 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
         float wanderY = y + (wander_distance * (float)rand_norm() - wander_distance/2);
 
         // prevent invalid coordinates generation
-        Trinity::NormalizeMapCoord(wanderX);
-        Trinity::NormalizeMapCoord(wanderY);
+        acore::NormalizeMapCoord(wanderX);
+        acore::NormalizeMapCoord(wanderY);
 
         float new_z = map->GetHeight(unit->GetPhaseMask(), wanderX, wanderY, z, true);
         if (new_z <= INVALID_HEIGHT || fabs(z-new_z) > 3.0f) // pussywizard

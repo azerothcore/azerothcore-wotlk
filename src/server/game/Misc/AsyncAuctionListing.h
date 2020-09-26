@@ -8,7 +8,7 @@
 class AuctionListOwnerItemsDelayEvent : public BasicEvent
 {
     public:
-        AuctionListOwnerItemsDelayEvent(WorldPacket& d, uint64 guid, bool o) : data(d), playerguid(guid), owner(o) {}
+        AuctionListOwnerItemsDelayEvent(uint64 _creatureGuid, uint64 guid, bool o) : creatureGuid(_creatureGuid), playerguid(guid), owner(o) {}
         virtual ~AuctionListOwnerItemsDelayEvent() {}
 
         virtual bool Execute(uint64 e_time, uint32 p_time);
@@ -16,7 +16,7 @@ class AuctionListOwnerItemsDelayEvent : public BasicEvent
         bool getOwner() { return owner; }
 
     private:
-        WorldPacket data;
+        uint64 creatureGuid;
         uint64 playerguid;
         bool owner;
 };

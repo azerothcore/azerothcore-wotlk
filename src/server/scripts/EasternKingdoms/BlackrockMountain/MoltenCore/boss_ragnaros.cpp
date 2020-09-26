@@ -86,9 +86,6 @@ class boss_ragnaros : public CreatureScript
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             }
 
-            // Make Sulfuras fall in his correct position
-            void JustDied(Unit* /*killer*/) override { me->SetFacingTo(DEATH_ORIENTATION); }
-
             void EnterCombat(Unit* victim) override
             {
                 BossAI::EnterCombat(victim);
@@ -99,6 +96,12 @@ class boss_ragnaros : public CreatureScript
                 events.ScheduleEvent(EVENT_ELEMENTAL_FIRE, 3000);
                 events.ScheduleEvent(EVENT_MAGMA_BLAST, 2000);
                 events.ScheduleEvent(EVENT_SUBMERGE, 180000);
+            }
+            
+            void JustDied(Unit* killer) override
+            {
+                BossAI::JustDied(killer);
+                me->SetFacingTo(DEATH_ORIENTATION);
             }
 
             void KilledUnit(Unit* /*victim*/) override
@@ -213,7 +216,7 @@ class boss_ragnaros : public CreatureScript
                                 events.ScheduleEvent(EVENT_ELEMENTAL_FIRE, urand(10000, 14000));
                                 break;
                             case EVENT_MAGMA_BLAST:
-                                if (me->IsWithinMeleeRange(me->GetVictim()))
+                                if (!me->IsWithinMeleeRange(me->GetVictim()))
                                 {
                                     DoCastVictim(SPELL_MAGMA_BLAST);
                                     if (!_hasYelledMagmaBurst)

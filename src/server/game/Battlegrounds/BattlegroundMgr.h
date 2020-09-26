@@ -12,13 +12,14 @@
 #include "Battleground.h"
 #include "BattlegroundQueue.h"
 #include "CreatureAIImpl.h"
-#include <ace/Singleton.h>
 #include <unordered_map>
 
 typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef std::unordered_map<uint32, BattlegroundTypeId> BattleMastersMap;
 typedef Battleground*(*bgRef)(Battleground*);
 
+typedef void(*bgMapRef)(WorldPacket*, Battleground::BattlegroundScoreMap::const_iterator);
+typedef void(*bgTypeRef)(WorldPacket*, Battleground::BattlegroundScoreMap::const_iterator, Battleground*);
 
 #define BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY 86400 // how many seconds in day
 
@@ -42,33 +43,20 @@ struct CreateBattlegroundData
     float Team2StartLocO;
     float StartMaxDist;
     uint32 scriptId;
+    uint8 Weight;
 };
 
 struct GroupQueueInfo;
 
-// pussywizard
-class RandomBattlegroundSystem
-{
-    public:
-        RandomBattlegroundSystem();
-        void Update(uint32 diff);
-        BattlegroundTypeId GetCurrentRandomBg() const { return m_CurrentRandomBg; }
-        void BattlegroundCreated(BattlegroundTypeId bgTypeId);
-    private:
-        BattlegroundTypeId m_CurrentRandomBg;
-        uint32 m_SwitchTimer;
-        std::vector<BattlegroundTypeId> m_BgOrder;
-};
-
 class BattlegroundMgr
 {
-    friend class ACE_Singleton<BattlegroundMgr, ACE_Null_Mutex>;
-
     private:
         BattlegroundMgr();
         ~BattlegroundMgr();
 
     public:
+        static BattlegroundMgr* instance();
+
         void Update(uint32 diff);
 
         /* Packet Building */
@@ -119,8 +107,6 @@ class BattlegroundMgr
         static BattlegroundTypeId WeekendHolidayIdToBGType(HolidayIds holiday);
         static bool IsBGWeekend(BattlegroundTypeId bgTypeId);
 
-        PvPDifficultyEntry randomBgDifficultyEntry;
-
         uint32 GetRatingDiscardTimer()  const;
         void InitAutomaticArenaPointDistribution();
         void LoadBattleMastersEntry();
@@ -134,16 +120,18 @@ class BattlegroundMgr
         }
 
         const BattlegroundContainer& GetBattlegroundList() { return m_Battlegrounds; } // pussywizard
-        RandomBattlegroundSystem RandomSystem; // pussywizard
 
-        static std::unordered_map<int, BattlegroundQueueTypeId> bgToQueue; // BattlegroundTypeId -> BattlegroundQueueTypeId
-        static std::unordered_map<int, BattlegroundTypeId> queueToBg; // BattlegroundQueueTypeId -> BattlegroundTypeId
-        static std::unordered_map<int, Battleground*> bgtypeToBattleground; // BattlegroundTypeId -> Battleground*
-        static std::unordered_map<int, bgRef> bgTypeToTemplate; // BattlegroundTypeId -> bgRef
+        static std::unordered_map<int, BattlegroundQueueTypeId> bgToQueue;      // BattlegroundTypeId -> BattlegroundQueueTypeId
+        static std::unordered_map<int, BattlegroundTypeId> queueToBg;           // BattlegroundQueueTypeId -> BattlegroundTypeId
+        static std::unordered_map<int, Battleground*> bgtypeToBattleground;     // BattlegroundTypeId -> Battleground*
+        static std::unordered_map<int, bgRef> bgTypeToTemplate;                 // BattlegroundTypeId -> bgRef
+        static std::unordered_map<int, bgMapRef> getBgFromMap;                  // BattlegroundMapID -> bgMapRef
+        static std::unordered_map<int, bgTypeRef> getBgFromTypeID;              // BattlegroundTypeID -> bgTypeRef
 
     private:
         bool CreateBattleground(CreateBattlegroundData& data);
         uint32 GetNextClientVisibleInstanceId();
+        BattlegroundTypeId GetRandomBG(BattlegroundTypeId id);
 
         typedef std::map<BattlegroundTypeId, Battleground*> BattlegroundTemplateContainer;
         BattlegroundTemplateContainer m_BattlegroundTemplates;
@@ -159,7 +147,31 @@ class BattlegroundMgr
         uint32 m_AutoDistributionTimeChecker;
         uint32 m_NextPeriodicQueueUpdateTime;
         BattleMastersMap mBattleMastersMap;
+
+        CreateBattlegroundData const* GetBattlegroundTemplateByTypeId(BattlegroundTypeId id)
+        {
+            BattlegroundTemplateMap::const_iterator itr = _battlegroundTemplates.find(id);
+            if (itr != _battlegroundTemplates.end())
+                return &itr->second;
+            return nullptr;
+        }
+
+        CreateBattlegroundData const* GetBattlegroundTemplateByMapId(uint32 mapId)
+        {
+            BattlegroundMapTemplateContainer::const_iterator itr = _battlegroundMapTemplates.find(mapId);
+            if (itr != _battlegroundMapTemplates.end())
+                return itr->second;
+            return nullptr;
+        }
+
+        typedef std::map<BattlegroundTypeId, uint8 /*weight*/> BattlegroundSelectionWeightMap;
+
+        typedef std::map<BattlegroundTypeId, CreateBattlegroundData> BattlegroundTemplateMap;
+        typedef std::map<uint32 /*mapId*/, CreateBattlegroundData*> BattlegroundMapTemplateContainer;
+        BattlegroundTemplateMap _battlegroundTemplates;
+        BattlegroundMapTemplateContainer _battlegroundMapTemplates;
 };
 
-#define sBattlegroundMgr ACE_Singleton<BattlegroundMgr, ACE_Null_Mutex>::instance()
+#define sBattlegroundMgr BattlegroundMgr::instance()
+
 #endif

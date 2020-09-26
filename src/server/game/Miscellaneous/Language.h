@@ -5,10 +5,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef __TRINITY_LANGUAGE_H
-#define __TRINITY_LANGUAGE_H
+#ifndef __ACORE_LANGUAGE_H
+#define __ACORE_LANGUAGE_H
 
-enum TrinityStrings
+enum AcoreStrings
 {
     // for chat commands
     LANG_SELECT_CHAR_OR_CREATURE        = 1,
@@ -294,7 +294,7 @@ enum TrinityStrings
       // TICKET STRINGS NEED REWRITE // 288-296 FREE
 
       // END
-    LANG_COMMAND_SPAWNDIST              = 297,
+    LANG_COMMAND_WANDER_DISTANCE        = 297,
     LANG_COMMAND_SPAWNTIME              = 298,
     LANG_COMMAND_MODIFY_HONOR           = 299,
 
@@ -1308,5 +1308,21 @@ enum TrinityStrings
     LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD   	    = 11018,
 
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
+
+    // Instant Flight
+    LANG_TOGGLE_INSTANT_FLIGHT                    = 30077,
+    LANG_INSTANT_FLIGHT_ON                        = 30078,
+    LANG_INSTANT_FLIGHT_OFF                       = 30079,
+
+    LANG_DEBUG_OPCODE_FILE_MISSING                = 30080,
+
+    LANG_REMOVEITEM_FAILURE                       = 30081,
+    LANG_REMOVEITEM_ERROR                         = 30082,
+
+    LANG_BG_SHARE_QUEST_ERROR                     = 30083,
+    LANG_BG_READY_CHECK_ERROR                     = 30084,
+
+    LANG_DEBUG_BG_CONF                            = 30085,
+    LANG_DEBUG_ARENA_CONF                         = 30086
 };
 #endif

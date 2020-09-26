@@ -20,6 +20,8 @@ class Transport;
 class StaticTransport;
 class MotionTransport;
 
+typedef void(*goEventFlag)(Player*, GameObject*, Battleground*);
+
 #define MAX_GAMEOBJECT_QUEST_ITEMS 6
 
 // from `gameobject_template`
@@ -662,14 +664,14 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         explicit GameObject();
         ~GameObject();
 
-        void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, Player* target) const;
+        void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, Player* target) const override;
 
-        void AddToWorld();
-        void RemoveFromWorld();
-        void CleanupsBeforeDelete(bool finalCleanup = true);
+        void AddToWorld() override;
+        void RemoveFromWorld() override;
+        void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
         virtual bool Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
-        void Update(uint32 p_time);
+        void Update(uint32 p_time) override;
         GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
         GameObjectTemplateAddon const* GetTemplateAddon() const;
         GameObjectData const* GetGOData() const { return m_goData; }
@@ -687,7 +689,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         int64 GetPackedWorldRotation() const { return m_packedRotation; }
 
         // overwrite WorldObject function for proper name localization
-        std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const;
+        std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const override;
 
         void SaveToDB();
         void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
@@ -700,7 +702,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
             // Owner already found and different than expected owner - remove object from old owner
             if (owner && GetOwnerGUID() && GetOwnerGUID() != owner)
             {
-                ASSERT(false);
+                ABORT();
             }
             m_spawnedByDefault = false;                     // all object with owner is despawned after delay
             SetUInt64Value(OBJECT_FIELD_CREATED_BY, owner);
@@ -718,7 +720,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         time_t GetRespawnTime() const { return m_respawnTime; }
         time_t GetRespawnTimeEx() const
         {
-            time_t now = time(NULL);
+            time_t now = time(nullptr);
             if (m_respawnTime > now)
                 return m_respawnTime;
             else
@@ -727,7 +729,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
 
         void SetRespawnTime(int32 respawn)
         {
-            m_respawnTime = respawn > 0 ? time(NULL) + respawn : 0;
+            m_respawnTime = respawn > 0 ? time(nullptr) + respawn : 0;
             m_respawnDelayTime = respawn > 0 ? respawn : 0;
         }
         void Respawn();
@@ -754,14 +756,14 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         void SetGoAnimProgress(uint8 animprogress) { SetByteValue(GAMEOBJECT_BYTES_1, 3, animprogress); }
         static void SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid = 0);
 
-        void SetPhaseMask(uint32 newPhaseMask, bool update);
+        void SetPhaseMask(uint32 newPhaseMask, bool update) override;
         void EnableCollision(bool enable);
 
         void Use(Unit* user);
 
         LootState getLootState() const { return m_lootState; }
         // Note: unit is only used when s = GO_ACTIVATED
-        void SetLootState(LootState s, Unit* unit = NULL);
+        void SetLootState(LootState s, Unit* unit = nullptr);
 
         uint16 GetLootMode() const { return m_LootMode; }
         bool HasLootMode(uint16 lootMode) const { return m_LootMode & lootMode; }
@@ -787,7 +789,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         uint32 GetUseCount() const { return m_usetimes; }
         uint32 GetUniqueUseCount() const { return m_unique_users.size(); }
 
-        void SaveRespawnTime();
+        void SaveRespawnTime() override;
 
         Loot        loot;
 
@@ -798,23 +800,23 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         bool HasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
         uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
         uint32 lootingGroupLowGUID;                         // used to find group which is looting
-        void SetLootGenerationTime() { m_lootGenerationTime = time(NULL); }
+        void SetLootGenerationTime() { m_lootGenerationTime = time(nullptr); }
         uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
 
-        bool hasQuest(uint32 quest_id) const;
-        bool hasInvolvedQuest(uint32 quest_id) const;
+        bool hasQuest(uint32 quest_id) const override;
+        bool hasInvolvedQuest(uint32 quest_id) const override;
         bool ActivateToQuest(Player* target) const;
-        void UseDoorOrButton(uint32 time_to_restore = 0, bool alternative = false, Unit* user = NULL);
+        void UseDoorOrButton(uint32 time_to_restore = 0, bool alternative = false, Unit* user = nullptr);
                                                             // 0 = use `gameobject`.`spawntimesecs`
         void ResetDoorOrButton();
 
         void TriggeringLinkedGameObject(uint32 trapEntry, Unit* target);
 
-        bool IsNeverVisible() const;
-        bool IsAlwaysVisibleFor(WorldObject const* seer) const;
-        bool IsInvisibleDueToDespawn() const;
+        bool IsNeverVisible() const override;
+        bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
+        bool IsInvisibleDueToDespawn() const override;
 
-        uint8 getLevelForTarget(WorldObject const* target) const
+        uint8 getLevelForTarget(WorldObject const* target) const override
         {
             if (Unit* owner = GetOwner())
                 return owner->getLevelForTarget(target);
@@ -828,7 +830,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         void SendCustomAnim(uint32 anim);
         bool IsInRange(float x, float y, float z, float radius) const;
 
-        void SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = NULL); // pussywizard!
+        void SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) override; // pussywizard!
 
         void ModifyHealth(int32 change, Unit* attackerOrHealer = NULL, uint32 spellId = 0);
         void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
@@ -853,7 +855,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
 
         GameObjectModel* m_model;
-        void GetRespawnPosition(float &x, float &y, float &z, float* ori = NULL) const;
+        void GetRespawnPosition(float &x, float &y, float &z, float* ori = nullptr) const;
 
         void SetPosition(float x, float y, float z, float o);
         void SetPosition(const Position &pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }
@@ -861,23 +863,25 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         bool IsStaticTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT; }
         bool IsMotionTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT; }
 
-        Transport* ToTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport*>(this); else return NULL; }
-        Transport const* ToTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport const*>(this); else return NULL; }
+        Transport* ToTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport*>(this); else return nullptr; }
+        Transport const* ToTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport const*>(this); else return nullptr; }
 
-        StaticTransport* ToStaticTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<StaticTransport*>(this); else return NULL; }
-        StaticTransport const* ToStaticTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<StaticTransport const*>(this); else return NULL; }
+        StaticTransport* ToStaticTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<StaticTransport*>(this); else return nullptr; }
+        StaticTransport const* ToStaticTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<StaticTransport const*>(this); else return nullptr; }
 
-        MotionTransport* ToMotionTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<MotionTransport*>(this); else return NULL; }
-        MotionTransport const* ToMotionTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<MotionTransport const*>(this); else return NULL; }
+        MotionTransport* ToMotionTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<MotionTransport*>(this); else return nullptr; }
+        MotionTransport const* ToMotionTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<MotionTransport const*>(this); else return nullptr; }
 
-        float GetStationaryX() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionX(); return GetPositionX(); }
-        float GetStationaryY() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionY(); return GetPositionY(); }
-        float GetStationaryZ() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionZ(); return GetPositionZ(); }
-        float GetStationaryO() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetOrientation(); return GetOrientation(); }
+        float GetStationaryX() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionX(); return GetPositionX(); }
+        float GetStationaryY() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionY(); return GetPositionY(); }
+        float GetStationaryZ() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionZ(); return GetPositionZ(); }
+        float GetStationaryO() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetOrientation(); return GetOrientation(); }
 
         float GetInteractionDistance();
   
         void UpdateModelPosition();
+
+        static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
     protected:
         bool AIM_Initialize();
@@ -920,7 +924,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         void UpdatePackedRotation();
 
         //! Object distance/size - overridden from Object::_IsWithinDist. Needs to take in account proper GO size.
-        bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/) const
+        bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/) const override
         {
             //! Following check does check 3d distance
             dist2compare += obj->GetObjectSize();

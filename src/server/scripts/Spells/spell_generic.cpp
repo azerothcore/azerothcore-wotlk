@@ -766,7 +766,7 @@ class spell_gen_select_target_count : public SpellScriptLoader
             void FilterTargets(std::list<WorldObject*>& targets)
             {
                 targets.remove(GetCaster());
-                Trinity::Containers::RandomResizeList(targets, _count);
+                acore::Containers::RandomResizeList(targets, _count);
             }
 
             void Register()
@@ -880,7 +880,7 @@ class spell_gen_proc_once_per_cast : public SpellScriptLoader
 
             bool Load()
             {
-                _spellPointer = NULL;
+                _spellPointer = nullptr;
                 return true;
             }
 
@@ -1360,7 +1360,7 @@ class spell_gen_flurry_of_claws : public SpellScriptLoader
             void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
-                if (Unit* target = GetUnitOwner()->SelectNearbyTarget(NULL, 7.0f))
+                if (Unit* target = GetUnitOwner()->SelectNearbyTarget(nullptr, 7.0f))
                     if (target->GetEntry() == NPC_FRENZYHEART_RAVAGER || target->GetEntry() == NPC_FRENZYHEART_HUNTER)
                     {
                         int32 basePoints = irand(1400, 2200);
@@ -1718,10 +1718,10 @@ class spell_gen_cannibalize : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
                 float max_range = GetSpellInfo()->GetMaxRange(false);
-                WorldObject* result = NULL;
+                WorldObject* result = nullptr;
                 // search for nearby enemy corpse in range
-                Trinity::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
-                Trinity::WorldObjectSearcher<Trinity::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
+                acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
+                acore::WorldObjectSearcher<acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
                 caster->GetMap()->VisitFirstFound(caster->m_positionX, caster->m_positionY, max_range, searcher);
                 if (!result)
                     return SPELL_FAILED_NO_EDIBLE_CORPSES;
@@ -2193,7 +2193,7 @@ class spell_gen_elune_candle : public SpellScriptLoader
                 else
                     spellId = SPELL_ELUNE_CANDLE_NORMAL;
 
-                GetCaster()->CastSpell(GetHitUnit(), spellId, true, NULL);
+                GetCaster()->CastSpell(GetHitUnit(), spellId, true, nullptr);
             }
 
             void Register()
@@ -3101,7 +3101,7 @@ class spell_gen_dummy_trigger : public SpellScriptLoader
                 if (Unit* target = GetHitUnit())
                     if (SpellInfo const* triggeredByAuraSpell = GetTriggeringSpell())
                         if (triggeredByAuraSpell->Id == SPELL_PERSISTANT_SHIELD_TRIGGERED)
-                            caster->CastCustomSpell(target, SPELL_PERSISTANT_SHIELD_TRIGGERED, &damage, NULL, NULL, true);
+                            caster->CastCustomSpell(target, SPELL_PERSISTANT_SHIELD_TRIGGERED, &damage, nullptr, nullptr, true);
             }
 
             void Register()
@@ -4387,7 +4387,7 @@ class spell_gen_summon_elemental : public SpellScriptLoader
                 if (GetCaster())
                     if (Unit* owner = GetCaster()->GetOwner())
                         if (owner->GetTypeId() == TYPEID_PLAYER) /// @todo this check is maybe wrong
-                            owner->ToPlayer()->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
+                            owner->ToPlayer()->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
             }
 
             void Register()
@@ -4766,13 +4766,13 @@ class spell_gen_replenishment : public SpellScriptLoader
                     }
                 }
 
-                targets.remove_if(Trinity::PowerCheck(POWER_MANA, false));
+                targets.remove_if(acore::PowerCheck(POWER_MANA, false));
 
                 uint8 const maxTargets = 10;
 
                 if (targets.size() > maxTargets)
                 {
-                    targets.sort(Trinity::PowerPctOrderPred(POWER_MANA));
+                    targets.sort(acore::PowerPctOrderPred(POWER_MANA));
                     targets.resize(maxTargets);
                 }
             }
@@ -4944,7 +4944,7 @@ class spell_gen_eject_all_passengers : public SpellScriptLoader
 
             void RemoveVehicleAuras()
             {
-                Unit* u = NULL;
+                Unit* u = nullptr;
                 if (Vehicle* vehicle = GetHitUnit()->GetVehicleKit())
                 {
                     u = vehicle->GetPassenger(0);

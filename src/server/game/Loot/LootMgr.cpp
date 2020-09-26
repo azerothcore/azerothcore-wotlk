@@ -42,7 +42,7 @@ LootStore LootTemplates_Skinning("skinning_loot_template",           "creature s
 LootStore LootTemplates_Spell("spell_loot_template",                 "spell id (random item creating)", false);
 
 // Selects invalid loot items to be removed from group possible entries (before rolling)
-struct LootGroupInvalidSelector : public std::unary_function<LootStoreItem*, bool>
+struct LootGroupInvalidSelector : public acore::unary_function<LootStoreItem*, bool>
 {
     explicit LootGroupInvalidSelector(Loot const& loot, uint16 lootMode) : _loot(loot), _lootMode(lootMode) { }
 
@@ -232,7 +232,7 @@ LootTemplate const* LootStore::GetLootFor(uint32 loot_id) const
     LootTemplateMap::const_iterator tab = m_LootTemplates.find(loot_id);
 
     if (tab == m_LootTemplates.end())
-        return NULL;
+        return nullptr;
 
     return tab->second;
 }
@@ -242,7 +242,7 @@ LootTemplate* LootStore::GetLootForConditionFill(uint32 loot_id) const
     LootTemplateMap::const_iterator tab = m_LootTemplates.find(loot_id);
 
     if (tab == m_LootTemplates.end())
-        return NULL;
+        return nullptr;
 
     return tab->second;
 }
@@ -372,7 +372,7 @@ LootItem::LootItem(LootStoreItem const& li)
     conditions   = li.conditions;
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid);
-    freeforall  = proto && (proto->Flags & ITEM_PROTO_FLAG_PARTY_LOOT);
+    freeforall  = proto && (proto->Flags & ITEM_FLAG_MULTI_DROP);
     follow_loot_rules = proto && (proto->FlagsCu & ITEM_FLAGS_CU_FOLLOW_LOOT_RULES);
 
     needs_quest = li.needs_quest;
@@ -399,7 +399,7 @@ bool LootItem::AllowedForPlayer(Player const* player) const
         return false;
 
     // not show loot for players without profession or those who already know the recipe
-    if ((pProto->Flags & ITEM_PROTO_FLAG_SMART_LOOT) && (!player->HasSkill(pProto->RequiredSkill) || player->HasSpell(pProto->Spells[1].SpellId)))
+    if ((pProto->Flags & ITEM_FLAG_HIDE_UNUSABLE_RECIPE) && (!player->HasSkill(pProto->RequiredSkill) || player->HasSpell(pProto->Spells[1].SpellId)))
         return false;
 
     // not show loot for not own team
@@ -449,7 +449,7 @@ void Loot::AddItem(LootStoreItem const& item)
         // non-conditional one-player only items are counted here,
         // free for all items are counted in FillFFALoot(),
         // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
-        if (!item.needs_quest && item.conditions.empty() && !(proto->Flags & ITEM_PROTO_FLAG_PARTY_LOOT))
+        if (!item.needs_quest && item.conditions.empty() && !(proto->Flags & ITEM_FLAG_MULTI_DROP))
             ++unlootedCount;
     }
 }
@@ -481,7 +481,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     {
         roundRobinPlayer = lootOwner->GetGUID();
 
-        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             if (Player* player = itr->GetSource())   // should actually be looted object instead of lootOwner but looter has to be really close so doesnt really matter
                 if (player->IsInMap(lootOwner)) // pussywizard: multithreading crashfix
                     FillNotNormalLootFor(player, player->IsAtGroupRewardDistance(lootOwner));
@@ -522,7 +522,7 @@ void Loot::FillNotNormalLootFor(Player* player, bool presentAtLooting)
 
     // Process currency items
     uint32 max_slot = GetMaxSlotInLootFor(player);
-    LootItem const* item = NULL;
+    LootItem const* item = nullptr;
     uint32 itemsSize = uint32(items.size());
     for (uint32 i = 0; i < max_slot; ++i)
     {
@@ -554,7 +554,7 @@ QuestItemList* Loot::FillFFALoot(Player* player)
     if (ql->empty())
     {
         delete ql;
-        return NULL;
+        return nullptr;
     }
 
     PlayerFFAItems[player->GetGUIDLow()] = ql;
@@ -564,7 +564,7 @@ QuestItemList* Loot::FillFFALoot(Player* player)
 QuestItemList* Loot::FillQuestLoot(Player* player)
 {
     if (items.size() == MAX_NR_LOOT_ITEMS)
-        return NULL;
+        return nullptr;
 
     QuestItemList* ql = new QuestItemList();
 
@@ -592,7 +592,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
     if (ql->empty())
     {
         delete ql;
-        return NULL;
+        return nullptr;
     }
 
     PlayerQuestItems[player->GetGUIDLow()] = ql;
@@ -624,7 +624,7 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player, bool pres
     if (ql->empty())
     {
         delete ql;
-        return NULL;
+        return nullptr;
     }
 
     PlayerNonQuestNonFFAConditionalItems[player->GetGUIDLow()] = ql;
@@ -713,7 +713,7 @@ void Loot::generateMoneyLoot(uint32 minAmount, uint32 maxAmount)
 
 LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem* *qitem, QuestItem* *ffaitem, QuestItem* *conditem)
 {
-    LootItem* item = NULL;
+    LootItem* item = nullptr;
     bool is_looted = true;
     if (lootSlot >= items.size())
     {
@@ -726,7 +726,7 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem* *qite
                 *qitem = qitem2;
             item = &quest_items[qitem2->index];
             if (item->follow_loot_rules && !item->AllowedForPlayer(player)) // pussywizard: such items (follow_loot_rules) are added to every player, but not everyone is allowed, check it here
-                return NULL;
+                return nullptr;
             is_looted = qitem2->is_looted;
         }
     }
@@ -771,7 +771,7 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem* *qite
     }
 
     if (is_looted)
-        return NULL;
+        return nullptr;
 
     return item;
 }
@@ -1141,9 +1141,9 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const *pla
     possibleLoot = EqualChanced;
     possibleLoot.remove_if(LootGroupInvalidSelector(loot, lootMode));
     if (!possibleLoot.empty())                              // If nothing selected yet - an item is taken from equal-chanced part
-        return Trinity::Containers::SelectRandomContainerElement(possibleLoot);
+        return acore::Containers::SelectRandomContainerElement(possibleLoot);
 
-    return NULL;                                            // Empty drop from the group
+    return nullptr;                                            // Empty drop from the group
 }
 
 // True if group includes at least 1 quest drop entry
@@ -1277,7 +1277,7 @@ void LootTemplate::AddEntry(LootStoreItem* item)
     if (item->groupid > 0 && item->reference == 0)            // Group
     {
         if (item->groupid >= Groups.size())
-            Groups.resize(item->groupid, NULL);               // Adds new group the the loot template if needed
+            Groups.resize(item->groupid, nullptr);               // Adds new group the the loot template if needed
         if (!Groups[item->groupid - 1])
             Groups[item->groupid - 1] = new LootGroup();
 
@@ -1679,7 +1679,7 @@ void LoadLootTemplates_Item()
     // remove real entries and check existence loot
     ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator itr = its->begin(); itr != its->end(); ++itr)
-        if (lootIdSet.find(itr->second.ItemId) != lootIdSet.end() && itr->second.Flags & ITEM_PROTO_FLAG_OPENABLE)
+        if (lootIdSet.find(itr->second.ItemId) != lootIdSet.end() && itr->second.Flags & ITEM_FLAG_HAS_LOOT)
             lootIdSet.erase(itr->second.ItemId);
 
     // output error for any still listed (not referenced from appropriate table) ids
@@ -1706,7 +1706,7 @@ void LoadLootTemplates_Milling()
     ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator itr = its->begin(); itr != its->end(); ++itr)
     {
-        if (!(itr->second.Flags & ITEM_PROTO_FLAG_MILLABLE))
+        if (!(itr->second.Flags & ITEM_FLAG_IS_MILLABLE))
             continue;
 
         if (lootIdSet.find(itr->second.ItemId) != lootIdSet.end())
@@ -1773,7 +1773,7 @@ void LoadLootTemplates_Prospecting()
     ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator itr = its->begin(); itr != its->end(); ++itr)
     {
-        if (!(itr->second.Flags & ITEM_PROTO_FLAG_PROSPECTABLE))
+        if (!(itr->second.Flags & ITEM_FLAG_IS_PROSPECTABLE))
             continue;
 
         if (lootIdSet.find(itr->second.ItemId) != lootIdSet.end())

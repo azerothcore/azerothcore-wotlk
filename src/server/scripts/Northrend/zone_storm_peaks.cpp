@@ -447,7 +447,7 @@ public:
             Player* charmer = ObjectAccessor::GetPlayer(*me, playerGUID);
             if (charmer && charmer->IsAlive() && me->GetDistance(charmer) < 20.0f)
                 return charmer;
-            return NULL;
+            return nullptr;
         }
 
         void UpdateAI(uint32 diff)

@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_GRIDNOTIFIERS_H
-#define TRINITY_GRIDNOTIFIERS_H
+#ifndef ACORE_GRIDNOTIFIERS_H
+#define ACORE_GRIDNOTIFIERS_H
 
 #include "ObjectGridLoader.h"
 #include "UpdateData.h"
@@ -24,7 +24,7 @@
 class Player;
 //class Map;
 
-namespace Trinity
+namespace acore
 {
     struct VisibleNotifier
     {
@@ -32,9 +32,10 @@ namespace Trinity
         Player::ClientGUIDs vis_guids;
         std::vector<Unit*> &i_visibleNow;
         bool i_gobjOnly;
+        bool i_largeOnly;
         UpdateData i_data;
 
-        VisibleNotifier(Player &player, bool gobjOnly) : i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly)
+        VisibleNotifier(Player &player, bool gobjOnly, bool largeOnly) : i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
         {
             i_visibleNow.clear();
         }
@@ -57,7 +58,7 @@ namespace Trinity
 
     struct PlayerRelocationNotifier : public VisibleNotifier
     {
-        PlayerRelocationNotifier(Player &player) : VisibleNotifier(player, false) {}
+        PlayerRelocationNotifier(Player &player, bool largeOnly) : VisibleNotifier(player, false, largeOnly) {}
 
         template<class T> void Visit(GridRefManager<T> &m) { VisibleNotifier::Visit(m); }
         void Visit(PlayerMapType &);
@@ -88,7 +89,7 @@ namespace Trinity
         float i_distSq;
         TeamId teamId;
         Player const* skipped_receiver;
-        MessageDistDeliverer(WorldObject* src, WorldPacket* msg, float dist, bool own_team_only = false, Player const* skipped = NULL)
+        MessageDistDeliverer(WorldObject* src, WorldPacket* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr)
             : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
             , teamId((own_team_only && src->GetTypeId() == TYPEID_PLAYER) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
             , skipped_receiver(skipped)
@@ -140,7 +141,8 @@ namespace Trinity
     struct ObjectUpdater
     {
         uint32 i_timeDiff;
-        explicit ObjectUpdater(const uint32 diff) : i_timeDiff(diff) {}
+        bool i_largeOnly;
+        explicit ObjectUpdater(const uint32 diff, bool largeOnly) : i_timeDiff(diff), i_largeOnly(largeOnly) {}
         template<class T> void Visit(GridRefManager<T> &m);
         void Visit(PlayerMapType &) {}
         void Visit(CorpseMapType &) {}
@@ -579,7 +581,7 @@ namespace Trinity
     {
         public:
             AnyDeadUnitSpellTargetInRangeCheck(Unit* searchObj, float range, SpellInfo const* spellInfo, SpellTargetCheckTypes check)
-                : AnyDeadUnitObjectInRangeCheck(searchObj, range), i_spellInfo(spellInfo), i_check(searchObj, searchObj, spellInfo, check, NULL)
+                : AnyDeadUnitObjectInRangeCheck(searchObj, range), i_spellInfo(spellInfo), i_check(searchObj, searchObj, spellInfo, check, nullptr)
             {}
             bool operator()(Player* u);
             bool operator()(Corpse* u);
@@ -975,7 +977,7 @@ namespace Trinity
     {
         public:
             AnyAoETargetUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range)
-                : i_obj(obj), i_funit(funit), _spellInfo(NULL), i_range(range)
+                : i_obj(obj), i_funit(funit), _spellInfo(nullptr), i_range(range)
             {
                 Unit const* check = i_funit;
                 Unit const* owner = i_funit->GetOwner();
@@ -991,7 +993,7 @@ namespace Trinity
                 if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem())
                     return false;
 
-                if (i_funit->_IsValidAttackTarget(u, _spellInfo,i_obj->GetTypeId() == TYPEID_DYNAMICOBJECT ? i_obj : NULL) && i_obj->IsWithinDistInMap(u, i_range))
+                if (i_funit->_IsValidAttackTarget(u, _spellInfo,i_obj->GetTypeId() == TYPEID_DYNAMICOBJECT ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range))
                     return true;
 
                 return false;
@@ -1244,6 +1246,23 @@ namespace Trinity
             float _range;
             bool _reqAlive;
             bool _disallowGM;
+    };
+
+    class AnyPlayerExactPositionInGameObjectRangeCheck
+    {
+        public:
+            AnyPlayerExactPositionInGameObjectRangeCheck(GameObject const* go, float range) : _go(go), _range(range) {}
+            bool operator()(Player* u)
+            {
+                if (!_go->IsInRange(u->GetPositionX(), u->GetPositionY(), u->GetPositionZ(), _range))
+                    return false;
+
+                return true;
+            }
+
+        private:
+            GameObject const* _go;
+            float _range;
     };
 
     class NearestPlayerInObjectRangeCheck

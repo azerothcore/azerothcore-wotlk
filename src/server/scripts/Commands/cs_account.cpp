@@ -147,7 +147,7 @@ public:
             return false;
 
         std::string accountName = account;
-        if (!AccountMgr::normalizeString(accountName))
+        if (!Utf8ToUpperOnlyLatin(accountName))
         {
             handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
             handler->SetSentErrorMessage(true);
@@ -419,7 +419,7 @@ public:
         {
             ///- Convert Account name to Upper Format
             accountName = account;
-            if (!AccountMgr::normalizeString(accountName))
+            if (!Utf8ToUpperOnlyLatin(accountName))
             {
                 handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
                 handler->SetSentErrorMessage(true);
@@ -485,7 +485,7 @@ public:
         if (isAccountNameGiven)
         {
             targetAccountName = arg1;
-            if (!AccountMgr::normalizeString(targetAccountName))
+            if (!Utf8ToUpperOnlyLatin(targetAccountName))
             {
                 handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, targetAccountName.c_str());
                 handler->SetSentErrorMessage(true);
@@ -597,7 +597,7 @@ public:
             return false;
 
         std::string accountName = account;
-        if (!AccountMgr::normalizeString(accountName))
+        if (!Utf8ToUpperOnlyLatin(accountName))
         {
             handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
             handler->SetSentErrorMessage(true);

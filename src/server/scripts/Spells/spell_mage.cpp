@@ -16,6 +16,7 @@
 #include "Player.h"
 #include "SpellMgr.h"
 #include "TemporarySummon.h"
+#include "Pet.h"
 
 enum MageSpells
 {
@@ -96,7 +97,7 @@ class spell_mage_deep_freeze : public SpellScriptLoader
             void HandleOnHit()
             {
                 if (Unit* caster = GetCaster())
-                    if (Unit* target = (caster->ToPlayer() ? caster->ToPlayer()->GetSelectedUnit() : NULL))
+                    if (Unit* target = (caster->ToPlayer() ? caster->ToPlayer()->GetSelectedUnit() : nullptr))
                         if (Creature* cTarget = target->ToCreature())
                             if (cTarget->HasMechanicTemplateImmunity(1 << (MECHANIC_STUN - 1)))
                                 caster->CastSpell(cTarget, 71757, true);
@@ -465,6 +466,36 @@ class spell_mage_brain_freeze : public SpellScriptLoader
         }
 };
 
+class spell_mage_glyph_of_eternal_water : public SpellScriptLoader
+{
+    public:
+        spell_mage_glyph_of_eternal_water() : SpellScriptLoader("spell_mage_glyph_of_eternal_water") { }
+
+        class spell_mage_glyph_of_eternal_water_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_mage_glyph_of_eternal_water_AuraScript);
+
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Unit* target = GetTarget())
+                    if (Player* player = target->ToPlayer())
+                        if (Pet* pet = player->GetPet())
+                            if (pet->GetEntry() == NPC_WATER_ELEMENTAL_PERM)
+                                pet->Remove(PET_SAVE_NOT_IN_SLOT);
+            }
+
+            void Register()
+            {
+                OnEffectRemove += AuraEffectRemoveFn(spell_mage_glyph_of_eternal_water_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_mage_glyph_of_eternal_water_AuraScript();
+        }
+};
+
 
 // Theirs
 // Incanter's Absorbtion
@@ -494,7 +525,7 @@ class spell_mage_incanters_absorbtion_base_AuraScript : public AuraScript
                     currentAura->GetBase()->RefreshDuration();
                 }
                 else
-                    target->CastCustomSpell(target, SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
+                    target->CastCustomSpell(target, SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED, &bp, nullptr, nullptr, true, NULL, aurEff);
             }
         }
 };
@@ -626,7 +657,7 @@ class spell_mage_fire_frost_ward : public SpellScriptLoader
                     if (roll_chance_i(chance))
                     {
                         int32 bp = dmgInfo.GetDamage();
-                        target->CastCustomSpell(target, SPELL_MAGE_FROST_WARDING_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
+                        target->CastCustomSpell(target, SPELL_MAGE_FROST_WARDING_TRIGGERED, &bp, nullptr, nullptr, true, NULL, aurEff);
                         absorbAmount = 0;
 
                         // Xinef: trigger Incanters Absorbtion
@@ -675,7 +706,7 @@ class spell_mage_focus_magic : public SpellScriptLoader
 
             bool Load()
             {
-                _procTarget = NULL;
+                _procTarget = nullptr;
                 return true;
             }
 
@@ -763,7 +794,7 @@ class spell_mage_ice_barrier : public SpellScriptLoader
 
                 if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_SCHOOL_ABSORB, (SpellFamilyNames)GetSpellInfo()->SpellFamilyName, GetSpellInfo()->SpellIconID, EFFECT_0))
                 {
-                    int32 newAmount = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, NULL, NULL);
+                    int32 newAmount = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, NULL, nullptr);
                     newAmount = CalculateSpellAmount(caster, newAmount, GetSpellInfo(), aurEff);
 
                     if (aurEff->GetAmount() > newAmount)
@@ -1091,6 +1122,7 @@ void AddSC_mage_spell_scripts()
     new spell_mage_burnout_trigger();
     new spell_mage_pet_scaling();
     new spell_mage_brain_freeze();
+    new spell_mage_glyph_of_eternal_water();
 
     // Theirs
     new spell_mage_blast_wave();

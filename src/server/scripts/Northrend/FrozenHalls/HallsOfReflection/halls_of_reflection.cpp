@@ -2015,7 +2015,7 @@ class at_hor_battered_hilt_throw : public AreaTriggerScript
                 if (InstanceScript* instance = player->GetInstanceScript())
                 {
                     uint32 bhd = instance->GetData(DATA_BATTERED_HILT);
-                    if (bhd == BHSF_NONE || bhd != BHSF_STARTED)
+                    if (bhd != BHSF_STARTED)
                         return true;
                     player->CastSpell(player, 70698, true);
                     player->DestroyItemCount(49766, 1, true);

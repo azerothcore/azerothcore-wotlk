@@ -4,11 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_PACKETLOG_H
-#define TRINITY_PACKETLOG_H
+#ifndef ACORE_PACKETLOG_H
+#define ACORE_PACKETLOG_H
 
 #include "Common.h"
-#include <ace/Singleton.h>
 
 enum Direction
 {
@@ -20,20 +19,21 @@ class WorldPacket;
 
 class PacketLog
 {
-    friend class ACE_Singleton<PacketLog, ACE_Thread_Mutex>;
-
     private:
         PacketLog();
         ~PacketLog();
 
     public:
+        static PacketLog* instance();
+
         void Initialize();
-        bool CanLogPacket() const { return (_file != NULL); }
+        bool CanLogPacket() const { return (_file != nullptr); }
         void LogPacket(WorldPacket const& packet, Direction direction);
 
     private:
         FILE* _file;
 };
 
-#define sPacketLog ACE_Singleton<PacketLog, ACE_Thread_Mutex>::instance()
+#define sPacketLog PacketLog::instance()
+
 #endif

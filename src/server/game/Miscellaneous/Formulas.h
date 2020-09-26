@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_FORMULAS_H
-#define TRINITY_FORMULAS_H
+#ifndef ACORE_FORMULAS_H
+#define ACORE_FORMULAS_H
 
 #include "World.h"
 #include "SharedDefines.h"
@@ -13,7 +13,7 @@
 #include "Player.h"
 #include "Creature.h"
 
-namespace Trinity
+namespace acore
 {
     namespace Honor
     {

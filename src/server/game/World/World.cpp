@@ -78,11 +78,12 @@
 #include "ServerMotd.h"
 #include "GameGraveyard.h"
 #include <VMapManager2.h>
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
 
-ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
+std::atomic_long World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
 uint32 World::m_gameMSTime = 0;
@@ -99,7 +100,7 @@ World::World()
     m_allowMovement = true;
     m_ShutdownMask = 0;
     m_ShutdownTimer = 0;
-    m_gameTime = time(NULL);
+    m_gameTime = time(nullptr);
     m_gameMSTime = getMSTime();
     m_startTime = m_gameTime;
     m_maxActiveSessionCount = 0;
@@ -110,6 +111,7 @@ World::World()
     m_NextWeeklyQuestReset = 0;
     m_NextMonthlyQuestReset = 0;
     m_NextRandomBGReset = 0;
+    m_NextCalendarOldEventsDeletionTime = 0;
     m_NextGuildReset = 0;
 
     m_defaultDbcLocale = LOCALE_enUS;
@@ -121,8 +123,6 @@ World::World()
     m_isClosed = false;
 
     m_CleaningFlags = 0;
-
-    m_configFileList = "";
 
     memset(rate_values, 0, sizeof(rate_values));
     memset(m_int_configs, 0, sizeof(m_int_configs));
@@ -147,7 +147,7 @@ World::~World()
         m_offlineSessions.erase(m_offlineSessions.begin());
     }
 
-    CliCommandHolder* command = NULL;
+    CliCommandHolder* command = nullptr;
     while (cliCmdQueue.next(command))
         delete command;
 
@@ -155,6 +155,12 @@ World::~World()
     MMAP::MMapFactory::clear();
 
     //TODO free addSessQueue
+}
+
+World* World::instance()
+{
+    static World instance;
+    return &instance;
 }
 
 /// Find a player in a specified zone
@@ -174,7 +180,7 @@ Player* World::FindPlayerInZone(uint32 zone)
         if (player->IsInWorld() && player->GetZoneId() == zone)
             return player;
     }
-    return NULL;
+    return nullptr;
 }
 
 bool World::IsClosed() const
@@ -198,7 +204,7 @@ WorldSession* World::FindSession(uint32 id) const
     if (itr != m_sessions.end())
         return itr->second;                                 // also can return NULL for kicked session
     else
-        return NULL;
+        return nullptr;
 }
 
 WorldSession* World::FindOfflineSession(uint32 id) const
@@ -207,17 +213,17 @@ WorldSession* World::FindOfflineSession(uint32 id) const
     if (itr != m_offlineSessions.end())
         return itr->second;
     else
-        return NULL;
+        return nullptr;
 }
 
 WorldSession* World::FindOfflineSessionForCharacterGUID(uint32 guidLow) const
 {
     if (m_offlineSessions.empty())
-        return NULL;
+        return nullptr;
     for (SessionMap::const_iterator itr = m_offlineSessions.begin(); itr != m_offlineSessions.end(); ++itr)
         if (itr->second->GetGuidLow() == guidLow)
             return itr->second;
-    return NULL;
+    return nullptr;
 }
 
 /// Remove a given session
@@ -261,7 +267,7 @@ void World::AddSession_(WorldSession* s)
         WorldSession* oldSession = old->second;
 
         if (!RemoveQueuedPlayer(oldSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-            m_disconnects[s->GetAccountId()] = time(NULL);
+            m_disconnects[s->GetAccountId()] = time(nullptr);
 
         // pussywizard:
         if (oldSession->HandleSocketClosed())
@@ -275,7 +281,7 @@ void World::AddSession_(WorldSession* s)
                 tmp->SetShouldSetOfflineInDB(false);
                 delete tmp;
             }
-            oldSession->SetOfflineTime(time(NULL));
+            oldSession->SetOfflineTime(time(nullptr));
             m_offlineSessions[oldSession->GetAccountId()] = oldSession;
         }
         else
@@ -317,7 +323,7 @@ bool World::HasRecentlyDisconnected(WorldSession* session)
     {
         for (DisconnectMap::iterator i = m_disconnects.begin(); i != m_disconnects.end();)
         {
-            if ((time(NULL) - i->second) < tolerance)
+            if ((time(nullptr) - i->second) < tolerance)
             {
                 if (i->first == session->GetAccountId())
                     return true;
@@ -406,43 +412,6 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
     return found;
 }
 
-void World::LoadModuleConfigSettings()
-{
-    Tokenizer configFileList(GetConfigFileList(), ',');
-    for (auto i = configFileList.begin(); i != configFileList.end(); i++)
-    {
-        std::string configFile = (*i) + std::string(".conf");
-
-        std::string conf_path = _CONF_DIR;
-        std::string cfg_file = conf_path + "/" + configFile;
-
-#if PLATFORM == PLATFORM_WINDOWS
-        cfg_file = configFile;
-#endif
-        std::string cfg_def_file = cfg_file + ".dist";
-
-        // Load .conf.dist config
-        if (!sConfigMgr->LoadMore(cfg_def_file.c_str()))
-        {
-            sLog->outString();
-            sLog->outError("Module config: Invalid or missing configuration dist file : %s", cfg_def_file.c_str());
-            sLog->outError("Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
-            sLog->outError("Module config: Use default settings!");
-            sLog->outString();
-        }
-
-        // Load .conf config
-        if (!sConfigMgr->LoadMore(cfg_file.c_str()))
-        {
-            sLog->outString();
-            sLog->outError("Module config: Invalid or missing configuration file : %s", cfg_file.c_str());
-            sLog->outError("Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
-            sLog->outError("Module config: Use default settings!");
-            sLog->outString();
-        }
-    }
-}
-
 /// Initialize config values
 void World::LoadConfigSettings(bool reload)
 {
@@ -454,8 +423,6 @@ void World::LoadConfigSettings(bool reload)
             return;
         }
     }
-
-    LoadModuleConfigSettings();
 
 #ifdef ELUNA
     ///- Initialize Lua Engine
@@ -476,6 +443,7 @@ void World::LoadConfigSettings(bool reload)
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)
         SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
+
     Motd::SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to an AzerothCore server"));
 
     ///- Read ticket system setting from the config file
@@ -515,62 +483,81 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError("Rate.RunicPower.Loss (%f) must be > 0. Using 1 instead.", rate_values[RATE_POWER_RUNICPOWER_LOSS]);
         rate_values[RATE_POWER_RUNICPOWER_LOSS] = 1;
     }
-    rate_values[RATE_POWER_FOCUS]  = sConfigMgr->GetFloatDefault("Rate.Focus", 1.0f);
-    rate_values[RATE_POWER_ENERGY] = sConfigMgr->GetFloatDefault("Rate.Energy", 1.0f);
+    rate_values[RATE_POWER_FOCUS]                 = sConfigMgr->GetFloatDefault("Rate.Focus", 1.0f);
+    rate_values[RATE_POWER_ENERGY]                = sConfigMgr->GetFloatDefault("Rate.Energy", 1.0f);
 
-    rate_values[RATE_SKILL_DISCOVERY]      = sConfigMgr->GetFloatDefault("Rate.Skill.Discovery", 1.0f);
+    rate_values[RATE_SKILL_DISCOVERY]             = sConfigMgr->GetFloatDefault("Rate.Skill.Discovery", 1.0f);
 
-    rate_values[RATE_DROP_ITEM_POOR]       = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Poor", 1.0f);
-    rate_values[RATE_DROP_ITEM_NORMAL]     = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Normal", 1.0f);
-    rate_values[RATE_DROP_ITEM_UNCOMMON]   = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Uncommon", 1.0f);
-    rate_values[RATE_DROP_ITEM_RARE]       = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Rare", 1.0f);
-    rate_values[RATE_DROP_ITEM_EPIC]       = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Epic", 1.0f);
-    rate_values[RATE_DROP_ITEM_LEGENDARY]  = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Legendary", 1.0f);
-    rate_values[RATE_DROP_ITEM_ARTIFACT]   = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Artifact", 1.0f);
-    rate_values[RATE_DROP_ITEM_REFERENCED] = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Referenced", 1.0f);
+    rate_values[RATE_DROP_ITEM_POOR]              = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Poor", 1.0f);
+    rate_values[RATE_DROP_ITEM_NORMAL]            = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Normal", 1.0f);
+    rate_values[RATE_DROP_ITEM_UNCOMMON]          = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Uncommon", 1.0f);
+    rate_values[RATE_DROP_ITEM_RARE]              = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Rare", 1.0f);
+    rate_values[RATE_DROP_ITEM_EPIC]              = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Epic", 1.0f);
+    rate_values[RATE_DROP_ITEM_LEGENDARY]         = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Legendary", 1.0f);
+    rate_values[RATE_DROP_ITEM_ARTIFACT]          = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Artifact", 1.0f);
+    rate_values[RATE_DROP_ITEM_REFERENCED]        = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Referenced", 1.0f);
     rate_values[RATE_DROP_ITEM_REFERENCED_AMOUNT] = sConfigMgr->GetFloatDefault("Rate.Drop.Item.ReferencedAmount", 1.0f);
-    rate_values[RATE_DROP_MONEY]  = sConfigMgr->GetFloatDefault("Rate.Drop.Money", 1.0f);
-    rate_values[RATE_XP_KILL]     = sConfigMgr->GetFloatDefault("Rate.XP.Kill", 1.0f);
-    rate_values[RATE_XP_BG_KILL] = sConfigMgr->GetFloatDefault("Rate.XP.BattlegroundKill", 1.0f);
-    rate_values[RATE_XP_QUEST]    = sConfigMgr->GetFloatDefault("Rate.XP.Quest", 1.0f);
-    rate_values[RATE_XP_EXPLORE]  = sConfigMgr->GetFloatDefault("Rate.XP.Explore", 1.0f);
-    rate_values[RATE_REPAIRCOST]  = sConfigMgr->GetFloatDefault("Rate.RepairCost", 1.0f);
+    rate_values[RATE_DROP_MONEY]                  = sConfigMgr->GetFloatDefault("Rate.Drop.Money", 1.0f);
+    rate_values[RATE_XP_KILL]                     = sConfigMgr->GetFloatDefault("Rate.XP.Kill", 1.0f);
+    rate_values[RATE_XP_BG_KILL]                  = sConfigMgr->GetFloatDefault("Rate.XP.BattlegroundKill", 1.0f);
+    rate_values[RATE_XP_QUEST]                    = sConfigMgr->GetFloatDefault("Rate.XP.Quest", 1.0f);
+    rate_values[RATE_XP_EXPLORE]                  = sConfigMgr->GetFloatDefault("Rate.XP.Explore", 1.0f);
+    rate_values[RATE_REPAIRCOST]                  = sConfigMgr->GetFloatDefault("Rate.RepairCost", 1.0f);
+
+    rate_values[RATE_SELLVALUE_ITEM_POOR]         = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Poor", 1.0f);
+    rate_values[RATE_SELLVALUE_ITEM_NORMAL]       = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Normal", 1.0f);
+    rate_values[RATE_SELLVALUE_ITEM_UNCOMMON]     = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Uncommon", 1.0f);
+    rate_values[RATE_SELLVALUE_ITEM_RARE]         = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Rare", 1.0f);
+    rate_values[RATE_SELLVALUE_ITEM_EPIC]         = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Epic", 1.0f);
+    rate_values[RATE_SELLVALUE_ITEM_LEGENDARY]    = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Legendary", 1.0f);
+    rate_values[RATE_SELLVALUE_ITEM_ARTIFACT]     = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Artifact", 1.0f);
+    rate_values[RATE_SELLVALUE_ITEM_HEIRLOOM]     = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Heirloom", 1.0f);
+
+    rate_values[ RATE_BUYVALUE_ITEM_POOR]         = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Poor", 1.0f);
+    rate_values[ RATE_BUYVALUE_ITEM_NORMAL]       = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Normal", 1.0f);
+    rate_values[ RATE_BUYVALUE_ITEM_UNCOMMON]     = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Uncommon", 1.0f);
+    rate_values[ RATE_BUYVALUE_ITEM_RARE]         = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Rare", 1.0f);
+    rate_values[ RATE_BUYVALUE_ITEM_EPIC]         = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Epic", 1.0f);
+    rate_values[ RATE_BUYVALUE_ITEM_LEGENDARY]    = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Legendary", 1.0f);
+    rate_values[RATE_BUYVALUE_ITEM_ARTIFACT]      = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Artifact", 1.0f);
+    rate_values[RATE_BUYVALUE_ITEM_HEIRLOOM]      = sConfigMgr->GetFloatDefault("Rate.BuyValue.Item.Heirloom", 1.0f);
+
     if (rate_values[RATE_REPAIRCOST] < 0.0f)
     {
         sLog->outError("Rate.RepairCost (%f) must be >=0. Using 0.0 instead.", rate_values[RATE_REPAIRCOST]);
         rate_values[RATE_REPAIRCOST] = 0.0f;
     }
-    rate_values[RATE_REPUTATION_GAIN]  = sConfigMgr->GetFloatDefault("Rate.Reputation.Gain", 1.0f);
-    rate_values[RATE_REPUTATION_LOWLEVEL_KILL]  = sConfigMgr->GetFloatDefault("Rate.Reputation.LowLevel.Kill", 1.0f);
-    rate_values[RATE_REPUTATION_LOWLEVEL_QUEST]  = sConfigMgr->GetFloatDefault("Rate.Reputation.LowLevel.Quest", 1.0f);
-    rate_values[RATE_REPUTATION_RECRUIT_A_FRIEND_BONUS] = sConfigMgr->GetFloatDefault("Rate.Reputation.RecruitAFriendBonus", 0.1f);
-    rate_values[RATE_CREATURE_NORMAL_DAMAGE]          = sConfigMgr->GetFloatDefault("Rate.Creature.Normal.Damage", 1.0f);
-    rate_values[RATE_CREATURE_ELITE_ELITE_DAMAGE]     = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.Elite.Damage", 1.0f);
-    rate_values[RATE_CREATURE_ELITE_RAREELITE_DAMAGE] = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.RAREELITE.Damage", 1.0f);
-    rate_values[RATE_CREATURE_ELITE_WORLDBOSS_DAMAGE] = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.WORLDBOSS.Damage", 1.0f);
-    rate_values[RATE_CREATURE_ELITE_RARE_DAMAGE]      = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.RARE.Damage", 1.0f);
-    rate_values[RATE_CREATURE_NORMAL_HP]          = sConfigMgr->GetFloatDefault("Rate.Creature.Normal.HP", 1.0f);
-    rate_values[RATE_CREATURE_ELITE_ELITE_HP]     = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.Elite.HP", 1.0f);
-    rate_values[RATE_CREATURE_ELITE_RAREELITE_HP] = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.RAREELITE.HP", 1.0f);
-    rate_values[RATE_CREATURE_ELITE_WORLDBOSS_HP] = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.WORLDBOSS.HP", 1.0f);
-    rate_values[RATE_CREATURE_ELITE_RARE_HP]      = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.RARE.HP", 1.0f);
+    rate_values[RATE_REPUTATION_GAIN]                      = sConfigMgr->GetFloatDefault("Rate.Reputation.Gain", 1.0f);
+    rate_values[RATE_REPUTATION_LOWLEVEL_KILL]             = sConfigMgr->GetFloatDefault("Rate.Reputation.LowLevel.Kill", 1.0f);
+    rate_values[RATE_REPUTATION_LOWLEVEL_QUEST]            = sConfigMgr->GetFloatDefault("Rate.Reputation.LowLevel.Quest", 1.0f);
+    rate_values[RATE_REPUTATION_RECRUIT_A_FRIEND_BONUS]    = sConfigMgr->GetFloatDefault("Rate.Reputation.RecruitAFriendBonus", 0.1f);
+    rate_values[RATE_CREATURE_NORMAL_DAMAGE]               = sConfigMgr->GetFloatDefault("Rate.Creature.Normal.Damage", 1.0f);
+    rate_values[RATE_CREATURE_ELITE_ELITE_DAMAGE]          = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.Elite.Damage", 1.0f);
+    rate_values[RATE_CREATURE_ELITE_RAREELITE_DAMAGE]      = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.RAREELITE.Damage", 1.0f);
+    rate_values[RATE_CREATURE_ELITE_WORLDBOSS_DAMAGE]      = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.WORLDBOSS.Damage", 1.0f);
+    rate_values[RATE_CREATURE_ELITE_RARE_DAMAGE]           = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.RARE.Damage", 1.0f);
+    rate_values[RATE_CREATURE_NORMAL_HP]                   = sConfigMgr->GetFloatDefault("Rate.Creature.Normal.HP", 1.0f);
+    rate_values[RATE_CREATURE_ELITE_ELITE_HP]              = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.Elite.HP", 1.0f);
+    rate_values[RATE_CREATURE_ELITE_RAREELITE_HP]          = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.RAREELITE.HP", 1.0f);
+    rate_values[RATE_CREATURE_ELITE_WORLDBOSS_HP]          = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.WORLDBOSS.HP", 1.0f);
+    rate_values[RATE_CREATURE_ELITE_RARE_HP]               = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.RARE.HP", 1.0f);
     rate_values[RATE_CREATURE_NORMAL_SPELLDAMAGE]          = sConfigMgr->GetFloatDefault("Rate.Creature.Normal.SpellDamage", 1.0f);
     rate_values[RATE_CREATURE_ELITE_ELITE_SPELLDAMAGE]     = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.Elite.SpellDamage", 1.0f);
     rate_values[RATE_CREATURE_ELITE_RAREELITE_SPELLDAMAGE] = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.RAREELITE.SpellDamage", 1.0f);
     rate_values[RATE_CREATURE_ELITE_WORLDBOSS_SPELLDAMAGE] = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.WORLDBOSS.SpellDamage", 1.0f);
     rate_values[RATE_CREATURE_ELITE_RARE_SPELLDAMAGE]      = sConfigMgr->GetFloatDefault("Rate.Creature.Elite.RARE.SpellDamage", 1.0f);
-    rate_values[RATE_CREATURE_AGGRO]  = sConfigMgr->GetFloatDefault("Rate.Creature.Aggro", 1.0f);
-    rate_values[RATE_REST_INGAME]                    = sConfigMgr->GetFloatDefault("Rate.Rest.InGame", 1.0f);
-    rate_values[RATE_REST_OFFLINE_IN_TAVERN_OR_CITY] = sConfigMgr->GetFloatDefault("Rate.Rest.Offline.InTavernOrCity", 1.0f);
-    rate_values[RATE_REST_OFFLINE_IN_WILDERNESS]     = sConfigMgr->GetFloatDefault("Rate.Rest.Offline.InWilderness", 1.0f);
-    rate_values[RATE_DAMAGE_FALL]  = sConfigMgr->GetFloatDefault("Rate.Damage.Fall", 1.0f);
-    rate_values[RATE_AUCTION_TIME]  = sConfigMgr->GetFloatDefault("Rate.Auction.Time", 1.0f);
-    rate_values[RATE_AUCTION_DEPOSIT] = sConfigMgr->GetFloatDefault("Rate.Auction.Deposit", 1.0f);
-    rate_values[RATE_AUCTION_CUT] = sConfigMgr->GetFloatDefault("Rate.Auction.Cut", 1.0f);
-    rate_values[RATE_HONOR] = sConfigMgr->GetFloatDefault("Rate.Honor", 1.0f);
-    rate_values[RATE_ARENA_POINTS] = sConfigMgr->GetFloatDefault("Rate.ArenaPoints", 1.0f);
-    rate_values[RATE_INSTANCE_RESET_TIME] = sConfigMgr->GetFloatDefault("Rate.InstanceResetTime", 1.0f);
-    rate_values[RATE_TALENT] = sConfigMgr->GetFloatDefault("Rate.Talent", 1.0f);
+    rate_values[RATE_CREATURE_AGGRO]                       = sConfigMgr->GetFloatDefault("Rate.Creature.Aggro", 1.0f);
+    rate_values[RATE_REST_INGAME]                          = sConfigMgr->GetFloatDefault("Rate.Rest.InGame", 1.0f);
+    rate_values[RATE_REST_OFFLINE_IN_TAVERN_OR_CITY]       = sConfigMgr->GetFloatDefault("Rate.Rest.Offline.InTavernOrCity", 1.0f);
+    rate_values[RATE_REST_OFFLINE_IN_WILDERNESS]           = sConfigMgr->GetFloatDefault("Rate.Rest.Offline.InWilderness", 1.0f);
+    rate_values[RATE_DAMAGE_FALL]                          = sConfigMgr->GetFloatDefault("Rate.Damage.Fall", 1.0f);
+    rate_values[RATE_AUCTION_TIME]                         = sConfigMgr->GetFloatDefault("Rate.Auction.Time", 1.0f);
+    rate_values[RATE_AUCTION_DEPOSIT]                      = sConfigMgr->GetFloatDefault("Rate.Auction.Deposit", 1.0f);
+    rate_values[RATE_AUCTION_CUT]                          = sConfigMgr->GetFloatDefault("Rate.Auction.Cut", 1.0f);
+    rate_values[RATE_HONOR]                                = sConfigMgr->GetFloatDefault("Rate.Honor", 1.0f);
+    rate_values[RATE_ARENA_POINTS]                         = sConfigMgr->GetFloatDefault("Rate.ArenaPoints", 1.0f);
+    rate_values[RATE_INSTANCE_RESET_TIME]                  = sConfigMgr->GetFloatDefault("Rate.InstanceResetTime", 1.0f);
+    rate_values[RATE_TALENT]                               = sConfigMgr->GetFloatDefault("Rate.Talent", 1.0f);
     if (rate_values[RATE_TALENT] < 0.0f)
     {
         sLog->outError("Rate.Talent (%f) must be > 0. Using 1 instead.", rate_values[RATE_TALENT]);
@@ -646,22 +633,23 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError("Compression level (%i) must be in range 1..9. Using default compression level (1).", m_int_configs[CONFIG_COMPRESSION]);
         m_int_configs[CONFIG_COMPRESSION] = 1;
     }
-    m_bool_configs[CONFIG_ADDON_CHANNEL] = sConfigMgr->GetBoolDefault("AddonChannel", true);
-    m_bool_configs[CONFIG_CLEAN_CHARACTER_DB] = sConfigMgr->GetBoolDefault("CleanCharacterDB", false);
+    m_bool_configs[CONFIG_ADDON_CHANNEL]                   = sConfigMgr->GetBoolDefault("AddonChannel", true);
+    m_bool_configs[CONFIG_CLEAN_CHARACTER_DB]              = sConfigMgr->GetBoolDefault("CleanCharacterDB", false);
     m_int_configs[CONFIG_PERSISTENT_CHARACTER_CLEAN_FLAGS] = sConfigMgr->GetIntDefault("PersistentCharacterCleanFlags", 0);
-    m_int_configs[CONFIG_CHAT_CHANNEL_LEVEL_REQ] = sConfigMgr->GetIntDefault("ChatLevelReq.Channel", 1);
-    m_int_configs[CONFIG_CHAT_WHISPER_LEVEL_REQ] = sConfigMgr->GetIntDefault("ChatLevelReq.Whisper", 1);
-    m_int_configs[CONFIG_CHAT_SAY_LEVEL_REQ] = sConfigMgr->GetIntDefault("ChatLevelReq.Say", 1);
-	m_int_configs[CONFIG_PARTY_LEVEL_REQ] = sConfigMgr->GetIntDefault("PartyLevelReq", 1);
-    m_int_configs[CONFIG_TRADE_LEVEL_REQ] = sConfigMgr->GetIntDefault("LevelReq.Trade", 1);
-    m_int_configs[CONFIG_TICKET_LEVEL_REQ] = sConfigMgr->GetIntDefault("LevelReq.Ticket", 1);
-    m_int_configs[CONFIG_AUCTION_LEVEL_REQ] = sConfigMgr->GetIntDefault("LevelReq.Auction", 1);
-    m_int_configs[CONFIG_MAIL_LEVEL_REQ] = sConfigMgr->GetIntDefault("LevelReq.Mail", 1);
-    m_bool_configs[CONFIG_ALLOW_PLAYER_COMMANDS] = sConfigMgr->GetBoolDefault("AllowPlayerCommands", 1);
-    m_bool_configs[CONFIG_PRESERVE_CUSTOM_CHANNELS] = sConfigMgr->GetBoolDefault("PreserveCustomChannels", false);
+    m_int_configs[CONFIG_CHAT_CHANNEL_LEVEL_REQ]           = sConfigMgr->GetIntDefault("ChatLevelReq.Channel", 1);
+    m_int_configs[CONFIG_CHAT_WHISPER_LEVEL_REQ]           = sConfigMgr->GetIntDefault("ChatLevelReq.Whisper", 1);
+    m_int_configs[CONFIG_CHAT_SAY_LEVEL_REQ]               = sConfigMgr->GetIntDefault("ChatLevelReq.Say", 1);
+	m_int_configs[CONFIG_PARTY_LEVEL_REQ]                  = sConfigMgr->GetIntDefault("PartyLevelReq", 1);
+    m_int_configs[CONFIG_TRADE_LEVEL_REQ]                  = sConfigMgr->GetIntDefault("LevelReq.Trade", 1);
+    m_int_configs[CONFIG_TICKET_LEVEL_REQ]                 = sConfigMgr->GetIntDefault("LevelReq.Ticket", 1);
+    m_int_configs[CONFIG_AUCTION_LEVEL_REQ]                = sConfigMgr->GetIntDefault("LevelReq.Auction", 1);
+    m_int_configs[CONFIG_MAIL_LEVEL_REQ]                   = sConfigMgr->GetIntDefault("LevelReq.Mail", 1);
+    m_bool_configs[CONFIG_ALLOW_PLAYER_COMMANDS]           = sConfigMgr->GetBoolDefault("AllowPlayerCommands", 1);
+    m_bool_configs[CONFIG_PRESERVE_CUSTOM_CHANNELS]        = sConfigMgr->GetBoolDefault("PreserveCustomChannels", false);
     m_int_configs[CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION] = sConfigMgr->GetIntDefault("PreserveCustomChannelDuration", 14);
-    m_int_configs[CONFIG_INTERVAL_DISCONNECT_TOLERANCE] = sConfigMgr->GetIntDefault("DisconnectToleranceInterval", 0);
-    m_bool_configs[CONFIG_STATS_SAVE_ONLY_ON_LOGOUT] = sConfigMgr->GetBoolDefault("PlayerSave.Stats.SaveOnlyOnLogout", true);
+    m_int_configs[CONFIG_INTERVAL_SAVE]                    = sConfigMgr->GetIntDefault("PlayerSaveInterval", 15 * MINUTE * IN_MILLISECONDS);
+    m_int_configs[CONFIG_INTERVAL_DISCONNECT_TOLERANCE]    = sConfigMgr->GetIntDefault("DisconnectToleranceInterval", 0);
+    m_bool_configs[CONFIG_STATS_SAVE_ONLY_ON_LOGOUT]       = sConfigMgr->GetBoolDefault("PlayerSave.Stats.SaveOnlyOnLogout", true);
 
     m_int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] = sConfigMgr->GetIntDefault("PlayerSave.Stats.MinLevel", 0);
     if (m_int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] > MAX_LEVEL)
@@ -690,12 +678,12 @@ void World::LoadConfigSettings(bool reload)
     else
         m_int_configs[CONFIG_PORT_WORLD] = sConfigMgr->GetIntDefault("WorldServerPort", 8085);
 
-    m_bool_configs[CONFIG_CLOSE_IDLE_CONNECTIONS] = sConfigMgr->GetBoolDefault("CloseIdleConnections", true);
-    m_int_configs[CONFIG_SOCKET_TIMEOUTTIME] = sConfigMgr->GetIntDefault("SocketTimeOutTime", 900000);
+    m_bool_configs[CONFIG_CLOSE_IDLE_CONNECTIONS]   = sConfigMgr->GetBoolDefault("CloseIdleConnections", true);
+    m_int_configs[CONFIG_SOCKET_TIMEOUTTIME]        = sConfigMgr->GetIntDefault("SocketTimeOutTime", 900000);
     m_int_configs[CONFIG_SOCKET_TIMEOUTTIME_ACTIVE] = sConfigMgr->GetIntDefault("SocketTimeOutTimeActive", 60000);
-    m_int_configs[CONFIG_SESSION_ADD_DELAY] = sConfigMgr->GetIntDefault("SessionAddDelay", 10000);
+    m_int_configs[CONFIG_SESSION_ADD_DELAY]         = sConfigMgr->GetIntDefault("SessionAddDelay", 10000);
 
-    m_float_configs[CONFIG_GROUP_XP_DISTANCE] = sConfigMgr->GetFloatDefault("MaxGroupXPDistance", 74.0f);
+    m_float_configs[CONFIG_GROUP_XP_DISTANCE]             = sConfigMgr->GetFloatDefault("MaxGroupXPDistance", 74.0f);
     m_float_configs[CONFIG_MAX_RECRUIT_A_FRIEND_DISTANCE] = sConfigMgr->GetFloatDefault("MaxRecruitAFriendBonusDistance", 100.0f);
 
     /// \todo Add MonsterSight and GuarderSight (with meaning) in worldserver.conf or put them as define
@@ -719,46 +707,55 @@ void World::LoadConfigSettings(bool reload)
     else
         m_int_configs[CONFIG_REALM_ZONE] = sConfigMgr->GetIntDefault("RealmZone", REALM_ZONE_DEVELOPMENT);
 
-    m_int_configs[CONFIG_STRICT_PLAYER_NAMES]                 = sConfigMgr->GetIntDefault ("StrictPlayerNames",  0);
-    m_int_configs[CONFIG_STRICT_CHARTER_NAMES]                = sConfigMgr->GetIntDefault ("StrictCharterNames", 0);
-    m_int_configs[CONFIG_STRICT_CHANNEL_NAMES]                = sConfigMgr->GetIntDefault ("StrictChannelNames", 0);
-    m_int_configs[CONFIG_STRICT_PET_NAMES]                    = sConfigMgr->GetIntDefault ("StrictPetNames",     0);
-    
-    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_ACCOUNTS]            = sConfigMgr->GetBoolDefault("AllowTwoSide.Accounts", true);
-    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_CALENDAR]= sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Calendar", false);
-    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT]    = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Chat", false);
-    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL] = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Channel", false);
-    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP]   = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Group", false);
-    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD]   = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Guild", false);
-    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION] = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Auction", false);
-    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL]    = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Mail", false);
-    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_WHO_LIST]            = sConfigMgr->GetBoolDefault("AllowTwoSide.WhoList", false);
-    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND]          = sConfigMgr->GetBoolDefault("AllowTwoSide.AddFriend", false);
-    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_TRADE]               = sConfigMgr->GetBoolDefault("AllowTwoSide.trade", false);
-   
-    m_int_configs[CONFIG_MIN_PLAYER_NAME]                     = sConfigMgr->GetIntDefault ("MinPlayerName",  2);
+    m_int_configs[CONFIG_STRICT_PLAYER_NAMES]                  = sConfigMgr->GetIntDefault ("StrictPlayerNames",  0);
+    m_int_configs[CONFIG_STRICT_CHARTER_NAMES]                 = sConfigMgr->GetIntDefault ("StrictCharterNames", 0);
+    m_int_configs[CONFIG_STRICT_CHANNEL_NAMES]                 = sConfigMgr->GetIntDefault ("StrictChannelNames", 0);
+    m_int_configs[CONFIG_STRICT_PET_NAMES]                     = sConfigMgr->GetIntDefault ("StrictPetNames",     0);
+
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_ACCOUNTS]             = sConfigMgr->GetBoolDefault("AllowTwoSide.Accounts", true);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_CALENDAR] = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Calendar", false);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT]     = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Chat", false);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL]  = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Channel", false);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP]    = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Group", false);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD]    = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Guild", false);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION]  = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Auction", false);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL]     = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Mail", false);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_WHO_LIST]             = sConfigMgr->GetBoolDefault("AllowTwoSide.WhoList", false);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND]           = sConfigMgr->GetBoolDefault("AllowTwoSide.AddFriend", false);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_TRADE]                = sConfigMgr->GetBoolDefault("AllowTwoSide.trade", false);
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE]    = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Emote", false);
+
+    m_int_configs[CONFIG_MIN_PLAYER_NAME] = sConfigMgr->GetIntDefault ("MinPlayerName",  2);
     if (m_int_configs[CONFIG_MIN_PLAYER_NAME] < 1 || m_int_configs[CONFIG_MIN_PLAYER_NAME] > MAX_PLAYER_NAME)
     {
         sLog->outError("MinPlayerName (%i) must be in range 1..%u. Set to 2.", m_int_configs[CONFIG_MIN_PLAYER_NAME], MAX_PLAYER_NAME);
         m_int_configs[CONFIG_MIN_PLAYER_NAME] = 2;
     }
 
-    m_int_configs[CONFIG_MIN_CHARTER_NAME]                    = sConfigMgr->GetIntDefault ("MinCharterName", 2);
+    m_int_configs[CONFIG_MIN_CHARTER_NAME] = sConfigMgr->GetIntDefault ("MinCharterName", 2);
     if (m_int_configs[CONFIG_MIN_CHARTER_NAME] < 1 || m_int_configs[CONFIG_MIN_CHARTER_NAME] > MAX_CHARTER_NAME)
     {
         sLog->outError("MinCharterName (%i) must be in range 1..%u. Set to 2.", m_int_configs[CONFIG_MIN_CHARTER_NAME], MAX_CHARTER_NAME);
         m_int_configs[CONFIG_MIN_CHARTER_NAME] = 2;
     }
 
-    m_int_configs[CONFIG_MIN_PET_NAME]                        = sConfigMgr->GetIntDefault ("MinPetName",     2);
+    m_int_configs[CONFIG_MIN_PET_NAME] = sConfigMgr->GetIntDefault ("MinPetName",     2);
     if (m_int_configs[CONFIG_MIN_PET_NAME] < 1 || m_int_configs[CONFIG_MIN_PET_NAME] > MAX_PET_NAME)
     {
         sLog->outError("MinPetName (%i) must be in range 1..%u. Set to 2.", m_int_configs[CONFIG_MIN_PET_NAME], MAX_PET_NAME);
         m_int_configs[CONFIG_MIN_PET_NAME] = 2;
     }
 
-    m_int_configs[CONFIG_CHARACTER_CREATING_DISABLED] = sConfigMgr->GetIntDefault("CharacterCreating.Disabled", 0);
-    m_int_configs[CONFIG_CHARACTER_CREATING_DISABLED_RACEMASK] = sConfigMgr->GetIntDefault("CharacterCreating.Disabled.RaceMask", 0);
+    m_int_configs[CONFIG_CHARTER_COST_GUILD]     = sConfigMgr->GetIntDefault("Guild.CharterCost", 1000);
+    m_int_configs[CONFIG_CHARTER_COST_ARENA_2v2] = sConfigMgr->GetIntDefault("ArenaTeam.CharterCost.2v2", 800000);
+    m_int_configs[CONFIG_CHARTER_COST_ARENA_3v3] = sConfigMgr->GetIntDefault("ArenaTeam.CharterCost.3v3", 1200000);
+    m_int_configs[CONFIG_CHARTER_COST_ARENA_5v5] = sConfigMgr->GetIntDefault("ArenaTeam.CharterCost.5v5", 2000000);
+
+    m_int_configs[CONFIG_MAX_WHO_LIST_RETURN] = sConfigMgr->GetIntDefault("MaxWhoListReturns", 49);
+
+    m_int_configs[CONFIG_CHARACTER_CREATING_DISABLED]           = sConfigMgr->GetIntDefault("CharacterCreating.Disabled", 0);
+    m_int_configs[CONFIG_CHARACTER_CREATING_DISABLED_RACEMASK]  = sConfigMgr->GetIntDefault("CharacterCreating.Disabled.RaceMask", 0);
+
     m_int_configs[CONFIG_CHARACTER_CREATING_DISABLED_CLASSMASK] = sConfigMgr->GetIntDefault("CharacterCreating.Disabled.ClassMask", 0);
 
     m_int_configs[CONFIG_CHARACTERS_PER_REALM] = sConfigMgr->GetIntDefault("CharactersPerRealm", 10);
@@ -900,19 +897,19 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL_DIFFERENCE] = sConfigMgr->GetIntDefault("RecruitAFriend.MaxDifference", 4);
     m_bool_configs[CONFIG_ALL_TAXI_PATHS] = sConfigMgr->GetBoolDefault("AllFlightPaths", false);
-    m_bool_configs[CONFIG_INSTANT_TAXI] = sConfigMgr->GetBoolDefault("InstantFlightPaths", false);
+    m_int_configs[CONFIG_INSTANT_TAXI]    = sConfigMgr->GetIntDefault("InstantFlightPaths", 0);
 
-    m_bool_configs[CONFIG_INSTANCE_IGNORE_LEVEL] = sConfigMgr->GetBoolDefault("Instance.IgnoreLevel", false);
-    m_bool_configs[CONFIG_INSTANCE_IGNORE_RAID]  = sConfigMgr->GetBoolDefault("Instance.IgnoreRaid", false);
+    m_bool_configs[CONFIG_INSTANCE_IGNORE_LEVEL]    = sConfigMgr->GetBoolDefault("Instance.IgnoreLevel", false);
+    m_bool_configs[CONFIG_INSTANCE_IGNORE_RAID]     = sConfigMgr->GetBoolDefault("Instance.IgnoreRaid", false);
     m_bool_configs[CONFIG_INSTANCE_GMSUMMON_PLAYER] = sConfigMgr->GetBoolDefault("Instance.GMSummonPlayer", false);
-    m_bool_configs[CONFIG_INSTANCE_SHARED_ID] = sConfigMgr->GetBoolDefault("Instance.SharedNormalHeroicId", false);
+    m_bool_configs[CONFIG_INSTANCE_SHARED_ID]       = sConfigMgr->GetBoolDefault("Instance.SharedNormalHeroicId", false);
 
-    m_int_configs[CONFIG_INSTANCE_RESET_TIME_HOUR]  = sConfigMgr->GetIntDefault("Instance.ResetTimeHour", 4);
+    m_int_configs[CONFIG_INSTANCE_RESET_TIME_HOUR]               = sConfigMgr->GetIntDefault("Instance.ResetTimeHour", 4);
     m_int_configs[CONFIG_INSTANCE_RESET_TIME_RELATIVE_TIMESTAMP] = sConfigMgr->GetIntDefault("Instance.ResetTimeRelativeTimestamp", 1135814400);
-    m_int_configs[CONFIG_INSTANCE_UNLOAD_DELAY] = sConfigMgr->GetIntDefault("Instance.UnloadDelay", 30 * MINUTE * IN_MILLISECONDS);
+    m_int_configs[CONFIG_INSTANCE_UNLOAD_DELAY]                  = sConfigMgr->GetIntDefault("Instance.UnloadDelay", 30 * MINUTE * IN_MILLISECONDS);
 
     m_int_configs[CONFIG_MAX_PRIMARY_TRADE_SKILL] = sConfigMgr->GetIntDefault("MaxPrimaryTradeSkill", 2);
-    m_int_configs[CONFIG_MIN_PETITION_SIGNS] = sConfigMgr->GetIntDefault("MinPetitionSigns", 9);
+    m_int_configs[CONFIG_MIN_PETITION_SIGNS]      = sConfigMgr->GetIntDefault("MinPetitionSigns", 9);
     if (m_int_configs[CONFIG_MIN_PETITION_SIGNS] > 9)
     {
         sLog->outError("MinPetitionSigns (%i) must be in range 0..9. Set to 9.", m_int_configs[CONFIG_MIN_PETITION_SIGNS]);
@@ -931,7 +928,7 @@ void World::LoadConfigSettings(bool reload)
     if (m_int_configs[CONFIG_START_GM_LEVEL] < m_int_configs[CONFIG_START_PLAYER_LEVEL])
     {
         sLog->outError("GM.StartLevel (%i) must be in range StartPlayerLevel(%u)..%u. Set to %u.",
-            m_int_configs[CONFIG_START_GM_LEVEL], m_int_configs[CONFIG_START_PLAYER_LEVEL], MAX_LEVEL, m_int_configs[CONFIG_START_PLAYER_LEVEL]);
+        m_int_configs[CONFIG_START_GM_LEVEL], m_int_configs[CONFIG_START_PLAYER_LEVEL], MAX_LEVEL, m_int_configs[CONFIG_START_PLAYER_LEVEL]);
         m_int_configs[CONFIG_START_GM_LEVEL] = m_int_configs[CONFIG_START_PLAYER_LEVEL];
     }
     else if (m_int_configs[CONFIG_START_GM_LEVEL] > MAX_LEVEL)
@@ -941,14 +938,14 @@ void World::LoadConfigSettings(bool reload)
     }
     m_bool_configs[CONFIG_ALLOW_GM_GROUP]       = sConfigMgr->GetBoolDefault("GM.AllowInvite", false);
     m_bool_configs[CONFIG_ALLOW_GM_FRIEND]      = sConfigMgr->GetBoolDefault("GM.AllowFriend", false);
-    m_bool_configs[CONFIG_GM_LOWER_SECURITY] = sConfigMgr->GetBoolDefault("GM.LowerSecurity", false);
+    m_bool_configs[CONFIG_GM_LOWER_SECURITY]    = sConfigMgr->GetBoolDefault("GM.LowerSecurity", false);
     m_float_configs[CONFIG_CHANCE_OF_GM_SURVEY] = sConfigMgr->GetFloatDefault("GM.TicketSystem.ChanceOfGMSurvey", 50.0f);
 
-    m_int_configs[CONFIG_GROUP_VISIBILITY] = sConfigMgr->GetIntDefault("Visibility.GroupMode", 1);
+    m_int_configs[CONFIG_GROUP_VISIBILITY]      = sConfigMgr->GetIntDefault("Visibility.GroupMode", 1);
 
-    m_int_configs[CONFIG_MAIL_DELIVERY_DELAY] = sConfigMgr->GetIntDefault("MailDeliveryDelay", HOUR);
+    m_int_configs[CONFIG_MAIL_DELIVERY_DELAY]   = sConfigMgr->GetIntDefault("MailDeliveryDelay", HOUR);
 
-    m_int_configs[CONFIG_UPTIME_UPDATE] = sConfigMgr->GetIntDefault("UpdateUptimeInterval", 10);
+    m_int_configs[CONFIG_UPTIME_UPDATE]         = sConfigMgr->GetIntDefault("UpdateUptimeInterval", 10);
     if (int32(m_int_configs[CONFIG_UPTIME_UPDATE]) <= 0)
     {
         sLog->outError("UpdateUptimeInterval (%i) must be > 0, set to default 10.", m_int_configs[CONFIG_UPTIME_UPDATE]);
@@ -975,12 +972,12 @@ void World::LoadConfigSettings(bool reload)
     }
     m_int_configs[CONFIG_LOGDB_CLEARTIME] = sConfigMgr->GetIntDefault("LogDB.Opt.ClearTime", 1209600); // 14 days default
     sLog->outString("Will clear `logs` table of entries older than %i seconds every %u minutes.",
-        m_int_configs[CONFIG_LOGDB_CLEARTIME], m_int_configs[CONFIG_LOGDB_CLEARINTERVAL]);
+    m_int_configs[CONFIG_LOGDB_CLEARTIME], m_int_configs[CONFIG_LOGDB_CLEARINTERVAL]);
 
-    m_int_configs[CONFIG_TELEPORT_TIMEOUT_NEAR] = sConfigMgr->GetIntDefault("TeleportTimeoutNear", 25); // pussywizard
-    m_int_configs[CONFIG_TELEPORT_TIMEOUT_FAR] = sConfigMgr->GetIntDefault("TeleportTimeoutFar", 45); // pussywizard
-    m_int_configs[CONFIG_MAX_ALLOWED_MMR_DROP] = sConfigMgr->GetIntDefault("MaxAllowedMMRDrop", 500); // pussywizard
-    m_bool_configs[CONFIG_ENABLE_LOGIN_AFTER_DC] = sConfigMgr->GetBoolDefault("EnableLoginAfterDC", true); // pussywizard
+    m_int_configs[CONFIG_TELEPORT_TIMEOUT_NEAR]             = sConfigMgr->GetIntDefault("TeleportTimeoutNear", 25); // pussywizard
+    m_int_configs[CONFIG_TELEPORT_TIMEOUT_FAR]              = sConfigMgr->GetIntDefault("TeleportTimeoutFar", 45); // pussywizard
+    m_int_configs[CONFIG_MAX_ALLOWED_MMR_DROP]              = sConfigMgr->GetIntDefault("MaxAllowedMMRDrop", 500); // pussywizard
+    m_bool_configs[CONFIG_ENABLE_LOGIN_AFTER_DC]            = sConfigMgr->GetBoolDefault("EnableLoginAfterDC", true); // pussywizard
     m_bool_configs[CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS] = sConfigMgr->GetBoolDefault("DontCacheRandomMovementPaths", true); // pussywizard
 
     m_int_configs[CONFIG_SKILL_CHANCE_ORANGE] = sConfigMgr->GetIntDefault("SkillChance.Orange", 100);
@@ -988,19 +985,19 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_SKILL_CHANCE_GREEN]  = sConfigMgr->GetIntDefault("SkillChance.Green", 25);
     m_int_configs[CONFIG_SKILL_CHANCE_GREY]   = sConfigMgr->GetIntDefault("SkillChance.Grey", 0);
 
-    m_int_configs[CONFIG_SKILL_CHANCE_MINING_STEPS]  = sConfigMgr->GetIntDefault("SkillChance.MiningSteps", 75);
+    m_int_configs[CONFIG_SKILL_CHANCE_MINING_STEPS]     = sConfigMgr->GetIntDefault("SkillChance.MiningSteps", 75);
     m_int_configs[CONFIG_SKILL_CHANCE_SKINNING_STEPS]   = sConfigMgr->GetIntDefault("SkillChance.SkinningSteps", 75);
 
     m_bool_configs[CONFIG_SKILL_PROSPECTING] = sConfigMgr->GetBoolDefault("SkillChance.Prospecting", false);
-    m_bool_configs[CONFIG_SKILL_MILLING] = sConfigMgr->GetBoolDefault("SkillChance.Milling", false);
+    m_bool_configs[CONFIG_SKILL_MILLING]     = sConfigMgr->GetBoolDefault("SkillChance.Milling", false);
 
-    m_int_configs[CONFIG_SKILL_GAIN_CRAFTING]  = sConfigMgr->GetIntDefault("SkillGain.Crafting", 1);
+    m_int_configs[CONFIG_SKILL_GAIN_CRAFTING] = sConfigMgr->GetIntDefault("SkillGain.Crafting", 1);
 
-    m_int_configs[CONFIG_SKILL_GAIN_DEFENSE]  = sConfigMgr->GetIntDefault("SkillGain.Defense", 1);
+    m_int_configs[CONFIG_SKILL_GAIN_DEFENSE] = sConfigMgr->GetIntDefault("SkillGain.Defense", 1);
 
-    m_int_configs[CONFIG_SKILL_GAIN_GATHERING]  = sConfigMgr->GetIntDefault("SkillGain.Gathering", 1);
+    m_int_configs[CONFIG_SKILL_GAIN_GATHERING] = sConfigMgr->GetIntDefault("SkillGain.Gathering", 1);
 
-    m_int_configs[CONFIG_SKILL_GAIN_WEAPON]  = sConfigMgr->GetIntDefault("SkillGain.Weapon", 1);
+    m_int_configs[CONFIG_SKILL_GAIN_WEAPON] = sConfigMgr->GetIntDefault("SkillGain.Weapon", 1);
 
     m_int_configs[CONFIG_MAX_OVERSPEED_PINGS] = sConfigMgr->GetIntDefault("MaxOverspeedPings", 2);
     if (m_int_configs[CONFIG_MAX_OVERSPEED_PINGS] != 0 && m_int_configs[CONFIG_MAX_OVERSPEED_PINGS] < 2)
@@ -1010,7 +1007,7 @@ void World::LoadConfigSettings(bool reload)
     }
 
     m_bool_configs[CONFIG_SAVE_RESPAWN_TIME_IMMEDIATELY] = sConfigMgr->GetBoolDefault("SaveRespawnTimeImmediately", true);
-    m_bool_configs[CONFIG_WEATHER] = sConfigMgr->GetBoolDefault("ActivateWeather", true);
+    m_bool_configs[CONFIG_WEATHER]                       = sConfigMgr->GetBoolDefault("ActivateWeather", true);
 
     m_int_configs[CONFIG_DISABLE_BREATHING] = sConfigMgr->GetIntDefault("DisableWaterBreath", SEC_CONSOLE);
 
@@ -1025,23 +1022,23 @@ void World::LoadConfigSettings(bool reload)
     else
         m_int_configs[CONFIG_EXPANSION] = sConfigMgr->GetIntDefault("Expansion", 2);
 
-    m_int_configs[CONFIG_CHATFLOOD_MESSAGE_COUNT] = sConfigMgr->GetIntDefault("ChatFlood.MessageCount", 10);
-    m_int_configs[CONFIG_CHATFLOOD_MESSAGE_DELAY] = sConfigMgr->GetIntDefault("ChatFlood.MessageDelay", 1);
-    m_int_configs[CONFIG_CHATFLOOD_MUTE_TIME]     = sConfigMgr->GetIntDefault("ChatFlood.MuteTime", 10);
-    m_bool_configs[CONFIG_CHAT_MUTE_FIRST_LOGIN]  = sConfigMgr->GetBoolDefault("Chat.MuteFirstLogin", false);
+    m_int_configs[CONFIG_CHATFLOOD_MESSAGE_COUNT]    = sConfigMgr->GetIntDefault("ChatFlood.MessageCount", 10);
+    m_int_configs[CONFIG_CHATFLOOD_MESSAGE_DELAY]    = sConfigMgr->GetIntDefault("ChatFlood.MessageDelay", 1);
+    m_int_configs[CONFIG_CHATFLOOD_MUTE_TIME]        = sConfigMgr->GetIntDefault("ChatFlood.MuteTime", 10);
+    m_bool_configs[CONFIG_CHAT_MUTE_FIRST_LOGIN]     = sConfigMgr->GetBoolDefault("Chat.MuteFirstLogin", false);
     m_int_configs[CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN] = sConfigMgr->GetIntDefault("Chat.MuteTimeFirstLogin", 120);
 
     m_int_configs[CONFIG_EVENT_ANNOUNCE] = sConfigMgr->GetIntDefault("Event.Announce", 0);
 
     m_float_configs[CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS] = sConfigMgr->GetFloatDefault("CreatureFamilyFleeAssistanceRadius", 30.0f);
-    m_float_configs[CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS] = sConfigMgr->GetFloatDefault("CreatureFamilyAssistanceRadius", 10.0f);
-    m_int_configs[CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY]  = sConfigMgr->GetIntDefault("CreatureFamilyAssistanceDelay", 1500);
-    m_int_configs[CONFIG_CREATURE_FAMILY_FLEE_DELAY]        = sConfigMgr->GetIntDefault("CreatureFamilyFleeDelay", 7000);
+    m_float_configs[CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS]      = sConfigMgr->GetFloatDefault("CreatureFamilyAssistanceRadius", 10.0f);
+    m_int_configs[CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY]         = sConfigMgr->GetIntDefault("CreatureFamilyAssistanceDelay", 1500);
+    m_int_configs[CONFIG_CREATURE_FAMILY_FLEE_DELAY]               = sConfigMgr->GetIntDefault("CreatureFamilyFleeDelay", 7000);
 
     m_int_configs[CONFIG_WORLD_BOSS_LEVEL_DIFF] = sConfigMgr->GetIntDefault("WorldBossLevelDiff", 3);
 
     m_bool_configs[CONFIG_QUEST_ENABLE_QUEST_TRACKER] = sConfigMgr->GetBoolDefault("Quests.EnableQuestTracker", false);
-    
+
     // note: disable value (-1) will assigned as 0xFFFFFFF, to prevent overflow at calculations limit it to max possible player level MAX_LEVEL(100)
     m_int_configs[CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF] = sConfigMgr->GetIntDefault("Quests.LowLevelHideDiff", 4);
     if (m_int_configs[CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF] > MAX_LEVEL)
@@ -1049,8 +1046,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_QUEST_HIGH_LEVEL_HIDE_DIFF] = sConfigMgr->GetIntDefault("Quests.HighLevelHideDiff", 7);
     if (m_int_configs[CONFIG_QUEST_HIGH_LEVEL_HIDE_DIFF] > MAX_LEVEL)
         m_int_configs[CONFIG_QUEST_HIGH_LEVEL_HIDE_DIFF] = MAX_LEVEL;
-    m_bool_configs[CONFIG_QUEST_IGNORE_RAID] = sConfigMgr->GetBoolDefault("Quests.IgnoreRaid", false);
-    m_bool_configs[CONFIG_QUEST_IGNORE_AUTO_ACCEPT] = sConfigMgr->GetBoolDefault("Quests.IgnoreAutoAccept", false);
+    m_bool_configs[CONFIG_QUEST_IGNORE_RAID]          = sConfigMgr->GetBoolDefault("Quests.IgnoreRaid", false);
+    m_bool_configs[CONFIG_QUEST_IGNORE_AUTO_ACCEPT]   = sConfigMgr->GetBoolDefault("Quests.IgnoreAutoAccept", false);
     m_bool_configs[CONFIG_QUEST_IGNORE_AUTO_COMPLETE] = sConfigMgr->GetBoolDefault("Quests.IgnoreAutoComplete", false);
 
     m_int_configs[CONFIG_RANDOM_BG_RESET_HOUR] = sConfigMgr->GetIntDefault("Battleground.Random.ResetHour", 6);
@@ -1058,6 +1055,13 @@ void World::LoadConfigSettings(bool reload)
     {
         sLog->outError("Battleground.Random.ResetHour (%i) can't be load. Set to 6.", m_int_configs[CONFIG_RANDOM_BG_RESET_HOUR]);
         m_int_configs[CONFIG_RANDOM_BG_RESET_HOUR] = 6;
+    }
+
+    m_int_configs[CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR] = sConfigMgr->GetIntDefault("Calendar.DeleteOldEventsHour", 6);
+    if (m_int_configs[CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR] > 23)
+    {
+        sLog->outError("Calendar.DeleteOldEventsHour (%i) can't be load. Set to 6.", m_int_configs[CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR]);
+        m_int_configs[CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR] = 6;
     }
 
     m_int_configs[CONFIG_GUILD_RESET_HOUR] = sConfigMgr->GetIntDefault("Guild.ResetHour", 6);
@@ -1072,10 +1076,10 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_RESTRICTED_LFG_CHANNEL]      = sConfigMgr->GetBoolDefault("Channel.RestrictedLfg", true);
     m_bool_configs[CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL] = sConfigMgr->GetBoolDefault("Channel.SilentlyGMJoin", false);
 
-    m_bool_configs[CONFIG_TALENTS_INSPECTING]           = sConfigMgr->GetBoolDefault("TalentsInspecting", true);
-    m_bool_configs[CONFIG_CHAT_FAKE_MESSAGE_PREVENTING] = sConfigMgr->GetBoolDefault("ChatFakeMessagePreventing", false);
+    m_bool_configs[CONFIG_TALENTS_INSPECTING]                = sConfigMgr->GetBoolDefault("TalentsInspecting", true);
+    m_bool_configs[CONFIG_CHAT_FAKE_MESSAGE_PREVENTING]      = sConfigMgr->GetBoolDefault("ChatFakeMessagePreventing", false);
     m_int_configs[CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY] = sConfigMgr->GetIntDefault("ChatStrictLinkChecking.Severity", 0);
-    m_int_configs[CONFIG_CHAT_STRICT_LINK_CHECKING_KICK] = sConfigMgr->GetIntDefault("ChatStrictLinkChecking.Kick", 0);
+    m_int_configs[CONFIG_CHAT_STRICT_LINK_CHECKING_KICK]     = sConfigMgr->GetIntDefault("ChatStrictLinkChecking.Kick", 0);
 
     m_int_configs[CONFIG_CORPSE_DECAY_NORMAL]    = sConfigMgr->GetIntDefault("Corpse.Decay.NORMAL", 60);
     m_int_configs[CONFIG_CORPSE_DECAY_RARE]      = sConfigMgr->GetIntDefault("Corpse.Decay.RARE", 300);
@@ -1083,7 +1087,7 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_CORPSE_DECAY_RAREELITE] = sConfigMgr->GetIntDefault("Corpse.Decay.RAREELITE", 300);
     m_int_configs[CONFIG_CORPSE_DECAY_WORLDBOSS] = sConfigMgr->GetIntDefault("Corpse.Decay.WORLDBOSS", 3600);
 
-    m_int_configs[CONFIG_DEATH_SICKNESS_LEVEL]           = sConfigMgr->GetIntDefault ("Death.SicknessLevel", 11);
+    m_int_configs[CONFIG_DEATH_SICKNESS_LEVEL]            = sConfigMgr->GetIntDefault ("Death.SicknessLevel", 11);
     m_bool_configs[CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVP] = sConfigMgr->GetBoolDefault("Death.CorpseReclaimDelay.PvP", true);
     m_bool_configs[CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVE] = sConfigMgr->GetBoolDefault("Death.CorpseReclaimDelay.PvE", true);
     m_bool_configs[CONFIG_DEATH_BONES_WORLD]              = sConfigMgr->GetBoolDefault("Death.Bones.World", true);
@@ -1099,14 +1103,27 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_LISTEN_RANGE_TEXTEMOTE] = sConfigMgr->GetFloatDefault("ListenRange.TextEmote", 25.0f);
     m_float_configs[CONFIG_LISTEN_RANGE_YELL]      = sConfigMgr->GetFloatDefault("ListenRange.Yell", 300.0f);
 
+    m_bool_configs[CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG]    = sConfigMgr->GetBoolDefault("Battleground.DisableQuestShareInBG", false);
+    m_bool_configs[CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG]    = sConfigMgr->GetBoolDefault("Battleground.DisableReadyCheckInBG", false);
     m_bool_configs[CONFIG_BATTLEGROUND_CAST_DESERTER]                = sConfigMgr->GetBoolDefault("Battleground.CastDeserter", true);
     m_bool_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE]       = sConfigMgr->GetBoolDefault("Battleground.QueueAnnouncer.Enable", false);
     m_bool_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY]   = sConfigMgr->GetBoolDefault("Battleground.QueueAnnouncer.PlayerOnly", false);
     m_bool_configs[CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE]      = sConfigMgr->GetBoolDefault("Battleground.StoreStatistics.Enable", false);
     m_bool_configs[CONFIG_BATTLEGROUND_TRACK_DESERTERS]              = sConfigMgr->GetBoolDefault("Battleground.TrackDeserters.Enable", false);
     m_int_configs[CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER]        = sConfigMgr->GetIntDefault ("Battleground.PrematureFinishTimer", 5 * MINUTE * IN_MILLISECONDS);
+    m_int_configs[CONFIG_BATTLEGROUND_INVITATION_TYPE]               = sConfigMgr->GetIntDefault("Battleground.InvitationType", 0);
     m_int_configs[CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH]  = sConfigMgr->GetIntDefault ("Battleground.PremadeGroupWaitForMatch", 30 * MINUTE * IN_MILLISECONDS);
     m_bool_configs[CONFIG_BG_XP_FOR_KILL]                            = sConfigMgr->GetBoolDefault("Battleground.GiveXPForKills", false);
+    m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK_TIMER]              = sConfigMgr->GetIntDefault("Battleground.ReportAFK.Timer", 4);
+    m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]                    = sConfigMgr->GetIntDefault("Battleground.ReportAFK", 3);
+    if (m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] < 1) {
+        sLog->outError("Battleground.ReportAFK (%d) must be >0. Using 3 instead.", m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]);
+        m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] = 3;
+    } else if (m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] > 9) {
+        sLog->outError("Battleground.ReportAFK (%d) must be <10. Using 3 instead.", m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]);
+        m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] = 3;
+    }
+
     m_int_configs[CONFIG_ARENA_MAX_RATING_DIFFERENCE]                = sConfigMgr->GetIntDefault ("Arena.MaxRatingDifference", 150);
     m_int_configs[CONFIG_ARENA_RATING_DISCARD_TIMER]                 = sConfigMgr->GetIntDefault ("Arena.RatingDiscardTimer", 10 * MINUTE * IN_MILLISECONDS);
     m_bool_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS]              = sConfigMgr->GetBoolDefault("Arena.AutoDistributePoints", false);
@@ -1185,16 +1202,22 @@ void World::LoadConfigSettings(bool reload)
     }
 
     ///- Load the CharDelete related config options
-    m_int_configs[CONFIG_CHARDELETE_METHOD] = sConfigMgr->GetIntDefault("CharDelete.Method", 0);
+    m_int_configs[CONFIG_CHARDELETE_METHOD]    = sConfigMgr->GetIntDefault("CharDelete.Method", 0);
     m_int_configs[CONFIG_CHARDELETE_MIN_LEVEL] = sConfigMgr->GetIntDefault("CharDelete.MinLevel", 0);
     m_int_configs[CONFIG_CHARDELETE_KEEP_DAYS] = sConfigMgr->GetIntDefault("CharDelete.KeepDays", 30);
+
+    ///- Load the ItemDelete related config options
+    m_bool_configs[CONFIG_ITEMDELETE_METHOD]    = sConfigMgr->GetBoolDefault("ItemDelete.Method", 0);
+    m_bool_configs[CONFIG_ITEMDELETE_VENDOR]    = sConfigMgr->GetBoolDefault("ItemDelete.Vendor", 0);
+    m_int_configs[CONFIG_ITEMDELETE_QUALITY]    = sConfigMgr->GetIntDefault("ItemDelete.Quality", 3);
+    m_int_configs[CONFIG_ITEMDELETE_ITEM_LEVEL] = sConfigMgr->GetIntDefault("ItemDelete.ItemLevel", 80);
 
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetStringDefault("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length()-1) != '/' && dataPath.at(dataPath.length()-1) != '\\'))
         dataPath.push_back('/');
 
-#if PLATFORM == PLATFORM_UNIX || PLATFORM == PLATFORM_APPLE
+#if AC_PLATFORM == AC_PLATFORM_UNIX || AC_PLATFORM == AC_PLATFORM_APPLE
     if (dataPath[0] == '~')
     {
         const char* home = getenv("HOME");
@@ -1227,38 +1250,39 @@ void World::LoadConfigSettings(bool reload)
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableHeightCalc(enableHeight);
     sLog->outString("WORLD: VMap support included. LineOfSight:%i, getHeight:%i, indoorCheck:%i PetLOS:%i", enableLOS, enableHeight, enableIndoor, enablePetLOS);
 
-    m_bool_configs[CONFIG_PET_LOS] = sConfigMgr->GetBoolDefault("vmap.petLOS", true);
+    m_bool_configs[CONFIG_PET_LOS]          = sConfigMgr->GetBoolDefault("vmap.petLOS", true);
     m_bool_configs[CONFIG_START_ALL_SPELLS] = sConfigMgr->GetBoolDefault("PlayerStart.AllSpells", false);
     if (m_bool_configs[CONFIG_START_ALL_SPELLS])
         sLog->outString("WORLD: WARNING: PlayerStart.AllSpells enabled - may not function as intended!");
-    m_int_configs[CONFIG_HONOR_AFTER_DUEL] = sConfigMgr->GetIntDefault("HonorPointsAfterDuel", 0);
+    m_int_configs[CONFIG_HONOR_AFTER_DUEL]    = sConfigMgr->GetIntDefault("HonorPointsAfterDuel", 0);
     m_bool_configs[CONFIG_START_ALL_EXPLORED] = sConfigMgr->GetBoolDefault("PlayerStart.MapsExplored", false);
-    m_bool_configs[CONFIG_START_ALL_REP] = sConfigMgr->GetBoolDefault("PlayerStart.AllReputation", false);
-    m_bool_configs[CONFIG_ALWAYS_MAXSKILL] = sConfigMgr->GetBoolDefault("AlwaysMaxWeaponSkill", false);
-    m_bool_configs[CONFIG_PVP_TOKEN_ENABLE] = sConfigMgr->GetBoolDefault("PvPToken.Enable", false);
-    m_int_configs[CONFIG_PVP_TOKEN_MAP_TYPE] = sConfigMgr->GetIntDefault("PvPToken.MapAllowType", 4);
-    m_int_configs[CONFIG_PVP_TOKEN_ID] = sConfigMgr->GetIntDefault("PvPToken.ItemID", 29434);
-    m_int_configs[CONFIG_PVP_TOKEN_COUNT] = sConfigMgr->GetIntDefault("PvPToken.ItemCount", 1);
+    m_bool_configs[CONFIG_START_ALL_REP]      = sConfigMgr->GetBoolDefault("PlayerStart.AllReputation", false);
+    m_bool_configs[CONFIG_ALWAYS_MAXSKILL]    = sConfigMgr->GetBoolDefault("AlwaysMaxWeaponSkill", false);
+    m_bool_configs[CONFIG_PVP_TOKEN_ENABLE]   = sConfigMgr->GetBoolDefault("PvPToken.Enable", false);
+    m_int_configs[CONFIG_PVP_TOKEN_MAP_TYPE]  = sConfigMgr->GetIntDefault("PvPToken.MapAllowType", 4);
+    m_int_configs[CONFIG_PVP_TOKEN_ID]        = sConfigMgr->GetIntDefault("PvPToken.ItemID", 29434);
+    m_int_configs[CONFIG_PVP_TOKEN_COUNT]     = sConfigMgr->GetIntDefault("PvPToken.ItemCount", 1);
     if (m_int_configs[CONFIG_PVP_TOKEN_COUNT] < 1)
         m_int_configs[CONFIG_PVP_TOKEN_COUNT] = 1;
 
-    m_bool_configs[CONFIG_NO_RESET_TALENT_COST] = sConfigMgr->GetBoolDefault("NoResetTalentsCost", false);
-    m_bool_configs[CONFIG_SHOW_KICK_IN_WORLD] = sConfigMgr->GetBoolDefault("ShowKickInWorld", false);
-    m_bool_configs[CONFIG_SHOW_BAN_IN_WORLD] = sConfigMgr->GetBoolDefault("ShowBanInWorld", false);
-    m_int_configs[CONFIG_INTERVAL_LOG_UPDATE] = sConfigMgr->GetIntDefault("RecordUpdateTimeDiffInterval", 60000);
-    m_int_configs[CONFIG_MIN_LOG_UPDATE] = sConfigMgr->GetIntDefault("MinRecordUpdateTimeDiff", 100);
-    m_int_configs[CONFIG_NUMTHREADS] = sConfigMgr->GetIntDefault("MapUpdate.Threads", 1);
+    m_bool_configs[CONFIG_NO_RESET_TALENT_COST]       = sConfigMgr->GetBoolDefault("NoResetTalentsCost", false);
+    m_bool_configs[CONFIG_SHOW_KICK_IN_WORLD]         = sConfigMgr->GetBoolDefault("ShowKickInWorld", false);
+    m_bool_configs[CONFIG_SHOW_MUTE_IN_WORLD]         = sConfigMgr->GetBoolDefault("ShowMuteInWorld", false);
+    m_bool_configs[CONFIG_SHOW_BAN_IN_WORLD]          = sConfigMgr->GetBoolDefault("ShowBanInWorld", false);
+    m_int_configs[CONFIG_INTERVAL_LOG_UPDATE]         = sConfigMgr->GetIntDefault("RecordUpdateTimeDiffInterval", 60000);
+    m_int_configs[CONFIG_MIN_LOG_UPDATE]              = sConfigMgr->GetIntDefault("MinRecordUpdateTimeDiff", 100);
+    m_int_configs[CONFIG_NUMTHREADS]                  = sConfigMgr->GetIntDefault("MapUpdate.Threads", 1);
     m_int_configs[CONFIG_MAX_RESULTS_LOOKUP_COMMANDS] = sConfigMgr->GetIntDefault("Command.LookupMaxResults", 0);
 
     // chat logging
     m_bool_configs[CONFIG_CHATLOG_CHANNEL] = sConfigMgr->GetBoolDefault("ChatLogs.Channel", false);
     m_bool_configs[CONFIG_CHATLOG_WHISPER] = sConfigMgr->GetBoolDefault("ChatLogs.Whisper", false);
     m_bool_configs[CONFIG_CHATLOG_SYSCHAN] = sConfigMgr->GetBoolDefault("ChatLogs.SysChan", false);
-    m_bool_configs[CONFIG_CHATLOG_PARTY] = sConfigMgr->GetBoolDefault("ChatLogs.Party", false);
-    m_bool_configs[CONFIG_CHATLOG_RAID] = sConfigMgr->GetBoolDefault("ChatLogs.Raid", false);
-    m_bool_configs[CONFIG_CHATLOG_GUILD] = sConfigMgr->GetBoolDefault("ChatLogs.Guild", false);
-    m_bool_configs[CONFIG_CHATLOG_PUBLIC] = sConfigMgr->GetBoolDefault("ChatLogs.Public", false);
-    m_bool_configs[CONFIG_CHATLOG_ADDON] = sConfigMgr->GetBoolDefault("ChatLogs.Addon", false);
+    m_bool_configs[CONFIG_CHATLOG_PARTY]   = sConfigMgr->GetBoolDefault("ChatLogs.Party", false);
+    m_bool_configs[CONFIG_CHATLOG_RAID]    = sConfigMgr->GetBoolDefault("ChatLogs.Raid", false);
+    m_bool_configs[CONFIG_CHATLOG_GUILD]   = sConfigMgr->GetBoolDefault("ChatLogs.Guild", false);
+    m_bool_configs[CONFIG_CHATLOG_PUBLIC]  = sConfigMgr->GetBoolDefault("ChatLogs.Public", false);
+    m_bool_configs[CONFIG_CHATLOG_ADDON]   = sConfigMgr->GetBoolDefault("ChatLogs.Addon", false);
     m_bool_configs[CONFIG_CHATLOG_BGROUND] = sConfigMgr->GetBoolDefault("ChatLogs.BattleGround", false);
 
     // Warden
@@ -1277,8 +1301,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_MAX_INSTANCES_PER_HOUR] = sConfigMgr->GetIntDefault("AccountInstancesPerHour", 5);
 
     // AutoBroadcast
-    m_bool_configs[CONFIG_AUTOBROADCAST] = sConfigMgr->GetBoolDefault("AutoBroadcast.On", false);
-    m_int_configs[CONFIG_AUTOBROADCAST_CENTER] = sConfigMgr->GetIntDefault("AutoBroadcast.Center", 0);
+    m_bool_configs[CONFIG_AUTOBROADCAST]         = sConfigMgr->GetBoolDefault("AutoBroadcast.On", false);
+    m_int_configs[CONFIG_AUTOBROADCAST_CENTER]   = sConfigMgr->GetIntDefault("AutoBroadcast.Center", 0);
     m_int_configs[CONFIG_AUTOBROADCAST_INTERVAL] = sConfigMgr->GetIntDefault("AutoBroadcast.Timer", 60000);
     if (reload)
     {
@@ -1290,24 +1314,24 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_DB_PING_INTERVAL] = sConfigMgr->GetIntDefault("MaxPingTime", 30);
 
     // misc
-    m_bool_configs[CONFIG_PDUMP_NO_PATHS] = sConfigMgr->GetBoolDefault("PlayerDump.DisallowPaths", true);
+    m_bool_configs[CONFIG_PDUMP_NO_PATHS]     = sConfigMgr->GetBoolDefault("PlayerDump.DisallowPaths", true);
     m_bool_configs[CONFIG_PDUMP_NO_OVERWRITE] = sConfigMgr->GetBoolDefault("PlayerDump.DisallowOverwrite", true);
-    m_bool_configs[CONFIG_ENABLE_MMAPS] = sConfigMgr->GetBoolDefault("MoveMaps.Enable", true);
+    m_bool_configs[CONFIG_ENABLE_MMAPS]       = sConfigMgr->GetBoolDefault("MoveMaps.Enable", true);
     MMAP::MMapFactory::InitializeDisabledMaps();
 
     // Wintergrasp
-    m_bool_configs[CONFIG_WINTERGRASP_ENABLE] = sConfigMgr->GetBoolDefault("Wintergrasp.Enable", false);
-    m_int_configs[CONFIG_WINTERGRASP_PLR_MAX] = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMax", 100);
-    m_int_configs[CONFIG_WINTERGRASP_PLR_MIN] = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMin", 0);
-    m_int_configs[CONFIG_WINTERGRASP_PLR_MIN_LVL] = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMinLvl", 77);
-    m_int_configs[CONFIG_WINTERGRASP_BATTLETIME] = sConfigMgr->GetIntDefault("Wintergrasp.BattleTimer", 30);
-    m_int_configs[CONFIG_WINTERGRASP_NOBATTLETIME] = sConfigMgr->GetIntDefault("Wintergrasp.NoBattleTimer", 150);
+    m_bool_configs[CONFIG_WINTERGRASP_ENABLE]             = sConfigMgr->GetBoolDefault("Wintergrasp.Enable", false);
+    m_int_configs[CONFIG_WINTERGRASP_PLR_MAX]             = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMax", 100);
+    m_int_configs[CONFIG_WINTERGRASP_PLR_MIN]             = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMin", 0);
+    m_int_configs[CONFIG_WINTERGRASP_PLR_MIN_LVL]         = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMinLvl", 77);
+    m_int_configs[CONFIG_WINTERGRASP_BATTLETIME]          = sConfigMgr->GetIntDefault("Wintergrasp.BattleTimer", 30);
+    m_int_configs[CONFIG_WINTERGRASP_NOBATTLETIME]        = sConfigMgr->GetIntDefault("Wintergrasp.NoBattleTimer", 150);
     m_int_configs[CONFIG_WINTERGRASP_RESTART_AFTER_CRASH] = sConfigMgr->GetIntDefault("Wintergrasp.CrashRestartTimer", 10);
 
-    m_int_configs[CONFIG_BIRTHDAY_TIME] = sConfigMgr->GetIntDefault("BirthdayTime", 1222964635);
+    m_int_configs[CONFIG_BIRTHDAY_TIME]     = sConfigMgr->GetIntDefault("BirthdayTime", 1222964635);
     m_bool_configs[CONFIG_MINIGOB_MANABONK] = sConfigMgr->GetBoolDefault("Minigob.Manabonk.Enable", true);
 
-    m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT] = sConfigMgr->GetBoolDefault("IsContinentTransport.Enabled", true);
+    m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT]            = sConfigMgr->GetBoolDefault("IsContinentTransport.Enabled", true);
     m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING] = sConfigMgr->GetBoolDefault("IsPreloadedContinentTransport.Enabled", false);
 
     m_bool_configs[CONFIG_IP_BASED_ACTION_LOGGING] = sConfigMgr->GetBoolDefault("Allow.IP.Based.Action.Logging", false);
@@ -1315,11 +1339,45 @@ void World::LoadConfigSettings(bool reload)
     // Whether to use LoS from game objects
     m_bool_configs[CONFIG_CHECK_GOBJECT_LOS] = sConfigMgr->GetBoolDefault("CheckGameObjectLoS", true);
 
-    m_bool_configs[CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Creature.Zone.Area.Data", false);
+    m_bool_configs[CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA]   = sConfigMgr->GetBoolDefault("Calculate.Creature.Zone.Area.Data", false);
     m_bool_configs[CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Gameoject.Zone.Area.Data", false);
 
     // Player can join LFG anywhere
     m_bool_configs[CONFIG_LFG_LOCATION_ALL] = sConfigMgr->GetBoolDefault("LFG.Location.All", false);
+
+    // Prevent players AFK from being logged out
+    m_int_configs[CONFIG_AFK_PREVENT_LOGOUT] = sConfigMgr->GetIntDefault("PreventAFKLogout", 0);
+
+    // Preload all grids of all non-instanced maps
+    m_bool_configs[CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS] = sConfigMgr->GetBoolDefault("PreloadAllNonInstancedMapGrids", false);
+
+    // ICC buff override
+    m_int_configs[CONFIG_ICC_BUFF_HORDE] = sConfigMgr->GetIntDefault("ICC.Buff.Horde", 73822);
+    m_int_configs[CONFIG_ICC_BUFF_ALLIANCE] = sConfigMgr->GetIntDefault("ICC.Buff.Alliance", 73828);
+
+    m_bool_configs[CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE] = sConfigMgr->GetBoolDefault("SetAllCreaturesWithWaypointMovementActive", false);
+
+    // packet spoof punishment
+    m_int_configs[CONFIG_PACKET_SPOOF_POLICY] = sConfigMgr->GetIntDefault("PacketSpoof.Policy", (uint32)WorldSession::DosProtection::POLICY_KICK);
+    m_int_configs[CONFIG_PACKET_SPOOF_BANMODE] = sConfigMgr->GetIntDefault("PacketSpoof.BanMode", (uint32)0);
+    if (m_int_configs[CONFIG_PACKET_SPOOF_BANMODE] > 1)
+        m_int_configs[CONFIG_PACKET_SPOOF_BANMODE] = (uint32)0;
+
+    m_int_configs[CONFIG_PACKET_SPOOF_BANDURATION] = sConfigMgr->GetIntDefault("PacketSpoof.BanDuration", 86400);
+
+    // Random Battleground Rewards
+    m_int_configs[CONFIG_BG_REWARD_WINNER_HONOR_FIRST] = sConfigMgr->GetIntDefault("Battleground.RewardWinnerHonorFirst", 30);
+    m_int_configs[CONFIG_BG_REWARD_WINNER_ARENA_FIRST] = sConfigMgr->GetIntDefault("Battleground.RewardWinnerArenaFirst", 25);
+    m_int_configs[CONFIG_BG_REWARD_WINNER_HONOR_LAST]  = sConfigMgr->GetIntDefault("Battleground.RewardWinnerHonorLast", 15);
+    m_int_configs[CONFIG_BG_REWARD_WINNER_ARENA_LAST]  = sConfigMgr->GetIntDefault("Battleground.RewardWinnerArenaLast", 0);
+    m_int_configs[CONFIG_BG_REWARD_LOSER_HONOR_FIRST]  = sConfigMgr->GetIntDefault("Battleground.RewardLoserHonorFirst", 5);
+    m_int_configs[CONFIG_BG_REWARD_LOSER_HONOR_LAST]   = sConfigMgr->GetIntDefault("Battleground.RewardLoserHonorLast", 5);
+
+    m_int_configs[CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER] = sConfigMgr->GetIntDefault("WaypointMovementStopTimeForPlayer", 120);
+
+    //Debug
+    m_bool_configs[CONFIG_DEBUG_BATTLEGROUND] = sConfigMgr->GetBoolDefault("Debug.Battleground", false);
+    m_bool_configs[CONFIG_DEBUG_ARENA]        = sConfigMgr->GetBoolDefault("Debug.Arena",        false);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -1334,11 +1392,11 @@ void World::SetInitialWorldSettings()
     uint32 startupBegin = getMSTime();
 
     ///- Initialize the random number generator
-    srand((unsigned int)time(NULL));
+    srand((unsigned int)time(nullptr));
 
     ///- Initialize detour memory management
     dtAllocSetCustom(dtCustomAlloc, dtCustomFree);
-    
+
     sLog->outString("Initializing Scripts...");
     sScriptMgr->Initialize();
 
@@ -1382,8 +1440,8 @@ void World::SetInitialWorldSettings()
 
     ///- Loading strings. Getting no records means core load has to be canceled because no error message can be output.
     sLog->outString();
-    sLog->outString("Loading Trinity strings...");
-    if (!sObjectMgr->LoadTrinityStrings())
+    sLog->outString("Loading acore strings...");
+    if (!sObjectMgr->LoadAcoreStrings())
         exit(1);                                            // Error message displayed in function already
 
     ///- Update the realm entry in the database with the realm type from the config file
@@ -1803,8 +1861,8 @@ void World::SetInitialWorldSettings()
     ///- Handle outdated emails (delete/return)
     sLog->outString("Returning old mails...");
     sObjectMgr->ReturnOrDeleteOldMails(false);
-    
-    ///- Load AutoBroadCast 
+
+    ///- Load AutoBroadCast
     sLog->outString("Loading Autobroadcasts...");
     LoadAutobroadcasts();
 
@@ -1812,7 +1870,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadSpellScripts();                              // must be after load Creature/Gameobject(Template/Data)
     sObjectMgr->LoadEventScripts();                              // must be after load Creature/Gameobject(Template/Data)
     sObjectMgr->LoadWaypointScripts();
-    
+
     sLog->outString("Loading spell script names...");
     sObjectMgr->LoadSpellScriptNames();
 
@@ -1839,7 +1897,7 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize game time and timers
     sLog->outString("Initialize game time and timers");
-    m_gameTime = time(NULL);
+    m_gameTime = time(nullptr);
     m_startTime = m_gameTime;
 
     LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES(%u, %u, 0, '%s')",
@@ -1864,7 +1922,7 @@ void World::SetInitialWorldSettings()
     // our speed up
     m_timers[WUPDATE_5_SECS].SetInterval(5*IN_MILLISECONDS);
 
-    mail_expire_check_timer = time(NULL) + 6*3600;
+    mail_expire_check_timer = time(nullptr) + 6*3600;
 
     ///- Initilize static helper structures
     AIRegistry::Initialize();
@@ -1926,6 +1984,9 @@ void World::SetInitialWorldSettings()
     sLog->outString("Calculate random battleground reset time..." );
     InitRandomBGResetTime();
 
+    sLog->outString("Calculate deletion of old calendar events time...");
+    InitCalendarOldEventsDeletionTime();
+
     sLog->outString("Calculate Guild cap reset time...");
     InitGuildResetTime();
 
@@ -1953,10 +2014,31 @@ void World::SetInitialWorldSettings()
     sEluna->RunScripts();
     sEluna->OnConfigLoad(false,false); // Must be done after Eluna is initialized and scripts have run.
 #endif
-    
+
+    if (sWorld->getBoolConfig(CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS))
+    {
+        sLog->outString("Loading all grids for all non-instanced maps...");
+
+        for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
+        {
+            MapEntry const* mapEntry = sMapStore.LookupEntry(i);
+
+            if (mapEntry && !mapEntry->Instanceable())
+            {
+                Map* map = sMapMgr->CreateBaseMap(mapEntry->MapID);
+
+                if (map)
+                {
+                    sLog->outString(">> Loading all grids for map %u", map->GetId());
+                    map->LoadAllCells();
+                }
+            }
+        }
+    }
+
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
     sLog->outString();
-    sLog->outError("WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
+    sLog->outError("WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000)); // outError for red color in console
     sLog->outString();
 
     // possibly enable db logging; avoid massive startup spam by doing it here.
@@ -2002,7 +2084,7 @@ void World::DetectDBCLang()
     {
         default_locale = m_lang_confid;
     }
-        
+
     if (default_locale >= TOTAL_LOCALES)
     {
         sLog->outError("Unable to determine your DBC Locale! (corrupt DBC?)");
@@ -2106,6 +2188,9 @@ void World::Update(uint32 diff)
     if (m_gameTime > m_NextRandomBGReset)
         ResetRandomBG();
 
+    if (m_gameTime > m_NextCalendarOldEventsDeletionTime)
+        CalendarDeleteOldEvents();
+
     if (m_gameTime > m_NextGuildReset)
         ResetGuildCap();
 
@@ -2114,7 +2199,7 @@ void World::Update(uint32 diff)
     // so we don't have to do it in every packet that modifies auctions
     AsyncAuctionListingMgr::SetAuctionListingAllowed(false);
     {
-        TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock()); 
+        ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock());
 
         // pussywizard: handle auctions when the timer has passed
         if (m_timers[WUPDATE_AUCTIONS].Passed())
@@ -2134,7 +2219,7 @@ void World::Update(uint32 diff)
         }
 
         UpdateSessions(diff);
-    } 
+    }
     // end of section with mutex
     AsyncAuctionListingMgr::SetAuctionListingAllowed(true);
 
@@ -2184,25 +2269,25 @@ void World::Update(uint32 diff)
 
     // execute callbacks from sql queries that were queued recently
     ProcessQueryCallbacks();
-    
+
     /// <li> Update uptime table
     if (m_timers[WUPDATE_UPTIME].Passed())
     {
         uint32 tmpDiff = uint32(m_gameTime - m_startTime);
         uint32 maxOnlinePlayers = GetMaxPlayerCount();
-        
+
         m_timers[WUPDATE_UPTIME].Reset();
-        
+
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_UPTIME_PLAYERS);
-        
+
         stmt->setUInt32(0, tmpDiff);
         stmt->setUInt16(1, uint16(maxOnlinePlayers));
         stmt->setUInt32(2, realmID);
         stmt->setUInt32(3, uint32(m_startTime));
-        
+
         LoginDatabase.Execute(stmt);
     }
-    
+
     ///- Erase corpses once every 20 minutes
     if (m_timers[WUPDATE_CORPSES].Passed())
     {
@@ -2285,16 +2370,16 @@ void World::SendGlobalGMMessage(WorldPacket* packet, WorldSession* self, TeamId 
     }
 }
 
-namespace Trinity
+namespace acore
 {
     class WorldWorldTextBuilder
     {
         public:
             typedef std::vector<WorldPacket*> WorldPacketList;
-            explicit WorldWorldTextBuilder(uint32 textId, va_list* args = NULL) : i_textId(textId), i_args(args) {}
+            explicit WorldWorldTextBuilder(uint32 textId, va_list* args = nullptr) : i_textId(textId), i_args(args) {}
             void operator()(WorldPacketList& data_list, LocaleConstant loc_idx)
             {
-                char const* text = sObjectMgr->GetTrinityString(i_textId, loc_idx);
+                char const* text = sObjectMgr->GetAcoreString(i_textId, loc_idx);
 
                 if (i_args)
                 {
@@ -2312,14 +2397,14 @@ namespace Trinity
                     do_helper(data_list, (char*)text);
             }
         private:
-            char* lineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = NULL; return start; }
+            char* lineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
             void do_helper(WorldPacketList& data_list, char* text)
             {
                 char* pos = text;
                 while (char* line = lineFromMessage(pos))
                 {
                     WorldPacket* data = new WorldPacket();
-                    ChatHandler::BuildChatPacket(*data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, NULL, NULL, line);
+                    ChatHandler::BuildChatPacket(*data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
                     data_list.push_back(data);
                 }
             }
@@ -2328,7 +2413,7 @@ namespace Trinity
             uint32 i_textId;
             va_list* i_args;
     };
-}                                                           // namespace Trinity
+}                                                           // namespace acore
 
 /// Send a System Message to all players (except self if mentioned)
 void World::SendWorldText(uint32 string_id, ...)
@@ -2336,8 +2421,8 @@ void World::SendWorldText(uint32 string_id, ...)
     va_list ap;
     va_start(ap, string_id);
 
-    Trinity::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Trinity::LocalizedPacketListDo<Trinity::WorldWorldTextBuilder> wt_do(wt_builder);
+    acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    acore::LocalizedPacketListDo<acore::WorldWorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
@@ -2355,8 +2440,8 @@ void World::SendGMText(uint32 string_id, ...)
     va_list ap;
     va_start(ap, string_id);
 
-    Trinity::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Trinity::LocalizedPacketListDo<Trinity::WorldWorldTextBuilder> wt_do(wt_builder);
+    acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    acore::LocalizedPacketListDo<acore::WorldWorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
@@ -2382,7 +2467,7 @@ void World::SendGlobalText(const char* text, WorldSession* self)
 
     while (char* line = ChatHandler::LineFromMessage(pos))
     {
-        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, NULL, NULL, line);
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
         SendGlobalMessage(&data, self);
     }
 
@@ -2416,7 +2501,7 @@ bool World::SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self
 void World::SendZoneText(uint32 zone, const char* text, WorldSession* self, TeamId teamId)
 {
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, NULL, NULL, text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, text);
     SendZoneMessage(zone, &data, self, teamId);
 }
 
@@ -2447,7 +2532,7 @@ void World::KickAllLess(AccountTypes sec)
 void World::_UpdateGameTime()
 {
     ///- update the time
-    time_t thisTime = time(NULL);
+    time_t thisTime = time(nullptr);
     uint32 elapsed = uint32(thisTime - m_gameTime);
     m_gameTime = thisTime;
     m_gameMSTime = getMSTime();
@@ -2531,7 +2616,7 @@ void World::ShutdownMsg(bool show, Player* player)
 void World::ShutdownCancel()
 {
     // nothing cancel or too later
-    if (!m_ShutdownTimer || m_stopEvent.value())
+    if (!m_ShutdownTimer || m_stopEvent)
         return;
 
     ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_CANCELLED : SERVER_MSG_SHUTDOWN_CANCELLED;
@@ -2565,7 +2650,7 @@ void World::SendServerMessage(ServerMessageType type, const char *text, Player* 
 void World::UpdateSessions(uint32 diff)
 {
     ///- Add new sessions
-    WorldSession* sess = NULL;
+    WorldSession* sess = nullptr;
     while (addSessQueue.next(sess))
         AddSession_ (sess);
 
@@ -2583,7 +2668,7 @@ void World::UpdateSessions(uint32 diff)
         if (pSession->HandleSocketClosed())
         {
             if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-                m_disconnects[pSession->GetAccountId()] = time(NULL);
+                m_disconnects[pSession->GetAccountId()] = time(nullptr);
             m_sessions.erase(itr);
             // there should be no offline session if current one is logged onto a character
             SessionMap::iterator iter;
@@ -2594,7 +2679,7 @@ void World::UpdateSessions(uint32 diff)
                 tmp->SetShouldSetOfflineInDB(false);
                 delete tmp;
             }
-            pSession->SetOfflineTime(time(NULL));
+            pSession->SetOfflineTime(time(nullptr));
             m_offlineSessions[pSession->GetAccountId()] = pSession;
             continue;
         }
@@ -2602,7 +2687,7 @@ void World::UpdateSessions(uint32 diff)
         if (!pSession->Update(diff, updater))
         {
             if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-                m_disconnects[pSession->GetAccountId()] = time(NULL);
+                m_disconnects[pSession->GetAccountId()] = time(nullptr);
             m_sessions.erase(itr);
             if (m_offlineSessions.find(pSession->GetAccountId()) != m_offlineSessions.end()) // pussywizard: don't set offline in db because offline session for that acc is present (character is in world)
                 pSession->SetShouldSetOfflineInDB(false);
@@ -2613,7 +2698,7 @@ void World::UpdateSessions(uint32 diff)
     // pussywizard:
     if (m_offlineSessions.empty())
         return;
-    uint32 currTime = time(NULL);
+    uint32 currTime = time(nullptr);
     for (SessionMap::iterator itr = m_offlineSessions.begin(), next; itr != m_offlineSessions.end(); itr = next)
     {
         next = itr;
@@ -2632,9 +2717,9 @@ void World::UpdateSessions(uint32 diff)
 // This handles the issued and queued CLI commands
 void World::ProcessCliCommands()
 {
-    CliCommandHolder::Print* zprint = NULL;
-    void* callbackArg = NULL;
-    CliCommandHolder* command = NULL;
+    CliCommandHolder::Print* zprint = nullptr;
+    void* callbackArg = nullptr;
+    CliCommandHolder* command = nullptr;
     while (cliCmdQueue.next(command))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -2654,7 +2739,7 @@ void World::SendAutoBroadcast()
 {
     if (m_Autobroadcasts.empty())
         return;
-    
+
     uint32 weight = 0;
     AutobroadcastsWeightMap selectionWeights;
 
@@ -2751,9 +2836,9 @@ time_t World::GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour)
 {
     if (hour < 0 || hour > 23)
         hour = 0;
-    time_t curr = time(NULL);
+    time_t curr = time(nullptr);
     tm localTm;
-    ACE_OS::localtime_r(&curr, &localTm);
+    localtime_r(&curr, &localTm);
     localTm.tm_hour = hour;
     localTm.tm_min  = 0;
     localTm.tm_sec  = 0;
@@ -2772,9 +2857,9 @@ time_t World::GetNextTimeWithMonthAndHour(int8 month, int8 hour)
 {
     if (hour < 0 || hour > 23)
         hour = 0;
-    time_t curr = time(NULL);
+    time_t curr = time(nullptr);
     tm localTm;
-    ACE_OS::localtime_r(&curr, &localTm);
+    localtime_r(&curr, &localTm);
     localTm.tm_mday = 1;
     localTm.tm_hour = hour;
     localTm.tm_min  = 0;
@@ -2821,6 +2906,23 @@ void World::InitRandomBGResetTime()
     m_NextRandomBGReset = wstime ? wstime : GetNextTimeWithDayAndHour(-1, 6);
     if (!wstime)
         sWorld->setWorldState(WS_BG_DAILY_RESET_TIME, uint64(m_NextRandomBGReset));
+}
+
+void World::InitCalendarOldEventsDeletionTime()
+{
+    time_t now = time(nullptr);
+    time_t currentDeletionTime = getWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME);
+    time_t nextDeletionTime = currentDeletionTime ? currentDeletionTime : GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR));
+
+    // If the reset time saved in the worldstate is before now it means the server was offline when the reset was supposed to occur.
+    // In this case we set the reset time in the past and next world update will do the reset and schedule next one in the future.
+    if (currentDeletionTime < now)
+        m_NextCalendarOldEventsDeletionTime = nextDeletionTime - DAY;
+    else
+        m_NextCalendarOldEventsDeletionTime = nextDeletionTime;
+
+    if (!currentDeletionTime)
+        sWorld->setWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME, uint64(m_NextCalendarOldEventsDeletionTime));
 }
 
 void World::InitGuildResetTime()
@@ -2923,6 +3025,15 @@ void World::ResetRandomBG()
 
     m_NextRandomBGReset = GetNextTimeWithDayAndHour(-1, 6);
     sWorld->setWorldState(WS_BG_DAILY_RESET_TIME, uint64(m_NextRandomBGReset));
+}
+
+void World::CalendarDeleteOldEvents()
+{
+    sLog->outString("Calendar deletion of old events.");
+
+    m_NextCalendarOldEventsDeletionTime = time_t(m_NextCalendarOldEventsDeletionTime + DAY);
+    sWorld->setWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME, uint64(m_NextCalendarOldEventsDeletionTime));
+    sCalendarMgr->DeleteOldEvents();
 }
 
 void World::ResetGuildCap()
@@ -3251,7 +3362,7 @@ GlobalPlayerData const* World::GetGlobalPlayerData(uint32 guid) const
     }
 
     // Player not found
-    return NULL;
+    return nullptr;
 }
 
 uint32 World::GetGlobalPlayerGUID(std::string const& name) const

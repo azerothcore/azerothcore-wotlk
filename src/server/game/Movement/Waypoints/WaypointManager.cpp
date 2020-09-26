@@ -27,6 +27,12 @@ WaypointMgr::~WaypointMgr()
     _waypointStore.clear();
 }
 
+WaypointMgr* WaypointMgr::instance()
+{
+    static WaypointMgr instance;
+    return &instance;
+}
+
 void WaypointMgr::Load()
 {
     uint32 oldMSTime = getMSTime();
@@ -56,8 +62,8 @@ void WaypointMgr::Load()
         float z = fields[4].GetFloat();
         float o = fields[5].GetFloat();
 
-        Trinity::NormalizeMapCoord(x);
-        Trinity::NormalizeMapCoord(y);
+        acore::NormalizeMapCoord(x);
+        acore::NormalizeMapCoord(y);
 
         wp->id = fields[1].GetUInt32();
         wp->x = x;
@@ -118,8 +124,8 @@ void WaypointMgr::ReloadPath(uint32 id)
         float z = fields[3].GetFloat();
         float o = fields[4].GetFloat();
 
-        Trinity::NormalizeMapCoord(x);
-        Trinity::NormalizeMapCoord(y);
+        acore::NormalizeMapCoord(x);
+        acore::NormalizeMapCoord(y);
 
         wp->id = fields[0].GetUInt32();
         wp->x = x;

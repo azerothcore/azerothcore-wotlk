@@ -51,7 +51,7 @@ bool LoadPetFromDBQueryHolder::Initialize()
     SetSize(MAX_PET_LOAD_QUERY);
 
     bool res = true;
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_AURA);
     stmt->setUInt32(0, m_petNumber);
@@ -128,7 +128,7 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
     Map* map = owner->GetMap();
     uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_PET);
     Pet* pet = new Pet(owner, pet_type);
-    LoadPetFromDBQueryHolder* holder = new LoadPetFromDBQueryHolder(pet_number, current, uint32(time(NULL) - fields[14].GetUInt32()), fields[13].GetString(), savedhealth, savedmana);
+    LoadPetFromDBQueryHolder* holder = new LoadPetFromDBQueryHolder(pet_number, current, uint32(time(nullptr) - fields[14].GetUInt32()), fields[13].GetString(), savedhealth, savedmana);
     if (!pet->Create(guid, map, owner->GetPhaseMask(), petentry, pet_number) || !holder->Initialize())
     {
         delete pet;
@@ -160,8 +160,10 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
         return PET_LOAD_OK;
     }
 
-    pet->GetCharmInfo()->SetPetNumber(pet_number, pet->IsPermanentPetFor(owner));
-
+    if (pet->getPetType() == HUNTER_PET || pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON || pet->GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD)
+        pet->GetCharmInfo()->SetPetNumber(pet_number, pet->IsPermanentPetFor(owner)); // Show pet details tab (Shift+P) only for hunter pets, demons or undead
+    else
+        pet->GetCharmInfo()->SetPetNumber(pet_number, false);
     pet->SetDisplayId(fields[3].GetUInt32());
     pet->SetNativeDisplayId(fields[3].GetUInt32());
     uint32 petlevel = fields[4].GetUInt16();
@@ -198,7 +200,7 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
             break;
     }
 
-    pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL))); // cast can't be helped here
+    pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped here
     pet->SetCreatorGUID(owner->GetGUID());
     owner->SetMinion(pet, true);
 
@@ -409,7 +411,7 @@ void WorldSession::HandlePetAction(WorldPacket & recvData)
     if (!pet->IsAlive())
     {
         // xinef: allow dissmis dead pets
-        SpellInfo const* spell = (flag == ACT_ENABLED || flag == ACT_PASSIVE) ? sSpellMgr->GetSpellInfo(spellid) : NULL;
+        SpellInfo const* spell = (flag == ACT_ENABLED || flag == ACT_PASSIVE) ? sSpellMgr->GetSpellInfo(spellid) : nullptr;
         if ((flag != ACT_COMMAND || spellid != COMMAND_ABANDON) && (!spell || !spell->HasAttribute(SPELL_ATTR0_CASTABLE_WHILE_DEAD)))
             return;
     }
@@ -645,6 +647,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid
                     if (pet->ToPet())
                         pet->ToPet()->ClearCastWhenWillAvailable();
                     pet->ClearInPetCombat();
+                    [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
 
                 case REACT_DEFENSIVE:                       //recovery
                 case REACT_AGGRESSIVE:                      //activete
@@ -659,7 +662,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid
         case ACT_PASSIVE:                                   // 0x01
         case ACT_ENABLED:                                   // 0xC1    spell
         {
-            Unit* unit_target = NULL;
+            Unit* unit_target = nullptr;
 
             // do not cast unknown spells
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
@@ -847,7 +850,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid
                         pet->AttackStop();
                     }
                     else
-                        victim = NULL;
+                        victim = nullptr;
 
                     if (pet->GetTypeId() != TYPEID_PLAYER && pet->ToCreature() && pet->ToCreature()->IsAIEnabled)
                     {
@@ -929,7 +932,18 @@ void WorldSession::SendPetNameQuery(uint64 petguid, uint32 petnumber)
         return;
     }
 
-    std::string name = pet->GetName();
+    std::string name;
+    if (pet->GetEntry() == NPC_WATER_ELEMENTAL_PERM)
+    {
+        // Use localized creature name for the mage pet
+        LocaleConstant loc_idx = GetSessionDbLocaleIndex();
+        if (loc_idx != DEFAULT_LOCALE)
+            name = pet->GetNameForLocaleIdx(loc_idx);
+        else
+            name = pet->GetCreatureTemplate()->Name;
+    }
+    else
+        name = pet->GetName();
 
     WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+4+name.size()+1));
     data << uint32(petnumber);
@@ -1130,13 +1144,13 @@ void WorldSession::HandlePetRename(WorldPacket & recvData)
     PetNameInvalidReason res = ObjectMgr::CheckPetName(name);
     if (res != PET_NAME_SUCCESS)
     {
-        SendPetNameInvalid(res, name, NULL);
+        SendPetNameInvalid(res, name, nullptr);
         return;
     }
 
     if (sObjectMgr->IsReservedName(name))
     {
-        SendPetNameInvalid(PET_NAME_RESERVED, name, NULL);
+        SendPetNameInvalid(PET_NAME_RESERVED, name, nullptr);
         return;
     }
 
@@ -1191,7 +1205,7 @@ void WorldSession::HandlePetRename(WorldPacket & recvData)
 
     CharacterDatabase.CommitTransaction(trans);
 
-    pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL))); // cast can't be helped
+    pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped
 }
 
 void WorldSession::HandlePetAbandon(WorldPacket & recvData)

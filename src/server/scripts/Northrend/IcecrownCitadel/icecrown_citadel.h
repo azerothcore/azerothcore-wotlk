@@ -562,6 +562,11 @@ enum AreaIds
     AREA_THE_FROZEN_THRONE  = 4859,
 };
 
+enum ItemIds
+{
+    ITEM_GOBLIN_ROCKET_PACK = 49278
+};
+
 class spell_trigger_spell_from_caster : public SpellScriptLoader
 {
     public:
@@ -610,7 +615,7 @@ CreatureAI* GetIcecrownCitadelAI(Creature* creature)
         if (instance->GetInstanceScript())
             if (instance->GetScriptId() == sObjectMgr->GetScriptId(ICCScriptName))
                 return new AI(creature);
-    return NULL;
+    return nullptr;
 }
 
 #endif // ICECROWN_CITADEL_H_

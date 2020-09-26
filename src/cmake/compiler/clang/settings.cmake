@@ -1,20 +1,40 @@
+#
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+# Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
+#
+
 # Set build-directive (used in core to tell which buildtype we used)
-add_definitions(-D_BUILD_DIRECTIVE='"${CMAKE_BUILD_TYPE}"')
+target_compile_definitions(acore-compile-option-interface
+  INTERFACE
+    -D_BUILD_DIRECTIVE="${CMAKE_BUILD_TYPE}")
 
 if(WITH_WARNINGS)
-  set(WARNING_FLAGS "-W -Wall -Wextra -Winit-self -Wfatal-errors -Wno-mismatched-tags")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNING_FLAGS}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Woverloaded-virtual")
+  target_compile_options(acore-warning-interface
+    INTERFACE
+      -W
+      -Wall
+      -Wextra
+      -Winit-self
+      -Wfatal-errors
+      -Wno-mismatched-tags
+      -Woverloaded-virtual)
   message(STATUS "Clang: All warnings enabled")
 endif()
 
 if(WITH_COREDEBUG)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g3")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
+  target_compile_options(acore-compile-option-interface
+    INTERFACE
+      -g3)
   message(STATUS "Clang: Debug-flags set (-g3)")
 endif()
 
 # -Wno-narrowing needed to suppress a warning in g3d
 # -Wno-deprecated-register is needed to suppress gsoap warnings on Unix systems.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14  -Wno-narrowing -Wno-deprecated-register")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG=1")
+target_compile_options(acore-compile-option-interface
+  INTERFACE
+    -Wno-narrowing
+    -Wno-deprecated-register)
+
+target_compile_definitions(acore-compile-option-interface
+  INTERFACE
+    -DDEBUG=1)

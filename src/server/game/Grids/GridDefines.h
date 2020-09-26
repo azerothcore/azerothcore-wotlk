@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_GRIDDEFINES_H
-#define TRINITY_GRIDDEFINES_H
+#ifndef ACORE_GRIDDEFINES_H
+#define ACORE_GRIDDEFINES_H
 
 #include "Common.h"
 #include "NGrid.h"
@@ -157,7 +157,7 @@ bool operator!=(const CoordPair<LIMIT> &p1, const CoordPair<LIMIT> &p2)
 typedef CoordPair<MAX_NUMBER_OF_GRIDS> GridCoord;
 typedef CoordPair<TOTAL_NUMBER_OF_CELLS_PER_MAP> CellCoord;
 
-namespace Trinity
+namespace acore
 {
     template<class RET_TYPE, int CENTER_VAL>
     inline RET_TYPE Compute(float x, float y, float center_offset, float size)

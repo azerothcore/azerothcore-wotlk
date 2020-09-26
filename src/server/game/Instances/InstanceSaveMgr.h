@@ -11,7 +11,7 @@
 #include "DatabaseEnv.h"
 #include "DBCEnums.h"
 #include "ObjectDefines.h"
-#include <ace/Singleton.h>
+
 #include <ace/Null_Mutex.h>
 #include <ace/Thread_Mutex.h>
 #include <list>
@@ -30,7 +30,7 @@ struct InstancePlayerBind
     InstanceSave* save;
     bool perm : 1;
     bool extended : 1;
-    InstancePlayerBind() : save(NULL), perm(false), extended(false) {}
+    InstancePlayerBind() : save(nullptr), perm(false), extended(false) {}
 };
 
 typedef std::unordered_map< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
@@ -98,7 +98,6 @@ typedef std::unordered_map<uint32 /*PAIR32(map, difficulty)*/, time_t /*resetTim
 
 class InstanceSaveManager
 {
-    friend class ACE_Singleton<InstanceSaveManager, ACE_Thread_Mutex>;
     friend class InstanceSave;
 
     private:
@@ -106,6 +105,8 @@ class InstanceSaveManager
         ~InstanceSaveManager();
 
     public:
+        static InstanceSaveManager* instance();
+        
         typedef std::unordered_map<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveHashMap;
 
         struct InstResetEvent
@@ -162,16 +163,16 @@ class InstanceSaveManager
 
         InstanceSave* GetInstanceSave(uint32 InstanceId);
 
-        InstancePlayerBind* PlayerBindToInstance(uint32 guidLow, InstanceSave* save, bool permanent, Player* player = NULL);
-        void PlayerUnbindInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player = NULL);
-        void PlayerUnbindInstanceNotExtended(uint32 guidLow, uint32 mapid, Difficulty difficulty, Player* player = NULL);
+        InstancePlayerBind* PlayerBindToInstance(uint32 guidLow, InstanceSave* save, bool permanent, Player* player = nullptr);
+        void PlayerUnbindInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player = nullptr);
+        void PlayerUnbindInstanceNotExtended(uint32 guidLow, uint32 mapid, Difficulty difficulty, Player* player = nullptr);
         InstancePlayerBind* PlayerGetBoundInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty);
         bool PlayerIsPermBoundToInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty);
         BoundInstancesMap const& PlayerGetBoundInstances(uint32 guidLow, Difficulty difficulty);
         void PlayerCreateBoundInstancesMaps(uint32 guidLow);
         InstanceSave* PlayerGetInstanceSave(uint32 guidLow, uint32 mapid, Difficulty difficulty);
         uint32 PlayerGetDestinationInstanceId(Player* player, uint32 mapid, Difficulty difficulty);
-        void CopyBinds(uint32 from, uint32 to, Player* toPlr = NULL);
+        void CopyBinds(uint32 from, uint32 to, Player* toPlr = nullptr);
         void UnbindAllFor(InstanceSave* save);
 
     protected:
@@ -189,5 +190,6 @@ class InstanceSaveManager
         ResetTimeQueue m_resetTimeQueue;
 };
 
-#define sInstanceSaveMgr ACE_Singleton<InstanceSaveManager, ACE_Thread_Mutex>::instance()
+#define sInstanceSaveMgr InstanceSaveManager::instance()
+
 #endif

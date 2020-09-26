@@ -23,9 +23,9 @@ Corpse::Corpse(CorpseType type) : WorldObject(type != CORPSE_BONES), m_type(type
 
     m_valuesCount = CORPSE_END;
 
-    m_time = time(NULL);
+    m_time = time(nullptr);
 
-    lootRecipient = NULL;
+    lootRecipient = nullptr;
 }
 
 Corpse::~Corpse()
@@ -79,7 +79,7 @@ bool Corpse::Create(uint32 guidlow, Player* owner)
     SetObjectScale(1);
     SetUInt64Value(CORPSE_FIELD_OWNER, owner->GetGUID());
 
-    _gridCoord = Trinity::ComputeGridCoord(GetPositionX(), GetPositionY());
+    _gridCoord = acore::ComputeGridCoord(GetPositionX(), GetPositionY());
 
     return true;
 }
@@ -116,7 +116,7 @@ void Corpse::SaveToDB()
 
 void Corpse::DeleteFromDB(SQLTransaction& trans)
 { 
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
     if (GetType() == CORPSE_BONES)
     {
         // Only specific bones
@@ -173,7 +173,7 @@ bool Corpse::LoadCorpseFromDB(uint32 guid, Field* fields)
         return false;
     }
 
-    _gridCoord = Trinity::ComputeGridCoord(GetPositionX(), GetPositionY());
+    _gridCoord = acore::ComputeGridCoord(GetPositionX(), GetPositionY());
     return true;
 }
 

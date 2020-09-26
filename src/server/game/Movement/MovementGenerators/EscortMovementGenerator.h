@@ -2,8 +2,8 @@
 Written by Xinef
  */
 
-#ifndef TRINITY_ESCORTMOVEMENTGENERATOR_H
-#define TRINITY_ESCORTMOVEMENTGENERATOR_H
+#ifndef ACORE_ESCORTMOVEMENTGENERATOR_H
+#define ACORE_ESCORTMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
 
@@ -11,7 +11,7 @@ template<class T>
 class EscortMovementGenerator : public MovementGeneratorMedium< T, EscortMovementGenerator<T> >
 {
     public:
-        EscortMovementGenerator(Movement::PointsArray* _path = NULL) : i_recalculateSpeed(false)
+        EscortMovementGenerator(Movement::PointsArray* _path = nullptr) : i_recalculateSpeed(false)
         {
             if (_path)
                 m_precomputedPath = *_path;

@@ -62,6 +62,7 @@ void AddSC_tele_commandscript();
 void AddSC_ticket_commandscript();
 void AddSC_titles_commandscript();
 void AddSC_wp_commandscript();
+void AddSC_player_commandscript();
 
 #ifdef SCRIPTS
 //world
@@ -212,7 +213,6 @@ void AddSC_ghostlands();
 void AddSC_hinterlands();
 void AddSC_ironforge();
 void AddSC_isle_of_queldanas();
-void AddSC_loch_modan();
 void AddSC_redridge_mountains();
 void AddSC_silverpine_forest();
 void AddSC_stormwind_city();
@@ -472,6 +472,7 @@ void AddSC_boss_exarch_maladaar();           //Auchindoun Auchenai Crypts
 void AddSC_instance_auchenai_crypts();
 void AddSC_boss_shirrak_the_dead_watcher();
 void AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
+void AddSC_boss_pandemonius();
 void AddSC_instance_mana_tombs();
 void AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
 void AddSC_instance_sethekk_halls();
@@ -613,7 +614,7 @@ void AddCommandScripts()
     AddSC_character_commandscript();
     AddSC_cheat_commandscript();
     AddSC_debug_commandscript();
-	AddSC_deserter_commandscript();
+    AddSC_deserter_commandscript();
     AddSC_disable_commandscript();
     AddSC_event_commandscript();
     AddSC_gm_commandscript();
@@ -639,6 +640,7 @@ void AddCommandScripts()
     AddSC_ticket_commandscript();
     AddSC_titles_commandscript();
     AddSC_wp_commandscript();
+    AddSC_player_commandscript();
 }
 
 void AddWorldScripts()
@@ -801,7 +803,6 @@ void AddEasternKingdomsScripts()
     AddSC_hinterlands();
     AddSC_ironforge();
     AddSC_isle_of_queldanas();
-    AddSC_loch_modan();
     AddSC_redridge_mountains();
     AddSC_silverpine_forest();
     AddSC_stormwind_city();
@@ -906,6 +907,7 @@ void AddOutlandScripts()
     AddSC_instance_auchenai_crypts();
     AddSC_boss_shirrak_the_dead_watcher();
     AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
+    AddSC_boss_pandemonius();
     AddSC_instance_mana_tombs();
     AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
     AddSC_instance_sethekk_halls();

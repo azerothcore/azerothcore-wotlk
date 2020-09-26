@@ -40,6 +40,14 @@ public:
             memset(&Encounters, 0, sizeof(Encounters));
         };
 
+        bool IsEncounterInProgress() const
+        {
+            if (Encounters[BOSS_SARTHARION_EVENT] == IN_PROGRESS)
+                return true;
+
+            return false;
+        }
+
         void OnCreatureCreate(Creature* pCreature)
         {
             switch(pCreature->GetEntry())

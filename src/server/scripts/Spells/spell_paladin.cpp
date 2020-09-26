@@ -45,8 +45,6 @@ enum PaladinSpells
     SPELL_PALADIN_HAND_OF_SACRIFICE              = 6940,
     SPELL_PALADIN_DIVINE_SACRIFICE               = 64205,
 
-    SPELL_PALADIN_ITEM_HEALING_TRANCE            = 37706,
-
     SPELL_PALADIN_JUDGEMENT_DAMAGE               = 54158,
     SPELL_PALADIN_JUDGEMENT_OF_JUSTICE           = 20184,
     SPELL_PALADIN_JUDGEMENT_OF_LIGHT             = 20185,
@@ -251,7 +249,7 @@ class spell_pal_sacred_shield_base : public SpellScriptLoader
                         if (AuraEffect const* aurEffect = caster->GetAuraEffect(67191, EFFECT_0))
                             AddPct(basepoints, aurEffect->GetAmount());
 
-                        caster->CastCustomSpell(eventInfo.GetActionTarget(), 66922, &basepoints, NULL, NULL, true, 0, aurEff, caster->GetGUID());
+                        caster->CastCustomSpell(eventInfo.GetActionTarget(), 66922, &basepoints, nullptr, nullptr, true, 0, aurEff, caster->GetGUID());
                         return;
                     }
 
@@ -271,7 +269,7 @@ class spell_pal_sacred_shield_base : public SpellScriptLoader
                         cooldown = aurEffect->GetAmount()*IN_MILLISECONDS;
 
                 eventInfo.GetActionTarget()->AddSpellCooldown(triggered_spell_id, 0, cooldown);
-                eventInfo.GetActionTarget()->CastCustomSpell(eventInfo.GetActionTarget(), triggered_spell_id, &basepoints, NULL, NULL, true, NULL, aurEff, eventInfo.GetActionTarget()->GetGUID());
+                eventInfo.GetActionTarget()->CastCustomSpell(eventInfo.GetActionTarget(), triggered_spell_id, &basepoints, nullptr, nullptr, true, NULL, aurEff, eventInfo.GetActionTarget()->GetGUID());
             }
 
             void Register()
@@ -664,7 +662,7 @@ class spell_pal_divine_storm_dummy : public SpellScriptLoader
 
             void CountTargets(std::list<WorldObject*>& targetList)
             {
-                Trinity::Containers::RandomResizeList(targetList, GetSpellValue()->MaxAffectedTargets);
+                acore::Containers::RandomResizeList(targetList, GetSpellValue()->MaxAffectedTargets);
                 _targetCount = targetList.size();
             }
 
@@ -674,7 +672,7 @@ class spell_pal_divine_storm_dummy : public SpellScriptLoader
                     return;
 
                 int32 heal = GetEffectValue() / _targetCount;
-                GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_PALADIN_DIVINE_STORM_HEAL, &heal, NULL, NULL, true);
+                GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_PALADIN_DIVINE_STORM_HEAL, &heal, nullptr, nullptr, true);
             }
         private:
             uint32 _targetCount;
@@ -781,7 +779,7 @@ class spell_pal_glyph_of_holy_light : public SpellScriptLoader
 
                 if (targets.size() > maxTargets)
                 {
-                    targets.sort(Trinity::HealthPctOrderPred());
+                    targets.sort(acore::HealthPctOrderPred());
                     targets.resize(maxTargets);
                 }
             }
@@ -1007,41 +1005,6 @@ class spell_pal_holy_shock : public SpellScriptLoader
         }
 };
 
-// 37705 - Healing Discount
-class spell_pal_item_healing_discount : public SpellScriptLoader
-{
-    public:
-        spell_pal_item_healing_discount() : SpellScriptLoader("spell_pal_item_healing_discount") { }
-
-        class spell_pal_item_healing_discount_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_pal_item_healing_discount_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_PALADIN_ITEM_HEALING_TRANCE))
-                    return false;
-                return true;
-            }
-
-            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
-            {
-                PreventDefaultAction();
-                GetTarget()->CastSpell(GetTarget(), SPELL_PALADIN_ITEM_HEALING_TRANCE, true, NULL, aurEff);
-            }
-
-            void Register()
-            {
-                OnEffectProc += AuraEffectProcFn(spell_pal_item_healing_discount_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_pal_item_healing_discount_AuraScript();
-        }
-};
-
 // 53407 - Judgement of Justice
 // 20271 - Judgement of Light
 // 53408 - Judgement of Wisdom
@@ -1121,7 +1084,7 @@ class spell_pal_judgement_of_command : public SpellScriptLoader
             {
                 if (Unit* unitTarget = GetHitUnit())
                     if (SpellInfo const* spell_proto = sSpellMgr->GetSpellInfo(GetEffectValue()))
-                        GetCaster()->CastSpell(unitTarget, spell_proto, true, NULL);
+                        GetCaster()->CastSpell(unitTarget, spell_proto, true, nullptr);
             }
 
             void Register()
@@ -1355,7 +1318,6 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_hand_of_sacrifice();
     new spell_pal_hand_of_salvation();
     new spell_pal_holy_shock();
-    new spell_pal_item_healing_discount();
     new spell_pal_judgement("spell_pal_judgement_of_justice", SPELL_PALADIN_JUDGEMENT_OF_JUSTICE);
     new spell_pal_judgement("spell_pal_judgement_of_light", SPELL_PALADIN_JUDGEMENT_OF_LIGHT);
     new spell_pal_judgement("spell_pal_judgement_of_wisdom", SPELL_PALADIN_JUDGEMENT_OF_WISDOM);
