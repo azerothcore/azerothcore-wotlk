@@ -4356,8 +4356,8 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
                  {
                      data << uint32(proto->ItemLimitCategory);
                  }
-                 break;
              }
+             break;
         }
         case SPELL_FAILED_CUSTOM_ERROR:
             data << uint32(customError);
