@@ -15769,12 +15769,10 @@ void Player::CompleteQuest(uint32 quest_id)
         if (log_slot < MAX_QUEST_LOG_SIZE)
             SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
 
-        if (Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id))
+        Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id);
+        if (qInfo && qInfo->HasFlag(QUEST_FLAGS_TRACKING))
         {
-            if (qInfo->HasFlag(QUEST_FLAGS_TRACKING))
-                RewardQuest(qInfo, 0, this, false);
-            else
-                SendQuestComplete(quest_id);
+            RewardQuest(qInfo, 0, this, false);
         }
 
         // Xinef: area auras may change on quest completion!
