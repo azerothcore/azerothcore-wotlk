@@ -56,10 +56,39 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(const std::string& arenaTeamName) co
     return nullptr;
 }
 
+
+ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(std::string const& arenaTeamName, const uint32 type) const
+{
+    std::string search = arenaTeamName;
+    std::transform(search.begin(), search.end(), search.begin(), ::toupper);
+    for (ArenaTeamContainer::const_iterator itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
+    {
+        if (itr->second->GetType() != type)
+        {
+            continue;
+        }
+        std::string teamName = itr->second->GetName();
+        std::transform(teamName.begin(), teamName.end(), teamName.begin(), ::toupper);
+        if (search == teamName)
+            return itr->second;
+    }
+    return nullptr;
+}
+
 ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid) const
 {
     for (ArenaTeamContainer::const_iterator itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
         if (itr->second->GetCaptain() == guid)
+            return itr->second;
+
+    return nullptr;
+}
+
+
+ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid, const uint32 type) const
+{
+    for (ArenaTeamContainer::const_iterator itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
+        if (itr->second->GetCaptain() == guid && itr->second->GetType() == type)
             return itr->second;
 
     return nullptr;

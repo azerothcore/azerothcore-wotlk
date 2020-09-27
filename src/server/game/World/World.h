@@ -581,7 +581,7 @@ struct GlobalPlayerData
     uint16 mailCount;
     uint32 guildId;
     uint32 groupId;
-    uint32 arenaTeamId[3];
+    std::map<uint8, uint32> arenaTeamId;
 };
 
 enum GlobalPlayerUpdateMask
