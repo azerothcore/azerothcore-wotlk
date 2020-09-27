@@ -1664,16 +1664,20 @@ class ScriptRegistry
             }
         }
 
-        static void AddALScripts() {
-            for(ScriptVectorIterator it = ALScripts.begin(); it != ALScripts.end(); ++it) {
+        static void AddALScripts()
+        {
+            for(ScriptVectorIterator it = ALScripts.begin(); it != ALScripts.end(); ++it)
+            {
                 TScript* const script = *it;
 
                 script->checkValidity();
 
-                if (script->IsDatabaseBound()) {
-
+                if (script->IsDatabaseBound())
+                {
                     if (!_checkMemory(script))
+                    {
                         return;
+                    }
 
                     // Get an ID for the script. An ID only exists if it's a script that is assigned in the database
                     // through a script name (or similar).
@@ -1715,7 +1719,9 @@ class ScriptRegistry
                             sLog->outErrorDb("Script named '%s' is not assigned in the database.",
                                 script->GetName().c_str());
                     }
-                } else {
+                }
+                else
+                {
                     // We're dealing with a code-only script; just add it.
                     ScriptPointerList[_scriptIdCounter++] = script;
                     sScriptMgr->IncrementScriptCount();

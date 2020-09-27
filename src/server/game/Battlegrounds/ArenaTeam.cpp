@@ -13,8 +13,7 @@
 #include "Player.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
-#include <Config.h>
-#include <Scripting\ScriptMgr.h>
+#include "ScriptMgr.h"
 
 ArenaTeam::ArenaTeam()
     : TeamId(0), Type(0), TeamName(), CaptainGuid(0), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
