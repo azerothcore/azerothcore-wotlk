@@ -67,7 +67,7 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 (34383, 40636, 0, 0, 0, 1, 1, 1, 1),
 (34383, 40637, 0, 0, 0, 1, 1, 1, 1),
 (34383, 40638, 0, 0, 0, 1, 1, 1, 1),
-(34383, 40639, 0, 0, 0, 1, 1, 1, 1),
+(34383, 40639, 0, 0, 0, 1, 1, 1, 1);
 
 -- Insert reference loot into the creature loot temlate
 DELETE FROM `creature_loot_template` WHERE `Entry`=29417 AND `Reference`=34383;
