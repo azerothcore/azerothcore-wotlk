@@ -23,11 +23,11 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `id`, `text`, `type`, `lan
 DELETE FROM `smart_scripts` WHERE  `entryorguid`=18693 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES	
 -- Speech (Passive)
-('18693', '0', '0', '0', '1', '0', '100', '0', '15000', '30000', '40000', '60000', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', 'Speaker Mar\'grom - In Combat - Say Speech'),
+(18693, 0, 0, 0, 1, 0, 100, 0, 15000, 30000, 40000, 60000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Speaker Mar\'grom - In Combat - Say Speech'),
 -- Quotes (Combat)
-('18693', '0', '1', '0', '0', '0', '100', '0', '0', '0', '0', '0', '0', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', 'Speaker Mar\'grom - In Combat - Say Quote'),
+(18693, 0, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Speaker Mar\'grom - In Combat - Say Quote'),
 -- Spells at combat per HP
-('18693', '0', '2', '0', '4', '0', '100', '0', '0', '0', '0', '0', '0', '11', '37844', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', 'Speaker Mar\'grom - On Aggro - Cast \'37844\''),
-('18693', '0', '3', '0', '2', '0', '100', '0', '60', '99', '60', '99', '0', '11', '12466', '0', '0', '0', '0', '0', '2', '0', '0', '0', '0', '0', '0', '0', '0', 'Speaker Mar\'grom - Between 60-99% Health - Cast \'12466\''),
-('18693', '0', '4', '0', '2', '0', '100', '0', '19', '69', '19', '69', '0', '11', '15497', '0', '0', '0', '0', '0', '2', '0', '0', '0', '0', '0', '0', '0', '0', 'Speaker Mar\'grom - Between 19-69% Health - Cast \'15497\''),
-('18693', '0', '5', '0', '2', '0', '100', '0', '0', '19', '0', '19', '0', '11', '15241', '0', '0', '0', '0', '0', '2', '0', '0', '0', '0', '0', '0', '0', '0', 'Speaker Mar\'grom - Between 0-19% Health - Cast \'15241\'');
+(18693, 0, 2, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 11, 37844, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Speaker Mar\'grom - On Aggro - Cast 37844'),
+(18693, 0, 3, 0, 2, 0, 100, 0, 60, 99, 60, 99, 0, 11, 12466, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Speaker Mar\'grom - Between 60-99% Health - Cast 12466'),
+(18693, 0, 4, 0, 2, 0, 100, 0, 19, 69, 19, 69, 0, 11, 15497, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Speaker Mar\'grom - Between 19-69% Health - Cast 15497'),
+(18693, 0, 5, 0, 2, 0, 100, 0, 0, 19, 0, 19, 0, 11, 15241, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Speaker Mar\'grom - Between 0-19% Health - Cast 15241');
