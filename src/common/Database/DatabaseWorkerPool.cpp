@@ -19,7 +19,7 @@ DatabaseWorkerPool<T>::DatabaseWorkerPool() :
     _connections.resize(IDX_SIZE);
 
     WPFatal(mysql_thread_safe(), "Used MySQL library isn't thread-safe.");
-    WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "AzerothCore does not support MySQL versions below 5.6");
+    //WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "AzerothCore does not support MySQL versions below 5.6");
 }
 
 template <class T>
