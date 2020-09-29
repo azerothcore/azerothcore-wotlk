@@ -726,7 +726,7 @@ class spell_kaelthas_kael_phase_two : public SpellScriptLoader
                 if (GetCaster()->GetTypeId() == TYPEID_UNIT)
                     if (InstanceScript* instance = GetCaster()->GetInstanceScript())
                         if (Creature* kael = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(NPC_KAELTHAS)))
-                            kael->AI()->SummonedCreatureDies(GetCaster()->ToCreature(), NULL);
+                            kael->AI()->SummonedCreatureDies(GetCaster()->ToCreature(), nullptr);
                 return true;
             }
 

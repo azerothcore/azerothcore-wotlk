@@ -93,7 +93,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     _lastAuctionListOwnerItemsMSTime(0),
     AntiDOS(this),
     m_GUIDLow(0),
-    _player(NULL),
+    _player(nullptr),
     m_Socket(sock),
     _security(sec),
     _skipQueue(skipQueue),
@@ -112,13 +112,14 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     m_TutorialsChanged(false),
     recruiterId(recruiter),
     isRecruiter(isARecruiter),
+    m_currentVendorEntry(0),
     m_currentBankerGUID(0),
     timeWhoCommandAllowed(0),
     _calendarEventCreationCooldown(0)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
-    _warden = NULL;
+    _warden = nullptr;
     _offlineTime = 0;
     _kicked = false;
     _shouldSetOfflineInDB = true;
@@ -148,17 +149,17 @@ WorldSession::~WorldSession()
     {
         m_Socket->CloseSocket("WorldSession destructor");
         m_Socket->RemoveReference();
-        m_Socket = NULL;
+        m_Socket = nullptr;
     }
 
     if (_warden)
     {
         delete _warden;
-        _warden = NULL;
+        _warden = nullptr;
     }
 
     ///- empty incoming packet queue
-    WorldPacket* packet = NULL;
+    WorldPacket* packet = nullptr;
     while (_recvQueue.next(packet))
         delete packet;
 
@@ -199,13 +200,13 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     static uint64 sendPacketCount = 0;
     static uint64 sendPacketBytes = 0;
 
-    static time_t firstTime = time(NULL);
+    static time_t firstTime = time(nullptr);
     static time_t lastTime = firstTime;                     // next 60 secs start time
 
     static uint64 sendLastPacketCount = 0;
     static uint64 sendLastPacketBytes = 0;
 
-    time_t cur_time = time(NULL);
+    time_t cur_time = time(nullptr);
 
     if ((cur_time - lastTime) < 60)
     {
@@ -263,10 +264,10 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     HandleTeleportTimeout(updater.ProcessLogout());
 
     uint32 _startMSTime = getMSTime();
-    WorldPacket* packet = NULL;
-    WorldPacket* movementPacket = NULL;
+    WorldPacket* packet = nullptr;
+    WorldPacket* movementPacket = nullptr;
     bool deletePacket = true;
-    WorldPacket* firstDelayedPacket = NULL;
+    WorldPacket* firstDelayedPacket = nullptr;
     uint32 processedPackets = 0;
     time_t currentTime = time(nullptr);
 
@@ -308,7 +309,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                             {
                                 HandleMovementOpcodes(*movementPacket);
                                 delete movementPacket;
-                                movementPacket = NULL;
+                                movementPacket = nullptr;
                             }
                             sScriptMgr->OnPacketReceive(this, *packet);
                             #ifdef ELUNA
@@ -324,7 +325,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                             if (movementPacket)
                             {
                                 delete movementPacket;
-                                movementPacket = NULL;
+                                movementPacket = nullptr;
                             }
                             sScriptMgr->OnPacketReceive(this, *packet);
                             #ifdef ELUNA
@@ -389,7 +390,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     if (updater.ProcessLogout())
     {
-        time_t currTime = time(NULL);
+        time_t currTime = time(nullptr);
         if (ShouldLogOut(currTime) && !m_playerLoading)
             LogoutPlayer(true);
 
@@ -399,7 +400,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         if (m_Socket && m_Socket->IsClosed())
         {
             m_Socket->RemoveReference();
-            m_Socket = NULL;
+            m_Socket = nullptr;
         }
 
         if (!m_Socket)
@@ -414,7 +415,7 @@ bool WorldSession::HandleSocketClosed()
     if (m_Socket && m_Socket->IsClosed() && !IsKicked() && GetPlayer() && !PlayerLogout() && GetPlayer()->m_taxi.empty() && GetPlayer()->IsInWorld() && !World::IsStopped())
     {
         m_Socket->RemoveReference();
-        m_Socket = NULL;
+        m_Socket = nullptr;
         GetPlayer()->TradeCancel(false);
         return true;
     }
@@ -426,7 +427,7 @@ void WorldSession::HandleTeleportTimeout(bool updateInSessions)
     // pussywizard: handle teleport ack timeout
     if (m_Socket && !m_Socket->IsClosed() && GetPlayer() && GetPlayer()->IsBeingTeleported())
     {
-        time_t currTime = time(NULL);
+        time_t currTime = time(nullptr);
         if (updateInSessions) // session update from World::UpdateSessions
         {
             if (GetPlayer()->IsBeingTeleportedFar() && GetPlayer()->GetSemaphoreTeleportFar() + sWorld->getIntConfig(CONFIG_TELEPORT_TIMEOUT_FAR) < currTime)
@@ -519,7 +520,7 @@ void WorldSession::LogoutPlayer(bool save)
             guild->HandleMemberLogout(this);
 
         ///- Remove pet
-        _player->RemovePet(NULL, PET_SAVE_AS_CURRENT);
+        _player->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
 
         // pussywizard: on logout remove auras that are removed at map change (before saving to db)
         // there are some positive auras from boss encounters that can be kept by logging out and logging in after boss is dead, and may be used on next bosses
@@ -595,7 +596,7 @@ void WorldSession::LogoutPlayer(bool save)
             _map->AfterPlayerUnlinkFromMap();
         }
 
-        SetPlayer(NULL); // pointer already deleted
+        SetPlayer(nullptr); // pointer already deleted
 
         //! Send the 'logout complete' packet to the client
         //! Client will respond by sending 3x CMSG_CANCEL_TRADE, which we currently dont handle
@@ -774,7 +775,7 @@ void WorldSession::SetAccountData(AccountDataType type, time_t tm, std::string c
 void WorldSession::SendAccountDataTimes(uint32 mask)
 {
     WorldPacket data(SMSG_ACCOUNT_DATA_TIMES, 4 + 1 + 4 + 8 * 4); // changed in WotLK
-    data << uint32(time(NULL));                             // unix time of something
+    data << uint32(time(nullptr));                             // unix time of something
     data << uint8(1);
     data << uint32(mask);                                   // type mask
     for (uint32 i = 0; i < NUM_ACCOUNT_DATA_TYPES; ++i)
@@ -1030,13 +1031,12 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
             SavedAddon const* savedAddon = AddonMgr::GetAddonInfo(addonName);
             if (savedAddon)
             {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 bool match = true;
 
                 if (addon.CRC != savedAddon->CRC)
                     match = false;
 
-
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 if (!match)
                     sLog->outDetail("ADDON: %s was known, but didn't match known CRC (0x%x)!", addon.Name.c_str(), savedAddon->CRC);
                 else

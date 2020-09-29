@@ -357,7 +357,7 @@ public:
         {
             if (m_pInstance)
                 return ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(entry));
-            return NULL;
+            return nullptr;
         }
 
         void JustSummoned(Creature* cr) { summons.Summon(cr); }
@@ -571,7 +571,7 @@ public:
                     events.SetPhase(EVENT_PHASE_OUTRO);
                     events.ScheduleEvent(EVENT_THORIM_OUTRO1, 2000, 0, EVENT_PHASE_OUTRO);
 
-                    GameObject* go = NULL;
+                    GameObject* go = nullptr;
                     if ((go = GetThorimObject(DATA_THORIM_FENCE)))
                         go->SetGoState(GO_STATE_ACTIVE);
 
@@ -656,7 +656,7 @@ public:
                 if (Player *p = itr->GetSource())
                     if (p->GetPositionX() > 2085 && p->GetPositionX() < 2185 && p->GetPositionY() < -214 && p->GetPositionY() > -305 && p->IsAlive() && p->GetPositionZ() < 425)
                         return p;
-            return NULL;
+            return nullptr;
         }
 
         void UpdateAI(uint32 diff)
@@ -1009,7 +1009,7 @@ public:
                 _checkTimer += diff;
                 if ((_checkTimer >= 1000 && _checkTimer < 10000) || _checkTimer >= 60000)
                 {
-                    if (me->SelectNearbyTarget(NULL, 12.0f))
+                    if (me->SelectNearbyTarget(nullptr, 12.0f))
                     {
                         me->CastSpell(me, SPELL_LIGHTNING_FIELD, true);
                         me->CastSpell(me, (me->GetEntry() == 33054 /*NPC_THORIM_TRAP_BUNNY*/ ? SPELL_PARALYTIC_FIELD_FIRST : SPELL_PARALYTIC_FIELD_SECOND), true);
@@ -1654,7 +1654,7 @@ public:
 
         bool SelectT()
         {
-            Player* target = NULL;
+            Player* target = nullptr;
             Map::PlayerList const& pList = me->GetMap()->GetPlayers();
             uint8 num = urand(0, pList.getSize()-1);
             uint8 count = 0;
