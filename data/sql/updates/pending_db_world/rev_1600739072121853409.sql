@@ -2,7 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1600739072121853409');
 
 /* brewfest camp hostile mobs */
 DELETE FROM `game_event_creature` WHERE `guid` IN (7370, 22181, 22188, 22473);
-INSERT INTO `game_event_creature` (eventEntry,guid) VALUES
+INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 (-24,7370),
 (-24,22181),
 (-24,22188),
