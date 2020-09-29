@@ -1,3 +1,19 @@
+-- DB update 2020_09_28_00 -> 2020_09_29_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_09_28_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_09_28_00 2020_09_29_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1598878568943578500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1598878568943578500');
 /*
  * Dungeon: Upper Blackrock
@@ -37,3 +53,12 @@ UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 563, `max
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 597, `maxdmg` = 682, `DamageModifier` = 1.01 WHERE `entry` = 10430;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 485, `maxdmg` = 597, `DamageModifier` = 1.01 WHERE `entry` = 10339;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 515, `maxdmg` = 697, `DamageModifier` = 1.01 WHERE `entry` = 103363;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
