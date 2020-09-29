@@ -10,7 +10,7 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 
 /* brewfest camp non-hostile mobs */
 DELETE FROM `game_event_creature` WHERE `guid` IN (12369, 12372, 21020, 21022, 21026);
-INSERT INTO `game_event_creature` (eventEntry,guid) VALUES
+INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 (-24,12369),
 (-24,12372),
 (-24,21020),
