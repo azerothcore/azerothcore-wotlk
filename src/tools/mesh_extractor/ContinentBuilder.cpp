@@ -29,12 +29,12 @@ public:
         X = x; 
         Y = y; 
         MapId = map; 
-        Continent = cont; 
+        Continent = cont;
+        Free = false;
     }
 
     int svc()
     {
-        Free = false;
         printf("[%02i,%02i] Building tile\n", X, Y);
         TileBuilder builder(cBuilder, Continent, X, Y, MapId);
         char buff[100];
@@ -57,6 +57,7 @@ public:
                 return 0;
             }
             MmapTileHeader header;
+            Utils::InitializeMmapTileHeader(mheader);
             header.size = builder.DataSize;
             fwrite(&header, sizeof(MmapTileHeader), 1, f);
             fwrite(nav, sizeof(unsigned char), builder.DataSize, f);
@@ -71,7 +72,7 @@ public:
     bool Free;
 };
 
-void ContinentBuilder::getTileBounds(uint32 tileX, uint32 tileY, float* verts, int vertCount, float* bmin, float* bmax)
+void ContinentBuilder::getTileBounds(uint32 tileX, uint32 tileY, float* verts, int vertCount, float* bmin, float* bmax) const
 {
     // this is for elevation
     if (verts && vertCount)
@@ -148,6 +149,7 @@ void ContinentBuilder::Build()
             }
 
             MmapTileHeader mheader;
+            Utils::InitializeMmapTileHeader(header);
             mheader.size = builder->DataSize;
             fwrite(&mheader, sizeof(MmapTileHeader), 1, f);
             fwrite(nav, sizeof(unsigned char), builder->DataSize, f);
@@ -159,8 +161,8 @@ void ContinentBuilder::Build()
     }
     else
     {
-        params.maxPolys = 32768;
-        params.maxTiles = 4096;
+        params.maxPolys = 1024;
+        params.maxTiles = TileMap->TileTable.size();
         rcVcopy(params.orig, Constants::Origin);
         params.tileHeight = Constants::TileSize;
         params.tileWidth = Constants::TileSize;

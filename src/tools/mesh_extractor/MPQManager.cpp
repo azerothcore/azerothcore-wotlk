@@ -71,7 +71,7 @@ void MPQManager::InitializeDBC()
 
 FILE* MPQManager::GetFile(const std::string& path )
 {
-    RETURN_GUAD(mutex, false);
+    RETURN_GUARD(_mutex, false);
     MPQFile file(path.c_str());
     if (file.isEof())
         return nullptr;
@@ -86,7 +86,7 @@ DBC* MPQManager::GetDBC(const std::string& name )
 
 FILE* MPQManager::GetFileFrom(const std::string& path, MPQArchive* file )
 {
-    RETURN_GUAD(mutex, false);
+    RETURN_GUARD(_mutex, false);
     mpq_archive* mpq_a = file->mpq_a;
 
     uint32_t filenum;

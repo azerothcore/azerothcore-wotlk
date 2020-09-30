@@ -47,7 +47,7 @@ DBC::DBC( FILE* stream ) : StringBlock(nullptr), StringBlockSize(0), IsFaulty(tr
         printf("DBC::DBC: Failed to read some data expected %u, read %u\n", StringBlockSize, count);
 }
 
-std::string DBC::GetStringByOffset( int offset )
+std::string DBC::GetStringByOffset( int offset ) const
 {
     int len = 0;
     for (uint32 i = offset; i < StringBlockSize; i++)
@@ -66,10 +66,10 @@ std::string DBC::GetStringByOffset( int offset )
     return val;
 }
 
-Record* DBC::GetRecordById( int id )
+Record const* DBC::GetRecordById( int id ) const
 {
     // we assume Id is index 0
-    for (std::vector<Record*>::iterator itr = Records.begin(); itr != Records.end(); ++itr)
+    for (std::vector<Record*>::const_iterator itr = Records.begin(); itr != Records.end(); ++itr)
         if ((*itr)->Values[0] == id)
             return *itr;
     return nullptr;

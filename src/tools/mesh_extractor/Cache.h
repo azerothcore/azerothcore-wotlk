@@ -10,7 +10,7 @@
 #include <map>
 #include "Define.h"
 #include "PolicyLock.h"
-#include <mutex>
+#include <_mutex>
 #include "WorldModelRoot.h"
 #include "Model.h"
 
@@ -22,18 +22,9 @@ public:
 
     static const uint32 FlushLimit = 300; // We can't get too close to filling up all the memory, and we have to be wary of the maximum number of open streams.
 
-    void Insert(K key, T* val)
+    T const* Get(K key)
     {
-        std::lock_guard<std::mutex> guard(_mutex);
-
-        if (_items.size() > FlushLimit)
-            Clear();
-        _items[key] = val;
-    }
-
-    T* Get(K key)
-    {
-        RETURN_GUAD(mutex, false);
+        RETURN_GUARD(_mutex, false);
         typename std::map<K, T*>::iterator itr = _items.find(key);
         if (itr != _items.end())
             return itr->second;
@@ -48,7 +39,7 @@ public:
     }
 private:
     std::map<K, T*> _items;
-    std::mutex mutex;
+    std::_mutex _mutex;
 };
 
 class CacheClass
