@@ -23,7 +23,7 @@ bool DBCStorageBase::Load(char const* path, char**& indexTable)
     indexTable = nullptr;
 
     DBCFileLoader dbc;
-    
+
     // Check if load was sucessful, only then continue
     if (!dbc.Load(path, _fileFormat))
         return false;
@@ -48,7 +48,7 @@ bool DBCStorageBase::LoadStringsFrom(char const* path, char** indexTable)
         return false;
 
     DBCFileLoader dbc;
-    
+
     // Check if load was successful, only then continue
     if (!dbc.Load(path, _fileFormat))
         return false;

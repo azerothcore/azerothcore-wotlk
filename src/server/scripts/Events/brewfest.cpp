@@ -842,7 +842,7 @@ public:
         {
             time_t curtime = time(nullptr);
             tm strDate;
-            ACE_OS::localtime_r(&curtime, &strDate);
+            localtime_r(&curtime, &strDate);
 
             if (strDate.tm_min == 0 || strDate.tm_min == 30)
                 return true;

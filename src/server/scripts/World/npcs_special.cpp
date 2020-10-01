@@ -110,7 +110,7 @@ public:
                 {
                     time_t curtime = time(nullptr);
                     tm strdate;
-                    ACE_OS::localtime_r(&curtime, &strdate);
+                    localtime_r(&curtime, &strdate);
 
                     if (!preWarning && strdate.tm_hour == 13 && strdate.tm_min == 55)
                     {
@@ -254,7 +254,7 @@ public:
                 {
                     time_t curtime = time(nullptr);
                     tm strdate;
-                    ACE_OS::localtime_r(&curtime, &strdate);
+                    localtime_r(&curtime, &strdate);
                     if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
                     {
                         sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);

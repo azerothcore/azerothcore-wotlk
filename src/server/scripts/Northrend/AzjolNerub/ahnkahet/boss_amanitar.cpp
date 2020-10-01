@@ -30,6 +30,7 @@ enum Events
     EVENT_AMANITAR_ROOTS                    = 2,
     EVENT_AMANITAR_BASH                     = 3,
     EVENT_AMANITAR_BOLT                     = 4,
+    EVENT_AMANITAR_MINI                     = 5
 };
 
 class boss_amanitar : public CreatureScript
@@ -77,11 +78,10 @@ public:
             if (pInstance)
                 pInstance->SetData(DATA_AMANITAR_EVENT, IN_PROGRESS);
 
-            me->CastSpell(me, SPELL_MINI, false);
-
             events.ScheduleEvent(EVENT_AMANITAR_ROOTS, urand(5000, 9000));
             events.ScheduleEvent(EVENT_AMANITAR_BASH, urand(10000, 14000));
             events.ScheduleEvent(EVENT_AMANITAR_BOLT, urand(15000, 20000));
+            events.ScheduleEvent(EVENT_AMANITAR_MINI, 30000);
             events.ScheduleEvent(EVENT_AMANITAR_SPAWN, 0);
         }
 
@@ -150,6 +150,12 @@ public:
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 }
+                case EVENT_AMANITAR_MINI:
+                {
+                    me->CastSpell(me, SPELL_MINI, false);
+                    events.RepeatEvent(30000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();
@@ -196,8 +202,17 @@ public:
             if (!killer)
                 return;
 
-            if (me->GetEntry() == NPC_HEALTHY_MUSHROOM && !killer->HasAura(SPELL_MINI))
-                DoCast(killer, SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
+            if (me->GetEntry() == NPC_HEALTHY_MUSHROOM)
+            {
+                if (killer->HasAura(SPELL_MINI))
+                {
+                    killer->RemoveAurasDueToSpell(SPELL_MINI);
+                }
+                else
+                {
+                    DoCast(killer, SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
+                }
+            }
         }
 
         void EnterCombat(Unit* /*who*/) {}
