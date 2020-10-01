@@ -275,7 +275,7 @@ public:
                     InstanceCleanup();
                     break;
                 case DATA_ACHIEV:
-                    bAchiev = data ? true : false;
+                    bAchiev = !!data;
                     break;
             }
         }
@@ -336,7 +336,7 @@ public:
 
         void StartBossEncounter(uint8 uiBoss)
         {
-            Creature* pBoss = NULL;
+            Creature* pBoss = nullptr;
 
             switch(uiBoss)
             {
@@ -596,7 +596,7 @@ public:
 
             // open main gate
             HandleGameObject(GO_MainGateGUID, true);
-            
+
             if (m_auiEncounter[MAX_ENCOUNTER-1] != DONE) // instance not finished
             {
                 // close all cells

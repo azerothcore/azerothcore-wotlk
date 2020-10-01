@@ -9,6 +9,7 @@
 
 #include "libmpq/mpq.h"
 #include "Define.h"
+#include "Errors.h"
 #include <string>
 #include <ctype.h>
 #include <vector>
@@ -17,42 +18,44 @@
 
 class MPQArchive
 {
-
-public:
-    mpq_archive_s *mpq_a;
-
-    std::vector<std::string> Files;
-
-    MPQArchive(const char* filename);
-    void close();
-
-    void GetFileListTo(std::vector<std::string>& filelist) {
-        uint32_t filenum;
-        if(libmpq__file_number(mpq_a, "(listfile)", &filenum)) return;
-        libmpq__off_t size, transferred;
-        libmpq__file_unpacked_size(mpq_a, filenum, &size);
-
-        char* buffer = new char[size + 1];
-        buffer[size] = '\0';
-
-        libmpq__file_read(mpq_a, filenum, (unsigned char*)buffer, size, &transferred);
-
-        char seps[] = "\n";
-        char* token;
-
-        token = strtok( buffer, seps );
-        uint32 counter = 0;
-        while ((token != NULL) && (counter < size)) {
-            //cout << token << endl;
-            token[strlen(token) - 1] = 0;
-            std::string s = token;
-            filelist.push_back(s);
-            counter += strlen(token) + 2;
-            token = strtok(NULL, seps);
+    
+    public:
+        mpq_archive_s *mpq_a;
+    
+        std::vector<std::string> Files;
+    
+        MPQArchive(const char* filename);
+        void close();
+    
+        void GetFileListTo(std::vector<std::string>& filelist) 
+        {
+            uint32_t filenum;
+            if(libmpq__file_number(mpq_a, "(listfile)", &filenum)) return;
+            libmpq__off_t size, transferred;
+            libmpq__file_unpacked_size(mpq_a, filenum, &size);
+    
+            char* buffer = new char[size + 1];
+            buffer[size] = '\0';
+    
+            libmpq__file_read(mpq_a, filenum, (unsigned char*)buffer, size, &transferred);
+    
+            char seps[] = "\n";
+            char* token;
+    
+            token = strtok( buffer, seps );
+            uint32 counter = 0;
+            while ((token != nullptr) && (counter < size))
+            {
+                //cout << token << endl;
+                token[strlen(token) - 1] = 0;
+                std::string s = token;
+                filelist.push_back(s);
+                counter += strlen(token) + 2;
+                token = strtok(nullptr, seps);
+            }
+    
+            delete[] buffer;
         }
-
-        delete[] buffer;
-    }
 };
 
 class MPQFile

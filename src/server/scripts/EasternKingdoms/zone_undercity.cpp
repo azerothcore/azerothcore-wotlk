@@ -1010,7 +1010,7 @@ public:
         {
             me->DeleteThreatList();
             me->CombatStop(true);
-            me->SetLootRecipient(NULL);
+            me->SetLootRecipient(nullptr);
 
             if (HasEscortState(STATE_ESCORT_ESCORTING))
             {
@@ -2356,7 +2356,7 @@ public:
             me->RemoveAura(SPELL_HEROIC_VANGUARD);
             me->DeleteThreatList();
             me->CombatStop(true);
-            me->SetLootRecipient(NULL);
+            me->SetLootRecipient(nullptr);
 
             if (HasEscortState(STATE_ESCORT_ESCORTING))
             {

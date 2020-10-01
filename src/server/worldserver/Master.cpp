@@ -46,27 +46,27 @@ extern int m_ServiceStatus;
 /// Handle worldservers's termination signals
 class WorldServerSignalHandler : public acore::SignalHandler
 {
-    public:
-        virtual void HandleSignal(int sigNum)
+public:
+    virtual void HandleSignal(int sigNum)
+    {
+        switch (sigNum)
         {
-            switch (sigNum)
-            {
-                case SIGINT:
-                    World::StopNow(RESTART_EXIT_CODE);
-                    break;
-                case SIGTERM:
+            case SIGINT:
+                World::StopNow(RESTART_EXIT_CODE);
+                break;
+            case SIGTERM:
 #ifdef _WIN32
-                case SIGBREAK:
-                    if (m_ServiceStatus != 1)
+            case SIGBREAK:
+                if (m_ServiceStatus != 1)
 #endif
                     World::StopNow(SHUTDOWN_EXIT_CODE);
-                    break;
+                break;
                 /*case SIGSEGV:
                     sLog->outString("ZOMG! SIGSEGV handled!");
                     World::StopNow(SHUTDOWN_EXIT_CODE);
                     break;*/
-            }
         }
+    }
 };
 
 class FreezeDetectorRunnable : public acore::Runnable
@@ -84,7 +84,7 @@ public:
         if (!_delayTime)
             return;
 
-        sLog->outString("Starting up anti-freeze thread (%u seconds max stuck time)...", _delayTime/1000);
+        sLog->outString("Starting up anti-freeze thread (%u seconds max stuck time)...", _delayTime / 1000);
         while (!World::IsStopped())
         {
             uint32 curtime = getMSTime();
@@ -166,9 +166,9 @@ int Master::Run()
 
     ///- Initialize the signal handlers
     WorldServerSignalHandler signalINT, signalTERM; //, signalSEGV
-    #ifdef _WIN32
+#ifdef _WIN32
     WorldServerSignalHandler signalBREAK;
-    #endif /* _WIN32 */
+#endif /* _WIN32 */
 
     ///- Register worldserver's signal handlers
     ACE_Sig_Handler handle;
@@ -183,7 +183,7 @@ int Master::Run()
     acore::Thread worldThread(new WorldRunnable);
     worldThread.setPriority(acore::Priority_Highest);
 
-    acore::Thread* cliThread = NULL;
+    acore::Thread* cliThread = nullptr;
 
 #ifdef _WIN32
     if (sConfigMgr->GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -271,7 +271,7 @@ int Master::Run()
 #endif
 
     // Start soap serving thread
-    acore::Thread* soapThread = NULL;
+    acore::Thread* soapThread = nullptr;
     if (sConfigMgr->GetBoolDefault("SOAP.Enabled", false))
     {
         ACSoapRunnable* runnable = new ACSoapRunnable();
@@ -280,10 +280,10 @@ int Master::Run()
     }
 
     // Start up freeze catcher thread
-    acore::Thread* freezeThread = NULL;
+    acore::Thread* freezeThread = nullptr;
     if (uint32 freezeDelay = sConfigMgr->GetIntDefault("MaxCoreStuckTime", 0))
     {
-        FreezeDetectorRunnable* runnable = new FreezeDetectorRunnable(freezeDelay*1000);
+        FreezeDetectorRunnable* runnable = new FreezeDetectorRunnable(freezeDelay * 1000);
         freezeThread = new acore::Thread(runnable);
         freezeThread->setPriority(acore::Priority_Highest);
     }
@@ -334,7 +334,7 @@ int Master::Run()
 
     if (cliThread)
     {
-        #ifdef _WIN32
+#ifdef _WIN32
 
         // this only way to terminate CLI thread exist at Win32 (alt. way exist only in Windows Vista API)
         //_exit(1);
@@ -373,11 +373,11 @@ int Master::Run()
 
         cliThread->wait();
 
-        #else
+#else
 
         cliThread->destroy();
 
-        #endif
+#endif
 
         delete cliThread;
     }
@@ -411,7 +411,7 @@ bool Master::_StartDB()
     if (async_threads < 1 || async_threads > 32)
     {
         sLog->outError("World database: invalid number of worker threads specified. "
-            "Please pick a value between 1 and 32.");
+                       "Please pick a value between 1 and 32.");
         return false;
     }
 
@@ -435,7 +435,7 @@ bool Master::_StartDB()
     if (async_threads < 1 || async_threads > 32)
     {
         sLog->outError("Character database: invalid number of worker threads specified. "
-            "Please pick a value between 1 and 32.");
+                       "Please pick a value between 1 and 32.");
         return false;
     }
 
@@ -460,7 +460,7 @@ bool Master::_StartDB()
     if (async_threads < 1 || async_threads > 32)
     {
         sLog->outError("Login database: invalid number of worker threads specified. "
-            "Please pick a value between 1 and 32.");
+                       "Please pick a value between 1 and 32.");
         return false;
     }
 

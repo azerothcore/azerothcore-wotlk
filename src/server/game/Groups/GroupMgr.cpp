@@ -72,7 +72,7 @@ Group* GroupMgr::GetGroupByGUID(uint32 groupId) const
     if (itr != GroupStore.end())
         return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 void GroupMgr::AddGroup(Group* group)
