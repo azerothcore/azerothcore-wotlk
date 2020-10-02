@@ -585,7 +585,7 @@ public:
                     {
                         HandleGameObject(GO_MainGateGUID, true);
                         break;
-                    }  
+                    }
                 case EVENT_CLOSE_GATE:
                     {
                         HandleGameObject(GO_MainGateGUID, false);

@@ -302,20 +302,25 @@ public:
                     std::vector<Unit*> targets;
                     auto i = me->getThreatManager().getThreatList().begin();
                     for (; i != me->getThreatManager().getThreatList().end(); ++i)
+                    {
                         if ((*i)->getTarget()->GetTypeId() == TYPEID_PLAYER)
                         {
                             bool inList = false;
                             if (!blockList.empty())
-                                for (std::list<uint64>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
+                            {                                for (std::list<uint64>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
                                     if ((*i)->getTarget()->GetGUID() == *itr)
                                     {
                                         inList = true;
                                         break;
                                     }
+                            }
 
                             if (!inList)
+                            {
                                 targets.push_back((*i)->getTarget());
+                            }
                         }
+                    }
 
                     if (!targets.empty() && iceboltCount)
                     {
@@ -328,7 +333,9 @@ public:
                         events.ScheduleEvent(EVENT_FLIGHT_ICEBOLT, (me->GetExactDist(*itr) / 13.0f)*IN_MILLISECONDS);
                     }
                     else
+                    {
                         events.ScheduleEvent(EVENT_FLIGHT_BREATH, 1000);
+                    }
                     return;
                 }
                 case EVENT_FLIGHT_BREATH:
