@@ -436,7 +436,7 @@ public:
                     return;
                 case EVENT_FOCUSED_EYEBEAM:
                 {
-                    events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, urand(15000,25000));
+                    events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 20000);
 
                     if ( (eyebeamTarget = SelectTarget(SELECT_TARGET_FARTHEST, 0, 0, true)) )
                     {
@@ -597,7 +597,6 @@ public:
         }
 
         InstanceScript* m_pInstance;
-
         uint32 _timer;
         bool _damaged, justSpawned;
 
@@ -616,11 +615,9 @@ public:
             if (justSpawned)
             {
                 me->DespawnOrUnsummon(10000);
-
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(TYPE_KOLOGARN)))
                     me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
                 me->CastSpell(me, SPELL_FOCUSED_EYEBEAM, true);
-
                 me->GetMotionMaster()->MoveChase(me->GetMap()->GetPlayer(eyebeamTarget->GetGUID()));
                 justSpawned = false;
             }
