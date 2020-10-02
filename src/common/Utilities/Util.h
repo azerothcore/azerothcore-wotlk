@@ -18,7 +18,7 @@
 #include <map>
 #include <ace/INET_Addr.h>
 
-// Searcher for map of structs
+ // Searcher for map of structs
 template<typename T, class S> struct Finder
 {
     T val_;
@@ -440,7 +440,7 @@ public:
                 part[0] == right.part[0] &&
                 part[1] == right.part[1] &&
                 part[2] == right.part[2]
-            );
+                );
     }
 
     inline bool operator!=(flag96 const& right) const
@@ -541,20 +541,20 @@ bool CompareValues(ComparisionType type, T val1, T val2)
 {
     switch (type)
     {
-        case COMP_TYPE_EQ:
-            return val1 == val2;
-        case COMP_TYPE_HIGH:
-            return val1 > val2;
-        case COMP_TYPE_LOW:
-            return val1 < val2;
-        case COMP_TYPE_HIGH_EQ:
-            return val1 >= val2;
-        case COMP_TYPE_LOW_EQ:
-            return val1 <= val2;
-        default:
-            // incorrect parameter
-            ABORT();
-            return false;
+    case COMP_TYPE_EQ:
+        return val1 == val2;
+    case COMP_TYPE_HIGH:
+        return val1 > val2;
+    case COMP_TYPE_LOW:
+        return val1 < val2;
+    case COMP_TYPE_HIGH_EQ:
+        return val1 >= val2;
+    case COMP_TYPE_LOW_EQ:
+        return val1 <= val2;
+    default:
+        // incorrect parameter
+        ABORT();
+        return false;
     }
 }
 
@@ -696,7 +696,7 @@ public:
             eventId |= (1 << (phase + 23));
         }
 
-    _eventMap.insert(EventStore::value_type(_time + time, eventId));
+        _eventMap.insert(EventStore::value_type(_time + time, eventId));
     }
 
     /**
@@ -726,11 +726,14 @@ public:
         _eventMap.insert(EventStore::value_type(_time + time, _lastEvent));
     }
 
-        if (itr->first > _time)
-            return 0;
-        else if (_phase && (itr->second & 0xFF000000) && !((itr->second >> 24) & _phase))
-            _eventMap.erase(itr);
-        else
+    /**
+    * @name ExecuteEvent
+    * @brief Returns the next event to execute and removes it from map.
+    * @return Id of the event to execute.
+    */
+    uint32 ExecuteEvent()
+    {
+        while (!Empty())
         {
             EventStore::iterator itr = _eventMap.begin();
 
@@ -750,6 +753,8 @@ public:
                 return eventId;
             }
         }
+
+        return 0;
     }
 
     /**
@@ -762,37 +767,21 @@ public:
         _time = delay < _time ? _time - delay : 0;
     }
 
-/**
-* @name DelayEvents
-* @brief Delays all events in the map. If delay is greater than or equal internal timer, delay will be 0.
-* @param delay Amount of delay.
-*/
-void DelayEvents(uint32 delay)
-{
-    _time = delay < _time ? _time - delay : 0;
-}
-
-void DelayEventsToMax(uint32 delay, uint32 group)
-{
-    for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
+    void DelayEventsToMax(uint32 delay, uint32 group)
     {
-        if (itr->first < _time + delay && (group == 0 || ((1 << (group + 15)) & itr->second)))
+        for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
         {
-            if (itr->first < _time+delay && (group == 0 || ((1 << (group + 15)) & itr->second)))
+            if (itr->first < _time + delay && (group == 0 || ((1 << (group + 15)) & itr->second)))
             {
                 ScheduleEvent(itr->second, delay);
                 _eventMap.erase(itr);
                 itr = _eventMap.begin();
+                continue;
             }
-            else
-            {
-                ++itr;
-            }
-        }
-        else
+
             ++itr;
+        }
     }
-}
 
     /**
     * @name DelayEvents
@@ -807,24 +796,21 @@ void DelayEventsToMax(uint32 delay, uint32 group)
             return;
         }
 
-    EventStore delayed;
+        EventStore delayed;
 
-    for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
-    {
-        if (!group || (itr->second & (1 << (group + 15))))
+        for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
         {
             if (!group || (itr->second & (1 << (group + 15))))
             {
                 delayed.insert(EventStore::value_type(itr->first + delay, itr->second));
-                _eventMap.erase(itr++);
+                itr = _eventMap.erase(itr);
+                continue;
             }
-            else
-            {
-                ++itr;
-            }
-        }
-        else
+
             ++itr;
+        }
+
+        _eventMap.insert(delayed.begin(), delayed.end());
     }
 
     /**
@@ -843,51 +829,39 @@ void DelayEventsToMax(uint32 delay, uint32 group)
         {
             if (eventId == (itr->second & 0x0000FFFF))
             {
-                _eventMap.erase(itr++);
+                itr = _eventMap.erase(itr);
+                continue;
             }
-            else
-            {
-                ++itr;
-            }
+
+            ++itr;
         }
     }
 
-    for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
+    /**
+    * @name CancelEventGroup
+    * @brief Cancel events belonging to specified group.
+    * @param group Group to cancel.
+    */
+    void CancelEventGroup(uint32 group)
     {
         if (!group || group > 8 || Empty())
         {
             return;
         }
 
-/**
-* @name CancelEventGroup
-* @brief Cancel events belonging to specified group.
-* @param group Group to cancel.
-*/
-void CancelEventGroup(uint32 group)
-{
-    if (!group || group > 8 || Empty())
-        return;
-
-    uint32 groupMask = (1 << (group + 15));
-    for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
-    {
-        if (itr->second & groupMask)
+        uint32 groupMask = (1 << (group + 15));
+        for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
         {
             if (itr->second & groupMask)
             {
                 _eventMap.erase(itr);
                 itr = _eventMap.begin();
+                continue;
             }
-            else
-            {
-                ++itr;
-            }
-        }
-        else
+
             ++itr;
+        }
     }
-}
 
     /**
     * @name GetNextEventTime
@@ -902,36 +876,36 @@ void CancelEventGroup(uint32 group)
             return 0;
         }
 
-        for (EventStore::const_iterator itr = _eventMap.begin(); itr != _eventMap.end(); ++itr)
+        for (auto const& itr : _eventMap)
         {
-            if (eventId == (itr->second & 0x0000FFFF))
+            if (eventId == (itr.second & 0x0000FFFF))
             {
-                return itr->first;
+                return itr.first;
             }
         }
 
-    return 0;
-}
+        return 0;
+    }
 
-/**
- * @name GetNextEventTime
- * @return Time of next event.
- */
-uint32 GetNextEventTime() const
-{
-    return Empty() ? 0 : _eventMap.begin()->first;
-}
+    /**
+     * @name GetNextEventTime
+     * @return Time of next event.
+     */
+    uint32 GetNextEventTime() const
+    {
+        return Empty() ? 0 : _eventMap.begin()->first;
+    }
 
-/**
-* @name IsInPhase
-* @brief Returns wether event map is in specified phase or not.
-* @param phase Wanted phase.
-* @return True, if phase of event map contains specified phase.
-*/
-bool IsInPhase(uint8 phase)
-{
-    return phase <= 8 && (!phase || _phase & (1 << (phase - 1)));
-}
+    /**
+    * @name IsInPhase
+    * @brief Returns wether event map is in specified phase or not.
+    * @param phase Wanted phase.
+    * @return True, if phase of event map contains specified phase.
+    */
+    bool IsInPhase(uint8 phase)
+    {
+        return phase <= 8 && (!phase || _phase & (1 << (phase - 1)));
+    }
 
 private:
     uint32 _time;
