@@ -83,7 +83,6 @@ public:
             if (me->GetEntry() == NPC_BELGARISTRASZ)
                 Talk(SAY_BELGARISTRASZ);
         }
-
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override
