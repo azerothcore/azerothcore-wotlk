@@ -45,6 +45,11 @@ enum NPCs
     NPC_IMAGE_OF_BELGARISTRASZ = 28012,
 };
 
+enum Talks
+{
+    SAY_BELGARISTRASZ = 0,
+};
+
 enum Items
 {
     ITEM_EMERALD_ESSENCE    = 37815,
@@ -76,6 +81,11 @@ enum OculusWorldStates
 {
     WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW   = 3524,
     WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT = 3486
+};
+
+enum MISC
+{
+    POINT_MOVE_DRAKES
 };
 
 #endif

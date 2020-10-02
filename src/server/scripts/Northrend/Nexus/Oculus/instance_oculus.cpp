@@ -9,6 +9,10 @@
 #include "Group.h"
 #include "Player.h"
 
+Position const VerdisaMove = { 949.188f, 1032.91f, 359.967f, 1.093027f };
+Position const BelgaristraszMove = { 941.453f, 1044.1f,  359.967f, 0.1984709f };
+Position const EternosMove = { 943.202f, 1059.35f, 359.967f, 5.757278f };
+
 class instance_oculus : public InstanceMapScript
 {
 public:
@@ -32,6 +36,9 @@ public:
         uint64 uiVarosGUID;
         uint64 uiUromGUID;
         uint64 uiEregosGUID;
+        uint64 BelgaristraszGUID;
+        uint64 EternosGUID;
+        uint64 VerdisaGUID;
 
         bool bAmberVoid;
         bool bEmeraldVoid;
@@ -68,6 +75,15 @@ public:
                     break;
                 case NPC_EREGOS:
                     uiEregosGUID = pCreature->GetGUID();
+                    break;
+                case NPC_BELGARISTRASZ:
+                    BelgaristraszGUID = pCreature->GetGUID();
+                    break;
+                case NPC_ETERNOS:
+                    EternosGUID = pCreature->GetGUID();
+                    break;
+                case NPC_VERDISA:
+                    VerdisaGUID = pCreature->GetGUID();
                     break;
             }
         }
@@ -129,7 +145,7 @@ public:
                     {
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 1);
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10-CentrifugeCount);
-
+                        FreeDragons();
                         if (instance->IsHeroic())
                             DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_MAKE_IT_COUNT_TIMED_EVENT);
                     }
@@ -182,6 +198,27 @@ public:
 
             if( data == DONE )
                 SaveToDB();
+        }
+
+        void FreeDragons()
+        {
+            if (Creature* belgaristrasz = instance->GetCreature(BelgaristraszGUID))
+            {
+                belgaristrasz->SetWalk(true);
+                belgaristrasz->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, BelgaristraszMove);
+            }
+
+            if (Creature* eternos = instance->GetCreature(EternosGUID))
+            {
+                eternos->SetWalk(true);
+                eternos->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, EternosMove);
+            }
+
+            if (Creature* verdisa = instance->GetCreature(VerdisaGUID))
+            {
+                verdisa->SetWalk(true);
+                verdisa->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, VerdisaMove);
+            }
         }
 
         uint32 GetData(uint32 type) const

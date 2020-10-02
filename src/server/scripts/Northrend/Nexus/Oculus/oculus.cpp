@@ -72,6 +72,20 @@ class npc_oculus_drakegiver : public CreatureScript
 public:
     npc_oculus_drakegiver() : CreatureScript("npc_oculus_drakegiver") { }
 
+    struct  npc_oculus_drakegiverAI : public ScriptedAI {
+        npc_oculus_drakegiverAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void MovementInform(uint32 /*type*/, uint32 id) override
+        {
+            if (id != POINT_MOVE_DRAKES)
+                return;
+
+            if (me->GetEntry() == NPC_BELGARISTRASZ)
+                Talk(SAY_BELGARISTRASZ);
+        }
+
+    };
+
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if(creature->IsQuestGiver())
