@@ -87,5 +87,4 @@ enum MISC
 {
     POINT_MOVE_DRAKES
 };
-
 #endif
