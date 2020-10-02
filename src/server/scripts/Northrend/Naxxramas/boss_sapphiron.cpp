@@ -286,7 +286,6 @@ public:
                     me->SetDisableGravity(true);
                     me->SetHover(true);
                     currentTarget = 0;
-                    
                     events.ScheduleEvent(EVENT_FLIGHT_ICEBOLT, 3000);
                     iceboltCount = RAID_MODE(2, 3);
                     return;
@@ -313,7 +312,7 @@ public:
                                         inList = true;
                                         break;
                                     }
-                            
+
                             if (!inList)
                                 targets.push_back((*i)->getTarget());
                         }
@@ -337,11 +336,9 @@ public:
                     Talk(EMOTE_BREATH);
                     me->CastSpell(me, SPELL_FROST_MISSILE, false);
                     events.ScheduleEvent(EVENT_FLIGHT_SPELL_EXPLOSION, 8500);
-                    
                     return;
                 case EVENT_FLIGHT_SPELL_EXPLOSION:
                     me->CastSpell(me, SPELL_FROST_EXPLOSION, true);
-                    
                     events.ScheduleEvent(EVENT_FLIGHT_START_LAND, 3000);
                     return;
                 case EVENT_FLIGHT_START_LAND:
@@ -365,7 +362,6 @@ public:
                 case EVENT_GROUND:
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetInCombatWithZone();
-                    
                     return;
                 case EVENT_HUNDRED_CLUB:
                 {
@@ -374,7 +370,6 @@ public:
                     {
                         if (itr.GetSource()->GetResistance(SPELL_SCHOOL_FROST) > 100 && pInstance)
                         {
-                            
                             pInstance->SetData(DATA_HUNDRED_CLUB, 0);
                             return;
                         }

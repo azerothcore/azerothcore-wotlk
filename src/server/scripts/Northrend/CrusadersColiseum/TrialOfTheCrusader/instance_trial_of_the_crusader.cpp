@@ -584,8 +584,8 @@ public:
                 case EVENT_OPEN_GATE:
                     {
                         HandleGameObject(GO_MainGateGUID, true);
-                    }
-                    break;
+                        break;
+                    }  
                 case EVENT_CLOSE_GATE:
                     {
                         HandleGameObject(GO_MainGateGUID, false);
@@ -1104,7 +1104,6 @@ public:
                         }
 
                         HandleGameObject(GO_EnterGateGUID, false);
-                        
                         events.RescheduleEvent(EVENT_CHAMPIONS_ATTACK, 4000);
                         break;
                     }
@@ -1137,7 +1136,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_3_01);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_302, 13000);
                         break;
                     }
@@ -1145,7 +1144,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_3_02);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_303, 3000);
                         break;
                     }
@@ -1172,7 +1171,7 @@ public:
                             c->GetMotionMaster()->MovePoint(0, Locs[LOC_VALKYR_DEST_2_RIGHT].GetPositionX(), Locs[LOC_VALKYR_DEST_2_RIGHT].GetPositionY(), Locs[LOC_VALKYR_DEST_2_RIGHT].GetPositionZ());
                         if( Creature* c = instance->GetCreature(NPC_DarkbaneGUID) )
                             c->GetMotionMaster()->MovePoint(0, Locs[LOC_VALKYR_DEST_2_LEFT].GetPositionX(), Locs[LOC_VALKYR_DEST_2_LEFT].GetPositionY(), Locs[LOC_VALKYR_DEST_2_LEFT].GetPositionZ());
-                        
+
                         events.RescheduleEvent(EVENT_VALKYRIES_ATTACK, 3250);
                         break;
                     }
@@ -1215,7 +1214,7 @@ public:
                         }
                         if( Creature* c = instance->GetCreature(TeamIdInInstance == TEAM_ALLIANCE ? NPC_VarianGUID : NPC_GarroshGUID) )
                             c->AI()->Talk((TeamIdInInstance == TEAM_ALLIANCE ? SAY_STAGE_3_03a : SAY_STAGE_3_03h));
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_401, 60000);
                         break;
                     }
@@ -1223,7 +1222,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_4_01);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_402, 20000);
                         break;
                     }
@@ -1240,7 +1239,7 @@ public:
                                 t->AI()->Talk(SAY_STAGE_4_02);
                                 t->SetVisible(false);
                             }
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_403, 2000);
                         break;
                     }
@@ -1252,7 +1251,7 @@ public:
                                 t->SetReactState(REACT_PASSIVE);
                                 t->CastSpell(t, 51807, true);
                             }
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_404, 2000);
                         break;
                     }
@@ -1264,7 +1263,7 @@ public:
                             c->SetVisible(true);
                             c->GetMotionMaster()->MovePoint(0, Locs[LOC_ARTHAS]);
                         }
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_405, 3000);
                         break;
                     }
@@ -1272,7 +1271,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_4_03);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_406, 7000);
                         break;
                     }
@@ -1283,7 +1282,7 @@ public:
                             c->AI()->Talk(SAY_STAGE_4_04);
                             c->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                         }
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_406_2, 2500);
                         events.RescheduleEvent(EVENT_SCENE_407, 12000);
                         break;
@@ -1302,7 +1301,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_LichKingGUID) )
                             c->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_408, 4000);
                         break;
                     }
@@ -1312,7 +1311,7 @@ public:
                         {
                             c->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
                         }
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_409, 1500);
                         break;
                     }
@@ -1354,7 +1353,7 @@ public:
                             c->SummonCreature(NPC_ARGENT_MAGE, Locs[LOC_MAGE].GetPositionX(), Locs[LOC_MAGE].GetPositionY(), Locs[LOC_MAGE].GetPositionZ(), Locs[LOC_MAGE].GetOrientation());
                             c->SummonGameObject(195682, 668.15f, 134.57f, 142.12f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 630000000);
                         }
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_502, 20000);
                         break;
                     }
