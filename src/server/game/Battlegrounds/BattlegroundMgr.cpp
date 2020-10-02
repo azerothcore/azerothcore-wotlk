@@ -46,7 +46,7 @@
 /***            BATTLEGROUND MANAGER                   ***/
 /*********************************************************/
 
-BattlegroundMgr::BattlegroundMgr() : m_ArenaTesting(false), m_Testing(false),
+BattlegroundMgr::BattlegroundMgr() : m_ArenaTesting(sWorld->getBoolConfig(CONFIG_DEBUG_ARENA)), m_Testing(sWorld->getBoolConfig(CONFIG_DEBUG_BATTLEGROUND)),
     m_lastClientVisibleInstanceId(0), m_NextAutoDistributionTime(0), m_AutoDistributionTimeChecker(0), m_NextPeriodicQueueUpdateTime(5*IN_MILLISECONDS)
 {
     for (uint32 qtype = BATTLEGROUND_QUEUE_NONE; qtype < MAX_BATTLEGROUND_QUEUE_TYPES; ++qtype)
