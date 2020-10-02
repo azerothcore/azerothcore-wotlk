@@ -172,7 +172,7 @@ public:
 
         void AttachHeart()
         {
-            if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : NULL)
+            if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                 heart->SetHealth(heart->GetMaxHealth());
             else if (Creature* accessory = me->SummonCreature(NPC_XT002_HEART, *me, TEMPSUMMON_MANUAL_DESPAWN))
             {
@@ -364,7 +364,7 @@ public:
                 case EVENT_START_SECOND_PHASE:
                     me->MonsterTextEmote("XT-002 Deconstructor's heart is exposed and leaking energy.", 0, true);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                    if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : NULL)
+                    if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                         heart->GetAI()->DoAction(ACTION_AWAKEN_HEART);
                     
                     events.ScheduleEvent(EVENT_RESTORE, 30000);
@@ -383,7 +383,7 @@ public:
                     
                     me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND); // emerge
                     // Hide heart
-                    if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : NULL)
+                    if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                         heart->GetAI()->DoAction(ACTION_HIDE_HEART);
 
                     events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4000);
@@ -481,7 +481,7 @@ public:
 
         void SendEnergyToCorner()
         {
-            Unit* pile = NULL;
+            Unit* pile = nullptr;
             uint8 num = urand(1,4);
             for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
