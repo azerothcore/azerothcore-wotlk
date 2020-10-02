@@ -659,7 +659,6 @@ public:
 			DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class spell_gothik_shadow_bolt_volley : public SpellScriptLoader

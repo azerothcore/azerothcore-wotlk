@@ -393,15 +393,13 @@ public:
                         float z = FourSidesPos[0].GetPositionZ();
                         me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                         me->GetMotionMaster()->MovePoint(MI_POINT_INTRO_CENTER_AIR, x, y, z);
-                        
+                        break;
                     }
-                    break;
                 case EVENT_INTRO_LAND:
                     {
                         me->GetMotionMaster()->MoveLand(MI_POINT_INTRO_LAND, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), 7.0f);
-                        
+                        break;
                     }
-                    break;
                 case EVENT_START_FIGHT:
                     {
                         if (pInstance)
@@ -415,7 +413,6 @@ public:
                             AttackStart(target);
                             me->GetMotionMaster()->MoveChase(target);
                         }
-                        
 
                         events.SetPhase(PHASE_ONE);
                         events.RescheduleEvent(EVENT_BERSERK, 600000, 0);
@@ -423,9 +420,8 @@ public:
                         events.RescheduleEvent(EVENT_SPELL_ARCANE_STORM, urand(2000,5000), 1);
                         events.RescheduleEvent(EVENT_SUMMON_POWER_SPARK, urand(10000,15000), 1);
                         events.RescheduleEvent(EVENT_START_VORTEX_0, 30000, 1);
+                        break;
                     }
-                    break;
-
                 case EVENT_SPELL_ARCANE_BREATH:
                     me->CastSpell(me->GetVictim(), SPELL_ARCANE_BREATH, false);
                     events.RepeatEvent(urand(12000,15000));
@@ -446,8 +442,8 @@ public:
                         }
                         
                         events.RepeatEvent(urand(20000,30000));
+                        break;
                     }
-                    break;
                 case EVENT_START_VORTEX_0:
                     {
                         bLockHealthCheck = true;
@@ -467,20 +463,18 @@ public:
                         me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ()+20.0f, 7.0f);
 
-                        
                         events.DelayEvents(25000, 1); // don't delay berserk (group 0)
                     }
                     break;
                 case EVENT_VORTEX_FLY_TO_CENTER:
                     me->GetMotionMaster()->MovePoint(MI_POINT_VORTEX_CENTER, CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ()+20.0f);
-                    
                     break;
                 case EVENT_START_VORTEX_REAL:
-                    me->SendMeleeAttackStop(me->GetVictim());
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
-                    me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
-
                     {
+                        me->SendMeleeAttackStop(me->GetVictim());
+                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                        me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+
                         Position pos;
                         float angle = (me->GetOrientation() >= M_PI/4 ? me->GetOrientation()-M_PI/4 : 7*M_PI/4+me->GetOrientation());
                         pos.m_positionX = CenterPos.GetPositionX()+cos(angle)*40.0f;
@@ -537,10 +531,10 @@ public:
                                         }
                                     }
                         }
+
+                        events.RescheduleEvent(EVENT_VORTEX_LAND_0, 11000, 1);
+                        break;
                     }
-                    
-                    events.RescheduleEvent(EVENT_VORTEX_LAND_0, 11000, 1);
-                    break;
                 case EVENT_VORTEX_LAND_0:
                     me->GetMotionMaster()->MoveLand(MI_POINT_VORTEX_LAND, CenterPos, 7.0f);
                     

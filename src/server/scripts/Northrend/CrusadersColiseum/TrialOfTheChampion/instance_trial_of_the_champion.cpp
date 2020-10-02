@@ -774,7 +774,6 @@ public:
                         DoSummonGrandChampion(temp1, 0);
                         HandleGameObject(GO_MainGateGUID, true);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
-                        
                     }
                     break;
                 case EVENT_SUMMON_GRAND_CHAMPION_2:
@@ -783,7 +782,6 @@ public:
                         DoSummonGrandChampion(temp2, 1);
                         HandleGameObject(GO_MainGateGUID, true);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
-                        
                     }
                     break;
                 case EVENT_SUMMON_GRAND_CHAMPION_3:
@@ -793,23 +791,23 @@ public:
                         DoSummonGrandChampion(number, 2);
                         HandleGameObject(GO_MainGateGUID, true);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
-                        
                     }
                     break;
                 case EVENT_CLOSE_GATE:
                     {
                         HandleGameObject(GO_MainGateGUID, false);
-                        
                     }
                     break;
                 case EVENT_YELL_WELCOME_2:
                     {
-                        if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
+                        if (Creature* tirion = instance->GetCreature(NPC_TirionGUID))
+                        {
                             tirion->AI()->Talk(TEXT_WELCOME_2);
+                        }
+
                         events.RescheduleEvent(EVENT_SUMMON_GRAND_CHAMPION_1, 8000);
-                        
+                        break;
                     }
-                    break;
                 case EVENT_GRAND_GROUP_1_MOVE_MIDDLE:
                     {
                         if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
@@ -827,7 +825,6 @@ public:
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_1_ATTACK, 3000);
-                        
                     }
                     break;
                 case EVENT_GRAND_GROUP_1_ATTACK:
@@ -842,7 +839,6 @@ public:
                                 c->AI()->DoZoneInCombat();
                             }
                         Counter = 0;
-                        
                     }
                     break;
                 case EVENT_GRAND_GROUP_2_MOVE_MIDDLE:
@@ -855,7 +851,6 @@ public:
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_2_ATTACK, 3000);
-                        
                     }
                     break;
                 case EVENT_GRAND_GROUP_2_ATTACK:

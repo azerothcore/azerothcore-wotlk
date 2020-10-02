@@ -174,7 +174,6 @@ public:
                 }
                 case EVENT_PRINCE_VANISH:
                 {
-                    
                     //Count alive players
                     uint8 count = 0;
                     Unit *pTarget;
@@ -214,7 +213,6 @@ public:
                 }
                 case EVENT_PRINCE_RESCHEDULE:
                 {
-                    
                     ScheduleEvents();
                     break;
                 }

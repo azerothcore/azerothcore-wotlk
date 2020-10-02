@@ -386,7 +386,6 @@ public:
                 case EVENT_SECOND_PHASE_HEALTH_CHECK:
                     if (me->HealthBelowPct(45))
                     {
-                        
                         Talk(SAY_REQUEST_AID);
                         events.DelayEvents(5500);
                         events.ScheduleEvent(EVENT_THIRD_PHASE_LICH_KING_SAY, 5000);
@@ -410,7 +409,6 @@ public:
                         cr->AI()->AttackStart(me->GetVictim());
                     }
 
-                    
                     break;
             }
 

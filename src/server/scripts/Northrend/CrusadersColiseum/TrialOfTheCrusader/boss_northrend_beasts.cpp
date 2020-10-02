@@ -359,7 +359,6 @@ public:
                                 }
                         }
                         PlayerGUID = 0;
-                        
                     }
                     break;
             }

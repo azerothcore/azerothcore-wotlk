@@ -340,7 +340,6 @@ public:
                     float ny = me->GetPositionY()+5.0f*sin(me->GetOrientation());
                     if (!me->IsWithinLOS(nx, ny, 42.5f))
                     {
-                        
                         break;
                     }
                     me->NearTeleportTo(nx, ny, 42.5f, me->GetOrientation());

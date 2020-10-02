@@ -1447,7 +1447,6 @@ public:
 
     class spell_pos_rimefang_frost_novaSpellScript : public SpellScript
     {
-
         PrepareSpellScript(spell_pos_rimefang_frost_novaSpellScript);
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
