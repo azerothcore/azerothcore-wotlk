@@ -595,7 +595,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_0_01);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_002, 22000);
                     }
                     break;

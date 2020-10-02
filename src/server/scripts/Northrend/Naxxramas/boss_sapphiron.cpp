@@ -299,7 +299,7 @@ public:
                             me->SummonGameObject(GO_ICE_BLOCK, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0);
                         }
                     }
-            
+
                     std::vector<Unit*> targets;
                     auto i = me->getThreatManager().getThreatList().begin();
                     for (; i != me->getThreatManager().getThreatList().end(); ++i)
