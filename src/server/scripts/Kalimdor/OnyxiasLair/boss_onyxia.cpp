@@ -358,7 +358,6 @@ public:
                         me->StopMoving();
                         DoResetThreat();
                         me->GetMotionMaster()->MovePoint(10, OnyxiaMoveData[0].x, OnyxiaMoveData[0].y, OnyxiaMoveData[0].z);
-                        
                     }
                     break;
                 case EVENT_LIFTOFF:
@@ -380,7 +379,6 @@ public:
                     break;
                 case EVENT_END_MANY_WHELPS_TIME:
                     bManyWhelpsAvailable = false;
-                    
                     break;
                 case EVENT_FLY_S_TO_N:
                     {
@@ -431,7 +429,6 @@ public:
                             me->SetFacingToObject(v);
                             me->CastSpell(v, SPELL_FIREBALL, false);
                         }
-                        
 
                         uint8 rand = urand(0, 99);
                         if( rand < 33 )
@@ -448,7 +445,6 @@ public:
                         if( newWP > 8 )
                             newWP = 1;
                         me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].x, OnyxiaMoveData[newWP].y, OnyxiaMoveData[newWP].z);
-                        
                     }
                     break;
                 case EVENT_PHASE_2_STEP_ACW:
@@ -457,7 +453,6 @@ public:
                         if( newWP < 1 )
                             newWP = 8;
                         me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].x, OnyxiaMoveData[newWP].y, OnyxiaMoveData[newWP].z);
-                        
                     }
                     break;
                 case EVENT_PHASE_2_STEP_ACROSS:
@@ -474,20 +469,16 @@ public:
                         uint8 newWP = OnyxiaMoveData[CurrentWP].DestId;
                         me->SetSpeed(MOVE_RUN, 2.95f, false);
                         me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].x, OnyxiaMoveData[newWP].y, OnyxiaMoveData[newWP].z);
-                        
                     }
                     break;
                 case EVENT_START_PHASE_3:
                     {
                         me->SetSpeed(MOVE_RUN, 2.95f, false);
                         me->GetMotionMaster()->MovePoint(12, OnyxiaMoveData[1].x, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z);
-                        
                     }
                     break;
                 case EVENT_PHASE_3_ATTACK:
                     {
-                        
-
                         me->SetReactState(REACT_AGGRESSIVE);
                         AttackStart(SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 0, false));
                         me->CastSpell(me, SPELL_BELLOWINGROAR, false);
@@ -512,8 +503,6 @@ public:
                     {
                         if( Creature* trigger = me->SummonCreature(12758, *me, TEMPSUMMON_TIMED_DESPAWN, 1000) )
                             trigger->CastSpell(trigger, 17731, false);
-
-                        
                     }
                     break;
                 case EVENT_SUMMON_WHELP:

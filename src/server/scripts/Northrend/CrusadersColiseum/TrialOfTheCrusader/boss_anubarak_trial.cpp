@@ -259,7 +259,6 @@ public:
                 case EVENT_ENRAGE:
                     {
                         me->CastSpell(me, SPELL_BERSERK, true);
-                        
                     }
                     break;
                 case EVENT_RESPAWN_SPHERE:
@@ -316,7 +315,6 @@ public:
                         events.RescheduleEvent(EVENT_EMERGE, EMERGE_INTERVAL);
                         events.RescheduleEvent(EVENT_SPELL_SUMMON_SPIKE, 2500);
                         events.RescheduleEvent(EVENT_SUMMON_SCARAB, 3000);
-                        
                     }
                     break;
                 case EVENT_SUMMON_SCARAB:
@@ -333,7 +331,6 @@ public:
                         summons.DespawnEntry(NPC_SPIKE);
                         events.CancelEvent(EVENT_SUMMON_SCARAB);
                         events.RescheduleEvent(EVENT_EMERGE_2, 2000);
-                        
                     }
                     break;
                 case EVENT_EMERGE_2:
@@ -347,12 +344,10 @@ public:
                         events.RescheduleEvent(EVENT_SPELL_FREEZING_SLASH, urand(7000,15000));
                         events.RescheduleEvent(EVENT_SPELL_PENETRATING_COLD, urand(15000,20000));
                         events.RescheduleEvent(EVENT_SUBMERGE, SUBMERGE_INTERVAL);
-                        
                     }
                     break;
                 case EVENT_SPELL_SUMMON_SPIKE:
                     me->CastSpell(me, SPELL_SUMMON_SPIKE, true);
-                    
                     break;
             }
 
@@ -374,7 +369,6 @@ public:
             Talk(SAY_DEATH);
             if( pInstance )
                 pInstance->SetData(TYPE_ANUBARAK, DONE);
-
 
             Player* plr = nullptr;
             if( !pInstance->instance->GetPlayers().isEmpty() )

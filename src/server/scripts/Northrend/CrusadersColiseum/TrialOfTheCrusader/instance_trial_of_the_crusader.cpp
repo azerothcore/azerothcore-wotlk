@@ -674,7 +674,7 @@ public:
                                 c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
                             }
-                        }                       
+                        }
                     }
                     break;
                 case EVENT_SCENE_005:
