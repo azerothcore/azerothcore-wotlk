@@ -616,7 +616,9 @@ public:
             {
                 me->DespawnOrUnsummon(10000);
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(TYPE_KOLOGARN)))
+                {
                     me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
+                }
                 me->CastSpell(me, SPELL_FOCUSED_EYEBEAM, true);
                 me->GetMotionMaster()->MoveChase(me->GetMap()->GetPlayer(eyebeamTarget->GetGUID()));
                 justSpawned = false;
