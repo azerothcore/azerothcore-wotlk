@@ -360,8 +360,7 @@ public:
                         break;
                     }
                     case EVENT_JEDOGA_MOVE_UP:
-                    {
-                        
+                    {                        
                         if (!summons.HasEntry(NPC_INITIATE))
                             break;
 

@@ -357,7 +357,6 @@ public:
                 case EVENT_SPELL_RENEW:
                     if( !MemoryGUID )
                     {
-                        
                         break;
                     }
                     if( urand(0,1) )

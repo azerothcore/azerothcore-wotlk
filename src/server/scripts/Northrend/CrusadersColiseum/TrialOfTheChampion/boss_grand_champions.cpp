@@ -711,9 +711,7 @@ public:
                             me->GetMotionMaster()->MovePoint(7, *mount);
                             events.RepeatEvent(200);
                             break;
-                        }
-
-                        
+                        }                      
                     }
                     break;
                 case EVENT_MOUNT_CHARGE:

@@ -674,8 +674,7 @@ public:
                                 c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
                             }
-                        }
-                        
+                        }                       
                     }
                     break;
                 case EVENT_SCENE_005:
@@ -736,7 +735,6 @@ public:
                                 c->AI()->DoZoneInCombat();
                             }
                         }
-                        
                     }
                     break;
                 case EVENT_SCENE_006:
@@ -772,7 +770,6 @@ public:
                                 c->AI()->DoZoneInCombat();
                             }
                         }
-                        
                     }
                     break;
                 case EVENT_SCENE_BEASTS_DONE:
@@ -781,7 +778,6 @@ public:
                             c->AI()->Talk(SAY_STAGE_0_06);
                         if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                             c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        
                     }
                     break;
                 case EVENT_SCENE_101:
@@ -805,7 +801,6 @@ public:
                                 icehowl->DestroyForNearbyPlayers();
                             }
                         }
-                        
                     }
                     break;
                 case EVENT_SCENE_102:
@@ -930,7 +925,6 @@ public:
                                 c->AI()->DoZoneInCombat();
                             }
                         }
-                        
                     }
                     break;
                 case EVENT_SCENE_110:
@@ -962,8 +956,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_1_11);
                         if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
-                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        
+                            c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);                    
                     }
                     break;
                 case EVENT_SCENE_201:
@@ -1005,7 +998,6 @@ public:
                                 c->AI()->Talk(SAY_STAGE_2_02a);
                             events.RescheduleEvent(EVENT_SCENE_203, 18000);
                         }
-                        
                     }
                     break;
                 case EVENT_SCENE_203:
@@ -1038,7 +1030,6 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(TeamIdInInstance == TEAM_ALLIANCE ? NPC_VarianGUID : NPC_GarroshGUID) )
                             c->AI()->Talk(TeamIdInInstance == TEAM_ALLIANCE ? SAY_STAGE_2_05a : SAY_STAGE_2_05h);
-                        
                     }
                     break;
                 case EVENT_SUMMON_CHAMPIONS:
@@ -1131,8 +1122,7 @@ public:
                         Map::PlayerList const& pl = instance->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             itr->GetSource()->AddToNotify(NOTIFY_AI_RELOCATION);
-                        EncounterStatus = IN_PROGRESS;
-                        
+                        EncounterStatus = IN_PROGRESS;  
                     }
                     break;
                 case EVENT_SCENE_FACTION_CHAMPIONS_DEAD:
@@ -1141,7 +1131,6 @@ public:
                             c->AI()->Talk(SAY_STAGE_2_06);
                         if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                             c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        
                     }
                     break;
                 case EVENT_SCENE_301:
@@ -1209,7 +1198,6 @@ public:
                                 c->AI()->DoZoneInCombat();
                             }*/
                         }
-                        
                     }
                     break;
                 case EVENT_SCENE_VALKYR_DEAD:
@@ -1414,8 +1402,6 @@ public:
                                     }
                                 }
                         }
-
-                        
                     }
                     break;
             }
