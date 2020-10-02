@@ -442,7 +442,7 @@ public:
                     {
                         me->CastSpell(eyebeamTarget, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
                     }
-                    
+
                     Talk(EMOTE_EYES);
                     return;
                 }
