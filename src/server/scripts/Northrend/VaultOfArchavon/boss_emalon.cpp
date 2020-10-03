@@ -173,6 +173,7 @@ class boss_emalon : public CreatureScript
                     case EVENT_BERSERK:
                         me->CastSpell(me, SPELL_BERSERK, true);
                         Talk(EMOTE_BERSERK);
+                        events.PopEvent();
                         break;
                     case EVENT_SUMMON_NEXT_MINION:
                         me->SummonCreature(NPC_TEMPEST_MINION, TempestMinions[urand(0,3)], TEMPSUMMON_CORPSE_DESPAWN, 0);
