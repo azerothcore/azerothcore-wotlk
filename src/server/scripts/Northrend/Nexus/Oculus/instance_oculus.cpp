@@ -9,10 +9,6 @@
 #include "Group.h"
 #include "Player.h"
 
-Position const VerdisaMove = { 949.188f, 1032.91f, 359.967f, 1.093027f };
-Position const BelgaristraszMove = { 941.453f, 1044.1f,  359.967f, 0.1984709f };
-Position const EternosMove = { 943.202f, 1059.35f, 359.967f, 5.757278f };
-
 class instance_oculus : public InstanceMapScript
 {
 public:
@@ -205,19 +201,19 @@ public:
             if (Creature* belgaristrasz = instance->GetCreature(BelgaristraszGUID))
             {
                 belgaristrasz->SetWalk(true);
-                belgaristrasz->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, BelgaristraszMove);
+                belgaristrasz->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, BelgaristraszPOS);
             }
 
             if (Creature* eternos = instance->GetCreature(EternosGUID))
             {
                 eternos->SetWalk(true);
-                eternos->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, EternosMove);
+                eternos->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, EternosPOS);
             }
 
             if (Creature* verdisa = instance->GetCreature(VerdisaGUID))
             {
                 verdisa->SetWalk(true);
-                verdisa->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, VerdisaMove);
+                verdisa->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, VerdisaPOS);
             }
         }
 
