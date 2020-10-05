@@ -65,6 +65,7 @@ enum LeviathanSpells
 
 enum GosNpcs
 {
+    NPC_ULDUAR_SHIELD_BUNNY         = 33779,
     NPC_FLAME_LEVIATHAN_TURRET      = 33139,
     NPC_SEAT                        = 33114,
     NPC_MECHANOLIFT                 = 33214,
@@ -953,7 +954,7 @@ public:
                 _castTimer = 0;
             }
         }
-        
+
         void DoAction(int32 param) override
         {
             if (param == ACTION_DESPAWN_ADDS)
@@ -1348,7 +1349,7 @@ public:
                             break;
                         case 12:
                             _dellorah->AI()->Talk(DELLORAH_SAY_7);
-                            
+
                             if (Creature* c = me->FindNearestCreature(NPC_START_BRANN_BRONZEBEARD, 110.0f, true) )
                                 c->AI()->DoAction(ACTION_START_NORGANNON_BRANN);
 
@@ -1468,6 +1469,16 @@ public:
                         case 3:
                             if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 200.0f))
                                 go->Delete();
+
+                            if (Creature* bunny = me->FindNearestCreature(NPC_ULDUAR_SHIELD_BUNNY, 200.0f)) // first bunny
+                            {
+                                Unit::Kill(bunny, bunny);
+                            }
+
+                            if (Creature* bunny = me->FindNearestCreature(NPC_ULDUAR_SHIELD_BUNNY, 200.0f)) // second bunny
+                            {
+                                Unit::Kill(bunny, bunny);
+                            }
 
                             Say("Mages of the Kirin Tor, on Brann's Command, release the shield! Defend this platform and our allies with your lives! For Dalaran!", false);
                             NextStep(9000);
