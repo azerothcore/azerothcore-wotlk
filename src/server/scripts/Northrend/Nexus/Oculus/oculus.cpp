@@ -84,52 +84,50 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if (resetPosition && m_pInstance->GetData(DATA_DRAKOS) == DONE)
+            if (resetPosition)
             {
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                switch (me->GetEntry())
+                if (m_pInstance->GetData(DATA_DRAKOS) == DONE)
                 {
-                case NPC_VERDISA:
-                    me->SetPosition(VerdisaPOS);
-                    break;
-                case NPC_BELGARISTRASZ:
-                    me->SetPosition(BelgaristraszPOS);
-                    break;
-                case NPC_ETERNOS:
-                    me->SetPosition(EternosPOS);
-                    break;
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                    switch (me->GetEntry())
+                    {
+                    case NPC_VERDISA:
+                        me->SetPosition(VerdisaPOS);
+                        break;
+                    case NPC_BELGARISTRASZ:
+                        me->SetPosition(BelgaristraszPOS);
+                        break;
+                    case NPC_ETERNOS:
+                        me->SetPosition(EternosPOS);
+                        break;
+                    }
+                    moved = true;
                 }
-                moved = true;
-                resetPosition = false;
-            }
-            else if (resetPosition && m_pInstance->GetData(DATA_DRAKOS) != DONE)
-            {
                 resetPosition = false;
             }
 
-            if (m_pInstance->GetData(DATA_DRAKOS) == DONE)
+            if (!moved && m_pInstance->GetData(DATA_DRAKOS) == DONE)
             {
                 timer += diff;
-            }
 
-            if (timer > 3000 && !moved)
-            {
-                moved = true;
-                me->SetWalk(true);
-                switch (me->GetEntry())
+                if (timer > 3000)
                 {
-                case NPC_VERDISA:
-                    me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, VerdisaPOS);
-                    break;
-                case NPC_BELGARISTRASZ:
-                    me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, BelgaristraszPOS);
-                    break;
-                case NPC_ETERNOS:
-                    me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, EternosPOS);
-                    break;
+                    moved = true;
+                    me->SetWalk(true);
+                    switch (me->GetEntry())
+                    {
+                    case NPC_VERDISA:
+                        me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, VerdisaPOS);
+                        break;
+                    case NPC_BELGARISTRASZ:
+                        me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, BelgaristraszPOS);
+                        break;
+                    case NPC_ETERNOS:
+                        me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, EternosPOS);
+                        break;
+                    }
                 }
             }
-
         }
 
         void MovementInform(uint32 /*type*/, uint32 id) override
