@@ -35,3 +35,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18693, 0, 3, 0, 2, 0, 100, 0, 60, 99, 60, 99, 0, 11, 12466, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Speaker Mar\'grom - Between 60-99% Health - Cast 12466'),
 (18693, 0, 4, 0, 2, 0, 100, 0, 19, 69, 19, 69, 0, 11, 15497, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Speaker Mar\'grom - Between 19-69% Health - Cast 15497'),
 (18693, 0, 5, 0, 2, 0, 100, 0, 0, 19, 0, 19, 0, 11, 15241, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Speaker Mar\'grom - Between 0-19% Health - Cast 15241');
+
