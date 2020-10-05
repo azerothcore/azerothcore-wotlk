@@ -525,7 +525,7 @@ char* Utils::GetPlainName(const char* FileName)
 {
     char* temp;
 
-    if((temp = (char*)strrchr(FileName, '\\')) != NULL)
+    if((temp = (char*)strrchr(FileName, '\\')) != nullptr)
         FileName = temp + 1;
     return (char*)FileName;
 }
