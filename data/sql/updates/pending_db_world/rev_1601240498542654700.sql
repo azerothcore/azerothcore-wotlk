@@ -1,5 +1,9 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1601240498542654700');
 
+/*
+ * Update by Silker | <www.azerothcore.org> | Copyright (C)
+*/
+
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18693;
 
 -- Passive
