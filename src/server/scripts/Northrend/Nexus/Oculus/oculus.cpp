@@ -84,7 +84,7 @@ public:
         bool resetPosition, moved;
         uint32 timer;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (resetPosition)
             {
