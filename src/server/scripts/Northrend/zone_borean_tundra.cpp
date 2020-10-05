@@ -581,7 +581,7 @@ public:
             {
                 EnterEvadeMode(); //We make sure that the npc is not attacking the player!
                 me->SetReactState(REACT_PASSIVE);
-                StartFollow(pCaster->ToPlayer(), 0, NULL);
+                StartFollow(pCaster->ToPlayer(), 0, nullptr);
                 me->UpdateEntry(NPC_CAPTURED_BERLY_SORCERER, NULL, false);
                 DoCast(me, SPELL_COSMETIC_ENSLAVE_CHAINS_SELF, true);
                 me->DespawnOrUnsummon(45000);
@@ -1169,7 +1169,10 @@ public:
                                 uiEventPhase = 2;
                                 break;
                             case NPC_TOM_HEGGER:
-                                Talk(SAY_HIDDEN_CULTIST_3);
+                                if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID)) 
+                                {
+                                    Talk(SAY_HIDDEN_CULTIST_3, player);
+                                } 
                                 uiEventTimer = 5000;
                                 uiEventPhase = 2;
                                 break;

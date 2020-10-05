@@ -157,7 +157,7 @@ public:
                             me->SummonCreature(NPC_HOUND, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
                         else 
                             me->SummonCreature(NPC_FEL_IMP, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
-                            events.ScheduleEvent(EVENT_PARTY_TIMER, 3000);
+                        events.ScheduleEvent(EVENT_PARTY_TIMER, 3000);
                         break;
                 }
             }
@@ -963,7 +963,7 @@ class npc_simon_bunny : public CreatureScript
                 if (spell->Id == SPELL_BAD_PRESS_TRIGGER)
                 {
                     int32 bp = (int32)((float)(fails)*0.33f*target->GetMaxHealth());
-                    target->CastCustomSpell(target, SPELL_BAD_PRESS_DAMAGE, &bp, NULL, NULL, true);
+                    target->CastCustomSpell(target, SPELL_BAD_PRESS_DAMAGE, &bp, nullptr, nullptr, true);
                 }
             }
 

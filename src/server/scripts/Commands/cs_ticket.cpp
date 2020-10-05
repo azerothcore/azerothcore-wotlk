@@ -172,14 +172,13 @@ public:
             return false;
 
         GmTicket* ticket = sTicketMgr->GetTicket(ticketId);
-        if (!ticket || ticket->IsClosed())
+        if (!ticket)
         {
             handler->PSendSysMessage(LANG_COMMAND_TICKETNOTEXIST);
             return true;
         }
 
-        // Cannot comment ticket assigned to someone else
-        //! Console excluded
+        // Cannot comment ticket assigned to someone else (unless done from the Console)
         Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
         if (player && ticket->IsAssignedNotTo(player->GetGUID()))
         {

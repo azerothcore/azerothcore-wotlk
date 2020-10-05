@@ -100,7 +100,7 @@ void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
             if (!minion->IsAlive())
                 minion->Respawn();
             else if (!minion->GetVictim())
-                minion->AI()->DoZoneInCombat(NULL, 100.0f);
+                minion->AI()->DoZoneInCombat(nullptr, 100.0f);
             break;
         default:
             break;
@@ -121,13 +121,13 @@ void InstanceScript::UpdateDoorState(GameObject* door)
         switch (info.type)
         {
             case DOOR_TYPE_ROOM:
-                open &= (info.bossInfo->state != IN_PROGRESS) ? true : false;
+                open &= (info.bossInfo->state != IN_PROGRESS);
                 break;
             case DOOR_TYPE_PASSAGE:
-                open &= (info.bossInfo->state == DONE) ? true : false;
+                open &= (info.bossInfo->state == DONE);
                 break;
             case DOOR_TYPE_SPAWN_HOLE:
-                open &= (info.bossInfo->state == IN_PROGRESS) ? true : false;
+                open &= (info.bossInfo->state == IN_PROGRESS);
                 break;
             default:
                 break;
@@ -233,7 +233,7 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
 std::string InstanceScript::LoadBossState(const char * data)
 {
     if (!data)
-        return NULL;
+        return nullptr;
     std::istringstream loadStream(data);
     uint32 buff;
     uint32 bossId = 0;

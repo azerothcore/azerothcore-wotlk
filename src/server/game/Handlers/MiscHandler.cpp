@@ -80,7 +80,7 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket & recv_data)
 #endif
 
     //this is spirit release confirm?
-    GetPlayer()->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
+    GetPlayer()->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
     GetPlayer()->BuildPlayerRepop();
     GetPlayer()->RepopAtGraveyard();
 }
@@ -101,9 +101,9 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket & recv_data)
     if (_player->PlayerTalkClass->IsGossipOptionCoded(gossipListId))
         recv_data >> code;
 
-    Creature* unit = NULL;
-    GameObject* go = NULL;
-    Item* item = NULL;
+    Creature* unit = nullptr;
+    GameObject* go = nullptr;
+    Item* item = nullptr;
     if (IS_CRE_OR_VEH_GUID(guid))
     {
         unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
@@ -218,7 +218,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_WHO Message");
 
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     if (now < timeWhoCommandAllowed)
         return;
     timeWhoCommandAllowed = now + 3;
@@ -390,7 +390,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 
         // 49 is maximum player count sent to client - can be overridden
         // through config, but is unstable
-        if ((matchcount++) >= 50 /*sWorld->getIntConfig(CONFIG_MAX_WHO)*/)
+        if ((matchcount++) >= sWorld->getIntConfig(CONFIG_MAX_WHO_LIST_RETURN))
             continue;
 
         data << pname;                                    // player name
@@ -408,7 +408,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     data.put(4, matchcount);                              // insert right count, count of matches
 
     SendPacket(&data);
-    ;// sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Send SMSG_WHO Message");
+    // sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Send SMSG_WHO Message");
 }
 
 
@@ -472,7 +472,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket & /*recv_data*/)
         GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     }
 
-    LogoutRequest(time(NULL));
+    LogoutRequest(time(nullptr));
 }
 
 void WorldSession::HandlePlayerLogoutOpcode(WorldPacket & /*recv_data*/)
@@ -830,7 +830,7 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
         return;
 
     // prevent resurrect before 30-sec delay after body release not finished
-    if (time_t(corpse->GetGhostTime() + _player->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP)) > time_t(time(NULL)))
+    if (time_t(corpse->GetGhostTime() + _player->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP)) > time_t(time(nullptr)))
         return;
 
     if (!corpse->IsWithinDistInMap(_player, CORPSE_RECLAIM_RADIUS, true))
@@ -1568,7 +1568,7 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket & recv_data)
     {
         if (group->IsLeader(_player->GetGUID()))
         {
-            for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* groupGuy = itr->GetSource();
                 if (!groupGuy)
@@ -1576,13 +1576,13 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket & recv_data)
 
                 if (!groupGuy->IsInWorld())
                 {
-                    _player->SendDungeonDifficulty(group != NULL);
+                    _player->SendDungeonDifficulty(group != nullptr);
                     return;
                 }
 
                 if (groupGuy->GetGUID() == _player->GetGUID() ? groupGuy->GetMap()->IsDungeon() : groupGuy->GetMap()->IsNonRaidDungeon())
                 {
-                    _player->SendDungeonDifficulty(group != NULL);
+                    _player->SendDungeonDifficulty(group != nullptr);
                     return;
                 }
             }
@@ -1595,7 +1595,7 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket & recv_data)
     {
         if (_player->FindMap() && _player->FindMap()->IsDungeon())
         {
-            _player->SendDungeonDifficulty(group != NULL);
+            _player->SendDungeonDifficulty(group != nullptr);
             return;
         }
         Player::ResetInstances(_player->GetGUIDLow(), INSTANCE_RESET_CHANGE_DIFFICULTY, false);
@@ -1625,7 +1625,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
         {
             std::set<uint32> foundMaps;
             std::set<Map*> foundMapsPtr;
-            Map* currMap = NULL;
+            Map* currMap = nullptr;
 
             if (uint32 preventionTime = group->GetDifficultyChangePreventionTime())
             {
@@ -1640,11 +1640,11 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
                         break;
                 }
 
-                _player->SendRaidDifficulty(group != NULL);
+                _player->SendRaidDifficulty(group != nullptr);
                 return;
             }
 
-            for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* groupGuy = itr->GetSource();
                 if (!groupGuy)
@@ -1652,7 +1652,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
 
                 if (!groupGuy->IsInWorld())
                 {
-                    _player->SendRaidDifficulty(group != NULL);
+                    _player->SendRaidDifficulty(group != nullptr);
                     return;
                 }
 
@@ -1664,7 +1664,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
                     foundMapsPtr.insert(groupGuy->GetMap());
                     if (foundMaps.size() > 1 || foundMapsPtr.size() > 1)
                     {
-                        _player->SendRaidDifficulty(group != NULL);
+                        _player->SendRaidDifficulty(group != nullptr);
                         return;
                     }
 
@@ -1672,19 +1672,19 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
                         || !groupGuy->movespline->Finalized() || !groupGuy->GetMap()->ToInstanceMap() || !groupGuy->GetMap()->ToInstanceMap()->GetInstanceScript() || groupGuy->GetMap()->ToInstanceMap()->GetInstanceScript()->IsEncounterInProgress()
                         || !groupGuy->Satisfy(sObjectMgr->GetAccessRequirement(groupGuy->GetMap()->GetId(), Difficulty(mode)), groupGuy->GetMap()->GetId(), false))
                     {
-                        _player->SendRaidDifficulty(group != NULL);
+                        _player->SendRaidDifficulty(group != nullptr);
                         return;
                     }
                 }
                 else if (groupGuy->GetGUID() == _player->GetGUID() ? groupGuy->GetMap()->IsDungeon() : groupGuy->GetMap()->IsRaid())
                 {
-                    _player->SendRaidDifficulty(group != NULL);
+                    _player->SendRaidDifficulty(group != nullptr);
                     return;
                 }
             }
 
-            Map* homeMap571 = sMapMgr->CreateMap(571, NULL);
-            Map* homeMap0 = sMapMgr->CreateMap(0, NULL);
+            Map* homeMap571 = sMapMgr->CreateMap(571, nullptr);
+            Map* homeMap0 = sMapMgr->CreateMap(0, nullptr);
             ASSERT(homeMap0 && homeMap571);
 
             std::map<Player*, Position> playerTeleport;
@@ -1697,7 +1697,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
                             if (!p->IsInWorld() || !p->IsAlive() || p->IsInCombat() || p->GetVictim() || p->m_mover != p || p->IsNonMeleeSpellCast(true) || (!p->GetMotionMaster()->empty() && p->GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE)
                                 || !p->movespline->Finalized() || !p->GetMap()->ToInstanceMap() || !p->GetMap()->ToInstanceMap()->GetInstanceScript() || p->GetMap()->ToInstanceMap()->GetInstanceScript()->IsEncounterInProgress())
                             {
-                                _player->SendRaidDifficulty(group != NULL);
+                                _player->SendRaidDifficulty(group != nullptr);
                                 return;
                             }
                             playerTeleport[p];
@@ -1717,7 +1717,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
 
             bool anyoneInside = false;
             playerTeleport.clear();
-            for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* groupGuy = itr->GetSource();
                 if (!groupGuy)
@@ -1757,7 +1757,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
     {
         if (_player->FindMap() && _player->FindMap()->IsDungeon())
         {
-            _player->SendRaidDifficulty(group != NULL);
+            _player->SendRaidDifficulty(group != nullptr);
             return;
         }
         Player::ResetInstances(_player->GetGUIDLow(), INSTANCE_RESET_CHANGE_DIFFICULTY, true);
@@ -1863,7 +1863,7 @@ void WorldSession::HandleWorldStateUITimerUpdate(WorldPacket& /*recv_data*/)
 #endif
 
     WorldPacket data(SMSG_WORLD_STATE_UI_TIMER_UPDATE, 4);
-    data << uint32(time(NULL));
+    data << uint32(time(nullptr));
     SendPacket(&data);
 }
 
@@ -1996,7 +1996,7 @@ void WorldSession::HandleUpdateMissileTrajectory(WorldPacket& recvPacket)
     recvPacket >> moveStop;
 
     Unit* caster = ObjectAccessor::GetUnit(*_player, guid);
-    Spell* spell = caster ? caster->GetCurrentSpell(CURRENT_GENERIC_SPELL) : NULL;
+    Spell* spell = caster ? caster->GetCurrentSpell(CURRENT_GENERIC_SPELL) : nullptr;
     if (!spell || spell->m_spellInfo->Id != spellId || !spell->m_targets.HasDst() || !spell->m_targets.HasSrc())
     {
         recvPacket.rfinish();

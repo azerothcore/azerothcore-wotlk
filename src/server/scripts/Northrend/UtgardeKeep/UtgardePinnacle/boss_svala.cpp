@@ -190,7 +190,7 @@ public:
             if (victim->GetEntry() == NPC_SCOURGE_HULK && instance)
             {
                 instance->SetData(DATA_SVALA_ACHIEVEMENT, true);
-                instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, 26555, 1, NULL);
+                instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, 26555, 1, nullptr);
             }
 
             if (victim->GetTypeId() == TYPEID_PLAYER)
@@ -235,6 +235,7 @@ public:
                 {
                     me->CastSpell(me, SPELL_SVALA_TRANSFORMING1, true);
                     me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
+                    me->SetCorpseDelay(sWorld->getIntConfig(CONFIG_CORPSE_DECAY_ELITE));
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                     if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))

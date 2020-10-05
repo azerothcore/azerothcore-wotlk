@@ -281,7 +281,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         stripLineInvisibleChars(msg);
 
     // pussywizard:
-    if (lang != LANG_ADDON && msg.find("|0") != std::string::npos)
+    if (msg.length() > 255 || (lang != LANG_ADDON && msg.find("|0") != std::string::npos))
         return;
 
     if (!ignoreChecks)
@@ -294,7 +294,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 
         if (!_player->CanSpeak())
         {
-            std::string timeStr = secsToTimeString(m_muteTime - time(NULL));
+            std::string timeStr = secsToTimeString(m_muteTime - time(nullptr));
             SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
             return;
         }
@@ -692,7 +692,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recvData)
 
     if (!GetPlayer()->CanSpeak())
     {
-        std::string timeStr = secsToTimeString(m_muteTime - time(NULL));
+        std::string timeStr = secsToTimeString(m_muteTime - time(nullptr));
         SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
         return;
     }

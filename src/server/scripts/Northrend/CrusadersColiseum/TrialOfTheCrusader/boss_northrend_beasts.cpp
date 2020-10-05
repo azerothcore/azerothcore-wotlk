@@ -556,7 +556,7 @@ struct boss_jormungarAI : public ScriptedAI
                 break;
             case EVENT_SUBMERGE:
                 {
-                    bIsStationary = me->GetDisplayId() == _MODEL_STATIONARY ? true : false;
+                    bIsStationary = (me->GetDisplayId() == _MODEL_STATIONARY);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_SUBMERGE_0, false);
                     Talk(EMOTE_SUBMERGE);
@@ -934,7 +934,7 @@ public:
                         destZ = Locs[LOC_CENTER].GetPositionZ()+1.0f;
                         me->StopMoving();
                         me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX()+cos(jumpangle)*35.0f, Locs[LOC_CENTER].GetPositionY()+sin(jumpangle)*35.0f, Locs[LOC_CENTER].GetPositionZ()+1.0f, 40.0f, 12.0f);
-                        
+
                         events.PopEvent();
                         events.RescheduleEvent(EVENT_TRAMPLE, 1500);
 
@@ -1007,7 +1007,7 @@ public:
 
             pInstance->SetData(TYPE_ICEHOWL, DONE);
 
-            Player* plr = NULL;
+            Player* plr = nullptr;
             if( !pInstance->instance->GetPlayers().isEmpty() )
                 plr = pInstance->instance->GetPlayers().begin()->GetSource();
 

@@ -179,7 +179,7 @@ public:
 
         void Reset()
         {
-            ryga = NULL;
+            ryga = nullptr;
             me->CastSpell(me, SPELL_ANCESTRAL_WOLF_BUFF, false);
             me->SetReactState(REACT_PASSIVE);
         }

@@ -196,7 +196,7 @@ public:
             me->DeleteThreatList();
             me->CombatStop(true);
             me->LoadCreaturesAddon(true);
-            me->SetLootRecipient(NULL);
+            me->SetLootRecipient(nullptr);
             me->ResetPlayerDamageReq();
         }
 
@@ -266,7 +266,10 @@ public:
                     Talk(SAY_ARCANE_EXPLOSION);
                     Talk(EMOTE_ARCANE_EXPLOSION);
 
+                    //At this point we are still in casting state so we need to clear it for DoCastAOE not to fail
+                    me->ClearUnitState(UNIT_STATE_CASTING);
                     DoCastAOE(DUNGEON_MODE(SPELL_EMPOWERED_ARCANE_EXPLOSION_N, SPELL_EMPOWERED_ARCANE_EXPLOSION_H));
+                    me->AddUnitState(UNIT_STATE_CASTING);
                     events.RescheduleEvent(EVENT_TELE_BACK, DUNGEON_MODE(9000, 7000));
                 default:
                     break;
