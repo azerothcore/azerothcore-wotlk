@@ -81,10 +81,10 @@ public:
 
         void UpdateAI(uint32 /*diff*/)
         {
-            if (justSummoned && m_pInstance->GetBossState(DATA_EREGOS) == DONE)
+            if (justSummoned && m_pInstance->GetData(DATA_DRAKOS) == DONE)
             {
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                switch (me->GetGUID())
+                switch (me->GetEntry())
                 {
                 case NPC_VERDISA:
                     me->SetPosition(VerdisaPOS);
@@ -96,8 +96,9 @@ public:
                     me->SetPosition(EternosPOS);
                     break;
                 }
+                justSummoned = false;
             }
-            else if (justSummoned && m_pInstance->GetBossState(DATA_EREGOS) != DONE)
+            else if (justSummoned && m_pInstance->GetData(DATA_DRAKOS) != DONE)
             {
                 justSummoned = false;
             }
