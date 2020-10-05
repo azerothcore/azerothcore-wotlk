@@ -1,5 +1,9 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1601269291015416700');
 
+/*
+ * Update by Silker | <www.azerothcore.org> | Copyright (C)
+*/
+
 -- = Thaddius 25 = 29448 -------------------------------------------------------------------------------
 
 -- Create referenced tokens into the reference table
@@ -76,3 +80,4 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 
 -- Delete tokens which are separetely placed
 DELETE FROM `creature_loot_template` WHERE  `Entry`=29417 AND `Item` IN (40625, 40626, 40627, 40634, 40635, 40636, 40637, 40638, 40639);
+
