@@ -108,9 +108,9 @@ public:
             {
                 case EVENT_CLEARWATER_ANNOUNCE:
                 {
-                    time_t curtime = time(NULL);
+                    time_t curtime = time(nullptr);
                     tm strdate;
-                    ACE_OS::localtime_r(&curtime, &strdate);
+                    localtime_r(&curtime, &strdate);
 
                     if (!preWarning && strdate.tm_hour == 13 && strdate.tm_min == 55)
                     {
@@ -253,9 +253,9 @@ public:
             {
                 case EVENT_RIGGLE_ANNOUNCE:
                 {
-                    time_t curtime = time(NULL);
+                    time_t curtime = time(nullptr);
                     tm strdate;
-                    ACE_OS::localtime_r(&curtime, &strdate);
+                    localtime_r(&curtime, &strdate);
                     if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
                     {
                         sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
@@ -495,7 +495,7 @@ public:
     {
         npc_air_force_botsAI(Creature* creature) : ScriptedAI(creature)
         {
-            SpawnAssoc = NULL;
+            SpawnAssoc = nullptr;
             SpawnedGUID = 0;
 
             // find the correct spawnhandling
@@ -519,7 +519,7 @@ public:
                 if (!spawnedTemplate)
                 {
                     sLog->outErrorDb("TCSR: Creature template entry %u does not exist in DB, which is required by npc_air_force_bots", SpawnAssoc->spawnedCreatureEntry);
-                    SpawnAssoc = NULL;
+                    SpawnAssoc = nullptr;
                     return;
                 }
             }
@@ -539,7 +539,7 @@ public:
             else
             {
                 sLog->outErrorDb("TCSR: npc_air_force_bots: wasn't able to spawn Creature %u", SpawnAssoc->spawnedCreatureEntry);
-                SpawnAssoc = NULL;
+                SpawnAssoc = nullptr;
             }
 
             return summoned;
@@ -552,7 +552,7 @@ public:
             if (creature && creature->IsAlive())
                 return creature;
 
-            return NULL;
+            return nullptr;
         }
 
         void MoveInLineOfSight(Unit* who)
@@ -1093,7 +1093,7 @@ public:
         void Reset()
         {
             DoctorGUID = 0;
-            Coord = NULL;
+            Coord = nullptr;
 
             //no select
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -2164,7 +2164,7 @@ public:
 
         GameObject* FindNearestLauncher()
         {
-            GameObject* launcher = NULL;
+            GameObject* launcher = nullptr;
 
             if (isCluster())
             {
