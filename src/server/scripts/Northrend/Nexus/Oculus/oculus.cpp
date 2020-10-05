@@ -66,9 +66,9 @@ public:
 
     npc_oculus_drakegiver() : CreatureScript("npc_oculus_drakegiver") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_oculus_drakegiverAI(pCreature);
+        return new npc_oculus_drakegiverAI(creature);
     }
 
     struct  npc_oculus_drakegiverAI : public ScriptedAI {
