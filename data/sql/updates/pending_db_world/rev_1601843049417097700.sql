@@ -1,9 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1601843049417097700');
 
-UPDATE `creature_template` SET `npcflag` = 0 WHERE (`entry` IN (27657,27658,27659));
-
-DELETE FROM `gossip_menu` WHERE `MenuID` IN (9573,9574,9575);
-INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES (9573, 12915), (9574, 12917), (9575, 12916);
+UPDATE `creature_template` SET `npcflag` = 2 WHERE (`entry` IN (27657,27658,27659));
 
 DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 9708) AND (`OptionID` IN (0));
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
