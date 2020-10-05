@@ -74,9 +74,16 @@ public:
     struct  npc_oculus_drakegiverAI : public ScriptedAI {
         npc_oculus_drakegiverAI(Creature* creature) : ScriptedAI(creature)
         {
-            resetPosition = true;
-            moved = false;
             m_pInstance = me->GetInstanceScript();
+            if (m_pInstance->GetData(DATA_DRAKOS) == DONE)
+            {
+                resetPosition = true;
+                moved = true;
+            }
+            else {
+                moved = false;
+                resetPosition = false;
+            }
             timer = 0;
         }
 
@@ -86,9 +93,31 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (resetPosition)
+            if (m_pInstance->GetData(DATA_DRAKOS) == DONE)
             {
-                if (m_pInstance->GetData(DATA_DRAKOS) == DONE)
+                if (!moved)
+                {
+                    timer += diff;
+
+                    if (timer > 3000)
+                    {
+                        moved = true;
+                        me->SetWalk(true);
+                        switch (me->GetEntry())
+                        {
+                        case NPC_VERDISA:
+                            me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, VerdisaPOS);
+                            break;
+                        case NPC_BELGARISTRASZ:
+                            me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, BelgaristraszPOS);
+                            break;
+                        case NPC_ETERNOS:
+                            me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, EternosPOS);
+                            break;
+                        }
+                    }
+                }
+                if (resetPosition)
                 {
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                     switch (me->GetEntry())
@@ -103,31 +132,7 @@ public:
                         me->SetPosition(EternosPOS);
                         break;
                     }
-                    moved = true;
-                }
-                resetPosition = false;
-            }
-
-            if (!moved && m_pInstance->GetData(DATA_DRAKOS) == DONE)
-            {
-                timer += diff;
-
-                if (timer > 3000)
-                {
-                    moved = true;
-                    me->SetWalk(true);
-                    switch (me->GetEntry())
-                    {
-                    case NPC_VERDISA:
-                        me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, VerdisaPOS);
-                        break;
-                    case NPC_BELGARISTRASZ:
-                        me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, BelgaristraszPOS);
-                        break;
-                    case NPC_ETERNOS:
-                        me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, EternosPOS);
-                        break;
-                    }
+                    resetPosition = false;
                 }
             }
         }
