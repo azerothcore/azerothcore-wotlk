@@ -66,7 +66,7 @@ public:
 
     npc_oculus_drakegiver() : CreatureScript("npc_oculus_drakegiver") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_oculus_drakegiverAI(creature);
     }
