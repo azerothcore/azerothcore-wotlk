@@ -57,6 +57,8 @@ enum DrakeGiverTexts
     GOSSIP_TEXTID_ETERNOS3                      = 13256,
 };
 
+#define HAS_ESSENCE(a) ((a)->HasItemCount(ITEM_EMERALD_ESSENCE) || (a)->HasItemCount(ITEM_AMBER_ESSENCE) || (a)->HasItemCount(ITEM_RUBY_ESSENCE))
+
 class npc_oculus_drakegiver : public CreatureScript
 {
 public:
@@ -173,6 +175,11 @@ public:
                 SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA1, creature->GetGUID());
                 break;
             case NPC_BELGARISTRASZ:
+                if (HAS_ESSENCE(player))
+                {
+                    openedMenu[player->GetGUID()] = true;
+                }
+
                 if (openedMenu[player->GetGUID()] != true)
                 {
                     AddGossipItemFor(player, 9708, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
