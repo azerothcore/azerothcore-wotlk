@@ -72,16 +72,19 @@ public:
     struct  npc_oculus_drakegiverAI : public ScriptedAI {
         npc_oculus_drakegiverAI(Creature* creature) : ScriptedAI(creature)
         {
-            justSummoned = true;
+            resetPosition = true;
+            moved = false;
             m_pInstance = me->GetInstanceScript();
+            timer = 0;
         }
 
         InstanceScript* m_pInstance;
-        bool justSummoned;
+        bool resetPosition, moved;
+        uint32 timer;
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 diff)
         {
-            if (justSummoned && m_pInstance->GetData(DATA_DRAKOS) == DONE)
+            if (resetPosition && m_pInstance->GetData(DATA_DRAKOS) == DONE)
             {
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 switch (me->GetEntry())
@@ -96,12 +99,37 @@ public:
                     me->SetPosition(EternosPOS);
                     break;
                 }
-                justSummoned = false;
+                moved = true;
+                resetPosition = false;
             }
-            else if (justSummoned && m_pInstance->GetData(DATA_DRAKOS) != DONE)
+            else if (resetPosition && m_pInstance->GetData(DATA_DRAKOS) != DONE)
             {
-                justSummoned = false;
+                resetPosition = false;
             }
+
+            if (m_pInstance->GetData(DATA_DRAKOS) == DONE)
+            {
+                timer += diff;
+            }
+
+            if (timer > 3000 && !moved)
+            {
+                moved = true;
+                me->SetWalk(true);
+                switch (me->GetEntry())
+                {
+                case NPC_VERDISA:
+                    me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, VerdisaPOS);
+                    break;
+                case NPC_BELGARISTRASZ:
+                    me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, BelgaristraszPOS);
+                    break;
+                case NPC_ETERNOS:
+                    me->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, EternosPOS);
+                    break;
+                }
+            }
+
         }
 
         void MovementInform(uint32 /*type*/, uint32 id) override
@@ -116,7 +144,6 @@ public:
                 Talk(SAY_BELGARISTRASZ);
             }
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetHomePosition(me->GetPosition());
         }
     };
 

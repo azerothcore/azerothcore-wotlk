@@ -32,9 +32,6 @@ public:
         uint64 uiVarosGUID;
         uint64 uiUromGUID;
         uint64 uiEregosGUID;
-        uint64 BelgaristraszGUID;
-        uint64 EternosGUID;
-        uint64 VerdisaGUID;
 
         bool bAmberVoid;
         bool bEmeraldVoid;
@@ -71,15 +68,6 @@ public:
                     break;
                 case NPC_EREGOS:
                     uiEregosGUID = pCreature->GetGUID();
-                    break;
-                case NPC_BELGARISTRASZ:
-                    BelgaristraszGUID = pCreature->GetGUID();
-                    break;
-                case NPC_ETERNOS:
-                    EternosGUID = pCreature->GetGUID();
-                    break;
-                case NPC_VERDISA:
-                    VerdisaGUID = pCreature->GetGUID();
                     break;
             }
         }
@@ -141,7 +129,7 @@ public:
                     {
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 1);
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10-CentrifugeCount);
-                        FreeDragons();
+
                         if (instance->IsHeroic())
                             DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_MAKE_IT_COUNT_TIMED_EVENT);
                     }
@@ -194,27 +182,6 @@ public:
 
             if( data == DONE )
                 SaveToDB();
-        }
-
-        void FreeDragons()
-        {
-            if (Creature* belgaristrasz = instance->GetCreature(BelgaristraszGUID))
-            {
-                belgaristrasz->SetWalk(true);
-                belgaristrasz->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, BelgaristraszPOS);
-            }
-
-            if (Creature* eternos = instance->GetCreature(EternosGUID))
-            {
-                eternos->SetWalk(true);
-                eternos->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, EternosPOS);
-            }
-
-            if (Creature* verdisa = instance->GetCreature(VerdisaGUID))
-            {
-                verdisa->SetWalk(true);
-                verdisa->GetMotionMaster()->MovePoint(POINT_MOVE_DRAKES, VerdisaPOS);
-            }
         }
 
         uint32 GetData(uint32 type) const
