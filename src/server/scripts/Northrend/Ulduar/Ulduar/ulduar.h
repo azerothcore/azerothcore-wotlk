@@ -79,6 +79,9 @@ enum UlduarData
 
     // Tram
     DATA_CALL_TRAM                          = 710,
+
+    // Mage Barrier
+    DATA_MAGE_BARRIER                       = 800,
 };
 
 enum UlduarNPCs
@@ -271,5 +274,8 @@ enum UlduarMisc
 
 Position const AlgalonSummonPos = {1632.531f, -304.8516f, 450.1123f, 1.530165f};
 Position const AlgalonLandPos   = {1632.668f, -302.7656f, 417.3211f, 1.530165f};
+
+Position const MageBarrierPos_1 = { -666.392f, -4.95139f, 518.596f, 0.0f };
+Position const MageBarrierPos_2 = { -642.508f, -101.339f, 518.981f, 0.0f };
 
 #endif

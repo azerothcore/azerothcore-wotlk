@@ -80,6 +80,7 @@ enum GosNpcs
     NPC_ULDUAR_GAUNTLET_GENERATOR   = 33571,
     NPC_DEFENDER_GENERATED          = 33572,
     GO_STARTING_BARRIER             = 194484,
+    NPC_ULDUAR_SHIELD_BUNNY         = 33779,
 
     // Hard Mode
     NPC_THORIM_HAMMER_TARGET        = 33364,
@@ -1400,22 +1401,44 @@ public:
         npc_brann_ulduarAI(Creature* c) : ScriptedAI(c)
         {
             _eventStarted = false;
+            mageBeam1 = nullptr;
+            mageBeam2 = nullptr;
+            m_pInstance = me->GetInstanceScript();
             Reset();
         }
 
         bool _eventStarted;
         bool _running;
+        InstanceScript* m_pInstance;
         int32 _checkTimer;
         uint8 _step;
         uint64 _pentarusGUID;
+        Creature* mageBeam1;
+        Creature* mageBeam2;
 
         void Reset() override
         {
-            _running = false;
+            _running = false; 
             _checkTimer = 0;
             _step = 0;
             _pentarusGUID = 0;
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+
+            if (m_pInstance->GetData(DATA_MAGE_BARRIER) == DONE)
+            {
+                BringDownThatShield();
+                if (m_pInstance->GetData(TYPE_LEVIATHAN) == NOT_STARTED)
+                {
+                    m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_START);
+                }
+            }
+            else
+            {
+                if (mageBeam1 == nullptr)
+                    mageBeam1 = me->SummonCreature(NPC_ULDUAR_SHIELD_BUNNY, MageBarrierPos_1.GetPositionX(), MageBarrierPos_1.GetPositionY(), MageBarrierPos_1.GetPositionZ(), MageBarrierPos_1.GetOrientation());
+                if (mageBeam2 == nullptr)
+                    mageBeam2 = me->SummonCreature(NPC_ULDUAR_SHIELD_BUNNY, MageBarrierPos_2.GetPositionX(), MageBarrierPos_2.GetPositionY(), MageBarrierPos_2.GetPositionZ(), MageBarrierPos_2.GetOrientation());
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
         }
 
         void NextStep(const uint32 time)
@@ -1436,6 +1459,18 @@ public:
             me->SendMessageToSetInRange(&data, 100.0f, true);
         }
 
+        void Yell(std::string text, bool self)
+        {
+            WorldPacket data;
+
+            if (self)
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, me, nullptr, text);
+            else if (Creature* c = ObjectAccessor::GetCreature(*me, _pentarusGUID))
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, c, nullptr, text);
+
+            me->SendMessageToSetInRange(&data, 100.0f, true);
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (_running)
@@ -1450,11 +1485,11 @@ public:
                     switch (_step)
                     {
                         case 0:
-                            Say("Pentarus, you heard the man. Have your mages release the shield and let these brave souls through!", true);
+                            Yell("Pentarus, you heard the man. Have your mages release the shield and let these brave souls through!", true);
                             NextStep(8000);
                             break;
                         case 1:
-                            Say("Of course, Brann: We will have the shield down momentarily.", false);
+                            Yell("Of course, Brann: We will have the shield down momentarily.", false);
                             NextStep(7000);
                             break;
                         case 2:
@@ -1466,20 +1501,36 @@ public:
                             NextStep(8000);
                             break;
                         case 3:
-                            if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 200.0f))
-                                go->Delete();
-
-                            Say("Mages of the Kirin Tor, on Brann's Command, release the shield! Defend this platform and our allies with your lives! For Dalaran!", false);
+                            Yell("Mages of the Kirin Tor, on Brann's Command, release the shield! Defend this platform and our allies with your lives! For Dalaran!", false);
                             NextStep(9000);
                             break;
                         case 4:
-                            Say("Our allies are ready. Bring down the shield and make way!", true);
+                            Yell("Our allies are ready. Bring down the shield and make way!", true);
                             _running = false;
                             me->MonsterTextEmote("Go to your vehicles!", 0, true);
-                            if (me->GetInstanceScript())
-                                me->GetInstanceScript()->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_START);
+                            if (m_pInstance)
+                            {
+                                BringDownThatShield();
+                                m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_START);
+                                m_pInstance->SetData(DATA_MAGE_BARRIER, DONE);
+                            }
                             return;
                     }
+            }
+        }
+
+        void BringDownThatShield() {
+            if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 200.0f))
+                go->Delete();
+
+            if (mageBeam1) // first bunny
+            {
+                mageBeam1->DespawnOrUnsummon();
+            }
+
+            if (mageBeam2) // second bunny
+            {
+                mageBeam2->DespawnOrUnsummon();
             }
         }
 
