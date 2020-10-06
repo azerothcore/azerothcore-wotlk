@@ -59,6 +59,12 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
     }
     if (speed > 0.0f)
         init.SetVelocity(speed);
+
+    if (i_orientation > 0.0f)
+    {
+        init.SetFacing(i_orientation);
+    }
+
     init.Launch();
 }
 
@@ -101,6 +107,12 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 /*diff*/)
             init.MoveTo(i_x, i_y, i_z);
         if (speed > 0.0f) // Default value for point motion type is 0.0, if 0.0 spline will use GetSpeed on unit
             init.SetVelocity(speed);
+
+        if (i_orientation > 0.0f)
+        {
+            init.SetFacing(i_orientation);
+        }
+
         init.Launch();
     }
 
