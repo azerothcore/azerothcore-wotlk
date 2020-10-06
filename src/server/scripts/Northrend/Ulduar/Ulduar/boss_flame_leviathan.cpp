@@ -4,16 +4,12 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
 #include "ulduar.h"
 #include "Vehicle.h"
 #include "ScriptedEscortAI.h"
-#include "SpellAuras.h"
 #include "PassiveAI.h"
-#include "SpellAuraEffects.h"
 #include "ScriptedGossip.h"
 #include "CombatAI.h"
-#include "Spell.h"
 #include "GridNotifiers.h"
 #include "Player.h"
 #include "Opcodes.h"
@@ -29,6 +25,7 @@ enum LeviathanSpells
     SPELL_NAPALM_10                 = 63666,
     SPELL_NAPALM_25                 = 65026,
     SPELL_INVIS_AND_STEALTH_DETECT  = 18950,
+    SPELL_TANSITUS_SHIELD_IMPACT    = 48387,
 
     // Shutdown spells
     SPELL_SYSTEMS_SHUTDOWN          = 62475,
@@ -1219,7 +1216,7 @@ public:
         if (creature->GetInstanceScript() && creature->GetInstanceScript()->GetData(TYPE_LEVIATHAN) == NOT_STARTED && !creature->AI()->GetData(DATA_EVENT_STARTED))
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Activate secondary defensive systems.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
-        SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+        SendGossipMenuFor(player, 14375, creature->GetGUID());
         return true;
     }
 
@@ -1384,10 +1381,25 @@ class npc_brann_ulduar : public CreatureScript
 public:
     npc_brann_ulduar() : CreatureScript("npc_brann_ulduar") { }
 
-    bool OnGossipHello(Player*  /*player*/, Creature* creature) override
+    bool OnGossipHello(Player*  player, Creature* creature) override
     {
         if (creature->GetInstanceScript() && creature->GetInstanceScript()->GetData(TYPE_LEVIATHAN) == NOT_STARTED && !creature->AI()->GetData(DATA_EVENT_STARTED))
-            creature->AI()->DoAction(ACTION_START_BRANN_EVENT);
+        {
+            AddGossipItemFor(player, 10355, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            SendGossipMenuFor(player, 14369, creature);
+        }
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*uiSender*/, uint32 uiAction) override
+    {
+        switch (uiAction)
+        {
+        case GOSSIP_ACTION_INFO_DEF:
+            creature->GetAI()->DoAction(ACTION_START_BRANN_EVENT);
+            creature->GetAI()->SetData(0, player->GetGUID());
+            break;
+        }
         return true;
     }
 
@@ -1404,6 +1416,7 @@ public:
             mageBeam1 = nullptr;
             mageBeam2 = nullptr;
             m_pInstance = me->GetInstanceScript();
+            oString.clear();
             Reset();
         }
 
@@ -1413,8 +1426,30 @@ public:
         int32 _checkTimer;
         uint8 _step;
         uint64 _pentarusGUID;
+        std::ostringstream oString;
+        Player* m_pPlayer;
         Creature* mageBeam1;
         Creature* mageBeam2;
+
+        uint32 GetData(uint32 id) const override
+        {
+            switch (id)
+            {
+            case 1:
+                return _eventStarted;
+            }
+            return 0;
+        }
+
+        void SetData(uint32 type, uint32 data)
+        {
+            switch (type)
+            {
+            case 0:
+                m_pPlayer = me->GetMap()->GetPlayer(data);
+                break;
+            };
+        }
 
         void Reset() override
         {
@@ -1422,21 +1457,28 @@ public:
             _checkTimer = 0;
             _step = 0;
             _pentarusGUID = 0;
+            m_pPlayer = nullptr;
 
             if (m_pInstance->GetData(DATA_MAGE_BARRIER) == DONE)
             {
+                me->SetPosition(BrannMovePos);
                 BringDownThatShield();
                 if (m_pInstance->GetData(TYPE_LEVIATHAN) == NOT_STARTED)
                 {
                     m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_START);
                 }
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
             else
             {
                 if (mageBeam1 == nullptr)
+                {
                     mageBeam1 = me->SummonCreature(NPC_ULDUAR_SHIELD_BUNNY, MageBarrierPos_1.GetPositionX(), MageBarrierPos_1.GetPositionY(), MageBarrierPos_1.GetPositionZ(), MageBarrierPos_1.GetOrientation());
+                }
                 if (mageBeam2 == nullptr)
+                {
                     mageBeam2 = me->SummonCreature(NPC_ULDUAR_SHIELD_BUNNY, MageBarrierPos_2.GetPositionX(), MageBarrierPos_2.GetPositionY(), MageBarrierPos_2.GetPositionZ(), MageBarrierPos_2.GetOrientation());
+                }
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
         }
@@ -1449,26 +1491,18 @@ public:
 
         void Say(std::string text, bool self)
         {
-            WorldPacket data;
-
             if (self)
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, me, nullptr, text);
+                me->MonsterSay(text.c_str(), LANG_UNIVERSAL, 0);
             else if (Creature* c = ObjectAccessor::GetCreature(*me, _pentarusGUID))
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, c, nullptr, text);
-
-            me->SendMessageToSetInRange(&data, 100.0f, true);
+                c->MonsterSay(text.c_str(), LANG_UNIVERSAL, 0);
         }
 
         void Yell(std::string text, bool self)
         {
-            WorldPacket data;
-
             if (self)
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, me, nullptr, text);
+                me->MonsterYell(text.c_str(), LANG_UNIVERSAL, 0);
             else if (Creature* c = ObjectAccessor::GetCreature(*me, _pentarusGUID))
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, c, nullptr, text);
-
-            me->SendMessageToSetInRange(&data, 100.0f, true);
+                c->MonsterYell(text.c_str(), LANG_UNIVERSAL, 0);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1485,7 +1519,17 @@ public:
                     switch (_step)
                     {
                         case 0:
-                            Yell("Pentarus, you heard the man. Have your mages release the shield and let these brave souls through!", true);
+                            oString << "Pentarus, you heard the ";
+                            if (m_pPlayer->getGender() == GENDER_MALE)
+                            {
+                                oString << "man";
+                            }
+                            else
+                            {
+                                oString << "woman";
+                            }
+                            oString << ". Have your mages release the shield and let these brave souls through!";
+                            Yell(oString.str(), true);
                             NextStep(8000);
                             break;
                         case 1:
@@ -1498,23 +1542,72 @@ public:
                                 cr->PlayDirectSound(RSOUND_L0);
                                 cr->MonsterSay("Okay! Let's move out. Get into your machines; I'll speak to you from here via the radio.", LANG_UNIVERSAL, 0);
                             }
-                            NextStep(8000);
-                            break;
-                        case 3:
-                            Yell("Mages of the Kirin Tor, on Brann's Command, release the shield! Defend this platform and our allies with your lives! For Dalaran!", false);
-                            NextStep(9000);
-                            break;
-                        case 4:
-                            Yell("Our allies are ready. Bring down the shield and make way!", true);
-                            _running = false;
                             me->MonsterTextEmote("Go to your vehicles!", 0, true);
                             if (m_pInstance)
                             {
-                                BringDownThatShield();
                                 m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_START);
+                            }
+                            NextStep(1000);
+                            break;
+                        case 3:
+                            if (Creature* cr = me->FindNearestCreature(NPC_ARCHMAGE_PENTARUS, 50.0f, true))
+                            {
+                                cr->SetWalk(true);
+                                cr->GetMotionMaster()->MovePoint(0, PentarusMovePos);
+                            }
+                            NextStep(8000);
+                            break;
+                        case 4:
+                            me->SetWalk(true);
+                            me->GetMotionMaster()->MovePoint(1, BrannMovePos);
+                            NextStep(15000);
+                            break;
+                        case 5:
+                            Yell("Mages of the Kirin Tor, on Brann's Command, release the shield! Defend this platform and our allies with your lives! For Dalaran!", false);
+                            NextStep(9000);
+                            break;
+                        case 6:
+                            Yell("Our allies are ready. Bring down the shield and make way!", true);
+                            NextStep(9000);
+                            break;
+                        case 7:
+                            if (Creature* cr = me->SummonCreature(NPC_BRANN_RADIO, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 5000))
+                            {
+                                cr->MonsterSay("The iron dwarves have been seen emerging from the bunkers at the base of the pillars straight ahead of you! Destroy the bunkers, and they'll be forced to fall back!", LANG_UNIVERSAL, 0);
+                                cr->PlayDirectSound(RSOUND_ENGAGE);
+                            }
+                            
+                            if (m_pInstance)
+                            {
+                                if (mageBeam1)
+                                {
+                                    mageBeam1->DespawnOrUnsummon();
+                                }
+                                if (mageBeam2)
+                                {
+                                    mageBeam2->DespawnOrUnsummon();
+                                }
                                 m_pInstance->SetData(DATA_MAGE_BARRIER, DONE);
                             }
-                            return;
+                            NextStep(1000);
+                            break;
+                        case 8:
+                            // Set-up for huge Arcane Explosion
+                            if (Creature* cr = me->FindNearestCreature(33779, 250.0f))
+                            {
+                                cr->SetObjectScale(2.5f);
+                            }
+                            NextStep(3000);
+                            break;
+                        case 9:
+                            if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 250.0f))
+                                go->Delete();
+                            if (Creature* cr = me->FindNearestCreature(33779, 250.0f))
+                            {
+                                cr->CastSpell(cr, 50759, false);
+                            }
+                            _running = false;
+                            break;
                     }
             }
         }
@@ -1522,13 +1615,11 @@ public:
         void BringDownThatShield() {
             if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 200.0f))
                 go->Delete();
-
-            if (mageBeam1) // first bunny
+            if (mageBeam1)
             {
                 mageBeam1->DespawnOrUnsummon();
             }
-
-            if (mageBeam2) // second bunny
+            if (mageBeam2)
             {
                 mageBeam2->DespawnOrUnsummon();
             }
@@ -1602,6 +1693,7 @@ public:
                     return;
 
                 // ENGAGE
+                /*
                 if (!_helpLock && me->GetDistance2d(-508.898f, -32.9631f) < 5.0f)
                 {
                     if (me->GetDistance2d(who) <= 60.0f)
@@ -1610,7 +1702,7 @@ public:
                         me->PlayDirectSound(RSOUND_ENGAGE);
                         _helpLock = true;
                     }
-                }
+                }*/
                 // MIMIRON
                 else if (me->GetDistance2d(-81.9207f, 111.432f) < 5.0f)
                 {
@@ -2257,41 +2349,97 @@ class spell_orbital_supports : public SpellScriptLoader
 
 class spell_thorims_hammer : public SpellScriptLoader
 {
-    public:
-        spell_thorims_hammer() : SpellScriptLoader("spell_thorims_hammer") { }
+public:
+    spell_thorims_hammer() : SpellScriptLoader("spell_thorims_hammer") { }
 
-        class spell_thorims_hammer_SpellScript : public SpellScript
+    class spell_thorims_hammer_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_thorims_hammer_SpellScript);
+
+        void RecalculateDamage(SpellEffIndex effIndex)
         {
-            PrepareSpellScript(spell_thorims_hammer_SpellScript);
-
-            void RecalculateDamage(SpellEffIndex effIndex)
+            if (!GetHitUnit() || effIndex == EFFECT_1)
             {
-                if (!GetHitUnit() || effIndex == EFFECT_1)
-                {
-                    PreventHitDefaultEffect(effIndex);
-                    return;
-                }
-
-                float dist = GetHitUnit()->GetExactDist2d(GetCaster());
-                if (dist <= 7.0f)
-                    SetHitDamage(GetSpellInfo()->Effects[EFFECT_1].CalcValue());
-                else
-                {
-                    dist -= 6.0f;
-                    SetHitDamage(int32(GetSpellInfo()->Effects[EFFECT_1].CalcValue() / std::max(dist, 1.0f)));
-                }
+                PreventHitDefaultEffect(effIndex);
+                return;
             }
 
-            void Register() override
+            float dist = GetHitUnit()->GetExactDist2d(GetCaster());
+            if (dist <= 7.0f)
+                SetHitDamage(GetSpellInfo()->Effects[EFFECT_1].CalcValue());
+            else
             {
-                OnEffectHitTarget += SpellEffectFn(spell_thorims_hammer_SpellScript::RecalculateDamage, EFFECT_ALL, SPELL_EFFECT_SCHOOL_DAMAGE);
+                dist -= 6.0f;
+                SetHitDamage(int32(GetSpellInfo()->Effects[EFFECT_1].CalcValue() / std::max(dist, 1.0f)));
             }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_thorims_hammer_SpellScript();
         }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_thorims_hammer_SpellScript::RecalculateDamage, EFFECT_ALL, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_thorims_hammer_SpellScript();
+    }
+};
+
+class spell_transitus_shield_beam : public SpellScriptLoader
+{
+public:
+    spell_transitus_shield_beam() : SpellScriptLoader("spell_transitus_shield_beam") { }
+
+    class spell_transitus_shield_beam_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_transitus_shield_beam_AuraScript);
+
+        void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            Unit* target = GetTarget();
+
+            if (!target)
+                return;
+
+            switch (aurEff->GetEffIndex())
+            {
+            case EFFECT_0:
+                caster->AddAura(SPELL_TANSITUS_SHIELD_IMPACT, target);
+                break;
+            }
+        }
+
+        void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+
+            if (!caster)
+                return;
+
+            Unit* target = GetTarget();
+
+            if (target)
+            {
+                //target->RemoveAurasDueToSpell(SPELL_TANSITUS_SHIELD_IMPACT);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_transitus_shield_beam_AuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            OnEffectRemove += AuraEffectRemoveFn(spell_transitus_shield_beam_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_transitus_shield_beam_AuraScript();
+    }
 };
 
 class spell_shield_generator : public SpellScriptLoader
@@ -2482,6 +2630,7 @@ void AddSC_boss_flame_leviathan()
     new spell_vehicle_circuit_overload();
     new spell_orbital_supports();
     new spell_thorims_hammer();
+    new spell_transitus_shield_beam();
     new spell_shield_generator();
     new spell_demolisher_ride_vehicle();
 
