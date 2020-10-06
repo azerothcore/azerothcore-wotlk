@@ -1547,30 +1547,17 @@ public:
                             {
                                 m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_START);
                             }
-                            NextStep(1000);
-                            break;
-                        case 3:
-                            if (Creature* cr = me->FindNearestCreature(NPC_ARCHMAGE_PENTARUS, 50.0f, true))
-                            {
-                                cr->SetWalk(true);
-                                cr->GetMotionMaster()->MovePoint(0, PentarusMovePos);
-                            }
-                            NextStep(8000);
-                            break;
-                        case 4:
-                            me->SetWalk(true);
-                            me->GetMotionMaster()->MovePoint(1, BrannMovePos);
                             NextStep(15000);
                             break;
-                        case 5:
+                        case 3:
                             Yell("Mages of the Kirin Tor, on Brann's Command, release the shield! Defend this platform and our allies with your lives! For Dalaran!", false);
                             NextStep(9000);
                             break;
-                        case 6:
+                        case 4:
                             Yell("Our allies are ready. Bring down the shield and make way!", true);
                             NextStep(9000);
                             break;
-                        case 7:
+                        case 5:
                             if (Creature* cr = me->SummonCreature(NPC_BRANN_RADIO, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 5000))
                             {
                                 cr->MonsterSay("The iron dwarves have been seen emerging from the bunkers at the base of the pillars straight ahead of you! Destroy the bunkers, and they'll be forced to fall back!", LANG_UNIVERSAL, 0);
@@ -1591,15 +1578,15 @@ public:
                             }
                             NextStep(1000);
                             break;
-                        case 8:
+                        case 6:
                             // Set-up for huge Arcane Explosion
                             if (Creature* cr = me->FindNearestCreature(33779, 250.0f))
                             {
-                                cr->SetObjectScale(2.5f);
+                                cr->SetObjectScale(5.0f);
                             }
                             NextStep(3000);
                             break;
-                        case 9:
+                        case 7:
                             if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 250.0f))
                                 go->Delete();
                             if (Creature* cr = me->FindNearestCreature(33779, 250.0f))
