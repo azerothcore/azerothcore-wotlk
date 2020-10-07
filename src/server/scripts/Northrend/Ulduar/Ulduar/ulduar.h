@@ -278,7 +278,15 @@ Position const AlgalonLandPos   = {1632.668f, -302.7656f, 417.3211f, 1.530165f};
 Position const MageBarrierPos_1 = { -666.392f, -4.95139f, 518.596f, 0.0f };
 Position const MageBarrierPos_2 = { -642.508f, -101.339f, 518.981f, 0.0f };
 
-Position const BrannMovePos = { -674.003f, -45.784f, 426.113f, 0.073612f };
-Position const PentarusMovePos = { -676.520f, -84.802f, 426.89f, 0.073428f };
+Position const BrannMovePos[1] =
+{
+    { -674.003f, -45.784f, 426.113f, 0.073612f },
+};
+
+Position const PentarusMovePos[2] =
+{
+    { -696.340f, -85.890f, 429.24f, 0.073428f },
+    { -676.520f, -84.802f, 426.89f, 0.073428f },
+};
 
 #endif

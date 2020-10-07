@@ -1413,10 +1413,7 @@ public:
         npc_brann_ulduarAI(Creature* c) : ScriptedAI(c)
         {
             _eventStarted = false;
-            mageBeam1 = nullptr;
-            mageBeam2 = nullptr;
             m_pInstance = me->GetInstanceScript();
-            oString.clear();
             Reset();
         }
 
@@ -1425,11 +1422,14 @@ public:
         InstanceScript* m_pInstance;
         int32 _checkTimer;
         uint8 _step;
-        uint64 _pentarusGUID;
         std::ostringstream oString;
         Player* m_pPlayer;
+        Creature* _pentarus;
         Creature* mageBeam1;
         Creature* mageBeam2;
+        Creature* battleMageBeam1;
+        Creature* battleMageBeam2;
+        Movement::PointsArray path;
 
         uint32 GetData(uint32 id) const override
         {
@@ -1451,18 +1451,39 @@ public:
             };
         }
 
+        void SetDefaultPosition()
+        {
+            me->SetPosition(BrannMovePos[0]);
+
+        }
+
         void Reset() override
         {
             _running = false; 
             _checkTimer = 0;
             _step = 0;
-            _pentarusGUID = 0;
             m_pPlayer = nullptr;
+            _pentarus = nullptr;
+            mageBeam1 = nullptr;
+            mageBeam2 = nullptr;
+            battleMageBeam1 = nullptr;
+            battleMageBeam2 = nullptr;
+            oString.clear();
+            path.clear();
 
             if (m_pInstance->GetData(DATA_MAGE_BARRIER) == DONE)
             {
-                me->SetPosition(BrannMovePos);
-                BringDownThatShield();
+                SetDefaultPosition();
+                if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 250.0f))
+                    go->Delete();
+                if (mageBeam1)
+                {
+                    mageBeam1->DespawnOrUnsummon();
+                }
+                if (mageBeam2)
+                {
+                    mageBeam2->DespawnOrUnsummon();
+                }
                 if (m_pInstance->GetData(TYPE_LEVIATHAN) == NOT_STARTED)
                 {
                     m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_START);
@@ -1471,13 +1492,23 @@ public:
             }
             else
             {
+                if (battleMageBeam1 == nullptr)
+                {
+                    battleMageBeam1 = me->SummonCreature(33662, -675.671f, -19.437f, 426.35f, 1.309158f);
+                }
+                if (battleMageBeam2 == nullptr)
+                {
+                    battleMageBeam2 = me->SummonCreature(33662, -673.059f, -77.446f, 426.35f, 5.350863f);
+                }
                 if (mageBeam1 == nullptr)
                 {
                     mageBeam1 = me->SummonCreature(NPC_ULDUAR_SHIELD_BUNNY, MageBarrierPos_1.GetPositionX(), MageBarrierPos_1.GetPositionY(), MageBarrierPos_1.GetPositionZ(), MageBarrierPos_1.GetOrientation());
+                    battleMageBeam1->CastSpell(mageBeam1, 48310, true);
                 }
                 if (mageBeam2 == nullptr)
                 {
                     mageBeam2 = me->SummonCreature(NPC_ULDUAR_SHIELD_BUNNY, MageBarrierPos_2.GetPositionX(), MageBarrierPos_2.GetPositionY(), MageBarrierPos_2.GetPositionZ(), MageBarrierPos_2.GetOrientation());
+                    battleMageBeam2->CastSpell(mageBeam2, 48310, true);
                 }
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
@@ -1493,16 +1524,16 @@ public:
         {
             if (self)
                 me->MonsterSay(text.c_str(), LANG_UNIVERSAL, 0);
-            else if (Creature* c = ObjectAccessor::GetCreature(*me, _pentarusGUID))
-                c->MonsterSay(text.c_str(), LANG_UNIVERSAL, 0);
+            else
+                _pentarus->MonsterSay(text.c_str(), LANG_UNIVERSAL, 0);
         }
 
         void Yell(std::string text, bool self)
         {
             if (self)
                 me->MonsterYell(text.c_str(), LANG_UNIVERSAL, 0);
-            else if (Creature* c = ObjectAccessor::GetCreature(*me, _pentarusGUID))
-                c->MonsterYell(text.c_str(), LANG_UNIVERSAL, 0);
+            else
+                _pentarus->MonsterYell(text.c_str(), LANG_UNIVERSAL, 0);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1547,17 +1578,40 @@ public:
                             {
                                 m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_START);
                             }
-                            NextStep(15000);
+                            _pentarus->SetWalk(true);
+                            path.push_back(G3D::Vector3(_pentarus->GetPositionX(), _pentarus->GetPositionY(), _pentarus->GetPositionZ()));
+                            for (uint8 i = 0; i < 2; i++)
+                                path.push_back(G3D::Vector3(PentarusMovePos[i].GetPositionX(), PentarusMovePos[i].GetPositionY(), PentarusMovePos[i].GetPositionZ()));
+                            _pentarus->GetMotionMaster()->MoveSplinePath(&path);
+
+                            if (Creature* cr2 = _pentarus->FindNearestCreature(33662, 50.0f, true))
+                            {
+                                cr2->GetMotionMaster()->MoveFollow(_pentarus, 1.0f, M_PI - M_PI / 4.0f, MOTION_SLOT_CONTROLLED);
+                            }
+                            if (Creature* cr2 = _pentarus->FindNearestCreature(33672, 50.0f, true))
+                            {
+                                cr2->GetMotionMaster()->MoveFollow(_pentarus, 1.0f, M_PI + M_PI / 4.0f, MOTION_SLOT_CONTROLLED);
+                            }
+                            NextStep(5000);
                             break;
                         case 3:
+                            me->SetWalk(true);
+                            path.clear();
+                            path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                            for (uint8 i = 0; i < 1; i++)
+                                path.push_back(G3D::Vector3(BrannMovePos[i].GetPositionX(), BrannMovePos[i].GetPositionY(), BrannMovePos[i].GetPositionZ()));
+                            me->GetMotionMaster()->MoveSplinePath(&path);
+                            NextStep(17000);
+                            break;
+                        case 4:
                             Yell("Mages of the Kirin Tor, on Brann's Command, release the shield! Defend this platform and our allies with your lives! For Dalaran!", false);
                             NextStep(9000);
                             break;
-                        case 4:
+                        case 5:
                             Yell("Our allies are ready. Bring down the shield and make way!", true);
                             NextStep(9000);
                             break;
-                        case 5:
+                        case 6:
                             if (Creature* cr = me->SummonCreature(NPC_BRANN_RADIO, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 5000))
                             {
                                 cr->MonsterSay("The iron dwarves have been seen emerging from the bunkers at the base of the pillars straight ahead of you! Destroy the bunkers, and they'll be forced to fall back!", LANG_UNIVERSAL, 0);
@@ -1578,7 +1632,7 @@ public:
                             }
                             NextStep(1000);
                             break;
-                        case 6:
+                        case 7:
                             // Set-up for huge Arcane Explosion
                             if (Creature* cr = me->FindNearestCreature(33779, 250.0f))
                             {
@@ -1586,7 +1640,7 @@ public:
                             }
                             NextStep(3000);
                             break;
-                        case 7:
+                        case 8:
                             if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 250.0f))
                                 go->Delete();
                             if (Creature* cr = me->FindNearestCreature(33779, 250.0f))
@@ -1596,19 +1650,6 @@ public:
                             _running = false;
                             break;
                     }
-            }
-        }
-
-        void BringDownThatShield() {
-            if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 200.0f))
-                go->Delete();
-            if (mageBeam1)
-            {
-                mageBeam1->DespawnOrUnsummon();
-            }
-            if (mageBeam2)
-            {
-                mageBeam2->DespawnOrUnsummon();
             }
         }
 
@@ -1630,7 +1671,7 @@ public:
             }
 
             if (Creature* cr = me->FindNearestCreature(NPC_ARCHMAGE_PENTARUS, 50.0f, true))
-                _pentarusGUID = cr->GetGUID();
+                _pentarus = cr;
 
             _eventStarted = true;
             _running = true;
