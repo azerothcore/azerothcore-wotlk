@@ -1363,6 +1363,11 @@ public:
             if (_eventStarted)
                 return;
 
+            if (param == ACTION_START_BRANN_EVENT)
+            {
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+
             if (param == ACTION_START_NORGANNON_EVENT)
             {
                 if (Creature* cr = me->FindNearestCreature(NPC_HIGH_EXPLORER_DELLORAH, 20.0f, true))
@@ -1396,6 +1401,10 @@ public:
         switch (uiAction)
         {
         case GOSSIP_ACTION_INFO_DEF:
+            if (Creature* cr = creature->FindNearestCreature(33686, 200.0f))
+            {
+                cr->GetAI()->DoAction(ACTION_START_BRANN_EVENT);
+            }
             creature->GetAI()->DoAction(ACTION_START_BRANN_EVENT);
             creature->GetAI()->SetData(0, player->GetGUID());
             break;
@@ -1413,6 +1422,10 @@ public:
         npc_brann_ulduarAI(Creature* c) : ScriptedAI(c)
         {
             _eventStarted = false;
+            mageBeam1 = nullptr;
+            mageBeam2 = nullptr;
+            battleMageBeam1 = nullptr;
+            battleMageBeam2 = nullptr;
             m_pInstance = me->GetInstanceScript();
             Reset();
         }
@@ -1464,10 +1477,6 @@ public:
             _step = 0;
             m_pPlayer = nullptr;
             _pentarus = nullptr;
-            mageBeam1 = nullptr;
-            mageBeam2 = nullptr;
-            battleMageBeam1 = nullptr;
-            battleMageBeam2 = nullptr;
             oString.clear();
             path.clear();
 
@@ -1584,17 +1593,29 @@ public:
                                 path.push_back(G3D::Vector3(PentarusMovePos[i].GetPositionX(), PentarusMovePos[i].GetPositionY(), PentarusMovePos[i].GetPositionZ()));
                             _pentarus->GetMotionMaster()->MoveSplinePath(&path);
 
-                            if (Creature* cr2 = _pentarus->FindNearestCreature(33662, 50.0f, true))
+                            if (Creature* cr2 = _pentarus->FindNearestCreature(33662, 50.0f))
                             {
                                 cr2->GetMotionMaster()->MoveFollow(_pentarus, 1.0f, M_PI - M_PI / 4.0f, MOTION_SLOT_CONTROLLED);
                             }
-                            if (Creature* cr2 = _pentarus->FindNearestCreature(33672, 50.0f, true))
+                            if (Creature* cr2 = _pentarus->FindNearestCreature(33672, 50.0f))
                             {
                                 cr2->GetMotionMaster()->MoveFollow(_pentarus, 1.0f, M_PI + M_PI / 4.0f, MOTION_SLOT_CONTROLLED);
                             }
-                            NextStep(5000);
+
+                            if (Creature* cr = me->FindNearestCreature(33622, 250.0f))
+                            {
+                                cr->GetMotionMaster()->MovePoint(0, -679.878f, -8.195f, 426.89f, true, true, MOTION_SLOT_CONTROLLED, 0.091053f);
+                            }
+
+                            NextStep(3000);
                             break;
                         case 3:
+                            if (Creature* cr = me->FindNearestCreature(33626, 10.0f))
+                            {
+                                cr->GetMotionMaster()->MovePoint(0, -792.043f, -44.357f, 429.84f, true, true, MOTION_SLOT_CONTROLLED, 2.419350f);
+                            }
+                            NextStep(2000);
+                        case 4:
                             me->SetWalk(true);
                             path.clear();
                             path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
@@ -1603,15 +1624,15 @@ public:
                             me->GetMotionMaster()->MoveSplinePath(&path);
                             NextStep(17000);
                             break;
-                        case 4:
+                        case 5:
                             Yell("Mages of the Kirin Tor, on Brann's Command, release the shield! Defend this platform and our allies with your lives! For Dalaran!", false);
                             NextStep(9000);
                             break;
-                        case 5:
+                        case 6:
                             Yell("Our allies are ready. Bring down the shield and make way!", true);
                             NextStep(9000);
                             break;
-                        case 6:
+                        case 7:
                             if (Creature* cr = me->SummonCreature(NPC_BRANN_RADIO, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 5000))
                             {
                                 cr->MonsterSay("The iron dwarves have been seen emerging from the bunkers at the base of the pillars straight ahead of you! Destroy the bunkers, and they'll be forced to fall back!", LANG_UNIVERSAL, 0);
@@ -1620,27 +1641,23 @@ public:
                             
                             if (m_pInstance)
                             {
-                                if (mageBeam1)
-                                {
-                                    mageBeam1->DespawnOrUnsummon();
-                                }
-                                if (mageBeam2)
-                                {
-                                    mageBeam2->DespawnOrUnsummon();
-                                }
+                                mageBeam1->DespawnOrUnsummon();
+                                mageBeam2->DespawnOrUnsummon();
+                                battleMageBeam1->GetMotionMaster()->MovePoint(0, -674.524f, -2.496f, 425.95f, true, true, MOTION_SLOT_CONTROLLED, 0.042202f);
+                                battleMageBeam2->GetMotionMaster()->MovePoint(0, -673.399f, -87.850f, 426.51f, true, true, MOTION_SLOT_CONTROLLED, 0.021254f);
                                 m_pInstance->SetData(DATA_MAGE_BARRIER, DONE);
                             }
                             NextStep(1000);
                             break;
-                        case 7:
+                        case 8:
                             // Set-up for huge Arcane Explosion
                             if (Creature* cr = me->FindNearestCreature(33779, 250.0f))
                             {
-                                cr->SetObjectScale(5.0f);
+                                cr->SetObjectScale(10.0f);
                             }
                             NextStep(3000);
                             break;
-                        case 8:
+                        case 9:
                             if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 250.0f))
                                 go->Delete();
                             if (Creature* cr = me->FindNearestCreature(33779, 250.0f))
@@ -1688,6 +1705,122 @@ public:
     CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_brann_radioAI (pCreature);
+    }
+
+    struct npc_brann_radioAI : public NullCreatureAI
+    {
+        npc_brann_radioAI(Creature* c) : NullCreatureAI(c)
+        {
+            _lock = (me->GetInstanceScript() && me->GetInstanceScript()->GetData(TYPE_LEVIATHAN) > NOT_STARTED);
+            _helpLock = _lock;
+        }
+
+        bool _lock;
+        bool _helpLock;
+
+        void Reset() override
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+        }
+
+        void Say(const char* text)
+        {
+            WorldPacket data;
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, me, nullptr, text);
+            me->SendMessageToSetInRange(&data, 100.0f, true);
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (!_lock)
+            {
+                if (who->GetTypeId() != TYPEID_PLAYER && !who->IsVehicle())
+                    return;
+
+                // ENGAGE
+                /*
+                if (!_helpLock && me->GetDistance2d(-508.898f, -32.9631f) < 5.0f)
+                {
+                    if (me->GetDistance2d(who) <= 60.0f)
+                    {
+                        Say("The iron dwarves have been seen emerging from the bunkers at the base of the pillars straight ahead of you. Destroy the bunkers and they will be forced to fall back.");
+                        me->PlayDirectSound(RSOUND_ENGAGE);
+                        _helpLock = true;
+                    }
+                }*/
+                // MIMIRON
+                else if (me->GetDistance2d(-81.9207f, 111.432f) < 5.0f)
+                {
+                    if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() > 430.0f)
+                    {
+                        Say("This generator powers Mimiron's Gaze. In moments, it can turn earth to ash, stone to magma--we cannot let it reach full power!");
+                        me->PlayDirectSound(RSOUND_MIMIRON);
+                        _lock = true;
+                    }
+                }
+                // FREYA
+                else if (me->GetDistance2d(-221.475f, -271.087f) < 5.0f)
+                {
+                    if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() < 380.0f)
+                    {
+                        Say("You're approaching the tower of Freya. It contains the power to turn barren wastelands into jungles teeming with life overnight");
+                        me->PlayDirectSound(RSOUND_FREYA);
+                        _lock = true;
+                    }
+                }
+                // STATIONS
+                else if (me->GetDistance2d(73.8978f, -29.3306f) < 5.0f)
+                {
+                    if (me->GetDistance2d(who) <= 40.0f)
+                    {
+                        Say("It appears you are near a repair station. Drive your vehicle on to the platform and it should be automatically repaired.");
+                        me->PlayDirectSound(RSOUND_STATION);
+                        _lock = true;
+                    }
+                }
+                // HODIR
+                else if (me->GetDistance2d(68.7679f, -325.026f) < 5.0f)
+                {
+                    if (me->GetDistance2d(who) <= 40.0f)
+                    {
+                        Say("This tower powers the hammer of Hodir. It is said to have the power to turn entire armies to ice!");
+                        me->PlayDirectSound(RSOUND_HODIR);
+                        _lock = true;
+                    }
+                }
+                // THORIM
+                else if (me->GetDistance2d(174.442f, 345.679f) < 5.0f)
+                {
+                    if (me->GetDistance2d(who) <= 60.0f)
+                    {
+                        Say("Aaaah, the tower of Krolmir. It is said that the power of Thorim has been used only once. And that it turned an entire continent to dust...");
+                        me->PlayDirectSound(RSOUND_THORIM);
+                        _lock = true;
+                    }
+                }
+                // COME A BIT CLOSER
+                else if (me->GetDistance2d(-508.898f, -32.9631f) < 5.0f)
+                {
+                    if (who->GetPositionX() >= -480.0f)
+                    {
+                        Say("There are four generators powering the defense structures. If you sabotage the generators, the missile attacks will stop!");
+                        me->PlayDirectSound(RSOUND_GENERATORS);
+                        _lock = true;
+                    }
+                }
+            }
+        }
+    };
+};
+
+class npc_goran_steelbreaker : public CreatureScript
+{
+public:
+    npc_goran_steelbreaker() : CreatureScript("npc_goran_steelbreaker") { }
+
+    CreatureAI* GetAI(Creature* pCreature) const override
+    {
+        return new npc_brann_radioAI(pCreature);
     }
 
     struct npc_brann_radioAI : public NullCreatureAI
