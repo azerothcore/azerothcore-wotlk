@@ -28,7 +28,7 @@ enum LfgCompatibility
 /// Stores player or group queue info
 struct LfgQueueData
 {
-    LfgQueueData(): joinTime(time_t(time(NULL))), lastRefreshTime(joinTime), tanks(LFG_TANKS_NEEDED),
+    LfgQueueData(): joinTime(time_t(time(nullptr))), lastRefreshTime(joinTime), tanks(LFG_TANKS_NEEDED),
         healers(LFG_HEALERS_NEEDED), dps(LFG_DPS_NEEDED)
         { }
 

@@ -9,6 +9,7 @@ jobs:
     strategy:
       fail-fast: false
     runs-on: ubuntu-20.04
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
         with:
@@ -24,7 +25,7 @@ jobs:
           cd ..
           git fetch --unshallow origin ${BRANCH}
           git add -A .
-          git commit -am "Import pending SQL update file..." -m "Referenced commit(s): ${GITHUB_SHA}" || true
+          git commit -am "chore(DB): import pending SQL update file" -m "Referenced commit(s): ${GITHUB_SHA}" || true
         env:
           BRANCH: ${{ steps.extract_branch.outputs.branch }}
       - name: Push changes
