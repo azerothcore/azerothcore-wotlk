@@ -127,7 +127,7 @@ public:
             {
                 if (Aura* heat = me->GetAura(SPELL_HEAT_BUFF))
                 {
-                    if(heat->GetStackAmount() >= 10)
+                    if (heat->GetStackAmount() >= 10)
                     {
                         if (heat->GetStackAmount() > 10)
                         {
