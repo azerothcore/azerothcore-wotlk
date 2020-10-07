@@ -25,7 +25,9 @@ enum LeviathanSpells
     SPELL_NAPALM_10                 = 63666,
     SPELL_NAPALM_25                 = 65026,
     SPELL_INVIS_AND_STEALTH_DETECT  = 18950,
-    SPELL_TANSITUS_SHIELD_IMPACT    = 48387,
+    SPELL_TRANSITUS_SHIELD_BEAM     = 48310,
+    SPELL_TRANSITUS_SHIELD_IMPACT   = 48387,
+    SPELL_BARRIER_EXPLOSION         = 59377, // 63660
 
     // Shutdown spells
     SPELL_SYSTEMS_SHUTDOWN          = 62475,
@@ -78,6 +80,9 @@ enum GosNpcs
     NPC_DEFENDER_GENERATED          = 33572,
     GO_STARTING_BARRIER             = 194484,
     NPC_ULDUAR_SHIELD_BUNNY         = 33779,
+    NPC_KIRIN_TOR_MAGE              = 33672,
+    NPC_KIRIN_TOR_BATTLE_MAGE       = 33662,
+    NPC_HIRED_ENGINEER              = 33626,
 
     // Hard Mode
     NPC_THORIM_HAMMER_TARGET        = 33364,
@@ -1435,14 +1440,13 @@ public:
         InstanceScript* m_pInstance;
         int32 _checkTimer;
         uint8 _step;
+        uint64 _pentarusGUID;
         std::ostringstream oString;
         Player* m_pPlayer;
-        Creature* _pentarus;
         Creature* mageBeam1;
         Creature* mageBeam2;
         Creature* battleMageBeam1;
         Creature* battleMageBeam2;
-        Movement::PointsArray path;
 
         uint32 GetData(uint32 id) const override
         {
@@ -1454,7 +1458,7 @@ public:
             return 0;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -1466,8 +1470,38 @@ public:
 
         void SetDefaultPosition()
         {
-            me->SetPosition(BrannMovePos[0]);
+            // Pentarus AND Kiring Tor Mages
+            if (Creature* _pentarus = ObjectAccessor::GetCreature(*me, _pentarusGUID))
+            {
+                if (Creature* cr = _pentarus->FindNearestCreature(NPC_KIRIN_TOR_BATTLE_MAGE, 10.0f))
+                {
+                    cr->SetPosition(PentarusMovePos[1].GetPositionX() - 3, PentarusMovePos[1].GetPositionY() + 2, PentarusMovePos[1].GetPositionZ() + 0.2f, PentarusMovePos[1].GetOrientation());
+                }
+                if (Creature* cr = _pentarus->FindNearestCreature(NPC_KIRIN_TOR_MAGE, 10.0f))
+                {
+                    cr->SetPosition(PentarusMovePos[1].GetPositionX() - 3, PentarusMovePos[1].GetPositionY() - 2, PentarusMovePos[1].GetPositionZ() + 0.2f, PentarusMovePos[1].GetOrientation());
+                }
+                _pentarus->SetPosition(PentarusMovePos[1]);
+            }
 
+            // TRANSITUS Shield Battle-Mages
+            if (battleMageBeam1 == nullptr)
+            {
+                battleMageBeam1 = me->SummonCreature(NPC_KIRIN_TOR_BATTLE_MAGE, BattleMagePosEnd_1);
+            }
+            if (battleMageBeam2 == nullptr)
+            {
+                battleMageBeam2 = me->SummonCreature(NPC_KIRIN_TOR_BATTLE_MAGE, BattleMagePosEnd_2);
+            }
+
+            // HIRED ENGINEER
+            if (Creature* cr = me->FindNearestCreature(NPC_HIRED_ENGINEER, 10.0f))
+            {
+                cr->SetPosition(HiredEngineerPos);
+            }
+
+            // BRANN
+            me->SetPosition(BrannMovePos[0]);
         }
 
         void Reset() override
@@ -1476,13 +1510,11 @@ public:
             _checkTimer = 0;
             _step = 0;
             m_pPlayer = nullptr;
-            _pentarus = nullptr;
             oString.clear();
-            path.clear();
+            _pentarusGUID = 0;
 
             if (m_pInstance->GetData(DATA_MAGE_BARRIER) == DONE)
             {
-                SetDefaultPosition();
                 if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 250.0f))
                     go->Delete();
                 if (mageBeam1)
@@ -1503,21 +1535,21 @@ public:
             {
                 if (battleMageBeam1 == nullptr)
                 {
-                    battleMageBeam1 = me->SummonCreature(33662, -675.671f, -19.437f, 426.35f, 1.309158f);
+                    battleMageBeam1 = me->SummonCreature(NPC_KIRIN_TOR_BATTLE_MAGE, BattleMagePos_1);
                 }
                 if (battleMageBeam2 == nullptr)
                 {
-                    battleMageBeam2 = me->SummonCreature(33662, -673.059f, -77.446f, 426.35f, 5.350863f);
+                    battleMageBeam2 = me->SummonCreature(NPC_KIRIN_TOR_BATTLE_MAGE, BattleMagePos_2);
                 }
                 if (mageBeam1 == nullptr)
                 {
                     mageBeam1 = me->SummonCreature(NPC_ULDUAR_SHIELD_BUNNY, MageBarrierPos_1.GetPositionX(), MageBarrierPos_1.GetPositionY(), MageBarrierPos_1.GetPositionZ(), MageBarrierPos_1.GetOrientation());
-                    battleMageBeam1->CastSpell(mageBeam1, 48310, true);
+                    battleMageBeam1->CastSpell(mageBeam1, SPELL_TRANSITUS_SHIELD_BEAM, true);
                 }
                 if (mageBeam2 == nullptr)
                 {
                     mageBeam2 = me->SummonCreature(NPC_ULDUAR_SHIELD_BUNNY, MageBarrierPos_2.GetPositionX(), MageBarrierPos_2.GetPositionY(), MageBarrierPos_2.GetPositionZ(), MageBarrierPos_2.GetOrientation());
-                    battleMageBeam2->CastSpell(mageBeam2, 48310, true);
+                    battleMageBeam2->CastSpell(mageBeam2, SPELL_TRANSITUS_SHIELD_BEAM, true);
                 }
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
@@ -1532,21 +1564,45 @@ public:
         void Say(std::string text, bool self)
         {
             if (self)
+            {
                 me->MonsterSay(text.c_str(), LANG_UNIVERSAL, 0);
-            else
+            }
+            else if (Creature* _pentarus = ObjectAccessor::GetCreature(*me, _pentarusGUID))
+            {
                 _pentarus->MonsterSay(text.c_str(), LANG_UNIVERSAL, 0);
+            }
         }
 
         void Yell(std::string text, bool self)
         {
             if (self)
+            {
                 me->MonsterYell(text.c_str(), LANG_UNIVERSAL, 0);
-            else
+            }
+            else if (Creature* _pentarus = ObjectAccessor::GetCreature(*me, _pentarusGUID))
+            {
                 _pentarus->MonsterYell(text.c_str(), LANG_UNIVERSAL, 0);
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
+            if (!_pentarusGUID)
+            {
+                if (Creature* cr = me->FindNearestCreature(NPC_ARCHMAGE_PENTARUS, 50.0f, true))
+                {
+                    _pentarusGUID = cr->GetGUID();
+                    if (m_pInstance->GetData(DATA_MAGE_BARRIER) == DONE)
+                    {
+                        if (Creature* cr = me->FindNearestCreature(33686, 200.0f))
+                        {
+                            cr->GetAI()->DoAction(ACTION_START_BRANN_EVENT);
+                        }
+                        SetDefaultPosition();
+                    }
+                }
+            }
+
             if (_running)
             {
                 if (_checkTimer != 0)
@@ -1577,7 +1633,7 @@ public:
                             NextStep(7000);
                             break;
                         case 2:
-                            if (Creature* cr = me->SummonCreature(NPC_BRANN_RADIO, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 5000))
+                            if (Creature* cr = me->SummonCreature(NPC_BRANN_RADIO, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 5000))
                             {
                                 cr->PlayDirectSound(RSOUND_L0);
                                 cr->MonsterSay("Okay! Let's move out. Get into your machines; I'll speak to you from here via the radio.", LANG_UNIVERSAL, 0);
@@ -1587,41 +1643,37 @@ public:
                             {
                                 m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_START);
                             }
-                            _pentarus->SetWalk(true);
-                            path.push_back(G3D::Vector3(_pentarus->GetPositionX(), _pentarus->GetPositionY(), _pentarus->GetPositionZ()));
-                            for (uint8 i = 0; i < 2; i++)
-                                path.push_back(G3D::Vector3(PentarusMovePos[i].GetPositionX(), PentarusMovePos[i].GetPositionY(), PentarusMovePos[i].GetPositionZ()));
-                            _pentarus->GetMotionMaster()->MoveSplinePath(&path);
+                            if (Creature* _pentarus = ObjectAccessor::GetCreature(*me, _pentarusGUID))
+                            {
+                                _pentarus->SetWalk(true);
+                                MoveWithinPath(_pentarus, PentarusMovePos, 2);
 
-                            if (Creature* cr2 = _pentarus->FindNearestCreature(33662, 50.0f))
-                            {
-                                cr2->GetMotionMaster()->MoveFollow(_pentarus, 1.0f, M_PI - M_PI / 4.0f, MOTION_SLOT_CONTROLLED);
-                            }
-                            if (Creature* cr2 = _pentarus->FindNearestCreature(33672, 50.0f))
-                            {
-                                cr2->GetMotionMaster()->MoveFollow(_pentarus, 1.0f, M_PI + M_PI / 4.0f, MOTION_SLOT_CONTROLLED);
+                                if (Creature* cr2 = _pentarus->FindNearestCreature(NPC_KIRIN_TOR_BATTLE_MAGE, 50.0f))
+                                {
+                                    cr2->GetMotionMaster()->MoveFollow(_pentarus, 1.0f, M_PI - M_PI / 4.0f, MOTION_SLOT_CONTROLLED);
+                                }
+                                if (Creature* cr2 = _pentarus->FindNearestCreature(NPC_KIRIN_TOR_MAGE, 50.0f))
+                                {
+                                    cr2->GetMotionMaster()->MoveFollow(_pentarus, 1.0f, M_PI + M_PI / 4.0f, MOTION_SLOT_CONTROLLED);
+                                }
                             }
 
                             if (Creature* cr = me->FindNearestCreature(33622, 250.0f))
                             {
-                                cr->GetMotionMaster()->MovePoint(0, -679.878f, -8.195f, 426.89f, true, true, MOTION_SLOT_CONTROLLED, 0.091053f);
+                                cr->GetAI()->DoAction(1);
                             }
 
                             NextStep(3000);
                             break;
                         case 3:
-                            if (Creature* cr = me->FindNearestCreature(33626, 10.0f))
+                            if (Creature* cr = me->FindNearestCreature(NPC_HIRED_ENGINEER, 10.0f))
                             {
-                                cr->GetMotionMaster()->MovePoint(0, -792.043f, -44.357f, 429.84f, true, true, MOTION_SLOT_CONTROLLED, 2.419350f);
+                                cr->GetMotionMaster()->MovePoint(0, HiredEngineerPos.GetPositionX(), HiredEngineerPos.GetPositionY(), HiredEngineerPos.GetPositionZ(), true, true, MOTION_SLOT_CONTROLLED, HiredEngineerPos.GetOrientation());
                             }
                             NextStep(2000);
                         case 4:
                             me->SetWalk(true);
-                            path.clear();
-                            path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                            for (uint8 i = 0; i < 1; i++)
-                                path.push_back(G3D::Vector3(BrannMovePos[i].GetPositionX(), BrannMovePos[i].GetPositionY(), BrannMovePos[i].GetPositionZ()));
-                            me->GetMotionMaster()->MoveSplinePath(&path);
+                            MoveWithinPath(me, BrannMovePos, 1);
                             NextStep(17000);
                             break;
                         case 5:
@@ -1643,31 +1695,33 @@ public:
                             {
                                 mageBeam1->DespawnOrUnsummon();
                                 mageBeam2->DespawnOrUnsummon();
-                                battleMageBeam1->GetMotionMaster()->MovePoint(0, -674.524f, -2.496f, 425.95f, true, true, MOTION_SLOT_CONTROLLED, 0.042202f);
-                                battleMageBeam2->GetMotionMaster()->MovePoint(0, -673.399f, -87.850f, 426.51f, true, true, MOTION_SLOT_CONTROLLED, 0.021254f);
+                                battleMageBeam1->GetMotionMaster()->MovePoint(0, BattleMagePosEnd_1.GetPositionX(), BattleMagePosEnd_1.GetPositionY(), BattleMagePosEnd_1.GetPositionZ(), true, true, MOTION_SLOT_CONTROLLED, BattleMagePosEnd_1.GetOrientation());
+                                battleMageBeam2->GetMotionMaster()->MovePoint(0, BattleMagePosEnd_2.GetPositionX(), BattleMagePosEnd_2.GetPositionY(), BattleMagePosEnd_2.GetPositionZ(), true, true, MOTION_SLOT_CONTROLLED, BattleMagePosEnd_2.GetOrientation());
                                 m_pInstance->SetData(DATA_MAGE_BARRIER, DONE);
-                            }
-                            NextStep(1000);
-                            break;
-                        case 8:
-                            // Set-up for huge Arcane Explosion
-                            if (Creature* cr = me->FindNearestCreature(33779, 250.0f))
-                            {
-                                cr->SetObjectScale(10.0f);
                             }
                             NextStep(3000);
                             break;
-                        case 9:
+                        case 8:
                             if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 250.0f))
                                 go->Delete();
                             if (Creature* cr = me->FindNearestCreature(33779, 250.0f))
                             {
-                                cr->CastSpell(cr, 50759, false);
+                                cr->CastSpell(cr, SPELL_BARRIER_EXPLOSION, true);
                             }
                             _running = false;
                             break;
                     }
             }
+        }
+
+        void MoveWithinPath(Creature* c, Position const pos[], int counter)
+        {
+            Movement::PointsArray path;
+            path.clear();
+            path.push_back(G3D::Vector3(c->GetPositionX(), c->GetPositionY(), c->GetPositionZ()));
+            for( int itr = 0; itr < counter; itr++)
+                path.push_back(G3D::Vector3(pos[itr].GetPositionX(), pos[itr].GetPositionY(), pos[itr].GetPositionZ()));
+            c->GetMotionMaster()->MoveSplinePath(&path);
         }
 
         void DoAction(int32 param) override
@@ -1686,9 +1740,6 @@ public:
                     me->GetInstanceScript()->ProcessEvent(nullptr, EVENT_TOWER_OF_LIFE_DESTROYED);
                 }
             }
-
-            if (Creature* cr = me->FindNearestCreature(NPC_ARCHMAGE_PENTARUS, 50.0f, true))
-                _pentarus = cr;
 
             _eventStarted = true;
             _running = true;
@@ -1820,110 +1871,116 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_brann_radioAI(pCreature);
+        return new npc_goran_steelbreakerAI(pCreature);
     }
 
-    struct npc_brann_radioAI : public NullCreatureAI
+    struct npc_goran_steelbreakerAI : public ScriptedAI
     {
-        npc_brann_radioAI(Creature* c) : NullCreatureAI(c)
+        npc_goran_steelbreakerAI(Creature* c) : ScriptedAI(c),
+            stoneShaper1(nullptr),
+            stoneShaper2(nullptr),
+            didReset(false),
+            _currentPoint(0)
         {
-            _lock = (me->GetInstanceScript() && me->GetInstanceScript()->GetData(TYPE_LEVIATHAN) > NOT_STARTED);
-            _helpLock = _lock;
+            m_pInstance = c->GetInstanceScript();
         }
 
-        bool _lock;
-        bool _helpLock;
+        EventMap events;
+        int _currentPoint;
+        InstanceScript* m_pInstance;
+        Creature* stoneShaper1;
+        Creature* stoneShaper2;
+        bool didReset;
 
+        enum {
+            EVENT_GORAN_MOVE_INTRO          = 1,
+        };
+
+        //Called at creature reset either by death or evade
         void Reset() override
         {
-            me->SetReactState(REACT_AGGRESSIVE);
-        }
-
-        void Say(const char* text)
-        {
-            WorldPacket data;
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, me, nullptr, text);
-            me->SendMessageToSetInRange(&data, 100.0f, true);
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (!_lock)
+            events.Reset();
+            if (stoneShaper1 == nullptr)
             {
-                if (who->GetTypeId() != TYPEID_PLAYER && !who->IsVehicle())
-                    return;
+                stoneShaper1 = me->SummonCreature(33620, -746.419f, -178.296f, 429.79f, 3.525500f);
+            }
+            if (stoneShaper2 == nullptr)
+            {
+                stoneShaper2 = me->SummonCreature(33620, -748.326f, -173.576f, 429.83f, 3.525500f);
+            }
+        }
 
-                // ENGAGE
-                /*
-                if (!_helpLock && me->GetDistance2d(-508.898f, -32.9631f) < 5.0f)
+        void UpdateAI(uint32 diff) override
+        {
+            if (m_pInstance->GetData(DATA_MAGE_BARRIER) == DONE && !didReset)
+            {
+                me->SetPosition(GoranMovePos[1]);
+                if (stoneShaper1 == nullptr)
                 {
-                    if (me->GetDistance2d(who) <= 60.0f)
-                    {
-                        Say("The iron dwarves have been seen emerging from the bunkers at the base of the pillars straight ahead of you. Destroy the bunkers and they will be forced to fall back.");
-                        me->PlayDirectSound(RSOUND_ENGAGE);
-                        _helpLock = true;
-                    }
-                }*/
-                // MIMIRON
-                else if (me->GetDistance2d(-81.9207f, 111.432f) < 5.0f)
-                {
-                    if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() > 430.0f)
-                    {
-                        Say("This generator powers Mimiron's Gaze. In moments, it can turn earth to ash, stone to magma--we cannot let it reach full power!");
-                        me->PlayDirectSound(RSOUND_MIMIRON);
-                        _lock = true;
-                    }
+                    stoneShaper1 = me->SummonCreature(33620, GoranMovePos[1].GetPositionX() - 3, GoranMovePos[1].GetPositionY() + 2, 427.241f, GoranMovePos[1].GetOrientation());
                 }
-                // FREYA
-                else if (me->GetDistance2d(-221.475f, -271.087f) < 5.0f)
+                else
                 {
-                    if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() < 380.0f)
-                    {
-                        Say("You're approaching the tower of Freya. It contains the power to turn barren wastelands into jungles teeming with life overnight");
-                        me->PlayDirectSound(RSOUND_FREYA);
-                        _lock = true;
-                    }
+                    stoneShaper1->SetPosition(GoranMovePos[1].GetPositionX() - 3, GoranMovePos[1].GetPositionY() + 2, 427.241f, GoranMovePos[1].GetOrientation());
                 }
-                // STATIONS
-                else if (me->GetDistance2d(73.8978f, -29.3306f) < 5.0f)
+                if (stoneShaper2 == nullptr)
                 {
-                    if (me->GetDistance2d(who) <= 40.0f)
-                    {
-                        Say("It appears you are near a repair station. Drive your vehicle on to the platform and it should be automatically repaired.");
-                        me->PlayDirectSound(RSOUND_STATION);
-                        _lock = true;
-                    }
+                    stoneShaper2 = me->SummonCreature(33620, GoranMovePos[1].GetPositionX() - 3, GoranMovePos[1].GetPositionY() - 2, 427.241f, GoranMovePos[1].GetOrientation());
                 }
-                // HODIR
-                else if (me->GetDistance2d(68.7679f, -325.026f) < 5.0f)
+                else
                 {
-                    if (me->GetDistance2d(who) <= 40.0f)
-                    {
-                        Say("This tower powers the hammer of Hodir. It is said to have the power to turn entire armies to ice!");
-                        me->PlayDirectSound(RSOUND_HODIR);
-                        _lock = true;
-                    }
+                    stoneShaper2->SetPosition(GoranMovePos[1].GetPositionX() - 3, GoranMovePos[1].GetPositionY() - 2, 427.241f, GoranMovePos[1].GetOrientation());
                 }
-                // THORIM
-                else if (me->GetDistance2d(174.442f, 345.679f) < 5.0f)
+                didReset = true;
+            }
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+            case EVENT_GORAN_MOVE_INTRO:
+                if (_currentPoint < 2)
+                    me->GetMotionMaster()->MovePoint(_currentPoint, GoranMovePos[_currentPoint]);
+                events.PopEvent();
+                break;
+            }
+        }
+
+        void MovementInform(uint32 movementType, uint32 pointId)
+        {
+            if (movementType != POINT_MOTION_TYPE || pointId > 1)
+                return;
+
+            _currentPoint = pointId + 1;
+            switch (pointId)
+            {
+            case 0:
+                me->SetWalk(true);
+                stoneShaper1->SetWalk(true);
+                stoneShaper2->SetWalk(true);
+                break;
+            case 1:
+                stoneShaper1->SetOrientation(me->GetOrientation());
+                stoneShaper1->GetMotionMaster()->Clear();
+                stoneShaper2->SetOrientation(me->GetOrientation());
+                stoneShaper1->GetMotionMaster()->Clear();
+                break;
+            }
+
+            events.ScheduleEvent(EVENT_GORAN_MOVE_INTRO, 1);
+        }
+
+        void DoAction(int32 param) override
+        {
+            if (param == 1)
+            {
+                if (stoneShaper1 != nullptr)
                 {
-                    if (me->GetDistance2d(who) <= 60.0f)
-                    {
-                        Say("Aaaah, the tower of Krolmir. It is said that the power of Thorim has been used only once. And that it turned an entire continent to dust...");
-                        me->PlayDirectSound(RSOUND_THORIM);
-                        _lock = true;
-                    }
+                    stoneShaper1->GetMotionMaster()->MoveFollow(me, 1.0f, M_PI - M_PI / 4.0f, MOTION_SLOT_ACTIVE);
                 }
-                // COME A BIT CLOSER
-                else if (me->GetDistance2d(-508.898f, -32.9631f) < 5.0f)
+                if (stoneShaper2 != nullptr)
                 {
-                    if (who->GetPositionX() >= -480.0f)
-                    {
-                        Say("There are four generators powering the defense structures. If you sabotage the generators, the missile attacks will stop!");
-                        me->PlayDirectSound(RSOUND_GENERATORS);
-                        _lock = true;
-                    }
+                    stoneShaper2->GetMotionMaster()->MoveFollow(me, 1.0f, M_PI + M_PI / 4.0f, MOTION_SLOT_ACTIVE);
                 }
+                events.ScheduleEvent(EVENT_GORAN_MOVE_INTRO, 1);
             }
         }
     };
@@ -2570,7 +2627,7 @@ public:
             switch (aurEff->GetEffIndex())
             {
             case EFFECT_0:
-                caster->AddAura(SPELL_TANSITUS_SHIELD_IMPACT, target);
+                caster->AddAura(SPELL_TRANSITUS_SHIELD_IMPACT, target);
                 break;
             }
         }
@@ -2586,7 +2643,7 @@ public:
 
             if (target)
             {
-                //target->RemoveAurasDueToSpell(SPELL_TANSITUS_SHIELD_IMPACT);
+                target->RemoveAurasDueToSpell(SPELL_TRANSITUS_SHIELD_IMPACT);
             }
         }
 
@@ -2762,6 +2819,7 @@ void AddSC_boss_flame_leviathan()
     new boss_flame_leviathan_defense_turret();
     new boss_flame_leviathan_overload_device();
     new npc_pool_of_tar();
+    new npc_goran_steelbreaker();
 
     // Hard Mode
     new npc_freya_ward();

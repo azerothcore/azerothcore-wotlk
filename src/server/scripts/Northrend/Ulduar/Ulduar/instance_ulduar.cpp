@@ -129,7 +129,7 @@ public:
             m_leviathanDoorsGUID    = 0;
             _leviathanVehicles.clear();
             m_unbrokenAchievement   = 1;
-            m_mageBarrier = 0;
+            m_mageBarrier           = 0;
 
             // Razorscale
             memset(&m_RazorscaleHarpoonFireStateGUID, 0, sizeof(m_RazorscaleHarpoonFireStateGUID));

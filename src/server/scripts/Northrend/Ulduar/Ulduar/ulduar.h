@@ -277,6 +277,17 @@ Position const AlgalonLandPos   = {1632.668f, -302.7656f, 417.3211f, 1.530165f};
 
 Position const MageBarrierPos_1 = { -666.392f, -4.95139f, 518.596f, 0.0f };
 Position const MageBarrierPos_2 = { -642.508f, -101.339f, 518.981f, 0.0f };
+Position const BattleMagePos_1 = { -675.671f, -19.437f, 426.35f, 1.309158f };
+Position const BattleMagePos_2 = { -673.059f, -77.446f, 426.35f, 5.350863f };
+Position const BattleMagePosEnd_1 = { -674.524f, -2.496f, 425.95f, 0.042202f };
+Position const BattleMagePosEnd_2 = { -673.399f, -87.850f, 426.51f, 0.021254f };
+Position const HiredEngineerPos = { -792.043f, -44.357f, 429.84f, 2.419350f };
+
+Position const GoranMovePos[2] =
+{
+    { -699.413f, -12.644f, 429.26f, 0.091053f },
+    { -679.878f, -8.195f, 426.89f, 0.091053f },
+};
 
 Position const BrannMovePos[1] =
 {
