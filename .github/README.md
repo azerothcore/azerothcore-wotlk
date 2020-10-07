@@ -12,7 +12,7 @@
 
 ## INTRODUCTION
 
-AzerothCore (AC) is an open source game-server application for World of Warcraft, currently supporting the 3.3.5a game version.
+AzerothCore (AC) is an open-source game-server application for World of Warcraft, currently supporting the 3.3.5a game version.
 
 It is written in C++ and is based on MaNGOS, TrinityCore and SunwellCore.
 
@@ -20,7 +20,7 @@ It is written in C++ and is based on MaNGOS, TrinityCore and SunwellCore.
 ## WHY AZEROTHCORE?
 
 1. Stability
-1. Authenticity of the content
+1. The authenticity of the content
 1. [Modularity](https://en.wikipedia.org/wiki/Modular_programming)
 1. A lot of modules to choose from
 1. Better configuration files system
@@ -35,13 +35,13 @@ Hence why nobody is allowed to push commits directly to the core. All changes ar
 
 #### Authenticity
 
-Fixing and implementing missing blizzlike content is one of our priorities, and we can boast to offer the most content-complete open source emulator.
+Fixing and implementing missing blizzlike content is one of our priorities, and we can boast to offer the most content-complete open-source emulator.
 <!-- Not sure for this below -->
-<!-- We were the first open source emulator to have almost every dungeon and raid working. -->
+<!-- We were the first open-source emulator to have almost every dungeon and raid working. -->
 
 #### Modules
 
-Modules are essential to AzerothCore's success. Modules allows users to plug them in and out easily, and do not require to modify the core files. It also means users can keep pulling the git changes from the main repository and only develop their own modules.
+Modules are essential to AzerothCore's success. Modules allow users to plug them in and out easily, and do not require to modify the core files. It also means users can keep pulling the git changes from the main repository and only develop their modules.
 
 We have a lot of modules already made, some of them are very important and will ease your work:
 
@@ -66,22 +66,22 @@ Here are the main points we focus on:
 
 * Stability
 * Ease of use / Practicability
-* Playability (ingame content)
+* Playability (in-game content)
 * Customization
-* Community driven software (check our discord)
+* Community-driven software (check our discord)
 
-We also welcome new users (even non-english speaking users!) and help them learn / improve their skills (C++, SQL, Git, software collaboration, tutoring / wiki etc...).
+We also welcome new users (even non-English speaking users!) and help them learn/improve their skills (C++, SQL, Git, software collaboration, tutoring/wiki, etc...).
 
-Unlike other projects which focus more on the developer's side of things, we want users to be able to run their own server with as few troubles as possible. All of our contributors run their own private server (in local or not).
+Unlike other projects which focus more on the developer's side of things, we want users to be able to run their server with as few troubles as possible. All of our contributors run their private servers (local or public).
 
-That's why AzerothCore is easier to use, to maintain, to understand, to develop on and to customize to suit your needs, than other emulators.
+That's why AzerothCore is easier to use, to maintain, to understand, to develop on, and to customize to suit your needs, than other emulators.
 
-In short, we focus on the **user experience (UX)**, whether it be the **player's experience**, the **developer's experience** or the **administrator's experience**.
+In short, we focus on the **user experience (UX)**, whether it be the **player's experience**, the **developer's experience**, or the **administrator's experience**.
 
 
 ## HOW TO THANK US
 
-Being an open source project, we rely on volunteers to pursue development. Here are ways to help us if you use AzerothCore:
+Being an open-source project, we rely on volunteers to pursue development. Here are ways to help us if you use AzerothCore:
 
 #### Github star
 
@@ -105,20 +105,21 @@ By talking about us on different platforms or to people who would like to get in
 AzerothCore is a learning project, and there are lots of different ways to contribute to the project:
 
 * By [testing our fixes](http://www.azerothcore.org/wiki/How-to-test-a-PR) (we can teach you how to correctly use Git to help us but that will also help you out tremendously)
-* By developing directly to the core or to the modules
+* By developing directly to the core or the modules
+* By reporting bugs within the project
 * By [creating new modules](http://www.azerothcore.org/wiki/Create-a-Module)
 * By improving our wiki
-* By providing direct support to our community (on discord, stackoverflow or specialized forums)
+* By providing direct support to our community (on Discord, StackOverflow or specialized forums)
 * By making extra content (video tutorial for example)
 * By putting bounties on issues
 
 
 If you want to contribute to the project, you will find a lot of resources that will guide you in our wiki.
 
-Feel free to join us on [our discord chat server][discord] where we taught a lot of new people how to get started and who are now important contributors!
+Feel free to join us on [our Discord chat server](https://discord.gg/gkt4y2x) where we teach a lot of new people how to get started and who are now important contributors!
 
 <!-- TO UNCOMMENT LATER -->
-<!-- As we put a big emphasis on community, there are also special rewards for contributors such as reputation ranks (displayed in our discord and our website), reputation badges (to display on your project/portfolio), premium software licenses, private modules access, private tools access and a lot of small private repositories access. -->
+<!-- As we put a big emphasis on community, there are also special rewards for contributors such as reputation ranks (displayed in our Discord and our website), reputation badges (to display on your project/portfolio), premium software licenses, private modules access, private tools access and a lot of small private repositories access. -->
 
 
 ## INSTALLATION
@@ -127,7 +128,7 @@ Installation instructions are available [here](http://www.azerothcore.org/wiki/I
 
 We also have an auto-installation bash script [here](/apps/installer/main.sh) (*Warning: try it/analyze it before running it*).
 
-Dockerization of AzerothCore is fully supported, and we have various community made tutorials (eg: AWS / Digital Ocean installation).
+Dockerization of AzerothCore is fully supported, and we have various community-made tutorials (eg: AWS / Digital Ocean installation).
 
 
 ## SUPPORT
@@ -149,8 +150,11 @@ This project exists thanks to:
 
 ## IMPORTANT LINKS
 
+<!-- Remove if the PR 3210 is accepted
+- [Code of Conduct](https://github.com/azerothcore-wotlk/.github/code_of_conduct.md
+-->
 - [Website](http://www.azerothcore.org/)
-- [AzerothCore catalogue](http://www.azerothcore.org/catalogue/  "Modules, tools, and other things for AzerothCore") (modules, tools etc...)
+- [AzerothCore catalogue](http://www.azerothcore.org/catalogue/  "Modules, tools, and other things for AzerothCore") (modules, tools, etc...)
 - [Module template / Module skeleton](https://github.com/azerothcore/skeleton-module/)
 - [Our community hub (Discord)](https://discord.gg/gkt4y2x)
 - [Our wiki](http://www.azerothcore.org/wiki "Easy to use and developed by AzerothCore founder")

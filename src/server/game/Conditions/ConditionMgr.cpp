@@ -49,7 +49,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             {
                 // don't allow 0 items (it's checked during table load)
                 ASSERT(ConditionValue2);
-                bool checkBank = ConditionValue3 ? true : false;
+                bool checkBank = !!ConditionValue3;
                 condMeets = player->HasItemCount(ConditionValue1, ConditionValue2, checkBank);
             }
             break;
@@ -207,12 +207,12 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         }
         case CONDITION_NEAR_CREATURE:
         {
-            condMeets = GetClosestCreatureWithEntry(object, ConditionValue1, (float)ConditionValue2, !ConditionValue3) ? true : false;
+            condMeets = !!GetClosestCreatureWithEntry(object, ConditionValue1, (float)ConditionValue2, !ConditionValue3);
             break;
         }
         case CONDITION_NEAR_GAMEOBJECT:
         {
-            condMeets = GetClosestGameObjectWithEntry(object, ConditionValue1, (float)ConditionValue2) ? true : false;
+            condMeets = !!GetClosestGameObjectWithEntry(object, ConditionValue1, (float)ConditionValue2);
             break;
         }
         case CONDITION_OBJECT_ENTRY_GUID:
