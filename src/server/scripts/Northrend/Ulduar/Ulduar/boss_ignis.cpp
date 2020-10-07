@@ -125,15 +125,18 @@ public:
             }
             else if (spell->Id == SPELL_HEAT_BUFF)
             {
-                if (Aura* a = me->GetAura(SPELL_HEAT_BUFF))
-                    if( a->GetStackAmount() >= RAID_MODE(10,20) )
+                if (Aura* heat = me->GetAura(SPELL_HEAT_BUFF))
+                {
+                    if(heat->GetStackAmount() >= 10)
+                    {
+                        if (heat->GetStackAmount() > 10)
                         {
-                            if (RAID_MODE(1,0) && a->GetStackAmount() > 10) // prevent going over 10 on 10man version
-                                a->ModStackAmount(-1);
-
-                            me->CastSpell(me, SPELL_MOLTEN, true);
-                            me->getThreatManager().resetAllAggro();
+                            heat->ModStackAmount(-1);
                         }
+                        me->CastSpell(me, SPELL_MOLTEN, true);
+                        me->getThreatManager().resetAllAggro();
+                    }
+                }
             }
         }
 
