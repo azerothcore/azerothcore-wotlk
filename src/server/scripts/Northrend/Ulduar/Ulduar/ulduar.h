@@ -82,6 +82,8 @@ enum UlduarData
 
     // Mage Barrier
     DATA_MAGE_BARRIER                       = 800,
+    DATA_BRANN_MEMOTESAY                    = 801,
+    DATA_BRANN_EASY_MODE                    = 802,
 };
 
 enum UlduarNPCs
@@ -135,6 +137,7 @@ enum UlduarNPCs
     NPC_VEHICLE_CHOPPER                     = 33062,
     NPC_SALVAGED_DEMOLISHER                 = 33109,
     NPC_SALVAGED_DEMOLISHER_TURRET          = 33167,
+    NPC_BRANN_BASE_CAMP                     = 33579,
 
     
     // Algalon the Observer
@@ -274,30 +277,5 @@ enum UlduarMisc
 
 Position const AlgalonSummonPos = {1632.531f, -304.8516f, 450.1123f, 1.530165f};
 Position const AlgalonLandPos   = {1632.668f, -302.7656f, 417.3211f, 1.530165f};
-
-Position const MageBarrierPos_1 = { -666.392f, -4.95139f, 518.596f, 0.0f };
-Position const MageBarrierPos_2 = { -642.508f, -101.339f, 518.981f, 0.0f };
-Position const BattleMagePos_1 = { -675.671f, -19.437f, 426.35f, 1.309158f };
-Position const BattleMagePos_2 = { -673.059f, -77.446f, 426.35f, 5.350863f };
-Position const BattleMagePosEnd_1 = { -674.524f, -2.496f, 425.95f, 0.042202f };
-Position const BattleMagePosEnd_2 = { -673.399f, -87.850f, 426.51f, 0.021254f };
-Position const HiredEngineerPos = { -792.043f, -44.357f, 429.84f, 2.419350f };
-
-Position const GoranMovePos[2] =
-{
-    { -699.413f, -12.644f, 429.26f, 0.091053f },
-    { -679.878f, -8.195f, 426.89f, 0.091053f },
-};
-
-Position const BrannMovePos[1] =
-{
-    { -674.003f, -45.784f, 426.113f, 0.073612f },
-};
-
-Position const PentarusMovePos[2] =
-{
-    { -696.340f, -85.890f, 429.24f, 0.073428f },
-    { -676.520f, -84.802f, 426.89f, 0.073428f },
-};
 
 #endif

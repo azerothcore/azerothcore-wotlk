@@ -91,6 +91,7 @@ public:
         uint64 m_algalonUniverseGUID;
         uint64 m_algalonTrapdoorGUID;
         uint64 m_brannBronzebeardAlgGUID;
+        uint64 m_brannBronzebeardBaseCamp;
         uint32 m_algalonTimer;
 
         // Shared
@@ -130,6 +131,7 @@ public:
             _leviathanVehicles.clear();
             m_unbrokenAchievement   = 1;
             m_mageBarrier           = 0;
+            m_brannBronzebeardBaseCamp = 0;
 
             // Razorscale
             memset(&m_RazorscaleHarpoonFireStateGUID, 0, sizeof(m_RazorscaleHarpoonFireStateGUID));
@@ -342,6 +344,8 @@ public:
                 case NPC_BRANN_BRONZBEARD_ALG:
                     m_brannBronzebeardAlgGUID = creature->GetGUID();
                     break;
+                case NPC_BRANN_BASE_CAMP:
+                    m_brannBronzebeardBaseCamp = creature->GetGUID();
                 //! These creatures are summoned by something else than Algalon
                 //! but need to be controlled/despawned by him - so they need to be
                 //! registered in his summon list
@@ -702,6 +706,18 @@ public:
                             if (data == 1 && t->GetGoState() == GO_STATE_READY && t->GetPathProgress() == 0)
                                 MimironTram->SetGoState(GO_STATE_ACTIVE);
                         }
+                    break;
+                case DATA_BRANN_MEMOTESAY:
+                    if (Creature* cr = instance->GetCreature(m_brannBronzebeardBaseCamp))
+                    {
+                        cr->MonsterTextEmote("Go to your vehicles!", 0, true);
+                    }
+                    break;
+                case DATA_BRANN_EASY_MODE:
+                    ProcessEvent(nullptr, EVENT_TOWER_OF_STORM_DESTROYED);
+                    ProcessEvent(nullptr, EVENT_TOWER_OF_FROST_DESTROYED);
+                    ProcessEvent(nullptr, EVENT_TOWER_OF_FLAMES_DESTROYED);
+                    ProcessEvent(nullptr, EVENT_TOWER_OF_LIFE_DESTROYED);
                     break;
             }
 
