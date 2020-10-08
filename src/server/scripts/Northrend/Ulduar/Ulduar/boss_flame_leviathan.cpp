@@ -29,6 +29,7 @@ enum LeviathanSpells
     SPELL_NAPALM_10                 = 63666,
     SPELL_NAPALM_25                 = 65026,
     SPELL_INVIS_AND_STEALTH_DETECT  = 18950,
+    SPELL_TRANSITUS_SHIELD_IMPACT   = 48387,
 
     // Shutdown spells
     SPELL_SYSTEMS_SHUTDOWN          = 62475,

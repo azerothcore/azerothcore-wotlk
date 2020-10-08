@@ -206,16 +206,16 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 33686);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(33686, 0, 0, 1, 62, 0, 100, 0, 10366, 0, 0, 0, 0, 98, 10477, 14496, 0, 0, 0, 0, 7, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Send Gossip'),
-(33686, 0, 1, 0, 61, 0, 100, 1, 10366, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Data 1 1'),
-(33686, 0, 2, 0, 62, 0, 100, 1, 10366, 0, 0, 0, 0, 80, 3368600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Run Script (No Repeat)'),
+(33686, 0, 0, 0, 62, 0, 100, 0, 10366, 0, 0, 0, 0, 80, 3368600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Run Script (No Repeat)'),
+(33686, 0, 1, 2, 61, 0, 100, 1, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Data 1 1'),
+(33686, 0, 2, 1, 61, 0, 100, 0, 0, 0, 0, 0, 0, 98, 10477, 14496, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Send Gossip'),
 (33686, 0, 3, 4, 62, 0, 100, 0, 10477, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Remove Npc Flags Gossip'),
-(33686, 0, 4, 5, 61, 0, 100, 0, 10477, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Close Gossip'),
-(33686, 0, 5, 6, 61, 0, 100, 0, 10477, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Store Targetlist'),
-(33686, 0, 6, 7, 61, 0, 100, 0, 10477, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Send Target 1'),
-(33686, 0, 7, 8, 61, 0, 100, 0, 10477, 0, 0, 0, 0, 45, 2, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Data 2 1'),
-(33686, 0, 8, 9, 61, 0, 100, 0, 10477, 0, 0, 0, 0, 80, 3368601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Run Script'),
-(33686, 0, 9, 0, 61, 0, 100, 0, 10477, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 10, 136253, 33579, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Remove Npc Flags Gossip'),
+(33686, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Close Gossip'),
+(33686, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Store Targetlist'),
+(33686, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Send Target 1'),
+(33686, 0, 7, 8, 61, 0, 100, 0, 0, 0, 0, 0, 0, 45, 2, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Data 2 1'),
+(33686, 0, 8, 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 80, 3368601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Run Script'),
+(33686, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 10, 136253, 33579, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Remove Npc Flags Gossip'),
 (33686, 0, 10, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Update - Remove Npc Flags Gossip (No Repeat)'),
 (33686, 0, 11, 0, 38, 0, 100, 0, 0, 1, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Data Set 0 1 - Set Phase Mask 2'),
 (33686, 0, 12, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Update - Set Phase Mask 2');
