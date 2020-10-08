@@ -4,12 +4,16 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "ulduar.h"
 #include "Vehicle.h"
 #include "ScriptedEscortAI.h"
+#include "SpellAuras.h"
 #include "PassiveAI.h"
+#include "SpellAuraEffects.h"
 #include "ScriptedGossip.h"
 #include "CombatAI.h"
+#include "Spell.h"
 #include "GridNotifiers.h"
 #include "Player.h"
 #include "Opcodes.h"
@@ -25,9 +29,6 @@ enum LeviathanSpells
     SPELL_NAPALM_10                 = 63666,
     SPELL_NAPALM_25                 = 65026,
     SPELL_INVIS_AND_STEALTH_DETECT  = 18950,
-    SPELL_TRANSITUS_SHIELD_BEAM     = 48310,
-    SPELL_TRANSITUS_SHIELD_IMPACT   = 48387,
-    SPELL_BARRIER_EXPLOSION         = 59377, // 63660
 
     // Shutdown spells
     SPELL_SYSTEMS_SHUTDOWN          = 62475,
@@ -71,18 +72,9 @@ enum GosNpcs
 
     // Starting event
     NPC_ULDUAR_COLOSSUS             = 33237,
-    NPC_HIGH_EXPLORER_DELLORAH      = 33701,
-    NPC_ARCHMAGE_RHYDIAN            = 33696,
-    NPC_START_BRANN_BRONZEBEARD     = 33579,
-    NPC_ARCHMAGE_PENTARUS           = 33624,
     NPC_BRANN_RADIO                 = 34054,
     NPC_ULDUAR_GAUNTLET_GENERATOR   = 33571,
     NPC_DEFENDER_GENERATED          = 33572,
-    GO_STARTING_BARRIER             = 194484,
-    NPC_ULDUAR_SHIELD_BUNNY         = 33779,
-    NPC_KIRIN_TOR_MAGE              = 33672,
-    NPC_KIRIN_TOR_BATTLE_MAGE       = 33662,
-    NPC_HIRED_ENGINEER              = 33626,
 
     // Hard Mode
     NPC_THORIM_HAMMER_TARGET        = 33364,
@@ -157,22 +149,21 @@ enum Seats
 
 enum Misc
 {
-    DATA_EVENT_STARTED                  = 1,
-    DATA_GET_TOWER_COUNT                = 2,
-    DATA_GET_SHUTDOWN                   = 3,
+    DATA_EVENT_STARTED              = 1,
+    DATA_GET_TOWER_COUNT            = 2,
+    DATA_GET_SHUTDOWN               = 3,
 
-    TOWER_OF_STORMS                     = 2,
-    TOWER_OF_FLAMES                     = 1,
-    TOWER_OF_FROST                      = 3,
-    TOWER_OF_LIFE                       = 0,
+    TOWER_OF_STORMS                 = 2,
+    TOWER_OF_FLAMES                 = 1,
+    TOWER_OF_FROST                  = 3,
+    TOWER_OF_LIFE                   = 0,
 
-    ACTION_START_NORGANNON_EVENT        = 1,
-    ACTION_START_NORGANNON_BRANN        = 2,
-    ACTION_START_BRANN_EVENT            = 3,
-    ACTION_DESPAWN_ADDS                 = 4,
-    ACTION_DELAY_CANNON                 = 5,
-    ACTION_DESTROYED_TURRET             = 6,
-    ACTION_START_NORGANNON_GOSSIP_EVENT = 7
+    ACTION_START_NORGANNON_EVENT    = 1,
+    ACTION_START_NORGANNON_BRANN    = 2,
+    ACTION_START_BRANN_EVENT        = 3,
+    ACTION_DESPAWN_ADDS             = 4,
+    ACTION_DELAY_CANNON             = 5,
+    ACTION_DESTROYED_TURRET         = 6,
 };
 
 ///////////////////////////////////////////
@@ -1252,17 +1243,6 @@ public:
                 if (who->GetTypeId() != TYPEID_PLAYER && !who->IsVehicle())
                     return;
 
-                // ENGAGE
-                /*
-                if (!_helpLock && me->GetDistance2d(-508.898f, -32.9631f) < 5.0f)
-                {
-                    if (me->GetDistance2d(who) <= 60.0f)
-                    {
-                        Say("The iron dwarves have been seen emerging from the bunkers at the base of the pillars straight ahead of you. Destroy the bunkers and they will be forced to fall back.");
-                        me->PlayDirectSound(RSOUND_ENGAGE);
-                        _helpLock = true;
-                    }
-                }*/
                 // MIMIRON
                 else if (me->GetDistance2d(-81.9207f, 111.432f) < 5.0f)
                 {
