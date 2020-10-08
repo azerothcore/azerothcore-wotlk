@@ -1,4 +1,3 @@
-DELETE FROM `version_db_world` WHERE `sql_rev` = '1601981411342865100';
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1601981411342865100');
 
 /*
@@ -110,7 +109,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (13627100, 25, -796.247, -66.4749, 429.843, 'Goran Steelbreaker'),
 (13627100, 26, -803.578, -54.884, 429.843, 'Goran Steelbreaker');
 
-DELETE FROM `waypoints` WHERE `entry` IN (13627101,13627102);
+DELETE FROM `waypoints` WHERE `entry` IN (13627101);
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
 (13627101, 1, -759.514, -46.609, 429.84, 'Goran Steelbreaker 1'),
 (13627101, 2, -709.315, -26.547, 429.84, 'Goran Steelbreaker 1'),
@@ -129,12 +128,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-136271, 0, 5, 6, 58, 0, 100, 0, 0, 13627101, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 6.2797, 'Goran Steelbreaker - On Waypoint Finished - Set Orientation 6.2797'),
 (-136271, 0, 6, 7, 61, 0, 100, 0, 0, 13627101, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 136525, 33620, 0, 0, 0, 0, 0, 0, 'Goran Steelbreaker - On Waypoint Finished - Set Data 0 1'),
 (-136271, 0, 7, 0, 61, 0, 100, 0, 0, 13627101, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 136526, 33620, 0, 0, 0, 0, 0, 0, 'Goran Steelbreaker - On Waypoint Finished - Set Data 0 1'),
-(-136271, 0, 8, 0, 40, 0, 100, 0, 3, 13627101, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Goran Steelbreaker - On Waypoint 3 Reached - Set Run Off'),
-(-136271, 0, 9, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -679.813, -8.959, 426.88, 6.2797, 'Goran Steelbreaker - On Update - Teleport (No Repeat)');
+(-136271, 0, 8, 9, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -679.813, -8.959, 426.88, 6.2797, 'Goran Steelbreaker - On Update - Teleport (No Repeat)'),
+(-136271, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Goran Steelbreaker - On Update - Stop Waypoint (No Repeat)');
 
 DELETE FROM `conditions` WHERE (`SourceEntry` = -136271);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 10, -136271, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
+(22, 9, -136271, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
 
 -- Earthen Stoneshaper
 DELETE FROM `creature` WHERE (`id` = 33620);
@@ -150,15 +149,17 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-136525, 0, 1, 2, 38, 0, 100, 0, 0, 1, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Earthen Stoneshaper - On Data Set 0 1 - Stop Follow '),
 (-136525, 0, 2, 0, 61, 0, 100, 0, 0, 1, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 10, 136271, 33622, 0, 0, -3, 3, 0, 0, 'Earthen Stoneshaper - On Data Set 0 1 - Move To Closest Creature \'Goran Steelbreaker\''),
 (-136525, 0, 3, 0, 34, 0, 100, 0, 0, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 6.2797, 'Earthen Stoneshaper - On Reached Point 1 - Set Orientation 6.2797'),
-(-136525, 0, 4, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -682.924, -12.419, 427.25, 6.279700, 'Earthen Stoneshaper - On Update - Teleport (No Repeat)');
+(-136525, 0, 4, 5, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -682.924, -5.959, 427.28, 6.2797, 'Earthen Stoneshaper - On Update - Teleport (No Repeat)'),
+(-136525, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Earthen Stoneshaper - On Update - Stop Follow  (No Repeat)');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136526);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-136526, 0, 0, 0, 1, 0, 100, 1, 500, 500, 500, 500, 0, 29, 2, 225, 0, 0, 0, 0, 10, 136271, 33622, 0, 0, 0, 0, 0, 0, 'Earthen Stoneshaper - Out of Combat - Start Follow Closest Creature \'Goran Steelbreaker\' (No Repeat)'),
 (-136526, 0, 1, 2, 38, 0, 100, 0, 0, 1, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Earthen Stoneshaper - On Data Set 0 1 - Stop Follow '),
-(-136526, 0, 2, 0, 61, 0, 100, 0, 0, 1, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 10, 136271, 33622, 0, 0, -3, -3, 0, 0, 'Earthen Stoneshaper - On Data Set 0 1 - Move To Closest Creature \'Goran Steelbreaker\''),
+(-136526, 0, 2, 0, 61, 0, 100, 0, 0, 1, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 10, 136271, 33622, 0, 0, -3, -3, 0.1, 0, 'Earthen Stoneshaper - On Data Set 0 1 - Move To Closest Creature \'Goran Steelbreaker\''),
 (-136526, 0, 3, 0, 34, 0, 100, 0, 0, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 6.2797, 'Earthen Stoneshaper - On Reached Point 1 - Set Orientation 6.2797'),
-(-136526, 0, 4, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -682.924, -5.624, 427.28, 6.279700, 'Earthen Stoneshaper - On Update - Teleport (No Repeat)');
+(-136526, 0, 4, 5, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -682.812, -11.959, 427.25, 6.2797, 'Earthen Stoneshaper - On Update - Teleport (No Repeat)'),
+(-136526, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Earthen Stoneshaper - On Update - Stop Follow  (No Repeat)');
 
 DELETE FROM `conditions` WHERE (`SourceEntry` IN (-136525,-136526));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
@@ -215,7 +216,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (33686, 0, 7, 8, 61, 0, 100, 0, 10477, 0, 0, 0, 0, 45, 2, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Data 2 1'),
 (33686, 0, 8, 9, 61, 0, 100, 0, 10477, 0, 0, 0, 0, 80, 3368601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Run Script'),
 (33686, 0, 9, 0, 61, 0, 100, 0, 10477, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 10, 136253, 33579, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Remove Npc Flags Gossip'),
-(33686, 0, 10, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Update - Remove Npc Flags Gossip (No Repeat)');
+(33686, 0, 10, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Update - Remove Npc Flags Gossip (No Repeat)'),
+(33686, 0, 11, 0, 38, 0, 100, 0, 0, 1, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Data Set 0 1 - Set Phase Mask 2'),
+(33686, 0, 12, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Update - Set Phase Mask 2');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3368600);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -232,7 +235,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `conditions` WHERE (`SourceEntry` = 33686);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 11, 33686, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
+(22, 11, 33686, 0, 0, 13, 1, 800, 0, 0, 1, 0, 0, '', 'Lore Keeper of Norgannon - Remove Gossip Flag - Ulduar Base Camp Intro Started'),
+(22, 13, 33686, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Lore Keeper of Norgannon - Change Phase - Ulduar Base Camp Intro Done');
 
 -- High Explorer Dellorah
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33701;
@@ -243,8 +247,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (33701, 0, 1, 0, 38, 0, 100, 1, 2, 1, 0, 0, 0, 80, 3370101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Data Set 2 1 - Run Script (No Repeat)'),
 (33701, 0, 2, 3, 40, 0, 100, 0, 6, 0, 0, 0, 0, 1, 8, 5000, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Waypoint 6 Reached - Say Line 8'),
 (33701, 0, 3, 0, 61, 0, 100, 0, 6, 0, 0, 0, 0, 54, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Waypoint 6 Reached - Pause Waypoint'),
-(33701, 0, 4, 0, 60, 0, 100, 0, 500, 500, 0, 0, 0, 44, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Update - Missing comment for action_type 44'),
-(33701, 0, 5, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 44, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Waypoint Finished - Missing comment for action_type 44'),
+(33701, 0, 4, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Update - Set Phase Mask 2'),
+(33701, 0, 5, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Waypoint Finished - Set Phase Mask 2'),
 (33701, 0, 6, 0, 52, 0, 100, 0, 8, 33701, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 136253, 33579, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Text 8 Over - Set Data 0 1');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3370100);
@@ -358,8 +362,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3357900, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 4, 15807, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Play Sound 15807'),
 (3357900, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Say Line 1'),
 (3357900, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 34, 801, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Instance Data 801 to 0'),
-(3357900, 9, 4, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136348, 33626, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Data 1 1'),
-(3357900, 9, 5, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 53, 0, 33579, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Start Waypoint');
+(3357900, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 136767, 33686, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Data 0 1'),
+(3357900, 9, 5, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136348, 33626, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Data 1 1'),
+(3357900, 9, 6, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 53, 0, 33579, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Start Waypoint');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3357901);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
