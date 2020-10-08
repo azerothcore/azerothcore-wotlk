@@ -52,7 +52,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136524);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-136524, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 29, 1, 135, 0, 0, 0, 0, 10, 136281, 33624, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - On Data Set 1 1 - Start Follow Closest Creature \'Archmage Pentarus\''),
-(-136524, 0, 1, 0, 60, 0, 100, 0, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -679.255, -87.855, 427.228, 0.054839, 'Kirin Tor Battle-Mage - On Update - Teleport');
+(-136524, 0, 1, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -679.573, -82.066, 427.233, 0.054839, 'Kirin Tor Battle-Mage - On Update - Teleport (No Repeat)');
 
 DELETE FROM `conditions` WHERE (`SourceEntry` = -136524);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
@@ -60,8 +60,8 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 
 DELETE FROM `conditions` WHERE (`SourceEntry` IN (-137507,-137508));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 1, -137507, 0, 0, 13, 1, 800, 3, 0, 1, 0, 0, '', ''),
-(22, 1, -137508, 0, 0, 13, 1, 800, 3, 0, 1, 0, 0, '', ''),
+(22, 1, -137507, 0, 0, 13, 1, 800, 0, 0, 0, 0, 0, '', ''),
+(22, 1, -137508, 0, 0, 13, 1, 800, 0, 0, 0, 0, 0, '', ''),
 (22, 5, -137507, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', ''),
 (22, 5, -137508, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
 
@@ -70,7 +70,7 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33672;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136537);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-136537, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 29, 1, 225, 0, 0, 0, 0, 10, 136281, 33624, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Data Set 1 1 - Start Follow Closest Creature \'Archmage Pentarus\''),
-(-136537, 0, 1, 0, 60, 0, 100, 0, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -679.573, -82.066, 427.233, 0.054839, 'Kirin Tor Mage - On Update - Teleport');
+(-136537, 0, 1, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -679.255, -87.855, 427.228, 0.054839, 'Kirin Tor Mage - On Update - Teleport (No Repeat)');
 
 DELETE FROM `conditions` WHERE (`SourceEntry` = -136537);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
@@ -112,9 +112,10 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 
 DELETE FROM `waypoints` WHERE `entry` IN (13627101,13627102);
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
-(13627101, 1, -758.608, -49.659, 429.84, 'Goran Steelbreaker 1'),
-(13627101, 2, -695.192, -15.364, 428.75, 'Goran Steelbreaker 1'),
-(13627101, 3, -679.813, -8.959, 426.88, 'Goran Steelbreaker 1');
+(13627101, 1, -759.514, -46.609, 429.84, 'Goran Steelbreaker 1'),
+(13627101, 2, -709.315, -26.547, 429.84, 'Goran Steelbreaker 1'),
+(13627101, 3, -702.395, -11.965, 429.73, 'Goran Steelbreaker 1'),
+(13627101, 4, -679.813, -8.959, 426.88, 'Goran Steelbreaker 1');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 33622);
 
@@ -126,8 +127,14 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-136271, 0, 3, 4, 38, 0, 100, 0, 0, 1, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Goran Steelbreaker - On Data Set 0 1 - Stop Waypoint'),
 (-136271, 0, 4, 0, 61, 0, 100, 0, 0, 1, 0, 0, 0, 53, 1, 13627101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Goran Steelbreaker - On Data Set 0 1 - Start Waypoint'),
 (-136271, 0, 5, 6, 58, 0, 100, 0, 0, 13627101, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 6.2797, 'Goran Steelbreaker - On Waypoint Finished - Set Orientation 6.2797'),
-(-136271, 0, 6, 0, 61, 0, 100, 0, 0, 13627101, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 136525, 33620, 0, 0, 0, 0, 0, 0, 'Goran Steelbreaker - On Waypoint Finished - Set Data 0 1'),
-(-136271, 0, 7, 0, 40, 0, 100, 0, 2, 13627101, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Goran Steelbreaker - On Waypoint 2 Reached - Set Run Off');
+(-136271, 0, 6, 7, 61, 0, 100, 0, 0, 13627101, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 136525, 33620, 0, 0, 0, 0, 0, 0, 'Goran Steelbreaker - On Waypoint Finished - Set Data 0 1'),
+(-136271, 0, 7, 0, 61, 0, 100, 0, 0, 13627101, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 136526, 33620, 0, 0, 0, 0, 0, 0, 'Goran Steelbreaker - On Waypoint Finished - Set Data 0 1'),
+(-136271, 0, 8, 0, 40, 0, 100, 0, 3, 13627101, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Goran Steelbreaker - On Waypoint 3 Reached - Set Run Off'),
+(-136271, 0, 9, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -679.813, -8.959, 426.88, 6.2797, 'Goran Steelbreaker - On Update - Teleport (No Repeat)');
+
+DELETE FROM `conditions` WHERE (`SourceEntry` = -136271);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 10, -136271, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
 
 -- Earthen Stoneshaper
 DELETE FROM `creature` WHERE (`id` = 33620);
@@ -140,12 +147,23 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33620;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136525);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-136525, 0, 0, 0, 1, 0, 100, 1, 500, 500, 500, 500, 0, 29, 2, 135, 0, 0, 0, 0, 10, 136271, 33622, 0, 0, 0, 0, 0, 0, 'Earthen Stoneshaper - Out of Combat - Start Follow Closest Creature \'Goran Steelbreaker\' (No Repeat)'),
-(-136525, 0, 1, 0, 38, 0, 100, 0, 0, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 6.2797, 'Earthen Stoneshaper - On Data Set 0 1 - Set Orientation 6.2797');
+(-136525, 0, 1, 2, 38, 0, 100, 0, 0, 1, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Earthen Stoneshaper - On Data Set 0 1 - Stop Follow '),
+(-136525, 0, 2, 0, 61, 0, 100, 0, 0, 1, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 10, 136271, 33622, 0, 0, -3, 3, 0, 0, 'Earthen Stoneshaper - On Data Set 0 1 - Move To Closest Creature \'Goran Steelbreaker\''),
+(-136525, 0, 3, 0, 34, 0, 100, 0, 0, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 6.2797, 'Earthen Stoneshaper - On Reached Point 1 - Set Orientation 6.2797'),
+(-136525, 0, 4, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -682.924, -12.419, 427.25, 6.279700, 'Earthen Stoneshaper - On Update - Teleport (No Repeat)');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136526);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-136526, 0, 0, 0, 1, 0, 100, 1, 500, 500, 500, 500, 0, 29, 2, 225, 0, 0, 0, 0, 10, 136271, 33622, 0, 0, 0, 0, 0, 0, 'Earthen Stoneshaper - Out of Combat - Start Follow Closest Creature \'Goran Steelbreaker\' (No Repeat)'),
-(-136526, 0, 1, 0, 38, 0, 100, 0, 0, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 6.2797, 'Earthen Stoneshaper - On Data Set 0 1 - Set Orientation 6.2797');
+(-136526, 0, 1, 2, 38, 0, 100, 0, 0, 1, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Earthen Stoneshaper - On Data Set 0 1 - Stop Follow '),
+(-136526, 0, 2, 0, 61, 0, 100, 0, 0, 1, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 10, 136271, 33622, 0, 0, -3, -3, 0, 0, 'Earthen Stoneshaper - On Data Set 0 1 - Move To Closest Creature \'Goran Steelbreaker\''),
+(-136526, 0, 3, 0, 34, 0, 100, 0, 0, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 6.2797, 'Earthen Stoneshaper - On Reached Point 1 - Set Orientation 6.2797'),
+(-136526, 0, 4, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -682.924, -5.624, 427.28, 6.279700, 'Earthen Stoneshaper - On Update - Teleport (No Repeat)');
+
+DELETE FROM `conditions` WHERE (`SourceEntry` IN (-136525,-136526));
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 5, -136525, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', ''),
+(22, 5, -136526, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
 
 -- Archmage Rhydian
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33696;
@@ -291,7 +309,12 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33626;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136348);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-136348, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -792.043, -44.357, 429.84, 2.41935, 'Hired Engineer - On Data Set 1 1 - Move To Position');
+(-136348, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -792.043, -44.357, 429.84, 2.41935, 'Hired Engineer - On Data Set 1 1 - Move To Position'),
+(-136348, 0, 1, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -792.043, -44.357, 429.84, 2.41935, 'Hired Engineer - On Update - Teleport (No Repeat)');
+
+DELETE FROM `conditions` WHERE (`SourceEntry` = -136348);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 2, -136348, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Hired Enginner - Set Correct Properties');
 
 -- Brann Bronzebear
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 33579);
@@ -309,14 +332,13 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (33579, 3, 0, 'The iron dwarves have been seen emerging from the bunkers at the base of the pillars straight ahead of you! Destroy the bunkers, and they\'ll be forced to fall back!', 12, 0, 100, 0, 0, 0, 34145, 0, 'Brann Bronzebeard - Ulduar'),
 (33579, 4, 0, 'Pentarus, you heard the woman. Have your mages release the shield and let these brave souls through!', 14, 0, 100, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Ulduar');
 
-
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33579;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 33579);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (33579, 0, 0, 1, 38, 0, 100, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Data Set 0 1 - Say Line 4'),
 (33579, 0, 1, 0, 61, 0, 100, 0, 0, 1, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Data Set 0 1 - Set Data 1 1'),
-(33579, 0, 2, 3, 62, 0, 100, 0, 10355, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Gossip Option 0 Selected - Say Line 1'),
+(33579, 0, 2, 3, 62, 0, 100, 0, 10355, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Gossip Option 0 Selected - Say Line 0'),
 (33579, 0, 3, 4, 61, 0, 100, 0, 10355, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Gossip Option 0 Selected - Set Data 1 1'),
 (33579, 0, 4, 5, 61, 0, 100, 0, 10355, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Gossip Option 0 Selected - Close Gossip'),
 (33579, 0, 5, 6, 61, 0, 100, 0, 10355, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Gossip Option 0 Selected - Remove Npc Flags Gossip'),
@@ -327,7 +349,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (33579, 0, 10, 0, 38, 0, 100, 0, 0, 2, 0, 0, 0, 80, 3357901, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Data Set 0 2 - Run Script'),
 (33579, 0, 11, 12, 60, 0, 100, 1, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Update - Remove Npc Flags Gossip (No Repeat)'),
 (33579, 0, 12, 13, 61, 0, 100, 0, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -674.782, -45.877, 426.2, 0.110212, 'Brann Bronzebeard - On Update - Teleport (No Repeat)'),
-(33579, 0, 13, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 14, 50363, 194484, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Update - Despawn Instant (No Repeat)');
+(33579, 0, 13, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 14, 50363, 194484, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Update - Despawn Instant (No Repeat)'),
+(33579, 0, 14, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 34, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Update - Set Instance Data 802 to 0 (No Repeat)');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3357900);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -353,7 +376,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `conditions` WHERE (`SourceEntry` = 33579);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 12, 33579, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Brann Bronzebeard - Set Correct Properties');
+(22, 12, 33579, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Brann Bronzebeard - Set Correct Properties'),
+(22, 15, 33579, 0, 1, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Brann Bronzebeard - Re-spawn vehicles - Intro Completed'),
+(22, 15, 33579, 0, 1, 13, 1, 0, 0, 0, 0, 0, 0, '', 'Brann Bronzebeard - Re-spawn vehicles - Leviathan not started');
 
 -- Arch Mage Pentarus
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33624;
