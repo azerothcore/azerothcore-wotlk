@@ -63,7 +63,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136527);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-136527, 0, 0, 0, 10, 0, 100, 1, 1, 20, 0, 0, 1, 80, 3366200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - Within 1-20 Range Out of Combat LoS - Run Script (No Repeat)'),
-(-136527, 0, 1, 0, 10, 0, 100, 0, 1, 20, 90000, 12000, 1, 80, 3366200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - Within 1-20 Range Out of Combat LoS - Run Script');
+(-136527, 0, 1, 0, 10, 0, 100, 0, 1, 20, 90000, 120000, 1, 80, 3366200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - Within 1-20 Range Out of Combat LoS - Run Script');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3369600); -- This has a invalid guid, it has Archmage Rhydian guid but it is for Kirin Tor Battle-Mage
 
@@ -236,7 +236,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 33686);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (33686, 0, 0, 0, 62, 0, 100, 0, 10366, 0, 0, 0, 0, 98, 10477, 14496, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Send Gossip'),
-(33686, 0, 1, 0, 10, 0, 100, 0, 1, 20, 90000, 18000, 1, 80, 3368600, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Within 1-20 Range Out of Combat LoS - Run Script'),
+(33686, 0, 1, 0, 10, 0, 100, 0, 1, 20, 90000, 180000, 1, 80, 3368600, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Within 1-20 Range Out of Combat LoS - Run Script'),
 (33686, 0, 2, 0, 10, 0, 100, 1, 1, 20, 0, 0, 1, 80, 3368600, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Within 1-20 Range Out of Combat LoS - Run Script (No Repeat)'),
 (33686, 0, 3, 0, 62, 0, 100, 1, 10366, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Event Phase 1 (No Repeat)'),
 (33686, 0, 4, 5, 62, 1, 100, 0, 10477, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Remove Npc Flags Gossip (Phase 1)'),
