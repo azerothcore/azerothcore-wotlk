@@ -1171,10 +1171,10 @@ public:
                                 uiEventPhase = 2;
                                 break;
                             case NPC_TOM_HEGGER:
-                                if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID)) 
+                                if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
                                 {
                                     Talk(SAY_HIDDEN_CULTIST_3, player);
-                                } 
+                                }
                                 uiEventTimer = 5000;
                                 uiEventPhase = 2;
                                 break;
