@@ -1907,7 +1907,9 @@ public:
 
             float dist = GetHitUnit()->GetExactDist2d(GetCaster());
             if (dist <= 7.0f)
+            {
                 SetHitDamage(GetSpellInfo()->Effects[EFFECT_1].CalcValue());
+            }
             else
             {
                 dist -= 6.0f;
@@ -1940,12 +1942,16 @@ public:
         {
             Unit* caster = GetCaster();
             if (!caster)
+            {
                 return;
+            }
 
             Unit* target = GetTarget();
 
             if (!target)
+            {
                 return;
+            }
 
             switch (aurEff->GetEffIndex())
             {
@@ -1960,7 +1966,9 @@ public:
             Unit* caster = GetCaster();
 
             if (!caster)
+            {
                 return;
+            }
 
             Unit* target = GetTarget();
 

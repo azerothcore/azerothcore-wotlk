@@ -1,11 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1601981411342865100');
 
-/*
- * <www.azerothcore.org> | Copyright (C)
-*/
-
 -- ULDUAR SHIELD BUNNY
-UPDATE `creature_template` SET `InhabitType`=4, `AIName`='SmartAI' WHERE  `entry`=33779;
+UPDATE `creature_template` SET `InhabitType`=4, `AIName`='SmartAI' WHERE `entry`=33779;
 
 DELETE FROM `creature` WHERE (`id` = 33779);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
@@ -53,11 +49,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-136524, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 29, 1, 135, 0, 0, 0, 0, 10, 136281, 33624, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - On Data Set 1 1 - Start Follow Closest Creature \'Archmage Pentarus\''),
 (-136524, 0, 1, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -679.573, -82.066, 427.233, 0.054839, 'Kirin Tor Battle-Mage - On Update - Teleport (No Repeat)');
 
-DELETE FROM `conditions` WHERE (`SourceEntry` = -136524);
+DELETE FROM `conditions` WHERE (`SourceEntry` = -136524) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 2);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 2, -136524, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
 
-DELETE FROM `conditions` WHERE (`SourceEntry` IN (-137507,-137508));
+DELETE FROM `conditions` WHERE (`SourceEntry` IN (-137507,-137508)) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (1,5));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 1, -137507, 0, 0, 13, 1, 800, 0, 0, 0, 0, 0, '', ''),
 (22, 1, -137508, 0, 0, 13, 1, 800, 0, 0, 0, 0, 0, '', ''),
@@ -71,7 +67,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-136537, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 29, 1, 225, 0, 0, 0, 0, 10, 136281, 33624, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Data Set 1 1 - Start Follow Closest Creature \'Archmage Pentarus\''),
 (-136537, 0, 1, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -679.255, -87.855, 427.228, 0.054839, 'Kirin Tor Mage - On Update - Teleport (No Repeat)');
 
-DELETE FROM `conditions` WHERE (`SourceEntry` = -136537);
+DELETE FROM `conditions` WHERE (`SourceEntry` = -136537) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 2);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 2, -136537, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
 
@@ -131,7 +127,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-136271, 0, 8, 9, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -679.813, -8.959, 426.88, 6.2797, 'Goran Steelbreaker - On Update - Teleport (No Repeat)'),
 (-136271, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Goran Steelbreaker - On Update - Stop Waypoint (No Repeat)');
 
-DELETE FROM `conditions` WHERE (`SourceEntry` = -136271);
+DELETE FROM `conditions` WHERE (`SourceEntry` = -136271) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 9);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 9, -136271, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
 
@@ -161,7 +157,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-136526, 0, 4, 5, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -682.812, -11.959, 427.25, 6.2797, 'Earthen Stoneshaper - On Update - Teleport (No Repeat)'),
 (-136526, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Earthen Stoneshaper - On Update - Stop Follow  (No Repeat)');
 
-DELETE FROM `conditions` WHERE (`SourceEntry` IN (-136525,-136526));
+DELETE FROM `conditions` WHERE (`SourceEntry` IN (-136525,-136526)) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 5, -136525, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', ''),
 (22, 5, -136526, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
@@ -238,7 +234,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3368600, 9, 4, 0, 0, 0, 100, 0, 31000, 31000, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Say Line 4'),
 (3368600, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 17, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Set Emote State 1');
 
-DELETE FROM `conditions` WHERE (`SourceEntry` = 33686);
+DELETE FROM `conditions` WHERE (`SourceEntry` = 33686) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (12,14));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 12, 33686, 0, 0, 13, 1, 800, 0, 0, 1, 0, 0, '', 'Lore Keeper of Norgannon - Remove Gossip Flag - Ulduar Base Camp Intro Started'),
 (22, 14, 33686, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Lore Keeper of Norgannon - Change Phase - Ulduar Base Camp Intro Done');
@@ -275,7 +271,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3370101, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 7, 0, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Say Line 7'),
 (3370101, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 53, 1, 33701, 0, 0, 2000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Start Waypoint');
 
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceEntry` = 33701);
+DELETE FROM `conditions` WHERE (`SourceEntry` = 33701) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 5);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 5, 33701, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'High Explorer Dellorah - Change Phase - Base Camp Intro Done');
 
@@ -322,7 +318,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-136348, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -792.043, -44.357, 429.84, 2.41935, 'Hired Engineer - On Data Set 1 1 - Move To Position'),
 (-136348, 0, 1, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -792.043, -44.357, 429.84, 2.41935, 'Hired Engineer - On Update - Teleport (No Repeat)');
 
-DELETE FROM `conditions` WHERE (`SourceEntry` = -136348);
+DELETE FROM `conditions` WHERE (`SourceEntry` = -136348) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 2);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 2, -136348, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Hired Enginner - Set Correct Properties');
 
@@ -388,7 +384,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3357901, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 14, 50363, 194484, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Despawn Instant'),
 (3357901, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 34, 800, 3, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Instance Data 800 to 3');
 
-DELETE FROM `conditions` WHERE (`SourceEntry` = 33579);
+DELETE FROM `conditions` WHERE (`SourceEntry` = 33579) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (12,15));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 12, 33579, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Brann Bronzebeard - Set Correct Properties'),
 (22, 15, 33579, 0, 1, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Brann Bronzebeard - Re-spawn vehicles - Intro Completed'),
@@ -424,7 +420,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3362400, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136524, 33662, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - Actionlist - Set Data 1 1'),
 (3362400, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136537, 33672, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - Actionlist - Set Data 1 1');
 
-DELETE FROM `conditions` WHERE (`SourceEntry` = 33624);
+DELETE FROM `conditions` WHERE (`SourceEntry` = 33624) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 4);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 4, 33624, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Archmage Pentarus - Set Correct Properties');
 
