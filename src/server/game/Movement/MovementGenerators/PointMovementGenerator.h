@@ -14,8 +14,8 @@ template<class T>
 class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementGenerator<T> >
 {
     public:
-        PointMovementGenerator(uint32 _id, float _x, float _y, float _z, float _speed = 0.0f, const Movement::PointsArray* _path = NULL, bool generatePath = false, bool forceDestination = false) : id(_id),
-            i_x(_x), i_y(_y), i_z(_z), speed(_speed), _generatePath(generatePath), _forceDestination(forceDestination)
+        PointMovementGenerator(uint32 _id, float _x, float _y, float _z, float _speed = 0.0f, float orientation = 0.0f, const Movement::PointsArray* _path = nullptr, bool generatePath = false, bool forceDestination = false) : id(_id),
+            i_x(_x), i_y(_y), i_z(_z), speed(_speed), i_orientation(orientation), _generatePath(generatePath), _forceDestination(forceDestination)
         {
             if (_path)
                 m_precomputedPath = *_path;
@@ -37,6 +37,7 @@ class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementG
         uint32 id;
         float i_x, i_y, i_z;
         float speed;
+        float i_orientation;
         bool i_recalculateSpeed;
         Movement::PointsArray m_precomputedPath;
         bool _generatePath;

@@ -9,7 +9,8 @@
 #include "DBC.h"
 #include "Utils.h"
 
-char const* MPQManager::Files[] = {
+char const* MPQManager::Files[] =
+{
     "common.MPQ",
     "common-2.MPQ",
     "expansion.MPQ",

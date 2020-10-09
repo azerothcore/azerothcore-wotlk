@@ -210,6 +210,8 @@ class InstanceScript : public ZoneScript
 
         uint32 GetEncounterCount() const { return bosses.size(); }
 
+        // Allows to perform particular actions
+        virtual void DoAction(int32 /*action*/) {}
     protected:
         void SetBossNumber(uint32 number) { bosses.resize(number); }
         void LoadDoorData(DoorData const* data);
