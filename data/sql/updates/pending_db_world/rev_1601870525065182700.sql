@@ -60,6 +60,20 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (22, 5, -137507, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', ''),
 (22, 5, -137508, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
 
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136527);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-136527, 0, 0, 0, 10, 0, 100, 1, 1, 20, 0, 0, 1, 80, 3366200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - Within 1-20 Range Out of Combat LoS - Run Script (No Repeat)'),
+(-136527, 0, 1, 0, 10, 0, 100, 0, 1, 20, 90000, 12000, 1, 80, 3366200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - Within 1-20 Range Out of Combat LoS - Run Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3369600); -- This has a invalid guid, it has Archmage Rhydian guid but it is for Kirin Tor Battle-Mage
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3366200);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(3366200, 9, 0, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - Script - Say Line 0'),
+(3366200, 9, 1, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 33626, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - Script - Say Line 0 (Hired Engineer)'),
+(3366200, 9, 2, 0, 0, 0, 100, 0, 7000, 7000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - Script - Say Line 1'),
+(3366200, 9, 3, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 33626, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - Script - Say Line 1 (Hired Engineer)');
+
 -- Kirin Tor Mage
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33672;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136537);
@@ -157,14 +171,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-136526, 0, 4, 5, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -682.812, -11.959, 427.25, 6.2797, 'Earthen Stoneshaper - On Update - Teleport (No Repeat)'),
 (-136526, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Earthen Stoneshaper - On Update - Stop Follow  (No Repeat)');
 
-DELETE FROM `conditions` WHERE (`SourceEntry` IN (-136525,-136526)) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 0);
+DELETE FROM `conditions` WHERE (`SourceEntry` = -136525) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 5);
+DELETE FROM `conditions` WHERE (`SourceEntry` = -136526) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 5);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 5, -136525, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', ''),
 (22, 5, -136526, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
 
 -- Archmage Rhydian
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3369600) AND (`source_type` = 9);
-
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33696;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 33696);
@@ -203,6 +216,19 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 -- Lore Keeper of Norgannon
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 33686);
 
+DELETE FROM `creature` WHERE (`id` = 33686);
+INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
+(136605, 33686, 603, 0, 0, 3, 1, 6589, 0, -764.599, -147.708, 430.172, 3.19395, 604800, 0, 0, 17010, 0, 0, 0, 0, 0, '', 0);
+
+DELETE FROM `creature_text` WHERE `CreatureID`=33686;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(33686, 0, 0, 'I was constructed to serve as a repository for essential information regarding this complex. My primary functions include communicating the status of the frontal defense systems and assessing the status of the entity that this complex was built to imprison.', 12, 0, 0, 0, 0, 0, 33703, 0, 'Norgannon SAY_EVENT_1'),
+(33686, 1, 0, 'Access to the interior of the complex is currently restricted. Primary defensive emplacements are active. Secondary systems are currently non-active.', 12, 0, 0, 0, 0, 0, 33705, 0, 'Norgannon SAY_EVENT_2'),
+(33686, 2, 0, 'Compromise of complex detected, security override enabled - query permitted.', 12, 0, 0, 0, 0, 0, 33707, 0, 'Norgannon SAY_EVENT_3'),
+(33686, 3, 0, 'Primary defensive emplacements consist of iron constructs and Storm Beacons, which will generate additional constructs as necessary. Secondary systems consist of orbital defense emplacements.', 12, 0, 0, 0, 0, 0, 33712, 0, 'Norgannon SAY_EVENT_4'),
+(33686, 4, 0, 'Entity designate: Yogg-Saron. Security has been compromised. Prison operational status unknown. Unable to contact Watchers for notification purposes.', 12, 0, 0, 0, 0, 0, 33711, 0, 'Norgannon SAY_EVENT_5'),
+(33686, 5, 0, 'Deactivating.', 12, 0, 0, 0, 0, 0, 33808, 0, 'Norgannon SAY_EVENT_6');
+
 DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 10366);
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
 (10366, 0, 0, 'Activate secondary defensive systems.', 34420, 1, 1, 0, 0, 0, 0, NULL, 0, 0);
@@ -210,9 +236,9 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 33686);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (33686, 0, 0, 0, 62, 0, 100, 0, 10366, 0, 0, 0, 0, 98, 10477, 14496, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Send Gossip'),
-(33686, 0, 1, 2, 62, 0, 100, 1, 10366, 0, 0, 0, 0, 80, 3368600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Run Script (No Repeat)'),
-(33686, 0, 2, 3, 61, 0, 100, 0, 10366, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Data 1 1 (No Repeat)'),
-(33686, 0, 3, 0, 61, 0, 100, 0, 10366, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Event Phase 1 (No Repeat)'),
+(33686, 0, 1, 2, 10, 0, 100, 0, 1, 20, 90000, 18000, 1, 80, 3368600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Within 1-20 Range Out of Combat LoS - Run Script'),
+(33686, 0, 2, 0, 61, 0, 100, 0, 1, 20, 90000, 18000, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Within 1-20 Range Out of Combat LoS - Set Data 1 1'),
+(33686, 0, 3, 0, 62, 0, 100, 1, 10366, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Event Phase 1 (No Repeat)'),
 (33686, 0, 4, 5, 62, 1, 100, 0, 10477, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Remove Npc Flags Gossip (Phase 1)'),
 (33686, 0, 5, 6, 61, 1, 100, 0, 10477, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Close Gossip (Phase 1)'),
 (33686, 0, 6, 7, 61, 1, 100, 0, 10477, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Store Targetlist (Phase 1)'),
@@ -221,9 +247,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (33686, 0, 9, 10, 61, 1, 100, 0, 10477, 0, 0, 0, 0, 45, 2, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Data 2 1 (Phase 1)'),
 (33686, 0, 10, 0, 61, 1, 100, 0, 10477, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 10, 136253, 33579, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Remove Npc Flags Gossip (Phase 1)'),
 (33686, 0, 11, 0, 60, 1, 100, 1, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Update - Remove Npc Flags Gossip (Phase 1) (No Repeat)'),
-(33686, 0, 12, 0, 38, 0, 100, 0, 0, 1, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Data Set 0 1 - Set Phase Mask 2'),
-(33686, 0, 13, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Update - Set Phase Mask 2'),
-(33686, 0, 14, 0, 38, 1, 100, 0, 1, 2, 0, 0, 0, 80, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Data Set 1 2 - Run Script (Phase 1)');
+(33686, 0, 12, 15, 38, 0, 100, 0, 0, 1, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Data Set 0 1 - Despawn In 2000 ms'),
+(33686, 0, 13, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Update - Despawn In 2000 ms (No Repeat)'),
+(33686, 0, 14, 0, 38, 1, 100, 0, 1, 2, 0, 0, 0, 80, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Data Set 1 2 - Run Script (Phase 1)'),
+(33686, 0, 15, 0, 61, 0, 100, 0, 0, 1, 0, 0, 0, 1, 6, 2000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Data Set 0 1 - Say Line 6');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3368600);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -428,6 +455,56 @@ DELETE FROM `waypoints` WHERE `entry`=33624;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
 (33624, 1, -696.34, -85.89, 429.24, 'Archmage Pentarus'),
 (33624, 2, -676.52, -84.802, 426.89, 'Archmage Pentarus');
+
+-- Teleporter
+UPDATE `gameobject_template` SET `ScriptName` = '' WHERE (`entry` = 194569);
+UPDATE `gameobject` SET `state` = 0 WHERE (`id` = 194569);
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 10389);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(15, 10389, 0, 0, 0, 13, 1, 0, 0, 0, 1, 0, 0, '', 'Ulduar Teleporter - Expedition Base Camp'),
+(15, 10389, 1, 0, 0, 13, 1, 0, 0, 0, 1, 0, 0, '', 'Ulduar Teleporter - Formation Grounds'),
+(15, 10389, 2, 0, 0, 13, 1, 0, 3, 0, 0, 0, 0, '', 'Ulduar Teleporter - Colossal Forge'),
+(15, 10389, 3, 0, 0, 13, 1, 3, 3, 0, 0, 0, 0, '', 'Ulduar Teleporter - Scrapyard'),
+(15, 10389, 4, 0, 0, 13, 1, 3, 3, 0, 0, 0, 0, '', 'Ulduar Teleporter - Antechamber of Ulduar'),
+(15, 10389, 5, 0, 0, 13, 1, 5, 3, 0, 0, 0, 0, '', 'Ulduar Teleporter - Shattered Walkway'),
+(15, 10389, 6, 0, 0, 13, 1, 6, 3, 0, 0, 0, 0, '', 'Ulduar Teleporter - Conservatory of Life'),
+(15, 10389, 7, 0, 0, 13, 1, 710, 0, 0, 1, 0, 0, '', 'Ulduar Teleporter - Spark of Imagination'),
+(15, 10389, 8, 0, 0, 13, 1, 11, 3, 0, 0, 0, 0, '', 'Ulduar Teleporter - Prison of Yogg-Saron');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceEntry` = 194569);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 2, 194569, 1, 0, 13, 1, 0, 0, 0, 1, 0, 0, '', 'Ulduar Teleporter - Enable');
+
+UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 194569;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` = 194569);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(194569, 1, 0, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 105, 16, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Update - Add Gameobject Flags Not Selectable (No Repeat)'),
+(194569, 1, 1, 2, 60, 0, 100, 1, 0, 0, 0, 0, 0, 106, 16, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Update - Remove Gameobject Flags Not Selectable (No Repeat)'),
+(194569, 1, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 202, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Update - Set GO state to 0 (No Repeat)'),
+(194569, 1, 3, 12, 62, 0, 100, 0, 10389, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, -706.122, -92.602, 430.27, 0, 'Ulduar Teleporter - On Gossip Option 0 Selected - Teleport'),
+(194569, 1, 4, 12, 62, 0, 100, 0, 10389, 1, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 131.248, -35.38, 410.2, 0, 'Ulduar Teleporter - On Gossip Option 1 Selected - Teleport'),
+(194569, 1, 5, 12, 62, 0, 100, 0, 10389, 2, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 553.233, -12.324, 410.07, 0, 'Ulduar Teleporter - On Gossip Option 2 Selected - Teleport'),
+(194569, 1, 6, 12, 62, 0, 100, 0, 10389, 3, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 926.292, -11.463, 418.99, 0, 'Ulduar Teleporter - On Gossip Option 3 Selected - Teleport'),
+(194569, 1, 7, 12, 62, 0, 100, 0, 10389, 4, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1498.09, -24.246, 421.36, 0, 'Ulduar Teleporter - On Gossip Option 4 Selected - Teleport'),
+(194569, 1, 8, 12, 62, 0, 100, 0, 10389, 5, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1859.72, -24.884, 449.21, 0, 'Ulduar Teleporter - On Gossip Option 5 Selected - Teleport'),
+(194569, 1, 9, 12, 62, 0, 100, 0, 10389, 6, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 2086.27, -24.313, 421.71, 0, 'Ulduar Teleporter - On Gossip Option 6 Selected - Teleport'),
+(194569, 1, 10, 12, 62, 0, 100, 0, 10389, 7, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1854.8, -11.46, 334.57, 0, 'Ulduar Teleporter - On Gossip Option 7 Selected - Teleport'),
+(194569, 1, 11, 12, 62, 0, 100, 0, 10389, 8, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 2518.22, -2569.11, 412.69, 0, 'Ulduar Teleporter - On Gossip Option 8 Selected - Teleport'),
+(194569, 1, 12, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option Selected - Close Gossip');
+
+DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 10389);
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+(10389, 0, 0, 'Teleport to the Expedition Base Camp.', 33919, 1, 0, 0, 0, 0, 0, '', 0, 0),
+(10389, 1, 0, 'Teleport to the Formation Grounds.', 33920, 1, 0, 0, 0, 0, 0, '', 0, 0),
+(10389, 2, 0, 'Teleport to the Colossal Forge.', 33921, 1, 0, 0, 0, 0, 0, '', 0, 0),
+(10389, 3, 0, 'Teleport to the Scrapyard.', 33922, 1, 0, 0, 0, 0, 0, '', 0, 0),
+(10389, 4, 0, 'Teleport to the Antechamber of Ulduar.', 33923, 1, 0, 0, 0, 0, 0, '', 0, 0),
+(10389, 5, 0, 'Teleport to the Shattered Walkway.', 33924, 1, 0, 0, 0, 0, 0, '', 0, 0),
+(10389, 6, 0, 'Teleport to the Conservatory of Life.', 33926, 1, 0, 0, 0, 0, 0, '', 0, 0),
+(10389, 7, 0, 'Teleport to the Spark of Imagination.', 33927, 1, 0, 0, 0, 0, 0, '', 0, 0),
+(10389, 8, 0, 'Teleport to the Prison of Yogg-Saron.', 33928, 1, 0, 0, 0, 0, 0, '', 0, 0); 
 
 -- Add the script to the 48310 id spell
 DELETE FROM `spell_script_names` WHERE `spell_id`=48310;
