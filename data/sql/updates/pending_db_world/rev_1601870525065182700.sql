@@ -167,18 +167,23 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (22, 5, -136526, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
 
 -- Archmage Rhydian
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3369600) AND (`source_type` = 9);
+
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33696;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 33696);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(33696, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 1, 0, 2000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Data Set 1 1 - Say Line 0'),
-(33696, 0, 1, 0, 52, 0, 100, 0, 0, 33696, 0, 0, 0, 53, 1, 33696, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Text 0 Over - Start Waypoint'),
-(33696, 0, 2, 0, 40, 0, 100, 0, 7, 33696, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Waypoint 7 Reached - Set Run Off'),
-(33696, 0, 3, 4, 40, 0, 100, 0, 9, 33696, 0, 0, 0, 54, 8000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Waypoint 9 Reached - Pause Waypoint'),
-(33696, 0, 4, 5, 61, 0, 100, 0, 9, 33696, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Waypoint 9 Reached - Say Line 1'),
-(33696, 0, 5, 0, 61, 0, 100, 0, 9, 33696, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Waypoint 9 Reached - Set Run On'),
-(33696, 0, 6, 0, 40, 0, 100, 0, 13, 33696, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Waypoint 13 Reached - Set Run Off'),
-(33696, 0, 7, 0, 40, 0, 100, 0, 14, 33696, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 5.91667, 'Archmage Rhydian - On Waypoint 14 Reached - Set Orientation 5.91667');
+(33696, 0, 0, 1, 38, 0, 100, 0, 1, 1, 0, 0, 0, 1, 0, 2000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Data Set 1 1 - Say Line 0'),
+(33696, 0, 1, 0, 61, 0, 100, 0, 1, 1, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Data Set 1 1 - Set Event Phase 1'),
+(33696, 0, 2, 0, 52, 1, 100, 0, 0, 33696, 0, 0, 0, 53, 1, 33696, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Text 0 Over - Start Waypoint (Phase 1)'),
+(33696, 0, 3, 0, 40, 1, 100, 0, 7, 33696, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Waypoint 7 Reached - Set Run Off (Phase 1)'),
+(33696, 0, 4, 5, 40, 1, 100, 0, 9, 33696, 0, 0, 0, 54, 8000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Waypoint 9 Reached - Pause Waypoint (Phase 1)'),
+(33696, 0, 5, 6, 61, 1, 100, 0, 9, 33696, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Waypoint 9 Reached - Say Line 1 (Phase 1)'),
+(33696, 0, 6, 0, 61, 1, 100, 0, 9, 33696, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Waypoint 9 Reached - Set Run On (Phase 1)'),
+(33696, 0, 7, 0, 40, 1, 100, 0, 13, 33696, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Waypoint 13 Reached - Set Run Off (Phase 1)'),
+(33696, 0, 8, 0, 40, 1, 100, 0, 14, 33696, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 5.91667, 'Archmage Rhydian - On Waypoint 14 Reached - Set Orientation 5.91667 (Phase 1)'),
+(33696, 0, 10, 0, 38, 1, 100, 0, 1, 2, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -773.48, -144.13, 429.91, 0, 'Archmage Rhydian - On Data Set 1 2 - Move To Position (Phase 1)'),
+(33696, 0, 11, 0, 34, 1, 100, 0, 0, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 5.91667, 'Archmage Rhydian - On Reached Point 1 - Set Orientation 5.91667 (Phase 1)');
 
 DELETE FROM `waypoints` WHERE `entry`=33696;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
@@ -206,19 +211,21 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 33686);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(33686, 0, 0, 0, 62, 0, 100, 0, 10366, 0, 0, 0, 0, 80, 3368600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Run Script (No Repeat)'),
-(33686, 0, 1, 2, 61, 0, 100, 1, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Data 1 1'),
-(33686, 0, 2, 1, 61, 0, 100, 0, 0, 0, 0, 0, 0, 98, 10477, 14496, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Send Gossip'),
-(33686, 0, 3, 4, 62, 0, 100, 0, 10477, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Remove Npc Flags Gossip'),
-(33686, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Close Gossip'),
-(33686, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Store Targetlist'),
-(33686, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Send Target 1'),
-(33686, 0, 7, 8, 61, 0, 100, 0, 0, 0, 0, 0, 0, 45, 2, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Data 2 1'),
-(33686, 0, 8, 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 80, 3368601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Run Script'),
-(33686, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 10, 136253, 33579, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Remove Npc Flags Gossip'),
-(33686, 0, 10, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Update - Remove Npc Flags Gossip (No Repeat)'),
-(33686, 0, 11, 0, 38, 0, 100, 0, 0, 1, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Data Set 0 1 - Set Phase Mask 2'),
-(33686, 0, 12, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Update - Set Phase Mask 2');
+(33686, 0, 0, 0, 62, 0, 100, 0, 10366, 0, 0, 0, 0, 98, 10477, 14496, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Send Gossip'),
+(33686, 0, 1, 2, 62, 0, 100, 1, 10366, 0, 0, 0, 0, 80, 3368600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Run Script (No Repeat)'),
+(33686, 0, 2, 3, 61, 0, 100, 0, 10366, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Data 1 1 (No Repeat)'),
+(33686, 0, 3, 0, 61, 0, 100, 0, 10366, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Event Phase 1 (No Repeat)'),
+(33686, 0, 4, 5, 62, 1, 100, 0, 10477, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Remove Npc Flags Gossip (Phase 1)'),
+(33686, 0, 5, 6, 61, 1, 100, 0, 10477, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Close Gossip (Phase 1)'),
+(33686, 0, 6, 7, 61, 1, 100, 0, 10477, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Store Targetlist (Phase 1)'),
+(33686, 0, 7, 8, 61, 1, 100, 0, 10477, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Send Target 1 (Phase 1)'),
+(33686, 0, 8, 9, 61, 1, 100, 0, 10477, 0, 0, 0, 0, 80, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Run Script (Phase 1)'),
+(33686, 0, 9, 10, 61, 1, 100, 0, 10477, 0, 0, 0, 0, 45, 2, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Data 2 1 (Phase 1)'),
+(33686, 0, 10, 0, 61, 1, 100, 0, 10477, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 10, 136253, 33579, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Remove Npc Flags Gossip (Phase 1)'),
+(33686, 0, 11, 0, 60, 1, 100, 1, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Update - Remove Npc Flags Gossip (Phase 1) (No Repeat)'),
+(33686, 0, 12, 0, 38, 0, 100, 0, 0, 1, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Data Set 0 1 - Set Phase Mask 2'),
+(33686, 0, 13, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Update - Set Phase Mask 2'),
+(33686, 0, 14, 0, 38, 1, 100, 0, 1, 2, 0, 0, 0, 80, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Data Set 1 2 - Run Script (Phase 1)');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3368600);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -229,14 +236,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3368600, 9, 4, 0, 0, 0, 100, 0, 31000, 31000, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Say Line 4'),
 (3368600, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 17, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Set Emote State 1');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3368601);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(3368601, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Set Data 1 0');
-
 DELETE FROM `conditions` WHERE (`SourceEntry` = 33686);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 11, 33686, 0, 0, 13, 1, 800, 0, 0, 1, 0, 0, '', 'Lore Keeper of Norgannon - Remove Gossip Flag - Ulduar Base Camp Intro Started'),
-(22, 13, 33686, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Lore Keeper of Norgannon - Change Phase - Ulduar Base Camp Intro Done');
+(22, 12, 33686, 0, 0, 13, 1, 800, 0, 0, 1, 0, 0, '', 'Lore Keeper of Norgannon - Remove Gossip Flag - Ulduar Base Camp Intro Started'),
+(22, 14, 33686, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Lore Keeper of Norgannon - Change Phase - Ulduar Base Camp Intro Done');
 
 -- High Explorer Dellorah
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33701;
@@ -249,7 +252,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (33701, 0, 3, 0, 61, 0, 100, 0, 6, 0, 0, 0, 0, 54, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Waypoint 6 Reached - Pause Waypoint'),
 (33701, 0, 4, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Update - Set Phase Mask 2'),
 (33701, 0, 5, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Waypoint Finished - Set Phase Mask 2'),
-(33701, 0, 6, 0, 52, 0, 100, 0, 8, 33701, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 136253, 33579, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Text 8 Over - Set Data 0 1');
+(33701, 0, 6, 0, 52, 0, 100, 0, 8, 33701, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 136253, 33579, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Text 8 Over - Set Data 0 1'),
+(33701, 0, 7, 8, 38, 0, 100, 0, 1, 2, 0, 0, 0, 80, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Data Set 1 2 - Run Script');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3370100);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -354,7 +358,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (33579, 0, 11, 12, 60, 0, 100, 1, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Update - Remove Npc Flags Gossip (No Repeat)'),
 (33579, 0, 12, 13, 61, 0, 100, 0, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -674.782, -45.877, 426.2, 0.110212, 'Brann Bronzebeard - On Update - Teleport (No Repeat)'),
 (33579, 0, 13, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 14, 50363, 194484, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Update - Despawn Instant (No Repeat)'),
-(33579, 0, 14, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 34, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Update - Set Instance Data 802 to 0 (No Repeat)');
+(33579, 0, 14, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 34, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Update - Set Instance Data 100 to 0 (No Repeat)'),
+(33579, 0, 15, 16, 38, 0, 100, 0, 1, 1, 0, 0, 0, 45, 1, 2, 0, 0, 0, 0, 10, 136761, 33696, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Data Set 1 1 - Set Data 1 2'),
+(33579, 0, 16, 17, 61, 0, 100, 0, 1, 1, 0, 0, 0, 45, 1, 2, 0, 0, 0, 0, 10, 136605, 33686, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Data Set 1 1 - Set Data 1 2'),
+(33579, 0, 17, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 2, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - On Data Set 1 1 - Set Data 1 2');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3357900);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
