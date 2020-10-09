@@ -16,7 +16,7 @@ public:
     explicit NodeArray() { memset(&_nodes, 0, sizeof(_nodes)); }
     void AddNode(Node* n)
     {
-        for (uint8 i=0; i<9; ++i)
+        for (uint8 i = 0; i < 9; ++i)
             if (_nodes[i] == 0)
             {
                 _nodes[i] = n;
@@ -29,37 +29,41 @@ public:
 };
 
 template<class Node>
-struct NodeCreator{
-    static Node * makeNode(int /*x*/, int /*y*/) { return new Node();}
+struct NodeCreator
+{
+    static Node* makeNode(int /*x*/, int /*y*/) { return new Node();}
 };
 
 template<class T,
-class Node,
-class NodeCreatorFunc = NodeCreator<Node>,
-    /*class BoundsFunc = BoundsTrait<T>,*/
-class PositionFunc = PositionTrait<T>
->
+         class Node,
+         class NodeCreatorFunc = NodeCreator<Node>,
+         /*class BoundsFunc = BoundsTrait<T>,*/
+         class PositionFunc = PositionTrait<T>
+         >
 class RegularGrid2D
 {
 public:
 
-    enum{
+    enum
+    {
         CELL_NUMBER = 64,
     };
 
-    #define HGRID_MAP_SIZE  (533.33333f * 64.f)     // shouldn't be changed
-    #define CELL_SIZE       float(HGRID_MAP_SIZE/(float)CELL_NUMBER)
+#define HGRID_MAP_SIZE  (533.33333f * 64.f)     // shouldn't be changed
+#define CELL_SIZE       float(HGRID_MAP_SIZE/(float)CELL_NUMBER)
 
     typedef G3D::Table<const T*, NodeArray<Node> > MemberTable;
 
     MemberTable memberTable;
     Node* nodes[CELL_NUMBER][CELL_NUMBER];
 
-    RegularGrid2D(){
+    RegularGrid2D()
+    {
         memset(nodes, 0, sizeof(nodes));
     }
 
-    ~RegularGrid2D(){
+    ~RegularGrid2D()
+    {
         for (int x = 0; x < CELL_NUMBER; ++x)
             for (int y = 0; y < CELL_NUMBER; ++y)
                 delete nodes[x][y];
@@ -72,14 +76,14 @@ public:
         pos[1] = value.getBounds().corner(1);
         pos[2] = value.getBounds().corner(2);
         pos[3] = value.getBounds().corner(3);
-        pos[4] = (pos[0] + pos[1])/2.0f;
-        pos[5] = (pos[1] + pos[2])/2.0f;
-        pos[6] = (pos[2] + pos[3])/2.0f;
-        pos[7] = (pos[3] + pos[0])/2.0f;
-        pos[8] = (pos[0] + pos[2])/2.0f;
+        pos[4] = (pos[0] + pos[1]) / 2.0f;
+        pos[5] = (pos[1] + pos[2]) / 2.0f;
+        pos[6] = (pos[2] + pos[3]) / 2.0f;
+        pos[7] = (pos[3] + pos[0]) / 2.0f;
+        pos[8] = (pos[0] + pos[2]) / 2.0f;
 
         NodeArray<Node> na;
-        for (uint8 i=0; i<9; ++i)
+        for (uint8 i = 0; i < 9; ++i)
         {
             Cell c = Cell::ComputeCell(pos[i].x, pos[i].y);
             if (!c.isValid())
@@ -88,7 +92,7 @@ public:
             na.AddNode(&node);
         }
 
-        for (uint8 i=0; i<9; ++i)
+        for (uint8 i = 0; i < 9; ++i)
         {
             if (na._nodes[i])
                 na._nodes[i]->insert(value);
@@ -102,7 +106,7 @@ public:
     void remove(const T& value)
     {
         NodeArray<Node>& na = memberTable[&value];
-        for (uint8 i=0; i<9; ++i)
+        for (uint8 i = 0; i < 9; ++i)
         {
             if (na._nodes[i])
                 na._nodes[i]->remove(value);
@@ -132,7 +136,7 @@ public:
 
         static Cell ComputeCell(float fx, float fy)
         {
-            Cell c = { int(fx * (1.f/CELL_SIZE) + (CELL_NUMBER/2)), int(fy * (1.f/CELL_SIZE) + (CELL_NUMBER/2)) };
+            Cell c = { int(fx * (1.f / CELL_SIZE) + (CELL_NUMBER / 2)), int(fy * (1.f / CELL_SIZE) + (CELL_NUMBER / 2)) };
             return c;
         }
 
@@ -185,26 +189,26 @@ public:
         if (kx_inv >= 0)
         {
             stepX = 1;
-            float x_border = (cell.x+1) * voxel;
+            float x_border = (cell.x + 1) * voxel;
             tMaxX = (x_border - bx) * kx_inv;
         }
         else
         {
             stepX = -1;
-            float x_border = (cell.x-1) * voxel;
+            float x_border = (cell.x - 1) * voxel;
             tMaxX = (x_border - bx) * kx_inv;
         }
 
         if (ky_inv >= 0)
         {
             stepY = 1;
-            float y_border = (cell.y+1) * voxel;
+            float y_border = (cell.y + 1) * voxel;
             tMaxY = (y_border - by) * ky_inv;
         }
         else
         {
             stepY = -1;
-            float y_border = (cell.y-1) * voxel;
+            float y_border = (cell.y - 1) * voxel;
             tMaxY = (y_border - by) * ky_inv;
         }
 

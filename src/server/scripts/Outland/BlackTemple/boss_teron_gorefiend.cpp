@@ -263,7 +263,7 @@ class spell_teron_gorefiend_spiritual_vengeance : public SpellScriptLoader
 
             void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                Unit::Kill(NULL, GetTarget());
+                Unit::Kill(nullptr, GetTarget());
             }
 
             void Register()

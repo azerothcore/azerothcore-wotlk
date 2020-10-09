@@ -636,7 +636,7 @@ public:
                         orb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         if (Creature* trigger = me->SummonTrigger(orb->GetPositionX(), orb->GetPositionY(), orb->GetPositionZ(), 0, 10*MINUTE*IN_MILLISECONDS))
                         {
-                            trigger->CastSpell(trigger, SPELL_RING_OF_BLUE_FLAMES, true, NULL, NULL, trigger->GetGUID());
+                            trigger->CastSpell(trigger, SPELL_RING_OF_BLUE_FLAMES, true, nullptr, nullptr, trigger->GetGUID());
                             if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KILJAEDEN_CONTROLLER)))
                                 controller->AI()->JustSummoned(trigger);
                         }
