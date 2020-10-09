@@ -182,8 +182,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (33696, 0, 6, 0, 61, 1, 100, 0, 9, 33696, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Waypoint 9 Reached - Set Run On (Phase 1)'),
 (33696, 0, 7, 0, 40, 1, 100, 0, 13, 33696, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Waypoint 13 Reached - Set Run Off (Phase 1)'),
 (33696, 0, 8, 0, 40, 1, 100, 0, 14, 33696, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 5.91667, 'Archmage Rhydian - On Waypoint 14 Reached - Set Orientation 5.91667 (Phase 1)'),
-(33696, 0, 10, 0, 38, 1, 100, 0, 1, 2, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -773.48, -144.13, 429.91, 0, 'Archmage Rhydian - On Data Set 1 2 - Move To Position (Phase 1)'),
-(33696, 0, 11, 0, 34, 1, 100, 0, 0, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 5.91667, 'Archmage Rhydian - On Reached Point 1 - Set Orientation 5.91667 (Phase 1)');
+(33696, 0, 9, 10, 38, 1, 100, 0, 1, 2, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -773.48, -144.13, 429.91, 0, 'Archmage Rhydian - On Data Set 1 2 - Move To Position (Phase 1)'),
+(33696, 0, 10, 0, 61, 0, 100, 0, 1, 2, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Data Set 1 2 - Set Run On (Phase 1)'),
+(33696, 0, 11, 12, 34, 1, 100, 0, 8, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 5.91667, 'Archmage Rhydian - On Reached Point 1 - Set Orientation 5.91667 (Phase 1)'),
+(33696, 0, 12, 0, 61, 1, 100, 0, 8, 1, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Rhydian - On Reached Point 1 - Stop Waypoint (Phase 1)');
 
 DELETE FROM `waypoints` WHERE `entry`=33696;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
