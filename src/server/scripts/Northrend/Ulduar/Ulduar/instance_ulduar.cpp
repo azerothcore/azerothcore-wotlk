@@ -346,6 +346,7 @@ public:
                     break;
                 case NPC_BRANN_BASE_CAMP:
                     m_brannBronzebeardBaseCamp = creature->GetGUID();
+                    break;
                 //! These creatures are summoned by something else than Algalon
                 //! but need to be controlled/despawned by him - so they need to be
                 //! registered in his summon list
