@@ -236,8 +236,8 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 33686);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (33686, 0, 0, 0, 62, 0, 100, 0, 10366, 0, 0, 0, 0, 98, 10477, 14496, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Send Gossip'),
-(33686, 0, 1, 2, 10, 0, 100, 0, 1, 20, 90000, 18000, 1, 80, 3368600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Within 1-20 Range Out of Combat LoS - Run Script'),
-(33686, 0, 2, 0, 61, 0, 100, 0, 1, 20, 90000, 18000, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Within 1-20 Range Out of Combat LoS - Set Data 1 1'),
+(33686, 0, 1, 0, 10, 0, 100, 0, 1, 20, 90000, 18000, 1, 80, 3368600, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Within 1-20 Range Out of Combat LoS - Run Script'),
+(33686, 0, 2, 0, 10, 0, 100, 1, 1, 20, 0, 0, 1, 80, 3368600, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Within 1-20 Range Out of Combat LoS - Run Script (No Repeat)'),
 (33686, 0, 3, 0, 62, 0, 100, 1, 10366, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Set Event Phase 1 (No Repeat)'),
 (33686, 0, 4, 5, 62, 1, 100, 0, 10477, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Remove Npc Flags Gossip (Phase 1)'),
 (33686, 0, 5, 6, 61, 1, 100, 0, 10477, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - On Gossip Option 0 Selected - Close Gossip (Phase 1)'),
@@ -254,12 +254,20 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3368600);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(3368600, 9, 0, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Say Line 0'),
-(3368600, 9, 1, 0, 0, 0, 100, 0, 25000, 25000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Say Line 1'),
-(3368600, 9, 2, 0, 0, 0, 100, 0, 20000, 20000, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Say Line 2'),
-(3368600, 9, 3, 0, 0, 0, 100, 0, 7000, 7000, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Say Line 3'),
-(3368600, 9, 4, 0, 0, 0, 100, 0, 31000, 31000, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Say Line 4'),
-(3368600, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 17, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Set Emote State 1');
+(3368600, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 10, 136767, 33701, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Store Targetlist'),
+(3368600, 9, 1, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - High Explorer Dellorah Say Line 0'),
+(3368600, 9, 2, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Say Line 0'),
+(3368600, 9, 3, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - High Explorer Dellorah Say Line 1'),
+(3368600, 9, 4, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Say Line 1'),
+(3368600, 9, 5, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - High Explorer Dellorah Say Line 2'),
+(3368600, 9, 6, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Say Line 2'),
+(3368600, 9, 7, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Say Line 3'),
+(3368600, 9, 8, 0, 0, 0, 100, 0, 14000, 14000, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - High Explorer Dellorah Say Line 3'),
+(3368600, 9, 9, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - High Explorer Dellorah Say Line 4'),
+(3368600, 9, 11, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136761, 33696, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Archmage Rhydian Waypoint Start'),
+(3368600, 9, 10, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - High Explorer Dellorah Say Line 5'),
+(3368600, 9, 12, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - Say Line 4'),
+(3368600, 9, 13, 0, 0, 0, 100, 0, 12000, 12000, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Actionlist - High Explorer Dellorah Say Line 6');
 
 DELETE FROM `conditions` WHERE (`SourceEntry` = 33686) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (12,14));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
@@ -271,32 +279,19 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33701;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 33701);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(33701, 0, 0, 0, 38, 0, 100, 1, 1, 1, 0, 0, 0, 80, 3370100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Data Set 1 1 - Run Script (No Repeat)'),
-(33701, 0, 1, 0, 38, 0, 100, 1, 2, 1, 0, 0, 0, 80, 3370101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Data Set 2 1 - Run Script (No Repeat)'),
+(33701, 0, 1, 0, 38, 0, 100, 1, 1, 1, 0, 0, 0, 80, 3370100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Data Set 1 1 - Run Script (No Repeat)'),
 (33701, 0, 2, 3, 40, 0, 100, 0, 6, 0, 0, 0, 0, 1, 8, 5000, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Waypoint 6 Reached - Say Line 8'),
 (33701, 0, 3, 0, 61, 0, 100, 0, 6, 0, 0, 0, 0, 54, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Waypoint 6 Reached - Pause Waypoint'),
-(33701, 0, 4, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Update - Set Phase Mask 2'),
-(33701, 0, 5, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 44, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Waypoint Finished - Set Phase Mask 2'),
+(33701, 0, 4, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Update - Despawn In 2000 ms (No Repeat)'),
+(33701, 0, 5, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Waypoint Finished - Despawn In 2000 ms'),
 (33701, 0, 6, 0, 52, 0, 100, 0, 8, 33701, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 136253, 33579, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Text 8 Over - Set Data 0 1'),
-(33701, 0, 7, 8, 38, 0, 100, 0, 1, 2, 0, 0, 0, 80, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Data Set 1 2 - Run Script');
+(33701, 0, 7, 0, 38, 0, 100, 0, 1, 2, 0, 0, 0, 80, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - On Data Set 1 2 - Run Script');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3370100);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(3370100, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Say Line 0'),
-(3370100, 9, 1, 0, 0, 0, 100, 0, 24000, 24000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Say Line 1'),
-(3370100, 9, 2, 0, 0, 0, 100, 0, 23000, 23000, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Say Line 2'),
-(3370100, 9, 3, 0, 0, 0, 100, 0, 18000, 18000, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Say Line 3'),
-(3370100, 9, 4, 0, 0, 0, 100, 0, 7000, 7000, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Say Line 4'),
-(3370100, 9, 5, 0, 0, 0, 100, 0, 7000, 7000, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Say Line 5'),
-(3370100, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136761, 33696, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Set Data 1 1'),
-(3370100, 9, 7, 0, 0, 0, 100, 0, 15000, 15000, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Say Line 6'),
-(3370100, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Set Data 1 0');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3370101);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(3370101, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Set Data 1 0'),
-(3370101, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 7, 0, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Say Line 7'),
-(3370101, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 53, 1, 33701, 0, 0, 2000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Start Waypoint');
+(3370100, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Set Data 1 0'),
+(3370100, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 7, 0, 1, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Say Line 7'),
+(3370100, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 53, 1, 33701, 0, 0, 2000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Explorer Dellorah - Actionlist - Start Waypoint');
 
 DELETE FROM `conditions` WHERE (`SourceEntry` = 33701) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 5);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
@@ -458,7 +453,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 
 -- Teleporter
 UPDATE `gameobject_template` SET `ScriptName` = '' WHERE (`entry` = 194569);
-UPDATE `gameobject` SET `state` = 0 WHERE (`id` = 194569);
+UPDATE `gameobject` SET `state` = 1 WHERE (`id` = 194569);
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 10389);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
