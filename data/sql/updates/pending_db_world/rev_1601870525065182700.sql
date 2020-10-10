@@ -152,21 +152,21 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (3367201, 7, -812.83, -202.50, 429.8, 'Kirin Tor Mage - Boxes Right Ulduar'),
 (3367201, 8, -814.09, -201.35, 429.8, 'Kirin Tor Mage - Boxes Right Ulduar');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136778);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136546);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-136778, 0, 0, 0, 1, 0, 100, 0, 3000, 4000, 3000, 4000, 0, 10, 273, 1, 6, 274, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+(-136546, 0, 0, 0, 1, 0, 100, 0, 3000, 4000, 3000, 4000, 0, 10, 273, 1, 6, 274, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136545);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-136545, 0, 0, 0, 1, 0, 100, 0, 3000, 4000, 3000, 4000, 0, 10, 273, 1, 6, 274, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+(-136545, 0, 0, 0, 1, 0, 100, 0, 3000, 4000, 3000, 4000, 0, 10, 273, 1, 6, 274, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136539);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-136539, 0, 0, 0, 1, 0, 100, 0, 3000, 4000, 3000, 4000, 0, 10, 273, 1, 6, 274, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+(-136539, 0, 0, 0, 1, 0, 100, 0, 3000, 4000, 3000, 4000, 0, 10, 273, 1, 6, 274, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136538);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-136538, 0, 0, 0, 1, 0, 100, 0, 3000, 4000, 3000, 4000, 0, 10, 273, 1, 6, 274, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+(-136538, 0, 0, 0, 1, 0, 100, 0, 3000, 4000, 3000, 4000, 0, 10, 273, 1, 6, 274, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '');
 
 -- Goran Steelbreaker
 DELETE FROM `creature` WHERE (`id` = 33622);
@@ -564,16 +564,28 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (194569, 1, 0, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 105, 16, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Update - Add Gameobject Flags Not Selectable (No Repeat)'),
 (194569, 1, 1, 2, 60, 0, 100, 1, 0, 0, 0, 0, 0, 106, 16, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Update - Remove Gameobject Flags Not Selectable (No Repeat)'),
 (194569, 1, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 202, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Update - Set GO state to 0 (No Repeat)'),
-(194569, 1, 3, 12, 62, 0, 100, 0, 10389, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, -706.122, -92.602, 430.27, 0, 'Ulduar Teleporter - On Gossip Option 0 Selected - Teleport'),
-(194569, 1, 4, 12, 62, 0, 100, 0, 10389, 1, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 131.248, -35.38, 410.2, 0, 'Ulduar Teleporter - On Gossip Option 1 Selected - Teleport'),
-(194569, 1, 5, 12, 62, 0, 100, 0, 10389, 2, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 553.233, -12.324, 410.07, 0, 'Ulduar Teleporter - On Gossip Option 2 Selected - Teleport'),
-(194569, 1, 6, 12, 62, 0, 100, 0, 10389, 3, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 926.292, -11.463, 418.99, 0, 'Ulduar Teleporter - On Gossip Option 3 Selected - Teleport'),
-(194569, 1, 7, 12, 62, 0, 100, 0, 10389, 4, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1498.09, -24.246, 421.36, 0, 'Ulduar Teleporter - On Gossip Option 4 Selected - Teleport'),
-(194569, 1, 8, 12, 62, 0, 100, 0, 10389, 5, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1859.72, -24.884, 449.21, 0, 'Ulduar Teleporter - On Gossip Option 5 Selected - Teleport'),
-(194569, 1, 9, 12, 62, 0, 100, 0, 10389, 6, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 2086.27, -24.313, 421.71, 0, 'Ulduar Teleporter - On Gossip Option 6 Selected - Teleport'),
-(194569, 1, 10, 12, 62, 0, 100, 0, 10389, 7, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1854.8, -11.46, 334.57, 0, 'Ulduar Teleporter - On Gossip Option 7 Selected - Teleport'),
-(194569, 1, 11, 12, 62, 0, 100, 0, 10389, 8, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 2518.22, -2569.11, 412.69, 0, 'Ulduar Teleporter - On Gossip Option 8 Selected - Teleport'),
-(194569, 1, 12, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option Selected - Close Gossip');
+(194569, 1, 3, 12, 62, 0, 100, 0, 10389, 0, 0, 0, 0, 11, 64014, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option 0 Selected - Cast \'Expedition Base Camp Teleport\''),
+(194569, 1, 4, 12, 62, 0, 100, 0, 10389, 1, 0, 0, 0, 11, 64032, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option 1 Selected - Cast \'Formation Grounds Teleport\''),
+(194569, 1, 5, 12, 62, 0, 100, 0, 10389, 2, 0, 0, 0, 11, 64028, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option 2 Selected - Cast \'Colossal Forge Teleport\''),
+(194569, 1, 6, 12, 62, 0, 100, 0, 10389, 3, 0, 0, 0, 11, 64031, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option 3 Selected - Cast \'Scrapyard Teleport\''),
+(194569, 1, 7, 12, 62, 0, 100, 0, 10389, 4, 0, 0, 0, 11, 64030, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option 4 Selected - Cast \'Antechamber Teleport\''),
+(194569, 1, 8, 12, 62, 0, 100, 0, 10389, 5, 0, 0, 0, 11, 64029, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option 5 Selected - Cast \'Shattered Walkway Teleport\''),
+(194569, 1, 9, 12, 62, 0, 100, 0, 10389, 6, 0, 0, 0, 11, 64024, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option 6 Selected - Cast \'Conservatory Teleport\''),
+(194569, 1, 10, 12, 62, 0, 100, 0, 10389, 7, 0, 0, 0, 11, 64025, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option 7 Selected - Cast \'Halls of Invention Teleport\''),
+(194569, 1, 11, 12, 62, 0, 100, 0, 10389, 8, 0, 0, 0, 11, 65042, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option 8 Selected - Cast \'Prison of Yogg-Saron Teleport\''),
+(194569, 1, 12, 0, 61, 0, 100, 0, 10389, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option 0 Selected - Close Gossip');
+
+DELETE FROM `spell_target_position` WHERE (ID IN (64014,64032,64028,64031,64030,64029))
+INSERT INTO `spell_target_position` VALUES
+(64014, 1, 603, -706.122, -92.602, 430.27, 0.110212, 0),
+(64032, 1, 603, 131.248, -35.38, 410.2, 3.176500, 0),
+(64028, 1, 603, 553.233, -12.324, 410.07, 3.176500, 0),
+(64031, 1, 603, 926.292, -11.463, 418.99, 3.134592, 0),
+(64030, 1, 603, 1498.09, -24.246, 421.36, 6.276185, 0),
+(64029, 1, 603, 1859.72, -24.884, 449.21, 3.110162, 0),
+(64024, 1, 603, 2086.28, -23.963, 421.71, 3.110162, 0),
+(64025, 1, 603, 1854.8, -11.46, 334.57, 4.792662, 0),
+(65042, 1, 603, 2518.22, 2569.11, 412.69, 3.106680, 0);
 
 DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 10389);
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES

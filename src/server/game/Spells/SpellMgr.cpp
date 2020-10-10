@@ -3306,54 +3306,54 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
-            case 38776: // Evergrove Druid Transform Crow
-                spellInfo->DurationIndex = 4; // 120 seconds
-                break;
-            case 63026: // Force Cast (HACK: Target shouldn't be changed)
-            case 63137: // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
-                spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_DB;
-                break;
-            case 53096: // Quetz'lun's Judgment
-            case 70743: // AoD Special
-            case 70614: // AoD Special - Vegard
-                spellInfo->MaxAffectedTargets = 1;
-                break;
-            case 52611: // Summon Skeletons
-            case 52612: // Summon Skeletons
-                spellInfo->EffectMiscValueB[0] = 64;
-                break;
-            case 45257: // Using Steam Tonk Controller
-            case 45440: // Steam Tonk Controller
-            case 60256: // Collect Sample
-            case 45634: // Neural Needle
-                // Crashes client on pressing ESC
-                spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
-                break;
-            case 40244: // Simon Game Visual
-            case 40245: // Simon Game Visual
-            case 40246: // Simon Game Visual
-            case 40247: // Simon Game Visual
-            case 42835: // Spout, remove damage effect, only anim is needed
-                spellInfo->Effect[0] = 0;
-                break;
-            case 63665: // Charge (Argent Tournament emote on riders)
-            case 31298: // Sleep (needs target selection script)
-            case 2895:  // Wrath of Air Totem rank 1 (Aura)
-            case 68933: // Wrath of Air Totem rank 2 (Aura)
-            case 29200: // Purify Helboar Meat
-                spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
-                spellInfo->EffectImplicitTargetB[0] = 0;
-                break;
-            case 31344: // Howl of Azgalor
-                spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_100_YARDS; // 100yards instead of 50000?!
-                break;
-            case 42818: // Headless Horseman - Wisp Flight Port
-            case 42821: // Headless Horseman - Wisp Flight Missile
-                spellInfo->rangeIndex = 6; // 100 yards
-                break;
-            case 36350: //They Must Burn Bomb Aura (self)
-                spellInfo->EffectTriggerSpell[0] = 36325; // They Must Burn Bomb Drop (DND)
-                break;
+        case 38776: // Evergrove Druid Transform Crow
+            spellInfo->DurationIndex = 4; // 120 seconds
+            break;
+        case 63026: // Force Cast (HACK: Target shouldn't be changed)
+        case 63137: // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
+            spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_DB;
+            break;
+        case 53096: // Quetz'lun's Judgment
+        case 70743: // AoD Special
+        case 70614: // AoD Special - Vegard
+            spellInfo->MaxAffectedTargets = 1;
+            break;
+        case 52611: // Summon Skeletons
+        case 52612: // Summon Skeletons
+            spellInfo->EffectMiscValueB[0] = 64;
+            break;
+        case 45257: // Using Steam Tonk Controller
+        case 45440: // Steam Tonk Controller
+        case 60256: // Collect Sample
+        case 45634: // Neural Needle
+            // Crashes client on pressing ESC
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
+            break;
+        case 40244: // Simon Game Visual
+        case 40245: // Simon Game Visual
+        case 40246: // Simon Game Visual
+        case 40247: // Simon Game Visual
+        case 42835: // Spout, remove damage effect, only anim is needed
+            spellInfo->Effect[0] = 0;
+            break;
+        case 63665: // Charge (Argent Tournament emote on riders)
+        case 31298: // Sleep (needs target selection script)
+        case 2895:  // Wrath of Air Totem rank 1 (Aura)
+        case 68933: // Wrath of Air Totem rank 2 (Aura)
+        case 29200: // Purify Helboar Meat
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            break;
+        case 31344: // Howl of Azgalor
+            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_100_YARDS; // 100yards instead of 50000?!
+            break;
+        case 42818: // Headless Horseman - Wisp Flight Port
+        case 42821: // Headless Horseman - Wisp Flight Missile
+            spellInfo->rangeIndex = 6; // 100 yards
+            break;
+        case 36350: //They Must Burn Bomb Aura (self)
+            spellInfo->EffectTriggerSpell[0] = 36325; // They Must Burn Bomb Drop (DND)
+            break;
         case 8494: // Mana Shield (rank 2)
             // because of bug in dbc
             spellInfo->procChance = 0;
@@ -4994,6 +4994,17 @@ void SpellMgr::LoadDbcDataCorrections()
         case 62625:
             spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
             break;
+
+        case 64014:
+        case 64032:
+        case 64028:
+        case 64031:
+        case 64030:
+        case 64029:
+        case 64024:
+        case 64025:
+        case 65042:
+            spellInfo->EffectImplicitTargetB[EFFECT_1] = TARGET_DEST_DB;
 
         //////////////////////////////////////////
         ////////// ONYXIA'S LAIR
