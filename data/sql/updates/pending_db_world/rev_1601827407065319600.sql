@@ -6,11 +6,11 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1601827407065319600');
 */
 
 /* REGULAR */
-UPDATE `creature_template` SET `mindmg` = 3293, `maxdmg` = 4560, `DamageModifier` = 1.03 WHERE `entry` = 12129;
-UPDATE `creature_template` SET `mindmg` = 5708, `maxdmg` = 7905, `DamageModifier` = 1.03 WHERE `entry` = 36572;
-UPDATE `creature_template` SET `mindmg` = 576, `maxdmg` = 812, `DamageModifier` = 1.03 WHERE `entry` = 12262;
-UPDATE `creature_template` SET `mindmg` = 724, `maxdmg` = 986, `DamageModifier` = 1.03 WHERE `entry` = 36566;
+UPDATE `creature_template` SET `mindmg` = 4293, `maxdmg` = 6560, `DamageModifier` = 1.03 WHERE `entry` = 12129;
+UPDATE `creature_template` SET `mindmg` = 7708, `maxdmg` = 9905, `DamageModifier` = 1.03 WHERE `entry` = 36572;
+UPDATE `creature_template` SET `mindmg` = 776, `maxdmg` = 912, `DamageModifier` = 1.03 WHERE `entry` = 12262;
+UPDATE `creature_template` SET `mindmg` = 824, `maxdmg` = 1286, `DamageModifier` = 1.03 WHERE `entry` = 36566;
 
 /* BOSS */ 
-UPDATE `creature_template` SET `mindmg` = 16120, `maxdmg` = 22340, `DamageModifier` = 1.01 WHERE `entry` = 10184;
-UPDATE `creature_template` SET `mindmg` = 32247, `maxdmg` = 45110, `DamageModifier` = 1.01 WHERE `entry` = 36538;
+UPDATE `creature_template` SET `mindmg` = 26120, `maxdmg` = 35490, `DamageModifier` = 1.01 WHERE `entry` = 10184;
+UPDATE `creature_template` SET `mindmg` = 52247, `maxdmg` = 78890, `DamageModifier` = 1.01 WHERE `entry` = 36538;
