@@ -40,10 +40,6 @@ UPDATE `creature_template` SET `mindmg` = 3031, `maxdmg` = 4232, `DamageModifier
 UPDATE `creature_template` SET `mindmg` = 5484, `maxdmg` = 7624, `DamageModifier` = 1.03 WHERE `entry` = 30909;
 
 /* BOSS */
-UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 3793, `maxdmg` = 5150, `DamageModifier` = 1.01 WHERE `entry` = 26796;
-UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 6755, `maxdmg` = 8840, `DamageModifier` = 1.01 WHERE `entry` = 30398;
-UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 3793, `maxdmg` = 5150, `DamageModifier` = 1.01 WHERE `entry` = 26798;
-UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 6755, `maxdmg` = 8840, `DamageModifier` = 1.01 WHERE `entry` = 30397;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 3862, `maxdmg` = 4630, `DamageModifier` = 1.01 WHERE `entry` = 27654;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 6752, `maxdmg` = 8475, `DamageModifier` = 1.01 WHERE `entry` = 31558;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 3793, `maxdmg` = 4680, `DamageModifier` = 1.01 WHERE `entry` = 27447;
