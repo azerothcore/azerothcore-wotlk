@@ -6,6 +6,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1602336256005673600');
 */
 
 /* BOSS */
+UPDATE `creature_template` SET `DamageModifier` = 1.84 WHERE `entry` = 7079;
 UPDATE `creature_template` SET `DamageModifier` = 1.60 WHERE `entry` = 5775;
 UPDATE `creature_template` SET `DamageModifier` = 1.38 WHERE `entry` = 644;
 UPDATE `creature_template` SET `DamageModifier` = 1.13 WHERE `entry` = 642;
