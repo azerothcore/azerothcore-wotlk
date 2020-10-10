@@ -11,22 +11,22 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -137509);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-137509, 0, 0, 0, 38, 0, 100, 0, 0, 1, 0, 0, 0, 11, 59377, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Shield Bunny - On Data Set 0 1 - Cast \'Empowered Arcane Explosion\'');
+(-137509, 0, 0, 0, 38, 0, 100, 0, 0, 1, 0, 0, 0, 11, 63660, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Shield Bunny - On Data Set 0 1 - Cast \'Empowered Arcane Explosion\'');
 
 -- Kirin Tor Battle-Mage
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33662;
 
 DELETE FROM `creature` WHERE (`id` = 33662);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(136521, 33662, 603, 0, 0, 3, 1, 28885, 1, -786.215, -84.7696, 429.792, 1.44862, 180, 0, 0, 75600, 39940, 0, 0, 0, 0, '', 0),
-(136522, 33662, 603, 0, 0, 3, 1, 28885, 1, -752.114, -102.089, 429.714, 6.17846, 180, 0, 0, 75600, 39940, 0, 0, 0, 0, '', 0),
-(136523, 33662, 603, 0, 0, 3, 1, 28886, 1, -813.209, -201.445, 492.843, 0, 180, 0, 0, 75600, 39940, 0, 0, 0, 0, '', 0),
-(136524, 33662, 603, 0, 0, 3, 1, 28884, 1, -718.091, -60.1257, 429.924, 0.959931, 180, 0, 0, 75600, 39940, 0, 0, 0, 0, '', 0),
-(136527, 33662, 603, 0, 0, 3, 1, 28886, 1, -704.212, -94.6969, 430.024, 2.44346, 180, 0, 0, 75600, 39940, 0, 0, 0, 0, '', 0),
+(137508, 33662, 603, 0, 0, 3, 1, 28886, 1, -673.059, -77.446, 426.35, 5.35086, 604800, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
+(137507, 33662, 603, 0, 0, 3, 1, 28886, 1, -675.671, -19.437, 426.35, 1.30916, 604800, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (136529, 33662, 603, 0, 0, 3, 1, 28780, 1, -800.668, -233.616, 429.967, 4.62572, 180, 5, 0, 75600, 39940, 1, 0, 0, 0, '', 0),
 (136530, 33662, 603, 0, 0, 3, 1, 28886, 1, -775.323, -158.514, 429.821, 0.836248, 180, 0, 0, 75600, 39940, 0, 0, 0, 0, '', 0),
-(137507, 33662, 603, 0, 0, 3, 1, 28886, 1, -675.671, -19.437, 426.35, 1.309158, 604800, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
-(137508, 33662, 603, 0, 0, 3, 1, 28886, 1, -673.059, -77.446, 426.35, 5.350863, 604800, 0, 0, 1, 0, 0, 0, 0, 0, '', 0);
+(136527, 33662, 603, 0, 0, 3, 1, 28886, 1, -704.212, -94.6969, 430.024, 2.44346, 180, 0, 0, 75600, 39940, 0, 0, 0, 0, '', 0),
+(136524, 33662, 603, 0, 0, 3, 1, 28884, 1, -718.091, -60.1257, 429.924, 0.959931, 180, 0, 0, 75600, 39940, 0, 0, 0, 0, '', 0),
+(136523, 33662, 603, 0, 0, 3, 1, 28886, 1, -815.095, -204.22, 429.841, 1.55333, 180, 0, 0, 75600, 39940, 0, 0, 0, 0, '', 0),
+(136522, 33662, 603, 0, 0, 3, 1, 28885, 1, -752.114, -102.089, 429.714, 6.17846, 180, 0, 0, 75600, 39940, 0, 0, 0, 0, '', 0),
+(136521, 33662, 603, 0, 0, 3, 1, 28885, 1, -786.215, -84.7696, 429.792, 1.44862, 180, 0, 0, 75600, 39940, 0, 0, 0, 0, '', 0);
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -137508);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -74,8 +74,26 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3366200, 9, 2, 0, 0, 0, 100, 0, 7000, 7000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - Script - Say Line 1'),
 (3366200, 9, 3, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 33626, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Battle-Mage - Script - Say Line 1 (Hired Engineer)');
 
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 1) AND (`SourceEntry` = 136527);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 1, 136527, 0, 0, 13, 0, 0, 0, 0, 1, 0, 0, '', '');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 2) AND (`SourceEntry` = 136527);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 2, 136527, 0, 0, 13, 0, 0, 0, 0, 1, 0, 0, '', '');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136523);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-136523, 0, 0, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 11, 58012, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Change the spell');
+
 -- Kirin Tor Mage
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33672;
+
+DELETE FROM `creature` WHERE (`id` = 33672) AND (`guid` IN (136553, 136552));
+INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
+(136553, 33672, 603, 0, 0, 3, 1, 0, 0, -814.096, -201.356, 429.84, 6.25175, 30, 0, 0, 9416, 8459, 0, 0, 0, 0, '', 0),
+(136552, 33672, 603, 0, 0, 3, 1, 0, 0, -814.096, -201.356, 429.84, 6.25175, 30, 0, 0, 2500, 8459, 0, 0, 0, 0, '', 0);
+
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136537);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-136537, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 29, 1, 225, 0, 0, 0, 0, 10, 136281, 33624, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Data Set 1 1 - Start Follow Closest Creature \'Archmage Pentarus\''),
@@ -84,6 +102,53 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `conditions` WHERE (`SourceEntry` = -136537) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 2);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 2, -136537, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', '');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136552);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-136552, 0, 0, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 11, 64446, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Update - Cast \'Teleport Visual Only\' (No Repeat)'),
+(-136552, 0, 1, 0, 60, 0, 100, 1, 2000, 2000, 0, 0, 0, 53, 0, 3367200, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Update - Start Waypoint (No Repeat)'),
+(-136552, 0, 2, 0, 40, 0, 100, 0, 6, 3367200, 0, 0, 0, 54, 10000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Waypoint 6 Reached - Pause Waypoint'),
+(-136552, 0, 3, 0, 40, 0, 100, 0, 6, 3367200, 0, 0, 0, 80, 3367200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Waypoint 6 Reached - Run Script'),
+(-136552, 0, 4, 0, 58, 0, 100, 0, 0, 3367200, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Waypoint Finished - Despawn In 500 ms');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -136553);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-136553, 0, 0, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 11, 64446, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Update - Cast \'Teleport Visual Only\' (No Repeat)'),
+(-136553, 0, 1, 0, 60, 0, 100, 1, 2000, 2000, 0, 0, 0, 53, 0, 3367201, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Update - Start Waypoint (No Repeat)'),
+(-136553, 0, 2, 0, 40, 0, 100, 0, 4, 3367201, 0, 0, 0, 54, 10000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Waypoint 4 Reached - Pause Waypoint'),
+(-136553, 0, 3, 0, 40, 0, 100, 0, 4, 3367201, 0, 0, 0, 80, 3367200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Waypoint 4 Reached - Run Script'),
+(-136553, 0, 4, 0, 58, 0, 100, 0, 0, 3367201, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kirin Tor Mage - On Waypoint Finished - Despawn In 500 ms');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3367200);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(3367200, 9, 0, 0, 0, 0, 100, 0, 250, 250, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(3367200, 9, 1, 0, 0, 0, 100, 0, 8500, 8500, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '');
+
+DELETE FROM `waypoints` WHERE `entry`=3367200;
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
+(3367200, 1, -812.01, -201.99, 429.8, 'Kirin Tor Mage - Boxes Middle Ulduar'),
+(3367200, 2, -810.91, -203.51, 429.8, 'Kirin Tor Mage - Boxes Middle Ulduar'),
+(3367200, 3, -810.72, -206.63, 429.8, 'Kirin Tor Mage - Boxes Middle Ulduar'),
+(3367200, 4, -811.23, -217.11, 429.8, 'Kirin Tor Mage - Boxes Middle Ulduar'),
+(3367200, 5, -812.88, -222.94, 429.8, 'Kirin Tor Mage - Boxes Middle Ulduar'),
+(3367200, 6, -815.95, -228.36, 429.8, 'Kirin Tor Mage - Boxes Middle Ulduar'),
+(3367200, 7, -812.88, -222.94, 429.8, 'Kirin Tor Mage - Boxes Middle Ulduar'),
+(3367200, 8, -811.23, -217.11, 429.8, 'Kirin Tor Mage - Boxes Middle Ulduar'),
+(3367200, 9, -810.72, -206.63, 429.8, 'Kirin Tor Mage - Boxes Middle Ulduar'),
+(3367200, 10, -810.91, -203.51, 429.8, 'Kirin Tor Mage - Boxes Middle Ulduar'),
+(3367200, 11, -812.01, -201.99, 429.8, 'Kirin Tor Mage - Boxes Middle Ulduar'),
+(3367200, 12, -814.09, -201.35, 429.8, 'Kirin Tor Mage - Boxes Middle Ulduar');
+
+DELETE FROM `waypoints` WHERE `entry`=3367201;
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
+(3367201, 1, -812.83, -202.50, 429.8, 'Kirin Tor Mage - Boxes Right Ulduar'),
+(3367201, 2, -812.35, -205.30, 429.8, 'Kirin Tor Mage - Boxes Right Ulduar'),
+(3367201, 3, -815.29, -207.55, 429.8, 'Kirin Tor Mage - Boxes Right Ulduar'),
+(3367201, 4, -818.87, -207.92, 429.8, 'Kirin Tor Mage - Boxes Right Ulduar'),
+(3367201, 5, -815.29, -207.55, 429.8, 'Kirin Tor Mage - Boxes Right Ulduar'),
+(3367201, 6, -812.35, -205.30, 429.8, 'Kirin Tor Mage - Boxes Right Ulduar'),
+(3367201, 7, -812.83, -202.50, 429.8, 'Kirin Tor Mage - Boxes Right Ulduar'),
+(3367201, 8, -814.09, -201.35, 429.8, 'Kirin Tor Mage - Boxes Right Ulduar');
 
 -- Goran Steelbreaker
 DELETE FROM `creature` WHERE (`id` = 33622);
@@ -385,13 +450,16 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3357900);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(3357900, 9, 0, 0, 0, 0, 100, 0, 15000, 15000, 0, 0, 0, 34, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Instance Data 100 to 0'),
-(3357900, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 4, 15807, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Play Sound 15807'),
-(3357900, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Say Line 1'),
-(3357900, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 34, 801, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Instance Data 801 to 0'),
-(3357900, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 136767, 33686, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Data 0 1'),
-(3357900, 9, 5, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136348, 33626, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Data 1 1'),
-(3357900, 9, 6, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 53, 0, 33579, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Start Waypoint');
+(3357900, 9, 0, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 136281, 33624, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Say Line 0'),
+(3357900, 9, 1, 0, 0, 0, 100, 0, 7000, 7000, 0, 0, 0, 53, 0, 33624, 0, 0, 0, 0, 10, 136281, 33624, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Start Waypoint'),
+(3357900, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136524, 33662, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Data 1 1'),
+(3357900, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136537, 33672, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Data 1 1'),
+(3357900, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Say Line 1'),
+(3357900, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 4, 15807, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Play Sound 15807'),
+(3357900, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 34, 801, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Instance Data 801 to 0'),
+(3357900, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 11, 33686, 200, 1, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Data 0 1'),
+(3357900, 9, 8, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, NULL, 33626, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Set Data 1 1'),
+(3357900, 9, 9, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 53, 0, 33579, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Start Waypoint');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3357901);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -422,29 +490,13 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 33624);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(33624, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 80, 3362400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - On Data Set 1 1 - Run Script'),
-(33624, 0, 1, 2, 58, 0, 100, 0, 2, 33624, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - On Waypoint Finished - Say Line 1'),
-(33624, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 45, 0, 2, 0, 0, 0, 0, 10, 136253, 33579, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - On Waypoint Finished - Set Data 0 2'),
-(33624, 0, 3, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -676.52, -84.802, 426.89, 0.054839, 'Archmage Pentarus - On Update - Teleport (No Repeat)');
+(33624, 0, 0, 2, 58, 0, 100, 0, 2, 33624, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - On Waypoint Finished - Say Line 1'),
+(33624, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 45, 0, 2, 0, 0, 0, 0, 10, 136253, 33579, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - On Waypoint Finished - Set Data 0 2'),
+(33624, 0, 2, 0, 60, 0, 100, 1, 0, 0, 0, 0, 0, 62, 603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -676.52, -84.802, 426.89, 0.054839, 'Archmage Pentarus - On Update - Teleport (No Repeat)');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3362400);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(3362400, 9, 0, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - Actionlist - Say Line 0'),
-(3362400, 9, 1, 0, 0, 0, 100, 0, 7000, 7000, 0, 0, 0, 53, 0, 33624, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - Actionlist - Start Waypoint'),
-(3362400, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136524, 33662, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - Actionlist - Set Data 1 1'),
-(3362400, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136537, 33672, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - Actionlist - Set Data 1 1');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3362400);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(3362400, 9, 0, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - Actionlist - Say Line 0'),
-(3362400, 9, 1, 0, 0, 0, 99, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 136271, 33622, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - Actionlist - Set Data 0 1'),
-(3362400, 9, 2, 0, 0, 0, 100, 0, 7000, 7000, 0, 0, 0, 53, 0, 33624, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - Actionlist - Start Waypoint'),
-(3362400, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136524, 33662, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - Actionlist - Set Data 1 1'),
-(3362400, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 136537, 33672, 0, 0, 0, 0, 0, 0, 'Archmage Pentarus - Actionlist - Set Data 1 1');
-
-DELETE FROM `conditions` WHERE (`SourceEntry` = 33624) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 4);
+DELETE FROM `conditions` WHERE (`SourceEntry` = 33624) AND (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 3);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 4, 33624, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Archmage Pentarus - Set Correct Properties');
+(22, 3, 33624, 0, 0, 13, 1, 800, 3, 0, 0, 0, 0, '', 'Archmage Pentarus - Set Correct Properties');
 
 DELETE FROM `waypoints` WHERE `entry`=33624;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
@@ -453,7 +505,18 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 
 -- Teleporter
 UPDATE `gameobject_template` SET `ScriptName` = '' WHERE (`entry` = 194569);
-UPDATE `gameobject` SET `state` = 1 WHERE (`id` = 194569);
+
+DELETE FROM `gameobject` WHERE (`id` = 194569) AND (`guid` IN (56100, 34935, 34923, 34296, 34288, 34283, 34281, 34223, 34219));
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
+(56100, 194569, 603, 0, 0, 3, 1, 2518.16, 2569.03, 412.299, 0, 0, 0, 0, 1, 180, 255, 1, '', 0),
+(34935, 194569, 603, 0, 0, 3, 1, 1498.05, -24.3509, 420.966, 0.034906, 0, 0, 0, 1, 180, 255, 1, '', 0),
+(34923, 194569, 603, 0, 0, 3, 1, 1854.82, -11.5608, 334.175, 0, 0, 0, 0, 1, 180, 255, 1, '', 0),
+(34296, 194569, 603, 0, 0, 3, 1, 926.292, -11.4635, 418.595, -0.017452, 0, 0, 0, 1, 180, 255, 1, '', 0),
+(34288, 194569, 603, 0, 0, 3, 1, 131.248, -35.3802, 409.804, 0, 0, 0, 0, 1, 180, 255, 1, '', 0),
+(34283, 194569, 603, 0, 0, 3, 1, -706.122, -92.6024, 429.876, 0, 0, 0, 0, 1, 180, 255, 1, '', 0),
+(34281, 194569, 603, 0, 0, 3, 1, 2086.26, -23.9948, 421.316, 0, 0, 0, 0, 1, 180, 255, 1, '', 0),
+(34223, 194569, 603, 0, 0, 3, 1, 553.233, -12.3247, 409.679, 0, 0, 0, 0, 1, 180, 255, 1, '', 0),
+(34219, 194569, 603, 0, 0, 3, 1, 1859.65, -24.9121, 448.811, 0, 0, 0, 0, 1, 180, 255, 1, '', 0);
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 10389);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
