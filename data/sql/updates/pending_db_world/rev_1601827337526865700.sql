@@ -16,11 +16,11 @@ UPDATE `creature_template` SET `mindmg` = 3293, `maxdmg` = 4670, `DamageModifier
 UPDATE `creature_template` SET `mindmg` = 5730, `maxdmg` = 7940, `DamageModifier` = 1.03 WHERE `entry` = 31001;
 
 /* BOSS */ 
-UPDATE `creature_template` SET `mindmg` = 16421, `maxdmg` = 22618, `DamageModifier` = 1.01 WHERE `entry` = 28860;
-UPDATE `creature_template` SET `mindmg` = 32841, `maxdmg` = 45236, `DamageModifier` = 1.01 WHERE `entry` = 31311;
-UPDATE `creature_template` SET `mindmg` = 15870, `maxdmg` = 21240, `DamageModifier` = 1.01 WHERE `entry` = 30449;
-UPDATE `creature_template` SET `mindmg` = 31440, `maxdmg` = 44170, `DamageModifier` = 1.01 WHERE `entry` = 31535;
-UPDATE `creature_template` SET `mindmg` = 15870, `maxdmg` = 21240, `DamageModifier` = 1.01 WHERE `entry` = 30451;
-UPDATE `creature_template` SET `mindmg` = 31440, `maxdmg` = 44170, `DamageModifier` = 1.01 WHERE `entry` = 31520;
-UPDATE `creature_template` SET `mindmg` = 15870, `maxdmg` = 21240, `DamageModifier` = 1.01 WHERE `entry` = 30452;
-UPDATE `creature_template` SET `mindmg` = 31440, `maxdmg` = 44170, `DamageModifier` = 1.01 WHERE `entry` = 31534;
+UPDATE `creature_template` SET `mindmg` = 14850, `maxdmg` = 18750, `DamageModifier` = 1.01 WHERE `entry` = 28860;
+UPDATE `creature_template` SET `mindmg` = 21757, `maxdmg` = 35350, `DamageModifier` = 1.01 WHERE `entry` = 31311;
+UPDATE `creature_template` SET `mindmg` = 13743, `maxdmg` = 18441, `DamageModifier` = 1.01 WHERE `entry` = 30449;
+UPDATE `creature_template` SET `mindmg` = 22905, `maxdmg` = 30735, `DamageModifier` = 1.01 WHERE `entry` = 31535;
+UPDATE `creature_template` SET `mindmg` = 13751, `maxdmg` = 18447, `DamageModifier` = 1.01 WHERE `entry` = 30451;
+UPDATE `creature_template` SET `mindmg` = 22879, `maxdmg` = 30727, `DamageModifier` = 1.01 WHERE `entry` = 31520;
+UPDATE `creature_template` SET `mindmg` = 13785, `maxdmg` = 18439, `DamageModifier` = 1.01 WHERE `entry` = 30452;
+UPDATE `creature_template` SET `mindmg` = 22768, `maxdmg` = 30734, `DamageModifier` = 1.01 WHERE `entry` = 31534;
