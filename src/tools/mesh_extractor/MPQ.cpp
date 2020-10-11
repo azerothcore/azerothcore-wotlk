@@ -46,9 +46,9 @@ void MPQArchive::close()
 }
 
 MPQFile::MPQFile(const char* filename):
-eof(false), buffer(0), pointer(0), size(0)
+    eof(false), buffer(0), pointer(0), size(0)
 {
-    for (std::deque<MPQArchive*>::iterator i = MPQHandler->Archives.begin(); i != MPQHandler->Archives.end();++i)
+    for (std::deque<MPQArchive*>::iterator i = MPQHandler->Archives.begin(); i != MPQHandler->Archives.end(); ++i)
     {
         mpq_archive* mpq_a = (*i)->mpq_a;
 
@@ -59,7 +59,8 @@ eof(false), buffer(0), pointer(0), size(0)
         libmpq__file_unpacked_size(mpq_a, filenum, &size);
 
         // HACK: in patch.mpq some files don't want to open and give 1 for filesize
-        if (size<=1) {
+        if (size <= 1)
+        {
             //            printf("warning: file %s has size %d; cannot Read.\n", filename, size);
             eof = true;
             buffer = 0;
@@ -83,7 +84,8 @@ size_t MPQFile::Read(void* dest, size_t bytes)
         return 0;
 
     size_t rpos = pointer + bytes;
-    if (rpos > size_t(size)) {
+    if (rpos > size_t(size))
+    {
         bytes = size - pointer;
         eof = true;
     }
