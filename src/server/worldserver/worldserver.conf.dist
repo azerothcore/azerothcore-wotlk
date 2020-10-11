@@ -187,7 +187,7 @@ Compression = 1
 #                     1+  - (Enabled)
 #                     0   - (Disabled, No limit)
 
-PlayerLimit = 100
+PlayerLimit = 0
 
 #
 #    SaveRespawnTimeImmediately
@@ -2901,7 +2901,7 @@ Arena.RatingDiscardTimer = 600000
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Arena.AutoDistributePoints = 0
+Arena.AutoDistributePoints = 1
 
 #
 #    Arena.AutoDistributeInterval
