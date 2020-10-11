@@ -148,7 +148,7 @@ public:
         void FlameWreathEffect()
         {
             std::vector<Unit*> targets;
-            ThreatContainer::StorageType const &t_list = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
 
             if (t_list.empty())
                 return;
@@ -192,7 +192,7 @@ public:
                     instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), false);
                     CloseDoorTimer = 0;
                 }
-                else 
+                else
                     CloseDoorTimer -= diff;
             }
 
@@ -201,7 +201,7 @@ public:
             {
                 if (ArcaneCooldown >= diff)
                     ArcaneCooldown -= diff;
-                else 
+                else
                     ArcaneCooldown = 0;
             }
 
@@ -209,7 +209,7 @@ public:
             {
                 if (FireCooldown >= diff)
                     FireCooldown -= diff;
-                else 
+                else
                     FireCooldown = 0;
             }
 
@@ -217,7 +217,7 @@ public:
             {
                 if (FrostCooldown >= diff)
                     FrostCooldown -= diff;
-                else 
+                else
                     FrostCooldown = 0;
             }
 
@@ -305,24 +305,24 @@ public:
                 }
                 NormalCastTimer = 1000;
             }
-            else 
+            else
                 NormalCastTimer -= diff;
 
             if (SecondarySpellTimer <= diff)
             {
                 switch (urand(0, 1))
                 {
-                case 0:
-                    DoCast(me, SPELL_AOE_CS);
-                    break;
-                case 1:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        DoCast(target, SPELL_CHAINSOFICE);
-                    break;
+                    case 0:
+                        DoCast(me, SPELL_AOE_CS);
+                        break;
+                    case 1:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            DoCast(target, SPELL_CHAINSOFICE);
+                        break;
                 }
                 SecondarySpellTimer = urand(5000, 20000);
             }
-            else 
+            else
                 SecondarySpellTimer -= diff;
 
             if (SuperCastTimer <= diff)
@@ -331,60 +331,60 @@ public:
 
                 switch (LastSuperSpell)
                 {
-                case SUPER_AE:
-                    Available[0] = SUPER_FLAME;
-                    Available[1] = SUPER_BLIZZARD;
-                    break;
-                case SUPER_FLAME:
-                    Available[0] = SUPER_AE;
-                    Available[1] = SUPER_BLIZZARD;
-                    break;
-                case SUPER_BLIZZARD:
-                    Available[0] = SUPER_FLAME;
-                    Available[1] = SUPER_AE;
-                    break;
+                    case SUPER_AE:
+                        Available[0] = SUPER_FLAME;
+                        Available[1] = SUPER_BLIZZARD;
+                        break;
+                    case SUPER_FLAME:
+                        Available[0] = SUPER_AE;
+                        Available[1] = SUPER_BLIZZARD;
+                        break;
+                    case SUPER_BLIZZARD:
+                        Available[0] = SUPER_FLAME;
+                        Available[1] = SUPER_AE;
+                        break;
                 }
 
                 LastSuperSpell = Available[urand(0, 1)];
 
                 switch (LastSuperSpell)
                 {
-                case SUPER_AE:
-                    Talk(SAY_EXPLOSION);
+                    case SUPER_AE:
+                        Talk(SAY_EXPLOSION);
 
-                    DoCast(me, SPELL_BLINK_CENTER, true);
-                    DoCast(me, SPELL_PLAYERPULL, true);
-                    DoCast(me, SPELL_MASSSLOW, true);
-                    DoCast(me, SPELL_AEXPLOSION, false);
-                    break;
+                        DoCast(me, SPELL_BLINK_CENTER, true);
+                        DoCast(me, SPELL_PLAYERPULL, true);
+                        DoCast(me, SPELL_MASSSLOW, true);
+                        DoCast(me, SPELL_AEXPLOSION, false);
+                        break;
 
-                case SUPER_FLAME:
-                    Talk(SAY_FLAMEWREATH);
+                    case SUPER_FLAME:
+                        Talk(SAY_FLAMEWREATH);
 
-                    FlameWreathTimer = 20000;
-                    FlameWreathCheckTime = 500;
+                        FlameWreathTimer = 20000;
+                        FlameWreathCheckTime = 500;
 
-                    FlameWreathTarget[0] = 0;
-                    FlameWreathTarget[1] = 0;
-                    FlameWreathTarget[2] = 0;
+                        FlameWreathTarget[0] = 0;
+                        FlameWreathTarget[1] = 0;
+                        FlameWreathTarget[2] = 0;
 
-                    FlameWreathEffect();
-                    break;
+                        FlameWreathEffect();
+                        break;
 
-                case SUPER_BLIZZARD:
-                    Talk(SAY_BLIZZARD);
+                    case SUPER_BLIZZARD:
+                        Talk(SAY_BLIZZARD);
 
-                    if (Creature* pSpawn = me->SummonCreature(CREATURE_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
-                    {
-                        pSpawn->setFaction(me->getFaction());
-                        pSpawn->CastSpell(pSpawn, SPELL_CIRCULAR_BLIZZARD, false);
-                    }
-                    break;
+                        if (Creature* pSpawn = me->SummonCreature(CREATURE_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
+                        {
+                            pSpawn->setFaction(me->getFaction());
+                            pSpawn->CastSpell(pSpawn, SPELL_CIRCULAR_BLIZZARD, false);
+                        }
+                        break;
                 }
 
                 SuperCastTimer = urand(35000, 40000);
             }
-            else 
+            else
                 SuperCastTimer -= diff;
 
             if (!ElementalsSpawned && HealthBelowPct(40))
@@ -479,7 +479,7 @@ public:
 
                 BerserkTimer = 60000;
             }
-            else 
+            else
                 BerserkTimer -= diff;
 
             //Flame Wreath check
@@ -487,7 +487,7 @@ public:
             {
                 if (FlameWreathTimer >= diff)
                     FlameWreathTimer -= diff;
-                else 
+                else
                     FlameWreathTimer = 0;
 
                 if (FlameWreathCheckTime <= diff)
@@ -507,7 +507,7 @@ public:
                     }
                     FlameWreathCheckTime = 500;
                 }
-                else 
+                else
                     FlameWreathCheckTime -= diff;
             }
 
@@ -515,7 +515,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             if (!DrinkInturrupted && Drinking && damage)
                 DrinkInturrupted = true;
@@ -525,8 +525,8 @@ public:
         {
             //We only care about interrupt effects and only if they are durring a spell currently being cast
             if ((Spell->Effects[0].Effect != SPELL_EFFECT_INTERRUPT_CAST &&
-                Spell->Effects[1].Effect != SPELL_EFFECT_INTERRUPT_CAST &&
-                Spell->Effects[2].Effect != SPELL_EFFECT_INTERRUPT_CAST) || !me->IsNonMeleeSpellCast(false))
+                    Spell->Effects[1].Effect != SPELL_EFFECT_INTERRUPT_CAST &&
+                    Spell->Effects[2].Effect != SPELL_EFFECT_INTERRUPT_CAST) || !me->IsNonMeleeSpellCast(false))
                 return;
 
             //Interrupt effect
@@ -537,9 +537,15 @@ public:
 
             switch (CurrentNormalSpell)
             {
-            case SPELL_ARCMISSLE: ArcaneCooldown = 5000; break;
-            case SPELL_FIREBALL: FireCooldown = 5000; break;
-            case SPELL_FROSTBOLT: FrostCooldown = 5000; break;
+                case SPELL_ARCMISSLE:
+                    ArcaneCooldown = 5000;
+                    break;
+                case SPELL_FIREBALL:
+                    FireCooldown = 5000;
+                    break;
+                case SPELL_FROSTBOLT:
+                    FrostCooldown = 5000;
+                    break;
             }
         }
     };

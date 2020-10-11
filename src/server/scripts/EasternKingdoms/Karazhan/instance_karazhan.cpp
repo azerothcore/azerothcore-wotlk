@@ -68,36 +68,36 @@ public:
 
             switch (creature->GetEntry())
             {
-            case NPC_COLDMIST_WIDOW:
-            case NPC_COLDMIST_STALKER:
-            case NPC_SHADOWBAT:
-            case NPC_VAMPIRIC_SHADOWBAT:
-            case NPC_GREATER_SHADOWBAT:
-            case NPC_PHASE_HOUND:
-            case NPC_DREADBEAST:
-            case NPC_SHADOWBEAST:
-                if (GetBossState(DATA_OPTIONAL_BOSS) == TO_BE_DECIDED)
-                {
-                    ++OptionalBossCount;
-                    if (OptionalBossCount == OPTIONAL_BOSS_REQUIRED_DEATH_COUNT)
+                case NPC_COLDMIST_WIDOW:
+                case NPC_COLDMIST_STALKER:
+                case NPC_SHADOWBAT:
+                case NPC_VAMPIRIC_SHADOWBAT:
+                case NPC_GREATER_SHADOWBAT:
+                case NPC_PHASE_HOUND:
+                case NPC_DREADBEAST:
+                case NPC_SHADOWBEAST:
+                    if (GetBossState(DATA_OPTIONAL_BOSS) == TO_BE_DECIDED)
                     {
-                        switch (urand(NPC_HYAKISS_THE_LURKER, NPC_ROKAD_THE_RAVAGER))
+                        ++OptionalBossCount;
+                        if (OptionalBossCount == OPTIONAL_BOSS_REQUIRED_DEATH_COUNT)
                         {
-                        case NPC_HYAKISS_THE_LURKER:
-                            instance->SummonCreature(NPC_HYAKISS_THE_LURKER, OptionalSpawn[0]);
-                            break;
-                        case NPC_SHADIKITH_THE_GLIDER:
-                            instance->SummonCreature(NPC_SHADIKITH_THE_GLIDER, OptionalSpawn[1]);
-                            break;
-                        case NPC_ROKAD_THE_RAVAGER:
-                            instance->SummonCreature(NPC_ROKAD_THE_RAVAGER, OptionalSpawn[2]);
-                            break;
+                            switch (urand(NPC_HYAKISS_THE_LURKER, NPC_ROKAD_THE_RAVAGER))
+                            {
+                                case NPC_HYAKISS_THE_LURKER:
+                                    instance->SummonCreature(NPC_HYAKISS_THE_LURKER, OptionalSpawn[0]);
+                                    break;
+                                case NPC_SHADIKITH_THE_GLIDER:
+                                    instance->SummonCreature(NPC_SHADIKITH_THE_GLIDER, OptionalSpawn[1]);
+                                    break;
+                                case NPC_ROKAD_THE_RAVAGER:
+                                    instance->SummonCreature(NPC_ROKAD_THE_RAVAGER, OptionalSpawn[2]);
+                                    break;
+                            }
                         }
                     }
-                }
-                break;
-            default:
-                break;
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -105,12 +105,12 @@ public:
         {
             switch (type)
             {
-            case DATA_OPERA_OZ_DEATHCOUNT:
-                if (data == SPECIAL)
-                    ++OzDeathCount;
-                else if (data == IN_PROGRESS)
-                    OzDeathCount = 0;
-                break;
+                case DATA_OPERA_OZ_DEATHCOUNT:
+                    if (data == SPECIAL)
+                        ++OzDeathCount;
+                    else if (data == IN_PROGRESS)
+                        OzDeathCount = 0;
+                    break;
             }
         }
 
@@ -121,22 +121,22 @@ public:
 
             switch (type)
             {
-            case DATA_OPERA_PERFORMANCE:
-                if (state == DONE)
-                {
-                    HandleGameObject(m_uiStageDoorLeftGUID, true);
-                    HandleGameObject(m_uiStageDoorRightGUID, true);
-                    if (GameObject* sideEntrance = instance->GetGameObject(m_uiSideEntranceDoor))
-                        sideEntrance->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
-                    instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
-                }
-                break;
-            case DATA_CHESS:
-                if (state == DONE)
-                    DoRespawnGameObject(DustCoveredChest, DAY);
-                break;
-            default:
-                break;
+                case DATA_OPERA_PERFORMANCE:
+                    if (state == DONE)
+                    {
+                        HandleGameObject(m_uiStageDoorLeftGUID, true);
+                        HandleGameObject(m_uiStageDoorRightGUID, true);
+                        if (GameObject* sideEntrance = instance->GetGameObject(m_uiSideEntranceDoor))
+                            sideEntrance->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                        instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
+                    }
+                    break;
+                case DATA_CHESS:
+                    if (state == DONE)
+                        DoRespawnGameObject(DustCoveredChest, DAY);
+                    break;
+                default:
+                    break;
             }
 
             return true;
@@ -152,71 +152,71 @@ public:
         {
             switch (go->GetEntry())
             {
-            case GO_STAGE_CURTAIN:
-                m_uiCurtainGUID = go->GetGUID();
-                break;
-            case GO_STAGE_DOOR_LEFT:
-                m_uiStageDoorLeftGUID = go->GetGUID();
-                if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
-                    go->SetGoState(GO_STATE_ACTIVE);
-                break;
-            case GO_STAGE_DOOR_RIGHT:
-                m_uiStageDoorRightGUID = go->GetGUID();
-                if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
-                    go->SetGoState(GO_STATE_ACTIVE);
-                break;
-            case GO_PRIVATE_LIBRARY_DOOR:
-                m_uiLibraryDoor = go->GetGUID();
-                break;
-            case GO_MASSIVE_DOOR:
-                m_uiMassiveDoor = go->GetGUID();
-                if (GetBossState(DATA_ARAN) != IN_PROGRESS)
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
-                else
-                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
-                break;
-            case GO_GAMESMAN_HALL_DOOR:
-                m_uiGamesmansDoor = go->GetGUID();
-                break;
-            case GO_GAMESMAN_HALL_EXIT_DOOR:
-                m_uiGamesmansExitDoor = go->GetGUID();
-                break;
-            case GO_NETHERSPACE_DOOR:
-                m_uiNetherspaceDoor = go->GetGUID();
-                if (GetBossState(DATA_PRINCE) != IN_PROGRESS)
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
-                else
-                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
-                break;
-            case GO_MASTERS_TERRACE_DOOR:
-                MastersTerraceDoor[0] = go->GetGUID();
-                break;
-            case GO_MASTERS_TERRACE_DOOR2:
-                MastersTerraceDoor[1] = go->GetGUID();
-                break;
-            case GO_SIDE_ENTRANCE_DOOR:
-                m_uiSideEntranceDoor = go->GetGUID();
-                if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
-                else
-                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
-                break;
-            case GO_DUST_COVERED_CHEST:
-                DustCoveredChest = go->GetGUID();
-                break;
+                case GO_STAGE_CURTAIN:
+                    m_uiCurtainGUID = go->GetGUID();
+                    break;
+                case GO_STAGE_DOOR_LEFT:
+                    m_uiStageDoorLeftGUID = go->GetGUID();
+                    if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_STAGE_DOOR_RIGHT:
+                    m_uiStageDoorRightGUID = go->GetGUID();
+                    if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_PRIVATE_LIBRARY_DOOR:
+                    m_uiLibraryDoor = go->GetGUID();
+                    break;
+                case GO_MASSIVE_DOOR:
+                    m_uiMassiveDoor = go->GetGUID();
+                    if (GetBossState(DATA_ARAN) != IN_PROGRESS)
+                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                    else
+                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                    break;
+                case GO_GAMESMAN_HALL_DOOR:
+                    m_uiGamesmansDoor = go->GetGUID();
+                    break;
+                case GO_GAMESMAN_HALL_EXIT_DOOR:
+                    m_uiGamesmansExitDoor = go->GetGUID();
+                    break;
+                case GO_NETHERSPACE_DOOR:
+                    m_uiNetherspaceDoor = go->GetGUID();
+                    if (GetBossState(DATA_PRINCE) != IN_PROGRESS)
+                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                    else
+                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                    break;
+                case GO_MASTERS_TERRACE_DOOR:
+                    MastersTerraceDoor[0] = go->GetGUID();
+                    break;
+                case GO_MASTERS_TERRACE_DOOR2:
+                    MastersTerraceDoor[1] = go->GetGUID();
+                    break;
+                case GO_SIDE_ENTRANCE_DOOR:
+                    m_uiSideEntranceDoor = go->GetGUID();
+                    if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
+                        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                    else
+                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                    break;
+                case GO_DUST_COVERED_CHEST:
+                    DustCoveredChest = go->GetGUID();
+                    break;
             }
 
             switch (OperaEvent)
             {
                 /// @todo Set Object visibilities for Opera based on performance
-            case EVENT_OZ:
-                break;
+                case EVENT_OZ:
+                    break;
 
-            case EVENT_HOOD:
-                break;
+                case EVENT_HOOD:
+                    break;
 
-            case EVENT_RAJ:
-                break;
+                case EVENT_RAJ:
+                    break;
             }
         }
 
@@ -224,41 +224,41 @@ public:
         {
             switch (type)
             {
-            case DATA_OPERA_PERFORMANCE:
-                return OperaEvent;
-            case DATA_OPERA_OZ_DEATHCOUNT:
-                return OzDeathCount;
+                case DATA_OPERA_PERFORMANCE:
+                    return OperaEvent;
+                case DATA_OPERA_OZ_DEATHCOUNT:
+                    return OzDeathCount;
 
-            case DATA_KILREK:
-                return m_uiKilrekGUID;
-            case DATA_TERESTIAN:
-                return m_uiTerestianGUID;
-            case DATA_MOROES:
-                return m_uiMoroesGUID;
-            case DATA_GO_STAGEDOORLEFT:
-                return m_uiStageDoorLeftGUID;
-            case DATA_GO_STAGEDOORRIGHT:
-                return m_uiStageDoorRightGUID;
-            case DATA_GO_CURTAINS:
-                return m_uiCurtainGUID;
-            case DATA_GO_LIBRARY_DOOR:
-                return m_uiLibraryDoor;
-            case DATA_GO_MASSIVE_DOOR:
-                return m_uiMassiveDoor;
-            case DATA_GO_SIDE_ENTRANCE_DOOR:
-                return m_uiSideEntranceDoor;
-            case DATA_GO_GAME_DOOR:
-                return m_uiGamesmansDoor;
-            case DATA_GO_GAME_EXIT_DOOR:
-                return m_uiGamesmansExitDoor;
-            case DATA_GO_NETHER_DOOR:
-                return m_uiNetherspaceDoor;
-            case DATA_MASTERS_TERRACE_DOOR_1:
-                return MastersTerraceDoor[0];
-            case DATA_MASTERS_TERRACE_DOOR_2:
-                return MastersTerraceDoor[1];
-            case DATA_IMAGE_OF_MEDIVH:
-                return ImageGUID;
+                case DATA_KILREK:
+                    return m_uiKilrekGUID;
+                case DATA_TERESTIAN:
+                    return m_uiTerestianGUID;
+                case DATA_MOROES:
+                    return m_uiMoroesGUID;
+                case DATA_GO_STAGEDOORLEFT:
+                    return m_uiStageDoorLeftGUID;
+                case DATA_GO_STAGEDOORRIGHT:
+                    return m_uiStageDoorRightGUID;
+                case DATA_GO_CURTAINS:
+                    return m_uiCurtainGUID;
+                case DATA_GO_LIBRARY_DOOR:
+                    return m_uiLibraryDoor;
+                case DATA_GO_MASSIVE_DOOR:
+                    return m_uiMassiveDoor;
+                case DATA_GO_SIDE_ENTRANCE_DOOR:
+                    return m_uiSideEntranceDoor;
+                case DATA_GO_GAME_DOOR:
+                    return m_uiGamesmansDoor;
+                case DATA_GO_GAME_EXIT_DOOR:
+                    return m_uiGamesmansExitDoor;
+                case DATA_GO_NETHER_DOOR:
+                    return m_uiNetherspaceDoor;
+                case DATA_MASTERS_TERRACE_DOOR_1:
+                    return MastersTerraceDoor[0];
+                case DATA_MASTERS_TERRACE_DOOR_2:
+                    return MastersTerraceDoor[1];
+                case DATA_IMAGE_OF_MEDIVH:
+                    return ImageGUID;
             }
 
             return 0;
@@ -268,22 +268,38 @@ public:
         {
             switch (data)
             {
-            case DATA_KILREK:                   return m_uiKilrekGUID;
-            case DATA_TERESTIAN:                return m_uiTerestianGUID;
-            case DATA_MOROES:                   return m_uiMoroesGUID;
-            case DATA_GO_STAGEDOORLEFT:         return m_uiStageDoorLeftGUID;
-            case DATA_GO_STAGEDOORRIGHT:        return m_uiStageDoorRightGUID;
-            case DATA_GO_CURTAINS:              return m_uiCurtainGUID;
-            case DATA_GO_LIBRARY_DOOR:          return m_uiLibraryDoor;
-            case DATA_GO_MASSIVE_DOOR:          return m_uiMassiveDoor;
-            case DATA_GO_SIDE_ENTRANCE_DOOR:    return m_uiSideEntranceDoor;
-            case DATA_GO_GAME_DOOR:             return m_uiGamesmansDoor;
-            case DATA_GO_GAME_EXIT_DOOR:        return m_uiGamesmansExitDoor;
-            case DATA_GO_NETHER_DOOR:           return m_uiNetherspaceDoor;
-            case DATA_MASTERS_TERRACE_DOOR_1:   return MastersTerraceDoor[0];
-            case DATA_MASTERS_TERRACE_DOOR_2:   return MastersTerraceDoor[1];
-            case DATA_IMAGE_OF_MEDIVH:          return ImageGUID;
-            case DATA_NIGHTBANE:                return m_uiNightBaneGUID;
+                case DATA_KILREK:
+                    return m_uiKilrekGUID;
+                case DATA_TERESTIAN:
+                    return m_uiTerestianGUID;
+                case DATA_MOROES:
+                    return m_uiMoroesGUID;
+                case DATA_GO_STAGEDOORLEFT:
+                    return m_uiStageDoorLeftGUID;
+                case DATA_GO_STAGEDOORRIGHT:
+                    return m_uiStageDoorRightGUID;
+                case DATA_GO_CURTAINS:
+                    return m_uiCurtainGUID;
+                case DATA_GO_LIBRARY_DOOR:
+                    return m_uiLibraryDoor;
+                case DATA_GO_MASSIVE_DOOR:
+                    return m_uiMassiveDoor;
+                case DATA_GO_SIDE_ENTRANCE_DOOR:
+                    return m_uiSideEntranceDoor;
+                case DATA_GO_GAME_DOOR:
+                    return m_uiGamesmansDoor;
+                case DATA_GO_GAME_EXIT_DOOR:
+                    return m_uiGamesmansExitDoor;
+                case DATA_GO_NETHER_DOOR:
+                    return m_uiNetherspaceDoor;
+                case DATA_MASTERS_TERRACE_DOOR_1:
+                    return MastersTerraceDoor[0];
+                case DATA_MASTERS_TERRACE_DOOR_2:
+                    return MastersTerraceDoor[1];
+                case DATA_IMAGE_OF_MEDIVH:
+                    return ImageGUID;
+                case DATA_NIGHTBANE:
+                    return m_uiNightBaneGUID;
             }
 
             return 0;

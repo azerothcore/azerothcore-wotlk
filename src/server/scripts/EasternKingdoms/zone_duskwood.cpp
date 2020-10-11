@@ -113,7 +113,7 @@ public:
                 {
                     case EVENT_SOUL_CORRUPTION:
                         DoCastVictim(SPELL_SOUL_CORRUPTION);
-                        _events.ScheduleEvent(EVENT_SOUL_CORRUPTION, rand()%4000+15000);
+                        _events.ScheduleEvent(EVENT_SOUL_CORRUPTION, rand() % 4000 + 15000);
                         break;
                     case EVENT_CREATURE_OF_NIGHTMARE:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
@@ -127,10 +127,10 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        private:
-            EventMap _events;
-            uint8 KillCount;
-            bool _introSpoken;
+    private:
+        EventMap _events;
+        uint8 KillCount;
+        bool _introSpoken;
     };
 
     CreatureAI* GetAI(Creature* creature) const

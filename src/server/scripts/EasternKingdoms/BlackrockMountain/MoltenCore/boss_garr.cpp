@@ -36,109 +36,109 @@ enum Events
 
 class boss_garr : public CreatureScript
 {
-    public:
-        boss_garr() : CreatureScript("boss_garr") { }
+public:
+    boss_garr() : CreatureScript("boss_garr") { }
 
-        struct boss_garrAI : public BossAI
+    struct boss_garrAI : public BossAI
+    {
+        boss_garrAI(Creature* creature) : BossAI(creature, BOSS_GARR)
         {
-            boss_garrAI(Creature* creature) : BossAI(creature, BOSS_GARR)
-            {
-            }
-
-            void EnterCombat(Unit* victim)
-            {
-                BossAI::EnterCombat(victim);
-                events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 25000);
-                events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 15000);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_ANTIMAGIC_PULSE:
-                            DoCast(me, SPELL_ANTIMAGIC_PULSE);
-                            events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, urand(10000, 15000));
-                            break;
-                        case EVENT_MAGMA_SHACKLES:
-                            DoCast(me, SPELL_MAGMA_SHACKLES);
-                            events.ScheduleEvent(EVENT_MAGMA_SHACKLES, urand(8000, 12000));
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_garrAI(creature);
         }
+
+        void EnterCombat(Unit* victim)
+        {
+            BossAI::EnterCombat(victim);
+            events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 25000);
+            events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 15000);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_ANTIMAGIC_PULSE:
+                        DoCast(me, SPELL_ANTIMAGIC_PULSE);
+                        events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, urand(10000, 15000));
+                        break;
+                    case EVENT_MAGMA_SHACKLES:
+                        DoCast(me, SPELL_MAGMA_SHACKLES);
+                        events.ScheduleEvent(EVENT_MAGMA_SHACKLES, urand(8000, 12000));
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new boss_garrAI(creature);
+    }
 };
 
 class npc_firesworn : public CreatureScript
 {
-    public:
-        npc_firesworn() : CreatureScript("npc_firesworn") { }
+public:
+    npc_firesworn() : CreatureScript("npc_firesworn") { }
 
-        struct npc_fireswornAI : public ScriptedAI
+    struct npc_fireswornAI : public ScriptedAI
+    {
+        npc_fireswornAI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 immolateTimer;
+
+        void Reset()
         {
-            npc_fireswornAI(Creature* creature) : ScriptedAI(creature) { }
-
-            uint32 immolateTimer;
-
-            void Reset()
-            {
-                immolateTimer = 4000;                              //These times are probably wrong
-            }
-
-            void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
-            {
-                uint32 const health10pct = me->CountPctFromMaxHealth(10);
-                uint32 health = me->GetHealth();
-                if (int32(health) - int32(damage) < int32(health10pct))
-                {
-                    damage = 0;
-                    DoCastVictim(SPELL_ERUPTION);
-                    me->DespawnOrUnsummon();
-                }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                if (immolateTimer <= diff)
-                {
-                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        DoCast(target, SPELL_IMMOLATE);
-                    immolateTimer = urand(5000, 10000);
-                }
-                else
-                    immolateTimer -= diff;
-
-                DoMeleeAttackIfReady();
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_fireswornAI(creature);
+            immolateTimer = 4000;                              //These times are probably wrong
         }
+
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        {
+            uint32 const health10pct = me->CountPctFromMaxHealth(10);
+            uint32 health = me->GetHealth();
+            if (int32(health) - int32(damage) < int32(health10pct))
+            {
+                damage = 0;
+                DoCastVictim(SPELL_ERUPTION);
+                me->DespawnOrUnsummon();
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (immolateTimer <= diff)
+            {
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    DoCast(target, SPELL_IMMOLATE);
+                immolateTimer = urand(5000, 10000);
+            }
+            else
+                immolateTimer -= diff;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_fireswornAI(creature);
+    }
 };
 
 void AddSC_boss_garr()

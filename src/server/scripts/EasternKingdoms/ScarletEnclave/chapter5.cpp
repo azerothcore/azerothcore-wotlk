@@ -302,19 +302,19 @@ const Position LightOfDawnFightPos[] =
 
 class DelayedSummonEvent : public BasicEvent
 {
-    public:
-        DelayedSummonEvent(Unit* owner, uint32 entry, Position pos) : _owner(owner), _entry(entry), _pos(pos) { }
+public:
+    DelayedSummonEvent(Unit* owner, uint32 entry, Position pos) : _owner(owner), _entry(entry), _pos(pos) { }
 
-        bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
-        {
-            _owner->SummonCreature(_entry, _pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
-            return true;
-        }
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    {
+        _owner->SummonCreature(_entry, _pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+        return true;
+    }
 
-    private:
-        Unit* _owner;
-        uint32 _entry;
-        Position _pos;
+private:
+    Unit* _owner;
+    uint32 _entry;
+    Position _pos;
 };
 
 class npc_highlord_darion_mograine : public CreatureScript
@@ -334,7 +334,7 @@ public:
 
         if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE && !creature->AI()->GetData(WORLD_STATE_SOLDIERS_ENABLE))
             AddGossipItemFor(player, 9795, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        
+
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
         return true;
@@ -342,7 +342,7 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             ClearGossipMenuFor(player);
             CloseGossipMenuFor(player);
@@ -356,8 +356,8 @@ public:
         npc_highlord_darion_mograineAI(Creature* creature) : ScriptedAI(creature), summons(me)
         {
             battleStarted = ENCOUNTER_STATE_NONE;
-            me->SetCorpseDelay(3*60);
-            me->SetRespawnTime(3*60);
+            me->SetCorpseDelay(3 * 60);
+            me->SetRespawnTime(3 * 60);
             resetExecuted = false;
         }
 
@@ -403,12 +403,18 @@ public:
         {
             switch (type)
             {
-                case WORLD_STATE_DEFENDERS_COUNT: return defendersRemaining;
-                case WORLD_STATE_SCOURGE_COUNT: return scourgeRemaining;
-                case WORLD_STATE_SOLDIERS_ENABLE: return me->IsAlive() && (startTimeRemaining || battleStarted);
-                case WORLD_STATE_COUNTDOWN_ENABLE: return me->IsAlive() && startTimeRemaining;
-                case WORLD_STATE_COUNTDOWN_TIME: return startTimeRemaining;
-                case WORLD_STATE_EVENT_BEGIN_ENABLE: return me->IsAlive() && !startTimeRemaining && battleStarted;
+                case WORLD_STATE_DEFENDERS_COUNT:
+                    return defendersRemaining;
+                case WORLD_STATE_SCOURGE_COUNT:
+                    return scourgeRemaining;
+                case WORLD_STATE_SOLDIERS_ENABLE:
+                    return me->IsAlive() && (startTimeRemaining || battleStarted);
+                case WORLD_STATE_COUNTDOWN_ENABLE:
+                    return me->IsAlive() && startTimeRemaining;
+                case WORLD_STATE_COUNTDOWN_TIME:
+                    return startTimeRemaining;
+                case WORLD_STATE_EVENT_BEGIN_ENABLE:
+                    return me->IsAlive() && !startTimeRemaining && battleStarted;
             }
             return 0;
         }
@@ -449,7 +455,7 @@ public:
             if (battleStarted == ENCOUNTER_STATE_OUTRO && cr->GetEntry() == NPC_DEFENDER_OF_THE_LIGHT)
             {
                 cr->SetReactState(REACT_PASSIVE);
-                cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 cr->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                 cr->HandleEmoteCommand(EMOTE_STATE_READY1H);
             }
@@ -480,8 +486,8 @@ public:
         void JustDied(Unit*) override
         {
             summons.DespawnAll();
-            me->SetCorpseDelay(3*60);
-            me->SetRespawnTime(3*60);
+            me->SetCorpseDelay(3 * 60);
+            me->SetRespawnTime(3 * 60);
         }
 
         void FinishFight()
@@ -530,8 +536,8 @@ public:
             events.Reset();
             summons.DespawnAll();
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetVisible(true);
             me->setActive(true);
@@ -634,27 +640,27 @@ public:
                     summons.DoAction(ACTION_PLAY_EMOTE);
                     break;
                 case EVENT_START_COUNTDOWN_13:
-                {
-                    uint8 first = 1;
-                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     {
-                        if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                        uint8 first = 1;
+                        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                         {
-                            Position pos = LightOfDawnPos[first];
-                            summon->SetHomePosition(pos);
-                            summon->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, false);
+                            if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                            {
+                                Position pos = LightOfDawnPos[first];
+                                summon->SetHomePosition(pos);
+                                summon->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, false);
+                            }
+                            first = first == 0 ? 1 : 0;
                         }
-                        first = first == 0 ? 1 : 0;
+                        Position pos = LightOfDawnPos[first];
+                        me->SetHomePosition(pos);
+                        me->SetWalk(false);
+                        me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, true);
+                        me->CastSpell(me, SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                        break;
                     }
-                    Position pos = LightOfDawnPos[first];
-                    me->SetHomePosition(pos);
-                    me->SetWalk(false);
-                    me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, true);
-                    me->CastSpell(me, SPELL_THE_MIGHT_OF_MOGRAINE, true);
-                    break;
-                }
                 case EVENT_START_COUNTDOWN_14:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SummonCreatureGroup(5);
                     return;
                 case EVENT_FINISH_FIGHT_1:
@@ -662,45 +668,45 @@ public:
                     battleStarted = ENCOUNTER_STATE_OUTRO;
                     break;
                 case EVENT_FINISH_FIGHT_2:
-                {
-                    summons.DespawnEntry(NPC_RAMPAGING_ABOMINATION);
-                    summons.DespawnEntry(NPC_ACHERUS_GHOUL);
-                    summons.DespawnEntry(NPC_WARRIOR_OF_THE_FROZEN_WASTES);
-                    summons.DespawnEntry(NPC_FLESH_BEHEMOTH);
-                    summons.DespawnEntry(NPC_DEFENDER_OF_THE_LIGHT);
-
-                    if (Creature* orbaz = GetEntryFromSummons(NPC_ORBAZ_BLOODBANE))
                     {
-                        orbaz->SetReactState(REACT_PASSIVE);
-                        orbaz->AI()->Talk(EMOTE_LIGHT_OF_DAWN04);
-                        orbaz->GetMotionMaster()->MovePoint(2, LightOfDawnPos[2], true, true);
-                        orbaz->DespawnOrUnsummon(7000);
-                    }
+                        summons.DespawnEntry(NPC_RAMPAGING_ABOMINATION);
+                        summons.DespawnEntry(NPC_ACHERUS_GHOUL);
+                        summons.DespawnEntry(NPC_WARRIOR_OF_THE_FROZEN_WASTES);
+                        summons.DespawnEntry(NPC_FLESH_BEHEMOTH);
+                        summons.DespawnEntry(NPC_DEFENDER_OF_THE_LIGHT);
 
-                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                        if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                        if (Creature* orbaz = GetEntryFromSummons(NPC_ORBAZ_BLOODBANE))
                         {
-                            summon->CombatStop(true);
-                            summon->DeleteThreatList();
-                            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-                            summon->SetReactState(REACT_PASSIVE);
-                            summon->GetMotionMaster()->Clear(false);
+                            orbaz->SetReactState(REACT_PASSIVE);
+                            orbaz->AI()->Talk(EMOTE_LIGHT_OF_DAWN04);
+                            orbaz->GetMotionMaster()->MovePoint(2, LightOfDawnPos[2], true, true);
+                            orbaz->DespawnOrUnsummon(7000);
                         }
-                    me->CombatStop(true);
-                    me->DeleteThreatList();
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-                    me->SetReactState(REACT_PASSIVE);
-                    me->GetMotionMaster()->Clear(false);
 
-                    // Position main stars
-                    summons.DoAction(ACTION_POSITION_NPCS);
+                        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                            if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                            {
+                                summon->CombatStop(true);
+                                summon->DeleteThreatList();
+                                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                summon->SetReactState(REACT_PASSIVE);
+                                summon->GetMotionMaster()->Clear(false);
+                            }
+                        me->CombatStop(true);
+                        me->DeleteThreatList();
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        me->SetReactState(REACT_PASSIVE);
+                        me->GetMotionMaster()->Clear(false);
 
-                    me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2276.66f, -5273.60f, 81.86f, 5.14f, TEMPSUMMON_CORPSE_DESPAWN);
-                    me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2272.11f, -5279.08f, 82.01f, 5.69f, TEMPSUMMON_CORPSE_DESPAWN);
-                    me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2285.11f, -5276.73f, 82.08f, 4.23f, TEMPSUMMON_CORPSE_DESPAWN);
-                    me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2290.06f, -5286.41f, 82.51f, 3.16f, TEMPSUMMON_CORPSE_DESPAWN);
-                    break;
-                }
+                        // Position main stars
+                        summons.DoAction(ACTION_POSITION_NPCS);
+
+                        me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2276.66f, -5273.60f, 81.86f, 5.14f, TEMPSUMMON_CORPSE_DESPAWN);
+                        me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2272.11f, -5279.08f, 82.01f, 5.69f, TEMPSUMMON_CORPSE_DESPAWN);
+                        me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2285.11f, -5276.73f, 82.08f, 4.23f, TEMPSUMMON_CORPSE_DESPAWN);
+                        me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2290.06f, -5286.41f, 82.51f, 3.16f, TEMPSUMMON_CORPSE_DESPAWN);
+                        break;
+                    }
                 case EVENT_FINISH_FIGHT_3:
                     if (Creature* koltira = GetEntryFromSummons(NPC_KOLTIRA_DEATHWEAVER))
                     {
@@ -927,7 +933,7 @@ public:
                                 if (summon->GetEntry() <= NPC_RIMBLAT_EARTHSHATTER && summon->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING)
                                 {
                                     float o = lk->GetAngle(summon);
-                                    summon->GetMotionMaster()->MovePoint(3, lk->GetPositionX() + 2.0f*cos(o), lk->GetPositionY() + 2.0f*sin(o), lk->GetPositionZ());
+                                    summon->GetMotionMaster()->MovePoint(3, lk->GetPositionX() + 2.0f * cos(o), lk->GetPositionY() + 2.0f * sin(o), lk->GetPositionZ());
                                     summon->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
                                 }
                     }
@@ -1011,7 +1017,7 @@ public:
                     {
                         tirion->CastSpell(tirion, SPELL_TIRION_CHARGE, true);
                         tirion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                        tirion->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                        tirion->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     }
                     break;
                 case EVENT_OUTRO_SCENE_44:
@@ -1036,7 +1042,7 @@ public:
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                     {
                         float o = me->GetAngle(tirion);
-                        tirion->GetMotionMaster()->MovePoint(4, me->GetPositionX() + 2.0f*cos(o), me->GetPositionY() + 2.0f*sin(o), me->GetPositionZ(), false);
+                        tirion->GetMotionMaster()->MovePoint(4, me->GetPositionX() + 2.0f * cos(o), me->GetPositionY() + 2.0f * sin(o), me->GetPositionZ(), false);
                         tirion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                         tirion->setFaction(35);
                     }
@@ -1107,17 +1113,17 @@ public:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     break;
                 case EVENT_OUTRO_SCENE_60:
-                {
-                    Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-                    if (!PlayerList.isEmpty())
                     {
-                        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                            if (i->GetSource()->IsAlive() && me->IsWithinDistInMap(i->GetSource(), 100))
-                                i->GetSource()->CastSpell(i->GetSource(), SPELL_THE_LIGHT_OF_DAWN_Q, false);
+                        Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
+                        if (!PlayerList.isEmpty())
+                        {
+                            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                                if (i->GetSource()->IsAlive() && me->IsWithinDistInMap(i->GetSource(), 100))
+                                    i->GetSource()->CastSpell(i->GetSource(), SPELL_THE_LIGHT_OF_DAWN_Q, false);
+                        }
+                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                        break;
                     }
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
-                    break;
-                }
                 case EVENT_OUTRO_SCENE_61:
                     summons.DespawnAll();
                     me->DespawnOrUnsummon(1);
@@ -1162,68 +1168,68 @@ public:
 
 class spell_chapter5_light_of_dawn_aura : public SpellScriptLoader
 {
-    public:
-        spell_chapter5_light_of_dawn_aura() : SpellScriptLoader("spell_chapter5_light_of_dawn_aura") { }
+public:
+    spell_chapter5_light_of_dawn_aura() : SpellScriptLoader("spell_chapter5_light_of_dawn_aura") { }
 
-        class spell_chapter5_light_of_dawn_aura_AuraScript : public AuraScript
+    class spell_chapter5_light_of_dawn_aura_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_chapter5_light_of_dawn_aura_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_chapter5_light_of_dawn_aura_AuraScript);
-
-            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                GetUnitOwner()->Dismount();
-                GetUnitOwner()->SetCanFly(true);
-                GetUnitOwner()->SetDisableGravity(true);
-                GetUnitOwner()->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
-            }
-
-            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                GetUnitOwner()->SetCanFly(false);
-                GetUnitOwner()->SetDisableGravity(false);
-                GetUnitOwner()->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
-                GetUnitOwner()->GetMotionMaster()->MoveFall();
-            }
-
-            void Register() override
-            {
-                OnEffectApply += AuraEffectApplyFn(spell_chapter5_light_of_dawn_aura_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-                OnEffectRemove += AuraEffectRemoveFn(spell_chapter5_light_of_dawn_aura_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_chapter5_light_of_dawn_aura_AuraScript();
+            GetUnitOwner()->Dismount();
+            GetUnitOwner()->SetCanFly(true);
+            GetUnitOwner()->SetDisableGravity(true);
+            GetUnitOwner()->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
         }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetUnitOwner()->SetCanFly(false);
+            GetUnitOwner()->SetDisableGravity(false);
+            GetUnitOwner()->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+            GetUnitOwner()->GetMotionMaster()->MoveFall();
+        }
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_chapter5_light_of_dawn_aura_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_chapter5_light_of_dawn_aura_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_chapter5_light_of_dawn_aura_AuraScript();
+    }
 };
 
 class spell_chapter5_rebuke : public SpellScriptLoader
 {
-    public:
-        spell_chapter5_rebuke() : SpellScriptLoader("spell_chapter5_rebuke") { }
+public:
+    spell_chapter5_rebuke() : SpellScriptLoader("spell_chapter5_rebuke") { }
 
-        class spell_chapter5_rebuke_SpellScript : public SpellScript
+    class spell_chapter5_rebuke_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_chapter5_rebuke_SpellScript);
+
+        void HandleLeapBack(SpellEffIndex effIndex)
         {
-            PrepareSpellScript(spell_chapter5_rebuke_SpellScript);
-
-            void HandleLeapBack(SpellEffIndex effIndex)
-            {
-                PreventHitEffect(effIndex);
-                if (Unit* unitTarget = GetHitUnit())
-                    unitTarget->KnockbackFrom(2282.86f, -5263.45f, 40.0f, 8.0f);
-            }
-
-            void Register() override
-            {
-                OnEffectLaunchTarget += SpellEffectFn(spell_chapter5_rebuke_SpellScript::HandleLeapBack, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_chapter5_rebuke_SpellScript();
+            PreventHitEffect(effIndex);
+            if (Unit* unitTarget = GetHitUnit())
+                unitTarget->KnockbackFrom(2282.86f, -5263.45f, 40.0f, 8.0f);
         }
+
+        void Register() override
+        {
+            OnEffectLaunchTarget += SpellEffectFn(spell_chapter5_rebuke_SpellScript::HandleLeapBack, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_chapter5_rebuke_SpellScript();
+    }
 };
 
 void AddSC_the_scarlet_enclave_c5()

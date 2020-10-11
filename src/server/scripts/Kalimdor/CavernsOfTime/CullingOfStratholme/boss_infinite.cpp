@@ -47,8 +47,8 @@ public:
         SummonList summons;
         uint32 beamTimer;
 
-        void Reset() 
-        { 
+        void Reset()
+        {
             events.Reset();
             summons.DespawnAll();
             if (InstanceScript* pInstance = me->GetInstanceScript())
