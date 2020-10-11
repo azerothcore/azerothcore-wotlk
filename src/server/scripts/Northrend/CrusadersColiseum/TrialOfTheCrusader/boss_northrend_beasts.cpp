@@ -87,7 +87,7 @@ public:
         void Reset()
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_FIRE_BOMB, urand(10000,30000));
+            events.ScheduleEvent(EVENT_SPELL_FIRE_BOMB, urand(10000, 30000));
         }
 
         void EnterCombat(Unit*  /*who*/)
@@ -127,7 +127,7 @@ public:
                     if( Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK)) )
                         if( gormok->IsAlive() )
                             if( Vehicle* vk = gormok->GetVehicleKit() )
-                                for( uint8 i=0; i<4; ++i )
+                                for( uint8 i = 0; i < 4; ++i )
                                     if( !vk->GetPassenger(i) )
                                     {
                                         me->EnterVehicleUnattackable(gormok, i);
@@ -155,25 +155,25 @@ public:
                 case EVENT_SPELL_BATTER:
                     if( t->GetTypeId() == TYPEID_PLAYER )
                         me->CastSpell(t, SPELL_BATTER);
-                    events.RepeatEvent(urand(6000,8000));
+                    events.RepeatEvent(urand(6000, 8000));
                     break;
                 case EVENT_SPELL_FIRE_BOMB:
                     {
                         if( t->GetTypeId() != TYPEID_PLAYER && pInstance )
                         {
                             std::vector<uint64> validPlayers;
-                            Map::PlayerList const &pl = me->GetMap()->GetPlayers();
+                            Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                             Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK));
 
                             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             {
                                 if( Player* p = itr->GetSource() )
-                                    if( p->IsAlive() && p->GetGUID()!=TargetGUID && (!gormok || !p->IsWithinMeleeRange(gormok)) )
+                                    if( p->IsAlive() && p->GetGUID() != TargetGUID && (!gormok || !p->IsWithinMeleeRange(gormok)) )
                                         validPlayers.push_back(p->GetGUID());
                             }
 
                             if( !validPlayers.empty() )
-                                if( Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0,validPlayers.size()-1))) )
+                                if( Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))) )
                                     if( Creature* trigger = me->SummonCreature(NPC_FIRE_BOMB, *p, TEMPSUMMON_TIMED_DESPAWN, 60000) )
                                     {
                                         me->CastSpell(trigger, SPELL_FIRE_BOMB_AURA, true); // periodic damage aura, speed 14.0f
@@ -181,13 +181,13 @@ public:
                                     }
                         }
 
-                        events.RepeatEvent(urand(20000,30000));
+                        events.RepeatEvent(urand(20000, 30000));
                     }
                     break;
                 case EVENT_SPELL_HEAD_CRACK:
                     if( t->GetTypeId() == TYPEID_PLAYER )
                         me->CastSpell(t, SPELL_HEAD_CRACK);
-                    events.RepeatEvent(urand(30000,35000));
+                    events.RepeatEvent(urand(30000, 35000));
                     break;
             }
 
@@ -247,13 +247,13 @@ public:
         {
             me->setActive(true);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_IMPALE, urand(9000,10000));
+            events.RescheduleEvent(EVENT_SPELL_IMPALE, urand(9000, 10000));
             events.RescheduleEvent(EVENT_SPELL_STAGGERING_STOMP, 15000);
-            events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, urand(16000,24000));
+            events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, urand(16000, 24000));
 
             // refresh snobold position
             if( Vehicle* vk = me->GetVehicleKit() )
-                for( uint8 i=0; i<4; ++i )
+                for( uint8 i = 0; i < 4; ++i )
                     if( Unit* snobold = vk->GetPassenger(i) )
                         snobold->SendMovementFlagUpdate();
         }
@@ -284,22 +284,22 @@ public:
                     {
                         if( Unit* victim = me->GetVictim() )
                             me->CastSpell(victim, SPELL_IMPALE, false);
-                        events.RepeatEvent(urand(9000,10000));
+                        events.RepeatEvent(urand(9000, 10000));
                     }
                     else
                         events.RepeatEvent(2500);
                     break;
                 case EVENT_SPELL_STAGGERING_STOMP:
                     me->CastSpell((Unit*)NULL, SPELL_STAGGERING_STOMP, false);
-                    events.RepeatEvent(urand(20000,25000));
+                    events.RepeatEvent(urand(20000, 25000));
                     break;
                 case EVENT_PICK_SNOBOLD_TARGET:
                     if( Vehicle* vk = me->GetVehicleKit() )
-                        for( uint8 i=0; i<4; ++i )
+                        for( uint8 i = 0; i < 4; ++i )
                             if( Unit* snobold = vk->GetPassenger(i) )
                             {
                                 std::vector<uint64> validPlayers;
-                                Map::PlayerList const &pl = me->GetMap()->GetPlayers();
+                                Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                                 {
                                     if( Player* p = itr->GetSource() )
@@ -308,7 +308,7 @@ public:
                                 }
 
                                 if( !validPlayers.empty() )
-                                    if( Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0,validPlayers.size()-1))) )
+                                    if( Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))) )
                                     {
                                         snobold->ChangeSeat(4); // switch to hand
                                         me->setAttackTimer(BASE_ATTACK, 3000);
@@ -318,7 +318,7 @@ public:
 
                                 break;
                             }
-                    events.RepeatEvent(urand(16000,24000));
+                    events.RepeatEvent(urand(16000, 24000));
                     break;
                 case EVENT_RELEASE_SNOBOLD:
                     {
@@ -347,7 +347,7 @@ public:
                                 if( snobold->GetTypeId() == TYPEID_UNIT )
                                 {
                                     bool needDespawn = true;
-                                    for( uint8 i=0; i<4; ++i )
+                                    for( uint8 i = 0; i < 4; ++i )
                                         if( !vk->GetPassenger(i) )
                                         {
                                             snobold->ChangeSeat(i);
@@ -503,17 +503,17 @@ struct boss_jormungarAI : public ScriptedAI
         {
             me->SetAttackTime(BASE_ATTACK, 1500);
             events.RescheduleEvent(EVENT_SPELL_SPRAY, (me->GetEntry() == NPC_ACIDMAW ? 20000 : 15000));
-            events.RescheduleEvent(EVENT_SPELL_SWEEP, urand(15000,30000));
+            events.RescheduleEvent(EVENT_SPELL_SWEEP, urand(15000, 30000));
         }
         else
         {
             me->SetAttackTime(BASE_ATTACK, 2000);
             events.RescheduleEvent(EVENT_SPELL_BITE, (me->GetEntry() == NPC_ACIDMAW ? 20000 : 15000));
-            events.RescheduleEvent(EVENT_SPELL_SPEW, urand(15000,30000));
+            events.RescheduleEvent(EVENT_SPELL_SPEW, urand(15000, 30000));
             events.RescheduleEvent(EVENT_SPELL_SLIME_POOL, 15000);
         }
         if( !me->HasAura(SPELL_ENRAGE) )
-            events.RescheduleEvent(EVENT_SUBMERGE, urand(45000,50000));
+            events.RescheduleEvent(EVENT_SUBMERGE, urand(45000, 50000));
     }
 
     void EnterCombat(Unit* /*who*/)
@@ -572,15 +572,15 @@ struct boss_jormungarAI : public ScriptedAI
                 break;
             case EVENT_MOVE_UNDERGROUND:
                 {
-                    float angle=me->GetAngle(Locs[LOC_CENTER].GetPositionX()+urand(0,20)-10.0f, Locs[LOC_CENTER].GetPositionY()+urand(0,20)-10.0f), dist=urand(10,35);
+                    float angle = me->GetAngle(Locs[LOC_CENTER].GetPositionX() + urand(0, 20) - 10.0f, Locs[LOC_CENTER].GetPositionY() + urand(0, 20) - 10.0f), dist = urand(10, 35);
                     if( Creature* c = me->SummonCreature(NPC_WORLD_TRIGGER, *me, TEMPSUMMON_TIMED_DESPAWN, 6000) )
                     {
                         c->SetSpeed(MOVE_RUN, 2.5f);
                         c->CastSpell(c, SPELL_CHURNING_GROUND, true);
                         c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
-                        c->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX()+cos(angle)*dist, Locs[LOC_CENTER].GetPositionY()+sin(angle)*dist, me->GetPositionZ());
+                        c->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ());
                     }
-                    me->UpdatePosition(Locs[LOC_CENTER].GetPositionX()+cos(angle)*dist, Locs[LOC_CENTER].GetPositionY()+sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
+                    me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
                     me->StopMovingOnCurrentPos();
                     DoResetThreat();
                     events.PopEvent();
@@ -618,7 +618,7 @@ struct boss_jormungarAI : public ScriptedAI
                 break;
             case EVENT_SPELL_SWEEP:
                 me->CastSpell((Unit*)NULL, SPELL_SWEEP_0, false);
-                events.RepeatEvent(urand(15000,30000));
+                events.RepeatEvent(urand(15000, 30000));
                 break;
             case EVENT_SPELL_BITE:
                 if( Unit* victim = me->GetVictim() )
@@ -627,7 +627,7 @@ struct boss_jormungarAI : public ScriptedAI
                 break;
             case EVENT_SPELL_SPEW:
                 me->CastSpell(me->GetVictim(), _SPELL_SPEW, false);
-                events.RepeatEvent(urand(15000,30000));
+                events.RepeatEvent(urand(15000, 30000));
                 break;
             case EVENT_SPELL_SLIME_POOL:
                 if( Creature* c = me->SummonCreature(NPC_SLIME_POOL, *me, TEMPSUMMON_TIMED_DESPAWN, 30000) )
@@ -667,7 +667,7 @@ struct boss_jormungarAI : public ScriptedAI
 
 class boss_acidmaw : public CreatureScript
 {
-    public:
+public:
     boss_acidmaw() : CreatureScript("boss_acidmaw") { }
 
     struct boss_acidmawAI : public boss_jormungarAI
@@ -793,8 +793,8 @@ public:
         {
             me->setActive(true);
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, urand(15000,30000));
-            events.RescheduleEvent(EVENT_SPELL_WHIRL, urand(10000,12000));
+            events.ScheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, urand(15000, 30000));
+            events.RescheduleEvent(EVENT_SPELL_WHIRL, urand(10000, 12000));
             events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, 14000);
             events.RescheduleEvent(EVENT_JUMP_MIDDLE, 30000);
         }
@@ -806,7 +806,7 @@ public:
 
         bool DoTrampleIfValid()
         {
-            Map::PlayerList const &lPlayers = me->GetMap()->GetPlayers();
+            Map::PlayerList const& lPlayers = me->GetMap()->GetPlayers();
             for( Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr )
                 if( Unit* p = itr->GetSource() )
                     if( p->IsAlive() && p->GetExactDist(me) <= 12.0f )
@@ -823,13 +823,13 @@ public:
             if( id == EVENT_CHARGE )
             {
                 events.Reset();
-                events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, urand(5000,15000));
-                events.RescheduleEvent(EVENT_SPELL_WHIRL, urand(2000,5000));
-                events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, urand(5000,8000));
-                events.RescheduleEvent(EVENT_JUMP_MIDDLE, urand(30000,50000));
+                events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, urand(5000, 15000));
+                events.RescheduleEvent(EVENT_SPELL_WHIRL, urand(2000, 5000));
+                events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, urand(5000, 8000));
+                events.RescheduleEvent(EVENT_JUMP_MIDDLE, urand(30000, 50000));
 
                 float angle = me->GetAngle(&Locs[LOC_CENTER]);
-                angle = angle >= M_PI ? angle-M_PI : angle+M_PI;
+                angle = angle >= M_PI ? angle - M_PI : angle + M_PI;
 
                 me->UpdatePosition(destX, destY, destZ, angle, true);
                 me->StopMovingOnCurrentPos();
@@ -868,16 +868,16 @@ public:
                 case EVENT_SPELL_FEROCIOUS_BUTT:
                     if( Unit* victim = me->GetVictim() )
                         me->CastSpell(victim, SPELL_FEROCIOUS_BUTT, false);
-                    events.RepeatEvent(urand(15000,30000));
+                    events.RepeatEvent(urand(15000, 30000));
                     break;
                 case EVENT_SPELL_WHIRL:
                     me->CastSpell((Unit*)NULL, SPELL_WHIRL, false);
-                    events.RepeatEvent(urand(15000,20000));
+                    events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_ARCTIC_BREATH:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true) )
                         me->CastSpell(target, SPELL_ARCTIC_BREATH, false);
-                    events.RepeatEvent(urand(20000,30000));
+                    events.RepeatEvent(urand(20000, 30000));
                     break;
                 case EVENT_JUMP_MIDDLE:
                     me->StopMoving();
@@ -908,10 +908,10 @@ public:
                     }
                     else // in case something went wrong
                     {
-                        events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, urand(5000,15000));
-                        events.RescheduleEvent(EVENT_SPELL_WHIRL, urand(2000,5000));
-                        events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, urand(5000,8000));
-                        events.RescheduleEvent(EVENT_JUMP_MIDDLE, urand(30000,50000));
+                        events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, urand(5000, 15000));
+                        events.RescheduleEvent(EVENT_SPELL_WHIRL, urand(2000, 5000));
+                        events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, urand(5000, 8000));
+                        events.RescheduleEvent(EVENT_JUMP_MIDDLE, urand(30000, 50000));
                         me->GetMotionMaster()->MovementExpired();
                         me->SetReactState(REACT_AGGRESSIVE);
                     }
@@ -923,17 +923,17 @@ public:
                         if( Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID) )
                             angle = me->GetAngle(target);
                         else // in case something went wrong
-                            angle = rand_norm()*2*M_PI;
+                            angle = rand_norm() * 2 * M_PI;
 
-                        float jumpangle = angle >= M_PI ? angle-M_PI : angle+M_PI;
+                        float jumpangle = angle >= M_PI ? angle - M_PI : angle + M_PI;
                         float dist = 50.0f;
                         if( angle > 1.0f && angle < 2.0f ) // near main gate
                             dist = 46.0f;
-                        destX = Locs[LOC_CENTER].GetPositionX()+cos(angle)*dist;
-                        destY = Locs[LOC_CENTER].GetPositionY()+sin(angle)*dist;
-                        destZ = Locs[LOC_CENTER].GetPositionZ()+1.0f;
+                        destX = Locs[LOC_CENTER].GetPositionX() + cos(angle) * dist;
+                        destY = Locs[LOC_CENTER].GetPositionY() + sin(angle) * dist;
+                        destZ = Locs[LOC_CENTER].GetPositionZ() + 1.0f;
                         me->StopMoving();
-                        me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX()+cos(jumpangle)*35.0f, Locs[LOC_CENTER].GetPositionY()+sin(jumpangle)*35.0f, Locs[LOC_CENTER].GetPositionZ()+1.0f, 40.0f, 12.0f);
+                        me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX() + cos(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionY() + sin(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionZ() + 1.0f, 40.0f, 12.0f);
 
                         events.PopEvent();
                         events.RescheduleEvent(EVENT_TRAMPLE, 1500);
@@ -962,7 +962,7 @@ public:
                     //Talk(EMOTE_TRAMPLE_START);
                     me->DisableSpline();
                     me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveCharge(destX, destY, destZ+1.0f, 65.0f);
+                    me->GetMotionMaster()->MoveCharge(destX, destY, destZ + 1.0f, 65.0f);
                     me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
                     events.RescheduleEvent(EVENT_CHECK_TRAMPLE_PLAYERS, 100);
                     events.PopEvent();
@@ -971,10 +971,10 @@ public:
                     if( DoTrampleIfValid() )
                     {
                         events.Reset();
-                        events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, urand(5000,15000));
-                        events.RescheduleEvent(EVENT_SPELL_WHIRL, urand(2000,5000));
-                        events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, urand(5000,8000));
-                        events.RescheduleEvent(EVENT_JUMP_MIDDLE, urand(30000,50000));
+                        events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, urand(5000, 15000));
+                        events.RescheduleEvent(EVENT_SPELL_WHIRL, urand(2000, 5000));
+                        events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, urand(5000, 8000));
+                        events.RescheduleEvent(EVENT_JUMP_MIDDLE, urand(30000, 50000));
                         Talk(EMOTE_TRAMPLE_FAIL);
                         me->CastSpell(me, SPELL_FROTHING_RAGE, true);
                         me->GetMotionMaster()->MovementExpired();
@@ -1016,7 +1016,7 @@ public:
 
             // remove loot for the other faction (items are invisible for players, done in conditions), so corpse can be skinned
             for( std::vector<LootItem>::iterator itr = me->loot.items.begin(); itr != me->loot.items.end(); ++itr )
-                if( ItemTemplate const *iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
+                if( ItemTemplate const* iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
                     if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && plr->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && plr->GetTeamId() != TEAM_ALLIANCE) )
                     {
                         (*itr).count = 0;

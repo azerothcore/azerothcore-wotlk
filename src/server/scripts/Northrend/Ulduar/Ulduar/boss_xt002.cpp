@@ -41,7 +41,7 @@ enum XT002Spells
     SPELL_VOID_ZONE_SUMMON_25   = 64235,
     //SPELL_VOID_ZONE_SUMMON        = RAID_MODE(SPELL_VOID_ZONE_SUMMON_10, SPELL_VOID_ZONE_SUMMON_25, SPELL_VOID_ZONE_SUMMON_10, SPELL_VOID_ZONE_SUMMON_25),
     SPELL_VOID_ZONE_DAMAGE      = 46262,
-    
+
     // SPARK
     SPELL_SPARK_SUMMON          = 64210,
     SPELL_SPARK_DAMAGE_10       = 64227,
@@ -119,7 +119,7 @@ public:
 
     struct boss_xt002AI : public ScriptedAI
     {
-        boss_xt002AI(Creature *pCreature) : ScriptedAI(pCreature), summons(me)
+        boss_xt002AI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
         {
             m_pInstance = pCreature->GetInstanceScript();
         }
@@ -162,7 +162,7 @@ public:
             {
                 m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_MUST_DECONSTRUCT_FASTER);
                 m_pInstance->SetData(TYPE_XT002, NOT_STARTED);
-                if (GameObject *pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
+                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
                     pGo->SetGoState(GO_STATE_ACTIVE);
             }
         }
@@ -199,7 +199,7 @@ public:
             {
                 m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_MUST_DECONSTRUCT_FASTER);
                 m_pInstance->SetData(TYPE_XT002, IN_PROGRESS);
-                if (GameObject *pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
+                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
                     pGo->SetGoState(GO_STATE_READY);
             }
 
@@ -210,9 +210,9 @@ public:
 
         void KilledUnit(Unit* victim)
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && !urand(0,2))
+            if (victim->GetTypeId() == TYPEID_PLAYER && !urand(0, 2))
             {
-                if (urand(0,1))
+                if (urand(0, 1))
                 {
                     me->MonsterYell("I... I think I broke it.", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(XT_SOUND_SLAY1);
@@ -225,7 +225,7 @@ public:
             }
         }
 
-        void JustDied(Unit * /*victim*/)
+        void JustDied(Unit* /*victim*/)
         {
             me->MonsterYell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL, 0);
             me->PlayDirectSound(XT_SOUND_DEATH);
@@ -233,7 +233,7 @@ public:
             if (m_pInstance)
             {
                 m_pInstance->SetData(TYPE_XT002, DONE);
-                if (GameObject *pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
+                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
                     pGo->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -253,7 +253,7 @@ public:
                 _gravityAchievement = false;
                 return;
             }
-            
+
             if (!me->IsAlive() || _hardMode)
                 return;
 
@@ -267,7 +267,7 @@ public:
                 me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND); // emerge
 
                 me->CastSpell(me, SPELL_HEARTBREAK, true);
-                
+
                 me->MonsterTextEmote("XT-002 Deconstructor's heart is severed from his body.", 0, true);
                 events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4000);
                 return;
@@ -277,7 +277,7 @@ public:
             if (param > 0)
             {
                 // avoid reducing health under 1
-                int32 _final = std::min(param, int32(me->GetHealth()-1));
+                int32 _final = std::min(param, int32(me->GetHealth() - 1));
 
                 me->ModifyHealth(-_final);
                 me->LowerPlayerDamageReq(_final);
@@ -315,7 +315,7 @@ public:
 
                     if (me->HealthBelowPct(_healthCheck))
                     {
-                        _healthCheck -= 25;                 
+                        _healthCheck -= 25;
                         me->SetControlled(true, UNIT_STATE_STUNNED);
                         me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_SUBMERGED); // submerge with animation
 
@@ -366,7 +366,7 @@ public:
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                         heart->GetAI()->DoAction(ACTION_AWAKEN_HEART);
-                    
+
                     events.ScheduleEvent(EVENT_RESTORE, 30000);
                     events.PopEvent();
                     return;
@@ -380,7 +380,7 @@ public:
 
                     me->MonsterYell("I'm ready to play!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(XT_SOUND_HEART_CLOSED);
-                    
+
                     me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND); // emerge
                     // Hide heart
                     if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
@@ -397,7 +397,7 @@ public:
                     events.PopEvent();
                     return;
             }
-            
+
             // Disabled by stunned state
             DoMeleeAttackIfReady();
         }
@@ -425,7 +425,7 @@ public:
         SummonList summons;
         uint32 _damageDone;
         uint32 _timerSpawn;
-        
+
         uint8 _spawnSelection;
         uint8 _pummelerCount;
 
@@ -438,7 +438,7 @@ public:
                 if (owner->GetTypeId() == TYPEID_UNIT)
                     owner->ToCreature()->AI()->JustSummoned(cr);
         }
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             _damageDone += damage;
         }
@@ -482,7 +482,7 @@ public:
         void SendEnergyToCorner()
         {
             Unit* pile = nullptr;
-            uint8 num = urand(1,4);
+            uint8 num = urand(1, 4);
             for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                     if (summon->GetEntry() == NPC_PILE_TRIGGER)
@@ -496,7 +496,7 @@ public:
                 me->CastSpell(pile, SPELL_ENERGY_ORB, true);
         }
 
-        void SpellHitTarget(Unit *target, const SpellInfo *spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
         {
             // spawn not-so-random robots
             if (spellInfo->Id == SPELL_ENERGY_ORB_TRIGGER && target->GetEntry() == NPC_PILE_TRIGGER)
@@ -504,34 +504,34 @@ public:
                 {
                     case 0:
                         for (uint8 i = 0; i < 5; ++i)
-                            me->SummonCreature(NPC_XS013_SCRAPBOT, target->GetPositionX()+irand(-3, 3), target->GetPositionY()+irand(-3, 3), target->GetPositionZ()+2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
+                            me->SummonCreature(NPC_XS013_SCRAPBOT, target->GetPositionX() + irand(-3, 3), target->GetPositionY() + irand(-3, 3), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
                         _spawnSelection++;
                         break;
                     case 1:
-                        me->SummonCreature(NPC_XE321_BOOMBOT, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()+2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+                        me->SummonCreature(NPC_XE321_BOOMBOT, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
                         _spawnSelection++;
                         break;
                     case 2:
                         for (uint8 i = 0; i < 5; ++i)
-                            me->SummonCreature(NPC_XS013_SCRAPBOT, target->GetPositionX()+irand(-3, 3), target->GetPositionY()+irand(-3, 3), target->GetPositionZ()+2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
+                            me->SummonCreature(NPC_XS013_SCRAPBOT, target->GetPositionX() + irand(-3, 3), target->GetPositionY() + irand(-3, 3), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
                         _spawnSelection++;
                         break;
                     case 3:
                         if(_pummelerCount < 2)
-                            me->SummonCreature(NPC_XM024_PUMMELLER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()+2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-                        
+                            me->SummonCreature(NPC_XM024_PUMMELLER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+
                         _pummelerCount++;
                         _spawnSelection++;
                         break;
                     case 4:
                         for (uint8 i = 0; i < 5; ++i)
-                            me->SummonCreature(NPC_XS013_SCRAPBOT, target->GetPositionX()+irand(-3, 3), target->GetPositionY()+irand(-3, 3), target->GetPositionZ()+2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
+                            me->SummonCreature(NPC_XS013_SCRAPBOT, target->GetPositionX() + irand(-3, 3), target->GetPositionY() + irand(-3, 3), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
                         _spawnSelection = 0;
                         break;
                 }
         }
 
-        void JustDied(Unit * /*victim*/)
+        void JustDied(Unit* /*victim*/)
         {
             me->SetVisible(false);
             if (me->GetInstanceScript())
@@ -616,9 +616,9 @@ public:
                         pXT002->ModifyHealth(pXT002->GetMaxHealth() * 0.01f);
                     }
 
-                    if (!urand(0,2))
+                    if (!urand(0, 2))
                         me->MonsterTextEmote("XT-002 Deconstructor consumes scrap bot to repair himself.", 0, true);
-                    
+
                     me->DespawnOrUnsummon(1);
                 }
         }
@@ -662,7 +662,7 @@ public:
             _trampleTimer = 0;
             _uppercutTimer = 0;
 
-            if (Unit *target = SelectTargetFromPlayerList(200))
+            if (Unit* target = SelectTargetFromPlayerList(200))
                 AttackStart(target);
             else
                 me->DespawnOrUnsummon(500);
@@ -703,25 +703,25 @@ public:
 
 class BoomEvent : public BasicEvent
 {
-    public:
-        BoomEvent(Creature* me) : _me(me)
-        {
-        }
+public:
+    BoomEvent(Creature* me) : _me(me)
+    {
+    }
 
-        bool Execute(uint64 /*time*/, uint32 /*diff*/)
-        {
-            // This hack is here because we suspect our implementation of spell effect execution on targets
-            // is done in the wrong order. We suspect that EFFECT_0 needs to be applied on all targets,
-            // then EFFECT_1, etc - instead of applying each effect on target1, then target2, etc.
-            // The above situation causes the visual for this spell to be bugged, so we remove the instakill
-            // effect and implement a script hack for that.
+    bool Execute(uint64 /*time*/, uint32 /*diff*/)
+    {
+        // This hack is here because we suspect our implementation of spell effect execution on targets
+        // is done in the wrong order. We suspect that EFFECT_0 needs to be applied on all targets,
+        // then EFFECT_1, etc - instead of applying each effect on target1, then target2, etc.
+        // The above situation causes the visual for this spell to be bugged, so we remove the instakill
+        // effect and implement a script hack for that.
 
-            _me->CastSpell(_me, SPELL_BOOM, false);
-            return true;
-        }
+        _me->CastSpell(_me, SPELL_BOOM, false);
+        return true;
+    }
 
-    private:
-        Creature* _me;
+private:
+    Creature* _me;
 };
 
 class npc_xt002_boombot : public CreatureScript
@@ -762,9 +762,9 @@ public:
             if (_boomed)
                 return;
 
-             _boomed = true; // Prevent recursive calls
+            _boomed = true; // Prevent recursive calls
 
-            WorldPacket data(SMSG_SPELLINSTAKILLLOG, 8+8+4);
+            WorldPacket data(SMSG_SPELLINSTAKILLLOG, 8 + 8 + 4);
             data << uint64(me->GetGUID());
             data << uint64(me->GetGUID());
             data << uint32(SPELL_BOOM);
@@ -777,15 +777,15 @@ public:
             // so that can't be the issue
             // See BoomEvent class
             // Schedule 1s delayed
-            me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1*IN_MILLISECONDS));
+            me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
         }
 
         void JustDied(Unit*)
         {
-            me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1*IN_MILLISECONDS));
+            me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             if (_boomed)
                 damage = 0;
@@ -847,7 +847,7 @@ public:
         uint32 _attackTimer;
         void Reset()
         {
-            if (Unit *target = SelectTargetFromPlayerList(200))
+            if (Unit* target = SelectTargetFromPlayerList(200))
                 AttackStart(target);
             else
                 me->DespawnOrUnsummon();
@@ -866,219 +866,219 @@ public:
 
 class spell_xt002_tympanic_tantrum : public SpellScriptLoader
 {
-    public:
-        spell_xt002_tympanic_tantrum() : SpellScriptLoader("spell_xt002_tympanic_tantrum") { }
+public:
+    spell_xt002_tympanic_tantrum() : SpellScriptLoader("spell_xt002_tympanic_tantrum") { }
 
-        class spell_xt002_tympanic_tantrum_SpellScript : public SpellScript
+    class spell_xt002_tympanic_tantrum_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_xt002_tympanic_tantrum_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            PrepareSpellScript(spell_xt002_tympanic_tantrum_SpellScript);
-
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                targets.remove_if(PlayerOrPetCheck());
-            }
-
-            void RecalculateDamage()
-            {
-                if (GetHitUnit())
-                    SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(GetHitDamage()));
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_xt002_tympanic_tantrum_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-                OnHit += SpellHitFn(spell_xt002_tympanic_tantrum_SpellScript::RecalculateDamage);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_xt002_tympanic_tantrum_SpellScript();
+            targets.remove_if(PlayerOrPetCheck());
         }
+
+        void RecalculateDamage()
+        {
+            if (GetHitUnit())
+                SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(GetHitDamage()));
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_xt002_tympanic_tantrum_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+            OnHit += SpellHitFn(spell_xt002_tympanic_tantrum_SpellScript::RecalculateDamage);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_xt002_tympanic_tantrum_SpellScript();
+    }
 };
 
 class spell_xt002_gravity_bomb_aura : public SpellScriptLoader
 {
-    public:
-        spell_xt002_gravity_bomb_aura() : SpellScriptLoader("spell_xt002_gravity_bomb_aura") { }
+public:
+    spell_xt002_gravity_bomb_aura() : SpellScriptLoader("spell_xt002_gravity_bomb_aura") { }
 
-        class spell_xt002_gravity_bomb_aura_AuraScript : public AuraScript
+    class spell_xt002_gravity_bomb_aura_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_xt002_gravity_bomb_aura_AuraScript);
+
+        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_xt002_gravity_bomb_aura_AuraScript);
-
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-            {
-                if (Player* player = GetOwner()->ToPlayer())
-                    if (Unit* xt002 = GetCaster())
-                        if (xt002->HasAura(aurEff->GetAmount()))   // Heartbreak aura indicating hard mode
-                            if (Creature* cr = xt002->SummonCreature(NPC_VOID_ZONE, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 180000))
-                            {
-                                int32 damage = GetSpellInfo()->Id == 63025 ? 5000 : 7500;
-                                cr->CastCustomSpell(cr, SPELL_VOID_ZONE_DAMAGE, &damage, 0, 0, true);
-                            }
-            }
-
-            void OnPeriodic(AuraEffect const* aurEff)
-            {
-                Unit* xt002 = GetCaster();
-                if (!xt002)
-                    return;
-
-                Unit* owner = GetOwner()->ToUnit();
-                if (!owner)
-                    return;
-
-               if (aurEff->GetAmount() >= int32(owner->GetHealth()))
-                    if (xt002->GetAI())
-                        xt002->GetAI()->DoAction(DATA_XT002_GRAVITY_ACHIEV);
-            }
-
-            void Register()
-            {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_xt002_gravity_bomb_aura_AuraScript::OnPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE);
-                AfterEffectRemove += AuraEffectRemoveFn(spell_xt002_gravity_bomb_aura_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_xt002_gravity_bomb_aura_AuraScript();
+            if (Player* player = GetOwner()->ToPlayer())
+                if (Unit* xt002 = GetCaster())
+                    if (xt002->HasAura(aurEff->GetAmount()))   // Heartbreak aura indicating hard mode
+                        if (Creature* cr = xt002->SummonCreature(NPC_VOID_ZONE, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 180000))
+                        {
+                            int32 damage = GetSpellInfo()->Id == 63025 ? 5000 : 7500;
+                            cr->CastCustomSpell(cr, SPELL_VOID_ZONE_DAMAGE, &damage, 0, 0, true);
+                        }
         }
 
-        class spell_xt002_gravity_bomb_aura_SpellScript : public SpellScript
+        void OnPeriodic(AuraEffect const* aurEff)
         {
-            PrepareSpellScript(spell_xt002_gravity_bomb_aura_SpellScript);
+            Unit* xt002 = GetCaster();
+            if (!xt002)
+                return;
 
-            void SelectTarget(std::list<WorldObject*>& targets)
-            {
-                if (Unit* victim = GetCaster()->GetVictim())
-                    targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true)); 
-            }
+            Unit* owner = GetOwner()->ToUnit();
+            if (!owner)
+                return;
 
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_xt002_gravity_bomb_aura_SpellScript::SelectTarget, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_xt002_gravity_bomb_aura_SpellScript();
+            if (aurEff->GetAmount() >= int32(owner->GetHealth()))
+                if (xt002->GetAI())
+                    xt002->GetAI()->DoAction(DATA_XT002_GRAVITY_ACHIEV);
         }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_xt002_gravity_bomb_aura_AuraScript::OnPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_xt002_gravity_bomb_aura_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_xt002_gravity_bomb_aura_AuraScript();
+    }
+
+    class spell_xt002_gravity_bomb_aura_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_xt002_gravity_bomb_aura_SpellScript);
+
+        void SelectTarget(std::list<WorldObject*>& targets)
+        {
+            if (Unit* victim = GetCaster()->GetVictim())
+                targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_xt002_gravity_bomb_aura_SpellScript::SelectTarget, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_xt002_gravity_bomb_aura_SpellScript();
+    }
 };
 
 class spell_xt002_gravity_bomb_damage : public SpellScriptLoader
 {
-    public:
-        spell_xt002_gravity_bomb_damage() : SpellScriptLoader("spell_xt002_gravity_bomb_damage") { }
+public:
+    spell_xt002_gravity_bomb_damage() : SpellScriptLoader("spell_xt002_gravity_bomb_damage") { }
 
-        class spell_xt002_gravity_bomb_damage_SpellScript : public SpellScript
+    class spell_xt002_gravity_bomb_damage_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_xt002_gravity_bomb_damage_SpellScript);
+
+        void HandleScript(SpellEffIndex /*eff*/)
         {
-            PrepareSpellScript(spell_xt002_gravity_bomb_damage_SpellScript);
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
 
-            void HandleScript(SpellEffIndex /*eff*/)
-            {
-                Unit* caster = GetCaster();
-                if (!caster)
-                    return;
-
-                if (GetHitDamage() >= int32(GetHitUnit()->GetHealth()))
-                    if (caster->GetAI())
-                        caster->GetAI()->DoAction(DATA_XT002_GRAVITY_ACHIEV);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_xt002_gravity_bomb_damage_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_xt002_gravity_bomb_damage_SpellScript();
+            if (GetHitDamage() >= int32(GetHitUnit()->GetHealth()))
+                if (caster->GetAI())
+                    caster->GetAI()->DoAction(DATA_XT002_GRAVITY_ACHIEV);
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_xt002_gravity_bomb_damage_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_xt002_gravity_bomb_damage_SpellScript();
+    }
 };
 
 class spell_xt002_searing_light_spawn_life_spark : public SpellScriptLoader
 {
-    public:
-        spell_xt002_searing_light_spawn_life_spark() : SpellScriptLoader("spell_xt002_searing_light_spawn_life_spark") { }
+public:
+    spell_xt002_searing_light_spawn_life_spark() : SpellScriptLoader("spell_xt002_searing_light_spawn_life_spark") { }
 
-        class spell_xt002_searing_light_spawn_life_spark_AuraScript : public AuraScript
+    class spell_xt002_searing_light_spawn_life_spark_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_xt002_searing_light_spawn_life_spark_AuraScript);
+
+        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_xt002_searing_light_spawn_life_spark_AuraScript);
-
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-            {
-                if (Player* player = GetOwner()->ToPlayer())
-                    if (Unit* xt002 = GetCaster())
-                        if (xt002->HasAura(aurEff->GetAmount()))   // Heartbreak aura indicating hard mode
-                            xt002->SummonCreature(NPC_LIFE_SPARK, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 180000);
-            }
-
-            void Register()
-            {
-                OnEffectRemove += AuraEffectRemoveFn(spell_xt002_searing_light_spawn_life_spark_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_xt002_searing_light_spawn_life_spark_AuraScript();
+            if (Player* player = GetOwner()->ToPlayer())
+                if (Unit* xt002 = GetCaster())
+                    if (xt002->HasAura(aurEff->GetAmount()))   // Heartbreak aura indicating hard mode
+                        xt002->SummonCreature(NPC_LIFE_SPARK, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 180000);
         }
 
-        class spell_xt002_searing_light_spawn_life_spark_SpellScript : public SpellScript
+        void Register()
         {
-            PrepareSpellScript(spell_xt002_searing_light_spawn_life_spark_SpellScript);
-
-            void SelectTarget(std::list<WorldObject*>& targets)
-            {
-                if (Unit* victim = GetCaster()->GetVictim())
-                    targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true)); 
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_xt002_searing_light_spawn_life_spark_SpellScript::SelectTarget, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_xt002_searing_light_spawn_life_spark_SpellScript();
+            OnEffectRemove += AuraEffectRemoveFn(spell_xt002_searing_light_spawn_life_spark_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_xt002_searing_light_spawn_life_spark_AuraScript();
+    }
+
+    class spell_xt002_searing_light_spawn_life_spark_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_xt002_searing_light_spawn_life_spark_SpellScript);
+
+        void SelectTarget(std::list<WorldObject*>& targets)
+        {
+            if (Unit* victim = GetCaster()->GetVictim())
+                targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_xt002_searing_light_spawn_life_spark_SpellScript::SelectTarget, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_xt002_searing_light_spawn_life_spark_SpellScript();
+    }
 };
 
 class achievement_xt002_nerf_engineering : public AchievementCriteriaScript
 {
-    public:
-        achievement_xt002_nerf_engineering() : AchievementCriteriaScript("achievement_xt002_nerf_engineering") {}
+public:
+    achievement_xt002_nerf_engineering() : AchievementCriteriaScript("achievement_xt002_nerf_engineering") {}
 
-        bool OnCheck(Player*  /*player*/, Unit* target)
-        {
-            if (target)
-                if (InstanceScript* instance = target->GetInstanceScript())
-                    if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_XT002)))
-                        return cr->AI()->GetData(DATA_XT002_NERF_ENGINEERING);
-                        
-            return false;
-        }
+    bool OnCheck(Player*  /*player*/, Unit* target)
+    {
+        if (target)
+            if (InstanceScript* instance = target->GetInstanceScript())
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_XT002)))
+                    return cr->AI()->GetData(DATA_XT002_NERF_ENGINEERING);
+
+        return false;
+    }
 };
 
 class achievement_xt002_nerf_gravity_bombs : public AchievementCriteriaScript
 {
-    public:
-        achievement_xt002_nerf_gravity_bombs() : AchievementCriteriaScript("achievement_xt002_nerf_gravity_bombs") {}
+public:
+    achievement_xt002_nerf_gravity_bombs() : AchievementCriteriaScript("achievement_xt002_nerf_gravity_bombs") {}
 
-        bool OnCheck(Player*  /*player*/, Unit* target)
-        {
-            if (target)
-                if (InstanceScript* instance = target->GetInstanceScript())
-                    if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_XT002)))
-                        return cr->AI()->GetData(DATA_XT002_GRAVITY_ACHIEV);
-                        
-            return false;
-        }
+    bool OnCheck(Player*  /*player*/, Unit* target)
+    {
+        if (target)
+            if (InstanceScript* instance = target->GetInstanceScript())
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_XT002)))
+                    return cr->AI()->GetData(DATA_XT002_GRAVITY_ACHIEV);
+
+        return false;
+    }
 };
 
 void AddSC_boss_xt002()

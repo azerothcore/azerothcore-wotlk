@@ -89,7 +89,7 @@ public:
 
     struct npc_ulduar_iron_constructAI : public ScriptedAI
     {
-        npc_ulduar_iron_constructAI(Creature *pCreature) : ScriptedAI(pCreature)
+        npc_ulduar_iron_constructAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             me->CastSpell(me, 38757, true);
         }
@@ -126,14 +126,14 @@ public:
             else if (spell->Id == SPELL_HEAT_BUFF)
             {
                 if (Aura* a = me->GetAura(SPELL_HEAT_BUFF))
-                    if( a->GetStackAmount() >= RAID_MODE(10,20) )
-                        {
-                            if (RAID_MODE(1,0) && a->GetStackAmount() > 10) // prevent going over 10 on 10man version
-                                a->ModStackAmount(-1);
+                    if( a->GetStackAmount() >= RAID_MODE(10, 20) )
+                    {
+                        if (RAID_MODE(1, 0) && a->GetStackAmount() > 10) // prevent going over 10 on 10man version
+                            a->ModStackAmount(-1);
 
-                            me->CastSpell(me, SPELL_MOLTEN, true);
-                            me->getThreatManager().resetAllAggro();
-                        }
+                        me->CastSpell(me, SPELL_MOLTEN, true);
+                        me->getThreatManager().resetAllAggro();
+                    }
             }
         }
 
@@ -194,7 +194,7 @@ public:
 
     struct boss_ignisAI : public ScriptedAI
     {
-        boss_ignisAI(Creature *pCreature) : ScriptedAI(pCreature) { }
+        boss_ignisAI(Creature* pCreature) : ScriptedAI(pCreature) { }
 
         EventMap events;
         uint8 counter;
@@ -239,7 +239,7 @@ public:
             bShattered = false;
             lastShatterMSTime = 0;
             events.Reset();
-            events.ScheduleEvent(EVENT_ACTIVATE_CONSTRUCT, RAID_MODE(40000,30000));
+            events.ScheduleEvent(EVENT_ACTIVATE_CONSTRUCT, RAID_MODE(40000, 30000));
             events.ScheduleEvent(EVENT_SPELL_SCORCH, 10000);
             events.ScheduleEvent(EVENT_SPELL_FLAME_JETS, 32000);
             events.ScheduleEvent(EVENT_GRAB, 25000);
@@ -282,7 +282,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/)
         {
-            if( rand()%2 )
+            if( rand() % 2 )
             {
                 me->MonsterYell(TEXT_SLAY_1, LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_SLAY_1);
@@ -294,7 +294,7 @@ public:
             }
         }
 
-        void JustDied(Unit * /*victim*/)
+        void JustDied(Unit* /*victim*/)
         {
             me->MonsterYell(TEXT_DEATH, LANG_UNIVERSAL, 0);
             me->PlayDirectSound(SOUND_DEATH);
@@ -350,10 +350,10 @@ public:
                         events.PopEvent();
                         break;
                     }
-                    events.RepeatEvent(RAID_MODE(40000,30000));
+                    events.RepeatEvent(RAID_MODE(40000, 30000));
                     break;
                 case EVENT_SPELL_SCORCH:
-                    if( rand()%2 )
+                    if( rand() % 2 )
                     {
                         me->MonsterYell(TEXT_SCORCH_1, LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(SOUND_SCORCH_1);
@@ -410,8 +410,8 @@ public:
 
                         if( !playerGUIDs.empty() )
                         {
-                            int8 pos = urand(0, playerGUIDs.size()-1);
-                            if( Player* pTarget = ObjectAccessor::GetPlayer(*me,playerGUIDs.at(pos)) )
+                            int8 pos = urand(0, playerGUIDs.size() - 1);
+                            if( Player* pTarget = ObjectAccessor::GetPlayer(*me, playerGUIDs.at(pos)) )
                             {
                                 me->MonsterYell(TEXT_SLAG_POT, LANG_UNIVERSAL, 0);
                                 me->PlayDirectSound(SOUND_SLAG_POT);
@@ -446,13 +446,13 @@ public:
     {
         PrepareAuraScript(spell_ignis_scorch_AuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const* aurEff)
         {
             if (aurEff->GetTotalTicks() >= 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()))
                 if (Unit* c = GetCaster())
-                    if (Creature* s = c->SummonCreature(NPC_SCORCHED_GROUND, c->GetPositionX()+20.0f*cos(c->GetOrientation()), c->GetPositionY()+20.0f*sin(c->GetOrientation()), 361.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000))
+                    if (Creature* s = c->SummonCreature(NPC_SCORCHED_GROUND, c->GetPositionX() + 20.0f * cos(c->GetOrientation()), c->GetPositionY() + 20.0f * sin(c->GetOrientation()), 361.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000))
                     {
-                        if (!s->FindNearestCreature(NPC_WATER_TRIGGER, 25.0f,true)) // must be away from the water
+                        if (!s->FindNearestCreature(NPC_WATER_TRIGGER, 25.0f, true)) // must be away from the water
                             s->CastSpell(s, (aurEff->GetId() == 62546 ? SPELL_SCORCHED_GROUND_10 : SPELL_SCORCHED_GROUND_25), true);
                     }
         }
@@ -463,7 +463,7 @@ public:
         }
     };
 
-    AuraScript *GetAuraScript() const
+    AuraScript* GetAuraScript() const
     {
         return new spell_ignis_scorch_AuraScript();
     }
@@ -505,7 +505,7 @@ public:
     {
         PrepareAuraScript(spell_ignis_slag_pot_AuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
+        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
         {
             if (Unit* c = GetCaster())
                 if (Unit* t = GetTarget())
@@ -540,7 +540,7 @@ public:
         }
     };
 
-    AuraScript *GetAuraScript() const
+    AuraScript* GetAuraScript() const
     {
         return new spell_ignis_slag_pot_AuraScript();
     }
@@ -548,15 +548,15 @@ public:
 
 class achievement_ignis_shattered : public AchievementCriteriaScript
 {
-    public:
-        achievement_ignis_shattered() : AchievementCriteriaScript("achievement_ignis_shattered") {}
+public:
+    achievement_ignis_shattered() : AchievementCriteriaScript("achievement_ignis_shattered") {}
 
-        bool OnCheck(Player*  /*player*/, Unit* target)
-        {
-            if (!target || target->GetTypeId() != TYPEID_UNIT)
-                return false;
-            return !!target->ToCreature()->AI()->GetData(1337);
-        }
+    bool OnCheck(Player*  /*player*/, Unit* target)
+    {
+        if (!target || target->GetTypeId() != TYPEID_UNIT)
+            return false;
+        return !!target->ToCreature()->AI()->GetData(1337);
+    }
 };
 
 void AddSC_boss_ignis()

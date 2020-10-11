@@ -91,7 +91,7 @@ public:
                             cr->AI()->DoAction(1);
                     }
                     break;
-                
+
                 case DATA_BLACKHEARTTHEINCITEREVENT:
                     if (uiData == DONE)
                         DoUseDoorOrButton(m_uiRefectoryDoorGUID);
@@ -125,7 +125,7 @@ public:
         {
             std::ostringstream saveStream;
             saveStream << "S L " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' '
-                    << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' ' << m_auiEncounter[4];
+                       << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' ' << m_auiEncounter[4];
 
             return saveStream.str();
         }
