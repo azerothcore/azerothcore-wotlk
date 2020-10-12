@@ -1123,7 +1123,18 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError("Battleground.ReportAFK (%d) must be <10. Using 3 instead.", m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]);
         m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] = 3;
     }
-
+    m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME]        = sConfigMgr->GetIntDefault("Battleground.RespawnTime", 30);
+    if (m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME] < 3)
+    {
+        sLog->outError("Battleground.RespawnTime (%i) must be in range 3..120. Using 30 instead.", m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME]),
+        m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME] = 30;
+    }
+    else if (m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME] > 120)
+    {
+        sLog->outError("Battleground.RespawnTime (%i) must be in range 3..120. Using 30 instead.", m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME]),
+        m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME] = 30;
+    }
+    
     m_int_configs[CONFIG_ARENA_MAX_RATING_DIFFERENCE]                = sConfigMgr->GetIntDefault ("Arena.MaxRatingDifference", 150);
     m_int_configs[CONFIG_ARENA_RATING_DISCARD_TIMER]                 = sConfigMgr->GetIntDefault ("Arena.RatingDiscardTimer", 10 * MINUTE * IN_MILLISECONDS);
     m_bool_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS]              = sConfigMgr->GetBoolDefault("Arena.AutoDistributePoints", false);
