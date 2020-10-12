@@ -187,15 +187,15 @@ uint32 GUID_HIPART(uint64 guid)
 uint32 GUID_ENPART(uint64 x)
 {
     return IsGuidHaveEnPart(x)
-            ? (uint32)((x >> 24) & UI64LIT(0x0000000000FFFFFF))
-            : 0;
+           ? (uint32)((x >> 24) & UI64LIT(0x0000000000FFFFFF))
+           : 0;
 }
 
 uint32 GUID_LOPART(uint64 x)
 {
     return IsGuidHaveEnPart(x)
-            ? (uint32)(x & UI64LIT(0x0000000000FFFFFF))
-            : (uint32)(x & UI64LIT(0x00000000FFFFFFFF));
+           ? (uint32)(x & UI64LIT(0x0000000000FFFFFF))
+           : (uint32)(x & UI64LIT(0x00000000FFFFFFFF));
 }
 
 bool IsGuidHaveEnPart(uint64 guid)
@@ -223,17 +223,28 @@ char const* GetLogNameForGuid(uint64 guid)
 {
     switch (GUID_HIPART(guid))
     {
-        case HIGHGUID_ITEM:         return "item";
-        case HIGHGUID_PLAYER:       return guid ? "player" : "none";
-        case HIGHGUID_GAMEOBJECT:   return "gameobject";
-        case HIGHGUID_TRANSPORT:    return "transport";
-        case HIGHGUID_UNIT:         return "creature";
-        case HIGHGUID_PET:          return "pet";
-        case HIGHGUID_VEHICLE:      return "vehicle";
-        case HIGHGUID_DYNAMICOBJECT:return "dynobject";
-        case HIGHGUID_CORPSE:       return "corpse";
-        case HIGHGUID_MO_TRANSPORT: return "mo_transport";
-        case HIGHGUID_GROUP:        return "group";
+        case HIGHGUID_ITEM:
+            return "item";
+        case HIGHGUID_PLAYER:
+            return guid ? "player" : "none";
+        case HIGHGUID_GAMEOBJECT:
+            return "gameobject";
+        case HIGHGUID_TRANSPORT:
+            return "transport";
+        case HIGHGUID_UNIT:
+            return "creature";
+        case HIGHGUID_PET:
+            return "pet";
+        case HIGHGUID_VEHICLE:
+            return "vehicle";
+        case HIGHGUID_DYNAMICOBJECT:
+            return "dynobject";
+        case HIGHGUID_CORPSE:
+            return "corpse";
+        case HIGHGUID_MO_TRANSPORT:
+            return "mo_transport";
+        case HIGHGUID_GROUP:
+            return "group";
         default:
             return "<unknown>";
     }
