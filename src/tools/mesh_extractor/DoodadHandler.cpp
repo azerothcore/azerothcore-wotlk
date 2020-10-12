@@ -10,7 +10,7 @@
 #include "Model.h"
 #include "G3D/Matrix4.h"
 
-DoodadHandler::DoodadHandler( ADT* adt ) : 
+DoodadHandler::DoodadHandler( ADT* adt ) :
     ObjectDataHandler(adt), _definitions(nullptr), _paths(nullptr)
 {
     Chunk* mddf = adt->ObjectData->GetChunkByName("MDDF");
@@ -27,7 +27,7 @@ void DoodadHandler::ProcessInternal( MapChunk* mcnk )
 {
     if (!IsSane())
         return;
-    
+
     uint32 refCount = mcnk->Header.DoodadRefs;
     FILE* stream = mcnk->Source->GetStream();
     fseek(stream, mcnk->Source->Offset + mcnk->Header.OffsetMCRF, SEEK_SET);
@@ -100,7 +100,7 @@ void DoodadHandler::ReadDoodadPaths( Chunk* id, Chunk* data )
 void DoodadHandler::InsertModelGeometry(const DoodadDefinition& def, Model* model)
 {
     uint32 vertOffset = Vertices.size();
-    
+
     for (std::vector<Vector3>::iterator itr = model->Vertices.begin(); itr != model->Vertices.end(); ++itr)
         Vertices.push_back(Utils::TransformDoodadVertex(def, *itr)); // Vertices have to be converted based on the information from the DoodadDefinition struct
 

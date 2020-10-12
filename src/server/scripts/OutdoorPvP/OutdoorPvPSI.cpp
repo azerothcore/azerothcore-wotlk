@@ -25,7 +25,7 @@ OutdoorPvPSI::OutdoorPvPSI()
     m_LastController = TEAM_NEUTRAL;
 }
 
-void OutdoorPvPSI::FillInitialWorldStates(WorldPacket &data)
+void OutdoorPvPSI::FillInitialWorldStates(WorldPacket& data)
 {
     data << SI_GATHERED_A << m_Gathered_A;
     data << SI_GATHERED_H << m_Gathered_H;
@@ -78,58 +78,58 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
 
     switch (trigger)
     {
-    case SI_AREATRIGGER_A:
-        if (player->GetTeamId() == TEAM_ALLIANCE && player->HasAura(SI_SILITHYST_FLAG))
-        {
-            // remove aura
-            player->RemoveAurasDueToSpell(SI_SILITHYST_FLAG);
-            ++ m_Gathered_A;
-            if (m_Gathered_A >= SI_MAX_RESOURCES)
+        case SI_AREATRIGGER_A:
+            if (player->GetTeamId() == TEAM_ALLIANCE && player->HasAura(SI_SILITHYST_FLAG))
             {
-                TeamApplyBuff(TEAM_ALLIANCE, SI_CENARION_FAVOR, 0, player);
-                sWorld->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_A));
-                m_LastController = TEAM_ALLIANCE;
-                m_Gathered_A = 0;
-                m_Gathered_H = 0;
+                // remove aura
+                player->RemoveAurasDueToSpell(SI_SILITHYST_FLAG);
+                ++ m_Gathered_A;
+                if (m_Gathered_A >= SI_MAX_RESOURCES)
+                {
+                    TeamApplyBuff(TEAM_ALLIANCE, SI_CENARION_FAVOR, 0, player);
+                    sWorld->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_A));
+                    m_LastController = TEAM_ALLIANCE;
+                    m_Gathered_A = 0;
+                    m_Gathered_H = 0;
+                }
+                UpdateWorldState();
+                // reward player, xinef: has no effect on characters above level 70
+                if (player->getLevel() < 70)
+                    player->CastSpell(player, SI_TRACES_OF_SILITHYST, true);
+                // add 19 honor
+                player->RewardHonor(nullptr, 1, 19);
+                // add 20 cenarion circle repu
+                player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(609), 20);
+                // complete quest
+                player->KilledMonsterCredit(SI_TURNIN_QUEST_CM_A, 0);
             }
-            UpdateWorldState();
-            // reward player, xinef: has no effect on characters above level 70
-            if (player->getLevel() < 70)
-                player->CastSpell(player, SI_TRACES_OF_SILITHYST, true);
-            // add 19 honor
-            player->RewardHonor(nullptr, 1, 19);
-            // add 20 cenarion circle repu
-            player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(609), 20);
-            // complete quest
-            player->KilledMonsterCredit(SI_TURNIN_QUEST_CM_A, 0);
-        }
-        return true;
-    case SI_AREATRIGGER_H:
-        if (player->GetTeamId() == TEAM_HORDE && player->HasAura(SI_SILITHYST_FLAG))
-        {
-            // remove aura
-            player->RemoveAurasDueToSpell(SI_SILITHYST_FLAG);
-            ++ m_Gathered_H;
-            if (m_Gathered_H >= SI_MAX_RESOURCES)
+            return true;
+        case SI_AREATRIGGER_H:
+            if (player->GetTeamId() == TEAM_HORDE && player->HasAura(SI_SILITHYST_FLAG))
             {
-                TeamApplyBuff(TEAM_HORDE, SI_CENARION_FAVOR, 0, player);
-                sWorld->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_H));
-                m_LastController = TEAM_HORDE;
-                m_Gathered_A = 0;
-                m_Gathered_H = 0;
+                // remove aura
+                player->RemoveAurasDueToSpell(SI_SILITHYST_FLAG);
+                ++ m_Gathered_H;
+                if (m_Gathered_H >= SI_MAX_RESOURCES)
+                {
+                    TeamApplyBuff(TEAM_HORDE, SI_CENARION_FAVOR, 0, player);
+                    sWorld->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_H));
+                    m_LastController = TEAM_HORDE;
+                    m_Gathered_A = 0;
+                    m_Gathered_H = 0;
+                }
+                UpdateWorldState();
+                // reward player, xinef: has no effect on characters above level 70
+                if (player->getLevel() < 70)
+                    player->CastSpell(player, SI_TRACES_OF_SILITHYST, true);
+                // add 19 honor
+                player->RewardHonor(nullptr, 1, 19);
+                // add 20 cenarion circle repu
+                player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(609), 20);
+                // complete quest
+                player->KilledMonsterCredit(SI_TURNIN_QUEST_CM_H, 0);
             }
-            UpdateWorldState();
-            // reward player, xinef: has no effect on characters above level 70
-            if (player->getLevel() < 70)
-                player->CastSpell(player, SI_TRACES_OF_SILITHYST, true);
-            // add 19 honor
-            player->RewardHonor(nullptr, 1, 19);
-            // add 20 cenarion circle repu
-            player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(609), 20);
-            // complete quest
-            player->KilledMonsterCredit(SI_TURNIN_QUEST_CM_H, 0);
-        }
-        return true;
+            return true;
     }
     return false;
 }
@@ -141,76 +141,76 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
         // if it was dropped away from the player's turn-in point, then create a silithyst mound, if it was dropped near the areatrigger, then it was dispelled by the outdoorpvp, so do nothing
         switch (player->GetTeamId())
         {
-        case TEAM_ALLIANCE:
-            {
-            AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(SI_AREATRIGGER_A);
-                if (atEntry)
+            case TEAM_ALLIANCE:
                 {
-                    // 5.0f is safe-distance
-                    if (player->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
+                    AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(SI_AREATRIGGER_A);
+                    if (atEntry)
                     {
-                        // he dropped it further, summon mound
-                        GameObject* go = sObjectMgr->IsGameObjectStaticTransport(SI_SILITHYST_MOUND) ? new StaticTransport() : new GameObject();
-                        Map* map = player->GetMap();
-                        if (!map)
+                        // 5.0f is safe-distance
+                        if (player->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
                         {
-                            delete go;
-                            return true;
-                        }
+                            // he dropped it further, summon mound
+                            GameObject* go = sObjectMgr->IsGameObjectStaticTransport(SI_SILITHYST_MOUND) ? new StaticTransport() : new GameObject();
+                            Map* map = player->GetMap();
+                            if (!map)
+                            {
+                                delete go;
+                                return true;
+                            }
 
-                        if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), SI_SILITHYST_MOUND, map, player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
-                        {
-                            delete go;
-                            return true;
-                        }
+                            if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), SI_SILITHYST_MOUND, map, player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
+                            {
+                                delete go;
+                                return true;
+                            }
 
-                        go->SetRespawnTime(0);
+                            go->SetRespawnTime(0);
 
-                        if (!map->AddToMap(go))
-                        {
-                            delete go;
-                            return true;
+                            if (!map->AddToMap(go))
+                            {
+                                delete go;
+                                return true;
+                            }
                         }
                     }
                 }
-            }
-            break;
-        case TEAM_HORDE:
-            {
-            AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(SI_AREATRIGGER_H);
-                if (atEntry)
+                break;
+            case TEAM_HORDE:
                 {
-                    // 5.0f is safe-distance
-                    if (player->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
+                    AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(SI_AREATRIGGER_H);
+                    if (atEntry)
                     {
-                        // he dropped it further, summon mound
-                        GameObject* go = sObjectMgr->IsGameObjectStaticTransport(SI_SILITHYST_MOUND) ? new StaticTransport() : new GameObject();
-                        Map* map = player->GetMap();
-                        if (!map)
+                        // 5.0f is safe-distance
+                        if (player->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
                         {
-                            delete go;
-                            return true;
-                        }
+                            // he dropped it further, summon mound
+                            GameObject* go = sObjectMgr->IsGameObjectStaticTransport(SI_SILITHYST_MOUND) ? new StaticTransport() : new GameObject();
+                            Map* map = player->GetMap();
+                            if (!map)
+                            {
+                                delete go;
+                                return true;
+                            }
 
-                        if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), SI_SILITHYST_MOUND, map, player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
-                        {
-                            delete go;
-                            return true;
-                        }
+                            if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), SI_SILITHYST_MOUND, map, player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
+                            {
+                                delete go;
+                                return true;
+                            }
 
-                        go->SetRespawnTime(0);
+                            go->SetRespawnTime(0);
 
-                        if (!map->AddToMap(go))
-                        {
-                            delete go;
-                            return true;
+                            if (!map->AddToMap(go))
+                            {
+                                delete go;
+                                return true;
+                            }
                         }
                     }
                 }
-            }
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
         return true;
     }
@@ -233,17 +233,17 @@ bool OutdoorPvPSI::HandleCustomSpell(Player* player, uint32 spellId, GameObject*
 
 class OutdoorPvP_silithus : public OutdoorPvPScript
 {
-    public:
+public:
 
-        OutdoorPvP_silithus()
-            : OutdoorPvPScript("outdoorpvp_si")
-        {
-        }
+    OutdoorPvP_silithus()
+        : OutdoorPvPScript("outdoorpvp_si")
+    {
+    }
 
-        OutdoorPvP* GetOutdoorPvP() const
-        {
-            return new OutdoorPvPSI();
-        }
+    OutdoorPvP* GetOutdoorPvP() const
+    {
+        return new OutdoorPvPSI();
+    }
 };
 
 void AddSC_outdoorpvp_si()

@@ -95,7 +95,7 @@ public:
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
-                Map::PlayerList const &players = instance->GetPlayers();
+                Map::PlayerList const& players = instance->GetPlayers();
                 if( !players.isEmpty() )
                     if( Player* pPlayer = players.begin()->GetSource() )
                         TeamIdInInstance = pPlayer->GetTeamId();
@@ -126,23 +126,23 @@ public:
                     break;
 
                 // Grand Champion Minions:
-                case NPC_ORGRIMMAR_MINION: 
+                case NPC_ORGRIMMAR_MINION:
                     if( TeamIdInInstance == TEAM_HORDE )
                         creature->UpdateEntry(NPC_STORMWIND_MINION);
                     break;
-                case NPC_SILVERMOON_MINION: 
+                case NPC_SILVERMOON_MINION:
                     if( TeamIdInInstance == TEAM_HORDE )
                         creature->UpdateEntry(NPC_GNOMEREGAN_MINION);
                     break;
-                case NPC_THUNDER_BLUFF_MINION: 
+                case NPC_THUNDER_BLUFF_MINION:
                     if( TeamIdInInstance == TEAM_HORDE )
                         creature->UpdateEntry(NPC_EXODAR_MINION);
                     break;
-                case NPC_SENJIN_MINION: 
+                case NPC_SENJIN_MINION:
                     if( TeamIdInInstance == TEAM_HORDE )
                         creature->UpdateEntry(NPC_DARNASSUS_MINION);
                     break;
-                case NPC_UNDERCITY_MINION: 
+                case NPC_UNDERCITY_MINION:
                     if( TeamIdInInstance == TEAM_HORDE )
                         creature->UpdateEntry(NPC_IRONFORGE_MINION);
                     break;
@@ -255,7 +255,7 @@ public:
 
         // EVENT STUFF BELOW:
 
-        void OnPlayerEnter(Player *)
+        void OnPlayerEnter(Player*)
         {
             if( DoNeedCleanup(true) )
                 InstanceCleanup();
@@ -266,13 +266,13 @@ public:
         bool DoNeedCleanup(bool /*enter*/)
         {
             uint8 aliveCount = 0;
-            Map::PlayerList const &pl = instance->GetPlayers();
+            Map::PlayerList const& pl = instance->GetPlayers();
             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                 if( Player* plr = itr->GetSource() )
                     if( plr->IsAlive() && !plr->IsGameMaster() )
                         ++aliveCount;
 
-            bool need = aliveCount==0;
+            bool need = aliveCount == 0;
             if( !need && CLEANED )
                 CLEANED = false;
             return need;
@@ -298,9 +298,9 @@ public:
                                 veh->DespawnOrUnsummon();
                                 veh->SetRespawnTime(3);
                             }
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                         {
-                            for( uint8 j=0; j<3; ++j )
+                            for( uint8 j = 0; j < 3; ++j )
                             {
                                 if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[i][j]) )
                                     c->DespawnOrUnsummon();
@@ -331,7 +331,7 @@ public:
                             announcer->SetRespawnTime(3);
                             announcer->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
-                            for( uint8 i=0; i<3; ++i )
+                            for( uint8 i = 0; i < 3; ++i )
                                 if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                                 {
                                     uint32 entry = c->GetEntry();
@@ -339,21 +339,21 @@ public:
                                     switch( i )
                                     {
                                         case 0:
-                                            if( Creature* pBoss = announcer->SummonCreature(entry, 736.695f, 650.02f, 412.4f, 3*M_PI/2) )
+                                            if( Creature* pBoss = announcer->SummonCreature(entry, 736.695f, 650.02f, 412.4f, 3 * M_PI / 2) )
                                             {
                                                 NPC_GrandChampionGUID[0] = pBoss->GetGUID();
                                                 pBoss->AI()->SetData(0, 2);
                                             }
                                             break;
                                         case 1:
-                                            if( Creature* pBoss = announcer->SummonCreature(entry, 756.32f, 650.05f, 412.4f, 3*M_PI/2) )
+                                            if( Creature* pBoss = announcer->SummonCreature(entry, 756.32f, 650.05f, 412.4f, 3 * M_PI / 2) )
                                             {
                                                 NPC_GrandChampionGUID[1] = pBoss->GetGUID();
                                                 pBoss->AI()->SetData(1, 2);
                                             }
                                             break;
                                         case 2:
-                                            if( Creature* pBoss = announcer->SummonCreature(entry, 746.5f, 650.65f, 411.7f, 3*M_PI/2) )
+                                            if( Creature* pBoss = announcer->SummonCreature(entry, 746.5f, 650.65f, 411.7f, 3 * M_PI / 2) )
                                             {
                                                 NPC_GrandChampionGUID[2] = pBoss->GetGUID();
                                                 pBoss->AI()->SetData(2, 2);
@@ -368,8 +368,8 @@ public:
                 case INSTANCE_PROGRESS_ARGENT_SOLDIERS_DIED:
                     // revert to INSTANCE_PROGRESS_CHAMPIONS_DEAD
                     {
-                        for( uint8 i=0; i<3; ++i )
-                            for( uint8 j=0; j<3; ++j )
+                        for( uint8 i = 0; i < 3; ++i )
+                            for( uint8 j = 0; j < 3; ++j )
                             {
                                 if( Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
                                     c->DespawnOrUnsummon();
@@ -483,12 +483,14 @@ public:
                             {
                                 shortver = true;
 
-                                temp1 = urand(0,4);
+                                temp1 = urand(0, 4);
                                 DoSummonGrandChampion(temp1, 0);
-                                do { temp2 = urand(0,4); } while( temp1 == temp2 );
+                                do { temp2 = urand(0, 4); }
+                                while( temp1 == temp2 );
                                 DoSummonGrandChampion(temp2, 1);
                                 uint8 number = 0;
-                                do { number = urand(0,4); } while( number == temp1 || number == temp2 );
+                                do { number = urand(0, 4); }
+                                while( number == temp1 || number == temp2 );
                                 DoSummonGrandChampion(number, 2);
 
                                 InstanceProgress = INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST;
@@ -504,7 +506,7 @@ public:
                         case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
                             if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
                             {
-                                Counter = urand(0,1);
+                                Counter = urand(0, 1);
                                 if( Counter )
                                     announcer->AI()->Talk(TEXT_INTRODUCE_EADRIC);
                                 else
@@ -598,7 +600,7 @@ public:
                         InstanceProgress = INSTANCE_PROGRESS_CHAMPIONS_DEAD;
                         m_auiEncounter[0] = DONE;
                         bool creditCasted = false;
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->GetMotionMaster()->MovePoint(9, 747.36f, 670.07f, 411.9f);
@@ -729,7 +731,7 @@ public:
             if( Creature* pBoss = instance->SummonCreature(CHAMPION_TO_SUMMON, SpawnPos) )
             {
                 NPC_GrandChampionGUID[BossOrder] = pBoss->GetGUID();
-                pBoss->ToCreature()->SetHomePosition(748.309f, 619.448f, 411.3f, M_PI/2);
+                pBoss->ToCreature()->SetHomePosition(748.309f, 619.448f, 411.3f, M_PI / 2);
                 pBoss->ToCreature()->SetReactState(REACT_PASSIVE);
                 pBoss->AI()->SetData(BossOrder, (shortver ? 1 : 0));
 
@@ -737,20 +739,20 @@ public:
                     if( Creature* pAdd = instance->SummonCreature(MINION_TO_SUMMON, SpawnPos) )
                     {
                         NPC_GrandChampionMinionsGUID[BossOrder][i] = pAdd->GetGUID();
-                        pAdd->SetHomePosition(748.309f, 619.448f, 411.3f, M_PI/2);
-                        pAdd->GetMotionMaster()->MoveFollow(pBoss, 2.0f, (i+1)*M_PI/2);
+                        pAdd->SetHomePosition(748.309f, 619.448f, 411.3f, M_PI / 2);
+                        pAdd->GetMotionMaster()->MoveFollow(pBoss, 2.0f, (i + 1)*M_PI / 2);
                         pAdd->SetReactState(REACT_PASSIVE);
                     }
 
             }
-            
+
             if (!shortver)
                 if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
                 {
                     if( TeamIdInInstance == TEAM_HORDE )
                         TEXT_ID -= 10;
                     announcer->AI()->Talk(TEXT_ID);
-                    announcer->AI()->Talk(TEXT_ID+1);
+                    announcer->AI()->Talk(TEXT_ID + 1);
                 }
         }
 
@@ -770,7 +772,7 @@ public:
                     break;
                 case EVENT_SUMMON_GRAND_CHAMPION_1:
                     {
-                        temp1 = urand(0,4);
+                        temp1 = urand(0, 4);
                         DoSummonGrandChampion(temp1, 0);
                         HandleGameObject(GO_MainGateGUID, true);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
@@ -779,7 +781,8 @@ public:
                     break;
                 case EVENT_SUMMON_GRAND_CHAMPION_2:
                     {
-                        do { temp2 = urand(0,4); } while( temp1 == temp2 );
+                        do { temp2 = urand(0, 4); }
+                        while( temp1 == temp2 );
                         DoSummonGrandChampion(temp2, 1);
                         HandleGameObject(GO_MainGateGUID, true);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
@@ -789,7 +792,8 @@ public:
                 case EVENT_SUMMON_GRAND_CHAMPION_3:
                     {
                         uint8 number = 0;
-                        do { number = urand(0,4); } while( number == temp1 || number == temp2 );
+                        do { number = urand(0, 4); }
+                        while( number == temp1 || number == temp2 );
                         DoSummonGrandChampion(number, 2);
                         HandleGameObject(GO_MainGateGUID, true);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
@@ -819,11 +823,11 @@ public:
                                 tirion->AI()->Talk(TEXT_BEGIN);
                             HandleGameObject(GO_EnterGateGUID, false);
                         }
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]) )
                             {
-                                float angle = rand_norm()*2*M_PI;
-                                c->GetMotionMaster()->MovePoint(0, 748.309f+3.0f*cos(angle), 619.448f+3.0f*sin(angle), 411.3f);
+                                float angle = rand_norm() * 2 * M_PI;
+                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_1_ATTACK, 3000);
@@ -832,7 +836,7 @@ public:
                     break;
                 case EVENT_GRAND_GROUP_1_ATTACK:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -847,11 +851,11 @@ public:
                     break;
                 case EVENT_GRAND_GROUP_2_MOVE_MIDDLE:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]) )
                             {
-                                float angle = rand_norm()*2*M_PI;
-                                c->GetMotionMaster()->MovePoint(0, 748.309f+3.0f*cos(angle), 619.448f+3.0f*sin(angle), 411.3f);
+                                float angle = rand_norm() * 2 * M_PI;
+                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_2_ATTACK, 3000);
@@ -860,7 +864,7 @@ public:
                     break;
                 case EVENT_GRAND_GROUP_2_ATTACK:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -874,11 +878,11 @@ public:
                     break;
                 case EVENT_GRAND_GROUP_3_MOVE_MIDDLE:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]) )
                             {
-                                float angle = rand_norm()*2*M_PI;
-                                c->GetMotionMaster()->MovePoint(0, 748.309f+3.0f*cos(angle), 619.448f+3.0f*sin(angle), 411.3f);
+                                float angle = rand_norm() * 2 * M_PI;
+                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_3_ATTACK, 3000);
@@ -887,7 +891,7 @@ public:
                     break;
                 case EVENT_GRAND_GROUP_3_ATTACK:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -901,11 +905,11 @@ public:
                     break;
                 case EVENT_GRAND_CHAMPIONS_MOVE_MIDDLE:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
-                                float angle = rand_norm()*2*M_PI;
-                                c->GetMotionMaster()->MovePoint(4, 748.309f+3.0f*cos(angle), 619.448f+3.0f*sin(angle), 411.3f);
+                                float angle = rand_norm() * 2 * M_PI;
+                                c->GetMotionMaster()->MovePoint(4, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_MOUNTS_ATTACK, 3000);
@@ -914,7 +918,7 @@ public:
                     break;
                 case EVENT_GRAND_CHAMPIONS_MOUNTS_ATTACK:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -929,7 +933,7 @@ public:
                     break;
                 case EVENT_GRAND_CHAMPIONS_MOVE_SIDE:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->AI()->DoAction(1);
@@ -953,7 +957,7 @@ public:
                     break;
                 case EVENT_GRAND_CHAMPIONS_ATTACK:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -1002,28 +1006,28 @@ public:
                                 announcer->AI()->Talk(TEXT_CHEER_PALETRESS_2);
                             }
                         }
-                            
+
                         for( int8 i = 0; i < 3; ++i )
                         {
                             Position pos(SpawnPosition);
                             float x = pos.GetPositionX();
 
-                            pos.m_positionX = x-2.0f+(i-1)*10.0f;
+                            pos.m_positionX = x - 2.0f + (i - 1) * 10.0f;
                             if( Creature* pTrash = instance->SummonCreature(NPC_ARGENT_LIGHTWIELDER, pos) )
                             {
-                                pTrash->AI()->SetData(i,0);
+                                pTrash->AI()->SetData(i, 0);
                                 NPC_ArgentSoldierGUID[i][0] = pTrash->GetGUID();
                             }
-                            pos.m_positionX = x+(i-1)*10.0f;
+                            pos.m_positionX = x + (i - 1) * 10.0f;
                             if( Creature* pTrash = instance->SummonCreature(NPC_ARGENT_MONK, pos) )
                             {
-                                pTrash->AI()->SetData(i,0);
+                                pTrash->AI()->SetData(i, 0);
                                 NPC_ArgentSoldierGUID[i][1] = pTrash->GetGUID();
                             }
-                            pos.m_positionX = x+2.0f+(i-1)*10.0f;
+                            pos.m_positionX = x + 2.0f + (i - 1) * 10.0f;
                             if( Creature* pTrash = instance->SummonCreature(NPC_PRIESTESS, pos) )
                             {
-                                pTrash->AI()->SetData(i,0);
+                                pTrash->AI()->SetData(i, 0);
                                 NPC_ArgentSoldierGUID[i][2] = pTrash->GetGUID();
                             }
                         }
@@ -1062,8 +1066,8 @@ public:
                 case EVENT_ARGENT_SOLDIER_GROUP_ATTACK:
                     {
                         Counter = 0;
-                        for( uint8 i=0; i<3; ++i )
-                            for( uint8 j=0; j<3; ++j )
+                        for( uint8 i = 0; i < 3; ++i )
+                            for( uint8 j = 0; j < 3; ++j )
                                 if( Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
                                 {
                                     c->SetReactState(REACT_AGGRESSIVE);
@@ -1077,11 +1081,12 @@ public:
                     break;
                 case EVENT_ARGENT_CHALLENGE_MOVE_FORWARD:
                     {
-                    if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID)) {
-                        boss->GetMotionMaster()->MovePoint(0, 746.881f, 635.263f, 411.7f);
-                    }
-                    events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_ATTACK, 3000);
-                    events.PopEvent();
+                        if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID))
+                        {
+                            boss->GetMotionMaster()->MovePoint(0, 746.881f, 635.263f, 411.7f);
+                        }
+                        events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_ATTACK, 3000);
+                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_ATTACK:
@@ -1241,7 +1246,7 @@ public:
                         events.PopEvent();
                     }
                     break;
-            }           
+            }
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)

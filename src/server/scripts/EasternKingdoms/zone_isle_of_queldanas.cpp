@@ -109,14 +109,14 @@ class npc_bh_thalorien_dawnseeker : public CreatureScript
 public:
     npc_bh_thalorien_dawnseeker() : CreatureScript("npc_bh_thalorien_dawnseeker") { }
 
-    CreatureAI *GetAI(Creature *creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_bh_thalorien_dawnseekerAI(creature);
     }
 
     struct npc_bh_thalorien_dawnseekerAI : public ScriptedAI
     {
-        npc_bh_thalorien_dawnseekerAI(Creature *c) : ScriptedAI(c), summons(me)
+        npc_bh_thalorien_dawnseekerAI(Creature* c) : ScriptedAI(c), summons(me)
         {
         }
 
@@ -198,7 +198,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             if (damage >= me->GetHealth())
             {
@@ -236,15 +236,15 @@ public:
                     EnterEvadeMode();
                     return;
                 case EVENT_SUMMON_SOLDIERS:
-                    for (uint8 i=0; i<SUNWELL_DEFENDER_NUM; ++i)
-                        me->SummonCreature(NPC_SUNWELL_DEFENDER, SunwellDefenderPos[i], TEMPSUMMON_TIMED_DESPAWN, 33000+(i/5)*5000);
+                    for (uint8 i = 0; i < SUNWELL_DEFENDER_NUM; ++i)
+                        me->SummonCreature(NPC_SUNWELL_DEFENDER, SunwellDefenderPos[i], TEMPSUMMON_TIMED_DESPAWN, 33000 + (i / 5) * 5000);
                     events.PopEvent();
                     break;
                 case EVENT_TALK_INTRO_0:
                 case EVENT_TALK_INTRO_1:
                 case EVENT_TALK_INTRO_2:
                 case EVENT_TALK_INTRO_3:
-                    Talk(SAY_INTRO_0 + (evId-EVENT_TALK_INTRO_0));
+                    Talk(SAY_INTRO_0 + (evId - EVENT_TALK_INTRO_0));
                     events.PopEvent();
                     break;
                 case EVENT_SALUTE:
@@ -292,7 +292,7 @@ public:
                     break;
                 case EVENT_TALK_SPAWN_0:
                 case EVENT_TALK_SPAWN_1:
-                    Talk(SAY_SPAWN_0 + (evId-EVENT_TALK_SPAWN_0));
+                    Talk(SAY_SPAWN_0 + (evId - EVENT_TALK_SPAWN_0));
                     events.PopEvent();
                     break;
                 case EVENT_SUMMON_MORLEN:
@@ -303,7 +303,7 @@ public:
                 case EVENT_TALK_MORLEN_0:
                 case EVENT_TALK_MORLEN_1:
                     if (Creature* c = ObjectAccessor::GetCreature(*me, morlenGUID))
-                        c->AI()->Talk(SAY_MORLEN_0 + (evId-EVENT_TALK_MORLEN_0));
+                        c->AI()->Talk(SAY_MORLEN_0 + (evId - EVENT_TALK_MORLEN_0));
                     events.PopEvent();
                     break;
                 case EVENT_SPAWN_WAVE_1:
@@ -311,7 +311,7 @@ public:
                 case EVENT_SPAWN_WAVE_3:
                     if (Creature* c = ObjectAccessor::GetCreature(*me, morlenGUID))
                     {
-                        c->AI()->Talk(SAY_MORLEN_1 + (evId-EVENT_SPAWN_WAVE_1));
+                        c->AI()->Talk(SAY_MORLEN_1 + (evId - EVENT_SPAWN_WAVE_1));
                         switch (evId)
                         {
                             // emerge cast tr false 66947
@@ -320,13 +320,13 @@ public:
                                     Position spawnPos;
                                     c->GetPosition(&spawnPos);
                                     spawnPos.m_orientation = 5.80f;
-                                    spawnPos.m_positionX += 5.0f*cos(4.5f);
-                                    spawnPos.m_positionY += 5.0f*sin(4.5f);
-                                    for (uint8 i=0; i<5; ++i)
+                                    spawnPos.m_positionX += 5.0f * cos(4.5f);
+                                    spawnPos.m_positionY += 5.0f * sin(4.5f);
+                                    for (uint8 i = 0; i < 5; ++i)
                                         if (me->SummonCreature(NPC_SCOURGE_ZOMBIE, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
-                                            spawnPos.m_positionX += 2.5f*cos(4.5f);
-                                            spawnPos.m_positionY += 2.5f*sin(4.5f);
+                                            spawnPos.m_positionX += 2.5f * cos(4.5f);
+                                            spawnPos.m_positionY += 2.5f * sin(4.5f);
                                         }
                                 }
                                 break;
@@ -335,14 +335,14 @@ public:
                                     Position spawnPos;
                                     c->GetPosition(&spawnPos);
                                     spawnPos.m_orientation = 5.80f;
-                                    spawnPos.m_positionX += 7.0f*cos(4.0f);
-                                    spawnPos.m_positionY += 7.0f*sin(4.0f);
-                                    for (uint8 i=0; i<3; ++i)
+                                    spawnPos.m_positionX += 7.0f * cos(4.0f);
+                                    spawnPos.m_positionY += 7.0f * sin(4.0f);
+                                    for (uint8 i = 0; i < 3; ++i)
                                         if (Creature* s = me->SummonCreature(NPC_GHOUL_INVADER, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
                                             s->CastSpell(s, 66947, false); // emerge effect
-                                            spawnPos.m_positionX += 4.0f*cos(4.5f);
-                                            spawnPos.m_positionY += 4.0f*sin(4.5f);
+                                            spawnPos.m_positionX += 4.0f * cos(4.5f);
+                                            spawnPos.m_positionY += 4.0f * sin(4.5f);
                                         }
                                 }
                                 break;
@@ -351,14 +351,14 @@ public:
                                     Position spawnPos;
                                     c->GetPosition(&spawnPos);
                                     spawnPos.m_orientation = 5.80f;
-                                    spawnPos.m_positionX += 8.0f*cos(4.0f);
-                                    spawnPos.m_positionY += 8.0f*sin(4.0f);
-                                    for (uint8 i=0; i<3; ++i)
+                                    spawnPos.m_positionX += 8.0f * cos(4.0f);
+                                    spawnPos.m_positionY += 8.0f * sin(4.0f);
+                                    for (uint8 i = 0; i < 3; ++i)
                                         if (Creature* s = me->SummonCreature(NPC_CRYPT_RAIDER, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
                                             s->CastSpell(s, 66947, false); // emerge effect
-                                            spawnPos.m_positionX += 4.0f*cos(4.5f);
-                                            spawnPos.m_positionY += 4.0f*sin(4.5f);
+                                            spawnPos.m_positionX += 4.0f * cos(4.5f);
+                                            spawnPos.m_positionY += 4.0f * sin(4.5f);
                                         }
                                 }
                                 break;
@@ -384,7 +384,7 @@ public:
                 case EVENT_OUTRO_1:
                 case EVENT_OUTRO_2:
                 case EVENT_OUTRO_3:
-                    Talk(SAY_OUTRO_0 + (evId-EVENT_OUTRO_0));
+                    Talk(SAY_OUTRO_0 + (evId - EVENT_OUTRO_0));
                     events.PopEvent();
                     if (evId == EVENT_OUTRO_3)
                         events.ScheduleEvent(EVENT_OUTRO_KNEEL, 6000);
@@ -498,14 +498,14 @@ class npc_grand_magister_rommath : public CreatureScript
 public:
     npc_grand_magister_rommath() : CreatureScript("npc_grand_magister_rommath") { }
 
-    CreatureAI *GetAI(Creature *creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_grand_magister_rommathAI(creature);
     }
 
     struct npc_grand_magister_rommathAI : public NullCreatureAI
     {
-        npc_grand_magister_rommathAI(Creature *c) : NullCreatureAI(c)
+        npc_grand_magister_rommathAI(Creature* c) : NullCreatureAI(c)
         {
             announced = false;
             playerGUID = 0;
@@ -570,16 +570,16 @@ public:
                     break;
                 case 3:
                     me->SetWalk(true);
-                    me->GetMotionMaster()->MovePath(me->GetEntry()*100, false);
+                    me->GetMotionMaster()->MovePath(me->GetEntry() * 100, false);
                     if (Creature* c = me->FindNearestCreature(NPC_THERON, 60.0f, true))
                     {
                         c->SetWalk(true);
-                        c->GetMotionMaster()->MovePath(c->GetEntry()*100, false);
+                        c->GetMotionMaster()->MovePath(c->GetEntry() * 100, false);
                     }
                     if (Creature* c = me->FindNearestCreature(NPC_AURIC, 60.0f, true))
                     {
                         c->SetWalk(true);
-                        c->GetMotionMaster()->MovePath(c->GetEntry()*100, false);
+                        c->GetMotionMaster()->MovePath(c->GetEntry() * 100, false);
                     }
                     break;
                 case 4:

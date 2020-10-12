@@ -44,7 +44,7 @@ public:
 
     struct boss_moraggAI : public ScriptedAI
     {
-        boss_moraggAI(Creature *c) : ScriptedAI(c)
+        boss_moraggAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -63,8 +63,8 @@ public:
             me->CastSpell(me, SPELL_RAY_OF_SUFFERING, true);
             me->CastSpell(me, SPELL_RAY_OF_PAIN, true);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_CORROSIVE_SALIVA, urand(4000,6000));
-            events.RescheduleEvent(EVENT_SPELL_OPTIC_LINK, urand(10000,11000));
+            events.RescheduleEvent(EVENT_SPELL_CORROSIVE_SALIVA, urand(4000, 6000));
+            events.RescheduleEvent(EVENT_SPELL_OPTIC_LINK, urand(10000, 11000));
         }
 
         void UpdateAI(uint32 diff)
@@ -83,13 +83,13 @@ public:
                     break;
                 case EVENT_SPELL_CORROSIVE_SALIVA:
                     me->CastSpell(me->GetVictim(), SPELL_CORROSIVE_SALIVA, false);
-                    events.RepeatEvent(urand(8000,10000));
+                    events.RepeatEvent(urand(8000, 10000));
                     break;
                 case EVENT_SPELL_OPTIC_LINK:
                     if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 40.0f, true))
                     {
                         me->CastSpell(target, SPELL_OPTIC_LINK, false);
-                        events.RepeatEvent(urand(18000,21000));
+                        events.RepeatEvent(urand(18000, 21000));
                     }
                     else
                         events.RepeatEvent(5000);
@@ -127,12 +127,12 @@ public:
     {
         PrepareAuraScript(spell_optic_linkAuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const* aurEff)
         {
             if (Unit* target = GetTarget())
                 if (Unit* caster = GetCaster())
                     if (GetAura() && GetAura()->GetEffect(0))
-                        GetAura()->GetEffect(0)->SetAmount(aurEff->GetSpellInfo()->Effects[EFFECT_0].BasePoints+(((int32)target->GetExactDist(caster))*25)+(aurEff->GetTickNumber()*100));
+                        GetAura()->GetEffect(0)->SetAmount(aurEff->GetSpellInfo()->Effects[EFFECT_0].BasePoints + (((int32)target->GetExactDist(caster)) * 25) + (aurEff->GetTickNumber() * 100));
         }
 
         void Register()
@@ -141,7 +141,7 @@ public:
         }
     };
 
-    AuraScript *GetAuraScript() const
+    AuraScript* GetAuraScript() const
     {
         return new spell_optic_linkAuraScript();
     }
