@@ -136,7 +136,7 @@ enum BattlegroundTimeIntervals
 };
 
 #define RESURRECTION_INTERVAL (sWorld->getIntConfig(CONFIG_BATTLEGROUND_PLAYER_RESPAWN) * IN_MILLISECONDS)
-#define BUFF_RESPAWN_TIME (sWorld->getIntConfig(CONFIG_BATTLEGROUND_BUFF_RESPAWN)
+#define BUFF_RESPAWN_TIME (sWorld->getIntConfig(CONFIG_BATTLEGROUND_BUFF_RESPAWN))
 
 enum BattlegroundStartTimeIntervals
 {
