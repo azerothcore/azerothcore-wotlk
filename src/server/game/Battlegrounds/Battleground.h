@@ -137,6 +137,8 @@ enum BattlegroundTimeIntervals
     BUFF_RESPAWN_TIME               = 180,                  // secs
 };
 
+#define RESURRECTION_INTERVAL (sWorld->getIntConfig(CONFIG_BATTLEGROUND_RESPAWN_TIME) * IN_MILLISECONDS)
+
 enum BattlegroundStartTimeIntervals
 {
     BG_START_DELAY_2M               = 120000,               // ms (2 minutes)
