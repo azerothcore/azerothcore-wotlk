@@ -1123,11 +1123,17 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError("Battleground.ReportAFK (%d) must be <10. Using 3 instead.", m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]);
         m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] = 3;
     }
-    m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME]        = sConfigMgr->GetIntDefault("Battleground.RespawnTime", 30);
-    if (m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME] < 3 || m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME] > 120)
+    m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN]        = sConfigMgr->GetIntDefault("Battleground.PlayerRespawn", 30);
+    if (m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN] < 3 || m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN] > 120)
     {
-        sLog->outError("Battleground.RespawnTime (%i) must be in range 3..120. Using 30 instead.", m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME]);
-        m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME] = 30;
+        sLog->outError("Battleground.PlayerRespawn (%i) must be in range 3..120. Using 30 instead.", m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN]);
+        m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN] = 30;
+    }
+    m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN]        = sConfigMgr->GetIntDefault("Battleground.BuffRespawn", 120);
+    if (m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN] < 1)
+    {
+        sLog->outError("Battleground.BuffRespawn (%i) must be >0. Using 120 instead.", m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN]);
+        m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN] = 120;
     }
     
     m_int_configs[CONFIG_ARENA_MAX_RATING_DIFFERENCE]                = sConfigMgr->GetIntDefault ("Arena.MaxRatingDifference", 150);
