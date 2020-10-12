@@ -54,7 +54,7 @@ public:
 
     struct boss_faerlinaAI : public BossAI
     {
-        boss_faerlinaAI(Creature *c) : BossAI(c, BOSS_FAERLINA), summons(me)
+        boss_faerlinaAI(Creature* c) : BossAI(c, BOSS_FAERLINA), summons(me)
         {
             pInstance = me->GetInstanceScript();
             sayGreet = false;
@@ -90,19 +90,19 @@ public:
             SummonHelpers();
         }
 
-        void EnterCombat(Unit * who) override
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             me->CallForHelp(VISIBLE_RANGE);
             summons.DoZoneInCombat();
             Talk(SAY_AGGRO);
-            events.ScheduleEvent(EVENT_SPELL_POISON_BOLT, urand(12000,15000));
-            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, urand(6000,18000));
-            events.ScheduleEvent(EVENT_SPELL_FRENZY, urand(60000,80000), 1);
+            events.ScheduleEvent(EVENT_SPELL_POISON_BOLT, urand(12000, 15000));
+            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, urand(6000, 18000));
+            events.ScheduleEvent(EVENT_SPELL_FRENZY, urand(60000, 80000), 1);
             events.SetPhase(1);
         }
 
-        void MoveInLineOfSight(Unit *who) override
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!sayGreet && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -118,7 +118,7 @@ public:
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (!urand(0,3))
+            if (!urand(0, 3))
                 Talk(SAY_SLAY);
 
             if (pInstance)
@@ -167,8 +167,8 @@ public:
 
             DoMeleeAttackIfReady();
         }
-        
-        void SpellHit(Unit*  /*caster*/, const SpellInfo *spell) override
+
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_WIDOWS_EMBRACE)
             {

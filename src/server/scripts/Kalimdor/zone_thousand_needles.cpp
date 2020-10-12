@@ -111,7 +111,7 @@ public:
         void DoSpawnBandits(int AmbushId)
         {
             for (int i = 0; i < 2; ++i)
-                me->SummonCreature(NPC_GRIM_BANDIT, BanditLoc[i+AmbushId], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
+                me->SummonCreature(NPC_GRIM_BANDIT, BanditLoc[i + AmbushId], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
         }
     };
 
@@ -221,7 +221,7 @@ public:
             case GOSSIP_ACTION_INFO_DEF+1:
                 CloseGossipMenuFor(player);
                 player->CompleteQuest(QUEST_SCOOP);
-            break;
+                break;
         }
         return true;
     }
@@ -229,7 +229,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_SCOOP) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_P, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_P, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, 738, creature->GetGUID());
 

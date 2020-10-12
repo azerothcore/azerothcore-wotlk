@@ -20,20 +20,20 @@ struct hyjal_trashAI : public npc_escortAI
 
     void JustDied(Unit* /*killer*/);
 
-    void DamageTaken(Unit* done_by, uint32 &damage, DamageEffectType, SpellSchoolMask);
+    void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask);
 
-    public:
-        InstanceScript* instance;
-        bool IsEvent;
-        uint32 Delay;
-        uint32 LastOverronPos;
-        bool IsOverrun;
-        bool SetupOverrun;
-        uint32 OverrunType;
-        uint8 faction;
-        bool useFlyPath;
-        uint32 damageTaken;
-        float DummyTarget[3];
+public:
+    InstanceScript* instance;
+    bool IsEvent;
+    uint32 Delay;
+    uint32 LastOverronPos;
+    bool IsOverrun;
+    bool SetupOverrun;
+    uint32 OverrunType;
+    uint8 faction;
+    bool useFlyPath;
+    uint32 damageTaken;
+    float DummyTarget[3];
 
     //private:
 };

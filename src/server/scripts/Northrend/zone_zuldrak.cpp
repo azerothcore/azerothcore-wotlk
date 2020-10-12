@@ -25,10 +25,11 @@ enum AlchemistItemRequirements
 const uint32 AA_ITEM_ENTRY[24] = {38336, 39669, 38342, 38340, 38344, 38369, 38396, 38398, 38338, 38386, 38341, 38384, 38397, 38381, 38337, 38393, 38339, 39668, 39670, 38346, 38379, 38345, 38343, 38370};
 const uint32 AA_AURA_ID[24]    = {51095, 53153, 51100, 51087, 51091, 51081, 51072, 51079, 51018, 51067, 51055, 51064, 51077, 51062, 51057, 51069, 51059, 53150, 53158, 51093, 51097, 51102, 51083, 51085};
 const char*  AA_ITEM_NAME[24]  = {"Crystallized Hogsnot", "Ghoul Drool", "Trollbane", "Amberseed", "Shrunken Dragon's Claw",
-"Wasp's Wings", "Hairy Herring Head", "Icecrown Bottled Water", "Knotroot", "Muddy Mire Maggot", "Pickled Eagle Egg",
-"Pulverized Gargoyle Teeth", "Putrid Pirate Perspiration", "Seasoned Slider Cider", "Speckled Guano", "Spiky Spider Egg",
-"Withered Batwing", "Abomination Guts", "Blight Crystal", "Chilled Serpent Mucus", "Crushed Basilisk Crystals",
-"Frozen Spider Ichor", "Prismatic Mojo", "Raptor Claw"};
+                                  "Wasp's Wings", "Hairy Herring Head", "Icecrown Bottled Water", "Knotroot", "Muddy Mire Maggot", "Pickled Eagle Egg",
+                                  "Pulverized Gargoyle Teeth", "Putrid Pirate Perspiration", "Seasoned Slider Cider", "Speckled Guano", "Spiky Spider Egg",
+                                  "Withered Batwing", "Abomination Guts", "Blight Crystal", "Chilled Serpent Mucus", "Crushed Basilisk Crystals",
+                                  "Frozen Spider Ichor", "Prismatic Mojo", "Raptor Claw"
+                                 };
 
 
 class npc_finklestein : public CreatureScript
@@ -36,174 +37,174 @@ class npc_finklestein : public CreatureScript
 public:
     npc_finklestein() : CreatureScript("npc_finklestein") { }
 
-        struct npc_finklesteinAI : public ScriptedAI
+    struct npc_finklesteinAI : public ScriptedAI
+    {
+        npc_finklesteinAI(Creature* creature) : ScriptedAI(creature) {}
+
+        std::map<uint64, uint32> questList;
+
+        void ClearPlayerOnTask(uint64 guid)
         {
-            npc_finklesteinAI(Creature* creature) : ScriptedAI(creature) {}
+            std::map<uint64, uint32>::iterator itr = questList.find(guid);
+            if (itr != questList.end())
+                questList.erase(itr);
+        }
 
-            std::map<uint64, uint32> questList;
+        bool IsPlayerOnTask(uint64 guid)
+        {
+            std::map<uint64, uint32>::const_iterator itr = questList.find(guid);
+            return itr != questList.end();
+        }
 
-            void ClearPlayerOnTask(uint64 guid)
+        void RightClickCauldron(uint64 guid)
+        {
+            if (questList.empty())
+                return;
+
+            std::map<uint64, uint32>::iterator itr = questList.find(guid);
+            if (itr == questList.end())
+                return;
+
+            Player* player = ObjectAccessor::GetPlayer(*me, guid);
+            if (player)
             {
-                std::map<uint64, uint32>::iterator itr = questList.find(guid);
-                if (itr != questList.end())
-                    questList.erase(itr);
-            }
+                uint32 itemCode = itr->second;
 
-            bool IsPlayerOnTask(uint64 guid)
-            {
-                std::map<uint64, uint32>::const_iterator itr = questList.find(guid);
-                return itr != questList.end();
-            }
-
-            void RightClickCauldron(uint64 guid)
-            {
-                if (questList.empty())
-                    return;
-
-                std::map<uint64, uint32>::iterator itr = questList.find(guid);
-                if (itr == questList.end())
-                    return;
-
-                Player* player = ObjectAccessor::GetPlayer(*me, guid);
-                if (player)
+                uint32 itemEntry = GetTaskItemEntry(itemCode);
+                uint32 auraId = GetTaskAura(itemCode);
+                uint32 counter = GetTaskCounter(itemCode);
+                if (player->HasAura(auraId))
                 {
-                    uint32 itemCode = itr->second;
+                    // player still has aura, but no item. Skip
+                    if (!player->HasItemCount(itemEntry))
+                        return;
 
-                    uint32 itemEntry = GetTaskItemEntry(itemCode);
-                    uint32 auraId = GetTaskAura(itemCode);
-                    uint32 counter = GetTaskCounter(itemCode);
-                    if (player->HasAura(auraId))
+                    // if we are here, all is ok (aura and item present)
+                    player->DestroyItemCount(itemEntry, 1, true);
+                    player->RemoveAurasDueToSpell(auraId);
+
+                    if (counter < 6)
                     {
-                        // player still has aura, but no item. Skip
-                        if (!player->HasItemCount(itemEntry))
-                            return;
-
-                        // if we are here, all is ok (aura and item present)
-                        player->DestroyItemCount(itemEntry, 1, true);
-                        player->RemoveAurasDueToSpell(auraId);
-
-                        if (counter < 6)
-                        {
-                            StartNextTask(player->GetGUID(), counter+1);
-                            return;
-                        }
-                        else
-                            player->KilledMonsterCredit(28248, 0);
+                        StartNextTask(player->GetGUID(), counter + 1);
+                        return;
                     }
                     else
-                    {
-                        // if we are here, it means we failed :(
-                        player->SetQuestStatus(QUEST_ALCHEMIST_APPRENTICE, QUEST_STATUS_FAILED);
-                    }
+                        player->KilledMonsterCredit(28248, 0);
                 }
-                questList.erase(itr);
-            }
-
-            // Generate a Task and announce it to the player
-            void StartNextTask(uint64 playerGUID, uint32 counter)
-            {
-                if (counter > 6)
-                    return;
-
-                Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
-                if (!player)
-                    return;
-
-                // Generate Item Code
-                uint32 itemCode = SelectRandomCode(counter);
-                questList[playerGUID] = itemCode;
-
-                // Decode Item Entry, Get Item Name, Generate Emotes
-                //uint32 itemEntry = GetTaskItemEntry(itemCode);
-                uint32 auraId = GetTaskAura(itemCode);
-                const char* itemName = GetTaskItemName(itemCode);
-
-                switch (counter)
+                else
                 {
-                    case 1:
-                        me->MonsterTextEmote("Quickly, get me some...", player, true);
-                        me->MonsterTextEmote(itemName, player, true);
-                        me->CastSpell(player, auraId, true);
-                        break;
-                    case 2:
-                        me->MonsterTextEmote("Find me some...", player, true);
-                        me->MonsterTextEmote(itemName, player, true);
-                        me->CastSpell(player, auraId, true);
-                        break;
-                    case 3:
-                        me->MonsterTextEmote("I think it needs...", player, true);
-                        me->MonsterTextEmote(itemName, player, true);
-                        me->CastSpell(player, auraId, true);
-                        break;
-                    case 4:
-                        me->MonsterTextEmote("Alright, now fetch me some...", player, true);
-                        me->MonsterTextEmote(itemName, player, true);
-                        me->CastSpell(player, auraId, true);
-                        break;
-                    case 5:
-                        me->MonsterTextEmote("Before it thickens, we must add...", player, true);
-                        me->MonsterTextEmote(itemName, player, true);
-                        me->CastSpell(player, auraId, true);
-                        break;
-                    case 6:
-                        me->MonsterTextEmote("It's thickening! Quickly get me some...", player, true);
-                        me->MonsterTextEmote(itemName, player, true);
-                        me->CastSpell(player, auraId, true);
-                        break;
+                    // if we are here, it means we failed :(
+                    player->SetQuestStatus(QUEST_ALCHEMIST_APPRENTICE, QUEST_STATUS_FAILED);
                 }
             }
-
-            uint32 SelectRandomCode(uint32 counter)  { return (counter * 100 + urand(0,23)); }
-
-            uint32 GetTaskCounter(uint32 itemcode)   { return itemcode / 100; }
-            uint32 GetTaskAura(uint32 itemcode)      { return AA_AURA_ID[itemcode % 100]; }
-            uint32 GetTaskItemEntry(uint32 itemcode) { return AA_ITEM_ENTRY[itemcode % 100]; }
-            const char* GetTaskItemName(uint32 itemcode)  { return AA_ITEM_NAME[itemcode % 100]; }
-
-        };
-
-        bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-        {
-            if (quest->GetQuestId() == QUEST_ALCHEMIST_APPRENTICE)
-                if (creature->AI() && CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI()))
-                    CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI())->ClearPlayerOnTask(player->GetGUID());
-
-            return true;
+            questList.erase(itr);
         }
 
-        bool OnGossipHello(Player* player, Creature* creature) override
+        // Generate a Task and announce it to the player
+        void StartNextTask(uint64 playerGUID, uint32 counter)
         {
-            if (creature->IsQuestGiver())
-                player->PrepareQuestMenu(creature->GetGUID());
+            if (counter > 6)
+                return;
+
+            Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
+            if (!player)
+                return;
+
+            // Generate Item Code
+            uint32 itemCode = SelectRandomCode(counter);
+            questList[playerGUID] = itemCode;
+
+            // Decode Item Entry, Get Item Name, Generate Emotes
+            //uint32 itemEntry = GetTaskItemEntry(itemCode);
+            uint32 auraId = GetTaskAura(itemCode);
+            const char* itemName = GetTaskItemName(itemCode);
+
+            switch (counter)
+            {
+                case 1:
+                    me->MonsterTextEmote("Quickly, get me some...", player, true);
+                    me->MonsterTextEmote(itemName, player, true);
+                    me->CastSpell(player, auraId, true);
+                    break;
+                case 2:
+                    me->MonsterTextEmote("Find me some...", player, true);
+                    me->MonsterTextEmote(itemName, player, true);
+                    me->CastSpell(player, auraId, true);
+                    break;
+                case 3:
+                    me->MonsterTextEmote("I think it needs...", player, true);
+                    me->MonsterTextEmote(itemName, player, true);
+                    me->CastSpell(player, auraId, true);
+                    break;
+                case 4:
+                    me->MonsterTextEmote("Alright, now fetch me some...", player, true);
+                    me->MonsterTextEmote(itemName, player, true);
+                    me->CastSpell(player, auraId, true);
+                    break;
+                case 5:
+                    me->MonsterTextEmote("Before it thickens, we must add...", player, true);
+                    me->MonsterTextEmote(itemName, player, true);
+                    me->CastSpell(player, auraId, true);
+                    break;
+                case 6:
+                    me->MonsterTextEmote("It's thickening! Quickly get me some...", player, true);
+                    me->MonsterTextEmote(itemName, player, true);
+                    me->CastSpell(player, auraId, true);
+                    break;
+            }
+        }
+
+        uint32 SelectRandomCode(uint32 counter)  { return (counter * 100 + urand(0, 23)); }
+
+        uint32 GetTaskCounter(uint32 itemcode)   { return itemcode / 100; }
+        uint32 GetTaskAura(uint32 itemcode)      { return AA_AURA_ID[itemcode % 100]; }
+        uint32 GetTaskItemEntry(uint32 itemcode) { return AA_ITEM_ENTRY[itemcode % 100]; }
+        const char* GetTaskItemName(uint32 itemcode)  { return AA_ITEM_NAME[itemcode % 100]; }
+
+    };
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
+    {
+        if (quest->GetQuestId() == QUEST_ALCHEMIST_APPRENTICE)
+            if (creature->AI() && CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI()))
+                CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI())->ClearPlayerOnTask(player->GetGUID());
+
+        return true;
+    }
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (creature->IsQuestGiver())
+            player->PrepareQuestMenu(creature->GetGUID());
+
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+
+        if (player->GetQuestStatus(QUEST_ALCHEMIST_APPRENTICE) == QUEST_STATUS_INCOMPLETE)
+        {
+            if (creature->AI() && CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI()))
+                if (!CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI())->IsPlayerOnTask(player->GetGUID()))
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I'm ready to begin. What is the first ingredient you require?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-            if (player->GetQuestStatus(QUEST_ALCHEMIST_APPRENTICE) == QUEST_STATUS_INCOMPLETE)
-            {
-                if (creature->AI() && CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI()))
-                    if (!CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI())->IsPlayerOnTask(player->GetGUID()))
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I'm ready to begin. What is the first ingredient you require?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-
-                SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-            }
-
-            return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
+    {
+        CloseGossipMenuFor(player);
+        if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
-            if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
-            {
-                CloseGossipMenuFor(player);
-                if (creature->AI() && CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI()))
-                    CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI())->StartNextTask(player->GetGUID(), 1);
-            }
-
-            return true;
+            if (creature->AI() && CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI()))
+                CAST_AI(npc_finklestein::npc_finklesteinAI, creature->AI())->StartNextTask(player->GetGUID(), 1);
         }
 
-    CreatureAI *GetAI(Creature* creature) const override
+        return true;
+    }
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_finklesteinAI(creature);
     }
@@ -259,7 +260,7 @@ public:
                     {
                         ghoul->SetReactState(REACT_DEFENSIVE);
                         float o = me->GetAngle(ghoul);
-                        ghoul->GetMotionMaster()->MovePoint(1, me->GetPositionX()+2*cos(o), me->GetPositionY()+2*sin(o), me->GetPositionZ());
+                        ghoul->GetMotionMaster()->MovePoint(1, me->GetPositionX() + 2 * cos(o), me->GetPositionY() + 2 * sin(o), me->GetPositionZ());
                         checkTimer = 1;
                         findTimer = 0;
                     }
@@ -443,7 +444,7 @@ public:
                 me->SetFacingToObject(cr);
                 lichGUID = cr->GetGUID();
                 float o = me->GetAngle(cr);
-                cr->GetMotionMaster()->MovePoint(0, me->GetPositionX()+cos(o)*6.0f, me->GetPositionY()+sin(o)*6.0f, me->GetPositionZ());
+                cr->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(o) * 6.0f, me->GetPositionY() + sin(o) * 6.0f, me->GetPositionZ());
             }
         }
 
@@ -583,7 +584,7 @@ public:
 
             }
 
-            if (me->getFaction() == 35 || me->HasUnitState(UNIT_STATE_CASTING|UNIT_STATE_STUNNED))
+            if (me->getFaction() == 35 || me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
                 return;
 
             if (!UpdateVictim())
@@ -697,9 +698,9 @@ public:
             }
         }
 
-        private:
-            uint64 _rageclawGUID;
-            uint32 timer;
+    private:
+        uint64 _rageclawGUID;
+        uint32 timer;
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -861,7 +862,7 @@ public:
             me->SetFacingToObject(player);
         }
 
-        private:
+    private:
         EventMap _events;
         float    _heading; // Store creature heading
     };
@@ -943,10 +944,10 @@ public:
 
             if (Vehicle* veh = caster->GetVehicleKit())
                 if (veh->GetAvailableSeatCount() != 0)
-            {
-                me->CastSpell(caster, RIDE_VEHICLE, true);
-                me->CastSpell(caster, HEALING_WINDS, true);
-            }
+                {
+                    me->CastSpell(caster, RIDE_VEHICLE, true);
+                    me->CastSpell(caster, HEALING_WINDS, true);
+                }
         }
     };
 
