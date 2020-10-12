@@ -183,9 +183,8 @@ Compression = 1
 #        Description: Maximum number of players in the world. Excluding Mods, GMs and Admins.
 #          Important: If you want to block players and only allow Mods, GMs or Admins to join the
 #                     server, use the DB field "auth.realmlist.allowedSecurityLevel".
-#            Default: 100 - (Enabled)
+#            Default: 0   - (No limit)
 #                     1+  - (Enabled)
-#                     0   - (Disabled, No limit)
 
 PlayerLimit = 0
 
@@ -2898,8 +2897,8 @@ Arena.RatingDiscardTimer = 600000
 #
 #    Arena.AutoDistributePoints
 #        Description: Automatically distribute arena points.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
 
 Arena.AutoDistributePoints = 1
 
