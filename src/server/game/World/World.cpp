@@ -1126,7 +1126,7 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME]        = sConfigMgr->GetIntDefault("Battleground.RespawnTime", 30);
     if (m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME] < 3 || m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME] > 120)
     {
-        sLog->outError("Battleground.RespawnTime (%i) must be in range 3 - 120. Using 30 instead.", m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME]),
+        sLog->outError("Battleground.RespawnTime (%i) must be in range 3 - 120. Using 30 instead.", m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME]);
         m_int_configs[CONFIG_BATTLEGROUND_RESPAWN_TIME] = 30;
     }
     
