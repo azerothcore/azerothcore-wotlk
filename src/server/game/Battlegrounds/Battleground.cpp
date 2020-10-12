@@ -323,7 +323,7 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
     // *********************************************************
     // this should be handled by spell system
     m_LastResurrectTime += diff;
-    if (m_LastResurrectTime >= RESURRECTION_INTERVAL)
+    if (m_LastResurrectTime >= (sWorld->getIntConfig(CONFIG_BATTLEGROUND_RESPAWN_TIME) * IN_MILLISECONDS))
     {
         if (GetReviveQueueSize())
         {
