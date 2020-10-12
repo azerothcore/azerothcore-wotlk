@@ -126,6 +126,7 @@ enum BattlegroundReputations
 enum BattlegroundTimeIntervals
 {
     CHECK_PLAYER_POSITION_INVERVAL  = 9000,                 // ms
+    //RESURRECTION_INTERVAL           = 30000,                // ms
     //REMIND_INTERVAL                 = 10000,                // ms
     INVITATION_REMIND_TIME          = 20000,                // ms
     INVITE_ACCEPT_WAIT_TIME         = 60000,                // ms
