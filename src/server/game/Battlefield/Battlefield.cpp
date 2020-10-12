@@ -11,6 +11,7 @@
 #include "Map.h"
 #include "MapManager.h"
 #include "Group.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -44,7 +45,7 @@ Battlefield::Battlefield()
 
     m_uiKickAfkPlayersTimer = 1000;
 
-    m_LastResurectTimer = 30 * IN_MILLISECONDS;
+    m_LastResurectTimer = (sWorld->getIntConfig(CONFIG_BATTLEGROUND_RESPAWN_TIME) * IN_MILLISECONDS);
     m_StartGroupingTimer = 0;
     m_StartGrouping = false;
     StalkerGuid = 0;
@@ -195,7 +196,7 @@ bool Battlefield::Update(uint32 diff)
         for (uint8 i = 0; i < m_GraveyardList.size(); i++)
             if (GetGraveyardById(i))
                 m_GraveyardList[i]->Resurrect();
-        m_LastResurectTimer = RESURRECTION_INTERVAL;
+        m_LastResurectTimer = (sWorld->getIntConfig(CONFIG_BATTLEGROUND_RESPAWN_TIME) * IN_MILLISECONDS);
     }
     else
         m_LastResurectTimer -= diff;
