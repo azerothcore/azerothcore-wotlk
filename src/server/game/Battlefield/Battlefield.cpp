@@ -67,7 +67,7 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
     // Xinef: do not invite players on taxi
     if (!player->IsInFlight())
     {
-        // If battle is started, 
+        // If battle is started,
         // If not full of players > invite player to join the war
         // If full of players > announce to player that BF is full and kick him after a few second if he desn't leave
         if (IsWarTime())
@@ -77,7 +77,7 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
             else // No more vacant places
             {
                 // TODO: Send a packet to announce it to player
-                m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(nullptr) + (player->IsGameMaster() ? 30*MINUTE : 10);
+                m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(nullptr) + (player->IsGameMaster() ? 30 * MINUTE : 10);
                 InvitePlayerToQueue(player);
             }
         }
@@ -424,11 +424,14 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
 
 void Battlefield::TeamCastSpell(TeamId team, int32 spellId)
 {
-    if (spellId > 0) {
+    if (spellId > 0)
+    {
         for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 player->CastSpell(player, uint32(spellId), true);
-    } else {
+    }
+    else
+    {
         for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 player->RemoveAuraFromStack(uint32(-spellId));
@@ -591,7 +594,7 @@ BfGraveyard* Battlefield::GetGraveyardById(uint32 id) const
     return nullptr;
 }
 
-GraveyardStruct const * Battlefield::GetClosestGraveyard(Player* player)
+GraveyardStruct const* Battlefield::GetClosestGraveyard(Player* player)
 {
     BfGraveyard* closestGY = nullptr;
     float maxdist = -1;
@@ -647,7 +650,7 @@ void Battlefield::RemovePlayerFromResurrectQueue(uint64 playerGuid)
     }
 }
 
-void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, const uint64 &guid)
+void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, const uint64& guid)
 {
     WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
     uint32 time = m_LastResurectTimer;  // resurrect every 30 seconds
@@ -875,9 +878,9 @@ GuidSet::iterator BfCapturePoint::HandlePlayerLeave(Player* player)
 {
     if (GameObject* go = GetCapturePointGo(player))
         player->SendUpdateWorldState(go->GetGOInfo()->capturePoint.worldState1, 0);
-    
+
     GuidSet::iterator current = m_activePlayers[player->GetTeamId()].find(player->GetGUID());
-    
+
     if (current == m_activePlayers[player->GetTeamId()].end())
         return current; // return end()
 

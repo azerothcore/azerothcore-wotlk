@@ -24,7 +24,7 @@ namespace Movement
         enum eFlags
         {
             None                = 0x00000000,
-                                                        // x00-xFF(first byte) used as animation Ids storage in pair with Animation flag
+            // x00-xFF(first byte) used as animation Ids storage in pair with Animation flag
             Done                = 0x00000100,
             Falling             = 0x00000200,           // Affects elevation computation, can't be combined with Parabolic flag
             No_Spline           = 0x00000400,
@@ -59,21 +59,21 @@ namespace Movement
             // CatmullRom interpolation mode used
             Mask_CatmullRom     = Flying | Catmullrom,
             // Unused, not suported flags
-            Mask_Unused         = No_Spline|Enter_Cycle|Frozen|Unknown7|Unknown8|Unknown10|Unknown11|Unknown12|Unknown13
+            Mask_Unused         = No_Spline | Enter_Cycle | Frozen | Unknown7 | Unknown8 | Unknown10 | Unknown11 | Unknown12 | Unknown13
         };
 
-        inline uint32& raw() { return (uint32&)*this; }
-        inline const uint32& raw() const { return (const uint32&)*this; }
+        inline uint32& raw() { return (uint32&) * this; }
+        inline const uint32& raw() const { return (const uint32&) * this; }
 
         MoveSplineFlag() { raw() = 0; }
         MoveSplineFlag(uint32 f) { raw() = f; }
         MoveSplineFlag(const MoveSplineFlag& f) { raw() = f.raw(); }
         /* requried as of C++ 11 */
-        #if __cplusplus >= 201103L
+#if __cplusplus >= 201103L
         MoveSplineFlag(MoveSplineFlag&&) = default;
         MoveSplineFlag& operator=(const MoveSplineFlag&) = default;
         MoveSplineFlag& operator=(MoveSplineFlag&&) = default;
-        #endif
+#endif
 
         // Constant interface
 
