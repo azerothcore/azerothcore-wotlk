@@ -68,79 +68,79 @@ enum MailShowFlags
 
 class MailSender
 {
-    public:                                                 // Constructors
-        MailSender(MailMessageType messageType, uint32 sender_guidlow_or_entry, MailStationery stationery = MAIL_STATIONERY_DEFAULT)
-            : m_messageType(messageType), m_senderId(sender_guidlow_or_entry), m_stationery(stationery)
-        {
-        }
-        MailSender(Object* sender, MailStationery stationery = MAIL_STATIONERY_DEFAULT);
-        MailSender(CalendarEvent* sender);
-        MailSender(AuctionEntry* sender);
-        MailSender(Player* sender);
-        MailSender(uint32 senderEntry);
-    public:                                                 // Accessors
-        MailMessageType GetMailMessageType() const { return m_messageType; }
-        uint32 GetSenderId() const { return m_senderId; }
-        MailStationery GetStationery() const { return m_stationery; }
-    private:
-        MailMessageType m_messageType;
-        uint32 m_senderId;                                  // player low guid or other object entry
-        MailStationery m_stationery;
+public:                                                 // Constructors
+    MailSender(MailMessageType messageType, uint32 sender_guidlow_or_entry, MailStationery stationery = MAIL_STATIONERY_DEFAULT)
+        : m_messageType(messageType), m_senderId(sender_guidlow_or_entry), m_stationery(stationery)
+    {
+    }
+    MailSender(Object* sender, MailStationery stationery = MAIL_STATIONERY_DEFAULT);
+    MailSender(CalendarEvent* sender);
+    MailSender(AuctionEntry* sender);
+    MailSender(Player* sender);
+    MailSender(uint32 senderEntry);
+public:                                                 // Accessors
+    MailMessageType GetMailMessageType() const { return m_messageType; }
+    uint32 GetSenderId() const { return m_senderId; }
+    MailStationery GetStationery() const { return m_stationery; }
+private:
+    MailMessageType m_messageType;
+    uint32 m_senderId;                                  // player low guid or other object entry
+    MailStationery m_stationery;
 };
 
 class MailReceiver
 {
-    public:                                                 // Constructors
-        explicit MailReceiver(uint32 receiver_lowguid) : m_receiver(nullptr), m_receiver_lowguid(receiver_lowguid) {}
-        MailReceiver(Player* receiver);
-        MailReceiver(Player* receiver, uint32 receiver_lowguid);
-    public:                                                 // Accessors
-        Player* GetPlayer() const { return m_receiver; }
-        uint32  GetPlayerGUIDLow() const { return m_receiver_lowguid; }
-    private:
-        Player* m_receiver;
-        uint32  m_receiver_lowguid;
+public:                                                 // Constructors
+    explicit MailReceiver(uint32 receiver_lowguid) : m_receiver(nullptr), m_receiver_lowguid(receiver_lowguid) {}
+    MailReceiver(Player* receiver);
+    MailReceiver(Player* receiver, uint32 receiver_lowguid);
+public:                                                 // Accessors
+    Player* GetPlayer() const { return m_receiver; }
+    uint32  GetPlayerGUIDLow() const { return m_receiver_lowguid; }
+private:
+    Player* m_receiver;
+    uint32  m_receiver_lowguid;
 };
 
 class MailDraft
 {
     typedef std::map<uint32, Item*> MailItemMap;
 
-    public:                                                 // Constructors
-        explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
-            : m_mailTemplateId(mailTemplateId), m_mailTemplateItemsNeed(need_items), m_money(0), m_COD(0)
-        {}
-        MailDraft(std::string const& subject, std::string const& body)
-            : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(subject), m_body(body), m_money(0), m_COD(0) {}
-    public:                                                 // Accessors
-        uint16 GetMailTemplateId() const { return m_mailTemplateId; }
-        std::string const& GetSubject() const { return m_subject; }
-        uint32 GetMoney() const { return m_money; }
-        uint32 GetCOD() const { return m_COD; }
-        std::string const& GetBody() const { return m_body; }
+public:                                                 // Constructors
+    explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
+        : m_mailTemplateId(mailTemplateId), m_mailTemplateItemsNeed(need_items), m_money(0), m_COD(0)
+    {}
+    MailDraft(std::string const& subject, std::string const& body)
+        : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(subject), m_body(body), m_money(0), m_COD(0) {}
+public:                                                 // Accessors
+    uint16 GetMailTemplateId() const { return m_mailTemplateId; }
+    std::string const& GetSubject() const { return m_subject; }
+    uint32 GetMoney() const { return m_money; }
+    uint32 GetCOD() const { return m_COD; }
+    std::string const& GetBody() const { return m_body; }
 
-    public:                                                 // modifiers
-        MailDraft& AddItem(Item* item);
-        MailDraft& AddMoney(uint32 money) { m_money = money; return *this; }
-        MailDraft& AddCOD(uint32 COD) { m_COD = COD; return *this; }
+public:                                                 // modifiers
+    MailDraft& AddItem(Item* item);
+    MailDraft& AddMoney(uint32 money) { m_money = money; return *this; }
+    MailDraft& AddCOD(uint32 COD) { m_COD = COD; return *this; }
 
-    public:                                                 // finishers
-        void SendReturnToSender(uint32 sender_acc, uint32 sender_guid, uint32 receiver_guid, SQLTransaction& trans);
-        void SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 custom_expiration = 0, bool deleteMailItemsFromDB = false, bool sendMail = true);
+public:                                                 // finishers
+    void SendReturnToSender(uint32 sender_acc, uint32 sender_guid, uint32 receiver_guid, SQLTransaction& trans);
+    void SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 custom_expiration = 0, bool deleteMailItemsFromDB = false, bool sendMail = true);
 
-    private:
-        void deleteIncludedItems(SQLTransaction& trans, bool inDB = false);
-        void prepareItems(Player* receiver, SQLTransaction& trans);                // called from SendMailTo for generate mailTemplateBase items
+private:
+    void deleteIncludedItems(SQLTransaction& trans, bool inDB = false);
+    void prepareItems(Player* receiver, SQLTransaction& trans);                // called from SendMailTo for generate mailTemplateBase items
 
-        uint16      m_mailTemplateId;
-        bool        m_mailTemplateItemsNeed;
-        std::string m_subject;
-        std::string m_body;
+    uint16      m_mailTemplateId;
+    bool        m_mailTemplateItemsNeed;
+    std::string m_subject;
+    std::string m_body;
 
-        MailItemMap m_items;                                // Keep the items in a map to avoid duplicate guids (which can happen), store only low part of guid
+    MailItemMap m_items;                                // Keep the items in a map to avoid duplicate guids (which can happen), store only low part of guid
 
-        uint32 m_money;
-        uint32 m_COD;
+    uint32 m_money;
+    uint32 m_COD;
 };
 
 struct MailItemInfo
