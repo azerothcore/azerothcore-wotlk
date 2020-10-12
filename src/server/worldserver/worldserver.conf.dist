@@ -2818,6 +2818,14 @@ Battleground.RewardLoserHonorFirst  = 5
 Battleground.RewardLoserHonorLast   = 5
 
 #
+#    Battleground.RespawnTime
+#        Description: Battleground graveyard ressurection interval (in seconds).
+#        Range:       3-120
+#        Default:     30
+
+Battleground.RespawnTime = 30
+
+#
 ###################################################################################################
 
 ###################################################################################################
