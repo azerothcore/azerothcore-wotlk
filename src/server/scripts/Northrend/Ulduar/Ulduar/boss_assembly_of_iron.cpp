@@ -129,16 +129,16 @@ enum Misc
 
 bool IsEncounterComplete(InstanceScript* pInstance, Creature* me)
 {
-   if (!pInstance || !me)
+    if (!pInstance || !me)
         return false;
 
     for (uint8 i = 0; i < 3; ++i)
     {
-        uint64 guid = pInstance->GetData64(DATA_STEELBREAKER+i);
+        uint64 guid = pInstance->GetData64(DATA_STEELBREAKER + i);
         if (!guid)
             return false;
 
-        if (Creature *boss = (ObjectAccessor::GetCreature(*me, guid)))
+        if (Creature* boss = (ObjectAccessor::GetCreature(*me, guid)))
         {
             if (boss->IsAlive())
                 return false;
@@ -157,18 +157,18 @@ void RespawnAssemblyOfIron(InstanceScript* pInstance, Creature* me)
 
     for (uint8 i = 0; i < 3; ++i)
     {
-        uint64 guid = pInstance->GetData64(DATA_STEELBREAKER+i);
+        uint64 guid = pInstance->GetData64(DATA_STEELBREAKER + i);
         if (!guid)
             return;
 
-        if (Creature *boss = (ObjectAccessor::GetCreature((*me), guid)))
+        if (Creature* boss = (ObjectAccessor::GetCreature((*me), guid)))
             if (!boss->IsAlive())
                 boss->Respawn();
     }
     return;
 }
 
-void RestoreAssemblyHealth(uint64 guid1, uint64 guid2, Creature *me)
+void RestoreAssemblyHealth(uint64 guid1, uint64 guid2, Creature* me)
 {
     if(Creature* cr = ObjectAccessor::GetCreature(*me, guid1))
         if(cr->IsAlive())
@@ -192,7 +192,7 @@ public:
 
     struct boss_steelbreakerAI : public ScriptedAI
     {
-        boss_steelbreakerAI(Creature *c) : ScriptedAI(c)
+        boss_steelbreakerAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -222,7 +222,7 @@ public:
         {
             if (pInstance)
                 pInstance->SetData(TYPE_ASSEMBLY, IN_PROGRESS);
-            
+
             me->setActive(true);
             me->SetInCombatWithZone();
             me->CastSpell(me, SPELL_HIGH_VOLTAGE, true);
@@ -232,24 +232,24 @@ public:
             if (!pInstance)
                 return;
 
-            if (Creature *boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_STEELBREAKER+urand(0,2))))
+            if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_STEELBREAKER + urand(0, 2))))
             {
                 switch (boss->GetEntry())
                 {
-                case NPC_STEELBREAKER:
-                    boss->AI()->Talk(SAY_STEELBREAKER_AGGRO);
-                    break;
-                case NPC_MOLGEIM:
-                    boss->AI()->Talk(SAY_MOLGEIM_AGGRO);
-                    break;
-                case NPC_BRUNDIR:
-                    boss->AI()->Talk(SAY_BRUNDIR_AGGRO);
-                    break;
+                    case NPC_STEELBREAKER:
+                        boss->AI()->Talk(SAY_STEELBREAKER_AGGRO);
+                        break;
+                    case NPC_MOLGEIM:
+                        boss->AI()->Talk(SAY_MOLGEIM_AGGRO);
+                        break;
+                    case NPC_BRUNDIR:
+                        boss->AI()->Talk(SAY_BRUNDIR_AGGRO);
+                        break;
                 }
             }
 
             for (uint8 i = 0; i < 3; ++i)
-                if (Creature *boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_STEELBREAKER+i)))
+                if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_STEELBREAKER + i)))
                     if (!boss->IsInCombat())
                         boss->AI()->AttackStart(who);
         }
@@ -331,13 +331,13 @@ public:
             {
                 case EVENT_FUSION_PUNCH:
                     me->CastSpell(me->GetVictim(), SPELL_FUSION_PUNCH, false);
-                    events.RepeatEvent(urand(15000,20000));
+                    events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_STATIC_DISRUPTION:
-                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_FARTHEST, 0, 0, true))
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_FARTHEST, 0, 0, true))
                         me->CastSpell(pTarget, SPELL_STATIC_DISRUPTION, false);
 
-                    events.RepeatEvent(urand(20000,40000));
+                    events.RepeatEvent(urand(20000, 40000));
                     break;
                 case EVENT_OVERWHELMING_POWER:
                     Talk(SAY_STEELBREAKER_POWER);
@@ -358,18 +358,18 @@ public:
 
 class CastRunesEvent : public BasicEvent
 {
-    public:
-        CastRunesEvent(Creature& owner) : BasicEvent(), _owner(owner) { }
+public:
+    CastRunesEvent(Creature& owner) : BasicEvent(), _owner(owner) { }
 
-        bool Execute(uint64 /*eventTime*/, uint32 /*diff*/) override
-        {
-            if (!_owner.IsInCombat())
-                _owner.CastSpell(&_owner, SPELL_RUNE_OF_POWER_OOC_CHANNEL, true);
-            return true;
-        }
+    bool Execute(uint64 /*eventTime*/, uint32 /*diff*/) override
+    {
+        if (!_owner.IsInCombat())
+            _owner.CastSpell(&_owner, SPELL_RUNE_OF_POWER_OOC_CHANNEL, true);
+        return true;
+    }
 
-    private:
-        Creature& _owner;
+private:
+    Creature& _owner;
 };
 
 class boss_runemaster_molgeim : public CreatureScript
@@ -384,7 +384,7 @@ public:
 
     struct boss_runemaster_molgeimAI : public ScriptedAI
     {
-        boss_runemaster_molgeimAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_runemaster_molgeimAI(Creature* c) : ScriptedAI(c), summons(me)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -402,7 +402,7 @@ public:
             _phase = 0;
             events.Reset();
             summons.DespawnAll();
-            
+
             if (pInstance)
                 pInstance->SetData(TYPE_ASSEMBLY, NOT_STARTED);
 
@@ -427,7 +427,7 @@ public:
                 return;
 
             for (uint8 i = 0; i < 3; ++i)
-                if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_STEELBREAKER+i)))
+                if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_STEELBREAKER + i)))
                     if (!boss->IsInCombat())
                         boss->AI()->AttackStart(who);
         }
@@ -450,7 +450,7 @@ public:
                     break;
                 case 3:
                     me->ResetLootMode();
-                    events.RescheduleEvent(EVENT_RUNE_OF_SUMMONING, urand(20000,30000));
+                    events.RescheduleEvent(EVENT_RUNE_OF_SUMMONING, urand(20000, 30000));
                     break;
             }
         }
@@ -500,31 +500,31 @@ public:
             switch(events.GetEvent())
             {
                 case EVENT_RUNE_OF_POWER:
-                {
-                    Unit* target = DoSelectLowestHpFriendly(60);
-                    if (!target || !target->IsAlive())
-                        target = me;
+                    {
+                        Unit* target = DoSelectLowestHpFriendly(60);
+                        if (!target || !target->IsAlive())
+                            target = me;
 
-                    me->CastSpell(target, SPELL_RUNE_OF_POWER, true);
-                    events.RepeatEvent(60000);
-                    break;
-                }
+                        me->CastSpell(target, SPELL_RUNE_OF_POWER, true);
+                        events.RepeatEvent(60000);
+                        break;
+                    }
                 case EVENT_SHIELD_OF_RUNES:
                     me->CastSpell(me, SPELL_SHIELD_OF_RUNES, false);
-                    events.RescheduleEvent(EVENT_SHIELD_OF_RUNES, urand(27000,34000));
+                    events.RescheduleEvent(EVENT_SHIELD_OF_RUNES, urand(27000, 34000));
                     break;
                 case EVENT_RUNE_OF_DEATH:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                         me->CastSpell(target, SPELL_RUNE_OF_DEATH, true);
 
                     Talk(SAY_MOLGEIM_RUNE_DEATH);
-                    events.RepeatEvent(urand(30000,40000));
+                    events.RepeatEvent(urand(30000, 40000));
                     break;
                 case EVENT_RUNE_OF_SUMMONING:
                     Talk(SAY_MOLGEIM_SUMMON);
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        me->CastSpell(target,SPELL_RUNE_OF_SUMMONING);
-                    events.RepeatEvent(urand(30000,45000));
+                        me->CastSpell(target, SPELL_RUNE_OF_SUMMONING);
+                    events.RepeatEvent(urand(30000, 45000));
                     break;
                 case EVENT_ENRAGE:
                     me->CastSpell(me, SPELL_BERSERK, true);
@@ -550,7 +550,7 @@ public:
 
     struct npc_assembly_lightningAI : public ScriptedAI
     {
-        npc_assembly_lightningAI(Creature *c) : ScriptedAI(c)
+        npc_assembly_lightningAI(Creature* c) : ScriptedAI(c)
         {
             _boomed = false;
         }
@@ -595,7 +595,7 @@ public:
 
     struct boss_stormcaller_brundirAI : public ScriptedAI
     {
-        boss_stormcaller_brundirAI(Creature *c) : ScriptedAI(c)
+        boss_stormcaller_brundirAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -621,7 +621,7 @@ public:
             _stunnedAchievement = true;
 
             events.Reset();
-            
+
             me->SetDisableGravity(false);
             me->SetRegeneratingHealth(true);
             me->SetReactState(REACT_AGGRESSIVE);
@@ -649,7 +649,7 @@ public:
                 return;
 
             for (uint8 i = 0; i < 3; ++i)
-                if (Creature *boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_STEELBREAKER+i)))
+                if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_STEELBREAKER + i)))
                     if (!boss->IsInCombat())
                         boss->AI()->AttackStart(who);
         }
@@ -664,16 +664,16 @@ public:
             switch (_phase)
             {
                 case 1:
-                    events.RescheduleEvent(EVENT_CHAIN_LIGHTNING, urand(9000,17000));
-                    events.RescheduleEvent(EVENT_OVERLOAD, urand(25000,40000));
+                    events.RescheduleEvent(EVENT_CHAIN_LIGHTNING, urand(9000, 17000));
+                    events.RescheduleEvent(EVENT_OVERLOAD, urand(25000, 40000));
                     break;
                 case 2:
-                    events.RescheduleEvent(EVENT_LIGHTNING_WHIRL, urand(20000,40000));
+                    events.RescheduleEvent(EVENT_LIGHTNING_WHIRL, urand(20000, 40000));
                     break;
                 case 3:
                     me->ResetLootMode();
                     me->CastSpell(me, SPELL_STORMSHIELD, true);
-                    events.RescheduleEvent(EVENT_LIGHTNING_TENDRILS, urand(15000,16000));
+                    events.RescheduleEvent(EVENT_LIGHTNING_TENDRILS, urand(15000, 16000));
                     break;
             }
         }
@@ -699,7 +699,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER || urand(0,2))
+            if (who->GetTypeId() != TYPEID_PLAYER || urand(0, 2))
                 return;
 
             Talk(SAY_BRUNDIR_SLAY);
@@ -741,19 +741,19 @@ public:
                     _channelTimer = 0;
                     float o = urand(0, 5) * M_PI / 3.0f;
                     me->InterruptNonMeleeSpells(false);
-                    me->GetMotionMaster()->MovePoint(POINT_CHANNEL_STEELBREAKER, 1587.18f + 10.0f*cos(o), 121.02f + 10.0f*sin(o), 427.3f);
+                    me->GetMotionMaster()->MovePoint(POINT_CHANNEL_STEELBREAKER, 1587.18f + 10.0f * cos(o), 121.02f + 10.0f * sin(o), 427.3f);
                 }
             }
 
             if (!UpdateVictim())
                 return;
-            
+
             if (_flyPhase)
             {
                 if (_flyTarget && me->GetDistance2d(_flyTarget) >= 6 )
                 {
                     //float speed = me->GetDistance(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ()+15) / (1500.0f * 0.001f);
-                    me->SendMonsterMove(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ()+15, 1500, SPLINEFLAG_FLYING);
+                    me->SendMonsterMove(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
                     me->SetPosition(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ(), _flyTarget->GetOrientation());
                 }
             }
@@ -768,7 +768,7 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                         me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
 
-                    events.RepeatEvent(urand(9000,17000));
+                    events.RepeatEvent(urand(9000, 17000));
                     break;
                 case EVENT_IMMUNE:
                     me->ApplySpellImmune(1, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
@@ -778,49 +778,49 @@ public:
                     me->ApplySpellImmune(1, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
                     Talk(EMOTE_BRUNDIR_OVERLOAD);
                     me->CastSpell(me, SPELL_OVERLOAD, true);
-                    events.RescheduleEvent(EVENT_OVERLOAD, urand(25000,40000));
+                    events.RescheduleEvent(EVENT_OVERLOAD, urand(25000, 40000));
                     events.RescheduleEvent(EVENT_IMMUNE, 5999);
                     break;
                 case EVENT_LIGHTNING_WHIRL:
                     Talk(SAY_BRUNDIR_SPECIAL);
                     me->CastSpell(me, SPELL_LIGHTNING_WHIRL, true);
-                    events.RepeatEvent(urand(10000,25000));
+                    events.RepeatEvent(urand(10000, 25000));
                     break;
                 case EVENT_LIGHTNING_TENDRILS:
-                {
-                    // Reschedule old
-                    events.RepeatEvent(35000);
-                    events.DelayEvents(18000);
-                    Talk(SAY_BRUNDIR_FLIGHT);
-                    
-                    _flyPhase = true;
-                    _flyTarget = me->GetVictim();
-                    me->SetRegeneratingHealth(false);
-                    me->SetDisableGravity(true);
+                    {
+                        // Reschedule old
+                        events.RepeatEvent(35000);
+                        events.DelayEvents(18000);
+                        Talk(SAY_BRUNDIR_FLIGHT);
 
-                    me->CombatStop();
-                    me->StopMoving();
-                    me->SetReactState(REACT_PASSIVE);
-                    me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-                    me->SendMonsterMove(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ()+15, 1500, SPLINEFLAG_FLYING);
-                    
-                    me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
-                    me->CastSpell(me, 61883, true);
-                    events.ScheduleEvent(EVENT_LIGHTNING_LAND, 16000);
-                    
-                    me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
-                    break;
-                }
+                        _flyPhase = true;
+                        _flyTarget = me->GetVictim();
+                        me->SetRegeneratingHealth(false);
+                        me->SetDisableGravity(true);
+
+                        me->CombatStop();
+                        me->StopMoving();
+                        me->SetReactState(REACT_PASSIVE);
+                        me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                        me->SendMonsterMove(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
+
+                        me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
+                        me->CastSpell(me, 61883, true);
+                        events.ScheduleEvent(EVENT_LIGHTNING_LAND, 16000);
+
+                        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
+                        break;
+                    }
                 case EVENT_LIGHTNING_LAND:
-                {
-                    float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
-                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
-                    _flyPhase = false;
-                    events.ScheduleEvent(EVENT_LAND_LAND, 1000);
-                    events.PopEvent();
-                    break;
-                }
+                    {
+                        float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
+                        me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
+                        _flyPhase = false;
+                        events.ScheduleEvent(EVENT_LAND_LAND, 1000);
+                        events.PopEvent();
+                        break;
+                    }
                 case EVENT_LAND_LAND:
                     me->SetCanFly(false);
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -851,129 +851,129 @@ public:
 
 class spell_shield_of_runes : public SpellScriptLoader
 {
-    public:
-        spell_shield_of_runes() : SpellScriptLoader("spell_shield_of_runes") { }
+public:
+    spell_shield_of_runes() : SpellScriptLoader("spell_shield_of_runes") { }
 
-        class spell_shield_of_runes_AuraScript : public AuraScript
+    class spell_shield_of_runes_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_shield_of_runes_AuraScript);
+
+        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_shield_of_runes_AuraScript);
-
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-            {
-                if (Unit* owner = GetUnitOwner())
-                    if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_ENEMY_SPELL && aurEff->GetAmount() <= 0)
-                        owner->CastSpell(owner, SPELL_SHIELD_OF_RUNES_BUFF, false);
-            }
-
-            void Register() override
-            {
-                 AfterEffectRemove += AuraEffectRemoveFn(spell_shield_of_runes_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_shield_of_runes_AuraScript();
+            if (Unit* owner = GetUnitOwner())
+                if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_ENEMY_SPELL && aurEff->GetAmount() <= 0)
+                    owner->CastSpell(owner, SPELL_SHIELD_OF_RUNES_BUFF, false);
         }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_shield_of_runes_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_shield_of_runes_AuraScript();
+    }
 };
 
 class spell_assembly_meltdown : public SpellScriptLoader
 {
-    public:
-        spell_assembly_meltdown() : SpellScriptLoader("spell_assembly_meltdown") { }
+public:
+    spell_assembly_meltdown() : SpellScriptLoader("spell_assembly_meltdown") { }
 
-        class spell_assembly_meltdown_SpellScript : public SpellScript
+    class spell_assembly_meltdown_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_assembly_meltdown_SpellScript);
+
+        void HandleInstaKill(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_assembly_meltdown_SpellScript);
-
-            void HandleInstaKill(SpellEffIndex /*effIndex*/)
-            {
-                if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                    if (Creature* Steelbreaker = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(DATA_STEELBREAKER)))
-                        Steelbreaker->AI()->DoAction(ACTION_ADD_CHARGE);
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_assembly_meltdown_SpellScript::HandleInstaKill, EFFECT_1, SPELL_EFFECT_INSTAKILL);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_assembly_meltdown_SpellScript();
+            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+                if (Creature* Steelbreaker = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(DATA_STEELBREAKER)))
+                    Steelbreaker->AI()->DoAction(ACTION_ADD_CHARGE);
         }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_assembly_meltdown_SpellScript::HandleInstaKill, EFFECT_1, SPELL_EFFECT_INSTAKILL);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_assembly_meltdown_SpellScript();
+    }
 };
 
 class spell_assembly_rune_of_summoning : public SpellScriptLoader
 {
-    public:
-        spell_assembly_rune_of_summoning() : SpellScriptLoader("spell_assembly_rune_of_summoning") { }
+public:
+    spell_assembly_rune_of_summoning() : SpellScriptLoader("spell_assembly_rune_of_summoning") { }
 
-        class spell_assembly_rune_of_summoning_AuraScript : public AuraScript
+    class spell_assembly_rune_of_summoning_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_assembly_rune_of_summoning_AuraScript);
+
+        void OnPeriodic(AuraEffect const* aurEff)
         {
-            PrepareAuraScript(spell_assembly_rune_of_summoning_AuraScript);
-
-            void OnPeriodic(AuraEffect const* aurEff)
-            {
-                PreventDefaultAction();
-                if (aurEff->GetTickNumber() % 2 == 0)
-                    GetTarget()->CastSpell(GetTarget(), SPELL_RUNE_OF_SUMMONING_SUMMON, true, nullptr, aurEff, GetTarget()->IsSummon() ? GetTarget()->ToTempSummon()->GetSummonerGUID() : 0);
-            }
-
-            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                if (TempSummon* summ = GetTarget()->ToTempSummon())
-                    summ->DespawnOrUnsummon(1);
-            }
-
-            void Register() override
-            {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_assembly_rune_of_summoning_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-                OnEffectRemove += AuraEffectRemoveFn(spell_assembly_rune_of_summoning_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_assembly_rune_of_summoning_AuraScript();
+            PreventDefaultAction();
+            if (aurEff->GetTickNumber() % 2 == 0)
+                GetTarget()->CastSpell(GetTarget(), SPELL_RUNE_OF_SUMMONING_SUMMON, true, nullptr, aurEff, GetTarget()->IsSummon() ? GetTarget()->ToTempSummon()->GetSummonerGUID() : 0);
         }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (TempSummon* summ = GetTarget()->ToTempSummon())
+                summ->DespawnOrUnsummon(1);
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_assembly_rune_of_summoning_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            OnEffectRemove += AuraEffectRemoveFn(spell_assembly_rune_of_summoning_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_assembly_rune_of_summoning_AuraScript();
+    }
 };
 
 class achievement_assembly_of_iron : public AchievementCriteriaScript
 {
-    public:
-        achievement_assembly_of_iron(char const* name, uint32 entry) : AchievementCriteriaScript(name),
-            _targetEntry(entry)
-        {
-        }
+public:
+    achievement_assembly_of_iron(char const* name, uint32 entry) : AchievementCriteriaScript(name),
+        _targetEntry(entry)
+    {
+    }
 
-        bool OnCheck(Player*  /*player*/, Unit* target) override
-        {
-            return target && target->GetAuraCount(SPELL_SUPERCHARGE) >= 2 && (!_targetEntry || target->GetEntry() == _targetEntry);
-        }
-        
-    private:
-        uint32 const _targetEntry;
+    bool OnCheck(Player*  /*player*/, Unit* target) override
+    {
+        return target && target->GetAuraCount(SPELL_SUPERCHARGE) >= 2 && (!_targetEntry || target->GetEntry() == _targetEntry);
+    }
+
+private:
+    uint32 const _targetEntry;
 };
 
 class achievement_cant_do_that_while_stunned : public AchievementCriteriaScript
 {
-    public:
-        achievement_cant_do_that_while_stunned() : AchievementCriteriaScript("achievement_cant_do_that_while_stunned") {}
+public:
+    achievement_cant_do_that_while_stunned() : AchievementCriteriaScript("achievement_cant_do_that_while_stunned") {}
 
-        bool OnCheck(Player*  /*player*/, Unit* target) override
-        {
-            bool allow = target && target->GetAuraCount(SPELL_SUPERCHARGE) >= 2;
-            if (!allow)
-                return false;
-            
-            if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(DATA_BRUNDIR)))
-                    return cr->AI()->GetData(DATA_BRUNDIR);
-                        
+    bool OnCheck(Player*  /*player*/, Unit* target) override
+    {
+        bool allow = target && target->GetAuraCount(SPELL_SUPERCHARGE) >= 2;
+        if (!allow)
             return false;
-        }
+
+        if (InstanceScript* instance = target->GetInstanceScript())
+            if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(DATA_BRUNDIR)))
+                return cr->AI()->GetData(DATA_BRUNDIR);
+
+        return false;
+    }
 };
 
 void AddSC_boss_assembly_of_iron()

@@ -64,7 +64,7 @@ public:
             pInstance = pCreature->GetInstanceScript();
         }
 
-        InstanceScript *pInstance;
+        InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
         uint8 insanityTimes;
@@ -77,7 +77,7 @@ public:
             insanityTimes = insanityHandled = 0;
 
             // Visible for all players in insanity
-            me->SetPhaseMask((1|16|32|64|128|256), true);
+            me->SetPhaseMask((1 | 16 | 32 | 64 | 128 | 256), true);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
             ResetPlayersPhaseMask();
@@ -89,7 +89,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* pTarget, const SpellInfo *spell)
+        void SpellHitTarget(Unit* pTarget, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_INSANITY)
             {
@@ -107,13 +107,13 @@ public:
                 }
 
                 // phase mask
-                pTarget->CastSpell(pTarget, SPELL_INSANITY_TARGET+insanityHandled, true);
-                
+                pTarget->CastSpell(pTarget, SPELL_INSANITY_TARGET + insanityHandled, true);
+
                 // summon twisted party members for this target
-                Map::PlayerList const &players = me->GetMap()->GetPlayers();
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                 {
-                    Player *plr = i->GetSource();
+                    Player* plr = i->GetSource();
                     if (!plr || !plr->IsAlive() || pTarget->GetGUID() == plr->GetGUID())
                         continue;
 
@@ -125,7 +125,7 @@ public:
                         pTarget->SetInCombatWith(summon);
 
                         plr->CastSpell(summon, SPELL_CLONE_PLAYER, true);
-                        summon->SetPhaseMask(1|(1<<(4+insanityHandled)), true);
+                        summon->SetPhaseMask(1 | (1 << (4 + insanityHandled)), true);
                         summon->SetUInt32Value(UNIT_FIELD_MINDAMAGE, plr->GetUInt32Value(UNIT_FIELD_MINDAMAGE));
                         summon->SetUInt32Value(UNIT_FIELD_MAXDAMAGE, plr->GetUInt32Value(UNIT_FIELD_MAXDAMAGE));
                     }
@@ -137,7 +137,7 @@ public:
 
         void ResetPlayersPhaseMask()
         {
-            Map::PlayerList const &players = me->GetMap()->GetPlayers();
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
             {
                 if (Player* pPlayer = i->GetSource())
@@ -164,7 +164,7 @@ public:
             me->SetInCombatWithZone();
         }
 
-        void JustSummoned(Creature *summon) { summons.Summon(summon); }
+        void JustSummoned(Creature* summon) { summons.Summon(summon); }
 
         uint32 GetSpellForPhaseMask(uint32 phase)
         {
@@ -202,11 +202,11 @@ public:
             uint16 phase = 1;
             for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
             {
-                if (Creature *summon = ObjectAccessor::GetCreature(*me, *itr))
+                if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                     phase |= summon->GetPhaseMask();
             }
 
-            Map::PlayerList const &players = me->GetMap()->GetPlayers();
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
             {
                 if (Player* pPlayer = i->GetSource())
@@ -241,41 +241,41 @@ public:
             switch (events.GetEvent())
             {
                 case EVENT_HERALD_HEALTH:
-                {
-                    if (insanityTimes == 0 && me->GetHealthPct() <= 66)
                     {
-                        me->CastSpell(me, SPELL_INSANITY, false);
-                        insanityTimes++;
-                    }
-                    else if (insanityTimes == 1 && me->GetHealthPct() <= 33)
-                    {
-                        me->CastSpell(me, SPELL_INSANITY, false);
-                        insanityTimes++;
-                    }
+                        if (insanityTimes == 0 && me->GetHealthPct() <= 66)
+                        {
+                            me->CastSpell(me, SPELL_INSANITY, false);
+                            insanityTimes++;
+                        }
+                        else if (insanityTimes == 1 && me->GetHealthPct() <= 33)
+                        {
+                            me->CastSpell(me, SPELL_INSANITY, false);
+                            insanityTimes++;
+                        }
 
-                    events.RepeatEvent(1000);
-                    break;
-                }
+                        events.RepeatEvent(1000);
+                        break;
+                    }
                 case EVENT_HERALD_MIND_FLAY:
-                {
-                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_MIND_FLAY_H : SPELL_MIND_FLAY, false);
-                    events.RepeatEvent(20000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_MIND_FLAY_H : SPELL_MIND_FLAY, false);
+                        events.RepeatEvent(20000);
+                        break;
+                    }
                 case EVENT_HERALD_SHADOW:
-                {
-                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_SHADOW_BOLT_VOLLEY_H : SPELL_SHADOW_BOLT_VOLLEY, false);
-                    events.RepeatEvent(5000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_SHADOW_BOLT_VOLLEY_H : SPELL_SHADOW_BOLT_VOLLEY, false);
+                        events.RepeatEvent(5000);
+                        break;
+                    }
                 case EVENT_HERALD_SHIVER:
-                {
-                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        me->CastSpell(pTarget, IsHeroic() ? SPELL_SHIVER_H : SPELL_SHIVER, false);
+                    {
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            me->CastSpell(pTarget, IsHeroic() ? SPELL_SHIVER_H : SPELL_SHIVER, false);
 
-                    events.RepeatEvent(15000);
-                    break;
-                }
+                        events.RepeatEvent(15000);
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
@@ -294,13 +294,13 @@ public:
             ResetPlayersPhaseMask();
         }
 
-        void KilledUnit(Unit * /*victim*/)
+        void KilledUnit(Unit* /*victim*/)
         {
             Talk(SAY_SLAY);
         }
     };
 
-    CreatureAI *GetAI(Creature *creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new boss_volazjAI(creature);
     }

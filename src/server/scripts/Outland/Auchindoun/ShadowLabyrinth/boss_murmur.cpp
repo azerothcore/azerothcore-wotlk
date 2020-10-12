@@ -15,7 +15,7 @@ enum Murmur
     SPELL_MAGNETIC_PULL             = 33689,
     SPELL_SONIC_SHOCK               = 38797,
     SPELL_THUNDERING_STORM          = 39365,
- 
+
     SPELL_SONIC_BOOM_CAST_N         = 33923,
     SPELL_SONIC_BOOM_CAST_H         = 38796,
     SPELL_SONIC_BOOM_EFFECT_N       = 38795,
@@ -155,58 +155,58 @@ public:
 
 class spell_murmur_sonic_boom_effect : public SpellScriptLoader
 {
+public:
+    spell_murmur_sonic_boom_effect() : SpellScriptLoader("spell_murmur_sonic_boom_effect") { }
+
+    class spell_murmur_sonic_boom_effect_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_murmur_sonic_boom_effect_SpellScript)
+
     public:
-        spell_murmur_sonic_boom_effect() : SpellScriptLoader("spell_murmur_sonic_boom_effect") { }
+        spell_murmur_sonic_boom_effect_SpellScript() : SpellScript() { }
 
-        class spell_murmur_sonic_boom_effect_SpellScript : public SpellScript
+        void RecalculateDamage()
         {
-            PrepareSpellScript(spell_murmur_sonic_boom_effect_SpellScript)
-
-        public:
-            spell_murmur_sonic_boom_effect_SpellScript() : SpellScript() { }
-
-            void RecalculateDamage()
-            {
-                SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(90));
-            }
-
-            void Register()
-            {
-                OnHit += SpellHitFn(spell_murmur_sonic_boom_effect_SpellScript::RecalculateDamage);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_murmur_sonic_boom_effect_SpellScript();
+            SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(90));
         }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_murmur_sonic_boom_effect_SpellScript::RecalculateDamage);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_murmur_sonic_boom_effect_SpellScript();
+    }
 };
 
 class spell_murmur_thundering_storm : public SpellScriptLoader
 {
-    public:
-        spell_murmur_thundering_storm() : SpellScriptLoader("spell_murmur_thundering_storm") { }
+public:
+    spell_murmur_thundering_storm() : SpellScriptLoader("spell_murmur_thundering_storm") { }
 
-        class spell_murmur_thundering_storm_SpellScript : public SpellScript
+    class spell_murmur_thundering_storm_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_murmur_thundering_storm_SpellScript);
+
+        void SelectTarget(std::list<WorldObject*>& targets)
         {
-            PrepareSpellScript(spell_murmur_thundering_storm_SpellScript);
-
-            void SelectTarget(std::list<WorldObject*>& targets)
-            {
-                targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 100.0f, true));
-                targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_murmur_thundering_storm_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_murmur_thundering_storm_SpellScript();
+            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 100.0f, true));
+            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
         }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_murmur_thundering_storm_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_murmur_thundering_storm_SpellScript();
+    }
 };
 
 void AddSC_boss_murmur()

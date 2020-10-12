@@ -297,7 +297,7 @@ enum Misc
     DATA_LOSE_YOUR_ILLUSION     = 2,
 };
 
-const Position Middle = {2134.68f, -263.13f, 419.44f, M_PI*1.5f};
+const Position Middle = {2134.68f, -263.13f, 419.44f, M_PI * 1.5f};
 
 const uint32 RollTable[3] = { 32877, 32878, 32876 };
 
@@ -444,7 +444,7 @@ public:
             _isArenaEmpty = false;
             _hitByLightning = false;
 
-            if (Player *t = SelectTargetFromPlayerList(1000))
+            if (Player* t = SelectTargetFromPlayerList(1000))
                 if (t->GetTeamId() == TEAM_HORDE)
                     _isAlly = false;
 
@@ -488,10 +488,10 @@ public:
 
         void KilledUnit(Unit*)
         {
-            if (urand(0,2))
+            if (urand(0, 2))
                 return;
 
-            if (urand(0,1))
+            if (urand(0, 1))
             {
                 me->MonsterYell("Can't you at least put up a fight!?", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_SLAY1);
@@ -596,16 +596,16 @@ public:
         {
             Creature* cr;
             uint8 rnd;
-            if (_spawnCommoners || urand(0,2))
+            if (_spawnCommoners || urand(0, 2))
                 _spawnCommoners = !_spawnCommoners;
 
             for (uint8 i = 0; i < (_spawnCommoners ? 7 : 2); ++i)
             {
                 rnd = urand(0, 13);
-                if ((cr = me->SummonCreature((_spawnCommoners ? NPC_DARK_RUNE_COMMONER : RollTable[urand(0,2)]), ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000)))
+                if ((cr = me->SummonCreature((_spawnCommoners ? NPC_DARK_RUNE_COMMONER : RollTable[urand(0, 2)]), ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000)))
                     cr->GetMotionMaster()->MoveJump(
-                        Middle.GetPositionX()+urand(19,24)*cos(Middle.GetAngle(cr)),
-                        Middle.GetPositionY()+urand(19,24)*sin(Middle.GetAngle(cr)),
+                        Middle.GetPositionX() + urand(19, 24) * cos(Middle.GetAngle(cr)),
+                        Middle.GetPositionY() + urand(19, 24) * sin(Middle.GetAngle(cr)),
                         Middle.GetPositionZ(), 20, 20);
             }
         }
@@ -629,10 +629,10 @@ public:
 
         void PlaySpecial()
         {
-            if (urand(0,9))
+            if (urand(0, 9))
                 return;
 
-            switch (urand(0,2))
+            switch (urand(0, 2))
             {
                 case 0:
                     me->MonsterYell("Behold the power of the storms and despair!", LANG_UNIVERSAL, 0);
@@ -653,7 +653,7 @@ public:
         {
             Map::PlayerList const& pList = me->GetMap()->GetPlayers();
             for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                if (Player *p = itr->GetSource())
+                if (Player* p = itr->GetSource())
                     if (p->GetPositionX() > 2085 && p->GetPositionX() < 2185 && p->GetPositionY() < -214 && p->GetPositionY() > -305 && p->IsAlive() && p->GetPositionZ() < 425)
                         return p;
             return nullptr;
@@ -681,28 +681,28 @@ public:
 
                     break;
                 case EVENT_THORIM_AGGRO2:
-                {
-                    me->MonsterYell("I remember you... In the mountains... But you... what is this? Where am--", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_AGGRO2);
-                    events.PopEvent();
+                    {
+                        me->MonsterYell("I remember you... In the mountains... But you... what is this? Where am--", LANG_UNIVERSAL, 0);
+                        me->PlayDirectSound(SOUND_AGGRO2);
+                        events.PopEvent();
 
-                    EntryCheckPredicate pred(NPC_SIF);
-                    summons.DoAction(ACTION_SIF_START_TALK, pred);
-                    break;
-                }
+                        EntryCheckPredicate pred(NPC_SIF);
+                        summons.DoAction(ACTION_SIF_START_TALK, pred);
+                        break;
+                    }
                 case EVENT_THORIM_START_PHASE1:
-                {
-                    events.PopEvent();
-                    events.ScheduleEvent(EVENT_THORIM_STORMHAMMER, 8000, 0, EVENT_PHASE_START);
-                    events.ScheduleEvent(EVENT_THORIM_CHARGE_ORB, 14000, 0, EVENT_PHASE_START);
-                    events.ScheduleEvent(EVENT_THORIM_FILL_ARENA, 0, 0, EVENT_PHASE_START);
-                    events.ScheduleEvent(EVENT_THORIM_LIGHTNING_ORB, 5000, 0, EVENT_PHASE_START); // checked every 5 secs if there are players on arena
-                    events.ScheduleEvent(EVENT_THORIM_NOT_REACH_IN_TIME, 300000, 0, EVENT_PHASE_START);
+                    {
+                        events.PopEvent();
+                        events.ScheduleEvent(EVENT_THORIM_STORMHAMMER, 8000, 0, EVENT_PHASE_START);
+                        events.ScheduleEvent(EVENT_THORIM_CHARGE_ORB, 14000, 0, EVENT_PHASE_START);
+                        events.ScheduleEvent(EVENT_THORIM_FILL_ARENA, 0, 0, EVENT_PHASE_START);
+                        events.ScheduleEvent(EVENT_THORIM_LIGHTNING_ORB, 5000, 0, EVENT_PHASE_START); // checked every 5 secs if there are players on arena
+                        events.ScheduleEvent(EVENT_THORIM_NOT_REACH_IN_TIME, 300000, 0, EVENT_PHASE_START);
 
-                    EntryCheckPredicate pred(NPC_SIF);
-                    summons.DoAction(ACTION_SIF_START_DOMINION, pred);
-                    break;
-                }
+                        EntryCheckPredicate pred(NPC_SIF);
+                        summons.DoAction(ACTION_SIF_START_DOMINION, pred);
+                        break;
+                    }
                 case EVENT_THORIM_STORMHAMMER:
                     me->CastCustomSpell(SPELL_STORMHAMMER, SPELLVALUE_MAX_TARGETS, 1, me->GetVictim(), false);
                     events.RepeatEvent(16000);
@@ -714,24 +714,24 @@ public:
                     PlaySpecial();
                     break;
                 case EVENT_THORIM_LIGHTNING_ORB:
-                {
-                    if (GetArenaPlayer())
                     {
-                        // Player found, repeat and return
-                        events.RepeatEvent(5000);
-                        return;
+                        if (GetArenaPlayer())
+                        {
+                            // Player found, repeat and return
+                            events.RepeatEvent(5000);
+                            return;
+                        }
+
+                        // No players found
+                        me->MonsterYell("Failures! Weaklings!", LANG_UNIVERSAL, 0);
+                        me->PlayDirectSound(SOUND_AWIPE);
+                        me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+
+                        _isArenaEmpty = true;
+                        events.PopEvent();
+                        events.CancelEvent(EVENT_THORIM_NOT_REACH_IN_TIME);
+                        break;
                     }
-
-                    // No players found
-                    me->MonsterYell("Failures! Weaklings!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_AWIPE);
-                    me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-
-                    _isArenaEmpty = true;
-                    events.PopEvent();
-                    events.CancelEvent(EVENT_THORIM_NOT_REACH_IN_TIME);
-                    break;
-                }
                 case EVENT_THORIM_NOT_REACH_IN_TIME:
                     _isArenaEmpty = true;
                     events.PopEvent();
@@ -913,7 +913,7 @@ public:
                     events.RepeatEvent(30000);
                     return;
                 case EVENT_SIF_FROST_NOVA_START:
-                    me->NearTeleportTo(2108+urand(0, 42), -238-irand(0,46), 420.02f, me->GetAngle(&Middle));
+                    me->NearTeleportTo(2108 + urand(0, 42), -238 - irand(0, 46), 420.02f, me->GetAngle(&Middle));
                     events.RepeatEvent(20000);
                     events.DelayEvents(5001);
                     events.ScheduleEvent(EVENT_SIF_FROST_NOVA_CAST, 2500);
@@ -1043,9 +1043,9 @@ public:
             SetDespawnAtEnd(false);
         }
 
-        void MoveInLineOfSight(Unit * /*who*/) {}
-        void EnterCombat(Unit * /*who*/) {}
-        void AttackStart(Unit * /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) {}
+        void AttackStart(Unit* /*who*/) {}
 
         void InitWaypoint()
         {
@@ -1101,7 +1101,7 @@ public:
                 me->CastSpell(me, SPELL_LIGHTNING_PILLAR_P1, true);
             else if (spellInfo->Id == SPELL_LIGHTNING_PILLAR_P2)
             {
-                if (Creature *cr = me->FindNearestCreature(NPC_THUNDER_ORB, 100))
+                if (Creature* cr = me->FindNearestCreature(NPC_THUNDER_ORB, 100))
                     cr->CastSpell(cr, SPELL_LIGHTNING_ORB_VISUAL, true);
             }
         }
@@ -1220,7 +1220,7 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_DR_ACOLYTE_HS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                         me->CastSpell(target, SPELL_HOLY_SMITE, false);
                     events.RepeatEvent(1600);
                     break;
@@ -1263,7 +1263,7 @@ public:
                     break;
             }
 
-            if (!_isCaster || (me->GetPower(POWER_MANA)*100 / me->GetMaxPower(POWER_MANA) < 10))
+            if (!_isCaster || (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA) < 10))
                 DoMeleeAttackIfReady();
         }
     };
@@ -1345,7 +1345,7 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_DR_ACOLYTE_HS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                         me->CastSpell(target, SPELL_HOLY_SMITE, false);
                     events.RepeatEvent(1600);
                     break;
@@ -1370,7 +1370,7 @@ public:
                     break;
             }
 
-            if (!_isCaster || (me->GetPower(POWER_MANA)*100 / me->GetMaxPower(POWER_MANA) < 10))
+            if (!_isCaster || (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA) < 10))
                 DoMeleeAttackIfReady();
         }
     };
@@ -1419,7 +1419,7 @@ public:
         void JustDied(Unit*)
         {
             if (me->GetInstanceScript())
-                if (GameObject *go = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetData64(DATA_THORIM_FIRST_DOORS)))
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetData64(DATA_THORIM_FIRST_DOORS)))
                     go->SetGoState(GO_STATE_ACTIVE);
         }
 
@@ -1482,7 +1482,7 @@ public:
                     RunRunicSmash(true);
                     break;
                 case EVENT_RC_RUNIC_SMASH:
-                    if (urand(0,1))
+                    if (urand(0, 1))
                         me->CastSpell(me, SPELL_RUNIC_SMASH_LEFT, false);
                     else
                         me->CastSpell(me, SPELL_RUNIC_SMASH_RIGHT, false);
@@ -1585,7 +1585,7 @@ public:
                     events.RepeatEvent(8000);
                     break;
                 case EVENT_ARG_SPAWN:
-                    if (Creature *cr = me->SummonCreature(NPC_IRON_HONOR_GUARD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000))
+                    if (Creature* cr = me->SummonCreature(NPC_IRON_HONOR_GUARD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000))
                         if (Unit* target = SelectTargetFromPlayerList(150.0f))
                             cr->AI()->AttackStart(target);
                     events.RepeatEvent(10000);
@@ -1656,7 +1656,7 @@ public:
         {
             Player* target = nullptr;
             Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            uint8 num = urand(0, pList.getSize()-1);
+            uint8 num = urand(0, pList.getSize() - 1);
             uint8 count = 0;
             for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr, ++count)
             {
@@ -1673,9 +1673,9 @@ public:
             {
                 AttackStart(target);
                 me->AddThreat(target, 500.0f);
-                if (me->GetEntry() == NPC_DARK_RUNE_EVOKER && urand(0,1))
+                if (me->GetEntry() == NPC_DARK_RUNE_EVOKER && urand(0, 1))
                     me->CastSpell(me, SPELL_RUNIC_SHIELD, false);
-                else if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION && !urand(0,2))
+                else if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION && !urand(0, 2))
                     me->CastSpell(target, SPELL_CHARGE, false);
                 return true;
             }
@@ -1737,7 +1737,7 @@ public:
                     break;
             }
 
-            if (!_isCaster || (me->GetPower(POWER_MANA)*100 / me->GetMaxPower(POWER_MANA) < 10))
+            if (!_isCaster || (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA) < 10))
                 DoMeleeAttackIfReady();
         }
     };
@@ -1750,7 +1750,7 @@ public:
 
     bool OnGossipHello(Player* pPlayer, GameObject* go) override
     {
-        if (GameObject *g = pPlayer->FindNearestGameObject(GO_ARENA_LEVER_GATE, 50))
+        if (GameObject* g = pPlayer->FindNearestGameObject(GO_ARENA_LEVER_GATE, 50))
             g->UseDoorOrButton();
 
         go->UseDoorOrButton();
@@ -1760,88 +1760,88 @@ public:
 
 class spell_thorim_lightning_pillar_P2 : public SpellScriptLoader
 {
-    public:
-        spell_thorim_lightning_pillar_P2() : SpellScriptLoader("spell_thorim_lightning_pillar_P2") { }
+public:
+    spell_thorim_lightning_pillar_P2() : SpellScriptLoader("spell_thorim_lightning_pillar_P2") { }
 
-        class spell_thorim_lightning_pillar_P2_AuraScript : public AuraScript
+    class spell_thorim_lightning_pillar_P2_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_thorim_lightning_pillar_P2_AuraScript);
+
+        void OnPeriodic(AuraEffect const* aurEff)
         {
-            PrepareAuraScript(spell_thorim_lightning_pillar_P2_AuraScript);
-
-            void OnPeriodic(AuraEffect const* aurEff)
-            {
-                PreventDefaultAction();
-                if (Unit* caster = GetCaster())
-                    GetUnitOwner()->CastSpell(caster, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-            }
-
-            void Register()
-            {
-                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_thorim_lightning_pillar_P2_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_thorim_lightning_pillar_P2_AuraScript();
+            PreventDefaultAction();
+            if (Unit* caster = GetCaster())
+                GetUnitOwner()->CastSpell(caster, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_thorim_lightning_pillar_P2_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_thorim_lightning_pillar_P2_AuraScript();
+    }
 };
 
 class spell_thorim_trash_impale : public SpellScriptLoader
 {
-    public:
-        spell_thorim_trash_impale() : SpellScriptLoader("spell_thorim_trash_impale") { }
+public:
+    spell_thorim_trash_impale() : SpellScriptLoader("spell_thorim_trash_impale") { }
 
-        class spell_thorim_trash_impale_AuraScript : public AuraScript
+    class spell_thorim_trash_impale_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_thorim_trash_impale_AuraScript);
+
+        void OnPeriodic(AuraEffect const*  /*aurEff*/)
         {
-            PrepareAuraScript(spell_thorim_trash_impale_AuraScript);
-
-            void OnPeriodic(AuraEffect const*  /*aurEff*/)
-            {
-                // deals damage until target is healed above 90%
-                if (GetUnitOwner()->HealthAbovePct(90))
-                    SetDuration(0);
-            }
-
-            void Register()
-            {
-                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_thorim_trash_impale_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_thorim_trash_impale_AuraScript();
+            // deals damage until target is healed above 90%
+            if (GetUnitOwner()->HealthAbovePct(90))
+                SetDuration(0);
         }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_thorim_trash_impale_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_thorim_trash_impale_AuraScript();
+    }
 };
 
 class achievement_thorim_stand_in_the_lightning : public AchievementCriteriaScript
 {
-    public:
-        achievement_thorim_stand_in_the_lightning() : AchievementCriteriaScript("achievement_thorim_stand_in_the_lightning") {}
+public:
+    achievement_thorim_stand_in_the_lightning() : AchievementCriteriaScript("achievement_thorim_stand_in_the_lightning") {}
 
-        bool OnCheck(Player* player, Unit*)
-        {
-            if (InstanceScript* instance = player->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetData64(TYPE_THORIM)))
-                    return cr->AI()->GetData(DATA_HIT_BY_LIGHTNING);
+    bool OnCheck(Player* player, Unit*)
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetData64(TYPE_THORIM)))
+                return cr->AI()->GetData(DATA_HIT_BY_LIGHTNING);
 
-            return false;
-        }
+        return false;
+    }
 };
 
 class achievement_thorim_lose_your_illusion : public AchievementCriteriaScript
 {
-    public:
-        achievement_thorim_lose_your_illusion() : AchievementCriteriaScript("achievement_thorim_lose_your_illusion") {}
+public:
+    achievement_thorim_lose_your_illusion() : AchievementCriteriaScript("achievement_thorim_lose_your_illusion") {}
 
-        bool OnCheck(Player* player, Unit*)
-        {
-            if (InstanceScript* instance = player->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetData64(TYPE_THORIM)))
-                    return cr->AI()->GetData(DATA_LOSE_YOUR_ILLUSION);
+    bool OnCheck(Player* player, Unit*)
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetData64(TYPE_THORIM)))
+                return cr->AI()->GetData(DATA_LOSE_YOUR_ILLUSION);
 
-            return false;
-        }
+        return false;
+    }
 };
 
 void AddSC_boss_thorim()
