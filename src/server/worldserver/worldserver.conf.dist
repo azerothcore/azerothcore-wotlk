@@ -2828,9 +2828,9 @@ Battleground.PlayerRespawn = 30
 #
 #    Battleground.BuffRespawn
 #        Description: Battleground buff respawn time (in seconds).
-#        Default:     120 (Recommended 10+)
+#        Default:     180 (Recommended 10+)
 
-Battleground.BuffRespawn = 120
+Battleground.BuffRespawn = 180
 
 #
 ###################################################################################################
