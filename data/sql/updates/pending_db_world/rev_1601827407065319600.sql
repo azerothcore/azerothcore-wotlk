@@ -13,4 +13,4 @@ UPDATE `creature_template` SET `mindmg` = 824, `maxdmg` = 1286, `DamageModifier`
 
 /* BOSS */ 
 UPDATE `creature_template` SET `mindmg` = 27120, `maxdmg` = 36490, `DamageModifier` = 1.01 WHERE `entry` = 10184;
-UPDATE `creature_template` SET `mindmg` = 58308, `maxdmg` = 78453, `DamageModifier` = 1.01 WHERE `entry` = 36538;
+UPDATE `creature_template` SET `mindmg` = 55596, `maxdmg` = 74804, `DamageModifier` = 1.01 WHERE `entry` = 36538;
