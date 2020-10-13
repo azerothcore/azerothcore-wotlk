@@ -75,7 +75,7 @@ public:
             insanityHandled = 0;
 
             // Visible for all players in insanity
-            me->SetPhaseMask((1|16|32|64|128|256), true);
+            me->SetPhaseMask((1 | 16 | 32 | 64 | 128 | 256), true);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
             ResetPlayersPhaseMask();
@@ -122,7 +122,7 @@ public:
                         pTarget->SetInCombatWith(summon);
 
                         plr->CastSpell(summon, SPELL_CLONE_PLAYER, true);
-                        summon->SetPhaseMask(1|(1<<(4+insanityHandled)), true);
+                        summon->SetPhaseMask(1 | (1 << (4 + insanityHandled)), true);
                         summon->SetUInt32Value(UNIT_FIELD_MINDAMAGE, plr->GetUInt32Value(UNIT_FIELD_MINDAMAGE));
                         summon->SetUInt32Value(UNIT_FIELD_MAXDAMAGE, plr->GetUInt32Value(UNIT_FIELD_MAXDAMAGE));
                     }
@@ -315,7 +315,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature *creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new boss_volazjAI(creature);
     }

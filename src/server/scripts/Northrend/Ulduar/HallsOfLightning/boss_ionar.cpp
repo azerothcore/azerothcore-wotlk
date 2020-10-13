@@ -146,14 +146,14 @@ public:
                     summons.Summon(spark);
                     spark->CastSpell(spark, me->GetMap()->IsHeroic() ? SPELL_SPARK_VISUAL_TRIGGER_H : SPELL_SPARK_VISUAL_TRIGGER_N, true);
                     spark->CastSpell(spark, SPELL_RANDOM_LIGHTNING, true);
-                    spark->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_NON_ATTACKABLE);
+                    spark->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     spark->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0);
 
                     if (Player* tgt = SelectTargetFromPlayerList(100))
                         spark->GetMotionMaster()->MoveFollow(tgt, 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
                 }
             }
-            
+
             me->SetVisible(false);
             me->SetControlled(true, UNIT_STATE_STUNNED);
 
@@ -176,14 +176,14 @@ public:
                 case EVENT_BALL_LIGHTNING:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                         me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_BALL_LIGHTNING_H : SPELL_BALL_LIGHTNING_N, false);
-                    
-                    events.RepeatEvent(10000 + rand()%1000);
+
+                    events.RepeatEvent(10000 + rand() % 1000);
                     break;
                 case EVENT_STATIC_OVERLOAD:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                         me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_STATIC_OVERLOAD_H : SPELL_STATIC_OVERLOAD_N, false);
 
-                    events.RepeatEvent(5000 + rand()%1000);
+                    events.RepeatEvent(5000 + rand() % 1000);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(HealthCheck))
@@ -192,13 +192,13 @@ public:
                     events.RepeatEvent(1000);
                     return;
                 case EVENT_CALL_SPARKS:
-                {
-                    EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
-                    summons.DoAction(ACTION_CALLBACK, pred);
-                    events.PopEvent();
-                    events.ScheduleEvent(EVENT_RESTORE, 2000, 0, 2);
-                    return;
-                }
+                    {
+                        EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
+                        summons.DoAction(ACTION_CALLBACK, pred);
+                        events.PopEvent();
+                        events.ScheduleEvent(EVENT_RESTORE, 2000, 0, 2);
+                        return;
+                    }
                 case EVENT_RESTORE:
                     EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
                     summons.DoAction(ACTION_SPARK_DESPAWN, pred);
@@ -237,7 +237,7 @@ public:
 
         void Reset() { returning = false; }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             damage = 0;
         }

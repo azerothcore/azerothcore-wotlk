@@ -91,7 +91,7 @@ public:
             _playerGUID = 0;
             events.Reset();
             summons.DespawnAll();
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         void SetData(uint32 faction, uint32)
@@ -140,7 +140,7 @@ public:
                 float y = -3049 + frand(-6.0f, 6.0f);
                 float z = 165.25;
                 float o = 2.0;
-                me->SummonCreature(roll_chance_i(5) ? NPC_PLAGUED_PEASANT : NPC_INJURED_PEASANT, x, y, z, o, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 2*MINUTE*IN_MILLISECONDS);
+                me->SummonCreature(roll_chance_i(5) ? NPC_PLAGUED_PEASANT : NPC_INJURED_PEASANT, x, y, z, o, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
             }
         }
 
@@ -159,8 +159,8 @@ public:
                 if (creature->GetEntry() == NPC_PLAGUED_PEASANT)
                     creature->CastSpell(creature, SPELL_SEETHING_PLAGUE, true);
 
-                float x = 3324+frand(-3.0f, 3.0f);
-                float y = -2966+frand(-3.0f, 3.0f);
+                float x = 3324 + frand(-3.0f, 3.0f);
+                float y = -2966 + frand(-3.0f, 3.0f);
                 float z = 159.65f;
                 creature->SetWalk(true);
                 creature->GetMotionMaster()->MovePoint(0, x, y, z);
@@ -206,16 +206,16 @@ public:
             switch (events.GetEvent())
             {
                 case EVENT_CHECK_PLAYER:
-                {
-                    Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
-                    if (!player || me->GetDistance2d(player) > 100.0f)
                     {
-                        EnterEvadeMode();
-                        return;
+                        Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
+                        if (!player || me->GetDistance2d(player) > 100.0f)
+                        {
+                            EnterEvadeMode();
+                            return;
+                        }
+                        events.RepeatEvent(2000);
+                        break;
                     }
-                    events.RepeatEvent(2000);
-                    break;
-                }
                 case EVENT_SUMMON_ARCHERS:
                     SummonArchers();
                     events.PopEvent();
@@ -224,7 +224,7 @@ public:
                     _spoken = false;
                     SummonPeasants();
                     _spoken = false;
-                    events.RepeatEvent(60*IN_MILLISECONDS);
+                    events.RepeatEvent(60 * IN_MILLISECONDS);
                     break;
             }
         }
@@ -297,7 +297,7 @@ public:
                     me->CastSpell(target, SPELL_SHOOT, true);
                 }
 
-                timer = urand(0,3000);
+                timer = urand(0, 3000);
             }
         }
     };

@@ -78,14 +78,14 @@ public:
         {
             instance->LoadGrid(LeaderIntroPos.GetPositionX(), LeaderIntroPos.GetPositionY());
             if (Creature* c = instance->GetCreature(GetData64(DATA_LEADER_FIRST_GUID)))
-	    	c->AI()->SetData(DATA_START_INTRO, 0);
+                c->AI()->SetData(DATA_START_INTRO, 0);
         }
 
         uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data)
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
-                Map::PlayerList const &players = instance->GetPlayers();
+                Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
                     if (Player* player = players.begin()->GetSource())
                         teamIdInInstance = player->GetTeamId();
@@ -111,7 +111,7 @@ public:
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
-                Map::PlayerList const &players = instance->GetPlayers();
+                Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
                     if (Player* player = players.begin()->GetSource())
                         teamIdInInstance = player->GetTeamId();
@@ -166,7 +166,7 @@ public:
                                 break;
                         }
                         NPC_TyrannusEventGUID = creature->GetGUID();
-                        
+
                     }
                     break;
                 case NPC_LORALEN:
@@ -183,38 +183,38 @@ public:
                     break;
                 case NPC_HORDE_SLAVE_1:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                       creature->UpdateEntry(NPC_ALLIANCE_SLAVE_1);
+                        creature->UpdateEntry(NPC_ALLIANCE_SLAVE_1);
                     break;
                 case NPC_HORDE_SLAVE_2:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                       creature->UpdateEntry(NPC_ALLIANCE_SLAVE_2);
+                        creature->UpdateEntry(NPC_ALLIANCE_SLAVE_2);
                     break;
                 case NPC_HORDE_SLAVE_3:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                       creature->UpdateEntry(NPC_ALLIANCE_SLAVE_3);
+                        creature->UpdateEntry(NPC_ALLIANCE_SLAVE_3);
                     break;
                 case NPC_HORDE_SLAVE_4:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                       creature->UpdateEntry(NPC_ALLIANCE_SLAVE_4);
+                        creature->UpdateEntry(NPC_ALLIANCE_SLAVE_4);
                     break;
                 case NPC_GORKUN_IRONSKULL_1:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                       creature->UpdateEntry(NPC_MARTIN_VICTUS_1);
+                        creature->UpdateEntry(NPC_MARTIN_VICTUS_1);
                     break;
                 case NPC_GARFROST:
                     NPC_GarfrostGUID = creature->GetGUID();
                     break;
                 case NPC_FREED_SLAVE_1_HORDE:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                       creature->UpdateEntry(NPC_FREED_SLAVE_1_ALLIANCE);
+                        creature->UpdateEntry(NPC_FREED_SLAVE_1_ALLIANCE);
                     break;
                 case NPC_FREED_SLAVE_2_HORDE:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                       creature->UpdateEntry(NPC_FREED_SLAVE_2_ALLIANCE);
+                        creature->UpdateEntry(NPC_FREED_SLAVE_2_ALLIANCE);
                     break;
                 case NPC_FREED_SLAVE_3_HORDE:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                       creature->UpdateEntry(NPC_FREED_SLAVE_3_ALLIANCE);
+                        creature->UpdateEntry(NPC_FREED_SLAVE_3_ALLIANCE);
                     break;
                 case NPC_GORKUN_IRONSKULL_2:
                     if (NPC_MartinOrGorkunGUID)
@@ -224,7 +224,7 @@ public:
                             c->DespawnOrUnsummon();
                         }
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                       creature->UpdateEntry(NPC_MARTIN_VICTUS_2);
+                        creature->UpdateEntry(NPC_MARTIN_VICTUS_2);
                     NPC_MartinOrGorkunGUID = creature->GetGUID();
                     break;
                 case NPC_RIMEFANG:

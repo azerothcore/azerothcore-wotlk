@@ -236,29 +236,29 @@ public:
         }
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap *map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const
     {
-       return new instance_ahnkahet_InstanceScript(map);
+        return new instance_ahnkahet_InstanceScript(map);
     }
 };
 
 class spell_shadow_sickle_periodic_damage : public SpellScriptLoader
 {
-    public:
-        spell_shadow_sickle_periodic_damage() : SpellScriptLoader("spell_shadow_sickle_periodic_damage") { }
+public:
+    spell_shadow_sickle_periodic_damage() : SpellScriptLoader("spell_shadow_sickle_periodic_damage") { }
 
-        class spell_shadow_sickle_periodic_damage_AuraScript : public AuraScript
+    class spell_shadow_sickle_periodic_damage_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_shadow_sickle_periodic_damage_AuraScript);
+
+        void HandlePeriodic(AuraEffect const*  /*aurEff*/)
         {
-            PrepareAuraScript(spell_shadow_sickle_periodic_damage_AuraScript);
+            PreventDefaultAction();
 
-            void HandlePeriodic(AuraEffect const*  /*aurEff*/)
+            if (Unit* caster = GetCaster())
             {
-                PreventDefaultAction();
-
-                if (Unit* caster = GetCaster())
-                {
-                    std::list<Player*> PlayerList;
-                    PlayerList.clear();
+                std::list<Player*> PlayerList;
+                PlayerList.clear();
 
                     Map::PlayerList const &players = caster->GetMap()->GetPlayers();
                     for (auto const& itr : players)
@@ -280,16 +280,22 @@ class spell_shadow_sickle_periodic_damage : public SpellScriptLoader
             {
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadow_sickle_periodic_damage_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
             }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_shadow_sickle_periodic_damage_AuraScript();
         }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadow_sickle_periodic_damage_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_shadow_sickle_periodic_damage_AuraScript();
+    }
 };
 
 void AddSC_instance_ahnkahet()
 {
-   new instance_ahnkahet;
-   new spell_shadow_sickle_periodic_damage();
+    new instance_ahnkahet;
+    new spell_shadow_sickle_periodic_damage();
 }

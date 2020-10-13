@@ -20,18 +20,18 @@ public:
 
     struct npc_dragonflayer_forge_masterAI : public ScriptedAI
     {
-        npc_dragonflayer_forge_masterAI(Creature *c) : ScriptedAI(c)
+        npc_dragonflayer_forge_masterAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
 
             float x = me->GetHomePosition().GetPositionX();
             float y = me->GetHomePosition().GetPositionY();
-            if (x>344.0f && x<357.0f && y<-35.0f && y>-44.0f)
+            if (x > 344.0f && x < 357.0f && y < -35.0f && y > -44.0f)
             {
                 dataId = DATA_FORGE_1;
                 prevDataId = 0;
             }
-            else if (x>380.0f && x<389.0f && y<-12.0f && y>-21.0f)
+            else if (x > 380.0f && x < 389.0f && y < -12.0f && y > -21.0f)
             {
                 dataId = DATA_FORGE_2;
                 prevDataId = DATA_FORGE_1;
@@ -199,36 +199,36 @@ enum TickingTimeBomb
 
 class spell_ticking_time_bomb : public SpellScriptLoader
 {
-    public:
-        spell_ticking_time_bomb() : SpellScriptLoader("spell_ticking_time_bomb") { }
+public:
+    spell_ticking_time_bomb() : SpellScriptLoader("spell_ticking_time_bomb") { }
 
-        class spell_ticking_time_bomb_AuraScript : public AuraScript
+    class spell_ticking_time_bomb_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_ticking_time_bomb_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellEntry*/)
         {
-            PrepareAuraScript(spell_ticking_time_bomb_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                return (bool) sSpellMgr->GetSpellInfo(SPELL_TICKING_TIME_BOMB_EXPLODE);
-            }
-
-            void HandleOnEffectRemove(AuraEffect const* /* aurEff */, AuraEffectHandleModes /* mode */)
-            {
-                if (GetCaster() == GetTarget())
-                {
-                    GetTarget()->CastSpell(GetTarget(), SPELL_TICKING_TIME_BOMB_EXPLODE, true);
-                }
-            }
-
-            void Register()
-            {
-                OnEffectRemove += AuraEffectRemoveFn(spell_ticking_time_bomb_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_ticking_time_bomb_AuraScript();
+            return (bool) sSpellMgr->GetSpellInfo(SPELL_TICKING_TIME_BOMB_EXPLODE);
         }
+
+        void HandleOnEffectRemove(AuraEffect const* /* aurEff */, AuraEffectHandleModes /* mode */)
+        {
+            if (GetCaster() == GetTarget())
+            {
+                GetTarget()->CastSpell(GetTarget(), SPELL_TICKING_TIME_BOMB_EXPLODE, true);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_ticking_time_bomb_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_ticking_time_bomb_AuraScript();
+    }
 };
 
 void AddSC_utgarde_keep()

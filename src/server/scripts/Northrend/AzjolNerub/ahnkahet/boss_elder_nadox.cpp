@@ -209,6 +209,17 @@ public:
                         events.PopEvent();
                         break;
                     }
+                case EVENT_CHECK_HOME:
+                    {
+                        if (me->HasAura(SPELL_ENRAGE))
+                            break;
+
+                        if (me->GetPositionZ() < 24)
+                        {
+                            me->CastSpell(me, SPELL_ENRAGE, true);
+                            events.PopEvent();
+                            break;
+                        }
 
                     events.RepeatEvent(2000);
                 }break;
@@ -288,7 +299,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature *creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new boss_elder_nadoxAI(creature);
     }
@@ -301,7 +312,8 @@ public:
 
     struct npc_ahnkahar_nerubianAI : public ScriptedAI
     {
-        npc_ahnkahar_nerubianAI(Creature *c) : ScriptedAI(c) { }
+        npc_ahnkahar_nerubianAI(Creature* c) : ScriptedAI(c) { }
+
 
         void Reset()
         {
@@ -319,7 +331,7 @@ public:
                 DoCastSelf(SPELL_SPRINT, false);
                 uiSprintTimer = 15000;
             }
-            else 
+            else
                 uiSprintTimer -= diff;
 
             DoMeleeAttackIfReady();
@@ -329,7 +341,7 @@ public:
         uint32 uiSprintTimer;
     };
 
-    CreatureAI *GetAI(Creature *creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_ahnkahar_nerubianAI(creature);
     }
@@ -337,12 +349,12 @@ public:
 
 class spell_ahn_kahet_swarmer_aura : public SpellScriptLoader
 {
-    public:
-        spell_ahn_kahet_swarmer_aura() : SpellScriptLoader("spell_ahn_kahet_swarmer_aura") { }
+public:
+    spell_ahn_kahet_swarmer_aura() : SpellScriptLoader("spell_ahn_kahet_swarmer_aura") { }
 
-        class spell_ahn_kahet_swarmer_aura_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_ahn_kahet_swarmer_aura_SpellScript)
+    class spell_ahn_kahet_swarmer_aura_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_ahn_kahet_swarmer_aura_SpellScript)
 
             void CountTargets(std::list<WorldObject*>& targets)
             {
@@ -381,12 +393,18 @@ class spell_ahn_kahet_swarmer_aura : public SpellScriptLoader
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ahn_kahet_swarmer_aura_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
                 OnEffectHitTarget += SpellEffectFn(spell_ahn_kahet_swarmer_aura_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_ahn_kahet_swarmer_aura_SpellScript();
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_ahn_kahet_swarmer_aura_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_ahn_kahet_swarmer_aura_SpellScript();
+    }
 };
 
 // 7317 - Respect Your Elders (2038)

@@ -53,7 +53,7 @@ public:
 
     struct boss_heiganAI : public BossAI
     {
-        explicit boss_heiganAI(Creature *c) : BossAI(c, BOSS_HEIGAN)
+        explicit boss_heiganAI(Creature* c) : BossAI(c, BOSS_HEIGAN)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -96,7 +96,7 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit * who) override
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
@@ -202,22 +202,22 @@ public:
                     events.RepeatEvent(currentPhase == PHASE_SLOW_DANCE ? 10000 : 4000);
                     break;
                 case EVENT_SAFETY_DANCE:
-                {
-                    Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                    for(const auto & itr : pList)
                     {
-                        if (IsInRoom(itr.GetSource()) && !itr.GetSource()->IsAlive())
+                        Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+                        for(const auto& itr : pList)
                         {
-                            events.PopEvent();
-                            pInstance->SetData(DATA_DANCE_FAIL, 0);
-                            pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
-                            return;
-                        }
+                            if (IsInRoom(itr.GetSource()) && !itr.GetSource()->IsAlive())
+                            {
+                                events.PopEvent();
+                                pInstance->SetData(DATA_DANCE_FAIL, 0);
+                                pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
+                                return;
+                            }
 
+                        }
+                        events.RepeatEvent(5000);
+                        return;
                     }
-                    events.RepeatEvent(5000);
-                    return;
-                }
             }
 
             DoMeleeAttackIfReady();

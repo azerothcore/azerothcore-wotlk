@@ -183,7 +183,7 @@ public:
         void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
         {
             isPeriodic = true;
-            amplitude = urand(10*IN_MILLISECONDS, 200*IN_MILLISECONDS);
+            amplitude = urand(10 * IN_MILLISECONDS, 200 * IN_MILLISECONDS);
         }
 
         void Update(AuraEffect*  /*effect*/)
