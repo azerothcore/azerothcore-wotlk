@@ -1127,9 +1127,9 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] = 3;
     }
     m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN]        = sConfigMgr->GetIntDefault("Battleground.PlayerRespawn", 30);
-    if (m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN] < 3 || m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN] > 120)
+    if (m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN] < 2)
     {
-        sLog->outError("Battleground.PlayerRespawn (%i) must be in range 3..120. Using 30 instead.", m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN]);
+        sLog->outError("Battleground.PlayerRespawn (%i) must be >1. Using 30 instead.", m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN]);
         m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN] = 30;
     }
     m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN]        = sConfigMgr->GetIntDefault("Battleground.BuffRespawn", 180);
