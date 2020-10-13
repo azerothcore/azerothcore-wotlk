@@ -55,9 +55,9 @@ UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 7750, `ma
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 7750, `maxdmg` = 9350, `DamageModifier` = 1.01 WHERE `entry` = 26796;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 7750, `maxdmg` = 9350, `DamageModifier` = 1.01 WHERE `entry` = 30398;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 3422, `maxdmg` = 4367, `DamageModifier` = 1.01 WHERE `entry` = 26731;
-UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 7875, `maxdmg` = 9870, `DamageModifier` = 1.01 WHERE `entry` = 30510;
+UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 7825, `maxdmg` = 9470, `DamageModifier` = 1.01 WHERE `entry` = 30510;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 3784, `maxdmg` = 4420, `DamageModifier` = 1.01 WHERE `entry` = 26763;
-UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 7853, `maxdmg` = 9685, `DamageModifier` = 1.01 WHERE `entry` = 30529;
+UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 7843, `maxdmg` = 9685, `DamageModifier` = 1.01 WHERE `entry` = 30529;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 3589, `maxdmg` = 4582, `DamageModifier` = 1.01 WHERE `entry` = 26794;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 7541, `maxdmg` = 9912, `DamageModifier` = 1.01 WHERE `entry` = 30532;
 UPDATE `creature_template` SET `type_flags`=`type_flags`|4, `mindmg` = 3627, `maxdmg` = 4876, `DamageModifier` = 1.01 WHERE `entry` = 26723;
