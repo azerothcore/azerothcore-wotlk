@@ -74,13 +74,13 @@ static sOnyxMove OnyxiaMoveData[] =
 {
     {0, 0, 0, -64.496f, -214.906f, -84.4f, 0.0f}, // south ground
     {1, 5, SPELL_BREATH_S_TO_N, -64.496f, -214.906f, -60.0f, 0.0f}, // south
-    {2, 6, SPELL_BREATH_SW_TO_NE, -59.809f, -190.758f, -60.0f, 7*M_PI/4}, // south-west
-    {3, 7, SPELL_BREATH_W_TO_E, -29.450f, -180.600f, -60.0f, M_PI+M_PI/2}, // west
-    {4, 8, SPELL_BREATH_NW_TO_SE, 6.895f, -180.246f, -60.0f, M_PI+M_PI/4}, // north-west
+    {2, 6, SPELL_BREATH_SW_TO_NE, -59.809f, -190.758f, -60.0f, 7 * M_PI / 4}, // south-west
+    {3, 7, SPELL_BREATH_W_TO_E, -29.450f, -180.600f, -60.0f, M_PI + M_PI / 2}, // west
+    {4, 8, SPELL_BREATH_NW_TO_SE, 6.895f, -180.246f, -60.0f, M_PI + M_PI / 4}, // north-west
     {5, 1, SPELL_BREATH_N_TO_S,  22.876f, -217.152f, -60.0f, M_PI}, // north
-    {6, 2, SPELL_BREATH_NE_TO_SW, 10.2191f, -247.912f, -60.0f, 3*M_PI/4}, // north-east
-    {7, 3, SPELL_BREATH_E_TO_W, -31.496f, -250.123f, -60.0f, M_PI/2}, // east
-    {8, 4, SPELL_BREATH_SE_TO_NW, -63.5156f, -240.096f, -60.0f, M_PI/4}, // south-east
+    {6, 2, SPELL_BREATH_NE_TO_SW, 10.2191f, -247.912f, -60.0f, 3 * M_PI / 4}, // north-east
+    {7, 3, SPELL_BREATH_E_TO_W, -31.496f, -250.123f, -60.0f, M_PI / 2}, // east
+    {8, 4, SPELL_BREATH_SE_TO_NW, -63.5156f, -240.096f, -60.0f, M_PI / 4}, // south-east
 };
 
 enum Yells
@@ -168,7 +168,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit* who)
         {
             if( me->GetVictim() || me->GetDistance(who) > 30.0f )
                 return;
@@ -214,16 +214,16 @@ public:
                 m_pInstance->SetData(DATA_ONYXIA, DONE);
         }
 
-        void DamageTaken(Unit*, uint32 & /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
         {
             switch( Phase )
             {
                 case 1:
-                    if( me->GetHealth()*100 / me->GetMaxHealth() <= 65 )
+                    if( me->GetHealth() * 100 / me->GetMaxHealth() <= 65 )
                         SetPhase(2);
                     break;
                 case 2:
-                    if( me->GetHealth()*100 / me->GetMaxHealth() <= 40 )
+                    if( me->GetHealth() * 100 / me->GetMaxHealth() <= 40 )
                     {
                         me->InterruptNonMeleeSpells(false);
                         SetPhase(3);
@@ -232,7 +232,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature *pSummoned)
+        void JustSummoned(Creature* pSummoned)
         {
             if( !pSummoned )
                 return;
@@ -261,27 +261,27 @@ public:
                 }
             }
             else switch( id )
-            {
-                case 10:
-                    me->SetFacingTo(OnyxiaMoveData[0].o);
-                    events.ScheduleEvent(EVENT_LIFTOFF, 0);
-                    break;
-                case 11:
-                    me->SetFacingTo(OnyxiaMoveData[1].o);
-                    events.ScheduleEvent(EVENT_FLY_S_TO_N, 0);
-                    break;
-                case 12:
-                    me->SetFacingTo(OnyxiaMoveData[1].o);
-                    events.ScheduleEvent(EVENT_LAND, 0);
-                    break;
-                case 13:
-                    me->SetCanFly(false);
-                    me->SetDisableGravity(false);
-                    me->SetHover(false);
-                    me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
-                    events.ScheduleEvent(EVENT_PHASE_3_ATTACK, 0);
-                    break;
-            }
+                {
+                    case 10:
+                        me->SetFacingTo(OnyxiaMoveData[0].o);
+                        events.ScheduleEvent(EVENT_LIFTOFF, 0);
+                        break;
+                    case 11:
+                        me->SetFacingTo(OnyxiaMoveData[1].o);
+                        events.ScheduleEvent(EVENT_FLY_S_TO_N, 0);
+                        break;
+                    case 12:
+                        me->SetFacingTo(OnyxiaMoveData[1].o);
+                        events.ScheduleEvent(EVENT_LAND, 0);
+                        break;
+                    case 13:
+                        me->SetCanFly(false);
+                        me->SetDisableGravity(false);
+                        me->SetHover(false);
+                        me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
+                        events.ScheduleEvent(EVENT_PHASE_3_ATTACK, 0);
+                        break;
+                }
         }
 
         void HandleWhelpSpam(const uint32 diff)
@@ -293,8 +293,8 @@ public:
                     whelpSpamTimer -= diff;
                     if( whelpSpamTimer <= 0 )
                     {
-                        float angle = rand_norm()*2*M_PI;
-                        float dist = rand_norm()*4.0f;
+                        float angle = rand_norm() * 2 * M_PI;
+                        float dist = rand_norm() * 4.0f;
                         me->CastSpell(-33.18f + cos(angle)*dist, -258.80f + sin(angle)*dist, -89.0f, 17646, true);
                         me->CastSpell(-32.535f + cos(angle)*dist, -170.190f + sin(angle)*dist, -89.0f, 17646, true);
                         whelpCount += 2;
@@ -372,7 +372,7 @@ public:
                         me->SetHover(true);
                         me->SetOrientation(OnyxiaMoveData[0].o);
                         me->SendMovementFlagUpdate();
-                        me->GetMotionMaster()->MoveTakeoff(11, OnyxiaMoveData[1].x+1.0f, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z, 12.0f);
+                        me->GetMotionMaster()->MoveTakeoff(11, OnyxiaMoveData[1].x + 1.0f, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z, 12.0f);
                         bManyWhelpsAvailable = true;
                         events.PopEvent();
                         events.RescheduleEvent(EVENT_END_MANY_WHELPS_TIME, 10000);
@@ -408,7 +408,7 @@ public:
                     {
                         Talk(SAY_PHASE_3_TRANS);
                         me->SendMeleeAttackStop(me->GetVictim());
-                        me->GetMotionMaster()->MoveLand(13, OnyxiaMoveData[0].x+1.0f, OnyxiaMoveData[0].y, OnyxiaMoveData[0].z, 12.0f);
+                        me->GetMotionMaster()->MoveLand(13, OnyxiaMoveData[0].x + 1.0f, OnyxiaMoveData[0].y, OnyxiaMoveData[0].z, 12.0f);
                         events.PopEvent();
                         DoResetThreat();
                     }
@@ -518,8 +518,8 @@ public:
                     break;
                 case EVENT_SUMMON_WHELP:
                     {
-                        float angle = rand_norm()*2*M_PI;
-                        float dist = rand_norm()*4.0f;
+                        float angle = rand_norm() * 2 * M_PI;
+                        float dist = rand_norm() * 4.0f;
                         me->CastSpell(-33.18f + cos(angle)*dist, -258.80f + sin(angle)*dist, -89.0f, 17646, true);
                         me->CastSpell(-32.535f + cos(angle)*dist, -170.190f + sin(angle)*dist, -89.0f, 17646, true);
                         events.RepeatEvent(30000);
@@ -558,7 +558,7 @@ public:
 
         EventMap events;
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit* who)
         {
             if( me->GetVictim() || me->GetDistance(who) > 20.0f )
                 return;
@@ -620,7 +620,7 @@ public:
     {
         npc_onyxia_whelpAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit* who)
         {
             if( me->GetVictim() || me->GetDistance(who) > 20.0f )
                 return;

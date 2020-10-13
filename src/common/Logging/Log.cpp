@@ -71,7 +71,7 @@ Log* Log::instance()
     return &instance;
 }
 
-void Log::SetLogLevel(char *Level)
+void Log::SetLogLevel(char* Level)
 {
     int32 NewLevel = atoi((char*)Level);
     if (NewLevel < 0)
@@ -81,7 +81,7 @@ void Log::SetLogLevel(char *Level)
     outString("LogLevel is %u", m_logLevel);
 }
 
-void Log::SetLogFileLevel(char *Level)
+void Log::SetLogFileLevel(char* Level)
 {
     int32 NewLevel = atoi((char*)Level);
     if (NewLevel < 0)
@@ -126,7 +126,7 @@ void Log::Initialize()
             bool m_gmlog_timestamp = sConfigMgr->GetBoolDefault("GmLogTimestamp", false, false);
 
             size_t dot_pos = m_gmlog_filename_format.find_last_of('.');
-            if (dot_pos!=m_gmlog_filename_format.npos)
+            if (dot_pos != m_gmlog_filename_format.npos)
             {
                 if (m_gmlog_timestamp)
                     m_gmlog_filename_format.insert(dot_pos, m_logsTimestamp);
@@ -151,7 +151,7 @@ void Log::Initialize()
     chatLogfile = openLogFile("ChatLogFile", "ChatLogTimestamp", "a");
     sqlLogFile = openLogFile("SQLDriverLogFile", NULL, "a");
     sqlDevLogFile = openLogFile("SQLDeveloperLogFile", NULL, "a");
-    miscLogFile = fopen((m_logsDir+"Misc.log").c_str(), "a");
+    miscLogFile = fopen((m_logsDir + "Misc.log").c_str(), "a");
 
     // Main log file settings
     m_logLevel     = sConfigMgr->GetIntDefault("LogLevel", LOGL_NORMAL, false);
@@ -184,20 +184,20 @@ void Log::ReloadConfig()
 
 FILE* Log::openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode)
 {
-    std::string logfn=sConfigMgr->GetStringDefault(configFileName, "", false);
+    std::string logfn = sConfigMgr->GetStringDefault(configFileName, "", false);
     if (logfn.empty())
         return NULL;
 
     if (configTimeStampFlag && sConfigMgr->GetBoolDefault(configTimeStampFlag, false, false))
     {
         size_t dot_pos = logfn.find_last_of(".");
-        if (dot_pos!=logfn.npos)
+        if (dot_pos != logfn.npos)
             logfn.insert(dot_pos, m_logsTimestamp);
         else
             logfn += m_logsTimestamp;
     }
 
-    return fopen((m_logsDir+logfn).c_str(), mode);
+    return fopen((m_logsDir + logfn).c_str(), mode);
 }
 
 FILE* Log::openGmlogPerAccount(uint32 account)
@@ -220,7 +220,7 @@ void Log::outTimestamp(FILE* file)
     //       HH     hour (2 digits 00-23)
     //       MM     minutes (2 digits 00-59)
     //       SS     seconds (2 digits 00-59)
-    fprintf(file, "%-4d-%02d-%02d %02d:%02d:%02d ", aTm->tm_year+1900, aTm->tm_mon+1, aTm->tm_mday, aTm->tm_hour, aTm->tm_min, aTm->tm_sec);
+    fprintf(file, "%-4d-%02d-%02d %02d:%02d:%02d ", aTm->tm_year + 1900, aTm->tm_mon + 1, aTm->tm_mday, aTm->tm_hour, aTm->tm_min, aTm->tm_sec);
 }
 
 void Log::InitColors(const std::string& str)
@@ -254,7 +254,7 @@ void Log::InitColors(const std::string& str)
 
 void Log::SetColor(bool stdout_stream, ColorTypes color)
 {
-    #if AC_PLATFORM == AC_PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
     static WORD WinColorFG[Colors] =
     {
         0,                                                  // BLACK
@@ -265,41 +265,41 @@ void Log::SetColor(bool stdout_stream, ColorTypes color)
         FOREGROUND_RED |                    FOREGROUND_BLUE, // MAGENTA
         FOREGROUND_GREEN | FOREGROUND_BLUE,                 // CYAN
         FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE, // WHITE
-                                                            // YELLOW
+        // YELLOW
         FOREGROUND_RED | FOREGROUND_GREEN |                   FOREGROUND_INTENSITY,
-                                                            // RED_BOLD
+        // RED_BOLD
         FOREGROUND_RED |                                      FOREGROUND_INTENSITY,
-                                                            // GREEN_BOLD
+        // GREEN_BOLD
         FOREGROUND_GREEN |                   FOREGROUND_INTENSITY,
         FOREGROUND_BLUE | FOREGROUND_INTENSITY,             // BLUE_BOLD
-                                                            // MAGENTA_BOLD
+        // MAGENTA_BOLD
         FOREGROUND_RED |                    FOREGROUND_BLUE | FOREGROUND_INTENSITY,
-                                                            // CYAN_BOLD
+        // CYAN_BOLD
         FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
-                                                            // WHITE_BOLD
+        // WHITE_BOLD
         FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY
     };
 
     HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE );
     SetConsoleTextAttribute(hConsole, WinColorFG[color]);
-    #else
+#else
     enum ANSITextAttr
     {
-        TA_NORMAL=0,
-        TA_BOLD=1,
-        TA_BLINK=5,
-        TA_REVERSE=7
+        TA_NORMAL = 0,
+        TA_BOLD = 1,
+        TA_BLINK = 5,
+        TA_REVERSE = 7
     };
 
     enum ANSIFgTextAttr
     {
-        FG_BLACK=30, FG_RED,  FG_GREEN, FG_BROWN, FG_BLUE,
+        FG_BLACK = 30, FG_RED,  FG_GREEN, FG_BROWN, FG_BLUE,
         FG_MAGENTA,  FG_CYAN, FG_WHITE, FG_YELLOW
     };
 
     enum ANSIBgTextAttr
     {
-        BG_BLACK=40, BG_RED,  BG_GREEN, BG_BROWN, BG_BLUE,
+        BG_BLACK = 40, BG_RED,  BG_GREEN, BG_BROWN, BG_BLUE,
         BG_MAGENTA,  BG_CYAN, BG_WHITE
     };
 
@@ -322,25 +322,25 @@ void Log::SetColor(bool stdout_stream, ColorTypes color)
         FG_WHITE                                            // LWHITE
     };
 
-    fprintf((stdout_stream? stdout : stderr), "\x1b[%d%sm", UnixColorFG[color], (color >= YELLOW && color < Colors ? ";1" : ""));
-    #endif
+    fprintf((stdout_stream ? stdout : stderr), "\x1b[%d%sm", UnixColorFG[color], (color >= YELLOW && color < Colors ? ";1" : ""));
+#endif
 }
 
 void Log::ResetColor(bool stdout_stream)
 {
-    #if AC_PLATFORM == AC_PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
     HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE );
     SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED );
-    #else
+#else
     fprintf(( stdout_stream ? stdout : stderr ), "\x1b[0m");
-    #endif
+#endif
 }
 
 std::string Log::GetTimestampStr()
 {
     time_t t = time(NULL);
     tm aTm;
-    ACE_OS::localtime_r(&t, &aTm);
+    localtime_r(&t, &aTm);
     //       YYYY   year
     //       MM     month (2 digits 01-12)
     //       DD     day (2 digits 01-31)
@@ -348,11 +348,17 @@ std::string Log::GetTimestampStr()
     //       MM     minutes (2 digits 00-59)
     //       SS     seconds (2 digits 00-59)
     char buf[20];
-    snprintf(buf, 20, "%04d-%02d-%02d_%02d-%02d-%02d", aTm.tm_year+1900, aTm.tm_mon+1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
+    int ret = snprintf(buf, 20, "%04d-%02d-%02d_%02d-%02d-%02d", aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
+
+    if (ret < 0)
+    {
+        return std::string("ERROR");
+    }
+
     return std::string(buf);
 }
 
-void Log::outDB(LogTypes type, const char * str)
+void Log::outDB(LogTypes type, const char* str)
 {
     if(!str || std::string(str).empty() || type >= MAX_LOG_TYPES)
         return;
@@ -361,10 +367,10 @@ void Log::outDB(LogTypes type, const char * str)
     LoginDatabase.EscapeString(new_str);
 
     LoginDatabase.PExecute("INSERT INTO logs (time, realm, type, string) "
-        "VALUES (" UI64FMTD ", %u, %u, '%s');", uint64(time(0)), realm, (uint32)type, new_str.c_str());
+                           "VALUES (" UI64FMTD ", %u, %u, '%s');", uint64(time(0)), realm, (uint32)type, new_str.c_str());
 }
 
-void Log::outString(const char * str, ...)
+void Log::outString(const char* str, ...)
 {
     if (!str)
         return;
@@ -417,7 +423,7 @@ void Log::outString()
     fflush(stdout);
 }
 
-void Log::outCrash(const char * err, ...)
+void Log::outCrash(const char* err, ...)
 {
     if (!err)
         return;
@@ -460,7 +466,7 @@ void Log::outCrash(const char * err, ...)
     fflush(stderr);
 }
 
-void Log::outError(const char * err, ...)
+void Log::outError(const char* err, ...)
 {
     if (!err)
         return;
@@ -531,7 +537,7 @@ void Log::outSQLDriver(const char* str, ...)
     fflush(stdout);
 }
 
-void Log::outErrorDb(const char * err, ...)
+void Log::outErrorDb(const char* err, ...)
 {
     if (!err)
         return;
@@ -586,7 +592,7 @@ void Log::outErrorDb(const char * err, ...)
     fflush(stderr);
 }
 
-void Log::outBasic(const char * str, ...)
+void Log::outBasic(const char* str, ...)
 {
     if (!str)
         return;
@@ -630,7 +636,7 @@ void Log::outBasic(const char * str, ...)
     fflush(stdout);
 }
 
-void Log::outDetail(const char * str, ...)
+void Log::outDetail(const char* str, ...)
 {
     if (!str)
         return;
@@ -702,7 +708,7 @@ void Log::outSQLDev(const char* str, ...)
     fflush(stdout);
 }
 
-void Log::outDebug(DebugLogFilters f, const char * str, ...)
+void Log::outDebug(DebugLogFilters f, const char* str, ...)
 {
     if (!(m_DebugLogMask & f))
         return;
@@ -750,7 +756,7 @@ void Log::outDebug(DebugLogFilters f, const char * str, ...)
     fflush(stdout);
 }
 
-void Log::outStaticDebug(const char * str, ...)
+void Log::outStaticDebug(const char* str, ...)
 {
     if (!str)
         return;
@@ -795,7 +801,7 @@ void Log::outStaticDebug(const char * str, ...)
     fflush(stdout);
 }
 
-void Log::outStringInLine(const char * str, ...)
+void Log::outStringInLine(const char* str, ...)
 {
     if (!str)
         return;
@@ -814,7 +820,7 @@ void Log::outStringInLine(const char * str, ...)
     }
 }
 
-void Log::outCommand(uint32 account, const char * str, ...)
+void Log::outCommand(uint32 account, const char* str, ...)
 {
     if (!str)
         return;
@@ -884,7 +890,7 @@ void Log::outCommand(uint32 account, const char * str, ...)
     fflush(stdout);
 }
 
-void Log::outChar(const char * str, ...)
+void Log::outChar(const char* str, ...)
 {
     if (!str)
         return;
@@ -911,7 +917,7 @@ void Log::outChar(const char * str, ...)
     }
 }
 
-void Log::outCharDump(const char * str, uint32 account_id, uint32 guid, const char * name)
+void Log::outCharDump(const char* str, uint32 account_id, uint32 guid, const char* name)
 {
     FILE* file = NULL;
     if (m_charLog_Dump_Separate)
@@ -927,14 +933,14 @@ void Log::outCharDump(const char * str, uint32 account_id, uint32 guid, const ch
     if (file)
     {
         fprintf(file, "== START DUMP == (account: %u guid: %u name: %s )\n%s\n== END DUMP ==\n",
-            account_id, guid, name, str);
+                account_id, guid, name, str);
         fflush(file);
         if (m_charLog_Dump_Separate)
             fclose(file);
     }
 }
 
-void Log::outChat(const char * str, ...)
+void Log::outChat(const char* str, ...)
 {
     if (!str)
         return;
@@ -961,7 +967,7 @@ void Log::outChat(const char * str, ...)
     }
 }
 
-void Log::outRemote(const char * str, ...)
+void Log::outRemote(const char* str, ...)
 {
     if (!str)
         return;
@@ -988,7 +994,7 @@ void Log::outRemote(const char * str, ...)
     }
 }
 
-void Log::outMisc(const char * str, ...)
+void Log::outMisc(const char* str, ...)
 {
     if (!str)
         return;

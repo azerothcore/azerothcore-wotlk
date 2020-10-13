@@ -28,7 +28,13 @@ enum Yells
     SAY_SYLVANAS_INTRO_6                        = 5,
 
     SAY_JAINA_OUTRO                             = 0,
-    SAY_SYLVANAS_OUTRO                          = 0,
+    SAY_SYLVANAS_OUTRO                          = 0
+};
+
+enum FOS_Gossip
+{
+    GOSSIP_JAINA_INTRO = 10943,
+    GOSSIP_SYLVANAS_INTRO = 10971
 };
 
 class npc_fos_leader : public CreatureScript
@@ -174,9 +180,9 @@ public:
         if (creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
         {
             if (creature->GetEntry() == NPC_JAINA_PART1)
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "What would you have of me, my lady?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, GOSSIP_JAINA_INTRO, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             else
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "What would you have of me, Banshee Queen?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, GOSSIP_SYLVANAS_INTRO, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
         SendGossipMenuFor(player, 15207, creature->GetGUID());
@@ -231,7 +237,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_fos_leader_secondAI(creature);
     }
@@ -257,10 +263,10 @@ public:
             return true;
         }
 
-        void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo & /*dmgInfo*/, uint32 & absorbAmount)
+        void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
         {
             amount += absorbAmount;
-            if (!fired && amount >= GetSpellInfo()->Effects[EFFECT_0].BasePoints+1)
+            if (!fired && amount >= GetSpellInfo()->Effects[EFFECT_0].BasePoints + 1)
                 if (Unit* caster = GetCaster())
                 {
                     fired = true;

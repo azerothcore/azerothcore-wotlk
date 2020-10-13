@@ -216,7 +216,7 @@ public:
 
 float const Clintar_spirit_WP[41][5] =
 {
-     //pos_x   pos_y    pos_z    orien waitTime
+    //pos_x   pos_y    pos_z    orien waitTime
     {7465.28f, -3115.46f, 439.327f, 0.83f, 4000},
     {7476.49f, -3101,    443.457f, 0.89f, 0},
     {7486.57f, -3085.59f, 439.478f, 1.07f, 0},
@@ -390,7 +390,8 @@ public:
                     if (player && player->IsInCombat() && player->getAttackerForHelper())
                         AttackStart(player->getAttackerForHelper());
                     checkPlayerTimer = 1000;
-                } else checkPlayerTimer -= diff;
+                }
+                else checkPlayerTimer -= diff;
             }
 
             if (EventOnWait && EventTimer <= diff)
@@ -531,7 +532,8 @@ public:
                         break;
                 }
 
-            } else if (EventOnWait) EventTimer -= diff;
+            }
+            else if (EventOnWait) EventTimer -= diff;
         }
 
         void WaypointReached(uint32 waypointId)
@@ -662,7 +664,7 @@ public:
         void Reset()
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_DESPAWN, 5*MINUTE*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_DESPAWN, 5 * MINUTE * IN_MILLISECONDS);
         }
 
         void UpdateAI(uint32 diff)
