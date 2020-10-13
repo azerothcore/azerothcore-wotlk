@@ -2820,7 +2820,6 @@ Battleground.RewardLoserHonorLast   = 5
 #
 #    Battleground.PlayerRespawn
 #        Description: Battleground player resurrection interval (in seconds).
-#        Range:       3-120
 #        Default:     30
 
 Battleground.PlayerRespawn = 30
