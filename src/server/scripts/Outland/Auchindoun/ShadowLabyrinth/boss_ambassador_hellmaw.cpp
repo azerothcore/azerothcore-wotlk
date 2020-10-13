@@ -108,7 +108,7 @@ public:
 
         void KilledUnit(Unit* victim)
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0,1))
+            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
                 Talk(SAY_SLAY);
         }
 
@@ -147,7 +147,7 @@ public:
                     me->CastSpell(me->GetVictim(), SPELL_ENRAGE, false);
                     break;
             }
-            
+
             DoMeleeAttackIfReady();
         }
     };

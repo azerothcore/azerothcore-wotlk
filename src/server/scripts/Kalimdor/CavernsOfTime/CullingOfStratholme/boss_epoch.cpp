@@ -133,7 +133,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/)
         {
-            if (!urand(0,1))
+            if (!urand(0, 1))
                 return;
 
             Talk(SAY_SLAY);

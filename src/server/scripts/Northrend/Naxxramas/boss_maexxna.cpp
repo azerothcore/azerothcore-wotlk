@@ -62,7 +62,7 @@ public:
 
     struct boss_maexxnaAI : public BossAI
     {
-        explicit boss_maexxnaAI(Creature *c) : BossAI(c, BOSS_MAEXXNA), summons(me)
+        explicit boss_maexxnaAI(Creature* c) : BossAI(c, BOSS_MAEXXNA), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -93,10 +93,10 @@ public:
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_MAEXXNA_GATE)))
                     go->SetGoState(GO_STATE_ACTIVE);
             }
-        
+
         }
 
-        void EnterCombat(Unit * who) override
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
@@ -177,13 +177,13 @@ public:
                     break;
                 case EVENT_WEB_WRAP:
                     Talk(EMOTE_WEB_WRAP);
-                    for (uint8 i = 0; i < RAID_MODE(1,2); ++i)
-                        if (Unit *target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0, true, -SPELL_WEB_WRAP))
+                    for (uint8 i = 0; i < RAID_MODE(1, 2); ++i)
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0, true, -SPELL_WEB_WRAP))
                         {
                             target->RemoveAura(RAID_MODE(SPELL_WEB_SPRAY_10, SPELL_WEB_SPRAY_25));
-                            uint8 pos = urand(0,2);
+                            uint8 pos = urand(0, 2);
 
-                            if (Creature *wrap = me->SummonCreature(NPC_WEB_WRAP, PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                            if (Creature* wrap = me->SummonCreature(NPC_WEB_WRAP, PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
                             {
                                 wrap->AI()->SetGUID(target->GetGUID());
                                 target->GetMotionMaster()->MoveJump(PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 20, 20);
@@ -211,21 +211,21 @@ public:
 
     struct boss_maexxna_webwrapAI : public NullCreatureAI
     {
-        explicit boss_maexxna_webwrapAI(Creature *c) : NullCreatureAI(c), victimGUID(0) {}
+        explicit boss_maexxna_webwrapAI(Creature* c) : NullCreatureAI(c), victimGUID(0) {}
 
         uint64 victimGUID;
         void SetGUID(uint64 guid, int32  /*param*/) override
         {
             victimGUID = guid;
             if (me->m_spells[0] && victimGUID)
-                if (Unit *victim = ObjectAccessor::GetUnit(*me, victimGUID))
+                if (Unit* victim = ObjectAccessor::GetUnit(*me, victimGUID))
                     victim->CastSpell(victim, me->m_spells[0], true, nullptr, nullptr, me->GetGUID());
         }
 
-        void JustDied(Unit * /*killer*/) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (me->m_spells[0] && victimGUID)
-                if (Unit *victim = ObjectAccessor::GetUnit(*me, victimGUID))
+                if (Unit* victim = ObjectAccessor::GetUnit(*me, victimGUID))
                     victim->RemoveAurasDueToSpell(me->m_spells[0], me->GetGUID());
         }
     };

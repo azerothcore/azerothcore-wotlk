@@ -107,7 +107,7 @@ public:
 
     struct boss_vezaxAI : public ScriptedAI
     {
-        boss_vezaxAI(Creature *pCreature) : ScriptedAI(pCreature), summons(me)
+        boss_vezaxAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
         {
             pInstance = pCreature->GetInstanceScript();
         }
@@ -180,8 +180,10 @@ public:
         {
             switch (id)
             {
-                case 1: return (me->GetLootMode() == 3 ? 1 : 0);
-                case 2: return (bAchievShadowdodger == true ? 1 : 0);
+                case 1:
+                    return (me->GetLootMode() == 3 ? 1 : 0);
+                case 2:
+                    return (bAchievShadowdodger == true ? 1 : 0);
             }
             return 0;
         }
@@ -230,7 +232,7 @@ public:
                         if (!players.empty())
                         {
                             me->setAttackTimer(BASE_ATTACK, 2000);
-                            Player* target = players.at(urand(0, players.size()-1));
+                            Player* target = players.at(urand(0, players.size() - 1));
                             me->SetUInt64Value(UNIT_FIELD_TARGET, target->GetGUID());
                             me->CastSpell(target, SPELL_VEZAX_SHADOW_CRASH, false);
                             events.ScheduleEvent(EVENT_RESTORE_TARGET, 750);
@@ -257,22 +259,22 @@ public:
                     {
                         std::vector<Player*> outside;
                         std::vector<Player*> inside;
-                        Map::PlayerList const &pl = me->GetMap()->GetPlayers();
-                            for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                                if( Player* tmp = itr->GetSource() )
-                                    if( tmp->IsAlive() )
-                                    {
-                                        if( tmp->GetDistance(me) > 15.0f )
-                                            outside.push_back(tmp);
-                                        else
-                                            inside.push_back(tmp);
-                                    }
+                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+                        for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
+                            if( Player* tmp = itr->GetSource() )
+                                if( tmp->IsAlive() )
+                                {
+                                    if( tmp->GetDistance(me) > 15.0f )
+                                        outside.push_back(tmp);
+                                    else
+                                        inside.push_back(tmp);
+                                }
 
                         Player* t = nullptr;
                         if( outside.size() >= uint8(me->GetMap()->Is25ManRaid() ? 9 : 4) )
-                            t = outside.at(urand(0, outside.size()-1));
+                            t = outside.at(urand(0, outside.size() - 1));
                         else if( !inside.empty() )
-                            t = inside.at(urand(0, inside.size()-1));
+                            t = inside.at(urand(0, inside.size() - 1));
 
                         if (t)
                             me->CastSpell(t, SPELL_MARK_OF_THE_FACELESS_AURA, false);
@@ -359,7 +361,7 @@ public:
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
             {
-                if( urand(0,1) )
+                if( urand(0, 1) )
                 {
                     me->MonsterYell(TEXT_VEZAX_SLAIN_1, LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_VEZAX_SLAIN_1, 0);
@@ -398,7 +400,7 @@ public:
 
     struct npc_ulduar_saronite_vaporsAI : public NullCreatureAI
     {
-        npc_ulduar_saronite_vaporsAI(Creature *pCreature) : NullCreatureAI(pCreature)
+        npc_ulduar_saronite_vaporsAI(Creature* pCreature) : NullCreatureAI(pCreature)
         {
             pInstance = pCreature->GetInstanceScript();
             me->GetMotionMaster()->MoveRandom(4.0f);
@@ -430,7 +432,7 @@ public:
 
     struct npc_ulduar_saronite_animusAI : public ScriptedAI
     {
-        npc_ulduar_saronite_animusAI(Creature *pCreature) : ScriptedAI(pCreature)
+        npc_ulduar_saronite_animusAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             pInstance = pCreature->GetInstanceScript();
             if( pInstance )
@@ -488,7 +490,7 @@ public:
                     target->CastSpell(target, SPELL_AURA_OF_DESPAIR_2, true);
                     if( target->HasSpell(SPELL_SHAMANISTIC_RAGE) )
                         caster->CastSpell(target, SPELL_CORRUPTED_RAGE, true);
-                    else if( target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1+1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1+2) )
+                    else if( target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 2) )
                         caster->CastSpell(target, SPELL_CORRUPTED_WISDOM, true);
                 }
         }
@@ -510,7 +512,7 @@ public:
         }
     };
 
-    AuraScript *GetAuraScript() const
+    AuraScript* GetAuraScript() const
     {
         return new spell_aura_of_despair_AuraScript();
     }
@@ -525,7 +527,7 @@ public:
     {
         PrepareAuraScript(spell_mark_of_the_faceless_periodic_AuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
+        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
         {
             if (Unit* caster = GetCaster())
                 if (Unit* target = GetTarget())
@@ -542,7 +544,7 @@ public:
         }
     };
 
-    AuraScript *GetAuraScript() const
+    AuraScript* GetAuraScript() const
     {
         return new spell_mark_of_the_faceless_periodic_AuraScript();
     }
@@ -570,7 +572,7 @@ public:
         }
     };
 
-    SpellScript *GetSpellScript() const
+    SpellScript* GetSpellScript() const
     {
         return new spell_mark_of_the_faceless_drainhealth_SpellScript();
     }
@@ -589,7 +591,7 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                int32 damage = 100*pow(2.0f, (float)GetStackAmount());
+                int32 damage = 100 * pow(2.0f, (float)GetStackAmount());
                 caster->CastCustomSpell(GetTarget(), SPELL_SARONITE_VAPORS_DMG, &damage, nullptr, nullptr, true);
             }
         }
@@ -600,7 +602,7 @@ public:
         }
     };
 
-    AuraScript *GetAuraScript() const
+    AuraScript* GetAuraScript() const
     {
         return new spell_saronite_vapors_dummy_AuraScript();
     }
@@ -620,7 +622,7 @@ public:
             if (Unit* caster = GetCaster())
                 if (GetHitDamage() > 2)
                 {
-                    int32 mana = GetHitDamage()/2;
+                    int32 mana = GetHitDamage() / 2;
                     if (Unit* t = GetHitUnit())
                         caster->CastCustomSpell(t, SPELL_SARONITE_VAPORS_ENERGIZE, &mana, nullptr, nullptr, true);
                 }

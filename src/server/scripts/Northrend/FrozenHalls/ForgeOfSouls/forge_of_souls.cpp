@@ -237,7 +237,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_fos_leader_secondAI(creature);
     }
@@ -263,10 +263,10 @@ public:
             return true;
         }
 
-        void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo & /*dmgInfo*/, uint32 & absorbAmount)
+        void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
         {
             amount += absorbAmount;
-            if (!fired && amount >= GetSpellInfo()->Effects[EFFECT_0].BasePoints+1)
+            if (!fired && amount >= GetSpellInfo()->Effects[EFFECT_0].BasePoints + 1)
                 if (Unit* caster = GetCaster())
                 {
                     fired = true;

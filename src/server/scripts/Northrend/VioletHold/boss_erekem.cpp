@@ -58,7 +58,7 @@ public:
 
     struct boss_erekemAI : public ScriptedAI
     {
-        boss_erekemAI(Creature *c) : ScriptedAI(c)
+        boss_erekemAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -78,11 +78,11 @@ public:
             DoCast(me, SPELL_EARTH_SHIELD);
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_BLOODLUST, 15000);
-            events.RescheduleEvent(EVENT_SPELL_BREAK_BONDS, urand(9000,14000));
+            events.RescheduleEvent(EVENT_SPELL_BREAK_BONDS, urand(9000, 14000));
             events.RescheduleEvent(EVENT_SPELL_CHAIN_HEAL, 0);
             events.RescheduleEvent(EVENT_SPELL_EARTH_SHIELD, 20000);
-            events.RescheduleEvent(EVENT_SPELL_EARTH_SHOCK, urand(2000,8000));
-            events.RescheduleEvent(EVENT_SPELL_LIGHTNING_BOLT, urand(5000,10000));
+            events.RescheduleEvent(EVENT_SPELL_EARTH_SHOCK, urand(2000, 8000));
+            events.RescheduleEvent(EVENT_SPELL_LIGHTNING_BOLT, urand(5000, 10000));
             if (IsHeroic())
                 events.RescheduleEvent(EVENT_SPELL_STORMSTRIKE, 3000);
 
@@ -110,11 +110,11 @@ public:
                     break;
                 case EVENT_SPELL_BLOODLUST:
                     me->CastSpell((Unit*)NULL, SPELL_BLOODLUST, false);
-                    events.RepeatEvent(urand(35000,45000));
+                    events.RepeatEvent(urand(35000, 45000));
                     break;
                 case EVENT_SPELL_BREAK_BONDS:
                     me->CastSpell((Unit*)NULL, SPELL_BREAK_BONDS, false);
-                    events.RepeatEvent(urand(16000,22000));
+                    events.RepeatEvent(urand(16000, 22000));
                     break;
                 case EVENT_SPELL_CHAIN_HEAL:
                     if (uint64 TargetGUID = GetChainHealTargetGUID())
@@ -123,15 +123,15 @@ public:
                             if (Creature* target = pInstance->instance->GetCreature(TargetGUID))
                                 me->CastSpell(target, SPELL_CHAIN_HEAL, false);
 
-                            Creature *pGuard1 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_1_GUID));
-                            Creature *pGuard2 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_2_GUID));
+                            Creature* pGuard1 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_1_GUID));
+                            Creature* pGuard2 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_2_GUID));
                             if ((pGuard1 && !pGuard1->IsAlive()) || (pGuard2 && !pGuard2->IsAlive()))
                             {
-                                events.RepeatEvent(urand(3000,6000));
+                                events.RepeatEvent(urand(3000, 6000));
                                 break;
                             }
                         }
-                    events.RepeatEvent(urand(8000,11000));
+                    events.RepeatEvent(urand(8000, 11000));
                     break;
                 case EVENT_SPELL_EARTH_SHIELD:
                     me->CastSpell(me, SPELL_EARTH_SHIELD, false);
@@ -139,17 +139,17 @@ public:
                     break;
                 case EVENT_SPELL_EARTH_SHOCK:
                     me->CastSpell(me->GetVictim(), SPELL_EARTH_SHOCK, false);
-                    events.RepeatEvent(urand(8000,13000));
+                    events.RepeatEvent(urand(8000, 13000));
                     break;
                 case EVENT_SPELL_LIGHTNING_BOLT:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true))
                         me->CastSpell(target, SPELL_LIGHTNING_BOLT, false);
-                    events.RepeatEvent(urand(15000,25000));
+                    events.RepeatEvent(urand(15000, 25000));
                     break;
                 case EVENT_SPELL_STORMSTRIKE:
                     {
-                        Creature *pGuard1 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_1_GUID));
-                        Creature *pGuard2 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_2_GUID));
+                        Creature* pGuard1 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_1_GUID));
+                        Creature* pGuard2 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_2_GUID));
                         if (pGuard1 && !pGuard1->IsAlive() && pGuard2 && !pGuard2->IsAlive()) // both dead
                             me->CastSpell(me->GetVictim(), SPELL_STORMSTRIKE, false);
                         events.RepeatEvent(3000);
@@ -233,7 +233,7 @@ public:
 
     struct npc_erekem_guardAI : public ScriptedAI
     {
-        npc_erekem_guardAI(Creature *c) : ScriptedAI(c)
+        npc_erekem_guardAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -250,7 +250,7 @@ public:
         {
             DoZoneInCombat();
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_GUSHING_WOUND, urand(1000,3000));
+            events.RescheduleEvent(EVENT_SPELL_GUSHING_WOUND, urand(1000, 3000));
             events.RescheduleEvent(EVENT_SPELL_HOWLING_SCREECH, urand(8000, 13000));
             events.RescheduleEvent(EVENT_SPELL_STRIKE, urand(4000, 8000));
 
@@ -275,15 +275,15 @@ public:
                     break;
                 case EVENT_SPELL_GUSHING_WOUND:
                     me->CastSpell(me->GetVictim(), SPELL_GUSHING_WOUND, false);
-                    events.RepeatEvent(urand(7000,12000));
+                    events.RepeatEvent(urand(7000, 12000));
                     break;
                 case EVENT_SPELL_HOWLING_SCREECH:
                     me->CastSpell(me->GetVictim(), SPELL_HOWLING_SCREECH, false);
-                    events.RepeatEvent(urand(8000,13000));
+                    events.RepeatEvent(urand(8000, 13000));
                     break;
                 case EVENT_SPELL_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_STRIKE, false);
-                    events.RepeatEvent(urand(4000,8000));
+                    events.RepeatEvent(urand(4000, 8000));
                     break;
             }
 

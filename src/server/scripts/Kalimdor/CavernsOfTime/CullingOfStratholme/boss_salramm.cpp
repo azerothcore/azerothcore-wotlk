@@ -59,8 +59,8 @@ public:
 
         EventMap events;
         SummonList summons;
-        void Reset() 
-        { 
+        void Reset()
+        {
             events.Reset();
             summons.DespawnAll();
         }
@@ -86,7 +86,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/)
         {
-            if (!urand(0,1))
+            if (!urand(0, 1))
                 return;
 
             Talk(SAY_SLAY);
@@ -119,19 +119,19 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_SPELL_STEAL_FLESH:
-                    if (!urand(0,2))
+                    if (!urand(0, 2))
                         Talk(SAY_STEAL_FLESH);
                     me->CastSpell(me->GetVictim(), SPELL_STEAL_FLESH_CHANNEL, false);
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_SPELL_SUMMON_GHOULS:
-                    if (!urand(0,2))
+                    if (!urand(0, 2))
                         Talk(SAY_SUMMON_GHOULS);
                     me->CastSpell(me, SPELL_SUMMON_GHOULS, false);
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_EXPLODE_GHOUL:
-                    if (!urand(0,2))
+                    if (!urand(0, 2))
                         Talk(SAY_EXPLODE_GHOUL);
                     ExplodeGhoul();
                     events.RepeatEvent(15000);
@@ -150,34 +150,34 @@ public:
 
 class spell_boss_salramm_steal_flesh : public SpellScriptLoader
 {
-    public:
-        spell_boss_salramm_steal_flesh() : SpellScriptLoader("spell_boss_salramm_steal_flesh") { }
+public:
+    spell_boss_salramm_steal_flesh() : SpellScriptLoader("spell_boss_salramm_steal_flesh") { }
 
-        class spell_boss_salramm_steal_flesh_AuraScript : public AuraScript
+    class spell_boss_salramm_steal_flesh_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_boss_salramm_steal_flesh_AuraScript);
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_boss_salramm_steal_flesh_AuraScript);
-
-            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            Unit* caster = GetCaster();
+            Unit* target = GetUnitOwner();
+            if (caster)
             {
-                Unit* caster = GetCaster();
-                Unit* target = GetUnitOwner();
-                if (caster)
-                {
-                    caster->CastSpell(caster, SPELL_STEAL_FLESH_CASTER, true);
-                    caster->CastSpell(target, SPELL_STEAL_FLESH_TARGET, true);
-                }
+                caster->CastSpell(caster, SPELL_STEAL_FLESH_CASTER, true);
+                caster->CastSpell(target, SPELL_STEAL_FLESH_TARGET, true);
             }
-
-            void Register()
-            {
-                AfterEffectRemove += AuraEffectRemoveFn(spell_boss_salramm_steal_flesh_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_boss_salramm_steal_flesh_AuraScript();
         }
+
+        void Register()
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_boss_salramm_steal_flesh_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_boss_salramm_steal_flesh_AuraScript();
+    }
 };
 
 void AddSC_boss_salramm()

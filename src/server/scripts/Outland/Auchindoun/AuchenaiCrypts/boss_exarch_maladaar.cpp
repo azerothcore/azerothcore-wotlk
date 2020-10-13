@@ -76,7 +76,7 @@ public:
 
         void KilledUnit(Unit*)
         {
-            if (urand(0,1))
+            if (urand(0, 1))
                 Talk(SAY_SLAY);
         }
 

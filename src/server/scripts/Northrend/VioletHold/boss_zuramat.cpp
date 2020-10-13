@@ -53,7 +53,7 @@ public:
 
     struct boss_zuramatAI : public ScriptedAI
     {
-        boss_zuramatAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_zuramatAI(Creature* c) : ScriptedAI(c), summons(me)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -73,8 +73,8 @@ public:
             Talk(SAY_AGGRO);
             DoZoneInCombat();
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_SHROUD_OF_DARKNESS, urand(5000,7000));
-            events.RescheduleEvent(EVENT_SPELL_VOID_SHIFT, urand(23000,25000));
+            events.RescheduleEvent(EVENT_SPELL_SHROUD_OF_DARKNESS, urand(5000, 7000));
+            events.RescheduleEvent(EVENT_SPELL_VOID_SHIFT, urand(23000, 25000));
             events.RescheduleEvent(EVENT_SPELL_SUMMON_VOID_SENTRY, 10000);
             if (pInstance)
                 pInstance->SetData(DATA_ACHIEV, 1);
@@ -105,7 +105,7 @@ public:
                         me->CastSpell(target, SPELL_VOID_SHIFT, false);
                         me->MonsterWhisper("Gaze... into the void.", target->ToPlayer(), false);
                     }
-                    events.RepeatEvent(urand(18000,22000));
+                    events.RepeatEvent(urand(18000, 22000));
                     break;
                 case EVENT_SPELL_SUMMON_VOID_SENTRY:
                     me->CastSpell((Unit*)NULL, SPELL_SUMMON_VOID_SENTRY, false);
@@ -124,7 +124,7 @@ public:
                 pInstance->SetData(DATA_BOSS_DIED, 0);
         }
 
-        void KilledUnit(Unit * victim)
+        void KilledUnit(Unit* victim)
         {
             if (victim && victim->GetGUID() == me->GetGUID())
                 return;
@@ -143,7 +143,7 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature *pSummoned)
+        void SummonedCreatureDespawn(Creature* pSummoned)
         {
             if (pSummoned)
             {
@@ -180,7 +180,7 @@ public:
 
     struct npc_vh_void_sentryAI : public NullCreatureAI
     {
-        npc_vh_void_sentryAI(Creature *c) : NullCreatureAI(c)
+        npc_vh_void_sentryAI(Creature* c) : NullCreatureAI(c)
         {
             pInstance = c->GetInstanceScript();
             SummonedGUID = 0;
@@ -216,7 +216,7 @@ public:
             me->DespawnOrUnsummon(5000);
         }
 
-        void SummonedCreatureDespawn(Creature *pSummoned)
+        void SummonedCreatureDespawn(Creature* pSummoned)
         {
             if (pSummoned)
                 pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());

@@ -88,7 +88,7 @@ public:
         {
             cr->ToTempSummon()->SetTempSummonType(TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT);
             cr->ToTempSummon()->InitStats(20000);
-            if (urand(0,1))
+            if (urand(0, 1))
                 cr->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f);
             else if (cr->AI())
                 cr->AI()->AttackStart(me);
@@ -406,7 +406,7 @@ public:
         {
             if (!playerGUID && spellInfo->Id == SPELL_SPEAR_OF_HODIR)
             {
-                me->GetMotionMaster()->MovePoint(1, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ()+12.0f);
+                me->GetMotionMaster()->MovePoint(1, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ() + 12.0f);
                 playerGUID = caster->GetGUID();
             }
             else if (spellInfo->Id == SPELL_GRAB_ON)
@@ -426,7 +426,7 @@ public:
             }
             else if (spellInfo->Id == SPELL_FATAL_STRIKE)
             {
-                if (roll_chance_i(me->GetAuraCount(SPELL_PRY_JAWS_OPEN)*10))
+                if (roll_chance_i(me->GetAuraCount(SPELL_PRY_JAWS_OPEN) * 10))
                 {
                     if (Player* player = GetValidPlayer())
                     {
@@ -496,7 +496,8 @@ public:
                 if (checkTimer >= 2000)
                 {
                     checkTimer = 1;
-                    if (me->HealthBelowPct(25)) {
+                    if (me->HealthBelowPct(25))
+                    {
                         if (Player* player = GetValidPlayer())
                         {
                             Talk(3);
@@ -577,47 +578,47 @@ public:
 
 class spell_q13003_thursting_hodirs_spear : public SpellScriptLoader
 {
-    public:
-        spell_q13003_thursting_hodirs_spear() : SpellScriptLoader("spell_q13003_thursting_hodirs_spear") { }
+public:
+    spell_q13003_thursting_hodirs_spear() : SpellScriptLoader("spell_q13003_thursting_hodirs_spear") { }
 
-        class spell_q13003_thursting_hodirs_spear_AuraScript : public AuraScript
+    class spell_q13003_thursting_hodirs_spear_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_q13003_thursting_hodirs_spear_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_q13003_thursting_hodirs_spear_AuraScript);
+            ModStackAmount(60);
+        }
 
-            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Creature* creature = GetUnitOwner()->ToCreature())
             {
-                ModStackAmount(60);
-            }
-
-            void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                if (Creature* creature = GetUnitOwner()->ToCreature())
+                if (!creature->IsInEvadeMode())
                 {
-                    if (!creature->IsInEvadeMode())
-                    {
-                        creature->RemoveAllAuras();
-                        creature->AI()->EnterEvadeMode();
-                    }
+                    creature->RemoveAllAuras();
+                    creature->AI()->EnterEvadeMode();
                 }
             }
-
-            void HandlePeriodic(AuraEffect const* /* aurEff */)
-            {
-                ModStackAmount(-1);
-            }
-
-            void Register()
-            {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_q13003_thursting_hodirs_spear_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-                OnEffectApply += AuraEffectApplyFn(spell_q13003_thursting_hodirs_spear_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-                AfterEffectRemove += AuraEffectRemoveFn(spell_q13003_thursting_hodirs_spear_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_q13003_thursting_hodirs_spear_AuraScript();
         }
+
+        void HandlePeriodic(AuraEffect const* /* aurEff */)
+        {
+            ModStackAmount(-1);
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_q13003_thursting_hodirs_spear_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            OnEffectApply += AuraEffectApplyFn(spell_q13003_thursting_hodirs_spear_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_q13003_thursting_hodirs_spear_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_q13003_thursting_hodirs_spear_AuraScript();
+    }
 };
 
 enum q13007IronColossus
@@ -724,12 +725,12 @@ public:
         ClearGossipMenuFor(player);
         switch (action)
         {
-        case GOSSIP_ACTION_TRAIN:
-            player->GetSession()->SendTrainerList(creature->GetGUID());
-            break;
-        case GOSSIP_ACTION_TRADE:
-            player->GetSession()->SendListInventory(creature->GetGUID());
-            break;
+            case GOSSIP_ACTION_TRAIN:
+                player->GetSession()->SendTrainerList(creature->GetGUID());
+                break;
+            case GOSSIP_ACTION_TRADE:
+                player->GetSession()->SendListInventory(creature->GetGUID());
+                break;
         }
         return true;
     }
@@ -950,45 +951,45 @@ class npc_hyldsmeet_protodrake : public CreatureScript
         NPC_HYLDSMEET_DRAKERIDER = 29694
     };
 
+public:
+    npc_hyldsmeet_protodrake() : CreatureScript("npc_hyldsmeet_protodrake") { }
+
+    class npc_hyldsmeet_protodrakeAI : public CreatureAI
+    {
     public:
-        npc_hyldsmeet_protodrake() : CreatureScript("npc_hyldsmeet_protodrake") { }
+        npc_hyldsmeet_protodrakeAI(Creature* creature) : CreatureAI(creature), _accessoryRespawnTimer(0), _vehicleKit(creature->GetVehicleKit()) { }
 
-        class npc_hyldsmeet_protodrakeAI : public CreatureAI
+        void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply)
         {
-            public:
-                npc_hyldsmeet_protodrakeAI(Creature* creature) : CreatureAI(creature), _accessoryRespawnTimer(0), _vehicleKit(creature->GetVehicleKit()) { }
+            if (apply)
+                return;
 
-                void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply)
-                {
-                    if (apply)
-                        return;
-
-                    if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
-                        _accessoryRespawnTimer = 5 * MINUTE * IN_MILLISECONDS;
-                }
-
-                void UpdateAI(uint32 diff)
-                {
-                    //! We need to manually reinstall accessories because the vehicle itself is friendly to players,
-                    //! so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
-                    if (_accessoryRespawnTimer && _accessoryRespawnTimer <= diff && _vehicleKit)
-                    {
-                        _vehicleKit->InstallAllAccessories(true);
-                        _accessoryRespawnTimer = 0;
-                    }
-                    else
-                        _accessoryRespawnTimer -= diff;
-                }
-
-            private:
-                uint32 _accessoryRespawnTimer;
-                Vehicle* _vehicleKit;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_hyldsmeet_protodrakeAI(creature);
+            if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
+                _accessoryRespawnTimer = 5 * MINUTE * IN_MILLISECONDS;
         }
+
+        void UpdateAI(uint32 diff)
+        {
+            //! We need to manually reinstall accessories because the vehicle itself is friendly to players,
+            //! so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
+            if (_accessoryRespawnTimer && _accessoryRespawnTimer <= diff && _vehicleKit)
+            {
+                _vehicleKit->InstallAllAccessories(true);
+                _accessoryRespawnTimer = 0;
+            }
+            else
+                _accessoryRespawnTimer -= diff;
+        }
+
+    private:
+        uint32 _accessoryRespawnTimer;
+        Vehicle* _vehicleKit;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_hyldsmeet_protodrakeAI(creature);
+    }
 };
 
 enum CloseRift
@@ -998,44 +999,44 @@ enum CloseRift
 
 class spell_close_rift : public SpellScriptLoader
 {
-    public:
-        spell_close_rift() : SpellScriptLoader("spell_close_rift") { }
+public:
+    spell_close_rift() : SpellScriptLoader("spell_close_rift") { }
 
-        class spell_close_rift_AuraScript : public AuraScript
+    class spell_close_rift_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_close_rift_AuraScript);
+
+        bool Load()
         {
-            PrepareAuraScript(spell_close_rift_AuraScript);
-
-            bool Load()
-            {
-                _counter = 0;
-                return true;
-            }
-
-            bool Validate(SpellInfo const* /*spell*/)
-            {
-                return sSpellMgr->GetSpellInfo(SPELL_DESPAWN_RIFT);
-            }
-
-            void HandlePeriodic(AuraEffect const* /* aurEff */)
-            {
-                if (++_counter == 5)
-                    GetTarget()->CastSpell((Unit*)NULL, SPELL_DESPAWN_RIFT, true);
-            }
-
-            void Register()
-            {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_close_rift_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-            }
-
-        private:
-            uint8 _counter;
-
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_close_rift_AuraScript();
+            _counter = 0;
+            return true;
         }
+
+        bool Validate(SpellInfo const* /*spell*/)
+        {
+            return sSpellMgr->GetSpellInfo(SPELL_DESPAWN_RIFT);
+        }
+
+        void HandlePeriodic(AuraEffect const* /* aurEff */)
+        {
+            if (++_counter == 5)
+                GetTarget()->CastSpell((Unit*)NULL, SPELL_DESPAWN_RIFT, true);
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_close_rift_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+
+    private:
+        uint8 _counter;
+
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_close_rift_AuraScript();
+    }
 };
 
 void AddSC_storm_peaks()

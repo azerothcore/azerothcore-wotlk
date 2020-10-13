@@ -59,7 +59,7 @@ void MapManager::Initialize()
 
 void MapManager::InitializeVisibilityDistanceInfo()
 {
-    for (MapMapType::iterator iter=i_maps.begin(); iter != i_maps.end(); ++iter)
+    for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
         (*iter).second->InitVisibilityDistance();
 }
 
@@ -127,7 +127,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
 {
     MapEntry const* entry = sMapStore.LookupEntry(mapid);
     if (!entry)
-       return false;
+        return false;
 
     if (!entry->IsDungeon())
         return true;
@@ -207,7 +207,8 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
             player->ResurrectPlayer(0.5f, false);
             player->SpawnCorpseBones();
         }
-        else {
+        else
+        {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_MAPS, "Map::CanPlayerEnter - player '%s' is dead but does not have a corpse!", player->GetName().c_str());
 #endif
@@ -245,7 +246,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
 
 void MapManager::Update(uint32 diff)
 {
-    for (uint8 i=0; i<4; ++i)
+    for (uint8 i = 0; i < 4; ++i)
         i_timer[i].Update(diff);
 
     // pussywizard: lfg compatibles update, schedule before maps so it is processed from the very beginning
@@ -258,14 +259,14 @@ void MapManager::Update(uint32 diff)
             uint32 startTime = getMSTime();
             sLFGMgr->Update(diff, 1);
             uint32 totalTime = getMSTimeDiff(startTime, getMSTime());
-            lfgDiffTracker.Update(10000+totalTime); // +10k to mark it was NOT multithreaded
+            lfgDiffTracker.Update(10000 + totalTime); // +10k to mark it was NOT multithreaded
         }
     }
 
     MapMapType::iterator iter = i_maps.begin();
     for (; iter != i_maps.end(); ++iter)
     {
-        bool full = mapUpdateStep<3 && ((mapUpdateStep==0 && !iter->second->IsBattlegroundOrArena() && !iter->second->IsDungeon()) || (mapUpdateStep==1 && iter->second->IsBattlegroundOrArena()) || (mapUpdateStep==2 && iter->second->IsDungeon()));
+        bool full = mapUpdateStep < 3 && ((mapUpdateStep == 0 && !iter->second->IsBattlegroundOrArena() && !iter->second->IsDungeon()) || (mapUpdateStep == 1 && iter->second->IsBattlegroundOrArena()) || (mapUpdateStep == 2 && iter->second->IsDungeon()));
         if (m_updater.activated())
             m_updater.schedule_update(*iter->second, uint32(full ? i_timer[mapUpdateStep].GetCurrent() : 0), diff);
         else
@@ -277,11 +278,11 @@ void MapManager::Update(uint32 diff)
 
     sObjectAccessor->ProcessDelayedCorpseActions();
 
-    if (mapUpdateStep<3)
+    if (mapUpdateStep < 3)
     {
         for (iter = i_maps.begin(); iter != i_maps.end(); ++iter)
         {
-            bool full = ((mapUpdateStep==0 && !iter->second->IsBattlegroundOrArena() && !iter->second->IsDungeon()) || (mapUpdateStep==1 && iter->second->IsBattlegroundOrArena()) || (mapUpdateStep==2 && iter->second->IsDungeon()));
+            bool full = ((mapUpdateStep == 0 && !iter->second->IsBattlegroundOrArena() && !iter->second->IsDungeon()) || (mapUpdateStep == 1 && iter->second->IsBattlegroundOrArena()) || (mapUpdateStep == 2 && iter->second->IsDungeon()));
             if (full)
                 iter->second->DelayedUpdate(uint32(i_timer[mapUpdateStep].GetCurrent()));
         }
@@ -307,8 +308,8 @@ bool MapManager::ExistMapAndVMap(uint32 mapid, float x, float y)
 {
     GridCoord p = acore::ComputeGridCoord(x, y);
 
-    int gx=63-p.x_coord;
-    int gy=63-p.y_coord;
+    int gx = 63 - p.x_coord;
+    int gy = 63 - p.y_coord;
 
     return Map::ExistMap(mapid, gx, gy) && Map::ExistVMap(mapid, gx, gy);
 }
@@ -345,7 +346,7 @@ void MapManager::GetNumInstances(uint32& dungeons, uint32& battlegrounds, uint32
         Map* map = itr->second;
         if (!map->Instanceable())
             continue;
-        MapInstanced::InstancedMaps &maps = ((MapInstanced*)map)->GetInstancedMaps();
+        MapInstanced::InstancedMaps& maps = ((MapInstanced*)map)->GetInstancedMaps();
         for (MapInstanced::InstancedMaps::iterator mitr = maps.begin(); mitr != maps.end(); ++mitr)
         {
             if (mitr->second->IsDungeon()) dungeons++;
@@ -362,7 +363,7 @@ void MapManager::GetNumPlayersInInstances(uint32& dungeons, uint32& battleground
         Map* map = itr->second;
         if (!map->Instanceable())
             continue;
-        MapInstanced::InstancedMaps &maps = ((MapInstanced*)map)->GetInstancedMaps();
+        MapInstanced::InstancedMaps& maps = ((MapInstanced*)map)->GetInstancedMaps();
         for (MapInstanced::InstancedMaps::iterator mitr = maps.begin(); mitr != maps.end(); ++mitr)
         {
             if (mitr->second->IsDungeon()) dungeons += ((InstanceMap*)mitr->second)->GetPlayers().getSize();
@@ -389,7 +390,7 @@ void MapManager::InitInstanceIds()
     if (result)
     {
         uint32 maxId = (*result)[0].GetUInt32();
-        _instanceIds.resize(maxId+1);
+        _instanceIds.resize(maxId + 1);
     }
 }
 

@@ -102,7 +102,7 @@ public:
 
             Talk(SAY_AGGRO);
             DoZoneInCombat();
-            events.RescheduleEvent(EVENT_SPELL_THROW_SARONITE, urand(5000,7500));
+            events.RescheduleEvent(EVENT_SPELL_THROW_SARONITE, urand(5000, 7500));
 
             if (pInstance)
                 pInstance->SetData(DATA_GARFROST, IN_PROGRESS);
@@ -201,9 +201,9 @@ public:
 
             if (me->GetVictim())
             {
-                float x,y,z;
+                float x, y, z;
                 me->GetVictim()->GetPosition(x, y, z);
-                if (x<600.0f || x>770.0f || y<-270.0f || y>-137.0f || z<514.0f || z>550.0f)
+                if (x < 600.0f || x > 770.0f || y < -270.0f || y > -137.0f || z < 514.0f || z > 550.0f)
                 {
                     me->SetHealth(me->GetMaxHealth());
                     EnterEvadeMode();
@@ -236,7 +236,7 @@ public:
                         target->ToPlayer()->GetSession()->SendPacket(&data);
                         me->CastSpell(target, SPELL_THROW_SARONITE, false);
                     }
-                    events.RepeatEvent(urand(12500,20000));
+                    events.RepeatEvent(urand(12500, 20000));
                     break;
                 case EVENT_JUMP:
                     me->DisableRotate(true);

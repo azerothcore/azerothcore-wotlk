@@ -8,13 +8,13 @@
 
 enum eSpells
 {
-  SPELL_CAUTERIZING_FLAMES                  = 59466,
-  SPELL_FIREBOLT_N                          = 54235,
-  SPELL_FIREBOLT_H                          = 59468,
-  SPELL_FLAME_BREATH_N                      = 54282,
-  SPELL_FLAME_BREATH_H                      = 59469,
-  SPELL_LAVA_BURN_N                         = 54249,
-  SPELL_LAVA_BURN_H                         = 59594,
+    SPELL_CAUTERIZING_FLAMES                  = 59466,
+    SPELL_FIREBOLT_N                          = 54235,
+    SPELL_FIREBOLT_H                          = 59468,
+    SPELL_FLAME_BREATH_N                      = 54282,
+    SPELL_FLAME_BREATH_H                      = 59469,
+    SPELL_LAVA_BURN_N                         = 54249,
+    SPELL_LAVA_BURN_H                         = 59594,
 };
 
 #define SPELL_FIREBOLT                      DUNGEON_MODE(SPELL_FIREBOLT_N, SPELL_FIREBOLT_H)
@@ -41,7 +41,7 @@ public:
 
     struct boss_lavanthorAI : public ScriptedAI
     {
-        boss_lavanthorAI(Creature *c) : ScriptedAI(c)
+        boss_lavanthorAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -81,19 +81,19 @@ public:
                     break;
                 case EVENT_SPELL_FIREBOLT:
                     me->CastSpell(me->GetVictim(), SPELL_FIREBOLT, false);
-                    events.RepeatEvent(urand(5000,13000));
+                    events.RepeatEvent(urand(5000, 13000));
                     break;
                 case EVENT_SPELL_FLAME_BREATH:
                     me->CastSpell(me->GetVictim(), SPELL_FLAME_BREATH, false);
-                    events.RepeatEvent(urand(10000,15000));
+                    events.RepeatEvent(urand(10000, 15000));
                     break;
                 case EVENT_SPELL_LAVA_BURN:
                     me->CastSpell(me->GetVictim(), SPELL_LAVA_BURN, false);
-                    events.RepeatEvent(urand(14000,20000));
+                    events.RepeatEvent(urand(14000, 20000));
                     break;
                 case EVENT_SPELL_CAUTERIZING_FLAMES:
                     me->CastSpell((Unit*)NULL, SPELL_FLAME_BREATH, false);
-                    events.RepeatEvent(urand(10000,16000));
+                    events.RepeatEvent(urand(10000, 16000));
                     break;
             }
 

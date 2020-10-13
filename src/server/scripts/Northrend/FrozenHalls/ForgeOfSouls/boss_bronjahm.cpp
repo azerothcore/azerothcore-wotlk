@@ -192,7 +192,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new boss_bronjahmAI(creature);
     }
@@ -241,11 +241,11 @@ public:
                     else
                         timer -= diff;
                 }
-            
+
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_fos_corrupted_soul_fragmentAI(creature);
     }
@@ -270,7 +270,7 @@ public:
             {
                 const int32 maxDamage = caster->GetMap()->GetSpawnMode() == 1 ? 15000 : 10000;
                 int32 newDamage = GetHitDamage();
-                newDamage += GetHitUnit()->GetMaxPower(POWER_MANA)/2;
+                newDamage += GetHitUnit()->GetMaxPower(POWER_MANA) / 2;
                 newDamage = std::min<int32>(maxDamage, newDamage);
 
                 SetHitDamage(newDamage);
@@ -302,7 +302,7 @@ public:
         void HandlePeriodicTick(AuraEffect const* aurEff)
         {
             PreventDefaultAction();
-            GetTarget()->CastSpell(GetTarget(), 68904+(aurEff->GetTickNumber()%4), true);
+            GetTarget()->CastSpell(GetTarget(), 68904 + (aurEff->GetTickNumber() % 4), true);
         }
 
         void Register()
@@ -331,12 +331,20 @@ public:
         {
             PreventDefaultAction();
             uint32 spellId = 0;
-            switch (aurEff->GetTickNumber()%4)
+            switch (aurEff->GetTickNumber() % 4)
             {
-                case 0: spellId = 68886; break;
-                case 1: spellId = 68896; break;
-                case 2: spellId = 68897; break;
-                case 3: spellId = 68898; break;
+                case 0:
+                    spellId = 68886;
+                    break;
+                case 1:
+                    spellId = 68896;
+                    break;
+                case 2:
+                    spellId = 68897;
+                    break;
+                case 3:
+                    spellId = 68898;
+                    break;
             }
             GetTarget()->CastSpell(GetTarget(), spellId, true);
         }
