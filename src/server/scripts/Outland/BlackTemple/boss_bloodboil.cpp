@@ -60,193 +60,193 @@ enum Misc
 
 class boss_gurtogg_bloodboil : public CreatureScript
 {
-    public:
-        boss_gurtogg_bloodboil() : CreatureScript("boss_gurtogg_bloodboil") { }
+public:
+    boss_gurtogg_bloodboil() : CreatureScript("boss_gurtogg_bloodboil") { }
 
-        CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetInstanceAI<boss_gurtogg_bloodboilAI>(creature);
+    }
+
+    struct boss_gurtogg_bloodboilAI : public BossAI
+    {
+        boss_gurtogg_bloodboilAI(Creature* creature) : BossAI(creature, DATA_GURTOGG_BLOODBOIL)
         {
-            return GetInstanceAI<boss_gurtogg_bloodboilAI>(creature);
         }
 
-        struct boss_gurtogg_bloodboilAI : public BossAI
+        void Reset()
         {
-            boss_gurtogg_bloodboilAI(Creature* creature) : BossAI(creature, DATA_GURTOGG_BLOODBOIL)
+            BossAI::Reset();
+        }
+
+        void EnterCombat(Unit* who)
+        {
+            BossAI::EnterCombat(who);
+            Talk(SAY_AGGRO);
+
+            me->CastSpell(me, SPELL_ACIDIC_WOUND, true);
+            events.ScheduleEvent(EVENT_SPELL_BLOOD_BOIL, 10000);
+            events.ScheduleEvent(EVENT_SPELL_BEWILDERING_STRIKE, 28000, GROUP_DELAY);
+            events.ScheduleEvent(EVENT_SPELL_FEL_ACID_BREATH, 38000);
+            events.ScheduleEvent(EVENT_SPELL_EJECT, 14000);
+            events.ScheduleEvent(EVENT_SPELL_ARCING_SMASH, 5000);
+            events.ScheduleEvent(EVENT_SPELL_FEL_GEYSER, 60000);
+            events.ScheduleEvent(EVENT_SPELL_BERSERK, 600000);
+        }
+
+        void KilledUnit(Unit*  /*victim*/)
+        {
+            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
+                Talk(SAY_SLAY);
+                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+            }
+        }
+
+        void JustSummoned(Creature* summon)
+        {
+            summons.Summon(summon);
+            summon->CastSpell(summon, SPELL_FEL_GEYSER_DAMAGE, false);
+        }
+
+        void JustDied(Unit* killer)
+        {
+            BossAI::JustDied(killer);
+            Talk(SAY_DEATH);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_SPELL_BERSERK:
+                    Talk(SAY_ENRAGE);
+                    me->CastSpell(me, SPELL_BERSERK, true);
+                    break;
+                case EVENT_SPELL_BLOOD_BOIL:
+                    me->CastCustomSpell(SPELL_BLOODBOIL, SPELLVALUE_MAX_TARGETS, 5, me, false);
+                    events.ScheduleEvent(EVENT_SPELL_BLOOD_BOIL, 10000);
+                    break;
+                case EVENT_SPELL_BEWILDERING_STRIKE:
+                    me->CastSpell(me->GetVictim(), SPELL_BEWILDERING_STRIKE, false);
+                    events.ScheduleEvent(EVENT_SPELL_BEWILDERING_STRIKE, 30000, GROUP_DELAY);
+                    break;
+                case EVENT_SPELL_FEL_ACID_BREATH:
+                    me->CastSpell(me->GetVictim(), me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_FEL_ACID_BREATH2 : SPELL_FEL_ACID_BREATH1, false);
+                    events.ScheduleEvent(EVENT_SPELL_FEL_ACID_BREATH, 30000);
+                    break;
+                case EVENT_SPELL_EJECT:
+                    me->CastSpell(me->GetVictim(), me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_EJECT2 : SPELL_EJECT1, false);
+                    events.ScheduleEvent(EVENT_SPELL_EJECT, 20000);
+                    break;
+                case EVENT_SPELL_ARCING_SMASH:
+                    me->CastSpell(me->GetVictim(), me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_ARCING_SMASH2 : SPELL_ARCING_SMASH1, false);
+                    events.ScheduleEvent(EVENT_SPELL_ARCING_SMASH, 15000);
+                    break;
+                case EVENT_SPELL_FEL_GEYSER:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 40.0f, true))
+                    {
+                        me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
+                        me->CastSpell(me, SPELL_FEL_RAGE_SELF, true);
+                        me->CastSpell(target, SPELL_FEL_RAGE_TARGET, true);
+                        me->CastSpell(target, SPELL_FEL_RAGE_2, true);
+                        me->CastSpell(target, SPELL_FEL_RAGE_3, true);
+                        me->CastSpell(target, SPELL_FEL_RAGE_SIZE, true);
+                        target->CastSpell(me, SPELL_TAUNT_GURTOGG, true);
+
+                        me->CastSpell(target, SPELL_FEL_GEYSER_SUMMON, true);
+                        me->CastSpell(me, SPELL_FEL_GEYSER_STUN, true);
+                        me->CastSpell(me, SPELL_INSIGNIFICANCE, true);
+                        events.ScheduleEvent(EVENT_SPELL_CHARGE, 2000);
+                        events.DelayEvents(30000, GROUP_DELAY);
+                    }
+                    events.ScheduleEvent(EVENT_SPELL_FEL_GEYSER, 90000);
+                    break;
+                case EVENT_SPELL_CHARGE:
+                    me->CastSpell(me->GetVictim(), SPELL_CHARGE, true);
+                    break;
             }
 
-            void Reset()
-            {
-                BossAI::Reset();
-            }
+            DoMeleeAttackIfReady();
+            EnterEvadeIfOutOfCombatArea();
+        }
 
-            void EnterCombat(Unit* who)
-            {
-                BossAI::EnterCombat(who);
-                Talk(SAY_AGGRO);
-
-                me->CastSpell(me, SPELL_ACIDIC_WOUND, true);
-                events.ScheduleEvent(EVENT_SPELL_BLOOD_BOIL, 10000);
-                events.ScheduleEvent(EVENT_SPELL_BEWILDERING_STRIKE, 28000, GROUP_DELAY);
-                events.ScheduleEvent(EVENT_SPELL_FEL_ACID_BREATH, 38000);
-                events.ScheduleEvent(EVENT_SPELL_EJECT, 14000);
-                events.ScheduleEvent(EVENT_SPELL_ARCING_SMASH, 5000);
-                events.ScheduleEvent(EVENT_SPELL_FEL_GEYSER, 60000);
-                events.ScheduleEvent(EVENT_SPELL_BERSERK, 600000);
-            }
-
-            void KilledUnit(Unit*  /*victim*/)
-            {
-                if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
-                {
-                    Talk(SAY_SLAY);
-                    events.ScheduleEvent(EVENT_KILL_TALK, 6000);
-                }
-            }
-
-            void JustSummoned(Creature* summon)
-            {
-                summons.Summon(summon);
-                summon->CastSpell(summon, SPELL_FEL_GEYSER_DAMAGE, false);
-            }
-
-            void JustDied(Unit* killer)
-            {
-                BossAI::JustDied(killer);
-                Talk(SAY_DEATH);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                switch (events.ExecuteEvent())
-                {
-                    case EVENT_SPELL_BERSERK:
-                        Talk(SAY_ENRAGE);
-                        me->CastSpell(me, SPELL_BERSERK, true);
-                        break;
-                    case EVENT_SPELL_BLOOD_BOIL:
-                        me->CastCustomSpell(SPELL_BLOODBOIL, SPELLVALUE_MAX_TARGETS, 5, me, false);
-                        events.ScheduleEvent(EVENT_SPELL_BLOOD_BOIL, 10000);
-                        break;
-                    case EVENT_SPELL_BEWILDERING_STRIKE:
-                        me->CastSpell(me->GetVictim(), SPELL_BEWILDERING_STRIKE, false);
-                        events.ScheduleEvent(EVENT_SPELL_BEWILDERING_STRIKE, 30000, GROUP_DELAY);
-                        break;
-                    case EVENT_SPELL_FEL_ACID_BREATH:
-                        me->CastSpell(me->GetVictim(), me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_FEL_ACID_BREATH2 : SPELL_FEL_ACID_BREATH1, false);
-                        events.ScheduleEvent(EVENT_SPELL_FEL_ACID_BREATH, 30000);
-                        break;
-                    case EVENT_SPELL_EJECT:
-                        me->CastSpell(me->GetVictim(), me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_EJECT2 : SPELL_EJECT1, false);
-                        events.ScheduleEvent(EVENT_SPELL_EJECT, 20000);
-                        break;
-                    case EVENT_SPELL_ARCING_SMASH:
-                        me->CastSpell(me->GetVictim(), me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_ARCING_SMASH2 : SPELL_ARCING_SMASH1, false);
-                        events.ScheduleEvent(EVENT_SPELL_ARCING_SMASH, 15000);
-                        break;
-                    case EVENT_SPELL_FEL_GEYSER:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 40.0f, true))
-                        {
-                            me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
-                            me->CastSpell(me, SPELL_FEL_RAGE_SELF, true);
-                            me->CastSpell(target, SPELL_FEL_RAGE_TARGET, true);
-                            me->CastSpell(target, SPELL_FEL_RAGE_2, true);
-                            me->CastSpell(target, SPELL_FEL_RAGE_3, true);
-                            me->CastSpell(target, SPELL_FEL_RAGE_SIZE, true);
-                            target->CastSpell(me, SPELL_TAUNT_GURTOGG, true);
-
-                            me->CastSpell(target, SPELL_FEL_GEYSER_SUMMON, true);
-                            me->CastSpell(me, SPELL_FEL_GEYSER_STUN, true);
-                            me->CastSpell(me, SPELL_INSIGNIFICANCE, true);
-                            events.ScheduleEvent(EVENT_SPELL_CHARGE, 2000);
-                            events.DelayEvents(30000, GROUP_DELAY);
-                        }
-                        events.ScheduleEvent(EVENT_SPELL_FEL_GEYSER, 90000);
-                        break;
-                    case EVENT_SPELL_CHARGE:
-                        me->CastSpell(me->GetVictim(), SPELL_CHARGE, true);
-                        break;
-                }
-
-                DoMeleeAttackIfReady();
-                EnterEvadeIfOutOfCombatArea();
-            }
-    
-            bool CheckEvadeIfOutOfCombatArea() const
-            {
-                return me->GetHomePosition().GetExactDist2d(me) > 105.0f;
-            }
-        };
+        bool CheckEvadeIfOutOfCombatArea() const
+        {
+            return me->GetHomePosition().GetExactDist2d(me) > 105.0f;
+        }
+    };
 
 };
 
 class spell_gurtogg_bloodboil : public SpellScriptLoader
 {
-    public:
-        spell_gurtogg_bloodboil() : SpellScriptLoader("spell_gurtogg_bloodboil") { }
+public:
+    spell_gurtogg_bloodboil() : SpellScriptLoader("spell_gurtogg_bloodboil") { }
 
-        class spell_gurtogg_bloodboil_SpellScript : public SpellScript
+    class spell_gurtogg_bloodboil_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gurtogg_bloodboil_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            PrepareSpellScript(spell_gurtogg_bloodboil_SpellScript);
+            if (targets.empty())
+                return;
 
-            void FilterTargets(std::list<WorldObject*>& targets)
+            targets.sort(acore::ObjectDistanceOrderPred(GetCaster(), false));
+            if (targets.size() > GetSpellValue()->MaxAffectedTargets)
             {
-                if (targets.empty())
-                    return;
-
-                targets.sort(acore::ObjectDistanceOrderPred(GetCaster(), false));
-                if (targets.size() > GetSpellValue()->MaxAffectedTargets)
-                {
-                    std::list<WorldObject*>::iterator itr = targets.begin();
-                    std::advance(itr, GetSpellValue()->MaxAffectedTargets);
-                    targets.erase(itr, targets.end());
-                }
+                std::list<WorldObject*>::iterator itr = targets.begin();
+                std::advance(itr, GetSpellValue()->MaxAffectedTargets);
+                targets.erase(itr, targets.end());
             }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gurtogg_bloodboil_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_gurtogg_bloodboil_SpellScript();
         }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gurtogg_bloodboil_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gurtogg_bloodboil_SpellScript();
+    }
 };
 
 class spell_gurtogg_eject : public SpellScriptLoader
 {
-    public:
-        spell_gurtogg_eject() : SpellScriptLoader("spell_gurtogg_eject") { }
+public:
+    spell_gurtogg_eject() : SpellScriptLoader("spell_gurtogg_eject") { }
 
-        class spell_gurtogg_eject_SpellScript : public SpellScript
+    class spell_gurtogg_eject_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gurtogg_eject_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex effIndex)
         {
-            PrepareSpellScript(spell_gurtogg_eject_SpellScript);
-
-            void HandleScriptEffect(SpellEffIndex effIndex)
-            {
-                PreventHitEffect(effIndex);
-                if (Unit* target = GetHitUnit())
-                    GetCaster()->getThreatManager().modifyThreatPercent(target, -20);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_gurtogg_eject_SpellScript::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_gurtogg_eject_SpellScript();
+            PreventHitEffect(effIndex);
+            if (Unit* target = GetHitUnit())
+                GetCaster()->getThreatManager().modifyThreatPercent(target, -20);
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gurtogg_eject_SpellScript::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gurtogg_eject_SpellScript();
+    }
 };
 
 void AddSC_boss_gurtogg_bloodboil()

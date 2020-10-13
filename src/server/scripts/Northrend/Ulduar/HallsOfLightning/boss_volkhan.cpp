@@ -96,7 +96,7 @@ public:
             HealthCheck = 100;
             events.Reset();
             summons.DespawnAll();
-            me->SetSpeed(MOVE_RUN, 1.2f,true);
+            me->SetSpeed(MOVE_RUN, 1.2f, true);
             me->SetReactState(REACT_AGGRESSIVE);
 
             if (m_pInstance)
@@ -133,7 +133,7 @@ public:
             {
                 if (me->GetPositionX() > 1330)
                     x = 1355;
-                else 
+                else
                     x = 1308;
 
                 y = -178;
@@ -143,7 +143,7 @@ public:
             {
                 if (me->GetPositionX() > 1330)
                     x = 1355;
-                else 
+                else
                     x = 1308;
 
                 y = -137;
@@ -153,7 +153,7 @@ public:
             {
                 if (me->GetPositionX() > 1330)
                     x = 1343;
-                else 
+                else
                     x = 1320;
 
                 y = -123;
@@ -214,7 +214,7 @@ public:
 
             if (id == POINT_ANVIL)
             {
-                me->SetSpeed(MOVE_RUN, 1.2f,true);
+                me->SetSpeed(MOVE_RUN, 1.2f, true);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->CastSpell(me, SPELL_TEMPER, false);
                 PointID = 0;
@@ -233,7 +233,7 @@ public:
                 events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0, 0, 2);
         }
 
-        void SpellHitTarget(Unit* /*who*/, const SpellInfo *spellInfo)
+        void SpellHitTarget(Unit* /*who*/, const SpellInfo* spellInfo)
         {
             if (spellInfo->Id == SPELL_TEMPER)
             {
@@ -248,7 +248,7 @@ public:
         {
             events.SetPhase(2);
             HealthCheck -= 20;
-            me->SetSpeed(MOVE_RUN, 4.0f,true);
+            me->SetSpeed(MOVE_RUN, 4.0f, true);
             me->SetReactState(REACT_PASSIVE);
 
             Talk(SAY_FORGE);
@@ -283,11 +283,11 @@ public:
                     events.RepeatEvent(1000);
                     return;
                 case EVENT_SHATTER:
-                {
-                    events.RepeatEvent(10000);
-                    summons.DoAction(ACTION_SHATTER);
-                    break;
-                }
+                    {
+                        events.RepeatEvent(10000);
+                        summons.DoAction(ACTION_SHATTER);
+                        break;
+                    }
                 case EVENT_MOVE_TO_ANVIL:
                     GetNextPos();
                     me->GetMotionMaster()->MovePoint(PointID, x, y, z);
@@ -298,10 +298,10 @@ public:
                         EnterEvadeMode();
                     else
                         events.RepeatEvent(4000);
-                
+
                     return;
             }
-            
+
             DoMeleeAttackIfReady();
         }
     };
@@ -334,7 +334,7 @@ public:
             events.ScheduleEvent(EVENT_IMMOLATION, 3000);
         }
 
-        void DamageTaken(Unit*, uint32 &uiDamage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& uiDamage, DamageEffectType, SpellSchoolMask)
         {
             if (me->GetEntry() == NPC_BRITTLE_GOLEM)
             {
@@ -446,7 +446,7 @@ public:
         npc_hol_monumentAI(Creature* creature) : ScriptedAI(creature)
         {
             _attackGUID = 0;
-            _isActive = urand(0,1);
+            _isActive = urand(0, 1);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->CastSpell(me, SPELL_FREEZE_ANIM, true);
         }
@@ -480,15 +480,15 @@ public:
             events.Reset();
             if (me->GetEntry() == 28961) // NPC_TITANIUM_SIEGEBREAKER
             {
-                events.ScheduleEvent(EVENT_PIERCING_HOWL, 10000+rand()%15000);
-                events.ScheduleEvent(EVENT_PENETRATING_STRIKE, 5000+rand()%5000);
-                events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 20000+rand()%8000);
+                events.ScheduleEvent(EVENT_PIERCING_HOWL, 10000 + rand() % 15000);
+                events.ScheduleEvent(EVENT_PENETRATING_STRIKE, 5000 + rand() % 5000);
+                events.ScheduleEvent(EVENT_FRIGHTENING_SHOUT, 20000 + rand() % 8000);
                 events.ScheduleEvent(EVENT_BLADE_TURNING, 12000);
             }
             else
             {
-                events.ScheduleEvent(EVENT_THROW, 10000+rand()%15000);
-                events.ScheduleEvent(EVENT_DEADLY_THROW, 15000+rand()%15000);
+                events.ScheduleEvent(EVENT_THROW, 10000 + rand() % 15000);
+                events.ScheduleEvent(EVENT_DEADLY_THROW, 15000 + rand() % 15000);
                 events.ScheduleEvent(EVENT_DEFLECTION, 15000);
             }
         }
@@ -531,27 +531,27 @@ public:
             {
                 case EVENT_PIERCING_HOWL:
                     me->CastSpell(me->GetVictim(), SPELL_PIERCING_HOWL, false);
-                    events.RepeatEvent(10000+rand()%1500);
+                    events.RepeatEvent(10000 + rand() % 1500);
                     break;
                 case EVENT_PENETRATING_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_PENETRATING_STRIKE, false);
-                    events.RepeatEvent(5000+rand()%5000);
+                    events.RepeatEvent(5000 + rand() % 5000);
                     break;
                 case EVENT_FRIGHTENING_SHOUT:
                     me->CastSpell(me->GetVictim(), SPELL_FRIGHTENING_SHOUT, false);
-                    events.RepeatEvent(20000+rand()%8000);
+                    events.RepeatEvent(20000 + rand() % 8000);
                     break;
                 case EVENT_BLADE_TURNING:
                     me->CastSpell(me->GetVictim(), me->GetMap()->IsHeroic() ? SPELL_BLADE_TURNING_H : SPELL_BLADE_TURNING_N, false);
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_THROW:
-                    me->CastSpell(SelectTarget(SELECT_TARGET_RANDOM,0,50.0f, true,0), me->GetMap()->IsHeroic() ? SPELL_THROW_H : SPELL_THROW_N, true);
-                    events.RepeatEvent(10000+rand()%15000);
+                    me->CastSpell(SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0), me->GetMap()->IsHeroic() ? SPELL_THROW_H : SPELL_THROW_N, true);
+                    events.RepeatEvent(10000 + rand() % 15000);
                     break;
                 case EVENT_DEADLY_THROW:
-                    me->CastSpell(SelectTarget(SELECT_TARGET_RANDOM,0,50.0f, true,0), me->GetMap()->IsHeroic() ? SPELL_DEADLY_THROW_H : SPELL_DEADLY_THROW_N, true);
-                    events.RepeatEvent(15000+rand()%15000);
+                    me->CastSpell(SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0), me->GetMap()->IsHeroic() ? SPELL_DEADLY_THROW_H : SPELL_DEADLY_THROW_N, true);
+                    events.RepeatEvent(15000 + rand() % 15000);
                     break;
                 case EVENT_DEFLECTION:
                     me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_DEFLECTION_H : SPELL_DEFLECTION_N, false);
