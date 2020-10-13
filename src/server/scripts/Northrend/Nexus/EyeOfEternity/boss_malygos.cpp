@@ -443,6 +443,7 @@ public:
 
                         events.RepeatEvent(urand(20000, 30000));
                     }
+                    break;
                 case EVENT_START_VORTEX_0:
                     {
                         bLockHealthCheck = true;
