@@ -89,7 +89,7 @@ public:
                     break;
                 case EVENT_SPELL_LUNG:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_LUNG_BURST);
+                        DoCast(target, SPELL_LUNG_BURST);
                     events.RepeatEvent(urand(7000, 12000));
                     break;
                 case EVENT_SPELL_ENVELOPING:

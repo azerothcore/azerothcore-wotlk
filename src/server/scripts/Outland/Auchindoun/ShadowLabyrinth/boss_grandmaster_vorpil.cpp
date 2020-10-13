@@ -168,25 +168,25 @@ public:
                     break;
                 case EVENT_SUMMON_TRAVELER:
                     spawnVoidTraveler();
-                    events.RepeatEvent(HealthBelowPct(20) ? 5000: 10000);
+                    events.RepeatEvent(HealthBelowPct(20) ? 5000 : 10000);
                     break;
                 case EVENT_SPELL_DRAWSHADOWS:
-                {
-                    Map* map = me->GetMap();
-                    Map::PlayerList const &PlayerList = map->GetPlayers();
-                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                        if (Player* player = i->GetSource())
-                            if (player->IsAlive() && !player->HasAura(SPELL_BANISH))
-                                player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
+                    {
+                        Map* map = me->GetMap();
+                        Map::PlayerList const& PlayerList = map->GetPlayers();
+                        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                            if (Player* player = i->GetSource())
+                                if (player->IsAlive() && !player->HasAura(SPELL_BANISH))
+                                    player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
 
-                    me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
-                    me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
-                    me->CastSpell(me, SPELL_RAIN_OF_FIRE_N);
+                        me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
+                        me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
+                        me->CastSpell(me, SPELL_RAIN_OF_FIRE_N);
 
-                    events.RepeatEvent(24000);
-                    events.DelayEvents(6000);
-                    break;
-                }
+                        events.RepeatEvent(24000);
+                        events.DelayEvents(6000);
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
