@@ -65,7 +65,8 @@ public:
                     playerGUID = 0;
                     exileTimer = 8500;
                     canTeleport = false;
-                } else exileTimer -= diff;
+                }
+                else exileTimer -= diff;
             }
             else if (banishTimer <= diff)
             {
@@ -78,7 +79,8 @@ public:
                     if (playerGUID)
                         canTeleport = true;
                 }
-            } else banishTimer -= diff;
+            }
+            else banishTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -130,7 +132,8 @@ public:
                     playerGUID = 0;
                     exileTimer = 8500;
                     canTeleport = false;
-                } else exileTimer -= diff;
+                }
+                else exileTimer -= diff;
             }
             else if (banishTimer <= diff)
             {
@@ -143,7 +146,8 @@ public:
                     if (playerGUID)
                         canTeleport = true;
                 }
-            } else banishTimer -= diff;
+            }
+            else banishTimer -= diff;
 
             DoMeleeAttackIfReady();
         }

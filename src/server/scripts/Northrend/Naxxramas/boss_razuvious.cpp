@@ -18,13 +18,13 @@ enum Says
 enum Spells
 {
     SPELL_UNBALANCING_STRIKE        = 26613,
-    SPELL_DISRUPTING_SHOUT_10       = 29107, 
+    SPELL_DISRUPTING_SHOUT_10       = 29107,
     SPELL_DISRUPTING_SHOUT_25       = 55543,
     SPELL_JAGGED_KNIFE              = 55550,
     SPELL_HOPELESS                  = 29125,
 
     SPELL_BONE_BARRIER              = 29061,
-    SPELL_BLOOD_STRIKE              = 61696, 
+    SPELL_BLOOD_STRIKE              = 61696,
 };
 
 
@@ -57,7 +57,7 @@ public:
 
     struct boss_razuviousAI : public BossAI
     {
-        explicit boss_razuviousAI(Creature *c) : BossAI(c, BOSS_RAZUVIOUS), summons(me)
+        explicit boss_razuviousAI(Creature* c) : BossAI(c, BOSS_RAZUVIOUS), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -109,11 +109,11 @@ public:
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
-            
+
             me->CastSpell(me, SPELL_HOPELESS, true);
         }
 
-        void EnterCombat(Unit * who) override
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -175,7 +175,7 @@ public:
 
     struct boss_razuvious_minionAI : public ScriptedAI
     {
-        explicit boss_razuvious_minionAI(Creature *c) : ScriptedAI(c) { }
+        explicit boss_razuvious_minionAI(Creature* c) : ScriptedAI(c) { }
 
         EventMap events;
 
@@ -193,7 +193,7 @@ public:
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void EnterCombat(Unit *who) override
+        void EnterCombat(Unit* who) override
         {
             if (Creature* cr = me->FindNearestCreature(NPC_RAZUVIOUS, 100.0f))
             {

@@ -63,16 +63,16 @@ enum Races
     //RACE_GOBLIN         = 9,
     RACE_BLOODELF       = 10,
     RACE_DRAENEI        = 11
-    //RACE_FEL_ORC        = 12,
-    //RACE_NAGA           = 13,
-    //RACE_BROKEN         = 14,
-    //RACE_SKELETON       = 15,
-    //RACE_VRYKUL         = 16,
-    //RACE_TUSKARR        = 17,
-    //RACE_FOREST_TROLL   = 18,
-    //RACE_TAUNKA         = 19,
-    //RACE_NORTHREND_SKELETON = 20,
-    //RACE_ICE_TROLL      = 21
+                          //RACE_FEL_ORC        = 12,
+                          //RACE_NAGA           = 13,
+                          //RACE_BROKEN         = 14,
+                          //RACE_SKELETON       = 15,
+                          //RACE_VRYKUL         = 16,
+                          //RACE_TUSKARR        = 17,
+                          //RACE_FOREST_TROLL   = 18,
+                          //RACE_TAUNKA         = 19,
+                          //RACE_NORTHREND_SKELETON = 20,
+                          //RACE_ICE_TROLL      = 21
 };
 
 // max+1 for player race
@@ -151,8 +151,8 @@ enum ReputationRank
 enum MoneyConstants
 {
     COPPER = 1,
-    SILVER = COPPER*100,
-    GOLD   = SILVER*100
+    SILVER = COPPER * 100,
+    GOLD   = SILVER * 100
 };
 
 enum Stats
@@ -208,8 +208,8 @@ enum SpellSchoolMask
 
     // 124, not include normal and holy damage
     SPELL_SCHOOL_MASK_SPELL   = (SPELL_SCHOOL_MASK_FIRE   |
-                                  SPELL_SCHOOL_MASK_NATURE | SPELL_SCHOOL_MASK_FROST  |
-                                  SPELL_SCHOOL_MASK_SHADOW | SPELL_SCHOOL_MASK_ARCANE),
+                                 SPELL_SCHOOL_MASK_NATURE | SPELL_SCHOOL_MASK_FROST  |
+                                 SPELL_SCHOOL_MASK_SHADOW | SPELL_SCHOOL_MASK_ARCANE),
     // 126
     SPELL_SCHOOL_MASK_MAGIC   = (SPELL_SCHOOL_MASK_HOLY | SPELL_SCHOOL_MASK_SPELL),
 
@@ -1167,7 +1167,8 @@ enum GhostVisibilityType
 
 // Spell aura states
 enum AuraStateType
-{   // (C) used in caster aura state     (T) used in target aura state
+{
+    // (C) used in caster aura state     (T) used in target aura state
     // (c) used in caster aura state-not (t) used in target aura state-not
     AURA_STATE_NONE                         = 0,            // C   |
     AURA_STATE_DEFENSE                      = 1,            // C   |
@@ -2515,9 +2516,9 @@ enum CreatureType
     CREATURE_TYPE_GAS_CLOUD        = 13
 };
 
-uint32 const CREATURE_TYPEMASK_DEMON_OR_UNDEAD = (1 << (CREATURE_TYPE_DEMON-1)) | (1 << (CREATURE_TYPE_UNDEAD-1));
-uint32 const CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD = (1 << (CREATURE_TYPE_HUMANOID-1)) | (1 << (CREATURE_TYPE_UNDEAD-1));
-uint32 const CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL = (1 << (CREATURE_TYPE_MECHANICAL-1)) | (1 << (CREATURE_TYPE_ELEMENTAL-1));
+uint32 const CREATURE_TYPEMASK_DEMON_OR_UNDEAD = (1 << (CREATURE_TYPE_DEMON - 1)) | (1 << (CREATURE_TYPE_UNDEAD - 1));
+uint32 const CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD = (1 << (CREATURE_TYPE_HUMANOID - 1)) | (1 << (CREATURE_TYPE_UNDEAD - 1));
+uint32 const CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL = (1 << (CREATURE_TYPE_MECHANICAL - 1)) | (1 << (CREATURE_TYPE_ELEMENTAL - 1));
 
 // CreatureFamily.dbc
 enum CreatureFamily
@@ -2710,16 +2711,26 @@ inline uint8 ClassByQuestSort(int32 QuestSort)
 {
     switch (QuestSort)
     {
-        case QUEST_SORT_WARLOCK:        return CLASS_WARLOCK;
-        case QUEST_SORT_WARRIOR:        return CLASS_WARRIOR;
-        case QUEST_SORT_SHAMAN:         return CLASS_SHAMAN;
-        case QUEST_SORT_PALADIN:        return CLASS_PALADIN;
-        case QUEST_SORT_MAGE:           return CLASS_MAGE;
-        case QUEST_SORT_ROGUE:          return CLASS_ROGUE;
-        case QUEST_SORT_HUNTER:         return CLASS_HUNTER;
-        case QUEST_SORT_PRIEST:         return CLASS_PRIEST;
-        case QUEST_SORT_DRUID:          return CLASS_DRUID;
-        case QUEST_SORT_DEATH_KNIGHT:   return CLASS_DEATH_KNIGHT;
+        case QUEST_SORT_WARLOCK:
+            return CLASS_WARLOCK;
+        case QUEST_SORT_WARRIOR:
+            return CLASS_WARRIOR;
+        case QUEST_SORT_SHAMAN:
+            return CLASS_SHAMAN;
+        case QUEST_SORT_PALADIN:
+            return CLASS_PALADIN;
+        case QUEST_SORT_MAGE:
+            return CLASS_MAGE;
+        case QUEST_SORT_ROGUE:
+            return CLASS_ROGUE;
+        case QUEST_SORT_HUNTER:
+            return CLASS_HUNTER;
+        case QUEST_SORT_PRIEST:
+            return CLASS_PRIEST;
+        case QUEST_SORT_DRUID:
+            return CLASS_DRUID;
+        case QUEST_SORT_DEATH_KNIGHT:
+            return CLASS_DEATH_KNIGHT;
     }
     return 0;
 }
@@ -2886,12 +2897,18 @@ inline SkillType SkillByLockType(LockType locktype)
 {
     switch (locktype)
     {
-        case LOCKTYPE_PICKLOCK:    return SKILL_LOCKPICKING;
-        case LOCKTYPE_HERBALISM:   return SKILL_HERBALISM;
-        case LOCKTYPE_MINING:      return SKILL_MINING;
-        case LOCKTYPE_FISHING:     return SKILL_FISHING;
-        case LOCKTYPE_INSCRIPTION: return SKILL_INSCRIPTION;
-        default: break;
+        case LOCKTYPE_PICKLOCK:
+            return SKILL_LOCKPICKING;
+        case LOCKTYPE_HERBALISM:
+            return SKILL_HERBALISM;
+        case LOCKTYPE_MINING:
+            return SKILL_MINING;
+        case LOCKTYPE_FISHING:
+            return SKILL_FISHING;
+        case LOCKTYPE_INSCRIPTION:
+            return SKILL_INSCRIPTION;
+        default:
+            break;
     }
     return SKILL_NONE;
 }
@@ -2900,17 +2917,28 @@ inline uint32 SkillByQuestSort(int32 QuestSort)
 {
     switch (QuestSort)
     {
-        case QUEST_SORT_HERBALISM:      return SKILL_HERBALISM;
-        case QUEST_SORT_FISHING:        return SKILL_FISHING;
-        case QUEST_SORT_BLACKSMITHING:  return SKILL_BLACKSMITHING;
-        case QUEST_SORT_ALCHEMY:        return SKILL_ALCHEMY;
-        case QUEST_SORT_LEATHERWORKING: return SKILL_LEATHERWORKING;
-        case QUEST_SORT_ENGINEERING:    return SKILL_ENGINEERING;
-        case QUEST_SORT_TAILORING:      return SKILL_TAILORING;
-        case QUEST_SORT_COOKING:        return SKILL_COOKING;
-        case QUEST_SORT_FIRST_AID:      return SKILL_FIRST_AID;
-        case QUEST_SORT_JEWELCRAFTING:  return SKILL_JEWELCRAFTING;
-        case QUEST_SORT_INSCRIPTION:    return SKILL_INSCRIPTION;
+        case QUEST_SORT_HERBALISM:
+            return SKILL_HERBALISM;
+        case QUEST_SORT_FISHING:
+            return SKILL_FISHING;
+        case QUEST_SORT_BLACKSMITHING:
+            return SKILL_BLACKSMITHING;
+        case QUEST_SORT_ALCHEMY:
+            return SKILL_ALCHEMY;
+        case QUEST_SORT_LEATHERWORKING:
+            return SKILL_LEATHERWORKING;
+        case QUEST_SORT_ENGINEERING:
+            return SKILL_ENGINEERING;
+        case QUEST_SORT_TAILORING:
+            return SKILL_TAILORING;
+        case QUEST_SORT_COOKING:
+            return SKILL_COOKING;
+        case QUEST_SORT_FIRST_AID:
+            return SKILL_FIRST_AID;
+        case QUEST_SORT_JEWELCRAFTING:
+            return SKILL_JEWELCRAFTING;
+        case QUEST_SORT_INSCRIPTION:
+            return SKILL_INSCRIPTION;
     }
     return 0;
 }
@@ -3133,7 +3161,7 @@ enum SummonCategory
     SUMMON_CATEGORY_PUPPET      = 3,
     SUMMON_CATEGORY_VEHICLE     = 4,
     SUMMON_CATEGORY_UNK         = 5, // as of patch 3.3.5a only Bone Spike in Icecrown Citadel
-                                     // uses this category
+    // uses this category
 };
 
 enum SummonType
@@ -3549,17 +3577,17 @@ struct MmapTileHeader
     char padding[3];
 
     MmapTileHeader() : mmapMagic(MMAP_MAGIC), dtVersion(DT_NAVMESH_VERSION),
-                       mmapVersion(MMAP_VERSION), size(0), usesLiquids(true), padding() { }
+        mmapVersion(MMAP_VERSION), size(0), usesLiquids(true), padding() { }
 };
 
 // All padding fields must be handled and initialized to ensure mmaps_generator will produce binary-identical *.mmtile files
 static_assert(sizeof(MmapTileHeader) == 20, "MmapTileHeader size is not correct, adjust the padding field size");
 static_assert(sizeof(MmapTileHeader) == (sizeof(MmapTileHeader::mmapMagic) +
-                                         sizeof(MmapTileHeader::dtVersion) +
-                                         sizeof(MmapTileHeader::mmapVersion) +
-                                         sizeof(MmapTileHeader::size) +
-                                         sizeof(MmapTileHeader::usesLiquids) +
-                                         sizeof(MmapTileHeader::padding)), "MmapTileHeader has uninitialized padding fields");
+              sizeof(MmapTileHeader::dtVersion) +
+              sizeof(MmapTileHeader::mmapVersion) +
+              sizeof(MmapTileHeader::size) +
+              sizeof(MmapTileHeader::usesLiquids) +
+              sizeof(MmapTileHeader::padding)), "MmapTileHeader has uninitialized padding fields");
 
 
 enum NavTerrain
@@ -3573,7 +3601,7 @@ enum NavTerrain
     NAV_UNUSED2 = 0x20,
     NAV_UNUSED3 = 0x40,
     NAV_UNUSED4 = 0x80
-    // we only have 8 bits
+                  // we only have 8 bits
 };
 
 #endif
