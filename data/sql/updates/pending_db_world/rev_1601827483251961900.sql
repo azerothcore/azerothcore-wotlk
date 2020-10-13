@@ -20,13 +20,13 @@ UPDATE `creature_template` SET `mindmg` = 5962, `maxdmg` = 8186, `DamageModifier
 /* BOSS */ 
 /* 1st: Available at opening. */
 UPDATE `creature_template` SET `mindmg` = 18352, `maxdmg` = 24482, `DamageModifier` = 1.01 WHERE `entry` = 31125; 
-UPDATE `creature_template` SET `mindmg` = 36368, `maxdmg` = 48484, `DamageModifier` = 1.01 WHERE `entry` = 31722;
+UPDATE `creature_template` SET `mindmg` = 39456, `maxdmg` = 52636, `DamageModifier` = 1.01 WHERE `entry` = 31722;
 /* 2nd: Second one to appear, towards Tier 8 */
 UPDATE `creature_template` SET `mindmg` = 18536, `maxdmg` = 25488, `DamageModifier` = 1.01 WHERE `entry` = 33993;
-UPDATE `creature_template` SET `mindmg` = 36571, `maxdmg` = 49486, `DamageModifier` = 1.01 WHERE `entry` = 33994;
+UPDATE `creature_template` SET `mindmg` = 39852, `maxdmg` = 54799, `DamageModifier` = 1.01 WHERE `entry` = 33994;
  /* 3rd: Towards Tier 8.5 / 9. */
 UPDATE `creature_template` SET `mindmg` = 18720, `maxdmg` = 26481, `DamageModifier` = 1.01 WHERE `entry` = 35013;
-UPDATE `creature_template` SET `mindmg` = 36740, `maxdmg` = 50487, `DamageModifier` = 1.01 WHERE `entry` = 35360;
+UPDATE `creature_template` SET `mindmg` = 40248, `maxdmg` = 56934, `DamageModifier` = 1.01 WHERE `entry` = 35360;
  /* 4th: Towards Tier 10 and last PvP Season. */
 UPDATE `creature_template` SET `mindmg` = 18934, `maxdmg` = 27483, `DamageModifier` = 1.01 WHERE `entry` = 38433;
-UPDATE `creature_template` SET `mindmg` = 36932, `maxdmg` = 51485, `DamageModifier` = 1.01 WHERE `entry` = 38462;
+UPDATE `creature_template` SET `mindmg` = 40708, `maxdmg` = 59088, `DamageModifier` = 1.01 WHERE `entry` = 38462;
