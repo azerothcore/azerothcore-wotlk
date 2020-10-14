@@ -8,5 +8,5 @@
   labels: ["Bash"]
 - regExp: ".*\\.cmake+$"
   labels: ["Cmake"]
--regExp: ".*\\.yml+$"
+- regExp: ".*\\.yml+$"
   labels: ["Workflow"]
