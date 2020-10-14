@@ -6,5 +6,7 @@
   labels: ["Documentation"]
 - regExp: ".*\\.sh+$"
   labels: ["Bash"]
-- regExp: ".*\\.cmake"
+- regExp: ".*\\.cmake+$"
   labels: ["Cmake"]
+-regExp: ".*\\.yml+$"
+  labels: ["Workflow"]
