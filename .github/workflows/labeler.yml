@@ -4,7 +4,7 @@ name: labeler
 on: [pull_request]
 jobs:
   label:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       # We need to checkout the repository to access the configured file (.github/label-pr.yml)
       - uses: actions/checkout@v2
