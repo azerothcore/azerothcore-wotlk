@@ -1,0 +1,14 @@
+- regExp: ".*\\.sql+$"
+  labels: ["DB"]
+- regExp: ".*\\.(cpp|h)+$"
+  labels: ["CORE"]
+- regExp: "src/server/scripts/(.*).(cpp|h)+$"
+  labels: ["Script"]
+- regExp: ".*\\.md+$"
+  labels: ["Documentation"]
+- regExp: ".*\\.sh+$"
+  labels: ["Bash"]
+- regExp: ".*\\.cmake+$"
+  labels: ["Cmake"]
+- regExp: ".*\\.yml+$"
+  labels: ["Workflow"]
