@@ -1,7 +1,9 @@
 - regExp: ".*\\.sql+$"
   labels: ["DB"]
-- regExp: "#^src/server/scripts/(.*).(cpp|h)$#i|.*\\.(cpp|h)+$"
+- regExp: ".*\\.(cpp|h)+$"
   labels: ["CORE"]
+- regExp: "src\\server\\scripts\\(.*).(cpp|h)+$"
+  labels: ["Script"]
 - regExp: ".*\\.md+$"
   labels: ["Documentation"]
 - regExp: ".*\\.sh+$"
