@@ -4,7 +4,7 @@ DB:
 CORE:
   - src/**/*.cpp
   - src/**/*.h
-  - !src/server/scripts/*
+  - '!src/server/scripts/*'
 
 Script:
   - src/server/scripts/*.cpp
