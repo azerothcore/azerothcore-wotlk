@@ -2,7 +2,7 @@ DB:
 - src/**/*.sql
 
 CORE:
-- any: ['src/**/*.cpp, src/**/*.h', !src/server/scripts/*]
+- any: ['src/**/*.cpp, src/**/*.h', !src/server/scripts/*']
 
 Script:
 - any: ['src/server/scripts/*.cpp, src/server/scripts/*.h']
