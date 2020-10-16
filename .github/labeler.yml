@@ -2,10 +2,13 @@ DB:
   - src/**/*.sql
 
 CORE:
-  - any: ['src/**/*.cpp', 'src/**/*.h', '!src/server/scripts/*']
+  - src/**/*.cpp
+  - src/**/*.h
+  - !src/server/scripts/*
 
 Script:
-  - any: ['src/server/scripts/*.cpp', 'src/server/scripts/*.h']
+  - src/server/scripts/*.cpp
+  - src/server/scripts/*.h
 
 Documentation:
   - ./*.md
@@ -17,4 +20,4 @@ Cmake:
   - ./*.cmake
 
 Workflow:
-  - ./*.yml
+  - .github/workflows/*
