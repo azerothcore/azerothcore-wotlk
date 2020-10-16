@@ -45,7 +45,7 @@ public:
 
     struct boss_loathebAI : public BossAI
     {
-        explicit boss_loathebAI(Creature *c) : BossAI(c, BOSS_LOATHEB), summons(me)
+        explicit boss_loathebAI(Creature* c) : BossAI(c, BOSS_LOATHEB), summons(me)
         {
             pInstance = me->GetInstanceScript();
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
@@ -86,7 +86,7 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void EnterCombat(Unit * who) override
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             if (pInstance)
@@ -136,7 +136,7 @@ public:
                     break;
                 case EVENT_SPELL_INEVITABLE_DOOM:
                     me->CastSpell(me, RAID_MODE(SPELL_INEVITABLE_DOOM_10, SPELL_INEVITABLE_DOOM_25), false);
-                    events.RepeatEvent(events.GetTimer() < 5*MINUTE*IN_MILLISECONDS ? 30000 : 15000);
+                    events.RepeatEvent(events.GetTimer() < 5 * MINUTE * IN_MILLISECONDS ? 30000 : 15000);
                     break;
                 case EVENT_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
@@ -151,8 +151,8 @@ public:
         {
             // Calculate the distance between his home position to the gate
             if (me->GetExactDist(me->GetHomePosition().GetPositionX(),
-                me->GetHomePosition().GetPositionY(),
-                me->GetHomePosition().GetPositionZ()) > 50.0f)
+                                 me->GetHomePosition().GetPositionY(),
+                                 me->GetHomePosition().GetPositionZ()) > 50.0f)
             {
                 EnterEvadeMode();
                 return false;
@@ -164,38 +164,38 @@ public:
 
 class spell_loatheb_necrotic_aura_warning : public SpellScriptLoader
 {
-    public:
-        spell_loatheb_necrotic_aura_warning() : SpellScriptLoader("spell_loatheb_necrotic_aura_warning") { }
+public:
+    spell_loatheb_necrotic_aura_warning() : SpellScriptLoader("spell_loatheb_necrotic_aura_warning") { }
 
-        class spell_loatheb_necrotic_aura_warning_AuraScript : public AuraScript
+    class spell_loatheb_necrotic_aura_warning_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_loatheb_necrotic_aura_warning_AuraScript);
+
+        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_loatheb_necrotic_aura_warning_AuraScript);
-
-            void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                Creature* target = GetTarget()->ToCreature();
-                if (target->IsAIEnabled)
-                    target->AI()->Talk(SAY_NECROTIC_AURA_APPLIED);
-            }
-
-            void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                Creature* target = GetTarget()->ToCreature();
-                if (target->IsAIEnabled)
-                    target->AI()->Talk(SAY_NECROTIC_AURA_REMOVED);
-            }
-
-            void Register() override
-            {
-                AfterEffectApply += AuraEffectApplyFn(spell_loatheb_necrotic_aura_warning_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-                AfterEffectRemove += AuraEffectRemoveFn(spell_loatheb_necrotic_aura_warning_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_loatheb_necrotic_aura_warning_AuraScript();
+            Creature* target = GetTarget()->ToCreature();
+            if (target->IsAIEnabled)
+                target->AI()->Talk(SAY_NECROTIC_AURA_APPLIED);
         }
+
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Creature* target = GetTarget()->ToCreature();
+            if (target->IsAIEnabled)
+                target->AI()->Talk(SAY_NECROTIC_AURA_REMOVED);
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_loatheb_necrotic_aura_warning_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_loatheb_necrotic_aura_warning_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_loatheb_necrotic_aura_warning_AuraScript();
+    }
 };
 
 void AddSC_boss_loatheb()
