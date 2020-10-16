@@ -45,15 +45,15 @@ public:
         //for special scripts
         switch (itemId)
         {
-           case 24538:
+            case 24538:
                 if (player->GetAreaId() != 3628)
                     disabled = true;
                 break;
-           case 34489:
+            case 34489:
                 if (player->GetZoneId() != 4080)
                     disabled = true;
                 break;
-           case 34475:
+            case 34475:
                 if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ARCANE_CHARGES))
                     Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_ON_GROUND);
                 break;
@@ -64,7 +64,7 @@ public:
             return false;
 
         // error
-        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, NULL);
+        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
         return true;
     }
 };
@@ -82,10 +82,10 @@ public:
     {
         if (player->GetQuestStatus(10832) == QUEST_STATUS_INCOMPLETE)
         {
-            if (Creature* nether = player->SummonCreature(22408, player->GetPositionX(), player->GetPositionY()+20, player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 180000))
+            if (Creature* nether = player->SummonCreature(22408, player->GetPositionX(), player->GetPositionY() + 20, player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 180000))
                 nether->AI()->AttackStart(player);
 
-            if (Creature* nether = player->SummonCreature(22408, player->GetPositionX(), player->GetPositionY()-20, player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 180000))
+            if (Creature* nether = player->SummonCreature(22408, player->GetPositionX(), player->GetPositionY() - 20, player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 180000))
                 nether->AI()->AttackStart(player);
         }
         return false;
@@ -104,10 +104,10 @@ public:
     bool OnUse(Player* player, Item* item, SpellCastTargets const& targets)
     {
         if (targets.GetUnitTarget() && targets.GetUnitTarget()->GetTypeId() == TYPEID_UNIT &&
-            targets.GetUnitTarget()->GetEntry() == 20748 && !targets.GetUnitTarget()->HasAura(32578))
+                targets.GetUnitTarget()->GetEntry() == 20748 && !targets.GetUnitTarget()->HasAura(32578))
             return false;
 
-        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, NULL);
+        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
         return true;
     }
 };
@@ -121,13 +121,13 @@ class item_incendiary_explosives : public ItemScript
 public:
     item_incendiary_explosives() : ItemScript("item_incendiary_explosives") { }
 
-    bool OnUse(Player* player, Item* item, SpellCastTargets const & /*targets*/)
+    bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/)
     {
         if (player->FindNearestCreature(26248, 15) || player->FindNearestCreature(26249, 15))
             return false;
         else
         {
-            player->SendEquipError(EQUIP_ERR_OUT_OF_RANGE, item, NULL);
+            player->SendEquipError(EQUIP_ERR_OUT_OF_RANGE, item, nullptr);
             return true;
         }
     }
@@ -189,14 +189,14 @@ class item_petrov_cluster_bombs : public ItemScript
 public:
     item_petrov_cluster_bombs() : ItemScript("item_petrov_cluster_bombs") { }
 
-    bool OnUse(Player* player, Item* item, const SpellCastTargets & /*targets*/)
+    bool OnUse(Player* player, Item* item, const SpellCastTargets& /*targets*/)
     {
         if (player->GetZoneId() != ZONE_ID_HOWLING)
             return false;
 
         if (!player->GetTransport() || player->GetAreaId() != AREA_ID_SHATTERED_STRAITS)
         {
-            player->SendEquipError(EQUIP_ERR_NONE, item, NULL);
+            player->SendEquipError(EQUIP_ERR_NONE, item, nullptr);
 
             if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(SPELL_PETROV_BOMB))
                 Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_HERE);
@@ -226,10 +226,34 @@ public:
             if (player->FindNearestCreature(NPC_VANIRAS_SENTRY_TOTEM, 10.0f))
                 return false;
             else
-                player->SendEquipError(EQUIP_ERR_OUT_OF_RANGE, item, NULL);
+                player->SendEquipError(EQUIP_ERR_OUT_OF_RANGE, item, nullptr);
         }
         else
-            player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, NULL);
+            player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
+        return true;
+    }
+};
+
+// Only used currently for
+// 19169: Nightfall
+class item_generic_limit_chance_above_60 : public ItemScript
+{
+public:
+    item_generic_limit_chance_above_60() : ItemScript("item_generic_limit_chance_above_60") { }
+
+    bool OnCastItemCombatSpell(Player* /*player*/, Unit* victim, SpellInfo const* /*spellInfo*/, Item* /*item*/) override
+    {
+        // spell proc chance gets severely reduced on victims > 60 (formula unknown)
+        if (victim->getLevel() > 60)
+        {
+            // gives ~0.1% proc chance at lvl 70
+            float const lvlPenaltyFactor = 9.93f;
+            float const failureChance = (victim->getLevel() - 60) * lvlPenaltyFactor;
+
+            // base ppm chance was already rolled, only roll success chance
+            return !roll_chance_f(failureChance);
+        }
+
         return true;
     }
 };
@@ -244,4 +268,5 @@ void AddSC_item_scripts()
     new item_disgusting_jar();
     new item_petrov_cluster_bombs();
     new item_captured_frog();
+    new item_generic_limit_chance_above_60();
 }
