@@ -12,7 +12,7 @@ namespace MMAP
 {
     // ######################## MMapFactory ########################
     // our global singleton copy
-    MMapManager *g_MMapManager = NULL;
+    MMapManager* g_MMapManager = NULL;
     bool MMapFactory::forbiddenMaps[1000] = {0};
 
     MMapManager* MMapFactory::createOrGetMMapManager()

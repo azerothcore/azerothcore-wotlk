@@ -49,7 +49,7 @@ public:
 
     struct boss_patchwerkAI : public BossAI
     {
-        explicit boss_patchwerkAI(Creature *c) : BossAI(c, BOSS_PATCHWERK)
+        explicit boss_patchwerkAI(Creature* c) : BossAI(c, BOSS_PATCHWERK)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -68,7 +68,7 @@ public:
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (!urand(0,3))
+            if (!urand(0, 3))
                 Talk(SAY_SLAY);
 
             if (pInstance)
@@ -81,11 +81,11 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit * who) override
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
-            
+
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_SPELL_HATEFUL_STRIKE, 1200);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 360000);
@@ -109,50 +109,50 @@ public:
             switch (events.GetEvent())
             {
                 case EVENT_SPELL_HATEFUL_STRIKE:
-                {
-                    //Cast Hateful strike on the player with the highest
-                    //amount of HP within melee distance, and second threat amount
-                    std::list<Unit*> meleeRangeTargets;
-                    Unit* finalTarget = nullptr;
-                    uint8 counter = 0;
-                    
-                    auto i = me->getThreatManager().getThreatList().begin();
-                    for (; i != me->getThreatManager().getThreatList().end(); ++i, ++counter)
                     {
-                        // Gather all units with melee range
-                        Unit *target = (*i)->getTarget();
-                        if (me->IsWithinMeleeRange(target))
-                            meleeRangeTargets.push_back(target);
+                        //Cast Hateful strike on the player with the highest
+                        //amount of HP within melee distance, and second threat amount
+                        std::list<Unit*> meleeRangeTargets;
+                        Unit* finalTarget = nullptr;
+                        uint8 counter = 0;
 
-                        // and add threat to most hated
-                        if (counter < RAID_MODE(2,3))
-                            me->AddThreat(target, 500.0f);
-                    }
-
-                    counter = 0;
-                    list<Unit *, std::allocator<Unit *>>::iterator itr;
-                    for (itr = meleeRangeTargets.begin(); itr != meleeRangeTargets.end(); ++itr, ++counter)
-                    {
-                        // if there is only one target available
-                        if (meleeRangeTargets.size() == 1)
-                            finalTarget = (*itr);
-                        else if (counter > 0) // skip first target
+                        auto i = me->getThreatManager().getThreatList().begin();
+                        for (; i != me->getThreatManager().getThreatList().end(); ++i, ++counter)
                         {
-                            if (!finalTarget || (*itr)->GetHealth() > finalTarget->GetHealth())
-                                finalTarget = (*itr);
+                            // Gather all units with melee range
+                            Unit* target = (*i)->getTarget();
+                            if (me->IsWithinMeleeRange(target))
+                                meleeRangeTargets.push_back(target);
 
-                            // third loop
-                            if (counter >= 2)
-                                break;
+                            // and add threat to most hated
+                            if (counter < RAID_MODE(2, 3))
+                                me->AddThreat(target, 500.0f);
                         }
+
+                        counter = 0;
+                        list<Unit*, std::allocator<Unit*>>::iterator itr;
+                        for (itr = meleeRangeTargets.begin(); itr != meleeRangeTargets.end(); ++itr, ++counter)
+                        {
+                            // if there is only one target available
+                            if (meleeRangeTargets.size() == 1)
+                                finalTarget = (*itr);
+                            else if (counter > 0) // skip first target
+                            {
+                                if (!finalTarget || (*itr)->GetHealth() > finalTarget->GetHealth())
+                                    finalTarget = (*itr);
+
+                                // third loop
+                                if (counter >= 2)
+                                    break;
+                            }
+                        }
+
+                        if (finalTarget)
+                            me->CastSpell(finalTarget, RAID_MODE(SPELL_HATEFUL_STRIKE_10, SPELL_HATEFUL_STRIKE_25), false);
+
+                        events.RepeatEvent(1000);
+                        break;
                     }
-
-                    if (finalTarget)
-                        me->CastSpell(finalTarget, RAID_MODE(SPELL_HATEFUL_STRIKE_10, SPELL_HATEFUL_STRIKE_25), false);
-
-                    events.RepeatEvent(1000);
-                    break;
-                }
                 case EVENT_SPELL_BERSERK:
                     Talk(EMOTE_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);

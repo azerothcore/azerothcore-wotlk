@@ -97,7 +97,7 @@ public:
                 {
                     c->RemoveAura(46598);
                     c->GetMotionMaster()->Clear();
-                    c->GetMotionMaster()->MovePath(PATH_BEGIN_VALUE+18, true);
+                    c->GetMotionMaster()->MovePath(PATH_BEGIN_VALUE + 18, true);
                 }
                 me->SetHomePosition(exitPos);
                 me->GetMotionMaster()->MoveJump(exitPos, 10.0f, 2.0f);
@@ -109,8 +109,8 @@ public:
                 me->CastSpell(me, 43979, true);
                 Talk(SAY_AGGRO);
                 events.Reset();
-                events.RescheduleEvent(EVENT_SPELL_FORCEFUL_SMASH, urand(14000,16000));
-                events.RescheduleEvent(EVENT_SPELL_OVERLORDS_BRAND, urand(4000,6000));
+                events.RescheduleEvent(EVENT_SPELL_FORCEFUL_SMASH, urand(14000, 16000));
+                events.RescheduleEvent(EVENT_SPELL_OVERLORDS_BRAND, urand(4000, 6000));
                 events.RescheduleEvent(EVENT_RIMEFANG_SPELL_ICY_BLAST, 5000);
                 events.RescheduleEvent(EVENT_SPELL_MARK_OF_RIMEFANG, 25000);
             }
@@ -123,9 +123,9 @@ public:
 
             if (me->GetVictim())
             {
-                float x,y,z;
+                float x, y, z;
                 me->GetVictim()->GetPosition(x, y, z);
-                if (TSDistCheckPos.GetExactDist(x,y,z) > 100.0f || z > TSDistCheckPos.GetPositionZ()+20.0f || z < TSDistCheckPos.GetPositionZ()-20.0f)
+                if (TSDistCheckPos.GetExactDist(x, y, z) > 100.0f || z > TSDistCheckPos.GetPositionZ() + 20.0f || z < TSDistCheckPos.GetPositionZ() - 20.0f)
                 {
                     me->SetHealth(me->GetMaxHealth());
                     EnterEvadeMode();
@@ -162,7 +162,7 @@ public:
                 case EVENT_SPELL_OVERLORDS_BRAND:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 95.0f, true))
                         me->CastSpell(target, SPELL_OVERLORDS_BRAND, false);
-                    events.RepeatEvent(urand(11000,12000));
+                    events.RepeatEvent(urand(11000, 12000));
                     break;
                 case EVENT_RIMEFANG_SPELL_ICY_BLAST:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 190.0f, true))
@@ -198,7 +198,7 @@ public:
         void KilledUnit(Unit* who)
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
-                Talk(RAND(SAY_SLAY_1,SAY_SLAY_2));
+                Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
         }
 
         bool CanAIAttack(const Unit* who) const
