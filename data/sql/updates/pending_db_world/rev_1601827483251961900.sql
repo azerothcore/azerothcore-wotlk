@@ -24,7 +24,7 @@ UPDATE `creature_template` SET `mindmg` = 35630, `maxdmg` = 47810, `DamageModifi
 /* 2nd: Second one to appear, towards Tier 8. - Will be updated during Ulduar. */
 UPDATE `creature_template` SET `mindmg` = 17815, `maxdmg` = 23905, `DamageModifier` = 1.01 WHERE `entry` = 33993;
 UPDATE `creature_template` SET `mindmg` = 35630, `maxdmg` = 47810, `DamageModifier` = 1.01 WHERE `entry` = 33994;
- /* 3rd: Towards Tier 8.5 / 9. - Should have better stats now. */ 
+ /* 3rd: Towards Tier 8.5 / 9. - Should have better stats now - Iya tested, vallues are correct now. */ 
 UPDATE `creature_template` SET `mindmg` = 26250, `maxdmg` = 36750, `DamageModifier` = 1.01 WHERE `entry` = 35013;
 UPDATE `creature_template` SET `mindmg` = 52500, `maxdmg` = 73500, `DamageModifier` = 1.01 WHERE `entry` = 35360;
  /* 4th: Towards Tier 10 and last PvP Season. - Will be updated during ICC fixes. */
