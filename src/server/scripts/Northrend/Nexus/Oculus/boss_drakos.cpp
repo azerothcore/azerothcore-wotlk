@@ -54,11 +54,11 @@ public:
 
     struct boss_drakosAI : public ScriptedAI
     {
-        boss_drakosAI(Creature *c) : ScriptedAI(c)
+        boss_drakosAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
-        
+
         InstanceScript* pInstance;
         EventMap events;
 
@@ -79,7 +79,7 @@ public:
 
             me->SetInCombatWithZone();
 
-            events.RescheduleEvent(EVENT_MAGIC_PULL, urand(10000,15000));
+            events.RescheduleEvent(EVENT_MAGIC_PULL, urand(10000, 15000));
             events.RescheduleEvent(EVENT_THUNDERING_STOMP, urand(3000, 6000));
             events.RescheduleEvent(EVENT_SUMMON, 2000);
         }
@@ -91,8 +91,8 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(DATA_DRAKOS, DONE);
-                for( uint8 i=0; i<3; ++i )
-                    if( uint64 guid = pInstance->GetData64(DATA_DCD_1+i) )
+                for( uint8 i = 0; i < 3; ++i )
+                    if( uint64 guid = pInstance->GetData64(DATA_DCD_1 + i) )
                         if( GameObject* pGo = ObjectAccessor::GetGameObject(*me, guid) )
                             if( pGo->GetGoState() != GO_STATE_ACTIVE )
                             {
@@ -103,7 +103,7 @@ public:
 
         }
 
-        void KilledUnit(Unit * /*victim*/)
+        void KilledUnit(Unit* /*victim*/)
         {
             Talk(SAY_KILL);
         }
@@ -133,7 +133,7 @@ public:
                         //me->MonsterTextEmote(TEXT_MAGIC_PULL, 0, true);
 
                         me->CastSpell(me, SPELL_MAGIC_PULL, false);
-                        events.RepeatEvent(urand(15000,25000));
+                        events.RepeatEvent(urand(15000, 25000));
                         events.ScheduleEvent(EVENT_SUMMON_x4, 1500);
                     }
                     break;
@@ -142,24 +142,24 @@ public:
                         Talk(SAY_STOMP);
 
                         me->CastSpell(me, SPELL_THUNDERING_STOMP, false);
-                        events.RepeatEvent(urand(10000,20000));
+                        events.RepeatEvent(urand(10000, 20000));
                     }
                     break;
                 case EVENT_SUMMON:
                     {
-                        for( uint8 i=0; i<2; ++i )
+                        for( uint8 i = 0; i < 2; ++i )
                         {
-                            float angle = rand_norm()*2*M_PI;
-                            me->SummonCreature(NPC_UNSTABLE_SPHERE, me->GetPositionX() + 5.0f*cos(angle), me->GetPositionY() + 5.0f*sin(angle), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 18000);
+                            float angle = rand_norm() * 2 * M_PI;
+                            me->SummonCreature(NPC_UNSTABLE_SPHERE, me->GetPositionX() + 5.0f * cos(angle), me->GetPositionY() + 5.0f * sin(angle), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 18000);
                         }
                         events.RepeatEvent(2000);
                     }
                     break;
                 case EVENT_SUMMON_x4:
-                    for( uint8 i=0; i<4; ++i )
+                    for( uint8 i = 0; i < 4; ++i )
                     {
-                        float angle = rand_norm()*2*M_PI;
-                        me->SummonCreature(NPC_UNSTABLE_SPHERE, me->GetPositionX() + 5.0f*cos(angle), me->GetPositionY() + 5.0f*sin(angle), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 18000);
+                        float angle = rand_norm() * 2 * M_PI;
+                        me->SummonCreature(NPC_UNSTABLE_SPHERE, me->GetPositionX() + 5.0f * cos(angle), me->GetPositionY() + 5.0f * sin(angle), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 18000);
                     }
                     events.PopEvent();
                     break;
@@ -180,16 +180,16 @@ public:
 
     struct npc_oculus_unstable_sphereAI : public ScriptedAI
     {
-        npc_oculus_unstable_sphereAI(Creature *c) : ScriptedAI(c) {}
+        npc_oculus_unstable_sphereAI(Creature* c) : ScriptedAI(c) {}
 
         uint32 timer;
         bool located, gonext;
 
         void PickNewLocation()
         {
-            float dist = rand_norm()*40.0f;
-            float angle = rand_norm()*2*M_PI;
-            me->GetMotionMaster()->MovePoint(1, 961.29f + dist*cos(angle), 1049.0f + dist*sin(angle), 360.0f);
+            float dist = rand_norm() * 40.0f;
+            float angle = rand_norm() * 2 * M_PI;
+            me->GetMotionMaster()->MovePoint(1, 961.29f + dist * cos(angle), 1049.0f + dist * sin(angle), 360.0f);
         }
 
         void MovementInform(uint32 type, uint32 id)

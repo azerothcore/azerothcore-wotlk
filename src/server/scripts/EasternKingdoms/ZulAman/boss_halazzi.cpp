@@ -55,83 +55,83 @@ enum Yells
 
 class boss_halazzi : public CreatureScript
 {
-    public:
-        boss_halazzi() : CreatureScript("boss_halazzi") { }
+public:
+    boss_halazzi() : CreatureScript("boss_halazzi") { }
 
-        struct boss_halazziAI : public ScriptedAI
+    struct boss_halazziAI : public ScriptedAI
+    {
+        boss_halazziAI(Creature* creature) : ScriptedAI(creature), summons(me)
         {
-            boss_halazziAI(Creature* creature) : ScriptedAI(creature), summons(me)
+            instance = creature->GetInstanceScript();
+        }
+
+        InstanceScript* instance;
+        SummonList summons;
+        PhaseHalazzi Phase;
+
+        uint32 FrenzyTimer;
+        uint32 SaberlashTimer;
+        uint32 ShockTimer;
+        uint32 TotemTimer;
+        uint32 CheckTimer;
+        uint32 BerserkTimer;
+        uint32 TransformCount;
+
+        uint64 LynxGUID;
+
+        void Reset()
+        {
+            instance->SetData(DATA_HALAZZIEVENT, NOT_STARTED);
+            summons.DespawnAll();
+
+            LynxGUID = 0;
+            TransformCount = 0;
+            BerserkTimer = 600000;
+            CheckTimer = 1000;
+
+            DoCast(me, SPELL_DUAL_WIELD, true);
+
+            Phase = PHASE_NONE;
+            EnterPhase(PHASE_LYNX);
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            instance->SetData(DATA_HALAZZIEVENT, IN_PROGRESS);
+            Talk(SAY_AGGRO);
+            EnterPhase(PHASE_LYNX);
+        }
+
+        void JustSummoned(Creature* summon)
+        {
+            summon->AI()->AttackStart(me->GetVictim());
+            if (summon->GetEntry() == NPC_SPIRIT_LYNX)
+                LynxGUID = summon->GetGUID();
+            summons.Summon(summon);
+        }
+
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        {
+            if (damage >= me->GetHealth() && Phase != PHASE_ENRAGE)
+                damage = 0;
+        }
+
+        void SpellHit(Unit*, const SpellInfo* spell)
+        {
+            if (spell->Id == SPELL_TRANSFORM_SPLIT2)
+                EnterPhase(PHASE_HUMAN);
+        }
+
+        void AttackStart(Unit* who)
+        {
+            if (Phase != PHASE_MERGE)
+                ScriptedAI::AttackStart(who);
+        }
+
+        void EnterPhase(PhaseHalazzi NextPhase)
+        {
+            switch (NextPhase)
             {
-                instance = creature->GetInstanceScript();
-            }
-
-            InstanceScript* instance;
-            SummonList summons;
-            PhaseHalazzi Phase;
-
-            uint32 FrenzyTimer;
-            uint32 SaberlashTimer;
-            uint32 ShockTimer;
-            uint32 TotemTimer;
-            uint32 CheckTimer;
-            uint32 BerserkTimer;
-            uint32 TransformCount;
-
-            uint64 LynxGUID;
-
-            void Reset()
-            {
-                instance->SetData(DATA_HALAZZIEVENT, NOT_STARTED);
-                summons.DespawnAll();
-
-                LynxGUID = 0;
-                TransformCount = 0;
-                BerserkTimer = 600000;
-                CheckTimer = 1000;
-
-                DoCast(me, SPELL_DUAL_WIELD, true);
-
-                Phase = PHASE_NONE;
-                EnterPhase(PHASE_LYNX);
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                instance->SetData(DATA_HALAZZIEVENT, IN_PROGRESS);
-                Talk(SAY_AGGRO);
-                EnterPhase(PHASE_LYNX);
-            }
-
-            void JustSummoned(Creature* summon)
-            {
-                summon->AI()->AttackStart(me->GetVictim());
-                if (summon->GetEntry() == NPC_SPIRIT_LYNX)
-                    LynxGUID = summon->GetGUID();
-                summons.Summon(summon);
-            }
-
-            void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
-            {
-                if (damage >= me->GetHealth() && Phase != PHASE_ENRAGE)
-                    damage = 0;
-            }
-
-            void SpellHit(Unit*, const SpellInfo* spell)
-            {
-                if (spell->Id == SPELL_TRANSFORM_SPLIT2)
-                    EnterPhase(PHASE_HUMAN);
-            }
-
-            void AttackStart(Unit* who)
-            {
-                if (Phase != PHASE_MERGE)
-                    ScriptedAI::AttackStart(who);
-            }
-
-            void EnterPhase(PhaseHalazzi NextPhase)
-            {
-                switch (NextPhase)
-                {
                 case PHASE_LYNX:
                 case PHASE_ENRAGE:
                     if (Phase == PHASE_MERGE)
@@ -175,191 +175,201 @@ class boss_halazzi : public CreatureScript
                     break;
                 default:
                     break;
-                }
-                Phase = NextPhase;
             }
+            Phase = NextPhase;
+        }
 
-            void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (BerserkTimer <= diff)
             {
-                if (!UpdateVictim())
-                    return;
+                Talk(SAY_BERSERK);
+                DoCast(me, SPELL_BERSERK, true);
+                BerserkTimer = 60000;
+            }
+            else BerserkTimer -= diff;
 
-                if (BerserkTimer <= diff)
+            if (Phase == PHASE_LYNX || Phase == PHASE_ENRAGE)
+            {
+                if (SaberlashTimer <= diff)
                 {
-                    Talk(SAY_BERSERK);
-                    DoCast(me, SPELL_BERSERK, true);
-                    BerserkTimer = 60000;
-                } else BerserkTimer -= diff;
-
-                if (Phase == PHASE_LYNX || Phase == PHASE_ENRAGE)
-                {
-                    if (SaberlashTimer <= diff)
-                    {
-                        // A tank with more than 490 defense skills should receive no critical hit
-                        //DoCast(me, 41296, true);
-                        DoCastVictim(SPELL_SABER_LASH, true);
-                        //me->RemoveAurasDueToSpell(41296);
-                        SaberlashTimer = 30000;
-                    } else SaberlashTimer -= diff;
-
-                    if (FrenzyTimer <= diff)
-                    {
-                        DoCast(me, SPELL_FRENZY);
-                        FrenzyTimer = urand(10000, 15000);
-                    } else FrenzyTimer -= diff;
-
-                    if (Phase == PHASE_LYNX)
-                    {
-                        if (CheckTimer <= diff)
-                        {
-                            if (HealthBelowPct(25 * (3 - TransformCount)))
-                                EnterPhase(PHASE_SPLIT);
-                            CheckTimer = 1000;
-                        } else CheckTimer -= diff;
-                    }
+                    // A tank with more than 490 defense skills should receive no critical hit
+                    //DoCast(me, 41296, true);
+                    DoCastVictim(SPELL_SABER_LASH, true);
+                    //me->RemoveAurasDueToSpell(41296);
+                    SaberlashTimer = 30000;
                 }
+                else SaberlashTimer -= diff;
 
-                if (Phase == PHASE_HUMAN || Phase == PHASE_ENRAGE)
+                if (FrenzyTimer <= diff)
                 {
-                    if (TotemTimer <= diff)
-                    {
-                        DoCast(me, SPELL_SUMMON_TOTEM);
-                        TotemTimer = 20000;
-                    } else TotemTimer -= diff;
-
-                    if (ShockTimer <= diff)
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        {
-                            if (target->IsNonMeleeSpellCast(false))
-                                DoCast(target, SPELL_EARTHSHOCK);
-                            else
-                                DoCast(target, SPELL_FLAMESHOCK);
-                            ShockTimer = urand(10000, 15000);
-                        }
-                    } else ShockTimer -= diff;
-
-                    if (Phase == PHASE_HUMAN)
-                    {
-                        if (CheckTimer <= diff)
-                        {
-                            if (!HealthAbovePct(20) /*HealthBelowPct(10)*/)
-                                EnterPhase(PHASE_MERGE);
-                            else
-                            {
-                                Unit* Lynx = ObjectAccessor::GetUnit(*me, LynxGUID);
-                                if (Lynx && !Lynx->HealthAbovePct(20) /*Lynx->HealthBelowPct(10)*/)
-                                    EnterPhase(PHASE_MERGE);
-                            }
-                            CheckTimer = 1000;
-                        } else CheckTimer -= diff;
-                    }
+                    DoCast(me, SPELL_FRENZY);
+                    FrenzyTimer = urand(10000, 15000);
                 }
+                else FrenzyTimer -= diff;
 
-                if (Phase == PHASE_MERGE)
+                if (Phase == PHASE_LYNX)
                 {
                     if (CheckTimer <= diff)
                     {
-                        Unit* Lynx = ObjectAccessor::GetUnit(*me, LynxGUID);
-                        if (Lynx)
+                        if (HealthBelowPct(25 * (3 - TransformCount)))
+                            EnterPhase(PHASE_SPLIT);
+                        CheckTimer = 1000;
+                    }
+                    else CheckTimer -= diff;
+                }
+            }
+
+            if (Phase == PHASE_HUMAN || Phase == PHASE_ENRAGE)
+            {
+                if (TotemTimer <= diff)
+                {
+                    DoCast(me, SPELL_SUMMON_TOTEM);
+                    TotemTimer = 20000;
+                }
+                else TotemTimer -= diff;
+
+                if (ShockTimer <= diff)
+                {
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    {
+                        if (target->IsNonMeleeSpellCast(false))
+                            DoCast(target, SPELL_EARTHSHOCK);
+                        else
+                            DoCast(target, SPELL_FLAMESHOCK);
+                        ShockTimer = urand(10000, 15000);
+                    }
+                }
+                else ShockTimer -= diff;
+
+                if (Phase == PHASE_HUMAN)
+                {
+                    if (CheckTimer <= diff)
+                    {
+                        if (!HealthAbovePct(20) /*HealthBelowPct(10)*/)
+                            EnterPhase(PHASE_MERGE);
+                        else
                         {
-                            Lynx->GetMotionMaster()->MoveFollow(me, 0, 0);
-                            me->GetMotionMaster()->MoveFollow(Lynx, 0, 0);
-                            if (me->IsWithinDistInMap(Lynx, 6.0f))
-                            {
-                                if (TransformCount < 3)
-                                    EnterPhase(PHASE_LYNX);
-                                else
-                                    EnterPhase(PHASE_ENRAGE);
-                            }
+                            Unit* Lynx = ObjectAccessor::GetUnit(*me, LynxGUID);
+                            if (Lynx && !Lynx->HealthAbovePct(20) /*Lynx->HealthBelowPct(10)*/)
+                                EnterPhase(PHASE_MERGE);
                         }
                         CheckTimer = 1000;
-                    } else CheckTimer -= diff;
+                    }
+                    else CheckTimer -= diff;
                 }
-
-                DoMeleeAttackIfReady();
             }
 
-            void KilledUnit(Unit* victim)
+            if (Phase == PHASE_MERGE)
             {
-                if (victim->GetTypeId() != TYPEID_PLAYER)
-                    return;
-
-                Talk(SAY_KILL);
+                if (CheckTimer <= diff)
+                {
+                    Unit* Lynx = ObjectAccessor::GetUnit(*me, LynxGUID);
+                    if (Lynx)
+                    {
+                        Lynx->GetMotionMaster()->MoveFollow(me, 0, 0);
+                        me->GetMotionMaster()->MoveFollow(Lynx, 0, 0);
+                        if (me->IsWithinDistInMap(Lynx, 6.0f))
+                        {
+                            if (TransformCount < 3)
+                                EnterPhase(PHASE_LYNX);
+                            else
+                                EnterPhase(PHASE_ENRAGE);
+                        }
+                    }
+                    CheckTimer = 1000;
+                }
+                else CheckTimer -= diff;
             }
 
-            void JustDied(Unit* /*killer*/)
-            {
-                instance->SetData(DATA_HALAZZIEVENT, DONE);
-                Talk(SAY_DEATH);
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return GetInstanceAI<boss_halazziAI>(creature);
+            DoMeleeAttackIfReady();
         }
+
+        void KilledUnit(Unit* victim)
+        {
+            if (victim->GetTypeId() != TYPEID_PLAYER)
+                return;
+
+            Talk(SAY_KILL);
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            instance->SetData(DATA_HALAZZIEVENT, DONE);
+            Talk(SAY_DEATH);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetInstanceAI<boss_halazziAI>(creature);
+    }
 };
 
 // Spirits Lynx AI
 class npc_halazzi_lynx : public CreatureScript
 {
-    public:
-        npc_halazzi_lynx() : CreatureScript("npc_halazzi_lynx") { }
+public:
+    npc_halazzi_lynx() : CreatureScript("npc_halazzi_lynx") { }
 
-        struct npc_halazzi_lynxAI : public ScriptedAI
+    struct npc_halazzi_lynxAI : public ScriptedAI
+    {
+        npc_halazzi_lynxAI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 FrenzyTimer;
+        uint32 shredder_timer;
+
+        void Reset()
         {
-            npc_halazzi_lynxAI(Creature* creature) : ScriptedAI(creature) { }
+            FrenzyTimer = urand(30000, 50000);  //frenzy every 30-50 seconds
+            shredder_timer = 4000;
+        }
 
-            uint32 FrenzyTimer;
-            uint32 shredder_timer;
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        {
+            if (damage >= me->GetHealth())
+                damage = 0;
+        }
 
-            void Reset()
+        void AttackStart(Unit* who)
+        {
+            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                ScriptedAI::AttackStart(who);
+        }
+
+        void EnterCombat(Unit* /*who*/) {/*DoZoneInCombat();*/ }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (FrenzyTimer <= diff)
             {
+                DoCast(me, SPELL_LYNX_FRENZY);
                 FrenzyTimer = urand(30000, 50000);  //frenzy every 30-50 seconds
+            }
+            else FrenzyTimer -= diff;
+
+            if (shredder_timer <= diff)
+            {
+                DoCastVictim(SPELL_SHRED_ARMOR);
                 shredder_timer = 4000;
             }
+            else shredder_timer -= diff;
 
-            void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
-            {
-                if (damage >= me->GetHealth())
-                    damage = 0;
-            }
-
-            void AttackStart(Unit* who)
-            {
-                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
-                    ScriptedAI::AttackStart(who);
-            }
-
-            void EnterCombat(Unit* /*who*/) {/*DoZoneInCombat();*/ }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                if (FrenzyTimer <= diff)
-                {
-                    DoCast(me, SPELL_LYNX_FRENZY);
-                    FrenzyTimer = urand(30000, 50000);  //frenzy every 30-50 seconds
-                } else FrenzyTimer -= diff;
-
-                if (shredder_timer <= diff)
-                {
-                    DoCastVictim(SPELL_SHRED_ARMOR);
-                    shredder_timer = 4000;
-                } else shredder_timer -= diff;
-
-                DoMeleeAttackIfReady();
-            }
-
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_halazzi_lynxAI(creature);
+            DoMeleeAttackIfReady();
         }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_halazzi_lynxAI(creature);
+    }
 };
 
 void AddSC_boss_halazzi()

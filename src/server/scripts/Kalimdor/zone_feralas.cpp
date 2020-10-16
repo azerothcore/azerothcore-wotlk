@@ -33,7 +33,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
             SendGossipMenuFor(player, 2434, creature->GetGUID());
@@ -49,7 +49,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->IsVendor() && player->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, 2433, creature->GetGUID());
         return true;
@@ -178,33 +178,33 @@ enum GordunniTrap
 
 class spell_gordunni_trap : public SpellScriptLoader
 {
-    public:
-        spell_gordunni_trap() : SpellScriptLoader("spell_gordunni_trap") { }
+public:
+    spell_gordunni_trap() : SpellScriptLoader("spell_gordunni_trap") { }
 
-        class spell_gordunni_trap_SpellScript : public SpellScript
+    class spell_gordunni_trap_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gordunni_trap_SpellScript);
+
+        void HandleDummy()
         {
-            PrepareSpellScript(spell_gordunni_trap_SpellScript);
-
-            void HandleDummy()
-            {
-                if (Unit* caster = GetCaster())
-                    if (GameObject* chest = caster->SummonGameObject(GO_GORDUNNI_DIRT_MOUND, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
-                    {
-                        chest->SetSpellId(GetSpellInfo()->Id);
-                        caster->RemoveGameObject(chest, false);
-                    }
-            }
-
-            void Register()
-            {
-                OnCast += SpellCastFn(spell_gordunni_trap_SpellScript::HandleDummy);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_gordunni_trap_SpellScript();
+            if (Unit* caster = GetCaster())
+                if (GameObject* chest = caster->SummonGameObject(GO_GORDUNNI_DIRT_MOUND, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                {
+                    chest->SetSpellId(GetSpellInfo()->Id);
+                    caster->RemoveGameObject(chest, false);
+                }
         }
+
+        void Register()
+        {
+            OnCast += SpellCastFn(spell_gordunni_trap_SpellScript::HandleDummy);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gordunni_trap_SpellScript();
+    }
 };
 
 /*######

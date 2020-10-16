@@ -26,7 +26,7 @@ MapInstanced::MapInstanced(uint32 id) : Map(id, 0, DUNGEON_DIFFICULTY_NORMAL)
 }
 
 void MapInstanced::InitVisibilityDistance()
-{ 
+{
     if (m_InstancedMaps.empty())
         return;
     //initialize visibility distances for all instance copies
@@ -66,7 +66,7 @@ void MapInstanced::Update(const uint32 t, const uint32 s_diff, bool /*thread*/)
 }
 
 void MapInstanced::DelayedUpdate(const uint32 diff)
-{ 
+{
     for (InstancedMaps::iterator i = m_InstancedMaps.begin(); i != m_InstancedMaps.end(); ++i)
         i->second->DelayedUpdate(diff);
 
@@ -75,14 +75,14 @@ void MapInstanced::DelayedUpdate(const uint32 diff)
 
 /*
 void MapInstanced::RelocationNotify()
-{ 
+{
     for (InstancedMaps::iterator i = m_InstancedMaps.begin(); i != m_InstancedMaps.end(); ++i)
         i->second->RelocationNotify();
 }
 */
 
 void MapInstanced::UnloadAll()
-{ 
+{
     // Unload instanced maps
     for (InstancedMaps::iterator i = m_InstancedMaps.begin(); i != m_InstancedMaps.end(); ++i)
         i->second->UnloadAll();
@@ -103,7 +103,7 @@ void MapInstanced::UnloadAll()
 - the player is not actually added to the instance (only in InstanceMap::Add)
 */
 Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
-{ 
+{
     if (GetId() != mapId || !player)
         return nullptr;
 
@@ -173,7 +173,7 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
 }
 
 InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty)
-{ 
+{
     // load/create a map
     ACORE_GUARD(ACE_Thread_Mutex, Lock);
 
@@ -195,7 +195,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
     GetDownscaledMapDifficultyData(GetId(), difficulty);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_MAPS, "MapInstanced::CreateInstance: %s map instance %d for %d created with difficulty %s", save?"":"new ", InstanceId, GetId(), difficulty?"heroic":"normal");
+    sLog->outDebug(LOG_FILTER_MAPS, "MapInstanced::CreateInstance: %s map instance %d for %d created with difficulty %s", save ? "" : "new ", InstanceId, GetId(), difficulty ? "heroic" : "normal");
 #endif
 
     InstanceMap* map = new InstanceMap(GetId(), InstanceId, difficulty, this);
@@ -216,7 +216,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
 }
 
 BattlegroundMap* MapInstanced::CreateBattleground(uint32 InstanceId, Battleground* bg)
-{ 
+{
     // load/create a map
     ACORE_GUARD(ACE_Thread_Mutex, Lock);
 
@@ -243,8 +243,8 @@ BattlegroundMap* MapInstanced::CreateBattleground(uint32 InstanceId, Battlegroun
 }
 
 // increments the iterator after erase
-bool MapInstanced::DestroyInstance(InstancedMaps::iterator &itr)
-{ 
+bool MapInstanced::DestroyInstance(InstancedMaps::iterator& itr)
+{
     itr->second->RemoveAllPlayers();
     if (itr->second->HavePlayers())
     {
@@ -271,7 +271,7 @@ bool MapInstanced::DestroyInstance(InstancedMaps::iterator &itr)
 }
 
 bool MapInstanced::CanEnter(Player* /*player*/, bool /*loginCheck*/)
-{ 
+{
     //ABORT();
     return true;
 }

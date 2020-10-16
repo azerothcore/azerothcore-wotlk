@@ -37,7 +37,7 @@ enum eSpells
     SPELL_WAILING_SOULS                 = 68899, // target 1.0,1.0, change model, triggers 68871, cast time 3 secs
     SPELL_WAILING_SOULS_SCRIPT_EFFECT   = 68871, // target 1.0, script effect, instant
     SPELL_WAILING_SOULS_PERIODIC_DUMMY  = 68875, // target 1.0, aura 226, instant
-    SPELL_WAILING_SOULS_PERIODIC_DUMMY_2= 68876, // target 1.0, aura 226, instant
+    SPELL_WAILING_SOULS_PERIODIC_DUMMY_2 = 68876, // target 1.0, aura 226, instant
     SPELL_WAILING_SOULS_TARGETING       = 68912, // target 22.15, aura dummy, 50000yd, cast instant, duration 4 secs
     SPELL_WAILING_SOULS_DMG_N           = 68873, // 100yd, 104.0
     SPELL_WAILING_SOULS_DMG_H           = 70324, // 100yd, 104.0
@@ -110,8 +110,8 @@ public:
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_PHANTOM_BLAST, 5000);
             events.RescheduleEvent(EVENT_SPELL_MIRRORED_SOUL, 9000);
-            events.RescheduleEvent(EVENT_SPELL_WELL_OF_SOULS, urand(6000,8000));
-            events.RescheduleEvent(EVENT_SPELL_UNLEASHED_SOULS, urand(18000,20000));
+            events.RescheduleEvent(EVENT_SPELL_WELL_OF_SOULS, urand(6000, 8000));
+            events.RescheduleEvent(EVENT_SPELL_UNLEASHED_SOULS, urand(18000, 20000));
             events.RescheduleEvent(EVENT_SPELL_WAILING_SOULS, 65000);
 
             if (pInstance)
@@ -123,7 +123,7 @@ public:
             {
                 Player* player = itr->GetSource();
                 if ((player->GetTeamId() == TEAM_ALLIANCE && player->GetQuestStatus(QUEST_TEMPERING_THE_BLADE_A) == QUEST_STATUS_INCOMPLETE) ||
-                    (player->GetTeamId() == TEAM_HORDE && player->GetQuestStatus(QUEST_TEMPERING_THE_BLADE_H) == QUEST_STATUS_INCOMPLETE))
+                        (player->GetTeamId() == TEAM_HORDE && player->GetQuestStatus(QUEST_TEMPERING_THE_BLADE_H) == QUEST_STATUS_INCOMPLETE))
                 {
                     if (!me->FindNearestCreature(NPC_CRUCIBLE_OF_SOULS, 100.0f))
                         me->SummonCreature(NPC_CRUCIBLE_OF_SOULS, 5672.29f, 2520.69f, 713.44f, 0.96f);
@@ -131,7 +131,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo *spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_PHANTOM_BLAST_H)
                 bAchiev = false;
@@ -205,19 +205,19 @@ public:
                         me->setAttackTimer(BASE_ATTACK, 2500);
                         Talk(EMOTE_MIRRORED_SOUL);
                     }
-                    events.RepeatEvent(urand(20000,30000));
+                    events.RepeatEvent(urand(20000, 30000));
                     break;
                 case EVENT_SPELL_WELL_OF_SOULS:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
                         me->CastSpell(target, SPELL_WELL_OF_SOULS, false);
-                    events.RepeatEvent(urand(25000,30000));
+                    events.RepeatEvent(urand(25000, 30000));
                     events.DelayEventsToMax(4000, 0);
                     break;
                 case EVENT_SPELL_UNLEASHED_SOULS:
                     me->CastSpell(me, SPELL_UNLEASHED_SOULS, false);
                     Talk(SAY_FACE_UNLEASH_SOUL);
                     Talk(EMOTE_UNLEASH_SOUL);
-                    events.RepeatEvent(urand(30000,40000));
+                    events.RepeatEvent(urand(30000, 40000));
                     events.DelayEventsToMax(5000, 0);
                     me->setAttackTimer(BASE_ATTACK, 5500);
                     break;
@@ -288,7 +288,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new boss_devourer_of_soulsAI(creature);
     }
@@ -308,7 +308,7 @@ public:
 
         bool Load()
         {
-            dir = urand(0,1) ? 1 : -1;
+            dir = urand(0, 1) ? 1 : -1;
             return true;
         }
 
@@ -320,12 +320,12 @@ public:
                 if (aurEff->GetTickNumber() < 30)
                 {
                     // spinning, casting, etc.
-                    float diff = (2*M_PI)/(4*30);
-                    float new_o = t->GetOrientation() + diff*dir;
-                    if (new_o >= 2*M_PI)
-                        new_o -= 2*M_PI;
+                    float diff = (2 * M_PI) / (4 * 30);
+                    float new_o = t->GetOrientation() + diff * dir;
+                    if (new_o >= 2 * M_PI)
+                        new_o -= 2 * M_PI;
                     else if (new_o < 0)
-                        new_o += 2*M_PI;
+                        new_o += 2 * M_PI;
                     t->UpdateOrientation(new_o);
                     t->SetFacingTo(new_o);
                     t->CastSpell(t, SPELL_WAILING_SOULS_DMG_N, true);
