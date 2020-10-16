@@ -40,41 +40,41 @@ enum songOfWindandWater
 
 class spell_q12726_song_of_wind_and_water : public SpellScriptLoader
 {
-    public:
-        spell_q12726_song_of_wind_and_water() : SpellScriptLoader("spell_q12726_song_of_wind_and_water") { }
+public:
+    spell_q12726_song_of_wind_and_water() : SpellScriptLoader("spell_q12726_song_of_wind_and_water") { }
 
-        class spell_q12726_song_of_wind_and_water_SpellScript : public SpellScript
+    class spell_q12726_song_of_wind_and_water_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_q12726_song_of_wind_and_water_SpellScript);
+
+        void HandleHealPct(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_q12726_song_of_wind_and_water_SpellScript);
-
-            void HandleHealPct(SpellEffIndex /*effIndex*/)
+            if (Creature* cr = GetHitCreature())
             {
-                if (Creature* cr = GetHitCreature())
+                //cr->UpdateEntry((cr->GetEntry() == NPC_SOWAW_WATER_ELEMENTAL ? NPC_SOWAW_WIND_ELEMENTAL : NPC_SOWAW_WATER_ELEMENTAL));
+                cr->SetDisplayId(cr->GetDisplayId() == NPC_SOWAW_WATER_MODEL ? NPC_SOWAW_WIND_MODEL : NPC_SOWAW_WATER_MODEL);
+                if (Player* player = cr->GetCharmerOrOwnerPlayerOrPlayerItself())
                 {
-                    //cr->UpdateEntry((cr->GetEntry() == NPC_SOWAW_WATER_ELEMENTAL ? NPC_SOWAW_WIND_ELEMENTAL : NPC_SOWAW_WATER_ELEMENTAL));
-                    cr->SetDisplayId(cr->GetDisplayId() == NPC_SOWAW_WATER_MODEL ? NPC_SOWAW_WIND_MODEL : NPC_SOWAW_WATER_MODEL);
-                    if (Player* player = cr->GetCharmerOrOwnerPlayerOrPlayerItself())
-                    {
-                        player->KilledMonsterCredit(cr->GetDisplayId() == NPC_SOWAW_WATER_MODEL ? 29008 : 29009, 0);
-                        CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(cr->GetDisplayId() == NPC_SOWAW_WIND_MODEL ? NPC_SOWAW_WIND_ELEMENTAL : NPC_SOWAW_WATER_ELEMENTAL);
-                        for (uint8 i=0; i < CREATURE_MAX_SPELLS; ++i)
-                            cr->m_spells[i] = ct->spells[i];
+                    player->KilledMonsterCredit(cr->GetDisplayId() == NPC_SOWAW_WATER_MODEL ? 29008 : 29009, 0);
+                    CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(cr->GetDisplayId() == NPC_SOWAW_WIND_MODEL ? NPC_SOWAW_WIND_ELEMENTAL : NPC_SOWAW_WATER_ELEMENTAL);
+                    for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+                        cr->m_spells[i] = ct->spells[i];
 
-                        player->VehicleSpellInitialize();
-                    }
+                    player->VehicleSpellInitialize();
                 }
             }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_q12726_song_of_wind_and_water_SpellScript::HandleHealPct, EFFECT_2, SPELL_EFFECT_HEAL_PCT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_q12726_song_of_wind_and_water_SpellScript();
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_q12726_song_of_wind_and_water_SpellScript::HandleHealPct, EFFECT_2, SPELL_EFFECT_HEAL_PCT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_q12726_song_of_wind_and_water_SpellScript();
+    }
 };
 
 enum AHerosBurden
@@ -121,7 +121,7 @@ public:
             summons.DespawnAll();
             me->SetControlled(false, UNIT_STATE_STUNNED);
 
-            Creature *cr;
+            Creature* cr;
             if ((cr = me->SummonCreature(NPC_JALOOT, 5616.91f, 3772.67f, -94.26f, 1.78f)))
             {
                 summons.Summon(cr);
@@ -179,7 +179,7 @@ public:
 
                 for (std::list<uint64>::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 {
-                    Creature *minion = ObjectAccessor::GetCreature(*me, *itr);
+                    Creature* minion = ObjectAccessor::GetCreature(*me, *itr);
                     if (minion && minion->IsAlive())
                     {
                         if (action == ACTION_BIND_MINIONS)
@@ -258,7 +258,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_artruis_the_hearthlessAI(creature);
     }
@@ -293,7 +293,7 @@ class npc_still_at_it_trigger : public CreatureScript
 public:
     npc_still_at_it_trigger() : CreatureScript("npc_still_at_it_trigger") { }
 
-    CreatureAI *GetAI(Creature *pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
         return new npc_still_at_it_triggerAI(pCreature);
     }
@@ -344,7 +344,7 @@ public:
         {
             timer = 5000;
             running = true;
-            stepcount = urand(5,10);
+            stepcount = urand(5, 10);
             Say(MCM_TEXT_START);
         }
 
@@ -356,16 +356,22 @@ public:
             if (a == expectedaction)
             {
                 currentstep++;
-                uint8 s = urand(0,2);
+                uint8 s = urand(0, 2);
 
                 if (Creature* th = ObjectAccessor::GetCreature(*me, thunderbrewGUID))
                     th->HandleEmoteCommand(EMOTE_ONESHOT_CHEER_NO_SHEATHE);
 
                 switch (s)
                 {
-                    case 0: Say(MCM_TEXT_CORRECT1); break;
-                    case 1: Say(MCM_TEXT_CORRECT2); break;
-                    default:Say(MCM_TEXT_CORRECT3); break;
+                    case 0:
+                        Say(MCM_TEXT_CORRECT1);
+                        break;
+                    case 1:
+                        Say(MCM_TEXT_CORRECT2);
+                        break;
+                    default:
+                        Say(MCM_TEXT_CORRECT3);
+                        break;
                 }
 
                 if (currentstep >= stepcount)
@@ -394,9 +400,15 @@ public:
                 uint8 a = 0;
                 switch (spellInfo->Id)
                 {
-                    case 51931: a = 4; break;
-                    case 51932: a = 3; break;
-                    case 51933: a = 5; break;
+                    case 51931:
+                        a = 4;
+                        break;
+                    case 51932:
+                        a = 3;
+                        break;
+                    case 51933:
+                        a = 5;
+                        break;
                 }
 
                 CheckAction(a, caster->GetGUID());
@@ -426,14 +438,24 @@ public:
                 }
                 else // it's time to rand next move
                 {
-                    expectedaction = urand(1,5);
+                    expectedaction = urand(1, 5);
                     switch (expectedaction)
                     {
-                        case 1: Say(MCM_TEXT_PRESSURE); break;
-                        case 2: Say(MCM_TEXT_HEAT); break;
-                        case 3: Say(MCM_TEXT_BANANA); break;
-                        case 4: Say(MCM_TEXT_ORANGE); break;
-                        case 5: Say(MCM_TEXT_PAPAYA); break;
+                        case 1:
+                            Say(MCM_TEXT_PRESSURE);
+                            break;
+                        case 2:
+                            Say(MCM_TEXT_HEAT);
+                            break;
+                        case 3:
+                            Say(MCM_TEXT_BANANA);
+                            break;
+                        case 4:
+                            Say(MCM_TEXT_ORANGE);
+                            break;
+                        case 5:
+                            Say(MCM_TEXT_PAPAYA);
+                            break;
                     }
                     timer = 10000;
                 }
@@ -456,7 +478,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(12644) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I'm ready to start the distillation, uh, Tipsy.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I'm ready to start the distillation, uh, Tipsy.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
@@ -467,7 +489,7 @@ public:
         if (!player)
             return true;
 
-        if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
+        if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
         {
             Creature* trigger = creature->FindNearestCreature(NPC_WANTS_BANANAS, 20.0f, true);
             if (trigger && trigger->AI())
@@ -555,7 +577,7 @@ public:
 
         if (player->GetQuestStatus(QUEST_MAKING_PEACE) == QUEST_STATUS_INCOMPLETE)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_VEKJIK_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_VEKJIK_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             SendGossipMenuFor(player, GOSSIP_TEXTID_VEKJIK1, creature->GetGUID());
             return true;
         }
@@ -570,7 +592,7 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_VEKJIK_ITEM2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_VEKJIK_ITEM2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, GOSSIP_TEXTID_VEKJIK2, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
@@ -616,7 +638,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(QUEST_FREYA_PACT) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AOF1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AOF1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR1, creature);
         return true;
@@ -627,18 +649,18 @@ public:
         ClearGossipMenuFor(player);
         switch (action)
         {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AOF2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-            SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR2, creature);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AOF3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
-            SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR3, creature);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            player->CastSpell(player, SPELL_FREYA_CONVERSATION, true);
-            CloseGossipMenuFor(player);
-            break;
+            case GOSSIP_ACTION_INFO_DEF+1:
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AOF2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR2, creature);
+                break;
+            case GOSSIP_ACTION_INFO_DEF+2:
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AOF3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR3, creature);
+                break;
+            case GOSSIP_ACTION_INFO_DEF+3:
+                player->CastSpell(player, SPELL_FREYA_CONVERSATION, true);
+                CloseGossipMenuFor(player);
+                break;
         }
         return true;
     }
@@ -957,7 +979,7 @@ public:
                     else if (me->GetEntry() == NPC_HADRIUS)
                     {
                         me->SetSheath(SHEATH_STATE_UNARMED);
-                        me->CastSpell(me,SPELL_KNOCKDOWN,false);
+                        me->CastSpell(me, SPELL_KNOCKDOWN, false);
                     }
                     SetEquipmentSlots(true);
                 }
@@ -1005,13 +1027,13 @@ public:
             }
         }
 
-        private:
-            uint16 sayTimer;
-            uint8 sayStep;
-            uint32 timer;
-            int8 phase;
-            uint64 playerGUID;
-            uint64 orphanGUID;
+    private:
+        uint16 sayTimer;
+        uint8 sayStep;
+        uint32 timer;
+        int8 phase;
+        uint64 playerGUID;
+        uint64 orphanGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -1258,46 +1280,46 @@ public:
             switch (ev)
             {
                 case EVENT_MISS_BIRD:
-                {
-                    Creature* crunchy = shooter->FindNearestCreature(NPC_CRUNCHY, 30);
-                    Creature* bird = shooter->FindNearestCreature(NPC_THICKBIRD, 30);
-
-                    if (!bird || !crunchy)
-                        ; // fall to EVENT_MISS
-                    else
                     {
-                        shooter->CastSpell(bird, SPELL_MISS_BIRD_APPLE);
-                        bird->CastSpell(bird, SPELL_BIRD_FALL);
+                        Creature* crunchy = shooter->FindNearestCreature(NPC_CRUNCHY, 30);
+                        Creature* bird = shooter->FindNearestCreature(NPC_THICKBIRD, 30);
+
+                        if (!bird || !crunchy)
+                            ; // fall to EVENT_MISS
+                        else
+                        {
+                            shooter->CastSpell(bird, SPELL_MISS_BIRD_APPLE);
+                            bird->CastSpell(bird, SPELL_BIRD_FALL);
+                            wilhelm->AI()->Talk(SAY_WILHELM_MISS);
+                            drostan->AI()->Talk(SAY_DROSTAN_REPLY_MISS);
+
+                            Unit::Kill(bird, bird);
+                            crunchy->GetMotionMaster()->MovePoint(0, bird->GetPositionX(), bird->GetPositionY(),
+                                                                  bird->GetMap()->GetWaterOrGroundLevel(bird->GetPhaseMask(), bird->GetPositionX(), bird->GetPositionY(), bird->GetPositionZ()));
+                            /// @todo Make crunchy perform emote eat when he reaches the bird
+
+                            break;
+                        }
+                        [[fallthrough]];
+                    }
+                case EVENT_MISS:
+                    {
+                        shooter->CastSpell(wilhelm, SPELL_MISS_APPLE);
                         wilhelm->AI()->Talk(SAY_WILHELM_MISS);
                         drostan->AI()->Talk(SAY_DROSTAN_REPLY_MISS);
-
-                        Unit::Kill(bird, bird);
-                        crunchy->GetMotionMaster()->MovePoint(0, bird->GetPositionX(), bird->GetPositionY(),
-                            bird->GetMap()->GetWaterOrGroundLevel(bird->GetPhaseMask(), bird->GetPositionX(), bird->GetPositionY(), bird->GetPositionZ()));
-                        /// @todo Make crunchy perform emote eat when he reaches the bird
+                        break;
+                    }
+                case EVENT_HIT:
+                    {
+                        shooter->CastSpell(apple, SPELL_HIT_APPLE);
+                        apple->CastSpell(apple, SPELL_APPLE_FALL);
+                        wilhelm->AI()->Talk(SAY_WILHELM_HIT);
+                        if (Player* player = shooter->ToPlayer())
+                            player->KilledMonsterCredit(NPC_APPLE, 0);
+                        //apple->DespawnOrUnsummon(); zomg!
 
                         break;
                     }
-                    [[fallthrough]];
-                }
-                case EVENT_MISS:
-                {
-                    shooter->CastSpell(wilhelm, SPELL_MISS_APPLE);
-                    wilhelm->AI()->Talk(SAY_WILHELM_MISS);
-                    drostan->AI()->Talk(SAY_DROSTAN_REPLY_MISS);
-                    break;
-                }
-                case EVENT_HIT:
-                {
-                    shooter->CastSpell(apple, SPELL_HIT_APPLE);
-                    apple->CastSpell(apple, SPELL_APPLE_FALL);
-                    wilhelm->AI()->Talk(SAY_WILHELM_HIT);
-                    if (Player* player = shooter->ToPlayer())
-                        player->KilledMonsterCredit(NPC_APPLE, 0);
-                    //apple->DespawnOrUnsummon(); zomg!
-
-                    break;
-                }
             }
         }
 
@@ -1376,35 +1398,35 @@ public:
 
             if (Vehicle* veh = me->GetVehicleKit())
                 if (Unit* pilot = veh->GetPassenger(0))
-                switch (pointId)
-                {
-                    case 5:
-                        pilot->ToCreature()->AI()->Talk(VIC_SAY_0);
-                        break;
-                    case 11:
-                        pilot->ToCreature()->AI()->Talk(VIC_SAY_1);
-                        break;
-                    case 12:
-                        pilot->ToCreature()->AI()->Talk(VIC_SAY_2);
-                        break;
-                    case 14:
-                        pilot->ToCreature()->AI()->Talk(VIC_SAY_3);
-                        break;
-                    case 15:
-                        pilot->ToCreature()->ToCreature()->AI()->Talk(VIC_SAY_4);
-                        break;
-                    case 17:
-                        pilot->ToCreature()->AI()->Talk(VIC_SAY_5);
-                        break;
-                    case 21:
-                        pilot->ToCreature()->AI()->Talk(VIC_SAY_6);
-                        break;
-                    case 25:
-                        Talk(PLANE_EMOTE);
-                        DoCast(AURA_ENGINE);
-                        me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FORCE_MOVEMENT);
-                        break;
-                }
+                    switch (pointId)
+                    {
+                        case 5:
+                            pilot->ToCreature()->AI()->Talk(VIC_SAY_0);
+                            break;
+                        case 11:
+                            pilot->ToCreature()->AI()->Talk(VIC_SAY_1);
+                            break;
+                        case 12:
+                            pilot->ToCreature()->AI()->Talk(VIC_SAY_2);
+                            break;
+                        case 14:
+                            pilot->ToCreature()->AI()->Talk(VIC_SAY_3);
+                            break;
+                        case 15:
+                            pilot->ToCreature()->ToCreature()->AI()->Talk(VIC_SAY_4);
+                            break;
+                        case 17:
+                            pilot->ToCreature()->AI()->Talk(VIC_SAY_5);
+                            break;
+                        case 21:
+                            pilot->ToCreature()->AI()->Talk(VIC_SAY_6);
+                            break;
+                        case 25:
+                            Talk(PLANE_EMOTE);
+                            DoCast(AURA_ENGINE);
+                            me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FORCE_MOVEMENT);
+                            break;
+                    }
             pointId++;
         }
 
@@ -1442,7 +1464,7 @@ enum ShangoTracks
 class spell_shango_tracks : public SpellScriptLoader
 {
 public:
-   spell_shango_tracks() : SpellScriptLoader("spell_shango_tracks") { }
+    spell_shango_tracks() : SpellScriptLoader("spell_shango_tracks") { }
 
     class spell_shango_tracks_SpellScript : public SpellScript
     {

@@ -17,9 +17,9 @@
 #define TEXT_RETREAT            "Ahune Retreats. His defenses diminish."
 #define TEXT_RESURFACE          "Ahune will soon resurface."
 
-const Position AhuneSummonPos = {-97.3473f, -233.139f, -1.27587f, M_PI/2};
+const Position AhuneSummonPos = {-97.3473f, -233.139f, -1.27587f, M_PI / 2};
 const Position TotemPos[3] = { {-115.141f, -143.317f, -2.09467f, 4.92772f}, {-120.178f, -144.398f, -2.23786f, 4.92379f}, {-125.277f, -145.463f, -1.95209f, 4.97877f} };
-const Position MinionSummonPos = {-97.154404f, -204.382675f, -1.19f, M_PI/2};
+const Position MinionSummonPos = {-97.154404f, -204.382675f, -1.19f, M_PI / 2};
 
 enum NPCs
 {
@@ -86,7 +86,7 @@ public:
 
     struct boss_ahuneAI : public ScriptedAI
     {
-        boss_ahuneAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_ahuneAI(Creature* c) : ScriptedAI(c), summons(me)
         {
             SetCombatMovement(false);
             SetEquipmentSlots(false, 54806, EQUIP_UNEQUIP, EQUIP_UNEQUIP);
@@ -139,8 +139,8 @@ public:
                     events.RescheduleEvent(EVENT_ATTACK, 2000);
                     break;
                 case EVENT_SUMMON_TOTEMS:
-                    for (uint8 i=0; i<3; ++i)
-                        DoSummon(NPC_TOTEM, TotemPos[i], 10*60*1000, TEMPSUMMON_TIMED_DESPAWN);
+                    for (uint8 i = 0; i < 3; ++i)
+                        DoSummon(NPC_TOTEM, TotemPos[i], 10 * 60 * 1000, TEMPSUMMON_TIMED_DESPAWN);
                     events.PopEvent();
                     break;
                 case EVENT_INVOKER_SAY_1:
@@ -177,8 +177,8 @@ public:
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case EVENT_TOTEMS_ATTACK:
-                    for (uint8 i=0; i<3; ++i)
-                        if (Creature* bunny = me->FindNearestCreature(NPC_TOTEM_BUNNY_1+i, 150.0f, true))
+                    for (uint8 i = 0; i < 3; ++i)
+                        if (Creature* bunny = me->FindNearestCreature(NPC_TOTEM_BUNNY_1 + i, 150.0f, true))
                             bunny->CastSpell(me, SPELL_TOTEM_BEAM, false);
                     events.PopEvent();
                     events.RescheduleEvent(EVENT_SUBMERGE, 10000);
@@ -212,35 +212,35 @@ public:
 
                 case EVENT_SPELL_COLD_SLAP:
                     if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 5.0f, true))
-                        if (target->GetPositionZ() < me->GetPositionZ()+6.0f)
+                        if (target->GetPositionZ() < me->GetPositionZ() + 6.0f)
                         {
-                            int32 dmg = urand(5500,6000);
+                            int32 dmg = urand(5500, 6000);
                             me->CastCustomSpell(target, SPELL_COLD_SLAP, &dmg, nullptr, nullptr, false);
                             float x, y, z;
                             target->GetNearPoint(target, x, y, z, target->GetObjectSize(), 30.0f, target->GetAngle(me->GetPositionX(), me->GetPositionY()) + M_PI);
-                            target->GetMotionMaster()->MoveJump(x, y, z+20.0f, 10.0f, 20.0f);
+                            target->GetMotionMaster()->MoveJump(x, y, z + 20.0f, 10.0f, 20.0f);
                         }
                     events.RepeatEvent(1500);
                     break;
                 case EVENT_SPELL_SUMMON_HAILSTONE:
                     {
-                        float dist = (float)urand(3,10);
-                        float angle = rand_norm()*2*M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX()+cos(angle)*dist, MinionSummonPos.GetPositionY()+sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_HAILSTONE, false);
+                        float dist = (float)urand(3, 10);
+                        float angle = rand_norm() * 2 * M_PI;
+                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_HAILSTONE, false);
                         events.RepeatEvent(30000);
                     }
                     break;
                 case EVENT_SPELL_SUMMON_COLDWAVE:
-                    for (uint8 i=0; i<2; ++i)
+                    for (uint8 i = 0; i < 2; ++i)
                     {
-                        float dist = (float)urand(3,10);
-                        float angle = rand_norm()*2*M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX()+cos(angle)*dist, MinionSummonPos.GetPositionY()+sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_COLDWAVE, false);
+                        float dist = (float)urand(3, 10);
+                        float angle = rand_norm() * 2 * M_PI;
+                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_COLDWAVE, false);
                     }
                     {
-                        float dist = (float)urand(3,10);
-                        float angle = rand_norm()*2*M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX()+cos(angle)*dist, MinionSummonPos.GetPositionY()+sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_FROSTWIND, false);
+                        float dist = (float)urand(3, 10);
+                        float angle = rand_norm() * 2 * M_PI;
+                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_FROSTWIND, false);
                     }
                     events.RepeatEvent(6000);
                     break;
@@ -292,7 +292,7 @@ public:
         {
             summons.DespawnAll();
             me->DespawnOrUnsummon(15000);
-            if (GameObject* chest = me->SummonGameObject(187892, MinionSummonPos.GetPositionX(), MinionSummonPos.GetPositionY(), MinionSummonPos.GetPositionZ(), M_PI/2, 0.0f, 0.0f, 0.0f, 0.0f, 900000000)) // loot
+            if (GameObject* chest = me->SummonGameObject(187892, MinionSummonPos.GetPositionX(), MinionSummonPos.GetPositionY(), MinionSummonPos.GetPositionZ(), M_PI / 2, 0.0f, 0.0f, 0.0f, 0.0f, 900000000)) // loot
                 me->RemoveGameObject(chest, false);
 
             bool finished = false;
@@ -302,7 +302,7 @@ public:
                     if (Player* player = i->GetSource())
                     {
                         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, 25740, 1, me);
-                        
+
                         if (player->GetGroup() && !finished)
                         {
                             finished = true;
@@ -314,9 +314,9 @@ public:
 };
 
 class go_ahune_ice_stone : public GameObjectScript
-{ 
-public: 
-    go_ahune_ice_stone() : GameObjectScript("go_ahune_ice_stone") { } 
+{
+public:
+    go_ahune_ice_stone() : GameObjectScript("go_ahune_ice_stone") { }
 
     bool OnGossipHello(Player* player, GameObject* go) override
     {
@@ -327,7 +327,7 @@ public:
         if (go->FindNearestCreature(NPC_AHUNE, 200.0f, true))
             return true;
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Disturb the stone and summon Lord Ahune.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1337);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Disturb the stone and summon Lord Ahune.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
         SendGossipMenuFor(player, GOSSIP_TEXT_ID, go->GetGUID());
         return true;
     }
@@ -336,7 +336,7 @@ public:
     {
         if (!player || !go)
             return true;
-        if (action != GOSSIP_ACTION_INFO_DEF+1337)
+        if (action != GOSSIP_ACTION_INFO_DEF + 1337)
             return true;
         if (!player->HasItemCount(ITEM_MAGMA_TOTEM))
             return true;
@@ -374,7 +374,7 @@ public:
 
     struct npc_ahune_frozen_coreAI : public NullCreatureAI
     {
-        npc_ahune_frozen_coreAI(Creature *c) : NullCreatureAI(c) {}
+        npc_ahune_frozen_coreAI(Creature* c) : NullCreatureAI(c) {}
 
         void JustDied(Unit* /*killer*/)
         {

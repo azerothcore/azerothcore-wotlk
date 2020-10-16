@@ -12,13 +12,13 @@
 #include "G3D/Quat.h"
 
 #ifdef _WIN32
-    #include "direct.h"
+#include "direct.h"
 #else
-    #include <sys/stat.h>
-    #include <unistd.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #endif
 
-const float Constants::TileSize = 533.0f + (1/3.0f);
+const float Constants::TileSize = 533.0f + (1 / 3.0f);
 const float Constants::MaxXY = 32.0f * Constants::TileSize;
 const float Constants::ChunkSize = Constants::TileSize / 16.0f;
 const float Constants::UnitSize = Constants::ChunkSize / 8.0f;
@@ -45,11 +45,11 @@ void Utils::CreateDir( const std::string& Path )
 void Utils::Reverse(char word[])
 {
     int len = strlen(word);
-    for (int i = 0;i < len / 2; i++)
+    for (int i = 0; i < len / 2; i++)
     {
-        word[i] ^= word[len-i-1];
-        word[len-i-1] ^= word[i];
-        word[i] ^= word[len-i-1];
+        word[i] ^= word[len - i - 1];
+        word[len - i - 1] ^= word[i];
+        word[i] ^= word[len - i - 1];
     }
 }
 
@@ -159,7 +159,7 @@ Vector3 Utils::GetLiquidVert(const IDefinition& def, Vector3 basePosition, float
 
 float Utils::Distance( float x, float y )
 {
-    return sqrt(x*x + y*y);
+    return sqrt(x * x + y * y);
 }
 
 std::string Utils::Replace( std::string str, const std::string& oldStr, const std::string& newStr )
@@ -194,7 +194,7 @@ void Utils::SaveToDisk( FILE* stream, const std::string& path )
         fclose(stream);
         return;
     }
-    
+
     // And write it in the file
     size_t wrote = fwrite(data, size, 1, disk);
     if (wrote != 1)
@@ -224,7 +224,7 @@ std::string Utils::GetExtension( std::string path )
     std::string extension = "";
 
     if(idx != std::string::npos)
-        extension = path.substr(idx+1);
+        extension = path.substr(idx + 1);
     return extension;
 }
 
@@ -260,7 +260,7 @@ void MapChunkHeader::Read(FILE* stream)
     count += fread(&OffsetMCCV, sizeof(uint32), 1, stream);
 
     if (count != 27)
-         printf("MapChunkHeader::Read: Failed to read some data expected 27, read %d\n", count);
+        printf("MapChunkHeader::Read: Failed to read some data expected 27, read %d\n", count);
 }
 
 void MHDR::Read(FILE* stream)
@@ -281,7 +281,7 @@ void MHDR::Read(FILE* stream)
     count += fread(&OffsetMTFX, sizeof(uint32), 1, stream);
 
     if (count != 12)
-         printf("MHDR::Read: Failed to read some data expected 12, read %d\n", count);
+        printf("MHDR::Read: Failed to read some data expected 12, read %d\n", count);
 }
 
 void ModelHeader::Read(FILE* stream)
@@ -343,7 +343,7 @@ void ModelHeader::Read(FILE* stream)
     count += fread(&OffsetBoundingNormals, sizeof(uint32), 1, stream);
 
     if (count != 51)
-         printf("ModelHeader::Read: Failed to read some data expected 51, read %d\n", count);
+        printf("ModelHeader::Read: Failed to read some data expected 51, read %d\n", count);
 
 }
 
@@ -366,7 +366,7 @@ WorldModelHeader WorldModelHeader::Read(FILE* stream)
     count += fread(&ret.LiquidTypeRelated, sizeof(uint32), 1, stream);
 
     if (count != 10)
-         printf("WorldModelHeader::Read: Failed to read some data expected 10, read %d\n", count);
+        printf("WorldModelHeader::Read: Failed to read some data expected 10, read %d\n", count);
 
     return ret;
 }
@@ -386,7 +386,7 @@ DoodadInstance DoodadInstance::Read(FILE* stream)
     count += fread(&ret.LightColor, sizeof(uint32), 1, stream);
 
     if (count != 7)
-         printf("DoodadInstance::Read: Failed to read some data expected 7, read %d\n", count);
+        printf("DoodadInstance::Read: Failed to read some data expected 7, read %d\n", count);
 
     return ret;
 }
@@ -405,7 +405,7 @@ DoodadSet DoodadSet::Read(FILE* stream)
     count += fread(&ret.UnknownZero, sizeof(uint32), 1, stream);
 
     if (count != 23)
-         printf("DoodadSet::Read: Failed to read some data expected 23, read %d\n", count);
+        printf("DoodadSet::Read: Failed to read some data expected 23, read %d\n", count);
 
     return ret;
 }
@@ -422,7 +422,7 @@ LiquidHeader LiquidHeader::Read(FILE* stream)
     count += fread(&ret.MaterialId, sizeof(uint16), 1, stream);
 
     if (count != 5)
-         printf("LiquidHeader::Read: Failed to read some data expected 5, read %d\n", count);
+        printf("LiquidHeader::Read: Failed to read some data expected 5, read %d\n", count);
 
     return ret;
 }
@@ -445,7 +445,7 @@ LiquidData LiquidData::Read(FILE* stream, LiquidHeader& header)
             uint32 discard;
             float tmp;
             if (fread(&discard, sizeof(uint32), 1, stream) == 1 &&
-                fread(&tmp, sizeof(float), 1, stream) == 1)
+                    fread(&tmp, sizeof(float), 1, stream) == 1)
             {
                 ret.HeightMap[x][y] = tmp;
             }
