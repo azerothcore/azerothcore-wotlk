@@ -297,11 +297,11 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (_phase == 3)
-                me->CastSpell(me, SPELL_ELECTRICAL_CHARGE, true);
-
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
+
+            if (_phase == 3)
+                me->CastSpell(me, SPELL_ELECTRICAL_CHARGE, true);
 
             Talk(SAY_STEELBREAKER_SLAY);
         }
