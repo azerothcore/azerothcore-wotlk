@@ -28,7 +28,7 @@ inline uint8 GetEruptionSection(float x, float y)
     if (x > -1.0f)
         return 3;
 
-    float slope = y/x;
+    float slope = y / x;
     for (uint32 i = 0; i < 3; ++i)
         if (slope > HeiganEruptionSlope[i])
             return i;
@@ -50,7 +50,7 @@ public:
         explicit instance_naxxramas_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
             SetBossNumber(MAX_ENCOUNTERS);
-            for (auto & i : HeiganEruption)
+            for (auto& i : HeiganEruption)
                 i.clear();
 
             // GOs
@@ -77,7 +77,7 @@ public:
             _plagueEyePortalGUID = 0;
             _spiderEyePortalGUID = 0;
             _abomEyePortalGUID = 0;
-			
+
             // NPCs
             PatchwerkRoomTrash.clear();
             _patchwerkGUID = 0;
@@ -141,7 +141,7 @@ public:
         uint64 _plagueEyePortalGUID;
         uint64 _spiderEyePortalGUID;
         uint64 _abomEyePortalGUID;
-		
+
         // NPCs
         std::list<uint64> PatchwerkRoomTrash;
         uint64 _patchwerkGUID;
@@ -346,30 +346,30 @@ public:
                     break;
                 case GO_KELTHUZAD_GATE:
                     _kelthuzadgateGUID = pGo->GetGUID();
-                    if (GetBossState(BOSS_SAPPHIRON) == DONE && _speakTimer==0)
+                    if (GetBossState(BOSS_SAPPHIRON) == DONE && _speakTimer == 0)
                         pGo->SetGoState(GO_STATE_ACTIVE);
-               	    break;
+                    break;
                 case GO_SAPPHIRON_GATE:
                     _sapphironGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_SAPPHIRON) == DONE)
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
-                case GO_DEATHKNIGHT_WING: 
+                case GO_DEATHKNIGHT_WING:
                     _loathebPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_LOATHEB) == DONE)
                         pGo->SetPhaseMask(1, true);
                     break;
-                case GO_THADDIUS_PORTAL: 
+                case GO_THADDIUS_PORTAL:
                     _thaddiusPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_THADDIUS) == DONE)
                         pGo->SetPhaseMask(1, true);
                     break;
-                case GO_MAEXXNA_PORTAL: 
+                case GO_MAEXXNA_PORTAL:
                     _maexxnaPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_MAEXXNA) == DONE)
                         pGo->SetPhaseMask(1, true);
                     break;
-                case GO_HORSEMAN_PORTAL: 
+                case GO_HORSEMAN_PORTAL:
                     _horsemanPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_HORSEMAN) == DONE)
                         pGo->SetPhaseMask(1, true);
@@ -417,7 +417,7 @@ public:
             {
                 case 7600: // And They Would All Go Down Together (10 player)
                 case 7601: // And They Would All Go Down Together (25 player)
-                    return (_horsemanTimer < 15*IN_MILLISECONDS);
+                    return (_horsemanTimer < 15 * IN_MILLISECONDS);
                 case 7614: // Just Can't Get Enough (10 player)
                 case 7615: // Just Can't Get Enough (25 player)
                     return abominationsKilled >= 18;
@@ -435,31 +435,61 @@ public:
                     return heiganAchievement;
                 case 7608: // Subtraction (10 player)
                 // The Dedicated few (10 player)
-                case 6802: case 7146: case 7147: case 7148: case 7149:
-                case 7150: case 7151: case 7152: case 7153: case 7154:
-                case 7155: case 7156: case 7157: case 7158:
+                case 6802:
+                case 7146:
+                case 7147:
+                case 7148:
+                case 7149:
+                case 7150:
+                case 7151:
+                case 7152:
+                case 7153:
+                case 7154:
+                case 7155:
+                case 7156:
+                case 7157:
+                case 7158:
                     return (instance->GetPlayersCountExceptGMs() < 9);
                 case 7609: // Subtraction (25 player)
                 // The Dedicated few (25 player)
-                case 7159: case 7160: case 7161: case 7162: case 7163:
-                case 7164: case 7165: case 7166: case 7167: case 7168:
-                case 7169: case 7170: case 7171: case 7172:
+                case 7159:
+                case 7160:
+                case 7161:
+                case 7162:
+                case 7163:
+                case 7164:
+                case 7165:
+                case 7166:
+                case 7167:
+                case 7168:
+                case 7169:
+                case 7170:
+                case 7171:
+                case 7172:
                     return (instance->GetPlayersCountExceptGMs() < 21);
                 case 7567: // The Hundred Club (10 player)
                 case 7568: // The Hundred Club (25 player)
                     return sapphironAchievement;
                 // The Undying
-                case 7617: case 13237: case 13238: case 13239: case 13240:
+                case 7617:
+                case 13237:
+                case 13238:
+                case 13239:
+                case 13240:
                 // The Immortal
-                case 7616: case 13233: case 13234: case 13235: case 13236:
-                {
-                    uint8 count = 0;
-                    for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                        if (GetBossState(i) == NOT_STARTED)
-                            ++count;
+                case 7616:
+                case 13233:
+                case 13234:
+                case 13235:
+                case 13236:
+                    {
+                        uint8 count = 0;
+                        for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                            if (GetBossState(i) == NOT_STARTED)
+                                ++count;
 
-                    return !count && immortalAchievement;
-                }
+                        return !count && immortalAchievement;
+                    }
 
                 default:
                     return false;
@@ -517,7 +547,7 @@ public:
             {
                 if (Creature* patch = instance->GetCreature(_patchwerkGUID))
                 {
-                    for (auto &itr : PatchwerkRoomTrash)
+                    for (auto& itr : PatchwerkRoomTrash)
                     {
                         Creature* trash = ObjectAccessor::GetCreature(*patch, itr);
                         if (trash && trash->IsAlive() && !trash->IsInCombat())
@@ -533,7 +563,8 @@ public:
                 {
                     _horsemanTimer++;
                     _horsemanKilled++;
-                    if (_horsemanKilled < 4) {
+                    if (_horsemanKilled < 4)
+                    {
                         return false;
                     }
 
@@ -588,11 +619,11 @@ public:
                 if (state == NOT_STARTED)
                     _horsemanTimer = 0;
             }
-            
-            
+
+
             if (!InstanceScript::SetBossState(bossId, state))
                 return false;
-            
+
             // Bosses data
             switch(bossId)
             {
@@ -629,7 +660,7 @@ public:
                 default:
                     break;
             }
-                    
+
             // Save instance and open gates
             if (state == DONE)
             {
@@ -719,7 +750,7 @@ public:
                         break;
                 }
             }
-                
+
             return true;
         }
 
@@ -879,7 +910,7 @@ public:
             else
                 OUT_LOAD_INST_DATA_FAIL;
         }
-            
+
     };
 };
 class boss_naxxramas_misc : public CreatureScript
@@ -923,7 +954,7 @@ public:
                     if (Creature* cr = me->SummonCreature(NPC_LIVING_POISON, *me, TEMPSUMMON_TIMED_DESPAWN, 9000))
                     {
                         cr->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        cr->GetMotionMaster()->MovePoint(0, me->GetPositionX()+50*cos(me->GetOrientation()), me->GetPositionY()+50*sin(me->GetOrientation()), me->GetPositionZ(), false);
+                        cr->GetMotionMaster()->MovePoint(0, me->GetPositionX() + 50 * cos(me->GetOrientation()), me->GetPositionY() + 50 * sin(me->GetOrientation()), me->GetPositionZ(), false);
                     }
                     timer = 0;
                 }

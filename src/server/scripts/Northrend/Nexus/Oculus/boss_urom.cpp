@@ -60,18 +60,20 @@ enum Yells
     SAY_PLAYER_KILL                               = 7
 };
 
-float summons[3][4] =   {
-                            {NPC_PHANTASMAL_AIR, NPC_PHANTASMAL_AIR, NPC_PHANTASMAL_WATER, NPC_PHANTASMAL_FIRE},
-                            {NPC_PHANTASMAL_OGRE, NPC_PHANTASMAL_OGRE, NPC_PHANTASMAL_NAGAL, NPC_PHANTASMAL_MURLOC},
-                            {NPC_PHANTASMAL_CLOUDSCRAPER, NPC_PHANTASMAL_CLOUDSCRAPER, NPC_PHANTASMAL_MAMMOTH, NPC_PHANTASMAL_WOLF}
-                        };
+float summons[3][4] =
+{
+    {NPC_PHANTASMAL_AIR, NPC_PHANTASMAL_AIR, NPC_PHANTASMAL_WATER, NPC_PHANTASMAL_FIRE},
+    {NPC_PHANTASMAL_OGRE, NPC_PHANTASMAL_OGRE, NPC_PHANTASMAL_NAGAL, NPC_PHANTASMAL_MURLOC},
+    {NPC_PHANTASMAL_CLOUDSCRAPER, NPC_PHANTASMAL_CLOUDSCRAPER, NPC_PHANTASMAL_MAMMOTH, NPC_PHANTASMAL_WOLF}
+};
 
-float cords[4][4] =     {
-                            {1177.47f, 937.722f, 527.405f, 2.21657f},
-                            {968.66f, 1042.53f, 527.32f, 0.077f},
-                            {1164.02f, 1170.85f, 527.321f, 3.66f},
-                            {1118.31f, 1080.377f, 508.361f, 4.25f}
-                        };
+float cords[4][4] =
+{
+    {1177.47f, 937.722f, 527.405f, 2.21657f},
+    {968.66f, 1042.53f, 527.32f, 0.077f},
+    {1164.02f, 1170.85f, 527.321f, 3.66f},
+    {1118.31f, 1080.377f, 508.361f, 4.25f}
+};
 
 class boss_urom : public CreatureScript
 {
@@ -85,20 +87,20 @@ public:
 
     struct boss_uromAI : public ScriptedAI
     {
-        boss_uromAI(Creature *c) : ScriptedAI(c)
+        boss_uromAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
-        
+
         InstanceScript* pInstance;
         EventMap events;
         bool lock;
-        float x,y,z;
+        float x, y, z;
         int32 releaseLockTimer;
 
         uint8 GetPhaseByCurrentPosition()
         {
-            for (uint8 i=0; i<4; ++i)
+            for (uint8 i = 0; i < 4; ++i)
                 if (me->GetDistance(cords[i][0], cords[i][1], cords[i][2]) < 20.0f)
                     return i;
 
@@ -218,35 +220,35 @@ public:
             switch( spell->Id )
             {
                 case SPELL_SUMMON_MENAGERIE_1:
-                {
-                    for( uint8 i=0; i<4; ++i )
-						me->SummonCreature(summons[0][i], cords[0][0] + ((i%2) ? 4.0f : -4.0f), cords[0][1] + (i<2 ? 4.0f : -4.0f), cords[0][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                    {
+                        for( uint8 i = 0; i < 4; ++i )
+                            me->SummonCreature(summons[0][i], cords[0][0] + ((i % 2) ? 4.0f : -4.0f), cords[0][1] + (i < 2 ? 4.0f : -4.0f), cords[0][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
-						me->SetHomePosition(cords[phase+1][0], cords[phase+1][1], cords[phase+1][2], cords[phase+1][3]);
-						me->DestroyForNearbyPlayers();
+                        me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
+                        me->DestroyForNearbyPlayers();
                         LeaveCombat();
-						me->CastSpell(me, SPELL_EVOCATION, true);
-						releaseLockTimer = 1;
-                }
-                break;
+                        me->CastSpell(me, SPELL_EVOCATION, true);
+                        releaseLockTimer = 1;
+                    }
+                    break;
                 case SPELL_SUMMON_MENAGERIE_2:
-                {
-                    for( uint8 i=0; i<4; ++i )
-						me->SummonCreature(summons[1][i], cords[1][0] + ((i%2) ? 4.0f : -4.0f), cords[1][1] + (i<2 ? 4.0f : -4.0f), cords[1][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                    {
+                        for( uint8 i = 0; i < 4; ++i )
+                            me->SummonCreature(summons[1][i], cords[1][0] + ((i % 2) ? 4.0f : -4.0f), cords[1][1] + (i < 2 ? 4.0f : -4.0f), cords[1][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
-						me->SetHomePosition(cords[phase+1][0], cords[phase+1][1], cords[phase+1][2], cords[phase+1][3]);
-						me->DestroyForNearbyPlayers();
+                        me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
+                        me->DestroyForNearbyPlayers();
                         LeaveCombat();
-						me->CastSpell(me, SPELL_EVOCATION, true);
-						releaseLockTimer = 1;
-                }
-                break;                
+                        me->CastSpell(me, SPELL_EVOCATION, true);
+                        releaseLockTimer = 1;
+                    }
+                    break;
                 case SPELL_SUMMON_MENAGERIE_3:
                     {
-                        for( uint8 i=0; i<4; ++i )
-						me->SummonCreature(summons[2][i], cords[2][0] + ((i%2) ? 4.0f : -4.0f), cords[2][1] + (i<2 ? 4.0f : -4.0f), cords[2][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                        for( uint8 i = 0; i < 4; ++i )
+                            me->SummonCreature(summons[2][i], cords[2][0] + ((i % 2) ? 4.0f : -4.0f), cords[2][1] + (i < 2 ? 4.0f : -4.0f), cords[2][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
-                        me->SetHomePosition(cords[phase+1][0], cords[phase+1][1], cords[phase+1][2], cords[phase+1][3]);
+                        me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
                         me->DestroyForNearbyPlayers();
                         LeaveCombat();
                         me->CastSpell(me, SPELL_EVOCATION, true);
@@ -262,7 +264,7 @@ public:
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
                     me->NearTeleportTo(1103.69f, 1048.76f, 512.279f, 1.16f);
-                    
+
                     Talk(SAY_ARCANE_EXPLOSION);
                     Talk(EMOTE_ARCANE_EXPLOSION);
 
@@ -313,7 +315,7 @@ public:
                 case EVENT_FROSTBOMB:
                     if( Unit* v = me->GetVictim() )
                         me->CastSpell(v, SPELL_FROSTBOMB, false);
-                    events.RepeatEvent(urand(7000,11000));
+                    events.RepeatEvent(urand(7000, 11000));
                     break;
                 case EVENT_TIME_BOMB:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
@@ -325,7 +327,7 @@ public:
                     y = me->GetPositionY();
                     z = me->GetPositionZ();
                     me->CastSpell(me, SPELL_TELEPORT, false);
-                    events.RepeatEvent(urand(25000,30000));
+                    events.RepeatEvent(urand(25000, 30000));
                     events.DelayEvents(10000);
                     break;
                 case EVENT_TELE_BACK:

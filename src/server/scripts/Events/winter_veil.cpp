@@ -21,41 +21,41 @@ enum Mistletoe
 
 class spell_winter_veil_mistletoe : public SpellScriptLoader
 {
-    public:
-        spell_winter_veil_mistletoe() : SpellScriptLoader("spell_winter_veil_mistletoe") { }
+public:
+    spell_winter_veil_mistletoe() : SpellScriptLoader("spell_winter_veil_mistletoe") { }
 
-        class spell_winter_veil_mistletoe_SpellScript : public SpellScript
+    class spell_winter_veil_mistletoe_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_winter_veil_mistletoe_SpellScript);
+
+        bool Validate(SpellInfo const* /*spell*/)
         {
-            PrepareSpellScript(spell_winter_veil_mistletoe_SpellScript);
-
-            bool Validate(SpellInfo const* /*spell*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_CREATE_MISTLETOE) ||
+            if (!sSpellMgr->GetSpellInfo(SPELL_CREATE_MISTLETOE) ||
                     !sSpellMgr->GetSpellInfo(SPELL_CREATE_HOLLY) ||
                     !sSpellMgr->GetSpellInfo(SPELL_CREATE_SNOWFLAKES))
-                    return false;
-                return true;
-            }
-
-            void HandleScript(SpellEffIndex /*effIndex*/)
-            {
-                if (Player* target = GetHitPlayer())
-                {
-                    uint32 spellId = RAND(SPELL_CREATE_HOLLY, SPELL_CREATE_MISTLETOE, SPELL_CREATE_SNOWFLAKES);
-                    GetCaster()->CastSpell(target, spellId, true);
-                }
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_winter_veil_mistletoe_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_winter_veil_mistletoe_SpellScript();
+                return false;
+            return true;
         }
+
+        void HandleScript(SpellEffIndex /*effIndex*/)
+        {
+            if (Player* target = GetHitPlayer())
+            {
+                uint32 spellId = RAND(SPELL_CREATE_HOLLY, SPELL_CREATE_MISTLETOE, SPELL_CREATE_SNOWFLAKES);
+                GetCaster()->CastSpell(target, spellId, true);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_winter_veil_mistletoe_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_winter_veil_mistletoe_SpellScript();
+    }
 };
 
 enum winterWondervoltTrap
@@ -68,7 +68,7 @@ enum winterWondervoltTrap
 
 class spell_winter_wondervolt_trap : public SpellScriptLoader
 {
-    public:
+public:
     spell_winter_wondervolt_trap() : SpellScriptLoader("spell_winter_wondervolt_trap") {}
 
     class spell_winter_wondervolt_trap_SpellScript : public SpellScript
@@ -125,7 +125,7 @@ enum crashinTrashin
 
 class spell_winter_veil_racer_rocket_slam : public SpellScriptLoader
 {
-    public:
+public:
     spell_winter_veil_racer_rocket_slam() : SpellScriptLoader("spell_winter_veil_racer_rocket_slam") {}
 
     class spell_winter_veil_racer_rocket_slam_SpellScript : public SpellScript
@@ -169,9 +169,9 @@ class spell_winter_veil_racer_rocket_slam : public SpellScriptLoader
             else
             {
                 Position pos;
-                float x = caster->GetPositionX()+30*cos(caster->GetOrientation());
-                float y = caster->GetPositionY()+30*sin(caster->GetOrientation());
-                pos.Relocate(x, y, caster->GetMap()->GetHeight(x, y, MAX_HEIGHT)+0.5f);
+                float x = caster->GetPositionX() + 30 * cos(caster->GetOrientation());
+                float y = caster->GetPositionY() + 30 * sin(caster->GetOrientation());
+                pos.Relocate(x, y, caster->GetMap()->GetHeight(x, y, MAX_HEIGHT) + 0.5f);
                 //caster->GetFirstCollisionPosition(pos, 30.0f, caster->GetOrientation());
                 caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_RACER_CHARGE_TO_OBJECT, true);
             }
@@ -191,7 +191,7 @@ class spell_winter_veil_racer_rocket_slam : public SpellScriptLoader
 
 class spell_winter_veil_racer_slam_hit : public SpellScriptLoader
 {
-    public:
+public:
     spell_winter_veil_racer_slam_hit() : SpellScriptLoader("spell_winter_veil_racer_slam_hit") {}
 
     class spell_winter_veil_racer_slam_hit_SpellScript : public SpellScript
@@ -205,7 +205,7 @@ class spell_winter_veil_racer_slam_hit : public SpellScriptLoader
             if (!target || caster == target)
                 return;
 
-            target->CastSpell(target->GetPositionX()+irand(-10, 10), target->GetPositionY()+irand(-10, 10), target->GetPositionZ() , SPELL_RACER_DEATH_VISUAL, true);
+            target->CastSpell(target->GetPositionX() + irand(-10, 10), target->GetPositionY() + irand(-10, 10), target->GetPositionZ(), SPELL_RACER_DEATH_VISUAL, true);
             target->DespawnOrUnsummon(3000);
             target->CastSpell(target, SPELL_RACER_FLAMES, true);
             caster->CastSpell(caster, SPELL_RACER_KILL_COUNTER, true);
@@ -240,7 +240,7 @@ enum airRifle
 
 class spell_winter_veil_shoot_air_rifle : public SpellScriptLoader
 {
-    public:
+public:
     spell_winter_veil_shoot_air_rifle() : SpellScriptLoader("spell_winter_veil_shoot_air_rifle") {}
 
     class spell_winter_veil_shoot_air_rifle_SpellScript : public SpellScript

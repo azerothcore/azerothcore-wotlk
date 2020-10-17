@@ -81,88 +81,88 @@ class Quest;
 
 class GameEventMgr
 {
-    private:
-        GameEventMgr();
-        ~GameEventMgr() {};
+private:
+    GameEventMgr();
+    ~GameEventMgr() {};
 
-    public:
-        static GameEventMgr* instance();
+public:
+    static GameEventMgr* instance();
 
-        typedef std::set<uint16> ActiveEvents;
-        typedef std::vector<GameEventData> GameEventDataMap;
-        ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; }
-        GameEventDataMap const& GetEventMap() const { return mGameEvent; }
-        bool CheckOneGameEvent(uint16 entry) const;
-        uint32 NextCheck(uint16 entry) const;
-        void LoadFromDB();
-        void LoadHolidayDates();
-        uint32 Update();
-        bool IsActiveEvent(uint16 event_id) { return (m_ActiveEvents.find(event_id) != m_ActiveEvents.end()); }
-        uint32 StartSystem();
-        void Initialize();
-        void StartArenaSeason();
-        void StartInternalEvent(uint16 event_id);
-        bool StartEvent(uint16 event_id, bool overwrite = false);
-        void StopEvent(uint16 event_id, bool overwrite = false);
-        void HandleQuestComplete(uint32 quest_id);  // called on world event type quest completions
-        uint32 GetNPCFlag(Creature* cr);
-    private:
-        void SendWorldStateUpdate(Player* player, uint16 event_id);
-        void AddActiveEvent(uint16 event_id) { m_ActiveEvents.insert(event_id); }
-        void RemoveActiveEvent(uint16 event_id) { m_ActiveEvents.erase(event_id); }
-        void ApplyNewEvent(uint16 event_id);
-        void UnApplyEvent(uint16 event_id);
-        void GameEventSpawn(int16 event_id);
-        void GameEventUnspawn(int16 event_id);
-        void ChangeEquipOrModel(int16 event_id, bool activate);
-        void UpdateEventQuests(uint16 event_id, bool activate);
-        void UpdateWorldStates(uint16 event_id, bool Activate);
-        void UpdateEventNPCFlags(uint16 event_id);
-        void UpdateEventNPCVendor(uint16 event_id, bool activate);
-        void UpdateBattlegroundSettings();
-        void RunSmartAIScripts(uint16 event_id, bool activate);    //! Runs SMART_EVENT_GAME_EVENT_START/_END SAI
-        bool CheckOneGameEventConditions(uint16 event_id);
-        void SaveWorldEventStateToDB(uint16 event_id);
-        bool hasCreatureQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
-        bool hasGameObjectQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
-        bool hasCreatureActiveEventExcept(uint32 creature_guid, uint16 event_id);
-        bool hasGameObjectActiveEventExcept(uint32 go_guid, uint16 event_id);
-        void SetHolidayEventTime(GameEventData& event);
+    typedef std::set<uint16> ActiveEvents;
+    typedef std::vector<GameEventData> GameEventDataMap;
+    ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; }
+    GameEventDataMap const& GetEventMap() const { return mGameEvent; }
+    bool CheckOneGameEvent(uint16 entry) const;
+    uint32 NextCheck(uint16 entry) const;
+    void LoadFromDB();
+    void LoadHolidayDates();
+    uint32 Update();
+    bool IsActiveEvent(uint16 event_id) { return (m_ActiveEvents.find(event_id) != m_ActiveEvents.end()); }
+    uint32 StartSystem();
+    void Initialize();
+    void StartArenaSeason();
+    void StartInternalEvent(uint16 event_id);
+    bool StartEvent(uint16 event_id, bool overwrite = false);
+    void StopEvent(uint16 event_id, bool overwrite = false);
+    void HandleQuestComplete(uint32 quest_id);  // called on world event type quest completions
+    uint32 GetNPCFlag(Creature* cr);
+private:
+    void SendWorldStateUpdate(Player* player, uint16 event_id);
+    void AddActiveEvent(uint16 event_id) { m_ActiveEvents.insert(event_id); }
+    void RemoveActiveEvent(uint16 event_id) { m_ActiveEvents.erase(event_id); }
+    void ApplyNewEvent(uint16 event_id);
+    void UnApplyEvent(uint16 event_id);
+    void GameEventSpawn(int16 event_id);
+    void GameEventUnspawn(int16 event_id);
+    void ChangeEquipOrModel(int16 event_id, bool activate);
+    void UpdateEventQuests(uint16 event_id, bool activate);
+    void UpdateWorldStates(uint16 event_id, bool Activate);
+    void UpdateEventNPCFlags(uint16 event_id);
+    void UpdateEventNPCVendor(uint16 event_id, bool activate);
+    void UpdateBattlegroundSettings();
+    void RunSmartAIScripts(uint16 event_id, bool activate);    //! Runs SMART_EVENT_GAME_EVENT_START/_END SAI
+    bool CheckOneGameEventConditions(uint16 event_id);
+    void SaveWorldEventStateToDB(uint16 event_id);
+    bool hasCreatureQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
+    bool hasGameObjectQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
+    bool hasCreatureActiveEventExcept(uint32 creature_guid, uint16 event_id);
+    bool hasGameObjectActiveEventExcept(uint32 go_guid, uint16 event_id);
+    void SetHolidayEventTime(GameEventData& event);
 
-        typedef std::list<uint32> GuidList;
-        typedef std::list<uint32> IdList;
-        typedef std::vector<GuidList> GameEventGuidMap;
-        typedef std::vector<IdList> GameEventIdMap;
-        typedef std::pair<uint32, ModelEquip> ModelEquipPair;
-        typedef std::list<ModelEquipPair> ModelEquipList;
-        typedef std::vector<ModelEquipList> GameEventModelEquipMap;
-        typedef std::pair<uint32, uint32> QuestRelation;
-        typedef std::list<QuestRelation> QuestRelList;
-        typedef std::vector<QuestRelList> GameEventQuestMap;
-        typedef std::list<NPCVendorEntry> NPCVendorList;
-        typedef std::vector<NPCVendorList> GameEventNPCVendorMap;
-        typedef std::map<uint32 /*quest id*/, GameEventQuestToEventConditionNum> QuestIdToEventConditionMap;
-        typedef std::pair<uint32 /*guid*/, uint32 /*npcflag*/> GuidNPCFlagPair;
-        typedef std::list<GuidNPCFlagPair> NPCFlagList;
-        typedef std::vector<NPCFlagList> GameEventNPCFlagMap;
-        typedef std::vector<uint32> GameEventBitmask;
-        GameEventQuestMap mGameEventCreatureQuests;
-        GameEventQuestMap mGameEventGameObjectQuests;
-        GameEventNPCVendorMap mGameEventVendors;
-        GameEventModelEquipMap mGameEventModelEquip;
-        //GameEventGuidMap  mGameEventCreatureGuids;
-        //GameEventGuidMap  mGameEventGameobjectGuids;
-        GameEventIdMap    mGameEventPoolIds;
-        GameEventDataMap  mGameEvent;
-        GameEventBitmask  mGameEventBattlegroundHolidays;
-        QuestIdToEventConditionMap mQuestToEventConditions;
-        GameEventNPCFlagMap mGameEventNPCFlags;
-        ActiveEvents m_ActiveEvents;
-        bool isSystemInit;
-    public:
-        GameEventGuidMap  mGameEventCreatureGuids;
-        GameEventGuidMap  mGameEventGameobjectGuids;
-        std::vector<uint32> modifiedHolidays;
+    typedef std::list<uint32> GuidList;
+    typedef std::list<uint32> IdList;
+    typedef std::vector<GuidList> GameEventGuidMap;
+    typedef std::vector<IdList> GameEventIdMap;
+    typedef std::pair<uint32, ModelEquip> ModelEquipPair;
+    typedef std::list<ModelEquipPair> ModelEquipList;
+    typedef std::vector<ModelEquipList> GameEventModelEquipMap;
+    typedef std::pair<uint32, uint32> QuestRelation;
+    typedef std::list<QuestRelation> QuestRelList;
+    typedef std::vector<QuestRelList> GameEventQuestMap;
+    typedef std::list<NPCVendorEntry> NPCVendorList;
+    typedef std::vector<NPCVendorList> GameEventNPCVendorMap;
+    typedef std::map<uint32 /*quest id*/, GameEventQuestToEventConditionNum> QuestIdToEventConditionMap;
+    typedef std::pair<uint32 /*guid*/, uint32 /*npcflag*/> GuidNPCFlagPair;
+    typedef std::list<GuidNPCFlagPair> NPCFlagList;
+    typedef std::vector<NPCFlagList> GameEventNPCFlagMap;
+    typedef std::vector<uint32> GameEventBitmask;
+    GameEventQuestMap mGameEventCreatureQuests;
+    GameEventQuestMap mGameEventGameObjectQuests;
+    GameEventNPCVendorMap mGameEventVendors;
+    GameEventModelEquipMap mGameEventModelEquip;
+    //GameEventGuidMap  mGameEventCreatureGuids;
+    //GameEventGuidMap  mGameEventGameobjectGuids;
+    GameEventIdMap    mGameEventPoolIds;
+    GameEventDataMap  mGameEvent;
+    GameEventBitmask  mGameEventBattlegroundHolidays;
+    QuestIdToEventConditionMap mQuestToEventConditions;
+    GameEventNPCFlagMap mGameEventNPCFlags;
+    ActiveEvents m_ActiveEvents;
+    bool isSystemInit;
+public:
+    GameEventGuidMap  mGameEventCreatureGuids;
+    GameEventGuidMap  mGameEventGameobjectGuids;
+    std::vector<uint32> modifiedHolidays;
 };
 
 #define sGameEventMgr GameEventMgr::instance()
