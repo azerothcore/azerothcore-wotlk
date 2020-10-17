@@ -125,9 +125,9 @@ public:
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_AURIAYA, NOT_STARTED);
 
-            for (uint8 i = 0; i < RAID_MODE(2,4); ++i)
-                me->SummonCreature(NPC_SANCTUM_SENTRY, me->GetPositionX()+urand(4,12), me->GetPositionY()+urand(4,12), me->GetPositionZ());
-                
+            for (uint8 i = 0; i < RAID_MODE(2, 4); ++i)
+                me->SummonCreature(NPC_SANCTUM_SENTRY, me->GetPositionX() + urand(4, 12), me->GetPositionY() + urand(4, 12), me->GetPositionZ());
+
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
         }
 
@@ -144,7 +144,7 @@ public:
         void JustSummoned(Creature* cr)
         {
             if (cr->GetEntry() == NPC_SANCTUM_SENTRY)
-                cr->GetMotionMaster()->MoveFollow(me, 6, rand_norm()*2*3.14f);
+                cr->GetMotionMaster()->MoveFollow(me, 6, rand_norm() * 2 * 3.14f);
             else
                 cr->SetInCombatWithZone();
 
@@ -180,10 +180,10 @@ public:
 
         void KilledUnit(Unit*  /*victim*/)
         {
-            if (urand(0,2))
+            if (urand(0, 2))
                 return;
 
-            if (urand(0,1))
+            if (urand(0, 1))
             {
                 me->MonsterYell("The secret dies with you!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_SLAY1);
@@ -195,7 +195,7 @@ public:
             }
         }
 
-        void JustDied(Unit * /*victim*/)
+        void JustDied(Unit* /*victim*/)
         {
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_AURIAYA, DONE);
@@ -256,12 +256,12 @@ public:
                     events.DelayEvents(5000, 0);
                     break;
                 case EVENT_RESPAWN_FERAL_DEFENDER:
-                {
-                    EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
-                    summons.DoAction(ACTION_FERAL_RESPAWN, pred);
-                    events.PopEvent();
-                    break;
-                }
+                    {
+                        EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
+                        summons.DoAction(ACTION_FERAL_RESPAWN, pred);
+                        events.PopEvent();
+                        break;
+                    }
                 case EVENT_ENRAGE:
                     me->MonsterTextEmote("You waste my time!", 0);
                     me->PlayDirectSound(SOUND_BERSERK);
@@ -376,7 +376,7 @@ public:
 
             if (_feralEssenceStack)
             {
-                if (Creature *cr = me->SummonCreature(NPC_SEEPING_FERAL_ESSENCE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f))
+                if (Creature* cr = me->SummonCreature(NPC_SEEPING_FERAL_ESSENCE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f))
                     summons.Summon(cr);
 
                 --_feralEssenceStack;
@@ -435,60 +435,60 @@ public:
 
 class spell_auriaya_sentinel_blast : public SpellScriptLoader
 {
-    public:
-        spell_auriaya_sentinel_blast() : SpellScriptLoader("spell_auriaya_sentinel_blast") { }
+public:
+    spell_auriaya_sentinel_blast() : SpellScriptLoader("spell_auriaya_sentinel_blast") { }
 
-        class spell_auriaya_sentinel_blast_SpellScript : public SpellScript
+    class spell_auriaya_sentinel_blast_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_auriaya_sentinel_blast_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            PrepareSpellScript(spell_auriaya_sentinel_blast_SpellScript);
-
-            void FilterTargets(std::list<WorldObject*>& unitList)
-            {
-                unitList.remove_if(PlayerOrPetCheck());
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_auriaya_sentinel_blast_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_auriaya_sentinel_blast_SpellScript();
+            unitList.remove_if(PlayerOrPetCheck());
         }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_auriaya_sentinel_blast_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_auriaya_sentinel_blast_SpellScript();
+    }
 };
 
 class achievement_auriaya_crazy_cat_lady : public AchievementCriteriaScript
 {
-    public:
-        achievement_auriaya_crazy_cat_lady() : AchievementCriteriaScript("achievement_auriaya_crazy_cat_lady") {}
+public:
+    achievement_auriaya_crazy_cat_lady() : AchievementCriteriaScript("achievement_auriaya_crazy_cat_lady") {}
 
-        bool OnCheck(Player*  /*player*/, Unit* target)
-        {
-            if (target)
-                if (InstanceScript* instance = target->GetInstanceScript())
-                    if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_AURIAYA)))
-                        return cr->AI()->GetData(DATA_CRAZY_CAT);
-                        
-            return false;
-        }
+    bool OnCheck(Player*  /*player*/, Unit* target)
+    {
+        if (target)
+            if (InstanceScript* instance = target->GetInstanceScript())
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_AURIAYA)))
+                    return cr->AI()->GetData(DATA_CRAZY_CAT);
+
+        return false;
+    }
 };
 
 class achievement_auriaya_nine_lives : public AchievementCriteriaScript
 {
-    public:
-        achievement_auriaya_nine_lives() : AchievementCriteriaScript("achievement_auriaya_nine_lives") {}
+public:
+    achievement_auriaya_nine_lives() : AchievementCriteriaScript("achievement_auriaya_nine_lives") {}
 
-        bool OnCheck(Player*  /*player*/, Unit* target)
-        {
-            if (target)
-                if (InstanceScript* instance = target->GetInstanceScript())
-                    if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_AURIAYA)))
-                        return cr->AI()->GetData(DATA_NINE_LIVES);
-                        
-            return false;
-        }
+    bool OnCheck(Player*  /*player*/, Unit* target)
+    {
+        if (target)
+            if (InstanceScript* instance = target->GetInstanceScript())
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_AURIAYA)))
+                    return cr->AI()->GetData(DATA_NINE_LIVES);
+
+        return false;
+    }
 };
 
 void AddSC_boss_auriaya()

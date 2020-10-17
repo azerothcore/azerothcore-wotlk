@@ -82,7 +82,7 @@ public:
             AttackStart(pAttacker);
         }
 
-        void DamageTaken(Unit* pDoneBy, uint32 &uiDamage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* pDoneBy, uint32& uiDamage, DamageEffectType, SpellSchoolMask)
         {
             if (pDoneBy && (uiDamage >= me->GetHealth() || me->HealthBelowPctDamaged(15, uiDamage)))
             {
@@ -254,7 +254,8 @@ public:
                             uiPhase = 0;
                             break;
                     }
-                } else uiTimer -= uiDiff;
+                }
+                else uiTimer -= uiDiff;
             }
             npc_escortAI::UpdateAI(uiDiff);
 
@@ -443,10 +444,10 @@ public:
                             uiPhase = 4;
                             break;
                         case 4:
-                           SetEscortPaused(false);
-                           uiPhase = 0;
-                           uiTimer = 0;
-                           break;
+                            SetEscortPaused(false);
+                            uiPhase = 0;
+                            uiTimer = 0;
+                            break;
                         case 5:
                             if (Creature* pGuard = me->FindNearestCreature(NPC_STORMWIND_ROYAL, 10.0f, true))
                                 pGuard->AI()->Talk(SAY_GUARD_1);
@@ -488,7 +489,8 @@ public:
                             uiPhase = 0;
                             break;
                     }
-                } else uiTimer -= uiDiff;
+                }
+                else uiTimer -= uiDiff;
             }
             npc_escortAI::UpdateAI(uiDiff);
 

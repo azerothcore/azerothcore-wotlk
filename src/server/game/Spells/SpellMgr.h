@@ -134,37 +134,37 @@ enum ProcFlags
 
     // flag masks
     AUTO_ATTACK_PROC_FLAG_MASK                = PROC_FLAG_DONE_MELEE_AUTO_ATTACK | PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK
-                                                | PROC_FLAG_DONE_RANGED_AUTO_ATTACK | PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK,
+            | PROC_FLAG_DONE_RANGED_AUTO_ATTACK | PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK,
 
     MELEE_PROC_FLAG_MASK                      = PROC_FLAG_DONE_MELEE_AUTO_ATTACK | PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK
-                                                | PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS
-                                                | PROC_FLAG_DONE_MAINHAND_ATTACK | PROC_FLAG_DONE_OFFHAND_ATTACK,
+            | PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS
+            | PROC_FLAG_DONE_MAINHAND_ATTACK | PROC_FLAG_DONE_OFFHAND_ATTACK,
 
     RANGED_PROC_FLAG_MASK                     = PROC_FLAG_DONE_RANGED_AUTO_ATTACK | PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK
-                                                | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS,
+            | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS,
 
     SPELL_PROC_FLAG_MASK                      = PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS
-                                                | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS
-                                                | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_POS
-                                                | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_NEG
-                                                | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS
-                                                | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG,
+            | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS
+            | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_POS
+            | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_NEG
+            | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS
+            | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG,
 
     SPELL_CAST_PROC_FLAG_MASK                  = SPELL_PROC_FLAG_MASK | PROC_FLAG_DONE_TRAP_ACTIVATION | RANGED_PROC_FLAG_MASK,
 
     PERIODIC_PROC_FLAG_MASK                    = PROC_FLAG_DONE_PERIODIC | PROC_FLAG_TAKEN_PERIODIC,
 
     DONE_HIT_PROC_FLAG_MASK                    = PROC_FLAG_DONE_MELEE_AUTO_ATTACK | PROC_FLAG_DONE_RANGED_AUTO_ATTACK
-                                                 | PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS
-                                                 | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG
-                                                 | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG
-                                                 | PROC_FLAG_DONE_PERIODIC | PROC_FLAG_DONE_MAINHAND_ATTACK | PROC_FLAG_DONE_OFFHAND_ATTACK,
+            | PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS
+            | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG
+            | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG
+            | PROC_FLAG_DONE_PERIODIC | PROC_FLAG_DONE_MAINHAND_ATTACK | PROC_FLAG_DONE_OFFHAND_ATTACK,
 
     TAKEN_HIT_PROC_FLAG_MASK                   = PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK | PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK
-                                                 | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS
-                                                 | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_NEG
-                                                 | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG
-                                                 | PROC_FLAG_TAKEN_PERIODIC | PROC_FLAG_TAKEN_DAMAGE,
+            | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS
+            | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_NEG
+            | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG
+            | PROC_FLAG_TAKEN_PERIODIC | PROC_FLAG_TAKEN_DAMAGE,
 
     REQ_SPELL_PHASE_PROC_FLAG_MASK             = SPELL_PROC_FLAG_MASK & DONE_HIT_PROC_FLAG_MASK,
 };
@@ -318,9 +318,9 @@ enum SpellGroupSpecialFlags
     SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN    = 0x002,
     SPELL_GROUP_SPECIAL_FLAG_ELIXIR_UNSTABLE    = 0x004,
     SPELL_GROUP_SPECIAL_FLAG_ELIXIR_SHATTRATH   = 0x008,
-    SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX= 0x00F,
+    SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX = 0x00F,
     SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST   = 0x010, // xinef: specially helpful flag if some spells have different auras, but only one should be present
-    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK= 0x020,
+    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK = 0x020,
     SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK  = 0x040,
     SPELL_GROUP_SPECIAL_FLAG_PRIORITY1          = 0x100,
     SPELL_GROUP_SPECIAL_FLAG_PRIORITY2          = 0x200,
@@ -440,51 +440,51 @@ enum EffectRadiusIndex
 // Spell pet auras
 class PetAura
 {
-    private:
-        typedef std::unordered_map<uint32, uint32> PetAuraMap;
+private:
+    typedef std::unordered_map<uint32, uint32> PetAuraMap;
 
-    public:
-        PetAura() : removeOnChangePet(false), damage(0)
-        {
-            auras.clear();
-        }
+public:
+    PetAura() : removeOnChangePet(false), damage(0)
+    {
+        auras.clear();
+    }
 
-        PetAura(uint32 petEntry, uint32 aura, bool _removeOnChangePet, int _damage) :
+    PetAura(uint32 petEntry, uint32 aura, bool _removeOnChangePet, int _damage) :
         removeOnChangePet(_removeOnChangePet), damage(_damage)
-        {
-            auras[petEntry] = aura;
-        }
+    {
+        auras[petEntry] = aura;
+    }
 
-        uint32 GetAura(uint32 petEntry) const
-        {
-            PetAuraMap::const_iterator itr = auras.find(petEntry);
-            if (itr != auras.end())
-                return itr->second;
-            PetAuraMap::const_iterator itr2 = auras.find(0);
-            if (itr2 != auras.end())
-                return itr2->second;
-            return 0;
-        }
+    uint32 GetAura(uint32 petEntry) const
+    {
+        PetAuraMap::const_iterator itr = auras.find(petEntry);
+        if (itr != auras.end())
+            return itr->second;
+        PetAuraMap::const_iterator itr2 = auras.find(0);
+        if (itr2 != auras.end())
+            return itr2->second;
+        return 0;
+    }
 
-        void AddAura(uint32 petEntry, uint32 aura)
-        {
-            auras[petEntry] = aura;
-        }
+    void AddAura(uint32 petEntry, uint32 aura)
+    {
+        auras[petEntry] = aura;
+    }
 
-        bool IsRemovedOnChangePet() const
-        {
-            return removeOnChangePet;
-        }
+    bool IsRemovedOnChangePet() const
+    {
+        return removeOnChangePet;
+    }
 
-        int32 GetDamage() const
-        {
-            return damage;
-        }
+    int32 GetDamage() const
+    {
+        return damage;
+    }
 
-    private:
-        PetAuraMap auras;
-        bool removeOnChangePet;
-        int32 damage;
+private:
+    PetAuraMap auras;
+    bool removeOnChangePet;
+    int32 damage;
 };
 typedef std::map<uint32, PetAura> SpellPetAuraMap;
 
@@ -601,159 +601,159 @@ typedef std::set<uint32> TalentAdditionalSet;
 class SpellMgr
 {
     // Constructors
-    private:
-        SpellMgr();
-        ~SpellMgr();
+private:
+    SpellMgr();
+    ~SpellMgr();
 
     // Accessors (const or static functions)
-    public:
-        static SpellMgr* instance();
+public:
+    static SpellMgr* instance();
 
-        // Spell correctness for client using
-        static bool ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg = true);
-        static bool IsSpellValid(SpellInfo const* spellInfo);
-        static bool CheckSpellValid(SpellInfo const* spellInfo, uint32 spellId, bool isTalent);
+    // Spell correctness for client using
+    static bool ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg = true);
+    static bool IsSpellValid(SpellInfo const* spellInfo);
+    static bool CheckSpellValid(SpellInfo const* spellInfo, uint32 spellId, bool isTalent);
 
-        // Spell difficulty
-        uint32 GetSpellDifficultyId(uint32 spellId) const;
-        void SetSpellDifficultyId(uint32 spellId, uint32 id);
-        uint32 GetSpellIdForDifficulty(uint32 spellId, Unit const* caster) const;
-        SpellInfo const* GetSpellForDifficultyFromSpell(SpellInfo const* spell, Unit const* caster) const;
+    // Spell difficulty
+    uint32 GetSpellDifficultyId(uint32 spellId) const;
+    void SetSpellDifficultyId(uint32 spellId, uint32 id);
+    uint32 GetSpellIdForDifficulty(uint32 spellId, Unit const* caster) const;
+    SpellInfo const* GetSpellForDifficultyFromSpell(SpellInfo const* spell, Unit const* caster) const;
 
-        // Spell Ranks table
-        SpellChainNode const* GetSpellChainNode(uint32 spell_id) const;
-        uint32 GetFirstSpellInChain(uint32 spell_id) const;
-        uint32 GetLastSpellInChain(uint32 spell_id) const;
-        uint32 GetNextSpellInChain(uint32 spell_id) const;
-        uint32 GetPrevSpellInChain(uint32 spell_id) const;
-        uint8 GetSpellRank(uint32 spell_id) const;
-        // not strict check returns provided spell if rank not avalible
-        uint32 GetSpellWithRank(uint32 spell_id, uint32 rank, bool strict = false) const;
+    // Spell Ranks table
+    SpellChainNode const* GetSpellChainNode(uint32 spell_id) const;
+    uint32 GetFirstSpellInChain(uint32 spell_id) const;
+    uint32 GetLastSpellInChain(uint32 spell_id) const;
+    uint32 GetNextSpellInChain(uint32 spell_id) const;
+    uint32 GetPrevSpellInChain(uint32 spell_id) const;
+    uint8 GetSpellRank(uint32 spell_id) const;
+    // not strict check returns provided spell if rank not avalible
+    uint32 GetSpellWithRank(uint32 spell_id, uint32 rank, bool strict = false) const;
 
-        // Spell Required table
-        SpellRequiredMapBounds GetSpellsRequiredForSpellBounds(uint32 spell_id) const;
-        SpellsRequiringSpellMapBounds GetSpellsRequiringSpellBounds(uint32 spell_id) const;
-        bool IsSpellRequiringSpell(uint32 spellid, uint32 req_spellid) const;
+    // Spell Required table
+    SpellRequiredMapBounds GetSpellsRequiredForSpellBounds(uint32 spell_id) const;
+    SpellsRequiringSpellMapBounds GetSpellsRequiringSpellBounds(uint32 spell_id) const;
+    bool IsSpellRequiringSpell(uint32 spellid, uint32 req_spellid) const;
 
-        // Spell learning
-        SpellLearnSkillNode const* GetSpellLearnSkill(uint32 spell_id) const;
+    // Spell learning
+    SpellLearnSkillNode const* GetSpellLearnSkill(uint32 spell_id) const;
 
-        // Spell target coordinates
-        SpellTargetPosition const* GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const;
+    // Spell target coordinates
+    SpellTargetPosition const* GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const;
 
-        // Spell Groups
-        uint32 GetSpellGroup(uint32 spellid) const;
-        SpellGroupSpecialFlags GetSpellGroupSpecialFlags(uint32 spell_id) const;
-        SpellGroupStackFlags GetGroupStackFlags(uint32 groupid) const;
-        SpellGroupStackFlags CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2, bool remove, bool areaAura) const;
-        void GetSetOfSpellsInSpellGroupWithFlag(uint32 group_id, SpellGroupSpecialFlags flag, std::set<uint32>& availableElixirs) const;
+    // Spell Groups
+    uint32 GetSpellGroup(uint32 spellid) const;
+    SpellGroupSpecialFlags GetSpellGroupSpecialFlags(uint32 spell_id) const;
+    SpellGroupStackFlags GetGroupStackFlags(uint32 groupid) const;
+    SpellGroupStackFlags CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2, bool remove, bool areaAura) const;
+    void GetSetOfSpellsInSpellGroupWithFlag(uint32 group_id, SpellGroupSpecialFlags flag, std::set<uint32>& availableElixirs) const;
 
-        // Spell proc event table
-        SpellProcEventEntry const* GetSpellProcEvent(uint32 spellId) const;
-        bool IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellInfo const* procSpell, uint32 procFlags, uint32 procExtra, bool active) const;
+    // Spell proc event table
+    SpellProcEventEntry const* GetSpellProcEvent(uint32 spellId) const;
+    bool IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellInfo const* procSpell, uint32 procFlags, uint32 procExtra, bool active) const;
 
-        // Spell proc table
-        SpellProcEntry const* GetSpellProcEntry(uint32 spellId) const;
-        bool CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const;
+    // Spell proc table
+    SpellProcEntry const* GetSpellProcEntry(uint32 spellId) const;
+    bool CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const;
 
-        // Spell bonus data table
-        SpellBonusEntry const* GetSpellBonusData(uint32 spellId) const;
+    // Spell bonus data table
+    SpellBonusEntry const* GetSpellBonusData(uint32 spellId) const;
 
-        // Spell threat table
-        SpellThreatEntry const* GetSpellThreatEntry(uint32 spellID) const;
+    // Spell threat table
+    SpellThreatEntry const* GetSpellThreatEntry(uint32 spellID) const;
 
-        // Spell mixology table
-        float GetSpellMixologyBonus(uint32 spellId) const;
+    // Spell mixology table
+    float GetSpellMixologyBonus(uint32 spellId) const;
 
-        SkillLineAbilityMapBounds GetSkillLineAbilityMapBounds(uint32 spell_id) const;
+    SkillLineAbilityMapBounds GetSkillLineAbilityMapBounds(uint32 spell_id) const;
 
-        PetAura const* GetPetAura(uint32 spell_id, uint8 eff) const;
+    PetAura const* GetPetAura(uint32 spell_id, uint8 eff) const;
 
-        SpellEnchantProcEntry const* GetSpellEnchantProcEvent(uint32 enchId) const;
-        bool IsArenaAllowedEnchancment(uint32 ench_id) const;
+    SpellEnchantProcEntry const* GetSpellEnchantProcEvent(uint32 enchId) const;
+    bool IsArenaAllowedEnchancment(uint32 ench_id) const;
 
-        const std::vector<int32> *GetSpellLinked(int32 spell_id) const;
+    const std::vector<int32>* GetSpellLinked(int32 spell_id) const;
 
-        PetLevelupSpellSet const* GetPetLevelupSpellList(uint32 petFamily) const;
-        PetDefaultSpellsEntry const* GetPetDefaultSpellsEntry(int32 id) const;
+    PetLevelupSpellSet const* GetPetLevelupSpellList(uint32 petFamily) const;
+    PetDefaultSpellsEntry const* GetPetDefaultSpellsEntry(int32 id) const;
 
-        // Spell area
-        SpellAreaMapBounds GetSpellAreaMapBounds(uint32 spell_id) const;
-        SpellAreaForQuestMapBounds GetSpellAreaForQuestMapBounds(uint32 quest_id) const;
-        SpellAreaForQuestMapBounds GetSpellAreaForQuestEndMapBounds(uint32 quest_id) const;
-        SpellAreaForAuraMapBounds GetSpellAreaForAuraMapBounds(uint32 spell_id) const;
-        SpellAreaForAreaMapBounds GetSpellAreaForAreaMapBounds(uint32 area_id) const;
+    // Spell area
+    SpellAreaMapBounds GetSpellAreaMapBounds(uint32 spell_id) const;
+    SpellAreaForQuestMapBounds GetSpellAreaForQuestMapBounds(uint32 quest_id) const;
+    SpellAreaForQuestMapBounds GetSpellAreaForQuestEndMapBounds(uint32 quest_id) const;
+    SpellAreaForAuraMapBounds GetSpellAreaForAuraMapBounds(uint32 spell_id) const;
+    SpellAreaForAreaMapBounds GetSpellAreaForAreaMapBounds(uint32 area_id) const;
 
-        // SpellInfo object management
-        SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : nullptr; }
-        uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
+    // SpellInfo object management
+    SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : nullptr; }
+    uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
 
-        // Talent Additional Set
-        bool IsAdditionalTalentSpell(uint32 spellId) const;
+    // Talent Additional Set
+    bool IsAdditionalTalentSpell(uint32 spellId) const;
 
-    private:
-        SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
+private:
+    SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
 
     // Modifiers
-    public:
+public:
 
-        // Loading data at server startup
-        void UnloadSpellInfoChains();
-        void LoadSpellTalentRanks();
-        void LoadSpellRanks();
-        void LoadSpellRequired();
-        void LoadSpellLearnSkills();
-        void LoadSpellTargetPositions();
-        void LoadSpellGroups();
-        void LoadSpellGroupStackRules();
-        void LoadSpellProcEvents();
-        void LoadSpellProcs();
-        void LoadSpellBonusess();
-        void LoadSpellThreats();
-        void LoadSpellMixology();
-        void LoadSkillLineAbilityMap();
-        void LoadSpellPetAuras();
-        void LoadEnchantCustomAttr();
-        void LoadSpellEnchantProcData();
-        void LoadSpellLinked();
-        void LoadPetLevelupSpellMap();
-        void LoadPetDefaultSpells();
-        void LoadSpellAreas();
-        void LoadSpellInfoStore();
-        void UnloadSpellInfoStore();
-        void UnloadSpellInfoImplicitTargetConditionLists();
-        void LoadSpellCustomAttr();
-        void LoadDbcDataCorrections();
-        void LoadSpellSpecificAndAuraState();
+    // Loading data at server startup
+    void UnloadSpellInfoChains();
+    void LoadSpellTalentRanks();
+    void LoadSpellRanks();
+    void LoadSpellRequired();
+    void LoadSpellLearnSkills();
+    void LoadSpellTargetPositions();
+    void LoadSpellGroups();
+    void LoadSpellGroupStackRules();
+    void LoadSpellProcEvents();
+    void LoadSpellProcs();
+    void LoadSpellBonusess();
+    void LoadSpellThreats();
+    void LoadSpellMixology();
+    void LoadSkillLineAbilityMap();
+    void LoadSpellPetAuras();
+    void LoadEnchantCustomAttr();
+    void LoadSpellEnchantProcData();
+    void LoadSpellLinked();
+    void LoadPetLevelupSpellMap();
+    void LoadPetDefaultSpells();
+    void LoadSpellAreas();
+    void LoadSpellInfoStore();
+    void UnloadSpellInfoStore();
+    void UnloadSpellInfoImplicitTargetConditionLists();
+    void LoadSpellCustomAttr();
+    void LoadDbcDataCorrections();
+    void LoadSpellSpecificAndAuraState();
 
-    private:
-        SpellDifficultySearcherMap mSpellDifficultySearcherMap;
-        SpellChainMap              mSpellChains;
-        SpellsRequiringSpellMap    mSpellsReqSpell;
-        SpellRequiredMap           mSpellReq;
-        SpellLearnSkillMap         mSpellLearnSkills;
-        SpellTargetPositionMap     mSpellTargetPositions;
-        SpellGroupMap              mSpellGroupMap;
-        SpellGroupStackMap         mSpellGroupStackMap;
-        SpellProcEventMap          mSpellProcEventMap;
-        SpellProcMap               mSpellProcMap;
-        SpellBonusMap              mSpellBonusMap;
-        SpellThreatMap             mSpellThreatMap;
-        SpellMixologyMap           mSpellMixologyMap;
-        SpellPetAuraMap            mSpellPetAuraMap;
-        SpellLinkedMap             mSpellLinkedMap;
-        SpellEnchantProcEventMap   mSpellEnchantProcEventMap;
-        EnchantCustomAttribute     mEnchantCustomAttr;
-        SpellAreaMap               mSpellAreaMap;
-        SpellAreaForQuestMap       mSpellAreaForQuestMap;
-        SpellAreaForQuestMap       mSpellAreaForQuestEndMap;
-        SpellAreaForAuraMap        mSpellAreaForAuraMap;
-        SpellAreaForAreaMap        mSpellAreaForAreaMap;
-        SkillLineAbilityMap        mSkillLineAbilityMap;
-        PetLevelupSpellMap         mPetLevelupSpellMap;
-        PetDefaultSpellsMap        mPetDefaultSpellsMap;           // only spells not listed in related mPetLevelupSpellMap entry
-        SpellInfoMap               mSpellInfoMap;
-        TalentAdditionalSet        mTalentSpellAdditionalSet;
+private:
+    SpellDifficultySearcherMap mSpellDifficultySearcherMap;
+    SpellChainMap              mSpellChains;
+    SpellsRequiringSpellMap    mSpellsReqSpell;
+    SpellRequiredMap           mSpellReq;
+    SpellLearnSkillMap         mSpellLearnSkills;
+    SpellTargetPositionMap     mSpellTargetPositions;
+    SpellGroupMap              mSpellGroupMap;
+    SpellGroupStackMap         mSpellGroupStackMap;
+    SpellProcEventMap          mSpellProcEventMap;
+    SpellProcMap               mSpellProcMap;
+    SpellBonusMap              mSpellBonusMap;
+    SpellThreatMap             mSpellThreatMap;
+    SpellMixologyMap           mSpellMixologyMap;
+    SpellPetAuraMap            mSpellPetAuraMap;
+    SpellLinkedMap             mSpellLinkedMap;
+    SpellEnchantProcEventMap   mSpellEnchantProcEventMap;
+    EnchantCustomAttribute     mEnchantCustomAttr;
+    SpellAreaMap               mSpellAreaMap;
+    SpellAreaForQuestMap       mSpellAreaForQuestMap;
+    SpellAreaForQuestMap       mSpellAreaForQuestEndMap;
+    SpellAreaForAuraMap        mSpellAreaForAuraMap;
+    SpellAreaForAreaMap        mSpellAreaForAreaMap;
+    SkillLineAbilityMap        mSkillLineAbilityMap;
+    PetLevelupSpellMap         mPetLevelupSpellMap;
+    PetDefaultSpellsMap        mPetDefaultSpellsMap;           // only spells not listed in related mPetLevelupSpellMap entry
+    SpellInfoMap               mSpellInfoMap;
+    TalentAdditionalSet        mTalentSpellAdditionalSet;
 };
 
 #define sSpellMgr SpellMgr::instance()

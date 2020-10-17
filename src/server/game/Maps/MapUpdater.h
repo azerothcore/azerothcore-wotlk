@@ -11,33 +11,33 @@ class Map;
 
 class MapUpdater
 {
-    public:
+public:
 
-        MapUpdater();
-        virtual ~MapUpdater();
+    MapUpdater();
+    virtual ~MapUpdater();
 
-        friend class MapUpdateRequest;
-        friend class LFGUpdateRequest;
+    friend class MapUpdateRequest;
+    friend class LFGUpdateRequest;
 
-        int schedule_update(Map& map, uint32 diff, uint32 s_diff);
-        int schedule_lfg_update(uint32 diff);
+    int schedule_update(Map& map, uint32 diff, uint32 s_diff);
+    int schedule_lfg_update(uint32 diff);
 
-        int wait();
+    int wait();
 
-        int activate(size_t num_threads);
+    int activate(size_t num_threads);
 
-        int deactivate();
+    int deactivate();
 
-        bool activated();
+    bool activated();
 
-    private:
+private:
 
-        DelayExecutor m_executor;
-        ACE_Thread_Mutex m_mutex;
-        ACE_Condition_Thread_Mutex m_condition;
-        size_t pending_requests;
+    DelayExecutor m_executor;
+    ACE_Thread_Mutex m_mutex;
+    ACE_Condition_Thread_Mutex m_condition;
+    size_t pending_requests;
 
-        void update_finished();
+    void update_finished();
 };
 
 #endif //_MAP_UPDATER_H_INCLUDED

@@ -98,7 +98,7 @@ public:
 
     struct boss_ingvar_the_plundererAI : public ScriptedAI
     {
-        boss_ingvar_the_plundererAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_ingvar_the_plundererAI(Creature* c) : ScriptedAI(c), summons(me)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -126,7 +126,7 @@ public:
                 pInstance->SetData(DATA_INGVAR, NOT_STARTED);
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             if (me->GetDisplayId() == DISPLAYID_DEFAULT && damage >= me->GetHealth())
             {
@@ -146,7 +146,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit* /*who*/)
         {
             events.Reset();
             // schedule Phase 1 abilities
@@ -171,7 +171,7 @@ public:
                 s->SetCanFly(true);
                 s->SetDisableGravity(true);
                 s->SetHover(true);
-                s->SetPosition(s->GetPositionX(), s->GetPositionY(), s->GetPositionZ()+35.0f, s->GetOrientation());
+                s->SetPosition(s->GetPositionX(), s->GetPositionY(), s->GetPositionZ() + 35.0f, s->GetOrientation());
                 s->SetFacingTo(s->GetOrientation());
             }
             else if (s->GetEntry() == NPC_THROW)
@@ -254,7 +254,7 @@ public:
                     break;
                 case EVENT_VALKYR_MOVE:
                     if( Creature* s = ObjectAccessor::GetCreature(*me, ValkyrGUID) )
-                        s->GetMotionMaster()->MovePoint(1, s->GetPositionX(), s->GetPositionY(), s->GetPositionZ()-15.0f);
+                        s->GetMotionMaster()->MovePoint(1, s->GetPositionX(), s->GetPositionY(), s->GetPositionZ() - 15.0f);
                     events.PopEvent();
                     break;
                 case EVENT_ANNHYLDE_YELL:
@@ -322,7 +322,7 @@ public:
                         me->CastSpell((Unit*)NULL, SPELL_STAGGERING_ROAR, false);
                     else
                         me->CastSpell((Unit*)NULL, SPELL_DREADFUL_ROAR, false);
-                    events.RepeatEvent(urand(15000,20000));
+                    events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_CLEAVE_OR_WOE_STRIKE:
                     if( me->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) == 0 )
@@ -334,7 +334,7 @@ public:
                         me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
                     else
                         me->CastSpell(me->GetVictim(), SPELL_WOE_STRIKE, false);
-                    events.RepeatEvent(urand(0,4000)+3000);
+                    events.RepeatEvent(urand(0, 4000) + 3000);
                     break;
                 case EVENT_SPELL_SMASH:
                     if( me->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) == 0 )
@@ -349,7 +349,7 @@ public:
                         me->CastSpell((Unit*)NULL, SPELL_SMASH, false);
                     else
                         me->CastSpell((Unit*)NULL, SPELL_DARK_SMASH, false);
-                    events.RepeatEvent(urand(9000,11000));
+                    events.RepeatEvent(urand(9000, 11000));
                     events.RescheduleEvent(EVENT_UNROOT, 3750);
                     break;
                 case EVENT_SPELL_ENRAGE_OR_SHADOW_AXE:
@@ -368,7 +368,7 @@ public:
                     break;
                 case EVENT_AXE_RETURN:
                     if (Creature* c = ObjectAccessor::GetCreature(*me, ThrowGUID))
-                        c->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+0.5f);
+                        c->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 0.5f);
                     events.PopEvent();
                     events.RescheduleEvent(EVENT_AXE_PICKUP, 1500);
                     break;
