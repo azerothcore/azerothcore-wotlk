@@ -145,12 +145,12 @@ enum Spells
 
 enum GossipMenuArthas
 {
-   GOSSIP_MENU_ARTHAS_1                     = 13076,
-   GOSSIP_MENU_ARTHAS_2                     = 13125,
-   GOSSIP_MENU_ARTHAS_3                     = 13126,
-   GOSSIP_MENU_ARTHAS_4                     = 13177,
-   GOSSIP_MENU_ARTHAS_5                     = 13179,
-   GOSSIP_MENU_ARTHAS_6                     = 13287,
+    GOSSIP_MENU_ARTHAS_1                     = 13076,
+    GOSSIP_MENU_ARTHAS_2                     = 13125,
+    GOSSIP_MENU_ARTHAS_3                     = 13126,
+    GOSSIP_MENU_ARTHAS_4                     = 13177,
+    GOSSIP_MENU_ARTHAS_5                     = 13179,
+    GOSSIP_MENU_ARTHAS_6                     = 13287,
 };
 
 enum Misc
@@ -181,7 +181,7 @@ enum Events
 };
 
 // Locations for necromancers and add to spawn
-float WavesLocations[ENCOUNTER_WAVES_NUMBER][ENCOUNTER_WAVES_MAX_SPAWNS][5]=
+float WavesLocations[ENCOUNTER_WAVES_NUMBER][ENCOUNTER_WAVES_MAX_SPAWNS][5] =
 {
     {
         {NPC_RISEN_ZOMBIE, 2164.698975f, 1255.392944f, 135.040878f, 0.490202f},
@@ -234,7 +234,7 @@ float WavesLocations[ENCOUNTER_WAVES_NUMBER][ENCOUNTER_WAVES_MAX_SPAWNS][5]=
 };
 
 // Locations for rifts to spawn and draconians to go
-float RiftAndSpawnsLocations[ENCOUNTER_CHRONO_NUMBER][ENCOUNTER_CHRONO_MAX_SPAWNS_FIRST][5]=
+float RiftAndSpawnsLocations[ENCOUNTER_CHRONO_NUMBER][ENCOUNTER_CHRONO_MAX_SPAWNS_FIRST][5] =
 {
     {
         {NPC_TIME_RIFT, 2431.790039f, 1190.670044f, 148.076004f, 0.187923f},
@@ -291,7 +291,7 @@ public:
                     break;
                 case GOSSIP_ACTION_INFO_DEF+2:
                     ClearGossipMenuFor(player);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                     SendGossipMenuFor(player, GOSSIP_MENU_ARTHAS_3, creature->GetGUID());
                     break;
                 case GOSSIP_ACTION_INFO_DEF+3:
@@ -332,23 +332,23 @@ public:
         switch (pInstance->GetData(DATA_ARTHAS_EVENT))
         {
             case COS_PROGRESS_FINISHED_INTRO:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, GOSSIP_MENU_ARTHAS_1, creature->GetGUID());
                 break;
             case COS_PROGRESS_REACHED_TOWN_HALL:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, GOSSIP_MENU_ARTHAS_2, creature->GetGUID());
                 break;
             case COS_PROGRESS_KILLED_EPOCH:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                 SendGossipMenuFor(player, GOSSIP_MENU_ARTHAS_4, creature->GetGUID());
                 break;
             case COS_PROGRESS_LAST_CITY:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 SendGossipMenuFor(player, GOSSIP_MENU_ARTHAS_5, creature->GetGUID());
                 break;
             case COS_PROGRESS_BEFORE_MALGANIS:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+6);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
                 SendGossipMenuFor(player, GOSSIP_MENU_ARTHAS_6, creature->GetGUID());
                 break;
         }
@@ -427,7 +427,7 @@ public:
                 waveGroupId = 10;
                 eventInRun = true;
                 SetRun(true);
-                actionEvents.ScheduleEvent(EVENT_ACTION_PHASE2+9, 10000);
+                actionEvents.ScheduleEvent(EVENT_ACTION_PHASE2 + 9, 10000);
             }
             else if (param == ACTION_START_TOWN_HALL)
             {
@@ -473,7 +473,7 @@ public:
             {
                 EnterEvadeMode();
                 eventInRun = true;
-                actionEvents.ScheduleEvent(EVENT_ACTION_PHASE5+1, 22000);
+                actionEvents.ScheduleEvent(EVENT_ACTION_PHASE5 + 1, 22000);
                 me->SetFacingTo(1.84f);
 
                 if (!me->GetMap()->GetPlayers().isEmpty())
@@ -649,7 +649,7 @@ public:
                     eventInRun = true;
                     break;
 
-             }
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -671,8 +671,8 @@ public:
                             me->SetTarget(uther->GetGUID());
                         }
                         for (int i = 0; i < 3; ++i)
-                            if (Creature *horse = me->SummonCreature(NPC_HORSE_ESCORT, EventPos[EVENT_SRC_HORSE1+i], TEMPSUMMON_DEAD_DESPAWN, 180000))
-                                horse->GetMotionMaster()->MovePoint(0, EventPos[EVENT_DST_HORSE1+i], false);
+                            if (Creature* horse = me->SummonCreature(NPC_HORSE_ESCORT, EventPos[EVENT_SRC_HORSE1 + i], TEMPSUMMON_DEAD_DESPAWN, 180000))
+                                horse->GetMotionMaster()->MovePoint(0, EventPos[EVENT_DST_HORSE1 + i], false);
 
                         ScheduleNextEvent(currentEvent, 4000);
                         break;
@@ -1050,7 +1050,7 @@ public:
                         eventInRun = false;
                         SetEscortPaused(false);
                         Talk(SAY_PHASE311);
-                        me->SetFacingTo(M_PI*3/2);
+                        me->SetFacingTo(M_PI * 3 / 2);
                         ScheduleNextEvent(currentEvent, 0);
                         break;
                     case EVENT_ACTION_PHASE3+14:
@@ -1061,7 +1061,7 @@ public:
                             return;
                         }
 
-                        me->SetFacingTo(M_PI/2);
+                        me->SetFacingTo(M_PI / 2);
                         ScheduleNextEvent(currentEvent, 8000);
                         break;
                     case EVENT_ACTION_PHASE3+15:
@@ -1152,7 +1152,7 @@ public:
                         me->SetVisible(false);
                         actionEvents.PopEvent();
                         break;
-                    }
+                }
             }
 
             //Battling skills
@@ -1203,15 +1203,15 @@ Creature* npc_arthas::npc_arthasAI::GetEventNpc(uint32 entry)
 void npc_arthas::npc_arthasAI::ScheduleNextEvent(uint32 currentEvent, uint32 time)
 {
     actionEvents.PopEvent();
-    actionEvents.ScheduleEvent(currentEvent+1, time);
+    actionEvents.ScheduleEvent(currentEvent + 1, time);
 }
 
 void npc_arthas::npc_arthasAI::SummonNextWave()
 {
-    Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-        if (!PlayerList.isEmpty())
-            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                i->GetSource()->PlayerTalkClass->SendPointOfInterest(1000+waveGroupId);
+    Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
+    if (!PlayerList.isEmpty())
+        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+            i->GetSource()->PlayerTalkClass->SendPointOfInterest(1000 + waveGroupId);
 
     waveKillCount = 0; // this is forced condition!
     uint32 tableId = waveGroupId;
@@ -1252,7 +1252,7 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
             if (data == COS_PROGRESS_FINISHED_CITY_INTRO)
             {
                 eventInRun = true;
-                actionEvents.RescheduleEvent(EVENT_ACTION_PHASE2+8, 10000);
+                actionEvents.RescheduleEvent(EVENT_ACTION_PHASE2 + 8, 10000);
             }
             else if (data == COS_PROGRESS_KILLED_MEATHOOK)
             {
@@ -1319,7 +1319,7 @@ void npc_arthas::npc_arthasAI::SendNextWave(uint32 entry)
         else
             SummonNextWave();
 
-        pInstance->DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, waveGroupId+1);
+        pInstance->DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, waveGroupId + 1);
     }
 }
 
@@ -1354,39 +1354,39 @@ void npc_arthas::npc_arthasAI::SpawnTimeRift()
 
 class npc_crate_helper : public CreatureScript
 {
-    public:
-        npc_crate_helper() : CreatureScript("npc_create_helper_cot") { }
+public:
+    npc_crate_helper() : CreatureScript("npc_create_helper_cot") { }
 
-        struct npc_crate_helperAI : public NullCreatureAI
+    struct npc_crate_helperAI : public NullCreatureAI
+    {
+        npc_crate_helperAI(Creature* creature) : NullCreatureAI(creature)
         {
-            npc_crate_helperAI(Creature* creature) : NullCreatureAI(creature)
-            {
-                _marked = false;
-            }
+            _marked = false;
+        }
 
-            void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+        {
+            if (spell->Id == SPELL_ARCANE_DISRUPTION && !_marked)
             {
-                if (spell->Id == SPELL_ARCANE_DISRUPTION && !_marked)
+                _marked = true;
+                if (InstanceScript* instance = me->GetInstanceScript())
+                    instance->SetData(DATA_CRATE_COUNT, 0);
+                if (GameObject* crate = me->FindNearestGameObject(GO_SUSPICIOUS_CRATE, 5.0f))
                 {
-                    _marked = true;
-                    if (InstanceScript* instance = me->GetInstanceScript())
-                        instance->SetData(DATA_CRATE_COUNT, 0);
-                    if (GameObject* crate = me->FindNearestGameObject(GO_SUSPICIOUS_CRATE, 5.0f))
-                    {
-                        crate->SummonGameObject(GO_PLAGUED_CRATE, crate->GetPositionX(), crate->GetPositionY(), crate->GetPositionZ(), crate->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, DAY);
-                        crate->Delete();
-                    }
+                    crate->SummonGameObject(GO_PLAGUED_CRATE, crate->GetPositionX(), crate->GetPositionY(), crate->GetPositionZ(), crate->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, DAY);
+                    crate->Delete();
                 }
             }
-
-        private:
-            bool _marked;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_crate_helperAI(creature);
         }
+
+    private:
+        bool _marked;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_crate_helperAI(creature);
+    }
 };
 
 enum chromie
@@ -1398,207 +1398,207 @@ enum chromie
 
 class npc_cos_chromie_start : public CreatureScript
 {
-    public:
-        npc_cos_chromie_start() : CreatureScript("npc_cos_chromie_start") { }
+public:
+    npc_cos_chromie_start() : CreatureScript("npc_cos_chromie_start") { }
 
-        bool OnQuestAccept(Player* , Creature* creature, const Quest* pQuest) override
+    bool OnQuestAccept(Player*, Creature* creature, const Quest* pQuest) override
+    {
+        if (pQuest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
+            if (InstanceScript* pInstance = creature->GetInstanceScript())
+                pInstance->SetData(DATA_SHOW_CRATES, 1);
+
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/) override
+    {
+        // final menu id, show crates if hidden and add item if missing
+        if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9595)
         {
-            if (pQuest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
-                if (InstanceScript* pInstance = creature->GetInstanceScript())
+            if (InstanceScript* pInstance = creature->GetInstanceScript())
+                if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
                     pInstance->SetData(DATA_SHOW_CRATES, 1);
 
-            return true;
+            if (!player->HasItemCount(ITEM_ARCANE_DISRUPTOR))
+                player->AddItem(ITEM_ARCANE_DISRUPTOR, 1);
         }
-
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/) override
+        // Skip Event
+        else if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11277)
         {
-            // final menu id, show crates if hidden and add item if missing
-            if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9595)
+            if (InstanceScript* pInstance = creature->GetInstanceScript())
             {
-                if (InstanceScript* pInstance = creature->GetInstanceScript())
-                    if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
-                        pInstance->SetData(DATA_SHOW_CRATES, 1);
-
-                if (!player->HasItemCount(ITEM_ARCANE_DISRUPTOR))
-                    player->AddItem(ITEM_ARCANE_DISRUPTOR, 1);
-            }
-            // Skip Event
-            else if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11277)
-            {
-                if (InstanceScript* pInstance = creature->GetInstanceScript())
+                if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
                 {
-                    if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
-                    {
-                        pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_INTRO);
-                        if (Creature* arthas = ObjectAccessor::GetCreature(*creature, pInstance->GetData64(DATA_ARTHAS)))
-                            arthas->AI()->Reset();
-                    }
-                    player->NearTeleportTo(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY(), LeaderIntroPos2.GetPositionZ(), LeaderIntroPos2.GetOrientation());
-
+                    pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_INTRO);
+                    if (Creature* arthas = ObjectAccessor::GetCreature(*creature, pInstance->GetData64(DATA_ARTHAS)))
+                        arthas->AI()->Reset();
                 }
-            }
+                player->NearTeleportTo(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY(), LeaderIntroPos2.GetPositionZ(), LeaderIntroPos2.GetOrientation());
 
-            // return false to display last windows
-            return false;
+            }
         }
+
+        // return false to display last windows
+        return false;
+    }
 };
 
 class npc_cos_chromie_middle : public CreatureScript
 {
-    public:
-        npc_cos_chromie_middle() : CreatureScript("npc_cos_chromie_middle") { }
+public:
+    npc_cos_chromie_middle() : CreatureScript("npc_cos_chromie_middle") { }
 
-        bool OnQuestAccept(Player* , Creature* creature, const Quest* pQuest) override
-        {
-            if (pQuest->GetQuestId() == QUEST_A_ROYAL_ESCORT)
-                if (InstanceScript* pInstance = creature->GetInstanceScript())
-                    if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_CRATES_FOUND)
-                        pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_START_INTRO);
+    bool OnQuestAccept(Player*, Creature* creature, const Quest* pQuest) override
+    {
+        if (pQuest->GetQuestId() == QUEST_A_ROYAL_ESCORT)
+            if (InstanceScript* pInstance = creature->GetInstanceScript())
+                if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_CRATES_FOUND)
+                    pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_START_INTRO);
 
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/) override
+    {
+        if (!creature->GetInstanceScript() || creature->GetInstanceScript()->GetData(DATA_ARTHAS_EVENT) != COS_PROGRESS_CRATES_FOUND)
             return true;
-        }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/) override
+        // We can start event:)
+        if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9612)
+            creature->GetInstanceScript()->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_START_INTRO);
+
+        return false;
+    }
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (creature->IsQuestGiver())
         {
-            if (!creature->GetInstanceScript() || creature->GetInstanceScript()->GetData(DATA_ARTHAS_EVENT) != COS_PROGRESS_CRATES_FOUND)
-                return true;
-
-            // We can start event:)
-            if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9612)
-                creature->GetInstanceScript()->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_START_INTRO);
-
-            return false;
+            player->PrepareQuestMenu(creature->GetGUID());
+            player->SendPreparedQuest(creature->GetGUID());
         }
 
-        bool OnGossipHello(Player* player, Creature* creature) override
-        {
-            if (creature->IsQuestGiver())
-            {
-                player->PrepareQuestMenu(creature->GetGUID());
-                player->SendPreparedQuest(creature->GetGUID());
-            }
+        if (!creature->GetInstanceScript() || creature->GetInstanceScript()->GetData(DATA_ARTHAS_EVENT) != COS_PROGRESS_CRATES_FOUND)
+            return true;
 
-            if (!creature->GetInstanceScript() || creature->GetInstanceScript()->GetData(DATA_ARTHAS_EVENT) != COS_PROGRESS_CRATES_FOUND)
-                return true;
-
-            return false;
-        }
+        return false;
+    }
 };
 
 class npc_cos_stratholme_citizien : public CreatureScript
 {
-    public:
-        npc_cos_stratholme_citizien() : CreatureScript("npc_cos_stratholme_citizien") { }
+public:
+    npc_cos_stratholme_citizien() : CreatureScript("npc_cos_stratholme_citizien") { }
 
-        struct npc_cos_stratholme_citizienAI : public ScriptedAI
+    struct npc_cos_stratholme_citizienAI : public ScriptedAI
+    {
+        npc_cos_stratholme_citizienAI(Creature* creature) : ScriptedAI(creature)
         {
-            npc_cos_stratholme_citizienAI(Creature* creature) : ScriptedAI(creature)
-            {
-                allowTimer = 0;
-                pInstance = me->GetInstanceScript();
-                if (!pInstance || pInstance->GetData(DATA_ARTHAS_EVENT) < COS_PROGRESS_FINISHED_CITY_INTRO)
-                    allowTimer++;
-            }
-
-            bool locked;
-            uint32 changeTimer;
-            InstanceScript* pInstance;
-            uint32 allowTimer;
-
-            void Reset()
-            {
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                locked = false;
-                changeTimer = 0;
-
-                if (pInstance)
-                {
-                    uint32 data = pInstance->GetData(DATA_ARTHAS_EVENT);
-                    if (me->GetDistance(2400, 1200, 135) > 20.0f && data >= COS_PROGRESS_FINISHED_CITY_INTRO)
-                    {
-                        if (data >= COS_PROGRESS_KILLED_SALRAMM)
-                            me->DespawnOrUnsummon(500);
-                        else
-                            InfectMe(3000);
-                    }
-                }
-            }
-
-            void MoveInLineOfSight(Unit* who)
-            {
-                if (!allowTimer && !locked && (who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && me->GetDistance(who) < 15.0f)
-                    InfectMe(2000);
-
-                ScriptedAI::MoveInLineOfSight(who);
-            }
-
-            void DoAction(int32 param)
-            {
-                if (param == ACTION_INFECT_CITIZIEN)
-                    InfectMe(1);
-                else if (param == ACTION_FORCE_CHANGE_LOCK)
-                    locked = true;
-            }
-
-            void InfectMe(uint32 time)
-            {
-                locked = true;
-                changeTimer = time;
-            }
-
-            void SpellHit(Unit* caster, const SpellInfo* spellInfo)
-            {
-                if (spellInfo->Id == SPELL_ARTHAS_CRUSADER_STRIKE)
-                {
-                    if (me->GetEntry() == NPC_CITY_MAN3)
-                    {
-                        me->StopMoving();
-                        me->HandleEmoteCommand(54); // laugh
-                    }
-                    else
-                        Unit::Kill(caster, me);
-                }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                ScriptedAI::UpdateAI(diff);
-
-                if (allowTimer)
-                {
-                    allowTimer += diff;
-                    if (allowTimer >= 8000 && pInstance && pInstance->GetData(DATA_ARTHAS_EVENT) >= COS_PROGRESS_FINISHED_CITY_INTRO)
-                        allowTimer = 0;
-                }
-
-                if (changeTimer)
-                {
-                    changeTimer += diff;
-                    if (changeTimer >= 2500 && changeTimer < 10000)
-                    {
-                        me->CastSpell(me, SPELL_GREEN_VISUAL_AURA, true);
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
-                        changeTimer = 10000;
-                    }
-                    else if (changeTimer >= 14500 && changeTimer < 20000)
-                    {
-                        me->UpdateEntry(NPC_RISEN_ZOMBIE, NULL, false);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        changeTimer = 20000;
-                    }
-                    else if (changeTimer >= 23000)
-                    {
-                        me->RemoveAura(SPELL_GREEN_VISUAL_AURA);
-                        changeTimer = 0;
-                    }
-                }
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_cos_stratholme_citizienAI(creature);
+            allowTimer = 0;
+            pInstance = me->GetInstanceScript();
+            if (!pInstance || pInstance->GetData(DATA_ARTHAS_EVENT) < COS_PROGRESS_FINISHED_CITY_INTRO)
+                allowTimer++;
         }
+
+        bool locked;
+        uint32 changeTimer;
+        InstanceScript* pInstance;
+        uint32 allowTimer;
+
+        void Reset()
+        {
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+            locked = false;
+            changeTimer = 0;
+
+            if (pInstance)
+            {
+                uint32 data = pInstance->GetData(DATA_ARTHAS_EVENT);
+                if (me->GetDistance(2400, 1200, 135) > 20.0f && data >= COS_PROGRESS_FINISHED_CITY_INTRO)
+                {
+                    if (data >= COS_PROGRESS_KILLED_SALRAMM)
+                        me->DespawnOrUnsummon(500);
+                    else
+                        InfectMe(3000);
+                }
+            }
+        }
+
+        void MoveInLineOfSight(Unit* who)
+        {
+            if (!allowTimer && !locked && (who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && me->GetDistance(who) < 15.0f)
+                InfectMe(2000);
+
+            ScriptedAI::MoveInLineOfSight(who);
+        }
+
+        void DoAction(int32 param)
+        {
+            if (param == ACTION_INFECT_CITIZIEN)
+                InfectMe(1);
+            else if (param == ACTION_FORCE_CHANGE_LOCK)
+                locked = true;
+        }
+
+        void InfectMe(uint32 time)
+        {
+            locked = true;
+            changeTimer = time;
+        }
+
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        {
+            if (spellInfo->Id == SPELL_ARTHAS_CRUSADER_STRIKE)
+            {
+                if (me->GetEntry() == NPC_CITY_MAN3)
+                {
+                    me->StopMoving();
+                    me->HandleEmoteCommand(54); // laugh
+                }
+                else
+                    Unit::Kill(caster, me);
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            ScriptedAI::UpdateAI(diff);
+
+            if (allowTimer)
+            {
+                allowTimer += diff;
+                if (allowTimer >= 8000 && pInstance && pInstance->GetData(DATA_ARTHAS_EVENT) >= COS_PROGRESS_FINISHED_CITY_INTRO)
+                    allowTimer = 0;
+            }
+
+            if (changeTimer)
+            {
+                changeTimer += diff;
+                if (changeTimer >= 2500 && changeTimer < 10000)
+                {
+                    me->CastSpell(me, SPELL_GREEN_VISUAL_AURA, true);
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
+                    changeTimer = 10000;
+                }
+                else if (changeTimer >= 14500 && changeTimer < 20000)
+                {
+                    me->UpdateEntry(NPC_RISEN_ZOMBIE, NULL, false);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    changeTimer = 20000;
+                }
+                else if (changeTimer >= 23000)
+                {
+                    me->RemoveAura(SPELL_GREEN_VISUAL_AURA);
+                    changeTimer = 0;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_cos_stratholme_citizienAI(creature);
+    }
 };
 
 void AddSC_culling_of_stratholme()

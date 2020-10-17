@@ -131,9 +131,15 @@ public:
             {
                 switch(HealthCheck)
                 {
-                    case 75: Talk(SAY_75HEALTH); break;
-                    case 50: Talk(SAY_50HEALTH); break;
-                    case 25: Talk(SAY_25HEALTH); break;
+                    case 75:
+                        Talk(SAY_75HEALTH);
+                        break;
+                    case 50:
+                        Talk(SAY_50HEALTH);
+                        break;
+                    case 25:
+                        Talk(SAY_25HEALTH);
+                        break;
                 }
             }
             else
@@ -177,7 +183,7 @@ public:
 
                     me->SetControlled(false, UNIT_STATE_STUNNED);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    
+
                     if (Player* target = SelectTargetFromPlayerList(80))
                         AttackStart(target);
                 }
@@ -238,33 +244,33 @@ public:
 
 class spell_loken_pulsing_shockwave : public SpellScriptLoader
 {
-    public:
-        spell_loken_pulsing_shockwave() : SpellScriptLoader("spell_loken_pulsing_shockwave") { }
+public:
+    spell_loken_pulsing_shockwave() : SpellScriptLoader("spell_loken_pulsing_shockwave") { }
 
-        class spell_loken_pulsing_shockwave_SpellScript : public SpellScript
+    class spell_loken_pulsing_shockwave_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_loken_pulsing_shockwave_SpellScript);
+
+        void CalculateDamage(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_loken_pulsing_shockwave_SpellScript);
+            if (!GetHitUnit())
+                return;
 
-            void CalculateDamage(SpellEffIndex /*effIndex*/)
-            {
-                if (!GetHitUnit())
-                    return;
-
-                float distance = GetCaster()->GetDistance2d(GetHitUnit());
-                if (distance > 1.0f)
-                    SetHitDamage(int32(GetHitDamage() * distance));
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_loken_pulsing_shockwave_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_loken_pulsing_shockwave_SpellScript();
+            float distance = GetCaster()->GetDistance2d(GetHitUnit());
+            if (distance > 1.0f)
+                SetHitDamage(int32(GetHitDamage() * distance));
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_loken_pulsing_shockwave_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_loken_pulsing_shockwave_SpellScript();
+    }
 };
 
 void AddSC_boss_loken()

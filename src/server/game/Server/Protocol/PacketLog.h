@@ -19,19 +19,19 @@ class WorldPacket;
 
 class PacketLog
 {
-    private:
-        PacketLog();
-        ~PacketLog();
+private:
+    PacketLog();
+    ~PacketLog();
 
-    public:
-        static PacketLog* instance();
+public:
+    static PacketLog* instance();
 
-        void Initialize();
-        bool CanLogPacket() const { return (_file != nullptr); }
-        void LogPacket(WorldPacket const& packet, Direction direction);
+    void Initialize();
+    bool CanLogPacket() const { return (_file != nullptr); }
+    void LogPacket(WorldPacket const& packet, Direction direction);
 
-    private:
-        FILE* _file;
+private:
+    FILE* _file;
 };
 
 #define sPacketLog PacketLog::instance()

@@ -53,7 +53,7 @@ public:
 
     struct boss_grobbulusAI : public BossAI
     {
-        explicit boss_grobbulusAI(Creature *c) : BossAI(c, BOSS_GROBBULUS), summons(me)
+        explicit boss_grobbulusAI(Creature* c) : BossAI(c, BOSS_GROBBULUS), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -82,7 +82,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit * who) override
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             PullChamberAdds();
@@ -90,10 +90,10 @@ public:
             events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 15000);
             events.ScheduleEvent(EVENT_SPELL_MUTATING_INJECTION, 20000);
             events.ScheduleEvent(EVENT_SPELL_SLIME_SPRAY, 10000);
-            events.ScheduleEvent(EVENT_SPELL_BERSERK, RAID_MODE(12*MINUTE*IN_MILLISECONDS, 9*MINUTE*IN_MILLISECONDS));
+            events.ScheduleEvent(EVENT_SPELL_BERSERK, RAID_MODE(12 * MINUTE * IN_MILLISECONDS, 9 * MINUTE * IN_MILLISECONDS));
         }
 
-        void SpellHitTarget(Unit *target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == RAID_MODE(SPELL_SLIME_SPRAY_10, SPELL_SLIME_SPRAY_25) && target->GetTypeId() == TYPEID_PLAYER)
                 me->SummonCreature(NPC_FALLOUT_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
@@ -128,7 +128,7 @@ public:
             if (!me->IsInCombat() && dropSludgeTimer >= 5000)
             {
                 if (me->IsWithinDist3d(3178, -3305, 319, 5.0f) && !summons.HasEntry(NPC_SEWAGE_SLIME))
-                    me->CastSpell(3128.96f+irand(-20, 20), -3312.96f+irand(-20, 20), 293.25f, SPELL_BOMBARD_SLIME, false);
+                    me->CastSpell(3128.96f + irand(-20, 20), -3312.96f + irand(-20, 20), 293.25f, SPELL_BOMBARD_SLIME, false);
 
                 dropSludgeTimer = 0;
             }
@@ -190,7 +190,7 @@ public:
             sizeTimer = 0;
             auraVisualTimer = 1;
             me->SetFloatValue(UNIT_FIELD_COMBATREACH, 2.0f);
-            me->setFaction(21); // Grobbulus one    
+            me->setFaction(21); // Grobbulus one
         }
 
         void KilledUnit(Unit* who) override
@@ -214,7 +214,7 @@ public:
 
             sizeTimer += diff;
             // increase size to 15yd in 60 seconds, 0.00025 is the growth of size in 1ms
-            me->SetFloatValue(UNIT_FIELD_COMBATREACH, 2.0f+(0.00025f*sizeTimer));
+            me->SetFloatValue(UNIT_FIELD_COMBATREACH, 2.0f + (0.00025f * sizeTimer));
         }
     };
 
@@ -222,35 +222,35 @@ public:
 
 class spell_grobbulus_poison : public SpellScriptLoader
 {
-    public:
-        spell_grobbulus_poison() : SpellScriptLoader("spell_grobbulus_poison") { }
+public:
+    spell_grobbulus_poison() : SpellScriptLoader("spell_grobbulus_poison") { }
 
-        class spell_grobbulus_poison_SpellScript : public SpellScript
+    class spell_grobbulus_poison_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_grobbulus_poison_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            PrepareSpellScript(spell_grobbulus_poison_SpellScript);
+            std::list<WorldObject*> tmplist;
+            for (auto& target : targets)
+                if (GetCaster()->IsWithinDist3d(target, 0.0f))
+                    tmplist.push_back(target);
 
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                std::list<WorldObject*> tmplist;
-                for (auto & target : targets)
-                    if (GetCaster()->IsWithinDist3d(target, 0.0f))
-                        tmplist.push_back(target);
-
-                 targets.clear();
-                 for (auto & itr : tmplist)
-                     targets.push_back(itr);
-            }
-
-            void Register() override
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_grobbulus_poison_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_grobbulus_poison_SpellScript();
+            targets.clear();
+            for (auto& itr : tmplist)
+                targets.push_back(itr);
         }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_grobbulus_poison_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_grobbulus_poison_SpellScript();
+    }
 };
 
 void AddSC_boss_grobbulus()

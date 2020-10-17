@@ -123,7 +123,7 @@ public:
                     NPC_SinclariGUID = creature->GetGUID();
                     break;
                 case NPC_VIOLET_HOLD_GUARD:
-                    for (uint8 i=0; i<4; ++i)
+                    for (uint8 i = 0; i < 4; ++i)
                         if (NPC_GuardGUID[i] == 0)
                         {
                             NPC_GuardGUID[i] = creature->GetGUID();
@@ -238,9 +238,9 @@ public:
                     PortalLocation = data;
                     break;
                 case DATA_DECRASE_DOOR_HEALTH:
-                    if (GateHealth>0)
+                    if (GateHealth > 0)
                         --GateHealth;
-                    if (GateHealth==0)
+                    if (GateHealth == 0)
                     {
                         CLEANED = false;
                         InstanceCleanup();
@@ -418,7 +418,7 @@ public:
                     break;
                 case EVENT_GUARDS_FALL_BACK:
                     {
-                        for (uint8 i=0; i<4; ++i)
+                        for (uint8 i = 0; i < 4; ++i)
                             if (Creature* c = instance->GetCreature(NPC_GuardGUID[i]))
                             {
                                 c->SetReactState(REACT_PASSIVE);
@@ -432,7 +432,7 @@ public:
                     break;
                 case EVENT_GUARDS_DISAPPEAR:
                     {
-                        for (uint8 i=0; i<4; ++i)
+                        for (uint8 i = 0; i < 4; ++i)
                             if (Creature* c = instance->GetCreature(NPC_GuardGUID[i]))
                                 c->SetVisible(false);
                         events.PopEvent();
@@ -474,17 +474,18 @@ public:
                 case EVENT_SUMMON_PORTAL:
                     ++WaveCount;
                     DoUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, (uint32)WaveCount);
-                    SetData(DATA_PORTAL_LOCATION, (GetData(DATA_PORTAL_LOCATION) + urand(1, 5))%6);
+                    SetData(DATA_PORTAL_LOCATION, (GetData(DATA_PORTAL_LOCATION) + urand(1, 5)) % 6);
                     if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
                     {
-                        if (WaveCount%6 != 0)
+                        if (WaveCount % 6 != 0)
                             c->SummonCreature(NPC_TELEPORTATION_PORTAL, PortalLocations[GetData(DATA_PORTAL_LOCATION)], TEMPSUMMON_CORPSE_DESPAWN);
                         else if (WaveCount == 6 || WaveCount == 12) // first or second boss
                         {
                             if (!uiFirstBoss || !uiSecondBoss)
                             {
-                                uiFirstBoss = urand(1,6);
-                                do { uiSecondBoss = urand(1,6); } while (uiFirstBoss==uiSecondBoss);
+                                uiFirstBoss = urand(1, 6);
+                                do { uiSecondBoss = urand(1, 6); }
+                                while (uiFirstBoss == uiSecondBoss);
                                 SaveToDB();
                             }
                             c->SummonCreature(NPC_TELEPORTATION_PORTAL, MiddleRoomPortalSaboLocation, TEMPSUMMON_CORPSE_DESPAWN);
@@ -539,13 +540,13 @@ public:
         bool DoNeedCleanup(bool enter)
         {
             uint8 aliveCount = 0;
-            Map::PlayerList const &pl = instance->GetPlayers();
+            Map::PlayerList const& pl = instance->GetPlayers();
             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                 if( Player* plr = itr->GetSource() )
                     if( plr->IsAlive() && !plr->IsGameMaster() && !plr->HasAura(27827)/*spirit of redemption aura*/ )
                         ++aliveCount;
 
-            bool need = enter ? aliveCount<=1 : aliveCount==0;
+            bool need = enter ? aliveCount <= 1 : aliveCount == 0;
             if( !need && CLEANED )
                 CLEANED = false;
             return need;
@@ -567,12 +568,12 @@ public:
 
             // reset positions of Sinclari and Guards
             if (Creature* c = instance->GetCreature(NPC_SinclariGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); }
-            for (uint8 i=0; i<4; ++i)
+            for (uint8 i = 0; i < 4; ++i)
                 if (Creature* c = instance->GetCreature(NPC_GuardGUID[i]))
                 {
                     c->DespawnOrUnsummon();
                     c->SetRespawnTime(3);
-                    if (m_auiEncounter[MAX_ENCOUNTER-1] == DONE)
+                    if (m_auiEncounter[MAX_ENCOUNTER - 1] == DONE)
                         c->SetVisible(false);
                     else
                         c->SetVisible(true);
@@ -597,7 +598,7 @@ public:
             // open main gate
             HandleGameObject(GO_MainGateGUID, true);
 
-            if (m_auiEncounter[MAX_ENCOUNTER-1] != DONE) // instance not finished
+            if (m_auiEncounter[MAX_ENCOUNTER - 1] != DONE) // instance not finished
             {
                 // close all cells
                 HandleGameObject(GO_MoraggCellGUID, false);
@@ -628,7 +629,7 @@ public:
             GateHealth = 100;
             WaveCount = 0;
             bDefensesUsed = false;
-            if (m_auiEncounter[MAX_ENCOUNTER-1] == DONE)
+            if (m_auiEncounter[MAX_ENCOUNTER - 1] == DONE)
                 EncounterStatus = DONE;
             events.Reset();
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
@@ -692,10 +693,10 @@ public:
                     if (m_auiEncounter[i] == IN_PROGRESS)
                         m_auiEncounter[i] = NOT_STARTED;
 
-                if (m_auiEncounter[MAX_ENCOUNTER-1] == DONE)
+                if (m_auiEncounter[MAX_ENCOUNTER - 1] == DONE)
                     EncounterStatus = DONE;
             }
-                else OUT_LOAD_INST_DATA_FAIL;
+            else OUT_LOAD_INST_DATA_FAIL;
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }

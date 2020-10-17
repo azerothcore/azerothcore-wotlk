@@ -58,7 +58,7 @@ public:
 
         void KilledUnit(Unit* victim)
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0,1))
+            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
                 Talk(SAY_SLAY);
         }
 
@@ -101,24 +101,24 @@ public:
                     events.PopEvent();
                     break;
                 case EVENT_SPELL_INCITE:
-                {
-                    me->CastSpell(me, SPELL_INCITE_CHAOS, false);
-
-                    std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
-                    for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                     {
-                        Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                        if (target && target->GetTypeId() == TYPEID_PLAYER)
-                            me->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
-                    }
+                        me->CastSpell(me, SPELL_INCITE_CHAOS, false);
 
-                    DoResetThreat();
-                    InciteChaos = true;
-                    events.DelayEvents(15000);
-                    events.RepeatEvent(40000);
-                    events.ScheduleEvent(EVENT_INCITE_WAIT, 15000);
-                    break;
-                }
+                        std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
+                        for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+                        {
+                            Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
+                            if (target && target->GetTypeId() == TYPEID_PLAYER)
+                                me->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
+                        }
+
+                        DoResetThreat();
+                        InciteChaos = true;
+                        events.DelayEvents(15000);
+                        events.RepeatEvent(40000);
+                        events.ScheduleEvent(EVENT_INCITE_WAIT, 15000);
+                        break;
+                    }
                 case EVENT_SPELL_CHARGE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                         me->CastSpell(target, SPELL_CHARGE, false);
