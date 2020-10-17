@@ -212,7 +212,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_ARTRUIS_HP_CHECK:
                     if (me->GetHealthPct() <= 30)
@@ -220,23 +220,19 @@ public:
                         me->SetControlled(true, UNIT_STATE_STUNNED);
                         me->MonsterTextEmote("Artruis is shielded. You must choose your side quickly to break his spell.", 0, true);
                         SummonsAction(ACTION_BIND_MINIONS);
-                        events.PopEvent();
                         break;
                     }
                     events.RepeatEvent(1000);
                     break;
                 case EVENT_ARTRUIS_TALK1:
                     me->MonsterYell("I have weathered a hundred years of war and suffering. Do you truly think it wise to pit your mortal bodies against a being that cannot die? I'd venture you have more to lose.", LANG_UNIVERSAL, 0);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_ARTRUIS_TALK2, 10000);
                     break;
                 case EVENT_ARTRUIS_TALK2:
                     me->MonsterYell("Even shattered into countless pieces, the crystals all around weaken me... perhaps i should not have underestimated the titans so...", LANG_UNIVERSAL, 0);
-                    events.PopEvent();
                     break;
                 case EVENT_ARTRUIS_TALK3:
                     me->MonsterYell("Arthas once mustered strength... of the very same sort... perhaps he is the path that you will follow.", LANG_UNIVERSAL, 0);
-                    events.PopEvent();
                     break;
                 case EVENT_CAST_FROST_BOLT:
                     me->CastSpell(me->GetVictim(), SPELL_ARTRUIS_FROSTBOLT, false);
