@@ -161,7 +161,7 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch ( events.GetEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case EVENT_CHECK_HEALTH:
                     {
@@ -177,7 +177,6 @@ public:
                     {
                         Talk(EMOTE_HATCHES, me);
                         SummonHelpers(false);
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_BROOD_RAGE:
@@ -208,7 +207,6 @@ public:
                         if (me->GetPositionZ() < 24)
                         {
                             me->CastSpell(me, SPELL_ENRAGE, true);
-                            events.PopEvent();
                             break;
                         }
 
