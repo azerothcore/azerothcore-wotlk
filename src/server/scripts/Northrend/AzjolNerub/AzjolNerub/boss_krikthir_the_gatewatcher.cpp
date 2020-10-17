@@ -181,7 +181,6 @@ public:
                 case EVENT_KRIK_HEALTH_CHECK:
                     if (HealthBelowPct(10))
                     {
-                        events.PopEvent();
                         me->CastSpell(me, SPELL_FRENZY, true);
                         break;
                     }
