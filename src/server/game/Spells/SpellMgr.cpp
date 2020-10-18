@@ -3152,7 +3152,8 @@ void SpellMgr::LoadSpellCustomAttr()
             case 67861:
             case 67862:
             case 67863:
-            case 67721: // Anub'arak, Nerubian Burrower, Expose Weakness
+            case 67721: // Anub'arak, Nerubian Burrower, Expose Weakness (normal)
+            case 67847: // Anub'arak, Nerubian Burrower, Expose Weakness (heroic)
             case 64638: // Ulduar, Winter Jormungar, Acidic Bite
             case 71157: // Icecrown Citadel, Plagued Zombie, Infected Wound
             case 72963: // Icecrown Citadel, Valithria Dreamwalker, Flesh Rot (Rot Worm)
