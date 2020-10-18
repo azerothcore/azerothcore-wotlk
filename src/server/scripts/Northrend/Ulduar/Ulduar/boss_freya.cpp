@@ -48,7 +48,7 @@ enum FreyaSpells
     SPELL_STONEBARK_ESSENCE                     = 62483,
     SPELL_IRONBRANCH_ESSENCE                    = 62484,
     SPELL_BRIGHTLEAF_ESSENCE                    = 62485,
-    
+
     // BRIGHTLEAF
     SPELL_BRIGHTLEAF_FLUX                       = 62239,
     SPELL_SOLAR_FLARE_10                        = 62240,
@@ -57,7 +57,7 @@ enum FreyaSpells
     SPELL_PHOTOSYNTHESIS                        = 62209,
     SPELL_UNSTABLE_SUN_DAMAGE_10                = 62217,
     SPELL_UNSTABLE_SUN_DAMAGE_25                = 62922,
-    
+
     // IRONBRANCH
     SPELL_IMPALE_10                             = 62310,
     SPELL_IMPALE_25                             = 62928,
@@ -67,7 +67,7 @@ enum FreyaSpells
     SPELL_IRON_ROOTS_DAMAGE_25                  = 62930,
     SPELL_THORN_SWARM_10                        = 62285,
     SPELL_THORN_SWARM_25                        = 62931,
-    
+
     // STONEBARK
     SPELL_FISTS_OF_STONE                        = 62344,
     SPELL_GROUND_TREMOR_10                      = 62325,
@@ -177,7 +177,7 @@ enum FreyaSounds
     SOUND_STONEBARK_SLAY1                       = 15501,
     SOUND_STONEBARK_SLAY2                       = 15502,
     SOUND_STONEBARK_DEATH                       = 15503,
-    
+
     // IRONBRANCH
     SOUND_IRONBRANCH_AGGRO                      = 15493,
     SOUND_IRONBRANCH_SLAY1                      = 15494,
@@ -192,7 +192,7 @@ enum FreyaSounds
 };
 
 enum FreyaNPCs
-{   
+{
     NPC_NATURE_BOMB                             = 34129,
     NPC_IRON_ROOT_TRIGGER                       = 33088,
     NPC_FREYA_UNSTABLE_SUN_BEAM                 = 33170,
@@ -206,7 +206,7 @@ enum FreyaNPCs
     // SEC WAVE
     NPC_ANCIENT_CONSERVATOR                     = 33203,
     NPC_HEALTHY_SPORE                           = 33215,
-    
+
     // THIRD WAVE
     NPC_DETONATING_LASHER                       = 32918,
 };
@@ -274,7 +274,7 @@ public:
         bool _respawningTrio;
         bool _backToNature;
         uint8 _deforestation;
-        
+
         uint64 _elderGUID[3];
 
         void Reset()
@@ -328,7 +328,7 @@ public:
             {
                 me->MonsterYell("His hold on me dissipates. I can see clearly once more. Thank you, heroes.", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_DEATH);
-                
+
                 damage = 0;
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->setFaction(35);
@@ -643,6 +643,19 @@ public:
                 {
                     cr->CastSpell(cr, SPELL_UNSTABLE_SUN_VISUAL, true);
                     cr->CastSpell(cr, SPELL_UNSTABLE_SUN_FREYA_DAMAGE, true);
+                }
+                if (Is25ManRaid())
+                {
+                    if (Creature* cr = me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX()+urand(7,25), me->GetPositionY()+urand(7,25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
+                    {
+                        cr->CastSpell(cr, SPELL_UNSTABLE_SUN_VISUAL, true);
+                        cr->CastSpell(cr, SPELL_UNSTABLE_SUN_FREYA_DAMAGE, true);
+                    }
+                    if (Creature* cr = me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX()+urand(7,25), me->GetPositionY()+urand(7,25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
+                    {
+                        cr->CastSpell(cr, SPELL_UNSTABLE_SUN_VISUAL, true);
+                        cr->CastSpell(cr, SPELL_UNSTABLE_SUN_FREYA_DAMAGE, true);
+                    }
                 }
                 events.RepeatEvent(38000+urand(0,10000));
                 break;
@@ -1312,7 +1325,7 @@ class achievement_freya_knock_on_wood : public AchievementCriteriaScript
         {
             return target && _elderCount <= target->GetAI()->GetData(DATA_GET_ELDER_COUNT);
         }
-        
+
     private:
         uint32 const _elderCount;
 };
