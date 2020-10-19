@@ -166,29 +166,29 @@ public:
 
 class spell_egg_event : public SpellScriptLoader
 {
-    public:
-        spell_egg_event() : SpellScriptLoader("spell_egg_event") { }
+public:
+    spell_egg_event() : SpellScriptLoader("spell_egg_event") { }
 
-        class spell_egg_eventSpellScript : public SpellScript
+    class spell_egg_eventSpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_egg_eventSpellScript);
+
+        void HandleOnHit()
         {
-            PrepareSpellScript(spell_egg_eventSpellScript);
-
-            void HandleOnHit()
-            {
-                if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                    instance->SetData(DATA_EGG_EVENT, SPECIAL);
-            }
-
-            void Register()
-            {
-                OnHit += SpellHitFn(spell_egg_eventSpellScript::HandleOnHit);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_egg_eventSpellScript();
+            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+                instance->SetData(DATA_EGG_EVENT, SPECIAL);
         }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_egg_eventSpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_egg_eventSpellScript();
+    }
 };
 
 void AddSC_boss_razorgore()

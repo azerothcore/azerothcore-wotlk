@@ -56,7 +56,8 @@ public:
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                     DoCast(target, SPELL_SHADOWWORDPAIN);
                 ShadowWordPain_Timer = 7000;
-            } else ShadowWordPain_Timer -= diff;
+            }
+            else ShadowWordPain_Timer -= diff;
 
             //ManaBurn_Timer
             if (ManaBurn_Timer <= diff)
@@ -64,21 +65,24 @@ public:
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                     DoCast(target, SPELL_MANABURN);
                 ManaBurn_Timer = 10000;
-            } else ManaBurn_Timer -= diff;
+            }
+            else ManaBurn_Timer -= diff;
 
             //PsychicScream_Timer
             if (PsychicScream_Timer <= diff)
             {
                 DoCastVictim(SPELL_PSYCHICSCREAM);
                 PsychicScream_Timer = 30000;
-            } else PsychicScream_Timer -= diff;
+            }
+            else PsychicScream_Timer -= diff;
 
             //ShadowShield_Timer
             if (ShadowShield_Timer <= diff)
             {
                 DoCast(me, SPELL_SHADOWSHIELD);
                 ShadowShield_Timer = 25000;
-            } else ShadowShield_Timer -= diff;
+            }
+            else ShadowShield_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }

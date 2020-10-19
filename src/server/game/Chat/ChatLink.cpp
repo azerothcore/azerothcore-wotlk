@@ -676,7 +676,7 @@ bool LinkExtractor::IsValidMessage()
         {
             if (commandChar == *validSequenceIterator)
             {
-                if (validSequenceIterator == validSequence+4)
+                if (validSequenceIterator == validSequence + 4)
                     validSequenceIterator = validSequence;
                 else
                     ++validSequenceIterator;
