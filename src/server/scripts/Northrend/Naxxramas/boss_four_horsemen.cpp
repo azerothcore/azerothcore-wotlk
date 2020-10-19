@@ -301,7 +301,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_MARK_CAST:
                     me->CastSpell(me, TABLE_SPELL_MARK[horsemanId], false);
@@ -310,7 +310,7 @@ public:
                 case EVENT_BERSERK:
                     Talk(SAY_SPECIAL);
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    events.PopEvent();
+                    
                     return;
                 case EVENT_SPELL_PRIMARY:
                     Talk(SAY_TAUNT);

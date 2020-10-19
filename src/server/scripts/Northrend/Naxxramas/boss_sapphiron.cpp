@@ -234,12 +234,11 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_BERSERK:
                     Talk(EMOTE_ENRAGE);
-                    me->CastSpell(me, SPELL_BERSERK, true);
-                    events.PopEvent();
+                    me->CastSpell(me, SPELL_BERSERK, true);  
                     return;
                 case EVENT_SPELL_CLEAVE:
                     me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
@@ -269,7 +268,7 @@ public:
                 case EVENT_FLIGHT_START:
                     if (me->HealthBelowPct(11))
                     {
-                        events.PopEvent();
+                        
                         return;
                     }
                     events.RepeatEvent(45000);
@@ -287,13 +286,11 @@ public:
                     me->SetDisableGravity(true);
                     me->SetHover(true);
                     currentTarget = 0;
-                    events.PopEvent();
                     events.ScheduleEvent(EVENT_FLIGHT_ICEBOLT, 3000);
                     iceboltCount = RAID_MODE(2, 3);
                     return;
                 case EVENT_FLIGHT_ICEBOLT:
                     {
-                        events.PopEvent();
                         if (currentTarget)
                             if (Unit* target = ObjectAccessor::GetUnit(*me, currentTarget))
                                 me->SummonGameObject(GO_ICE_BLOCK, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0);
@@ -335,11 +332,9 @@ public:
                     Talk(EMOTE_BREATH);
                     me->CastSpell(me, SPELL_FROST_MISSILE, false);
                     events.ScheduleEvent(EVENT_FLIGHT_SPELL_EXPLOSION, 8500);
-                    events.PopEvent();
                     return;
                 case EVENT_FLIGHT_SPELL_EXPLOSION:
                     me->CastSpell(me, SPELL_FROST_EXPLOSION, true);
-                    events.PopEvent();
                     events.ScheduleEvent(EVENT_FLIGHT_START_LAND, 3000);
                     return;
                 case EVENT_FLIGHT_START_LAND:
@@ -351,20 +346,18 @@ public:
                     blockList.clear();
                     me->RemoveAllGameObjects();
                     events.ScheduleEvent(EVENT_LAND, 1000);
-                    events.PopEvent();
                     return;
                 case EVENT_LAND:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
                     me->SetDisableGravity(false);
 
                     me->SetHover(false);
-                    events.PopEvent();
+                    
                     events.ScheduleEvent(EVENT_GROUND, 1500);
                     return;
                 case EVENT_GROUND:
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetInCombatWithZone();
-                    events.PopEvent();
                     return;
                 case EVENT_HUNDRED_CLUB:
                     {
@@ -373,7 +366,6 @@ public:
                         {
                             if (itr.GetSource()->GetResistance(SPELL_SCHOOL_FROST) > 100 && pInstance)
                             {
-                                events.PopEvent();
                                 pInstance->SetData(DATA_HUNDRED_CLUB, 0);
                                 return;
                             }

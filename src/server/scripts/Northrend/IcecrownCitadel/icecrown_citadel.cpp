@@ -1686,7 +1686,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING) || me->isFeared() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED) || ((me->GetEntry() == NPC_YMIRJAR_DEATHBRINGER || me->GetEntry() == NPC_YMIRJAR_FROSTBINDER) && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED)))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1712,7 +1712,6 @@ public:
                     break;
                 case 4: // Summon Warhawk
                     me->CastSpell(me, 71705, false);
-                    events.PopEvent();
                     break;
                 case 11: // Whirlwind
                     me->CastSpell(me->GetVictim(), 41056, false);
@@ -1728,7 +1727,6 @@ public:
                     break;
                 case 31: // Arctic Chill
                     me->CastSpell(me, 71270, true);
-                    events.PopEvent();
                     break;
                 case 32: // Frozen Orb
                     if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 30.0f, true))
@@ -1748,7 +1746,6 @@ public:
                     events.RepeatEvent(45000);
                     break;
                 default:
-                    events.PopEvent();
                     break;
             }
 
@@ -2582,7 +2579,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -2647,7 +2644,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -2702,7 +2699,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -2764,7 +2761,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -2883,7 +2880,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -3006,7 +3003,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            if (uint32 e = events.GetEvent())
+            if (uint32 e = events.ExecuteEvent())
             {
                 Unit* target = nullptr;
                 if (sesi_spells[e - 1].targetType == 1)
@@ -3105,7 +3102,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 1:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
@@ -3255,7 +3252,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 1:
                     if (me->GetVictim() && !me->GetVictim()->HasAura(71163) && me->GetVictim()->GetDistance(me) > 5.0f && me->GetVictim()->GetDistance(me) < 30.0f)
@@ -3396,7 +3393,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
