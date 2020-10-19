@@ -5,8 +5,8 @@ CORE:
   any: ['src/**/*.cpp', 'src/**/*.h', '!src/server/scripts/*']
 
 Script:
-  - src/server/scripts/*.cpp
-  - src/server/scripts/*.h
+  - src/server/scripts/**/*.cpp
+  - src/server/scripts/**/*.h
 
 Documentation:
   - ./*.md
