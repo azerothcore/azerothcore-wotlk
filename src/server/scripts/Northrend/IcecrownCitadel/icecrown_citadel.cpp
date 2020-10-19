@@ -1979,7 +1979,7 @@ public:
                 {
                     (*itr)->AI()->Talk(SAY_TRAP_ACTIVATE);
                     (*itr)->RemoveAurasDueToSpell(SPELL_STONEFORM);
-                    (*itr)->AI()->AttackStart(target);
+                    (*itr)->AI()->SetData(1, 1);
                     break;
                 }
             }
