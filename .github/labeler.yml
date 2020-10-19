@@ -1,12 +1,12 @@
 DB:
-  - data/**/*
+  - data/**/*.sql
 
 CORE:
-  - any: ['src/**/*', 'src/**/*', '!src/server/scripts/*']
+  - any: ['src/**/*.cpp', 'src/**/*.h', '!src/server/scripts/*']
 
 Script:
-  - src/server/scripts/**/*
-  - src/server/scripts/**/*
+  - src/server/scripts/**/*.cpp
+  - src/server/scripts/**/*.h
 
 Documentation:
   - ./*.md
