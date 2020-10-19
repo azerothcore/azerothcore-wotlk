@@ -1,8 +1,8 @@
- /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
- */
+/*
+* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+*/
 
 /* ScriptData
 SDName: Azuremyst_Isle
@@ -126,7 +126,8 @@ public:
 
                     RunAwayTimer = 10000;
                     SayThanksTimer = 0;
-                } else SayThanksTimer -= diff;
+                }
+                else SayThanksTimer -= diff;
 
                 return;
             }
@@ -145,7 +146,8 @@ public:
             {
                 CanSayHelp = true;
                 SayHelpTimer = 20000;
-            } else SayHelpTimer -= diff;
+            }
+            else SayHelpTimer -= diff;
         }
     };
 
@@ -220,7 +222,8 @@ public:
                     Talk(SAY_TEXT);
                     Talk(SAY_EMOTE);
                     EmoteTimer = urand(120000, 150000);
-                } else EmoteTimer -= diff;
+                }
+                else EmoteTimer -= diff;
             }
             else if (IsTreeEvent)
                 return;
@@ -232,7 +235,8 @@ public:
             {
                 DoCastVictim(SPELL_DYNAMITE);
                 DynamiteTimer = 8000;
-            } else DynamiteTimer -= diff;
+            }
+            else DynamiteTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -481,7 +485,8 @@ public:
                     DespawnNagaFlag(false);
                     me->DespawnOrUnsummon(1);
                     return 5000;
-                default: return 99999999;
+                default:
+                    return 99999999;
             }
         }
 
@@ -574,7 +579,7 @@ public:
 
     struct npc_death_ravagerAI : public ScriptedAI
     {
-        npc_death_ravagerAI(Creature* creature) : ScriptedAI(creature){ }
+        npc_death_ravagerAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 RendTimer;
         uint32 EnragingBiteTimer;
@@ -635,70 +640,70 @@ enum BristlelimbCage
 
 class npc_stillpine_capitive : public CreatureScript
 {
-    public:
-        npc_stillpine_capitive() : CreatureScript("npc_stillpine_capitive") { }
+public:
+    npc_stillpine_capitive() : CreatureScript("npc_stillpine_capitive") { }
 
-        struct npc_stillpine_capitiveAI : public ScriptedAI
+    struct npc_stillpine_capitiveAI : public ScriptedAI
+    {
+        npc_stillpine_capitiveAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset()
         {
-            npc_stillpine_capitiveAI(Creature* creature) : ScriptedAI(creature) { }
-
-            void Reset()
+            if (GameObject* cage = me->FindNearestGameObject(GO_BRISTELIMB_CAGE, 5.0f))
             {
-                if (GameObject* cage = me->FindNearestGameObject(GO_BRISTELIMB_CAGE, 5.0f))
-                {
-                    cage->SetLootState(GO_JUST_DEACTIVATED);
-                    cage->SetGoState(GO_STATE_READY);
-                }
-                _events.Reset();
-                _playerGUID = 0;
-                _movementComplete = false;
+                cage->SetLootState(GO_JUST_DEACTIVATED);
+                cage->SetGoState(GO_STATE_READY);
             }
-
-            void StartMoving(Player* owner)
-            {
-                if (owner)
-                {
-                    Talk(CAPITIVE_SAY, owner);
-                    _playerGUID = owner->GetGUID();
-                }
-                Position pos;
-                me->GetNearPosition(pos, 3.0f, 0.0f);
-                me->GetMotionMaster()->MovePoint(POINT_INIT, pos);
-            }
-
-            void MovementInform(uint32 type, uint32 id)
-            {
-                if (type != POINT_MOTION_TYPE || id != POINT_INIT)
-                    return;
-
-                if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
-                    player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
-
-                _movementComplete = true;
-                _events.ScheduleEvent(EVENT_DESPAWN, 3500);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!_movementComplete)
-                    return;
-
-                _events.Update(diff);
-
-                if (_events.ExecuteEvent() == EVENT_DESPAWN)
-                    me->DespawnOrUnsummon();
-            }
-
-        private:
-            uint64 _playerGUID;
-            EventMap _events;
-            bool _movementComplete;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_stillpine_capitiveAI(creature);
+            _events.Reset();
+            _playerGUID = 0;
+            _movementComplete = false;
         }
+
+        void StartMoving(Player* owner)
+        {
+            if (owner)
+            {
+                Talk(CAPITIVE_SAY, owner);
+                _playerGUID = owner->GetGUID();
+            }
+            Position pos;
+            me->GetNearPosition(pos, 3.0f, 0.0f);
+            me->GetMotionMaster()->MovePoint(POINT_INIT, pos);
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type != POINT_MOTION_TYPE || id != POINT_INIT)
+                return;
+
+            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
+
+            _movementComplete = true;
+            _events.ScheduleEvent(EVENT_DESPAWN, 3500);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!_movementComplete)
+                return;
+
+            _events.Update(diff);
+
+            if (_events.ExecuteEvent() == EVENT_DESPAWN)
+                me->DespawnOrUnsummon();
+        }
+
+    private:
+        uint64 _playerGUID;
+        EventMap _events;
+        bool _movementComplete;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_stillpine_capitiveAI(creature);
+    }
 };
 
 class go_bristlelimb_cage : public GameObjectScript

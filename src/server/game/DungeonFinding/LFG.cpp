@@ -65,30 +65,30 @@ namespace lfg
         int32 entry = LANG_LFG_ERROR;
         switch (state)
         {
-        case LFG_STATE_NONE:
-            entry = LANG_LFG_STATE_NONE;
-            break;
-        case LFG_STATE_ROLECHECK:
-            entry = LANG_LFG_STATE_ROLECHECK;
-            break;
-        case LFG_STATE_QUEUED:
-            entry = LANG_LFG_STATE_QUEUED;
-            break;
-        case LFG_STATE_PROPOSAL:
-            entry = LANG_LFG_STATE_PROPOSAL;
-            break;
-        case LFG_STATE_DUNGEON:
-            entry = LANG_LFG_STATE_DUNGEON;
-            break;
-        case LFG_STATE_BOOT:
-            entry = LANG_LFG_STATE_BOOT;
-            break;
-        case LFG_STATE_FINISHED_DUNGEON:
-            entry = LANG_LFG_STATE_FINISHED_DUNGEON;
-            break;
-        case LFG_STATE_RAIDBROWSER:
-            entry = LANG_LFG_STATE_RAIDBROWSER;
-            break;
+            case LFG_STATE_NONE:
+                entry = LANG_LFG_STATE_NONE;
+                break;
+            case LFG_STATE_ROLECHECK:
+                entry = LANG_LFG_STATE_ROLECHECK;
+                break;
+            case LFG_STATE_QUEUED:
+                entry = LANG_LFG_STATE_QUEUED;
+                break;
+            case LFG_STATE_PROPOSAL:
+                entry = LANG_LFG_STATE_PROPOSAL;
+                break;
+            case LFG_STATE_DUNGEON:
+                entry = LANG_LFG_STATE_DUNGEON;
+                break;
+            case LFG_STATE_BOOT:
+                entry = LANG_LFG_STATE_BOOT;
+                break;
+            case LFG_STATE_FINISHED_DUNGEON:
+                entry = LANG_LFG_STATE_FINISHED_DUNGEON;
+                break;
+            case LFG_STATE_RAIDBROWSER:
+                entry = LANG_LFG_STATE_RAIDBROWSER;
+                break;
         }
 
         return std::string(sObjectMgr->GetAcoreStringForDBCLocale(entry));
