@@ -91,104 +91,104 @@ public:
         player->PlayerTalkClass->GetGossipMenu().ClearMenu();
         switch(creature->GetEntry())
         {
-        case NPC_VERDISA:
-            switch(uiAction)
-            {
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                if (!HAS_ESSENCE(player))
+            case NPC_VERDISA:
+                switch(uiAction)
                 {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_VERDISA1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_VERDISA2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA1, creature->GetGUID());
-                }
-                else
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_VERDISA2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA2, creature->GetGUID());
-                }
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-            {
-                ItemPosCountVec dest;
-                uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_EMERALD_ESSENCE, 1);
-                if (msg == EQUIP_ERR_OK)
-                    player->StoreNewItem(dest, ITEM_EMERALD_ESSENCE, true);
-                CloseGossipMenuFor(player);
-                break;
-            }
-            case GOSSIP_ACTION_INFO_DEF + 3:
-                if (!HAS_ESSENCE(player))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_VERDISA1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA3, creature->GetGUID());
-                break;
-            }
-            break;
-        case NPC_BELGARISTRASZ:
-            switch(uiAction)
-            {
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                if (!HAS_ESSENCE(player))
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BELGARISTRASZ1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BELGARISTRASZ2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    SendGossipMenuFor(player, GOSSIP_TEXTID_BELGARISTRASZ1, creature->GetGUID());
-                }
-                else
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BELGARISTRASZ2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    SendGossipMenuFor(player, GOSSIP_TEXTID_BELGARISTRASZ2, creature->GetGUID());
+                    case GOSSIP_ACTION_INFO_DEF + 1:
+                        if (!HAS_ESSENCE(player))
+                        {
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_VERDISA1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_VERDISA2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                            SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA1, creature->GetGUID());
+                        }
+                        else
+                        {
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_VERDISA2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                            SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA2, creature->GetGUID());
+                        }
+                        break;
+                    case GOSSIP_ACTION_INFO_DEF + 2:
+                        {
+                            ItemPosCountVec dest;
+                            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_EMERALD_ESSENCE, 1);
+                            if (msg == EQUIP_ERR_OK)
+                                player->StoreNewItem(dest, ITEM_EMERALD_ESSENCE, true);
+                            CloseGossipMenuFor(player);
+                            break;
+                        }
+                    case GOSSIP_ACTION_INFO_DEF + 3:
+                        if (!HAS_ESSENCE(player))
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_VERDISA1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                        SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA3, creature->GetGUID());
+                        break;
                 }
                 break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-            {
-                ItemPosCountVec dest;
-                uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_RUBY_ESSENCE, 1);
-                if (msg == EQUIP_ERR_OK)
-                    player->StoreNewItem(dest, ITEM_RUBY_ESSENCE, true);
-                CloseGossipMenuFor(player);
-                break;
-            }
-            case GOSSIP_ACTION_INFO_DEF + 3:
-                if (!HAS_ESSENCE(player))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BELGARISTRASZ1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, GOSSIP_TEXTID_BELGARISTRASZ3, creature->GetGUID());
-                break;
-            }
-            break;
-        case NPC_ETERNOS:
-            switch(uiAction)
-            {
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                if (!HAS_ESSENCE(player))
+            case NPC_BELGARISTRASZ:
+                switch(uiAction)
                 {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ETERNOS1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ETERNOS2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS1, creature->GetGUID());
-                }
-                else
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ETERNOS2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS2, creature->GetGUID());
+                    case GOSSIP_ACTION_INFO_DEF + 1:
+                        if (!HAS_ESSENCE(player))
+                        {
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BELGARISTRASZ1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BELGARISTRASZ2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                            SendGossipMenuFor(player, GOSSIP_TEXTID_BELGARISTRASZ1, creature->GetGUID());
+                        }
+                        else
+                        {
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BELGARISTRASZ2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                            SendGossipMenuFor(player, GOSSIP_TEXTID_BELGARISTRASZ2, creature->GetGUID());
+                        }
+                        break;
+                    case GOSSIP_ACTION_INFO_DEF + 2:
+                        {
+                            ItemPosCountVec dest;
+                            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_RUBY_ESSENCE, 1);
+                            if (msg == EQUIP_ERR_OK)
+                                player->StoreNewItem(dest, ITEM_RUBY_ESSENCE, true);
+                            CloseGossipMenuFor(player);
+                            break;
+                        }
+                    case GOSSIP_ACTION_INFO_DEF + 3:
+                        if (!HAS_ESSENCE(player))
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BELGARISTRASZ1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                        SendGossipMenuFor(player, GOSSIP_TEXTID_BELGARISTRASZ3, creature->GetGUID());
+                        break;
                 }
                 break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-            {
-                ItemPosCountVec dest;
-                uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_AMBER_ESSENCE, 1);
-                if (msg == EQUIP_ERR_OK)
-                    player->StoreNewItem(dest, ITEM_AMBER_ESSENCE, true);
+            case NPC_ETERNOS:
+                switch(uiAction)
+                {
+                    case GOSSIP_ACTION_INFO_DEF + 1:
+                        if (!HAS_ESSENCE(player))
+                        {
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ETERNOS1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ETERNOS2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                            SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS1, creature->GetGUID());
+                        }
+                        else
+                        {
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ETERNOS2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                            SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS2, creature->GetGUID());
+                        }
+                        break;
+                    case GOSSIP_ACTION_INFO_DEF + 2:
+                        {
+                            ItemPosCountVec dest;
+                            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_AMBER_ESSENCE, 1);
+                            if (msg == EQUIP_ERR_OK)
+                                player->StoreNewItem(dest, ITEM_AMBER_ESSENCE, true);
 
-                CloseGossipMenuFor(player);
-                break;
-            }
-            case GOSSIP_ACTION_INFO_DEF + 3:
-                if (!HAS_ESSENCE(player))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ETERNOS1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                            CloseGossipMenuFor(player);
+                            break;
+                        }
+                    case GOSSIP_ACTION_INFO_DEF + 3:
+                        if (!HAS_ESSENCE(player))
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ETERNOS1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
-                SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS3, creature->GetGUID());
+                        SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS3, creature->GetGUID());
+                        break;
+                }
                 break;
-            }
-            break;
         }
 
         return true;
@@ -207,7 +207,7 @@ public:
 
     struct npc_oculus_drakeAI : public VehicleAI
     {
-        npc_oculus_drakeAI(Creature *creature) : VehicleAI(creature)
+        npc_oculus_drakeAI(Creature* creature) : VehicleAI(creature)
         {
             m_pInstance = me->GetInstanceScript();
             JustSummoned = true;
@@ -227,17 +227,17 @@ public:
 
             switch (me->GetEntry())
             {
-            case NPC_RUBY_DRAKE:
-                me->CastSpell(summoner, SPELL_RIDE_RUBY_DRAKE_QUE);
-                break;
-            case NPC_EMERALD_DRAKE:
-                me->CastSpell(summoner, SPELL_RIDE_EMERALD_DRAKE_QUE);
-                break;
-            case NPC_AMBER_DRAKE:
-                me->CastSpell(summoner, SPELL_RIDE_AMBER_DRAKE_QUE);
-                break;
-            default:
-                return;
+                case NPC_RUBY_DRAKE:
+                    me->CastSpell(summoner, SPELL_RIDE_RUBY_DRAKE_QUE);
+                    break;
+                case NPC_EMERALD_DRAKE:
+                    me->CastSpell(summoner, SPELL_RIDE_EMERALD_DRAKE_QUE);
+                    break;
+                case NPC_AMBER_DRAKE:
+                    me->CastSpell(summoner, SPELL_RIDE_AMBER_DRAKE_QUE);
+                    break;
+                default:
+                    return;
             }
 
             Position pos = summoner->GetPosition();
@@ -294,7 +294,7 @@ public:
                 JustSummoned = false;
                 if( m_pInstance )
                 {
-                    if( !m_pInstance->IsEncounterInProgress() || m_pInstance->GetData(DATA_EREGOS)==IN_PROGRESS )
+                    if( !m_pInstance->IsEncounterInProgress() || m_pInstance->GetData(DATA_EREGOS) == IN_PROGRESS )
                     {
                         if( me->GetVehicleKit() && me->IsSummon() )
                             if( !me->GetVehicleKit()->GetPassenger(0) )
@@ -358,7 +358,7 @@ public:
 
     struct npc_centrifuge_constructAI : public ScriptedAI
     {
-        npc_centrifuge_constructAI(Creature *creature) : ScriptedAI(creature) {}
+        npc_centrifuge_constructAI(Creature* creature) : ScriptedAI(creature) {}
 
         void Reset() {}
 
@@ -394,400 +394,400 @@ public:
 // 49838 - Stop Time
 class spell_oculus_stop_time : public SpellScriptLoader
 {
-    public:
-        spell_oculus_stop_time() : SpellScriptLoader("spell_oculus_stop_time") { }
+public:
+    spell_oculus_stop_time() : SpellScriptLoader("spell_oculus_stop_time") { }
 
-        class spell_oculus_stop_time_AuraScript : public AuraScript
+    class spell_oculus_stop_time_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_oculus_stop_time_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/)
         {
-            PrepareAuraScript(spell_oculus_stop_time_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
-                    return false;
-                return true;
-            }
-
-            void Apply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                Unit* caster = GetCaster();
-                if (!caster)
-                    return;
-
-                Unit* target = GetTarget();
-                for (uint32 i = 0; i < 5; ++i)
-                    caster->CastSpell(target, SPELL_AMBER_SHOCK_CHARGE, true);
-            }
-
-            void Register()
-            {
-                AfterEffectApply += AuraEffectApplyFn(spell_oculus_stop_time_AuraScript::Apply, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_oculus_stop_time_AuraScript();
+            if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
+                return false;
+            return true;
         }
+
+        void Apply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            Unit* target = GetTarget();
+            for (uint32 i = 0; i < 5; ++i)
+                caster->CastSpell(target, SPELL_AMBER_SHOCK_CHARGE, true);
+        }
+
+        void Register()
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_oculus_stop_time_AuraScript::Apply, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_oculus_stop_time_AuraScript();
+    }
 };
 
 // 50240 - Evasive Maneuvers
 class spell_oculus_evasive_maneuvers : public SpellScriptLoader
 {
-    public:
-        spell_oculus_evasive_maneuvers() : SpellScriptLoader("spell_oculus_evasive_maneuvers") { }
+public:
+    spell_oculus_evasive_maneuvers() : SpellScriptLoader("spell_oculus_evasive_maneuvers") { }
 
-        class spell_oculus_evasive_maneuvers_AuraScript : public AuraScript
+    class spell_oculus_evasive_maneuvers_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_oculus_evasive_maneuvers_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/)
         {
-            PrepareAuraScript(spell_oculus_evasive_maneuvers_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_RUBY_EVASIVE_CHARGES))
-                    return false;
-                return true;
-            }
-
-            void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
-            {
-                PreventDefaultAction();
-                GetTarget()->RemoveAuraFromStack(SPELL_RUBY_EVASIVE_CHARGES);
-                if (!GetTarget()->HasAura(SPELL_RUBY_EVASIVE_CHARGES))
-                    SetDuration(0);
-            }
-
-            void Register()
-            {
-                OnEffectProc += AuraEffectProcFn(spell_oculus_evasive_maneuvers_AuraScript::HandleProc, EFFECT_2, SPELL_AURA_PROC_TRIGGER_SPELL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_oculus_evasive_maneuvers_AuraScript();
+            if (!sSpellMgr->GetSpellInfo(SPELL_RUBY_EVASIVE_CHARGES))
+                return false;
+            return true;
         }
+
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+        {
+            PreventDefaultAction();
+            GetTarget()->RemoveAuraFromStack(SPELL_RUBY_EVASIVE_CHARGES);
+            if (!GetTarget()->HasAura(SPELL_RUBY_EVASIVE_CHARGES))
+                SetDuration(0);
+        }
+
+        void Register()
+        {
+            OnEffectProc += AuraEffectProcFn(spell_oculus_evasive_maneuvers_AuraScript::HandleProc, EFFECT_2, SPELL_AURA_PROC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_oculus_evasive_maneuvers_AuraScript();
+    }
 };
 
 // 49840 - Shock Lance
 class spell_oculus_shock_lance : public SpellScriptLoader
 {
-    public:
-        spell_oculus_shock_lance() : SpellScriptLoader("spell_oculus_shock_lance") { }
+public:
+    spell_oculus_shock_lance() : SpellScriptLoader("spell_oculus_shock_lance") { }
 
-        class spell_oculus_shock_lance_SpellScript : public SpellScript
+    class spell_oculus_shock_lance_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_oculus_shock_lance_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/)
         {
-            PrepareSpellScript(spell_oculus_shock_lance_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
-                    return false;
-                return true;
-            }
-
-            void CalcDamage()
-            {
-                int32 damage = GetHitDamage();
-                if (Unit* target = GetHitUnit())
-                    if (Aura* aura = target->GetAura(SPELL_AMBER_SHOCK_CHARGE, GetCaster()->GetGUID())) // shock charges from same caster
-                    {
-                        damage += aura->GetStackAmount()*6525;
-                        aura->Remove();
-                    }
-
-                SetHitDamage(damage);
-            }
-
-            void Register()
-            {
-                OnHit += SpellHitFn(spell_oculus_shock_lance_SpellScript::CalcDamage);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_oculus_shock_lance_SpellScript();
+            if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
+                return false;
+            return true;
         }
+
+        void CalcDamage()
+        {
+            int32 damage = GetHitDamage();
+            if (Unit* target = GetHitUnit())
+                if (Aura* aura = target->GetAura(SPELL_AMBER_SHOCK_CHARGE, GetCaster()->GetGUID())) // shock charges from same caster
+                {
+                    damage += aura->GetStackAmount() * 6525;
+                    aura->Remove();
+                }
+
+            SetHitDamage(damage);
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_oculus_shock_lance_SpellScript::CalcDamage);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_oculus_shock_lance_SpellScript();
+    }
 };
 
 // 49592 - Temporal Rift
 class spell_oculus_temporal_rift : public SpellScriptLoader
 {
-    public:
-        spell_oculus_temporal_rift() : SpellScriptLoader("spell_oculus_temporal_rift") { }
+public:
+    spell_oculus_temporal_rift() : SpellScriptLoader("spell_oculus_temporal_rift") { }
 
-        class spell_oculus_temporal_rift_AuraScript : public AuraScript
+    class spell_oculus_temporal_rift_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_oculus_temporal_rift_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/)
         {
-            PrepareAuraScript(spell_oculus_temporal_rift_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
-                    return false;
-                return true;
-            }
-
-            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-            {
-                PreventDefaultAction();
-                int32 amount = aurEff->GetAmount() + eventInfo.GetDamageInfo()->GetDamage();
-
-                uint8 num = amount/15000;
-                if (amount >= 15000)
-                {
-                    if (Unit* caster = GetCaster())
-                        for (uint8 i  =0; i < num; ++i )
-                            caster->CastSpell(GetTarget(), SPELL_AMBER_SHOCK_CHARGE, true);
-                }
-
-                const_cast<AuraEffect*>(aurEff)->SetAmount(amount - 15000*num);
-            }
-
-            void Register()
-            {
-                OnEffectProc += AuraEffectProcFn(spell_oculus_temporal_rift_AuraScript::HandleProc, EFFECT_2, SPELL_AURA_DUMMY);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_oculus_temporal_rift_AuraScript();
+            if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
+                return false;
+            return true;
         }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            int32 amount = aurEff->GetAmount() + eventInfo.GetDamageInfo()->GetDamage();
+
+            uint8 num = amount / 15000;
+            if (amount >= 15000)
+            {
+                if (Unit* caster = GetCaster())
+                    for (uint8 i  = 0; i < num; ++i )
+                        caster->CastSpell(GetTarget(), SPELL_AMBER_SHOCK_CHARGE, true);
+            }
+
+            const_cast<AuraEffect*>(aurEff)->SetAmount(amount - 15000 * num);
+        }
+
+        void Register()
+        {
+            OnEffectProc += AuraEffectProcFn(spell_oculus_temporal_rift_AuraScript::HandleProc, EFFECT_2, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_oculus_temporal_rift_AuraScript();
+    }
 };
 
 // 50341 - Touch the Nightmare
 class spell_oculus_touch_the_nightmare : public SpellScriptLoader
 {
-    public:
-        spell_oculus_touch_the_nightmare() : SpellScriptLoader("spell_oculus_touch_the_nightmare") { }
+public:
+    spell_oculus_touch_the_nightmare() : SpellScriptLoader("spell_oculus_touch_the_nightmare") { }
 
-        class spell_oculus_touch_the_nightmare_SpellScript : public SpellScript
+    class spell_oculus_touch_the_nightmare_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_oculus_touch_the_nightmare_SpellScript);
+
+        void HandleDamageCalc(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_oculus_touch_the_nightmare_SpellScript);
-
-            void HandleDamageCalc(SpellEffIndex /*effIndex*/)
-            {
-                SetHitDamage(int32(GetCaster()->CountPctFromMaxHealth(30)));
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_oculus_touch_the_nightmare_SpellScript::HandleDamageCalc, EFFECT_2, SPELL_EFFECT_SCHOOL_DAMAGE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_oculus_touch_the_nightmare_SpellScript();
+            SetHitDamage(int32(GetCaster()->CountPctFromMaxHealth(30)));
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_oculus_touch_the_nightmare_SpellScript::HandleDamageCalc, EFFECT_2, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_oculus_touch_the_nightmare_SpellScript();
+    }
 };
 
 // 50344 - Dream Funnel
 class spell_oculus_dream_funnel : public SpellScriptLoader
 {
-    public:
-        spell_oculus_dream_funnel() : SpellScriptLoader("spell_oculus_dream_funnel") { }
+public:
+    spell_oculus_dream_funnel() : SpellScriptLoader("spell_oculus_dream_funnel") { }
 
-        class spell_oculus_dream_funnel_AuraScript : public AuraScript
+    class spell_oculus_dream_funnel_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_oculus_dream_funnel_AuraScript);
+
+        void HandleEffectCalcAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
         {
-            PrepareAuraScript(spell_oculus_dream_funnel_AuraScript);
+            if (Unit* caster = GetCaster())
+                amount = int32(caster->CountPctFromMaxHealth(5));
 
-            void HandleEffectCalcAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
-            {
-                if (Unit* caster = GetCaster())
-                    amount = int32(caster->CountPctFromMaxHealth(5));
-
-                canBeRecalculated = false;
-            }
-
-            void Register()
-            {
-                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_oculus_dream_funnel_AuraScript::HandleEffectCalcAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
-                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_oculus_dream_funnel_AuraScript::HandleEffectCalcAmount, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_oculus_dream_funnel_AuraScript();
+            canBeRecalculated = false;
         }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_oculus_dream_funnel_AuraScript::HandleEffectCalcAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_oculus_dream_funnel_AuraScript::HandleEffectCalcAmount, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_oculus_dream_funnel_AuraScript();
+    }
 };
 
 class spell_oculus_call_ruby_emerald_amber_drake : public SpellScriptLoader
 {
-    public:
-        spell_oculus_call_ruby_emerald_amber_drake() : SpellScriptLoader("spell_oculus_call_ruby_emerald_amber_drake") { }
+public:
+    spell_oculus_call_ruby_emerald_amber_drake() : SpellScriptLoader("spell_oculus_call_ruby_emerald_amber_drake") { }
 
-        class spell_oculus_call_ruby_emerald_amber_drake_SpellScript : public SpellScript
+    class spell_oculus_call_ruby_emerald_amber_drake_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_oculus_call_ruby_emerald_amber_drake_SpellScript);
+
+        void SetDest(SpellDestination& dest)
         {
-            PrepareSpellScript(spell_oculus_call_ruby_emerald_amber_drake_SpellScript);
-
-            void SetDest(SpellDestination& dest)
-            {
-                // Adjust effect summon position
-                Position const offset = { 0.0f, 0.0f, 12.0f, 0.0f };
-                dest.RelocateOffset(offset);
-            }
-
-            void Register()
-            {
-                OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_oculus_call_ruby_emerald_amber_drake_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_oculus_call_ruby_emerald_amber_drake_SpellScript();
+            // Adjust effect summon position
+            Position const offset = { 0.0f, 0.0f, 12.0f, 0.0f };
+            dest.RelocateOffset(offset);
         }
+
+        void Register()
+        {
+            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_oculus_call_ruby_emerald_amber_drake_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_oculus_call_ruby_emerald_amber_drake_SpellScript();
+    }
 };
 
 class spell_oculus_ride_ruby_emerald_amber_drake_que : public SpellScriptLoader
 {
-    public:
-        spell_oculus_ride_ruby_emerald_amber_drake_que() : SpellScriptLoader("spell_oculus_ride_ruby_emerald_amber_drake_que") { }
+public:
+    spell_oculus_ride_ruby_emerald_amber_drake_que() : SpellScriptLoader("spell_oculus_ride_ruby_emerald_amber_drake_que") { }
 
-        class spell_oculus_ride_ruby_emerald_amber_drake_que_AuraScript : public AuraScript
+    class spell_oculus_ride_ruby_emerald_amber_drake_que_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_oculus_ride_ruby_emerald_amber_drake_que_AuraScript);
+
+        void HandlePeriodic(AuraEffect const* aurEff)
         {
-            PrepareAuraScript(spell_oculus_ride_ruby_emerald_amber_drake_que_AuraScript);
-
-            void HandlePeriodic(AuraEffect const* aurEff)
-            {
-                // caster of the triggered spell is wrong for an unknown reason, handle it here correctly
-                PreventDefaultAction();
-                if (Unit* caster = GetCaster())
-                    GetTarget()->CastSpell(caster, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-            }
-
-            void Register()
-            {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_oculus_ride_ruby_emerald_amber_drake_que_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_oculus_ride_ruby_emerald_amber_drake_que_AuraScript();
+            // caster of the triggered spell is wrong for an unknown reason, handle it here correctly
+            PreventDefaultAction();
+            if (Unit* caster = GetCaster())
+                GetTarget()->CastSpell(caster, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_oculus_ride_ruby_emerald_amber_drake_que_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_oculus_ride_ruby_emerald_amber_drake_que_AuraScript();
+    }
 };
 
 class spell_oculus_evasive_charges : public SpellScriptLoader
 {
-    public:
-        spell_oculus_evasive_charges() : SpellScriptLoader("spell_oculus_evasive_charges") { }
+public:
+    spell_oculus_evasive_charges() : SpellScriptLoader("spell_oculus_evasive_charges") { }
 
-        class spell_oculus_evasive_chargesAuraScript : public AuraScript
+    class spell_oculus_evasive_chargesAuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_oculus_evasive_chargesAuraScript);
+
+        void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_oculus_evasive_chargesAuraScript);
-
-            void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                if (Unit* caster = GetCaster())
-                    caster->ModifyAuraState(AURA_STATE_UNKNOWN22, true);
-            }
-
-            void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                if (Unit* caster = GetCaster())
-                {
-                    caster->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_MANEUVERS);
-                    caster->ModifyAuraState(AURA_STATE_UNKNOWN22, false);
-                }
-            }
-
-            void Register()
-            {
-                OnEffectApply += AuraEffectApplyFn(spell_oculus_evasive_chargesAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-                OnEffectRemove += AuraEffectRemoveFn(spell_oculus_evasive_chargesAuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_oculus_evasive_chargesAuraScript();
+            if (Unit* caster = GetCaster())
+                caster->ModifyAuraState(AURA_STATE_UNKNOWN22, true);
         }
+
+        void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                caster->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_MANEUVERS);
+                caster->ModifyAuraState(AURA_STATE_UNKNOWN22, false);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_oculus_evasive_chargesAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            OnEffectRemove += AuraEffectRemoveFn(spell_oculus_evasive_chargesAuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_oculus_evasive_chargesAuraScript();
+    }
 };
 
 class spell_oculus_soar : public SpellScriptLoader
 {
-    public:
-        spell_oculus_soar() : SpellScriptLoader("spell_oculus_soar") { }
+public:
+    spell_oculus_soar() : SpellScriptLoader("spell_oculus_soar") { }
 
-        class spell_oculus_soarAuraScript : public AuraScript
+    class spell_oculus_soarAuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_oculus_soarAuraScript);
+
+        void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
         {
-            PrepareAuraScript(spell_oculus_soarAuraScript);
-			
-            void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+            Unit* caster = GetCaster();
+
+            if (!caster)
+                return;
+
+            if (!caster->getAttackers().empty())
             {
-                Unit* caster = GetCaster();
+                if (caster->HasAura(SPELL_SOAR_BUFF))
+                    caster->RemoveAurasDueToSpell(SPELL_SOAR_BUFF);
 
-                if (!caster)
-                    return;
-
-                if (!caster->getAttackers().empty())
-                {
-                    if (caster->HasAura(SPELL_SOAR_BUFF))
-                        caster->RemoveAurasDueToSpell(SPELL_SOAR_BUFF);
-
-                    PreventDefaultAction();
-                    return;
-                }
-
-                if (!caster->HasAura(SPELL_SOAR_BUFF))
-                    caster->CastSpell(caster, SPELL_SOAR_BUFF, true);
-
-                // We handle the health regen here, normal heal regen isn't working....
-                if (caster->GetHealth() < caster->GetMaxHealth())
-                    caster->SetHealth(caster->GetHealth() + (uint32)((double)caster->GetMaxHealth()*0.2));
+                PreventDefaultAction();
+                return;
             }
 
-            void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                Unit* caster = GetCaster();
+            if (!caster->HasAura(SPELL_SOAR_BUFF))
+                caster->CastSpell(caster, SPELL_SOAR_BUFF, true);
 
-                if (!caster)
-                    return;
-
-                if (!caster->HasAura(SPELL_SOAR_BUFF))
-                    caster->CastSpell(caster, SPELL_SOAR_BUFF, true);
-            }
-
-            void Register()
-            {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_oculus_soarAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-                OnEffectApply += AuraEffectApplyFn(spell_oculus_soarAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_oculus_soarAuraScript();
+            // We handle the health regen here, normal heal regen isn't working....
+            if (caster->GetHealth() < caster->GetMaxHealth())
+                caster->SetHealth(caster->GetHealth() + (uint32)((double)caster->GetMaxHealth() * 0.2));
         }
+
+        void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+
+            if (!caster)
+                return;
+
+            if (!caster->HasAura(SPELL_SOAR_BUFF))
+                caster->CastSpell(caster, SPELL_SOAR_BUFF, true);
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_oculus_soarAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            OnEffectApply += AuraEffectApplyFn(spell_oculus_soarAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_oculus_soarAuraScript();
+    }
 };
 
 class spell_oculus_rider_aura : public SpellScriptLoader
 {
-    public:
-        spell_oculus_rider_aura() : SpellScriptLoader("spell_oculus_rider_aura") { }
+public:
+    spell_oculus_rider_aura() : SpellScriptLoader("spell_oculus_rider_aura") { }
 
-        class spell_oculus_rider_auraAuraScript : public AuraScript
+    class spell_oculus_rider_auraAuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_oculus_rider_auraAuraScript);
+
+        uint64 _drakeGUID;
+
+        void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_oculus_rider_auraAuraScript);
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
 
-            uint64 _drakeGUID;
+            Creature* drake = caster->GetVehicleCreatureBase();
 
-            void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            if (!drake)
+                return;
+
+            switch (aurEff->GetEffIndex())
             {
-                Unit* caster = GetCaster();
-                if (!caster)
-                    return;
-
-                Creature* drake = caster->GetVehicleCreatureBase();
-
-                if (!drake)
-                    return;
-
-                switch (aurEff->GetEffIndex())
-                {
                 case EFFECT_1:
                     _drakeGUID = drake->GetGUID();
                     caster->AddAura(SPELL_DRAKE_FLAG_VISUAL, caster);
@@ -801,78 +801,78 @@ class spell_oculus_rider_aura : public SpellScriptLoader
                     caster->AddAura(SPELL_SCALE_STATS, drake);
                     PreventDefaultAction();
                     break;
-                }
             }
-
-            void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                Unit* caster = GetCaster();
-
-                if (!caster)
-                    return;
-
-                Creature* drake = ObjectAccessor::GetCreature(*caster, _drakeGUID);
-
-                if (drake)
-                {
-                    drake->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-                    drake->RemoveAurasDueToSpell(GetId());
-                    drake->RemoveAurasDueToSpell(SPELL_SOAR_TRIGGER);
-                    drake->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_AURA);
-                }
-                caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
-            }
-
-            void Register()
-            {
-                OnEffectApply += AuraEffectApplyFn(spell_oculus_rider_auraAuraScript::HandleOnEffectApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-                OnEffectApply += AuraEffectApplyFn(spell_oculus_rider_auraAuraScript::HandleOnEffectApply, EFFECT_2, SPELL_AURA_LINKED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-                OnEffectRemove += AuraEffectRemoveFn(spell_oculus_rider_auraAuraScript::HandleOnEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_oculus_rider_auraAuraScript();
         }
+
+        void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+
+            if (!caster)
+                return;
+
+            Creature* drake = ObjectAccessor::GetCreature(*caster, _drakeGUID);
+
+            if (drake)
+            {
+                drake->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                drake->RemoveAurasDueToSpell(GetId());
+                drake->RemoveAurasDueToSpell(SPELL_SOAR_TRIGGER);
+                drake->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_AURA);
+            }
+            caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_oculus_rider_auraAuraScript::HandleOnEffectApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            OnEffectApply += AuraEffectApplyFn(spell_oculus_rider_auraAuraScript::HandleOnEffectApply, EFFECT_2, SPELL_AURA_LINKED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            OnEffectRemove += AuraEffectRemoveFn(spell_oculus_rider_auraAuraScript::HandleOnEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_oculus_rider_auraAuraScript();
+    }
 };
 
 class spell_oculus_drake_flag : public SpellScriptLoader
 {
-    public:
-        spell_oculus_drake_flag() : SpellScriptLoader("spell_oculus_drake_flag") { }
+public:
+    spell_oculus_drake_flag() : SpellScriptLoader("spell_oculus_drake_flag") { }
 
-        class spell_oculus_drake_flagAuraScript : public AuraScript
+    class spell_oculus_drake_flagAuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_oculus_drake_flagAuraScript);
+
+        void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_oculus_drake_flagAuraScript);
+            Unit* caster = GetCaster();
 
-            void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            if (!caster)
+                return;
+
+            Creature* drake = caster->GetVehicleCreatureBase();
+
+            if (!drake)
             {
-                Unit* caster = GetCaster();
-
-                if (!caster)
-                    return;
-
-                Creature* drake = caster->GetVehicleCreatureBase();
-
-                if (!drake)
-                {
-                    caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
-                }
+                caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
             }
-
-            void Register()
-            {
-                OnEffectApply += AuraEffectApplyFn(spell_oculus_drake_flagAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_oculus_drake_flagAuraScript();
         }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_oculus_drake_flagAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_oculus_drake_flagAuraScript();
+    }
 };
 
 void AddSC_oculus()

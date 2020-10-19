@@ -30,7 +30,7 @@ WorldModelDefinition WorldModelDefinition::Read( FILE* file )
     count += fread(&discard, sizeof(uint32), 1, file);
 
     if (count != 5)
-         printf("WorldModelDefinition::Read: Error reading data, expected 5, read %d\n", count);
+        printf("WorldModelDefinition::Read: Error reading data, expected 5, read %d\n", count);
     return ret;
 }
 
@@ -45,7 +45,7 @@ void WorldModelHandler::ProcessInternal( MapChunk* mcnk )
 {
     if (!IsSane())
         return;
-    
+
     uint32 refCount = mcnk->Header.MapObjectRefs;
     FILE* stream = mcnk->Source->GetStream();
     fseek(stream, mcnk->Source->Offset + mcnk->Header.OffsetMCRF, SEEK_SET);
@@ -159,13 +159,13 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
                     uint32 vertOffset = verts.size();
 
                     Vector3 v1 = Utils::GetLiquidVert(def, liquidHeader.BaseLocation,
-                        liquidDataGeometry.HeightMap[x][y], x, y, translate);
+                                                      liquidDataGeometry.HeightMap[x][y], x, y, translate);
                     Vector3 v2 = Utils::GetLiquidVert(def, liquidHeader.BaseLocation,
-                        liquidDataGeometry.HeightMap[x + 1][y], x + 1, y, translate);
+                                                      liquidDataGeometry.HeightMap[x + 1][y], x + 1, y, translate);
                     Vector3 v3 = Utils::GetLiquidVert(def, liquidHeader.BaseLocation,
-                        liquidDataGeometry.HeightMap[x][y + 1], x, y + 1, translate);
+                                                      liquidDataGeometry.HeightMap[x][y + 1], x, y + 1, translate);
                     Vector3 v4 = Utils::GetLiquidVert(def, liquidHeader.BaseLocation,
-                        liquidDataGeometry.HeightMap[x + 1][y + 1], x + 1, y + 1, translate);
+                                                      liquidDataGeometry.HeightMap[x + 1][y + 1], x + 1, y + 1, translate);
 
                     verts.push_back(translate ? v1 : Utils::ToRecast(v1));
                     verts.push_back(translate ? v2 : Utils::ToRecast(v2));
