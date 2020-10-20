@@ -146,7 +146,7 @@ public:
 
             events.Update(diff);
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -155,7 +155,6 @@ public:
                     spawned = true;
                     if (Creature* c = DoSummon(RAND(NPC_PORTAL_GUARDIAN, NPC_PORTAL_KEEPER), me, 2.0f, 0, TEMPSUMMON_DEAD_DESPAWN))
                         me->CastSpell(c, SPELL_PORTAL_CHANNEL, false);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_SUMMON_KEEPER_TRASH, 20000);
                     break;
                 case EVENT_SUMMON_KEEPER_TRASH:
@@ -174,12 +173,10 @@ public:
                         DoSummon(entry, me, 2.0f, 20000, TEMPSUMMON_DEAD_DESPAWN);
                     }
                     me->SetVisible(false);
-                    events.PopEvent();
                     break;
                 case EVENT_SUMMON_SABOTEOUR:
                     DoSummon(NPC_SABOTEOUR, me, 2.0f, 0, TEMPSUMMON_CORPSE_DESPAWN);
                     me->DespawnOrUnsummon(3000);
-                    events.PopEvent();
                     break;
             }
 

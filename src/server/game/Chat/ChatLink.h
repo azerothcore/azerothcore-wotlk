@@ -46,7 +46,7 @@ class ItemChatLink : public ChatLink
 {
 public:
     ItemChatLink() : ChatLink(), _item(nullptr), _suffix(nullptr), _property(nullptr)
-    { 
+    {
         memset(_data, 0, sizeof(_data));
     }
     virtual bool Initialize(std::istringstream& iss);
@@ -91,7 +91,7 @@ class AchievementChatLink : public ChatLink
 {
 public:
     AchievementChatLink() : ChatLink(), _guid(0), _achievement(nullptr)
-    { 
+    {
         memset(_data, 0, sizeof(_data));
     }
     virtual bool Initialize(std::istringstream& iss);

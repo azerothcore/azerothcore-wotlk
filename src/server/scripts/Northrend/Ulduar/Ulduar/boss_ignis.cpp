@@ -336,7 +336,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -347,7 +347,6 @@ public:
                         me->MonsterYell(TEXT_BERSERK, LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(SOUND_BERSERK);
                         me->CastSpell(me, SPELL_BERSERK, true);
-                        events.PopEvent();
                         break;
                     }
                     events.RepeatEvent(RAID_MODE(40000, 30000));
@@ -373,7 +372,6 @@ public:
                 case EVENT_ENABLE_ROTATE:
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     me->DisableRotate(false);
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_FLAME_JETS:
                     me->MonsterTextEmote(TEXT_FLAME_JETS, 0, true);
