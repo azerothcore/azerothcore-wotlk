@@ -1196,6 +1196,6 @@ void AddOutdoorPvPScripts()
 void AddCustomScripts()
 {
 #ifdef SCRIPTS
-	//~ AddSC_MySuperScript();
+    //~ AddSC_MySuperScript();
 #endif
 }

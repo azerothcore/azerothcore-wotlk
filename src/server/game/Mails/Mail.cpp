@@ -80,7 +80,8 @@ MailReceiver::MailReceiver(Player* receiver, uint32 receiver_lowguid) : m_receiv
 
 MailDraft& MailDraft::AddItem(Item* item)
 {
-    m_items[item->GetGUIDLow()] = item; return *this;
+    m_items[item->GetGUIDLow()] = item;
+    return *this;
 }
 
 void MailDraft::prepareItems(Player* receiver, SQLTransaction& trans)
@@ -195,7 +196,7 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
     // mail from battlemaster (rewardmarks) should last only one day
     else if (sender.GetMailMessageType() == MAIL_CREATURE && sBattlegroundMgr->GetBattleMasterBG(sender.GetSenderId()) != BATTLEGROUND_TYPE_NONE)
         expire_delay = DAY;
-     // default case: expire time if COD 3 days, if no COD 30 days (or 90 days if sender is a game master)
+    // default case: expire time if COD 3 days, if no COD 30 days (or 90 days if sender is a game master)
     else
     {
         if (m_COD)

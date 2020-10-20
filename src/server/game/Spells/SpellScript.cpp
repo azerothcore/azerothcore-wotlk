@@ -63,20 +63,20 @@ uint8 _SpellScript::EffectHook::GetAffectedEffectsMask(SpellInfo const* spellEnt
             if ((effIndex == EFFECT_FIRST_FOUND) && mask)
                 return mask;
             if (CheckEffect(spellEntry, i))
-                mask |= (uint8)1<<i;
+                mask |= (uint8)1 << i;
         }
     }
     else
     {
         if (CheckEffect(spellEntry, effIndex))
-            mask |= (uint8)1<<effIndex;
+            mask |= (uint8)1 << effIndex;
     }
     return mask;
 }
 
 bool _SpellScript::EffectHook::IsEffectAffected(SpellInfo const* spellEntry, uint8 effIndex)
 {
-    return GetAffectedEffectsMask(spellEntry) & 1<<effIndex;
+    return GetAffectedEffectsMask(spellEntry) & 1 << effIndex;
 }
 
 std::string _SpellScript::EffectHook::EffIndexToString()
@@ -169,7 +169,7 @@ SpellScript::EffectHandler::EffectHandler(SpellEffectFnType _pEffectHandlerScrip
 
 std::string SpellScript::EffectHandler::ToString()
 {
-    return "Index: " + EffIndexToString() + " Name: " +_SpellScript::EffectNameCheck::ToString();
+    return "Index: " + EffIndexToString() + " Name: " + _SpellScript::EffectNameCheck::ToString();
 }
 
 bool SpellScript::EffectHandler::CheckEffect(SpellInfo const* spellEntry, uint8 effIndex)
@@ -208,7 +208,7 @@ bool SpellScript::TargetHook::CheckEffect(SpellInfo const* spellEntry, uint8 eff
         return false;
 
     if (spellEntry->Effects[effIndex].TargetA.GetTarget() != targetType &&
-        spellEntry->Effects[effIndex].TargetB.GetTarget() != targetType)
+            spellEntry->Effects[effIndex].TargetB.GetTarget() != targetType)
         return false;
 
     SpellImplicitTargetInfo targetInfo(targetType);
@@ -368,12 +368,12 @@ bool SpellScript::IsInEffectHook() const
 
 Unit* SpellScript::GetCaster()
 {
-     return m_spell->GetCaster();
+    return m_spell->GetCaster();
 }
 
 Unit* SpellScript::GetOriginalCaster()
 {
-     return m_spell->GetOriginalCaster();
+    return m_spell->GetOriginalCaster();
 }
 
 SpellInfo const* SpellScript::GetSpellInfo()
@@ -756,7 +756,7 @@ bool AuraScript::EffectBase::CheckEffect(SpellInfo const* spellEntry, uint8 effI
 
 std::string AuraScript::EffectBase::ToString()
 {
-    return "Index: " + EffIndexToString() + " AuraName: " +_SpellScript::EffectAuraNameCheck::ToString();
+    return "Index: " + EffIndexToString() + " AuraName: " + _SpellScript::EffectAuraNameCheck::ToString();
 }
 
 AuraScript::EffectPeriodicHandler::EffectPeriodicHandler(AuraEffectPeriodicFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName)
