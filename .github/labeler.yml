@@ -1,5 +1,5 @@
 DB:
-  - src/**/*.sql
+  - data/**/*.sql
 
 CORE:
   - any: ['src/**/*.cpp', 'src/**/*.h', '!src/server/scripts/*']
