@@ -163,13 +163,12 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_MATE_DIED:
                     Talk(YELL_SKARVALD_DAL_DIEDFIRST);
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_CHARGE:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, (IsHeroic() ? 100.0f : 30.0f), true) )
@@ -317,17 +316,15 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_YELL_DALRONN_AGGRO:
                     Talk(YELL_DALRONN_AGGRO);
-                    events.PopEvent();
                     break;
                 case EVENT_MATE_DIED:
                     Talk(YELL_DALRONN_SKA_DIEDFIRST);
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_SHADOW_BOLT:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 42.0f, true) )

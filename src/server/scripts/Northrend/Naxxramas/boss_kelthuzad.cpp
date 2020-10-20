@@ -265,7 +265,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_FLOOR_CHANGE:
                     if (pInstance)
@@ -277,7 +277,7 @@ public:
                             go->SetPhaseMask(2, true);
                         }
                     }
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_SUMMON_SOLDIER:
                     if (Creature* cr = me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonPositions[urand(0, 5)], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
@@ -386,7 +386,6 @@ public:
                 case EVENT_SECOND_PHASE_HEALTH_CHECK:
                     if (me->HealthBelowPct(45))
                     {
-                        events.PopEvent();
                         Talk(SAY_REQUEST_AID);
                         events.DelayEvents(5500);
                         events.ScheduleEvent(EVENT_THIRD_PHASE_LICH_KING_SAY, 5000);
@@ -401,7 +400,7 @@ public:
 
                     for (uint8 i = 0 ; i < RAID_MODE(2, 4); ++i)
                         events.ScheduleEvent(EVENT_SUMMON_GUARDIAN_OF_ICECROWN, 10000 + (i * 5000));
-                    events.PopEvent();
+
                     break;
                 case EVENT_SUMMON_GUARDIAN_OF_ICECROWN:
                     if (Creature* cr = me->SummonCreature(NPC_GUARDIAN_OF_ICECROWN, SummonPositions[RAND(0, 1, 3, 4)]))
@@ -410,7 +409,6 @@ public:
                         cr->AI()->AttackStart(me->GetVictim());
                     }
 
-                    events.PopEvent();
                     break;
             }
 
@@ -519,7 +517,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_MINION_SPELL_MORTAL_WOUND:
                     me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
@@ -529,7 +527,7 @@ public:
                     if (me->HealthBelowPct(35))
                     {
                         me->CastSpell(me, SPELL_FRENZY, true);
-                        events.PopEvent();
+                        
                         break;
                     }
                     events.RepeatEvent(1000);

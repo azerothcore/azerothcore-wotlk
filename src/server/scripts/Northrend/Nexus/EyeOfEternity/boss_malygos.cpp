@@ -371,14 +371,14 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     Talk(EMOTE_BERSERK);
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_INTRO_MOVE_CENTER:
                     {
@@ -393,15 +393,13 @@ public:
                         float z = FourSidesPos[0].GetPositionZ();
                         me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                         me->GetMotionMaster()->MovePoint(MI_POINT_INTRO_CENTER_AIR, x, y, z);
-                        events.PopEvent();
+                        break;
                     }
-                    break;
                 case EVENT_INTRO_LAND:
                     {
                         me->GetMotionMaster()->MoveLand(MI_POINT_INTRO_LAND, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), 7.0f);
-                        events.PopEvent();
+                        break;
                     }
-                    break;
                 case EVENT_START_FIGHT:
                     {
                         if (pInstance)
@@ -415,7 +413,6 @@ public:
                             AttackStart(target);
                             me->GetMotionMaster()->MoveChase(target);
                         }
-                        events.PopEvent();
 
                         events.SetPhase(PHASE_ONE);
                         events.RescheduleEvent(EVENT_BERSERK, 600000, 0);
@@ -423,9 +420,8 @@ public:
                         events.RescheduleEvent(EVENT_SPELL_ARCANE_STORM, urand(2000, 5000), 1);
                         events.RescheduleEvent(EVENT_SUMMON_POWER_SPARK, urand(10000, 15000), 1);
                         events.RescheduleEvent(EVENT_START_VORTEX_0, 30000, 1);
+                        break;
                     }
-                    break;
-
                 case EVENT_SPELL_ARCANE_BREATH:
                     me->CastSpell(me->GetVictim(), SPELL_ARCANE_BREATH, false);
                     events.RepeatEvent(urand(12000, 15000));
@@ -467,20 +463,18 @@ public:
                         me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ() + 20.0f, 7.0f);
 
-                        events.PopEvent();
                         events.DelayEvents(25000, 1); // don't delay berserk (group 0)
                     }
                     break;
                 case EVENT_VORTEX_FLY_TO_CENTER:
                     me->GetMotionMaster()->MovePoint(MI_POINT_VORTEX_CENTER, CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ() + 20.0f);
-                    events.PopEvent();
                     break;
                 case EVENT_START_VORTEX_REAL:
-                    me->SendMeleeAttackStop(me->GetVictim());
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
-                    me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
-
                     {
+                        me->SendMeleeAttackStop(me->GetVictim());
+                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                        me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+
                         Position pos;
                         float angle = (me->GetOrientation() >= M_PI / 4 ? me->GetOrientation() - M_PI / 4 : 7 * M_PI / 4 + me->GetOrientation());
                         pos.m_positionX = CenterPos.GetPositionX() + cos(angle) * 40.0f;
@@ -537,13 +531,13 @@ public:
                                         }
                                     }
                         }
+
+                        events.RescheduleEvent(EVENT_VORTEX_LAND_0, 11000, 1);
+                        break;
                     }
-                    events.PopEvent();
-                    events.RescheduleEvent(EVENT_VORTEX_LAND_0, 11000, 1);
-                    break;
                 case EVENT_VORTEX_LAND_0:
                     me->GetMotionMaster()->MoveLand(MI_POINT_VORTEX_LAND, CenterPos, 7.0f);
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_VORTEX_LAND_1:
                     {
@@ -556,7 +550,6 @@ public:
                             AttackStart(target);
                             me->GetMotionMaster()->MoveChase(target);
                         }
-                        events.PopEvent();
                         events.RescheduleEvent(EVENT_START_VORTEX_0, 60000, 1);
                         break;
                     }
@@ -581,7 +574,6 @@ public:
                         //me->SetHover(true);
                         me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(MI_POINT_CENTER_AIR_PH_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 32.0f, 7.0f);
-                        events.PopEvent();
                         events.RescheduleEvent(EVENT_START_PHASE_2_MOVE_TO_SIDE, 22500, 1);
                         break;
                     }
@@ -617,7 +609,6 @@ public:
                             }
                     }
 
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_ARCANE_OVERLOAD:
                     {
@@ -640,7 +631,6 @@ public:
                         float newangle = angle + 0.5f;
                         if (newangle >= 2 * M_PI) newangle -= 2 * M_PI;
                         me->GetMotionMaster()->MovePoint(MI_POINT_CIRCLE_OUTSIDE_PH_2, CenterPos.GetPositionX() + cos(newangle)*dist, CenterPos.GetPositionY() + sin(newangle)*dist, Phase2NorthPos.GetPositionZ());
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_MOVE_TO_SURGE_OF_POWER:
@@ -655,13 +645,11 @@ public:
                     break;
                 case EVENT_SURGE_OF_POWER_WARNING:
                     Talk(EMOTE_SURGE_OF_POWER_WARNING_P2);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_SPELL_SURGE_OF_POWER, 1500, 1);
                     break;
                 case EVENT_SPELL_SURGE_OF_POWER:
                     if (Creature* c = me->SummonCreature(NPC_SURGE_OF_POWER, CenterPos, TEMPSUMMON_TIMED_DESPAWN, 10000))
                         me->CastSpell(c, SPELL_SURGE_OF_POWER, false);
-                    events.PopEvent();
                     Talk(SAY_SURGE_OF_POWER);
                     events.RescheduleEvent(EVENT_CLEAR_TARGET, 10000, 1);
                     events.RescheduleEvent(EVENT_RESUME_FLYING_CIRCLES_PH_2, 10000, 1);
@@ -673,7 +661,6 @@ public:
                 case EVENT_CLEAR_TARGET:
                     me->SendMeleeAttackStop();
                     me->SetTarget(0);
-                    events.PopEvent();
                     break;
                 case EVENT_CHECK_TRASH_DEAD:
                     {
@@ -698,7 +685,6 @@ public:
                     break;
                 case EVENT_LIGHT_DIMENSION_CHANGE:
                     me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_CHANGE_DIMENSIONS, 2 * IN_MILLISECONDS);
-                    events.PopEvent();
                     break;
                 case EVENT_DESTROY_PLATFORM_0:
                     if (Creature* c = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, CenterPos, TEMPSUMMON_TIMED_DESPAWN, 3000))
@@ -708,7 +694,6 @@ public:
                         c->CastSpell(c, SPELL_DESTROY_PLATFORM_EFFECT, false);
                     }
                     me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_OBSCURE_SPACE, 1 * IN_MILLISECONDS);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_MOVE_TO_PHASE_3_POSITION, 2000, 1);
                     break;
                 case EVENT_MOVE_TO_PHASE_3_POSITION:
@@ -736,16 +721,13 @@ public:
                                     }
                                 }
 
-                        events.PopEvent();
                         events.RescheduleEvent(EVENT_SAY_PHASE_3_INTRO, 3000, 1);
                     }
                     break;
                 case EVENT_SAY_PHASE_3_INTRO:
                     Talk(SAY_INTRO_PHASE_3);
-                    events.PopEvent();
                     break;
                 case EVENT_START_PHASE_3:
-                    events.PopEvent();
                     events.SetPhase(PHASE_THREE);
                     me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_OBSCURE_ARCANE_RUNES, 1 * IN_MILLISECONDS);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -1125,13 +1107,12 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_TELEPORT_VISUAL:
                     me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
-                    events.PopEvent();
                     break;
                 case EVENT_NEXUS_LORD_ARCANE_SHOCK:
                     if (Unit* victim = me->GetVictim())
@@ -1187,13 +1168,12 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_TELEPORT_VISUAL:
                     me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
-                    events.PopEvent();
                     break;
                 case EVENT_SCION_OF_ETERNITY_ARCANE_BARRAGE:
                     {
@@ -1359,13 +1339,12 @@ public:
         {
             events.Update(diff);
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_DISK_MOVE_NEXT_POINT:
                     DoAction(1);
-                    events.PopEvent();
                     break;
             }
         }
@@ -1402,7 +1381,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1412,22 +1391,18 @@ public:
                     me->SummonGameObject(HEART_OF_MAGIC, 773.98f, 1275.97f, 266.254f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
 
                     Talk(SAY_ALEXSTRASZA_ONE);
-                    events.PopEvent();
                     events.RescheduleEvent(2, 6000);
                     break;
                 case 2:
                     Talk(SAY_ALEXSTRASZA_TWO);
-                    events.PopEvent();
                     events.RescheduleEvent(3, 5000);
                     break;
                 case 3:
                     Talk(SAY_ALEXSTRASZA_THREE);
-                    events.PopEvent();
                     events.RescheduleEvent(4, 22000);
                     break;
                 case 4:
                     Talk(SAY_ALEXSTRASZA_FOUR);
-                    events.PopEvent();
                     break;
             }
         }
