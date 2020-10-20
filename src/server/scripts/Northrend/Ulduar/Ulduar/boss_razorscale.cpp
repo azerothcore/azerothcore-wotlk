@@ -324,7 +324,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -335,7 +335,6 @@ public:
                 case EVENT_COMMANDER_SAY_AGGRO:
                     if (Creature* commander = ObjectAccessor::GetCreature(*me, CommanderGUID))
                         commander->AI()->Talk(SAY_COMMANDER_AGGRO);
-                    events.PopEvent();
                     break;
                 case EVENT_EE_SAY_MOVE_OUT:
                     for (uint8 i = 0; i < 3; ++i)
@@ -345,7 +344,6 @@ public:
                                 c->MonsterYell(TEXT_EE_MOVE_OUT, LANG_UNIVERSAL, 0);
                             c->AI()->SetData(1, 0); // start repairing
                         }
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_FIREBALL:
                     if( Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true) )
@@ -436,17 +434,14 @@ public:
 
                         }
                     }
-                    events.PopEvent();
                     break;
                 case EVENT_WARN_DEEP_BREATH:
                     me->MonsterTextEmote(TEXT_DEEP_BREATH, 0, true);
                     me->RemoveAura(62794);
-                    events.PopEvent();
                     events.ScheduleEvent(EVENT_PHASE2_FLAME_BREATH, 2500);
                     break;
                 case EVENT_PHASE2_FLAME_BREATH:
                     me->CastSpell(me, S_FLAMEBREATH, true);
-                    events.PopEvent();
                     events.ScheduleEvent(EVENT_FLY_UP, 2000);
                     break;
                 case EVENT_FLY_UP:
@@ -484,7 +479,6 @@ public:
                             me->GetMotionMaster()->MoveChase(target);
                         }
                         bGroundPhase = true;
-                        events.PopEvent();
                         events.CancelEvent(EVENT_SPELL_FIREBALL);
                         events.CancelEvent(EVENT_SPELL_DEVOURING_FLAME);
                         events.CancelEvent(EVENT_SUMMON_MOLE_MACHINES);
@@ -512,7 +506,6 @@ public:
                         events.ScheduleEvent(EVENT_RESUME_FIXING, 22000);
                     }
 
-                    events.PopEvent();
                     break;
                 case EVENT_RESUME_FIXING:
                     for (uint8 i = 0; i < 3; ++i)
@@ -522,7 +515,6 @@ public:
                                 c->MonsterYell(TEXT_EE_FIRES_OUT, LANG_UNIVERSAL, 0);
                             c->AI()->SetData(1, 0); // start repairing
                         }
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_FLAME_BREATH:
                     me->CastSpell(me->GetVictim(), S_FLAMEBREATH, false);

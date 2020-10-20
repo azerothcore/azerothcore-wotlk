@@ -162,7 +162,7 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -340,7 +340,7 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -357,7 +357,6 @@ public:
                 case EVENT_SPELL_RENEW:
                     if( !MemoryGUID )
                     {
-                        events.PopEvent();
                         break;
                     }
                     if( urand(0, 1) )
@@ -417,14 +416,14 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_MEMORY_SCALE:
                     me->SetObjectScale(1.0f);
                     events.ScheduleEvent(EVENT_MEMORY_START_ATTACK, 5000);
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_MEMORY_START_ATTACK:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -437,7 +436,6 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_OLD_WOUNDS, 8000);
                     events.ScheduleEvent(EVENT_SPELL_SHADOWS_PAST, 4000);
                     events.ScheduleEvent(EVENT_SPELL_WAKING_NIGHTMARE, urand(20000, 30000));
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_OLD_WOUNDS:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f, true) )
@@ -655,7 +653,7 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
