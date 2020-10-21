@@ -1,0 +1,12 @@
+on:
+  pull_request:
+  
+  
+jobs:
+  check-pending-sql:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check for Procedure/Function
+        run: grep -R -i -E "(PROCEDURE|FUNCTION)" data/sql/*
+      
