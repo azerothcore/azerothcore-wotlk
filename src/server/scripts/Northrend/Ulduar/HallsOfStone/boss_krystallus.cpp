@@ -104,7 +104,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_BOULDER:
                     {
@@ -139,13 +139,11 @@ public:
                         me->CastSpell((Unit*)NULL, DUNGEON_MODE(SHATTER, SHATTER_H), false);
                         Talk(SAY_SHATTER);
                         events.RescheduleEvent(EVENT_REMOVE_STONED, 1500);
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_REMOVE_STONED:
                     {
                         RemoveStonedEffect();
-                        events.PopEvent();
                         break;
                     }
             }
