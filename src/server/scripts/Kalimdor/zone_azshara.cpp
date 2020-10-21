@@ -90,9 +90,9 @@ public:
                 return;
             }
             // walk 5 seconds before summoning
-            if (spellhit && morphtimer<5000)
+            if (spellhit && morphtimer < 5000)
             {
-                morphtimer+=diff;
+                morphtimer += diff;
                 if (morphtimer >= 5000)
                 {
                     DoCast(me, SPELL_POLYMORPH_BACKFIRE); // summon copies
@@ -275,7 +275,8 @@ public:
                 {
                     me->DespawnOrUnsummon();
                     return;
-                } else MustDieTimer -= diff;
+                }
+                else MustDieTimer -= diff;
             }
 
             if (!Escape)
@@ -287,7 +288,8 @@ public:
                 {
                     DoCast(me, SPELL_RIZZLE_ESCAPE, false);
                     SpellEscapeTimer = 10000;
-                } else SpellEscapeTimer -= diff;
+                }
+                else SpellEscapeTimer -= diff;
 
                 if (TeleportTimer <= diff)
                 {
@@ -307,7 +309,8 @@ public:
                     me->GetMotionMaster()->MovementExpired();
                     me->GetMotionMaster()->MovePoint(CurrWP, WPs[CurrWP]);
                     Escape = true;
-                } else TeleportTimer -= diff;
+                }
+                else TeleportTimer -= diff;
 
                 return;
             }
@@ -322,11 +325,12 @@ public:
             {
                 if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                 {
-                   Talk(SAY_RIZZLE_GRENADE, player);
-                   DoCast(player, SPELL_RIZZLE_FROST_GRENADE, true);
+                    Talk(SAY_RIZZLE_GRENADE, player);
+                    DoCast(player, SPELL_RIZZLE_FROST_GRENADE, true);
                 }
                 GrenadeTimer = 30000;
-            } else GrenadeTimer -= diff;
+            }
+            else GrenadeTimer -= diff;
 
             if (CheckTimer <= diff)
             {
@@ -348,7 +352,8 @@ public:
                 }
 
                 CheckTimer = 1000;
-            } else CheckTimer -= diff;
+            }
+            else CheckTimer -= diff;
         }
 
     private:
@@ -372,7 +377,7 @@ public:
 
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_GET_MOONSTONE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         SendGossipMenuFor(player, 10811, creature->GetGUID());
-        
+
         return true;
     }
 

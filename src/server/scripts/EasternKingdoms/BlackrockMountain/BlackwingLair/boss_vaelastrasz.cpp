@@ -12,26 +12,26 @@
 
 enum Says
 {
-   SAY_LINE1                         = 0,
-   SAY_LINE2                         = 1,
-   SAY_LINE3                         = 2,
-   SAY_HALFLIFE                      = 3,
-   SAY_KILLTARGET                    = 4
+    SAY_LINE1                         = 0,
+    SAY_LINE2                         = 1,
+    SAY_LINE3                         = 2,
+    SAY_HALFLIFE                      = 3,
+    SAY_KILLTARGET                    = 4
 };
 
 enum Gossip
 {
-   GOSSIP_ID                         = 21334,
+    GOSSIP_ID                         = 21334,
 };
 
 enum Spells
 {
-   SPELL_ESSENCEOFTHERED             = 23513,
-   SPELL_FLAMEBREATH                 = 23461,
-   SPELL_FIRENOVA                    = 23462,
-   SPELL_TAILSWIPE                   = 15847,
-   SPELL_BURNINGADRENALINE           = 23620,
-   SPELL_CLEAVE                      = 20684   //Chain cleave is most likely named something different and contains a dummy effect
+    SPELL_ESSENCEOFTHERED             = 23513,
+    SPELL_FLAMEBREATH                 = 23461,
+    SPELL_FIRENOVA                    = 23462,
+    SPELL_TAILSWIPE                   = 15847,
+    SPELL_BURNINGADRENALINE           = 23620,
+    SPELL_CLEAVE                      = 20684   //Chain cleave is most likely named something different and contains a dummy effect
 };
 
 enum Events
@@ -99,7 +99,7 @@ public:
 
         void KilledUnit(Unit* victim)
         {
-            if (rand()%5)
+            if (rand() % 5)
                 return;
 
             Talk(SAY_KILLTARGET, victim);
@@ -213,9 +213,9 @@ public:
             }
         }
 
-        private:
-            uint64 PlayerGUID;
-            bool HasYelled;
+    private:
+        uint64 PlayerGUID;
+        bool HasYelled;
     };
 
     CreatureAI* GetAI(Creature* creature) const
