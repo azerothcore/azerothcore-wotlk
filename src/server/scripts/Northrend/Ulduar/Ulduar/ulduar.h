@@ -133,7 +133,7 @@ enum UlduarNPCs
     NPC_SALVAGED_DEMOLISHER                 = 33109,
     NPC_SALVAGED_DEMOLISHER_TURRET          = 33167,
 
-    
+
     // Algalon the Observer
     NPC_BRANN_BRONZBEARD_ALG                = 34064,
     NPC_AZEROTH                             = 34246,
@@ -199,6 +199,7 @@ enum UlduarGameObjects
     GO_MIMIRON_DOOR_3                       = 194775,
     GO_HODIR_FROZEN_DOOR                    = 194441,
     GO_HODIR_DOOR                           = 194634,
+    GO_HODIR_FRONTDOOR                      = 194442,
     GO_VEZAX_DOOR                           = 194750,
 
     GO_SNOW_MOUND                           = 194907,
