@@ -759,7 +759,7 @@ public:
         void Update(uint32 diff)
         {
             events.Update(diff);
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case EVENT_NULL:
                     break;
@@ -776,7 +776,6 @@ public:
                         DoSummonGrandChampion(temp1, 0);
                         HandleGameObject(GO_MainGateGUID, true);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_SUMMON_GRAND_CHAMPION_2:
@@ -786,7 +785,6 @@ public:
                         DoSummonGrandChampion(temp2, 1);
                         HandleGameObject(GO_MainGateGUID, true);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_SUMMON_GRAND_CHAMPION_3:
@@ -797,23 +795,23 @@ public:
                         DoSummonGrandChampion(number, 2);
                         HandleGameObject(GO_MainGateGUID, true);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_CLOSE_GATE:
                     {
                         HandleGameObject(GO_MainGateGUID, false);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_YELL_WELCOME_2:
                     {
-                        if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
+                        if (Creature* tirion = instance->GetCreature(NPC_TirionGUID))
+                        {
                             tirion->AI()->Talk(TEXT_WELCOME_2);
+                        }
+
                         events.RescheduleEvent(EVENT_SUMMON_GRAND_CHAMPION_1, 8000);
-                        events.PopEvent();
+                        break;
                     }
-                    break;
                 case EVENT_GRAND_GROUP_1_MOVE_MIDDLE:
                     {
                         if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
@@ -831,7 +829,6 @@ public:
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_1_ATTACK, 3000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_GROUP_1_ATTACK:
@@ -846,7 +843,6 @@ public:
                                 c->AI()->DoZoneInCombat();
                             }
                         Counter = 0;
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_GROUP_2_MOVE_MIDDLE:
@@ -859,7 +855,6 @@ public:
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_2_ATTACK, 3000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_GROUP_2_ATTACK:
@@ -873,7 +868,6 @@ public:
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
                             }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_GROUP_3_MOVE_MIDDLE:
@@ -886,7 +880,6 @@ public:
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_3_ATTACK, 3000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_GROUP_3_ATTACK:
@@ -900,7 +893,6 @@ public:
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
                             }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_CHAMPIONS_MOVE_MIDDLE:
@@ -913,7 +905,6 @@ public:
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_MOUNTS_ATTACK, 3000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_CHAMPIONS_MOUNTS_ATTACK:
@@ -928,7 +919,6 @@ public:
                                 c->AI()->DoZoneInCombat();
                                 c->CastSpell(c, 67865, true); // SPELL_TRAMPLE_AURA
                             }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_CHAMPIONS_MOVE_SIDE:
@@ -952,7 +942,6 @@ public:
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_ATTACK, 15000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_CHAMPIONS_ATTACK:
@@ -967,14 +956,13 @@ public:
                                 c->AI()->DoZoneInCombat();
                                 c->AI()->DoAction(2);
                             }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRATZ_SLAIN_CHAMPIONS:
                     {
                         if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
                             tirion->AI()->Talk(TEXT_GRATZ_SLAIN_CHAMPIONS);
-                        events.PopEvent();
+                        
                         HandleGameObject(GO_EnterGateGUID, true);
                     }
                     break;
@@ -982,7 +970,6 @@ public:
                     {
                         if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
                             announcer->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_START_ARGENT_CHALLENGE_INTRO:
@@ -1032,7 +1019,6 @@ public:
                             }
                         }
                         events.ScheduleEvent(EVENT_SUMMON_ARGENT_CHALLENGE, 4000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_SUMMON_ARGENT_CHALLENGE:
@@ -1044,7 +1030,6 @@ public:
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 5000);
                         events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_SAY_1, 4000);
                         events.ScheduleEvent(EVENT_ARGENT_SOLDIER_GROUP_ATTACK, 12500);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_SAY_1:
@@ -1053,14 +1038,12 @@ public:
                             ac->AI()->Talk(Counter ? TEXT_EADRIC_SAY_1 : TEXT_PALETRESS_SAY_1);
                         if( !Counter )
                             events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_SAY_2, 6000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_SAY_2:
                     {
                         if( Creature* ac = instance->GetCreature(NPC_ArgentChampionGUID) )
                             ac->AI()->Talk(TEXT_PALETRESS_SAY_2);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_SOLDIER_GROUP_ATTACK:
@@ -1076,7 +1059,6 @@ public:
                                 }
                         if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
                             tirion->AI()->Talk(TEXT_YOU_MAY_BEGIN);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_MOVE_FORWARD:
@@ -1086,7 +1068,6 @@ public:
                             boss->GetMotionMaster()->MovePoint(0, 746.881f, 635.263f, 411.7f);
                         }
                         events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_ATTACK, 3000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_ATTACK:
@@ -1099,7 +1080,6 @@ public:
                                 boss->AI()->AttackStart(target);
                             boss->AI()->DoZoneInCombat();
                         }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_RUN_MIDDLE:
@@ -1109,7 +1089,6 @@ public:
                             boss->GetMotionMaster()->MovePoint(1, 747.13f, 628.037f, 411.2f);
                             events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_LEAVE_CHEST, 6000);
                         }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_LEAVE_CHEST:
@@ -1128,7 +1107,6 @@ public:
 
                         events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_DISAPPEAR, 4000);
                         events.ScheduleEvent(EVENT_RESTORE_ANNOUNCER_GOSSIP, 15000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_DISAPPEAR:
@@ -1138,7 +1116,6 @@ public:
                             boss->GetMotionMaster()->MovePoint(0, SpawnPosition);
                             boss->DespawnOrUnsummon(3000);
                         }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_SUMMON_BLACK_KNIGHT:
@@ -1161,7 +1138,6 @@ public:
                                 announcer->SetFacingToObject(bk_vehicle);
                                 announcer->AI()->Talk(TEXT_BK_RAFTERS);
                             }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_START_BLACK_KNIGHT_SCENE:
@@ -1174,7 +1150,6 @@ public:
                             bk->AI()->Talk(TEXT_BK_SPOILED);
                         }
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_CAST_ANNOUNCER, 2000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_BLACK_KNIGHT_CAST_ANNOUNCER:
@@ -1194,7 +1169,6 @@ public:
                             }
                         }
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_KILL_ANNOUNCER, 1000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_BLACK_KNIGHT_KILL_ANNOUNCER:
@@ -1203,7 +1177,6 @@ public:
                             bk_vehicle->AI()->DoAction(1);
 
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_MOVE_FORWARD, 4000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_BLACK_KNIGHT_MOVE_FORWARD:
@@ -1218,7 +1191,6 @@ public:
                             if (announcer->IsAlive())
                                 Unit::Kill(announcer, announcer);
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_SAY_TASK, 14000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_BLACK_KNIGHT_SAY_TASK:
@@ -1229,7 +1201,6 @@ public:
                             bk->AI()->Talk(TEXT_BK_TASK);
                         }
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_ATTACK, 5000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_BLACK_KNIGHT_ATTACK:
@@ -1243,7 +1214,6 @@ public:
                             bk->AI()->DoZoneInCombat();
                             bk->AI()->DoAction(1);
                         }
-                        events.PopEvent();
                     }
                     break;
             }
