@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 # workaround to fix mac build from failing
-time brew uninstall openssl
+time brew uninstall openssl@1.0.2t
 time brew uninstall python@2.7.17
-time brew untap local/openssl
-time brew untap local/python2
+#time brew untap local/openssl
+#time brew untap local/python2
 
 time brew update
 time brew upgrade
