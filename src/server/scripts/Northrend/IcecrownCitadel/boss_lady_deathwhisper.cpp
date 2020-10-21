@@ -325,38 +325,31 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING) && !(events.GetPhaseMask() & PHASE_INTRO_MASK))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_INTRO_2:
                     Talk(SAY_INTRO_2);
-                    events.PopEvent();
                     break;
                 case EVENT_INTRO_3:
                     Talk(SAY_INTRO_3);
-                    events.PopEvent();
                     break;
                 case EVENT_INTRO_4:
                     Talk(SAY_INTRO_4);
-                    events.PopEvent();
                     break;
                 case EVENT_INTRO_5:
                     Talk(SAY_INTRO_5);
-                    events.PopEvent();
                     break;
                 case EVENT_INTRO_6:
                     Talk(SAY_INTRO_6);
-                    events.PopEvent();
                     break;
                 case EVENT_INTRO_7:
                     Talk(SAY_INTRO_7);
-                    events.PopEvent();
                     break;
                 case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     Talk(SAY_BERSERK);
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_DEATH_AND_DECAY:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
@@ -723,7 +716,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_FANATIC_NECROTIC_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_NECROTIC_STRIKE, false);
@@ -749,7 +742,6 @@ public:
 
                     if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_LADY_DEATHWHISPER)))
                         ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
                     me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
@@ -760,8 +752,6 @@ public:
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
                     Reset();
                     events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
-                    break;
-                default:
                     break;
             }
 
@@ -839,7 +829,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_ADHERENT_FROST_FEVER:
                     me->CastSpell(me->GetVictim(), SPELL_FROST_FEVER, false);
@@ -873,7 +863,6 @@ public:
 
                     if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_LADY_DEATHWHISPER)))
                         ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
                     me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
@@ -1072,7 +1061,7 @@ public:
                 return;
             }
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_DARNAVAN_BLADESTORM:
                     me->CastSpell((Unit*)nullptr, SPELL_BLADESTORM, false);
@@ -1080,7 +1069,6 @@ public:
                     break;
                 case EVENT_DARNAVAN_CHARGE:
                     _canCharge = true;
-                    events.PopEvent();
                     break;
                 case EVENT_DARNAVAN_INTIMIDATING_SHOUT:
                     me->CastSpell((Unit*)nullptr, SPELL_INTIMIDATING_SHOUT, false);
@@ -1092,7 +1080,6 @@ public:
                     break;
                 case EVENT_DARNAVAN_SHATTERING_THROW:
                     _canShatter = true;
-                    events.PopEvent();
                     break;
                 case EVENT_DARNAVAN_SUNDER_ARMOR:
                     me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
