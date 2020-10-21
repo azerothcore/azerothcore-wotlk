@@ -1,6 +1,6 @@
+name: Check pending sql
 on:
   pull_request:
-  
   
 jobs:
   check-pending-sql:
