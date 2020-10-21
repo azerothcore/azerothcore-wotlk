@@ -8,5 +8,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Check for Procedure/Function
-        run: grep -R -i -E "(PROCEDURE|FUNCTION)" data/sql/*
-      
+        run: grep -R -i -E "(PROCEDURE|FUNCTION)" data/sql/updates/pending*
