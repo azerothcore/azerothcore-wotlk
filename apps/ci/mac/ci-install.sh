@@ -7,4 +7,5 @@ time brew untap local/openssl
 time brew untap local/python2
 
 time brew update
+time brew upgrade
 time brew install openssl readline ace coreutils bash bash-completion mysql ccache
