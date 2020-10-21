@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Check for Procedure/Function
         run: | 
-         if grep -R -q -i -E "(PROCEDURE|FUNCTION)" data/sql/updates/pending*; 
+         if grep -R -q -i -E "(PROCEDURE|FUNCTION)" data/sql/updates/pending* 
             then
                 exit 1
             else 
