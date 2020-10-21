@@ -104,7 +104,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_CLEARWATER_ANNOUNCE:
                     {
@@ -130,7 +130,6 @@ public:
                             if (!finished)
                             {
                                 me->DespawnOrUnsummon();
-                                events.PopEvent();
                                 break;
                             }
                         }
@@ -249,7 +248,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_RIGGLE_ANNOUNCE:
                     {
@@ -269,7 +268,6 @@ public:
                             if (!finished)
                             {
                                 me->DespawnOrUnsummon();
-                                events.PopEvent();
                                 break;
                             }
                         }
