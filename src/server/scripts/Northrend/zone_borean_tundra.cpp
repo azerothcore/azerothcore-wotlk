@@ -1370,42 +1370,6 @@ public:
     }
 };
 
-enum ReCusive
-{
-     NPC_FIZZCRANK_MECHAGNOME = 25814
-};
-
-class spell_q11712_re_cursive : public SpellScriptLoader
-{
-    public:
-        spell_q11712_re_cursive() : SpellScriptLoader("spell_q11712_re_cursive") { }
-
-        class spell_q11712_re_cursive_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_q11712_re_cursive_SpellScript);
-
-            SpellCastResult CheckCast()
-            {
-                if (Unit* target = GetExplTargetUnit())
-                    if (Creature* creature = target->ToCreature())
-                        if ((creature->GetEntry() == NPC_FIZZCRANK_MECHAGNOME) && !creature->IsAlive())
-                           return SPELL_CAST_OK;                   
-                
-                return SPELL_FAILED_NO_VALID_TARGETS;
-            }
-
-            void Register() override
-            {
-                OnCheckCast += SpellCheckCastFn(spell_q11712_re_cursive_SpellScript::CheckCast);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_q11712_re_cursive_SpellScript();
-        }
-};
-
 void AddSC_borean_tundra()
 {
     // Ours
@@ -1427,5 +1391,4 @@ void AddSC_borean_tundra()
     new npc_hidden_cultist();
     new spell_q11719_bloodspore_ruination_45997();
     new npc_bloodmage_laurith();
-    new spell_q11712_re_cursive();
 }
