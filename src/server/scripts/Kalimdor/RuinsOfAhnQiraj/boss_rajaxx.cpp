@@ -28,7 +28,7 @@ enum Yells
     SAY_CHANGEAGGRO           = 10,
     SAY_KILLS_ANDOROV         = 11,
     SAY_COMPLETE_QUEST        = 12    // Yell when realm complete quest 8743 for world event
-    // Warriors, Captains, continue the fight! Sound: 8640
+                                // Warriors, Captains, continue the fight! Sound: 8640
 };
 
 enum Spells
@@ -47,71 +47,71 @@ enum Events
 
 class boss_rajaxx : public CreatureScript
 {
-    public:
-        boss_rajaxx() : CreatureScript("boss_rajaxx") { }
+public:
+    boss_rajaxx() : CreatureScript("boss_rajaxx") { }
 
-        struct boss_rajaxxAI : public BossAI
+    struct boss_rajaxxAI : public BossAI
+    {
+        boss_rajaxxAI(Creature* creature) : BossAI(creature, DATA_RAJAXX)
         {
-            boss_rajaxxAI(Creature* creature) : BossAI(creature, DATA_RAJAXX)
-            {
-            }
-
-            void Reset()
-            {
-                _Reset();
-                enraged = false;
-                events.ScheduleEvent(EVENT_DISARM, 10000);
-                events.ScheduleEvent(EVENT_THUNDERCRASH, 12000);
-            }
-
-            void JustDied(Unit* /*killer*/)
-            {
-                //SAY_DEATH
-                _JustDied();
-            }
-
-            void EnterCombat(Unit* /*victim*/)
-            {
-                _EnterCombat();
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_DISARM:
-                            DoCastVictim(SPELL_DISARM);
-                            events.ScheduleEvent(EVENT_DISARM, 22000);
-                            break;
-                        case EVENT_THUNDERCRASH:
-                            DoCast(me, SPELL_THUNDERCRASH);
-                            events.ScheduleEvent(EVENT_THUNDERCRASH, 21000);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-            private:
-                bool enraged;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_rajaxxAI(creature);
         }
+
+        void Reset()
+        {
+            _Reset();
+            enraged = false;
+            events.ScheduleEvent(EVENT_DISARM, 10000);
+            events.ScheduleEvent(EVENT_THUNDERCRASH, 12000);
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            //SAY_DEATH
+            _JustDied();
+        }
+
+        void EnterCombat(Unit* /*victim*/)
+        {
+            _EnterCombat();
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_DISARM:
+                        DoCastVictim(SPELL_DISARM);
+                        events.ScheduleEvent(EVENT_DISARM, 22000);
+                        break;
+                    case EVENT_THUNDERCRASH:
+                        DoCast(me, SPELL_THUNDERCRASH);
+                        events.ScheduleEvent(EVENT_THUNDERCRASH, 21000);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    private:
+        bool enraged;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new boss_rajaxxAI(creature);
+    }
 };
 
 void AddSC_boss_rajaxx()
