@@ -370,6 +370,11 @@ public:
 
         void JustSummoned(Creature* cr)
         {
+            if (cr->GetEntry() == NPC_FREYA_UNSTABLE_SUN_BEAM)
+            {
+                cr->CastSpell(cr, SPELL_UNSTABLE_SUN_VISUAL, true);
+                cr->CastSpell(cr, SPELL_UNSTABLE_SUN_FREYA_DAMAGE, true);
+            }
             summons.Summon(cr);
         }
 
@@ -558,7 +563,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
             case EVENT_FREYA_ADDS_SPAM:
                 if (_spawnedAmount < 6)
@@ -568,7 +573,6 @@ public:
                     me->RemoveAura(SPELL_ATTUNED_TO_NATURE);
                     events.ScheduleEvent(EVENT_FREYA_NATURE_BOMB, 5000);
                     events.SetPhase(EVENT_PHASE_FINAL);
-                    events.PopEvent();
                     return;
                 }
                 _spawnedAmount++;
@@ -599,7 +603,6 @@ public:
                 events.RepeatEvent(15000+urand(0,5000));
                 break;
             case EVENT_FREYA_RESPAWN_TRIO:
-                events.PopEvent();
                 _deforestation = 0;
                 _respawningTrio = false;
                 if (_trioKilled < 3)
@@ -628,7 +631,6 @@ public:
                 me->MonsterYell("You have strayed too far, wasted too much time!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_BERSERK);
                 me->CastSpell(me, SPELL_BERSERK, true);
-                events.PopEvent();
                 break;
             case EVENT_FREYA_GROUND_TREMOR:
                 me->CastSpell(me, SPELL_GROUND_TREMOR_FREYA, false);
@@ -639,23 +641,11 @@ public:
                 events.RepeatEvent(45000+urand(0,10000));
                 break;
             case EVENT_FREYA_UNSTABLE_SUN_BEAM:
-                if (Creature* cr = me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX()+urand(7,25), me->GetPositionY()+urand(7,25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
-                {
-                    cr->CastSpell(cr, SPELL_UNSTABLE_SUN_VISUAL, true);
-                    cr->CastSpell(cr, SPELL_UNSTABLE_SUN_FREYA_DAMAGE, true);
-                }
+                me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX()+urand(7,25), me->GetPositionY()+urand(7,25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
                 if (Is25ManRaid())
                 {
-                    if (Creature* cr = me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX()+urand(7,25), me->GetPositionY()+urand(7,25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
-                    {
-                        cr->CastSpell(cr, SPELL_UNSTABLE_SUN_VISUAL, true);
-                        cr->CastSpell(cr, SPELL_UNSTABLE_SUN_FREYA_DAMAGE, true);
-                    }
-                    if (Creature* cr = me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX()+urand(7,25), me->GetPositionY()+urand(7,25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
-                    {
-                        cr->CastSpell(cr, SPELL_UNSTABLE_SUN_VISUAL, true);
-                        cr->CastSpell(cr, SPELL_UNSTABLE_SUN_FREYA_DAMAGE, true);
-                    }
+                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX()+urand(7,25), me->GetPositionY()+urand(7,25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX()+urand(7,25), me->GetPositionY()+urand(7,25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
                 }
                 events.RepeatEvent(38000+urand(0,10000));
                 break;
@@ -755,7 +745,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_STONEBARK_FISTS_OF_STONE:
                     me->CastSpell(me, SPELL_FISTS_OF_STONE, false);
@@ -852,7 +842,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_BRIGHTLEAF_FLUX:
                     if (Aura* aur = me->AddAura(SPELL_BRIGHTLEAF_FLUX, me))
@@ -893,7 +883,6 @@ public:
                     }
 
                     summons.DespawnAll();
-                    events.PopEvent();
                     break;
             }
 
@@ -974,7 +963,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_IRONBRANCH_IMPALE:
                     me->CastSpell(me->GetVictim(), SPELL_IMPALE, false);
@@ -1206,7 +1195,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_ANCIENT_CONSERVATOR_NATURE_FURY:
                     me->CastSpell(me->GetVictim(), SPELL_NATURE_FURY, false);
@@ -1220,7 +1209,6 @@ public:
                     break;
                 case EVENT_WATER_SPIRIT_DAMAGE:
                     me->CastSpell(me, SPELL_TIDAL_WAVE_DAMAGE, false);
-                    events.PopEvent();
                     break;
                 case EVENT_STORM_LASHER_LIGHTNING_LASH:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
