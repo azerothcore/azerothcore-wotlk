@@ -98,7 +98,7 @@ public:
         void UpdateAI(uint32 diff)
         {
             events.Update(diff);
-            uint32 eventId = events.GetEvent();
+            uint32 eventId = events.ExecuteEvent();
 
             if (eventId == EVENT_SPELL_INHIBIT_MAGIC)
             {
@@ -157,11 +157,9 @@ public:
                 case EVENT_SPELL_FOCUS_FIRE_2:
                     if (Unit* flare = ObjectAccessor::GetCreature(*me, focusGUID))
                         me->CastSpell(flare, SPELL_FOCUS_CAST, true);
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_FOCUS_FIRE_3:
                     me->SetControlled(false, UNIT_STATE_ROOT);
-                    events.PopEvent();
                     break;
             }
 
