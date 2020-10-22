@@ -34,7 +34,7 @@ public:
         void Reset()
         {
             GroundTremor_Timer = 12000;
-            Frenzy_Timer =0;
+            Frenzy_Timer = 0;
         }
 
         void EnterCombat(Unit* /*who*/) { }
@@ -50,7 +50,8 @@ public:
             {
                 DoCastVictim(SPELL_GROUNDTREMOR);
                 GroundTremor_Timer = 8000;
-            } else GroundTremor_Timer -= diff;
+            }
+            else GroundTremor_Timer -= diff;
 
             //Frenzy_Timer
             if (HealthBelowPct(51))
@@ -61,7 +62,8 @@ public:
                     Talk(EMOTE_FRENZY_KILL);
 
                     Frenzy_Timer = 15000;
-                } else Frenzy_Timer -= diff;
+                }
+                else Frenzy_Timer -= diff;
             }
 
             DoMeleeAttackIfReady();

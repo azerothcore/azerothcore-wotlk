@@ -31,7 +31,7 @@ void UnitAI::DoMeleeAttackIfReady()
     if (me->HasUnitState(UNIT_STATE_CASTING))
         return;
 
-    Unit *victim = me->GetVictim();
+    Unit* victim = me->GetVictim();
     if (!victim || !victim->IsInWorld())
         return;
 
@@ -130,32 +130,40 @@ void UnitAI::DoCast(uint32 spellId)
     switch (AISpellInfo[spellId].target)
     {
         default:
-        case AITARGET_SELF:     target = me; break;
-        case AITARGET_VICTIM:   target = me->GetVictim(); break;
+        case AITARGET_SELF:
+            target = me;
+            break;
+        case AITARGET_VICTIM:
+            target = me->GetVictim();
+            break;
         case AITARGET_ENEMY:
-        {
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
-            //float range = GetSpellMaxRange(spellInfo, false);
-            target = SelectTarget(SELECT_TARGET_RANDOM, 0, spellInfo->GetMaxRange(false), playerOnly);
+            {
+                const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
+                //float range = GetSpellMaxRange(spellInfo, false);
+                target = SelectTarget(SELECT_TARGET_RANDOM, 0, spellInfo->GetMaxRange(false), playerOnly);
+                break;
+            }
+        case AITARGET_ALLY:
+            target = me;
             break;
-        }
-        case AITARGET_ALLY:     target = me; break;
-        case AITARGET_BUFF:     target = me; break;
+        case AITARGET_BUFF:
+            target = me;
+            break;
         case AITARGET_DEBUFF:
-        {
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
-            float range = spellInfo->GetMaxRange(false);
+            {
+                const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
+                float range = spellInfo->GetMaxRange(false);
 
-            DefaultTargetSelector targetSelector(me, range, playerOnly, -(int32)spellId);
-            if (!(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_VICTIM)
-                && targetSelector(me->GetVictim()))
-                target = me->GetVictim();
-            else
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0, targetSelector);
-            break;
-        }
+                DefaultTargetSelector targetSelector(me, range, playerOnly, -(int32)spellId);
+                if (!(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_VICTIM)
+                        && targetSelector(me->GetVictim()))
+                    target = me->GetVictim();
+                else
+                    target = SelectTarget(SELECT_TARGET_RANDOM, 0, targetSelector);
+                break;
+            }
     }
 
     if (target)
@@ -213,27 +221,27 @@ void UnitAI::FillAISpellInfo()
 
         if (!spellInfo->GetMaxRange(false))
             UPDATE_TARGET(AITARGET_SELF)
-        else
-        {
-            for (uint32 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+            else
             {
-                uint32 targetType = spellInfo->Effects[j].TargetA.GetTarget();
-
-                if (targetType == TARGET_UNIT_TARGET_ENEMY
-                    || targetType == TARGET_DEST_TARGET_ENEMY)
-                    UPDATE_TARGET(AITARGET_VICTIM)
-                else if (targetType == TARGET_UNIT_DEST_AREA_ENEMY)
-                    UPDATE_TARGET(AITARGET_ENEMY)
-
-                if (spellInfo->Effects[j].Effect == SPELL_EFFECT_APPLY_AURA)
+                for (uint32 j = 0; j < MAX_SPELL_EFFECTS; ++j)
                 {
-                    if (targetType == TARGET_UNIT_TARGET_ENEMY)
-                        UPDATE_TARGET(AITARGET_DEBUFF)
-                    else if (spellInfo->IsPositive())
-                        UPDATE_TARGET(AITARGET_BUFF)
+                    uint32 targetType = spellInfo->Effects[j].TargetA.GetTarget();
+
+                    if (targetType == TARGET_UNIT_TARGET_ENEMY
+                            || targetType == TARGET_DEST_TARGET_ENEMY)
+                        UPDATE_TARGET(AITARGET_VICTIM)
+                        else if (targetType == TARGET_UNIT_DEST_AREA_ENEMY)
+                            UPDATE_TARGET(AITARGET_ENEMY)
+
+                            if (spellInfo->Effects[j].Effect == SPELL_EFFECT_APPLY_AURA)
+                            {
+                                if (targetType == TARGET_UNIT_TARGET_ENEMY)
+                                    UPDATE_TARGET(AITARGET_DEBUFF)
+                                    else if (spellInfo->IsPositive())
+                                        UPDATE_TARGET(AITARGET_BUFF)
+                                    }
                 }
             }
-        }
         AIInfo->realCooldown = spellInfo->RecoveryTime + spellInfo->StartRecoveryTime;
         AIInfo->maxRange = spellInfo->GetMaxRange(false) * 3 / 4;
     }
@@ -247,7 +255,7 @@ void PlayerAI::OnCharmed(bool apply)
 
 void SimpleCharmedAI::UpdateAI(uint32 /*diff*/)
 {
-  Creature* charmer = me->GetCharmer()->ToCreature();
+    Creature* charmer = me->GetCharmer()->ToCreature();
 
     //kill self if charm aura has infinite duration
     if (charmer->IsInEvadeMode())

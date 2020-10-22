@@ -19,7 +19,7 @@
 #include "GameGraveyard.h"
 
 OPvPCapturePointEP_EWT::OPvPCapturePointEP_EWT(OutdoorPvP* pvp)
-: OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_UnitsSummonedSideId(TEAM_NEUTRAL)
+    : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_UnitsSummonedSideId(TEAM_NEUTRAL)
 {
     SetCapturePointData(EPCapturePoints[EP_EWT].entry, EPCapturePoints[EP_EWT].map, EPCapturePoints[EP_EWT].x, EPCapturePoints[EP_EWT].y, EPCapturePoints[EP_EWT].z, EPCapturePoints[EP_EWT].o, EPCapturePoints[EP_EWT].rot0, EPCapturePoints[EP_EWT].rot1, EPCapturePoints[EP_EWT].rot2, EPCapturePoints[EP_EWT].rot3);
     AddObject(EP_EWT_FLAGS, EPTowerFlags[EP_EWT].entry, EPTowerFlags[EP_EWT].map, EPTowerFlags[EP_EWT].x, EPTowerFlags[EP_EWT].y, EPTowerFlags[EP_EWT].z, EPTowerFlags[EP_EWT].o, EPTowerFlags[EP_EWT].rot0, EPTowerFlags[EP_EWT].rot1, EPTowerFlags[EP_EWT].rot2, EPTowerFlags[EP_EWT].rot3);
@@ -99,7 +99,7 @@ void OPvPCapturePointEP_EWT::SendChangePhase()
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
 }
 
-void OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPacket &data)
+void OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPacket& data)
 {
     data << EP_EWT_A << uint32(bool(m_TowerState & EP_TS_A));
     data << EP_EWT_H << uint32(bool(m_TowerState & EP_TS_H));
@@ -141,11 +141,11 @@ void OPvPCapturePointEP_EWT::SummonSupportUnitAtNorthpassTower(TeamId teamId)
     if (m_UnitsSummonedSideId != teamId)
     {
         m_UnitsSummonedSideId = teamId;
-        const creature_type * ct = nullptr;
+        const creature_type* ct = nullptr;
         if (teamId == TEAM_ALLIANCE)
-            ct=EP_EWT_Summons_A;
+            ct = EP_EWT_Summons_A;
         else
-            ct=EP_EWT_Summons_H;
+            ct = EP_EWT_Summons_H;
 
         for (uint8 i = 0; i < EP_EWT_NUM_CREATURES; ++i)
         {
@@ -157,7 +157,7 @@ void OPvPCapturePointEP_EWT::SummonSupportUnitAtNorthpassTower(TeamId teamId)
 
 // NPT
 OPvPCapturePointEP_NPT::OPvPCapturePointEP_NPT(OutdoorPvP* pvp)
-: OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_SummonedGOSideId(TEAM_NEUTRAL)
+    : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_SummonedGOSideId(TEAM_NEUTRAL)
 {
     SetCapturePointData(EPCapturePoints[EP_NPT].entry, EPCapturePoints[EP_NPT].map, EPCapturePoints[EP_NPT].x, EPCapturePoints[EP_NPT].y, EPCapturePoints[EP_NPT].z, EPCapturePoints[EP_NPT].o, EPCapturePoints[EP_NPT].rot0, EPCapturePoints[EP_NPT].rot1, EPCapturePoints[EP_NPT].rot2, EPCapturePoints[EP_NPT].rot3);
     AddObject(EP_NPT_FLAGS, EPTowerFlags[EP_NPT].entry, EPTowerFlags[EP_NPT].map, EPTowerFlags[EP_NPT].x, EPTowerFlags[EP_NPT].y, EPTowerFlags[EP_NPT].z, EPTowerFlags[EP_NPT].o, EPTowerFlags[EP_NPT].rot0, EPTowerFlags[EP_NPT].rot1, EPTowerFlags[EP_NPT].rot2, EPTowerFlags[EP_NPT].rot3);
@@ -247,7 +247,7 @@ void OPvPCapturePointEP_NPT::SendChangePhase()
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
 }
 
-void OPvPCapturePointEP_NPT::FillInitialWorldStates(WorldPacket &data)
+void OPvPCapturePointEP_NPT::FillInitialWorldStates(WorldPacket& data)
 {
     data << EP_NPT_A << uint32(bool(m_TowerState & EP_TS_A));
     data << EP_NPT_H << uint32(bool(m_TowerState & EP_TS_H));
@@ -299,7 +299,7 @@ void OPvPCapturePointEP_NPT::SummonGO(TeamId teamId)
 
 // CGT
 OPvPCapturePointEP_CGT::OPvPCapturePointEP_CGT(OutdoorPvP* pvp)
-: OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_GraveyardSide(TEAM_NEUTRAL)
+    : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_GraveyardSide(TEAM_NEUTRAL)
 {
     SetCapturePointData(EPCapturePoints[EP_CGT].entry, EPCapturePoints[EP_CGT].map, EPCapturePoints[EP_CGT].x, EPCapturePoints[EP_CGT].y, EPCapturePoints[EP_CGT].z, EPCapturePoints[EP_CGT].o, EPCapturePoints[EP_CGT].rot0, EPCapturePoints[EP_CGT].rot1, EPCapturePoints[EP_CGT].rot2, EPCapturePoints[EP_CGT].rot3);
     AddObject(EP_CGT_FLAGS, EPTowerFlags[EP_CGT].entry, EPTowerFlags[EP_CGT].map, EPTowerFlags[EP_CGT].x, EPTowerFlags[EP_CGT].y, EPTowerFlags[EP_CGT].z, EPTowerFlags[EP_CGT].o, EPTowerFlags[EP_CGT].rot0, EPTowerFlags[EP_CGT].rot1, EPTowerFlags[EP_CGT].rot2, EPTowerFlags[EP_CGT].rot3);
@@ -379,7 +379,7 @@ void OPvPCapturePointEP_CGT::SendChangePhase()
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
 }
 
-void OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPacket &data)
+void OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPacket& data)
 {
     data << EP_CGT_A << uint32(bool(m_TowerState & EP_TS_A));
     data << EP_CGT_H << uint32(bool(m_TowerState & EP_TS_H));
@@ -428,7 +428,7 @@ void OPvPCapturePointEP_CGT::LinkGraveyard(TeamId teamId)
 
 // PWT
 OPvPCapturePointEP_PWT::OPvPCapturePointEP_PWT(OutdoorPvP* pvp)
-: OPvPCapturePoint(pvp), m_FlightMasterSpawnedId(TEAM_NEUTRAL), m_TowerState(EP_TS_N)
+    : OPvPCapturePoint(pvp), m_FlightMasterSpawnedId(TEAM_NEUTRAL), m_TowerState(EP_TS_N)
 {
     SetCapturePointData(EPCapturePoints[EP_PWT].entry, EPCapturePoints[EP_PWT].map, EPCapturePoints[EP_PWT].x, EPCapturePoints[EP_PWT].y, EPCapturePoints[EP_PWT].z, EPCapturePoints[EP_PWT].o, EPCapturePoints[EP_PWT].rot0, EPCapturePoints[EP_PWT].rot1, EPCapturePoints[EP_PWT].rot2, EPCapturePoints[EP_PWT].rot3);
     AddObject(EP_PWT_FLAGS, EPTowerFlags[EP_PWT].entry, EPTowerFlags[EP_PWT].map, EPTowerFlags[EP_PWT].x, EPTowerFlags[EP_PWT].y, EPTowerFlags[EP_PWT].z, EPTowerFlags[EP_PWT].o, EPTowerFlags[EP_PWT].rot0, EPTowerFlags[EP_PWT].rot1, EPTowerFlags[EP_PWT].rot2, EPTowerFlags[EP_PWT].rot3);
@@ -518,7 +518,7 @@ void OPvPCapturePointEP_PWT::SendChangePhase()
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
 }
 
-void OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPacket &data)
+void OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPacket& data)
 {
     data << EP_PWT_A << uint32(bool(m_TowerState & EP_TS_A));
     data << EP_PWT_H << uint32(bool(m_TowerState & EP_TS_H));
@@ -653,12 +653,12 @@ void OutdoorPvPEP::HandlePlayerEnterZone(Player* player, uint32 zone)
     if (player->GetTeamId() == TEAM_ALLIANCE)
     {
         if (m_AllianceTowersControlled && m_AllianceTowersControlled < 5)
-            player->CastSpell(player, EP_AllianceBuffs[m_AllianceTowersControlled-1], true);
+            player->CastSpell(player, EP_AllianceBuffs[m_AllianceTowersControlled - 1], true);
     }
     else
     {
         if (m_HordeTowersControlled && m_HordeTowersControlled < 5)
-            player->CastSpell(player, EP_HordeBuffs[m_HordeTowersControlled-1], true);
+            player->CastSpell(player, EP_HordeBuffs[m_HordeTowersControlled - 1], true);
     }
     OutdoorPvP::HandlePlayerEnterZone(player, zone);
 }
@@ -688,7 +688,7 @@ void OutdoorPvPEP::BuffTeams()
             for (int i = 0; i < 4; ++i)
                 player->RemoveAurasDueToSpell(EP_AllianceBuffs[i]);
             if (m_AllianceTowersControlled && m_AllianceTowersControlled < 5)
-                player->CastSpell(player, EP_AllianceBuffs[m_AllianceTowersControlled-1], true);
+                player->CastSpell(player, EP_AllianceBuffs[m_AllianceTowersControlled - 1], true);
         }
     }
     for (PlayerSet::iterator itr = m_players[1].begin(); itr != m_players[1].end(); ++itr)
@@ -698,7 +698,7 @@ void OutdoorPvPEP::BuffTeams()
             for (int i = 0; i < 4; ++i)
                 player->RemoveAurasDueToSpell(EP_HordeBuffs[i]);
             if (m_HordeTowersControlled && m_HordeTowersControlled < 5)
-                player->CastSpell(player, EP_HordeBuffs[m_HordeTowersControlled-1], true);
+                player->CastSpell(player, EP_HordeBuffs[m_HordeTowersControlled - 1], true);
         }
     }
 }
@@ -708,7 +708,7 @@ void OutdoorPvPEP::SetControlledState(uint32 index, TeamId teamId)
     EP_ControlsId[index] = teamId;
 }
 
-void OutdoorPvPEP::FillInitialWorldStates(WorldPacket & data)
+void OutdoorPvPEP::FillInitialWorldStates(WorldPacket& data)
 {
     data << EP_UI_TOWER_COUNT_A << m_AllianceTowersControlled;
     data << EP_UI_TOWER_COUNT_H << m_HordeTowersControlled;
@@ -756,17 +756,17 @@ void OutdoorPvPEP::SendRemoveWorldStates(Player* player)
 
 class OutdoorPvP_eastern_plaguelands : public OutdoorPvPScript
 {
-    public:
+public:
 
-        OutdoorPvP_eastern_plaguelands()
-            : OutdoorPvPScript("outdoorpvp_ep")
-        {
-        }
+    OutdoorPvP_eastern_plaguelands()
+        : OutdoorPvPScript("outdoorpvp_ep")
+    {
+    }
 
-        OutdoorPvP* GetOutdoorPvP() const
-        {
-            return new OutdoorPvPEP();
-        }
+    OutdoorPvP* GetOutdoorPvP() const
+    {
+        return new OutdoorPvPEP();
+    }
 };
 
 void AddSC_outdoorpvp_ep()
