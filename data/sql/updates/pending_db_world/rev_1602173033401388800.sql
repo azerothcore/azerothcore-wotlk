@@ -91,7 +91,7 @@ UPDATE `creature_template` SET `mindmg` = 35630, `maxdmg` = 47810, `DamageModifi
 UPDATE `creature_template` SET `mindmg` = 5400, `maxdmg` = 7200, `DamageModifier` = 1.01 WHERE `entry` = 33089;
 UPDATE `creature_template` SET `mindmg` = 10800, `maxdmg` = 14400, `DamageModifier` = 1.01 WHERE `entry` = 34221;
 
-/* BOSS - No difference in basic melee due different Hard Mode mechanics. */ 
+/* BOSS - Some difference in basic melee attacks due Mechanics and or Hard Mode. */ 
 UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifier` = 1.01 WHERE `entry` = 33113;
 UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69400, `DamageModifier` = 1.01 WHERE `entry` = 34003;
 UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifier` = 1.01 WHERE `entry` = 33118;
@@ -104,12 +104,8 @@ UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifi
 UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69700, `DamageModifier` = 1.01 WHERE `entry` = 33909;
 UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifier` = 1.01 WHERE `entry` = 33515;
 UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69700, `DamageModifier` = 1.01 WHERE `entry` = 34175;
-UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifier` = 1.01 WHERE `entry` = 32906;
-UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69700, `DamageModifier` = 1.01 WHERE `entry` = 33360;
 UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifier` = 1.01 WHERE `entry` = 32845;
 UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69700, `DamageModifier` = 1.01 WHERE `entry` = 32846;
-UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifier` = 1.01 WHERE `entry` = 32865;
-UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69700, `DamageModifier` = 1.01 WHERE `entry` = 33147;
 UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifier` = 1.01 WHERE `entry` = 33271;
 UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69700, `DamageModifier` = 1.01 WHERE `entry` = 33449;
 UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifier` = 1.01 WHERE `entry` = 33288;
@@ -122,9 +118,23 @@ UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifi
 UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69700, `DamageModifier` = 1.01 WHERE `entry` = 33692;
 UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifier` = 1.01 WHERE `entry` = 32867;
 UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69700, `DamageModifier` = 1.01 WHERE `entry` = 33693;
-UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifier` = 1.01 WHERE `entry` = 33670;
-UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69700, `DamageModifier` = 1.01 WHERE `entry` = 34109;
-UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifier` = 1.01 WHERE `entry` = 33651;
-UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69700, `DamageModifier` = 1.01 WHERE `entry` = 34108;
-UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34700, `DamageModifier` = 1.01 WHERE `entry` = 33432;
-UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69700, `DamageModifier` = 1.01 WHERE `entry` = 34106;
+
+/* Thorim - Hes basic melee is lowered by 50% due staccking increase of damage and attack speed.*/
+UPDATE `creature_template` SET `mindmg` = 12725, `maxdmg` = 17350, `DamageModifier` = 1.01 WHERE `entry` = 32865;
+UPDATE `creature_template` SET `mindmg` = 25450, `maxdmg` = 34850, `DamageModifier` = 1.01 WHERE `entry` = 33147;
+
+/* FREYA - Due Hard Mode and flat increase of 75% Psy. damage, her basic is lowered by 30%. */
+UPDATE `creature_template` SET `mindmg` = 17815, `maxdmg` = 23905, `DamageModifier` = 1.01 WHERE `entry` = 32906;
+UPDATE `creature_template` SET `mindmg` = 35630, `maxdmg` = 47810, `DamageModifier` = 1.01 WHERE `entry` = 33360;
+
+/* MIMIRON LEVIATHAN TANK - Basic melee damage is lowered by 20%. */
+UPDATE `creature_template` SET `mindmg` = 20360, `maxdmg` = 27760, `DamageModifier` = 1.01 WHERE `entry` = 33432;
+UPDATE `creature_template` SET `mindmg` = 40720, `maxdmg` = 55760, `DamageModifier` = 1.01 WHERE `entry` = 34106;
+
+/* MIMIRON ASSAULT CANNON */
+UPDATE `creature_template` SET `mindmg` = 12725, `maxdmg` = 17350, `DamageModifier` = 1.01 WHERE `entry` = 33651;
+UPDATE `creature_template` SET `mindmg` = 24450, `maxdmg` = 34850, `DamageModifier` = 1.01 WHERE `entry` = 34108;
+
+/* MIMIRON COMMAND UNIT */
+UPDATE `creature_template` SET `mindmg` = 12725, `maxdmg` = 17350, `DamageModifier` = 1.01 WHERE `entry` = 33670;
+UPDATE `creature_template` SET `mindmg` = 24450, `maxdmg` = 34850, `DamageModifier` = 1.01 WHERE `entry` = 34109;
