@@ -17,8 +17,8 @@ namespace Movement
     float terminalVelocity = 60.148003f;
     float terminalSafefallVelocity = 7.0f;
 
-    const float terminal_length = float(terminalVelocity * terminalVelocity) / (2.0f * gravity);
-    const float terminal_safeFall_length = (terminalSafefallVelocity * terminalSafefallVelocity) / (2.0f * gravity);
+    const float terminal_length = float(terminalVelocity* terminalVelocity) / (2.0f * gravity);
+    const float terminal_safeFall_length = (terminalSafefallVelocity* terminalSafefallVelocity) / (2.0f * gravity);
     const float terminal_fallTime = float(terminalVelocity / gravity); // the time that needed to reach terminalVelocity
     const float terminal_safeFall_fallTime = float(terminalSafefallVelocity / gravity); // the time that needed to reach terminalVelocity with safefall
 
@@ -64,8 +64,8 @@ namespace Movement
         if (t_passed > terminal_time)
         {
             result = termVel * (t_passed - terminal_time) +
-                start_velocity * terminal_time +
-                gravity * terminal_time * terminal_time*0.5f;
+                     start_velocity * terminal_time +
+                     gravity * terminal_time * terminal_time * 0.5f;
         }
         else
             result = t_passed * (start_velocity + t_passed * gravity * 0.5f);
@@ -73,7 +73,7 @@ namespace Movement
         return result;
     }
 
-    #define STR(x) #x
+#define STR(x) #x
 
     char const* g_MovementFlag_names[] =
     {
@@ -165,7 +165,7 @@ namespace Movement
     };
 
     template<class Flags, int N>
-    void print_flags(Flags t, char const* (&names)[N], std::string& str)
+    void print_flags(Flags t, char const * (&names)[N], std::string& str)
     {
         for (int i = 0; i < N; ++i)
         {

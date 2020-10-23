@@ -139,7 +139,7 @@ enum UlduarNPCs
     NPC_SALVAGED_DEMOLISHER_TURRET          = 33167,
     NPC_BRANN_BASE_CAMP                     = 33579,
 
-    
+
     // Algalon the Observer
     NPC_BRANN_BRONZBEARD_ALG                = 34064,
     NPC_AZEROTH                             = 34246,

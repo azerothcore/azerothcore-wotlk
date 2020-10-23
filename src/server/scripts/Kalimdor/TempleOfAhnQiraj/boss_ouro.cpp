@@ -77,14 +77,16 @@ public:
             {
                 DoCastVictim(SPELL_SWEEP);
                 Sweep_Timer = urand(15000, 30000);
-            } else Sweep_Timer -= diff;
+            }
+            else Sweep_Timer -= diff;
 
             //SandBlast_Timer
             if (!Submerged && SandBlast_Timer <= diff)
             {
                 DoCastVictim(SPELL_SANDBLAST);
                 SandBlast_Timer = urand(20000, 35000);
-            } else SandBlast_Timer -= diff;
+            }
+            else SandBlast_Timer -= diff;
 
             //Submerge_Timer
             if (!Submerged && Submerge_Timer <= diff)
@@ -97,7 +99,8 @@ public:
 
                 Submerged = true;
                 Back_Timer = urand(30000, 45000);
-            } else Submerge_Timer -= diff;
+            }
+            else Submerge_Timer -= diff;
 
             //ChangeTarget_Timer
             if (Submerged && ChangeTarget_Timer <= diff)
@@ -109,7 +112,8 @@ public:
                     me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
 
                 ChangeTarget_Timer = urand(10000, 20000);
-            } else ChangeTarget_Timer -= diff;
+            }
+            else ChangeTarget_Timer -= diff;
 
             //Back_Timer
             if (Submerged && Back_Timer <= diff)
@@ -121,7 +125,8 @@ public:
 
                 Submerged = false;
                 Submerge_Timer = urand(60000, 120000);
-            } else Back_Timer -= diff;
+            }
+            else Back_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }

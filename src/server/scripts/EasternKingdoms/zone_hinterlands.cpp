@@ -198,7 +198,7 @@ public:
                     _IsByOutrunner = true;
                 }
 
-                if (rand()%4)
+                if (rand() % 4)
                     return;
 
                 //only if attacked and escorter is not in combat?
@@ -212,12 +212,12 @@ public:
                 spawnId = 1;
 
             me->SummonCreature(NPC_RANGER, AmbushSpawn[spawnId].posX, AmbushSpawn[spawnId].posY, AmbushSpawn[spawnId].posZ, 0.0f,
-                TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
+                               TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
 
             for (int i = 0; i < 2; ++i)
             {
                 me->SummonCreature(NPC_OUTRUNNER, AmbushSpawn[spawnId].posX, AmbushSpawn[spawnId].posY, AmbushSpawn[spawnId].posZ, 0.0f,
-                    TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
+                                   TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
             }
         }
 

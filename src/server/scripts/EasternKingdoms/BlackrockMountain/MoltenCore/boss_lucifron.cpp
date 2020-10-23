@@ -32,62 +32,62 @@ enum Events
 
 class boss_lucifron : public CreatureScript
 {
-    public:
-        boss_lucifron() : CreatureScript("boss_lucifron") { }
+public:
+    boss_lucifron() : CreatureScript("boss_lucifron") { }
 
-        struct boss_lucifronAI : public BossAI
+    struct boss_lucifronAI : public BossAI
+    {
+        boss_lucifronAI(Creature* creature) : BossAI(creature, BOSS_LUCIFRON)
         {
-            boss_lucifronAI(Creature* creature) : BossAI(creature, BOSS_LUCIFRON)
-            {
-            }
-
-            void EnterCombat(Unit* victim)
-            {
-                BossAI::EnterCombat(victim);
-                events.ScheduleEvent(EVENT_IMPENDING_DOOM, 10000);
-                events.ScheduleEvent(EVENT_LUCIFRON_CURSE, 20000);
-                events.ScheduleEvent(EVENT_SHADOW_SHOCK, 6000);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_IMPENDING_DOOM:
-                            DoCastVictim(SPELL_IMPENDING_DOOM);
-                            events.ScheduleEvent(EVENT_IMPENDING_DOOM, 20000);
-                            break;
-                        case EVENT_LUCIFRON_CURSE:
-                            DoCastVictim(SPELL_LUCIFRON_CURSE);
-                            events.ScheduleEvent(EVENT_LUCIFRON_CURSE, 15000);
-                            break;
-                        case EVENT_SHADOW_SHOCK:
-                            DoCastVictim(SPELL_SHADOW_SHOCK);
-                            events.ScheduleEvent(EVENT_SHADOW_SHOCK, 6000);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_lucifronAI(creature);
         }
+
+        void EnterCombat(Unit* victim)
+        {
+            BossAI::EnterCombat(victim);
+            events.ScheduleEvent(EVENT_IMPENDING_DOOM, 10000);
+            events.ScheduleEvent(EVENT_LUCIFRON_CURSE, 20000);
+            events.ScheduleEvent(EVENT_SHADOW_SHOCK, 6000);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_IMPENDING_DOOM:
+                        DoCastVictim(SPELL_IMPENDING_DOOM);
+                        events.ScheduleEvent(EVENT_IMPENDING_DOOM, 20000);
+                        break;
+                    case EVENT_LUCIFRON_CURSE:
+                        DoCastVictim(SPELL_LUCIFRON_CURSE);
+                        events.ScheduleEvent(EVENT_LUCIFRON_CURSE, 15000);
+                        break;
+                    case EVENT_SHADOW_SHOCK:
+                        DoCastVictim(SPELL_SHADOW_SHOCK);
+                        events.ScheduleEvent(EVENT_SHADOW_SHOCK, 6000);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new boss_lucifronAI(creature);
+    }
 };
 
 void AddSC_boss_lucifron()
