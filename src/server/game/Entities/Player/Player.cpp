@@ -20094,7 +20094,7 @@ void Player::_SaveMail(SQLTransaction& trans)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
             stmt->setUInt32(0, m->messageID);
             trans->Append(stmt);
-            if(totalMailCount > 0)
+            if (totalMailCount > 0)
                 totalMailCount--;
         }
     }
