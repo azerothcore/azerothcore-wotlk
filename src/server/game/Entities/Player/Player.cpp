@@ -3696,7 +3696,6 @@ void Player::UpdateNextMailTimeAndUnreads()
 
 void Player::AddNewMailDeliverTime(time_t deliver_time)
 {
-    ++totalMailCount;
     sWorld->UpdateGlobalPlayerMails(GetGUIDLow(), totalMailCount, false);
     if (deliver_time <= time(nullptr))                      // ready now
     {
@@ -19065,7 +19064,7 @@ void Player::_LoadMailInit(PreparedQueryResult resultMailCount, PreparedQueryRes
     //Set count for all mails used to display correct size later one
     if (resultMailCount)
     {
-        totalMailCount = uint64((*resultMailCount)[0].GetUInt64());
+        totalMailCount = uint32((*resultMailCount)[0].GetUInt32());
         sWorld->UpdateGlobalPlayerMails(GetGUIDLow(), totalMailCount, false);
     }
 
@@ -19097,10 +19096,12 @@ void Player::_LoadMail()
     }
 
     //This should in theory always be < 100
-    for (PlayerMails::iterator itr = GetMailBegin(); itr != GetMailEnd(); ++itr)
+    for (PlayerMails::iterator itr = GetMailBegin(); itr != GetMailEnd();)
     {
-        delete *itr;
+        Mail* m = *itr;
         m_mailCache.erase(itr);
+        if(m)
+            delete m;
         itr = GetMailBegin();
     }
 
@@ -20093,6 +20094,8 @@ void Player::_SaveMail(SQLTransaction& trans)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
             stmt->setUInt32(0, m->messageID);
             trans->Append(stmt);
+            if(totalMailCount > 0)
+                totalMailCount--;
         }
     }
 
