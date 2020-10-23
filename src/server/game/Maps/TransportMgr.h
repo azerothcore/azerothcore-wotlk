@@ -80,8 +80,8 @@ struct TransportAnimation
     TransportPathRotationContainer Rotations;
     uint32 TotalTime;
 
-    bool GetAnimNode(uint32 time, TransportAnimationEntry const* &curr, TransportAnimationEntry const* &next, float &percPos) const;
-    void GetAnimRotation(uint32 time, G3D::Quat &curr, G3D::Quat &next, float &percRot) const;
+    bool GetAnimNode(uint32 time, TransportAnimationEntry const*& curr, TransportAnimationEntry const*& next, float& percPos) const;
+    void GetAnimRotation(uint32 time, G3D::Quat& curr, G3D::Quat& next, float& percRot) const;
 };
 
 typedef std::map<uint32, TransportAnimation> TransportAnimationContainer;
@@ -89,7 +89,7 @@ typedef std::map<uint32, TransportAnimation> TransportAnimationContainer;
 class TransportMgr
 {
     friend void LoadDBCStores(std::string const&);
-    
+
 public:
     static TransportMgr* instance();
 
