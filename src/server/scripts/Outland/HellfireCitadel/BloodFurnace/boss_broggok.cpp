@@ -75,7 +75,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_SLIME:
                     me->CastSpell(me->GetVictim(), SPELL_SLIME_SPRAY, false);
