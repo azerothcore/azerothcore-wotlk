@@ -405,7 +405,7 @@ public:
         void Update(uint32 diff)
         {
             events.Update(diff);
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -426,7 +426,6 @@ public:
                                 c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                 c->GetMotionMaster()->MovePoint(0, guardMovePosition);
                             }
-                        events.PopEvent();
                         events.RescheduleEvent(EVENT_GUARDS_DISAPPEAR, 5000);
                     }
                     break;
@@ -435,7 +434,6 @@ public:
                         for (uint8 i = 0; i < 4; ++i)
                             if (Creature* c = instance->GetCreature(NPC_GuardGUID[i]))
                                 c->SetVisible(false);
-                        events.PopEvent();
                         events.RescheduleEvent(EVENT_SINCLARI_FALL_BACK, 2000);
                     }
                     break;
@@ -447,7 +445,6 @@ public:
                             c->GetMotionMaster()->MovePoint(0, sinclariOutsidePosition);
                         }
                         SetData(DATA_ACTIVATE_DEFENSE_SYSTEM, 0);
-                        events.PopEvent();
                         events.RescheduleEvent(EVENT_START_ENCOUNTER, 4000);
                     }
                     break;
@@ -467,7 +464,6 @@ public:
                                 HandleGameObject(0, false, go); // not used yet
                                 go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // make it useable
                             }
-                        events.PopEvent();
                         events.RescheduleEvent(EVENT_SUMMON_PORTAL, 4000);
                     }
                     break;
@@ -501,7 +497,6 @@ public:
                             events.RescheduleEvent(EVENT_CYANIGOSSA_TRANSFORM, 10000);
                         }
                     }
-                    events.PopEvent();
                     break;
                 case EVENT_CYANIGOSSA_TRANSFORM:
                     if (Creature* c = instance->GetCreature(NPC_CyanigosaGUID))
@@ -510,12 +505,10 @@ public:
                         c->CastSpell(c, SPELL_CYANIGOSA_TRANSFORM, 0);
                         events.RescheduleEvent(EVENT_CYANIGOSA_ATTACK, 2500);
                     }
-                    events.PopEvent();
                     break;
                 case EVENT_CYANIGOSA_ATTACK:
                     if (Creature* c = instance->GetCreature(NPC_CyanigosaGUID))
                         c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
-                    events.PopEvent();
                     break;
             }
         }

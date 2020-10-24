@@ -820,11 +820,12 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_INVENTORY               = 8,
     PLAYER_LOGIN_QUERY_LOAD_ACTIONS                 = 9,
     PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT              = 10,
-    PLAYER_LOGIN_QUERY_LOAD_MAIL_DATE               = 11,
-    PLAYER_LOGIN_QUERY_LOAD_SOCIAL_LIST             = 12,
-    PLAYER_LOGIN_QUERY_LOAD_HOME_BIND               = 13,
-    PLAYER_LOGIN_QUERY_LOAD_SPELL_COOLDOWNS         = 14,
-    PLAYER_LOGIN_QUERY_LOAD_DECLINED_NAMES          = 15,
+    PLAYER_LOGIN_QUERY_LOAD_MAIL_UNREAD_COUNT       = 11,
+    PLAYER_LOGIN_QUERY_LOAD_MAIL_DATE               = 12,
+    PLAYER_LOGIN_QUERY_LOAD_SOCIAL_LIST             = 13,
+    PLAYER_LOGIN_QUERY_LOAD_HOME_BIND               = 14,
+    PLAYER_LOGIN_QUERY_LOAD_SPELL_COOLDOWNS         = 15,
+    PLAYER_LOGIN_QUERY_LOAD_DECLINED_NAMES          = 16,
     PLAYER_LOGIN_QUERY_LOAD_ACHIEVEMENTS            = 18,
     PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS       = 19,
     PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS          = 20,
@@ -840,7 +841,6 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_INSTANCE_LOCK_TIMES     = 30,
     PLAYER_LOGIN_QUERY_LOAD_SEASONAL_QUEST_STATUS   = 31,
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS    = 32,
-    PLAYER_LOGIN_QUERY_LOAD_MAIL                    = 33,
     PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH       = 34,
     MAX_PLAYER_LOGIN_QUERY,
 };
@@ -1611,7 +1611,6 @@ public:
     static void DeleteOldCharacters();
     static void DeleteOldCharacters(uint32 keepDays);
 
-    bool m_mailsLoaded;
     bool m_mailsUpdated;
 
     void SetBindPoint(uint64 guid);
@@ -1667,22 +1666,23 @@ public:
     void SendNewMail();
     void UpdateNextMailTimeAndUnreads();
     void AddNewMailDeliverTime(time_t deliver_time);
-    bool IsMailsLoaded() const { return m_mailsLoaded; }
 
     void RemoveMail(uint32 id);
 
-    void AddMail(Mail* mail) { m_mail.push_front(mail);}// for call from WorldSession::SendMailTo
-    uint32 GetMailSize() { return m_mail.size();}
+    void AddMail(Mail* mail) { totalMailCount++; m_mailCache.push_front(mail); }// for call from WorldSession::SendMailTo
+    uint32 GetMailSize() { return totalMailCount; }
+    uint32 GetMailCacheSize() { return m_mailCache.size();}
     Mail* GetMail(uint32 id);
 
-    PlayerMails::iterator GetMailBegin() { return m_mail.begin();}
-    PlayerMails::iterator GetMailEnd() { return m_mail.end();}
+    PlayerMails::iterator GetMailBegin() { return m_mailCache.begin();}
+    PlayerMails::iterator GetMailEnd() { return m_mailCache.end();}
 
     /*********************************************************/
     /*** MAILED ITEMS SYSTEM ***/
     /*********************************************************/
 
     uint8 unReadMails;
+    uint32 totalMailCount;
     time_t m_nextMailDelivereTime;
 
     typedef std::unordered_map<uint32, Item*> ItemMap;
@@ -2728,8 +2728,7 @@ protected:
     void _LoadAuras(PreparedQueryResult result, uint32 timediff);
     void _LoadGlyphAuras();
     void _LoadInventory(PreparedQueryResult result, uint32 timeDiff);
-    void _LoadMailInit(PreparedQueryResult resultUnread, PreparedQueryResult resultDelivery);
-    void _LoadMailAsynch(PreparedQueryResult result);
+    void _LoadMailInit(PreparedQueryResult resultMailCount, PreparedQueryResult resultUnread, PreparedQueryResult resultDelivery);
     void _LoadMail();
     void _LoadMailedItems(Mail* mail);
     void _LoadQuestStatus(PreparedQueryResult result);
@@ -2828,7 +2827,7 @@ protected:
     uint32 m_GuildIdInvited;
     uint32 m_ArenaTeamIdInvited;
 
-    PlayerMails m_mail;
+    PlayerMails m_mailCache;
     PlayerSpellMap m_spells;
     PlayerTalentMap m_talents;
     uint32 m_lastPotionId;                              // last used health/mana potion in combat, that block next potion use

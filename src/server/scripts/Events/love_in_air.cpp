@@ -371,20 +371,20 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_CALL_BAXTER:
                     {
                         EntryCheckPredicate pred(NPC_APOTHECARY_BAXTER);
                         summons.DoAction(ACTION_RELEASE_HELPER, pred);
-                        events.PopEvent();
+                        
                         break;
                     }
                 case EVENT_CALL_FRYE:
                     {
                         EntryCheckPredicate pred(NPC_APOTHECARY_FRYE);
                         summons.DoAction(ACTION_RELEASE_HELPER, pred);
-                        events.PopEvent();
+                        
                         break;
                     }
                 case EVENT_SPELL_PERFUME_SPRAY:
@@ -455,7 +455,6 @@ public:
 
         void JustDied(Unit* ) { me->MonsterSay("...please don't think less of me.", LANG_UNIVERSAL, 0); }
 
-
         void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
@@ -465,7 +464,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_PERFUME_SPRAY:
                     me->CastSpell(me->GetVictim(), SPELL_COLOGNE_SPRAY, false);
