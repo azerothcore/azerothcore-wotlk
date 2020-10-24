@@ -237,17 +237,15 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_YELL_DEAD_1:
                     Talk(YELL_DEAD_1);
-                    events.PopEvent();
                     break;
                 case EVENT_START_RESURRECTION:
                     me->CastSpell(me, SPELL_SUMMON_VALKYR, true);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_VALKYR_BEAM, 7000);
                     events.RescheduleEvent(EVENT_VALKYR_MOVE, 1);
                     events.RescheduleEvent(EVENT_ANNHYLDE_YELL, 3000);
@@ -255,35 +253,29 @@ public:
                 case EVENT_VALKYR_MOVE:
                     if( Creature* s = ObjectAccessor::GetCreature(*me, ValkyrGUID) )
                         s->GetMotionMaster()->MovePoint(1, s->GetPositionX(), s->GetPositionY(), s->GetPositionZ() - 15.0f);
-                    events.PopEvent();
                     break;
                 case EVENT_ANNHYLDE_YELL:
                     if( Creature* s = ObjectAccessor::GetCreature(*me, ValkyrGUID) )
                         s->AI()->Talk(YELL_ANHYLDE_2);
-                    events.PopEvent();
                     break;
                 case EVENT_VALKYR_BEAM:
                     me->RemoveAura(SPELL_SUMMON_VALKYR);
                     if( Creature* c = ObjectAccessor::GetCreature(*me, ValkyrGUID) )
                         c->CastSpell(me, SPELL_RESURRECTION_BEAM, false);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_RESURRECTION_BALL, 4000);
                     break;
                 case EVENT_RESURRECTION_BALL:
                     me->CastSpell(me, SPELL_RESURRECTION_BALL, true);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_RESURRECTION_HEAL, 4000);
                     break;
                 case EVENT_RESURRECTION_HEAL:
                     me->RemoveAura(SPELL_RESURRECTION_BALL);
                     me->CastSpell(me, SPELL_RESURRECTION_HEAL, true);
                     FeignDeath(false);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_MORPH_TO_UNDEAD, 3000);
                     break;
                 case EVENT_MORPH_TO_UNDEAD:
                     me->CastSpell(me, SPELL_INGVAR_TRANSFORM, true);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_START_PHASE_2, 1000);
                     break;
                 case EVENT_START_PHASE_2:
@@ -292,7 +284,6 @@ public:
                         c->DespawnOrUnsummon();
                         summons.DespawnAll();
                     }
-                    events.PopEvent();
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     AttackStart(me->GetVictim());
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -310,7 +301,6 @@ public:
                 case EVENT_UNROOT:
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     me->DisableRotate(false);
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_ROAR:
                     Talk(EMOTE_ROAR);
@@ -369,7 +359,6 @@ public:
                 case EVENT_AXE_RETURN:
                     if (Creature* c = ObjectAccessor::GetCreature(*me, ThrowGUID))
                         c->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 0.5f);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_AXE_PICKUP, 1500);
                     break;
                 case EVENT_AXE_PICKUP:
@@ -381,7 +370,6 @@ public:
                     }
                     ThrowGUID = 0;
                     SetEquipmentSlots(true);
-                    events.PopEvent();
                     break;
             }
 
