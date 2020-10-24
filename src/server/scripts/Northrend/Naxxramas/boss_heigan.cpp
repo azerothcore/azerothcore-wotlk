@@ -162,7 +162,7 @@ public:
             //if (me->HasUnitState(UNIT_STATE_CASTING))
             //  return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_SPELL_DISRUPTION:
                     me->CastSpell(me, SPELL_SPELL_DISRUPTION, false);
@@ -208,7 +208,6 @@ public:
                         {
                             if (IsInRoom(itr.GetSource()) && !itr.GetSource()->IsAlive())
                             {
-                                events.PopEvent();
                                 pInstance->SetData(DATA_DANCE_FAIL, 0);
                                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
                                 return;

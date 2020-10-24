@@ -91,7 +91,7 @@ public:
                 return;
 
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_SONIC_BOOM:
                     Talk(EMOTE_SONIC_BOOM);
@@ -102,7 +102,6 @@ public:
                     return;
                 case EVENT_SPELL_SONIC_BOOM_EFFECT:
                     me->CastSpell(me, DUNGEON_MODE(SPELL_SONIC_BOOM_EFFECT_N, SPELL_SONIC_BOOM_EFFECT_H), true);
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_MURMURS_TOUCH:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 80.0f, true))

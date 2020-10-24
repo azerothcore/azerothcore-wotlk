@@ -335,7 +335,7 @@ public:
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_JEDOGA_CYCLONE:
                         {
@@ -361,7 +361,6 @@ public:
                         }
                     case EVENT_JEDOGA_MOVE_UP:
                         {
-                            events.PopEvent();
                             if (!summons.HasEntry(NPC_INITIATE))
                                 break;
 
@@ -383,7 +382,6 @@ public:
                             Talk(TEXT_SACRIFICE_2);
                             summons.DespawnEntry(NPC_JEDOGA_CONTROLLER);
                             MoveDown();
-                            events.PopEvent();
                             break;
                         }
                 }
