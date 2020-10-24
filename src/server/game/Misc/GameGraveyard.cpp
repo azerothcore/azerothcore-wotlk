@@ -12,7 +12,7 @@ Graveyard* Graveyard::instance()
 
 void Graveyard::LoadGraveyardFromDB()
 {
-    uint32 oldMSTime = getMSTime();    
+    uint32 oldMSTime = getMSTime();
 
     _graveyardStore.clear();
 
@@ -38,7 +38,7 @@ void Graveyard::LoadGraveyardFromDB()
         Graveyard.y = fields[3].GetFloat();
         Graveyard.z = fields[4].GetFloat();
         Graveyard.name = fields[5].GetString();
-        
+
         if (!Utf8toWStr(Graveyard.name, Graveyard.wnameLow))
         {
             sLog->outErrorDb("Wrong UTF8 name for id %u in `game_graveyard` table, ignoring.", ID);
@@ -63,7 +63,7 @@ GraveyardStruct const* Graveyard::GetGraveyard(uint32 ID) const
     if (itr != _graveyardStore.end())
         return &itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 GraveyardStruct const* Graveyard::GetDefaultGraveyard(TeamId teamId)
@@ -111,15 +111,15 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
     // at corpse map
     bool foundNear = false;
     float distNear = 10000;
-    GraveyardStruct const* entryNear = NULL;
+    GraveyardStruct const* entryNear = nullptr;
 
     // at entrance map for corpse map
     bool foundEntr = false;
     float distEntr = 10000;
-    GraveyardStruct const* entryEntr = NULL;
+    GraveyardStruct const* entryEntr = nullptr;
 
     // some where other
-    GraveyardStruct const* entryFar = NULL;
+    GraveyardStruct const* entryFar = nullptr;
 
     MapEntry const* mapEntry = sMapStore.LookupEntry(MapId);
 
@@ -143,9 +143,9 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
         {
             // if find graveyard at different map from where entrance placed (or no entrance data), use any first
             if (!mapEntry
-                || mapEntry->entrance_map < 0
-                || uint32(mapEntry->entrance_map) != entry->Map
-                || (mapEntry->entrance_x == 0 && mapEntry->entrance_y == 0))
+                    || mapEntry->entrance_map < 0
+                    || uint32(mapEntry->entrance_map) != entry->Map
+                    || (mapEntry->entrance_x == 0 && mapEntry->entrance_y == 0))
             {
                 // not have any corrdinates for check distance anyway
                 entryFar = entry;
@@ -153,8 +153,8 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
             }
 
             // at entrance map calculate distance (2D);
-            float dist2 = (entry->x - mapEntry->entrance_x)*(entry->x - mapEntry->entrance_x)
-                + (entry->y - mapEntry->entrance_y)*(entry->y - mapEntry->entrance_y);
+            float dist2 = (entry->x - mapEntry->entrance_x) * (entry->x - mapEntry->entrance_x)
+                          + (entry->y - mapEntry->entrance_y) * (entry->y - mapEntry->entrance_y);
             if (foundEntr)
             {
                 if (dist2 < distEntr)
@@ -173,7 +173,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
         // find now nearest graveyard at same map
         else
         {
-            float dist2 = (entry->x - x)*(entry->x - x) + (entry->y - y)*(entry->y - y) + (entry->z - z)*(entry->z - z);
+            float dist2 = (entry->x - x) * (entry->x - x) + (entry->y - y) * (entry->y - y) + (entry->z - z) * (entry->z - z);
             if (foundNear)
             {
                 if (dist2 < distNear)
@@ -210,7 +210,7 @@ GraveyardData const* Graveyard::FindGraveyardData(uint32 id, uint32 zoneId)
             return &data;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool Graveyard::AddGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool persist /*= true*/)
@@ -254,7 +254,7 @@ void Graveyard::RemoveGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, boo
 
     for (; range.first != range.second; ++range.first)
     {
-        GraveyardData & data = range.first->second;
+        GraveyardData& data = range.first->second;
 
         // skip not matching safezone id
         if (data.safeLocId != id)
@@ -359,13 +359,13 @@ GraveyardStruct const* Graveyard::GetGraveyard(const std::string& name) const
     // explicit name case
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
-        return NULL;
+        return nullptr;
 
     // converting string that we try to find to lower case
     wstrToLower(wname);
 
     // Alternative first GameTele what contains wnameLow as substring in case no GameTele location found
-    const GraveyardStruct* alt = NULL;
+    const GraveyardStruct* alt = nullptr;
     for (GraveyardContainer::const_iterator itr = _graveyardStore.begin(); itr != _graveyardStore.end(); ++itr)
     {
         if (itr->second.wnameLow == wname)
