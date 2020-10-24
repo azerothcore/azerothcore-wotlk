@@ -28,5 +28,5 @@ UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69400, `DamageModifi
 UPDATE `creature_template` SET `mindmg` = 27250, `maxdmg` = 37750, `DamageModifier` = 1.01 WHERE `entry` = 35013;
 UPDATE `creature_template` SET `mindmg` = 54500, `maxdmg` = 75500, `DamageModifier` = 1.01 WHERE `entry` = 35360;
  /* 4th: Towards Tier 10 and last PvP Season - During Icecrown Citadel (Not updated yet!) */
-UPDATE `creature_template` SET `mindmg` = 17815, `maxdmg` = 23905, `DamageModifier` = 1.01 WHERE `entry` = 38433;
-UPDATE `creature_template` SET `mindmg` = 35630, `maxdmg` = 47810, `DamageModifier` = 1.01 WHERE `entry` = 38462;
+UPDATE `creature_template` SET `mindmg` = 30380, `maxdmg` = 41445, `DamageModifier` = 1.01 WHERE `entry` = 38433;
+UPDATE `creature_template` SET `mindmg` = 60760, `maxdmg` = 82890, `DamageModifier` = 1.01 WHERE `entry` = 38462;
