@@ -1,17 +1,16 @@
-#include <ace/Singleton.h>
 #include <ace/Thread_Mutex.h>
 #include <ace/Log_Msg.h>
 #include "Threading.h"
-
 #include "DelayExecutor.h"
 
 DelayExecutor* DelayExecutor::instance()
 {
-    return ACE_Singleton<DelayExecutor, ACE_Thread_Mutex>::instance();
+    static DelayExecutor instance;
+    return &instance;
 }
 
 DelayExecutor::DelayExecutor()
-    : pre_svc_hook_(0), post_svc_hook_(0), activated_(false), mqueue_(1*1024*1024, 1*1024*1024), queue_(&mqueue_)
+    : pre_svc_hook_(0), post_svc_hook_(0), activated_(false), mqueue_(1 * 1024 * 1024, 1 * 1024 * 1024), queue_(&mqueue_)
 {
 }
 
@@ -80,8 +79,8 @@ int DelayExecutor::start(int num_threads, ACE_Method_Request* pre_svc_hook, ACE_
     queue_.queue()->activate();
 
     // pussywizard:
-    //ACORE::ThreadPriority tp;
-    //int _priority = tp.getPriority(ACORE::Priority_Highest);
+    //acore::ThreadPriority tp;
+    //int _priority = tp.getPriority(acore::Priority_Highest);
     //if (ACE_Task_Base::activate(THR_NEW_LWP | THR_JOINABLE, num_threads, 0, _priority) == -1)
     //    return -1;
 

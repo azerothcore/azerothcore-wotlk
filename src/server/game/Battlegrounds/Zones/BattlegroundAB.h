@@ -171,8 +171,8 @@ enum BG_AB_Misc
     BG_AB_BANNER_UPDATE_TIME            = 2000
 };
 
-const uint32 BG_AB_TickIntervals[BG_AB_DYNAMIC_NODES_COUNT+1] = {0, 12000, 9000, 6000, 3000, 1000};
-const uint32 BG_AB_TickPoints[BG_AB_DYNAMIC_NODES_COUNT+1] = {0, 10, 10, 10, 10, 30};
+const uint32 BG_AB_TickIntervals[BG_AB_DYNAMIC_NODES_COUNT + 1] = {0, 12000, 9000, 6000, 3000, 1000};
+const uint32 BG_AB_TickPoints[BG_AB_DYNAMIC_NODES_COUNT + 1] = {0, 10, 10, 10, 10, 30};
 const uint32 BG_AB_GraveyardIds[BG_AB_ALL_NODES_COUNT] = {895, 894, 893, 897, 896, 898, 899};
 
 const float BG_AB_BuffPositions[BG_AB_DYNAMIC_NODES_COUNT][4] =
@@ -212,69 +212,69 @@ const float BG_AB_SpiritGuidePos[BG_AB_ALL_NODES_COUNT][4] =
 
 struct BattlegroundABScore : public BattlegroundScore
 {
-    BattlegroundABScore(Player* player) : BattlegroundScore(player), BasesAssaulted(0), BasesDefended(0) { }
-    ~BattlegroundABScore() { }
+    explicit BattlegroundABScore(Player* player) : BattlegroundScore(player), BasesAssaulted(0), BasesDefended(0) { }
+    ~BattlegroundABScore() override = default;
     uint32 BasesAssaulted;
     uint32 BasesDefended;
 
-    uint32 GetAttr1() const final override { return BasesAssaulted; }
-    uint32 GetAttr2() const final override { return BasesDefended; }
+    uint32 GetAttr1() const final { return BasesAssaulted; }
+    uint32 GetAttr2() const final { return BasesDefended; }
 };
 
 class BattlegroundAB : public Battleground
 {
-    public:
-        BattlegroundAB();
-        ~BattlegroundAB();
+public:
+    BattlegroundAB();
+    ~BattlegroundAB() override;
 
-        void AddPlayer(Player* player);
-        void StartingEventCloseDoors();
-        void StartingEventOpenDoors();
-        void RemovePlayer(Player* player);
-        void HandleAreaTrigger(Player* player, uint32 trigger);
-        bool SetupBattleground();
-        void Init();
-        void EndBattleground(TeamId winnerTeamId);
-        GraveyardStruct const* GetClosestGraveyard(Player* player);
+    void AddPlayer(Player* player) override;
+    void StartingEventCloseDoors() override;
+    void StartingEventOpenDoors() override;
+    void RemovePlayer(Player* player) override;
+    void HandleAreaTrigger(Player* player, uint32 trigger) override;
+    bool SetupBattleground() override;
+    void Init() override;
+    void EndBattleground(TeamId winnerTeamId) override;
+    GraveyardStruct const* GetClosestGraveyard(Player* player) override;
 
-        void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
-        void FillInitialWorldStates(WorldPacket& data);
-        void EventPlayerClickedOnFlag(Player* source, GameObject* gameObject);
+    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
+    void FillInitialWorldStates(WorldPacket& data) override;
+    void EventPlayerClickedOnFlag(Player* source, GameObject* gameObject) override;
 
-        bool AllNodesConrolledByTeam(TeamId teamId) const;
-        bool IsTeamScores500Disadvantage(TeamId teamId) const { return _teamScores500Disadvantage[teamId]; }
-        
-        TeamId GetPrematureWinner();
-    private:
-        void PostUpdateImpl(uint32 diff);
+    bool AllNodesConrolledByTeam(TeamId teamId) const override;
+    bool IsTeamScores500Disadvantage(TeamId teamId) const { return _teamScores500Disadvantage[teamId]; }
 
-        void DeleteBanner(uint8 node);
-        void CreateBanner(uint8 node, bool delay);
-        void SendNodeUpdate(uint8 node);
-        void NodeOccupied(uint8 node);
-        void NodeDeoccupied(uint8 node);
-        void ApplyPhaseMask();
+    TeamId GetPrematureWinner() override;
+private:
+    void PostUpdateImpl(uint32 diff) override;
 
-        struct CapturePointInfo
+    void DeleteBanner(uint8 node);
+    void CreateBanner(uint8 node, bool delay);
+    void SendNodeUpdate(uint8 node);
+    void NodeOccupied(uint8 node);
+    void NodeDeoccupied(uint8 node);
+    void ApplyPhaseMask();
+
+    struct CapturePointInfo
+    {
+        CapturePointInfo() : _ownerTeamId(TEAM_NEUTRAL), _iconNone(0), _iconCapture(0), _state(BG_AB_NODE_STATE_NEUTRAL), _captured(false)
         {
-            CapturePointInfo() : _ownerTeamId(TEAM_NEUTRAL), _iconNone(0), _iconCapture(0), _state(BG_AB_NODE_STATE_NEUTRAL), _captured(false)
-            {
-            }
+        }
 
-            TeamId _ownerTeamId;
-            uint32 _iconNone;
-            uint32 _iconCapture;
-            uint8 _state;
+        TeamId _ownerTeamId;
+        uint32 _iconNone;
+        uint32 _iconCapture;
+        uint8 _state;
 
-            bool _captured;
-        };
+        bool _captured;
+    };
 
-        CapturePointInfo _capturePointInfo[BG_AB_DYNAMIC_NODES_COUNT];
-        EventMap _bgEvents;
-        uint32 _honorTics;
-        uint32 _reputationTics;
-        uint8 _controlledPoints[BG_TEAMS_COUNT];
-        bool _teamScores500Disadvantage[BG_TEAMS_COUNT];
+    CapturePointInfo _capturePointInfo[BG_AB_DYNAMIC_NODES_COUNT];
+    EventMap _bgEvents;
+    uint32 _honorTics;
+    uint32 _reputationTics;
+    uint8 _controlledPoints[BG_TEAMS_COUNT] {};
+    bool _teamScores500Disadvantage[BG_TEAMS_COUNT] {};
 };
 #endif
 
