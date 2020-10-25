@@ -27,6 +27,6 @@ UPDATE `creature_template` SET `mindmg` = 50900, `maxdmg` = 69400, `DamageModifi
  /* 3rd: Towards Tier 8.5 / 9 - During Trial of Crusader. */ 
 UPDATE `creature_template` SET `mindmg` = 27250, `maxdmg` = 37750, `DamageModifier` = 1.01 WHERE `entry` = 35013;
 UPDATE `creature_template` SET `mindmg` = 54500, `maxdmg` = 75500, `DamageModifier` = 1.01 WHERE `entry` = 35360;
- /* 4th: Towards Tier 10 and last PvP Season - During Icecrown Citadel (Not updated yet!) */
+ /* 4th: Towards Tier 10 and last PvP Season - During Icecrown Citadel (Need testing) */
 UPDATE `creature_template` SET `mindmg` = 30380, `maxdmg` = 41445, `DamageModifier` = 1.01 WHERE `entry` = 38433;
 UPDATE `creature_template` SET `mindmg` = 60760, `maxdmg` = 82890, `DamageModifier` = 1.01 WHERE `entry` = 38462;
