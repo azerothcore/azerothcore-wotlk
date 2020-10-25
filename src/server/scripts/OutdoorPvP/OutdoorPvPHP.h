@@ -10,7 +10,7 @@
 #include "OutdoorPvP.h"
 
 #define OutdoorPvPHPBuffZonesNum 6
-                                                         //  HP, citadel, ramparts, blood furnace, shattered halls, mag's lair
+//  HP, citadel, ramparts, blood furnace, shattered halls, mag's lair
 const uint32 OutdoorPvPHPBuffZones[OutdoorPvPHPBuffZonesNum] = { 3483, 3563, 3562, 3713, 3714, 3836 };
 
 enum OutdoorPvPHPSpells
@@ -76,55 +76,55 @@ const go_type HPTowerFlags[HP_TOWER_NUM] =
 
 class OPvPCapturePointHP : public OPvPCapturePoint
 {
-    public:
+public:
 
-        OPvPCapturePointHP(OutdoorPvP* pvp, OutdoorPvPHPTowerType type);
+    OPvPCapturePointHP(OutdoorPvP* pvp, OutdoorPvPHPTowerType type);
 
-        void ChangeState();
+    void ChangeState();
 
-        void SendChangePhase();
+    void SendChangePhase();
 
-        void FillInitialWorldStates(WorldPacket & data);
+    void FillInitialWorldStates(WorldPacket& data);
 
-        // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* player);
-        void HandlePlayerLeave(Player* player);
+    // used when player is activated/inactivated in the area
+    bool HandlePlayerEnter(Player* player);
+    void HandlePlayerLeave(Player* player);
 
-    private:
+private:
 
-        OutdoorPvPHPTowerType m_TowerType;
+    OutdoorPvPHPTowerType m_TowerType;
 };
 
 class OutdoorPvPHP : public OutdoorPvP
 {
-    public:
+public:
 
-        OutdoorPvPHP();
+    OutdoorPvPHP();
 
-        bool SetupOutdoorPvP();
+    bool SetupOutdoorPvP();
 
-        void HandlePlayerEnterZone(Player* player, uint32 zone);
-        void HandlePlayerLeaveZone(Player* player, uint32 zone);
+    void HandlePlayerEnterZone(Player* player, uint32 zone);
+    void HandlePlayerLeaveZone(Player* player, uint32 zone);
 
-        bool Update(uint32 diff);
+    bool Update(uint32 diff);
 
-        void FillInitialWorldStates(WorldPacket &data);
+    void FillInitialWorldStates(WorldPacket& data);
 
-        void SendRemoveWorldStates(Player* player);
+    void SendRemoveWorldStates(Player* player);
 
-        void HandleKillImpl(Player* player, Unit* killed);
+    void HandleKillImpl(Player* player, Unit* killed);
 
-        uint32 GetAllianceTowersControlled() const;
-        void SetAllianceTowersControlled(uint32 count);
+    uint32 GetAllianceTowersControlled() const;
+    void SetAllianceTowersControlled(uint32 count);
 
-        uint32 GetHordeTowersControlled() const;
-        void SetHordeTowersControlled(uint32 count);
+    uint32 GetHordeTowersControlled() const;
+    void SetHordeTowersControlled(uint32 count);
 
-    private:
+private:
 
-        // how many towers are controlled
-        uint32 m_AllianceTowersControlled;
-        uint32 m_HordeTowersControlled;
+    // how many towers are controlled
+    uint32 m_AllianceTowersControlled;
+    uint32 m_HordeTowersControlled;
 };
 
 #endif
