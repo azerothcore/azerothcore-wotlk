@@ -3215,10 +3215,14 @@ void Unit::_UpdateAutoRepeatSpell()
 {
     SpellInfo const* spellProto = nullptr;
     if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL])
+    {
         spellProto = m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo;
+    }
 
     if (!spellProto)
+    {
         return;
+    }
 
     // Check "realtime" interrupts
     if ((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving() && spellProto->Id != 75) || IsNonMeleeSpellCast(false, false, true, spellProto->Id == 75))
@@ -3230,7 +3234,9 @@ void Unit::_UpdateAutoRepeatSpell()
 
     // Apply delay (Auto Shot (spellID 75) not affected)
     if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && spellProto->Id != 75)
+    {
         setAttackTimer(RANGED_ATTACK, 500);
+    }
 
     m_AutoRepeatFirstCast = false;
 
@@ -3241,7 +3247,9 @@ void Unit::_UpdateAutoRepeatSpell()
         if (result != SPELL_CAST_OK)
         {
             if (spellProto->Id != 75)
+            {
                 InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+            }
 
             return;
         }
