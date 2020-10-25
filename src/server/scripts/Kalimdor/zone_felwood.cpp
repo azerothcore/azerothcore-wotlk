@@ -45,7 +45,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
             creature->CastSpell(player, SPELL_CENARION_BEACON, false);
@@ -64,10 +64,11 @@ public:
         {
             if (player->GetQuestRewardStatus(QUEST_CLEASING_FELWOOD_A))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 2848, creature->GetGUID());
-            } else if (player->GetTeamId() == TEAM_HORDE)
-            SendGossipMenuFor(player, 2845, creature->GetGUID());
+            }
+            else if (player->GetTeamId() == TEAM_HORDE)
+                SendGossipMenuFor(player, 2845, creature->GetGUID());
             else
                 SendGossipMenuFor(player, 2844, creature->GetGUID());
         }
@@ -76,10 +77,11 @@ public:
         {
             if (player->GetQuestRewardStatus(QUEST_CLEASING_FELWOOD_H))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 2849, creature->GetGUID());
-            } else if (player->GetTeamId() == TEAM_ALLIANCE)
-            SendGossipMenuFor(player, 2843, creature->GetGUID());
+            }
+            else if (player->GetTeamId() == TEAM_ALLIANCE)
+                SendGossipMenuFor(player, 2843, creature->GetGUID());
             else
                 SendGossipMenuFor(player, 2842, creature->GetGUID());
         }
@@ -103,25 +105,25 @@ enum AncientMisc
 
 class at_ancient_leaf : public AreaTriggerScript
 {
-    public:
-        at_ancient_leaf() : AreaTriggerScript("at_ancient_leaf") { }
+public:
+    at_ancient_leaf() : AreaTriggerScript("at_ancient_leaf") { }
 
-        bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
-        {
-            if (player->IsGameMaster() || !player->IsAlive())
-                return false;
-
-            // Handle Call Ancients event start - The area trigger summons 3 ancients
-            if ((player->GetQuestStatus(QUEST_ANCIENT_LEAF) == QUEST_STATUS_COMPLETE) || (player->GetQuestStatus(QUEST_ANCIENT_LEAF) == QUEST_STATUS_REWARDED))
-            {
-                // If ancients are already spawned, skip the rest
-                if (GetClosestCreatureWithEntry(player, NPC_VARTRUS, 50.0f) || GetClosestCreatureWithEntry(player, NPC_STOMA, 50.0f) || GetClosestCreatureWithEntry(player, NPC_HASTAT, 50.0f))
-                    return true;
-
-                player->GetMap()->SummonCreatureGroup(CREATURE_GROUP_ANCIENTS);
-            }
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
+    {
+        if (player->IsGameMaster() || !player->IsAlive())
             return false;
+
+        // Handle Call Ancients event start - The area trigger summons 3 ancients
+        if ((player->GetQuestStatus(QUEST_ANCIENT_LEAF) == QUEST_STATUS_COMPLETE) || (player->GetQuestStatus(QUEST_ANCIENT_LEAF) == QUEST_STATUS_REWARDED))
+        {
+            // If ancients are already spawned, skip the rest
+            if (GetClosestCreatureWithEntry(player, NPC_VARTRUS, 50.0f) || GetClosestCreatureWithEntry(player, NPC_STOMA, 50.0f) || GetClosestCreatureWithEntry(player, NPC_HASTAT, 50.0f))
+                return true;
+
+            player->GetMap()->SummonCreatureGroup(CREATURE_GROUP_ANCIENTS);
         }
+        return false;
+    }
 };
 
 void AddSC_felwood()

@@ -20,7 +20,7 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
     if (!unit->IsStopped())
         unit->StopMoving();
 
-    unit->AddUnitState(UNIT_STATE_ROAMING|UNIT_STATE_ROAMING_MOVE);
+    unit->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
     i_recalculateSpeed = false;
     Movement::MoveSplineInit init(unit);
     if (m_precomputedPath.size() > 2) // pussywizard: for charge
@@ -39,8 +39,8 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
             // Xinef: fix strange client visual bug, moving on z coordinate only switches orientation by 180 degrees (visual only)
             if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
             {
-                i_x += 0.2f*cos(unit->GetOrientation());
-                i_y += 0.2f*sin(unit->GetOrientation());
+                i_x += 0.2f * cos(unit->GetOrientation());
+                i_y += 0.2f * sin(unit->GetOrientation());
             }
 
             init.MoveTo(i_x, i_y, i_z);
@@ -51,14 +51,20 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
         // Xinef: fix strange client visual bug, moving on z coordinate only switches orientation by 180 degrees (visual only)
         if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
         {
-            i_x += 0.2f*cos(unit->GetOrientation());
-            i_y += 0.2f*sin(unit->GetOrientation());
+            i_x += 0.2f * cos(unit->GetOrientation());
+            i_y += 0.2f * sin(unit->GetOrientation());
         }
 
         init.MoveTo(i_x, i_y, i_z);
     }
     if (speed > 0.0f)
         init.SetVelocity(speed);
+
+    if (i_orientation > 0.0f)
+    {
+        init.SetFacing(i_orientation);
+    }
+
     init.Launch();
 }
 
@@ -101,6 +107,12 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 /*diff*/)
             init.MoveTo(i_x, i_y, i_z);
         if (speed > 0.0f) // Default value for point motion type is 0.0, if 0.0 spline will use GetSpeed on unit
             init.SetVelocity(speed);
+
+        if (i_orientation > 0.0f)
+        {
+            init.SetFacing(i_orientation);
+        }
+
         init.Launch();
     }
 
@@ -122,7 +134,7 @@ void PointMovementGenerator<T>::DoReset(T* unit)
     if (!unit->IsStopped())
         unit->StopMoving();
 
-    unit->AddUnitState(UNIT_STATE_ROAMING|UNIT_STATE_ROAMING_MOVE);
+    unit->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
 }
 
 template<class T>
