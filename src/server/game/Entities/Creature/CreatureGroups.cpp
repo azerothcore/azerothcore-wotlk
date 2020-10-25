@@ -136,8 +136,7 @@ void FormationMgr::LoadCreatureFormations()
 
         CreatureGroupMap[memberGUID] = group_member;
         ++count;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     sLog->outString(">> Loaded %u creatures in formations in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
@@ -165,10 +164,10 @@ void CreatureGroup::AddMember(Creature* member)
 void CreatureGroup::RemoveMember(Creature* member)
 {
     if (m_leader == member)
-        m_leader = NULL;
+        m_leader = nullptr;
 
     m_members.erase(member);
-    member->SetFormation(NULL);
+    member->SetFormation(nullptr);
 }
 
 void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
@@ -248,7 +247,7 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
             continue;
 
         // Xinef: this should be automatized, if turn angle is greater than PI/2 (90�) we should swap formation angle
-        if (M_PI - fabs(fabs(m_leader->GetOrientation() - pathAngle) - M_PI) > M_PI*0.50f)
+        if (M_PI - fabs(fabs(m_leader->GetOrientation() - pathAngle) - M_PI) > M_PI * 0.50f)
         {
             // pussywizard: in both cases should be 2*M_PI - follow_angle
             // pussywizard: also, GetCurrentWaypointID() returns 0..n-1, while point_1 must be > 0, so +1

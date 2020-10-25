@@ -154,7 +154,7 @@ public:
     Patches::const_iterator begin() const { return _patches.begin(); }
     Patches::const_iterator end() const { return _patches.end(); }
     void LoadPatchMD5(char*);
-    bool GetHash(char * pat, uint8 mymd5[16]);
+    bool GetHash(char* pat, uint8 mymd5[16]);
 
 private:
     void LoadPatchesInfo();
@@ -180,7 +180,7 @@ Patcher PatchesCache;
 
 // Constructor - set the N and g values for SRP6
 AuthSocket::AuthSocket(RealmSocket& socket) :
-    pPatch(NULL), socket_(socket), _status(STATUS_CHALLENGE), _build(0),
+    pPatch(nullptr), socket_(socket), _status(STATUS_CHALLENGE), _build(0),
     _expversion(0), _accountSecurityLevel(SEC_PLAYER)
 {
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
@@ -206,16 +206,16 @@ void AuthSocket::OnClose(void)
 // Read the packet from the client
 void AuthSocket::OnRead()
 {
-    #define MAX_AUTH_LOGON_CHALLENGES_IN_A_ROW 3
+#define MAX_AUTH_LOGON_CHALLENGES_IN_A_ROW 3
     uint32 challengesInARow = 0;
 
-    #define MAX_AUTH_GET_REALM_LIST 10
+#define MAX_AUTH_GET_REALM_LIST 10
     uint32 challengesInARowRealmList = 0;
 
     uint8 _cmd;
     while (1)
     {
-        if (!socket().recv_soft((char *)&_cmd, 1))
+        if (!socket().recv_soft((char*)&_cmd, 1))
             return;
 
         if (_cmd == AUTH_LOGON_CHALLENGE)
@@ -228,14 +228,15 @@ void AuthSocket::OnRead()
                 return;
             }
         }
-        else if (_cmd == REALM_LIST) {
-          challengesInARowRealmList++;
-          if (challengesInARowRealmList == MAX_AUTH_GET_REALM_LIST)
-          {
-              sLog->outString("Got %u REALM_LIST in a row from '%s', possible ongoing DoS", challengesInARowRealmList, socket().getRemoteAddress().c_str());
-              socket().shutdown();
-              return;
-          }
+        else if (_cmd == REALM_LIST)
+        {
+            challengesInARowRealmList++;
+            if (challengesInARowRealmList == MAX_AUTH_GET_REALM_LIST)
+            {
+                sLog->outString("Got %u REALM_LIST in a row from '%s', possible ongoing DoS", challengesInARowRealmList, socket().getRemoteAddress().c_str());
+                socket().shutdown();
+                return;
+            }
         }
 
         size_t i;
@@ -297,7 +298,7 @@ void AuthSocket::_SetVSFields(const std::string& rI)
     v = g.ModExp(x, N);
 
     // No SQL injection (username escaped)
-    char *v_hex, *s_hex;
+    char* v_hex, *s_hex;
     v_hex = v.AsHexStr();
     s_hex = s.AsHexStr();
 
@@ -331,7 +332,7 @@ bool AuthSocket::_HandleLogonChallenge()
     {
         ACORE_GUARD(ACE_Thread_Mutex, LastLoginAttemptMutex);
         std::string ipaddr = socket().getRemoteAddress();
-        uint32 currTime = time(NULL);
+        uint32 currTime = time(nullptr);
         std::map<std::string, uint32>::iterator itr = LastLoginAttemptTimeForIP.find(ipaddr);
         if (itr != LastLoginAttemptTimeForIP.end() && itr->second >= currTime)
         {
@@ -342,7 +343,7 @@ bool AuthSocket::_HandleLogonChallenge()
             socket().send((char const*)pkt.contents(), pkt.size());
             return true;
         }
-        if (LastLoginAttemptCleanTime+60 < currTime)
+        if (LastLoginAttemptCleanTime + 60 < currTime)
         {
             LastLoginAttemptTimeForIP.clear();
             LastLoginAttemptCleanTime = currTime;
@@ -355,11 +356,11 @@ bool AuthSocket::_HandleLogonChallenge()
     std::vector<uint8> buf;
     buf.resize(4);
 
-    socket().recv((char *)&buf[0], 4);
+    socket().recv((char*)&buf[0], 4);
 
     EndianConvertPtr<uint16>(&buf[0]);
 
-    uint16 remaining = ((sAuthLogonChallenge_C *)&buf[0])->size;
+    uint16 remaining = ((sAuthLogonChallenge_C*)&buf[0])->size;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] got header, body is %#04x bytes", remaining);
 #endif
@@ -370,10 +371,10 @@ bool AuthSocket::_HandleLogonChallenge()
     //No big fear of memory outage (size is int16, i.e. < 65536)
     buf.resize(remaining + buf.size() + 1);
     buf[buf.size() - 1] = 0;
-    sAuthLogonChallenge_C *ch = (sAuthLogonChallenge_C*)&buf[0];
+    sAuthLogonChallenge_C* ch = (sAuthLogonChallenge_C*)&buf[0];
 
     // Read the remaining of the packet
-    socket().recv((char *)&buf[4], remaining);
+    socket().recv((char*)&buf[4], remaining);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] got full packet, %#04x bytes", ch->size);
     sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] name(%d): '%s'", ch->I_len, ch->I);
@@ -416,7 +417,7 @@ bool AuthSocket::_HandleLogonChallenge()
     {
         pkt << uint8(WOW_FAIL_BANNED);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] Banned ip tries to login!",socket().getRemoteAddress().c_str(), socket().getRemotePort());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] Banned ip tries to login!", socket().getRemoteAddress().c_str(), socket().getRemotePort());
 #endif
     }
     else
@@ -546,12 +547,12 @@ bool AuthSocket::_HandleLogonChallenge()
                     pkt.append(s.AsByteArray().get(), s.GetNumBytes());   // 32 bytes
                     pkt.append(unk3.AsByteArray(16).get(), 16);
                     uint8 securityFlags = 0;
-					
-					// Check if token is used
+
+                    // Check if token is used
                     _tokenKey = fields[8].GetString();
                     if (!_tokenKey.empty())
                         securityFlags = 4;
-					
+
                     pkt << uint8(securityFlags);            // security flags (0x0...0x04)
 
                     if (securityFlags & 0x01)               // PIN input
@@ -577,11 +578,11 @@ bool AuthSocket::_HandleLogonChallenge()
 
                     _localizationName.resize(4);
                     for (int i = 0; i < 4; ++i)
-                        _localizationName[i] = ch->country[4-i-1];
+                        _localizationName[i] = ch->country[4 - i - 1];
 
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                                        sLog->outDebug( LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str (), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName) );
+                    sLog->outDebug( LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str (), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName) );
 #endif
 
                     ///- All good, await client's proof
@@ -606,7 +607,7 @@ bool AuthSocket::_HandleLogonProof()
     // Read the packet
     sAuthLogonProof_C lp;
 
-    if (!socket().recv((char *)&lp, sizeof(sAuthLogonProof_C)))
+    if (!socket().recv((char*)&lp, sizeof(sAuthLogonProof_C)))
         return false;
 
     _status = STATUS_CLOSED;
@@ -635,7 +636,7 @@ bool AuthSocket::_HandleLogonProof()
     }
 
     SHA1Hash sha;
-    sha.UpdateBigNumbers(&A, &B, NULL);
+    sha.UpdateBigNumbers(&A, &B, nullptr);
     sha.Finalize();
     BigNumber u;
     u.SetBinary(sha.GetDigest(), 20);
@@ -671,11 +672,11 @@ bool AuthSocket::_HandleLogonProof()
     uint8 hash[20];
 
     sha.Initialize();
-    sha.UpdateBigNumbers(&N, NULL);
+    sha.UpdateBigNumbers(&N, nullptr);
     sha.Finalize();
     memcpy(hash, sha.GetDigest(), 20);
     sha.Initialize();
-    sha.UpdateBigNumbers(&g, NULL);
+    sha.UpdateBigNumbers(&g, nullptr);
     sha.Finalize();
 
     for (int i = 0; i < 20; ++i)
@@ -691,9 +692,9 @@ bool AuthSocket::_HandleLogonProof()
     memcpy(t4, sha.GetDigest(), SHA_DIGEST_LENGTH);
 
     sha.Initialize();
-    sha.UpdateBigNumbers(&t3, NULL);
+    sha.UpdateBigNumbers(&t3, nullptr);
     sha.UpdateData(t4, SHA_DIGEST_LENGTH);
-    sha.UpdateBigNumbers(&s, &A, &B, &K, NULL);
+    sha.UpdateBigNumbers(&s, &A, &B, &K, nullptr);
     sha.Finalize();
     BigNumber M;
     M.SetBinary(sha.GetDigest(), 20);
@@ -707,9 +708,9 @@ bool AuthSocket::_HandleLogonProof()
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
-        const char *K_hex = K.AsHexStr();
+        const char* K_hex = K.AsHexStr();
 
-        PreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
         stmt->setString(0, K_hex);
         stmt->setString(1, socket().getRemoteAddress().c_str());
         stmt->setUInt32(2, GetLocaleByName(_localizationName));
@@ -721,10 +722,10 @@ bool AuthSocket::_HandleLogonProof()
 
         // Finish SRP6 and send the final result to the client
         sha.Initialize();
-        sha.UpdateBigNumbers(&A, &M, &K, NULL);
+        sha.UpdateBigNumbers(&A, &M, &K, nullptr);
         sha.Finalize();
 
-		// Check auth token
+        // Check auth token
         if ((lp.securityFlags & 0x04) || !_tokenKey.empty())
         {
             uint8 size;
@@ -742,7 +743,7 @@ bool AuthSocket::_HandleLogonProof()
                 return false;
             }
         }
-		
+
         if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
         {
             sAuthLogonProof_S proof;
@@ -752,7 +753,7 @@ bool AuthSocket::_HandleLogonProof()
             proof.unk1 = 0x00800000;    // Accountflags. 0x01 = GM, 0x08 = Trial, 0x00800000 = Pro pass (arena tournament)
             proof.unk2 = 0x00;          // SurveyId
             proof.unk3 = 0x00;
-            socket().send((char *)&proof, sizeof(proof));
+            socket().send((char*)&proof, sizeof(proof));
         }
         else
         {
@@ -761,7 +762,7 @@ bool AuthSocket::_HandleLogonProof()
             proof.cmd = AUTH_LOGON_PROOF;
             proof.error = 0;
             proof.unk2 = 0x00;
-            socket().send((char *)&proof, sizeof(proof));
+            socket().send((char*)&proof, sizeof(proof));
         }
 
         ///- Set _status to authed!
@@ -829,7 +830,7 @@ bool AuthSocket::_HandleLogonProof()
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                         sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] IP %s got banned for '%u' seconds because account %s failed to authenticate '%u' times",
-                            socket().getRemoteAddress().c_str(), socket().getRemotePort(), socket().getRemoteAddress().c_str(), WrongPassBanTime, _login.c_str(), failed_logins);
+                                       socket().getRemoteAddress().c_str(), socket().getRemotePort(), socket().getRemoteAddress().c_str(), WrongPassBanTime, _login.c_str(), failed_logins);
 #endif
                     }
                 }
@@ -853,11 +854,11 @@ bool AuthSocket::_HandleReconnectChallenge()
     std::vector<uint8> buf;
     buf.resize(4);
 
-    socket().recv((char *)&buf[0], 4);
+    socket().recv((char*)&buf[0], 4);
 
     EndianConvertPtr<uint16>(&buf[0]);
 
-    uint16 remaining = ((sAuthLogonChallenge_C *)&buf[0])->size;
+    uint16 remaining = ((sAuthLogonChallenge_C*)&buf[0])->size;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "[ReconnectChallenge] got header, body is %#04x bytes", remaining);
 #endif
@@ -871,10 +872,10 @@ bool AuthSocket::_HandleReconnectChallenge()
     // No big fear of memory outage (size is int16, i.e. < 65536)
     buf.resize(remaining + buf.size() + 1);
     buf[buf.size() - 1] = 0;
-    sAuthLogonChallenge_C *ch = (sAuthLogonChallenge_C*)&buf[0];
+    sAuthLogonChallenge_C* ch = (sAuthLogonChallenge_C*)&buf[0];
 
     // Read the remaining of the packet
-    socket().recv((char *)&buf[4], remaining);
+    socket().recv((char*)&buf[4], remaining);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "[ReconnectChallenge] got full packet, %#04x bytes", ch->size);
     sLog->outDebug(LOG_FILTER_NETWORKIO, "[ReconnectChallenge] name(%d): '%s'", ch->I_len, ch->I);
@@ -933,7 +934,7 @@ bool AuthSocket::_HandleReconnectProof()
 #endif
     // Read the packet
     sAuthReconnectProof_C lp;
-    if (!socket().recv((char *)&lp, sizeof(sAuthReconnectProof_C)))
+    if (!socket().recv((char*)&lp, sizeof(sAuthReconnectProof_C)))
         return false;
 
     _status = STATUS_CLOSED;
@@ -947,7 +948,7 @@ bool AuthSocket::_HandleReconnectProof()
     SHA1Hash sha;
     sha.Initialize();
     sha.UpdateData(_login);
-    sha.UpdateBigNumbers(&t1, &_reconnectProof, &K, NULL);
+    sha.UpdateBigNumbers(&t1, &_reconnectProof, &K, nullptr);
     sha.Finalize();
 
     if (!memcmp(sha.GetDigest(), lp.R2, SHA_DIGEST_LENGTH))
@@ -1032,7 +1033,7 @@ bool AuthSocket::_HandleRealmList()
     size_t RealmListSize = 0;
     for (RealmList::RealmMap::const_iterator i = sRealmList->begin(); i != sRealmList->end(); ++i)
     {
-        const Realm &realm = i->second;
+        const Realm& realm = i->second;
         // don't work with realms which not compatible with the client
         bool okBuild = ((_expversion & POST_BC_EXP_FLAG) && realm.gamebuild == _build) || ((_expversion & PRE_BC_EXP_FLAG) && !AuthHelper::IsPreBCAcceptedClientBuild(realm.gamebuild));
 
@@ -1199,8 +1200,8 @@ void PatcherRunnable::run() { }
 #include <errno.h>
 void Patcher::LoadPatchesInfo()
 {
-    DIR *dirp;
-    struct dirent *dp;
+    DIR* dirp;
+    struct dirent* dp;
     dirp = opendir("./patches/");
 
     if (!dirp)
@@ -1209,7 +1210,7 @@ void Patcher::LoadPatchesInfo()
     while (dirp)
     {
         errno = 0;
-        if ((dp = readdir(dirp)) != NULL)
+        if ((dp = readdir(dirp)) != nullptr)
         {
             int l = strlen(dp->d_name);
 
@@ -1248,7 +1249,7 @@ void Patcher::LoadPatchesInfo()
 #endif
 
 // Calculate and store MD5 hash for a given patch file
-void Patcher::LoadPatchMD5(char *szFileName)
+void Patcher::LoadPatchMD5(char* szFileName)
 {
     // Try to open the patch file
     std::string path = "./patches/";
@@ -1280,11 +1281,11 @@ void Patcher::LoadPatchMD5(char *szFileName)
 
     // Store the result in the internal patch hash map
     _patches[path] = new PATCH_INFO;
-    MD5_Final((uint8 *)&_patches[path]->md5, &ctx);
+    MD5_Final((uint8*)&_patches[path]->md5, &ctx);
 }
 
 // Get cached MD5 hash for a given patch file
-bool Patcher::GetHash(char * pat, uint8 mymd5[16])
+bool Patcher::GetHash(char* pat, uint8 mymd5[16])
 {
     for (Patches::iterator i = _patches.begin(); i != _patches.end(); ++i)
         if (!stricmp(pat, i->first.c_str()))
