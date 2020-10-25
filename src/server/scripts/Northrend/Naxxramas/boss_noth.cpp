@@ -185,7 +185,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 // GROUND
                 case EVENT_SPELL_CURSE:
@@ -202,13 +202,12 @@ public:
                 case EVENT_SUMMON_PLAGUED_WARRIOR_REAL:
                     me->CastSpell(me, SPELL_SUMMON_PLAGUED_WARRIORS, true);
                     SummonHelper(NPC_PLAGUED_WARRIOR, RAID_MODE(2, 3));
-                    events.PopEvent();
                     break;
                 case EVENT_MOVE_TO_BALCONY:
                     Talk(EMOTE_TELEPORT_BALCONY);
                     me->CastSpell(me, SPELL_TELEPORT, true);
                     StartBalconyPhase();
-                    //events.PopEvent(); events.Reset()!!
+                    // events.Reset()!!
                     break;
                 case EVENT_SPELL_BLINK:
                     DoResetThreat();
@@ -234,7 +233,6 @@ public:
                     }
                     else
                         SummonHelper(NPC_PLAGUED_GUARDIAN, RAID_MODE(2, 4));
-                    events.PopEvent();
                     break;
                 case EVENT_MOVE_TO_GROUND:
                     Talk(EMOTE_TELEPORT_BACK);

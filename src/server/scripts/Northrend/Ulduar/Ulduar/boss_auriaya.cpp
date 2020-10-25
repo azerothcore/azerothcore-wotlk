@@ -224,17 +224,15 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SUMMON_FERAL_DEFENDER:
                     me->MonsterTextEmote("Auriaya begins to activate Feral Defender.", 0, true);
                     me->CastSpell(me, SPELL_ACTIVATE_FERAL_DEFENDER, true);
-                    events.PopEvent();
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
                     events.ScheduleEvent(EVENT_REMOVE_IMMUNE, 3000);
                     break;
                 case EVENT_REMOVE_IMMUNE:
-                    events.PopEvent();
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
                     break;
                 case EVENT_TERRIFYING_SCREECH:
@@ -259,14 +257,12 @@ public:
                     {
                         EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
                         summons.DoAction(ACTION_FERAL_RESPAWN, pred);
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_ENRAGE:
                     me->MonsterTextEmote("You waste my time!", 0);
                     me->PlayDirectSound(SOUND_BERSERK);
                     me->CastSpell(me, SPELL_ENRAGE, true);
-                    events.PopEvent();
                     break;
             }
 
