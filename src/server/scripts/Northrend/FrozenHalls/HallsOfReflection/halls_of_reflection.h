@@ -319,7 +319,7 @@ const Position CannonFirePos[2][3] =
     }
 };
 
-const Position StairsPos[2][3] = 
+const Position StairsPos[2][3] =
 {
     {
         {5226.36f, 1640.87f, 785.737f, 5.56137f},

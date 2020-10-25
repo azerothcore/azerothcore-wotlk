@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
- /* ScriptData
- SDName: Boss_Magmadar
- SD%Complete: 75
- SDComment: Conflag on ground nyi
- SDCategory: Molten Core
- EndScriptData */
+/* ScriptData
+SDName: Boss_Magmadar
+SD%Complete: 75
+SDComment: Conflag on ground nyi
+SDCategory: Molten Core
+EndScriptData */
 
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
@@ -80,22 +80,22 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_FRENZY:
-                    Talk(EMOTE_FRENZY);
-                    DoCast(me, SPELL_FRENZY);
-                    events.ScheduleEvent(EVENT_FRENZY, 15000);
-                    break;
-                case EVENT_PANIC:
-                    DoCastVictim(SPELL_PANIC);
-                    events.ScheduleEvent(EVENT_PANIC, 35000);
-                    break;
-                case EVENT_LAVA_BOMB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_LAVA_BOMB))
-                        DoCast(target, SPELL_LAVA_BOMB);
-                    events.ScheduleEvent(EVENT_LAVA_BOMB, 12000);
-                    break;
-                default:
-                    break;
+                    case EVENT_FRENZY:
+                        Talk(EMOTE_FRENZY);
+                        DoCast(me, SPELL_FRENZY);
+                        events.ScheduleEvent(EVENT_FRENZY, 15000);
+                        break;
+                    case EVENT_PANIC:
+                        DoCastVictim(SPELL_PANIC);
+                        events.ScheduleEvent(EVENT_PANIC, 35000);
+                        break;
+                    case EVENT_LAVA_BOMB:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_LAVA_BOMB))
+                            DoCast(target, SPELL_LAVA_BOMB);
+                        events.ScheduleEvent(EVENT_LAVA_BOMB, 12000);
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -122,11 +122,12 @@ public:
         }
 
         EventMap events;
-        std::list<Creature *> hounds;
+        std::list<Creature*> hounds;
         bool smoldering = false;
         Unit* killer;
 
-        void removeFeignDeath() {
+        void removeFeignDeath()
+        {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
             me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
             me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
@@ -161,11 +162,13 @@ public:
             }
         }
 
-        void Reset() {
+        void Reset()
+        {
             removeFeignDeath();
         }
 
-        void JustDied(Unit* /*killer*/) {
+        void JustDied(Unit* /*killer*/)
+        {
             removeFeignDeath();
         }
 
@@ -185,47 +188,48 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_SERRATED_BITE:
-                    if (UpdateVictim() && !smoldering) {
-                        DoCast(me->GetVictim(), SPELL_SERRATED_BITE);
-                        events.ScheduleEvent(EVENT_SERRATED_BITE, 10000); // again, timer may be wrong
-                    }
-                    break;
-                case EVENT_IGNITE:
-                    smoldering = false;
-                    me->GetCreaturesWithEntryInRange(hounds, 80, NPC_CORE_HOUND);
-                    for (Creature * i : hounds)
-                    {
-                        if (i && i->IsAlive() && i->IsInCombat() && !i->HasUnitState(UNIT_STATE_DIED))
+                    case EVENT_SERRATED_BITE:
+                        if (UpdateVictim() && !smoldering)
                         {
-                            Talk(EMOTE_IGNITE);
-                            me->SetFullHealth();
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                            me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                            me->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
-                            me->ClearUnitState(UNIT_STATE_DIED);
-                            me->ClearUnitState(UNIT_STATE_CANNOT_AUTOATTACK);
-                            me->DisableRotate(false);
-                            me->AI()->AttackStart(i->GetVictim());
-                            return;
+                            DoCast(me->GetVictim(), SPELL_SERRATED_BITE);
+                            events.ScheduleEvent(EVENT_SERRATED_BITE, 10000); // again, timer may be wrong
                         }
-                    }
-                    if (me->HasUnitState(UNIT_STATE_DIED))
-                    {
-                        if (killer)
+                        break;
+                    case EVENT_IGNITE:
+                        smoldering = false;
+                        me->GetCreaturesWithEntryInRange(hounds, 80, NPC_CORE_HOUND);
+                        for (Creature* i : hounds)
                         {
-                            me->Kill(killer, me);
+                            if (i && i->IsAlive() && i->IsInCombat() && !i->HasUnitState(UNIT_STATE_DIED))
+                            {
+                                Talk(EMOTE_IGNITE);
+                                me->SetFullHealth();
+                                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                                me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                                me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                                me->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
+                                me->ClearUnitState(UNIT_STATE_DIED);
+                                me->ClearUnitState(UNIT_STATE_CANNOT_AUTOATTACK);
+                                me->DisableRotate(false);
+                                me->AI()->AttackStart(i->GetVictim());
+                                return;
+                            }
                         }
-                        else
+                        if (me->HasUnitState(UNIT_STATE_DIED))
                         {
-                            me->Kill(me, me);
+                            if (killer)
+                            {
+                                me->Kill(killer, me);
+                            }
+                            else
+                            {
+                                me->Kill(me, me);
+                            }
                         }
-                    }
-                    break;
-                default:
-                    break;
+                        break;
+                    default:
+                        break;
                 }
             }
 
