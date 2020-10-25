@@ -3223,17 +3223,20 @@ void Unit::_UpdateAutoRepeatSpell()
     {
         return;
     }
+    
+    static uint32 const HUNTER_AUTOSHOOT = 75;
 
     // Check "realtime" interrupts
-    if ((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving() && spellProto->Id != 75) || IsNonMeleeSpellCast(false, false, true, spellProto->Id == 75))
+    if ((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving() && spellProto->Id != HUNTER_AUTOSHOOT) ||
+        IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
     {
         InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
         m_AutoRepeatFirstCast = true;
         return;
     }
 
-    // Apply delay (Auto Shot (spellID 75) not affected)
-    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && spellProto->Id != 75)
+    // Apply delay (Hunter's autoshoot not affected)
+    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && spellProto->Id != HUNTER_AUTOSHOOT)
     {
         setAttackTimer(RANGED_ATTACK, 500);
     }
@@ -3246,7 +3249,7 @@ void Unit::_UpdateAutoRepeatSpell()
         SpellCastResult result = m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->CheckCast(true);
         if (result != SPELL_CAST_OK)
         {
-            if (spellProto->Id != 75)
+            if (spellProto->Id != HUNTER_AUTOSHOOT)
             {
                 InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
             }
