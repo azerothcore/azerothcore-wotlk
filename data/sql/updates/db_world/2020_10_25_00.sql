@@ -1,3 +1,19 @@
+-- DB update 2020_10_22_00 -> 2020_10_25_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_10_22_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_10_22_00 2020_10_25_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1601240498542654700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1601240498542654700');
 
 /*
@@ -36,3 +52,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18693, 0, 4, 0, 2, 0, 100, 0, 19, 69, 19, 69, 0, 11, 15497, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Speaker Mar\'grom - Between 19-69% Health - Cast 15497'),
 (18693, 0, 5, 0, 2, 0, 100, 0, 0, 19, 0, 19, 0, 11, 15241, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Speaker Mar\'grom - Between 0-19% Health - Cast 15241');
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
