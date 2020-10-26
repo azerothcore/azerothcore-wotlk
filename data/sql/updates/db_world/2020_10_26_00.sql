@@ -1,3 +1,19 @@
+-- DB update 2020_10_25_00 -> 2020_10_26_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_10_25_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_10_25_00 2020_10_26_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1601314356612298800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1601314356612298800');
 /*
  * Zone: Eastern Plaguelands
@@ -38,3 +54,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (12387, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 13901, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Large Vile Slime - On Aggro - Cast \'13901\''),
 (12387, 0, 1, 0, 2, 0, 100, 1, 30, 60, 0, 0, 11, 16843, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Large Vile Slime - Between 30-60% Health - Cast \'16843\' (No Repeat)'),
 (12387, 0, 2, 0, 2, 0, 100, 1, 10, 20, 0, 0, 11, 11975, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Large Vile Slime - Between 10-20% Health - Cast \'11975\' (No Repeat)');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
