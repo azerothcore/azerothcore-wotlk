@@ -61,7 +61,7 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1844;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 1844);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1844, 0, 0, 0, 0, 0, 100, 0, 2450, 3800, 8700, 9200, 11, 11976, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Foreman Marcrid - In Combat - Cast \'11976\''),
-(1844, 0, 1, 0, 12, 0, 100, 1, 20, 50, 0, 0, 0, 15284, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Foreman Marcrid - Target Between 20-50% Health - No Action Type (No Repeat)');
+(1844, 0, 1, 0, 12, 0, 100, 1, 20, 50, 0, 0, 11, 15284, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Foreman Marcrid - Target Between 20-50% Health - Cast \'15284\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1847;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 1847);
@@ -80,7 +80,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10359;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 10359);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(10359, 0, 0, 0, 0, 0, 100, 1, 2700, 3900, 0, 0, 0, 3583, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sri\'skulk - In Combat - No Action Type (No Repeat)');
+(10359, 0, 0, 0, 0, 0, 100, 1, 2700, 3900, 0, 0, 11, 3583, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sri\'skulk - In Combat - Cast \'3583\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1531;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 1531);
