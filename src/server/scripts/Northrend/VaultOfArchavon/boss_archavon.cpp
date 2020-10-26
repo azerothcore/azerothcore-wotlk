@@ -76,7 +76,9 @@ class boss_archavon : public CreatureScript
             void AttackStart(Unit* who)
             {
                 if (me->HasAura(SPELL_STONED_AURA))
+                {
                     return;
+                }
 
                 ScriptedAI::AttackStart(who);
             }
@@ -89,36 +91,48 @@ class boss_archavon : public CreatureScript
                 events.ScheduleEvent(EVENT_BERSERK, 300000);
 
                 if (pInstance)
+                {
                     pInstance->SetData(EVENT_ARCHAVON, IN_PROGRESS);
+                }
             }
 
-            void JustDied(Unit* )
+            void JustDied(Unit*)
             {
                 if (pInstance)
+                {
                     pInstance->SetData(EVENT_ARCHAVON, DONE);
+                }
             }
 
             void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
+                {
                     return;
+                }
 
                 events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
                     return;
+                }
 
                 switch (events.ExecuteEvent())
                 {
                     case EVENT_ROCK_SHARDS:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        {
                             DoCast(target, SPELL_ROCK_SHARDS);
+                        }
                         
                         events.RepeatEvent(15000);
                         break;
                     case EVENT_CHOKING_CLOUD:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                        {
                             DoCast(target, RAID_MODE(SPELL_CRUSHING_LEAP_10, SPELL_CRUSHING_LEAP_25), true); //10y ~ 80y, ignore range
+                        }
                         
                         events.RepeatEvent(30000);
                         break;
