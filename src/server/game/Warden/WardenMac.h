@@ -18,17 +18,17 @@ class Warden;
 
 class WardenMac : public Warden
 {
-    public:
-        WardenMac();
-        ~WardenMac();
+public:
+    WardenMac();
+    ~WardenMac();
 
-        void Init(WorldSession* session, BigNumber* k);
-        ClientWardenModule* GetModuleForClient();
-        void InitializeModule();
-        void RequestHash();
-        void HandleHashResult(ByteBuffer& buff);
-        void RequestData();
-        void HandleData(ByteBuffer& buff);
+    void Init(WorldSession* session, BigNumber* k);
+    ClientWardenModule* GetModuleForClient();
+    void InitializeModule();
+    void RequestHash();
+    void HandleHashResult(ByteBuffer& buff);
+    void RequestData();
+    void HandleData(ByteBuffer& buff);
 };
 
 #endif
