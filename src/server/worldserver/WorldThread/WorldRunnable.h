@@ -14,14 +14,14 @@
 /// Heartbeat thread for the World
 class WorldRunnable : public acore::Runnable
 {
-    public:
-        void run();
+public:
+    void run();
 };
 
 class AuctionListingRunnable : public acore::Runnable
 {
-    public:
-        void run();
+public:
+    void run();
 };
 #endif
 /// @}
