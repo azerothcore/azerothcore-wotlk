@@ -1408,7 +1408,7 @@ public:
 
         bool spawned;
 
-        bool Load()
+        bool Load() override
         {
             spawned = false;
             return true;
