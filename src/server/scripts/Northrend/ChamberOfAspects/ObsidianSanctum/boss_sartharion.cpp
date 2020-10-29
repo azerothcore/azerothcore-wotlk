@@ -395,7 +395,7 @@ public:
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
-            if (dragonsCount && !usedBerserk && me->HealthBelowPctDamaged(36, damage))
+            if (!usedBerserk && me->HealthBelowPctDamaged(30, damage))
             {
                 DoCastSelf(SPELL_SARTHARION_BERSERK, true);
                 usedBerserk = true;
