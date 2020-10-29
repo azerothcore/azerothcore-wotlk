@@ -177,7 +177,7 @@ public:
                 return;
             }
 
-            while (uint32 const eventId = events.GetEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
@@ -206,23 +206,9 @@ public:
                     if (!me->HasAura(SPELL_ENRAGE) && (me->GetPositionZ() < 24.0f || !me->GetHomePosition().IsInDist(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 110.0f)))
                     {
                         DoCastSelf(SPELL_ENRAGE, true);
-                        events.PopEvent();
-                        break;
                     }
-                case EVENT_CHECK_HOME:
-                    {
-                        if (me->HasAura(SPELL_ENRAGE))
-                            break;
-
-                        if (me->GetPositionZ() < 24)
-                        {
-                            me->CastSpell(me, SPELL_ENRAGE, true);
-                            events.PopEvent();
-                            break;
-                        }
-
-                    events.RepeatEvent(2000);
-                }break;
+                    break;
+                }
                 }
             }
 
@@ -356,47 +342,41 @@ public:
     {
         PrepareSpellScript(spell_ahn_kahet_swarmer_aura_SpellScript)
 
-            void CountTargets(std::list<WorldObject*>& targets)
-            {
-                _targetCount = static_cast<uint32>(targets.size());
-            }
+        void CountTargets(std::list<WorldObject*>& targets)
+        {
+            _targetCount = static_cast<uint32>(targets.size());
+        }
 
-            void HandleDummy(SpellEffIndex /*effIndex*/)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            if (_targetCount)
             {
-                Unit* caster = GetCaster();
-                if (_targetCount)
+                if (Aura *aur = caster->GetAura(SPELL_SWARM))
                 {
+                    aur->SetStackAmount(static_cast<uint8>(_targetCount));
+                }
+                else if (_targetCount)
+                {
+                    // TODO: move spell id to enum
+                    caster->CastCustomSpell(SPELL_SWARM, SPELLVALUE_AURA_STACK, _targetCount, caster, true);
                     if (Aura *aur = caster->GetAura(SPELL_SWARM))
                     {
                         aur->SetStackAmount(static_cast<uint8>(_targetCount));
                     }
-                    else if (_targetCount)
-                    {
-                        // TODO: move spell id to enum
-                        caster->CastCustomSpell(SPELL_SWARM, SPELLVALUE_AURA_STACK, _targetCount, caster, true);
-                        if (Aura *aur = caster->GetAura(SPELL_SWARM))
-                        {
-                            aur->SetStackAmount(static_cast<uint8>(_targetCount));
-                        }
-                    }
-                }
-                else
-                {
-                    caster->RemoveAurasDueToSpell(SPELL_SWARM);
                 }
             }
-
-            uint32 _targetCount;
-
-            void Register()
+            else
             {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ahn_kahet_swarmer_aura_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
-                OnEffectHitTarget += SpellEffectFn(spell_ahn_kahet_swarmer_aura_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+                caster->RemoveAurasDueToSpell(SPELL_SWARM);
             }
         }
 
+        uint32 _targetCount;
+
         void Register()
         {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ahn_kahet_swarmer_aura_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
             OnEffectHitTarget += SpellEffectFn(spell_ahn_kahet_swarmer_aura_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };

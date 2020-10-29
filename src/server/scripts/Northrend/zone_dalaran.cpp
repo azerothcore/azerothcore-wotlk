@@ -181,12 +181,11 @@ public:
         void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
-            switch (_events.GetEvent())
+            switch (_events.ExecuteEvent())
             {
                 case EVENT_INTRO_DH1:
                     Talk(SAY_SHANDY3);
                     _events.ScheduleEvent(EVENT_INTRO_DH2, 15000);
-                    _events.PopEvent();
                     break;
                 case EVENT_INTRO_DH2:
                     if (_lCount++ > 6)
@@ -194,28 +193,23 @@ public:
                     else
                         RollTask();
 
-                    _events.PopEvent();
                     break;
                 case EVENT_INTRO_DH3:
                     Talk(SAY_SHANDY4);
                     _events.ScheduleEvent(EVENT_INTRO_DH4, 20000);
-                    _events.PopEvent();
                     break;
                 case EVENT_INTRO_DH4:
                     Talk(SAY_SHANDY5);
                     _events.ScheduleEvent(EVENT_INTRO_DH5, 3000);
-                    _events.PopEvent();
                     break;
                 case EVENT_INTRO_DH5:
                     me->SummonGameObject(201384, 5798.74f, 693.19f, 657.94f, 0.91f, 0, 0, 0, 0, 90000000);
                     _events.ScheduleEvent(EVENT_INTRO_DH6, 1000);
-                    _events.PopEvent();
                     break;
                 case EVENT_INTRO_DH6:
                     me->SetWalk(true);
                     me->GetMotionMaster()->MovePoint(0, 5797.55f, 691.97f, 657.94f);
                     _events.RescheduleEvent(EVENT_OUTRO_DH, 30000);
-                    _events.PopEvent();
                     break;
                 case EVENT_OUTRO_DH:
                     me->GetMotionMaster()->MoveTargetedHome();

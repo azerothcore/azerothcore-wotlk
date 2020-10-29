@@ -427,7 +427,7 @@ public:
                 return;
             }
 
-            while (uint32 const eventId = events.GetEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
@@ -435,7 +435,7 @@ public:
                     case EVENT_JEDOGA_CYCLONE:
                     {
                         DoCastSelf(DUNGEON_MODE(SPELL_CYCLONE_STRIKE, SPELL_CYCLONE_STRIKE_H), false);
-                        events.RescheduleEvent(eventId, urand(10000, 14000), 0, PHASE_NORMAL);
+                        events.RepeatEvent(urand(10000, 14000));
                         break;
                     }
                     case EVENT_JEDOGA_LIGHTNING_BOLT:
@@ -444,7 +444,7 @@ public:
                         {
                             DoCast(pTarget, DUNGEON_MODE(SPELL_LIGHTNING_BOLT, SPELL_LIGHTNING_BOLT_H), false);
                         }
-                        events.RescheduleEvent(eventId, urand(11000, 15000), 0, PHASE_NORMAL);
+                        events.RepeatEvent(urand(11000, 15000));
                         break;
                     }
                     case EVENT_JEDOGA_THUNDERSHOCK:
@@ -454,7 +454,7 @@ public:
                             DoCast(pTarget, DUNGEON_MODE(SPELL_THUNDERSHOCK, SPELL_THUNDERSHOCK_H), false);
                         }
 
-                        events.RescheduleEvent(eventId, urand(16000, 22000), 0, PHASE_NORMAL);
+                        events.RepeatEvent(urand(16000, 22000));
                         break;
                     }
                     // Ritual phase
@@ -462,7 +462,6 @@ public:
                     {
                         me->GetMotionMaster()->Clear(true);
                         me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[1]);
-                        events.PopEvent();
                         break;
                     }
                     case EVENT_JEDOGA_MOVE_UP:
@@ -471,7 +470,6 @@ public:
                         me->SetDisableGravity(true);
                         me->SetHover(true);
                         me->GetMotionMaster()->MoveTakeoff(POINT_UP, JedogaPosition[0], 7.0f);
-                        events.PopEvent();
                         break;
                     }
                     case EVENT_JEDOGA_MOVE_DOWN:
@@ -480,7 +478,6 @@ public:
                         DoCastSelf(SPELL_HOVER_FALL);
                         me->GetMotionMaster()->Clear();
                         me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], false);
-                        events.PopEvent();
                         break;
                     }
                 }
@@ -635,13 +632,12 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            if (events.GetEvent() == EVENT_RITUAL_BEGIN_MOVE)
+            if (events.ExecuteEvent() == EVENT_RITUAL_BEGIN_MOVE)
             {
                 me->GetMotionMaster()->Clear();
                 me->SetHomePosition(JedogaPosition[2]);
                 me->SetWalk(true);
                 me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[2], false);
-                events.PopEvent();
             }
 
             if (isSacraficeTarget)

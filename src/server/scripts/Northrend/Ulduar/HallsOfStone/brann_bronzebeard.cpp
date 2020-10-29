@@ -390,24 +390,21 @@ public:
         void UpdateEscortAI(uint32 diff) override
         {
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_KADDRAK_VISUAL:
                     {
                         SwitchHeadVisaul(0x1, true);
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_MARNAK_VISUAL:
                     {
                         SwitchHeadVisaul(0x2, true);
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_ABEDNEUM_VISUAL:
                     {
                         SwitchHeadVisaul(0x4, true);
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_KADDRAK_HEAD: // First
@@ -434,7 +431,6 @@ public:
                             kaddrak->StopMovingOnCurrentPos();
                         }
 
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_MARNAK_HEAD: // Second
@@ -727,7 +723,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_DRP_CHARGE:
                     {
@@ -785,7 +781,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_DRS_LIGHTNING_BOLD:
                     {
@@ -839,7 +835,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_IGC_CRUSH:
                     {

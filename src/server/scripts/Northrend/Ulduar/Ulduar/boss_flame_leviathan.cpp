@@ -384,7 +384,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_POSITION_CHECK:
                     if (me->GetPositionX() > 450 || me->GetPositionX() < 120)
@@ -423,10 +423,8 @@ public:
                         Talk(FLAME_LEVIATHAN_SAY_HARDMODE);
                     else
                         Talk(FLAME_LEVIATHAN_SAY_TOWER_NONE);
-                    events.PopEvent();
                     return;
                 case EVENT_REINSTALL:
-                    events.PopEvent();
                     for (uint8 i = RAID_MODE(0, 2); i < 4; ++i)
                         if (Unit* seat = vehicle->GetPassenger(i))
                             if (seat->GetTypeId() == TYPEID_UNIT)
@@ -441,19 +439,16 @@ public:
                     return;
                 case EVENT_FREYA:
                     SummonTowerHelpers(TOWER_OF_LIFE);
-                    events.PopEvent();
                     me->MonsterTextEmote("Flame Leviathan activates Freya's Ward.", 0, true);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_NATURE);
                     return;
                 case EVENT_MIMIRONS_INFERNO:
                     SummonTowerHelpers(TOWER_OF_FLAMES);
-                    events.PopEvent();
                     me->MonsterTextEmote("Flame Leviathan activates Mimiron's Inferno.", 0, true);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_FLAME);
                     return;
                 case EVENT_HODIRS_FURY:
                     SummonTowerHelpers(TOWER_OF_FROST);
-                    events.PopEvent();
                     me->MonsterTextEmote("Flame Leviathan activates Hodir's Fury.", 0, true);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_FROST);
                     return;

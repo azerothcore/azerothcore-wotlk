@@ -351,87 +351,93 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
-            while (uint32 const eventId = events.GetEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
-                case EVENT_PRINCE_BLOODTHIRST:
-                {
-                    DoCastSelf(SPELL_BLOODTHIRST);
-                    events.RepeatEvent(10000);
-                }break;
-                case EVENT_PRINCE_FLAME_SPHERES:
-                {
-                    if (Unit* victim = me->GetVictim())
+                    case EVENT_PRINCE_BLOODTHIRST:
                     {
-                        DoCast(victim, SPELL_CONJURE_FLAME_SPHERE);
-                        victimSperePos = *victim;
-                    }
-                    events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
-                    events.RepeatEvent(15000);
-                }break;
-                case EVENT_PRINCE_VANISH:
-                {
-                    //Count alive players
-                    uint8 count = 0;
-                    std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
-                    if (!t_list.empty())
+                        DoCastSelf(SPELL_BLOODTHIRST);
+                        events.RepeatEvent(10000);
+                    }break;
+                    case EVENT_PRINCE_FLAME_SPHERES:
                     {
-                        for (HostileReference const* reference : t_list)
+                        if (Unit* victim = me->GetVictim())
                         {
-                            if (!reference)
+                            DoCast(victim, SPELL_CONJURE_FLAME_SPHERE);
+                            victimSperePos = *victim;
+                        }
+                        events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
+                        events.RepeatEvent(15000);
+                    }break;
+                    case EVENT_PRINCE_VANISH:
+                    {
+                        //Count alive players
+                        uint8 count = 0;
+                        std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
+                        if (!t_list.empty())
+                        {
+                            for (HostileReference const* reference : t_list)
                             {
-                                continue;
-                            }
+                                if (!reference)
+                                {
+                                    continue;
+                                }
 
-                            Unit const* pTarget = ObjectAccessor::GetUnit(*me, reference->getUnitGuid());
-                            if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
-                            {
-                                ++count;
+                                Unit const* pTarget = ObjectAccessor::GetUnit(*me, reference->getUnitGuid());
+                                if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
+                                {
+                                    ++count;
+                                }
                             }
                         }
-                    }
 
-                    //He only vanishes if there are 3 or more alive players
-                    if (count > 2)
+                        //He only vanishes if there are 3 or more alive players
+                        if (count > 2)
+                        {
+                            Talk(SAY_VANISH);
+                            DoCastSelf(SPELL_VANISH, false);
+
+                            if (Unit* pEmbraceTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                                vanishTarget_GUID = pEmbraceTarget->GetGUID();
+
+                            events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
+                            events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
+                            events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499);
+
+                        }
+                    }break;
+                    case EVENT_PRINCE_VANISH_RUN:
                     {
-                        Talk(SAY_VANISH);
-                        DoCastSelf(SPELL_VANISH, false);
+                        if (Unit* _vanishTarget = ObjectAccessor::GetUnit(*me, vanishTarget_GUID))
+                        {
+                            DoCast(_vanishTarget, SPELL_SHADOWSTEP);
+                            me->CastSpell(_vanishTarget, SPELL_EMBRACE_OF_THE_VAMPYR, false);
+                            me->RemoveAura(SPELL_VANISH);
+                        }
 
-                        if (Unit* pEmbraceTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                            vanishTarget_GUID = pEmbraceTarget->GetGUID();
-
-                        events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
-                        events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
-                        events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499);
-
-                    }
-                    events.PopEvent();
-                }break;
-                case EVENT_PRINCE_VANISH_RUN:
-                {
-                    if (Unit* _vanishTarget = ObjectAccessor::GetUnit(*me, vanishTarget_GUID))
+                        events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20000);
+                    }break;
+                    case EVENT_PRINCE_RESCHEDULE:
                     {
-                        DoCast(_vanishTarget, SPELL_SHADOWSTEP);
-                        me->CastSpell(_vanishTarget, SPELL_EMBRACE_OF_THE_VAMPYR, false);
-                        me->RemoveAura(SPELL_VANISH);
-                    }
+                        ScheduleCombatEvents();
+                    }break;
+                }
 
-                    events.PopEvent();
-                    events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20000);
-                }break;
-                case EVENT_PRINCE_RESCHEDULE:
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                 {
-                    events.PopEvent();
-                    ScheduleCombatEvents();
-                }break;
+                    return;
                 }
             }
 
