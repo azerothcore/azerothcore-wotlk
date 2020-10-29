@@ -84,51 +84,50 @@ public:
                 case 7326:
                 // Gonna Go When the Volcano Blows (25 player) (2048)
                 case 7327:
-                    if (Creature* cr = instance->GetCreature(m_uiSartharionGUID))
-                        if (!cr->AI()->GetData(source->GetGUIDLow()))
-                            return true;
-                    break;
+                {
+                    Creature const* sartharion = instance->GetCreature(m_uiSartharionGUID);
+                    return sartharion && !sartharion->AI()->GetData(source->GetGUIDLow());
+                }
                 // Less Is More (10 player) (624)
                 case 7189:
                 case 7190:
                 case 7191:
                 case 522:
-                    if (instance->GetPlayersCountExceptGMs() < 9)
-                        return true;
-                    break;
+                {
+                    return instance->GetPlayersCountExceptGMs() < 9;
+                }
                 // Less Is More (25 player) (1877)
                 case 7185:
                 case 7186:
                 case 7187:
                 case 7188:
-                    if (instance->GetPlayersCountExceptGMs() < 21)
-                        return true;
-                    break;
+                {
+                    return instance->GetPlayersCountExceptGMs() < 21;
+                }
                 // Twilight Assist (10 player) (2049)
                 case 7328:
                 // Twilight Assist (25 player) (2052)
                 case 7331:
-                    if (Creature* cr = instance->GetCreature(m_uiSartharionGUID))
-                        if (cr->AI()->GetData(DATA_ACHIEVEMENT_DRAGONS_COUNT) >= 1)
-                            return true;
-                    break;
+                {
+                    Creature const* sartharion = instance->GetCreature(m_uiSartharionGUID);
+                    return sartharion && sartharion->AI()->GetData(DATA_ACHIEVEMENT_DRAGONS_COUNT) >= 1;
+                }
                 // Twilight Duo (10 player) (2050)
                 case 7329:
                 // Twilight Duo (25 player) (2053)
                 case 7332:
-                    if (Creature* cr = instance->GetCreature(m_uiSartharionGUID))
-                        if (cr->AI()->GetData(DATA_ACHIEVEMENT_DRAGONS_COUNT) >= 2)
-                            return true;
-                    break;
+                {
+                    Creature const* sartharion = instance->GetCreature(m_uiSartharionGUID);
+                    return sartharion && sartharion->AI()->GetData(DATA_ACHIEVEMENT_DRAGONS_COUNT) >= 2;
+                }
                 // Twilight Zone (10 player) (2051)
                 case 7330:
                 // Twilight Zone (25 player) (2054)
                 case 7333:
-                    if (Creature* cr = instance->GetCreature(m_uiSartharionGUID))
-                        if (cr->AI()->GetData(DATA_ACHIEVEMENT_DRAGONS_COUNT) >= 3)
-                            return true;
-                    break;
-
+                {
+                    Creature const* sartharion = instance->GetCreature(m_uiSartharionGUID);
+                    return sartharion && sartharion->AI()->GetData(DATA_ACHIEVEMENT_DRAGONS_COUNT) >= 3;
+                }
             }
 
             return false;

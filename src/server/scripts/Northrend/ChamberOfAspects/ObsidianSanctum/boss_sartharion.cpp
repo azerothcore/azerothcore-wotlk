@@ -570,7 +570,6 @@ public:
         }
 
     private:
-
         void SummonStartingTriggers()
         {
             for (uint8 i = 0; i < MAX_CYCLONE_COUNT; ++i)
@@ -946,11 +945,6 @@ struct boss_sartharion_dragonAI : public BossAI
     }
 
 protected:
-
-    uint64 portalGUID;
-    uint32 speechTimer;
-    bool isCalledBySartharion;
-
     void RemoveTwilightPortal()
     {
         if (portalGUID)
@@ -963,6 +957,10 @@ protected:
             portalGUID = 0;
         }
     }
+
+    uint64 portalGUID;
+    uint32 speechTimer;
+    bool isCalledBySartharion;
 };
 
 /////////////////////////////
