@@ -655,7 +655,7 @@ public:
                     }
 
                     dragon->DespawnOrUnsummon();
-                    dragon->SetRespawnTime(10);
+                    dragon->SetRespawnTime(5);
                 }
             }
 
@@ -1317,7 +1317,7 @@ public:
         }
 
     private:
-        void ClearInstance()
+        void ClearInstance() override
         {
             boss_sartharion_dragonAI::ClearInstance();
 
