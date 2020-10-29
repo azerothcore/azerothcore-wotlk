@@ -402,7 +402,7 @@ public:
                 return;
             }
 
-            if (!below11PctReached && me->HealthBelowPct(11))
+            if (!below11PctReached && mme->HealthBelowPctDamaged(11, damage))
             {
                 summons.RemoveNotExisting();
                 if (!summons.empty())
