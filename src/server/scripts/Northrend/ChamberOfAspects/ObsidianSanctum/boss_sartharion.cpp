@@ -752,7 +752,7 @@ struct boss_sartharion_dragonAI : public BossAI
         me->SetInCombatWithZone();
     }
 
-    void EnterCombat(Unit* who) final
+    void EnterCombat(Unit* /*who*/) final
     {
         me->setActive(true);
         DoZoneInCombat();
