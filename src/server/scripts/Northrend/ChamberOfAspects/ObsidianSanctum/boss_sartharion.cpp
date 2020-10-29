@@ -371,7 +371,9 @@ public:
                     case EVENT_SARTHARION_BOUNDARY:
                     {
                         if (me->GetPositionX() < 3218.86f || me->GetPositionX() > 3275.69f || me->GetPositionY() < 484.68f || me->GetPositionY() > 572.4f) // https://github.com/TrinityCore/TrinityCore/blob/3.3.5/src/server/scripts/Northrend/ChamberOfAspects/ObsidianSanctum/instance_obsidian_sanctum.cpp#L31
+                        {
                             EnterEvadeMode();
+                        }
 
                         extraEvents.RepeatEvent(1000);
                         break;
@@ -379,7 +381,9 @@ public:
                     case EVENT_SARTHARION_SUMMON_LAVA:
                     {
                         if (!urand(0, 3))
+                        {
                             Talk(SAY_SARTHARION_SPECIAL);
+                        }
 
                         SummonLavaWaves();
                         extraEvents.RepeatEvent(25000);
@@ -790,7 +794,7 @@ public:
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                         {
-                            me->CastSpell(target, SPELL_SHADOW_FISSURE, false);
+                            DoCast(target, SPELL_SHADOW_FISSURE, false);
                         }
                         events.RepeatEvent(22500);
                         break;
@@ -1023,7 +1027,9 @@ public:
             if (isSartharion)
             {
                 if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                {
                     sartharion->RemoveAura(SPELL_GIFT_OF_TWILIGHT_FIRE);
+                }
 
                 instance->DoAction(ACTION_CLEAR_PORTAL);
             }
@@ -1486,7 +1492,11 @@ public:
 
         bool spawned;
 
-        bool Load() { spawned = false; return true; }
+        bool Load()
+        {
+            spawned = false;
+            return true;
+        }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
