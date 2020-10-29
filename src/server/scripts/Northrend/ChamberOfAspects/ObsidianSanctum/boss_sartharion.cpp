@@ -282,7 +282,7 @@ public:
             extraEvents.ScheduleEvent(EVENT_SARTHARION_SUMMON_LAVA, 20000);
             extraEvents.ScheduleEvent(EVENT_SARTHARION_LAVA_STRIKE, 5000);
             extraEvents.ScheduleEvent(EVENT_SARTHARION_BERSERK, 900000);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_BOUNDARY, 1000);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_BOUNDARY, 250);
 
             // Store dragons
             for (uint8 i = 0; i < MAX_DRAGONS; ++i)
@@ -402,7 +402,7 @@ public:
                 return;
             }
 
-            if (!below11PctReached && mme->HealthBelowPctDamaged(11, damage))
+            if (!below11PctReached && me->HealthBelowPctDamaged(11, damage))
             {
                 summons.RemoveNotExisting();
                 if (!summons.empty())
@@ -440,7 +440,7 @@ public:
                             EnterEvadeMode();
                         }
 
-                        extraEvents.RepeatEvent(1000);
+                        extraEvents.RepeatEvent(250);
                         break;
                     }
                     case EVENT_SARTHARION_SUMMON_LAVA:
