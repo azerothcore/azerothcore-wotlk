@@ -329,7 +329,7 @@ public:
             me->CallForHelp(500.0f);
         }
 
-        void JustDied(Unit*  /*pKiller*/)
+        void JustDied(Unit*  /*pKiller*/) override
         {
             RespawnDragons(true);
             _JustDied();
