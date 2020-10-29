@@ -128,6 +128,7 @@ enum Misc
     MAX_DRAGONS                                 = 3,
     MAX_AREA_TRIGGER_COUNT                      = 2,
     MAX_CYCLONE_COUNT                           = 5,
+    MAX_TENEBORN_EGGS_SUMMONS                   = 6,
 };
 
 enum Events
@@ -167,23 +168,28 @@ const Position portalPos[4] =
     { 3351.78f, 517.138f, 99.1620f, 0.0f },
 };
 
-const Position EggsPos[12] =
+// 0 = Tenebron normal
+// 1 = Tenebron was called by Sartharion
+const Position TenebronEggsPos[2][MAX_TENEBORN_EGGS_SUMMONS] =
 {
-    // Tenebron
-    { 3253.09f, 657.439f, 86.9921f, 3.16334f },
-    { 3247.76f, 662.413f, 87.7281f, 4.12938f },
-    { 3246.01f, 656.606f, 86.8737f, 4.12938f },
-    { 3246.7f, 649.558f, 85.8179f, 4.12938f },
-    { 3238.72f, 650.386f, 85.9625f, 0.897469f },
-    { 3257.89f, 651.323f, 85.9177f, 0.897469f },
-
-    // Sartharion
-    { 3237.24f, 524.20f, 58.95f, 0.0f },
-    { 3238.95f, 513.96f, 58.662f, 0.7f },
-    { 3245.66f, 519.685f, 58.78f, 0.7f },
-    { 3254.64f, 524.6f, 58.811f, 1.966f },
-    { 3258.9f, 534.41f, 58.811f, 2.08f },
-    { 3248.23f, 541.93f, 58.718f, 3.29f }
+    // Teneborn normal
+    {
+        { 3253.09f, 657.439f, 86.9921f, 3.16334f },
+        { 3247.76f, 662.413f, 87.7281f, 4.12938f },
+        { 3246.01f, 656.606f, 86.8737f, 4.12938f },
+        { 3246.7f, 649.558f, 85.8179f, 4.12938f },
+        { 3238.72f, 650.386f, 85.9625f, 0.897469f },
+        { 3257.89f, 651.323f, 85.9177f, 0.897469f },
+    },
+    // Tenebron eggs positions when he is called by Sartharion
+    {
+        { 3237.24f, 524.20f, 58.95f, 0.0f },
+        { 3238.95f, 513.96f, 58.662f, 0.7f },
+        { 3245.66f, 519.685f, 58.78f, 0.7f },
+        { 3254.64f, 524.6f, 58.811f, 1.966f },
+        { 3258.9f, 534.41f, 58.811f, 2.08f },
+        { 3248.23f, 541.93f, 58.718f, 3.29f }
+    }
 };
 
 const Position CycloneSummonPos[MAX_CYCLONE_COUNT] =
@@ -316,7 +322,9 @@ public:
             }
 
             if (dragonsCount)
+            {
                 DoCastSelf(SPELL_WILL_OF_SARTHARION, true);
+            }
 
             me->CallForHelp(500.0f);
         }
@@ -492,10 +500,12 @@ public:
                     case EVENT_SARTHARION_LAVA_STRIKE:
                     {
                         if (!urand(0, 2))
+                        {
                             Talk(SAY_SARTHARION_SPECIAL_4);
+                        }
 
                         summons.RemoveNotExisting();
-                        uint8 rand = urand(0, 4); // 5 - numer of cyclones
+                        uint8 rand = urand(0, MAX_CYCLONE_COUNT - 1); // 5 - numer of cyclones
                         uint8 iter = 0;
                         if (!summons.empty())
                         {
@@ -631,7 +641,7 @@ public:
 
         void RespawnDragons(bool checkCombat)
         {          
-            for (uint8 i = 0; i < 3; ++i)
+            for (uint8 i = 0; i < MAX_DRAGONS; ++i)
             {
                 if (instance->GetBossState(dragons[i]) == DONE)
                 {
@@ -790,7 +800,7 @@ struct boss_sartharion_dragonAI : public BossAI
         }
     }
 
-    void JustDied(Unit* /*killer*/) override
+    void JustDied(Unit* /*killer*/) final override
     {
         //_JustDied();
         events.Reset();
@@ -1037,9 +1047,9 @@ public:
                 case EVENT_MINIBOSS_SPAWN_HELPERS:
                 {
                     Talk(WHISPER_HATCH_EGGS);
-                    for (uint8 i = 0; i < 6; ++i)
+                    for (uint8 i = 0; i < MAX_TENEBORN_EGGS_SUMMONS; ++i)
                     {
-                        if (Creature* egg = me->SummonCreature(NPC_TWILIGHT_EGG, EggsPos[isCalledBySartharion ? i + 6 : i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
+                        if (Creature* egg = me->SummonCreature(NPC_TWILIGHT_EGG, TenebronEggsPos[isCalledBySartharion ? 1 : 0][i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
                         {
                             summons.Summon(egg);
                             egg->SetPhaseMask(16, true);
