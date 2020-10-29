@@ -7,7 +7,6 @@
 #include "obsidian_sanctum.h"
 #include "SpellScript.h"
 #include "SpellAuras.h"
-#include <array>
 
 enum Says
 {
@@ -109,13 +108,26 @@ enum NPCs
 
 enum Misc
 {
+    // Actions
     ACTION_SWITCH_PHASE                         = 1,
     ACTION_CALL_DRAGON                          = 2,
     ACTION_DRAKE_DIED                           = 3,
 
+    // Movement points
     POINT_FINAL_TENEBRON                        = 8,
     POINT_FINAL_SHADRON                         = 4,
     POINT_FINAL_VESPERON                        = 4,
+
+    // Lava directions. Its used to identify to which side lava was moving by last time
+    LAVA_LEFT_SIDE                              = 0,
+    LAVA_RIGHT_SIDE                             = 1,
+
+    // Counters
+    MAX_LEFT_LAVA_TSUNAMIS                      = 3,
+    MAX_RIGHT_LAVA_TSUNAMIS                     = 2,
+    MAX_DRAGONS                                 = 3,
+    MAX_AREA_TRIGGER_COUNT                      = 2,
+    MAX_CYCLONE_COUNT                           = 5,
 };
 
 enum Events
@@ -144,37 +156,36 @@ enum Events
     EVENT_SARTHARION_CALL_SHADRON               = 31,
     EVENT_SARTHARION_CALL_VESPERON              = 32,
 
-    EVENT_SARTHARION_BOUNDARY                   = 33
+    EVENT_SARTHARION_BOUNDARY                   = 33,
 };
 
 const Position portalPos[4] =
 {
-    {3247.29f, 529.804f, 58.9595f, 0.0f},
-    {3248.62f, 646.739f, 85.2939f, 0.0f},
-    {3151.20f, 517.862f, 90.3389f, 0.0f},
-    {3351.78f, 517.138f, 99.1620f, 0.0f},
+    { 3247.29f, 529.804f, 58.9595f, 0.0f },
+    { 3248.62f, 646.739f, 85.2939f, 0.0f },
+    { 3151.20f, 517.862f, 90.3389f, 0.0f },
+    { 3351.78f, 517.138f, 99.1620f, 0.0f },
 };
 
 const Position EggsPos[12] =
 {
     // Tenebron
-    {3253.09f, 657.439f, 86.9921f, 3.16334f},
-    {3247.76f, 662.413f, 87.7281f, 4.12938f},
-    {3246.01f, 656.606f, 86.8737f, 4.12938f},
-    {3246.7f, 649.558f, 85.8179f, 4.12938f},
-    {3238.72f, 650.386f, 85.9625f, 0.897469f},
-    {3257.89f, 651.323f, 85.9177f, 0.897469f},
+    { 3253.09f, 657.439f, 86.9921f, 3.16334f },
+    { 3247.76f, 662.413f, 87.7281f, 4.12938f },
+    { 3246.01f, 656.606f, 86.8737f, 4.12938f },
+    { 3246.7f, 649.558f, 85.8179f, 4.12938f },
+    { 3238.72f, 650.386f, 85.9625f, 0.897469f },
+    { 3257.89f, 651.323f, 85.9177f, 0.897469f },
 
     // Sartharion
-    {3237.24f, 524.20f, 58.95f, 0.0f},
-    {3238.95f, 513.96f, 58.662f, 0.7f},
-    {3245.66f, 519.685f, 58.78f, 0.7f},
-    {3254.64f, 524.6f, 58.811f, 1.966f},
-    {3258.9f, 534.41f, 58.811f, 2.08f},
-    {3248.23f, 541.93f, 58.718f, 3.29f}
+    { 3237.24f, 524.20f, 58.95f, 0.0f },
+    { 3238.95f, 513.96f, 58.662f, 0.7f },
+    { 3245.66f, 519.685f, 58.78f, 0.7f },
+    { 3254.64f, 524.6f, 58.811f, 1.966f },
+    { 3258.9f, 534.41f, 58.811f, 2.08f },
+    { 3248.23f, 541.93f, 58.718f, 3.29f }
 };
 
-constexpr uint8 MAX_CYCLONE_COUNT = 5;
 const Position CycloneSummonPos[MAX_CYCLONE_COUNT] =
 {
     { 3235.28f, 591.180f, 57.0833f, 0.59037f },
@@ -184,15 +195,21 @@ const Position CycloneSummonPos[MAX_CYCLONE_COUNT] =
     { 3286.42f, 585.010f, 57.0833f, 4.10307f },
 };
 
-constexpr uint8 MAX_AREA_TRIGGER_COUNT = 2;
 const Position AreaTriggerSummonPos[MAX_AREA_TRIGGER_COUNT] =
 {
     { 3244.14f, 512.597f, 58.6534f, 0.0f },
     { 3242.84f, 553.979f, 58.8272f, 0.0f },
 };
 
-constexpr uint8 MAX_DRAGONS = 3;
-static std::array<uint32, MAX_DRAGONS> const dragons = { DATA_TENEBRON, DATA_VESPERON, DATA_SHADRON };
+const float SartharionBoundary[4] =
+{
+    3218.86f,   // South X
+    3275.69f,   // North X
+    484.68f,    // East Y
+    572.4f      // West Y
+};
+
+const uint32 dragons[MAX_DRAGONS] = { DATA_TENEBRON, DATA_VESPERON, DATA_SHADRON };
 
 /////////////////////////////
 // SARTHARION
@@ -212,6 +229,7 @@ public:
     {
         boss_sartharionAI(Creature* pCreature) : BossAI(pCreature, DATA_SARTHARION),
             dragonsCount(0),
+            lastLavaSide(LAVA_RIGHT_SIDE),
             usedBerserk(false)
         {
         }
@@ -236,8 +254,14 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*pWho*/) override
+        void EnterCombat(Unit* pWho) override
         {
+            if (pWho->GetPositionX() < SartharionBoundary[0] || pWho->GetPositionX() > SartharionBoundary[1] || pWho->GetPositionY() < SartharionBoundary[2] || pWho->GetPositionY() > SartharionBoundary[3])
+            {
+                EnterEvadeMode();
+                return;
+            }
+
             _EnterCombat();
             DoCastSelf(SPELL_SARTHARION_PYROBUFFET, true);
             Talk(SAY_SARTHARION_AGGRO);
@@ -257,8 +281,8 @@ public:
             // Store dragons
             for (uint8 i = 0; i < MAX_DRAGONS; ++i)
             {
-                Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetData64(dragons.at(i)));
-                if (!dragon || !dragon->IsAlive() || instance->GetBossState(dragons.at(i)) == DONE)
+                Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetData64(dragons[i]));
+                if (!dragon || !dragon->IsAlive() || instance->GetBossState(dragons[i]) == DONE)
                 {
                     continue;
                 }
@@ -268,7 +292,7 @@ public:
                 me->AddLootMode(1 << dragonsCount);
 
                 dragon->SetFullHealth();
-                switch (dragons.at(i))
+                switch (dragons[i])
                 {
                     case DATA_TENEBRON:
                     {
@@ -324,22 +348,20 @@ public:
                 return dragonsCount;
 
             // otherwise it is guid to check if player was hit by lava strike :)
-            if (!volcanoBlows.empty())
+            if (!volcanoBlows.empty() && std::find(volcanoBlows.begin(), volcanoBlows.end(), dataOrGuid) != volcanoBlows.end())
             {
-                for (uint32 const vulcanoGuid : volcanoBlows)
-                {
-                    if (dataOrGuid == vulcanoGuid)
-                        return true;
-                }
+                return 1;
             }
 
-            return false;
+            return 0;
         }
 
         void KilledUnit(Unit* pVictim) override
         {
             if (!urand(0, 2) && pVictim->GetTypeId() == TYPEID_PLAYER)
+            {
                 Talk(SAY_SARTHARION_SLAY);
+            }
         }
 
         void JustSummoned(Creature* summon)
@@ -375,7 +397,7 @@ public:
                 {
                     case EVENT_SARTHARION_BOUNDARY:
                     {
-                        if (me->GetPositionX() < 3218.86f || me->GetPositionX() > 3275.69f || me->GetPositionY() < 484.68f || me->GetPositionY() > 572.4f) // https://github.com/TrinityCore/TrinityCore/blob/3.3.5/src/server/scripts/Northrend/ChamberOfAspects/ObsidianSanctum/instance_obsidian_sanctum.cpp#L31
+                        if (me->GetPositionX() < SartharionBoundary[0] || me->GetPositionX() > SartharionBoundary[1] || me->GetPositionY() < SartharionBoundary[2] || me->GetPositionY() > SartharionBoundary[3]) // https://github.com/TrinityCore/TrinityCore/blob/3.3.5/src/server/scripts/Northrend/ChamberOfAspects/ObsidianSanctum/instance_obsidian_sanctum.cpp#L31
                         {
                             EnterEvadeMode();
                         }
@@ -560,20 +582,24 @@ public:
             extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 9000);
 
             // Send wave from left
-            if (urand(0, 1))
+            if (lastLavaSide == LAVA_RIGHT_SIDE)
             {
-                for (uint8 i = 0; i < 3; ++i)
+                for (uint8 i = 0; i < MAX_LEFT_LAVA_TSUNAMIS; ++i)
                 {
                     me->SummonCreature(NPC_FLAME_TSUNAMI, 3208.44f, 580.0f - (i * 50.0f), 55.8f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000);
                 }
+
+                lastLavaSide = LAVA_LEFT_SIDE;
             }
             // from right
             else
             {
-                for (uint8 i = 0; i < 2; ++i)
+                for (uint8 i = 0; i < MAX_RIGHT_LAVA_TSUNAMIS; ++i)
                 {
                     me->SummonCreature(NPC_FLAME_TSUNAMI, 3283.44f, 555.0f - (i * 50.0f), 55.8f, 3.14f, TEMPSUMMON_TIMED_DESPAWN, 12000);
                 }
+
+                lastLavaSide = LAVA_RIGHT_SIDE;
             }
         }
 
@@ -607,12 +633,12 @@ public:
         {          
             for (uint8 i = 0; i < 3; ++i)
             {
-                if (instance->GetBossState(dragons.at(i)) == DONE)
+                if (instance->GetBossState(dragons[i]) == DONE)
                 {
                     continue;
                 }
 
-                if (Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetData64(dragons.at(i))))
+                if (Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetData64(dragons[i])))
                 {
                     if (checkCombat && dragon->IsInCombat())
                     {
@@ -630,6 +656,7 @@ public:
         EventMap extraEvents;
         std::list<uint32> volcanoBlows;
         uint8 dragonsCount;
+        uint8 lastLavaSide; // 0 = left, 1 = right
         bool usedBerserk;
     };
 };

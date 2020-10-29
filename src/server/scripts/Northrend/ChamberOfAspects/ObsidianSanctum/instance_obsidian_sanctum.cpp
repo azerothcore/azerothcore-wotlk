@@ -27,6 +27,7 @@ public:
             m_uiPortalGUID(0),
             portalCount(0)
         {
+            SetBossNumber(MAX_ENCOUNTERS);
         }
 
         bool IsEncounterInProgress() const
