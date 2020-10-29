@@ -228,7 +228,9 @@ public:
         void DoAction(int32 param) override
         {
             if (param == ACTION_DRAKE_DIED)
+            {
                 DoCastSelf(SPELL_SARTHARION_TWILIGHT_REVENGE, true);
+            }
         }
 
         void EnterCombat(Unit* /*pWho*/) override
@@ -253,7 +255,7 @@ public:
             for (uint8 i = 0; i < 3; ++i)
             {
                 Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetData64(dragons.at(i)));
-                if (!dragon || !dragon->IsAlive())
+                if (!dragon || !dragon->IsAlive() || instance->GetBossState(dragons.at(i)) == DONE)
                 {
                     continue;
                 }
@@ -301,7 +303,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            if (type == DATA_VOLCANO_BLOWS)
+            if (type == DATA_VOLCANO_BLOWS && data)
             {
                 if (!volcanoBlows.empty() && std::find(volcanoBlows.begin(), volcanoBlows.end(), data) != volcanoBlows.end())
                 {
@@ -530,11 +532,6 @@ public:
         }
 
     private:
-        EventMap extraEvents;
-        std::list<uint32> volcanoBlows;
-        uint8 dragonsCount;
-        bool usedBerserk;
-
         void SummonStartingTriggers()
         {
             for (uint8 i = 0; i < 5; ++i)
@@ -612,6 +609,11 @@ public:
 
             dragonsCount = 0;
         }
+
+        EventMap extraEvents;
+        std::list<uint32> volcanoBlows;
+        uint8 dragonsCount;
+        bool usedBerserk;
     };
 };
 
@@ -768,7 +770,9 @@ public:
             }
 
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -873,11 +877,6 @@ public:
         }
 
     private:
-        SummonList summons2;
-        uint64 portalGUID;
-        bool isSartharion;
-        uint32 speechTimer;
-
         void ClearInstance()
         {
             events.Reset();
@@ -899,6 +898,11 @@ public:
                 portalGUID = 0;
             }
         }
+
+        SummonList summons2;
+        uint64 portalGUID;
+        uint32 speechTimer;
+        bool isSartharion;
     };
 };
 
@@ -937,7 +941,9 @@ public:
         void MoveInLineOfSight(Unit* who) override
         {
             if (isSartharion)
+            {
                 return;
+            }
 
             BossAI::MoveInLineOfSight(who);
         }
@@ -1141,10 +1147,6 @@ public:
         }
 
     private:
-        uint64 portalGUID;
-        bool isSartharion;
-        uint32 speechTimer;
-
         void ClearInstance()
         {
             summons.DespawnAll();
@@ -1159,6 +1161,10 @@ public:
                 portalGUID = 0;
             }
         }
+
+        uint64 portalGUID;
+        bool isSartharion;
+        uint32 speechTimer;
     };
 };
 
