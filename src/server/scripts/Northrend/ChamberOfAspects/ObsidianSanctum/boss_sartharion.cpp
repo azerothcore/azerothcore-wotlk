@@ -402,7 +402,7 @@ public:
                 return;
             }
 
-            if (!below11PctReached && me->HealthBelowPctDamaged(11, damage))
+            if (!usedBerserk && !below11PctReached && me->HealthBelowPctDamaged(10, damage))
             {
                 summons.RemoveNotExisting();
                 if (!summons.empty())
@@ -550,7 +550,7 @@ public:
                             }
                         }
 
-                        events.RepeatEvent(20000);
+                        events.RepeatEvent((below11PctReached ? urand(1400, 2000) : urand(5000, 20000)));
                         break;
                     }
                     case EVENT_SARTHARION_BERSERK:
