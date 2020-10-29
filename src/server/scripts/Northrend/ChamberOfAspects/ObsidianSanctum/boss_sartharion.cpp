@@ -696,7 +696,7 @@ struct boss_sartharion_dragonAI : public BossAI
         instance->DoAction(ACTION_CLEAR_PORTAL);
     }
 
-    void DoAction(int32 param) final override
+    void DoAction(int32 param) final
     {
         if (param == ACTION_CALL_DRAGON && !isCalledBySartharion)
         {
@@ -705,7 +705,7 @@ struct boss_sartharion_dragonAI : public BossAI
         }
     }
 
-    void MoveInLineOfSight(Unit* who) final override
+    void MoveInLineOfSight(Unit* who) final
     {
         if (isCalledBySartharion)
             return;
@@ -713,7 +713,7 @@ struct boss_sartharion_dragonAI : public BossAI
         ScriptedAI::MoveInLineOfSight(who);
     }
 
-    void MovementInform(uint32 type, uint32 pointId) final override
+    void MovementInform(uint32 type, uint32 pointId) final
     {
         if (type != WAYPOINT_MOTION_TYPE)
         {
@@ -752,7 +752,7 @@ struct boss_sartharion_dragonAI : public BossAI
         me->SetInCombatWithZone();
     }
 
-    void EnterCombat(Unit* who) final override
+    void EnterCombat(Unit* who) final
     {
         me->setActive(true);
         DoZoneInCombat();
@@ -800,7 +800,7 @@ struct boss_sartharion_dragonAI : public BossAI
         }
     }
 
-    void JustDied(Unit* /*killer*/) final override
+    void JustDied(Unit* /*killer*/) final
     {
         //_JustDied();
         events.Reset();
@@ -851,7 +851,7 @@ struct boss_sartharion_dragonAI : public BossAI
         }
     }
 
-    void KilledUnit(Unit* victim) final override
+    void KilledUnit(Unit* victim) final
     {
         if (victim->GetTypeId() != TYPEID_PLAYER || urand(0, 2))
         {
@@ -878,7 +878,7 @@ struct boss_sartharion_dragonAI : public BossAI
         }
     }
 
-    void UpdateAI(uint32 diff) final override
+    void UpdateAI(uint32 diff) final
     {
         // Call speach
         if (speechTimer)
