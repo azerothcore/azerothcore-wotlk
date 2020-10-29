@@ -149,8 +149,7 @@ enum Events
     EVENT_SARTHARION_START_LAVA                 = 14,
     EVENT_SARTHARION_FINISH_LAVA                = 15,
     EVENT_SARTHARION_LAVA_STRIKE                = 16,
-    EVENT_SARTHARION_HEALTH_CHECK               = 17,
-    EVENT_SARTHARION_BERSERK                    = 18,
+    EVENT_SARTHARION_BERSERK                    = 17,
 
     // Drake abilities called by sartharion
     EVENT_SARTHARION_CALL_TENEBRON              = 30,
@@ -236,7 +235,8 @@ public:
         boss_sartharionAI(Creature* pCreature) : BossAI(pCreature, DATA_SARTHARION),
             dragonsCount(0),
             lastLavaSide(LAVA_RIGHT_SIDE),
-            usedBerserk(false)
+            usedBerserk(false),
+            below11PctReached(false)
         {
         }
 
@@ -247,6 +247,7 @@ public:
             RespawnDragons(false);
             SummonStartingTriggers();
             usedBerserk = false;
+            below11PctReached = false;
             dragonsCount = 0;
             volcanoBlows.clear();
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
@@ -280,7 +281,6 @@ public:
             // Extra events
             extraEvents.ScheduleEvent(EVENT_SARTHARION_SUMMON_LAVA, 20000);
             extraEvents.ScheduleEvent(EVENT_SARTHARION_LAVA_STRIKE, 5000);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_HEALTH_CHECK, 10000);
             extraEvents.ScheduleEvent(EVENT_SARTHARION_BERSERK, 900000);
             extraEvents.ScheduleEvent(EVENT_SARTHARION_BOUNDARY, 1000);
 
@@ -353,7 +353,9 @@ public:
         {
             // it means we want dragons count
             if (dataOrGuid == DATA_ACHIEVEMENT_DRAGONS_COUNT)
+            {
                 return dragonsCount;
+            }
 
             // otherwise it is guid to check if player was hit by lava strike :)
             if (!volcanoBlows.empty() && std::find(volcanoBlows.begin(), volcanoBlows.end(), dataOrGuid) != volcanoBlows.end())
@@ -372,7 +374,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             switch (summon->GetEntry())
             {
@@ -389,6 +391,34 @@ public:
             }
 
             summons.Summon(summon);
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
+        {
+            if (dragonsCount && !usedBerserk && me->HealthBelowPctDamaged(36, damage))
+            {
+                DoCastSelf(SPELL_SARTHARION_BERSERK, true);
+                usedBerserk = true;
+                return;
+            }
+
+            if (!below11PctReached && me->HealthBelowPct(11))
+            {
+                summons.RemoveNotExisting();
+                if (!summons.empty())
+                {
+                    for (uint64 const summonGuid : summons)
+                    {
+                        Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
+                        if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE)
+                        {
+                            summon->CastSpell(summon, SPELL_CYCLONE_AURA_PERIODIC, true);
+                        }
+                    }
+                }
+                Talk(SAY_SARTHARION_BERSERK);
+                below11PctReached = true;
+            }
         }
 
         void UpdateAI(uint32 diff)
@@ -523,36 +553,6 @@ public:
                         events.RepeatEvent(20000);
                         break;
                     }
-                    case EVENT_SARTHARION_HEALTH_CHECK:
-                    {
-                        if (dragonsCount && !usedBerserk && me->HealthBelowPct(36))
-                        {
-                            DoCastSelf(SPELL_SARTHARION_BERSERK, true);
-                            usedBerserk = true;
-                            events.RepeatEvent(2000);
-                            break;
-                        }
-
-                        if (me->HealthBelowPct(11))
-                        {
-                            summons.RemoveNotExisting();
-                            if (!summons.empty())
-                            {
-                                for (uint64 const summonGuid : summons)
-                                {
-                                    Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
-                                    if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE)
-                                    {
-                                        summon->CastSpell(summon, SPELL_CYCLONE_AURA_PERIODIC, true);
-                                    }
-                                }
-                            }
-                            Talk(SAY_SARTHARION_BERSERK);
-                            break;
-                        }
-                        events.RepeatEvent(2000);
-                        break;
-                    }
                     case EVENT_SARTHARION_BERSERK:
                     {
                         summons.DespawnEntry(NPC_SAFE_AREA_TRIGGER);
@@ -667,6 +667,7 @@ public:
         uint8 dragonsCount;
         uint8 lastLavaSide; // 0 = left, 1 = right
         bool usedBerserk;
+        bool below11PctReached;
     };
 };
 
