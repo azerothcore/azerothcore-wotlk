@@ -194,7 +194,7 @@ public:
 
     struct boss_sartharionAI : public BossAI
     {
-        boss_sartharionAI(Creature* pCreature) : BossAI(pCreature, BOSS_SARTHARION_EVENT),
+        boss_sartharionAI(Creature* pCreature) : BossAI(pCreature, DATA_SARTHARION),
             dragonsCount(0),
             usedBerserk(false)
         {
@@ -603,43 +603,14 @@ public:
         return new boss_sartharion_tenebronAI (pCreature);
     }
 
-    struct boss_sartharion_tenebronAI : public ScriptedAI
+    struct boss_sartharion_tenebronAI : public BossAI
     {
-        boss_sartharion_tenebronAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me), summons2(me)
+        boss_sartharion_tenebronAI(Creature* pCreature) : BossAI(pCreature, DATA_TENEBRON), summons2(pCreature),
+            portalGUID(0)
         {
-            portalGUID = 0;
-            pInstance = me->GetInstanceScript();
         }
 
-        EventMap events;
-        SummonList summons;
-        SummonList summons2;
-        uint64 portalGUID;
-        InstanceScript* pInstance;
-        bool isSartharion;
-        uint32 timer;
-
-        void ClearInstance()
-        {
-            events.Reset();
-            summons.DespawnAll();
-            // Remove phase shift
-            if (pInstance)
-                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
-
-            RemoveTwilightPortal();
-        }
-
-        void RemoveTwilightPortal()
-        {
-            if (portalGUID)
-                if (GameObject* gobj = me->GetMap()->GetGameObject(portalGUID))
-                    gobj->Delete();
-
-            portalGUID = 0;
-        }
-
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_CALL_DRAGON)
             {
@@ -648,7 +619,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (isSartharion)
                 return;
@@ -656,7 +627,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void Reset()
+        void Reset() override
         {
             summons2.DespawnAll();
             ClearInstance();
@@ -669,14 +640,17 @@ public:
             isSartharion = false;
             timer = 0;
 
-            if (pInstance)
-            {
-                pInstance->SetData(BOSS_TENEBRON_EVENT, NOT_STARTED);
-                pInstance->SetData(DATA_CLEAR_PORTAL, 0);
-            }
+            instance->SetData(DATA_TENEBRON, NOT_STARTED);
+            instance->SetData(DATA_CLEAR_PORTAL, 0);
         }
 
-        void EnterCombat(Unit* )
+        void JustSummoned(Creature* summon) override
+        {
+            if (summon->GetEntry() != NPC_TWILIGHT_EGG)
+                summons.Summon(summon);
+        }
+
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_TENEBRON_AGGRO);
             me->SetInCombatWithZone();
@@ -691,36 +665,37 @@ public:
             events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10000);
             events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15000);
 
-            if (pInstance && !isSartharion)
-                pInstance->SetData(BOSS_TENEBRON_EVENT, IN_PROGRESS);
+            if (!isSartharion)
+                instance->SetData(DATA_TENEBRON, IN_PROGRESS);
 
-            if (isSartharion || (pInstance && pInstance->GetData(BOSS_SARTHARION_EVENT) == DONE))
+            if (isSartharion || instance->GetBossState(DATA_SARTHARION) == DONE)
                 me->SetLootMode(0);
 
             if (isSartharion)
+            {
                 if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 500, true))
-                    me->AI()->AttackStart(target);
+                    AttackStart(target);
+            }
         }
 
-        void JustDied(Unit* )
+        void JustDied(Unit* /*killer*/) override
         {
+            _JustDied();
             Talk(SAY_TENEBRON_DEATH);
 
             if (!isSartharion)
             {
                 ClearInstance();
-                if (pInstance)
-                    pInstance->SetData(BOSS_TENEBRON_EVENT, DONE);
             }
-            else if (pInstance)
+            else
             {
-                pInstance->SetData(DATA_CLEAR_PORTAL, 0);
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SARTHARION)))
-                    cr->AI()->DoAction(ACTION_DRAKE_DIED);
+                instance->SetData(DATA_CLEAR_PORTAL, 0);
+                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                    sartharion->AI()->DoAction(ACTION_DRAKE_DIED);
             }
         }
 
-        void JustKilled(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER || urand(0, 2))
                 return;
@@ -728,7 +703,7 @@ public:
             Talk(SAY_TENEBRON_SLAY);
         }
 
-        void MovementInform(uint32 type, uint32 pointId)
+        void MovementInform(uint32 type, uint32 pointId) override
         {
             if (type == WAYPOINT_MOTION_TYPE && pointId == POINT_FINAL_TENEBRON)
             {
@@ -737,7 +712,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // Call speach
             if (timer)
@@ -760,36 +735,43 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
-                case EVENT_MINIBOSS_SHADOW_BREATH:
-                    if (!urand(0, 10))
-                        Talk(SAY_TENEBRON_BREATH);
-                    me->CastSpell(me->GetVictim(), SPELL_SHADOW_BREATH, false);
-                    events.RepeatEvent(17500);
-                    break;
-                case EVENT_MINIBOSS_SHADOW_FISSURE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                        me->CastSpell(target, SPELL_SHADOW_FISSURE, false);
-                    events.RepeatEvent(22500);
-                    break;
-                case EVENT_MINIBOSS_OPEN_PORTAL:
-                    Talk(WHISPER_OPEN_PORTAL);
-                    Talk(SAY_TENEBRON_SPECIAL);
-
-                    if (!isSartharion)
+                switch (eventId)
+                {
+                    case EVENT_MINIBOSS_SHADOW_BREATH:
                     {
-                        if (GameObject* Portal = me->GetVictim()->SummonGameObject(GO_TWILIGHT_PORTAL, portalPos[BOSS_TENEBRON_EVENT].GetPositionX(), portalPos[BOSS_TENEBRON_EVENT].GetPositionY(), portalPos[BOSS_TENEBRON_EVENT].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
-                            portalGUID = Portal->GetGUID();
+                        if (!urand(0, 10))
+                            Talk(SAY_TENEBRON_BREATH);
+                        me->CastSpell(me->GetVictim(), SPELL_SHADOW_BREATH, false);
+                        events.RepeatEvent(17500);
+                        break;
                     }
-                    else if (pInstance)
-                        pInstance->SetData(DATA_ADD_PORTAL, 0);
+                    case EVENT_MINIBOSS_SHADOW_FISSURE:
+                    {
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                            me->CastSpell(target, SPELL_SHADOW_FISSURE, false);
+                        events.RepeatEvent(22500);
+                        break;
+                    }
+                    case EVENT_MINIBOSS_OPEN_PORTAL:
+                    {
+                        Talk(WHISPER_OPEN_PORTAL);
+                        Talk(SAY_TENEBRON_SPECIAL);
 
+                        if (!isSartharion)
+                        {
+                            if (GameObject* Portal = me->GetVictim()->SummonGameObject(GO_TWILIGHT_PORTAL, portalPos[DATA_TENEBRON].GetPositionX(), portalPos[DATA_TENEBRON].GetPositionY(), portalPos[DATA_TENEBRON].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                                portalGUID = Portal->GetGUID();
+                        }
+                        else
+                            instance->SetData(DATA_ADD_PORTAL, 0);
 
-                    events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2000);
-                    events.RepeatEvent(60000);
-                    break;
-                case EVENT_MINIBOSS_SPAWN_HELPERS:
+                        events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2000);
+                        events.RepeatEvent(60000);
+                        break;
+                    }
+                    case EVENT_MINIBOSS_SPAWN_HELPERS:
                     {
                         Talk(WHISPER_HATCH_EGGS);
                         Creature* cr = nullptr;
@@ -805,7 +787,7 @@ public:
                         events.ScheduleEvent(EVENT_MINIBOSS_HATCH_EGGS, 25000);
                         break;
                     }
-                case EVENT_MINIBOSS_HATCH_EGGS:
+                    case EVENT_MINIBOSS_HATCH_EGGS:
                     {
                         Creature* cr = nullptr;
                         summons.RemoveNotExisting();
@@ -827,20 +809,51 @@ public:
                         {
                             // Remove phase shift
                             if (InstanceScript* instance = me->GetInstanceScript())
+                            {
                                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
+                            }
 
                             RemoveTwilightPortal();
                         }
-                        else if (pInstance)
-                            pInstance->SetData(DATA_CLEAR_PORTAL, 0);
+                        else
+                            instance->SetData(DATA_CLEAR_PORTAL, 0);
 
                         EntryCheckPredicate pred(NPC_TWILIGHT_EGG);
                         summons.DoAction(ACTION_SWITCH_PHASE, pred);
                         break;
                     }
+                }
             }
 
             DoMeleeAttackIfReady();
+        }
+
+    private:
+        SummonList summons2;
+        uint64 portalGUID;
+        bool isSartharion;
+        uint32 timer;
+
+        void ClearInstance()
+        {
+            events.Reset();
+            summons.DespawnAll();
+            // Remove phase shift
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
+            RemoveTwilightPortal();
+        }
+
+        void RemoveTwilightPortal()
+        {
+            if (portalGUID)
+            {
+                if (GameObject* gobj = me->GetMap()->GetGameObject(portalGUID))
+                {
+                    gobj->Delete();
+                }
+
+                portalGUID = 0;
+            }
         }
     };
 };
@@ -859,50 +872,25 @@ public:
         return new boss_sartharion_shadronAI (pCreature);
     }
 
-    struct boss_sartharion_shadronAI : public ScriptedAI
+    struct boss_sartharion_shadronAI : public BossAI
     {
-        boss_sartharion_shadronAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+        boss_sartharion_shadronAI(Creature* pCreature) : BossAI(pCreature, DATA_SHADRON),
+            portalGUID(0),
+            speechTimer(0),
+            isSartharion(false)
         {
-            portalGUID = 0;
-            pInstance = me->GetInstanceScript();
         }
 
-        EventMap events;
-        SummonList summons;
-        uint64 portalGUID;
-        InstanceScript* pInstance;
-        bool isSartharion;
-        uint32 timer;
-
-        void ClearInstance()
+        void DoAction(int32 param) override
         {
-            summons.DespawnAll();
-            // Remove phase shift
-            if (pInstance)
-                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
-
-            RemoveTwilightPortal();
-        }
-
-        void RemoveTwilightPortal()
-        {
-            if (portalGUID)
-                if (GameObject* gobj = me->GetMap()->GetGameObject(portalGUID))
-                    gobj->Delete();
-
-            portalGUID = 0;
-        }
-
-        void DoAction(int32 param)
-        {
-            if (param == ACTION_CALL_DRAGON)
+            if (param == ACTION_CALL_DRAGON && !speechTimer)
             {
                 isSartharion = true;
-                timer++;
+                ++speechTimer;
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (isSartharion)
                 return;
@@ -910,7 +898,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             ClearInstance();
@@ -920,16 +908,13 @@ public:
             me->SetCanFly(false);
             me->ResetLootMode();
             isSartharion = false;
-            timer = 0;
+            speechTimer = 0;
 
-            if (pInstance)
-            {
-                pInstance->SetData(BOSS_SHADRON_EVENT, NOT_STARTED);
-                pInstance->SetData(DATA_CLEAR_PORTAL, 0);
-            }
+            instance->SetData(DATA_SHADRON, NOT_STARTED);
+            instance->SetData(DATA_CLEAR_PORTAL, 0);
         }
 
-        void EnterCombat(Unit* )
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_SHADRON_AGGRO);
             me->SetInCombatWithZone();
@@ -944,35 +929,43 @@ public:
             events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10000);
             events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15000);
 
-            if (pInstance && !isSartharion)
-                pInstance->SetData(BOSS_SHADRON_EVENT, IN_PROGRESS);
+            if (!isSartharion)
+            {
+                instance->SetData(DATA_SHADRON, IN_PROGRESS);
+            }
 
-            if (isSartharion || (pInstance && pInstance->GetData(BOSS_SARTHARION_EVENT) == DONE))
+            if (isSartharion || instance->GetBossState(DATA_SARTHARION) == DONE)
+            {
                 me->SetLootMode(0);
+            }
 
             if (isSartharion)
+            {
                 if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 500, true))
-                    me->AI()->AttackStart(target);
+                    AttackStart(target);
+            }
         }
 
-        void JustDied(Unit* )
+        void JustDied(Unit* /*killer*/) override
         {
+            _JustDied();
             Talk(SAY_SHADRON_DEATH);
 
             if (!isSartharion)
             {
                 ClearInstance();
-                if (pInstance)
-                    pInstance->SetData(BOSS_SHADRON_EVENT, DONE);
+                instance->SetData(DATA_SHADRON, DONE);
             }
-            else if (pInstance)
+            else
             {
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SARTHARION)))
-                    cr->AI()->DoAction(ACTION_DRAKE_DIED);
+                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                {
+                    sartharion->AI()->DoAction(ACTION_DRAKE_DIED);
+                }
             }
         }
 
-        void JustKilled(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER || urand(0, 2))
                 return;
@@ -980,14 +973,14 @@ public:
             Talk(SAY_SHADRON_SLAY);
         }
 
-        void SummonedCreatureDies(Creature* /*summon*/, Unit*)
+        void SummonedCreatureDies(Creature* /*summon*/, Unit* /*summon*/) override
         {
-            if (isSartharion && pInstance)
+            if (isSartharion)
             {
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SARTHARION)))
-                    cr->RemoveAura(SPELL_GIFT_OF_TWILIGHT_FIRE);
+                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                    sartharion->RemoveAura(SPELL_GIFT_OF_TWILIGHT_FIRE);
 
-                pInstance->SetData(DATA_CLEAR_PORTAL, 0);
+                instance->SetData(DATA_CLEAR_PORTAL, 0);
             }
             else
             {
@@ -998,7 +991,7 @@ public:
             events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30000);
         }
 
-        void MovementInform(uint32 type, uint32 pointId)
+        void MovementInform(uint32 type, uint32 pointId) override
         {
             if (type == WAYPOINT_MOTION_TYPE && pointId == POINT_FINAL_SHADRON)
             {
@@ -1007,19 +1000,19 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // Call speach
-            if (timer)
+            if (speechTimer)
             {
-                timer += diff;
-                if (timer >= 4000)
+                speechTimer += diff;
+                if (speechTimer >= 4000)
                 {
                     Talk(SAY_SHADRON_RESPOND);
                     me->SetCanFly(true);
                     me->SetSpeed(MOVE_FLIGHT, 3.0f);
                     me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
-                    timer = 0;
+                    speechTimer = 0;
                 }
             }
 
@@ -1030,47 +1023,78 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
-                case EVENT_MINIBOSS_SHADOW_BREATH:
-                    if (!urand(0, 10))
-                        Talk(SAY_SHADRON_BREATH);
-                    me->CastSpell(me->GetVictim(), SPELL_SHADOW_BREATH, false);
-                    events.RepeatEvent(17500);
-                    break;
-                case EVENT_MINIBOSS_SHADOW_FISSURE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                        me->CastSpell(target, SPELL_SHADOW_FISSURE, false);
-                    events.RepeatEvent(22500);
-                    break;
-                case EVENT_MINIBOSS_OPEN_PORTAL:
-                    Talk(WHISPER_OPEN_PORTAL);
-                    Talk(SAY_SHADRON_SPECIAL);
-                    if (!isSartharion)
+                switch (eventId)
+                {
+                    case EVENT_MINIBOSS_SHADOW_BREATH:
                     {
-                        if (GameObject* Portal = me->GetVictim()->SummonGameObject(GO_TWILIGHT_PORTAL, portalPos[BOSS_SHADRON_EVENT].GetPositionX(), portalPos[BOSS_SHADRON_EVENT].GetPositionY(), portalPos[BOSS_SHADRON_EVENT].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
-                            portalGUID = Portal->GetGUID();
+                        if (!urand(0, 10))
+                            Talk(SAY_SHADRON_BREATH);
+                        me->CastSpell(me->GetVictim(), SPELL_SHADOW_BREATH, false);
+                        events.RepeatEvent(17500);
+                        break;
                     }
-                    else if (pInstance)
-                        pInstance->SetData(DATA_ADD_PORTAL, 0);
-
-                    events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2000);
-                    
-                    break;
-                case EVENT_MINIBOSS_SPAWN_HELPERS:
-                    Talk(WHISPER_SUMMON_DICIPLE);
-                    me->CastSpell(me, (isSartharion ? SPELL_GIFT_OF_TWILIGHT_FIRE : SPELL_GIFT_OF_TWILIGHT_SHADOW), true);
-                    if (Creature* cr = me->SummonCreature((isSartharion ? NPC_ACOLYTE_OF_SHADRON : NPC_DISCIPLE_OF_SHADRON), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
+                    case EVENT_MINIBOSS_SHADOW_FISSURE:
                     {
-                        summons.Summon(cr);
-                        cr->SetPhaseMask(16, true);
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                            me->CastSpell(target, SPELL_SHADOW_FISSURE, false);
+                        events.RepeatEvent(22500);
+                        break;
                     }
+                    case EVENT_MINIBOSS_OPEN_PORTAL:
+                    {
+                        Talk(WHISPER_OPEN_PORTAL);
+                        Talk(SAY_SHADRON_SPECIAL);
+                        if (!isSartharion)
+                        {
+                            if (GameObject* Portal = me->GetVictim()->SummonGameObject(GO_TWILIGHT_PORTAL, portalPos[DATA_SHADRON].GetPositionX(), portalPos[DATA_SHADRON].GetPositionY(), portalPos[DATA_SHADRON].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                                portalGUID = Portal->GetGUID();
+                        }
+                        else
+                            instance->SetData(DATA_ADD_PORTAL, 0);
 
-                    
-                    break;
+                        events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2000);
+
+                        break;
+                    }
+                    case EVENT_MINIBOSS_SPAWN_HELPERS:
+                    {
+                        Talk(WHISPER_SUMMON_DICIPLE);
+                        me->CastSpell(me, (isSartharion ? SPELL_GIFT_OF_TWILIGHT_FIRE : SPELL_GIFT_OF_TWILIGHT_SHADOW), true);
+                        if (Creature* acolyte = me->SummonCreature((isSartharion ? NPC_ACOLYTE_OF_SHADRON : NPC_DISCIPLE_OF_SHADRON), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
+                        {
+                            // TODO: inpect JustSummoned
+                            summons.Summon(acolyte);
+                            acolyte->SetPhaseMask(16, true);
+                        }
+
+                        break;
+                    }
+                }
             }
 
             DoMeleeAttackIfReady();
+        }
+
+    private:
+        uint64 portalGUID;
+        bool isSartharion;
+        uint32 speechTimer;
+
+        void ClearInstance()
+        {
+            summons.DespawnAll();
+            // Remove phase shift
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
+            if (portalGUID)
+            {
+                if (GameObject* gobj = me->GetMap()->GetGameObject(portalGUID))
+                {
+                    gobj->Delete();
+                }
+                portalGUID = 0;
+            }
         }
     };
 };
@@ -1091,7 +1115,7 @@ public:
 
     struct boss_sartharion_vesperonAI : public BossAI
     {
-        boss_sartharion_vesperonAI(Creature* pCreature) : BossAI(pCreature, BOSS_VESPERON_EVENT),
+        boss_sartharion_vesperonAI(Creature* pCreature) : BossAI(pCreature, DATA_VESPERON),
             portalGUID(0),
             speechTimer(0),
             isSartharion(false)
@@ -1144,7 +1168,7 @@ public:
             events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10000);
             events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30000);
 
-            if (isSartharion || instance->GetBossState(BOSS_SARTHARION_EVENT) == DONE)
+            if (isSartharion || instance->GetBossState(DATA_SARTHARION) == DONE)
             {
                 me->SetLootMode(0);
             }
@@ -1165,7 +1189,7 @@ public:
             if (!isSartharion)
             {
                 ClearInstance();
-                instance->SetData(BOSS_VESPERON_EVENT, DONE);
+                instance->SetData(DATA_VESPERON, DONE);
             }
             else
             {
@@ -1262,7 +1286,7 @@ public:
                         Talk(SAY_VESPERON_SPECIAL);
                         if (!isSartharion)
                         {
-                            if (GameObject* Portal = me->GetVictim()->SummonGameObject(GO_TWILIGHT_PORTAL, portalPos[BOSS_VESPERON_EVENT].GetPositionX(), portalPos[BOSS_VESPERON_EVENT].GetPositionY(), portalPos[BOSS_VESPERON_EVENT].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                            if (GameObject* Portal = me->GetVictim()->SummonGameObject(GO_TWILIGHT_PORTAL, portalPos[DATA_VESPERON].GetPositionX(), portalPos[DATA_VESPERON].GetPositionY(), portalPos[DATA_VESPERON].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
                             {
                                 portalGUID = Portal->GetGUID();
                             }

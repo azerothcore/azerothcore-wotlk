@@ -42,7 +42,7 @@ public:
 
         bool IsEncounterInProgress() const
         {
-            if (Encounters[BOSS_SARTHARION_EVENT] == IN_PROGRESS)
+            if (Encounters[DATA_SARTHARION] == IN_PROGRESS)
                 return true;
 
             return false;
@@ -71,10 +71,10 @@ public:
         {
             switch (id)
             {
-                case BOSS_SARTHARION_EVENT:
-                case BOSS_TENEBRON_EVENT:
-                case BOSS_SHADRON_EVENT:
-                case BOSS_VESPERON_EVENT:
+                case DATA_SARTHARION:
+                case DATA_TENEBRON:
+                case DATA_SHADRON:
+                case DATA_VESPERON:
                     return Encounters[id];
             }
 
@@ -158,10 +158,10 @@ public:
         {
             switch(type)
             {
-                case BOSS_SARTHARION_EVENT:
-                case BOSS_TENEBRON_EVENT:
-                case BOSS_SHADRON_EVENT:
-                case BOSS_VESPERON_EVENT:
+                case DATA_SARTHARION:
+                case DATA_TENEBRON:
+                case DATA_SHADRON:
+                case DATA_VESPERON:
                     Encounters[type] = data;
                     break;
                 case DATA_ADD_PORTAL:

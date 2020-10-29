@@ -7,11 +7,11 @@
 
 enum Data
 {
-    // Encounter
-    BOSS_SARTHARION_EVENT           = 0,
-    BOSS_TENEBRON_EVENT             = 1,
-    BOSS_VESPERON_EVENT             = 2,
-    BOSS_SHADRON_EVENT              = 3,
+    // Encounters
+    DATA_SARTHARION                 = 0,
+    DATA_TENEBRON                   = 1,
+    DATA_VESPERON                   = 2,
+    DATA_SHADRON                    = 3,
     MAX_ENCOUNTERS                  = 4,
 
     // GUIDs
