@@ -5,7 +5,7 @@
 #ifndef DEF_OBSIDIAN_SANCTUM_H
 #define DEF_OBSIDIAN_SANCTUM_H
 
-enum Data
+enum Data : uint32
 {
     // Encounters
     DATA_SARTHARION                 = 0,

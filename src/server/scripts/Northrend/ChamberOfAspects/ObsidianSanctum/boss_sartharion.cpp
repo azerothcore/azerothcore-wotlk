@@ -1304,7 +1304,7 @@ public:
                 case EVENT_MINIBOSS_SPAWN_HELPERS:
                 {
                     Talk(WHISPER_SUMMON_DICIPLE);
-                    DoCastSelf(static_cast<uint32>(isCalledBySartharion ? SPELL_TWILIGHT_TORMENT_SARTHARION : SPELL_TWILIGHT_TORMENT_VESPERON), true);
+                    DoCastSelf(isCalledBySartharion ? static_cast<uint32>(SPELL_TWILIGHT_TORMENT_SARTHARION) : static_cast<uint32>(SPELL_TWILIGHT_TORMENT_VESPERON), true);
                     if (Creature* acolyte = me->SummonCreature((isCalledBySartharion ? NPC_ACOLYTE_OF_VESPERON : NPC_DISCIPLE_OF_VESPERON), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
                     {
                         summons.Summon(acolyte);
