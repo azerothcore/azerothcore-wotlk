@@ -402,7 +402,8 @@ public:
                 return;
             }
 
-            if (!usedBerserk && !below11PctReached && me->HealthBelowPctDamaged(10, damage))
+            // Soft enrage
+            if (!dragonsCount && !below11PctReached && me->HealthBelowPctDamaged(10, damage))
             {
                 summons.RemoveNotExisting();
                 if (!summons.empty())
