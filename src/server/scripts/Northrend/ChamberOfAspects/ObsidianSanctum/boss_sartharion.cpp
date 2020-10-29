@@ -1242,7 +1242,7 @@ public:
             events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30000);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit* killer) override
+        void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
         {
             if (!isCalledBySartharion)
             {
@@ -1440,7 +1440,7 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             if (m_scriptSpellId == 57578) // Dummy lava strike
             {
