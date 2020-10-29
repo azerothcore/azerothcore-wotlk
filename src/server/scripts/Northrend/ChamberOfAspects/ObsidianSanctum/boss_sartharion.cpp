@@ -629,6 +629,7 @@ public:
 
         void Reset() override
         {
+            _Reset();
             summons2.DespawnAll();
             ClearInstance();
 
@@ -641,7 +642,7 @@ public:
             timer = 0;
 
             instance->SetData(DATA_TENEBRON, NOT_STARTED);
-            instance->SetData(DATA_CLEAR_PORTAL, 0);
+            instance->DoAction(ACTION_CLEAR_PORTAL);
         }
 
         void JustSummoned(Creature* summon) override
@@ -689,7 +690,7 @@ public:
             }
             else
             {
-                instance->SetData(DATA_CLEAR_PORTAL, 0);
+                instance->DoAction(ACTION_CLEAR_PORTAL);
                 if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
                     sartharion->AI()->DoAction(ACTION_DRAKE_DIED);
             }
@@ -765,7 +766,7 @@ public:
                                 portalGUID = Portal->GetGUID();
                         }
                         else
-                            instance->SetData(DATA_ADD_PORTAL, 0);
+                            instance->DoAction(ACTION_ADD_PORTAL);
 
                         events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2000);
                         events.RepeatEvent(60000);
@@ -816,7 +817,7 @@ public:
                             RemoveTwilightPortal();
                         }
                         else
-                            instance->SetData(DATA_CLEAR_PORTAL, 0);
+                            instance->DoAction(ACTION_CLEAR_PORTAL);
 
                         EntryCheckPredicate pred(NPC_TWILIGHT_EGG);
                         summons.DoAction(ACTION_SWITCH_PHASE, pred);
@@ -900,6 +901,7 @@ public:
 
         void Reset() override
         {
+            _Reset();
             events.Reset();
             ClearInstance();
 
@@ -910,8 +912,7 @@ public:
             isSartharion = false;
             speechTimer = 0;
 
-            instance->SetData(DATA_SHADRON, NOT_STARTED);
-            instance->SetData(DATA_CLEAR_PORTAL, 0);
+            instance->DoAction(ACTION_CLEAR_PORTAL);
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -980,7 +981,7 @@ public:
                 if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
                     sartharion->RemoveAura(SPELL_GIFT_OF_TWILIGHT_FIRE);
 
-                instance->SetData(DATA_CLEAR_PORTAL, 0);
+                instance->DoAction(ACTION_CLEAR_PORTAL);
             }
             else
             {
@@ -1052,7 +1053,7 @@ public:
                                 portalGUID = Portal->GetGUID();
                         }
                         else
-                            instance->SetData(DATA_ADD_PORTAL, 0);
+                            instance->DoAction(ACTION_ADD_PORTAL);
 
                         events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2000);
 
@@ -1213,7 +1214,7 @@ public:
             else
             {
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_SARTHARION);
-                instance->SetData(DATA_CLEAR_PORTAL, 1);
+                instance->DoAction(ACTION_CLEAR_PORTAL);
             }
 
             events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30000);
@@ -1292,7 +1293,7 @@ public:
                             }
                         }
                         else
-                            instance->SetData(DATA_ADD_PORTAL, 0);
+                            instance->DoAction(ACTION_ADD_PORTAL);
 
                         events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2000);
                         break;

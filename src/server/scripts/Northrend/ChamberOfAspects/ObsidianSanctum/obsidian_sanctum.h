@@ -20,10 +20,6 @@ enum Data
     DATA_SHADRON                    = 12,
     DATA_VESPERON                   = 13,
 
-    // Portal
-    DATA_CLEAR_PORTAL               = 20,
-    DATA_ADD_PORTAL                 = 21,
-
     // Achievements
     DATA_ACHIEVEMENT_DRAGONS_COUNT  = 30,
     DATA_VOLCANO_BLOWS              = 31,
@@ -44,4 +40,10 @@ enum Data
     SPELL_TWILIGHT_TORMENT_SARTHARION = 58835,
 };
 
+enum OSActions
+{
+    // Portal
+    ACTION_CLEAR_PORTAL               = -1,
+    ACTION_ADD_PORTAL                 = -2,
+};
 #endif

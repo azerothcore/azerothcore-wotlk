@@ -19,31 +19,23 @@ public:
 
     struct instance_obsidian_sanctum_InstanceMapScript : public InstanceScript
     {
-        instance_obsidian_sanctum_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {}
-
-        uint64 m_uiSartharionGUID;
-        uint64 m_uiTenebronGUID;
-        uint64 m_uiShadronGUID;
-        uint64 m_uiVesperonGUID;
-        uint32 Encounters[MAX_ENCOUNTERS];
-        uint64 m_uiPortalGUID;
-        uint8 portalCount;
-
-        void Initialize()
+        instance_obsidian_sanctum_InstanceMapScript(Map* pMap) : InstanceScript(pMap),
+            m_uiSartharionGUID(0),
+            m_uiTenebronGUID(0),
+            m_uiShadronGUID(0),
+            m_uiVesperonGUID(0),
+            m_uiPortalGUID(0),
+            portalCount(0)
         {
-            m_uiSartharionGUID = 0;
-            m_uiTenebronGUID   = 0;
-            m_uiShadronGUID    = 0;
-            m_uiVesperonGUID   = 0;
-            m_uiPortalGUID     = 0;
-            portalCount        = 0;
-            memset(&Encounters, 0, sizeof(Encounters));
-        };
+        }
 
         bool IsEncounterInProgress() const
         {
-            if (Encounters[DATA_SARTHARION] == IN_PROGRESS)
-                return true;
+            for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+            {
+                if (GetBossState(i) == IN_PROGRESS)
+                    return true;
+            }
 
             return false;
         }
@@ -65,20 +57,6 @@ public:
                     m_uiVesperonGUID = pCreature->GetGUID();
                     break;
             }
-        }
-
-        uint32 GetData(uint32 id) const
-        {
-            switch (id)
-            {
-                case DATA_SARTHARION:
-                case DATA_TENEBRON:
-                case DATA_SHADRON:
-                case DATA_VESPERON:
-                    return Encounters[id];
-            }
-
-            return 0;
         }
 
         uint64 GetData64(uint32 uiData) const
@@ -154,46 +132,59 @@ public:
             return false;
         }
 
-        void SetData(uint32 type, uint32 data)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
-            switch(type)
+            if (InstanceScript::SetBossState(type, state))
             {
-                case DATA_SARTHARION:
-                case DATA_TENEBRON:
-                case DATA_SHADRON:
-                case DATA_VESPERON:
-                    Encounters[type] = data;
-                    break;
-                case DATA_ADD_PORTAL:
+                return false;
+            }
+
+            if (state == DONE)
+            {
+                SaveToDB();
+            }
+            return true;
+        }
+
+        void DoAction(int32 action) override
+        {
+            switch (action)
+            {
+                case ACTION_ADD_PORTAL:
+                {
                     if (!m_uiPortalGUID)
                     {
-                        if (Creature* cr = instance->GetCreature(m_uiSartharionGUID))
-                            if (GameObject* go = cr->SummonGameObject(GO_TWILIGHT_PORTAL, 3247.29f, 529.804f, 58.9595f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                        if (Creature* sartharion = instance->GetCreature(m_uiSartharionGUID))
+                        {
+                            if (GameObject* portal = sartharion->SummonGameObject(GO_TWILIGHT_PORTAL, 3247.29f, 529.804f, 58.9595f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
                             {
-                                cr->RemoveGameObject(go, false);
-                                m_uiPortalGUID = go->GetGUID();
+                                sartharion->RemoveGameObject(portal, false);
+                                m_uiPortalGUID = portal->GetGUID();
                             }
+                        }
 
                         portalCount = 0;
                     }
 
-                    portalCount++;
+                    ++portalCount;
                     break;
-                case DATA_CLEAR_PORTAL:
-                    portalCount--;
-                    if (!portalCount || data == 2)
+                }
+                case ACTION_CLEAR_PORTAL:
+                {
+                    --portalCount;
+                    if (!portalCount)
                     {
                         if (GameObject* go = instance->GetGameObject(m_uiPortalGUID))
+                        {
                             go->Delete();
+                        }
 
                         DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
                         m_uiPortalGUID = 0;
                     }
                     break;
+                }
             }
-
-            if (data == DONE)
-                SaveToDB();
         }
 
         std::string GetSaveData()
@@ -201,7 +192,7 @@ public:
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << "O S " << Encounters[0] << ' ' << Encounters[1] << ' ' << Encounters[2] << ' ' << Encounters[3];
+            saveStream << "O S " << GetBossSaveData();
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
@@ -226,14 +217,25 @@ public:
             {
                 for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
                 {
-                    loadStream >> Encounters[i];
-                    if (Encounters[i] == IN_PROGRESS)
-                        Encounters[i] = NOT_STARTED;
+                    uint32 temp;
+                    loadStream >> temp;
+                    if (temp == IN_PROGRESS)
+                        temp = NOT_STARTED;
+
+                    SetBossState(i, static_cast<EncounterState>(temp));
                 }
             }
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }
+
+    private:
+        uint64 m_uiSartharionGUID;
+        uint64 m_uiTenebronGUID;
+        uint64 m_uiShadronGUID;
+        uint64 m_uiVesperonGUID;
+        uint64 m_uiPortalGUID;
+        uint8 portalCount;
     };
 };
 
