@@ -113,10 +113,6 @@ enum Misc
     ACTION_CALL_DRAGON                          = 2,
     ACTION_DRAKE_DIED                           = 3,
 
-    DRAGON_TENEBRON                             = 0,
-    DRAGON_SHADRON                              = 1,
-    DRAGON_VESPERON                             = 2,
-
     POINT_FINAL_TENEBRON                        = 8,
     POINT_FINAL_SHADRON                         = 4,
     POINT_FINAL_VESPERON                        = 4,
@@ -198,12 +194,12 @@ public:
             dragonsCount(0),
             usedBerserk(false)
         {
-            dragons.fill(0);
         }
 
         void Reset() override
         {
             _Reset();
+            extraEvents.Reset();
             RespawnDragons(false);
             SummonStartingTriggers();
             usedBerserk = false;
@@ -245,7 +241,6 @@ public:
                         continue;
 
                     dragon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                    dragons.at(i) = dragon->GetGUID();
                     ++dragonsCount;
                     me->AddLootMode(1 << dragonsCount);
 
@@ -254,15 +249,15 @@ public:
                     {
                     case DATA_TENEBRON:
                         dragon->CastSpell(dragon, SPELL_POWER_OF_TENEBRON, true);
-                        events.ScheduleEvent(EVENT_SARTHARION_CALL_TENEBRON, 10000);
+                        extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_TENEBRON, 10000);
                         break;
                     case DATA_SHADRON:
                         dragon->CastSpell(dragon, SPELL_POWER_OF_SHADRON, true);
-                        events.ScheduleEvent(EVENT_SARTHARION_CALL_SHADRON, 65000);
+                        extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_SHADRON, 65000);
                         break;
                     case DATA_VESPERON:
                         dragon->CastSpell(dragon, SPELL_POWER_OF_VESPERON, true);
-                        events.ScheduleEvent(EVENT_SARTHARION_CALL_VESPERON, 115000);
+                        extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_VESPERON, 115000);
                         break;
                     }
                 }
@@ -386,23 +381,27 @@ public:
                     case EVENT_SARTHARION_CALL_TENEBRON:
                     {
                         Talk(SAY_SARTHARION_CALL_TENEBRON);
-                        if (Creature* tenebron = ObjectAccessor::GetCreature(*me, dragons[DRAGON_TENEBRON]))
+                        if (Creature* tenebron = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TENEBRON)))
+                        {
                             tenebron->AI()->DoAction(ACTION_CALL_DRAGON);
+                        }
 
                         break;
                     }
                     case EVENT_SARTHARION_CALL_SHADRON:
                     {
                         Talk(SAY_SARTHARION_CALL_SHADRON);
-                        if (Creature* shadron = ObjectAccessor::GetCreature(*me, dragons[DRAGON_SHADRON]))
+                        if (Creature* shadron = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SHADRON)))
+                        {
                             shadron->AI()->DoAction(ACTION_CALL_DRAGON);
+                        }
 
                         break;
                     }
                     case EVENT_SARTHARION_CALL_VESPERON:
                     {
                         Talk(SAY_SARTHARION_CALL_VESPERON);
-                        if (Creature* vesperon = ObjectAccessor::GetCreature(*me, dragons[DRAGON_VESPERON]))
+                        if (Creature* vesperon = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VESPERON)))
                             vesperon->AI()->DoAction(ACTION_CALL_DRAGON);
 
                         break;
@@ -510,7 +509,6 @@ public:
 
     private:
         EventMap extraEvents;
-        std::array<uint64, 3> dragons;
         std::list<uint32> volcanoBlows;
         uint8 dragonsCount;
         bool usedBerserk;
@@ -531,8 +529,8 @@ public:
         {
             summons.RemoveNotExisting();
             Talk(WHISPER_LAVA_CHURN);
-            events.ScheduleEvent(EVENT_SARTHARION_START_LAVA, 2000);
-            events.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 9000);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_START_LAVA, 2000);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 9000);
 
             // Send wave from left
             if (urand(0, 1))
@@ -568,11 +566,12 @@ public:
 
         void RespawnDragons(bool combat)
         {
+            static std::array<uint32, 3> const dragons = { DATA_TENEBRON, DATA_VESPERON, DATA_SHADRON };
             for (uint8 i = 0; i < 3; ++i)
             {
                 if (dragons.at(i))
                 {
-                    if (Creature* dragon = ObjectAccessor::GetCreature(*me, dragons[i]))
+                    if (Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetData64(dragons[i])))
                     {
                         if (combat && dragon->IsInCombat())
                             continue;
@@ -583,7 +582,6 @@ public:
                 }
             }
 
-            dragons.fill(0);
             dragonsCount = 0;
         }
     };

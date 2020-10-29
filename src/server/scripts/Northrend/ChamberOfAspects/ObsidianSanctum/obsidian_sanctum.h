@@ -14,12 +14,6 @@ enum Data
     DATA_SHADRON                    = 3,
     MAX_ENCOUNTERS                  = 4,
 
-    // GUIDs
-    DATA_SARTHARION                 = 10,
-    DATA_TENEBRON                   = 11,
-    DATA_SHADRON                    = 12,
-    DATA_VESPERON                   = 13,
-
     // Achievements
     DATA_ACHIEVEMENT_DRAGONS_COUNT  = 30,
     DATA_VOLCANO_BLOWS              = 31,
