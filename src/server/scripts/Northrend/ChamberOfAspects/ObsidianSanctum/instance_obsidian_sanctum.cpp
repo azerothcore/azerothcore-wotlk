@@ -30,7 +30,7 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
             {
@@ -41,7 +41,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* pCreature)
+        void OnCreatureCreate(Creature* pCreature) override
         {
             switch(pCreature->GetEntry())
             {
@@ -60,7 +60,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 uiData) const
+        uint64 GetData64(uint32 uiData) const override
         {
             switch(uiData)
             {
@@ -76,7 +76,7 @@ public:
             return 0;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -188,7 +188,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -199,7 +199,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* strIn)
+        void Load(const char* strIn) override
         {
             if (!strIn)
             {
