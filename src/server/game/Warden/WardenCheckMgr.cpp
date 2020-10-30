@@ -115,12 +115,12 @@ void WardenCheckMgr::LoadWardenChecks()
 
         if (checkType == MPQ_CHECK || checkType == MEM_CHECK)
         {
-            WardenCheckResult *wr = new WardenCheckResult();
+            WardenCheckResult* wr = new WardenCheckResult();
             wr->Result.SetHexStr(checkResult.c_str());
             int len = checkResult.size() / 2;
             if (wr->Result.GetNumBytes() < len)
             {
-                uint8 *temp = new uint8[len];
+                uint8* temp = new uint8[len];
                 memset(temp, 0, len);
                 memcpy(temp, wr->Result.AsByteArray().get(), wr->Result.GetNumBytes());
                 std::reverse(temp, temp + len);
@@ -136,8 +136,7 @@ void WardenCheckMgr::LoadWardenChecks()
             wardenCheck->Comment = comment;
 
         ++count;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     sLog->outString(">> Loaded %u warden checks.", count);
     sLog->outString();
@@ -185,8 +184,7 @@ void WardenCheckMgr::LoadWardenOverrides()
             CheckStore[checkId]->Action = WardenActions(action);
             ++count;
         }
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     sLog->outString(">> Loaded %u warden action overrides.", count);
     sLog->outString();

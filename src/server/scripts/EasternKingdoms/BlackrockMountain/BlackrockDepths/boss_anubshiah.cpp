@@ -58,7 +58,8 @@ public:
             {
                 DoCastVictim(SPELL_SHADOWBOLT);
                 ShadowBolt_Timer = 7000;
-            } else ShadowBolt_Timer -= diff;
+            }
+            else ShadowBolt_Timer -= diff;
 
             //CurseOfTongues_Timer
             if (CurseOfTongues_Timer <= diff)
@@ -66,21 +67,24 @@ public:
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                     DoCast(target, SPELL_CURSEOFTONGUES);
                 CurseOfTongues_Timer = 18000;
-            } else CurseOfTongues_Timer -= diff;
+            }
+            else CurseOfTongues_Timer -= diff;
 
             //CurseOfWeakness_Timer
             if (CurseOfWeakness_Timer <= diff)
             {
                 DoCastVictim(SPELL_CURSEOFWEAKNESS);
                 CurseOfWeakness_Timer = 45000;
-            } else CurseOfWeakness_Timer -= diff;
+            }
+            else CurseOfWeakness_Timer -= diff;
 
             //DemonArmor_Timer
             if (DemonArmor_Timer <= diff)
             {
                 DoCast(me, SPELL_DEMONARMOR);
                 DemonArmor_Timer = 300000;
-            } else DemonArmor_Timer -= diff;
+            }
+            else DemonArmor_Timer -= diff;
 
             //EnvelopingWeb_Timer
             if (EnvelopingWeb_Timer <= diff)
@@ -88,7 +92,8 @@ public:
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                     DoCast(target, SPELL_ENVELOPINGWEB);
                 EnvelopingWeb_Timer = 12000;
-            } else EnvelopingWeb_Timer -= diff;
+            }
+            else EnvelopingWeb_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }

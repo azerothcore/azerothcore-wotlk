@@ -65,7 +65,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/)
         {
-            if (!urand(0,1))
+            if (!urand(0, 1))
                 return;
 
             Talk(SAY_SLAY);
@@ -81,7 +81,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_DISEASE_EXPULSION:
                     me->CastSpell(me, DUNGEON_MODE(SPELL_DISEASE_EXPULSION_N, SPELL_DISEASE_EXPULSION_H), false);
@@ -92,7 +92,7 @@ public:
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SPELL_CONSTRICTING_CHAINS:
-                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_BOTTOMAGGRO, 0, 50.0f, true))
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_BOTTOMAGGRO, 0, 50.0f, true))
                         me->CastSpell(pTarget, DUNGEON_MODE(SPELL_CONSTRICTING_CHAINS_N, SPELL_CONSTRICTING_CHAINS_H), false);
                     events.RepeatEvent(14000);
                     break;
