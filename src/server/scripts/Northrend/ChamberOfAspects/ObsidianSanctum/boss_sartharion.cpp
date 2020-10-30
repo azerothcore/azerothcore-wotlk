@@ -263,7 +263,7 @@ public:
 
         void EnterCombat(Unit* pWho) override
         {
-            if (pWho->GetPositionX() < SartharionBoundary[0] || pWho->GetPositionX() > SartharionBoundary[1] || pWho->GetPositionY() < SartharionBoundary[2] || pWho->GetPositionY() > SartharionBoundary[3])
+            if (pWho && pWho->GetPositionX() < SartharionBoundary[0] || pWho->GetPositionX() > SartharionBoundary[1] || pWho->GetPositionY() < SartharionBoundary[2] || pWho->GetPositionY() > SartharionBoundary[3])
             {
                 EnterEvadeMode();
                 return;
