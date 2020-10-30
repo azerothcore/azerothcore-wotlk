@@ -6,7 +6,7 @@
  *
  *   Moved from Synch.h.
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //==========================================================================
 
@@ -47,40 +47,18 @@ public:
                int type = USYNC_THREAD,
                const ACE_TCHAR *name = 0,
                void *arg = 0,
-               LPSECURITY_ATTRIBUTES sa = 0) : ACE_Event_Base ()
-  {
-  ACE_Condition_Attributes_T<TIME_POLICY> cond_attr (type);
-  if (ACE_OS::event_init (&this->handle_,
-                          type,
-                          &const_cast<ACE_condattr_t&> (cond_attr.attributes ()),
-                          manual_reset,
-                          initial_state,
-                          name,
-                          arg,
-                          sa) != 0)
-    ACELIB_ERROR ((LM_ERROR,
-                ACE_TEXT ("%p\n"),
-                ACE_TEXT ("ACE_Event_T<TIME_POLICY>::ACE_Event_T")));
-  }
+               LPSECURITY_ATTRIBUTES sa = 0);
 
   /// Implicitly destroy the event variable.
-  virtual ~ACE_Event_T (void)
-  {
-  }
+  virtual ~ACE_Event_T (void);
 
   /// Get the current time of day according to the queue's TIME_POLICY.
   /// Allows users to initialize timeout values using correct time policy.
-  ACE_Time_Value_T<TIME_POLICY> gettimeofday (void) const
-  {
-    return this->time_policy_ ();
-  }
+  ACE_Time_Value_T<TIME_POLICY> gettimeofday (void) const;
 
   /// Allows applications to control how the event gets the time
   /// of day.
-  void set_time_policy (TIME_POLICY const & time_policy)
-  {
-	this->time_policy_ = rhs;
-  }
+  void set_time_policy (TIME_POLICY const & time_policy);
 
   /// Declare the dynamic allocation hooks
   ACE_ALLOC_HOOK_DECLARE;

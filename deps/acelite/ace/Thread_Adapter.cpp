@@ -42,6 +42,8 @@ ACE_Thread_Adapter::~ACE_Thread_Adapter (void)
 {
 }
 
+ACE_ALLOC_HOOK_DEFINE(ACE_Thread_Adapter);
+
 ACE_THR_FUNC_RETURN
 ACE_Thread_Adapter::invoke (void)
 {
