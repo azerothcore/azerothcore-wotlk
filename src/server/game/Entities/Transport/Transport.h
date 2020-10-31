@@ -116,7 +116,7 @@ public:
 
     uint32 GetPauseTime() const { return GetUInt32Value(GAMEOBJECT_LEVEL); }
     void SetPauseTime(uint32 val) { SetUInt32Value(GAMEOBJECT_LEVEL, val); }
-    uint32 GetPeriod() const { return m_goValue.Transport.AnimationInfo ? m_goValue.Transport.AnimationInfo->TotalTime : GetPauseTime()+2; }
+    uint32 GetPeriod() const { return m_goValue.Transport.AnimationInfo ? m_goValue.Transport.AnimationInfo->TotalTime : GetPauseTime() + 2; }
 private:
     bool _needDoInitialRelocation;
 };

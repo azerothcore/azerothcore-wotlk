@@ -130,20 +130,20 @@ enum Misc
 
 class CastArmageddon : public BasicEvent
 {
-    public:
-        CastArmageddon(Creature* caster) : _caster(caster)
-        {
-        }
+public:
+    CastArmageddon(Creature* caster) : _caster(caster)
+    {
+    }
 
-        bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
-        {
-            _caster->CastSpell(_caster, SPELL_ARMAGEDDON_MISSILE, true);
-            _caster->SetPosition(_caster->GetPositionX(), _caster->GetPositionY(), _caster->GetPositionZ()-20.0f, 0.0f);
-            return true;
-        }
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    {
+        _caster->CastSpell(_caster, SPELL_ARMAGEDDON_MISSILE, true);
+        _caster->SetPosition(_caster->GetPositionX(), _caster->GetPositionY(), _caster->GetPositionZ() - 20.0f, 0.0f);
+        return true;
+    }
 
-    private:
-        Creature* _caster;
+private:
+    Creature* _caster;
 };
 
 class npc_kiljaeden_controller : public CreatureScript
@@ -170,7 +170,7 @@ public:
         void ResetOrbs()
         {
             for (uint8 i = 0; i < 4; ++i)
-                if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1+i)))
+                if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
                     orb->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
         }
 
@@ -184,7 +184,7 @@ public:
             me->SummonCreature(NPC_HAND_OF_THE_DECEIVER, 1702.62f, 611.19f, 27.66f, 1.81f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
             me->SummonCreature(NPC_HAND_OF_THE_DECEIVER, 1684.099f, 618.848f, 27.67f, 0.589f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
             me->SummonCreature(NPC_HAND_OF_THE_DECEIVER, 1688.38f, 641.10f, 27.50f, 5.43f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_ANVEENA, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+40.0f, 0.0f);
+            me->SummonCreature(NPC_ANVEENA, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 40.0f, 0.0f);
 
             me->CastSpell(me, SPELL_DESTROY_ALL_DRAKES, true);
             me->CastSpell(me, SPELL_ANVEENA_ENERGY_DRAIN, true);
@@ -224,7 +224,7 @@ public:
                 if (!summons.HasEntry(NPC_HAND_OF_THE_DECEIVER))
                 {
                     me->RemoveAurasDueToSpell(SPELL_ANVEENA_ENERGY_DRAIN);
-                    me->SummonCreature(NPC_KILJAEDEN, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+1.5f, 4.3f, TEMPSUMMON_MANUAL_DESPAWN);
+                    me->SummonCreature(NPC_KILJAEDEN, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 1.5f, 4.3f, TEMPSUMMON_MANUAL_DESPAWN);
                     me->SummonCreature(NPC_KALECGOS_KJ, 1726.80f, 661.43f, 138.65f, 3.95f, TEMPSUMMON_MANUAL_DESPAWN);
                 }
             }
@@ -241,19 +241,19 @@ public:
                     events.ScheduleEvent(EVENT_RANDOM_TALK, urand(90000, 180000));
                     break;
                 case EVENT_CHECK_PLAYERS:
-                {
-                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (Player* player = itr->GetSource())
-                            if (!player->IsGameMaster() && me->GetDistance2d(player) < 60.0f && player->IsAlive())
-                            {
-                                events.ScheduleEvent(EVENT_CHECK_PLAYERS, 1000);
-                                return;
-                            }
+                    {
+                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                            if (Player* player = itr->GetSource())
+                                if (!player->IsGameMaster() && me->GetDistance2d(player) < 60.0f && player->IsAlive())
+                                {
+                                    events.ScheduleEvent(EVENT_CHECK_PLAYERS, 1000);
+                                    return;
+                                }
 
-                    CreatureAI::EnterEvadeMode();
-                    break;
-                }
+                        CreatureAI::EnterEvadeMode();
+                        break;
+                    }
             }
         }
     };
@@ -373,7 +373,7 @@ public:
                 summon->SetDisableGravity(true);
                 summon->SetCanFly(true);
                 summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
-                summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ()+20.0f, 0.0f);
+                summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
                 summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
                 summon->DespawnOrUnsummon(10000);
             }
@@ -486,7 +486,7 @@ public:
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
-            
+
             switch (events.ExecuteEvent())
             {
                 case EVENT_CHECK_HEALTH85:
@@ -498,7 +498,7 @@ public:
                         events2.ScheduleEvent(EVENT_TEXT_SPEACH22, 22000, EVENT_GROUP_SPEACH);
                         events2.ScheduleEvent(EVENT_TEXT_SPEACH23, 28000, EVENT_GROUP_SPEACH);
                         events2.RescheduleEvent(EVENT_EMPOWER_ORBS1, 35000);
-                        
+
                         events.DelayEvents(2000);
                         events.ScheduleEvent(EVENT_SPELL_SINISTER_REFLECTION, 500);
                         events.ScheduleEvent(EVENT_SPELL_SHADOW_SPIKE, 1200);
@@ -508,7 +508,7 @@ public:
                     }
                     events.ScheduleEvent(EVENT_CHECK_HEALTH85, 0);
                     break;
-                
+
                 case EVENT_CHECK_HEALTH55:
                     if (me->HealthBelowPct(55))
                     {
@@ -518,7 +518,7 @@ public:
                         events2.ScheduleEvent(EVENT_TEXT_SPEACH32, 22000, EVENT_GROUP_SPEACH);
                         events2.ScheduleEvent(EVENT_TEXT_SPEACH33, 28000, EVENT_GROUP_SPEACH);
                         events2.RescheduleEvent(EVENT_EMPOWER_ORBS2, 35000);
-                        
+
                         events.DelayEvents(2000);
                         events.ScheduleEvent(EVENT_SPELL_SINISTER_REFLECTION, 500);
                         events.ScheduleEvent(EVENT_SPELL_SHADOW_SPIKE, 1200);
@@ -528,7 +528,7 @@ public:
                     }
                     events.ScheduleEvent(EVENT_CHECK_HEALTH55, 0);
                     break;
-                
+
                 case EVENT_CHECK_HEALTH25:
                     if (me->HealthBelowPct(25))
                     {
@@ -571,8 +571,8 @@ public:
                 case EVENT_SUMMON_ORBS:
                     for (uint8 i = 1; i < phase; ++i)
                     {
-                        float x = me->GetPositionX() + 18.0f*cos((i*2.0f-1.0f)*M_PI/3.0f);
-                        float y = me->GetPositionY() + 18.0f*sin((i*2.0f-1.0f)*M_PI/3.0f);
+                        float x = me->GetPositionX() + 18.0f * cos((i * 2.0f - 1.0f) * M_PI / 3.0f);
+                        float y = me->GetPositionY() + 18.0f * sin((i * 2.0f - 1.0f) * M_PI / 3.0f);
                         if (Creature* orb = me->SummonCreature(NPC_SHIELD_ORB, x, y, 40.0f, 0, TEMPSUMMON_CORPSE_DESPAWN))
                         {
                             Movement::PointsArray movementArray;
@@ -581,11 +581,11 @@ public:
                             // generate movement array
                             for (uint8 j = 1; j < 20; ++j)
                             {
-                                x = me->GetPositionX() + 18.0f*cos(((i*2.0f-1.0f)*M_PI/3.0f) + (j/20.0f*2*M_PI));
-                                y = me->GetPositionY() + 18.0f*sin(((i*2.0f-1.0f)*M_PI/3.0f) + (j/20.0f*2*M_PI));
+                                x = me->GetPositionX() + 18.0f * cos(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
+                                y = me->GetPositionY() + 18.0f * sin(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
                                 movementArray.push_back(G3D::Vector3(x, y, 40.0f));
                             }
-                            
+
                             Movement::MoveSplineInit init(orb);
                             init.MovebyPath(movementArray);
                             init.SetCyclic();
@@ -629,12 +629,12 @@ public:
         {
             for (uint8 i = 0; i < 4; ++i)
             {
-                if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1+i)))
+                if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
                 {
                     if (orb->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE))
                     {
                         orb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                        if (Creature* trigger = me->SummonTrigger(orb->GetPositionX(), orb->GetPositionY(), orb->GetPositionZ(), 0, 10*MINUTE*IN_MILLISECONDS))
+                        if (Creature* trigger = me->SummonTrigger(orb->GetPositionX(), orb->GetPositionY(), orb->GetPositionZ(), 0, 10 * MINUTE * IN_MILLISECONDS))
                         {
                             trigger->CastSpell(trigger, SPELL_RING_OF_BLUE_FLAMES, true, nullptr, nullptr, trigger->GetGUID());
                             if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KILJAEDEN_CONTROLLER)))
@@ -717,43 +717,43 @@ enum postEvent
 
 class MoveDelayed : public BasicEvent
 {
-    public:
-        MoveDelayed(Creature* owner, float x, float y, float z, float o) : _owner(owner), _x(x), _y(y), _z(z), _o(o)
-        {
-        }
+public:
+    MoveDelayed(Creature* owner, float x, float y, float z, float o) : _owner(owner), _x(x), _y(y), _z(z), _o(o)
+    {
+    }
 
-        bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
-        {
-            Movement::MoveSplineInit init(_owner);
-            init.MoveTo(_x, _y, _z, false, true);
-            init.SetFacing(_o);
-            init.Launch();
-            return true;
-        }
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    {
+        Movement::MoveSplineInit init(_owner);
+        init.MoveTo(_x, _y, _z, false, true);
+        init.SetFacing(_o);
+        init.Launch();
+        return true;
+    }
 
-    private:
-        Creature* _owner;
-        float _x, _y, _z, _o;
+private:
+    Creature* _owner;
+    float _x, _y, _z, _o;
 };
 
 class FixOrientation : public BasicEvent
 {
-    public:
-        FixOrientation(Creature* owner) : _owner(owner)
-        {
-        }
+public:
+    FixOrientation(Creature* owner) : _owner(owner)
+    {
+    }
 
-        bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
-        {
-            std::list<Creature*> cList;
-            _owner->GetCreaturesWithEntryInRange(cList, 20.0f, NPC_SHATTERED_SUN_SOLDIER);
-            for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
-                (*itr)->SetFacingTo(_owner->GetOrientation());
-            return true;
-        }
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    {
+        std::list<Creature*> cList;
+        _owner->GetCreaturesWithEntryInRange(cList, 20.0f, NPC_SHATTERED_SUN_SOLDIER);
+        for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
+            (*itr)->SetFacingTo(_owner->GetOrientation());
+        return true;
+    }
 
-    private:
-        Creature* _owner;
+private:
+    Creature* _owner;
 };
 
 class npc_kalecgos_kj : public CreatureScript
@@ -818,7 +818,7 @@ public:
                 if (Creature* riftwaker = summon->FindNearestCreature(NPC_SHATTERED_SUN_RIFTWAKER, 10.0f))
                     riftwaker->CastSpell(summon, SPELL_OPEN_PORTAL_FROM_SHATTRATH, false);
                 summon->SetWalk(true);
-                summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ()+30.0f, false, true);
+                summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 30.0f, false, true);
             }
             else if (summon->GetEntry() == NPC_INERT_PORTAL)
                 summon->CastSpell(summon, SPELL_BOSS_ARCANE_PORTAL_STATE, true);
@@ -846,21 +846,21 @@ public:
             {
                 case EVENT_SCENE_01:
                     Talk(SAY_KALECGOS_GOODBYE);
-                    events.ScheduleEvent(eventId+1, 15000);
+                    events.ScheduleEvent(eventId + 1, 15000);
                     break;
                 case EVENT_SCENE_02:
                     me->SummonCreature(NPC_SHATTERED_SUN_RIFTWAKER, 1688.42f, 641.82f, 27.60f, 0.67f);
                     me->SummonCreature(NPC_SHATTERED_SUN_RIFTWAKER, 1712.58f, 616.29f, 27.78f, 0.76f);
-                    events.ScheduleEvent(eventId+1, 6000);
+                    events.ScheduleEvent(eventId + 1, 6000);
                     break;
                 case EVENT_SCENE_03:
-                    me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1727.08f+cos(5.14f), 656.82f+sin(5.14f), 28.37f+2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                    me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1738.84f+cos(2.0f), 627.32f+sin(2.0f), 28.26f+2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                    events.ScheduleEvent(eventId+1, 11000);
+                    me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1727.08f + cos(5.14f), 656.82f + sin(5.14f), 28.37f + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1738.84f + cos(2.0f), 627.32f + sin(2.0f), 28.26f + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    events.ScheduleEvent(eventId + 1, 11000);
                     break;
                 case EVENT_SCENE_04:
                     me->SummonCreature(NPC_INERT_PORTAL, 1734.96f, 642.43f, 28.06f, 3.49f);
-                    events.ScheduleEvent(eventId+1, 4000);
+                    events.ScheduleEvent(eventId + 1, 4000);
                     break;
                 case EVENT_SCENE_05:
                     if (Creature* first = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f, 640.49f, 28.06f, 3.49f))
@@ -868,10 +868,10 @@ public:
                         first->m_Events.AddEvent(new MoveDelayed(first, 1718.70f, 607.78f, 28.06f, 2.323f), first->m_Events.CalculateTime(5000));
                         first->m_Events.AddEvent(new FixOrientation(first), first->m_Events.CalculateTime(12000));
                         for (uint8 i = 0; i < 9; ++i)
-                            if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f+5*cos(i*2.0f*M_PI/9), 640.49f+5*sin(i*2.0f*M_PI/9), 28.06f, 3.49f))
+                            if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
                                 follower->GetMotionMaster()->MoveFollow(first, 3.0f, follower->GetAngle(first));
                     }
-                    events.ScheduleEvent(eventId+1, 10000);
+                    events.ScheduleEvent(eventId + 1, 10000);
                     break;
                 case EVENT_SCENE_06:
                     if (Creature* first = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f, 640.49f, 28.06f, 3.49f))
@@ -879,36 +879,36 @@ public:
                         first->m_Events.AddEvent(new MoveDelayed(first, 1678.69f, 649.27f, 28.06f, 5.46f), first->m_Events.CalculateTime(5000));
                         first->m_Events.AddEvent(new FixOrientation(first), first->m_Events.CalculateTime(14500));
                         for (uint8 i = 0; i < 9; ++i)
-                            if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f+5*cos(i*2.0f*M_PI/9), 640.49f+5*sin(i*2.0f*M_PI/9), 28.06f, 3.49f))
+                            if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
                                 follower->GetMotionMaster()->MoveFollow(first, 3.0f, follower->GetAngle(first));
                     }
-                    events.ScheduleEvent(eventId+1, 12000);
+                    events.ScheduleEvent(eventId + 1, 12000);
                     break;
                 case EVENT_SCENE_07:
                     me->SummonCreature(NPC_LADY_LIADRIN, 1719.87f, 644.265f, 28.06f, 3.83f);
                     me->SummonCreature(NPC_PROPHET_VELEN, 1717.97f, 646.44f, 28.06f, 3.94f);
-                    events.ScheduleEvent(eventId+1, 7000);
+                    events.ScheduleEvent(eventId + 1, 7000);
                     break;
                 case EVENT_SCENE_08:
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                         velen->AI()->Talk(SAY_VELEN_01);
-                    events.ScheduleEvent(eventId+1, 25000);
+                    events.ScheduleEvent(eventId + 1, 25000);
                     break;
                 case EVENT_SCENE_09:
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                         velen->AI()->Talk(SAY_VELEN_02);
-                    events.ScheduleEvent(eventId+1, 14500);
+                    events.ScheduleEvent(eventId + 1, 14500);
                     break;
                 case EVENT_SCENE_10:
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                         velen->AI()->Talk(SAY_VELEN_03);
-                    events.ScheduleEvent(eventId+1, 12500);
+                    events.ScheduleEvent(eventId + 1, 12500);
                     break;
                 case EVENT_SCENE_11:
                     me->SummonCreature(NPC_THE_CORE_OF_ENTROPIUS, 1698.86f, 628.73f, 92.83f, 0.0f);
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                         velen->CastSpell(velen, SPELL_CALL_ENTROPIUS, false);
-                    events.ScheduleEvent(eventId+1, 8000);
+                    events.ScheduleEvent(eventId + 1, 8000);
                     break;
                 case EVENT_SCENE_12:
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
@@ -916,32 +916,32 @@ public:
                         velen->InterruptNonMeleeSpells(false);
                         velen->AI()->Talk(SAY_VELEN_04);
                     }
-                    events.ScheduleEvent(eventId+1, 20000);
+                    events.ScheduleEvent(eventId + 1, 20000);
                     break;
                 case EVENT_SCENE_13:
                     if (Creature* liadrin = summons.GetCreatureWithEntry(NPC_LADY_LIADRIN))
                         liadrin->GetMotionMaster()->MovePoint(0, 1711.28f, 637.29f, 27.29f);
-                    events.ScheduleEvent(eventId+1, 6000);
+                    events.ScheduleEvent(eventId + 1, 6000);
                     break;
                 case EVENT_SCENE_14:
                     if (Creature* liadrin = summons.GetCreatureWithEntry(NPC_LADY_LIADRIN))
                         liadrin->AI()->Talk(SAY_LIADRIN_01);
-                    events.ScheduleEvent(eventId+1, 10000);
+                    events.ScheduleEvent(eventId + 1, 10000);
                     break;
                 case EVENT_SCENE_15:
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                         velen->AI()->Talk(SAY_VELEN_05);
-                    events.ScheduleEvent(eventId+1, 14000);
+                    events.ScheduleEvent(eventId + 1, 14000);
                     break;
                 case EVENT_SCENE_16:
                     if (Creature* liadrin = summons.GetCreatureWithEntry(NPC_LADY_LIADRIN))
                         liadrin->AI()->Talk(SAY_LIADRIN_02);
-                    events.ScheduleEvent(eventId+1, 2000);
+                    events.ScheduleEvent(eventId + 1, 2000);
                     break;
                 case EVENT_SCENE_17:
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                         velen->AI()->Talk(SAY_VELEN_06);
-                    events.ScheduleEvent(eventId+1, 3000);
+                    events.ScheduleEvent(eventId + 1, 3000);
                     break;
                 case EVENT_SCENE_18:
                     if (Creature* core = summons.GetCreatureWithEntry(NPC_THE_CORE_OF_ENTROPIUS))
@@ -949,7 +949,7 @@ public:
                         core->RemoveAllAuras();
                         core->CastSpell(core, SPELL_BLAZE_TO_LIGHT, true);
                     }
-                    events.ScheduleEvent(eventId+1, 8000);
+                    events.ScheduleEvent(eventId + 1, 8000);
                     break;
                 case EVENT_SCENE_19:
                     if (Creature* core = summons.GetCreatureWithEntry(NPC_THE_CORE_OF_ENTROPIUS))
@@ -957,34 +957,34 @@ public:
                         core->SetObjectScale(0.75f);
                         core->GetMotionMaster()->MovePoint(0, core->GetPositionX(), core->GetPositionY(), 28.0f);
                     }
-                    events.ScheduleEvent(eventId+1, 2000);
+                    events.ScheduleEvent(eventId + 1, 2000);
                     break;
                 case EVENT_SCENE_20:
                     if (Creature* core = summons.GetCreatureWithEntry(NPC_THE_CORE_OF_ENTROPIUS))
                         core->CastSpell(core, SPELL_SUNWELL_IGNITION, true);
-                    events.ScheduleEvent(eventId+1, 3000);
+                    events.ScheduleEvent(eventId + 1, 3000);
                     break;
                 case EVENT_SCENE_21:
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                         velen->AI()->Talk(SAY_VELEN_07);
-                    events.ScheduleEvent(eventId+1, 15000);
+                    events.ScheduleEvent(eventId + 1, 15000);
                     break;
                 case EVENT_SCENE_22:
                     if (Creature* liadrin = summons.GetCreatureWithEntry(NPC_LADY_LIADRIN))
                         liadrin->AI()->Talk(SAY_LIADRIN_03);
-                    events.ScheduleEvent(eventId+1, 20000);
+                    events.ScheduleEvent(eventId + 1, 20000);
                     break;
                 case EVENT_SCENE_23:
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                         velen->AI()->Talk(SAY_VELEN_08);
                     if (Creature* liadrin = summons.GetCreatureWithEntry(NPC_LADY_LIADRIN))
                         liadrin->SetStandState(UNIT_STAND_STATE_KNEEL);
-                    events.ScheduleEvent(eventId+1, 8000);
+                    events.ScheduleEvent(eventId + 1, 8000);
                     break;
                 case EVENT_SCENE_24:
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                         velen->AI()->Talk(SAY_VELEN_09);
-                    events.ScheduleEvent(eventId+1, 5000);
+                    events.ScheduleEvent(eventId + 1, 5000);
                     break;
                 case EVENT_SCENE_25:
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
@@ -992,7 +992,7 @@ public:
                         velen->GetMotionMaster()->MovePoint(0, 1739.38f, 643.79f, 28.06f);
                         velen->DespawnOrUnsummon(5000);
                     }
-                    events.ScheduleEvent(eventId+1, 3000);
+                    events.ScheduleEvent(eventId + 1, 3000);
                     break;
                 case EVENT_SCENE_26:
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
@@ -1000,9 +1000,9 @@ public:
                             if (summon->GetEntry() == NPC_SHATTERED_SUN_SOLDIER)
                             {
                                 summon->GetMotionMaster()->MovePoint(0, 1739.38f, 643.79f, 28.06f);
-                                summon->DespawnOrUnsummon(summon->GetExactDist2d(1734.96f, 642.43f)*100);
+                                summon->DespawnOrUnsummon(summon->GetExactDist2d(1734.96f, 642.43f) * 100);
                             }
-                    events.ScheduleEvent(eventId+1, 7000);
+                    events.ScheduleEvent(eventId + 1, 7000);
                     break;
                 case EVENT_SCENE_27:
                     me->setActive(false);
@@ -1016,303 +1016,303 @@ public:
 
 class spell_kiljaeden_shadow_spike : public SpellScriptLoader
 {
-    public:
-        spell_kiljaeden_shadow_spike() : SpellScriptLoader("spell_kiljaeden_shadow_spike") { }
+public:
+    spell_kiljaeden_shadow_spike() : SpellScriptLoader("spell_kiljaeden_shadow_spike") { }
 
-        class spell_kiljaeden_shadow_spike_AuraScript : public AuraScript
+    class spell_kiljaeden_shadow_spike_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_kiljaeden_shadow_spike_AuraScript);
+
+        void HandlePeriodic(AuraEffect const* aurEff)
         {
-            PrepareAuraScript(spell_kiljaeden_shadow_spike_AuraScript);
-
-            void HandlePeriodic(AuraEffect const* aurEff)
-            {
-                PreventDefaultAction();
-                if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
-                    GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-            }
-
-            void Register()
-            {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_shadow_spike_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_kiljaeden_shadow_spike_AuraScript();
+            PreventDefaultAction();
+            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
+                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_shadow_spike_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_kiljaeden_shadow_spike_AuraScript();
+    }
 };
 
 class spell_kiljaeden_sinister_reflection : public SpellScriptLoader
 {
-    public:
-        spell_kiljaeden_sinister_reflection() : SpellScriptLoader("spell_kiljaeden_sinister_reflection") { }
+public:
+    spell_kiljaeden_sinister_reflection() : SpellScriptLoader("spell_kiljaeden_sinister_reflection") { }
 
-        class spell_kiljaeden_sinister_reflection_SpellScript : public SpellScript
+    class spell_kiljaeden_sinister_reflection_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_kiljaeden_sinister_reflection_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            PrepareSpellScript(spell_kiljaeden_sinister_reflection_SpellScript);
-
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                targets.remove_if(acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
-            }
-
-            void HandleScriptEffect(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-                if (Unit* target = GetHitUnit())
-                {
-                    target->CastSpell(target, SPELL_SINISTER_REFLECTION_SUMMON, true);
-                    //target->CastSpell(target, SPELL_SINISTER_REFLECTION_CLONE, true);
-                }
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-                OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_sinister_reflection_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_kiljaeden_sinister_reflection_SpellScript();
+            targets.remove_if(acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
         }
+
+        void HandleScriptEffect(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            if (Unit* target = GetHitUnit())
+            {
+                target->CastSpell(target, SPELL_SINISTER_REFLECTION_SUMMON, true);
+                //target->CastSpell(target, SPELL_SINISTER_REFLECTION_CLONE, true);
+            }
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+            OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_sinister_reflection_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_kiljaeden_sinister_reflection_SpellScript();
+    }
 };
 
 class spell_kiljaeden_sinister_reflection_clone : public SpellScriptLoader
 {
-    public:
-        spell_kiljaeden_sinister_reflection_clone() : SpellScriptLoader("spell_kiljaeden_sinister_reflection_clone") { }
+public:
+    spell_kiljaeden_sinister_reflection_clone() : SpellScriptLoader("spell_kiljaeden_sinister_reflection_clone") { }
 
-        class spell_kiljaeden_sinister_reflection_clone_SpellScript : public SpellScript
+    class spell_kiljaeden_sinister_reflection_clone_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_kiljaeden_sinister_reflection_clone_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            PrepareSpellScript(spell_kiljaeden_sinister_reflection_clone_SpellScript);
+            targets.sort(acore::ObjectDistanceOrderPred(GetCaster()));
+            WorldObject* target = targets.front();
 
-            void FilterTargets(std::list<WorldObject*>& targets)
+            targets.clear();
+            if (target && target->GetTypeId() == TYPEID_UNIT)
             {
-                targets.sort(acore::ObjectDistanceOrderPred(GetCaster()));
-                WorldObject* target = targets.front();
-                
-                targets.clear();
-                if (target && target->GetTypeId() == TYPEID_UNIT)
-                {
-                    target->ToCreature()->AI()->SetData(1, GetCaster()->getClass());
-                    targets.push_back(target);
-                }               
+                target->ToCreature()->AI()->SetData(1, GetCaster()->getClass());
+                targets.push_back(target);
             }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection_clone_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_kiljaeden_sinister_reflection_clone_SpellScript();
         }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection_clone_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_kiljaeden_sinister_reflection_clone_SpellScript();
+    }
 };
 
 class spell_kiljaeden_flame_dart : public SpellScriptLoader
 {
-    public:
-        spell_kiljaeden_flame_dart() : SpellScriptLoader("spell_kiljaeden_flame_dart") { }
+public:
+    spell_kiljaeden_flame_dart() : SpellScriptLoader("spell_kiljaeden_flame_dart") { }
 
-        class spell_kiljaeden_flame_dart_SpellScript : public SpellScript
+    class spell_kiljaeden_flame_dart_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_kiljaeden_flame_dart_SpellScript);
+
+        void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
         {
-            PrepareSpellScript(spell_kiljaeden_flame_dart_SpellScript);
-
-            void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
-            {
-                if (Unit* target = GetHitUnit())
-                    target->CastSpell(target, SPELL_FLAME_DART_EXPLOSION, true);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_flame_dart_SpellScript::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_kiljaeden_flame_dart_SpellScript();
+            if (Unit* target = GetHitUnit())
+                target->CastSpell(target, SPELL_FLAME_DART_EXPLOSION, true);
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_flame_dart_SpellScript::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_kiljaeden_flame_dart_SpellScript();
+    }
 };
 
 class spell_kiljaeden_darkness : public SpellScriptLoader
 {
-    public:
-        spell_kiljaeden_darkness() : SpellScriptLoader("spell_kiljaeden_darkness") { }
+public:
+    spell_kiljaeden_darkness() : SpellScriptLoader("spell_kiljaeden_darkness") { }
 
-        class spell_kiljaeden_darkness_AuraScript : public AuraScript
+    class spell_kiljaeden_darkness_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_kiljaeden_darkness_AuraScript);
+
+        void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_kiljaeden_darkness_AuraScript);
+            if (GetUnitOwner()->GetTypeId() == TYPEID_UNIT)
+                GetUnitOwner()->ToCreature()->AI()->DoAction(ACTION_NO_KILL_TALK);
 
-            void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                if (GetUnitOwner()->GetTypeId() == TYPEID_UNIT)
-                    GetUnitOwner()->ToCreature()->AI()->DoAction(ACTION_NO_KILL_TALK);
-
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DARKNESS_OF_A_THOUSAND_SOULS_DAMAGE, true);
-            }
-
-            void Register()
-            {
-                OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_darkness_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_kiljaeden_darkness_AuraScript();
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DARKNESS_OF_A_THOUSAND_SOULS_DAMAGE, true);
         }
+
+        void Register()
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_darkness_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_kiljaeden_darkness_AuraScript();
+    }
 };
 
 class spell_kiljaeden_power_of_the_blue_flight : public SpellScriptLoader
 {
-    public:
-        spell_kiljaeden_power_of_the_blue_flight() : SpellScriptLoader("spell_kiljaeden_power_of_the_blue_flight") { }
+public:
+    spell_kiljaeden_power_of_the_blue_flight() : SpellScriptLoader("spell_kiljaeden_power_of_the_blue_flight") { }
 
-        class spell_kiljaeden_power_of_the_blue_flight_SpellScript : public SpellScript
+    class spell_kiljaeden_power_of_the_blue_flight_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_kiljaeden_power_of_the_blue_flight_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex effIndex)
         {
-            PrepareSpellScript(spell_kiljaeden_power_of_the_blue_flight_SpellScript);
-
-            void HandleScriptEffect(SpellEffIndex effIndex)
+            PreventHitDefaultEffect(effIndex);
+            if (Player* player = GetHitPlayer())
             {
-                PreventHitDefaultEffect(effIndex);
-                if (Player* player = GetHitPlayer())
-                {
-                    player->CastSpell(player, SPELL_SUMMON_BLUE_DRAKE, true);
-                    player->CastSpell(player, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT, true);
-                }
+                player->CastSpell(player, SPELL_SUMMON_BLUE_DRAKE, true);
+                player->CastSpell(player, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT, true);
             }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_power_of_the_blue_flight_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_kiljaeden_power_of_the_blue_flight_SpellScript();
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_power_of_the_blue_flight_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_kiljaeden_power_of_the_blue_flight_SpellScript();
+    }
 };
 
 class spell_kiljaeden_vengeance_of_the_blue_flight : public SpellScriptLoader
 {
-    public:
-        spell_kiljaeden_vengeance_of_the_blue_flight() : SpellScriptLoader("spell_kiljaeden_vengeance_of_the_blue_flight") { }
+public:
+    spell_kiljaeden_vengeance_of_the_blue_flight() : SpellScriptLoader("spell_kiljaeden_vengeance_of_the_blue_flight") { }
 
-        class spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript : public AuraScript
+    class spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript);
+
+        void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript);
-
-            void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_POSSESS_DRAKE_IMMUNITY, true);
-            }
-
-            void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                GetUnitOwner()->RemoveAurasDueToSpell(SPELL_POSSESS_DRAKE_IMMUNITY);
-            }
-
-            void Register()
-            {
-                OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
-                OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleApply, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
-                OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
-                OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleRemove, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript();
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_POSSESS_DRAKE_IMMUNITY, true);
         }
+
+        void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetUnitOwner()->RemoveAurasDueToSpell(SPELL_POSSESS_DRAKE_IMMUNITY);
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+            OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleApply, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleRemove, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript();
+    }
 };
 
 class spell_kiljaeden_armageddon_periodic : public SpellScriptLoader
 {
-    public:
-        spell_kiljaeden_armageddon_periodic() : SpellScriptLoader("spell_kiljaeden_armageddon_periodic") { }
+public:
+    spell_kiljaeden_armageddon_periodic() : SpellScriptLoader("spell_kiljaeden_armageddon_periodic") { }
 
-        class spell_kiljaeden_armageddon_periodic_AuraScript : public AuraScript
+    class spell_kiljaeden_armageddon_periodic_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_kiljaeden_armageddon_periodic_AuraScript);
+
+        void HandlePeriodic(AuraEffect const* aurEff)
         {
-            PrepareAuraScript(spell_kiljaeden_armageddon_periodic_AuraScript);
-
-            void HandlePeriodic(AuraEffect const* aurEff)
-            {
-                PreventDefaultAction();
-                if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
-                    GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-            }
-
-            void Register()
-            {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_armageddon_periodic_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_kiljaeden_armageddon_periodic_AuraScript();
+            PreventDefaultAction();
+            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
+                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_armageddon_periodic_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_kiljaeden_armageddon_periodic_AuraScript();
+    }
 };
 
 class spell_kiljaeden_armageddon_missile : public SpellScriptLoader
 {
-    public:
-        spell_kiljaeden_armageddon_missile() : SpellScriptLoader("spell_kiljaeden_armageddon_missile") { }
+public:
+    spell_kiljaeden_armageddon_missile() : SpellScriptLoader("spell_kiljaeden_armageddon_missile") { }
 
-        class spell_kiljaeden_armageddon_missile_SpellScript : public SpellScript
+    class spell_kiljaeden_armageddon_missile_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_kiljaeden_armageddon_missile_SpellScript);
+
+        void SetDest(SpellDestination& dest)
         {
-            PrepareSpellScript(spell_kiljaeden_armageddon_missile_SpellScript);
-
-            void SetDest(SpellDestination& dest)
-            {
-                Position const offset = { 0.0f, 0.0f, -20.0f, 0.0f };
-                dest.RelocateOffset(offset);
-            }
-
-            void Register()
-            {
-                OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_kiljaeden_armageddon_missile_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_kiljaeden_armageddon_missile_SpellScript();
+            Position const offset = { 0.0f, 0.0f, -20.0f, 0.0f };
+            dest.RelocateOffset(offset);
         }
+
+        void Register()
+        {
+            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_kiljaeden_armageddon_missile_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_kiljaeden_armageddon_missile_SpellScript();
+    }
 };
 
 class spell_kiljaeden_dragon_breath : public SpellScriptLoader
 {
-    public:
-        spell_kiljaeden_dragon_breath() : SpellScriptLoader("spell_kiljaeden_dragon_breath") { }
+public:
+    spell_kiljaeden_dragon_breath() : SpellScriptLoader("spell_kiljaeden_dragon_breath") { }
 
-        class spell_kiljaeden_dragon_breath_SpellScript : public SpellScript
+    class spell_kiljaeden_dragon_breath_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_kiljaeden_dragon_breath_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            PrepareSpellScript(spell_kiljaeden_dragon_breath_SpellScript);
-
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                targets.remove_if(acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_dragon_breath_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ALLY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_kiljaeden_dragon_breath_SpellScript();
+            targets.remove_if(acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
         }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_dragon_breath_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ALLY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_kiljaeden_dragon_breath_SpellScript();
+    }
 };
 
 void AddSC_boss_kiljaeden()

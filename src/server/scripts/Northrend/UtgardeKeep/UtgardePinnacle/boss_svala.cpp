@@ -74,7 +74,7 @@ enum Events
     EVENT_SORROWGRAVE_FINISH_RITUAL     = 15,
 };
 
-const Position RitualChannelerLoc[3]=
+const Position RitualChannelerLoc[3] =
 {
     {296.42f, -355.01f, 90.94f, 0.0f},
     {302.36f, -352.01f, 90.54f, 0.0f},
@@ -123,10 +123,10 @@ public:
             events.Reset();
             events2.Reset();
             if (!Started)
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             else
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetHover(true);
             }
         }
@@ -142,7 +142,7 @@ public:
             if (data != 1 || param != 1 || Started || (instance && instance->GetData(DATA_SVALA_SORROWGRAVE) == DONE))
                 return;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             Started = true;
             me->setActive(true);
             events2.ScheduleEvent(EVENT_SVALA_START, 5000);
@@ -225,43 +225,43 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK4, 9000);
                     break;
                 case 30:
-                {
-                    WorldPacket data(SMSG_SPLINE_MOVE_SET_HOVER, 9);
-                    data.append(me->GetPackGUID());
-                    me->SendMessageToSet(&data, false);
-                    break;
-                }
+                    {
+                        WorldPacket data(SMSG_SPLINE_MOVE_SET_HOVER, 9);
+                        data.append(me->GetPackGUID());
+                        me->SendMessageToSet(&data, false);
+                        break;
+                    }
                 case EVENT_SVALA_TALK4:
-                {
-                    me->CastSpell(me, SPELL_SVALA_TRANSFORMING1, true);
-                    me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
-                    me->SetCorpseDelay(sWorld->getIntConfig(CONFIG_CORPSE_DECAY_ELITE));
-                    me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-                    if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
-                        Arthas->InterruptNonMeleeSpells(false);
-                    me->RemoveAllAuras();
-                    me->SetWalk(false);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK5, 2000);
+                    {
+                        me->CastSpell(me, SPELL_SVALA_TRANSFORMING1, true);
+                        me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
+                        me->SetCorpseDelay(sWorld->getIntConfig(CONFIG_CORPSE_DECAY_ELITE));
+                        me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
+                            Arthas->InterruptNonMeleeSpells(false);
+                        me->RemoveAllAuras();
+                        me->SetWalk(false);
+                        events2.ScheduleEvent(EVENT_SVALA_TALK5, 2000);
 
-                    std::list<Creature*> creatureList;
-                    me->GetCreaturesWithEntryInRange(creatureList, 100.0f, NPC_DRAGONFLAYER_SPECTATOR);
-                    for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
-                        (*itr)->AI()->SetData(1, 2);
+                        std::list<Creature*> creatureList;
+                        me->GetCreaturesWithEntryInRange(creatureList, 100.0f, NPC_DRAGONFLAYER_SPECTATOR);
+                        for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                            (*itr)->AI()->SetData(1, 2);
 
-                    break;
-                }
+                        break;
+                    }
                 case EVENT_SVALA_TALK5:
                     Talk(TALK_INTRO_S2);
                     events2.ScheduleEvent(EVENT_SVALA_TALK6, 12000);
                     break;
                 case EVENT_SVALA_TALK6:
-                    if (Creature *Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
+                    if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
                         Arthas->AI()->Talk(TALK_INTRO_A2);
                     events2.ScheduleEvent(EVENT_SVALA_TALK7, 9000);
                     break;
                 case EVENT_SVALA_TALK7:
-                    me->SetFacingTo(M_PI/2.0f);
+                    me->SetFacingTo(M_PI / 2.0f);
                     Talk(TALK_INTRO_S3);
                     if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_SVALA_MIRROR)))
                         mirror->SetGoState(GO_STATE_ACTIVE);
@@ -273,7 +273,7 @@ public:
                     break;
                 case EVENT_SVALA_TALK9:
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 3.0f);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->LoadEquipment(1, true);
                     me->setActive(false);
                     if (Player* target = SelectTargetFromPlayerList(100.0f))
@@ -302,16 +302,16 @@ public:
                     events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, urand(8000, 12000));
                     break;
                 case EVENT_SORROWGRAVE_FLAMES2:
-                {
-                    std::list<Creature*> braziers;
-                    me->GetCreaturesWithEntryInRange(braziers, 100.0f, NPC_FLAME_BRAZIER);
-                    if (!braziers.empty())
                     {
-                        for (std::list<Creature*>::const_iterator itr = braziers.begin(); itr != braziers.end(); ++itr)
-                            (*itr)->CastCustomSpell(SPELL_BALL_OF_FLAME, SPELLVALUE_MAX_TARGETS, 1, (*itr), true);
+                        std::list<Creature*> braziers;
+                        me->GetCreaturesWithEntryInRange(braziers, 100.0f, NPC_FLAME_BRAZIER);
+                        if (!braziers.empty())
+                        {
+                            for (std::list<Creature*>::const_iterator itr = braziers.begin(); itr != braziers.end(); ++itr)
+                                (*itr)->CastCustomSpell(SPELL_BALL_OF_FLAME, SPELLVALUE_MAX_TARGETS, 1, (*itr), true);
+                        }
+                        break;
                     }
-                    break;
-                }
                 case EVENT_SORROWGRAVE_RITUAL:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     {
@@ -386,55 +386,55 @@ public:
 
 class spell_svala_ritual_strike : public SpellScriptLoader
 {
-    public:
-        spell_svala_ritual_strike() : SpellScriptLoader("spell_svala_ritual_strike") { }
+public:
+    spell_svala_ritual_strike() : SpellScriptLoader("spell_svala_ritual_strike") { }
 
-        class spell_svala_ritual_strike_SpellScript : public SpellScript
+    class spell_svala_ritual_strike_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_svala_ritual_strike_SpellScript);
+
+        void HandleDummyEffect(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_svala_ritual_strike_SpellScript);
-
-            void HandleDummyEffect(SpellEffIndex /*effIndex*/)
+            if (Unit* unitTarget = GetHitUnit())
             {
-                if (Unit* unitTarget = GetHitUnit())
-                {
-                    if (unitTarget->GetTypeId() != TYPEID_UNIT)
-                        return;
+                if (unitTarget->GetTypeId() != TYPEID_UNIT)
+                    return;
 
-                    Unit::DealDamage(GetCaster(), unitTarget, 7000, NULL, DIRECT_DAMAGE);
-                }
+                Unit::DealDamage(GetCaster(), unitTarget, 7000, NULL, DIRECT_DAMAGE);
             }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_svala_ritual_strike_SpellScript::HandleDummyEffect, EFFECT_2, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript *GetSpellScript() const
-        {
-            return new spell_svala_ritual_strike_SpellScript();
         }
 
-        class spell_svala_ritual_strike_AuraScript : public AuraScript
+        void Register()
         {
-            PrepareAuraScript(spell_svala_ritual_strike_AuraScript);
-
-            void CalculateAmount(AuraEffect const * /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
-            {
-                // Set amount based on difficulty
-                amount = (GetCaster()->GetMap()->IsHeroic() ? 2000 : 1000);
-            }
-
-            void Register()
-            {
-                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_svala_ritual_strike_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
-            }
-        };
-
-        AuraScript *GetAuraScript() const
-        {
-            return new spell_svala_ritual_strike_AuraScript();
+            OnEffectHitTarget += SpellEffectFn(spell_svala_ritual_strike_SpellScript::HandleDummyEffect, EFFECT_2, SPELL_EFFECT_DUMMY);
         }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_svala_ritual_strike_SpellScript();
+    }
+
+    class spell_svala_ritual_strike_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_svala_ritual_strike_AuraScript);
+
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            // Set amount based on difficulty
+            amount = (GetCaster()->GetMap()->IsHeroic() ? 2000 : 1000);
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_svala_ritual_strike_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_svala_ritual_strike_AuraScript();
+    }
 };
 
 void AddSC_boss_svala()

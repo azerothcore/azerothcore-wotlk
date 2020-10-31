@@ -7,18 +7,18 @@
 
 class AuctionListOwnerItemsDelayEvent : public BasicEvent
 {
-    public:
-        AuctionListOwnerItemsDelayEvent(uint64 _creatureGuid, uint64 guid, bool o) : creatureGuid(_creatureGuid), playerguid(guid), owner(o) {}
-        virtual ~AuctionListOwnerItemsDelayEvent() {}
+public:
+    AuctionListOwnerItemsDelayEvent(uint64 _creatureGuid, uint64 guid, bool o) : creatureGuid(_creatureGuid), playerguid(guid), owner(o) {}
+    virtual ~AuctionListOwnerItemsDelayEvent() {}
 
-        virtual bool Execute(uint64 e_time, uint32 p_time);
-        virtual void Abort(uint64 /*e_time*/) {}
-        bool getOwner() { return owner; }
+    virtual bool Execute(uint64 e_time, uint32 p_time);
+    virtual void Abort(uint64 /*e_time*/) {}
+    bool getOwner() { return owner; }
 
-    private:
-        uint64 creatureGuid;
-        uint64 playerguid;
-        bool owner;
+private:
+    uint64 creatureGuid;
+    uint64 playerguid;
+    bool owner;
 };
 
 class AuctionListItemsDelayEvent
@@ -53,8 +53,8 @@ public:
     static bool IsAuctionListingAllowed() { return auctionListingAllowed; }
     static void SetAuctionListingAllowed(bool a) { auctionListingAllowed = a; }
 
-    static std::list<AuctionListItemsDelayEvent> & GetList() { return auctionListingList; }
-    static std::list<AuctionListItemsDelayEvent> & GetTempList() { return auctionListingListTemp; }
+    static std::list<AuctionListItemsDelayEvent>& GetList() { return auctionListingList; }
+    static std::list<AuctionListItemsDelayEvent>& GetTempList() { return auctionListingListTemp; }
     static ACE_Thread_Mutex& GetLock() { return auctionListingLock; }
     static ACE_Thread_Mutex& GetTempLock() { return auctionListingTempLock; }
 

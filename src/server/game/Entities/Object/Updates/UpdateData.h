@@ -37,22 +37,22 @@ enum OBJECT_UPDATE_FLAGS
 
 class UpdateData
 {
-    public:
-        UpdateData();
+public:
+    UpdateData();
 
-        void AddOutOfRangeGUID(uint64 guid);
-        void AddUpdateBlock(const ByteBuffer &block);
-        void AddUpdateBlock(const UpdateData &block);
-        bool BuildPacket(WorldPacket* packet);
-        bool HasData() const { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
-        void Clear();
+    void AddOutOfRangeGUID(uint64 guid);
+    void AddUpdateBlock(const ByteBuffer& block);
+    void AddUpdateBlock(const UpdateData& block);
+    bool BuildPacket(WorldPacket* packet);
+    bool HasData() const { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
+    void Clear();
 
-    protected:
-        uint32 m_blockCount;
-        std::vector<uint64> m_outOfRangeGUIDs;
-        ByteBuffer m_data;
+protected:
+    uint32 m_blockCount;
+    std::vector<uint64> m_outOfRangeGUIDs;
+    ByteBuffer m_data;
 
-        void Compress(void* dst, uint32 *dst_size, void* src, int src_size);
+    void Compress(void* dst, uint32* dst_size, void* src, int src_size);
 };
 #endif
 
