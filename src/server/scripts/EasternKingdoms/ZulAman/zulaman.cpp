@@ -36,7 +36,7 @@ enum ForestFrog
     SPELL_SUMMON_AMANI_CHARM_CHEST_2  = 43756, // Amani Charm Box (186734)
     SPELL_SUMMON_MONEY_BAG            = 43774, // Money Bag (186736)
     SPELL_STEALTH_                    = 34189,
-    
+
     // Creatures
     NPC_FOREST_FROG                   = 24396,
     NPC_MANNUTH                       = 24397,
@@ -116,235 +116,321 @@ enum ForestFrog
 
 class npc_forest_frog : public CreatureScript
 {
-    public:
+public:
 
-        npc_forest_frog() : CreatureScript("npc_forest_frog") { }
+    npc_forest_frog() : CreatureScript("npc_forest_frog") { }
 
-        struct npc_forest_frogAI : public ScriptedAI
+    struct npc_forest_frogAI : public ScriptedAI
+    {
+        npc_forest_frogAI(Creature* creature) : ScriptedAI(creature)
         {
-            npc_forest_frogAI(Creature* creature) : ScriptedAI(creature)
-            {
-                instance = creature->GetInstanceScript();
-            }
-
-            InstanceScript* instance;
-            EventMap events;
-            uint8 eventTimer;
-            uint64 PlayerGUID;
-
-            void Reset() override { }
-
-            void EnterCombat(Unit* /*who*/) override { }
-
-            void MovementInform(uint32 type, uint32 data) override
-            {
-                if (type == POINT_MOTION_TYPE && data == POINT_DESPAWN)
-                    me->DespawnOrUnsummon(1000);
-            }
-
-            void UpdateAI(uint32 diff) override
-            {
-                events.Update(diff);
-                if (eventTimer)
-                {
-                    Player* player = me->GetMap()->GetPlayer(PlayerGUID);
-                    switch (events.ExecuteEvent())
-                    {
-                        case 1:
-                            switch (me->GetEntry())
-                            {
-                                case NPC_MANNUTH:   Talk(SAY_MANNUTH_0, player); break;
-                                case NPC_DEEZ:      Talk(SAY_DEEZ_0, player); break;
-                                case NPC_GALATHRYN: Talk(SAY_GALATHRYN_0, player); break;
-                                case NPC_ADARRAH:   Talk(SAY_ADARRAH_1, player); break;
-                                case NPC_DARWEN:    Talk(SAY_DARWEN_0, player); break;
-                                case NPC_FUDGERICK: Talk(SAY_FUDGERICK_0, player); break;
-                                case NPC_GUNTER:    Talk(SAY_GUNTER_0, player); break;
-                                case NPC_KYREN:     Talk(SAY_KYREN_0, player); break;
-                                case NPC_MITZI:     Talk(SAY_MITZI_0, player); break;
-                                case NPC_CHRISTIAN: Talk(SAY_CHRISTIAN_0, player); break;
-                                case NPC_BRENNAN:   Talk(SAY_BRENNAN_0, player); break;
-                                case NPC_HOLLEE:    Talk(SAY_HOLLEE_0, player); break;
-                            }
-                            eventTimer = 2;
-                            events.ScheduleEvent(eventTimer, urand(4000, 5000));
-                            break;
-                        case 2:
-                            if (me->GetEntry() != NPC_GUNTER && me->GetEntry() != NPC_KYREN) // vendors don't kneel?
-                                me->SetStandState(UNIT_STAND_STATE_KNEEL);
-            
-                            switch (me->GetEntry())
-                            {
-                                case NPC_MANNUTH:
-                                    DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
-                                    Talk(SAY_MANNUTH_1, player);
-                                    break;
-                                case NPC_DEEZ:
-                                    DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
-                                    Talk(SAY_DEEZ_1, player);
-                                    break;
-                                case NPC_GALATHRYN:
-                                    DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
-                                    Talk(SAY_GALATHRYN_1, player);
-                                    break;
-                                case NPC_ADARRAH:
-                                    DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
-                                    Talk(SAY_ADARRAH_2, player);
-                                    break;
-                                case NPC_DARWEN:
-                                    DoCast(me, SPELL_SUMMON_MONEY_BAG, true);
-                                    me->LoadEquipment(0, true);
-                                    Talk(SAY_DARWEN_1, player);
-                                    break;
-                                case NPC_FUDGERICK:
-                                    DoCast(me, SPELL_SUMMON_MONEY_BAG, true);
-                                    me->LoadEquipment(0, true);
-                                    Talk(SAY_FUDGERICK_1, player);
-                                    break;
-                                case NPC_GUNTER:
-                                    Talk(SAY_GUNTER_1, player);
-                                    break;
-                                case NPC_KYREN:
-                                    Talk(SAY_KYREN_1, player);
-                                    break;
-                                case NPC_MITZI:
-                                    DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
-                                    Talk(SAY_MITZI_1, player);
-                                    break;
-                                case NPC_CHRISTIAN:
-                                    DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
-                                    Talk(SAY_CHRISTIAN_1, player);
-                                    break;
-                                case NPC_BRENNAN:
-                                    DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
-                                    Talk(SAY_BRENNAN_1, player);
-                                    break;
-                                case NPC_HOLLEE:
-                                    DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
-                                    Talk(SAY_HOLLEE_1, player);
-                                    break;
-                            }
-                            eventTimer = 3;
-                            events.ScheduleEvent(eventTimer, urand(6000, 7000));
-                            break;
-                        case 3:
-                            me->SetStandState(EMOTE_ONESHOT_NONE);
-                            switch (me->GetEntry())
-                            {
-                                case NPC_MANNUTH:   Talk(SAY_MANNUTH_2, player); break;
-                                case NPC_DEEZ:      Talk(SAY_DEEZ_2, player); break;
-                                case NPC_GALATHRYN: Talk(SAY_GALATHRYN_2, player); break;
-                                case NPC_ADARRAH:   Talk(SAY_ADARRAH_3, player); break;
-                                case NPC_DARWEN:    Talk(SAY_DARWEN_2, player); break;
-                                case NPC_FUDGERICK: Talk(SAY_FUDGERICK_2, player); break;
-                                case NPC_GUNTER:    Talk(SAY_GUNTER_2, player); break;
-                                case NPC_KYREN:     Talk(SAY_KYREN_2, player); break;
-                                case NPC_MITZI:     Talk(SAY_MITZI_2, player); break;
-                                case NPC_CHRISTIAN: Talk(SAY_CHRISTIAN_2, player); break;
-                                case NPC_BRENNAN:   Talk(SAY_BRENNAN_2, player); break;
-                                case NPC_HOLLEE:    Talk(SAY_HOLLEE_2, player); break;
-                            }
-                            eventTimer = 4;
-                            if (me->GetEntry() == NPC_GUNTER || me->GetEntry() == NPC_KYREN)
-                                events.ScheduleEvent(eventTimer, 5*MINUTE*IN_MILLISECONDS); // vendors wait for 5 minutes before running away and despawning
-                            else
-                                events.ScheduleEvent(eventTimer, 6000);
-                            break;
-                        case 4:
-                            me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
-                            switch (me->GetEntry())
-                            {
-                                case NPC_MANNUTH:   Talk(SAY_MANNUTH_3, player); break;
-                                case NPC_DEEZ:      Talk(SAY_DEEZ_3, player); break;
-                                case NPC_GALATHRYN: Talk(SAY_GALATHRYN_3, player); break;
-                                case NPC_ADARRAH:   Talk(SAY_ADARRAH_4, player); break;
-                                case NPC_DARWEN:    Talk(SAY_DARWEN_3, player); break;
-                                case NPC_FUDGERICK: Talk(SAY_FUDGERICK_3, player); break;
-                                case NPC_MITZI:     Talk(SAY_MITZI_3, player); break;
-                                case NPC_CHRISTIAN: Talk(SAY_CHRISTIAN_3, player); break;
-                                case NPC_BRENNAN:   Talk(SAY_BRENNAN_3, player); break;
-                                case NPC_HOLLEE:    Talk(SAY_HOLLEE_3, player); break;
-                            }
-                            eventTimer = 5;
-                            events.ScheduleEvent(eventTimer, 2000);
-                            break;
-                        case 5:
-                            switch (me->GetEntry())
-                            {
-                                case NPC_ADARRAH:
-                                    DoCast(me, SPELL_STEALTH_, true);
-                                    break;
-                            }
-                            if (me->GetPositionY() > 1290.0f)
-                                me->GetMotionMaster()->MovePoint(POINT_DESPAWN, 118.2742f, 1400.657f, -9.118711f);
-                            else
-                                me->GetMotionMaster()->MovePoint(POINT_DESPAWN, 114.3155f, 1244.244f, -20.97606f);
-                            eventTimer = 0;
-                            break;
-                    }
-                }
-            }
-
-            void DoSpawnRandom()
-            {
-                if (instance)
-                { 
-                    uint32 cEntry = NPC_MANNUTH;
-                    switch (urand(0, 9))
-                    {         
-                        case 1: cEntry = NPC_DEEZ; break;          
-                        case 2: cEntry = NPC_GALATHRYN; break;          
-                        case 3: cEntry = NPC_ADARRAH; break;          
-                        case 4: cEntry = NPC_FUDGERICK; break;          
-                        case 5: cEntry = NPC_DARWEN; break;          
-                        case 6: cEntry = NPC_MITZI; break;          
-                        case 7: cEntry = NPC_CHRISTIAN; break;          
-                        case 8: cEntry = NPC_BRENNAN; break;          
-                        case 9: cEntry = NPC_HOLLEE; break;          
-                    }
-
-                    if (!instance->GetData(TYPE_RAND_VENDOR_1) && roll_chance_i(10))
-                    {
-                        cEntry = NPC_GUNTER;      
-                        instance->SetData(TYPE_RAND_VENDOR_1, DONE);
-                    }
-                    else if (!instance->GetData(TYPE_RAND_VENDOR_2) && roll_chance_i(10))
-                    {
-                        cEntry = NPC_KYREN;      
-                        instance->SetData(TYPE_RAND_VENDOR_2, DONE);
-                    }
-
-                    // start generic rp
-                    eventTimer = 1;
-                    events.ScheduleEvent(eventTimer, 3000);
-
-                    me->UpdateEntry(cEntry);
-                }
-            }
-
-            void SpellHit(Unit* caster, SpellInfo const* spell) override
-            {
-                if (spell->Id == SPELL_REMOVE_AMANI_CURSE && caster->GetTypeId() == TYPEID_PLAYER && me->GetEntry() == NPC_FOREST_FROG)
-                {
-                    me->GetMotionMaster()->MoveIdle();
-                    me->SetFacingToObject(caster);
-                    PlayerGUID = caster->GetGUID();
-
-                    if (roll_chance_i(2))
-                    {
-                        DoCast(caster, SPELL_PUSH_MOJO, true);
-                        me->GetMotionMaster()->MovePoint(POINT_DESPAWN, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
-                    }
-                    else
-                        DoSpawnRandom();
-                }
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const override
-        {
-            return GetInstanceAI<npc_forest_frogAI>(creature);
+            instance = creature->GetInstanceScript();
         }
+
+        InstanceScript* instance;
+        EventMap events;
+        uint8 eventTimer;
+        uint64 PlayerGUID;
+
+        void Reset() override { }
+
+        void EnterCombat(Unit* /*who*/) override { }
+
+        void MovementInform(uint32 type, uint32 data) override
+        {
+            if (type == POINT_MOTION_TYPE && data == POINT_DESPAWN)
+                me->DespawnOrUnsummon(1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+            if (eventTimer)
+            {
+                Player* player = me->GetMap()->GetPlayer(PlayerGUID);
+                switch (events.ExecuteEvent())
+                {
+                    case 1:
+                        switch (me->GetEntry())
+                        {
+                            case NPC_MANNUTH:
+                                Talk(SAY_MANNUTH_0, player);
+                                break;
+                            case NPC_DEEZ:
+                                Talk(SAY_DEEZ_0, player);
+                                break;
+                            case NPC_GALATHRYN:
+                                Talk(SAY_GALATHRYN_0, player);
+                                break;
+                            case NPC_ADARRAH:
+                                Talk(SAY_ADARRAH_1, player);
+                                break;
+                            case NPC_DARWEN:
+                                Talk(SAY_DARWEN_0, player);
+                                break;
+                            case NPC_FUDGERICK:
+                                Talk(SAY_FUDGERICK_0, player);
+                                break;
+                            case NPC_GUNTER:
+                                Talk(SAY_GUNTER_0, player);
+                                break;
+                            case NPC_KYREN:
+                                Talk(SAY_KYREN_0, player);
+                                break;
+                            case NPC_MITZI:
+                                Talk(SAY_MITZI_0, player);
+                                break;
+                            case NPC_CHRISTIAN:
+                                Talk(SAY_CHRISTIAN_0, player);
+                                break;
+                            case NPC_BRENNAN:
+                                Talk(SAY_BRENNAN_0, player);
+                                break;
+                            case NPC_HOLLEE:
+                                Talk(SAY_HOLLEE_0, player);
+                                break;
+                        }
+                        eventTimer = 2;
+                        events.ScheduleEvent(eventTimer, urand(4000, 5000));
+                        break;
+                    case 2:
+                        if (me->GetEntry() != NPC_GUNTER && me->GetEntry() != NPC_KYREN) // vendors don't kneel?
+                            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+
+                        switch (me->GetEntry())
+                        {
+                            case NPC_MANNUTH:
+                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
+                                Talk(SAY_MANNUTH_1, player);
+                                break;
+                            case NPC_DEEZ:
+                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
+                                Talk(SAY_DEEZ_1, player);
+                                break;
+                            case NPC_GALATHRYN:
+                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
+                                Talk(SAY_GALATHRYN_1, player);
+                                break;
+                            case NPC_ADARRAH:
+                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
+                                Talk(SAY_ADARRAH_2, player);
+                                break;
+                            case NPC_DARWEN:
+                                DoCast(me, SPELL_SUMMON_MONEY_BAG, true);
+                                me->LoadEquipment(0, true);
+                                Talk(SAY_DARWEN_1, player);
+                                break;
+                            case NPC_FUDGERICK:
+                                DoCast(me, SPELL_SUMMON_MONEY_BAG, true);
+                                me->LoadEquipment(0, true);
+                                Talk(SAY_FUDGERICK_1, player);
+                                break;
+                            case NPC_GUNTER:
+                                Talk(SAY_GUNTER_1, player);
+                                break;
+                            case NPC_KYREN:
+                                Talk(SAY_KYREN_1, player);
+                                break;
+                            case NPC_MITZI:
+                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
+                                Talk(SAY_MITZI_1, player);
+                                break;
+                            case NPC_CHRISTIAN:
+                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
+                                Talk(SAY_CHRISTIAN_1, player);
+                                break;
+                            case NPC_BRENNAN:
+                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
+                                Talk(SAY_BRENNAN_1, player);
+                                break;
+                            case NPC_HOLLEE:
+                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
+                                Talk(SAY_HOLLEE_1, player);
+                                break;
+                        }
+                        eventTimer = 3;
+                        events.ScheduleEvent(eventTimer, urand(6000, 7000));
+                        break;
+                    case 3:
+                        me->SetStandState(EMOTE_ONESHOT_NONE);
+                        switch (me->GetEntry())
+                        {
+                            case NPC_MANNUTH:
+                                Talk(SAY_MANNUTH_2, player);
+                                break;
+                            case NPC_DEEZ:
+                                Talk(SAY_DEEZ_2, player);
+                                break;
+                            case NPC_GALATHRYN:
+                                Talk(SAY_GALATHRYN_2, player);
+                                break;
+                            case NPC_ADARRAH:
+                                Talk(SAY_ADARRAH_3, player);
+                                break;
+                            case NPC_DARWEN:
+                                Talk(SAY_DARWEN_2, player);
+                                break;
+                            case NPC_FUDGERICK:
+                                Talk(SAY_FUDGERICK_2, player);
+                                break;
+                            case NPC_GUNTER:
+                                Talk(SAY_GUNTER_2, player);
+                                break;
+                            case NPC_KYREN:
+                                Talk(SAY_KYREN_2, player);
+                                break;
+                            case NPC_MITZI:
+                                Talk(SAY_MITZI_2, player);
+                                break;
+                            case NPC_CHRISTIAN:
+                                Talk(SAY_CHRISTIAN_2, player);
+                                break;
+                            case NPC_BRENNAN:
+                                Talk(SAY_BRENNAN_2, player);
+                                break;
+                            case NPC_HOLLEE:
+                                Talk(SAY_HOLLEE_2, player);
+                                break;
+                        }
+                        eventTimer = 4;
+                        if (me->GetEntry() == NPC_GUNTER || me->GetEntry() == NPC_KYREN)
+                            events.ScheduleEvent(eventTimer, 5 * MINUTE * IN_MILLISECONDS); // vendors wait for 5 minutes before running away and despawning
+                        else
+                            events.ScheduleEvent(eventTimer, 6000);
+                        break;
+                    case 4:
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
+                        switch (me->GetEntry())
+                        {
+                            case NPC_MANNUTH:
+                                Talk(SAY_MANNUTH_3, player);
+                                break;
+                            case NPC_DEEZ:
+                                Talk(SAY_DEEZ_3, player);
+                                break;
+                            case NPC_GALATHRYN:
+                                Talk(SAY_GALATHRYN_3, player);
+                                break;
+                            case NPC_ADARRAH:
+                                Talk(SAY_ADARRAH_4, player);
+                                break;
+                            case NPC_DARWEN:
+                                Talk(SAY_DARWEN_3, player);
+                                break;
+                            case NPC_FUDGERICK:
+                                Talk(SAY_FUDGERICK_3, player);
+                                break;
+                            case NPC_MITZI:
+                                Talk(SAY_MITZI_3, player);
+                                break;
+                            case NPC_CHRISTIAN:
+                                Talk(SAY_CHRISTIAN_3, player);
+                                break;
+                            case NPC_BRENNAN:
+                                Talk(SAY_BRENNAN_3, player);
+                                break;
+                            case NPC_HOLLEE:
+                                Talk(SAY_HOLLEE_3, player);
+                                break;
+                        }
+                        eventTimer = 5;
+                        events.ScheduleEvent(eventTimer, 2000);
+                        break;
+                    case 5:
+                        switch (me->GetEntry())
+                        {
+                            case NPC_ADARRAH:
+                                DoCast(me, SPELL_STEALTH_, true);
+                                break;
+                        }
+                        if (me->GetPositionY() > 1290.0f)
+                            me->GetMotionMaster()->MovePoint(POINT_DESPAWN, 118.2742f, 1400.657f, -9.118711f);
+                        else
+                            me->GetMotionMaster()->MovePoint(POINT_DESPAWN, 114.3155f, 1244.244f, -20.97606f);
+                        eventTimer = 0;
+                        break;
+                }
+            }
+        }
+
+        void DoSpawnRandom()
+        {
+            if (instance)
+            {
+                uint32 cEntry = NPC_MANNUTH;
+                switch (urand(0, 9))
+                {
+                    case 1:
+                        cEntry = NPC_DEEZ;
+                        break;
+                    case 2:
+                        cEntry = NPC_GALATHRYN;
+                        break;
+                    case 3:
+                        cEntry = NPC_ADARRAH;
+                        break;
+                    case 4:
+                        cEntry = NPC_FUDGERICK;
+                        break;
+                    case 5:
+                        cEntry = NPC_DARWEN;
+                        break;
+                    case 6:
+                        cEntry = NPC_MITZI;
+                        break;
+                    case 7:
+                        cEntry = NPC_CHRISTIAN;
+                        break;
+                    case 8:
+                        cEntry = NPC_BRENNAN;
+                        break;
+                    case 9:
+                        cEntry = NPC_HOLLEE;
+                        break;
+                }
+
+                if (!instance->GetData(TYPE_RAND_VENDOR_1) && roll_chance_i(10))
+                {
+                    cEntry = NPC_GUNTER;
+                    instance->SetData(TYPE_RAND_VENDOR_1, DONE);
+                }
+                else if (!instance->GetData(TYPE_RAND_VENDOR_2) && roll_chance_i(10))
+                {
+                    cEntry = NPC_KYREN;
+                    instance->SetData(TYPE_RAND_VENDOR_2, DONE);
+                }
+
+                // start generic rp
+                eventTimer = 1;
+                events.ScheduleEvent(eventTimer, 3000);
+
+                me->UpdateEntry(cEntry);
+            }
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_REMOVE_AMANI_CURSE && caster->GetTypeId() == TYPEID_PLAYER && me->GetEntry() == NPC_FOREST_FROG)
+            {
+                me->GetMotionMaster()->MoveIdle();
+                me->SetFacingToObject(caster);
+                PlayerGUID = caster->GetGUID();
+
+                if (roll_chance_i(2))
+                {
+                    DoCast(caster, SPELL_PUSH_MOJO, true);
+                    me->GetMotionMaster()->MovePoint(POINT_DESPAWN, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+                }
+                else
+                    DoSpawnRandom();
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetInstanceAI<npc_forest_frogAI>(creature);
+    }
 };
 
 /*######
@@ -358,80 +444,80 @@ static uint32 ChestEntry[] = {186648, 187021, 186672, 186667};
 
 class npc_zulaman_hostage : public CreatureScript
 {
-    public:
-        npc_zulaman_hostage() : CreatureScript("npc_zulaman_hostage") { }
+public:
+    npc_zulaman_hostage() : CreatureScript("npc_zulaman_hostage") { }
 
-        struct npc_zulaman_hostageAI : public ScriptedAI
+    struct npc_zulaman_hostageAI : public ScriptedAI
+    {
+        npc_zulaman_hostageAI(Creature* creature) : ScriptedAI(creature)
         {
-            npc_zulaman_hostageAI(Creature* creature) : ScriptedAI(creature)
-            {
-                IsLoot = false;
-            }
-
-            bool IsLoot;
-            uint64 PlayerGUID;
-
-            void Reset() override { }
-
-            void EnterCombat(Unit* /*who*/) override { }
-
-            void JustDied(Unit* /*killer*/) override
-            {
-                if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
-                    player->SendLoot(me->GetGUID(), LOOT_CORPSE);
-            }
-
-            void UpdateAI(uint32 /*diff*/) override
-            {
-                if (IsLoot)
-                    DoCast(me, 7, false);
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const override
-        {
-            return new npc_zulaman_hostageAI(creature);
+            IsLoot = false;
         }
 
-        bool OnGossipHello(Player* player, Creature* creature) override
+        bool IsLoot;
+        uint64 PlayerGUID;
+
+        void Reset() override { }
+
+        void EnterCombat(Unit* /*who*/) override { }
+
+        void JustDied(Unit* /*killer*/) override
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HOSTAGE1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+            if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
+                player->SendLoot(me->GetGUID(), LOOT_CORPSE);
+        }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            if (IsLoot)
+                DoCast(me, 7, false);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_zulaman_hostageAI(creature);
+    }
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HOSTAGE1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    {
+        ClearGossipMenuFor(player);
+
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
+            CloseGossipMenuFor(player);
+
+        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
             return true;
-        }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+
+        InstanceScript* instance = creature->GetInstanceScript();
+        if (instance)
         {
-            ClearGossipMenuFor(player);
-
-            if (action == GOSSIP_ACTION_INFO_DEF + 1)
-                CloseGossipMenuFor(player);
-
-            if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-                return true;
-
-            creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
-            InstanceScript* instance = creature->GetInstanceScript();
-            if (instance)
+            //uint8 progress = instance->GetData(DATA_CHESTLOOTED);
+            instance->SetData(DATA_CHESTLOOTED, 0);
+            float x, y, z;
+            creature->GetPosition(x, y, z);
+            uint32 entry = creature->GetEntry();
+            for (uint8 i = 0; i < 4; ++i)
             {
-                //uint8 progress = instance->GetData(DATA_CHESTLOOTED);
-                instance->SetData(DATA_CHESTLOOTED, 0);
-                float x, y, z;
-                creature->GetPosition(x, y, z);
-                uint32 entry = creature->GetEntry();
-                for (uint8 i = 0; i < 4; ++i)
+                if (HostageEntry[i] == entry)
                 {
-                    if (HostageEntry[i] == entry)
-                    {
-                        creature->SummonGameObject(ChestEntry[i], x-2, y, z, 0, 0, 0, 0, 0, 0);
-                        break;
-                    }
+                    creature->SummonGameObject(ChestEntry[i], x - 2, y, z, 0, 0, 0, 0, 0, 0);
+                    break;
                 }
             }
-
-            return true;
         }
+
+        return true;
+    }
 };
 
 /*######
@@ -677,7 +763,7 @@ public:
                     }
                 }
                 else
-                _gongTimer -= diff;
+                    _gongTimer -= diff;
             }
         }
     };
@@ -690,29 +776,29 @@ public:
 
 class spell_banging_the_gong : public SpellScriptLoader
 {
-    public:
-        spell_banging_the_gong() : SpellScriptLoader("spell_banging_the_gong") { }
+public:
+    spell_banging_the_gong() : SpellScriptLoader("spell_banging_the_gong") { }
 
-        class spell_banging_the_gong_SpellScript : public SpellScript
+    class spell_banging_the_gong_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_banging_the_gong_SpellScript);
+
+        void Activate(SpellEffIndex index)
         {
-            PrepareSpellScript(spell_banging_the_gong_SpellScript);
-
-            void Activate(SpellEffIndex index)
-            {
-                PreventHitDefaultEffect(index);
-                GetHitGObj()->SendCustomAnim(0);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_banging_the_gong_SpellScript::Activate, EFFECT_1, SPELL_EFFECT_ACTIVATE_OBJECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_banging_the_gong_SpellScript();
+            PreventHitDefaultEffect(index);
+            GetHitGObj()->SendCustomAnim(0);
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_banging_the_gong_SpellScript::Activate, EFFECT_1, SPELL_EFFECT_ACTIVATE_OBJECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_banging_the_gong_SpellScript();
+    }
 };
 
 void AddSC_zulaman()

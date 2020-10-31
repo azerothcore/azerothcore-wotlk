@@ -131,7 +131,7 @@ void npc_escortAI::JustDied(Unit* /*killer*/)
 
 void npc_escortAI::JustRespawned()
 {
-    RemoveEscortState(STATE_ESCORT_ESCORTING|STATE_ESCORT_RETURNING|STATE_ESCORT_PAUSED);
+    RemoveEscortState(STATE_ESCORT_ESCORTING | STATE_ESCORT_RETURNING | STATE_ESCORT_PAUSED);
 
     if (!IsCombatMovementAllowed())
         SetCombatMovement(true);
@@ -432,7 +432,7 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
     if (WaypointList.empty())
     {
         sLog->outErrorDb("TSCR: EscortAI (script: %s, creature entry: %u) starts with 0 waypoints (possible missing entry in script_waypoint. Quest: %u).",
-            me->GetScriptName().c_str(), me->GetEntry(), quest ? quest->GetQuestId() : 0);
+                         me->GetScriptName().c_str(), me->GetEntry(), quest ? quest->GetQuestId() : 0);
         return;
     }
 
@@ -556,7 +556,7 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
     uint32 startingWaypointId = CurrentWP->id;
 
     // Flying unit, just fill array
-    if (me->m_movementInfo.HasMovementFlag((MovementFlags)(MOVEMENTFLAG_CAN_FLY|MOVEMENTFLAG_DISABLE_GRAVITY)))
+    if (me->m_movementInfo.HasMovementFlag((MovementFlags)(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY)))
     {
         // xinef: first point in vector is unit real position
         points->clear();
@@ -571,7 +571,7 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
             std::vector<G3D::Vector3> pVector;
             // xinef: first point in vector is unit real position
             pVector.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            uint32 length = (WaypointList.size() - startingWaypointId)*size;
+            uint32 length = (WaypointList.size() - startingWaypointId) * size;
 
             uint32 cnt = 0;
             for (std::list<Escort_Waypoint>::const_iterator itr = CurrentWP; itr != WaypointList.end() && cnt <= length; ++itr, ++cnt)
@@ -579,11 +579,11 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
 
             if (pVector.size() > 2) // more than source + dest
             {
-                G3D::Vector3 middle = (pVector[0] + pVector[pVector.size()-1]) / 2.f;
+                G3D::Vector3 middle = (pVector[0] + pVector[pVector.size() - 1]) / 2.f;
                 G3D::Vector3 offset;
 
                 bool continueLoop = false;
-                for (uint32 i = 1; i < pVector.size()-1; ++i)
+                for (uint32 i = 1; i < pVector.size() - 1; ++i)
                 {
                     offset = middle - pVector[i];
                     if (fabs(offset.x) >= 0xFF || fabs(offset.y) >= 0xFF || fabs(offset.z) >= 0x7F)
@@ -599,6 +599,6 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
             // everything ok
             *points = pVector;
             break;
-       }
+        }
     }
 }

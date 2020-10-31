@@ -53,7 +53,7 @@ public:
                 if (InstanceScript* instance = creature->GetInstanceScript())
                 {
                     //are 5 minutes expected? go template may have data to despawn when used at quest
-                    instance->DoRespawnGameObject(instance->GetData64(DATA_GO_CHALICE), MINUTE*5);
+                    instance->DoRespawnGameObject(instance->GetData64(DATA_GO_CHALICE), MINUTE * 5);
                 }
                 break;
         }
@@ -189,7 +189,7 @@ public:
                 return;
 
             _events.Update(diff);
-            
+
             switch(_events.ExecuteEvent())
             {
                 case EVENT_SPELL_SHADOWBOLTVOLLEY:
@@ -199,8 +199,8 @@ public:
                 case EVENT_SPELL_IMMOLATE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                     {
-                       DoCast(target, SPELL_IMMOLATE);
-                       _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 25000);
+                        DoCast(target, SPELL_IMMOLATE);
+                        _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 25000);
                     }
                     // Didn't get a target, try again in 1s
                     _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 1000);

@@ -24,8 +24,8 @@ void SavingSystemMgr::Update(uint32 diff)
             return;
         }
 
-        if (GetSavingMaxValue()-GetSavingCurrentValue() > playerCount+m_savingSkipList.size()) // this should not happen, but just in case
-            m_savingMaxValueAssigned = m_savingCurrentValue+playerCount+m_savingSkipList.size();
+        if (GetSavingMaxValue() - GetSavingCurrentValue() > playerCount + m_savingSkipList.size()) // this should not happen, but just in case
+            m_savingMaxValueAssigned = m_savingCurrentValue + playerCount + m_savingSkipList.size();
 
         if (playerCount <= 1500) // every 2min
             multiplicator = 1000.0f / playerCount;
@@ -41,7 +41,7 @@ void SavingSystemMgr::Update(uint32 diff)
             multiplicator = 4000.0f / playerCount;
 
         m_savingDiffSum += diff;
-        while (m_savingDiffSum >= (uint32)(step*multiplicator))
+        while (m_savingDiffSum >= (uint32)(step * multiplicator))
         {
             IncreaseSavingCurrentValue(1);
 
@@ -51,7 +51,7 @@ void SavingSystemMgr::Update(uint32 diff)
                 m_savingSkipList.pop_front();
             }
 
-            m_savingDiffSum -= (uint32)(step*multiplicator);
+            m_savingDiffSum -= (uint32)(step * multiplicator);
 
             if (GetSavingCurrentValue() > GetSavingMaxValue())
             {
