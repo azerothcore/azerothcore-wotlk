@@ -63,7 +63,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(std::string const& arenaTeamName, co
 {
     std::string search = arenaTeamName;
     std::transform(search.begin(), search.end(), search.begin(), ::toupper);
-    for (ArenaTeamContainer::const_iterator itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
+    for (auto itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
     {
         if (itr->second->GetType() != type)
         {

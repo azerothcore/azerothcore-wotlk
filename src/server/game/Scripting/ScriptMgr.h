@@ -1679,7 +1679,9 @@ public:
             if (script->IsDatabaseBound())
             {
                 if (!_checkMemory(script))
+                {
                     return;
+                }
 
                 // Get an ID for the script. An ID only exists if it's a script that is assigned in the database
                 // through a script name (or similar).
