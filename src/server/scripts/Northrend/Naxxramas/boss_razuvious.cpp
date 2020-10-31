@@ -18,8 +18,8 @@ enum Says
 enum Spells
 {
     SPELL_UNBALANCING_STRIKE        = 26613,
-    SPELL_DISRUPTING_SHOUT_10       = 29107,
-    SPELL_DISRUPTING_SHOUT_25       = 55543,
+    SPELL_DISRUPTING_SHOUT_10       = 55543,
+    SPELL_DISRUPTING_SHOUT_25       = 29107,
     SPELL_JAGGED_KNIFE              = 55550,
     SPELL_HOPELESS                  = 29125,
 
