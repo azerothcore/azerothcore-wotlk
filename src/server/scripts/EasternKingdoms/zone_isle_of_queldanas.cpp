@@ -220,7 +220,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (uint32 evId = events.GetEvent())
+            switch (uint32 evId = events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -231,28 +231,24 @@ public:
                             events.RepeatEvent(5000);
                             break;
                         }
-                    events.PopEvent();
                     me->setActive(false);
                     EnterEvadeMode();
                     return;
                 case EVENT_SUMMON_SOLDIERS:
                     for (uint8 i = 0; i < SUNWELL_DEFENDER_NUM; ++i)
                         me->SummonCreature(NPC_SUNWELL_DEFENDER, SunwellDefenderPos[i], TEMPSUMMON_TIMED_DESPAWN, 33000 + (i / 5) * 5000);
-                    events.PopEvent();
                     break;
                 case EVENT_TALK_INTRO_0:
                 case EVENT_TALK_INTRO_1:
                 case EVENT_TALK_INTRO_2:
                 case EVENT_TALK_INTRO_3:
                     Talk(SAY_INTRO_0 + (evId - EVENT_TALK_INTRO_0));
-                    events.PopEvent();
                     break;
                 case EVENT_SALUTE:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                         if (Creature* c = ObjectAccessor::GetCreature(*me, *itr))
                             c->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                    events.PopEvent();
                     break;
                 case EVENT_SOLDIERS_RUN_AWAY:
                     {
@@ -276,35 +272,29 @@ public:
                                 }
                                 else
                                 {
-                                    events.PopEvent();
                                     return;
                                 }
                             }
                         }
                     }
-                    events.PopEvent();
                     break;
                 case EVENT_GO_FIGHTPOINT:
                     me->SetWalk(true);
                     me->GetMotionMaster()->MovePoint(0, 11779.30f, -7065.43f, 24.92f);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                    events.PopEvent();
                     break;
                 case EVENT_TALK_SPAWN_0:
                 case EVENT_TALK_SPAWN_1:
                     Talk(SAY_SPAWN_0 + (evId - EVENT_TALK_SPAWN_0));
-                    events.PopEvent();
                     break;
                 case EVENT_SUMMON_MORLEN:
                     if (Creature* c = me->SummonCreature(NPC_MORLEN_COLDGRIP, 11766.70f, -7050.57f, 25.17f, 5.56f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                         morlenGUID = c->GetGUID();
-                    events.PopEvent();
                     break;
                 case EVENT_TALK_MORLEN_0:
                 case EVENT_TALK_MORLEN_1:
                     if (Creature* c = ObjectAccessor::GetCreature(*me, morlenGUID))
                         c->AI()->Talk(SAY_MORLEN_0 + (evId - EVENT_TALK_MORLEN_0));
-                    events.PopEvent();
                     break;
                 case EVENT_SPAWN_WAVE_1:
                 case EVENT_SPAWN_WAVE_2:
@@ -364,7 +354,6 @@ public:
                                 break;
                         }
                     }
-                    events.PopEvent();
                     events.ScheduleEvent(EVENT_SUMMONS_ATTACK, 3000);
                     break;
                 case EVENT_SUMMONS_ATTACK:
@@ -378,14 +367,12 @@ public:
                             c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                             c->AI()->AttackStart(me);
                         }
-                    events.PopEvent();
                     break;
                 case EVENT_OUTRO_0:
                 case EVENT_OUTRO_1:
                 case EVENT_OUTRO_2:
                 case EVENT_OUTRO_3:
                     Talk(SAY_OUTRO_0 + (evId - EVENT_OUTRO_0));
-                    events.PopEvent();
                     if (evId == EVENT_OUTRO_3)
                         events.ScheduleEvent(EVENT_OUTRO_KNEEL, 6000);
                     break;
@@ -393,18 +380,15 @@ public:
                     if (Player* p = ObjectAccessor::GetPlayer(*me, playerGUID))
                         p->KilledMonsterCredit(NPC_THALORIEN_KILL_CREDIT, 0);
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                    events.PopEvent();
                     events.ScheduleEvent(EVENT_DISAPPEAR, 6000);
                     break;
                 case EVENT_DISAPPEAR:
-                    events.PopEvent();
                     me->SetVisible(false);
                     me->setActive(false);
                     EnterEvadeMode();
                     break;
                 case EVENT_SET_FACING:
                     me->SetFacingTo(2.45f);
-                    events.PopEvent();
                     break;
 
                 case EVENT_SPELL_BLADESTORM:
