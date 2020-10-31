@@ -33,21 +33,21 @@ enum BattlegroundNAObjects
 
 class BattlegroundNA : public Battleground
 {
-    public:
-        BattlegroundNA();
-        ~BattlegroundNA();
+public:
+    BattlegroundNA();
+    ~BattlegroundNA();
 
-        /* inherited from BattlegroundClass */
-        void AddPlayer(Player* player);
-        void StartingEventCloseDoors();
-        void StartingEventOpenDoors();
+    /* inherited from BattlegroundClass */
+    void AddPlayer(Player* player);
+    void StartingEventCloseDoors();
+    void StartingEventOpenDoors();
 
-        void RemovePlayer(Player* player);
-        void HandleAreaTrigger(Player* player, uint32 trigger);
-        bool SetupBattleground();
-        void Init();
-        void FillInitialWorldStates(WorldPacket &d);
-        void HandleKillPlayer(Player* player, Player* killer);
-        bool HandlePlayerUnderMap(Player* player);
+    void RemovePlayer(Player* player);
+    void HandleAreaTrigger(Player* player, uint32 trigger);
+    bool SetupBattleground();
+    void Init();
+    void FillInitialWorldStates(WorldPacket& d);
+    void HandleKillPlayer(Player* player, Player* killer);
+    bool HandlePlayerUnderMap(Player* player);
 };
 #endif

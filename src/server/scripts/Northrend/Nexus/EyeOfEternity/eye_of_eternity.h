@@ -80,10 +80,10 @@ const Position CenterPos = {754.395f, 1301.27f, 266.10f, 0.0f};
 
 const Position FourSidesPos[] =
 {
-    {686.417f, 1235.52f, 288.17f, M_PI/4},
-    {828.182f, 1379.05f, 288.17f, 5*M_PI/4},
-    {681.278f, 1375.796f, 288.17f, 7*M_PI/4},
-    {821.182f, 1235.42f, 288.17f, 3*M_PI/4},
+    {686.417f, 1235.52f, 288.17f, M_PI / 4},
+    {828.182f, 1379.05f, 288.17f, 5 * M_PI / 4},
+    {681.278f, 1375.796f, 288.17f, 7 * M_PI / 4},
+    {821.182f, 1235.42f, 288.17f, 3 * M_PI / 4},
 };
 
 const Position Phase2NorthPos = {837.22f, 1301.676f, 296.10f, M_PI};
@@ -92,12 +92,12 @@ const uint32 MalygosIntroIntervals[] = {18000, 19000, 21000, 18000, 15000};
 
 class EoEDrakeEnterVehicleEvent : public BasicEvent
 {
-    public:
-        EoEDrakeEnterVehicleEvent(Creature& owner, uint64 playerGUID) : _owner(owner), _playerGUID(playerGUID) { }
-        bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override;
-    private:
-        Creature& _owner;
-        uint64 _playerGUID;
+public:
+    EoEDrakeEnterVehicleEvent(Creature& owner, uint64 playerGUID) : _owner(owner), _playerGUID(playerGUID) { }
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override;
+private:
+    Creature& _owner;
+    uint64 _playerGUID;
 };
 
 #endif

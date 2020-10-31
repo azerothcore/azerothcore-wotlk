@@ -12,57 +12,57 @@
 namespace lfg
 {
 
-enum LfgCompatibility
-{
-    LFG_COMPATIBILITY_PENDING,
-    LFG_INCOMPATIBLES_WRONG_GROUP_SIZE,
-    LFG_INCOMPATIBLES_TOO_MUCH_PLAYERS,
-    LFG_INCOMPATIBLES_MULTIPLE_LFG_GROUPS,
-    LFG_INCOMPATIBLES_HAS_IGNORES,
-    LFG_INCOMPATIBLES_NO_ROLES,
-    LFG_INCOMPATIBLES_NO_DUNGEONS,
-    LFG_COMPATIBLES_WITH_LESS_PLAYERS,                     // Values under this = not compatible (do not modify order)
-    LFG_COMPATIBLES_MATCH                                  // Must be the last one
-};
+    enum LfgCompatibility
+    {
+        LFG_COMPATIBILITY_PENDING,
+        LFG_INCOMPATIBLES_WRONG_GROUP_SIZE,
+        LFG_INCOMPATIBLES_TOO_MUCH_PLAYERS,
+        LFG_INCOMPATIBLES_MULTIPLE_LFG_GROUPS,
+        LFG_INCOMPATIBLES_HAS_IGNORES,
+        LFG_INCOMPATIBLES_NO_ROLES,
+        LFG_INCOMPATIBLES_NO_DUNGEONS,
+        LFG_COMPATIBLES_WITH_LESS_PLAYERS,                     // Values under this = not compatible (do not modify order)
+        LFG_COMPATIBLES_MATCH                                  // Must be the last one
+    };
 
-/// Stores player or group queue info
-struct LfgQueueData
-{
-    LfgQueueData(): joinTime(time_t(time(nullptr))), lastRefreshTime(joinTime), tanks(LFG_TANKS_NEEDED),
-        healers(LFG_HEALERS_NEEDED), dps(LFG_DPS_NEEDED)
+    /// Stores player or group queue info
+    struct LfgQueueData
+    {
+        LfgQueueData(): joinTime(time_t(time(nullptr))), lastRefreshTime(joinTime), tanks(LFG_TANKS_NEEDED),
+            healers(LFG_HEALERS_NEEDED), dps(LFG_DPS_NEEDED)
         { }
 
-    LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles):
-        joinTime(_joinTime), lastRefreshTime(_joinTime), tanks(LFG_TANKS_NEEDED), healers(LFG_HEALERS_NEEDED),
-        dps(LFG_DPS_NEEDED), dungeons(_dungeons), roles(_roles)
+        LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles):
+            joinTime(_joinTime), lastRefreshTime(_joinTime), tanks(LFG_TANKS_NEEDED), healers(LFG_HEALERS_NEEDED),
+            dps(LFG_DPS_NEEDED), dungeons(_dungeons), roles(_roles)
         { }
 
-    time_t joinTime;                                       ///< Player queue join time (to calculate wait times)
-    time_t lastRefreshTime;                                ///< pussywizard
-    uint8 tanks;                                           ///< Tanks needed
-    uint8 healers;                                         ///< Healers needed
-    uint8 dps;                                             ///< Dps needed
-    LfgDungeonSet dungeons;                                ///< Selected Player/Group Dungeon/s
-    LfgRolesMap roles;                                     ///< Selected Player Role/s
-    Lfg5Guids bestCompatible;                              ///< Best compatible combination of people queued
-};
+        time_t joinTime;                                       ///< Player queue join time (to calculate wait times)
+        time_t lastRefreshTime;                                ///< pussywizard
+        uint8 tanks;                                           ///< Tanks needed
+        uint8 healers;                                         ///< Healers needed
+        uint8 dps;                                             ///< Dps needed
+        LfgDungeonSet dungeons;                                ///< Selected Player/Group Dungeon/s
+        LfgRolesMap roles;                                     ///< Selected Player Role/s
+        Lfg5Guids bestCompatible;                              ///< Best compatible combination of people queued
+    };
 
-struct LfgWaitTime
-{
-    LfgWaitTime(): time(-1), number(0) {}
-    int32 time;                                            ///< Wait time
-    uint32 number;                                         ///< Number of people used to get that wait time
-};
+    struct LfgWaitTime
+    {
+        LfgWaitTime(): time(-1), number(0) {}
+        int32 time;                                            ///< Wait time
+        uint32 number;                                         ///< Number of people used to get that wait time
+    };
 
-typedef std::map<uint32, LfgWaitTime> LfgWaitTimesContainer;
-typedef std::map<uint64, LfgQueueData> LfgQueueDataContainer;
-typedef std::list<Lfg5Guids> LfgCompatibleContainer;
+    typedef std::map<uint32, LfgWaitTime> LfgWaitTimesContainer;
+    typedef std::map<uint64, LfgQueueData> LfgQueueDataContainer;
+    typedef std::list<Lfg5Guids> LfgCompatibleContainer;
 
-/**
-    Stores all data related to queue
-*/
-class LFGQueue
-{
+    /**
+        Stores all data related to queue
+    */
+    class LFGQueue
+    {
     public:
 
         // Add/Remove from queue
@@ -111,7 +111,7 @@ class LFGQueue
         LfgWaitTimesContainer waitTimesDpsStore;           ///< Average wait time to find a group queuing as dps
         LfgGuidList newToQueueStore;                       ///< New groups to add to queue
         LfgGuidList restoredAfterProposal;
-};
+    };
 
 } // namespace lfg
 
