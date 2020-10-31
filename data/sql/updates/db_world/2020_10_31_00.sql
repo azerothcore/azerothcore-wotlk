@@ -1,3 +1,19 @@
+-- DB update 2020_10_30_01 -> 2020_10_31_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_10_30_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_10_30_01 2020_10_31_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1602815099418099300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1602815099418099300');
 
 /*
@@ -12,3 +28,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (11443, 0, 1, 0, 0, 0, 100, 0, 4000, 7500, 12500, 17000, 0, 11, 10179, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Gordok Ogre-Mage - In Combat - Cast 10179'),
 (11443, 0, 2, 0, 0, 0, 100, 0, 11000, 18000, 25000, 33000, 0, 11, 10149, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Gordok Ogre-Mage - In Combat - Cast 10149');
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
