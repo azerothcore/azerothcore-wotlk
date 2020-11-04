@@ -3178,6 +3178,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 58567: // Player Sunder Armor
             case 12579: // Player Winter's Chill
             case 29306: // Naxxramas(Gluth's Zombies): Infected Wound
+            case 61920: // Ulduar(Spellbreaker): Supercharge
             case 63978: // Ulduar(Rubble): Stone Nova 
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
                 break;
