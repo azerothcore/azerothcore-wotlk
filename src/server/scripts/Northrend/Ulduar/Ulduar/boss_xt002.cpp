@@ -352,7 +352,7 @@ public:
                     return;
                 case EVENT_ENRAGE:
                     me->MonsterYell("I'm tired of these toys. I don't want to play anymore!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(XT_SOUND_SUMMON);
+                    me->PlayDirectSound(XT_SOUND_ENRAGE);
                     me->CastSpell(me, SPELL_XT002_ENRAGE, true);
                     break;
 
