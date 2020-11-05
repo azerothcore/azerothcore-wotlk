@@ -396,8 +396,11 @@ public:
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
             // Temporal hack, by some case some melee spells can bypass this aura damage reduction
-            if (me->HasAura(SPELL_GIFT_OF_TWILIGHT_FIRE) || me->HasAura(SPELL_GIFT_OF_TWILIGHT_SHADOW))
+            if (me->HasAura(SPELL_GIFT_OF_TWILIGHT_FIRE))
+            {
                 damage = 0;
+                return;
+            }
 
             if (!usedBerserk && me->HealthBelowPctDamaged(30, damage))
             {
@@ -825,6 +828,11 @@ struct boss_sartharion_dragonAI : public BossAI
             case NPC_SHADRON:
             {
                 Talk(SAY_SHADRON_DEATH);
+                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                {
+                    sartharion->RemoveAura(SPELL_GIFT_OF_TWILIGHT_FIRE);
+                }
+
                 if (!isCalledBySartharion)
                 {
                     instance->SetBossState(DATA_SHADRON, DONE);
@@ -1142,12 +1150,9 @@ public:
         {
             if (isCalledBySartharion)
             {
-                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
-                {
-                    sartharion->RemoveAura(SPELL_GIFT_OF_TWILIGHT_FIRE);
-                }
-
-                instance->DoAction(ACTION_CLEAR_PORTAL);
+                // Acolytes are dead
+                if (!summons.HasEntry(NPC_ACOLYTE_OF_SHADRON))
+                    instance->DoAction(ACTION_CLEAR_PORTAL);
             }
             else
             {
