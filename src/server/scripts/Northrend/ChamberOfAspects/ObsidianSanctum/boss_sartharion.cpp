@@ -395,6 +395,10 @@ public:
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
+            // Temporal hack, by some case some melee spells can bypass this aura damage reduction
+            if (me->HasAura(SPELL_GIFT_OF_TWILIGHT_FIRE) || me->HasAura(SPELL_GIFT_OF_TWILIGHT_SHADOW))
+                damage = 0;
+
             if (!usedBerserk && me->HealthBelowPctDamaged(30, damage))
             {
                 DoCastSelf(SPELL_SARTHARION_BERSERK, true);
