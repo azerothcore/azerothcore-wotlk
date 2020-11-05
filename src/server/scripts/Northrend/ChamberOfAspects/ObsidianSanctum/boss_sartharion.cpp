@@ -1200,7 +1200,7 @@ public:
                 case EVENT_MINIBOSS_SPAWN_HELPERS:
                 {
                     Talk(WHISPER_SUMMON_DICIPLE);
-                    DoCastSelf(static_cast<uint32>((isCalledBySartharion ? SPELL_GIFT_OF_TWILIGHT_FIRE : SPELL_GIFT_OF_TWILIGHT_SHADOW)), true);
+                    DoCastAOE(static_cast<uint32>((isCalledBySartharion ? SPELL_GIFT_OF_TWILIGHT_FIRE : SPELL_GIFT_OF_TWILIGHT_SHADOW)), true);
                     if (Creature* acolyte = me->SummonCreature((isCalledBySartharion ? NPC_ACOLYTE_OF_SHADRON : NPC_DISCIPLE_OF_SHADRON), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
                     {
                         // TODO: inpect JustSummoned
