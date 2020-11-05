@@ -410,7 +410,7 @@ public:
             }
 
             // Soft enrage
-            if (!dragonsCount && !below11PctReached && me->HealthBelowPctDamaged(10, damage))
+            if (!below11PctReached && me->HealthBelowPctDamaged(10, damage))
             {
                 summons.RemoveNotExisting();
                 if (!summons.empty())
