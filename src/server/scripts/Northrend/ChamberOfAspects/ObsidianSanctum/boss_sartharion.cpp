@@ -760,6 +760,20 @@ struct boss_sartharion_dragonAI : public BossAI
         me->SetInCombatWithZone();
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        // Transfer summons to Sartharion
+        if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
+        {
+            if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+            {
+                sartharion->AI()->JustSummoned(summon);
+            }
+        }
+
+        BossAI::JustSummoned(summon);
+    }
+
     void EnterCombat(Unit* /*who*/) final
     {
         me->setActive(true);
@@ -808,11 +822,14 @@ struct boss_sartharion_dragonAI : public BossAI
         }
     }
 
-    void JustDied(Unit* /*killer*/) final
+    void JustDied(Unit* /*killer*/) override
     {
         //_JustDied();
         events.Reset();
-        summons.DespawnAll();
+
+        // Despawn minions only if not called by Sartharion
+        if (!isCalledBySartharion)
+            summons.DespawnAll();
 
         switch (me->GetEntry())
         {
@@ -1000,7 +1017,10 @@ public:
         void Reset() override
         {
             boss_sartharion_dragonAI::Reset();
-            summons2.DespawnAll();
+            if (!isCalledBySartharion)
+            {
+                summons2.DespawnAll();
+            }
             events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20000);
             events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10000);
             events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15000);
@@ -1009,7 +1029,20 @@ public:
         void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() != NPC_TWILIGHT_EGG)
+            {
                 summons.Summon(summon);
+            }
+            // Summons to Sartharion are linked manually
+        }
+
+        void JustDied(Unit* killer) override
+        {
+            if (!isCalledBySartharion)
+            {
+                summons2.DespawnAll();
+            }
+
+            boss_sartharion_dragonAI::JustDied(killer);
         }
 
         void ExecuteEvent(uint32 eventId) override
@@ -1064,6 +1097,13 @@ public:
                         if (Creature* egg = me->SummonCreature(NPC_TWILIGHT_EGG, TenebronEggsPos[isCalledBySartharion ? 1 : 0][i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
                         {
                             summons.Summon(egg);
+                            if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
+                            {
+                                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                                {
+                                    sartharion->AI()->JustSummoned(egg);
+                                }
+                            }
                             egg->SetPhaseMask(16, true);
                         }
                     }
@@ -1086,6 +1126,13 @@ public:
                         if (Creature* whelp = me->SummonCreature(NPC_TWILIGHT_WHELP, summon->GetPosition(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
                         {
                             summons2.Summon(whelp);
+                            if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
+                            {
+                                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                                {
+                                    sartharion->AI()->JustSummoned(whelp);
+                                }
+                            }
                         }
                     }
 
