@@ -14,12 +14,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 213;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 213);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(213, 0, 0, 0, 2, 0, 100, 1, 1, 3, 0, 0, 11, 3149, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Starving Dire Wolf - Between 1-3% Health - Cast \'3149\' (No Repeat)');
+(213, 0, 0, 0, 2, 0, 100, 1, 1, 5, 0, 0, 11, 3149, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Starving Dire Wolf - Between 1-5% Health - Cast \'3149\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 3;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 3);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(3, 0, 0, 0, 2, 0, 100, 0, 1, 3, 0, 0, 11, 13496, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Flash Eater - Between 1-3% Health - Cast \'13496\'');
+(3, 0, 0, 0, 2, 0, 100, 0, 1, 5, 0, 0, 11, 13496, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Flash Eater - Between 1-5% Health - Cast \'13496\'');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1871;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 1871);
@@ -34,4 +34,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 923;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 923);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(923, 0, 0, 0, 2, 0, 100, 1, 1, 3, 0, 0, 11, 3149, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Young Black Ravager - Between 1-3% Health - Cast \'3149\' (No Repeat)');
+(923, 0, 0, 0, 2, 0, 100, 1, 1, 5, 0, 0, 11, 3149, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Young Black Ravager - Between 1-5% Health - Cast \'3149\' (No Repeat)');
