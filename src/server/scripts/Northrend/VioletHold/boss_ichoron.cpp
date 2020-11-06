@@ -12,7 +12,7 @@
 #define ACTION_WATER_ELEMENT_KILLED         2
 
 #define MAX_SPAWN_LOC 5
-static Position SpawnLoc[MAX_SPAWN_LOC]=
+static Position SpawnLoc[MAX_SPAWN_LOC] =
 {
     {1840.64f, 795.407f, 44.079f, 1.676f},
     {1886.24f, 757.733f, 47.750f, 5.201f},
@@ -74,7 +74,7 @@ public:
 
     struct boss_ichoronAI : public ScriptedAI
     {
-        boss_ichoronAI(Creature *c) : ScriptedAI(c), globules(me)
+        boss_ichoronAI(Creature* c) : ScriptedAI(c), globules(me)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -92,7 +92,7 @@ public:
             bIsExploded = false;
             bIsFrenzy = false;
             uiDrainedTimer = 15000;
-            uiWaterBoltVolleyTimer = urand(7000,12000);
+            uiWaterBoltVolleyTimer = urand(7000, 12000);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisplayId(me->GetNativeDisplayId());
         }
@@ -113,7 +113,7 @@ public:
                     break;
                 case ACTION_WATER_ELEMENT_KILLED:
                     uint32 damage = me->CountPctFromMaxHealth(3);
-                    damage = std::min(damage, me->GetHealth()-1);
+                    damage = std::min(damage, me->GetHealth() - 1);
                     me->ModifyHealth(-int32(damage));
                     me->LowerPlayerDamageReq(damage);
                     break;
@@ -136,12 +136,12 @@ public:
 
         void IchoronDoCastToAllHostilePlayers(uint32 spellId, bool triggered)
         {
-            Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+            Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
             if (PlayerList.isEmpty())
                 return;
 
             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                if (Player *plr = i->GetSource())
+                if (Player* plr = i->GetSource())
                     me->CastSpell(plr, spellId, triggered);
         }
 
@@ -150,7 +150,7 @@ public:
             bIsExploded = false;
             bIsFrenzy = false;
             uiDrainedTimer = 15000;
-            uiWaterBoltVolleyTimer = urand(7000,12000);
+            uiWaterBoltVolleyTimer = urand(7000, 12000);
             DoZoneInCombat();
             Talk(SAY_AGGRO);
             me->CastSpell(me, SPELL_PROTECTIVE_BUBBLE, true);
@@ -185,14 +185,14 @@ public:
                         uiDrainedTimer = 15000;
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         me->SetDisplayId(11686);
-                        for (uint8 i=0; i<MAX_SPAWN_LOC; ++i)
+                        for (uint8 i = 0; i < MAX_SPAWN_LOC; ++i)
                         {
-                            float angle = rand_norm()*2*M_PI;
+                            float angle = rand_norm() * 2 * M_PI;
                             Position p1(SpawnLoc[i]), p2(SpawnLoc[i]);
-                            p1.m_positionX += 2.5f*cos(angle);
-                            p1.m_positionY += 2.5f*sin(angle);
-                            p2.m_positionX -= 2.5f*cos(angle);
-                            p2.m_positionY -= 2.5f*sin(angle);
+                            p1.m_positionX += 2.5f * cos(angle);
+                            p1.m_positionY += 2.5f * sin(angle);
+                            p2.m_positionX -= 2.5f * cos(angle);
+                            p2.m_positionY -= 2.5f * sin(angle);
                             DoSummon(NPC_ICHOR_GLOBULE, p1, 60000, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN);
                             DoSummon(NPC_ICHOR_GLOBULE, p2, 60000, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN);
                         }
@@ -251,7 +251,7 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature *pSummoned)
+        void SummonedCreatureDespawn(Creature* pSummoned)
         {
             if (pSummoned)
             {
@@ -272,7 +272,7 @@ public:
                 pInstance->SetData(DATA_BOSS_DIED, 0);
         }
 
-        void KilledUnit(Unit * victim)
+        void KilledUnit(Unit* victim)
         {
             if (victim && victim->GetGUID() == me->GetGUID())
                 return;
@@ -305,7 +305,7 @@ public:
 
     struct npc_ichor_globuleAI : public ScriptedAI
     {
-        npc_ichor_globuleAI(Creature *c) : ScriptedAI(c)
+        npc_ichor_globuleAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
             uiRangeCheck_Timer = 1000;
@@ -326,7 +326,7 @@ public:
             {
                 if (pInstance)
                     if (Creature* pIchoron = pInstance->instance->GetCreature(pInstance->GetData64(DATA_ICHORON_GUID)))
-                        if (me->IsWithinDist(pIchoron, 2.0f , false))
+                        if (me->IsWithinDist(pIchoron, 2.0f, false))
                         {
                             if (pIchoron->AI())
                                 pIchoron->AI()->DoAction(ACTION_WATER_ELEMENT_HIT);

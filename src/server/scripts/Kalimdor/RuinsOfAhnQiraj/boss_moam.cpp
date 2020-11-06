@@ -42,45 +42,45 @@ enum Actions
 
 class boss_moam : public CreatureScript
 {
-    public:
-        boss_moam() : CreatureScript("boss_moam") { }
+public:
+    boss_moam() : CreatureScript("boss_moam") { }
 
-        struct boss_moamAI : public BossAI
+    struct boss_moamAI : public BossAI
+    {
+        boss_moamAI(Creature* creature) : BossAI(creature, DATA_MOAM)
         {
-            boss_moamAI(Creature* creature) : BossAI(creature, DATA_MOAM)
-            {
-            }
+        }
 
-            void Reset()
-            {
-                _Reset();
-                me->SetPower(POWER_MANA, 0);
-                _isStonePhase = false;
-                events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-                //events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
-            }
+        void Reset()
+        {
+            _Reset();
+            me->SetPower(POWER_MANA, 0);
+            _isStonePhase = false;
+            events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
+            //events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
+        }
 
-            void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        {
+            if (!_isStonePhase && HealthBelowPct(45))
             {
-                if (!_isStonePhase && HealthBelowPct(45))
-                {
-                    _isStonePhase = true;
-                    DoAction(ACTION_STONE_PHASE_START);
-                }
+                _isStonePhase = true;
+                DoAction(ACTION_STONE_PHASE_START);
             }
+        }
 
-            void DoAction(int32 action)
+        void DoAction(int32 action)
+        {
+            switch (action)
             {
-                switch (action)
-                {
-                    case ACTION_STONE_PHASE_END:
+                case ACTION_STONE_PHASE_END:
                     {
                         me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
                         events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
                         _isStonePhase = false;
                         break;
                     }
-                    case ACTION_STONE_PHASE_START:
+                case ACTION_STONE_PHASE_START:
                     {
                         DoCast(me, SPELL_SUMMON_MANA_FIEND_1);
                         DoCast(me, SPELL_SUMMON_MANA_FIEND_2);
@@ -89,45 +89,45 @@ class boss_moam : public CreatureScript
                         events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
                         break;
                     }
-                    default:
-                        break;
-                }
+                default:
+                    break;
+            }
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
+            {
+                if (_isStonePhase)
+                    DoAction(ACTION_STONE_PHASE_END);
+                DoCastAOE(SPELL_ARCANE_ERUPTION);
+                me->SetPower(POWER_MANA, 0);
             }
 
-            void UpdateAI(uint32 diff)
+            if (_isStonePhase)
             {
-                if (!UpdateVictim())
-                    return;
+                if (events.ExecuteEvent() == EVENT_STONE_PHASE_END)
+                    DoAction(ACTION_STONE_PHASE_END);
+                return;
+            }
 
-                events.Update(diff);
+            // Messing up mana-drain channel
+            //if (me->HasUnitState(UNIT_STATE_CASTING))
+            //    return;
 
-                if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
                 {
-                    if (_isStonePhase)
-                        DoAction(ACTION_STONE_PHASE_END);
-                    DoCastAOE(SPELL_ARCANE_ERUPTION);
-                    me->SetPower(POWER_MANA, 0);
-                }
-
-                if (_isStonePhase)
-                {
-                    if (events.ExecuteEvent() == EVENT_STONE_PHASE_END)
-                        DoAction(ACTION_STONE_PHASE_END);
-                    return;
-                }
-
-                // Messing up mana-drain channel
-                //if (me->HasUnitState(UNIT_STATE_CASTING))
-                //    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_STONE_PHASE:
-                            DoAction(ACTION_STONE_PHASE_START);
-                            break;
-                        case EVENT_DRAIN_MANA:
+                    case EVENT_STONE_PHASE:
+                        DoAction(ACTION_STONE_PHASE_START);
+                        break;
+                    case EVENT_DRAIN_MANA:
                         {
                             std::list<Unit*> targetList;
                             {
@@ -153,21 +153,21 @@ class boss_moam : public CreatureScript
                             DoCast(me, SPELL_TRASH);
                             events.ScheduleEvent(EVENT_WIDE_SLASH, 16000);
                             break;*/
-                        default:
-                            break;
-                    }
+                    default:
+                        break;
                 }
-
-                DoMeleeAttackIfReady();
             }
-        private:
-            bool _isStonePhase;
-        };
 
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_moamAI(creature);
+            DoMeleeAttackIfReady();
         }
+    private:
+        bool _isStonePhase;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new boss_moamAI(creature);
+    }
 };
 
 void AddSC_boss_moam()

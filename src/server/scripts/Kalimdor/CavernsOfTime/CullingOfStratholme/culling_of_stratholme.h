@@ -139,7 +139,7 @@ const Position LeaderIntroPos4 = {2423.12f, 1119.43f, 148.07f, 0.0f};
 const Position LeaderIntroPos5 = {2540.48f, 1129.06f, 130.86f, 0.0f};
 const Position LeaderIntroPos6 = {2327.39f, 1412.47f, 127.69f, 0.0f};
 
-const Position EventPos[] = 
+const Position EventPos[] =
 {
     {1813.298f, 1283.578f, 142.326f, 3.878161f},    // chromie
     {1809.46f,  1286.05f,  142.62f,  4.8f},         // hourglass

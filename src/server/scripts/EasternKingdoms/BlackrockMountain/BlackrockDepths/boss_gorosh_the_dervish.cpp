@@ -51,14 +51,16 @@ public:
             {
                 DoCast(me, SPELL_WHIRLWIND);
                 WhirlWind_Timer = 15000;
-            } else WhirlWind_Timer -= diff;
+            }
+            else WhirlWind_Timer -= diff;
 
             //MortalStrike_Timer
             if (MortalStrike_Timer <= diff)
             {
                 DoCastVictim(SPELL_MORTALSTRIKE);
                 MortalStrike_Timer = 15000;
-            } else MortalStrike_Timer -= diff;
+            }
+            else MortalStrike_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }

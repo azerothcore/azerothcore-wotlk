@@ -23,6 +23,7 @@
 #include "ace/Event_Base.h"
 #include "ace/Time_Policy.h"
 #include "ace/Time_Value_T.h"
+#include "ace/Log_Category.h"
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 

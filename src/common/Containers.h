@@ -36,35 +36,35 @@ namespace acore
     template <class T>
     class CheckedBufferOutputIterator
     {
-        public:
-            using iterator_category = std::output_iterator_tag;
-            using value_type = void;
-            using pointer = T*;
-            using reference = T&;
-            using difference_type = std::ptrdiff_t;
+    public:
+        using iterator_category = std::output_iterator_tag;
+        using value_type = void;
+        using pointer = T*;
+        using reference = T&;
+        using difference_type = std::ptrdiff_t;
 
-            CheckedBufferOutputIterator(T* buf, size_t n) : _buf(buf), _end(buf+n) {}
+        CheckedBufferOutputIterator(T* buf, size_t n) : _buf(buf), _end(buf + n) {}
 
-            T& operator*() const { check(); return *_buf; }
-            CheckedBufferOutputIterator& operator++() { check(); ++_buf; return *this; }
-            CheckedBufferOutputIterator operator++(int) { CheckedBufferOutputIterator v = *this; operator++(); return v; }
+        T& operator*() const { check(); return *_buf; }
+        CheckedBufferOutputIterator& operator++() { check(); ++_buf; return *this; }
+        CheckedBufferOutputIterator operator++(int) { CheckedBufferOutputIterator v = *this; operator++(); return v; }
 
-            size_t remaining() const { return (_end - _buf); }
+        size_t remaining() const { return (_end - _buf); }
 
-        private:
-            T* _buf;
-            T* _end;
-            void check() const
-            {
-                if (!(_buf < _end))
-                    throw std::out_of_range("index");
-            }
+    private:
+        T* _buf;
+        T* _end;
+        void check() const
+        {
+            if (!(_buf < _end))
+                throw std::out_of_range("index");
+        }
     };
 
     namespace Containers
     {
         template<class T>
-        void RandomResizeList(std::list<T> &list, uint32 size)
+        void RandomResizeList(std::list<T>& list, uint32 size)
         {
             size_t list_size = list.size();
 
@@ -78,7 +78,7 @@ namespace acore
         }
 
         template<class T, class Predicate>
-        void RandomResizeList(std::list<T> &list, Predicate& predicate, uint32 size)
+        void RandomResizeList(std::list<T>& list, Predicate& predicate, uint32 size)
         {
             //! First use predicate filter
             std::list<T> listCopy;

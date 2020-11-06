@@ -12,7 +12,7 @@ class instance_forge_of_souls : public InstanceMapScript
 public:
     instance_forge_of_souls() : InstanceMapScript("instance_forge_of_souls", 632) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap *map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const
     {
         return new instance_forge_of_souls_InstanceScript(map);
     }
@@ -67,7 +67,7 @@ public:
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
-                Map::PlayerList const &players = instance->GetPlayers();
+                Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
                     if (Player* player = players.begin()->GetSource())
                         teamIdInInstance = player->GetTeamId();
@@ -124,7 +124,7 @@ public:
                     if (Creature* boss = instance->GetCreature(NPC_DevourerGUID))
                     {
                         float angle = boss->GetAngle(leader);
-                        leader->GetMotionMaster()->MovePoint(1, boss->GetPositionX()+10.0f*cos(angle), boss->GetPositionY()+10.0f*sin(angle), boss->GetPositionZ());
+                        leader->GetMotionMaster()->MovePoint(1, boss->GetPositionX() + 10.0f * cos(angle), boss->GetPositionY() + 10.0f * sin(angle), boss->GetPositionZ());
                     }
 
             for (int8 i = 0; outroPositions[i].entry[teamIdInInstance] != 0; ++i)
@@ -154,7 +154,8 @@ public:
         {
             switch (type)
             {
-                case DATA_BRONJAHM: return NPC_BronjahmGUID;
+                case DATA_BRONJAHM:
+                    return NPC_BronjahmGUID;
             }
 
             return 0;
