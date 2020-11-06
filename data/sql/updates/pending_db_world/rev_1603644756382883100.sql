@@ -28,7 +28,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1851;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 1851);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(1851, 0, 0, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 17320, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'The Husk - Between 20-80% Health - Cast \'17320\' (No Repeat)'),
+(1851, 0, 0, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 17230, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'The Husk - Between 20-80% Health - Cast \'17230\' (No Repeat)'),
 (1851, 0, 1, 0, 0, 0, 100, 0, 2400, 3800, 14900, 16800, 11, 3604, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'The Husk - In Combat - Cast \'3604\'');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1837;
@@ -44,9 +44,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1841, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Executioner - On Aggro - Cast \'8599\''),
 (1841, 0, 1, 0, 0, 0, 100, 0, 2500, 3000, 9500, 10000, 11, 16856, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Executioner - In Combat - Cast \'16856\''),
 (1841, 0, 2, 0, 2, 0, 100, 1, 40, 80, 0, 0, 11, 15284, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Executioner - Between 40-80% Health - Cast \'15284\' (No Repeat)'),
-(1841, 0, 3, 0, 12, 0, 100, 1, 5, 30, 0, 0, 11, 7160, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Executioner - Target Between 5-30% Health - Cast \'7160\' (No Repeat)');
+(1841, 0, 3, 0, 12, 0, 100, 1, 5, 20, 0, 0, 11, 7160, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Executioner - Target Between 5-20% Health - Cast \'7160\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1838;
+UPDATE `creature_template` SET `unit_class`= 2 WHERE `entry`= 1838;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 1838);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1838, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 20294, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Interrogator - On Aggro - Cast \'20294\'');
@@ -75,7 +76,7 @@ DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 10358);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (10358, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 7068, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Fellicent\'s Shade - On Aggro - Cast \'7068\''),
 (10358, 0, 1, 0, 0, 0, 100, 0, 2300, 3200, 8900, 9600, 11, 13901, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Fellicent\'s Shade - In Combat - Cast \'13901\''),
-(10358, 0, 2, 0, 2, 0, 100, 1, 0, 0, 0, 0, 11, 11975, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Fellicent\'s Shade - Between 0-0% Health - Cast \'11975\' (No Repeat)');
+(10358, 0, 2, 0, 2, 0, 100, 1, 20, 40, 0, 0, 11, 11975, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Fellicent\'s Shade - Between 20-40% Health - Cast \'11975\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10359;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 10359);
