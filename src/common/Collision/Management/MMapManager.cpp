@@ -27,9 +27,9 @@ namespace MMAP
             return true;
 
         // load and init dtNavMesh - read parameters from file
-        uint32 pathLen = sWorld->GetDataPath().length() + strlen("mmaps/%03i.mmap")+1;
-        char *fileName = new char[pathLen];
-        snprintf(fileName, pathLen, (sWorld->GetDataPath()+"mmaps/%03i.mmap").c_str(), mapId);
+        uint32 pathLen = sWorld->GetDataPath().length() + strlen("mmaps/%03i.mmap") + 1;
+        char* fileName = new char[pathLen];
+        snprintf(fileName, pathLen, (sWorld->GetDataPath() + "mmaps/%03i.mmap").c_str(), mapId);
 
         FILE* file = fopen(fileName, "rb");
         if (!file)
@@ -112,11 +112,11 @@ namespace MMAP
         }
 
         // load this tile :: mmaps/MMMXXYY.mmtile
-        uint32 pathLen = sWorld->GetDataPath().length() + strlen("mmaps/%03i%02i%02i.mmtile")+1;
-        char *fileName = new char[pathLen];
-        snprintf(fileName, pathLen, (sWorld->GetDataPath()+"mmaps/%03i%02i%02i.mmtile").c_str(), mapId, x, y);
+        uint32 pathLen = sWorld->GetDataPath().length() + strlen("mmaps/%03i%02i%02i.mmtile") + 1;
+        char* fileName = new char[pathLen];
+        snprintf(fileName, pathLen, (sWorld->GetDataPath() + "mmaps/%03i%02i%02i.mmtile").c_str(), mapId, x, y);
 
-        FILE *file = fopen(fileName, "rb");
+        FILE* file = fopen(fileName, "rb");
         if (!file)
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -139,7 +139,7 @@ namespace MMAP
         if (fileHeader.mmapVersion != MMAP_VERSION)
         {
             sLog->outError("MMAP:loadMap: %03u%02i%02i.mmtile was built with generator v%i, expected v%i",
-                mapId, x, y, fileHeader.mmapVersion, MMAP_VERSION);
+                           mapId, x, y, fileHeader.mmapVersion, MMAP_VERSION);
             fclose(file);
             return false;
         }
@@ -345,26 +345,26 @@ namespace MMAP
         MMapData* mmap = loadedMMaps[mapId];
         if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())
         {
-        // pussywizard: different instances of the same map shouldn't access this simultaneously
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
-        // check again after acquiring mutex
-        if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())
-        {
-            // allocate mesh query
-            dtNavMeshQuery* query = dtAllocNavMeshQuery();
-            ASSERT(query);
-            if (DT_SUCCESS != query->init(mmap->navMesh, 1024))
+            // pussywizard: different instances of the same map shouldn't access this simultaneously
+            ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
+            // check again after acquiring mutex
+            if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())
             {
-                dtFreeNavMeshQuery(query);
-                sLog->outError("MMAP:GetNavMeshQuery: Failed to initialize dtNavMeshQuery for mapId %03u instanceId %u", mapId, instanceId);
-                return NULL;
-            }
+                // allocate mesh query
+                dtNavMeshQuery* query = dtAllocNavMeshQuery();
+                ASSERT(query);
+                if (DT_SUCCESS != query->init(mmap->navMesh, 1024))
+                {
+                    dtFreeNavMeshQuery(query);
+                    sLog->outError("MMAP:GetNavMeshQuery: Failed to initialize dtNavMeshQuery for mapId %03u instanceId %u", mapId, instanceId);
+                    return NULL;
+                }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDetail("MMAP:GetNavMeshQuery: created dtNavMeshQuery for mapId %03u instanceId %u", mapId, instanceId);
+                sLog->outDetail("MMAP:GetNavMeshQuery: created dtNavMeshQuery for mapId %03u instanceId %u", mapId, instanceId);
 #endif
-            mmap->navMeshQueries.insert(std::pair<uint32, dtNavMeshQuery*>(instanceId, query));
-        }
+                mmap->navMeshQueries.insert(std::pair<uint32, dtNavMeshQuery*>(instanceId, query));
+            }
         }
 
         return mmap->navMeshQueries[instanceId];
