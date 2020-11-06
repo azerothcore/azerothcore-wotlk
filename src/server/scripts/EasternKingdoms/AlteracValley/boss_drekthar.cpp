@@ -73,31 +73,36 @@ public:
             {
                 DoCastVictim(SPELL_WHIRLWIND);
                 WhirlwindTimer =  urand(8 * IN_MILLISECONDS, 18 * IN_MILLISECONDS);
-            } else WhirlwindTimer -= diff;
+            }
+            else WhirlwindTimer -= diff;
 
             if (Whirlwind2Timer <= diff)
             {
                 DoCastVictim(SPELL_WHIRLWIND2);
                 Whirlwind2Timer = urand(7 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
-            } else Whirlwind2Timer -= diff;
+            }
+            else Whirlwind2Timer -= diff;
 
             if (KnockdownTimer <= diff)
             {
                 DoCastVictim(SPELL_KNOCKDOWN);
                 KnockdownTimer = urand(10 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
-            } else KnockdownTimer -= diff;
+            }
+            else KnockdownTimer -= diff;
 
             if (FrenzyTimer <= diff)
             {
                 DoCastVictim(SPELL_FRENZY);
                 FrenzyTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
-            } else FrenzyTimer -= diff;
+            }
+            else FrenzyTimer -= diff;
 
             if (YellTimer <= diff)
             {
                 Talk(YELL_RANDOM);
                 YellTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS); //20 to 30 seconds
-            } else YellTimer -= diff;
+            }
+            else YellTimer -= diff;
 
             // check if creature is not outside of building
             if (ResetTimer <= diff)
@@ -108,7 +113,8 @@ public:
                     Talk(YELL_EVADE);
                 }
                 ResetTimer = 5 * IN_MILLISECONDS;
-            } else ResetTimer -= diff;
+            }
+            else ResetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }

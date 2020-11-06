@@ -198,7 +198,7 @@ public:
                                 nefarian->DespawnOrUnsummon();
                             break;
                         case FAIL:
-                            _events.ScheduleEvent(EVENT_RESPAWN_NEFARIUS, 15*IN_MILLISECONDS*MINUTE);
+                            _events.ScheduleEvent(EVENT_RESPAWN_NEFARIUS, 15 * IN_MILLISECONDS * MINUTE);
                             SetBossState(BOSS_NEFARIAN, NOT_STARTED);
                             break;
                         default:
@@ -213,15 +213,24 @@ public:
         {
             switch (id)
             {
-                case DATA_RAZORGORE_THE_UNTAMED:  return RazorgoreTheUntamedGUID;
-                case DATA_VAELASTRAZ_THE_CORRUPT: return VaelastraszTheCorruptGUID;
-                case DATA_BROODLORD_LASHLAYER:    return BroodlordLashlayerGUID;
-                case DATA_FIRENAW:                return FiremawGUID;
-                case DATA_EBONROC:                return EbonrocGUID;
-                case DATA_FLAMEGOR:               return FlamegorGUID;
-                case DATA_CHROMAGGUS:             return ChromaggusGUID;
-                case DATA_LORD_VICTOR_NEFARIUS:   return LordVictorNefariusGUID;
-                case DATA_NEFARIAN:               return NefarianGUID;
+                case DATA_RAZORGORE_THE_UNTAMED:
+                    return RazorgoreTheUntamedGUID;
+                case DATA_VAELASTRAZ_THE_CORRUPT:
+                    return VaelastraszTheCorruptGUID;
+                case DATA_BROODLORD_LASHLAYER:
+                    return BroodlordLashlayerGUID;
+                case DATA_FIRENAW:
+                    return FiremawGUID;
+                case DATA_EBONROC:
+                    return EbonrocGUID;
+                case DATA_FLAMEGOR:
+                    return FlamegorGUID;
+                case DATA_CHROMAGGUS:
+                    return ChromaggusGUID;
+                case DATA_LORD_VICTOR_NEFARIUS:
+                    return LordVictorNefariusGUID;
+                case DATA_NEFARIAN:
+                    return NefarianGUID;
             }
 
             return 0;
@@ -234,7 +243,7 @@ public:
                 switch (data)
                 {
                     case IN_PROGRESS:
-                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45*IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45 * IN_MILLISECONDS);
                         EggEvent = data;
                         EggCount = 0;
                         break;

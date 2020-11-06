@@ -31,15 +31,7 @@ enum CharterItemIDs
     ARENA_TEAM_CHARTER_5v5                        = 23562
 };
 
-enum CharterCosts
-{
-    GUILD_CHARTER_COST                            = 1000,
-    ARENA_TEAM_CHARTER_2v2_COST                   = 800000,
-    ARENA_TEAM_CHARTER_3v3_COST                   = 1200000,
-    ARENA_TEAM_CHARTER_5v5_COST                   = 2000000
-};
-
-void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recvData)
+void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_BUY");
@@ -101,7 +93,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recvData)
             return;
 
         charterid = GUILD_CHARTER;
-        cost = GUILD_CHARTER_COST;
+        cost = sWorld->getIntConfig(CONFIG_CHARTER_COST_GUILD);
         type = GUILD_CHARTER_TYPE;
     }
     else
@@ -117,17 +109,17 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recvData)
         {
             case 1:
                 charterid = ARENA_TEAM_CHARTER_2v2;
-                cost = ARENA_TEAM_CHARTER_2v2_COST;
+                cost = sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_2v2);
                 type = ARENA_TEAM_CHARTER_2v2_TYPE;
                 break;
             case 2:
                 charterid = ARENA_TEAM_CHARTER_3v3;
-                cost = ARENA_TEAM_CHARTER_3v3_COST;
+                cost = sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_3v3);
                 type = ARENA_TEAM_CHARTER_3v3_TYPE;
                 break;
             case 3:
                 charterid = ARENA_TEAM_CHARTER_5v5;
-                cost = ARENA_TEAM_CHARTER_5v5_COST;
+                cost = sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_5v5);
                 type = ARENA_TEAM_CHARTER_5v5_TYPE;
                 break;
             default:
@@ -180,7 +172,8 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recvData)
     }
 
     if (!_player->HasEnoughMoney(cost))
-    {                                                       //player hasn't got enough money
+    {
+        //player hasn't got enough money
         _player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, creature, charterid, 0);
         return;
     }
@@ -189,7 +182,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recvData)
     InventoryResult msg = _player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, charterid, pProto->BuyCount);
     if (msg != EQUIP_ERR_OK)
     {
-        _player->SendEquipError(msg, NULL, NULL, charterid);
+        _player->SendEquipError(msg, nullptr, nullptr, charterid);
         return;
     }
 
@@ -211,7 +204,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recvData)
 
     CharacterDatabase.EscapeString(name);
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    
+
     if (petition)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -268,7 +261,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_PETITION_SHOW_SIGNATURES petition entry: '%u'", petitionGuidLow);
 #endif
 
-    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8+8+4+1+signs*12));
+    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
     data << uint64(petitionguid);                           // petition guid
     data << uint64(_player->GetGUID());                     // owner guid
     data << uint32(petitionGuidLow);                        // guild guid
@@ -284,7 +277,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
     SendPacket(&data);
 }
 
-void WorldSession::HandlePetitionQueryOpcode(WorldPacket & recvData)
+void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_QUERY");   // ok
@@ -313,7 +306,7 @@ void WorldSession::SendPetitionQueryOpcode(uint64 petitionguid)
     }
 
     uint8 type = petition->petitionType;
-    WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4+8+petition->petitionName.size()+1+1+4*12+2+10));
+    WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4 + 8 + petition->petitionName.size() + 1 + 1 + 4 * 12 + 2 + 10));
     data << uint32(GUID_LOPART(petitionguid));              // guild/team guid (in Trinity always same as GUID_LOPART(petition guid)
     data << MAKE_NEW_GUID(petition->ownerGuid, 0, HIGHGUID_PLAYER);    // charter owner guid
     data << petition->petitionName;                                    // name (guild/arena team)
@@ -327,8 +320,8 @@ void WorldSession::SendPetitionQueryOpcode(uint64 petitionguid)
     }
     else
     {
-        data << uint32(type-1);
-        data << uint32(type-1);
+        data << uint32(type - 1);
+        data << uint32(type - 1);
         data << uint32(type);                               // bypass client - side limitation, a different value is needed here for each petition
     }
     data << uint32(0);                                      // 5
@@ -350,7 +343,7 @@ void WorldSession::SendPetitionQueryOpcode(uint64 petitionguid)
     SendPacket(&data);
 }
 
-void WorldSession::HandlePetitionRenameOpcode(WorldPacket & recvData)
+void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode MSG_PETITION_RENAME");   // ok
@@ -415,13 +408,13 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket & recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Petition (GUID: %u) renamed to '%s'", GUID_LOPART(petitionGuid), newName.c_str());
 #endif
-    WorldPacket data(MSG_PETITION_RENAME, (8+newName.size()+1));
+    WorldPacket data(MSG_PETITION_RENAME, (8 + newName.size() + 1));
     data << uint64(petitionGuid);
     data << newName;
     SendPacket(&data);
 }
 
-void WorldSession::HandlePetitionSignOpcode(WorldPacket & recvData)
+void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_SIGN");    // ok
@@ -499,14 +492,14 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recvData)
         }
     }
 
-    
+
     uint32 signs = signatures->signatureMap.size();
     if (++signs > type)                                        // client signs maximum
         return;
 
     // Client doesn't allow to sign petition two times by one character, but not check sign by another character from same account
     // not allow sign another player from already sign player account
- 
+
     bool found = false;
     for (SignatureMap::const_iterator itr = signatures->signatureMap.begin(); itr != signatures->signatureMap.end(); ++itr)
         if (itr->second == GetAccountId())
@@ -517,7 +510,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recvData)
 
     if (found)
     {
-        WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8+8+4));
+        WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
         data << uint64(petitionGuid);
         data << uint64(_player->GetGUID());
         data << (uint32)PETITION_SIGN_ALREADY_SIGNED;
@@ -547,7 +540,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "PETITION SIGN: GUID %u by player: %s (GUID: %u Account: %u)", GUID_LOPART(petitionGuid), _player->GetName().c_str(), playerGuid, GetAccountId());
 #endif
 
-    WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8+8+4));
+    WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
     data << uint64(petitionGuid);
     data << uint64(_player->GetGUID());
     data << uint32(PETITION_SIGN_OK);
@@ -565,7 +558,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recvData)
         owner->GetSession()->SendPacket(&data);
 }
 
-void WorldSession::HandlePetitionDeclineOpcode(WorldPacket & recvData)
+void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode MSG_PETITION_DECLINE");  // ok
@@ -591,7 +584,7 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket & recvData)
     }
 }
 
-void WorldSession::HandleOfferPetitionOpcode(WorldPacket & recvData)
+void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_OFFER_PETITION");   // ok
@@ -665,7 +658,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket & recvData)
     Signatures const* signatures = sPetitionMgr->GetSignature(GUID_LOPART(petitionguid));
     uint8 signs = signatures ? signatures->signatureMap.size() : 0;
 
-    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8+8+4+signs+signs*12));
+    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + signs + signs * 12));
     data << uint64(petitionguid);                           // petition guid
     data << uint64(_player->GetGUID());                     // owner guid
     data << uint32(GUID_LOPART(petitionguid));              // guild guid
@@ -681,7 +674,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket & recvData)
     player->GetSession()->SendPacket(&data);
 }
 
-void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recvData)
+void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_TURN_IN_PETITION");
@@ -769,7 +762,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recvData)
     if (type == GUILD_CHARTER_TYPE)
         requiredSignatures = sWorld->getIntConfig(CONFIG_MIN_PETITION_SIGNS);
     else
-        requiredSignatures = type-1;
+        requiredSignatures = type - 1;
 
     // Notify player if signatures are missing
     if (signs < requiredSignatures)
@@ -863,7 +856,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recvData)
     SendPacket(&data);
 }
 
-void WorldSession::HandlePetitionShowListOpcode(WorldPacket & recvData)
+void WorldSession::HandlePetitionShowListOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received CMSG_PETITION_SHOWLIST");
@@ -886,7 +879,7 @@ void WorldSession::SendPetitionShowList(uint64 guid)
         return;
     }
 
-    WorldPacket data(SMSG_PETITION_SHOWLIST, 8+1+4*6);
+    WorldPacket data(SMSG_PETITION_SHOWLIST, 8 + 1 + 4 * 6);
     data << guid;                                           // npc guid
 
     if (creature->IsTabardDesigner())
@@ -895,7 +888,7 @@ void WorldSession::SendPetitionShowList(uint64 guid)
         data << uint32(1);                                  // index
         data << uint32(GUILD_CHARTER);                      // charter entry
         data << uint32(CHARTER_DISPLAY_ID);                 // charter display id
-        data << uint32(GUILD_CHARTER_COST);                 // charter cost
+        data << uint32(sWorld->getIntConfig(CONFIG_CHARTER_COST_GUILD)); // charter cost
         data << uint32(0);                                  // unknown
         data << uint32(sWorld->getIntConfig(CONFIG_MIN_PETITION_SIGNS)); // required signs
     }
@@ -906,21 +899,21 @@ void WorldSession::SendPetitionShowList(uint64 guid)
         data << uint32(1);                                  // index
         data << uint32(ARENA_TEAM_CHARTER_2v2);             // charter entry
         data << uint32(CHARTER_DISPLAY_ID);                 // charter display id
-        data << uint32(ARENA_TEAM_CHARTER_2v2_COST);        // charter cost
+        data << uint32(sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_2v2)); // charter cost
         data << uint32(2);                                  // unknown
         data << uint32(2);                                  // required signs?
         // 3v3
         data << uint32(2);                                  // index
         data << uint32(ARENA_TEAM_CHARTER_3v3);             // charter entry
         data << uint32(CHARTER_DISPLAY_ID);                 // charter display id
-        data << uint32(ARENA_TEAM_CHARTER_3v3_COST);        // charter cost
+        data << uint32(sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_3v3)); // charter cost
         data << uint32(3);                                  // unknown
         data << uint32(3);                                  // required signs?
         // 5v5
         data << uint32(3);                                  // index
         data << uint32(ARENA_TEAM_CHARTER_5v5);             // charter entry
         data << uint32(CHARTER_DISPLAY_ID);                 // charter display id
-        data << uint32(ARENA_TEAM_CHARTER_5v5_COST);        // charter cost
+        data << uint32(sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_5v5)); // charter cost
         data << uint32(5);                                  // unknown
         data << uint32(5);                                  // required signs?
     }

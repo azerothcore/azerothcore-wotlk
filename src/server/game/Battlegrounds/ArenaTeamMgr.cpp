@@ -39,7 +39,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamById(uint32 arenaTeamId) const
     if (itr != ArenaTeamStore.end())
         return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(const std::string& arenaTeamName) const
@@ -53,7 +53,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(const std::string& arenaTeamName) co
         if (search == teamName)
             return itr->second;
     }
-    return NULL;
+    return nullptr;
 }
 
 ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid) const
@@ -62,7 +62,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid) const
         if (itr->second->GetCaptain() == guid)
             return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 void ArenaTeamMgr::AddArenaTeam(ArenaTeam* arenaTeam)
@@ -94,8 +94,8 @@ void ArenaTeamMgr::LoadArenaTeams()
 
     //                                                        0        1         2         3          4              5            6            7           8
     QueryResult result = CharacterDatabase.Query("SELECT arenaTeamId, name, captainGuid, type, backgroundColor, emblemStyle, emblemColor, borderStyle, borderColor, "
-    //      9        10        11         12           13       14
-        "rating, weekGames, weekWins, seasonGames, seasonWins, rank FROM arena_team ORDER BY arenaTeamId ASC");
+                         //      9        10        11         12           13        14
+                         "rating, weekGames, weekWins, seasonGames, seasonWins, `rank` FROM arena_team ORDER BY arenaTeamId ASC");
 
     if (!result)
     {
@@ -105,12 +105,12 @@ void ArenaTeamMgr::LoadArenaTeams()
     }
 
     QueryResult result2 = CharacterDatabase.Query(
-        //              0              1           2             3              4                 5          6     7          8                  9      10
-        "SELECT arenaTeamId, atm.guid, atm.weekGames, atm.weekWins, atm.seasonGames, atm.seasonWins, c.name, class, personalRating, matchMakerRating, maxMMR FROM arena_team_member atm"
-        " INNER JOIN arena_team ate USING (arenaTeamId)"
-        " LEFT JOIN characters AS c ON atm.guid = c.guid"
-        " LEFT JOIN character_arena_stats AS cas ON c.guid = cas.guid AND (cas.slot = 0 AND ate.type = 2 OR cas.slot = 1 AND ate.type = 3 OR cas.slot = 2 AND ate.type = 5)"
-        " ORDER BY atm.arenateamid ASC");
+                              //              0              1           2             3              4                 5          6     7          8                  9      10
+                              "SELECT arenaTeamId, atm.guid, atm.weekGames, atm.weekWins, atm.seasonGames, atm.seasonWins, c.name, class, personalRating, matchMakerRating, maxMMR FROM arena_team_member atm"
+                              " INNER JOIN arena_team ate USING (arenaTeamId)"
+                              " LEFT JOIN characters AS c ON atm.guid = c.guid"
+                              " LEFT JOIN character_arena_stats AS cas ON c.guid = cas.guid AND (cas.slot = 0 AND ate.type = 2 OR cas.slot = 1 AND ate.type = 3 OR cas.slot = 2 AND ate.type = 5)"
+                              " ORDER BY atm.arenateamid ASC");
 
     uint32 count = 0;
     do
@@ -119,7 +119,7 @@ void ArenaTeamMgr::LoadArenaTeams()
 
         if (!newArenaTeam->LoadArenaTeamFromDB(result) || !newArenaTeam->LoadMembersFromDB(result2))
         {
-            newArenaTeam->Disband(NULL);
+            newArenaTeam->Disband(nullptr);
             delete newArenaTeam;
             continue;
         }
@@ -127,8 +127,7 @@ void ArenaTeamMgr::LoadArenaTeams()
         AddArenaTeam(newArenaTeam);
 
         ++count;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     sLog->outString(">> Loaded %u arena teams in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
