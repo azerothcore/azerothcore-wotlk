@@ -29,7 +29,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 114;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 114);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(114, 0, 0, 0, 2, 0, 100, 0, 1, 3, 0, 0, 11, 13496, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Harvest Watcher - Between 1-3% Health - Cast \'13496\'');
+(114, 0, 0, 0, 2, 0, 100, 0, 1, 5, 0, 0, 11, 13496, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Harvest Watcher - Between 1-5% Health - Cast \'13496\'');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 7051;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 7051);
@@ -54,12 +54,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 36;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 36);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(36, 0, 0, 0, 2, 0, 100, 0, 1, 3, 0, 0, 11, 13496, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Harvest Golem - Between 1-3% Health - Cast \'13496\'');
+(36, 0, 0, 0, 2, 0, 100, 0, 1, 5, 0, 0, 11, 13496, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Harvest Golem - Between 1-5% Health - Cast \'13496\'');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 596;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 596);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(596, 0, 0, 0, 2, 0, 100, 1, 30, 60, 0, 0, 11, 20883, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Brainwashed Noble - Between 30-60% Health - Cast \'20883\' (No Repeat)');
+(596, 0, 0, 0, 0, 0, 100, 0, 2300, 4100, 7400, 9800, 11, 20883, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Brainwashed Noble - In Combat - Cast \'20883\''),
+(596, 0, 1, 0, 2, 0, 100, 1, 30, 60, 0, 0, 11, 6117, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Brainwashed Noble - Between 30-60% Health - Cast \'6117\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1216;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 1216);
