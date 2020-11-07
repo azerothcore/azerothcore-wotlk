@@ -679,18 +679,16 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 1:
                     me->MonsterYell("Prepare yourselves, the bells have tolled! Shelter your weak, your young and your old! Each of you shall pay the final sum! Cry for mercy; the reckoning has come!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(11966);
-                    events.PopEvent();
                     break;
                 case 2:
                     {
                         if (Unit* trigger = getTrigger())
                             me->CastSpell(trigger, SPELL_START_FIRE, true);
-                        events.PopEvent();
                         break;
                     }
                 case 3:
@@ -710,7 +708,6 @@ public:
                                         }
 
                                 FinishEvent(failed);
-                                events.PopEvent();
                             }
                             return;
                         }
@@ -1103,7 +1100,7 @@ public:
             if (inFight && !UpdateVictim())
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_HH_PLAYER_TALK:
                     {
@@ -1132,7 +1129,6 @@ public:
                             case 4:
                                 me->CastSpell(me, SPELL_SHAKE_CAMERA_MEDIUM, true);
                                 player->MonsterSay("Now, know demise!", LANG_UNIVERSAL, 0);
-                                events.PopEvent();
                                 talkCount = 0;
                                 return; // pop and return, skip repeat
                         }
@@ -1147,7 +1143,6 @@ public:
                             AttackStart(player);
                             me->GetMotionMaster()->MoveChase(player);
                         }
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_HORSEMAN_CLEAVE:
@@ -1173,7 +1168,6 @@ public:
                         if (me->GetHealth() == me->GetMaxHealth())
                         {
                             me->CastSpell(me, SPELL_BODY_RESTORED_INFO, true);
-                            events.PopEvent();
                             return;
                         }
 

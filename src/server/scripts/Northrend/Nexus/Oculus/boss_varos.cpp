@@ -154,7 +154,7 @@ public:
 
             DoMeleeAttackIfReady();
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -172,7 +172,7 @@ public:
                     {
                         Talk(SAY_AZURE);
                         Talk(SAY_AZURE_EMOTE);
-                        switch( events.GetEvent() )
+                        switch( events.ExecuteEvent() )
                         {
                             case EVENT_CALL_AZURE_RING_CAPTAIN_1:
                                 me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_1, true);
@@ -201,7 +201,6 @@ public:
                                 trigger->CastSpell(me, SPELL_ARCANE_BEAM_PERIODIC_DAMAGE, true);
                             }
                         }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ENERGIZE_CORES_THIN:
@@ -210,7 +209,6 @@ public:
                         me->DisableRotate(false);
                         me->SetOrientation(ZapAngle);
                         me->CastSpell(me, SPELL_ENERGIZE_CORES_THIN, true);
-                        events.PopEvent();
                         events.ScheduleEvent(EVENT_ENERGIZE_CORES_DAMAGE, 4500);
                     }
                     break;
@@ -225,7 +223,6 @@ public:
                         ZapAngle += M_PI / 2;
                         if( ZapAngle >= 2 * M_PI )
                             ZapAngle -= 2 * M_PI;
-                        events.PopEvent();
                         events.ScheduleEvent(EVENT_ENERGIZE_CORES_THIN, 2000);
                     }
                     break;
