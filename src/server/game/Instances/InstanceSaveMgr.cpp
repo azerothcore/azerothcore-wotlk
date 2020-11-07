@@ -60,19 +60,19 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
     if (!entry)
     {
         sLog->outError("InstanceSaveManager::AddInstanceSave: wrong mapid = %d, instanceid = %d!", mapId, instanceId);
-        return NULL;
+        return nullptr;
     }
 
     if (instanceId == 0)
     {
         sLog->outError("InstanceSaveManager::AddInstanceSave: mapid = %d, wrong instanceid = %d!", mapId, instanceId);
-        return NULL;
+        return nullptr;
     }
 
     if (difficulty >= (entry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
     {
         sLog->outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong dificalty %u!", mapId, instanceId, difficulty);
-        return NULL;
+        return nullptr;
     }
 
     time_t resetTime, extendedResetTime;
@@ -83,7 +83,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
     }
     else
     {
-        resetTime = time(NULL) + 3*DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
+        resetTime = time(nullptr) + 3 * DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
         extendedResetTime = 0;
     }
     InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, resetTime, extendedResetTime);
@@ -97,7 +97,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
 InstanceSave* InstanceSaveManager::GetInstanceSave(uint32 InstanceId)
 {
     InstanceSaveHashMap::iterator itr = m_instanceSaveById.find(InstanceId);
-    return itr != m_instanceSaveById.end() ? itr->second : NULL;
+    return itr != m_instanceSaveById.end() ? itr->second : nullptr;
 }
 
 bool InstanceSaveManager::DeleteInstanceSaveIfNeeded(uint32 InstanceId, bool skipMapCheck)
@@ -132,7 +132,7 @@ bool InstanceSaveManager::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool sk
 }
 
 InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, time_t extendedResetTime)
-: m_resetTime(resetTime), m_extendedResetTime(extendedResetTime), m_instanceid(InstanceId), m_mapid(MapId), m_difficulty(IsSharedDifficultyMap(MapId) ? Difficulty(difficulty%2) : difficulty), m_canReset(true), m_instanceData(""), m_completedEncounterMask(0)
+    : m_resetTime(resetTime), m_extendedResetTime(extendedResetTime), m_instanceid(InstanceId), m_mapid(MapId), m_difficulty(IsSharedDifficultyMap(MapId) ? Difficulty(difficulty % 2) : difficulty), m_canReset(true), m_instanceData(""), m_completedEncounterMask(0)
 {
 }
 
@@ -245,7 +245,7 @@ void InstanceSaveManager::LoadInstances()
 
 void InstanceSaveManager::LoadResetTimes()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     time_t today = (now / DAY) * DAY;
 
     // load the global respawn times for raid/heroic instances
@@ -284,7 +284,7 @@ void InstanceSaveManager::LoadResetTimes()
             continue;
 
         // the reset_delay must be at least one day
-        uint32 period = uint32(((mapDiff->resetTime * sWorld->getRate(RATE_INSTANCE_RESET_TIME))/DAY) * DAY);
+        uint32 period = uint32(((mapDiff->resetTime * sWorld->getRate(RATE_INSTANCE_RESET_TIME)) / DAY) * DAY);
         if (period < DAY)
             period = DAY;
 
@@ -311,10 +311,10 @@ void InstanceSaveManager::LoadResetTimes()
         // schedule the global reset/warning
         uint8 type;
         for (type = 1; type < 5; ++type)
-            if (now + ResetTimeDelay[type-1] < t)
+            if (now + ResetTimeDelay[type - 1] < t)
                 break;
 
-        ScheduleReset(t - ResetTimeDelay[type-1], InstResetEvent(type, mapid, difficulty));
+        ScheduleReset(t - ResetTimeDelay[type - 1], InstResetEvent(type, mapid, difficulty));
     }
 }
 
@@ -345,8 +345,7 @@ void InstanceSaveManager::LoadInstanceSaves()
                 if (resettime > 0)
                     save->SetResetTime(resettime);
             }
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 }
 
@@ -396,8 +395,7 @@ void InstanceSaveManager::LoadCharacterBinds()
                 if (perm)
                     save->SetCanReset(false);
             }
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 
     lock_instLists = false;
@@ -410,7 +408,7 @@ void InstanceSaveManager::ScheduleReset(time_t time, InstResetEvent event)
 
 void InstanceSaveManager::Update()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     time_t t;
     bool resetOccurred = false;
 
@@ -420,7 +418,7 @@ void InstanceSaveManager::Update()
         if (t >= now)
             break;
 
-        InstResetEvent &event = m_resetTimeQueue.begin()->second;
+        InstResetEvent& event = m_resetTimeQueue.begin()->second;
         if (event.type)
         {
             // global reset/warning for a certain map
@@ -431,7 +429,7 @@ void InstanceSaveManager::Update()
             {
                 // schedule the next warning/reset
                 ++event.type;
-                ScheduleReset(resetTime - ResetTimeDelay[event.type-1], event);
+                ScheduleReset(resetTime - ResetTimeDelay[event.type - 1], event);
             }
             else
                 resetOccurred = true;
@@ -453,11 +451,11 @@ void InstanceSaveManager::Update()
     }
 }
 
-void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator &itr)
+void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator& itr)
 {
     lock_instLists = true;
 
-    InstanceSave::PlayerListType &pList = itr->second->m_playerList;
+    InstanceSave::PlayerListType& pList = itr->second->m_playerList;
     for (InstanceSave::PlayerListType::iterator iter = pList.begin(), iter2; iter != pList.end(); )
     {
         iter2 = iter++;
@@ -509,7 +507,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
     if (!mapEntry->Instanceable())
         return;
 
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
 
     if (!warn)
     {
@@ -523,14 +521,14 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         // calculate the next reset time
         uint32 diff = sWorld->getIntConfig(CONFIG_INSTANCE_RESET_TIME_HOUR) * HOUR;
 
-        uint32 period = uint32(((mapDiff->resetTime * sWorld->getRate(RATE_INSTANCE_RESET_TIME))/DAY) * DAY);
+        uint32 period = uint32(((mapDiff->resetTime * sWorld->getRate(RATE_INSTANCE_RESET_TIME)) / DAY) * DAY);
         if (period < DAY)
             period = DAY;
 
         uint32 next_reset = uint32(((resetTime + MINUTE) / DAY * DAY) + period + diff);
         SetResetTimeFor(mapid, difficulty, next_reset);
         SetExtendedResetTimeFor(mapid, difficulty, next_reset + period);
-        ScheduleReset(time_t(next_reset-3600), InstResetEvent(1, mapid, difficulty));
+        ScheduleReset(time_t(next_reset - 3600), InstResetEvent(1, mapid, difficulty));
 
         // update it in the DB
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GLOBAL_INSTANCE_RESETTIME);
@@ -551,7 +549,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
 
     // now loop all existing maps to warn / reset
     Map const* map = sMapMgr->CreateBaseMap(mapid);
-    MapInstanced::InstancedMaps &instMaps = ((MapInstanced*)map)->GetInstancedMaps();
+    MapInstanced::InstancedMaps& instMaps = ((MapInstanced*)map)->GetInstancedMaps();
     MapInstanced::InstancedMaps::iterator mitr;
     uint32 timeLeft;
 
@@ -573,7 +571,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         else
         {
             InstanceSave* save = GetInstanceSave(map2->GetInstanceId());
-            map2->ToInstanceMap()->Reset(INSTANCE_RESET_GLOBAL, (save ? &(save->m_playerList) : NULL));
+            map2->ToInstanceMap()->Reset(INSTANCE_RESET_GLOBAL, (save ? & (save->m_playerList) : nullptr));
         }
     }
 }
@@ -692,28 +690,28 @@ void InstanceSaveManager::PlayerUnbindInstanceNotExtended(uint32 guidLow, uint32
 
 InstancePlayerBind* InstanceSaveManager::PlayerGetBoundInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty)
 {
-    Difficulty difficulty_fixed = ( IsSharedDifficultyMap(mapid) ? Difficulty(difficulty%2) : difficulty);
+    Difficulty difficulty_fixed = ( IsSharedDifficultyMap(mapid) ? Difficulty(difficulty % 2) : difficulty);
 
     MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(mapid, difficulty_fixed);
     if (!mapDiff)
-        return NULL;
+        return nullptr;
 
-    BoundInstancesMapWrapper* w = NULL;
+    BoundInstancesMapWrapper* w = nullptr;
     PlayerBindStorage::const_iterator itr = playerBindStorage.find(guidLow);
     if (itr != playerBindStorage.end())
         w = itr->second;
     else
-        return NULL;
+        return nullptr;
 
     BoundInstancesMap::iterator itr2 = w->m[difficulty_fixed].find(mapid);
     if (itr2 != w->m[difficulty_fixed].end())
         return &itr2->second;
     else
-        return NULL;
+        return nullptr;
 }
 
 bool InstanceSaveManager::PlayerIsPermBoundToInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty)
-{ 
+{
     if (InstancePlayerBind* bind = PlayerGetBoundInstance(guidLow, mapid, difficulty))
         if (bind->perm)
             return true;
@@ -737,7 +735,7 @@ void InstanceSaveManager::PlayerCreateBoundInstancesMaps(uint32 guidLow)
 InstanceSave* InstanceSaveManager::PlayerGetInstanceSave(uint32 guidLow, uint32 mapid, Difficulty difficulty)
 {
     InstancePlayerBind* pBind = PlayerGetBoundInstance(guidLow, mapid, difficulty);
-    return (pBind ? pBind->save : NULL);
+    return (pBind ? pBind->save : nullptr);
 }
 
 uint32 InstanceSaveManager::PlayerGetDestinationInstanceId(Player* player, uint32 mapid, Difficulty difficulty)
@@ -773,7 +771,7 @@ void InstanceSaveManager::CopyBinds(uint32 from, uint32 to, Player* toPlr)
 
 void InstanceSaveManager::UnbindAllFor(InstanceSave* save)
 {
-    InstanceSave::PlayerListType &pList = save->m_playerList;
+    InstanceSave::PlayerListType& pList = save->m_playerList;
     while (!pList.empty())
         PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::GetObjectInOrOutOfWorld(MAKE_NEW_GUID(*(pList.begin()), 0, HIGHGUID_PLAYER), (Player*)NULL));
 }

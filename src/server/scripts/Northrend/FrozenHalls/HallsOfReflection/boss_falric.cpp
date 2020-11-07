@@ -129,7 +129,7 @@ public:
             if ((uiHopelessnessCount == 0 && HealthBelowPct(67)) || (uiHopelessnessCount == 1 && HealthBelowPct(34)) || (uiHopelessnessCount == 2 && HealthBelowPct(11)))
             {
                 if (uiHopelessnessCount)
-                    me->RemoveOwnedAura(hopelessnessId[uiHopelessnessCount-1][DUNGEON_MODE(0, 1)]);
+                    me->RemoveOwnedAura(hopelessnessId[uiHopelessnessCount - 1][DUNGEON_MODE(0, 1)]);
                 me->CastSpell((Unit*)NULL, hopelessnessId[uiHopelessnessCount][DUNGEON_MODE(0, 1)], true);
                 ++uiHopelessnessCount;
             }
