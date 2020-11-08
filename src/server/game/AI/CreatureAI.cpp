@@ -114,15 +114,21 @@ void CreatureAI::MoveInLineOfSight(Unit* who)
 {
     if (me->GetVictim())
         return;
+	
+	if (me->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET) // non-combat pets should just stand there and look good;)
+        return;
+
+    // Northshire Abbey - wolves fix. They can call assistance only outside the starting zone.
+    if (me->ToUnit()->getLevel() < 5 && me->GetAreaId() == 9)
+        return;
 
     // pussywizard: civilian, non-combat pet or any other NOT HOSTILE TO ANYONE (!)
     if (me->IsMoveInLineOfSightDisabled())
-        if (me->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET ||      // nothing more to do, return
-                !who->IsInCombat() ||                                         // if not in combat, nothing more to do
+        if (!who->IsInCombat() ||                                         // if not in combat, nothing more to do
                 !me->IsWithinDist(who, ATTACK_DISTANCE))                      // if in combat and in dist - neutral to all can actually assist other creatures
             return;
 
-    if (me->CanStartAttack(who))
+    if (me->HasReactState(REACT_AGGRESSIVE) && me->CanStartAttack(who))
         AttackStart(who);
 }
 

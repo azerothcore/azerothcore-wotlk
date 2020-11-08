@@ -124,18 +124,18 @@ void HostileReference::fireStatusChanged(ThreatRefStatusChangeEvent& threatRefSt
 
 void HostileReference::addThreat(float modThreat)
 {
+	if (!modThreat)
+        return;
+
     iThreat += modThreat;
     // the threat is changed. Source and target unit have to be available
     // if the link was cut before relink it again
     if (!isOnline())
         updateOnlineStatus();
-    if (modThreat != 0.0f)
-    {
-        ThreatRefStatusChangeEvent event(UEV_THREAT_REF_THREAT_CHANGE, this, modThreat);
-        fireStatusChanged(event);
-    }
+    ThreatRefStatusChangeEvent event(UEV_THREAT_REF_THREAT_CHANGE, this, modThreat);
+    fireStatusChanged(event);
 
-    if (isValid() && modThreat >= 0.0f)
+    if (isValid() && modThreat > 0.0f)
     {
         Unit* victimOwner = getTarget()->GetCharmerOrOwner();
         if (victimOwner && victimOwner->IsAlive())
@@ -145,14 +145,7 @@ void HostileReference::addThreat(float modThreat)
 
 void HostileReference::addThreatPercent(int32 percent)
 {
-    // Xinef: Do not allow to modify threat by percent if threat is negative (forced to big value < 0 by spells adding temporary threat)
-    // Xinef: When the temporary effect ends, temporary threat is added back which results in huge additional amount of threat
-    if (iThreat <= 0)
-        return;
-
-    float tmpThreat = iThreat;
-    AddPct(tmpThreat, percent);
-    addThreat(tmpThreat - iThreat);
+    addThreat(CalculatePct(iThreat, percent));
 }
 
 //============================================================
