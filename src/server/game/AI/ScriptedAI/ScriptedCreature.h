@@ -80,7 +80,7 @@ public:
     void DespawnAll();
 
     template <typename T>
-    void DespawnIf(T const &predicate)
+    void DespawnIf(T const& predicate)
     {
         storage_.remove_if(predicate);
     }
@@ -135,25 +135,25 @@ private:
 
 class EntryCheckPredicate
 {
-    public:
-        EntryCheckPredicate(uint32 entry) : _entry(entry) {}
-        bool operator()(uint64 guid) { return GUID_ENPART(guid) == _entry; }
+public:
+    EntryCheckPredicate(uint32 entry) : _entry(entry) {}
+    bool operator()(uint64 guid) { return GUID_ENPART(guid) == _entry; }
 
-    private:
-        uint32 _entry;
+private:
+    uint32 _entry;
 };
 
 class PlayerOrPetCheck
 {
-    public:
-        bool operator() (WorldObject* unit) const
-        {
-            if (unit->GetTypeId() != TYPEID_PLAYER)
-                if (!IS_PLAYER_GUID(unit->ToUnit()->GetOwnerGUID()))
-                    return true;
+public:
+    bool operator() (WorldObject* unit) const
+    {
+        if (unit->GetTypeId() != TYPEID_PLAYER)
+            if (!IS_PLAYER_GUID(unit->ToUnit()->GetOwnerGUID()))
+                return true;
 
-            return false;
-        }
+        return false;
+    }
 };
 
 struct ScriptedAI : public CreatureAI
@@ -353,92 +353,92 @@ struct ScriptedAI : public CreatureAI
 
     Player* SelectTargetFromPlayerList(float maxdist, uint32 excludeAura = 0, bool mustBeInLOS = false) const;
 
-    private:
-        Difficulty _difficulty;
-        uint32 _evadeCheckCooldown;
-        bool _isCombatMovementAllowed;
-        bool _isHeroic;
+private:
+    Difficulty _difficulty;
+    uint32 _evadeCheckCooldown;
+    bool _isCombatMovementAllowed;
+    bool _isHeroic;
 };
 
 class BossAI : public ScriptedAI
 {
-    public:
-        BossAI(Creature* creature, uint32 bossId);
-        virtual ~BossAI() {}
+public:
+    BossAI(Creature* creature, uint32 bossId);
+    virtual ~BossAI() {}
 
-        InstanceScript* const instance;
-        BossBoundaryMap const* GetBoundary() const { return _boundary; }
+    InstanceScript* const instance;
+    BossBoundaryMap const* GetBoundary() const { return _boundary; }
 
-        void JustSummoned(Creature* summon);
-        void SummonedCreatureDespawn(Creature* summon);
+    void JustSummoned(Creature* summon);
+    void SummonedCreatureDespawn(Creature* summon);
 
-        virtual void UpdateAI(uint32 diff);
+    virtual void UpdateAI(uint32 diff);
 
-        // Hook used to execute events scheduled into EventMap without the need
-        // to override UpdateAI
-        // note: You must re-schedule the event within this method if the event
-        // is supposed to run more than once
-        virtual void ExecuteEvent(uint32 /*eventId*/) { }
+    // Hook used to execute events scheduled into EventMap without the need
+    // to override UpdateAI
+    // note: You must re-schedule the event within this method if the event
+    // is supposed to run more than once
+    virtual void ExecuteEvent(uint32 /*eventId*/) { }
 
-        void Reset() { _Reset(); }
-        void EnterCombat(Unit* /*who*/) { _EnterCombat(); }
-        void JustDied(Unit* /*killer*/) { _JustDied(); }
-        void JustReachedHome() { _JustReachedHome(); }
+    void Reset() { _Reset(); }
+    void EnterCombat(Unit* /*who*/) { _EnterCombat(); }
+    void JustDied(Unit* /*killer*/) { _JustDied(); }
+    void JustReachedHome() { _JustReachedHome(); }
 
-    protected:
-        void _Reset();
-        void _EnterCombat();
-        void _JustDied();
-        void _JustReachedHome() { me->setActive(false); }
+protected:
+    void _Reset();
+    void _EnterCombat();
+    void _JustDied();
+    void _JustReachedHome() { me->setActive(false); }
 
-        bool CheckInRoom()
-        {
-            if (CheckBoundary(me))
-                return true;
+    bool CheckInRoom()
+    {
+        if (CheckBoundary(me))
+            return true;
 
-            EnterEvadeMode();
-            return false;
-        }
+        EnterEvadeMode();
+        return false;
+    }
 
-        bool CheckBoundary(Unit* who);
-        void TeleportCheaters();
+    bool CheckBoundary(Unit* who);
+    void TeleportCheaters();
 
-        EventMap events;
-        SummonList summons;
+    EventMap events;
+    SummonList summons;
 
-    private:
-        BossBoundaryMap const* const _boundary;
-        uint32 const _bossId;
+private:
+    BossBoundaryMap const* const _boundary;
+    uint32 const _bossId;
 };
 
 class WorldBossAI : public ScriptedAI
 {
-    public:
-        WorldBossAI(Creature* creature);
-        virtual ~WorldBossAI() {}
+public:
+    WorldBossAI(Creature* creature);
+    virtual ~WorldBossAI() {}
 
-        void JustSummoned(Creature* summon);
-        void SummonedCreatureDespawn(Creature* summon);
+    void JustSummoned(Creature* summon);
+    void SummonedCreatureDespawn(Creature* summon);
 
-        virtual void UpdateAI(uint32 diff);
+    virtual void UpdateAI(uint32 diff);
 
-        // Hook used to execute events scheduled into EventMap without the need
-        // to override UpdateAI
-        // note: You must re-schedule the event within this method if the event
-        // is supposed to run more than once
-        virtual void ExecuteEvent(uint32 /*eventId*/) { }
+    // Hook used to execute events scheduled into EventMap without the need
+    // to override UpdateAI
+    // note: You must re-schedule the event within this method if the event
+    // is supposed to run more than once
+    virtual void ExecuteEvent(uint32 /*eventId*/) { }
 
-        void Reset() { _Reset(); }
-        void EnterCombat(Unit* /*who*/) { _EnterCombat(); }
-        void JustDied(Unit* /*killer*/) { _JustDied(); }
+    void Reset() { _Reset(); }
+    void EnterCombat(Unit* /*who*/) { _EnterCombat(); }
+    void JustDied(Unit* /*killer*/) { _JustDied(); }
 
-    protected:
-        void _Reset();
-        void _EnterCombat();
-        void _JustDied();
+protected:
+    void _Reset();
+    void _EnterCombat();
+    void _JustDied();
 
-        EventMap events;
-        SummonList summons;
+    EventMap events;
+    SummonList summons;
 };
 
 // SD2 grid searchers.

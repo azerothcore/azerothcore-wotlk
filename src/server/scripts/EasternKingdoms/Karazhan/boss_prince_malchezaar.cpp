@@ -94,7 +94,7 @@ public:
         uint32 HellfireTimer;
         uint32 CleanupTimer;
         uint64 malchezaar;
-        InfernalPoint *point;
+        InfernalPoint* point;
 
         void Reset() { }
         void EnterCombat(Unit* /*who*/) { }
@@ -143,7 +143,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit* done_by, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             if (!done_by || done_by->GetGUID() != malchezaar)
                 damage = 0;
@@ -246,7 +246,7 @@ public:
             if (!info)
                 return;
 
-            ThreatContainer::StorageType const &t_list = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
             std::vector<Unit*> targets;
 
             if (t_list.empty())
@@ -290,7 +290,7 @@ public:
 
         void SummonInfernal()
         {
-            InfernalPoint *point = 0;
+            InfernalPoint* point = 0;
             Position pos;
 
             if ((me->GetMapId() == 532))
@@ -442,82 +442,82 @@ public:
             }
 
             DoMeleeAttackIfReady();
-            }
-
-        };
-    };
-
-    class prince_axes : public CreatureScript
-    {
-    public:
-        prince_axes() : CreatureScript("prince_axes") { }
-
-        CreatureAI* GetAI(Creature* creature) const override
-        {
-            return GetInstanceAI<prince_axesAI>(creature);
         }
 
-        struct prince_axesAI : public ScriptedAI
-        {
-
-            prince_axesAI(Creature* creature) : ScriptedAI(creature)
-            {
-                Initialize();
-                instance = creature->GetInstanceScript();
-            }
-
-            uint32 AxesTargetSwitchTimer;
-            InstanceScript* instance;
-
-
-            void Initialize()
-            {
-                AxesTargetSwitchTimer = 7500;
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                me->SetCanDualWield(true);
-            }
-
-            void Reset() override
-            {
-            }
-
-            void EnterCombat(Unit* /*who*/) override
-            {
-                DoZoneInCombat();
-            }
-
-            void changetarget()
-            {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                {
-                    if (me->GetVictim())
-                        DoModifyThreatPercent(me->GetVictim(), -100);
-                    if (target)
-                        me->AddThreat(target, 1000000.0f);
-                }
-            }
-
-            void UpdateAI(uint32 diff) override
-            {
-                if (!UpdateVictim())
-                    return;
-
-                if (AxesTargetSwitchTimer <= diff)
-                {
-                    AxesTargetSwitchTimer = urand(7500, 20000);
-                    changetarget();
-                }
-                else
-                    AxesTargetSwitchTimer -= diff;
-
-                DoMeleeAttackIfReady();
-            }
-        };
     };
+};
 
-    void AddSC_boss_malchezaar()
+class prince_axes : public CreatureScript
+{
+public:
+    prince_axes() : CreatureScript("prince_axes") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        new boss_malchezaar();
-        new prince_axes();
-        new netherspite_infernal();
+        return GetInstanceAI<prince_axesAI>(creature);
     }
+
+    struct prince_axesAI : public ScriptedAI
+    {
+
+        prince_axesAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Initialize();
+            instance = creature->GetInstanceScript();
+        }
+
+        uint32 AxesTargetSwitchTimer;
+        InstanceScript* instance;
+
+
+        void Initialize()
+        {
+            AxesTargetSwitchTimer = 7500;
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetCanDualWield(true);
+        }
+
+        void Reset() override
+        {
+        }
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            DoZoneInCombat();
+        }
+
+        void changetarget()
+        {
+            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+            {
+                if (me->GetVictim())
+                    DoModifyThreatPercent(me->GetVictim(), -100);
+                if (target)
+                    me->AddThreat(target, 1000000.0f);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (AxesTargetSwitchTimer <= diff)
+            {
+                AxesTargetSwitchTimer = urand(7500, 20000);
+                changetarget();
+            }
+            else
+                AxesTargetSwitchTimer -= diff;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+};
+
+void AddSC_boss_malchezaar()
+{
+    new boss_malchezaar();
+    new prince_axes();
+    new netherspite_infernal();
+}

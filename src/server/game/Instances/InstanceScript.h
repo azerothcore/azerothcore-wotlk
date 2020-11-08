@@ -120,116 +120,116 @@ typedef std::map<uint32 /*entry*/, MinionInfo> MinionInfoMap;
 
 class InstanceScript : public ZoneScript
 {
-    public:
+public:
 
-        explicit InstanceScript(Map* map) : instance(map), completedEncounters(0) {}
+    explicit InstanceScript(Map* map) : instance(map), completedEncounters(0) {}
 
-        virtual ~InstanceScript() {}
+    virtual ~InstanceScript() {}
 
-        Map* instance;
+    Map* instance;
 
-        //On creation, NOT load.
-        virtual void Initialize() {}
+    //On creation, NOT load.
+    virtual void Initialize() {}
 
-        //On load
-        virtual void Load(char const* data) { LoadBossState(data); }
+    //On load
+    virtual void Load(char const* data) { LoadBossState(data); }
 
-        //Called when creature is Looted
-        virtual void CreatureLooted(Creature* /*creature*/, LootType) {}
+    //Called when creature is Looted
+    virtual void CreatureLooted(Creature* /*creature*/, LootType) {}
 
-        //When save is needed, this function generates the data
-        virtual std::string GetSaveData() { return GetBossSaveData(); }
+    //When save is needed, this function generates the data
+    virtual std::string GetSaveData() { return GetBossSaveData(); }
 
-        void SaveToDB();
+    void SaveToDB();
 
-        virtual void Update(uint32 /*diff*/) {}
+    virtual void Update(uint32 /*diff*/) {}
 
-        //Used by the map's CanEnter function.
-        //This is to prevent players from entering during boss encounters.
-        virtual bool IsEncounterInProgress() const;
+    //Used by the map's CanEnter function.
+    //This is to prevent players from entering during boss encounters.
+    virtual bool IsEncounterInProgress() const;
 
-        //Called when a player successfully enters the instance.
-        virtual void OnPlayerEnter(Player* /*player*/) {}
+    //Called when a player successfully enters the instance.
+    virtual void OnPlayerEnter(Player* /*player*/) {}
 
-        virtual void OnPlayerAreaUpdate(Player* /*player*/, uint32 /*oldArea*/, uint32 /*newArea*/) {}
+    virtual void OnPlayerAreaUpdate(Player* /*player*/, uint32 /*oldArea*/, uint32 /*newArea*/) {}
 
-        //Handle open / close objects
-        //use HandleGameObject(0, boolen, GO); in OnObjectCreate in instance scripts
-        //use HandleGameObject(GUID, boolen, nullptr); in any other script
-        void HandleGameObject(uint64 guid, bool open, GameObject* go = nullptr);
+    //Handle open / close objects
+    //use HandleGameObject(0, boolen, GO); in OnObjectCreate in instance scripts
+    //use HandleGameObject(GUID, boolen, nullptr); in any other script
+    void HandleGameObject(uint64 guid, bool open, GameObject* go = nullptr);
 
-        //change active state of doors or buttons
-        void DoUseDoorOrButton(uint64 guid, uint32 withRestoreTime = 0, bool useAlternativeState = false);
+    //change active state of doors or buttons
+    void DoUseDoorOrButton(uint64 guid, uint32 withRestoreTime = 0, bool useAlternativeState = false);
 
-        //Respawns a GO having negative spawntimesecs in gameobject-table
-        void DoRespawnGameObject(uint64 guid, uint32 timeToDespawn = MINUTE);
+    //Respawns a GO having negative spawntimesecs in gameobject-table
+    void DoRespawnGameObject(uint64 guid, uint32 timeToDespawn = MINUTE);
 
-        //sends world state update to all players in instance
-        void DoUpdateWorldState(uint32 worldstateId, uint32 worldstateValue);
+    //sends world state update to all players in instance
+    void DoUpdateWorldState(uint32 worldstateId, uint32 worldstateValue);
 
-        // Send Notify to all players in instance
-        void DoSendNotifyToInstance(char const* format, ...);
+    // Send Notify to all players in instance
+    void DoSendNotifyToInstance(char const* format, ...);
 
-        // Update Achievement Criteria for all players in instance
-        void DoUpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
+    // Update Achievement Criteria for all players in instance
+    void DoUpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
 
-        // Start/Stop Timed Achievement Criteria for all players in instance
-        void DoStartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);
-        void DoStopTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);
+    // Start/Stop Timed Achievement Criteria for all players in instance
+    void DoStartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);
+    void DoStopTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);
 
-        // Remove Auras due to Spell on all players in instance
-        void DoRemoveAurasDueToSpellOnPlayers(uint32 spell);
+    // Remove Auras due to Spell on all players in instance
+    void DoRemoveAurasDueToSpellOnPlayers(uint32 spell);
 
-        // Cast spell on all players in instance
-        void DoCastSpellOnPlayers(uint32 spell);
+    // Cast spell on all players in instance
+    void DoCastSpellOnPlayers(uint32 spell);
 
-        // Return wether server allow two side groups or not
-        bool ServerAllowsTwoSideGroups() { return sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP); }
+    // Return wether server allow two side groups or not
+    bool ServerAllowsTwoSideGroups() { return sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP); }
 
-        virtual bool SetBossState(uint32 id, EncounterState state);
-        EncounterState GetBossState(uint32 id) const { return id < bosses.size() ? bosses[id].state : TO_BE_DECIDED; }
-        static std::string GetBossStateName(uint8 state);
-        BossBoundaryMap const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : nullptr; }
-        BossInfo const* GetBossInfo(uint32 id) const { return &bosses[id]; } 
+    virtual bool SetBossState(uint32 id, EncounterState state);
+    EncounterState GetBossState(uint32 id) const { return id < bosses.size() ? bosses[id].state : TO_BE_DECIDED; }
+    static std::string GetBossStateName(uint8 state);
+    BossBoundaryMap const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : nullptr; }
+    BossInfo const* GetBossInfo(uint32 id) const { return &bosses[id]; }
 
-        // Achievement criteria additional requirements check
-        // NOTE: not use this if same can be checked existed requirement types from AchievementCriteriaRequirementType
-        virtual bool CheckAchievementCriteriaMeet(uint32 /*criteria_id*/, Player const* /*source*/, Unit const* /*target*/ = NULL, uint32 /*miscvalue1*/ = 0);
+    // Achievement criteria additional requirements check
+    // NOTE: not use this if same can be checked existed requirement types from AchievementCriteriaRequirementType
+    virtual bool CheckAchievementCriteriaMeet(uint32 /*criteria_id*/, Player const* /*source*/, Unit const* /*target*/ = NULL, uint32 /*miscvalue1*/ = 0);
 
-        // Checks boss requirements (one boss required to kill other)
-        virtual bool CheckRequiredBosses(uint32 /*bossId*/, Player const* /*player*/ = nullptr) const { return true; }
+    // Checks boss requirements (one boss required to kill other)
+    virtual bool CheckRequiredBosses(uint32 /*bossId*/, Player const* /*player*/ = nullptr) const { return true; }
 
-        void SetCompletedEncountersMask(uint32 newMask, bool save);
+    void SetCompletedEncountersMask(uint32 newMask, bool save);
 
-        // Returns completed encounters mask for packets
-        uint32 GetCompletedEncounterMask() const { return completedEncounters; }
+    // Returns completed encounters mask for packets
+    uint32 GetCompletedEncounterMask() const { return completedEncounters; }
 
-        void SendEncounterUnit(uint32 type, Unit* unit = NULL, uint8 param1 = 0, uint8 param2 = 0);
+    void SendEncounterUnit(uint32 type, Unit* unit = NULL, uint8 param1 = 0, uint8 param2 = 0);
 
-        virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+    virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
 
-        uint32 GetEncounterCount() const { return bosses.size(); }
+    uint32 GetEncounterCount() const { return bosses.size(); }
 
-        // Allows to perform particular actions
-        virtual void DoAction(int32 /*action*/) {}
-    protected:
-        void SetBossNumber(uint32 number) { bosses.resize(number); }
-        void LoadDoorData(DoorData const* data);
-        void LoadMinionData(MinionData const* data);
+    // Allows to perform particular actions
+    virtual void DoAction(int32 /*action*/) {}
+protected:
+    void SetBossNumber(uint32 number) { bosses.resize(number); }
+    void LoadDoorData(DoorData const* data);
+    void LoadMinionData(MinionData const* data);
 
-        void AddDoor(GameObject* door, bool add);
-        void AddMinion(Creature* minion, bool add);
+    void AddDoor(GameObject* door, bool add);
+    void AddMinion(Creature* minion, bool add);
 
-        void UpdateDoorState(GameObject* door);
-        void UpdateMinionState(Creature* minion, EncounterState state);
+    void UpdateDoorState(GameObject* door);
+    void UpdateMinionState(Creature* minion, EncounterState state);
 
-        std::string LoadBossState(char const* data);
-        std::string GetBossSaveData();
-    private:
-        std::vector<BossInfo> bosses;
-        DoorInfoMap doors;
-        MinionInfoMap minions;
-        uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
+    std::string LoadBossState(char const* data);
+    std::string GetBossSaveData();
+private:
+    std::vector<BossInfo> bosses;
+    DoorInfoMap doors;
+    MinionInfoMap minions;
+    uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
 };
 
 template<class AI, class T>

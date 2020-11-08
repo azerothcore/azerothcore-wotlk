@@ -40,7 +40,7 @@ void LootItemStorage::LoadStorageFromDB()
     do
     {
         Field* fields = result->Fetch();
-        
+
         StoredLootItemList& itemList = lootItemStore[fields[0].GetUInt32()];
         itemList.push_back(StoredLootItem(fields[1].GetUInt32(), fields[2].GetUInt32(), fields[3].GetInt32(), fields[4].GetUInt32()));
 
@@ -152,12 +152,12 @@ bool LootItemStorage::LoadStoredLoot(Item* item)
         loot->unlootedCount++;
     }
 
-   // Mark the item if it has loot so it won't be generated again on open
-   item->m_lootGenerated = true;
-   return true;
+    // Mark the item if it has loot so it won't be generated again on open
+    item->m_lootGenerated = true;
+    return true;
 }
 
-void LootItemStorage::RemoveStoredLootItem(uint32 containerId, uint32 itemid, uint32 count, Loot *loot)
+void LootItemStorage::RemoveStoredLootItem(uint32 containerId, uint32 itemid, uint32 count, Loot* loot)
 {
     LootItemContainer::iterator itr = lootItemStore.find(containerId);
     if (itr == lootItemStore.end())
@@ -172,13 +172,13 @@ void LootItemStorage::RemoveStoredLootItem(uint32 containerId, uint32 itemid, ui
             break;
         }
 
-    // loot with empty itemList but unlootedCount > 0 
+    // loot with empty itemList but unlootedCount > 0
     // must be deleted manually by the player or traded
     if (!loot->unlootedCount)
         lootItemStore.erase(itr);
 }
 
-void LootItemStorage::RemoveStoredLootMoney(uint32 containerId, Loot *loot)
+void LootItemStorage::RemoveStoredLootMoney(uint32 containerId, Loot* loot)
 {
     LootItemContainer::iterator itr = lootItemStore.find(containerId);
     if (itr == lootItemStore.end())
@@ -193,7 +193,7 @@ void LootItemStorage::RemoveStoredLootMoney(uint32 containerId, Loot *loot)
             break;
         }
 
-    // loot with empty itemList but unlootedCount > 0 
+    // loot with empty itemList but unlootedCount > 0
     // must be deleted manually by the player or traded
     if (!loot->unlootedCount)
         lootItemStore.erase(itr);
