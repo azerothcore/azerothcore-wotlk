@@ -499,7 +499,7 @@ public:
     uint8 getLevelForTarget(WorldObject const* target) const override; // overwrite Unit::getLevelForTarget for boss level support
 
     bool IsInEvadeMode() const { return HasUnitState(UNIT_STATE_EVADE); }
-	bool IsEvadingAttacks() const { return IsInEvadeMode() || CanNotReachTarget(); }
+    bool IsEvadingAttacks() const { return IsInEvadeMode() || CanNotReachTarget(); }
 
     bool AIM_Initialize(CreatureAI* ai = nullptr);
     void Motion_Initialize();
