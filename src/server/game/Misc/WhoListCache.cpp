@@ -10,7 +10,7 @@ void WhoListCacheMgr::Update()
 {
     // clear current list
     m_whoOpcodeList.clear();
-    m_whoOpcodeList.reserve(sWorld->GetPlayerCount()+1);
+    m_whoOpcodeList.reserve(sWorld->GetPlayerCount() + 1);
 
     ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
     HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();

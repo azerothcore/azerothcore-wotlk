@@ -130,60 +130,60 @@ public:
 
 class spell_najentus_needle_spine : public SpellScriptLoader
 {
-    public:
-        spell_najentus_needle_spine() : SpellScriptLoader("spell_najentus_needle_spine") { }
+public:
+    spell_najentus_needle_spine() : SpellScriptLoader("spell_najentus_needle_spine") { }
 
-        class spell_najentus_needle_spine_SpellScript : public SpellScript
+    class spell_najentus_needle_spine_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_najentus_needle_spine_SpellScript);
+
+        void HandleDummy(SpellEffIndex  /*effIndex*/)
         {
-            PrepareSpellScript(spell_najentus_needle_spine_SpellScript);
-
-            void HandleDummy(SpellEffIndex  /*effIndex*/)
-            {
-                if (Unit* target = GetHitUnit())
-                    GetCaster()->CastSpell(target, SPELL_NEEDLE_SPINE_DAMAGE, true);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_najentus_needle_spine_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_najentus_needle_spine_SpellScript();
+            if (Unit* target = GetHitUnit())
+                GetCaster()->CastSpell(target, SPELL_NEEDLE_SPINE_DAMAGE, true);
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_najentus_needle_spine_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_najentus_needle_spine_SpellScript();
+    }
 };
 
 class spell_najentus_hurl_spine : public SpellScriptLoader
 {
-    public:
-        spell_najentus_hurl_spine() : SpellScriptLoader("spell_najentus_hurl_spine") { }
+public:
+    spell_najentus_hurl_spine() : SpellScriptLoader("spell_najentus_hurl_spine") { }
 
-        class spell_najentus_hurl_spine_SpellScript : public SpellScript
+    class spell_najentus_hurl_spine_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_najentus_hurl_spine_SpellScript);
+
+        void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
         {
-            PrepareSpellScript(spell_najentus_hurl_spine_SpellScript);
-
-            void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
+            Unit* target = GetHitUnit();
+            if (target && target->HasAura(SPELL_TIDAL_SHIELD))
             {
-                Unit* target = GetHitUnit();
-                if (target && target->HasAura(SPELL_TIDAL_SHIELD))
-                {
-                    target->RemoveAurasDueToSpell(SPELL_TIDAL_SHIELD);
-                    target->CastSpell(target, SPELL_TIDAL_BURST, true);
-                }
+                target->RemoveAurasDueToSpell(SPELL_TIDAL_SHIELD);
+                target->CastSpell(target, SPELL_TIDAL_BURST, true);
             }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_najentus_hurl_spine_SpellScript::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_najentus_hurl_spine_SpellScript();
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_najentus_hurl_spine_SpellScript::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_najentus_hurl_spine_SpellScript();
+    }
 };
 
 void AddSC_boss_najentus()

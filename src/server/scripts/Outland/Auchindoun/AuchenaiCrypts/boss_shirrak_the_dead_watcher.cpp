@@ -98,11 +98,11 @@ public:
         void UpdateAI(uint32 diff)
         {
             events.Update(diff);
-            uint32 eventId = events.GetEvent();
+            uint32 eventId = events.ExecuteEvent();
 
             if (eventId == EVENT_SPELL_INHIBIT_MAGIC)
             {
-                Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+                Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                     if (Player* player = i->GetSource())
                     {
@@ -157,11 +157,9 @@ public:
                 case EVENT_SPELL_FOCUS_FIRE_2:
                     if (Unit* flare = ObjectAccessor::GetCreature(*me, focusGUID))
                         me->CastSpell(flare, SPELL_FOCUS_CAST, true);
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_FOCUS_FIRE_3:
                     me->SetControlled(false, UNIT_STATE_ROOT);
-                    events.PopEvent();
                     break;
             }
 
@@ -172,51 +170,51 @@ public:
 
 class spell_auchenai_possess : public SpellScriptLoader
 {
-    public:
-        spell_auchenai_possess() : SpellScriptLoader("spell_auchenai_possess") { }
+public:
+    spell_auchenai_possess() : SpellScriptLoader("spell_auchenai_possess") { }
 
-        class spell_auchenai_possess_AuraScript : public AuraScript
+    class spell_auchenai_possess_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_auchenai_possess_AuraScript);
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_auchenai_possess_AuraScript);
-
-            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                if (Unit* caster = GetCaster())
-                    if (Unit* target = GetTarget())
-                        caster->CastSpell(target, 32830 /*POSSESS*/, true);
-            }
-
-            void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
-            {
-                isPeriodic = true;
-                amplitude = 2000;
-            }
-
-            void Update(AuraEffect*  /*effect*/)
-            {
-                // Xinef: Charm is removed when target is at or below 50%hp
-                if (Unit* owner = GetUnitOwner())
-                    if (owner->GetHealthPct() <= 50)
-                        SetDuration(0);
-            }
-
-            void Register()
-            {
-                // Base channel
-                if (m_scriptSpellId == 33401)
-                    OnEffectRemove += AuraEffectRemoveFn(spell_auchenai_possess_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-                else
-                {
-                    DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_auchenai_possess_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_CHARM);
-                    OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_auchenai_possess_AuraScript::Update, EFFECT_0, SPELL_AURA_MOD_CHARM);
-                }
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_auchenai_possess_AuraScript();
+            if (Unit* caster = GetCaster())
+                if (Unit* target = GetTarget())
+                    caster->CastSpell(target, 32830 /*POSSESS*/, true);
         }
+
+        void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
+        {
+            isPeriodic = true;
+            amplitude = 2000;
+        }
+
+        void Update(AuraEffect*  /*effect*/)
+        {
+            // Xinef: Charm is removed when target is at or below 50%hp
+            if (Unit* owner = GetUnitOwner())
+                if (owner->GetHealthPct() <= 50)
+                    SetDuration(0);
+        }
+
+        void Register()
+        {
+            // Base channel
+            if (m_scriptSpellId == 33401)
+                OnEffectRemove += AuraEffectRemoveFn(spell_auchenai_possess_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            else
+            {
+                DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_auchenai_possess_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_CHARM);
+                OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_auchenai_possess_AuraScript::Update, EFFECT_0, SPELL_AURA_MOD_CHARM);
+            }
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_auchenai_possess_AuraScript();
+    }
 };
 
 void AddSC_boss_shirrak_the_dead_watcher()

@@ -14,17 +14,17 @@ typedef ACE_Future<QueryResult> QueryResultFuture;
 /*! Raw, ad-hoc query. */
 class BasicStatementTask : public SQLOperation
 {
-    public:
-        BasicStatementTask(const char* sql);
-        BasicStatementTask(const char* sql, QueryResultFuture result);
-        ~BasicStatementTask();
+public:
+    BasicStatementTask(const char* sql);
+    BasicStatementTask(const char* sql, QueryResultFuture result);
+    ~BasicStatementTask();
 
-        bool Execute();
+    bool Execute();
 
-    private:
-        const char* m_sql;      //- Raw query to be executed
-        bool m_has_result;
-        QueryResultFuture m_result;
+private:
+    const char* m_sql;      //- Raw query to be executed
+    bool m_has_result;
+    QueryResultFuture m_result;
 };
 
 #endif

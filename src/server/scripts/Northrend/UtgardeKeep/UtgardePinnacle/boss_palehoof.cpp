@@ -106,12 +106,12 @@ public:
 
     struct boss_palehoofAI : public ScriptedAI
     {
-        boss_palehoofAI(Creature *pCreature) : ScriptedAI(pCreature), summons(me)
+        boss_palehoofAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
         {
             m_pInstance = pCreature->GetInstanceScript();
         }
 
-        InstanceScript *m_pInstance;
+        InstanceScript* m_pInstance;
         EventMap events;
         SummonList summons;
         uint64 OrbGUID;
@@ -126,7 +126,7 @@ public:
                 do
                 {
                     good = true;
-                    RandomUnfreeze[i] = urand(0,3);
+                    RandomUnfreeze[i] = urand(0, 3);
 
                     for (uint8 j = 0; j < i; ++j)
                         if (RandomUnfreeze[i] == RandomUnfreeze[j])
@@ -134,8 +134,7 @@ public:
                             good = false;
                             break;
                         }
-                }
-                while (!good);
+                } while (!good);
             }
 
             events.Reset();
@@ -144,7 +143,7 @@ public:
             OrbGUID = 0;
             Counter = 0;
             me->CastSpell(me, SPELL_FREEZE, true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
 
             if (m_pInstance)
@@ -152,7 +151,7 @@ public:
                 m_pInstance->SetData(DATA_GORTOK_PALEHOOF, NOT_STARTED);
 
                 // Reset statue
-                if (GameObject *statisGenerator = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(STATIS_GENERATOR)))
+                if (GameObject* statisGenerator = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(STATIS_GENERATOR)))
                 {
                     statisGenerator->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     statisGenerator->SetGoState(GO_STATE_READY);
@@ -161,7 +160,7 @@ public:
                 // Reset mini bosses
                 for(uint8 i = 0; i < 4; ++i)
                 {
-                    if(Creature *Animal = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_NPC_FRENZIED_WORGEN+i)))
+                    if(Creature* Animal = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_NPC_FRENZIED_WORGEN + i)))
                     {
                         Animal->SetPosition(Animal->GetHomePosition());
                         Animal->StopMovingOnCurrentPos();
@@ -178,7 +177,7 @@ public:
         {
             if (param == ACTION_START_EVENT)
             {
-                if (Creature *cr = me->SummonCreature(NPC_ORB_TRIGGER, 238.608f, -460.71f, 109.567f))
+                if (Creature* cr = me->SummonCreature(NPC_ORB_TRIGGER, 238.608f, -460.71f, 109.567f))
                 {
                     OrbGUID = cr->GetGUID();
                     cr->AddAura(SPELL_ORB_VISUAL, cr);
@@ -204,7 +203,7 @@ public:
                 m_pInstance->SetData(DATA_GORTOK_PALEHOOF, IN_PROGRESS);
         }
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit* who)
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                 return;
@@ -223,88 +222,84 @@ public:
                 return;
 
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_UNFREEZE_MONSTER:
-                {
-                    if (Creature *orb = ObjectAccessor::GetCreature(*me, OrbGUID))
                     {
-                        if (Creature *miniBoss = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_NPC_FRENZIED_WORGEN+RandomUnfreeze[Counter])))
+                        if (Creature* orb = ObjectAccessor::GetCreature(*me, OrbGUID))
                         {
-                            Counter++;
-                            miniBoss->AI()->DoAction(ACTION_UNFREEZE);
-                            orb->CastSpell(miniBoss, SPELL_AWAKEN_SUBBOSS, true);
-                            events.ScheduleEvent(EVENT_UNFREEZE_MONSTER2, 6000);
+                            if (Creature* miniBoss = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_NPC_FRENZIED_WORGEN + RandomUnfreeze[Counter])))
+                            {
+                                Counter++;
+                                miniBoss->AI()->DoAction(ACTION_UNFREEZE);
+                                orb->CastSpell(miniBoss, SPELL_AWAKEN_SUBBOSS, true);
+                                events.ScheduleEvent(EVENT_UNFREEZE_MONSTER2, 6000);
+                            }
+                            else
+                                EnterEvadeMode();
                         }
-                        else
-                            EnterEvadeMode();
+                        break;
                     }
-                    events.PopEvent();
-                    break;
-                }
                 case EVENT_UNFREEZE_MONSTER2:
-                {
-                    if (Creature *orb = ObjectAccessor::GetCreature(*me, OrbGUID))
                     {
-                        if (Creature *miniBoss = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_NPC_FRENZIED_WORGEN+RandomUnfreeze[Counter-1])))
+                        if (Creature* orb = ObjectAccessor::GetCreature(*me, OrbGUID))
                         {
-                            miniBoss->AI()->DoAction(ACTION_UNFREEZE2);
-                            orb->RemoveAurasDueToSpell(SPELL_AWAKEN_SUBBOSS);
+                            if (Creature* miniBoss = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_NPC_FRENZIED_WORGEN + RandomUnfreeze[Counter - 1])))
+                            {
+                                miniBoss->AI()->DoAction(ACTION_UNFREEZE2);
+                                orb->RemoveAurasDueToSpell(SPELL_AWAKEN_SUBBOSS);
+                            }
+                            else
+                                EnterEvadeMode();
                         }
-                        else
-                            EnterEvadeMode();
+                        break;
                     }
-                    events.PopEvent();
-                    break;
-                }
                 case EVENT_PALEHOOF_START:
-                {
-                    if (Creature *orb = ObjectAccessor::GetCreature(*me, OrbGUID))
                     {
-                        orb->CastSpell(me, SPELL_AWAKEN_SUBBOSS, true);
-                        events.ScheduleEvent(EVENT_PALEHOOF_START2, 6000);
+                        if (Creature* orb = ObjectAccessor::GetCreature(*me, OrbGUID))
+                        {
+                            orb->CastSpell(me, SPELL_AWAKEN_SUBBOSS, true);
+                            events.ScheduleEvent(EVENT_PALEHOOF_START2, 6000);
+                        }
+                        break;
                     }
-                    events.PopEvent();
-                    break;
-                }
                 case EVENT_PALEHOOF_START2:
-                {
-                    Talk(SAY_AGGRO);
-                    if (Creature *orb = ObjectAccessor::GetCreature(*me, OrbGUID))
-                        orb->RemoveAurasDueToSpell(SPELL_AWAKEN_SUBBOSS);
+                    {
+                        Talk(SAY_AGGRO);
+                        if (Creature* orb = ObjectAccessor::GetCreature(*me, OrbGUID))
+                            orb->RemoveAurasDueToSpell(SPELL_AWAKEN_SUBBOSS);
 
-                    me->RemoveAurasDueToSpell(SPELL_FREEZE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetControlled(false, UNIT_STATE_STUNNED);
-                    // SETINCOMBATWITHZONE
+                        me->RemoveAurasDueToSpell(SPELL_FREEZE);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetControlled(false, UNIT_STATE_STUNNED);
+                        // SETINCOMBATWITHZONE
 
-                    // schedule combat events
-                    events.ScheduleEvent(EVENT_PALEHOOF_WITHERING_ROAR, 10000);
-                    events.ScheduleEvent(EVENT_PALEHOOF_IMPALE, 12000);
-                    events.ScheduleEvent(EVENT_PALEHOOF_ARCING_SMASH, 15000);
-                    events.PopEvent();
-                    break;
-                }
+                        // schedule combat events
+                        events.ScheduleEvent(EVENT_PALEHOOF_WITHERING_ROAR, 10000);
+                        events.ScheduleEvent(EVENT_PALEHOOF_IMPALE, 12000);
+                        events.ScheduleEvent(EVENT_PALEHOOF_ARCING_SMASH, 15000);
+                        break;
+                    }
                 case EVENT_PALEHOOF_WITHERING_ROAR:
-                {
-                    me->CastSpell(me, IsHeroic() ? SPELL_WITHERING_ROAR_H : SPELL_WITHERING_ROAR_N, false);
-                    events.RepeatEvent(8000 + rand()%4000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me, IsHeroic() ? SPELL_WITHERING_ROAR_H : SPELL_WITHERING_ROAR_N, false);
+                        events.RepeatEvent(8000 + rand() % 4000);
+                        break;
+                    }
                 case EVENT_PALEHOOF_IMPALE:
-                {
-                    if (Unit *tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        me->CastSpell(tgt, IsHeroic() ? SPELL_IMPALE_H : SPELL_IMPALE_N, false);
+                    {
+                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            me->CastSpell(tgt, IsHeroic() ? SPELL_IMPALE_H : SPELL_IMPALE_N, false);
 
-                    events.RepeatEvent(8000 + rand()%4000);
-                    break;
-                }
+                        events.RepeatEvent(8000 + rand() % 4000);
+                        break;
+                    }
                 case EVENT_PALEHOOF_ARCING_SMASH:
-                {
-                    me->CastSpell(me->GetVictim(), SPELL_ARCING_SMASH, false);
-                    events.RepeatEvent(13000 + rand()%4000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_ARCING_SMASH, false);
+                        events.RepeatEvent(13000 + rand() % 4000);
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
@@ -348,7 +343,7 @@ public:
             m_pInstance = pCreature->GetInstanceScript();
         }
 
-        InstanceScript *m_pInstance;
+        InstanceScript* m_pInstance;
         EventMap events;
         SummonList summons;
 
@@ -356,10 +351,10 @@ public:
         {
             summons.DespawnAll();
             events.Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit *) {}
+        void EnterCombat(Unit*) {}
 
         void DoAction(int32 param)
         {
@@ -381,7 +376,7 @@ public:
                 summons.DespawnAll();
         }
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit* who)
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
@@ -403,42 +398,42 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_JORMUNGAR_ACID_SPIT:
-                {
-                    if (Unit *tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        me->CastSpell(tgt, SPELL_ACID_SPIT, false);
-
-                    events.RepeatEvent(2000 + rand()%2000);
-                    break;
-                }
-                case EVENT_JORMUNGAR_ACID_SPLATTER:
-                {
-                    me->CastSpell(me, IsHeroic() ? SPELL_ACID_SPLATTER_H : SPELL_ACID_SPLATTER_N, false);
-
-                    // Aura summon wont work because of duration
-                    float x, y, z;
-                    me->GetPosition(x, y, z);
-                    for (uint8 i = 0; i < 6; ++i)
                     {
-                        if (Creature* pJormungarWorm = me->SummonCreature(NPC_JORMUNGAR_WORM, x+rand()%10, y+rand()%10, z, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 360000))
-                        {
-                            summons.Summon(pJormungarWorm);
-                            pJormungarWorm->SetInCombatWithZone();
-                        }
-                    }
-                    events.RepeatEvent(10000 + rand()%4000);
-                    break;
-                }
-                case EVENT_JORMUNGAR_POISON_BREATH:
-                {
-                    if (Unit *tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        me->CastSpell(tgt, IsHeroic() ? SPELL_POISON_BREATH_H : SPELL_POISON_BREATH_N, false);
+                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            me->CastSpell(tgt, SPELL_ACID_SPIT, false);
 
-                    events.RepeatEvent(8000 + rand()%4000);
-                    break;
-                }
+                        events.RepeatEvent(2000 + rand() % 2000);
+                        break;
+                    }
+                case EVENT_JORMUNGAR_ACID_SPLATTER:
+                    {
+                        me->CastSpell(me, IsHeroic() ? SPELL_ACID_SPLATTER_H : SPELL_ACID_SPLATTER_N, false);
+
+                        // Aura summon wont work because of duration
+                        float x, y, z;
+                        me->GetPosition(x, y, z);
+                        for (uint8 i = 0; i < 6; ++i)
+                        {
+                            if (Creature* pJormungarWorm = me->SummonCreature(NPC_JORMUNGAR_WORM, x + rand() % 10, y + rand() % 10, z, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 360000))
+                            {
+                                summons.Summon(pJormungarWorm);
+                                pJormungarWorm->SetInCombatWithZone();
+                            }
+                        }
+                        events.RepeatEvent(10000 + rand() % 4000);
+                        break;
+                    }
+                case EVENT_JORMUNGAR_POISON_BREATH:
+                    {
+                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            me->CastSpell(tgt, IsHeroic() ? SPELL_POISON_BREATH_H : SPELL_POISON_BREATH_N, false);
+
+                        events.RepeatEvent(8000 + rand() % 4000);
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
@@ -448,7 +443,7 @@ public:
         {
             if (m_pInstance)
             {
-                if (Creature *palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
+                if (Creature* palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
                     palehoof->AI()->DoAction(ACTION_MINIBOSS_DIED);
             }
         }
@@ -476,16 +471,16 @@ public:
             m_pInstance = pCreature->GetInstanceScript();
         }
 
-        InstanceScript *m_pInstance;
+        InstanceScript* m_pInstance;
         EventMap events;
 
         void Reset()
         {
             events.Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit *) {}
+        void EnterCombat(Unit*) {}
 
         void DoAction(int32 param)
         {
@@ -505,7 +500,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit* who)
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
@@ -527,28 +522,28 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_RHINO_STOMP:
-                {
-                    me->CastSpell(me->GetVictim(), SPELL_STOMP, false);
-                    events.RepeatEvent(8000 + rand()%4000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_STOMP, false);
+                        events.RepeatEvent(8000 + rand() % 4000);
+                        break;
+                    }
                 case EVENT_RHINO_GORE:
-                {
-                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_GORE_H : SPELL_GORE_N, false);
-                    events.RepeatEvent(13000 + rand()%4000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_GORE_H : SPELL_GORE_N, false);
+                        events.RepeatEvent(13000 + rand() % 4000);
+                        break;
+                    }
                 case EVENT_RHINO_WOUND:
-                {
-                    if (Unit *tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        me->CastSpell(tgt, IsHeroic() ? SPELL_GRIEVOUS_WOUND_H : SPELL_GRIEVOUS_WOUND_N, false);
+                    {
+                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            me->CastSpell(tgt, IsHeroic() ? SPELL_GRIEVOUS_WOUND_H : SPELL_GRIEVOUS_WOUND_N, false);
 
-                    events.RepeatEvent(18000 + rand()%4000);
-                    break;
-                }
+                        events.RepeatEvent(18000 + rand() % 4000);
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
@@ -558,7 +553,7 @@ public:
         {
             if (m_pInstance)
             {
-                if (Creature *palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
+                if (Creature* palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
                     palehoof->AI()->DoAction(ACTION_MINIBOSS_DIED);
             }
         }
@@ -586,16 +581,16 @@ public:
             m_pInstance = pCreature->GetInstanceScript();
         }
 
-        InstanceScript *m_pInstance;
+        InstanceScript* m_pInstance;
         EventMap events;
 
         void Reset()
         {
             events.Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit *) {}
+        void EnterCombat(Unit*) {}
 
         void DoAction(int32 param)
         {
@@ -615,7 +610,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit* who)
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
@@ -637,26 +632,26 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_FURBOLG_CHAIN:
-                {
-                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_CHAIN_LIGHTING_H : SPELL_CHAIN_LIGHTING_N, false);
-                    events.RepeatEvent(4000 + rand()%3000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_CHAIN_LIGHTING_H : SPELL_CHAIN_LIGHTING_N, false);
+                        events.RepeatEvent(4000 + rand() % 3000);
+                        break;
+                    }
                 case EVENT_FURBOLG_CRAZED:
-                {
-                    me->CastSpell(me, SPELL_CRAZED, false);
-                    events.RepeatEvent(8000 + rand()%4000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me, SPELL_CRAZED, false);
+                        events.RepeatEvent(8000 + rand() % 4000);
+                        break;
+                    }
                 case EVENT_FURBOLG_ROAR:
-                {
-                    me->CastSpell(me, SPELL_TERRIFYING_ROAR, false);
-                    events.RepeatEvent(10000 + rand()%5000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me, SPELL_TERRIFYING_ROAR, false);
+                        events.RepeatEvent(10000 + rand() % 5000);
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
@@ -666,7 +661,7 @@ public:
         {
             if (m_pInstance)
             {
-                if (Creature *palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
+                if (Creature* palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
                     palehoof->AI()->DoAction(ACTION_MINIBOSS_DIED);
             }
         }
@@ -694,16 +689,16 @@ public:
             m_pInstance = pCreature->GetInstanceScript();
         }
 
-        InstanceScript *m_pInstance;
+        InstanceScript* m_pInstance;
         EventMap events;
 
         void Reset()
         {
             events.Reset();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit *) {}
+        void EnterCombat(Unit*) {}
 
         void DoAction(int32 param)
         {
@@ -723,7 +718,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit* who)
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
@@ -745,26 +740,26 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_WORGEN_MORTAL:
-                {
-                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_MORTAL_WOUND_H : SPELL_MORTAL_WOUND_N, false);
-                    events.RepeatEvent(4000 + rand()%3000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_MORTAL_WOUND_H : SPELL_MORTAL_WOUND_N, false);
+                        events.RepeatEvent(4000 + rand() % 3000);
+                        break;
+                    }
                 case EVENT_WORGEN_ENRAGE1:
-                {
-                    me->CastSpell(me, SPELL_ENRAGE_1, false);
-                    events.RepeatEvent(15000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me, SPELL_ENRAGE_1, false);
+                        events.RepeatEvent(15000);
+                        break;
+                    }
                 case EVENT_WORGEN_ENRAGE2:
-                {
-                    me->CastSpell(me, SPELL_ENRAGE_2, false);
-                    events.RepeatEvent(10000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me, SPELL_ENRAGE_2, false);
+                        events.RepeatEvent(10000);
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
@@ -774,7 +769,7 @@ public:
         {
             if (m_pInstance)
             {
-                if (Creature *palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
+                if (Creature* palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
                     palehoof->AI()->DoAction(ACTION_MINIBOSS_DIED);
             }
         }
@@ -786,11 +781,11 @@ class go_palehoof_sphere : public GameObjectScript
 public:
     go_palehoof_sphere() : GameObjectScript("go_palehoof_sphere") { }
 
-    bool OnGossipHello(Player * /*pPlayer*/, GameObject *go) override
+    bool OnGossipHello(Player* /*pPlayer*/, GameObject* go) override
     {
-        InstanceScript *pInstance = go->GetInstanceScript();
+        InstanceScript* pInstance = go->GetInstanceScript();
 
-        Creature *pPalehoof = ObjectAccessor::GetCreature(*go, pInstance ? pInstance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
+        Creature* pPalehoof = ObjectAccessor::GetCreature(*go, pInstance ? pInstance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
         if (pPalehoof && pPalehoof->IsAlive())
         {
             // maybe these are hacks :(
