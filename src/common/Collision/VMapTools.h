@@ -21,13 +21,15 @@ The collision detection is modified to return true, if we are inside an object.
 namespace VMAP
 {
     template<class TValue>
-    class IntersectionCallBack {
+    class IntersectionCallBack
+    {
     public:
         TValue*      closestEntity;
         G3D::Vector3 hitLocation;
         G3D::Vector3 hitNormal;
 
-        void operator()(const G3D::Ray& ray, const TValue* entity, bool StopAtFirstHit, float& distance) {
+        void operator()(const G3D::Ray& ray, const TValue* entity, bool StopAtFirstHit, float& distance)
+        {
             entity->intersect(ray, distance, StopAtFirstHit, hitLocation, hitNormal);
         }
     };
@@ -116,7 +118,7 @@ namespace VMAP
                 {
                     location[i] = origin[i] + MaxT[WhichPlane] * dir[i];
                     if ((location[i] < MinB[i]) ||
-                        (location[i] > MaxB[i]))
+                            (location[i] > MaxB[i]))
                     {
                         // On this plane we're outside the box extents, so
                         // we miss the box

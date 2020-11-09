@@ -88,17 +88,19 @@ public:
                 //}
                 //else
                 //{
-                    HandOfThaurissan_Timer = 5000;
-                    //Counter = 0;
+                HandOfThaurissan_Timer = 5000;
+                //Counter = 0;
                 //}
-            } else HandOfThaurissan_Timer -= diff;
+            }
+            else HandOfThaurissan_Timer -= diff;
 
             //AvatarOfFlame_Timer
             if (AvatarOfFlame_Timer <= diff)
             {
                 DoCastVictim(SPELL_AVATAROFFLAME);
                 AvatarOfFlame_Timer = 18000;
-            } else AvatarOfFlame_Timer -= diff;
+            }
+            else AvatarOfFlame_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }

@@ -41,38 +41,39 @@
 #define AV_EVENT_START_BATTLE           9166 // Achievement: The Alterac Blitz
 
 enum BG_AV_Sounds
-{ //TODO: get out if there comes a sound when neutral team captures mine
+{
+    //TODO: get out if there comes a sound when neutral team captures mine
 
-/*
-8212:
-    alliance grave assault
-    alliance tower assault
-    drek "mlanzenabschaum! In meiner Burg?! Toetet sie all" - nicht immer der sound
-8333:
-    galv "sterbt fuer euch ist kein platz hier"
+    /*
+    8212:
+        alliance grave assault
+        alliance tower assault
+        drek "mlanzenabschaum! In meiner Burg?! Toetet sie all" - nicht immer der sound
+    8333:
+        galv "sterbt fuer euch ist kein platz hier"
 
-8332:
-    bal "Verschwinde, dreckiger Abschaum! Die Allianz wird im Alteractal "
-8174:
-    horde tower assault
-    horde grave assault
-    van "es Sturmlanzenklans, euer General wird angegriffen! Ich fordere Unterst"
-8173:
-    ally grave capture/defend
-    tower destroy
-    mine capture
-    ally wins
-8192:
-    ally tower destroy(only iceblood - found a bug^^)
-    ally tower  defend
-    horde tower defend
-8213
-horde:
-    grave defend/capture
-    tower destroy
-    mine capture
-    horde wins
-    */
+    8332:
+        bal "Verschwinde, dreckiger Abschaum! Die Allianz wird im Alteractal "
+    8174:
+        horde tower assault
+        horde grave assault
+        van "es Sturmlanzenklans, euer General wird angegriffen! Ich fordere Unterst"
+    8173:
+        ally grave capture/defend
+        tower destroy
+        mine capture
+        ally wins
+    8192:
+        ally tower destroy(only iceblood - found a bug^^)
+        ally tower  defend
+        horde tower defend
+    8213
+    horde:
+        grave defend/capture
+        tower destroy
+        mine capture
+        horde wins
+        */
 
     AV_SOUND_NEAR_VICTORY                   = 8456, //not confirmed yet
 
@@ -223,7 +224,7 @@ enum BG_AV_ObjectTypes
 
     BG_AV_OBJECT_DOOR_H                     = 45,
     BG_AV_OBJECT_DOOR_A                     = 46,
-//auras for graveyards (3auras per graveyard neutral, alliance, horde)
+    //auras for graveyards (3auras per graveyard neutral, alliance, horde)
     BG_AV_OBJECT_AURA_N_FIRSTAID_STATION    = 47,
     BG_AV_OBJECT_AURA_A_FIRSTAID_STATION    = 48,
     BG_AV_OBJECT_AURA_H_FIRSTAID_STATION    = 49,
@@ -486,7 +487,7 @@ const float BG_AV_ObjectPos[AV_OPLACE_MAX][4] =
     {-62.9474f, -286.212f, 66.7288f, 0},
     {-5.05132f, -325.323f, 38.8536f, 0},
     {-64.2677f, -289.412f, 33.469f, 0},
-//horde
+    //horde
     {-524.276f, -199.6f, 82.8733f, -1.46608f},
     {-518.196f, -173.085f, 102.43f, 0},
     {-500.732f, -145.358f, 88.5337f, 2.44346f},
@@ -498,7 +499,7 @@ const float BG_AV_ObjectPos[AV_OPLACE_MAX][4] =
     {-501.775f, -151.581f, 81.2027f, 0},
     {-509.975f, -191.652f, 83.2978f, 0},
 
-//snowfall eyecandy
+    //snowfall eyecandy
     {-191.153f, -129.868f, 78.5595f, -1.25664f },
     {-201.282f, -134.319f, 78.6753f, -0.942478f },
     {-215.981f, -91.4101f, 80.8702f, -1.74533f },
@@ -562,7 +563,7 @@ enum BG_AV_CreaturePlace
     AV_CPLACE_SPIRIT_FROST_HUT      = 6,
     AV_CPLACE_SPIRIT_MAIN_ALLIANCE  = 7,
     AV_CPLACE_SPIRIT_MAIN_HORDE     = 8,
-//i don't will add for all 4 positions a variable.. i think one is enough to compute the rest
+    //i don't will add for all 4 positions a variable.. i think one is enough to compute the rest
     AV_CPLACE_DEFENSE_STORM_AID      = 9,
     AV_CPLACE_DEFEMSE_STORM_GRAVE    = 13,
     AV_CPLACE_DEFENSE_STONE_GRAVE    = 17,
@@ -652,44 +653,44 @@ const float BG_AV_CreaturePos[AV_CPLACE_MAX][4] =
     {-1496.065063f, -333.338409f, 101.134804f, -0.001854f},
     {873.001770f, -491.283630f, 96.541931f, -0.001854f},
     {-1437.670044f, -610.088989f, 51.161900f, -0.001854f},
- //grave
- //firstaid
+    //grave
+    //firstaid
     {635.17f, -29.5594f, 46.5056f, 4.81711f},
     {642.488f, -32.9437f, 46.365f, 4.67748f},
     {642.326f, -27.9442f, 46.9211f, 4.59022f},
     {635.945f, -33.6171f, 45.7164f, 4.97419f},
-   //stormpike
+    //stormpike
     {669.272f, -297.304f, 30.291f, 4.66604f},
     {674.08f, -292.328f, 30.4817f, 0.0918785f},
     {667.01f, -288.532f, 29.8809f, 1.81583f},
     {664.153f, -294.042f, 30.2851f, 3.28531f},
-  //stone
+    //stone
     {81.7027f, -406.135f, 47.7843f, 0.598464f},
     {78.1431f, -409.215f, 48.0401f, 5.05953f},
     {73.4135f, -407.035f, 46.7527f, 3.34736f},
     {78.2258f, -401.859f, 46.4202f, 2.05852f},
-  //snowfall
+    //snowfall
     {-207.412f, -110.616f, 78.7959f, 2.43251f},
     {-197.95f, -112.205f, 78.5686f, 6.22441f},
     {-202.709f, -116.829f, 78.4358f, 5.13742f},
     {-202.059f, -108.314f, 78.5783f, 5.91968f},
-  //ice
+    //ice
     {-615.501f, -393.802f, 60.4299f, 3.06147f},
     {-608.513f, -392.717f, 62.5724f, 2.06323f},
     {-609.769f, -400.072f, 60.7174f, 5.22367f},
     {-616.093f, -398.293f, 60.5628f, 3.73613f},
-  //frost
+    //frost
     {-1077.7f, -340.21f, 55.4682f, 6.25569f},
     {-1082.74f, -333.821f, 54.7962f, 2.05459f},
     {-1090.66f, -341.267f, 54.6768f, 3.27746f},
     {-1081.58f, -344.63f, 55.256f, 4.75636f},
-  //frost hut
+    //frost hut
     {-1408.95f, -311.69f, 89.2536f, 4.49954f},
     {-1407.15f, -305.323f, 89.1993f, 2.86827f},
     {-1400.64f, -304.3f, 89.7008f, 1.0595f},
     {-1400.4f, -311.35f, 89.3028f, 4.99434f},
-  //towers
-  //dun south - OK
+    //towers
+    //dun south - OK
     {569.395f, -101.064f, 52.8296f, 2.34974f},
     {574.85f, -92.9842f, 52.5869f, 3.09325f},
     {575.411f, -83.597f, 52.3626f, 6.26573f},
@@ -735,14 +736,14 @@ const float BG_AV_CreaturePos[AV_CPLACE_MAX][4] =
     {723.058f, -14.1548f, 50.7046f, 3.40339f}, // north
     {715.691f, -4.72233f, 50.2187f, 3.47321f}, // icewing
     {720.046f, -19.9413f, 50.2187f, 3.36849f}, // stone
-//horde  (coords not 100% ok)
+    //horde  (coords not 100% ok)
     {-1363.99f, -221.99f, 98.4053f, 4.93012f},
     {-1370.96f, -223.532f, 98.4266f, 4.93012f},
     {-1378.37f, -228.614f, 99.3546f, 5.38565f},
     {-1358.02f, -228.998f, 98.868f, 3.87768f},
 
- //irondeep mine
- //Irondeep Trogg
+    //irondeep mine
+    //Irondeep Trogg
     {971.671f, -442.657f, 57.6951f, 3.1765f},
     {969.979f, -457.148f, 58.1119f, 4.5204f},
     {958.692f, -333.477f, 63.2276f, 5.77704f},
@@ -1024,7 +1025,7 @@ enum BG_AV_CreatureIds
     AV_NPC_H_MARSHAL_ICE   = 18,
     AV_NPC_H_MARSHAL_TOWER = 19,
     AV_NPC_MARSHAL_ETOWER  = 20,
-    AV_NPC_H_MARSHAL_WTOWER= 21,
+    AV_NPC_H_MARSHAL_WTOWER = 21,
     AV_NPC_N_MINE_N_1      = 22,
     AV_NPC_N_MINE_N_2      = 23,
     AV_NPC_N_MINE_N_3      = 24,
@@ -1312,7 +1313,7 @@ enum BG_AV_Graveyards
     AV_GRAVE_MAIN_HORDE        = 610
 };
 
-const uint32 BG_AV_GraveyardIds[9]=
+const uint32 BG_AV_GraveyardIds[9] =
 {
     AV_GRAVE_STORM_AID,
     AV_GRAVE_STORM_GRAVE,
@@ -1326,7 +1327,8 @@ const uint32 BG_AV_GraveyardIds[9]=
 };
 
 enum BG_AV_BUFF
-{ //TODO add all other buffs here
+{
+    //TODO add all other buffs here
     AV_BUFF_ARMOR = 21163,
     AV_BUFF_A_CAPTAIN = 23693, //the buff which the alliance captain does
     AV_BUFF_H_CAPTAIN = 22751 //the buff which the horde captain does
@@ -1346,110 +1348,110 @@ enum BG_AV_WorldStates
     AV_SHOW_H_SCORE                 = 3133,
     AV_SHOW_A_SCORE                 = 3134,
 
-/*
-    //the comments behind the state shows which icon overlaps the other.. but is, until now, unused and maybe not a good solution (but give few performance (:)
+    /*
+        //the comments behind the state shows which icon overlaps the other.. but is, until now, unused and maybe not a good solution (but give few performance (:)
 
-// Graves
+    // Graves
 
-    // Alliance
-    //Stormpike first aid station
-    AV_AID_A_C                      = 1325,
-    AV_AID_A_A                      = 1326,
-    AV_AID_H_C                      = 1327,
-    AV_AID_H_A                      = 1328,
-    //Stormpike Graveyard
-    AV_PIKEGRAVE_A_C                = 1333,
-    AV_PIKEGRAVE_A_A                = 1335,
-    AV_PIKEGRAVE_H_C                = 1334,
-    AV_PIKEGRAVE_H_A                = 1336,
-    //Stoneheart Grave
-    AV_STONEHEART_A_C               = 1302,
-    AV_STONEHEART_A_A               = 1304, //over hc
-    AV_STONEHEART_H_C               = 1301, //over ac
-    AV_STONEHEART_H_A               = 1303, //over aa
-    //Neutral
-    //Snowfall Grave
-*/
+        // Alliance
+        //Stormpike first aid station
+        AV_AID_A_C                      = 1325,
+        AV_AID_A_A                      = 1326,
+        AV_AID_H_C                      = 1327,
+        AV_AID_H_A                      = 1328,
+        //Stormpike Graveyard
+        AV_PIKEGRAVE_A_C                = 1333,
+        AV_PIKEGRAVE_A_A                = 1335,
+        AV_PIKEGRAVE_H_C                = 1334,
+        AV_PIKEGRAVE_H_A                = 1336,
+        //Stoneheart Grave
+        AV_STONEHEART_A_C               = 1302,
+        AV_STONEHEART_A_A               = 1304, //over hc
+        AV_STONEHEART_H_C               = 1301, //over ac
+        AV_STONEHEART_H_A               = 1303, //over aa
+        //Neutral
+        //Snowfall Grave
+    */
     AV_SNOWFALL_N                   = 1966, //over aa
-/*
-    AV_SNOWFALL_A_C                 = 1341, //over hc
-    AV_SNOWFALL_A_A                 = 1343, //over ha
-    AV_SNOWFALL_H_C                 = 1342,
-    AV_SNOWFALL_H_A                 = 1344, //over ac
-    //Horde
-    //Iceblood grave
-    AV_ICEBLOOD_A_C                 = 1346, //over hc
-    AV_ICEBLOOD_A_A                 = 1348, //over ac
-    AV_ICEBLOOD_H_C                 = 1347,
-    AV_ICEBLOOD_H_A                 = 1349, //over aa
-    //Frostwolf Grave
-    AV_FROSTWOLF_A_C                = 1337, //over hc
-    AV_FROSTWOLF_A_A                = 1339, //over ac
-    AV_FROSTWOLF_H_C                = 1338,
-    AV_FROSTWOLF_H_A                = 1340, //over aa
-    //Frostwolf Hut
-    AV_FROSTWOLFHUT_A_C             = 1329, //over hc
-    AV_FROSTWOLFHUT_A_A             = 1331, //over ha
-    AV_FROSTWOLFHUT_H_C             = 1330,
-    AV_FROSTWOLFHUT_H_A             = 1332, //over ac
+    /*
+        AV_SNOWFALL_A_C                 = 1341, //over hc
+        AV_SNOWFALL_A_A                 = 1343, //over ha
+        AV_SNOWFALL_H_C                 = 1342,
+        AV_SNOWFALL_H_A                 = 1344, //over ac
+        //Horde
+        //Iceblood grave
+        AV_ICEBLOOD_A_C                 = 1346, //over hc
+        AV_ICEBLOOD_A_A                 = 1348, //over ac
+        AV_ICEBLOOD_H_C                 = 1347,
+        AV_ICEBLOOD_H_A                 = 1349, //over aa
+        //Frostwolf Grave
+        AV_FROSTWOLF_A_C                = 1337, //over hc
+        AV_FROSTWOLF_A_A                = 1339, //over ac
+        AV_FROSTWOLF_H_C                = 1338,
+        AV_FROSTWOLF_H_A                = 1340, //over aa
+        //Frostwolf Hut
+        AV_FROSTWOLFHUT_A_C             = 1329, //over hc
+        AV_FROSTWOLFHUT_A_A             = 1331, //over ha
+        AV_FROSTWOLFHUT_H_C             = 1330,
+        AV_FROSTWOLFHUT_H_A             = 1332, //over ac
 
-//Towers
-    //Alliance
-    //Dunbaldar South Bunker
-    AV_DUNS_CONTROLLED              = 1361,
-    AV_DUNS_DESTROYED               = 1370,
-    AV_DUNS_ASSAULTED               = 1378,
-    //Dunbaldar North Bunker
-    AV_DUNN_CONTROLLED              = 1362,
-    AV_DUNN_DESTROYED               = 1371,
-    AV_DUNN_ASSAULTED               = 1379,
-    //Icewing Bunker
-    AV_ICEWING_CONTROLLED           = 1363,
-    AV_ICEWING_DESTROYED            = 1372,
-    AV_ICEWING_ASSAULTED            = 1380,
-    //Stoneheart Bunker
-    AV_STONEH_CONTROLLED            = 1364,
-    AV_STONEH_DESTROYED             = 1373,
-    AV_STONEH_ASSAULTED             = 1381,
-    //Horde
-    //Iceblood Tower
-    AV_ICEBLOOD_CONTROLLED          = 1385,
-    AV_ICEBLOOD_DESTROYED           = 1368,
-    AV_ICEBLOOD_ASSAULTED           = 1390,
-    //Tower Point
-    AV_TOWERPOINT_CONTROLLED        = 1384,
-    AV_TOWERPOINT_DESTROYED         = 1367, //goes over controlled
-    AV_TOWERPOINT_ASSAULTED         = 1389, //goes over destroyed
-    //Frostwolf West
-    AV_FROSTWOLFW_CONTROLLED        = 1382,
-    AV_FROSTWOLFW_DESTROYED         = 1365, //over controlled
-    AV_FROSTWOLFW_ASSAULTED         = 1387, //over destroyed
-    //Frostwolf East
-    AV_FROSTWOLFE_CONTROLLED        = 1383,
-    AV_FROSTWOLFE_DESTROYED         = 1366,
-    AV_FROSTWOLFE_ASSAULTED         = 1388,
+    //Towers
+        //Alliance
+        //Dunbaldar South Bunker
+        AV_DUNS_CONTROLLED              = 1361,
+        AV_DUNS_DESTROYED               = 1370,
+        AV_DUNS_ASSAULTED               = 1378,
+        //Dunbaldar North Bunker
+        AV_DUNN_CONTROLLED              = 1362,
+        AV_DUNN_DESTROYED               = 1371,
+        AV_DUNN_ASSAULTED               = 1379,
+        //Icewing Bunker
+        AV_ICEWING_CONTROLLED           = 1363,
+        AV_ICEWING_DESTROYED            = 1372,
+        AV_ICEWING_ASSAULTED            = 1380,
+        //Stoneheart Bunker
+        AV_STONEH_CONTROLLED            = 1364,
+        AV_STONEH_DESTROYED             = 1373,
+        AV_STONEH_ASSAULTED             = 1381,
+        //Horde
+        //Iceblood Tower
+        AV_ICEBLOOD_CONTROLLED          = 1385,
+        AV_ICEBLOOD_DESTROYED           = 1368,
+        AV_ICEBLOOD_ASSAULTED           = 1390,
+        //Tower Point
+        AV_TOWERPOINT_CONTROLLED        = 1384,
+        AV_TOWERPOINT_DESTROYED         = 1367, //goes over controlled
+        AV_TOWERPOINT_ASSAULTED         = 1389, //goes over destroyed
+        //Frostwolf West
+        AV_FROSTWOLFW_CONTROLLED        = 1382,
+        AV_FROSTWOLFW_DESTROYED         = 1365, //over controlled
+        AV_FROSTWOLFW_ASSAULTED         = 1387, //over destroyed
+        //Frostwolf East
+        AV_FROSTWOLFE_CONTROLLED        = 1383,
+        AV_FROSTWOLFE_DESTROYED         = 1366,
+        AV_FROSTWOLFE_ASSAULTED         = 1388,
 
-//mines
+    //mines
 
-    AV_N_MINE_N              = 1360,
-    AV_N_MINE_A              = 1358,
-    AV_N_MINE_H              = 1359,
+        AV_N_MINE_N              = 1360,
+        AV_N_MINE_A              = 1358,
+        AV_N_MINE_H              = 1359,
 
-    AV_S_MINE_N                     = 1357,
-    AV_S_MINE_A                     = 1355,
-    AV_S_MINE_H                     = 1356,
+        AV_S_MINE_N                     = 1357,
+        AV_S_MINE_A                     = 1355,
+        AV_S_MINE_H                     = 1356,
 
-//towers assaulted by own team (unused)
-    AV_STONEH_UNUSED                = 1377,
-    AV_ICEWING_UNUSED               = 1376,
-    AV_DUNS_UNUSED                  = 1375,
-    AV_DUNN_UNUSED                  = 1374,
+    //towers assaulted by own team (unused)
+        AV_STONEH_UNUSED                = 1377,
+        AV_ICEWING_UNUSED               = 1376,
+        AV_DUNS_UNUSED                  = 1375,
+        AV_DUNN_UNUSED                  = 1374,
 
-    AV_ICEBLOOD_UNUSED              = 1395,
-    AV_TOWERPOINT_UNUSED            = 1394,
-    AV_FROSTWOLFE_UNUSED            = 1393,
-    AV_FROSTWOLFW_UNUSED            = 1392
-*/
+        AV_ICEBLOOD_UNUSED              = 1395,
+        AV_TOWERPOINT_UNUSED            = 1394,
+        AV_FROSTWOLFE_UNUSED            = 1393,
+        AV_FROSTWOLFW_UNUSED            = 1392
+    */
 
 };
 
@@ -1540,7 +1542,7 @@ struct BG_AV_NodeInfo
     bool         Tower;
 };
 
-inline BG_AV_Nodes &operator++(BG_AV_Nodes &i){ return i = BG_AV_Nodes(i + 1); }
+inline BG_AV_Nodes& operator++(BG_AV_Nodes& i) { return i = BG_AV_Nodes(i + 1); }
 
 struct BattlegroundAVScore : public BattlegroundScore
 {
@@ -1563,87 +1565,87 @@ struct BattlegroundAVScore : public BattlegroundScore
 
 class BattlegroundAV : public Battleground
 {
-    public:
-        BattlegroundAV();
-        ~BattlegroundAV() override;
+public:
+    BattlegroundAV();
+    ~BattlegroundAV() override;
 
-        /* inherited from BattlegroundClass */
-        void AddPlayer(Player* player) override;
-        void StartingEventCloseDoors() override;
-        void StartingEventOpenDoors() override;
+    /* inherited from BattlegroundClass */
+    void AddPlayer(Player* player) override;
+    void StartingEventCloseDoors() override;
+    void StartingEventOpenDoors() override;
 
-        void RemovePlayer(Player* player) override;
-        void HandleAreaTrigger(Player* player, uint32 trigger) override;
-        bool SetupBattleground() override;
-        void ResetBGSubclass() override;
+    void RemovePlayer(Player* player) override;
+    void HandleAreaTrigger(Player* player, uint32 trigger) override;
+    bool SetupBattleground() override;
+    void ResetBGSubclass() override;
 
-        /*general stuff*/
-        void UpdateScore(TeamId teamId, int16 points);
-        void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
+    /*general stuff*/
+    void UpdateScore(TeamId teamId, int16 points);
+    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
 
-        /*handlestuff*/ //these are functions which get called from extern
-        void EventPlayerClickedOnFlag(Player* source, GameObject* gameObject) override;
-        void HandleKillPlayer(Player* player, Player* killer) override;
-        void HandleKillUnit(Creature* unit, Player* killer) override;
-        void HandleQuestComplete(uint32 questid, Player* player);
-        bool PlayerCanDoMineQuest(int32 GOId, TeamId teamId);
+    /*handlestuff*/ //these are functions which get called from extern
+    void EventPlayerClickedOnFlag(Player* source, GameObject* gameObject) override;
+    void HandleKillPlayer(Player* player, Player* killer) override;
+    void HandleKillUnit(Creature* unit, Player* killer) override;
+    void HandleQuestComplete(uint32 questid, Player* player);
+    bool PlayerCanDoMineQuest(int32 GOId, TeamId teamId);
 
-        void EndBattleground(TeamId winnerTeamId) override;
+    void EndBattleground(TeamId winnerTeamId) override;
 
-        GraveyardStruct const* GetClosestGraveyard(Player* player) override;
+    GraveyardStruct const* GetClosestGraveyard(Player* player) override;
 
-        /* achievement req. */
-        bool IsBothMinesControlledByTeam(TeamId teamId) const;
-        bool IsAllTowersControlledAndCaptainAlive(TeamId teamId) const;
-        
-        TeamId GetPrematureWinner() override;
+    /* achievement req. */
+    bool IsBothMinesControlledByTeam(TeamId teamId) const;
+    bool IsAllTowersControlledAndCaptainAlive(TeamId teamId) const;
 
-    private:
-        void PostUpdateImpl(uint32 diff) override;
+    TeamId GetPrematureWinner() override;
 
-        /* Nodes occupying */
-        void EventPlayerAssaultsPoint(Player* player, uint32 object);
-        void EventPlayerDefendsPoint(Player* player, uint32 object);
-        void EventPlayerDestroyedPoint(BG_AV_Nodes node);
+private:
+    void PostUpdateImpl(uint32 diff) override;
 
-        void AssaultNode(BG_AV_Nodes node, TeamId teamId);
-        void DestroyNode(BG_AV_Nodes node);
-        void InitNode(BG_AV_Nodes node, TeamId teamId, bool tower);
-        void DefendNode(BG_AV_Nodes node, TeamId teamId);
+    /* Nodes occupying */
+    void EventPlayerAssaultsPoint(Player* player, uint32 object);
+    void EventPlayerDefendsPoint(Player* player, uint32 object);
+    void EventPlayerDestroyedPoint(BG_AV_Nodes node);
 
-        void PopulateNode(BG_AV_Nodes node);
-        void DePopulateNode(BG_AV_Nodes node);
+    void AssaultNode(BG_AV_Nodes node, TeamId teamId);
+    void DestroyNode(BG_AV_Nodes node);
+    void InitNode(BG_AV_Nodes node, TeamId teamId, bool tower);
+    void DefendNode(BG_AV_Nodes node, TeamId teamId);
 
-        BG_AV_Nodes GetNodeThroughObject(uint32 object);
-        uint32 GetObjectThroughNode(BG_AV_Nodes node);
-        char const* GetNodeName(BG_AV_Nodes node);
-        bool IsTower(BG_AV_Nodes node) { return m_Nodes[node].Tower; }
+    void PopulateNode(BG_AV_Nodes node);
+    void DePopulateNode(BG_AV_Nodes node);
 
-        /*mine*/
-        void ChangeMineOwner(uint8 mine, TeamId teamId, bool initial=false);
+    BG_AV_Nodes GetNodeThroughObject(uint32 object);
+    uint32 GetObjectThroughNode(BG_AV_Nodes node);
+    char const* GetNodeName(BG_AV_Nodes node);
+    bool IsTower(BG_AV_Nodes node) { return m_Nodes[node].Tower; }
 
-        /*worldstates*/
-        void FillInitialWorldStates(WorldPacket& data) override;
-        uint8 GetWorldStateType(uint8 state, TeamId teamId);
-        void SendMineWorldStates(uint32 mine);
-        void UpdateNodeWorldState(BG_AV_Nodes node);
+    /*mine*/
+    void ChangeMineOwner(uint8 mine, TeamId teamId, bool initial = false);
 
-        /*general */
-        Creature* AddAVCreature(uint16 cinfoid, uint16 type);
+    /*worldstates*/
+    void FillInitialWorldStates(WorldPacket& data) override;
+    uint8 GetWorldStateType(uint8 state, TeamId teamId);
+    void SendMineWorldStates(uint32 mine);
+    void UpdateNodeWorldState(BG_AV_Nodes node);
 
-        /*variables */
-        int32 m_Team_Scores[2]{};
-        uint32 m_Team_QuestStatus[2][9]{}; //[x][y] x=team y=questcounter
+    /*general */
+    Creature* AddAVCreature(uint16 cinfoid, uint16 type);
 
-        BG_AV_NodeInfo m_Nodes[BG_AV_NODES_MAX]{};
+    /*variables */
+    int32 m_Team_Scores[2] {};
+    uint32 m_Team_QuestStatus[2][9] {}; //[x][y] x=team y=questcounter
 
-        TeamId m_Mine_Owner[2]{};
-        int32 m_Mine_Timer; //ticks for both teams
-        uint32 m_Mine_Reclaim_Timer[2]{};
-        uint32 m_CaptainBuffTimer[2]{};
-        bool m_CaptainAlive[2]{};
+    BG_AV_NodeInfo m_Nodes[BG_AV_NODES_MAX] {};
 
-        bool m_IsInformedNearVictory[2]{};
+    TeamId m_Mine_Owner[2] {};
+    int32 m_Mine_Timer; //ticks for both teams
+    uint32 m_Mine_Reclaim_Timer[2] {};
+    uint32 m_CaptainBuffTimer[2] {};
+    bool m_CaptainAlive[2] {};
+
+    bool m_IsInformedNearVictory[2] {};
 };
 
 #endif

@@ -41,7 +41,7 @@ enum SSNPCs
 
     NPC_COILFANG_SHATTERER                  = 21301,
     NPC_COILFANG_PRIESTESS                  = 21220,
-    
+
     NPC_ENCHANTED_ELEMENTAL                 = 21958,
     NPC_COILFANG_ELITE                      = 22055,
     NPC_COILFANG_STRIDER                    = 22056,
