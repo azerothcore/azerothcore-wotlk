@@ -115,7 +115,7 @@ void CreatureAI::MoveInLineOfSight(Unit* who)
     if (me->GetVictim())
         return;
 	
-	if (me->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET) // non-combat pets should just stand there and look good;)
+    if (me->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET) // non-combat pets should just stand there and look good;)
         return;
 
     // Northshire Abbey - wolves fix. They can call assistance only outside the starting zone.
