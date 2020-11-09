@@ -106,7 +106,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_HATEFUL_STRIKE:
                     {
@@ -157,7 +157,7 @@ public:
                     Talk(EMOTE_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
                     events.ScheduleEvent(EVENT_SPELL_SLIME_BOLT, 2000);
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_SPELL_SLIME_BOLT:
                     me->CastSpell(me, SPELL_SLIME_BOLT, false);
@@ -168,7 +168,7 @@ public:
                     {
                         Talk(EMOTE_ENRAGE);
                         me->CastSpell(me, SPELL_FRENZY, true);
-                        events.PopEvent();
+                        
                         break;
                     }
                     events.RepeatEvent(1000);

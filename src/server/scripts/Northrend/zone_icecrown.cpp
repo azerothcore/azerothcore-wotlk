@@ -216,7 +216,7 @@ public:
         void UpdateAI(uint32 diff)
         {
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_VALHALAS_FIRST:
                     {
@@ -250,7 +250,6 @@ public:
 
                         me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f);
                         me->SetPosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f, me->GetOrientation());
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_VALHALAS_SECOND:
@@ -277,19 +276,16 @@ public:
                         }
 
                         PrepareSummons();
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_VALHALAS_THIRD:
                     {
-                        events.PopEvent();
                         me->MonsterYell("In defeating him, he and his fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                         events.ScheduleEvent(EVENT_VALHALAS_THIRD + 2, 7000);
                         break;
                     }
                 case EVENT_VALHALAS_THIRD+2:
                     {
-                        events.PopEvent();
                         me->MonsterYell("ALL HAIL $N, CHAMPION OF VALHALAS! ", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID2));
                         break;
                     }

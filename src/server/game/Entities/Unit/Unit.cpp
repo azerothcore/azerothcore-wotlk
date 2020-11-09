@@ -3213,36 +3213,55 @@ void Unit::_UpdateSpells(uint32 time)
 
 void Unit::_UpdateAutoRepeatSpell()
 {
-    // check "realtime" interrupts
-    if ((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving()) || IsNonMeleeSpellCast(false, false, true, m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id == 75))
+    SpellInfo const* spellProto = nullptr;
+    if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL])
     {
-        // cancel wand shoot
-        if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != 75)
-            InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+        spellProto = m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo;
+    }
+
+    if (!spellProto)
+    {
+        return;
+    }
+    
+    static uint32 const HUNTER_AUTOSHOOT = 75;
+
+    // Check "realtime" interrupts
+    if ((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving() && spellProto->Id != HUNTER_AUTOSHOOT) ||
+        IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
+    {
+        InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
         m_AutoRepeatFirstCast = true;
         return;
     }
 
-    // apply delay (Auto Shot (spellID 75) not affected)
-    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != 75)
+    // Apply delay (Hunter's autoshoot not affected)
+    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && spellProto->Id != HUNTER_AUTOSHOOT)
+    {
         setAttackTimer(RANGED_ATTACK, 500);
+    }
+
     m_AutoRepeatFirstCast = false;
 
-    // castroutine
+    // Check for ranged attack timer
     if (isAttackReady(RANGED_ATTACK))
     {
-        // Check if able to cast
-        if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->CheckCast(true) != SPELL_CAST_OK)
+        SpellCastResult result = m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->CheckCast(true);
+        if (result != SPELL_CAST_OK)
         {
-            InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+            if (spellProto->Id != HUNTER_AUTOSHOOT)
+            {
+                InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+            }
+
             return;
         }
 
-        // we want to shoot
-        Spell* spell = new Spell(this, m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo, TRIGGERED_FULL_MASK);
+        // We want to shoot
+        Spell* spell = new Spell(this, spellProto, TRIGGERED_FULL_MASK);
         spell->prepare(&(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets));
 
-        // all went good, reset attack
+        // Reset attack
         resetAttackTimer(RANGED_ATTACK);
     }
 }
@@ -12796,8 +12815,11 @@ void Unit::ClearInCombat()
 void Unit::ClearInPetCombat()
 {
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LEAVE_COMBAT);
     if (Unit* owner = GetOwner())
+    {
         owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+    }
 }
 
 bool Unit::isTargetableForAttack(bool checkFakeDeath, Unit const* byWho) const
@@ -13600,8 +13622,10 @@ float Unit::ApplyTotalThreatModifier(float fThreat, SpellSchoolMask schoolMask)
 void Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
 {
     // Only mobs can manage threat lists
-    if (CanHaveThreatList())
+    if (CanHaveThreatList() && !HasUnitState(UNIT_STATE_EVADE))
+    {
         m_ThreatManager.addThreat(victim, fThreat, schoolMask, threatSpell);
+    }
 }
 
 //======================================================================
@@ -19482,11 +19506,6 @@ bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/)
     else
     {
         RemoveUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
-        if (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY))
-        {
-            m_movementInfo.SetFallTime(0);
-            //AddUnitMovementFlag(MOVEMENTFLAG_FALLING); // pussywizard: ZOMG!
-        }
     }
 
     return true;
@@ -19518,11 +19537,6 @@ bool Unit::SetCanFly(bool enable, bool /*packetOnly = false */)
     else
     {
         RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_MASK_MOVING_FLY);
-        if (!IsLevitating())
-        {
-            m_movementInfo.SetFallTime(0);
-            //AddUnitMovementFlag(MOVEMENTFLAG_FALLING); // pussywizard: ZOMG!
-        }
     }
 
     return true;

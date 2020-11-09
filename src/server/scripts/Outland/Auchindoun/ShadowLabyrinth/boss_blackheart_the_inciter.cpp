@@ -94,11 +94,10 @@ public:
                 return;
 
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_INCITE_WAIT:
                     InciteChaos = false;
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_INCITE:
                     {

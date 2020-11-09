@@ -668,13 +668,12 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_THORIM_AGGRO:
                     me->MonsterYell("Interlopers! You mortals who dare to interfere with my sport will pay... Wait--you...", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_AGGRO1);
                     events.ScheduleEvent(EVENT_THORIM_AGGRO2, 9000);
-                    events.PopEvent();
 
                     if (GameObject* go = GetThorimObject(DATA_THORIM_FENCE))
                         go->SetGoState(GO_STATE_READY);
@@ -684,7 +683,6 @@ public:
                     {
                         me->MonsterYell("I remember you... In the mountains... But you... what is this? Where am--", LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(SOUND_AGGRO2);
-                        events.PopEvent();
 
                         EntryCheckPredicate pred(NPC_SIF);
                         summons.DoAction(ACTION_SIF_START_TALK, pred);
@@ -692,7 +690,6 @@ public:
                     }
                 case EVENT_THORIM_START_PHASE1:
                     {
-                        events.PopEvent();
                         events.ScheduleEvent(EVENT_THORIM_STORMHAMMER, 8000, 0, EVENT_PHASE_START);
                         events.ScheduleEvent(EVENT_THORIM_CHARGE_ORB, 14000, 0, EVENT_PHASE_START);
                         events.ScheduleEvent(EVENT_THORIM_FILL_ARENA, 0, 0, EVENT_PHASE_START);
@@ -728,13 +725,11 @@ public:
                         me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
 
                         _isArenaEmpty = true;
-                        events.PopEvent();
                         events.CancelEvent(EVENT_THORIM_NOT_REACH_IN_TIME);
                         break;
                     }
                 case EVENT_THORIM_NOT_REACH_IN_TIME:
                     _isArenaEmpty = true;
-                    events.PopEvent();
                     events.CancelEvent(EVENT_THORIM_LIGHTNING_ORB);
                     me->CastSpell(me, SPELL_BERSERK_FRIENDS, true);
                     me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
@@ -750,7 +745,6 @@ public:
                     break;
                 case EVENT_THORIM_LIGHTNING_CHARGE:
                     me->CastSpell(me, SPELL_LIGHTNING_PILLAR_P2, true);
-                    events.PopEvent();
                     break;
                 case EVENT_THORIM_CHAIN_LIGHTNING:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
@@ -759,12 +753,10 @@ public:
                     break;
                 case EVENT_THORIM_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    events.PopEvent();
                     me->MonsterYell("My patience has reached its limit!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_BERSERK);
                     break;
                 case EVENT_THORIM_OUTRO1:
-                    events.PopEvent();
                     if (_hardMode)
                     {
                         me->MonsterYell("You! Fiend! You are not my beloved! Be gone!", LANG_UNIVERSAL, 0);
@@ -781,7 +773,6 @@ public:
                     }
                     break;
                 case EVENT_THORIM_OUTRO2:
-                    events.PopEvent();
                     if (_hardMode)
                     {
                         me->MonsterYell("Behold the hand behind all the evil that has befallen Ulduar! Left my kingdom in ruins, corrupted my brother and slain my wife!", LANG_UNIVERSAL, 0);
@@ -796,7 +787,6 @@ public:
                     }
                     break;
                 case EVENT_THORIM_OUTRO3:
-                    events.PopEvent();
                     if (_hardMode)
                     {
                         me->MonsterYell("And now it falls to you, champions, to avenge us all! The task before you is great, but I will lend you my aid as I am able. You must prevail!", LANG_UNIVERSAL, 0);
@@ -883,23 +873,20 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SIF_FINISH_DOMINION:
-                    events.PopEvent();
                     me->PlayDirectSound(SOUND_SIF_DESPAWN);
                     me->MonsterYell("This pathetic morons are harmless. Relive my station, dispose of them!", LANG_UNIVERSAL, 0);
                     me->DespawnOrUnsummon(5000);
                     break;
                 case EVENT_SIF_START_TALK:
-                    events.PopEvent();
                     me->MonsterYell("Thorim, my lord, why else would these invaders have come into your sanctum but to slay you? They must be stopped!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_SIF_START);
                     break;
                 case EVENT_SIF_JOIN_TALK:
                     me->PlayDirectSound(SOUND_SIF_EVENT);
                     me->MonsterYell("Impossible! Lord Thorim, I will bring your foes a frigid death!", LANG_UNIVERSAL, 0);
-                    events.PopEvent();
                     events.ScheduleEvent(EVENT_SIF_FROST_NOVA_START, 1000);
                     events.ScheduleEvent(EVENT_SIF_FROSTBOLT_VALLEY, 11000);
                     events.ScheduleEvent(EVENT_SIF_BLIZZARD, 15000);
@@ -922,7 +909,6 @@ public:
                 case EVENT_SIF_FROST_NOVA_CAST:
                     _allowCast = true;
                     me->CastSpell(me, SPELL_FROST_NOVA, false);
-                    events.PopEvent();
                     return;
             }
 
@@ -1210,7 +1196,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_DR_ACOLYTE_GH:
                     if (HealthBelowPct(60))
@@ -1327,7 +1313,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_IR_GUARD_IMPALE:
                     me->CastSpell(me->GetVictim(), SPELL_IMPALE, false);
@@ -1470,13 +1456,11 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_RC_RUNIC_SMASH_TRIGGER:
                     _nextTriggerPos += 16.0f;
-                    if (_nextTriggerPos > -260.0f)
-                        events.PopEvent();
-                    else
+                    if (!(_nextTriggerPos > -260.0f))
                         events.RescheduleEvent(EVENT_RC_RUNIC_SMASH_TRIGGER, 500);
 
                     RunRunicSmash(true);
@@ -1573,7 +1557,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_ARG_RD:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
@@ -1691,7 +1675,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_DR_WARBRINGER_RS:
                     me->CastSpell(me->GetVictim(), SPELL_RUNIC_STRIKE, false);
