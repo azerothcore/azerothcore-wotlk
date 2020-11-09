@@ -5277,7 +5277,9 @@ void Spell::HandleThreatSpells()
         else
         {
             if (!target->CanHaveThreatList())
+            {
                 continue;
+            }
 
             target->AddThreat(m_caster, threatToAdd, m_spellInfo->GetSchoolMask(), m_spellInfo);
         }
