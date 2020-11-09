@@ -755,8 +755,6 @@ protected:
     bool m_AlreadySearchedAssistance;
     bool m_regenHealth;
     bool m_AI_locked;
-    bool m_cannotReachTarget;
-    uint32 m_cannotReachTimer;
 
     SpellSchoolMask m_meleeDamageSchoolMask;
     uint32 m_originalEntry;
@@ -790,6 +788,9 @@ private:
 
     time_t _lastDamagedTime; // Part of Evade mechanics
 
+    bool m_cannotReachTarget;
+    uint32 m_cannotReachTimer;
+    
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
 };
 
