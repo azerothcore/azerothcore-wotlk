@@ -125,7 +125,9 @@ void HostileReference::fireStatusChanged(ThreatRefStatusChangeEvent& threatRefSt
 void HostileReference::addThreat(float modThreat)
 {
 	if (!modThreat)
+    {
         return;
+    }
 
     iThreat += modThreat;
     // the threat is changed. Source and target unit have to be available
