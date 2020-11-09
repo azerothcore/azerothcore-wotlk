@@ -64,7 +64,8 @@ enum BWLMisc
 {
     // Razorgore Egg Event
     ACTION_PHASE_TWO            = 1,
-    DATA_EGG_EVENT
+    DATA_EGG_EVENT              = 2,
+    TALK_EGG_BROKEN_RAND        = 3,
 };
 
 #endif
