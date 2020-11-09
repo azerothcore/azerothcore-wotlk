@@ -43,7 +43,7 @@ enum Says
     // BWL
     SAY_GAMESBEGIN_1           = 12,
     SAY_GAMESBEGIN_2           = 13,
- // SAY_VAEL_INTRO             = 14, Not used - when he corrupts Vaelastrasz
+    // SAY_VAEL_INTRO             = 14, Not used - when he corrupts Vaelastrasz
 
     // Nefarian
     SAY_RANDOM                 = 0,
@@ -65,8 +65,8 @@ enum Says
 
 enum Gossip
 {
-   GOSSIP_ID                   = 21332,
-   GOSSIP_OPTION_ID            = 0
+    GOSSIP_ID                   = 21332,
+    GOSSIP_OPTION_ID            = 0
 };
 
 enum Paths
@@ -127,10 +127,10 @@ enum Spells
     SPELL_ROGUE                 = 23414,     // Paralise
     SPELL_DEATH_KNIGHT          = 49576      // Death Grip
 
-// 19484
-// 22664
-// 22674
-// 22666
+                                  // 19484
+                                  // 22664
+                                  // 22674
+                                  // 22666
 };
 
 Position const DrakeSpawnLoc[2] = // drakonid
@@ -322,7 +322,7 @@ public:
                             events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
                             break;
                         case EVENT_SPAWN_ADD:
-                            for (uint8 i=0; i<2; ++i)
+                            for (uint8 i = 0; i < 2; ++i)
                             {
                                 uint32 CreatureID;
                                 if (urand(0, 2) == 0)
@@ -378,8 +378,8 @@ public:
             }
         }
 
-        private:
-            uint32 SpawnedAdds;
+    private:
+        uint32 SpawnedAdds;
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -428,7 +428,7 @@ public:
 
         void KilledUnit(Unit* victim)
         {
-            if (rand()%5)
+            if (rand() % 5)
                 return;
 
             Talk(SAY_SLAY, victim);
@@ -458,7 +458,8 @@ public:
                 for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
                     (*itr)->DespawnOrUnsummon();
 
-            } else DespawnTimer -= diff;
+            }
+            else DespawnTimer -= diff;
 
             if (!UpdateVictim())
                 return;
@@ -499,50 +500,50 @@ public:
                     case EVENT_CLASSCALL:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
                             switch (target->getClass())
-                        {
-                            case CLASS_MAGE:
-                                Talk(SAY_MAGE);
-                                DoCast(me, SPELL_MAGE);
-                                break;
-                            case CLASS_WARRIOR:
-                                Talk(SAY_WARRIOR);
-                                DoCast(me, SPELL_WARRIOR);
-                                break;
-                            case CLASS_DRUID:
-                                Talk(SAY_DRUID);
-                                DoCast(target, SPELL_DRUID);
-                                break;
-                            case CLASS_PRIEST:
-                                Talk(SAY_PRIEST);
-                                DoCast(me, SPELL_PRIEST);
-                                break;
-                            case CLASS_PALADIN:
-                                Talk(SAY_PALADIN);
-                                DoCast(me, SPELL_PALADIN);
-                                break;
-                            case CLASS_SHAMAN:
-                                Talk(SAY_SHAMAN);
-                                DoCast(me, SPELL_SHAMAN);
-                                break;
-                            case CLASS_WARLOCK:
-                                Talk(SAY_WARLOCK);
-                                DoCast(me, SPELL_WARLOCK);
-                                break;
-                            case CLASS_HUNTER:
-                                Talk(SAY_HUNTER);
-                                DoCast(me, SPELL_HUNTER);
-                                break;
-                            case CLASS_ROGUE:
-                                Talk(SAY_ROGUE);
-                                DoCast(me, SPELL_ROGUE);
-                                break;
-                            case CLASS_DEATH_KNIGHT:
-                                Talk(SAY_DEATH_KNIGHT);
-                                DoCast(me, SPELL_DEATH_KNIGHT);
-                                break;
-                            default:
-                                break;
-                        }
+                            {
+                                case CLASS_MAGE:
+                                    Talk(SAY_MAGE);
+                                    DoCast(me, SPELL_MAGE);
+                                    break;
+                                case CLASS_WARRIOR:
+                                    Talk(SAY_WARRIOR);
+                                    DoCast(me, SPELL_WARRIOR);
+                                    break;
+                                case CLASS_DRUID:
+                                    Talk(SAY_DRUID);
+                                    DoCast(target, SPELL_DRUID);
+                                    break;
+                                case CLASS_PRIEST:
+                                    Talk(SAY_PRIEST);
+                                    DoCast(me, SPELL_PRIEST);
+                                    break;
+                                case CLASS_PALADIN:
+                                    Talk(SAY_PALADIN);
+                                    DoCast(me, SPELL_PALADIN);
+                                    break;
+                                case CLASS_SHAMAN:
+                                    Talk(SAY_SHAMAN);
+                                    DoCast(me, SPELL_SHAMAN);
+                                    break;
+                                case CLASS_WARLOCK:
+                                    Talk(SAY_WARLOCK);
+                                    DoCast(me, SPELL_WARLOCK);
+                                    break;
+                                case CLASS_HUNTER:
+                                    Talk(SAY_HUNTER);
+                                    DoCast(me, SPELL_HUNTER);
+                                    break;
+                                case CLASS_ROGUE:
+                                    Talk(SAY_ROGUE);
+                                    DoCast(me, SPELL_ROGUE);
+                                    break;
+                                case CLASS_DEATH_KNIGHT:
+                                    Talk(SAY_DEATH_KNIGHT);
+                                    DoCast(me, SPELL_DEATH_KNIGHT);
+                                    break;
+                                default:
+                                    break;
+                            }
                         events.ScheduleEvent(EVENT_CLASSCALL, urand(30000, 35000));
                         break;
                 }

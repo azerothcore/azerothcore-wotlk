@@ -18,8 +18,8 @@ class Transport : public GameObject, public TransportBase
 {
 public:
     Transport() : GameObject() {}
-    void CalculatePassengerPosition(float& x, float& y, float& z, float* o = NULL) const { TransportBase::CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
-    void CalculatePassengerOffset(float& x, float& y, float& z, float* o = NULL) const { TransportBase::CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
+    void CalculatePassengerPosition(float& x, float& y, float& z, float* o = nullptr) const { TransportBase::CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
+    void CalculatePassengerOffset(float& x, float& y, float& z, float* o = nullptr) const { TransportBase::CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
 
     typedef std::set<WorldObject*> PassengerSet;
     virtual void AddPassenger(WorldObject* passenger, bool withAll = false) = 0;
@@ -116,7 +116,7 @@ public:
 
     uint32 GetPauseTime() const { return GetUInt32Value(GAMEOBJECT_LEVEL); }
     void SetPauseTime(uint32 val) { SetUInt32Value(GAMEOBJECT_LEVEL, val); }
-    uint32 GetPeriod() const { return m_goValue.Transport.AnimationInfo ? m_goValue.Transport.AnimationInfo->TotalTime : GetPauseTime()+2; }
+    uint32 GetPeriod() const { return m_goValue.Transport.AnimationInfo ? m_goValue.Transport.AnimationInfo->TotalTime : GetPauseTime() + 2; }
 private:
     bool _needDoInitialRelocation;
 };
