@@ -617,8 +617,10 @@ void Creature::Update(uint32 diff)
                 {
                     m_cannotReachTimer += diff;
                     if (m_cannotReachTimer >= DEF_CANNOT_REACH && IsAIEnabled)
+                    {
                         AI()->EnterEvadeMode();
-                }
+                    }
+                } 
 
                 break;
             }
