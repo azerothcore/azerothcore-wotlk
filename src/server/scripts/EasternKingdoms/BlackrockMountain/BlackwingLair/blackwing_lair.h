@@ -68,4 +68,9 @@ enum BWLMisc
     TALK_EGG_BROKEN_RAND        = 3,
 };
 
+enum Gameobjects
+{
+    GO_SUPPRESSION_DEVICE       = 179784
+};
+
 #endif

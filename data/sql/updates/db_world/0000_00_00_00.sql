@@ -83,3 +83,8 @@ DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_vael_burning_adrenali
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 ('18173', 'spell_vael_burning_adrenaline');
 
+-- Suppression Room
+SET @GO_TURRET = 179784;
+UPDATE `gameobject_template` SET `ScriptName`='go_suppression_device' WHERE `entry`=@GO_TURRET;
+UPDATE `gameobject_template_addon` SET `faction`=14 WHERE `entry`=@GO_TURRET;
+
