@@ -105,6 +105,15 @@ public:
                     else
                         EggList.push_back(go->GetGUID());
                     break;
+
+                case GO_PORTCULLIS_RAZORGORE:
+                case GO_PORTCULLIS_VAELASTRASZ:
+                case GO_PORTCULLIS_BROODLORD:
+                case GO_PORTCULLIS_THREEDRAGONS:
+                case GO_PORTCULLIS_CHROMAGGUS:
+                case GO_PORTCULLIS_NEFARIAN:
+                    AddDoor(go, true);
+                    break;
                 default:
                     break;
             }
@@ -116,6 +125,20 @@ public:
 
             if (go->GetEntry() == GO_BLACK_DRAGON_EGG)
                 EggList.remove(go->GetGUID());
+
+            switch (go->GetEntry())
+            { 
+            case GO_PORTCULLIS_RAZORGORE:
+            case GO_PORTCULLIS_VAELASTRASZ:
+            case GO_PORTCULLIS_BROODLORD:
+            case GO_PORTCULLIS_THREEDRAGONS:
+            case GO_PORTCULLIS_CHROMAGGUS:
+            case GO_PORTCULLIS_NEFARIAN:
+                AddDoor(go, false);
+                break;
+            default:
+                break;
+            }
         }
 
         bool CheckRequiredBosses(uint32 bossId, Player const* player /*= nullptr*/) const override
