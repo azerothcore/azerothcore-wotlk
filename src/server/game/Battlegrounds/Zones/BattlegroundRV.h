@@ -76,41 +76,41 @@ enum BattlegroundRVData
 
 class BattlegroundRV : public Battleground
 {
-    public:
-        BattlegroundRV();
-        ~BattlegroundRV();
+public:
+    BattlegroundRV();
+    ~BattlegroundRV();
 
-        /* inherited from BattlegroundClass */
-        void AddPlayer(Player* player);
-        void RemovePlayer(Player* player);
-        void StartingEventCloseDoors();
-        void StartingEventOpenDoors();
-        void Init();
-        void FillInitialWorldStates(WorldPacket &d);
-        void UpdateArenaWorldState();
-        void HandleAreaTrigger(Player* player, uint32 trigger);
-        bool SetupBattleground();
-        void HandleKillPlayer(Player* player, Player* killer);
-        bool HandlePlayerUnderMap(Player* player);
+    /* inherited from BattlegroundClass */
+    void AddPlayer(Player* player);
+    void RemovePlayer(Player* player);
+    void StartingEventCloseDoors();
+    void StartingEventOpenDoors();
+    void Init();
+    void FillInitialWorldStates(WorldPacket& d);
+    void UpdateArenaWorldState();
+    void HandleAreaTrigger(Player* player, uint32 trigger);
+    bool SetupBattleground();
+    void HandleKillPlayer(Player* player, Player* killer);
+    bool HandlePlayerUnderMap(Player* player);
 
-        GameObject* GetPillarAtPosition(Position* p);
+    GameObject* GetPillarAtPosition(Position* p);
 
-    private:
-        uint32 Timer;
-        uint32 State;
-        uint16 CheckPlayersTimer;
+private:
+    uint32 Timer;
+    uint32 State;
+    uint16 CheckPlayersTimer;
 
-        void PostUpdateImpl(uint32 diff);
+    void PostUpdateImpl(uint32 diff);
 
-    protected:
-        uint32 getTimer() { return Timer; }
-        void setTimer(uint32 timer) { Timer = timer; }
-        uint32 getState() { return State; };
-        void setState(uint32 state) { State = state; }
+protected:
+    uint32 getTimer() { return Timer; }
+    void setTimer(uint32 timer) { Timer = timer; }
+    uint32 getState() { return State; };
+    void setState(uint32 state) { State = state; }
 
-        void TeleportUnitToNewZ(Unit* unit, float newZ, bool casting);
-        void CheckPositionForUnit(Unit* unit);
-        void UpdatePillars();
-        uint32 GetPillarIdForPos(Position* p);
+    void TeleportUnitToNewZ(Unit* unit, float newZ, bool casting);
+    void CheckPositionForUnit(Unit* unit);
+    void UpdatePillars();
+    uint32 GetPillarIdForPos(Position* p);
 };
 #endif
