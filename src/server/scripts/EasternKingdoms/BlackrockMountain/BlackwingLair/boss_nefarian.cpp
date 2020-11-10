@@ -203,10 +203,10 @@ public:
             me->SetStandState(UNIT_STAND_STATE_STAND); 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             AttackStart(target);
-            events.ScheduleEvent(EVENT_SHADOW_BOLT, 3, 10);
-            events.ScheduleEvent(EVENT_FEAR, 10, 20);
-            //events.ScheduleEvent(EVENT_MIND_CONTROL, 30, 35);
-            events.ScheduleEvent(EVENT_SPAWN_ADD, 10);
+            events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
+            events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
+            //events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
+            events.ScheduleEvent(EVENT_SPAWN_ADD, 10000);
         }
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
@@ -227,11 +227,11 @@ public:
             if ( type == 1 && data == 1)
             {
                 me->StopMoving();
-                events.ScheduleEvent(EVENT_PATH_2, 9);
+                events.ScheduleEvent(EVENT_PATH_2, 9000);
             }
 
             if (type == 1 && data == 2)
-                events.ScheduleEvent(EVENT_SUCCESS_1, 5);
+                events.ScheduleEvent(EVENT_SUCCESS_1, 5000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -246,7 +246,7 @@ public:
                     {
                         case EVENT_PATH_2:
                             me->GetMotionMaster()->MovePath(NEFARIUS_PATH_2, false);
-                            events.ScheduleEvent(EVENT_CHAOS_1, 7);
+                            events.ScheduleEvent(EVENT_CHAOS_1, 7000);
                             break;
                         case EVENT_CHAOS_1:
                             if (Creature* gyth = me->FindNearestCreature(NPC_GYTH, 75.0f, true))
@@ -254,7 +254,7 @@ public:
                                 me->SetFacingToObject(gyth);
                                 Talk(SAY_CHAOS_SPELL);
                             }
-                            events.ScheduleEvent(EVENT_CHAOS_2, 2);
+                            events.ScheduleEvent(EVENT_CHAOS_2, 2000);
                             break;
                         case EVENT_CHAOS_2:
                             DoCast(SPELL_CHROMATIC_CHAOS);
@@ -310,17 +310,17 @@ public:
                                     break;
                             }
                             DoResetThreat();
-                            events.ScheduleEvent(EVENT_SHADOW_BOLT, 3, 10);
+                            events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
                             break;
                         case EVENT_FEAR:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true))
                                 DoCast(target, SPELL_FEAR);
-                            events.ScheduleEvent(EVENT_FEAR, 10, 20);
+                            events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
                             break;
                         case EVENT_MIND_CONTROL:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true))
                                 DoCast(target, SPELL_SHADOW_COMMAND);
-                            events.ScheduleEvent(EVENT_MIND_CONTROL, 30, 35);
+                            events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
                             break;
                         case EVENT_SPAWN_ADD:
                             for (uint8 i=0; i<2; ++i)
@@ -353,7 +353,7 @@ public:
                                     return;
                                 }
                             }
-                            events.ScheduleEvent(EVENT_SPAWN_ADD, 4);
+                            events.ScheduleEvent(EVENT_SPAWN_ADD, 4000);
                             break;
                     }
 
@@ -363,15 +363,19 @@ public:
             }
         }
 
-        bool OnGossipSelect(Player* player, uint32 menuId, uint32 gossipListId)
+        void sGossipSelect(Player* player, uint32 sender, uint32 action)
         {
-            if (menuId == GOSSIP_ID && gossipListId == GOSSIP_OPTION_ID)
+            if (sender == GOSSIP_ID && action == GOSSIP_OPTION_ID)
             {
-                CloseGossipMenuFor(player);
+                // pussywizard:
+                InstanceScript* instance = player->GetInstanceScript();
+                if (!instance || instance->GetBossState(DATA_NEFARIAN) == DONE)
+                    return;
+
+                player->CLOSE_GOSSIP_MENU();
                 Talk(SAY_GAMESBEGIN_1);
                 BeginEvent(player);
             }
-            return false;
         }
 
         private:
@@ -415,12 +419,12 @@ public:
 
         void EnterCombat(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_SHADOWFLAME, 12);
-            events.ScheduleEvent(EVENT_FEAR, 25, 35);
-            events.ScheduleEvent(EVENT_VEILOFSHADOW, 25, 35);
-            events.ScheduleEvent(EVENT_CLEAVE, 7);
-            //events.ScheduleEvent(EVENT_TAILLASH, 10);
-            events.ScheduleEvent(EVENT_CLASSCALL, 30, 35);
+            events.ScheduleEvent(EVENT_SHADOWFLAME, 12000);
+            events.ScheduleEvent(EVENT_FEAR, urand(25000, 35000));
+            events.ScheduleEvent(EVENT_VEILOFSHADOW, urand(25000, 35000));
+            events.ScheduleEvent(EVENT_CLEAVE, 7000);
+            //events.ScheduleEvent(EVENT_TAILLASH, 10000);
+            events.ScheduleEvent(EVENT_CLASSCALL, urand(30000, 35000));
             Talk(SAY_RANDOM);
         }
 
@@ -481,24 +485,24 @@ public:
                 {
                     case EVENT_SHADOWFLAME:
                         DoCastVictim(SPELL_SHADOWFLAME);
-                        events.ScheduleEvent(EVENT_SHADOWFLAME, 12);
+                        events.ScheduleEvent(EVENT_SHADOWFLAME, 12000);
                         break;
                     case EVENT_FEAR:
                         DoCastVictim(SPELL_BELLOWINGROAR);
-                        events.ScheduleEvent(EVENT_FEAR, 25, 35);
+                        events.ScheduleEvent(EVENT_FEAR, urand(25000, 35000));
                         break;
                     case EVENT_VEILOFSHADOW:
                         DoCastVictim(SPELL_VEILOFSHADOW);
-                        events.ScheduleEvent(EVENT_VEILOFSHADOW, 25, 35);
+                        events.ScheduleEvent(EVENT_VEILOFSHADOW, urand(25000, 35000));
                         break;
                     case EVENT_CLEAVE:
                         DoCastVictim(SPELL_CLEAVE);
-                        events.ScheduleEvent(EVENT_CLEAVE, 7);
+                        events.ScheduleEvent(EVENT_CLEAVE, 7000);
                         break;
                     case EVENT_TAILLASH:
                         // Cast NYI since we need a better check for behind target
                         DoCastVictim(SPELL_TAILLASH);
-                        events.ScheduleEvent(EVENT_TAILLASH, 10);
+                        events.ScheduleEvent(EVENT_TAILLASH, 10000);
                         break;
                     case EVENT_CLASSCALL:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
@@ -547,7 +551,7 @@ public:
                             default:
                                 break;
                         }
-                        events.ScheduleEvent(EVENT_CLASSCALL, 30, 35);
+                        events.ScheduleEvent(EVENT_CLASSCALL, urand(30000, 35000));
                         break;
                 }
 

@@ -24,7 +24,7 @@ enum Says
 
 enum Gossip
 {
-   GOSSIP_ID                         = 6101,
+   GOSSIP_ID                         = 21334,
 };
 
 enum Spells
@@ -211,14 +211,13 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        bool OnGossipSelect(Player* player, uint32 menuId, uint32 gossipListId)
+        void sGossipSelect(Player* player, uint32 sender, uint32 action)
         {
-            if (menuId == GOSSIP_ID && gossipListId == 0)
+            if (sender == GOSSIP_ID && action == 0)
             {
-                CloseGossipMenuFor(player);
+                player->CLOSE_GOSSIP_MENU();
                 BeginSpeech(player);
             }
-            return false;
         }
 
         private:
