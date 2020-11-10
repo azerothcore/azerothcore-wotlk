@@ -191,7 +191,7 @@ enum eFBSTexts
     SAY_TYRANNUS_GARFROST                       = 20,
 };
 
-const Position FBSSpawnPos = {695.685f, -118.825f, 513.877f, 3*M_PI/2};
+const Position FBSSpawnPos = {695.685f, -118.825f, 513.877f, 3 * M_PI / 2};
 
 struct FBSPosition
 {
@@ -201,15 +201,15 @@ struct FBSPosition
 
 const FBSPosition FBSData[] =
 {
-    { NPC_HORDE_SLAVE_1, PATH_BEGIN_VALUE+0 },
-    { NPC_HORDE_SLAVE_1, PATH_BEGIN_VALUE+1 },
-    { NPC_HORDE_SLAVE_2, PATH_BEGIN_VALUE+2 },
-    { NPC_HORDE_SLAVE_2, PATH_BEGIN_VALUE+3 },
-    { NPC_HORDE_SLAVE_2, PATH_BEGIN_VALUE+4 },
-    { NPC_HORDE_SLAVE_3, PATH_BEGIN_VALUE+5 },
-    { NPC_HORDE_SLAVE_3, PATH_BEGIN_VALUE+6 },
-    { NPC_HORDE_SLAVE_4, PATH_BEGIN_VALUE+7 },
-    { NPC_HORDE_SLAVE_4, PATH_BEGIN_VALUE+8 },
+    { NPC_HORDE_SLAVE_1, PATH_BEGIN_VALUE + 0 },
+    { NPC_HORDE_SLAVE_1, PATH_BEGIN_VALUE + 1 },
+    { NPC_HORDE_SLAVE_2, PATH_BEGIN_VALUE + 2 },
+    { NPC_HORDE_SLAVE_2, PATH_BEGIN_VALUE + 3 },
+    { NPC_HORDE_SLAVE_2, PATH_BEGIN_VALUE + 4 },
+    { NPC_HORDE_SLAVE_3, PATH_BEGIN_VALUE + 5 },
+    { NPC_HORDE_SLAVE_3, PATH_BEGIN_VALUE + 6 },
+    { NPC_HORDE_SLAVE_4, PATH_BEGIN_VALUE + 7 },
+    { NPC_HORDE_SLAVE_4, PATH_BEGIN_VALUE + 8 },
     { 0, 0 }
 };
 
@@ -269,7 +269,7 @@ const Position TSSindragosaPos2 = {948.39f, 215.47f, 653.71f, 5.51f};
 struct TSPosition
 {
     uint32 entry;
-    float x,y;
+    float x, y;
 };
 
 const TSPosition TSData[] =
