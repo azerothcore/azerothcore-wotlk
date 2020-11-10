@@ -92,23 +92,23 @@ enum Misc
 
 class CorruptTriggers : public BasicEvent
 {
-    public:
-        CorruptTriggers(Unit* caster) : _caster(caster)
-        {
-        }
+public:
+    CorruptTriggers(Unit* caster) : _caster(caster)
+    {
+    }
 
-        bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
-        {
-            std::list<Creature*> cList;
-            _caster->GetCreaturesWithEntryInRange(cList, 70.0f, NPC_FOG_TRIGGER);
-            for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
-                if (_caster->GetExactDist2d(*itr) <= 11.0f)
-                    (*itr)->CastSpell(*itr, SPELL_FOG_OF_CORRUPTION, true);
-            return true;
-        }
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    {
+        std::list<Creature*> cList;
+        _caster->GetCreaturesWithEntryInRange(cList, 70.0f, NPC_FOG_TRIGGER);
+        for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
+            if (_caster->GetExactDist2d(*itr) <= 11.0f)
+                (*itr)->CastSpell(*itr, SPELL_FOG_OF_CORRUPTION, true);
+        return true;
+    }
 
-    private:
-        Unit* _caster;
+private:
+    Unit* _caster;
 };
 
 class boss_felmyst : public CreatureScript
@@ -244,7 +244,7 @@ public:
                     events2.ScheduleEvent(EVENT_INTRO_3, 1500);
                     break;
                 case EVENT_INTRO_3:
-                    me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+10.0f, false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, false, true);
                     events2.ScheduleEvent(EVENT_INTRO_4, 2000);
                     break;
                 case EVENT_INTRO_4:
@@ -322,23 +322,23 @@ public:
                     events.ScheduleEvent(EVENT_LAND_FIGHT, 86000);
                     break;
                 case EVENT_FLIGHT_MOVE_UP:
-                    me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+15.0f, false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, false, true);
                     break;
                 case EVENT_FLIGHT_VAPOR:
                     me->CastSpell(me, SPELL_SUMMON_DEMONIC_VAPOR, true);
                     break;
                 case EVENT_FLIGHT_BREATH1:
-                {
-                    Position pos = {1447.0f + urand(0, 2)*25.0f, 705.0f, 50.0f, 4.71f};
-                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_START1, pos, false, true);
-                    break;
-                }
+                    {
+                        Position pos = {1447.0f + urand(0, 2) * 25.0f, 705.0f, 50.0f, 4.71f};
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_START1, pos, false, true);
+                        break;
+                    }
                 case EVENT_FLIGHT_BREATH2:
-                {
-                    Position pos = {1447.0f + urand(0, 2)*25.0f, 515.0f, 50.0f, 1.57f};
-                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_START2, pos, false, true);
-                    break;
-                }
+                    {
+                        Position pos = {1447.0f + urand(0, 2) * 25.0f, 515.0f, 50.0f, 1.57f};
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_START2, pos, false, true);
+                        break;
+                    }
                 case EVENT_FLIGHT_EMOTE:
                     Talk(EMOTE_BREATH);
                     break;
@@ -356,11 +356,11 @@ public:
                     break;
                 case EVENT_FLIGHT_FLYOVER1:
                     me->CastSpell(me, SPELL_FELMYST_SPEED_BURST, true);
-                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END1, me->GetPositionX(), me->GetPositionY()-200.0f, me->GetPositionZ()+5.0f, false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END1, me->GetPositionX(), me->GetPositionY() - 200.0f, me->GetPositionZ() + 5.0f, false, true);
                     break;
                 case EVENT_FLIGHT_FLYOVER2:
                     me->CastSpell(me, SPELL_FELMYST_SPEED_BURST, true);
-                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END2, me->GetPositionX(), me->GetPositionY()+200.0f, me->GetPositionZ()+5.0f, false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END2, me->GetPositionX(), me->GetPositionY() + 200.0f, me->GetPositionZ() + 5.0f, false, true);
                     break;
                 case EVENT_LAND_FIGHT:
                     me->GetMotionMaster()->MovePoint(POINT_GROUND, 1500.0f, 552.8f, 26.52f, false, true);
@@ -438,7 +438,7 @@ public:
             me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
         }
 
-        void SpellHitTarget(Unit* , const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit*, const SpellInfo* spellInfo)
         {
             if (spellInfo->Id == SPELL_DEMONIC_VAPOR)
                 me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
@@ -467,103 +467,103 @@ public:
 
 class spell_felmyst_fog_of_corruption : public SpellScriptLoader
 {
-    public:
-        spell_felmyst_fog_of_corruption() : SpellScriptLoader("spell_felmyst_fog_of_corruption") { }
+public:
+    spell_felmyst_fog_of_corruption() : SpellScriptLoader("spell_felmyst_fog_of_corruption") { }
 
-        class spell_felmyst_fog_of_corruption_SpellScript : public SpellScript
+    class spell_felmyst_fog_of_corruption_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_felmyst_fog_of_corruption_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex effIndex)
         {
-            PrepareSpellScript(spell_felmyst_fog_of_corruption_SpellScript);
-
-            void HandleScriptEffect(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-                if (Unit* target = GetHitUnit())
-                    target->CastSpell(GetCaster(), SPELL_FOG_OF_CORRUPTION_CHARM, true);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_felmyst_fog_of_corruption_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_felmyst_fog_of_corruption_SpellScript();
+            PreventHitDefaultEffect(effIndex);
+            if (Unit* target = GetHitUnit())
+                target->CastSpell(GetCaster(), SPELL_FOG_OF_CORRUPTION_CHARM, true);
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_felmyst_fog_of_corruption_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_felmyst_fog_of_corruption_SpellScript();
+    }
 };
 
 class spell_felmyst_fog_of_corruption_charm : public SpellScriptLoader
 {
-    public:
-        spell_felmyst_fog_of_corruption_charm() : SpellScriptLoader("spell_felmyst_fog_of_corruption_charm") { }
+public:
+    spell_felmyst_fog_of_corruption_charm() : SpellScriptLoader("spell_felmyst_fog_of_corruption_charm") { }
 
-        class spell_felmyst_fog_of_corruption_charm_AuraScript : public AuraScript
+    class spell_felmyst_fog_of_corruption_charm_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_felmyst_fog_of_corruption_charm_AuraScript);
+
+        void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_felmyst_fog_of_corruption_charm_AuraScript);
-
-            void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                GetTarget()->CastSpell(GetTarget(), SPELL_FOG_OF_CORRUPTION_CHARM2, true);
-            }
-
-            void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM);
-                GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM2);
-                Unit::Kill(GetCaster(), GetTarget(), false);
-            }
-
-            void Register()
-            {
-                OnEffectApply += AuraEffectApplyFn(spell_felmyst_fog_of_corruption_charm_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
-                OnEffectRemove += AuraEffectRemoveFn(spell_felmyst_fog_of_corruption_charm_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_felmyst_fog_of_corruption_charm_AuraScript();
+            GetTarget()->CastSpell(GetTarget(), SPELL_FOG_OF_CORRUPTION_CHARM2, true);
         }
+
+        void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM);
+            GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM2);
+            Unit::Kill(GetCaster(), GetTarget(), false);
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_felmyst_fog_of_corruption_charm_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_felmyst_fog_of_corruption_charm_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_felmyst_fog_of_corruption_charm_AuraScript();
+    }
 };
 
 class DoorsGuidCheck
 {
-    public:
-        bool operator()(WorldObject* object) const
-        {
-            if (object->GetTypeId() != TYPEID_UNIT)
-                return true;
+public:
+    bool operator()(WorldObject* object) const
+    {
+        if (object->GetTypeId() != TYPEID_UNIT)
+            return true;
 
-            Creature* cr = object->ToCreature();
-            return cr->GetDBTableGUIDLow() != 54780 && cr->GetDBTableGUIDLow() != 54787 && cr->GetDBTableGUIDLow() != 54801;
-        }
+        Creature* cr = object->ToCreature();
+        return cr->GetDBTableGUIDLow() != 54780 && cr->GetDBTableGUIDLow() != 54787 && cr->GetDBTableGUIDLow() != 54801;
+    }
 };
 
 class spell_felmyst_open_brutallus_back_doors : public SpellScriptLoader
 {
-    public:
-        spell_felmyst_open_brutallus_back_doors() : SpellScriptLoader("spell_felmyst_open_brutallus_back_doors") { }
+public:
+    spell_felmyst_open_brutallus_back_doors() : SpellScriptLoader("spell_felmyst_open_brutallus_back_doors") { }
 
-        class spell_felmyst_open_brutallus_back_doors_SpellScript : public SpellScript
+    class spell_felmyst_open_brutallus_back_doors_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_felmyst_open_brutallus_back_doors_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            PrepareSpellScript(spell_felmyst_open_brutallus_back_doors_SpellScript);
-
-            void FilterTargets(std::list<WorldObject*>& unitList)
-            {
-                unitList.remove_if(DoorsGuidCheck());
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_felmyst_open_brutallus_back_doors_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_felmyst_open_brutallus_back_doors_SpellScript();
+            unitList.remove_if(DoorsGuidCheck());
         }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_felmyst_open_brutallus_back_doors_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_felmyst_open_brutallus_back_doors_SpellScript();
+    }
 };
 
 void AddSC_boss_felmyst()

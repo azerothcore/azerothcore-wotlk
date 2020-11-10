@@ -43,8 +43,8 @@ enum GuildDefaultRanks
     GR_VETERAN      = 2,
     GR_MEMBER       = 3,
     GR_INITIATE     = 4
-    // When promoting member server does: rank--
-    // When demoting member server does: rank++
+                      // When promoting member server does: rank--
+                      // When demoting member server does: rank++
 };
 
 enum GuildRankRights
@@ -839,7 +839,7 @@ private:
     void _SendBankMoneyUpdate(WorldSession* session) const;
     void _SendBankContentUpdate(MoveItemData* pSrc, MoveItemData* pDest) const;
     void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
-    void _SendBankList(WorldSession* session = NULL, uint8 tabId = 0, bool sendFullSlots = false, SlotIds *slots = nullptr) const;
+    void _SendBankList(WorldSession* session = NULL, uint8 tabId = 0, bool sendFullSlots = false, SlotIds* slots = nullptr) const;
 
     void _BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* param1 = NULL, const char* param2 = NULL, const char* param3 = nullptr) const;
 };

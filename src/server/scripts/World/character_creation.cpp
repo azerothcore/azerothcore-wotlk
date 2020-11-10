@@ -26,26 +26,26 @@ public:
         switch (player->getClass())
         {
             // Only two classes posses an aura on creation;
-        case CLASS_WARRIOR:
-            player->CastSpell(player, WARRIOR_CREATION_BATTLE_STANCE, true);
-            return;
-        case CLASS_DEATH_KNIGHT:
-            player->CastSpell(player, DEATH_KNIGHT_CREATION_BLOOD_PRESENCE, true);
-            return;
+            case CLASS_WARRIOR:
+                player->CastSpell(player, WARRIOR_CREATION_BATTLE_STANCE, true);
+                return;
+            case CLASS_DEATH_KNIGHT:
+                player->CastSpell(player, DEATH_KNIGHT_CREATION_BLOOD_PRESENCE, true);
+                return;
             // We include, but do not change the other classes
-        case CLASS_NONE:
-        case CLASS_PALADIN:
-        case CLASS_HUNTER:
-        case CLASS_ROGUE:
-        case CLASS_PRIEST:
-        case CLASS_SHAMAN:
-        case CLASS_MAGE:
-        case CLASS_WARLOCK:
+            case CLASS_NONE:
+            case CLASS_PALADIN:
+            case CLASS_HUNTER:
+            case CLASS_ROGUE:
+            case CLASS_PRIEST:
+            case CLASS_SHAMAN:
+            case CLASS_MAGE:
+            case CLASS_WARLOCK:
             // case CLASS_UNK: // Does not exist!
-        case CLASS_DRUID:
-        default:
-            // Can be modified based on personal needs;
-            return;
+            case CLASS_DRUID:
+            default:
+                // Can be modified based on personal needs;
+                return;
         }
     }
 };

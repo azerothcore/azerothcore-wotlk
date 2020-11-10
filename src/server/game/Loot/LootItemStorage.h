@@ -13,7 +13,7 @@ Xinef
 
 struct StoredLootItem
 {
-    StoredLootItem(uint32 i, uint32 c, int32 ri, uint32 rs) : 
+    StoredLootItem(uint32 i, uint32 c, int32 ri, uint32 rs) :
         itemid(i), count(c), randomPropertyId(ri), randomSuffix(rs) { }
 
     // If itemid == 0 - money amount is stored in count value
@@ -28,25 +28,25 @@ typedef std::unordered_map<uint32, StoredLootItemList> LootItemContainer;
 
 class LootItemStorage
 {
-    private:
-        LootItemStorage();
-        ~LootItemStorage();
+private:
+    LootItemStorage();
+    ~LootItemStorage();
 
-    public:
-        static LootItemStorage* instance();
+public:
+    static LootItemStorage* instance();
 
-        void LoadStorageFromDB();
-        void RemoveEntryFromDB(uint32 containerId, uint32 itemid, uint32 count);
+    void LoadStorageFromDB();
+    void RemoveEntryFromDB(uint32 containerId, uint32 itemid, uint32 count);
 
-        void AddNewStoredLoot(Loot* loot, Player* player);
-        bool LoadStoredLoot(Item* item);
+    void AddNewStoredLoot(Loot* loot, Player* player);
+    bool LoadStoredLoot(Item* item);
 
-        void RemoveStoredLootItem(uint32 containerId, uint32 itemid, uint32 count, Loot* loot);
-        void RemoveStoredLootMoney(uint32 containerId, Loot* loot);
-        void RemoveStoredLoot(uint32 containerId);
+    void RemoveStoredLootItem(uint32 containerId, uint32 itemid, uint32 count, Loot* loot);
+    void RemoveStoredLootMoney(uint32 containerId, Loot* loot);
+    void RemoveStoredLoot(uint32 containerId);
 
-    private:
-        LootItemContainer lootItemStore;
+private:
+    LootItemContainer lootItemStore;
 };
 
 #define sLootItemStorage LootItemStorage::instance()

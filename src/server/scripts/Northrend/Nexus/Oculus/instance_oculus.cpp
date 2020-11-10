@@ -77,7 +77,7 @@ public:
             switch( pGo->GetEntry() )
             {
                 case GO_DRAGON_CAGE_DOOR:
-                    for( uint8 i=0; i<3; ++i )
+                    for( uint8 i = 0; i < 3; ++i )
                     {
                         if( DragonCageDoorGUID[i] )
                             continue;
@@ -104,7 +104,7 @@ public:
             if (m_auiEncounter[DATA_DRAKOS] == DONE && m_auiEncounter[DATA_VAROS] != DONE)
             {
                 player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 1);
-                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10-CentrifugeCount);
+                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
             }
             else
             {
@@ -128,7 +128,7 @@ public:
                     if( data == DONE )
                     {
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 1);
-                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10-CentrifugeCount);
+                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
 
                         if (instance->IsHeroic())
                             DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_MAKE_IT_COUNT_TIMED_EVENT);
@@ -153,13 +153,13 @@ public:
                 case DATA_EREGOS:
                     m_auiEncounter[DATA_EREGOS] = data;
                     if (data == DONE)
-                        DoRespawnGameObject(EregosCacheGUID, 7*DAY);
+                        DoRespawnGameObject(EregosCacheGUID, 7 * DAY);
                     break;
                 case DATA_CC_COUNT:
                     if( CentrifugeCount < 10 )
                     {
                         ++CentrifugeCount;
-                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10-CentrifugeCount);
+                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
                     }
                     if( CentrifugeCount >= 10 )
                         if( Creature* varos = instance->GetCreature(uiVarosGUID) )
@@ -215,7 +215,7 @@ public:
                 case DATA_DCD_1:
                 case DATA_DCD_2:
                 case DATA_DCD_3:
-                    return DragonCageDoorGUID[identifier-100];
+                    return DragonCageDoorGUID[identifier - 100];
             }
 
             return 0;
@@ -251,7 +251,7 @@ public:
             {
                 loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> CentrifugeCount;
 
-                for( uint8 i=0; i<MAX_ENCOUNTER; ++i )
+                for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
                     if( m_auiEncounter[i] == IN_PROGRESS )
                         m_auiEncounter[i] = NOT_STARTED;
 
