@@ -50,17 +50,11 @@ public:
 
     struct boss_broodlordAI : public BossAI
     {
-        boss_broodlordAI(Creature* creature) : BossAI(creature, BOSS_BROODLORD) { }
+        boss_broodlordAI(Creature* creature) : BossAI(creature, DATA_BROODLORD_LASHLAYER) { }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* who) override
         {
-            if (instance->GetBossState(BOSS_VAELASTRAZ) != DONE)
-            {
-                EnterEvadeMode();
-                return;
-            }
-
-            _EnterCombat();
+            BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
 
             events.ScheduleEvent(EVENT_CLEAVE, 8000);
@@ -80,7 +74,7 @@ public:
                 ((*itr)->AI()->DoAction(ACTION_DEACTIVATE));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -105,8 +99,8 @@ public:
                         break;
                     case EVENT_KNOCKBACK:
                         DoCastVictim(SPELL_KNOCKBACK);
-                        if (me->getThreatManager().getThreat(me->GetVictim()))
-                            me->getThreatManager().modifyThreatPercent(me->GetVictim(), -50);
+                        if (DoGetThreat(me->GetVictim()))
+                            DoModifyThreatPercent(me->GetVictim(), -50);
                         events.ScheduleEvent(EVENT_KNOCKBACK, 15000, 30000);
                         break;
                     case EVENT_CHECK:
@@ -124,7 +118,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_broodlordAI>(creature);
     }
@@ -147,7 +141,7 @@ class go_suppression_device : public GameObjectScript
                     return;
                 }
 
-                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 1000, 5000);
+                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5000);
             }
 
             void UpdateAI(uint32 diff) override

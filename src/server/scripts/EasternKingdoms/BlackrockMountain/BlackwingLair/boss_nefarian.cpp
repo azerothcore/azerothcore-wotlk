@@ -154,7 +154,7 @@ public:
 
     struct boss_victor_nefariusAI : public BossAI
     {
-        boss_victor_nefariusAI(Creature* creature) : BossAI(creature, BOSS_NEFARIAN) { }
+        boss_victor_nefariusAI(Creature* creature) : BossAI(creature, DATA_NEFARIAN) { }
 
         void Reset()
         {
@@ -171,7 +171,7 @@ public:
                     _Reset();
 
                 // pussywizard:
-                if (!instance || instance->GetBossState(BOSS_NEFARIAN) == DONE || instance->GetBossState(BOSS_NEFARIAN) == IN_PROGRESS)
+                if (!instance || instance->GetBossState(DATA_NEFARIAN) == DONE || instance->GetBossState(DATA_NEFARIAN) == IN_PROGRESS)
                     me->SetVisible(false);
                 else
                     me->SetVisible(true);
@@ -369,7 +369,7 @@ public:
             {
                 // pussywizard:
                 InstanceScript* instance = player->GetInstanceScript();
-                if (!instance || instance->GetBossState(BOSS_NEFARIAN) == DONE)
+                if (!instance || instance->GetBossState(DATA_NEFARIAN) == DONE)
                     return;
 
                 CloseGossipMenuFor(player);
@@ -395,7 +395,7 @@ public:
 
     struct boss_nefarianAI : public BossAI
     {
-        boss_nefarianAI(Creature* creature) : BossAI(creature, BOSS_NEFARIAN) { }
+        boss_nefarianAI(Creature* creature) : BossAI(creature, DATA_NEFARIAN) { }
 
         void Reset()
         {
@@ -451,7 +451,7 @@ public:
         {
             if (canDespawn && DespawnTimer <= diff)
             {
-                instance->SetBossState(BOSS_NEFARIAN, FAIL);
+                instance->SetBossState(DATA_NEFARIAN, FAIL);
 
                 std::list<Creature*> constructList;
                 me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);

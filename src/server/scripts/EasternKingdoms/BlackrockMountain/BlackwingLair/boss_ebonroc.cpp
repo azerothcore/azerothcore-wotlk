@@ -29,23 +29,18 @@ public:
 
     struct boss_ebonrocAI : public BossAI
     {
-        boss_ebonrocAI(Creature* creature) : BossAI(creature, BOSS_EBONROC) { }
+        boss_ebonrocAI(Creature* creature) : BossAI(creature, DATA_EBONROC) { }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* who) override
         {
-            if (instance->GetBossState(BOSS_BROODLORD) != DONE)
-            {
-                EnterEvadeMode();
-                return;
-            }
-            _EnterCombat();
+            BossAI::EnterCombat(who);
 
-            events.ScheduleEvent(EVENT_SHADOWFLAME, urand(10000, 20000));
+            events.ScheduleEvent(EVENT_SHADOWFLAME, 10000, 20000);
             events.ScheduleEvent(EVENT_WINGBUFFET, 30000);
-            events.ScheduleEvent(EVENT_SHADOWOFEBONROC, urand(8000, 10000));
+            events.ScheduleEvent(EVENT_SHADOWOFEBONROC, 8000, 10000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -61,7 +56,7 @@ public:
                 {
                     case EVENT_SHADOWFLAME:
                         DoCastVictim(SPELL_SHADOWFLAME);
-                        events.ScheduleEvent(EVENT_SHADOWFLAME, urand(10000, 20000));
+                        events.ScheduleEvent(EVENT_SHADOWFLAME, 10000, 20000);
                         break;
                     case EVENT_WINGBUFFET:
                         DoCastVictim(SPELL_WINGBUFFET);
@@ -69,16 +64,19 @@ public:
                         break;
                     case EVENT_SHADOWOFEBONROC:
                         DoCastVictim(SPELL_SHADOWOFEBONROC);
-                        events.ScheduleEvent(EVENT_SHADOWOFEBONROC, urand(8000, 10000));
+                        events.ScheduleEvent(EVENT_SHADOWOFEBONROC, 8000, 10000);
                         break;
                 }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
             }
 
             DoMeleeAttackIfReady();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_ebonrocAI>(creature);
     }

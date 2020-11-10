@@ -241,10 +241,10 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (84534, 84533, 0, 0, 3, 0, 0);
 
 -- Make NPC 11981 (Flamegor) roam
-UPDATE creature SET MovementType=1, spawndist=5 WHERE id = 11981;
+UPDATE `creature` SET `MovementType`=1, `wander_distance`=10 WHERE `id` = 11981;
 
 -- Add waypoints for Ebonroc (14601)
-SET @EBONROCGUID = 3120753;
+SET @EBONROCGUID = 85780;
 UPDATE `creature` SET `spawndist`=0, `MovementType`=2 WHERE `id`=@EBONROCGUID;
 DELETE FROM `creature_addon` WHERE `guid`=@EBONROCGUID;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`auras`) VALUES (@EBONROCGUID,@EBONROCGUID*10,0,0,0,0, '');
@@ -264,3 +264,29 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@EBONROCGUID*10, 12, -7368.8, -983.092, 477.167),
 (@EBONROCGUID*10, 13, -7358.19, -994.32, 477.167);
 
+-- Add waypoints for Firemaw ( NOT BLIZZLIKE !!! )
+SET @FIREMAW = 84572;
+UPDATE `creature` SET `spawndist`=0, `MovementType`=2 WHERE `id`=@FIREMAW;
+DELETE FROM `creature_addon` WHERE `guid`=@FIREMAW;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`auras`) VALUES (@FIREMAW,@FIREMAW*10,0,0,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@FIREMAW*10;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`) VALUES 
+(@FIREMAW*10, 1, -7534.64, -1036.18, 448.907),
+(@FIREMAW*10, 2, -7494.43, -1007.4, 448.907),
+(@FIREMAW*10, 3, -7466.28, -987.258, 449.73),
+(@FIREMAW*10, 4, -7506.56, -923.1, 457.856),
+(@FIREMAW*10, 5, -7459.02, -889.93, 465.217),
+(@FIREMAW*10, 6, -7442.65, -911.727, 465.355),
+(@FIREMAW*10, 7, -7459.02, -889.93, 465.217),
+(@FIREMAW*10, 8, -7506.56, -923.1, 457.856),
+(@FIREMAW*10, 9, -7466.28, -987.258, 449.73),
+(@FIREMAW*10, 10, -7494.43, -1007.4, 448.907),
+(@FIREMAW*10, 11, -7534.64, -1036.18, 448.907);
+
+-- scriptname for the bwl shadowflame
+SET @SHADOWFLAME_BWL = 22539;
+DELETE FROM `spell_script_names` WHERE `spell_id` = @SHADOWFLAME_BWL;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (@SHADOWFLAME_BWL, 'spell_bwl_shadowflame');
+
+-- attaching lever script to gob
+UPDATE `gameobject_template` SET `ScriptName`='go_chromaggus_lever' WHERE  `entry`=179148;

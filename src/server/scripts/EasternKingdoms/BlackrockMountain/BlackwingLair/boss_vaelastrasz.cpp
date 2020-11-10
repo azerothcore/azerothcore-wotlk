@@ -5,52 +5,52 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "blackwing_lair.h"
-#include "ScriptedGossip.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
-#include "SpellScript.h"
+#include "SpellScript.h" 
 
 enum Says
 {
-    SAY_LINE1 = 0,
-    SAY_LINE2 = 1,
-    SAY_LINE3 = 2,
-    SAY_HALFLIFE = 3,
-    SAY_KILLTARGET = 4
+   SAY_LINE1                         = 0,
+   SAY_LINE2                         = 1,
+   SAY_LINE3                         = 2,
+   SAY_HALFLIFE                      = 3,
+   SAY_KILLTARGET                    = 4
 };
 
 enum Gossip
 {
-    GOSSIP_ID = 21334,
+   GOSSIP_ID                         = 6101,
 };
 
 enum Spells
 {
-    SPELL_ESSENCEOFTHERED = 23513,
-    SPELL_FLAMEBREATH = 23461,
-    SPELL_FIRENOVA = 23462,
-    SPELL_TAILSWIPE = 15847,
-    SPELL_BURNINGADRENALINE = 18173,  //Cast this one. It's what 3.3.5 DBM expects.
-    SPELL_BURNINGADRENALINE_EXPLOSION = 23478,
-    SPELL_CLEAVE = 19983   //Chain cleave is most likely named something different and contains a dummy effect
+   SPELL_ESSENCEOFTHERED             = 23513,
+   SPELL_FLAMEBREATH                 = 23461,
+   SPELL_FIRENOVA                    = 23462,
+   SPELL_TAILSWIPE                   = 15847,
+   SPELL_BURNINGADRENALINE           = 18173,  //Cast this one. It's what 3.3.5 DBM expects.
+   SPELL_BURNINGADRENALINE_EXPLOSION = 23478,
+   SPELL_CLEAVE                      = 19983   //Chain cleave is most likely named something different and contains a dummy effect
 };
 
 enum Events
 {
-    EVENT_SPEECH_1 = 1,
-    EVENT_SPEECH_2 = 2,
-    EVENT_SPEECH_3 = 3,
-    EVENT_SPEECH_4 = 4,
-    EVENT_ESSENCEOFTHERED = 5,
-    EVENT_FLAMEBREATH = 6,
-    EVENT_FIRENOVA = 7,
-    EVENT_TAILSWIPE = 8,
-    EVENT_CLEAVE = 9,
-    EVENT_BURNINGADRENALINE_CASTER = 10,
-    EVENT_BURNINGADRENALINE_TANK = 11
+    EVENT_SPEECH_1                  = 1,
+    EVENT_SPEECH_2                  = 2,
+    EVENT_SPEECH_3                  = 3,
+    EVENT_SPEECH_4                  = 4,
+    EVENT_ESSENCEOFTHERED           = 5,
+    EVENT_FLAMEBREATH               = 6,
+    EVENT_FIRENOVA                  = 7,
+    EVENT_TAILSWIPE                 = 8,
+    EVENT_CLEAVE                    = 9,
+    EVENT_BURNINGADRENALINE_CASTER  = 10,
+    EVENT_BURNINGADRENALINE_TANK    = 11
 };
 
 class boss_vaelastrasz : public CreatureScript
@@ -60,26 +60,31 @@ public:
 
     struct boss_vaelAI : public BossAI
     {
-        boss_vaelAI(Creature* creature) : BossAI(creature, BOSS_VAELASTRAZ)
+        boss_vaelAI(Creature* creature) : BossAI(creature, DATA_VAELASTRAZ_THE_CORRUPT)
         {
+            Initialize();
             creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             creature->setFaction(35);
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void Reset()
+        void Initialize()
+        {
+            PlayerGUID = 0;
+            HasYelled = false;
+        }
+
+        void Reset() override
         {
             _Reset();
 
             me->SetStandState(UNIT_STAND_STATE_DEAD);
-            PlayerGUID = 0;
-
-            HasYelled = false;
+            Initialize();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* victim) override
         {
-            _EnterCombat();
+            BossAI::EnterCombat(victim);
 
             DoCast(me, SPELL_ESSENCEOFTHERED);
             me->SetHealth(me->CountPctFromMaxHealth(30));
@@ -101,15 +106,15 @@ public:
             events.ScheduleEvent(EVENT_SPEECH_1, 1000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
-            if (rand() % 5)
+            if (rand32() % 5)
                 return;
 
             Talk(SAY_KILLTARGET, victim);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -120,27 +125,27 @@ public:
                 {
                     switch (eventId)
                     {
-                    case EVENT_SPEECH_1:
-                        Talk(SAY_LINE1);
-                        me->SetStandState(UNIT_STAND_STATE_STAND);
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        events.ScheduleEvent(EVENT_SPEECH_2, 12000);
-                        break;
-                    case EVENT_SPEECH_2:
-                        Talk(SAY_LINE2);
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        events.ScheduleEvent(EVENT_SPEECH_3, 12000);
-                        break;
-                    case EVENT_SPEECH_3:
-                        Talk(SAY_LINE3);
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        events.ScheduleEvent(EVENT_SPEECH_4, 16000);
-                        break;
-                    case EVENT_SPEECH_4:
-                        me->setFaction(103);
+                        case EVENT_SPEECH_1:
+                            Talk(SAY_LINE1);
+                            me->SetStandState(UNIT_STAND_STATE_STAND);
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                            events.ScheduleEvent(EVENT_SPEECH_2, 12000);
+                            break;
+                        case EVENT_SPEECH_2:
+                            Talk(SAY_LINE2);
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                            events.ScheduleEvent(EVENT_SPEECH_3, 12000);
+                            break;
+                        case EVENT_SPEECH_3:
+                            Talk(SAY_LINE3);
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                            events.ScheduleEvent(EVENT_SPEECH_4, 16000);
+                            break;
+                        case EVENT_SPEECH_4:
+                            me->setFaction(103); // Black Dragonflight
                             if (PlayerGUID && ObjectAccessor::GetUnit(*me, PlayerGUID))
                                 AttackStart(ObjectAccessor::GetUnit(*me, PlayerGUID));;
-                        break;
+                            break;
                     }
                 }
                 return;
@@ -153,43 +158,43 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_CLEAVE:
-                    events.ScheduleEvent(EVENT_CLEAVE, 15000);
-                    DoCastVictim(SPELL_CLEAVE);
-                    break;
-                case EVENT_FLAMEBREATH:
-                    DoCastVictim(SPELL_FLAMEBREATH);
-                    events.ScheduleEvent(EVENT_FLAMEBREATH, urand(8000, 14000));
-                    break;
-                case EVENT_FIRENOVA:
-                    DoCastVictim(SPELL_FIRENOVA);
-                    events.ScheduleEvent(EVENT_FIRENOVA, 15000);
-                    break;
-                case EVENT_TAILSWIPE:
-                    //Only cast if we are behind
-                    /*if (!me->HasInArc(M_PI, me->GetVictim()))
-                    {
-                    DoCast(me->GetVictim(), SPELL_TAILSWIPE);
-                    }*/
-                    events.ScheduleEvent(EVENT_TAILSWIPE, 15000);
-                    break;
-                case EVENT_BURNINGADRENALINE_CASTER:
-                {
-                    //selects a random target that isn't the current victim and is a mana user (selects mana users) but not pets
-                    //it also ignores targets who have the aura. We don't want to place the debuff on the same target twice.
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, [&](Unit* u) { return u && !u->IsPet() && u->getPowerType() == POWER_MANA && !u->HasAura(SPELL_BURNINGADRENALINE); }))
-                    {
-                        me->CastSpell(target, SPELL_BURNINGADRENALINE, true);
-                    }
-                }
-                //reschedule the event
-                events.ScheduleEvent(EVENT_BURNINGADRENALINE_CASTER, 15000);
-                break;
-                case EVENT_BURNINGADRENALINE_TANK:
-                    //Vael has to cast it himself; contrary to the previous commit's comment. Nothing happens otherwise.
-                    me->CastSpell(me->GetVictim(), SPELL_BURNINGADRENALINE, true);
-                    events.ScheduleEvent(EVENT_BURNINGADRENALINE_TANK, 45000);
-                    break;
+                    case EVENT_CLEAVE:
+                        events.ScheduleEvent(EVENT_CLEAVE, 15000);
+                        DoCastVictim(SPELL_CLEAVE);
+                        break;
+                    case EVENT_FLAMEBREATH:
+                        DoCastVictim(SPELL_FLAMEBREATH);
+                        events.ScheduleEvent(EVENT_FLAMEBREATH, 8000, 14000);
+                        break;
+                    case EVENT_FIRENOVA:
+                        DoCastVictim(SPELL_FIRENOVA);
+                        events.ScheduleEvent(EVENT_FIRENOVA, 15000);
+                        break;
+                    case EVENT_TAILSWIPE:
+                        //Only cast if we are behind
+                        /*if (!me->HasInArc(M_PI, me->GetVictim()))
+                        {
+                        DoCast(me->GetVictim(), SPELL_TAILSWIPE);
+                        }*/
+                        events.ScheduleEvent(EVENT_TAILSWIPE, 15000);
+                        break;
+                    case EVENT_BURNINGADRENALINE_CASTER:
+                        {
+                            //selects a random target that isn't the current victim and is a mana user (selects mana users) but not pets
+                            //it also ignores targets who have the aura. We don't want to place the debuff on the same target twice.
+                            if (Unit *target = SelectTarget(SELECT_TARGET_RANDOM, 1, [&](Unit* u) { return u && !u->IsPet() && u->getPowerType() == POWER_MANA && !u->HasAura(SPELL_BURNINGADRENALINE); }))
+                            {
+                                me->CastSpell(target, SPELL_BURNINGADRENALINE, true);
+                            }
+                        }
+                        //reschedule the event
+                        events.ScheduleEvent(EVENT_BURNINGADRENALINE_CASTER, 15000);
+                        break;
+                    case EVENT_BURNINGADRENALINE_TANK:
+                        //Vael has to cast it himself; contrary to the previous commit's comment. Nothing happens otherwise.
+                        me->CastSpell(me->GetVictim(), SPELL_BURNINGADRENALINE, true);
+                        events.ScheduleEvent(EVENT_BURNINGADRENALINE_TANK, 45000);
+                        break;
                 }
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -206,26 +211,26 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void sGossipSelect(Player* player, uint32 sender, uint32 action)
+        bool OnGossipSelect(Player* player, uint32 menuId, uint32 gossipListId)
         {
-            if (sender == GOSSIP_ID && action == 0)
+            if (menuId == GOSSIP_ID && gossipListId == 0)
             {
                 CloseGossipMenuFor(player);
                 BeginSpeech(player);
             }
+            return false;
         }
 
-    private:
-        uint64 PlayerGUID;
-        bool HasYelled;
+        private:
+            uint64 PlayerGUID;
+            bool HasYelled;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_vaelAI(creature);
+        return GetInstanceAI<boss_vaelAI>(creature);
     }
 };
-
 
 //Need to define an aurascript for EVENT_BURNINGADRENALINE's death effect.
 // 18173 - Burning Adrenaline
