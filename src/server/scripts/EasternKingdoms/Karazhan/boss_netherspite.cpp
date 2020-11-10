@@ -39,7 +39,8 @@ const float PortalCoord[3][3] =
     {-11094.493164f, -1591.969238f, 279.949188f}  // Back side
 };
 
-enum Netherspite_Portal{
+enum Netherspite_Portal
+{
     RED_PORTAL = 0, // Perseverence
     GREEN_PORTAL = 1, // Serenity
     BLUE_PORTAL = 2 // Dominance
@@ -68,7 +69,7 @@ public:
         {
             instance = creature->GetInstanceScript();
 
-            for (int i=0; i<3; ++i)
+            for (int i = 0; i < 3; ++i)
             {
                 PortalGUID[i] = 0;
                 BeamTarget[i] = 0;
@@ -107,12 +108,12 @@ public:
             if (dist(xn, yn, xh, yh) >= dist(xn, yn, xp, yp) || dist(xp, yp, xh, yh) >= dist(xn, yn, xp, yp))
                 return false;
             // check  distance from the beam
-            return (abs((xn-xp)*yh+(yp-yn)*xh-xn*yp+xp*yn)/dist(xn, yn, xp, yp) < 1.5f);
+            return (abs((xn - xp) * yh + (yp - yn) * xh - xn * yp + xp * yn) / dist(xn, yn, xp, yp) < 1.5f);
         }
 
         float dist(float xa, float ya, float xb, float yb) // auxiliary method for distance
         {
-            return sqrt((xa-xb)*(xa-xb) + (ya-yb)*(ya-yb));
+            return sqrt((xa - xb) * (xa - xb) + (ya - yb) * (ya - yb));
         }
 
         void Reset()
@@ -128,13 +129,13 @@ public:
 
         void SummonPortals()
         {
-            uint8 r = rand()%4;
+            uint8 r = rand() % 4;
             uint8 pos[3];
             pos[RED_PORTAL] = ((r % 2) ? (r > 1 ? 2 : 1) : 0);
             pos[GREEN_PORTAL] = ((r % 2) ? 0 : (r > 1 ? 2 : 1));
             pos[BLUE_PORTAL] = (r > 1 ? 1 : 2); // Blue Portal not on the left side (0)
 
-            for (int i=0; i<3; ++i)
+            for (int i = 0; i < 3; ++i)
                 if (Creature* portal = me->SummonCreature(PortalID[i], PortalCoord[pos[i]][0], PortalCoord[pos[i]][1], PortalCoord[pos[i]][2], 0, TEMPSUMMON_TIMED_DESPAWN, 60000))
                 {
                     PortalGUID[i] = portal->GetGUID();
@@ -144,7 +145,7 @@ public:
 
         void DestroyPortals()
         {
-            for (int i=0; i<3; ++i)
+            for (int i = 0; i < 3; ++i)
             {
                 if (Creature* portal = ObjectAccessor::GetCreature(*me, PortalGUID[i]))
                     portal->DisappearAndDie();
@@ -157,7 +158,7 @@ public:
 
         void UpdatePortals() // Here we handle the beams' behavior
         {
-            for (int j=0; j<3; ++j) // j = color
+            for (int j = 0; j < 3; ++j) // j = color
                 if (Creature* portal = ObjectAccessor::GetCreature(*me, PortalGUID[j]))
                 {
                     // the one who's been cast upon before
@@ -174,11 +175,11 @@ public:
                         {
                             Player* p = i->GetSource();
                             if (p && p->IsAlive() // alive
-                                && (!target || target->GetDistance2d(portal)>p->GetDistance2d(portal)) // closer than current best
-                                && !p->HasAura(PlayerDebuff[j], 0) // not exhausted
-                                && !p->HasAura(PlayerBuff[(j+1)%3], 0) // not on another beam
-                                && !p->HasAura(PlayerBuff[(j+2)%3], 0)
-                                && IsBetween(me, p, portal)) // on the beam
+                                    && (!target || target->GetDistance2d(portal) > p->GetDistance2d(portal)) // closer than current best
+                                    && !p->HasAura(PlayerDebuff[j], 0) // not exhausted
+                                    && !p->HasAura(PlayerBuff[(j + 1) % 3], 0) // not on another beam
+                                    && !p->HasAura(PlayerBuff[(j + 2) % 3], 0)
+                                    && IsBetween(me, p, portal)) // on the beam
                                 target = p;
                         }
                     }
@@ -208,7 +209,7 @@ public:
                     }
                     // aggro target if Red Beam
                     if (j == RED_PORTAL && me->GetVictim() != target && target->GetTypeId() == TYPEID_PLAYER)
-                        me->getThreatManager().addThreat(target, 100000.0f+DoGetThreat(me->GetVictim()));
+                        me->getThreatManager().addThreat(target, 100000.0f + DoGetThreat(me->GetVictim()));
                 }
         }
 
@@ -268,7 +269,8 @@ public:
             {
                 DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1, 45, true), SPELL_VOIDZONE, true);
                 VoidZoneTimer = 15000;
-            } else 
+            }
+            else
                 VoidZoneTimer -= diff;
 
             // NetherInfusion Berserk
@@ -277,7 +279,8 @@ public:
                 me->AddAura(SPELL_NETHER_INFUSION, me);
                 DoCast(me, SPELL_NETHERSPITE_ROAR);
                 Berserk = true;
-            } else 
+            }
+            else
                 NetherInfusionTimer -= diff;
 
             if (PortalPhase) // PORTAL PHASE
@@ -287,7 +290,8 @@ public:
                 {
                     UpdatePortals();
                     PortalTimer = 1000;
-                } else 
+                }
+                else
                     PortalTimer -= diff;
 
                 // Empowerment & Nether Burn
@@ -296,7 +300,8 @@ public:
                     DoCast(me, SPELL_EMPOWERMENT);
                     me->AddAura(SPELL_NETHERBURN_AURA, me);
                     EmpowermentTimer = 90000;
-                } else 
+                }
+                else
                     EmpowermentTimer -= diff;
 
                 if (PhaseTimer <= diff)
@@ -306,7 +311,8 @@ public:
                         SwitchToBanishPhase();
                         return;
                     }
-                } else 
+                }
+                else
                     PhaseTimer -= diff;
             }
             else // BANISH PHASE
@@ -317,7 +323,8 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true))
                         DoCast(target, SPELL_NETHERBREATH);
                     NetherbreathTimer = urand(5000, 7000);
-                } else 
+                }
+                else
                     NetherbreathTimer -= diff;
 
                 if (PhaseTimer <= diff)
@@ -327,7 +334,8 @@ public:
                         SwitchToPortalPhase();
                         return;
                     }
-                } else 
+                }
+                else
                     PhaseTimer -= diff;
             }
 

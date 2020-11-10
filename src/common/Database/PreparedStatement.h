@@ -65,31 +65,31 @@ class PreparedStatement
     friend class MySQLPreparedStatement;
     friend class MySQLConnection;
 
-    public:
-        explicit PreparedStatement(uint32 index);
-        ~PreparedStatement();
+public:
+    explicit PreparedStatement(uint32 index);
+    ~PreparedStatement();
 
-        void setBool(const uint8 index, const bool value);
-        void setUInt8(const uint8 index, const uint8 value);
-        void setUInt16(const uint8 index, const uint16 value);
-        void setUInt32(const uint8 index, const uint32 value);
-        void setUInt64(const uint8 index, const uint64 value);
-        void setInt8(const uint8 index, const int8 value);
-        void setInt16(const uint8 index, const int16 value);
-        void setInt32(const uint8 index, const int32 value);
-        void setInt64(const uint8 index, const int64 value);
-        void setFloat(const uint8 index, const float value);
-        void setDouble(const uint8 index, const double value);
-        void setString(const uint8 index, const std::string& value);
-        void setNull(const uint8 index);
+    void setBool(const uint8 index, const bool value);
+    void setUInt8(const uint8 index, const uint8 value);
+    void setUInt16(const uint8 index, const uint16 value);
+    void setUInt32(const uint8 index, const uint32 value);
+    void setUInt64(const uint8 index, const uint64 value);
+    void setInt8(const uint8 index, const int8 value);
+    void setInt16(const uint8 index, const int16 value);
+    void setInt32(const uint8 index, const int32 value);
+    void setInt64(const uint8 index, const int64 value);
+    void setFloat(const uint8 index, const float value);
+    void setDouble(const uint8 index, const double value);
+    void setString(const uint8 index, const std::string& value);
+    void setNull(const uint8 index);
 
-    protected:
-        void BindParameters();
+protected:
+    void BindParameters();
 
-    protected:
-        MySQLPreparedStatement* m_stmt;
-        uint32 m_index;
-        std::vector<PreparedStatementData> statement_data;    //- Buffer of parameters, not tied to MySQL in any way yet
+protected:
+    MySQLPreparedStatement* m_stmt;
+    uint32 m_index;
+    std::vector<PreparedStatementData> statement_data;    //- Buffer of parameters, not tied to MySQL in any way yet
 };
 
 //- Class of which the instances are unique per MySQLConnection
@@ -100,40 +100,40 @@ class MySQLPreparedStatement
     friend class MySQLConnection;
     friend class PreparedStatement;
 
-    public:
-        MySQLPreparedStatement(MYSQL_STMT* stmt);
-        ~MySQLPreparedStatement();
+public:
+    MySQLPreparedStatement(MYSQL_STMT* stmt);
+    ~MySQLPreparedStatement();
 
-        void setBool(const uint8 index, const bool value);
-        void setUInt8(const uint8 index, const uint8 value);
-        void setUInt16(const uint8 index, const uint16 value);
-        void setUInt32(const uint8 index, const uint32 value);
-        void setUInt64(const uint8 index, const uint64 value);
-        void setInt8(const uint8 index, const int8 value);
-        void setInt16(const uint8 index, const int16 value);
-        void setInt32(const uint8 index, const int32 value);
-        void setInt64(const uint8 index, const int64 value);
-        void setFloat(const uint8 index, const float value);
-        void setDouble(const uint8 index, const double value);
-        void setString(const uint8 index, const char* value);
-        void setNull(const uint8 index);
+    void setBool(const uint8 index, const bool value);
+    void setUInt8(const uint8 index, const uint8 value);
+    void setUInt16(const uint8 index, const uint16 value);
+    void setUInt32(const uint8 index, const uint32 value);
+    void setUInt64(const uint8 index, const uint64 value);
+    void setInt8(const uint8 index, const int8 value);
+    void setInt16(const uint8 index, const int16 value);
+    void setInt32(const uint8 index, const int32 value);
+    void setInt64(const uint8 index, const int64 value);
+    void setFloat(const uint8 index, const float value);
+    void setDouble(const uint8 index, const double value);
+    void setString(const uint8 index, const char* value);
+    void setNull(const uint8 index);
 
-    protected:
-        MYSQL_STMT* GetSTMT() { return m_Mstmt; }
-        MYSQL_BIND* GetBind() { return m_bind; }
-        PreparedStatement* m_stmt;
-        void ClearParameters();
-        bool CheckValidIndex(uint8 index);
-        std::string getQueryString(std::string const& sqlPattern) const;
+protected:
+    MYSQL_STMT* GetSTMT() { return m_Mstmt; }
+    MYSQL_BIND* GetBind() { return m_bind; }
+    PreparedStatement* m_stmt;
+    void ClearParameters();
+    bool CheckValidIndex(uint8 index);
+    std::string getQueryString(std::string const& sqlPattern) const;
 
-    private:
-        void setValue(MYSQL_BIND* param, enum_field_types type, const void* value, uint32 len, bool isUnsigned);
+private:
+    void setValue(MYSQL_BIND* param, enum_field_types type, const void* value, uint32 len, bool isUnsigned);
 
-    private:
-        MYSQL_STMT* m_Mstmt;
-        uint32 m_paramCount;
-        std::vector<bool> m_paramsSet;
-        MYSQL_BIND* m_bind;
+private:
+    MYSQL_STMT* m_Mstmt;
+    uint32 m_paramCount;
+    std::vector<bool> m_paramsSet;
+    MYSQL_BIND* m_bind;
 };
 
 typedef ACE_Future<PreparedQueryResult> PreparedQueryResultFuture;
@@ -141,16 +141,16 @@ typedef ACE_Future<PreparedQueryResult> PreparedQueryResultFuture;
 //- Lower-level class, enqueuable operation
 class PreparedStatementTask : public SQLOperation
 {
-    public:
-        PreparedStatementTask(PreparedStatement* stmt);
-        PreparedStatementTask(PreparedStatement* stmt, PreparedQueryResultFuture result);
-        ~PreparedStatementTask();
+public:
+    PreparedStatementTask(PreparedStatement* stmt);
+    PreparedStatementTask(PreparedStatement* stmt, PreparedQueryResultFuture result);
+    ~PreparedStatementTask();
 
-        bool Execute();
+    bool Execute();
 
-    protected:
-        PreparedStatement* m_stmt;
-        bool m_has_result;
-        PreparedQueryResultFuture m_result;
+protected:
+    PreparedStatement* m_stmt;
+    bool m_has_result;
+    PreparedQueryResultFuture m_result;
 };
 #endif

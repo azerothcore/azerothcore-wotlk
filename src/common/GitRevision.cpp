@@ -21,13 +21,13 @@ char const* GitRevision::GetBranch()
     return _BRANCH;
 }
 
-#if PLATFORM == PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #  ifdef _WIN64
 #    define AZEROTH_PLATFORM_STR "Win64"
 #  else
 #    define AZEROTH_PLATFORM_STR "Win32"
 #  endif
-#else // PLATFORM
+#else // AC_PLATFORM
 #  define AZEROTH_PLATFORM_STR "Unix"
 #endif
 
