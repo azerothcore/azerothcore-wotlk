@@ -29,20 +29,6 @@ DoorData const doorData[] =
     { 0,                         0,                            DOOR_TYPE_ROOM, BOUNDARY_NONE}     // END
 };
 
-uint64 const creatureData[10][2] =
-{
-    { NPC_RAZORGORE,       DATA_RAZORGORE_THE_UNTAMED  },
-    { NPC_VAELASTRAZ,      DATA_VAELASTRAZ_THE_CORRUPT },
-    { NPC_BROODLORD,       DATA_BROODLORD_LASHLAYER    },
-    { NPC_FIREMAW,         DATA_FIREMAW                },
-    { NPC_EBONROC,         DATA_EBONROC                },
-    { NPC_FLAMEGOR,        DATA_FLAMEGOR               },
-    { NPC_CHROMAGGUS,      DATA_CHROMAGGUS             },
-    { NPC_NEFARIAN,        DATA_NEFARIAN               },
-    { NPC_VICTOR_NEFARIUS, DATA_LORD_VICTOR_NEFARIUS   },
-    { 0,                   0                           } // END
-}; 
-
 Position const SummonPosition[8] =
 {
     {-7661.207520f, -1043.268188f, 407.199554f, 6.280452f},
