@@ -274,11 +274,11 @@ INSERT INTO `script_waypoint` VALUES
 ('39910', '69', '-4947.596191', '725.010742', '261.424683', '0', ''),
 ('39910', '70', '-4941.947266', '726.680725', '261.646057', '0', '');
 
--- [Q:25229] xxxxxxx
+-- [Q:25229] A Few Good Gnomes
 UPDATE `creature_template` SET `ScriptName`='npc_gnome_citizen_motivated' WHERE `entry`=39466;
 UPDATE `creature_template` SET `ScriptName`='npc_gnome_citizen' WHERE `entry`=39623;
-INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
-(7937, 25229);
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES (7937, 25229);
+INSERT INTO `creature_questender` (`id`, `quest`) VALUES (39675, 25229);
 
 SET @MOVITVATED_CITIZEN = 39466;
 DELETE FROM `creature_text` WHERE `CreatureID`=@MOVITVATED_CITIZEN;
