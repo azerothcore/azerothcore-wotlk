@@ -205,7 +205,7 @@ public:
             AttackStart(target);
             events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
             events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
-            //events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
+            events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
             events.ScheduleEvent(EVENT_SPAWN_ADD, 10000);
         }
 
