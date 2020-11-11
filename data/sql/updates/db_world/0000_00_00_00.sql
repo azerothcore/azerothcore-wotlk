@@ -273,3 +273,21 @@ INSERT INTO `script_waypoint` VALUES
 ('39910', '68', '-4950.066406', '725.069885', '260.181854', '0', ''),
 ('39910', '69', '-4947.596191', '725.010742', '261.424683', '0', ''),
 ('39910', '70', '-4941.947266', '726.680725', '261.646057', '0', '');
+
+-- [Q:25229] xxxxxxx
+UPDATE `creature_template` SET `ScriptName`='npc_gnome_citizen_motivated' WHERE `entry`=39466;
+UPDATE `creature_template` SET `ScriptName`='npc_gnome_citizen' WHERE `entry`=39623;
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
+(7937, 25229);
+
+SET @MOVITVATED_CITIZEN = 39466;
+DELETE FROM `creature_text` WHERE `CreatureID`=@MOVITVATED_CITIZEN;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
+(@MOVITVATED_CITIZEN, 0, 0, 'Anything for King Mekkatorque!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 1, 'Can I bring my wrench?', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 2, 'Is this going to hurt?', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 3, 'I\'d love to help!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 4, 'Sign me up!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 5, 'Wow! We\'re taking back Gnomeregan? I\'m in!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 6, 'My wrench of vengance awaits!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 7, 'I want to drive a Spider Tank!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx');

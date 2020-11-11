@@ -22,7 +22,8 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h" 
-#include "ScriptedEscortAI.h" 
+#include "ScriptedEscortAI.h"
+#include "ScriptedFollowerAI.h"
 #include "operation_gnomeregan.h"
 
 class npc_og_suit : public CreatureScript
@@ -1344,7 +1345,8 @@ class npc_og_mekkatorque : public CreatureScript
 
             void EnterCombat(Unit* pWho)
             {
-                SquadAssist(pWho->ToCreature());
+                if (pWho && pWho->ToCreature())
+                    SquadAssist(pWho->ToCreature());
             }
 
             void PartyCast(uint32 spell)
@@ -1999,6 +2001,116 @@ class npc_og_camera_vehicle : public CreatureScript
     }
 };
 
+// npc_gnome_citizen
+enum
+{
+    QUEST_A_FEW_GOOD_GNOMES        = 25229,
+    SPELL_MOTIVATE                 = 74035,
+    NPC_GNOME_CITIZEN              = 39623,
+    NPC_GNOME_CITIZEN_MOTIVATED    = 39466,
+    NPC_CAPTAIN_TREAD_SPARKNOZZLE  = 39675,
+    QUEST_CREDIT_CITIZEN           = 39623,
+    QUEST_CREDIT_MOTIVATED_CITIZEN = 39466, 
+    TALK_BROADCAST_ENTRY_MIN       = 100004,
+    TALK_BROADCAST_ENTRY_MAX       = 100012,
+    TALK_CHARMED                   = 0,
+
+};
+
+class npc_gnome_citizen : public CreatureScript
+{
+public:
+    npc_gnome_citizen() : CreatureScript("npc_gnome_citizen") { }
+
+    struct npc_gnome_citizenAI : public FollowerAI
+    {
+        npc_gnome_citizenAI(Creature* creature) : FollowerAI(creature) { }
+
+        void Reset() { } 
+                 
+        void SpellHit(Unit* pWho, const SpellInfo* pSpell)
+        {
+            if (!pWho || !pWho->IsInWorld() || pWho->GetTypeId() != TYPEID_PLAYER || !pSpell)
+                return;
+
+            if(Player* plr = pWho->ToPlayer())
+                if (pSpell->Id == SPELL_MOTIVATE && plr->GetQuestStatus(QUEST_A_FEW_GOOD_GNOMES) == QUEST_STATUS_INCOMPLETE)
+                {
+                    if (Creature* motivated_gnome = me->SummonCreature(NPC_GNOME_CITIZEN_MOTIVATED, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 40 * MINUTE * IN_MILLISECONDS))
+                    { 
+                        plr->KilledMonsterCredit(QUEST_CREDIT_CITIZEN, 0);
+                        CreatureAI* motivated_gnomeAI = motivated_gnome->AI();
+                        if (!motivated_gnomeAI)
+                            return;
+
+                        motivated_gnomeAI->Talk(TALK_CHARMED); 
+                    }
+
+                    me->DespawnOrUnsummon();
+                }
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_gnome_citizenAI(creature);
+    }
+};
+
+class npc_gnome_citizen_motivated : public CreatureScript
+{
+public:
+    npc_gnome_citizen_motivated() : CreatureScript("npc_gnome_citizen_motivated") { }
+
+    struct npc_gnome_citizen_motivatedAI : public FollowerAI
+    {
+        npc_gnome_citizen_motivatedAI(Creature* creature) : FollowerAI(creature) { }
+
+
+        void Reset() { }
+
+
+        void MoveInLineOfSight(Unit* pWho)
+        {
+            FollowerAI::MoveInLineOfSight(pWho); 
+            if (pWho->GetTypeId() != TYPEID_PLAYER)
+                return; 
+            Player* plr = pWho->ToPlayer();
+             
+            if (plr->GetQuestStatus(QUEST_A_FEW_GOOD_GNOMES) != QUEST_STATUS_INCOMPLETE)
+                return;
+
+            // if the motivated guy is not mounted, mount up
+            if (plr->IsMounted() && (!me->IsMounted() || !me->HasAura(23225)))
+                me->CastSpell(me, 23225);
+            else if(me->HasAura(23225) && !plr->IsMounted())
+                me->RemoveAura(23225);
+
+            if(!HasFollowState(STATE_FOLLOW_INPROGRESS))
+                StartFollow(plr); 
+        }
+
+        void UpdateFollowerAI(const uint32 uiDiff)
+        {  
+            if (me->FindNearestCreature(NPC_CAPTAIN_TREAD_SPARKNOZZLE, 2.f))
+            { 
+                GetLeaderForFollower()->KilledMonsterCredit(QUEST_CREDIT_MOTIVATED_CITIZEN, 0);
+                SetFollowComplete(true);
+                me->DisappearAndDie();
+            }
+        }
+
+ 
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_gnome_citizen_motivatedAI(creature);
+    }
+};
+
+
 void AddSC_operation_gnomeregan()
 {
     new npc_og_camera_vehicle;
@@ -2014,4 +2126,6 @@ void AddSC_operation_gnomeregan()
     new npc_og_tank;
     new npc_og_suit;
     new npc_og_rl;
+    new npc_gnome_citizen;
+    new npc_gnome_citizen_motivated;
 }
