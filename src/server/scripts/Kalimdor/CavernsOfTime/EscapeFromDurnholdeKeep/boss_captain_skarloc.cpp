@@ -69,7 +69,7 @@ public:
             summons.Summon(summon);
             if (Creature* thrall = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_THRALL_GUID)))
                 thrall->AI()->JustSummoned(summon);
-            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 
             if (summon->GetEntry() == NPC_SKARLOC_MOUNT)
                 return;
@@ -82,15 +82,15 @@ public:
 
         void InitializeAI()
         {
-            ScriptedAI::InitializeAI(); 
+            ScriptedAI::InitializeAI();
 
             Movement::PointsArray path;
             path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            for (uint8 i = 0; i < WAYPOINTS_COUNT; ++i) 
+            for (uint8 i = 0; i < WAYPOINTS_COUNT; ++i)
                 path.push_back(G3D::Vector3(startPath[i].GetPositionX(), startPath[i].GetPositionY(), startPath[i].GetPositionZ()));
 
             me->GetMotionMaster()->MoveSplinePath(&path);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->Mount(SKARLOC_MOUNT_MODEL);
         }
 
@@ -155,13 +155,13 @@ public:
                     Talk(SAY_ENTER);
                     break;
                 case EVENT_START_FIGHT:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SetInCombatWithZone();
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                             if (summon->GetEntry() != NPC_SKARLOC_MOUNT)
                             {
-                                summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                                summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                                 summon->SetInCombatWithZone();
                             }
                     break;

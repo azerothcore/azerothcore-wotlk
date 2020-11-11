@@ -32,7 +32,6 @@ template <class T>
 class ACE_Typed_SV_Message
 {
 public:
-  // = Initialization and termination methods.
   ACE_Typed_SV_Message (long type = 0,
                         int length = sizeof (T),
                         int max_size = sizeof (T));

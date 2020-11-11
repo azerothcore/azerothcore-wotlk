@@ -1,7 +1,7 @@
 name: core-build
 on:
   push:
-    branches: 
+    branches:
       - '**'         # matches every branch
       - '!coverity_scan'   # excludes coverity_scan
   pull_request:
@@ -13,17 +13,30 @@ jobs:
       matrix:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
         os: [ubuntu-20.04]
-        compiler: [clang6, clang9, clang10]
+        compiler: [clang]
         modules: [with, without]
         # we can include specific combinations here
         include:
+          - os: ubuntu-20.04
+            compiler: clang9
+            modules: without
           - os: ubuntu-18.04
-            compiler: clang
+            compiler: clang # default in 18.04 is clang 6
+            modules: without
+          - os: ubuntu-18.04
+            compiler: gcc # default in 18.04 is gcc 7
+            modules: without
+          - os: ubuntu-20.04
+            compiler: gcc # default in 20.04 is gcc 9
+            modules: without
+          - os: ubuntu-20.04
+            compiler: gcc10
             modules: without
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
       COMPILER: ${{ matrix.compiler }}
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Checkout modules
@@ -57,6 +70,7 @@ jobs:
       fail-fast: false
     runs-on: macos-10.15
     name: macos-10.15
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Cache
@@ -79,6 +93,7 @@ jobs:
       fail-fast: false
     runs-on: windows-2019
     name: windows-2019-MSVC16
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Configure OS
@@ -104,6 +119,7 @@ jobs:
     strategy:
       fail-fast: true
     runs-on: ubuntu-20.04
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Configure
@@ -118,6 +134,7 @@ jobs:
     strategy:
       fail-fast: true
     runs-on: ubuntu-20.04
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Configure
@@ -132,6 +149,7 @@ jobs:
     strategy:
       fail-fast: true
     runs-on: ubuntu-20.04
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Configure
@@ -146,6 +164,7 @@ jobs:
     strategy:
       fail-fast: true
     runs-on: ubuntu-20.04
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Configure
