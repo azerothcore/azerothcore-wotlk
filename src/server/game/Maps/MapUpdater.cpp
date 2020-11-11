@@ -10,79 +10,79 @@
 
 class WDBThreadStartReq1 : public ACE_Method_Request
 {
-    public:
+public:
 
-        WDBThreadStartReq1()
-        {
-        }
+    WDBThreadStartReq1()
+    {
+    }
 
-        virtual int call()
-        {
-            return 0;
-        }
+    virtual int call()
+    {
+        return 0;
+    }
 };
 
 class WDBThreadEndReq1 : public ACE_Method_Request
 {
-    public:
+public:
 
-        WDBThreadEndReq1()
-        {
-        }
+    WDBThreadEndReq1()
+    {
+    }
 
-        virtual int call()
-        {
-            return 0;
-        }
+    virtual int call()
+    {
+        return 0;
+    }
 };
 
 class MapUpdateRequest : public ACE_Method_Request
 {
-    private:
+private:
 
-        Map& m_map;
-        MapUpdater& m_updater;
-        uint32 m_diff;
-        uint32 s_diff;
+    Map& m_map;
+    MapUpdater& m_updater;
+    uint32 m_diff;
+    uint32 s_diff;
 
-    public:
+public:
 
-        MapUpdateRequest(Map& m, MapUpdater& u, uint32 d, uint32 sd)
-            : m_map(m), m_updater(u), m_diff(d), s_diff(sd)
-        {
-        }
+    MapUpdateRequest(Map& m, MapUpdater& u, uint32 d, uint32 sd)
+        : m_map(m), m_updater(u), m_diff(d), s_diff(sd)
+    {
+    }
 
-        virtual int call()
-        {
-            m_map.Update (m_diff, s_diff);
-            m_updater.update_finished();
-            return 0;
-        }
+    virtual int call()
+    {
+        m_map.Update (m_diff, s_diff);
+        m_updater.update_finished();
+        return 0;
+    }
 };
 
 class LFGUpdateRequest : public ACE_Method_Request
 {
-    private:
+private:
 
-        MapUpdater& m_updater;
-        uint32 m_diff;
+    MapUpdater& m_updater;
+    uint32 m_diff;
 
-    public:
-        LFGUpdateRequest(MapUpdater& u, uint32 d) : m_updater(u), m_diff(d) {}
+public:
+    LFGUpdateRequest(MapUpdater& u, uint32 d) : m_updater(u), m_diff(d) {}
 
-        virtual int call()
-        {
-            uint32 startTime = getMSTime();
-            sLFGMgr->Update(m_diff, 1);
-            uint32 totalTime = getMSTimeDiff(startTime, getMSTime());
-            lfgDiffTracker.Update(totalTime);
-            m_updater.update_finished();
-            return 0;
-        }
+    virtual int call()
+    {
+        uint32 startTime = getMSTime();
+        sLFGMgr->Update(m_diff, 1);
+        uint32 totalTime = getMSTimeDiff(startTime, getMSTime());
+        lfgDiffTracker.Update(totalTime);
+        m_updater.update_finished();
+        return 0;
+    }
 };
 
 MapUpdater::MapUpdater():
-m_executor(), m_mutex(), m_condition(m_mutex), pending_requests(0)
+    m_executor(), m_mutex(), m_condition(m_mutex), pending_requests(0)
 {
 }
 

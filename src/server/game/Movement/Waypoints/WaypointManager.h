@@ -36,30 +36,30 @@ typedef std::unordered_map<uint32, WaypointPath> WaypointPathContainer;
 
 class WaypointMgr
 {
-    public:
-        static WaypointMgr* instance();
+public:
+    static WaypointMgr* instance();
 
-        // Attempts to reload a single path from database
-        void ReloadPath(uint32 id);
+    // Attempts to reload a single path from database
+    void ReloadPath(uint32 id);
 
-        // Loads all paths from database, should only run on startup
-        void Load();
+    // Loads all paths from database, should only run on startup
+    void Load();
 
-        // Returns the path from a given id
-        WaypointPath const* GetPath(uint32 id) const
-        {
-            WaypointPathContainer::const_iterator itr = _waypointStore.find(id);
-            if (itr != _waypointStore.end())
-                return &itr->second;
+    // Returns the path from a given id
+    WaypointPath const* GetPath(uint32 id) const
+    {
+        WaypointPathContainer::const_iterator itr = _waypointStore.find(id);
+        if (itr != _waypointStore.end())
+            return &itr->second;
 
-            return nullptr;
-        }
+        return nullptr;
+    }
 
-    private:
-        WaypointMgr();
-        ~WaypointMgr();
+private:
+    WaypointMgr();
+    ~WaypointMgr();
 
-        WaypointPathContainer _waypointStore;
+    WaypointPathContainer _waypointStore;
 };
 
 #define sWaypointMgr WaypointMgr::instance()
