@@ -1,3 +1,19 @@
+-- DB update 2020_11_10_02 -> 2020_11_11_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_11_10_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_11_10_02 2020_11_11_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1603643078632991300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1603643078632991300');
 /*
  * Zone: Blasted Lands
@@ -63,3 +79,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (5976, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 11960, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Dreadmaul Brute - On Aggro - Cast \'11960\' (No Repeat)'),
 (5976, 0, 1, 0, 0, 0, 100, 0, 2700, 4300, 9800, 12400, 11, 3391, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Dreadmaul Brute - In Combat - Cast \'3391\''),
 (5976, 0, 2, 0, 2, 0, 100, 1, 5, 30, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Dreadmaul Brute - Between 5-30% Health - Cast \'8599\' (No Repeat)');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
