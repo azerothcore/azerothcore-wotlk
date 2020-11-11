@@ -2111,6 +2111,409 @@ public:
 };
 
 
+#define STEAM_0 "Well, a bunch of useless gears, let's get to work!"
+#define STEAM_1 "I will teach you everything you must know how to be a real soldier!"
+#define STEAM_2 "First of all, you need to go drill."
+#define STEAM_3 "At the signal, show me how to welcome the commander for the charter!"
+#define STEAM_4 "So recruits saluted his commander!"
+#define STEAM_5 "Great job!"
+#define STEAM_6 "On the battlefield, it is important to intimidate the enemy furious battle roar!"
+#define STEAM_7 "As soon as I give the signal, show me what real fury!"
+#define STEAM_8 "Show me now furious!"
+#define STEAM_9 "Wow, nice!"
+#define STEAM_10 "Remember that the most important factor in any battle - is the spirit!"
+#define STEAM_11 "Get ready to show me how the soldiers should be happy to win!"
+#define STEAM_12 "Let's! Express your enthusiasm!"
+#define STEAM_13 "Terrific!"
+#define STEAM_14 "However, the most important in the battle - to be able to correctly mark earned sweat and blood of victory!"
+#define STEAM_15 "Execute me your best victory dance! Start the alarm!"
+#define STEAM_16 "And now - dance!"
+#define STEAM_17 "Great!"
+#define STEAM_18 "You - are the best squad of recruits that I have ever seen Let's repeat everything!"
+
+
+class npc_steamcrank : public CreatureScript
+{
+    public:
+        npc_steamcrank() : CreatureScript("npc_steamcrank") { }
+
+        struct npc_steamcrankAI : public ScriptedAI
+        {
+            npc_steamcrankAI(Creature* creature) : ScriptedAI(creature) { }
+
+            void Reset()
+            {
+            }
+
+            void JumpToNextStep(uint32 uiTimer)
+            {
+                _stepTimer = uiTimer;
+                ++_step;
+                if (_step > 26)
+                {
+                    _step = 0;
+                    _stepTimer = 2000;
+                }
+            }
+
+            void ReceiveEmote(Player* pPlayer, uint32 uiTextEmote)
+            {
+                switch(uiTextEmote)
+                {
+                    case TEXT_EMOTE_SALUTE:
+                        if (_step >= 5 && _step < 8)
+                            me->CastSpell(pPlayer, SPELL_SALUTE_CREDIT, true);
+                        break;
+                    case TEXT_EMOTE_ROAR:
+                        if (_step >= 11 && _step < 14)
+                            me->CastSpell(pPlayer, SPELL_ROAR_CREDIT, true);
+                        break;
+                    case TEXT_EMOTE_CHEER:
+                        if (_step >= 17 && _step < 20)
+                            me->CastSpell(pPlayer, SPELL_CHEER_CREDIT, true);
+                        break;
+                    case TEXT_EMOTE_DANCE:
+                        if (_step >= 23 && _step < 26)
+                            me->CastSpell(pPlayer, SPELL_DANCE_CREDIT, true);
+                        break;
+                }
+            }
+
+            void ForceEmote(uint32 uiEmote)
+            {
+                std::list<Creature*> Trainees;
+                GetCreatureListWithEntryInGrid(Trainees, me, NPC_TRAINEE, 15.0f);
+                if (!Trainees.empty())
+                {
+                    for (std::list<Creature*>::iterator itr = Trainees.begin(); itr != Trainees.end(); ++itr)
+                        (*itr)->SetUInt32Value(UNIT_NPC_EMOTESTATE, uiEmote);
+                }
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if (_stepTimer <= diff)
+                {
+                    switch (_step)
+                    {
+                        case 0:
+                            me->MonsterSay(STEAM_0, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 1:
+                            me->MonsterSay(STEAM_1, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 2:
+                            me->MonsterSay(STEAM_2, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 3:
+                            me->MonsterSay(STEAM_3, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 4:
+                            me->MonsterSay(STEAM_4, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(1000);
+                            break;
+                        case 5:
+                            ForceEmote(EMOTE_ONESHOT_SALUTE);
+                            JumpToNextStep(1500);
+                            break;
+                        case 6:
+                            ForceEmote(EMOTE_ONESHOT_NONE);
+                            JumpToNextStep(3000);
+                        case 7:
+                            me->MonsterSay(STEAM_5, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 8:
+                            me->MonsterSay(STEAM_6, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 9:
+                            me->MonsterSay(STEAM_7, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 10:
+                            me->MonsterSay(STEAM_8, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(1000);
+                            break;
+                        case 11:
+                            ForceEmote(EMOTE_ONESHOT_ROAR);
+                            JumpToNextStep(2000);
+                            break;
+                        case 12:
+                            ForceEmote(EMOTE_ONESHOT_NONE);
+                            JumpToNextStep(3000);
+                            break;
+                        case 13:
+                            me->MonsterSay(STEAM_9, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 14:
+                            me->MonsterSay(STEAM_10, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 15:
+                            me->MonsterSay(STEAM_11, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 16:
+                            me->MonsterSay(STEAM_12, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(1000);
+                            break;
+                        case 17:
+                            ForceEmote(EMOTE_ONESHOT_CHEER);
+                            JumpToNextStep(1500);
+                            break;
+                        case 18:
+                            ForceEmote(EMOTE_ONESHOT_NONE);
+                            JumpToNextStep(3000);
+                            break;
+                        case 19:
+                            me->MonsterSay(STEAM_13, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 20:
+                            me->MonsterSay(STEAM_14, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 21:
+                            me->MonsterSay(STEAM_15, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 22:
+                            me->MonsterSay(STEAM_16, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(1000);
+                            break;
+                        case 23:
+                            ForceEmote(EMOTE_ONESHOT_DANCE);
+                            JumpToNextStep(2500);
+                            break;
+                        case 24:
+                            ForceEmote(EMOTE_ONESHOT_NONE);
+                            JumpToNextStep(3000);
+                            break;
+                        case 25:
+                            me->MonsterSay(STEAM_17, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                        case 26:
+                            me->MonsterSay(STEAM_18, LANG_UNIVERSAL, NULL);
+                            JumpToNextStep(5000);
+                            break;
+                    }
+                }
+                else
+                    _stepTimer -= diff;
+            }
+
+        private:
+            uint32 _step;
+            uint32 _stepTimer;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_steamcrankAI(creature);
+        }
+};
+
+#define MEK_1_0    "They may take our lives, but they'll never take..."
+#define MEK_1_1    "...our INNOVATION!"
+#define LIS_1_0    "What? I don't even know what you're talking about! That's terrible!"
+#define MEK_2_0    "We will not go quietly into the night! We will not vanish without a fight!"
+#define MEK_2_1    "We're going to live on! We're going to survive! Today we celebrate..."
+#define MEK_2_2    "...our Autonomy Day!"
+#define LIS_2_0    "Horrible! Well, all right, maybe it just needs a little cleaning up?"
+#define MEK_3_0    "What I want out of each and every one of you is a hard-target search of every refuelling station, residence, warehouse, farmhouse, henhouse, outhouse and doghouse in this area."
+#define MEK_3_1    "Your fugitive's name is Mekgineer Thermaplugg."
+#define MEK_3_2    "Go get him."
+#define LIS_3_0    "Hmm, I suppose it could work.  But it could really use a little more umph!"
+
+class npc_mekkatorque : public CreatureScript
+{
+    public:
+        npc_mekkatorque() : CreatureScript("npc_mekkatorque") { }
+
+        struct npc_mekkatorqueAI : public ScriptedAI
+        {
+            npc_mekkatorqueAI(Creature* creature) : ScriptedAI(creature)
+            {
+                if (Creature* ozzie = me->FindNearestCreature(NPC_OZZIE, 15.0f, true))
+                    _listener = ozzie;
+                else if (Creature* milli = me->FindNearestCreature(NPC_MILLI, 15.0f, true))
+                    _listener = milli;
+                else if(Creature* tog = me->FindNearestCreature(NPC_TOG, 15.0f, true))
+                    _listener = tog;
+                else
+                {
+                    me->DespawnOrUnsummon();
+                    return;
+                }
+                _variation = urand (1,3);
+                me->CastSpell(me, SPELL_CREATE_TELEPORTER, true);
+            }
+
+            void Reset()
+            {
+            }
+
+            void JumpToNextStep(uint32 uiTimer)
+            {
+                _stepTimer = uiTimer;
+                ++_step;
+            }
+
+            void CastCredit()
+            {
+                Unit* owner = me->GetOwner();
+                switch (_listener->GetEntry())
+                {
+                    case NPC_OZZIE:
+                        me->CastSpell(owner, SPELL_CREDIT_OZZIE, true);
+                        break;
+                    case NPC_MILLI:
+                        me->CastSpell(owner, SPELL_CREDIT_MILLI, true);
+                        break;
+                    case NPC_TOG:
+                        me->CastSpell(owner, SPELL_CREDIT_TOG, true);
+                        break;
+                }
+                me->DespawnOrUnsummon();
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (_stepTimer <= diff)
+                {
+                    switch (_variation)
+                    {
+                        case 1:
+                            switch (_step)
+                            {
+                                case 0:
+                                    me->MonsterSay(MEK_1_0, LANG_UNIVERSAL, NULL);
+                                    JumpToNextStep(5000);
+                                    break;
+                                case 1:
+                                    me->MonsterSay(MEK_1_1, LANG_UNIVERSAL, NULL);
+                                    JumpToNextStep(5000);
+                                    break;
+                                case 2:
+                                    _listener->MonsterSay(LIS_1_0, LANG_UNIVERSAL, NULL);
+                                    JumpToNextStep(3000);
+                                    break;
+                                case 3:
+                                    if (Creature* Pad = me->FindNearestCreature(NPC_SUMMONING_PAD, 1.0f, true))
+                                        Pad->DespawnOrUnsummon();
+                                    CastCredit();
+                                    break;
+                            }
+                            break;
+                        case 2:
+                            switch (_step)
+                            {
+                                case 0:
+                                    me->MonsterSay(MEK_2_0, LANG_UNIVERSAL, NULL);
+                                    JumpToNextStep(5000);
+                                    break;
+                                case 1:
+                                    me->MonsterSay(MEK_2_1, LANG_UNIVERSAL, NULL);
+                                    JumpToNextStep(5000);
+                                    break;
+                                case 2:
+                                    me->MonsterSay(MEK_2_2, LANG_UNIVERSAL, NULL);
+                                    JumpToNextStep(5000);
+                                    break;
+                                case 3:
+                                    _listener->MonsterSay(LIS_2_0, LANG_UNIVERSAL, NULL);
+                                    JumpToNextStep(3000);
+                                    break;
+                                case 4:
+                                    if (Creature* Pad = me->FindNearestCreature(NPC_SUMMONING_PAD, 1.0f, true))
+                                        Pad->DespawnOrUnsummon();
+                                    CastCredit();
+                                    break;
+                            }
+                            break;
+                        case 3:
+                            switch (_step)
+                            {
+                                case 0:
+                                    me->MonsterSay(MEK_3_0, LANG_UNIVERSAL, NULL);
+                                    JumpToNextStep(7000);
+                                    break;
+                                case 1:
+                                    me->MonsterSay(MEK_3_1, LANG_UNIVERSAL, NULL);
+                                    JumpToNextStep(3000);
+                                    break;
+                                case 2:
+                                    me->MonsterSay(MEK_3_2, LANG_UNIVERSAL, NULL);
+                                    JumpToNextStep(3000);
+                                    break;
+                                case 3:
+                                    _listener->MonsterSay(LIS_3_0, LANG_UNIVERSAL, NULL);
+                                    JumpToNextStep(3000);
+                                    break;
+                                case 4:
+                                    if (Creature* Pad = me->FindNearestCreature(NPC_SUMMONING_PAD, 1.0f, true))
+                                        Pad->DespawnOrUnsummon();
+                                    CastCredit();
+                                    break;
+                            }
+                            break;
+                    }
+                }
+                else
+                    _stepTimer -= diff;
+            }
+
+        private:
+            uint32 _step;
+            uint32 _stepTimer;
+            uint32 _variation;
+            Creature* _listener;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_mekkatorqueAI(creature);
+        }
+};
+
+// 39716 is the giver, 39713 is the drivable
+class npc_scuttling_mechano_tank : public CreatureScript
+{
+public:
+    npc_scuttling_mechano_tank() : CreatureScript("npc_scuttling_mechano_tank") { }
+
+    struct npc_scuttling_mechano_tankAI : public ScriptedAI
+    {
+        npc_scuttling_mechano_tankAI(Creature* creature) : ScriptedAI(creature) { }
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (player->GetQuestStatus(QUEST_ONE_STEP_FORWARD) == QUEST_STATUS_INCOMPLETE)
+        {
+            Creature* veh = creature->SummonCreature(NPC_DRIVEABLE_MECHANOTANK, creature->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 60 * MINUTE * IN_MILLISECONDS);
+            if (veh)
+            {
+                player->EnterVehicle(veh, 0);
+            } 
+        }
+
+        return true;
+    }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_scuttling_mechano_tankAI(creature);
+    }
+};
+
 void AddSC_operation_gnomeregan()
 {
     new npc_og_camera_vehicle;
@@ -2128,4 +2531,7 @@ void AddSC_operation_gnomeregan()
     new npc_og_rl;
     new npc_gnome_citizen;
     new npc_gnome_citizen_motivated;
+    new npc_steamcrank;
+    new npc_mekkatorque;
+    new npc_scuttling_mechano_tank;
 }

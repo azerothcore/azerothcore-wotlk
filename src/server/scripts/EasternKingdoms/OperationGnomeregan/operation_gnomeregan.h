@@ -19,6 +19,19 @@
  
 enum eSpells
 {
+    // quests
+    SPELL_SALUTE_CREDIT         = 73771,
+    SPELL_DANCE_CREDIT          = 73830,
+    SPELL_ROAR_CREDIT           = 73832,
+    SPELL_CHEER_CREDIT          = 73833,
+    
+    // Prepping the Speech
+    SPELL_CREATE_TELEPORTER     = 74206,
+    SPELL_CREDIT_OZZIE          = 74154,
+    SPELL_CREDIT_MILLI          = 74155,
+    SPELL_CREDIT_TOG            = 74156,
+
+    // intro
     SPELL_MUSIC_START           = 75760,
     SPELL_MUSIC                 = 75765,
     SPELL_MUSIC_END             = 75767,
@@ -71,6 +84,7 @@ enum eCreatures
     NPC_BOMBER                  = 39735,
     NPC_ELGIN                   = 40478,
     NPC_TANK                    = 39860,
+    NPC_TRAINEE                 = 39349,
 
 ///----------------Enemies--------------
     NPC_I_INFANTRY              = 39755,
@@ -87,6 +101,14 @@ enum eCreatures
 ///--------------Bunnies----------------
     NPC_EXPLOSION_BUNNY         = 40506,
     NPC_CAMERA_VEHICLE          = 40479,
+
+    // Prepping Speech
+    NPC_OZZIE                   = 1268,
+    NPC_MILLI                   = 7955,
+    NPC_TOG                     = 6119,
+    NPC_SUMMONING_PAD           = 39817,
+
+    NPC_DRIVEABLE_MECHANOTANK   = 39713,
 };
 
 enum eObjects
@@ -103,6 +125,7 @@ enum eMisc
     DATA_MOUNT_FAST             = 6569,
     DATA_MOUNT_COG              = 9473,
     FACTION_GNOMEREGAN          = 1770,
+    QUEST_ONE_STEP_FORWARD      = 25289,
 };
 
 enum eEvents

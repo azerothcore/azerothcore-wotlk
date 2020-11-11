@@ -1,7 +1,89 @@
+-- Cleanup for the total mess that's in the db
+
+delete from creature_questender where quest in(25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
+delete from creature_queststarter where quest in(25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
+delete FROM quest_template_addon where id in(25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
+
+
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES 
+('7937', '25229');
+
+INSERT INTO `creature_questender` (`id`, `quest`) VALUES 
+(7937, 25393),
+(39271, 25287),
+(39386, 25212),
+(39675, 25199),
+(39675, 25229),
+(39675, 25285),
+(39675, 25289),
+(39675, 25295),
+(39675, 25500),
+(39678, 25283);
+
+INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `SourceSpellID`, `PrevQuestID`, `NextQuestID`, `ExclusiveGroup`, `RewardMailTemplateID`, `RewardMailDelay`, `RequiredSkillID`, `RequiredSkillPoints`, `RequiredMinRepFaction`, `RequiredMaxRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepValue`, `ProvidedItemCount`, `SpecialFlags`) VALUES 
+(25199, 0, 0, 0, 25229, 25285, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(25212, 0, 0, 0, 25199, 0, -25295, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
+(25229, 0, 0, 0, 0, 25199, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
+(25283, 0, 0, 0, 25295, 25500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
+(25285, 0, 0, 0, 25199, 25289, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(25287, 0, 0, 0, 25286, 25393, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
+(25289, 0, 0, 0, 25285, 25295, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(25295, 0, 0, 0, 25289, 0, -25295, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(25393, 0, 0, 0, 25287, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(25500, 0, 0, 0, 25283, 25287, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+
+
+-- [Q:25229] A Few Good Gnomes
+UPDATE `creature_template` SET `ScriptName`='npc_gnome_citizen_motivated' WHERE `entry`=39466;
+UPDATE `creature_template` SET `ScriptName`='npc_gnome_citizen' WHERE `entry`=39623; 
+
+SET @MOVITVATED_CITIZEN = 39466;
+DELETE FROM `creature_text` WHERE `CreatureID`=@MOVITVATED_CITIZEN;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
+(@MOVITVATED_CITIZEN, 0, 0, 'Anything for King Mekkatorque!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 1, 'Can I bring my wrench?', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 2, 'Is this going to hurt?', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 3, 'I\'d love to help!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 4, 'Sign me up!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 5, 'Wow! We\'re taking back Gnomeregan? I\'m in!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 6, 'My wrench of vengance awaits!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
+(@MOVITVATED_CITIZEN, 0, 7, 'I want to drive a Spider Tank!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx');
+
+-- [Q:25199] Basic Orders
+UPDATE `creature_template` SET `ScriptName` = 'npc_steamcrank', `ainame` = '' WHERE `entry` = '39368';
+UPDATE `creature_template` SET `ainame` = '' WHERE `entry`=39349;
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 39368 OR `entryorguid`=39349;
+
+-- [Q:25289] One Step Forward
+UPDATE `creature_template` SET `spell1` = '74157', `spell2` = '74159', `spell3` = '74160', `spell4` = '74153' WHERE `entry` = '39713';
+
+-- [Q:25295] Press Fire
+UPDATE `creature_template` SET `spell4` = '74174', `spell6` = '74153' WHERE `entry` = '39714';
+UPDATE `creature_template` SET `ScriptName` = 'npc_shoot_bunny' WHERE `entry` = '39707';
+DELETE FROM `spell_scripts` WHERE `id` = '74182';
+INSERT INTO `spell_scripts` (`id`, `command`, `datalong`, `datalong2`) VALUES ('74182', '15', '74179', '2');
+
+-- [Q:25212] Vent Horizon 
+UPDATE `conditions` SET `ConditionValue1` = '25212' WHERE (`SourceTypeOrReferenceId`='15') AND (`SourceGroup`='11211') AND (`SourceEntry`='0') AND (`ElseGroup`='0') AND (`ConditionTypeOrReference`='9') AND (`ConditionValue1`='25283') AND (`ConditionValue2`='0') AND (`ConditionValue3`='0');
+DELETE FROM `creature_template_addon` WHERE (`entry` = '39420');
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES ('39420', '0', '0', '65536', '1', '0', '75779');
+UPDATE `creature_template` SET `scale` = '2' WHERE `entry` = '39420';
+DELETE FROM `conditions` WHERE `SourceEntry`=73082;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `ConditionTypeOrReference`, `ConditionValue1`, `ConditionValue2`) VALUES 
+('13', '1', '73082', '31', '3', '39420');
+
+-- [Q:25283] Prepping the Speech  
+UPDATE `creature_template` SET `AIName`='' WHERE `entry` IN(1268,7955,6119,39817);
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN(1268,7955,6119,39817); 
+UPDATE `creature_template` SET `ScriptName` = 'npc_mekkatorque', `scale` = '0.6', `unit_flags` = '33554752' WHERE `entry` = '39712';
+
+-- [Q:25286] Words for Delivery, we have 3, but "25286" is the correct one. 
+
+-- [Q:25393] Operation Gnomergan 
 UPDATE `creature_template` SET `mechanic_immune_mask` = '12658704', `ScriptName` = 'npc_og_mekkatorque' WHERE `entry` = '39271';
 UPDATE `creature_template` SET `unit_flags` = '393220', `ScriptName` = 'npc_og_rl' WHERE `entry` = '39820';
 UPDATE `creature_template` SET `npcflag` = '0', `VehicleId` = '0', `ScriptName` = 'npc_og_tank' WHERE `entry` = '39860';
-UPDATE `creature_template` SET `faction_A` = '1771', `faction_H` = '1771', `unit_flags` = '4', `ScriptName` = 'npc_og_cannon' WHERE `entry` = '39759';
+UPDATE `creature_template` SET `faction` = '1771', `unit_flags` = '4', `ScriptName` = 'npc_og_cannon' WHERE `entry` = '39759';
 UPDATE `creature_template` SET `ScriptName` = 'npc_og_bomber' WHERE `entry` = '39735';
 UPDATE `creature_template` SET `ScriptName` = 'npc_og_infantry' WHERE `entry` = '39252';
 UPDATE `creature_template` SET `spell1` = '74764', `ScriptName` = 'npc_og_i_infantry' WHERE `entry` = '39755';
@@ -15,11 +97,11 @@ UPDATE `creature_template` SET `VehicleId` = '0', `ScriptName` = 'npc_og_camera_
 UPDATE `creature_template` SET `mechanic_immune_mask` = '8192' WHERE `entry` IN ('39860', '39826', '39799', '39819', '39273', '39910', '39837');
 
 DELETE FROM `creature` WHERE `id` IN ('39273', '39910');
-INSERT INTO `creature` (`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
-('39273', '0', '1', '256', '0', '0', '-5423.01', '535.254', '386.516', '5.23555', '300', '0', '0', '630000', '0', '0', '0', '134217728', '0'),
-('39910', '0', '1', '256', '0', '0', '-5427.93', '532.323', '386.85', '5.27046', '300', '0', '0', '630000', '0', '0', '0', '0', '0');
+INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
+('250249', '39273', '0', '1', '256', '0', '0', '-5423.01', '535.254', '386.516', '5.23555', '300', '0', '0', '630000', '0', '0', '0', '134217728', '0'),
+('250248', '39910', '0', '1', '256', '0', '0', '-5427.93', '532.323', '386.85', '5.27046', '300', '0', '0', '630000', '0', '0', '0', '0', '0');
 UPDATE `creature` SET `position_x` = '-5424.462891', `position_y` = '531.410095', `position_z` = '386.743347', `orientation` = '5.2' WHERE `id` = '39271';
-UPDATE `creature` SET `phaseMask`= '257' WHERE `id` = '7937';
+UPDATE `creature` SET `phaseMask`= '1' WHERE `id` = '7937';
 
 DELETE FROM `vehicle_template_accessory` WHERE `entry` = '39860';
 
@@ -30,14 +112,14 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 ('39910', '0', '6569', '0', '0', '0', '');
 
 UPDATE `creature_template` SET `modelid2` = '0' WHERE `entry` = '39903';
-UPDATE `creature_template` SET `equipment_id` = '39368' WHERE `entry` = '39271';
-UPDATE `creature_template` SET `speed_run` = '1.25', `faction` = '1770' WHERE `entry` = '39273';
-UPDATE `creature_template` SET `speed_run` = '1.29', `faction` = '1770' WHERE `entry` = '39910';
+-- UPDATE `creature_template` SET `equipment_id` = '39368' WHERE `entry` = '39271';
+UPDATE `creature_template` SET `speed_run` = '1.25', `faction` = '1771' WHERE `entry` = '39273';
+UPDATE `creature_template` SET `speed_run` = '1.29', `faction` = '1771' WHERE `entry` = '39910';
 
-DELETE FROM `spell_area` WHERE (`spell` = '74310') AND (`area` IN ('1', '135'));
-INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status`) VALUES 
-('74310', '1', '25393',   '1', '25393', '0', '0', '2', '1', '1'),
-('74310', '135', '25287', '1', '25393', '0', '0', '2', '1', '1');
+DELETE FROM `spell_area` WHERE (`spell` = '74310') AND (`area` IN ('1', '135', '721'));
+INSERT INTO `spell_area` VALUES
+('74310', '721', '25287', '25393', '0', '0', '2', '1', '74', '11'),
+('74310', '135', '25287', '25393', '0', '0', '2', '1', '74', '11');
 
 UPDATE `gameobject` SET `phaseMask` = '257' WHERE `id` = '194498';
 UPDATE `gameobject` SET `phaseMask` = '256' WHERE `id` = '202922';
@@ -48,11 +130,11 @@ INSERT INTO `spell_scripts` (`id`, `command`, `x`, `y`, `z`, `o`) VALUES
 ('74412', '6', '-4842.156738', '-1277.52771', '501.868256', '0.84'),
 ('75510', '6', '-5164.767578', '556.341125', '423.753784', '25.29');
 
--- @todo
---DELETE FROM `spell_dbc` WHERE `id` = '75517';
---INSERT INTO `spell_dbc` VALUES ('75517', '0', '0', '384', '1024', '4', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '21', '13', '0', '-1', '0', '0', '6', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '25', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '[DND] Bind Sight');
+DELETE FROM `spell_dbc` WHERE `id` = '75517';
+INSERT INTO `spell_dbc` VALUES (75517,0,0,384,1024,4,0,0,8,0,0,0,0,0,1,0,0,0,0,0,0,0,245,1,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,'Tumultuous Earthstorm');
 
--- waypoints for the last battle --
+-- Waypoints for the last battle --
+
 DELETE FROM `script_waypoint` WHERE `entry` IN ('39271', '39273', '39910');
 INSERT INTO `script_waypoint` VALUES 
 ('39271', '0', '-5420.67', '528.775', '386.713', '0', ''),
@@ -273,21 +355,3 @@ INSERT INTO `script_waypoint` VALUES
 ('39910', '68', '-4950.066406', '725.069885', '260.181854', '0', ''),
 ('39910', '69', '-4947.596191', '725.010742', '261.424683', '0', ''),
 ('39910', '70', '-4941.947266', '726.680725', '261.646057', '0', '');
-
--- [Q:25229] A Few Good Gnomes
-UPDATE `creature_template` SET `ScriptName`='npc_gnome_citizen_motivated' WHERE `entry`=39466;
-UPDATE `creature_template` SET `ScriptName`='npc_gnome_citizen' WHERE `entry`=39623;
-INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES (7937, 25229);
-INSERT INTO `creature_questender` (`id`, `quest`) VALUES (39675, 25229);
-
-SET @MOVITVATED_CITIZEN = 39466;
-DELETE FROM `creature_text` WHERE `CreatureID`=@MOVITVATED_CITIZEN;
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
-(@MOVITVATED_CITIZEN, 0, 0, 'Anything for King Mekkatorque!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
-(@MOVITVATED_CITIZEN, 0, 1, 'Can I bring my wrench?', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
-(@MOVITVATED_CITIZEN, 0, 2, 'Is this going to hurt?', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
-(@MOVITVATED_CITIZEN, 0, 3, 'I\'d love to help!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
-(@MOVITVATED_CITIZEN, 0, 4, 'Sign me up!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
-(@MOVITVATED_CITIZEN, 0, 5, 'Wow! We\'re taking back Gnomeregan? I\'m in!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
-(@MOVITVATED_CITIZEN, 0, 6, 'My wrench of vengance awaits!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx'),
-(@MOVITVATED_CITIZEN, 0, 7, 'I want to drive a Spider Tank!', 12, 0, 100, 0, 0, 0, 1871, 0, 'xxx');
