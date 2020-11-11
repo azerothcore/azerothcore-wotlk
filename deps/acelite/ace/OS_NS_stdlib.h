@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_stdlib.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
  *  @author and a cast of thousands...
  *
@@ -76,6 +76,18 @@ inline ACE_INT64 ace_strtoull_helper (const char *s, char **ptr, int base)
 # endif /* strtoull */
 }
 #endif /* !ACE_LACKS_STRTOULL && !ACE_STRTOULL_EQUIVALENT */
+
+#if !defined (ACE_LACKS_RAND_R)
+inline int ace_rand_r_helper (unsigned *seed)
+{
+#  if defined (rand_r)
+  return rand_r (seed);
+#  undef rand_r
+#  else
+  return ACE_STD_NAMESPACE::rand_r (seed);
+#  endif /* rand_r */
+}
+#endif /* !ACE_LACKS_RAND_R */
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 

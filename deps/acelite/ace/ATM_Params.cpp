@@ -2,8 +2,6 @@
 
 #if defined (ACE_HAS_ATM)
 
-
-
 #if !defined (__ACE_INLINE__)
 #include "ace/ATM_Params.inl"
 #endif /* __ACE_INLINE__ */

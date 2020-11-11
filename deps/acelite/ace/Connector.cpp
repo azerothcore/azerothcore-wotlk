@@ -13,7 +13,9 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Connector)
+ACE_ALLOC_HOOK_DEFINE_Tc (ACE_NonBlocking_Connect_Handler)
+ACE_ALLOC_HOOK_DEFINE_Tco (ACE_Connector)
+ACE_ALLOC_HOOK_DEFINE_Tco (ACE_Strategy_Connector)
 
 template <typename SVC_HANDLER>
 ACE_NonBlocking_Connect_Handler<SVC_HANDLER>::ACE_NonBlocking_Connect_Handler (ACE_Connector_Base<SVC_HANDLER> &connector,
@@ -769,10 +771,10 @@ ACE_Connector<SVC_HANDLER, PEER_CONNECTOR>::info (ACE_TCHAR **strp, size_t lengt
   ACE_TRACE ("ACE_Connector<SVC_HANDLER, PEER_CONNECTOR>::info");
   ACE_TCHAR buf[BUFSIZ];
 
-  ACE_OS::sprintf (buf,
-                   ACE_TEXT ("%s\t %s"),
-                   ACE_TEXT ("ACE_Connector"),
-                   ACE_TEXT ("# connector factory\n"));
+  ACE_OS::snprintf (buf, BUFSIZ,
+                    ACE_TEXT ("%s\t %s"),
+                    ACE_TEXT ("ACE_Connector"),
+                    ACE_TEXT ("# connector factory\n"));
 
   if (*strp == 0 && (*strp = ACE_OS::strdup (buf)) == 0)
     return -1;
