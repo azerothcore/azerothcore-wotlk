@@ -30,36 +30,36 @@ EndContentData */
 
 class spell_q10935_the_exorcism_of_colonel_jules : public SpellScriptLoader
 {
-    public:
-        spell_q10935_the_exorcism_of_colonel_jules() : SpellScriptLoader("spell_q10935_the_exorcism_of_colonel_jules") { }
+public:
+    spell_q10935_the_exorcism_of_colonel_jules() : SpellScriptLoader("spell_q10935_the_exorcism_of_colonel_jules") { }
 
-        class spell_q10935_the_exorcism_of_colonel_jules_SpellScript : public SpellScript
+    class spell_q10935_the_exorcism_of_colonel_jules_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_q10935_the_exorcism_of_colonel_jules_SpellScript);
+
+        void HandleDummy(SpellEffIndex effIndex)
         {
-            PrepareSpellScript(spell_q10935_the_exorcism_of_colonel_jules_SpellScript);
+            PreventHitDefaultEffect(effIndex);
+            Creature* target = GetHitCreature();
+            if (!target)
+                return;
 
-            void HandleDummy(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-                Creature* target = GetHitCreature();
-                if (!target)
-                    return;
-
-                if (GetCaster()->IsHostileTo(target))
-                    GetCaster()->CastSpell(target, 39323 /*SPELL_HOLY_FIRE*/, true);
-                else
-                    GetCaster()->CastSpell(target, 39322 /*SPELL_HEAL_BARADA*/, true);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_q10935_the_exorcism_of_colonel_jules_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_q10935_the_exorcism_of_colonel_jules_SpellScript();
+            if (GetCaster()->IsHostileTo(target))
+                GetCaster()->CastSpell(target, 39323 /*SPELL_HOLY_FIRE*/, true);
+            else
+                GetCaster()->CastSpell(target, 39322 /*SPELL_HEAL_BARADA*/, true);
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_q10935_the_exorcism_of_colonel_jules_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_q10935_the_exorcism_of_colonel_jules_SpellScript();
+    }
 };
 
 
@@ -107,7 +107,8 @@ public:
                 {
                     me->setFaction(FACTION_HOSTILE);
                     faction_Timer = 0;
-                } else faction_Timer -= diff;
+                }
+                else faction_Timer -= diff;
             }
 
             if (!UpdateVictim())
@@ -128,13 +129,15 @@ public:
             {
                 DoCastVictim(SPELL_SHOCK);
                 shock_Timer = 10000;
-            } else shock_Timer -= diff;
+            }
+            else shock_Timer -= diff;
 
             if (envelopingWinds_Timer <= diff)
             {
                 DoCastVictim(SPELL_ENVELOPING_WINDS);
                 envelopingWinds_Timer = 25000;
-            } else envelopingWinds_Timer -= diff;
+            }
+            else envelopingWinds_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }

@@ -12,7 +12,7 @@
 
 class MPQFile;
 
-u_map_fcc MverMagic = { {'R','E','V','M'} };
+u_map_fcc MverMagic = { {'R', 'E', 'V', 'M'} };
 
 FileLoader::FileLoader()
 {
@@ -54,7 +54,7 @@ bool FileLoader::loadFile(std::string const& fileName, bool log)
 bool FileLoader::prepareLoadedData()
 {
     // Check version
-    version = (file_MVER *) data;
+    version = (file_MVER*) data;
     if (version->fcc != MverMagic.fcc)
         return false;
     if (version->ver != FILE_FORMAT_VERSION)

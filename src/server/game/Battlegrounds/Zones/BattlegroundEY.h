@@ -18,10 +18,10 @@ enum BG_EY_Events
 
 enum BG_EY_Timers
 {
-    BG_EY_FLAG_RESPAWN_TIME         = 20*IN_MILLISECONDS,
-    BG_EY_FLAG_ON_GROUND_TIME       = 10*IN_MILLISECONDS,
-    BG_EY_FPOINTS_CHECK_TIME        = 2*IN_MILLISECONDS,
-    BG_EY_FPOINTS_TICK_TIME         = 1*IN_MILLISECONDS
+    BG_EY_FLAG_RESPAWN_TIME         = 20 * IN_MILLISECONDS,
+    BG_EY_FLAG_ON_GROUND_TIME       = 10 * IN_MILLISECONDS,
+    BG_EY_FPOINTS_CHECK_TIME        = 2 * IN_MILLISECONDS,
+    BG_EY_FPOINTS_TICK_TIME         = 1 * IN_MILLISECONDS
 };
 
 enum BG_EY_WorldStates
@@ -249,8 +249,8 @@ struct BattlegroundEYLosingPointStruct
 {
     BattlegroundEYLosingPointStruct(uint32 _SpawnNeutralObjectType, uint32 _DespawnObjectTypeAlliance, uint32 _MessageIdAlliance, uint32 _DespawnObjectTypeHorde, uint32 _MessageIdHorde)
         : SpawnNeutralObjectType(_SpawnNeutralObjectType),
-        DespawnObjectTypeAlliance(_DespawnObjectTypeAlliance), MessageIdAlliance(_MessageIdAlliance),
-        DespawnObjectTypeHorde(_DespawnObjectTypeHorde), MessageIdHorde(_MessageIdHorde)
+          DespawnObjectTypeAlliance(_DespawnObjectTypeAlliance), MessageIdAlliance(_MessageIdAlliance),
+          DespawnObjectTypeHorde(_DespawnObjectTypeHorde), MessageIdHorde(_MessageIdHorde)
     {}
 
     uint32 SpawnNeutralObjectType;
@@ -264,9 +264,9 @@ struct BattlegroundEYCapturingPointStruct
 {
     BattlegroundEYCapturingPointStruct(uint32 _DespawnNeutralObjectType, uint32 _SpawnObjectTypeAlliance, uint32 _MessageIdAlliance, uint32 _SpawnObjectTypeHorde, uint32 _MessageIdHorde, uint32 _GraveYardId)
         : DespawnNeutralObjectType(_DespawnNeutralObjectType),
-        SpawnObjectTypeAlliance(_SpawnObjectTypeAlliance), MessageIdAlliance(_MessageIdAlliance),
-        SpawnObjectTypeHorde(_SpawnObjectTypeHorde), MessageIdHorde(_MessageIdHorde),
-        GraveYardId(_GraveYardId)
+          SpawnObjectTypeAlliance(_SpawnObjectTypeAlliance), MessageIdAlliance(_MessageIdAlliance),
+          SpawnObjectTypeHorde(_SpawnObjectTypeHorde), MessageIdHorde(_MessageIdHorde),
+          GraveYardId(_GraveYardId)
     {}
 
     uint32 DespawnNeutralObjectType;
@@ -316,84 +316,84 @@ struct BattlegroundEYScore : public BattlegroundScore
 
 class BattlegroundEY : public Battleground
 {
-    public:
-        BattlegroundEY();
-        ~BattlegroundEY();
+public:
+    BattlegroundEY();
+    ~BattlegroundEY();
 
-        /* inherited from BattlegroundClass */
-        void AddPlayer(Player* player);
-        void StartingEventCloseDoors();
-        void StartingEventOpenDoors();
+    /* inherited from BattlegroundClass */
+    void AddPlayer(Player* player);
+    void StartingEventCloseDoors();
+    void StartingEventOpenDoors();
 
-        /* BG Flags */
-        uint64 GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const    { return _flagKeeperGUID; }
-        void SetFlagPicker(uint64 guid)     { _flagKeeperGUID = guid; }
-        uint8 GetFlagState() const          { return _flagState; }
-        void RespawnFlag();
-        void RespawnFlagAfterDrop();
+    /* BG Flags */
+    uint64 GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const    { return _flagKeeperGUID; }
+    void SetFlagPicker(uint64 guid)     { _flagKeeperGUID = guid; }
+    uint8 GetFlagState() const          { return _flagState; }
+    void RespawnFlag();
+    void RespawnFlagAfterDrop();
 
-        void RemovePlayer(Player* player);
-        void HandleBuffUse(uint64 buff_guid);
-        void HandleAreaTrigger(Player* player, uint32 trigger);
-        void HandleKillPlayer(Player* player, Player* killer);
-        GraveyardStruct const* GetClosestGraveyard(Player* player);
-        bool SetupBattleground();
-        void Init();
-        void EndBattleground(TeamId winnerTeamId);
-        void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
-        void FillInitialWorldStates(WorldPacket& data);
-        void SetDroppedFlagGUID(uint64 guid, TeamId /*teamId*/ = TEAM_NEUTRAL)  { _droppedFlagGUID = guid; }
-        uint64 GetDroppedFlagGUID() const { return _droppedFlagGUID; }
+    void RemovePlayer(Player* player);
+    void HandleBuffUse(uint64 buff_guid);
+    void HandleAreaTrigger(Player* player, uint32 trigger);
+    void HandleKillPlayer(Player* player, Player* killer);
+    GraveyardStruct const* GetClosestGraveyard(Player* player);
+    bool SetupBattleground();
+    void Init();
+    void EndBattleground(TeamId winnerTeamId);
+    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
+    void FillInitialWorldStates(WorldPacket& data);
+    void SetDroppedFlagGUID(uint64 guid, TeamId /*teamId*/ = TEAM_NEUTRAL)  { _droppedFlagGUID = guid; }
+    uint64 GetDroppedFlagGUID() const { return _droppedFlagGUID; }
 
-        /* Battleground Events */
-        void EventPlayerClickedOnFlag(Player* player, GameObject* gameObject);
-        void EventPlayerDroppedFlag(Player* player);
+    /* Battleground Events */
+    void EventPlayerClickedOnFlag(Player* player, GameObject* gameObject);
+    void EventPlayerDroppedFlag(Player* player);
 
-        /* achievement req. */
-        bool AllNodesConrolledByTeam(TeamId teamId) const;
-        TeamId GetPrematureWinner();
+    /* achievement req. */
+    bool AllNodesConrolledByTeam(TeamId teamId) const;
+    TeamId GetPrematureWinner();
 
-    private:
-        void PostUpdateImpl(uint32 diff);
+private:
+    void PostUpdateImpl(uint32 diff);
 
-        void EventPlayerCapturedFlag(Player* Source, uint32 BgObjectType);
-        void EventTeamLostPoint(TeamId teamId, uint32 point);
-        void EventTeamCapturedPoint(TeamId teamId, uint32 point);
-        void UpdatePointsCount();
-        void UpdatePointsIcons(uint32 point);
+    void EventPlayerCapturedFlag(Player* Source, uint32 BgObjectType);
+    void EventTeamLostPoint(TeamId teamId, uint32 point);
+    void EventTeamCapturedPoint(TeamId teamId, uint32 point);
+    void UpdatePointsCount();
+    void UpdatePointsIcons(uint32 point);
 
-        /* Point status updating procedures */
-        void UpdatePointsState();
+    /* Point status updating procedures */
+    void UpdatePointsState();
 
-        /* Scorekeeping */
-        void AddPoints(TeamId teamId, uint32 points);
+    /* Scorekeeping */
+    void AddPoints(TeamId teamId, uint32 points);
 
-        struct CapturePointInfo
+    struct CapturePointInfo
+    {
+        CapturePointInfo() : _ownerTeamId(TEAM_NEUTRAL), _barStatus(BG_EY_PROGRESS_BAR_STATE_MIDDLE), _areaTrigger(0)
         {
-            CapturePointInfo() : _ownerTeamId(TEAM_NEUTRAL), _barStatus(BG_EY_PROGRESS_BAR_STATE_MIDDLE), _areaTrigger(0)
-            {
-                _playersCount[TEAM_ALLIANCE] = 0;
-                _playersCount[TEAM_HORDE] = 0;
-            }
+            _playersCount[TEAM_ALLIANCE] = 0;
+            _playersCount[TEAM_HORDE] = 0;
+        }
 
-            TeamId _ownerTeamId;
-            int8 _barStatus;
-            uint32 _areaTrigger;
-            int8 _playersCount[BG_TEAMS_COUNT];
+        TeamId _ownerTeamId;
+        int8 _barStatus;
+        uint32 _areaTrigger;
+        int8 _playersCount[BG_TEAMS_COUNT];
 
-            bool IsUnderControl(TeamId teamId) const { return _ownerTeamId == teamId; }
-            bool IsUnderControl() const { return _ownerTeamId != TEAM_NEUTRAL; }
-            bool IsUncontrolled() const { return _ownerTeamId == TEAM_NEUTRAL; }
-        };
+        bool IsUnderControl(TeamId teamId) const { return _ownerTeamId == teamId; }
+        bool IsUnderControl() const { return _ownerTeamId != TEAM_NEUTRAL; }
+        bool IsUncontrolled() const { return _ownerTeamId == TEAM_NEUTRAL; }
+    };
 
-        CapturePointInfo _capturePointInfo[EY_POINTS_MAX];
-        EventMap _bgEvents;
-        uint32 _honorTics;
-        uint8 _ownedPointsCount[BG_TEAMS_COUNT];
-        uint64 _flagKeeperGUID;
-        uint64 _droppedFlagGUID;
-        uint8 _flagState;
-        uint32 _flagCapturedObject;
+    CapturePointInfo _capturePointInfo[EY_POINTS_MAX];
+    EventMap _bgEvents;
+    uint32 _honorTics;
+    uint8 _ownedPointsCount[BG_TEAMS_COUNT];
+    uint64 _flagKeeperGUID;
+    uint64 _droppedFlagGUID;
+    uint8 _flagState;
+    uint32 _flagCapturedObject;
 };
 #endif
 

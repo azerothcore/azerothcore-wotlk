@@ -14,34 +14,34 @@
 class MapInstanced : public Map
 {
     friend class MapManager;
-    public:
-        typedef std::unordered_map< uint32, Map*> InstancedMaps;
+public:
+    typedef std::unordered_map< uint32, Map*> InstancedMaps;
 
-        MapInstanced(uint32 id);
-        ~MapInstanced() {}
+    MapInstanced(uint32 id);
+    ~MapInstanced() {}
 
-        // functions overwrite Map versions
-        void Update(const uint32, const uint32, bool thread = true);
-        void DelayedUpdate(const uint32 diff);
-        //void RelocationNotify();
-        void UnloadAll();
-        bool CanEnter(Player* player, bool loginCheck = false);
+    // functions overwrite Map versions
+    void Update(const uint32, const uint32, bool thread = true);
+    void DelayedUpdate(const uint32 diff);
+    //void RelocationNotify();
+    void UnloadAll();
+    bool CanEnter(Player* player, bool loginCheck = false);
 
-        Map* CreateInstanceForPlayer(const uint32 mapId, Player* player);
-        Map* FindInstanceMap(uint32 instanceId) const
-        {
-            InstancedMaps::const_iterator i = m_InstancedMaps.find(instanceId);
-            return(i == m_InstancedMaps.end() ? NULL : i->second);
-        }
-        bool DestroyInstance(InstancedMaps::iterator &itr);
+    Map* CreateInstanceForPlayer(const uint32 mapId, Player* player);
+    Map* FindInstanceMap(uint32 instanceId) const
+    {
+        InstancedMaps::const_iterator i = m_InstancedMaps.find(instanceId);
+        return(i == m_InstancedMaps.end() ? NULL : i->second);
+    }
+    bool DestroyInstance(InstancedMaps::iterator& itr);
 
-        InstancedMaps &GetInstancedMaps() { return m_InstancedMaps; }
-        virtual void InitVisibilityDistance();
+    InstancedMaps& GetInstancedMaps() { return m_InstancedMaps; }
+    virtual void InitVisibilityDistance();
 
-    private:
-        InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty);
-        BattlegroundMap* CreateBattleground(uint32 InstanceId, Battleground* bg);
+private:
+    InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty);
+    BattlegroundMap* CreateBattleground(uint32 InstanceId, Battleground* bg);
 
-        InstancedMaps m_InstancedMaps;
+    InstancedMaps m_InstancedMaps;
 };
 #endif

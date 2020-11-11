@@ -41,18 +41,18 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature* creature)
 void WaypointMovementGenerator<Creature>::DoInitialize(Creature* creature)
 {
     LoadPath(creature);
-    creature->AddUnitState(UNIT_STATE_ROAMING|UNIT_STATE_ROAMING_MOVE);
+    creature->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
 }
 
 void WaypointMovementGenerator<Creature>::DoFinalize(Creature* creature)
 {
-    creature->ClearUnitState(UNIT_STATE_ROAMING|UNIT_STATE_ROAMING_MOVE);
+    creature->ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
     creature->SetWalk(false);
 }
 
 void WaypointMovementGenerator<Creature>::DoReset(Creature* creature)
 {
-    creature->AddUnitState(UNIT_STATE_ROAMING|UNIT_STATE_ROAMING_MOVE);
+    creature->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
     StartMoveNow(creature);
 }
 
@@ -134,7 +134,7 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
             return false;
         }
 
-        i_currentNode = (i_currentNode+1) % i_path->size();
+        i_currentNode = (i_currentNode + 1) % i_path->size();
     }
 
     // xinef: do not initialize motion if we got stunned in movementinform
@@ -240,7 +240,7 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
             // xinef: do not start pre-empetive movement if current node has delay or we are ending waypoint movement
             bool finished = creature->movespline->Finalized();
             if (!finished && !i_path->at(i_currentNode)->delay && ((i_currentNode != i_path->size() - 1) || repeating))
-                finished = (creature->movespline->_Spline().length(creature->movespline->_currentSplineIdx()+1) - creature->movespline->timePassed()) < 200;
+                finished = (creature->movespline->_Spline().length(creature->movespline->_currentSplineIdx() + 1) - creature->movespline->timePassed()) < 200;
 
             if (finished)
             {
@@ -249,8 +249,8 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
             }
         }
     }
-     return true;
- }
+    return true;
+}
 
 void WaypointMovementGenerator<Creature>::MovementInform(Creature* creature)
 {
@@ -277,7 +277,7 @@ void FlightPathMovementGenerator::LoadPath(Player* player)
 {
     _pointsForPathSwitch.clear();
     std::vector<uint32> const& taxi = player->m_taxi.GetPath();
-    for (uint32 src = player->m_taxi.GetTaxiSegment(), dst = player->m_taxi.GetTaxiSegment()+1; dst < taxi.size(); src = dst++)
+    for (uint32 src = player->m_taxi.GetTaxiSegment(), dst = player->m_taxi.GetTaxiSegment() + 1; dst < taxi.size(); src = dst++)
     {
         uint32 path, cost;
         sObjectMgr->GetTaxiPath(taxi[src], taxi[dst], path, cost);
@@ -397,7 +397,7 @@ bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
             departureEvent = !departureEvent;
 
             // xinef: map should be switched, do not rely on client packets QQ
-            if (i_currentNode + 1 < i_path.size() && i_path[i_currentNode+1]->mapid != player->GetMapId())
+            if (i_currentNode + 1 < i_path.size() && i_path[i_currentNode + 1]->mapid != player->GetMapId())
             {
                 ++i_currentNode;
                 _mapSwitch = true;
@@ -415,8 +415,7 @@ bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
 
                 return false;
             }
-        }
-        while (true);
+        } while (true);
     }
 
     return i_currentNode < (i_path.size() - 1);
@@ -481,11 +480,12 @@ void FlightPathMovementGenerator::PreloadEndGrid()
     if (endMap)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDetail("Preloading rid (%f, %f) for map %u at node index %u/%u", _endGridX, _endGridY, _endMapId, _preloadTargetNode, (uint32)(i_path.size()-1));
+        sLog->outDetail("Preloading rid (%f, %f) for map %u at node index %u/%u", _endGridX, _endGridY, _endMapId, _preloadTargetNode, (uint32)(i_path.size() - 1));
 #endif
         endMap->LoadGrid(_endGridX, _endGridY);
     }
-    else {
+    else
+    {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDetail("Unable to determine map to preload flightmaster grid");
 #endif

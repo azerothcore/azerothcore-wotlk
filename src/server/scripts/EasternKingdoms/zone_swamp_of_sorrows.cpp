@@ -62,23 +62,23 @@ public:
         {
             switch (uiPointId)
             {
-            case 0:
-                {
-                    GameObject* cage = nullptr;
-                    if (galensCageGUID)
-                        cage = me->GetMap()->GetGameObject(galensCageGUID);
-                    else
-                        cage = GetClosestGameObjectWithEntry(me, GO_GALENS_CAGE, INTERACTION_DISTANCE);
-                    if (cage)
+                case 0:
                     {
-                        cage->UseDoorOrButton();
-                        galensCageGUID = cage->GetGUID();
+                        GameObject* cage = nullptr;
+                        if (galensCageGUID)
+                            cage = me->GetMap()->GetGameObject(galensCageGUID);
+                        else
+                            cage = GetClosestGameObjectWithEntry(me, GO_GALENS_CAGE, INTERACTION_DISTANCE);
+                        if (cage)
+                        {
+                            cage->UseDoorOrButton();
+                            galensCageGUID = cage->GetGUID();
+                        }
+                        break;
                     }
+                case 21:
+                    Talk(EMOTE_DISAPPEAR);
                     break;
-                }
-            case 21:
-                Talk(EMOTE_DISAPPEAR);
-                break;
             }
         }
 
