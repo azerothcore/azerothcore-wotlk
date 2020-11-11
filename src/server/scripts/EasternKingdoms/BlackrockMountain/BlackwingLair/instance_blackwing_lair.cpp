@@ -141,7 +141,7 @@ public:
             }
         }
 
-        bool CheckRequiredBosses(uint32 bossId, Player const* player /*= nullptr*/) const override
+        bool CheckRequiredBosses(uint32 bossId, Player const* /* player */) const override
         {
             switch (bossId)
             {

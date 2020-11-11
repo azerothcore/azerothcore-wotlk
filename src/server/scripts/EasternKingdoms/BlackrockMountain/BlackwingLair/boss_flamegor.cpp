@@ -8,8 +8,6 @@
 #include "ScriptedCreature.h"
 #include "blackwing_lair.h"
 
-constexpr uint32 GATE_ENTRY = 185483;
-
 enum Emotes
 {
     EMOTE_FRENZY            = 0,
