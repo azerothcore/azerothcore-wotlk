@@ -108,6 +108,8 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/MagistersTerrace/instance_magisters_terrace.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/MagistersTerrace/boss_selin_fireheart.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/MagistersTerrace/boss_vexallus.cpp
+  ${AC_SCRIPTS_DIR}/EasternKingdoms/OperationGnomeregan/operation_gnomeregan.cpp
+  ${AC_SCRIPTS_DIR}/EasternKingdoms/OperationGnomeregan/operation_gnomeregan.h
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Uldaman/uldaman.h
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Uldaman/instance_uldaman.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_swamp_of_sorrows.cpp
