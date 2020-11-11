@@ -6091,6 +6091,21 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
                 break;
 
+            // ///////////////////////////////////////////
+            // ///////////OPERATION GNOMERGAN/////////////
+            // ///////////////////////////////////////////
+            case 51590: // Toss Ice Boulder
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 74412: // Emergency Recall [Final]
+                for (int8 i = 0; i < 3; ++i)
+                    spellInfo->EffectImplicitTargetB[i] = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 75536: // Explosion (prevent error message in console)
+            case 75545: // Explosion (prevent error message in console)
+            case 75553: // Emergency Recall [Camera trigger]
+                spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_TARGET_ANY;
+                break;
 
             // ///////////////////////////////////////////
             // ////////////////QUESTS/////////////////////
