@@ -11,7 +11,9 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
-#include "SpellScript.h" 
+#include "SpellScript.h"
+
+constexpr float aNefariusSpawnLoc[4] = { -7466.16f, -1040.80f, 412.053f, 2.14675f };
 
 enum Says
 {
@@ -35,7 +37,9 @@ enum Spells
    SPELL_TAILSWIPE                   = 15847,
    SPELL_BURNINGADRENALINE           = 18173,  //Cast this one. It's what 3.3.5 DBM expects.
    SPELL_BURNINGADRENALINE_EXPLOSION = 23478,
-   SPELL_CLEAVE                      = 19983   //Chain cleave is most likely named something different and contains a dummy effect
+   SPELL_CLEAVE                      = 19983,   //Chain cleave is most likely named something different and contains a dummy effect
+   SPELL_NEFARIUS_CORRUPTION         = 23642,
+   SPELL_RED_LIGHTNING               = 19484,
 };
 
 enum Events
@@ -44,13 +48,16 @@ enum Events
     EVENT_SPEECH_2                  = 2,
     EVENT_SPEECH_3                  = 3,
     EVENT_SPEECH_4                  = 4,
-    EVENT_ESSENCEOFTHERED           = 5,
-    EVENT_FLAMEBREATH               = 6,
-    EVENT_FIRENOVA                  = 7,
-    EVENT_TAILSWIPE                 = 8,
-    EVENT_CLEAVE                    = 9,
-    EVENT_BURNINGADRENALINE_CASTER  = 10,
-    EVENT_BURNINGADRENALINE_TANK    = 11
+    EVENT_SPEECH_5                  = 5,
+    EVENT_SPEECH_6                  = 6,
+    EVENT_SPEECH_7                  = 7, 
+    EVENT_ESSENCEOFTHERED           = 8,
+    EVENT_FLAMEBREATH               = 9,
+    EVENT_FIRENOVA                  = 10,
+    EVENT_TAILSWIPE                 = 11,
+    EVENT_CLEAVE                    = 12,
+    EVENT_BURNINGADRENALINE_CASTER  = 13,
+    EVENT_BURNINGADRENALINE_TANK    = 14,
 };
 
 class boss_vaelastrasz : public CreatureScript
@@ -63,15 +70,16 @@ public:
         boss_vaelAI(Creature* creature) : BossAI(creature, DATA_VAELASTRAZ_THE_CORRUPT)
         {
             Initialize();
-            creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            creature->setFaction(35);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void Initialize()
         {
             PlayerGUID = 0;
             HasYelled = false;
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->setFaction(35);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void Reset() override
@@ -79,6 +87,7 @@ public:
             _Reset();
 
             me->SetStandState(UNIT_STAND_STATE_DEAD);
+            me->SetReactState(REACT_PASSIVE);  
             Initialize();
         }
 
@@ -126,23 +135,43 @@ public:
                     switch (eventId)
                     {
                         case EVENT_SPEECH_1:
+                            me->SummonCreature(NPC_VICTOR_NEFARIUS, aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], aNefariusSpawnLoc[2], aNefariusSpawnLoc[3], TEMPSUMMON_TIMED_DESPAWN, 35000);
+                            events.ScheduleEvent(EVENT_SPEECH_2, 1000);
+                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            break;
+                        case EVENT_SPEECH_2:
+                            if (Creature* nefarius = me->GetMap()->GetCreature(m_nefariusGuid))
+                            {
+                                nefarius->CastSpell(me, SPELL_NEFARIUS_CORRUPTION, TRIGGERED_CAST_DIRECTLY);
+                                nefarius->MonsterYell(SAY_NEFARIAN_VAEL_INTRO, LANG_UNIVERSAL, 0);
+                                nefarius->SetStandState(UNIT_STAND_STATE_STAND);
+                            }
+                            events.ScheduleEvent(EVENT_SPEECH_3, 18000);
+                            break; 
+                        case EVENT_SPEECH_3:
+                            if (Creature* nefarius = me->GetMap()->GetCreature(m_nefariusGuid))
+                                nefarius->CastSpell(me, SPELL_RED_LIGHTNING, TRIGGERED_NONE);
+                            events.ScheduleEvent(EVENT_SPEECH_4, 6000);
+                            break;
+                        case EVENT_SPEECH_4:
                             Talk(SAY_LINE1);
                             me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            events.ScheduleEvent(EVENT_SPEECH_2, 12000);
+                            events.ScheduleEvent(EVENT_SPEECH_5, 12000);
                             break;
-                        case EVENT_SPEECH_2:
+                        case EVENT_SPEECH_5:
                             Talk(SAY_LINE2);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            events.ScheduleEvent(EVENT_SPEECH_3, 12000);
+                            events.ScheduleEvent(EVENT_SPEECH_6, 12000);
                             break;
-                        case EVENT_SPEECH_3:
+                        case EVENT_SPEECH_6:
                             Talk(SAY_LINE3);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            events.ScheduleEvent(EVENT_SPEECH_4, 16000);
+                            events.ScheduleEvent(EVENT_SPEECH_7, 16000);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             break;
-                        case EVENT_SPEECH_4:
-                            me->setFaction(103); // Black Dragonflight
+                        case EVENT_SPEECH_7:
+                            me->setFaction(103);
                             if (PlayerGUID && ObjectAccessor::GetUnit(*me, PlayerGUID))
                                 AttackStart(ObjectAccessor::GetUnit(*me, PlayerGUID));;
                             break;
@@ -211,6 +240,16 @@ public:
             DoMeleeAttackIfReady();
         }
 
+        void JustSummoned(Creature* summoned) override
+        {
+            if (summoned->GetEntry() == NPC_VICTOR_NEFARIUS)
+            {
+                // Set not selectable, so players won't interact with it
+                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                m_nefariusGuid = summoned->GetGUID();
+            }
+        }
+
         void sGossipSelect(Player* player, uint32 sender, uint32 action)
         {
             if (sender == GOSSIP_ID && action == 0)
@@ -222,6 +261,7 @@ public:
 
         private:
             uint64 PlayerGUID;
+            uint64 m_nefariusGuid;
             bool HasYelled;
     };
 
@@ -231,7 +271,7 @@ public:
     }
 };
 
-//Need to define an aurascript for EVENT_BURNINGADRENALINE's death effect.
+// Need to define an aurascript for EVENT_BURNINGADRENALINE's death effect.
 // 18173 - Burning Adrenaline
 class spell_vael_burning_adrenaline : public SpellScriptLoader
 {
