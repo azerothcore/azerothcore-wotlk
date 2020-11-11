@@ -4,7 +4,7 @@
 /**
  *  @file    Timer_Queue_T.h
  *
- *  @author Doug Schmidt <schmidt@cs.wustl.edu>
+ *  @author Doug Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Irfan Pyarali <irfan@cs.wustl.edu> and
  *  @author Darrell Brunsch <brunsch@cs.wustl.edu>
  */
@@ -73,7 +73,9 @@ class ACE_Timer_Queue_T
   : public ACE_Timer_Queue_Upcall_Base<TYPE,FUNCTOR>
 {
 public:
-  // = Initialization and termination methods.
+  /// Type of time policy
+  typedef TIME_POLICY time_policy_t;
+
   /**
    * Default constructor. @a upcall_functor is the instance of the
    * FUNCTOR to be used by the queue. If @a upcall_functor is 0, Timer
@@ -185,7 +187,6 @@ public:
                    const void *upcall_act);
 
 protected:
-
   /// Schedule a timer.
   virtual long schedule_i (const TYPE &type,
                            const void *act,
@@ -223,7 +224,6 @@ protected:
   bool const delete_free_list_;
 
 private:
-
   /// Returned by <calculate_timeout>.
   ACE_Time_Value timeout_;
 
