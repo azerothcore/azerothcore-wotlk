@@ -291,7 +291,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (@SHADOWFLAME
 -- attaching lever script to gob
 UPDATE `gameobject_template` SET `ScriptName`='go_chromaggus_lever' WHERE  `entry`=179148;
 
-DELETE FROM `gameobject` WHERE `guid` IN(75160,75163,7228,7227,);
+DELETE FROM `gameobject` WHERE `guid` IN(75160,75163,7228,7227);
 
 DELETE FROM `conditions` WHERE `SourceEntry` IN(23642,14984) AND `ConditionValue2` = 13020;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
