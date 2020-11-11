@@ -3219,36 +3219,55 @@ void Unit::_UpdateSpells(uint32 time)
 
 void Unit::_UpdateAutoRepeatSpell()
 {
-    // check "realtime" interrupts
-    if ((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving()) || IsNonMeleeSpellCast(false, false, true, m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id == 75))
+    SpellInfo const* spellProto = nullptr;
+    if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL])
     {
-        // cancel wand shoot
-        if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != 75)
-            InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+        spellProto = m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo;
+    }
+
+    if (!spellProto)
+    {
+        return;
+    }
+    
+    static uint32 const HUNTER_AUTOSHOOT = 75;
+
+    // Check "realtime" interrupts
+    if ((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving() && spellProto->Id != HUNTER_AUTOSHOOT) ||
+        IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
+    {
+        InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
         m_AutoRepeatFirstCast = true;
         return;
     }
 
-    // apply delay (Auto Shot (spellID 75) not affected)
-    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != 75)
+    // Apply delay (Hunter's autoshoot not affected)
+    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && spellProto->Id != HUNTER_AUTOSHOOT)
+    {
         setAttackTimer(RANGED_ATTACK, 500);
+    }
+
     m_AutoRepeatFirstCast = false;
 
-    // castroutine
+    // Check for ranged attack timer
     if (isAttackReady(RANGED_ATTACK))
     {
-        // Check if able to cast
-        if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->CheckCast(true) != SPELL_CAST_OK)
+        SpellCastResult result = m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->CheckCast(true);
+        if (result != SPELL_CAST_OK)
         {
-            InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+            if (spellProto->Id != HUNTER_AUTOSHOOT)
+            {
+                InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+            }
+
             return;
         }
 
-        // we want to shoot
-        Spell* spell = new Spell(this, m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo, TRIGGERED_FULL_MASK);
+        // We want to shoot
+        Spell* spell = new Spell(this, spellProto, TRIGGERED_FULL_MASK);
         spell->prepare(&(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets));
 
-        // all went good, reset attack
+        // Reset attack
         resetAttackTimer(RANGED_ATTACK);
     }
 }
