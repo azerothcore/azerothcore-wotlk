@@ -135,7 +135,7 @@ public:
                     switch (eventId)
                     {
                         case EVENT_SPEECH_1:
-                            me->SummonCreature(NPC_VICTOR_NEFARIUS, aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], aNefariusSpawnLoc[2], aNefariusSpawnLoc[3], TEMPSUMMON_TIMED_DESPAWN, 35000);
+                            me->SummonCreature(NPC_VICTOR_NEFARIUS, aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], aNefariusSpawnLoc[2], aNefariusSpawnLoc[3], TEMPSUMMON_TIMED_DESPAWN, 26000);
                             events.ScheduleEvent(EVENT_SPEECH_2, 1000);
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             break;
@@ -151,7 +151,7 @@ public:
                         case EVENT_SPEECH_3:
                             if (Creature* nefarius = me->GetMap()->GetCreature(m_nefariusGuid))
                                 nefarius->CastSpell(me, SPELL_RED_LIGHTNING, TRIGGERED_NONE);
-                            events.ScheduleEvent(EVENT_SPEECH_4, 6000);
+                            events.ScheduleEvent(EVENT_SPEECH_4, 2000);
                             break;
                         case EVENT_SPEECH_4:
                             Talk(SAY_LINE1);
@@ -167,7 +167,7 @@ public:
                         case EVENT_SPEECH_6:
                             Talk(SAY_LINE3);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            events.ScheduleEvent(EVENT_SPEECH_7, 16000);
+                            events.ScheduleEvent(EVENT_SPEECH_7, 17000);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             break;
                         case EVENT_SPEECH_7:
