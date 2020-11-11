@@ -241,7 +241,7 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (84534, 84533, 0, 0, 3, 0, 0);
 
 -- Make NPC 11981 (Flamegor) roam
-UPDATE `creature` SET `MovementType`=1, `wander_distance`=10 WHERE `id` = 11981;
+UPDATE `creature` SET `MovementType`=1, `spawndist`=10 WHERE `id` = 11981;
 
 -- Add waypoints for Ebonroc (14601)
 SET @EBONROCGUID = 85780;
