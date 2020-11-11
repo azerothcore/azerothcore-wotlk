@@ -293,10 +293,10 @@ UPDATE `gameobject_template` SET `ScriptName`='go_chromaggus_lever' WHERE  `entr
 
 DELETE FROM `gameobject` WHERE `guid` IN(75160,75163,7228,7227);
 
-DELETE FROM `conditions` WHERE `SourceEntry` IN(23642,14984) AND `ConditionValue2` = 13020;
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(13, 1, 23642, 0, 0, 31, 0, 3, 0, 13020, 0, 0, 0, '', 'Spell \'Nefarius Corruption\' targets Vaelstrasz'),
-(13, 1, 19484, 0, 0, 31, 0, 3, 0, 13020, 0, 0, 0, '', 'Spell \'Red Lightning\' targets Vaelstrasz');
+-- DELETE FROM `conditions` WHERE `SourceEntry` IN(23642,14984) AND `ConditionValue2` = 13020;
+-- INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+-- (17, 0, 23642, 0, 1, 29, 99, 3, 0, 13020, 0, 0, 0, '', 'Spell \'Nefarius Corruption\' targets Vaelstrasz'),
+-- (17, 0, 19484, 0, 1, 29, 99, 3, 0, 13020, 0, 0, 0, '', 'Spell \'Red Lightning\' targets Vaelstrasz');
 
 DELETE FROM `broadcast_text` WHERE `ID` = 100003;
 INSERT INTO `broadcast_text` (`ID`, `Language`, `MaleText`, `FemaleText`, `EmoteID0`, `EmoteID1`, `EmoteID2`, `EmoteDelay0`, `EmoteDelay1`, `EmoteDelay2`, `SoundId`, `Unk1`, `Unk2`, `VerifiedBuild`) VALUES
