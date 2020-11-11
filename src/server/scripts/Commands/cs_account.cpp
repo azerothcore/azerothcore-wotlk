@@ -100,35 +100,35 @@ public:
         AccountOpResult result = AccountMgr::CreateAccount(std::string(accountName), std::string(password));
         switch (result)
         {
-        case AOR_OK:
-            handler->PSendSysMessage(LANG_ACCOUNT_CREATED, accountName);
-            if (handler->GetSession())
-            {
-                sLog->outDebug(LOG_FILTER_WARDEN, "Account: %d (IP: %s) Character:[%s] (GUID: %u) Change Password.",
-                    handler->GetSession()->GetAccountId(), handler->GetSession()->GetRemoteAddress().c_str(),
-                    handler->GetSession()->GetPlayer()->GetName().c_str(), handler->GetSession()->GetPlayer()->GetGUIDLow());
-            }
-            break;
-        case AOR_NAME_TOO_LONG:
-            handler->SendSysMessage(LANG_ACCOUNT_TOO_LONG);
-            handler->SetSentErrorMessage(true);
-            return false;
-        case AOR_PASS_TOO_LONG:
-            handler->SendSysMessage(LANG_ACCOUNT_PASS_TOO_LONG);
-            handler->SetSentErrorMessage(true);
-            return false;
-        case AOR_NAME_ALREDY_EXIST:
-            handler->SendSysMessage(LANG_ACCOUNT_ALREADY_EXIST);
-            handler->SetSentErrorMessage(true);
-            return false;
-        case AOR_DB_INTERNAL_ERROR:
-            handler->PSendSysMessage(LANG_ACCOUNT_NOT_CREATED_SQL_ERROR, accountName);
-            handler->SetSentErrorMessage(true);
-            return false;
-        default:
-            handler->PSendSysMessage(LANG_ACCOUNT_NOT_CREATED, accountName);
-            handler->SetSentErrorMessage(true);
-            return false;
+            case AOR_OK:
+                handler->PSendSysMessage(LANG_ACCOUNT_CREATED, accountName);
+                if (handler->GetSession())
+                {
+                    sLog->outDebug(LOG_FILTER_WARDEN, "Account: %d (IP: %s) Character:[%s] (GUID: %u) Change Password.",
+                                   handler->GetSession()->GetAccountId(), handler->GetSession()->GetRemoteAddress().c_str(),
+                                   handler->GetSession()->GetPlayer()->GetName().c_str(), handler->GetSession()->GetPlayer()->GetGUIDLow());
+                }
+                break;
+            case AOR_NAME_TOO_LONG:
+                handler->SendSysMessage(LANG_ACCOUNT_TOO_LONG);
+                handler->SetSentErrorMessage(true);
+                return false;
+            case AOR_PASS_TOO_LONG:
+                handler->SendSysMessage(LANG_ACCOUNT_PASS_TOO_LONG);
+                handler->SetSentErrorMessage(true);
+                return false;
+            case AOR_NAME_ALREDY_EXIST:
+                handler->SendSysMessage(LANG_ACCOUNT_ALREADY_EXIST);
+                handler->SetSentErrorMessage(true);
+                return false;
+            case AOR_DB_INTERNAL_ERROR:
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_CREATED_SQL_ERROR, accountName);
+                handler->SetSentErrorMessage(true);
+                return false;
+            default:
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_CREATED, accountName);
+                handler->SetSentErrorMessage(true);
+                return false;
         }
 
         return true;
@@ -171,21 +171,21 @@ public:
         AccountOpResult result = AccountMgr::DeleteAccount(accountId);
         switch (result)
         {
-        case AOR_OK:
-            handler->PSendSysMessage(LANG_ACCOUNT_DELETED, accountName.c_str());
-            break;
-        case AOR_NAME_NOT_EXIST:
-            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
-            handler->SetSentErrorMessage(true);
-            return false;
-        case AOR_DB_INTERNAL_ERROR:
-            handler->PSendSysMessage(LANG_ACCOUNT_NOT_DELETED_SQL_ERROR, accountName.c_str());
-            handler->SetSentErrorMessage(true);
-            return false;
-        default:
-            handler->PSendSysMessage(LANG_ACCOUNT_NOT_DELETED, accountName.c_str());
-            handler->SetSentErrorMessage(true);
-            return false;
+            case AOR_OK:
+                handler->PSendSysMessage(LANG_ACCOUNT_DELETED, accountName.c_str());
+                break;
+            case AOR_NAME_NOT_EXIST:
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->SetSentErrorMessage(true);
+                return false;
+            case AOR_DB_INTERNAL_ERROR:
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_DELETED_SQL_ERROR, accountName.c_str());
+                handler->SetSentErrorMessage(true);
+                return false;
+            default:
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_DELETED, accountName.c_str());
+                handler->SetSentErrorMessage(true);
+                return false;
         }
 
         return true;
@@ -227,9 +227,9 @@ public:
             {
                 Field* fieldsLogin = resultLogin->Fetch();
                 handler->PSendSysMessage(LANG_ACCOUNT_LIST_LINE,
-                    fieldsLogin[0].GetCString(), name.c_str(), fieldsLogin[1].GetCString(),
-                    fieldsDB[2].GetUInt16(), fieldsDB[3].GetUInt16(), fieldsLogin[3].GetUInt8(),
-                    fieldsLogin[2].GetUInt8());
+                                         fieldsLogin[0].GetCString(), name.c_str(), fieldsLogin[1].GetCString(),
+                                         fieldsDB[2].GetUInt16(), fieldsDB[3].GetUInt16(), fieldsLogin[3].GetUInt8(),
+                                         fieldsLogin[2].GetUInt8());
             }
             else
                 handler->PSendSysMessage(LANG_ACCOUNT_LIST_ERROR, name.c_str());
@@ -367,19 +367,19 @@ public:
         AccountOpResult result = AccountMgr::ChangePassword(handler->GetSession()->GetAccountId(), std::string(newPassword));
         switch (result)
         {
-        case AOR_OK:
-            handler->SendSysMessage(LANG_COMMAND_PASSWORD);
-            sScriptMgr->OnPasswordChange(handler->GetSession()->GetAccountId());
-            break;
-        case AOR_PASS_TOO_LONG:
-            handler->SendSysMessage(LANG_PASSWORD_TOO_LONG);
-            sScriptMgr->OnFailedPasswordChange(handler->GetSession()->GetAccountId());
-            handler->SetSentErrorMessage(true);
-            return false;
-        default:
-            handler->SendSysMessage(LANG_COMMAND_NOTCHANGEPASSWORD);
-            handler->SetSentErrorMessage(true);
-            return false;
+            case AOR_OK:
+                handler->SendSysMessage(LANG_COMMAND_PASSWORD);
+                sScriptMgr->OnPasswordChange(handler->GetSession()->GetAccountId());
+                break;
+            case AOR_PASS_TOO_LONG:
+                handler->SendSysMessage(LANG_PASSWORD_TOO_LONG);
+                sScriptMgr->OnFailedPasswordChange(handler->GetSession()->GetAccountId());
+                handler->SetSentErrorMessage(true);
+                return false;
+            default:
+                handler->SendSysMessage(LANG_COMMAND_NOTCHANGEPASSWORD);
+                handler->SetSentErrorMessage(true);
+                return false;
         }
 
         return true;
@@ -438,7 +438,7 @@ public:
         // Let set addon state only for lesser (strong) security level
         // or to self account
         if (handler->GetSession() && handler->GetSession()->GetAccountId() != accountId &&
-            handler->HasLowerSecurityAccount(nullptr, accountId, true))
+                handler->HasLowerSecurityAccount(nullptr, accountId, true))
             return false;
 
         int expansion = atoi(exp); //get int anyway (0 if error)
@@ -628,21 +628,21 @@ public:
 
         switch (result)
         {
-        case AOR_OK:
-            handler->SendSysMessage(LANG_COMMAND_PASSWORD);
-            break;
-        case AOR_NAME_NOT_EXIST:
-            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
-            handler->SetSentErrorMessage(true);
-            return false;
-        case AOR_PASS_TOO_LONG:
-            handler->SendSysMessage(LANG_PASSWORD_TOO_LONG);
-            handler->SetSentErrorMessage(true);
-            return false;
-        default:
-            handler->SendSysMessage(LANG_COMMAND_NOTCHANGEPASSWORD);
-            handler->SetSentErrorMessage(true);
-            return false;
+            case AOR_OK:
+                handler->SendSysMessage(LANG_COMMAND_PASSWORD);
+                break;
+            case AOR_NAME_NOT_EXIST:
+                handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->SetSentErrorMessage(true);
+                return false;
+            case AOR_PASS_TOO_LONG:
+                handler->SendSysMessage(LANG_PASSWORD_TOO_LONG);
+                handler->SetSentErrorMessage(true);
+                return false;
+            default:
+                handler->SendSysMessage(LANG_COMMAND_NOTCHANGEPASSWORD);
+                handler->SetSentErrorMessage(true);
+                return false;
         }
         return true;
     }
