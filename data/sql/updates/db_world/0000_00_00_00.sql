@@ -1,13 +1,20 @@
 -- Cleanup for the total mess that's in the db
 
-delete from creature_questender where quest in(25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
-delete from creature_queststarter where quest in(25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
-delete FROM quest_template_addon where id in(25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
 
-
+delete from creature_queststarter where quest in(25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393); 
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES 
-('7937', '25229');
+(7937, 25229),
+(7937, 25393),
+(39271, 25287),
+(39386, 25212),
+(39675, 25199), 
+(39675, 25285),
+(39675, 25289),
+(39675, 25295),
+(39675, 25500),
+(39678, 25283);
 
+delete from creature_questender where quest in(25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES 
 (7937, 25393),
 (39271, 25287),
@@ -20,6 +27,8 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (39675, 25500),
 (39678, 25283);
 
+
+delete FROM quest_template_addon where id in(25229, 25199, 25285, 25289, 25295, 25212, 25283, 25500, 25287, 25393);
 INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `SourceSpellID`, `PrevQuestID`, `NextQuestID`, `ExclusiveGroup`, `RewardMailTemplateID`, `RewardMailDelay`, `RequiredSkillID`, `RequiredSkillPoints`, `RequiredMinRepFaction`, `RequiredMaxRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepValue`, `ProvidedItemCount`, `SpecialFlags`) VALUES 
 (25199, 0, 0, 0, 25229, 25285, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (25212, 0, 0, 0, 25199, 0, -25295, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
@@ -31,6 +40,15 @@ INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `Sourc
 (25295, 0, 0, 0, 25289, 0, -25295, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (25393, 0, 0, 0, 25287, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (25500, 0, 0, 0, 25283, 25287, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+
+
+UPDATE `creature_template` SET `npcflag`='2' WHERE  `entry`=39675;
+
+-- FULL Gossip menu
+DELETE FROM `gossip_menu_option` WHERE `MenuID` = 11211;
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES 
+(11211, 0, 0, 'Board the Flying Machine.', 39462, 1, 1, 0, 0, 0, 0, '', 0, 0),
+(11211, 1, 0, 'Take me to Mekkatorque!',       0, 1, 1, 0, 0, 0, 0, '', 0, 0);
 
 
 -- [Q:25229] A Few Good Gnomes
@@ -79,7 +97,7 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_mekkatorque', `scale` = '0.6'
 
 -- [Q:25286] Words for Delivery, we have 3, but "25286" is the correct one. 
 
--- [Q:25393] Operation Gnomergan 
+-- [Q:25393] Operation Gnomeregan 
 UPDATE `creature_template` SET `mechanic_immune_mask` = '12658704', `ScriptName` = 'npc_og_mekkatorque' WHERE `entry` = '39271';
 UPDATE `creature_template` SET `unit_flags` = '393220', `ScriptName` = 'npc_og_rl' WHERE `entry` = '39820';
 UPDATE `creature_template` SET `npcflag` = '0', `VehicleId` = '0', `ScriptName` = 'npc_og_tank' WHERE `entry` = '39860';
@@ -355,3 +373,60 @@ INSERT INTO `script_waypoint` VALUES
 ('39910', '68', '-4950.066406', '725.069885', '260.181854', '0', ''),
 ('39910', '69', '-4947.596191', '725.010742', '261.424683', '0', ''),
 ('39910', '70', '-4941.947266', '726.680725', '261.646057', '0', '');
+
+-- Operation Gnomeregan
+SET @ENTRY := 82;
+DELETE FROM `game_event` WHERE `eventEntry`=@ENTRY;
+INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
+(@ENTRY, "2010-09-07 01:00:00", "2010-10-10 01:00:00", 9999999, 47520, 0, 0, "Operation: Gnomeregan", 0, 2);
+
+DELETE FROM `game_event_creature` WHERE `eventEntry`=@ENTRY;
+INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
+(@ENTRY, 207186),
+(@ENTRY, 207193),
+(@ENTRY, 207174),
+(@ENTRY, 207175),
+(@ENTRY, 207176),
+(@ENTRY, 207177),
+(@ENTRY, 207178),
+(@ENTRY, 207179),
+(@ENTRY, 207180),
+(@ENTRY, 207181),
+(@ENTRY, 207182),
+(@ENTRY, 207183),
+(@ENTRY, 207184),
+(@ENTRY, 207185),
+(@ENTRY, 207190),
+(@ENTRY, 207191),
+(@ENTRY, 207192),
+(@ENTRY, 207194),
+(@ENTRY, 207195),
+(@ENTRY, 207188),
+(@ENTRY, 207187),
+(@ENTRY, 207196),
+(@ENTRY, 207197),
+(@ENTRY, 207198),
+(@ENTRY, 207199),
+(@ENTRY, 207189);
+
+DELETE FROM `game_event_gameobject` WHERE `eventEntry`=@ENTRY;
+INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
+(@ENTRY, 151271),
+(@ENTRY, 151272),
+(@ENTRY, 151273),
+(@ENTRY, 151274),
+(@ENTRY, 151275),
+(@ENTRY, 151276),
+(@ENTRY, 151277),
+(@ENTRY, 151244),
+(@ENTRY, 151245),
+(@ENTRY, 151246),
+(@ENTRY, 151247),
+(@ENTRY, 151248),
+(@ENTRY, 151249),
+(@ENTRY, 151250),
+(@ENTRY, 151251),
+(@ENTRY, 151252),
+(@ENTRY, 151253),
+(@ENTRY, 151254),
+(@ENTRY, 151255);

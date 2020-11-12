@@ -113,9 +113,13 @@ enum eCreatures
 
 enum eObjects
 {
+    GO_PLR_LANDING_PLATFORM    = 202760,
+    GO_TELE_DISK               = 202733,
+    GO_HAZ_LIGHT               = 202713,
     GO_BANNER                  = 194498,
     GO_RAD_CONTROL             = 202767,
     GO_IRRADIATOR              = 202922,
+    GO_CRAP_TABLE              = 202564,
 };
 
 enum eMisc
@@ -150,6 +154,86 @@ enum eWorldstates
     WORLDSTATE_TUNNELS_CAPTURED                         = 5011,
     WORLDSTATE_COUNTDOWN                                = 5037,
     WORLDSTATE_COUNTDOWN_CTRL                           = 5038,
+};
+
+const Position decor_beginning_teleport_platforms[6] = {
+    // Teleport Platforms 202733
+    {-5414.52, 474.504, 383.974, 0.645772},
+    {-5420.38, 473.085, 383.956, 0.663223},
+    {-5411.08, 472.309, 384.004, 0.575957},
+    {-5413.32, 468.844, 384.21, 0.575957},
+    {-5418.15, 476.55, 384.068, 0.663223},
+    {-5416.76, 471.038, 383.984, 0.645772}
+};
+
+const Position decor_gnomish_tables[2] = {
+    {-5430.01, 535.743, 386.827,-1.41372},
+    {-5463.99, -626.967, 393.529,0},
+};
+
+const Position decor_gnomeregan_banners[32] = {
+    // P1 INTRO (8)
+    {-5418.68, 459.585, 386.622, -2.44346},
+    {-5404.91, 462.189, 384.779, -0.837758},
+    {-5376.39, 472.72, 384.283, -0.837758},
+    {-5375.15, 482.976, 384.449, 0.575957},
+    {-5455.16, 515.398, 387.598, -2.3911},
+    {-5429.35, 547.783, 386.938, 0.575957},
+    {-5389.39, 550.753, 386.725, -2.44346},
+    {-5373.3, 525.882, 387.03, -2.93214},
+    // P2 AIRFIELD (5)
+    {-5310.91, 586.951, 389.693, -1.25664},
+    {-5268.48, 568.033, 387.138, -1.13446},
+    {-5336.79, 562.766, 395.812, -0.837758},
+    {-5334.65, 555.167, 384.071, -0.523598},
+    {-5305.06, 532.271, 384.891, -0.680679},
+    // P3 SMALL HOUSE (5)
+    {-5153.77, 454.16, 393.133, 2.56563},
+    {-5117.25, 444.118, 397.804, 2.56563},
+    {-5087.5, 482.637, 401.899, -2.14675},
+    {-5141.51, 471.094, 392.839, 2.56563},
+    {-5080.71, 451.729, 410.369, 2.53072},
+    // P4 OUTSIDE CAVE (5)
+    {-5180.89, 530.708, 389.413, -1.62316},
+    {-5145.07, 556.821, 413.427, -2.18166},
+    {-5198.83, 534.108, 389.122, -1.62316},
+    {-5190.92, 596.262, 408.516, -1.51844},
+    {-5176.98, 596.332, 408.102, -1.64061},
+    // P5 INSIDE GNOMEREGAN (9)
+    {-5156.54, 662.779, 245.188, -1.74533},
+    {-5154.93, 671.948, 248.057, 1.72787},
+    {-5169.41, 664.198, 245.406, -1.71042},
+    {-5171.89, 641.462, 347.195, 1.27409},
+    {-5157.88, 639.892, 347.195, 1.71042},
+    {-5170.58, 672.648, 248.057, 1.29154},
+    {-5174.28, 719.535, 369.765, -1.76278},
+    {-5165.14, 640.599, 348.922, 1.48353},
+    {-5153.2, 713.705, 369.589, -3.08918},
+    // P6 BOMB PLATFORM INSIDE GNOMEREGAN
+};
+
+const Position decor_beginning_hazard_lights[20] = {
+    // Hazard Light Red 02
+    {-5440.04, 524.285, 388.257, 1.29154},
+    {-5435.77, 517.83, 388.278, 1.29154},
+    {-5429.48, 522.066, 388.259, 1.29154},
+    {-5437.63, 527.63, 388.275, 1.29154},
+    {-5433.61, 528.453, 388.305, 1.29154},
+    {-5439.32, 520.198, 388.265, 1.29154},
+    {-5430.19, 526.101, 388.255, 1.29154},
+    {-5431.73, 518.66, 388.255, 1.29154},
+    {-5389.46, -604.698, 393.345, 1.29154},
+    {-5391.94, -609.545, 393.589, 1.29154},
+    {-5393.62, -612.368, 393.799, 1.29154},
+    {-5396.01, -617.333, 393.741, 1.29154},
+    {-5410.24, -654.898, 393.749, 1.29154},
+    {-5412.61, -659.821, 393.915, 1.29154},
+    {-5414.69, -662.712, 394.14, 1.29154},
+    {-5417.49, -667.495, 394.616, 1.29154},
+    {-5428.03, -692.396, 394.648, 1.29154},
+    {-5430.65, -697.174, 394.863, 1.29154},
+    {-5432.19, -700.075, 395.037, 1.29154},
+    {-5434.78, -704.911, 395.076, 1.29154}
 };
 
 const Position iInfantrySpawn[26] =
@@ -299,6 +383,41 @@ const Position TroggSpawn               = {-5181.74f, 631.21f, 398.54f, 4.7f};
 const Position ExplosionBunnySpawn      = {-5183.24f, 608.97f, 410.89f, 4.7f};
 
 //#define SOUND_NAME            soundID // Duration
+#define MEK1_1_0    "They may take our lives, but they'll never take..."
+#define MEK1_1_1    "...our INNOVATION!"
+#define LIS1_1_0    "What? I don't even know what you're talking about! That's terrible!"
+#define MEK1_2_0    "We will not go quietly into the night! We will not vanish without a fight!"
+#define MEK1_2_1    "We're going to live on! We're going to survive! Today we celebrate..."
+#define MEK1_2_2    "...our Autonomy Day!"
+#define LIS1_2_0    "Horrible! Well, all right, maybe it just needs a little cleaning up?"
+#define MEK1_3_0    "What I want out of each and every one of you is a hard-target search of every refuelling station, residence, warehouse, farmhouse, henhouse, outhouse and doghouse in this area."
+#define MEK1_3_1    "Your fugitive's name is Mekgineer Thermaplugg."
+#define MEK1_3_2    "Go get him."
+#define LIS1_3_0    "Hmm, I suppose it could work.  But it could really use a little more umph!"
+
+
+
+#define STEAM_0 "Well, a bunch of useless gears, let's get to work!"
+#define STEAM_1 "I will teach you everything you must know how to be a real soldier!"
+#define STEAM_2 "First of all, you need to go drill."
+#define STEAM_3 "At the signal, show me how to welcome the commander for the charter!"
+#define STEAM_4 "So recruits saluted his commander!"
+#define STEAM_5 "Great job!"
+#define STEAM_6 "On the battlefield, it is important to intimidate the enemy furious battle roar!"
+#define STEAM_7 "As soon as I give the signal, show me what real fury!"
+#define STEAM_8 "Show me now furious!"
+#define STEAM_9 "Wow, nice!"
+#define STEAM_10 "Remember that the most important factor in any battle - is the spirit!"
+#define STEAM_11 "Get ready to show me how the soldiers should be happy to win!"
+#define STEAM_12 "Let's! Express your enthusiasm!"
+#define STEAM_13 "Terrific!"
+#define STEAM_14 "However, the most important in the battle - to be able to correctly mark earned sweat and blood of victory!"
+#define STEAM_15 "Execute me your best victory dance! Start the alarm!"
+#define STEAM_16 "And now - dance!"
+#define STEAM_17 "Great!"
+#define STEAM_18 "You - are the best squad of recruits that I have ever seen Let's repeat everything!"
+
+
 #define MEK_1_1                 "Граждане и друзья Гномрегана!"
 #define MEK_1_2                 "Сегодня мы отвоюем у подлого предателя Термоштепселя наш славный город!"
 #define MEK_1_3                 "Встанем плечом к плечу в битве за родину!"
