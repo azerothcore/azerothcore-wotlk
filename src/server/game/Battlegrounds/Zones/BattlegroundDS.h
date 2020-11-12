@@ -53,7 +53,8 @@ enum BattlegroundDSSpells
 };
 
 enum BattlegroundDSData
-{ // These values are NOT blizzlike... need the correct data!
+{
+    // These values are NOT blizzlike... need the correct data!
     BG_DS_WATERFALL_TIMER_MIN                    = 30000,
     BG_DS_WATERFALL_TIMER_MAX                    = 60000,
     BG_DS_WATERFALL_WARNING_DURATION             = 5000,
@@ -71,40 +72,40 @@ enum BattlegroundDSData
 
 class BattlegroundDS : public Battleground
 {
-    public:
-        BattlegroundDS();
-        ~BattlegroundDS();
+public:
+    BattlegroundDS();
+    ~BattlegroundDS();
 
-        /* inherited from BattlegroundClass */
-        void AddPlayer(Player* player);
-        void StartingEventCloseDoors();
-        void StartingEventOpenDoors();
+    /* inherited from BattlegroundClass */
+    void AddPlayer(Player* player);
+    void StartingEventCloseDoors();
+    void StartingEventOpenDoors();
 
-        void RemovePlayer(Player* player);
-        void HandleAreaTrigger(Player* player, uint32 trigger);
-        bool SetupBattleground();
-        void Init();
-        void FillInitialWorldStates(WorldPacket &d);
-        void HandleKillPlayer(Player* player, Player* killer);
-        bool HandlePlayerUnderMap(Player* player);
-    private:
-        uint32 _waterfallTimer;
-        uint8 _waterfallStatus;
-        uint32 _waterfallKnockbackTimer;
-        uint32 _pipeKnockBackTimer;
-        uint8 _pipeKnockBackCount;
+    void RemovePlayer(Player* player);
+    void HandleAreaTrigger(Player* player, uint32 trigger);
+    bool SetupBattleground();
+    void Init();
+    void FillInitialWorldStates(WorldPacket& d);
+    void HandleKillPlayer(Player* player, Player* killer);
+    bool HandlePlayerUnderMap(Player* player);
+private:
+    uint32 _waterfallTimer;
+    uint8 _waterfallStatus;
+    uint32 _waterfallKnockbackTimer;
+    uint32 _pipeKnockBackTimer;
+    uint8 _pipeKnockBackCount;
 
-        void PostUpdateImpl(uint32 diff);
-    protected:
-        uint32 getWaterFallStatus() { return _waterfallStatus; };
-        void setWaterFallStatus(uint8 status) { _waterfallStatus = status; };
-        uint32 getWaterFallTimer() { return _waterfallTimer; };
-        void setWaterFallTimer(uint32 timer) { _waterfallTimer = timer; };
-        uint32 getWaterFallKnockbackTimer() { return _waterfallKnockbackTimer; };
-        void setWaterFallKnockbackTimer(uint32 timer) { _waterfallKnockbackTimer = timer; };
-        uint8 getPipeKnockBackCount() { return _pipeKnockBackCount; };
-        void setPipeKnockBackCount(uint8 count) { _pipeKnockBackCount = count; };
-        uint32 getPipeKnockBackTimer() { return _pipeKnockBackTimer; };
-        void setPipeKnockBackTimer(uint32 timer) { _pipeKnockBackTimer = timer; };
+    void PostUpdateImpl(uint32 diff);
+protected:
+    uint32 getWaterFallStatus() { return _waterfallStatus; };
+    void setWaterFallStatus(uint8 status) { _waterfallStatus = status; };
+    uint32 getWaterFallTimer() { return _waterfallTimer; };
+    void setWaterFallTimer(uint32 timer) { _waterfallTimer = timer; };
+    uint32 getWaterFallKnockbackTimer() { return _waterfallKnockbackTimer; };
+    void setWaterFallKnockbackTimer(uint32 timer) { _waterfallKnockbackTimer = timer; };
+    uint8 getPipeKnockBackCount() { return _pipeKnockBackCount; };
+    void setPipeKnockBackCount(uint8 count) { _pipeKnockBackCount = count; };
+    uint32 getPipeKnockBackTimer() { return _pipeKnockBackTimer; };
+    void setPipeKnockBackTimer(uint32 timer) { _pipeKnockBackTimer = timer; };
 };
 #endif

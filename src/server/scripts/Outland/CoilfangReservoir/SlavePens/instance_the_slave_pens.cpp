@@ -39,7 +39,7 @@ public:
         {
             counter = DATA_FLAMECALLER_000;
         }
-        
+
         void Load(char const* /*data*/) override { LoadBossState(DataHeader); }
 
         void OnCreatureCreate(Creature* creature) override

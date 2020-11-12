@@ -21,6 +21,13 @@ ACE_Message_Queue_Vx::msgq (void)
                                 );
 }
 
+ACE_INLINE int
+ACE_Message_Queue_Vx::peek_dequeue_head (ACE_Message_Block *&,
+                                         ACE_Time_Value *)
+{
+  ACE_NOTSUP_RETURN (-1);
+}
+
 #endif /* ACE_VXWORKS */
 
 ACE_END_VERSIONED_NAMESPACE_DECL

@@ -14,8 +14,13 @@
 #include "ace/Task_Ex_T.inl"
 #endif /* __ACE_INLINE__ */
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
+
+ACE_ALLOC_HOOK_DEFINE_Tycc (ACE_Task_Ex)
 
 template <ACE_SYNCH_DECL, class ACE_MESSAGE_TYPE, class TIME_POLICY> void
 ACE_Task_Ex<ACE_SYNCH_USE, ACE_MESSAGE_TYPE, TIME_POLICY>::dump (void) const
