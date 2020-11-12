@@ -38,9 +38,7 @@ class npc_og_suit : public CreatureScript
         {
             npc_og_suitAI(Creature* pCreature) : npc_escortAI(pCreature) {}
 
-            void WaypointReached(uint32 i)
-            {
-            }
+            void WaypointReached(uint32 /* point */) { }
 
             void SetupMovement(uint32 variation)
             {
@@ -160,7 +158,7 @@ class npc_og_suit : public CreatureScript
                         pEscortAI->Start(true, true, NULL, NULL, false, true);
                     else
                     {
-                        pEscortAI->Start(true, true);
+                        pEscortAI->Start(true, true); 
                         pEscortAI->SetDespawnAtEnd(false);
                     }
                     pEscortAI->SetDespawnAtFar(false);
@@ -843,7 +841,8 @@ class npc_og_mekkatorque : public CreatureScript
                         SetHoldState(true);
                         JumpToNextStep(3500);
                         break;
-                    case 71: 
+                    case 71:
+                        // wtf?
                         ;//me->SetReactState(REACT_AGGRESSIVE);
                         if (Creature* pCogspin = me->FindNearestCreature(NPC_COGSPIN, 100.0f))
                             ;//pCogspin->SetReactState(REACT_AGGRESSIVE);
