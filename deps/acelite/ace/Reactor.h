@@ -5,7 +5,7 @@
  *  @file    Reactor.h
  *
  *  @author Irfan Pyarali <irfan@cs.wustl.edu>
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -341,7 +341,6 @@ public:
                         ACE_Reactor_Mask mask);
 
 #if defined (ACE_WIN32)
-
   /**
    * Register handler for OS events.
    *
@@ -360,7 +359,6 @@ public:
    */
   int register_handler (ACE_Event_Handler *event_handler,
                         ACE_HANDLE event_handle = ACE_INVALID_HANDLE);
-
 #endif /* ACE_WIN32 */
 
   /**
@@ -578,7 +576,19 @@ public:
                                const ACE_Time_Value &delay,
                                const ACE_Time_Value &interval =
                                 ACE_Time_Value::zero);
-
+#if defined (ACE_HAS_CPP11)
+  template<class Rep1, class Period1, class Rep2 = int, class Period2 = std::ratio<1>>
+  long schedule_timer (ACE_Event_Handler *event_handler,
+                       const void *arg,
+                       const std::chrono::duration<Rep1, Period1>& delay,
+                       const std::chrono::duration<Rep2, Period2>& interval =
+                        std::chrono::duration<Rep2, Period2>::zero ())
+  {
+    ACE_Time_Value const tv_delay (delay);
+    ACE_Time_Value const tv_interval (interval);
+    return this->schedule_timer (event_handler, arg, tv_delay, tv_interval);
+  }
+#endif
   /**
    * Reset recurring timer interval.
    *
@@ -592,6 +602,15 @@ public:
    */
   virtual int reset_timer_interval (long timer_id,
                                     const ACE_Time_Value &interval);
+#if defined (ACE_HAS_CPP11)
+  template<class Rep, class Period>
+  int reset_timer_interval (long timer_id,
+                            const std::chrono::duration<Rep, Period>& interval)
+  {
+    ACE_Time_Value const tv_interval (interval);
+    return this->reset_timer_interval (timer_id, tv_interval);
+  }
+#endif
 
   /**
    * Cancel timer.
