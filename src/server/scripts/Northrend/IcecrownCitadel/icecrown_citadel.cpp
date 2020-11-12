@@ -411,7 +411,7 @@ public:
                     _events.ScheduleEvent(EVENT_LK_INTRO_2, 58000);
                     _events.ScheduleEvent(EVENT_LK_INTRO_3, 74000);
                     _events.ScheduleEvent(EVENT_LK_INTRO_4, 86000); // sound last 21 seconds (five more)
-                    _events.ScheduleEvent(EVENT_BOLVAR_INTRO_1, 105000);
+                    _events.ScheduleEvent(EVENT_BOLVAR_INTRO_1, 107000);
                     _events.ScheduleEvent(EVENT_LK_INTRO_5, 113000);
 
                     if (_instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE)
