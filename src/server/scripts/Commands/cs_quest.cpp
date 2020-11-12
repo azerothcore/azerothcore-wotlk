@@ -64,8 +64,8 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-		
-		if (player->IsActiveQuest(entry))
+
+        if (player->IsActiveQuest(entry))
         {
             handler->PSendSysMessage("This quest is already active!");
             return false;
@@ -181,11 +181,11 @@ public:
             uint32 curItemCount = player->GetItemCount(id, true);
 
             ItemPosCountVec dest;
-            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count-curItemCount);
+            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count - curItemCount);
             if (msg == EQUIP_ERR_OK)
             {
                 Item* item = player->StoreNewItem(dest, id, true);
-                player->SendNewItem(item, count-curItemCount, true, false);
+                player->SendNewItem(item, count - curItemCount, true, false);
             }
         }
 

@@ -20,7 +20,9 @@
 # pragma once
 #endif /* ACE_LACKS_PRAGMA_ONCE */
 
-#include "ace/Auto_Ptr.h"
+#if !defined (ACE_HAS_CPP11)
+# include "ace/Auto_Ptr.h"
+#endif /* !ACE_HAS_CPP11 */
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -72,13 +74,11 @@ public:
   static bool object_was_deleted (ACE_Bound_Ptr_Counter<ACE_LOCK> *counter);
 
 private:
-
   /// Allocate a new ACE_Bound_Ptr_Counter<ACE_LOCK> instance,
   /// returning NULL if it cannot be created.
   static ACE_Bound_Ptr_Counter<ACE_LOCK> *internal_create (long init_obj_ref_count);
 
 private:
-
   /// Reference count of underlying object. Is set to -1 once the
   /// object has been destroyed to indicate to all weak pointers that
   /// it is no longer valid.
@@ -114,9 +114,11 @@ public:
   /// object \<p\> immediately.
   explicit ACE_Strong_Bound_Ptr (X *p = 0);
 
+#if !defined (ACE_HAS_CPP11)
   /// Constructor that initializes an ACE_Strong_Bound_Ptr by stealing
   /// ownership of an object from an auto_ptr.
-  explicit ACE_Strong_Bound_Ptr (std::unique_ptr<X> p);
+  explicit ACE_Strong_Bound_Ptr (auto_ptr<X> p);
+#endif /* !ACE_HAS_CPP11 */
 
   /// Copy constructor binds @c this and @a r to the same object.
   ACE_Strong_Bound_Ptr (const ACE_Strong_Bound_Ptr<X, ACE_LOCK> &r);
@@ -214,10 +216,12 @@ public:
   /// underlying object.
   void reset (X *p = 0);
 
+#if !defined (ACE_HAS_CPP11)
   /// Resets the ACE_Strong_Bound_Ptr to refer to a different
   /// underlying object, ownership of which is stolen from the
   /// auto_ptr.
-  void reset (std::unique_ptr<X> p);
+  void reset (auto_ptr<X> p);
+#endif /* !ACE_HAS_CPP11 */
 
   /// Allows us to check for NULL on all ACE_Strong_Bound_Ptr
   /// objects.
@@ -379,7 +383,17 @@ private:
 
 ACE_END_VERSIONED_NAMESPACE_DECL
 
+#if defined (__ACE_INLINE__)
 #include "ace/Bound_Ptr.inl"
+#endif /* __ACE_INLINE__ */
+
+#if defined (ACE_TEMPLATES_REQUIRE_SOURCE)
+#include "ace/Bound_Ptr.cpp"
+#endif /* ACE_TEMPLATES_REQUIRE_SOURCE */
+
+#if defined (ACE_TEMPLATES_REQUIRE_PRAGMA)
+#pragma implementation ("Bound_Ptr.cpp")
+#endif /* ACE_TEMPLATES_REQUIRE_PRAGMA */
 
 #include /**/ "ace/post.h"
 

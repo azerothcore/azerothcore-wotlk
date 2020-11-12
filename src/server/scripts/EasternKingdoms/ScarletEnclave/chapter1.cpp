@@ -29,6 +29,9 @@ enum eyeOfAcherus
     EYE_TEXT_LAUNCH                 = 0,
     EYE_TEXT_CONTROL                = 1,
 
+    EYE_POINT_DESTINATION_1         = 0,
+    EYE_POINT_DESTINATION_2         = 1,
+
     SPELL_EYE_OF_ACHERUS_VISUAL     = 51892,
 };
 
@@ -51,6 +54,7 @@ public:
         void InitializeAI() override
         {
             events.Reset();
+
             events.ScheduleEvent(EVENT_REMOVE_CONTROL, 500);
             events.ScheduleEvent(EVENT_SPEAK_1, 4000);
             events.ScheduleEvent(EVENT_LAUNCH, 7000);
@@ -60,13 +64,15 @@ public:
 
         void MovementInform(uint32 type, uint32 point) override
         {
-            if (type == ESCORT_MOTION_TYPE || point !=0)
+            if (type == POINT_MOTION_TYPE && point == EYE_POINT_DESTINATION_2)
+            {
                 events.ScheduleEvent(EVENT_REGAIN_CONTROL, 1000);
+            }
         }
 
         void SetControl(Player* player, bool on)
         {
-            WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, me->GetPackGUID().size()+1);
+            WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, me->GetPackGUID().size() + 1);
             data.append(me->GetPackGUID());
             data << uint8(on ? 1 : 0);
             player->GetSession()->SendPacket(&data);
@@ -85,23 +91,31 @@ public:
             {
                 case EVENT_REMOVE_CONTROL:
                     if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    {
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
                         SetControl(player, false);
+                    }
                     break;
                 case EVENT_SPEAK_1:
                     Talk(EYE_TEXT_LAUNCH, me->GetCharmerOrOwnerPlayerOrPlayerItself());
                     break;
                 case EVENT_LAUNCH:
-                {
-                    Movement::PointsArray path;
-                    path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                    path.push_back(G3D::Vector3(me->GetPositionX()-40.0f, me->GetPositionY(), me->GetPositionZ()+10.0f));
-                    path.push_back(G3D::Vector3(1768.0f, -5876.0f, 153.0f));
-                    me->GetMotionMaster()->MoveSplinePath(&path);
-                    break;
-                }
+                    {
+                        me->SetSpeed(MOVE_FLIGHT, 5.0f, true);
+
+                        const Position EYE_DESTINATION_1 = { me->GetPositionX() - 40.0f, me->GetPositionY(), me->GetPositionZ() + 10.0f, 0.0f };
+                        const Position EYE_DESTINATION_2 = { 1768.0f, -5876.0f, 153.0f, 0.0f };
+
+                        me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_1);
+                        me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_2);
+                        break;
+                    }
                 case EVENT_REGAIN_CONTROL:
                     if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                        me->SetSpeed(MOVE_FLIGHT, 3.3f, true);
+
                         SetControl(player, true);
                         Talk(EYE_TEXT_CONTROL, player);
                     }
@@ -113,30 +127,30 @@ public:
 
 class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScriptLoader
 {
-    public:
-        spell_q12641_death_comes_from_on_high_summon_ghouls() : SpellScriptLoader("spell_q12641_death_comes_from_on_high_summon_ghouls") { }
+public:
+    spell_q12641_death_comes_from_on_high_summon_ghouls() : SpellScriptLoader("spell_q12641_death_comes_from_on_high_summon_ghouls") { }
 
-        class spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript : public SpellScript
+    class spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex effIndex)
         {
-            PrepareSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript);
-
-            void HandleScriptEffect(SpellEffIndex effIndex)
-            {
-                PreventHitEffect(effIndex);
-                if (Unit* target = GetHitUnit())
-                    GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 54522, true);
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript();
+            PreventHitEffect(effIndex);
+            if (Unit* target = GetHitUnit())
+                GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 54522, true);
         }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript();
+    }
 };
 
 enum deathsChallenge
@@ -247,11 +261,11 @@ public:
                 me->GetMotionMaster()->MoveFollow(caster, 2.0f, 0.0f);
 
                 events.ScheduleEvent(EVENT_SPEAK, 3000);
-                events.ScheduleEvent(EVENT_SPEAK+1, 7000);
-                events.ScheduleEvent(EVENT_SPEAK+2, 8000);
-                events.ScheduleEvent(EVENT_SPEAK+3, 9000);
-                events.ScheduleEvent(EVENT_SPEAK+4, 10000);
-                events.ScheduleEvent(EVENT_SPEAK+5, 11000);
+                events.ScheduleEvent(EVENT_SPEAK + 1, 7000);
+                events.ScheduleEvent(EVENT_SPEAK + 2, 8000);
+                events.ScheduleEvent(EVENT_SPEAK + 3, 9000);
+                events.ScheduleEvent(EVENT_SPEAK + 4, 10000);
+                events.ScheduleEvent(EVENT_SPEAK + 5, 11000);
             }
         }
 
@@ -265,7 +279,7 @@ public:
                 {
                     damage = 0;
                     events.ScheduleEvent(EVENT_DUEL_LOST, 2000);
-                    events.ScheduleEvent(EVENT_DUEL_LOST+1, 6000);
+                    events.ScheduleEvent(EVENT_DUEL_LOST + 1, 6000);
                     _duelGUID = 0;
                     _duelInProgress = 0;
 
@@ -301,16 +315,16 @@ public:
                     Talk(SAY_DUEL, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+1:
-                    Talk(SAY_DUEL+1, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    Talk(SAY_DUEL + 1, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+2:
-                    Talk(SAY_DUEL+2, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    Talk(SAY_DUEL + 2, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+3:
-                    Talk(SAY_DUEL+3, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    Talk(SAY_DUEL + 3, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+4:
-                    Talk(SAY_DUEL+4, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    Talk(SAY_DUEL + 4, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+5:
                     me->setFaction(FACTION_HOSTILE);
@@ -363,63 +377,63 @@ enum GiftOfTheHarvester
 
 class spell_item_gift_of_the_harvester : public SpellScriptLoader
 {
-    public:
-        spell_item_gift_of_the_harvester() : SpellScriptLoader("spell_item_gift_of_the_harvester") { }
+public:
+    spell_item_gift_of_the_harvester() : SpellScriptLoader("spell_item_gift_of_the_harvester") { }
 
-        class spell_item_gift_of_the_harvester_SpellScript : public SpellScript
+    class spell_item_gift_of_the_harvester_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_gift_of_the_harvester_SpellScript);
+
+        SpellCastResult CheckRequirement()
         {
-            PrepareSpellScript(spell_item_gift_of_the_harvester_SpellScript);
-
-            SpellCastResult CheckRequirement()
+            std::list<Creature*> ghouls;
+            GetCaster()->GetAllMinionsByEntry(ghouls, NPC_GHOUL);
+            if (ghouls.size() >= MAX_GHOULS)
             {
-                std::list<Creature*> ghouls;
-                GetCaster()->GetAllMinionsByEntry(ghouls, NPC_GHOUL);
-                if (ghouls.size() >= MAX_GHOULS)
-                {
-                    SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_TOO_MANY_GHOULS);
-                    return SPELL_FAILED_CUSTOM_ERROR;
-                }
-
-                return SPELL_CAST_OK;
+                SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_TOO_MANY_GHOULS);
+                return SPELL_FAILED_CUSTOM_ERROR;
             }
 
-            void Register() override
-            {
-                OnCheckCast += SpellCheckCastFn(spell_item_gift_of_the_harvester_SpellScript::CheckRequirement);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_item_gift_of_the_harvester_SpellScript();
+            return SPELL_CAST_OK;
         }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_item_gift_of_the_harvester_SpellScript::CheckRequirement);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_item_gift_of_the_harvester_SpellScript();
+    }
 };
 
 class spell_q12698_the_gift_that_keeps_on_giving : public SpellScriptLoader
 {
-    public:
-        spell_q12698_the_gift_that_keeps_on_giving() : SpellScriptLoader("spell_q12698_the_gift_that_keeps_on_giving") { }
+public:
+    spell_q12698_the_gift_that_keeps_on_giving() : SpellScriptLoader("spell_q12698_the_gift_that_keeps_on_giving") { }
 
-        class spell_q12698_the_gift_that_keeps_on_giving_SpellScript : public SpellScript
+    class spell_q12698_the_gift_that_keeps_on_giving_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_q12698_the_gift_that_keeps_on_giving_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_q12698_the_gift_that_keeps_on_giving_SpellScript);
-
-            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-            {
-                if (GetOriginalCaster() && GetHitUnit())
-                    GetOriginalCaster()->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_q12698_the_gift_that_keeps_on_giving_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_q12698_the_gift_that_keeps_on_giving_SpellScript();
+            if (GetOriginalCaster() && GetHitUnit())
+                GetOriginalCaster()->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
         }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_q12698_the_gift_that_keeps_on_giving_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_q12698_the_gift_that_keeps_on_giving_SpellScript();
+    }
 };
 
 class npc_scarlet_ghoul : public CreatureScript
@@ -477,24 +491,21 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_GHOUL_MOVE_TO_PIT:
                     me->GetMotionMaster()->MovePoint(1, 2364.77f, -5776.14f, 151.36f);
                     if (Creature* gothik = ObjectAccessor::GetCreature(*me, gothikGUID))
                         gothik->AI()->DoAction(SAY_GOTHIK_PIT);
-                    events.PopEvent();
                     break;
                 case EVENT_GHOUL_EMOTE:
                     me->CastSpell(me, SPELL_GHOUL_EMERGE, true);
-                    events.PopEvent();
                     break;
                 case EVENT_GHOUL_RESTORE_STATE:
                     me->SetReactState(REACT_DEFENSIVE);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                     if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-                        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, frand(0.0f, 2*M_PI));
-                    events.PopEvent();
+                        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, frand(0.0f, 2 * M_PI));
                     events.ScheduleEvent(EVENT_GHOUL_CHECK_COMBAT, 1000);
                     return;
                 case EVENT_GHOUL_CHECK_COMBAT:
@@ -553,7 +564,7 @@ public:
                             creature->CastSpell(owner, 52517, true);
 
                         creature->AI()->SetGUID(me->GetGUID());
-                        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     }
         }
 
@@ -597,7 +608,7 @@ public:
                 if (summonAttackers >= 15000)
                 {
                     for (uint8 i = 0; i < 15; ++i)
-                        if (Creature* summon = me->SummonCreature(28834 /*NPC_SCARLET_FLEET_DEFENDER*/, 2192.56f+irand(-10, 10), -6147.90f+irand(-10, 10), 5.2f, 4.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 45000))
+                        if (Creature* summon = me->SummonCreature(28834 /*NPC_SCARLET_FLEET_DEFENDER*/, 2192.56f + irand(-10, 10), -6147.90f + irand(-10, 10), 5.2f, 4.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 45000))
                         {
                             summon->SetHomePosition(me->GetHomePosition());
                             summon->AI()->AttackStart(me);
@@ -756,103 +767,103 @@ public:
         {
             switch (phase)
             {
-            case PHASE_CHAINED:
-                if (!anchorGUID)
-                {
-                    if (Creature* anchor = me->FindNearestCreature(29521, 30))
+                case PHASE_CHAINED:
+                    if (!anchorGUID)
                     {
-                        anchor->AI()->SetGUID(me->GetGUID());
-                        anchor->CastSpell(me, SPELL_SOUL_PRISON_CHAIN, true);
-                        anchorGUID = anchor->GetGUID();
-                    }
-
-                    float dist = 99.0f;
-                    GameObject* prison = nullptr;
-
-                    for (uint8 i = 0; i < 12; ++i)
-                    {
-                        if (GameObject* temp_prison = me->FindNearestGameObject(acherus_soul_prison[i], 100))
+                        if (Creature* anchor = me->FindNearestCreature(29521, 30))
                         {
-                            if (temp_prison && me->IsWithinDist(temp_prison, dist, false))
+                            anchor->AI()->SetGUID(me->GetGUID());
+                            anchor->CastSpell(me, SPELL_SOUL_PRISON_CHAIN, true);
+                            anchorGUID = anchor->GetGUID();
+                        }
+
+                        float dist = 99.0f;
+                        GameObject* prison = nullptr;
+
+                        for (uint8 i = 0; i < 12; ++i)
+                        {
+                            if (GameObject* temp_prison = me->FindNearestGameObject(acherus_soul_prison[i], 100))
                             {
-                                dist = me->GetDistance2d(temp_prison);
-                                prison = temp_prison;
+                                if (temp_prison && me->IsWithinDist(temp_prison, dist, false))
+                                {
+                                    dist = me->GetDistance2d(temp_prison);
+                                    prison = temp_prison;
+                                }
                             }
+                        }
+
+                        if (prison)
+                            prison->ResetDoorOrButton();
+                    }
+                    break;
+                case PHASE_TO_EQUIP:
+                    if (wait_timer)
+                    {
+                        if (wait_timer > diff)
+                            wait_timer -= diff;
+                        else
+                        {
+                            me->GetMotionMaster()->MovePoint(1, anchorX, anchorY, me->GetPositionZ());
+                            //sLog->outDebug(LOG_FILTER_TSCR, "npc_unworthy_initiateAI: move to %f %f %f", anchorX, anchorY, me->GetPositionZ());
+                            phase = PHASE_EQUIPING;
+                            wait_timer = 0;
+                        }
+                    }
+                    break;
+                case PHASE_TO_ATTACK:
+                    if (wait_timer)
+                    {
+                        if (wait_timer > diff)
+                            wait_timer -= diff;
+                        else
+                        {
+                            me->setFaction(14);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            phase = PHASE_ATTACKING;
+
+                            if (Player* target = ObjectAccessor::GetPlayer(*me, playerGUID))
+                                AttackStart(target);
+                            wait_timer = 0;
+                        }
+                    }
+                    break;
+                case PHASE_ATTACKING:
+                    if (!UpdateVictim())
+                        return;
+
+                    events.Update(diff);
+
+                    while (uint32 eventId = events.ExecuteEvent())
+                    {
+                        switch (eventId)
+                        {
+                            case EVENT_ICY_TOUCH:
+                                DoCastVictim(SPELL_ICY_TOUCH);
+                                events.DelayEvents(1000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_ICY_TOUCH, 5000, GCD_CAST);
+                                break;
+                            case EVENT_PLAGUE_STRIKE:
+                                DoCastVictim(SPELL_PLAGUE_STRIKE);
+                                events.DelayEvents(1000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 5000, GCD_CAST);
+                                break;
+                            case EVENT_BLOOD_STRIKE:
+                                DoCastVictim(SPELL_BLOOD_STRIKE);
+                                events.DelayEvents(1000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_BLOOD_STRIKE, 5000, GCD_CAST);
+                                break;
+                            case EVENT_DEATH_COIL:
+                                DoCastVictim(SPELL_DEATH_COIL);
+                                events.DelayEvents(1000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_DEATH_COIL, 5000, GCD_CAST);
+                                break;
                         }
                     }
 
-                    if (prison)
-                        prison->ResetDoorOrButton();
-                }
-                break;
-            case PHASE_TO_EQUIP:
-                if (wait_timer)
-                {
-                    if (wait_timer > diff)
-                        wait_timer -= diff;
-                    else
-                    {
-                        me->GetMotionMaster()->MovePoint(1, anchorX, anchorY, me->GetPositionZ());
-                        //sLog->outDebug(LOG_FILTER_TSCR, "npc_unworthy_initiateAI: move to %f %f %f", anchorX, anchorY, me->GetPositionZ());
-                        phase = PHASE_EQUIPING;
-                        wait_timer = 0;
-                    }
-                }
-                break;
-            case PHASE_TO_ATTACK:
-                if (wait_timer)
-                {
-                    if (wait_timer > diff)
-                        wait_timer -= diff;
-                    else
-                    {
-                        me->setFaction(14);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                        phase = PHASE_ATTACKING;
-
-                        if (Player* target = ObjectAccessor::GetPlayer(*me, playerGUID))
-                            AttackStart(target);
-                        wait_timer = 0;
-                    }
-                }
-                break;
-            case PHASE_ATTACKING:
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                    case EVENT_ICY_TOUCH:
-                        DoCastVictim(SPELL_ICY_TOUCH);
-                        events.DelayEvents(1000, GCD_CAST);
-                        events.ScheduleEvent(EVENT_ICY_TOUCH, 5000, GCD_CAST);
-                        break;
-                    case EVENT_PLAGUE_STRIKE:
-                        DoCastVictim(SPELL_PLAGUE_STRIKE);
-                        events.DelayEvents(1000, GCD_CAST);
-                        events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 5000, GCD_CAST);
-                        break;
-                    case EVENT_BLOOD_STRIKE:
-                        DoCastVictim(SPELL_BLOOD_STRIKE);
-                        events.DelayEvents(1000, GCD_CAST);
-                        events.ScheduleEvent(EVENT_BLOOD_STRIKE, 5000, GCD_CAST);
-                        break;
-                    case EVENT_DEATH_COIL:
-                        DoCastVictim(SPELL_DEATH_COIL);
-                        events.DelayEvents(1000, GCD_CAST);
-                        events.ScheduleEvent(EVENT_DEATH_COIL, 5000, GCD_CAST);
-                        break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-                break;
-            default:
-                break;
+                    DoMeleeAttackIfReady();
+                    break;
+                default:
+                    break;
             }
         }
     };
@@ -928,7 +939,7 @@ public:
     {
         npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature), minerGUID(0)
         {
-            me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->setFaction(35);
             me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
         }
@@ -951,7 +962,7 @@ public:
                 me->SetSpeed(MOVE_RUN, 1.25f);
 
                 me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
-                me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->setFaction(35);
             }
         }
@@ -1009,32 +1020,39 @@ public:
         {
             AddWaypoint(1, 2389.03f,     -5902.74f,     109.014f, 5000);
             AddWaypoint(2, 2341.812012f, -5900.484863f, 102.619743f);
-            AddWaypoint(3, 2306.561279f, -5901.738281f, 91.792419f);
-            AddWaypoint(4, 2300.098389f, -5912.618652f, 86.014885f);
+            AddWaypoint(3, 2308.34f, -5904.2f, 91.1099f);
+            AddWaypoint(4, 2300.69f, -5912.99f, 86.1572f);
             AddWaypoint(5, 2294.142090f, -5927.274414f, 75.316849f);
             AddWaypoint(6, 2286.984375f, -5944.955566f, 63.714966f);
             AddWaypoint(7, 2280.001709f, -5961.186035f, 54.228283f);
             AddWaypoint(8, 2259.389648f, -5974.197754f, 42.359348f);
             AddWaypoint(9, 2242.882812f, -5984.642578f, 32.827850f);
-            AddWaypoint(10, 2217.265625f, -6028.959473f, 7.675705f);
-            AddWaypoint(11, 2202.595947f, -6061.325684f, 5.882018f);
-            AddWaypoint(12, 2188.974609f, -6080.866699f, 3.370027f);
+            AddWaypoint(10, 2239.79f, -5989.31f, 30.4453f);
+            AddWaypoint(11, 2236.52f, -5994.28f, 27.4829f);
+            AddWaypoint(12, 2232.61f, -6000.23f, 23.1281f);
+            AddWaypoint(13, 2228.69f, -6006.46f, 17.6638f);
+            AddWaypoint(14, 2225.2f, -6012.39f, 12.9487f);
+            AddWaypoint(15, 2217.265625f, -6028.959473f, 7.675705f);
+            AddWaypoint(16, 2202.595947f, -6061.325684f, 5.882018f);
+            AddWaypoint(17, 2188.974609f, -6080.866699f, 3.370027f);
 
             if (urand(0, 1))
             {
-                AddWaypoint(13, 2176.483887f, -6110.407227f, 1.855181f);
-                AddWaypoint(14, 2172.516602f, -6146.752441f, 1.074235f);
-                AddWaypoint(15, 2138.918457f, -6158.920898f, 1.342926f);
-                AddWaypoint(16, 2129.866699f, -6174.107910f, 4.380779f);
-                AddWaypoint(17, 2117.709473f, -6193.830078f, 13.3542f, 10000);
+                AddWaypoint(18, 2176.483887f, -6110.407227f, 1.855181f);
+                AddWaypoint(19, 2172.516602f, -6146.752441f, 1.074235f);
+                AddWaypoint(20, 2138.918457f, -6158.920898f, 1.342926f);
+                AddWaypoint(21, 2129.866699f, -6174.107910f, 4.380779f);
+                AddWaypoint(22, 2125.250001f, -6181.230001f, 9.91997f);
+                AddWaypoint(23, 2117.709473f, -6193.830078f, 13.3542f, 10000);
             }
             else
             {
-                AddWaypoint(13, 2184.190186f, -6166.447266f, 0.968877f);
-                AddWaypoint(14, 2234.265625f, -6163.741211f, 0.916021f);
-                AddWaypoint(15, 2268.071777f, -6158.750977f, 1.822252f);
-                AddWaypoint(16, 2270.028320f, -6176.505859f, 6.340538f);
-                AddWaypoint(17, 2271.739014f, -6195.401855f, 13.3542f, 10000);
+                AddWaypoint(18, 2184.190186f, -6166.447266f, 0.968877f);
+                AddWaypoint(19, 2234.265625f, -6163.741211f, 0.916021f);
+                AddWaypoint(20, 2268.071777f, -6158.750977f, 1.822252f);
+                AddWaypoint(21, 2270.028320f, -6176.505859f, 6.340538f);
+                AddWaypoint(22, 2270.350001f, -6182.410001f, 10.42431f);
+                AddWaypoint(23, 2271.739014f, -6195.401855f, 13.3542f, 10000);
             }
         }
 
@@ -1055,7 +1073,7 @@ public:
                     {
                         me->SetFacingToObject(car);
                         // xinef: add some flags
-                        car->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                        car->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         car->setFaction(35);
                     }
                     Talk(SAY_SCARLET_MINER_0);
@@ -1063,7 +1081,7 @@ public:
                     IntroTimer = 4000;
                     IntroPhase = 1;
                     break;
-                case 17:
+                case 23:
                     if (Creature* car = ObjectAccessor::GetCreature(*me, carGUID))
                     {
                         car->SetPosition(car->GetPositionX(), car->GetPositionY(), me->GetPositionZ() + 1, car->GetOrientation());
@@ -1097,7 +1115,8 @@ public:
                             car->AI()->DoAction(0);
                         IntroPhase = 0;
                     }
-                } else IntroTimer-=diff;
+                }
+                else IntroTimer -= diff;
             }
             npc_escortAI::UpdateAI(diff);
         }
@@ -1137,7 +1156,7 @@ public:
                 }
             }
         }
-        
+
         return true;
     }
 

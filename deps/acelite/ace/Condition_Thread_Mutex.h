@@ -6,7 +6,7 @@
  *
  *   Moved from Synch.h.
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //==========================================================================
 
@@ -76,9 +76,9 @@ public:
 
   /**
    * Block on condition, or until absolute time-of-day has passed.  If
-   * abstime == 0 use "blocking" <wait> semantics.  Else, if @a abstime
+   * abstime == 0 use "blocking" wait semantics.  Else, if @a abstime
    * != 0 and the call times out before the condition is signaled
-   * <wait> returns -1 and sets errno to ETIME.
+   * wait() returns -1 and sets errno to ETIME.
    */
   int wait (const ACE_Time_Value *abstime);
 
@@ -117,11 +117,11 @@ protected:
   /// Reference to mutex lock.
   ACE_Thread_Mutex &mutex_;
 
-  /// Keeps track of whether <remove> has been called yet to avoid
-  /// multiple <remove> calls, e.g., explicitly and implicitly in the
+  /// Keeps track of whether remove() has been called yet to avoid
+  /// multiple remove() calls, e.g., explicitly and implicitly in the
   /// destructor.  This flag isn't protected by a lock, so make sure
   /// that you don't have multiple threads simultaneously calling
-  /// <remove> on the same object, which is a bad idea anyway...
+  /// remove() on the same object, which is a bad idea anyway...
   bool removed_;
 
 private:
