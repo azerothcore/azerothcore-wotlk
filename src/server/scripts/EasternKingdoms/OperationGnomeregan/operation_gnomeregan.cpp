@@ -155,7 +155,7 @@ class npc_og_suit : public CreatureScript
                 if (npc_og_suitAI* pEscortAI = CAST_AI(npc_og_suitAI, me->AI()))
                 {
                     if (variation == 5)
-                        pEscortAI->Start(true, true, NULL, NULL, false, true);
+                        pEscortAI->Start(true, true, 0, nullptr, false, true);
                     else
                     {
                         pEscortAI->Start(true, true); 
@@ -484,7 +484,7 @@ class npc_og_tank : public CreatureScript
                 if (npc_og_tankAI* pEscortAI = CAST_AI(npc_og_tankAI, me->AI()))
                 {
                     if (variation > 2)
-                        pEscortAI->Start(true, true, NULL, NULL, false, true);
+                        pEscortAI->Start(true, true, 0, nullptr, false, true);
                     else
                     {
                         pEscortAI->Start(true, true);
@@ -577,7 +577,7 @@ class npc_og_i_tank : public CreatureScript
                 }
                 if (npc_og_i_tankAI* pEscortAI = CAST_AI(npc_og_i_tankAI, me->AI()))
                 {
-                    pEscortAI->Start(true, true, NULL, NULL, false, true);
+                    pEscortAI->Start(true, true, 0, nullptr, false, true);
                     pEscortAI->SetDespawnAtFar(false);
                     me->setActive(true);
                 }
@@ -2235,9 +2235,7 @@ class npc_steamcrank : public CreatureScript
         {
             npc_steamcrankAI(Creature* creature) : ScriptedAI(creature) { }
 
-            void Reset()
-            {
-            }
+            void Reset() { }
 
             void JumpToNextStep(uint32 uiTimer)
             {
