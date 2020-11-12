@@ -56,7 +56,7 @@ UPDATE `creature` SET `position_x` = 5706.99, `position_y` = 3306.82, `position_
 UPDATE `creature` SET `position_x` = 5734.7, `position_y` = 3308.84, `position_z` = 299.826, `orientation` = 1.8675 WHERE `guid` = 111424;
 
 -- Titan Sentry
-UPDATE `creature_template` SET `InhabitType`='4' WHERE  `entry`=29066;
+UPDATE `creature_template` SET `InhabitType`= 4 WHERE  `entry`=29066;
 
 -- Overlook Sentry 111399
 DELETE FROM `creature` WHERE `guid`=111399;
