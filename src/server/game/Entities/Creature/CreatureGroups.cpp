@@ -17,6 +17,12 @@ FormationMgr::~FormationMgr()
         delete itr->second;
 }
 
+FormationMgr* FormationMgr::instance()
+{
+    static FormationMgr instance;
+    return &instance;
+}
+
 void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
 {
     Map* map = member->FindMap();
@@ -130,8 +136,7 @@ void FormationMgr::LoadCreatureFormations()
 
         CreatureGroupMap[memberGUID] = group_member;
         ++count;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     sLog->outString(">> Loaded %u creatures in formations in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
@@ -159,10 +164,10 @@ void CreatureGroup::AddMember(Creature* member)
 void CreatureGroup::RemoveMember(Creature* member)
 {
     if (m_leader == member)
-        m_leader = NULL;
+        m_leader = nullptr;
 
     m_members.erase(member);
-    member->SetFormation(NULL);
+    member->SetFormation(nullptr);
 }
 
 void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
@@ -242,7 +247,7 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
             continue;
 
         // Xinef: this should be automatized, if turn angle is greater than PI/2 (90�) we should swap formation angle
-        if (M_PI - fabs(fabs(m_leader->GetOrientation() - pathAngle) - M_PI) > M_PI*0.50f)
+        if (M_PI - fabs(fabs(m_leader->GetOrientation() - pathAngle) - M_PI) > M_PI * 0.50f)
         {
             // pussywizard: in both cases should be 2*M_PI - follow_angle
             // pussywizard: also, GetCurrentWaypointID() returns 0..n-1, while point_1 must be > 0, so +1
@@ -258,8 +263,8 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         float dy = y + sin(followAngle + pathAngle) * followDist;
         float dz = z;
 
-        Trinity::NormalizeMapCoord(dx);
-        Trinity::NormalizeMapCoord(dy);
+        acore::NormalizeMapCoord(dx);
+        acore::NormalizeMapCoord(dy);
 
         member->UpdateGroundPositionZ(dx, dy, dz);
 
@@ -273,9 +278,13 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         // xinef: if we move members to position without taking care of sizes, we should compare distance without sizes
         // xinef: change members speed basing on distance - if too far speed up, if too close slow down
         UnitMoveType mtype = Movement::SelectSpeedType(member->GetUnitMovementFlags());
-        member->SetSpeedRate(mtype, m_leader->GetSpeedRate(mtype) * member->GetExactDist(dx, dy, dz) / pathDist);
+        float speedRate = m_leader->GetSpeedRate(mtype) * member->GetExactDist(dx, dy, dz) / pathDist;
 
-        member->GetMotionMaster()->MovePoint(0, dx, dy, dz);
-        member->SetHomePosition(dx, dy, dz, pathAngle);
+        if (speedRate > 0.01f) // don't move if speed rate is too low
+        {
+            member->SetSpeedRate(mtype, speedRate);
+            member->GetMotionMaster()->MovePoint(0, dx, dy, dz);
+            member->SetHomePosition(dx, dy, dz, pathAngle);
+        }
     }
 }

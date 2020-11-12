@@ -34,7 +34,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  * classes.
  *
  * See the Proactor pattern description at
- * http://www.cs.wustl.edu/~schmidt/proactor.ps.gz for more
+ * http://www.dre.vanderbilt.edu/~schmidt/PDF/proactor.pdf for more
  * details.
  */
 class ACE_Export ACE_Proactor_Impl : public ACE_Event_Handler

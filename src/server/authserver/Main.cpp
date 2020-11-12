@@ -35,8 +35,8 @@
 #define PROCESS_HIGH_PRIORITY -15 // [-20, 19], default is 0
 #endif
 
-#ifndef _TRINITY_REALM_CONFIG
-# define _TRINITY_REALM_CONFIG  "authserver.conf"
+#ifndef _ACORE_REALM_CONFIG
+#define _ACORE_REALM_CONFIG "authserver.conf"
 #endif
 
 bool StartDB();
@@ -47,17 +47,17 @@ bool stopEvent = false;                                     // Setting it to tru
 LoginDatabaseWorkerPool LoginDatabase;                      // Accessor to the authserver database
 
 /// Handle authserver's termination signals
-class AuthServerSignalHandler : public Trinity::SignalHandler
+class AuthServerSignalHandler : public acore::SignalHandler
 {
 public:
     virtual void HandleSignal(int sigNum)
     {
         switch (sigNum)
         {
-        case SIGINT:
-        case SIGTERM:
-            stopEvent = true;
-            break;
+            case SIGINT:
+            case SIGTERM:
+                stopEvent = true;
+                break;
         }
     }
 };
@@ -66,15 +66,15 @@ public:
 void usage(const char* prog)
 {
     sLog->outString("Usage: \n %s [<options>]\n"
-        "    -c config_file           use config_file as configuration file\n\r",
-        prog);
+                    "    -c config_file           use config_file as configuration file\n\r",
+                    prog);
 }
 
 /// Launch the auth server
 extern int main(int argc, char** argv)
 {
     // Command line parsing to get the configuration file name
-    char const* configFile = _TRINITY_REALM_CONFIG;
+    char const* configFile = _ACORE_REALM_CONFIG;
     int count = 1;
     while (count < argc)
     {
@@ -92,33 +92,24 @@ extern int main(int argc, char** argv)
         ++count;
     }
 
-    std::string cfg_def_file=_TRINITY_REALM_CONFIG;
-    cfg_def_file += ".dist";
+    sConfigMgr->SetConfigList(std::string(configFile));
 
-    if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {
-        printf("ERROR: Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
+    if (!sConfigMgr->LoadAppConfigs("authserver"))
         return 1;
-    }
-
-    if (!sConfigMgr->LoadMore(configFile))
-    {
-        printf("WARNING: Invalid or missing configuration file : %s\n", configFile);
-        printf("Verify that the file exists and has \'[authserver]\' written in the top of the file!\n");
-    }
 
     sLog->outString("%s (authserver)", GitRevision::GetFullVersion());
     sLog->outString("<Ctrl-C> to stop.\n");
 
-    sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
-    sLog->outString("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           
-    sLog->outString("  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
-    sLog->outString("  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");           
-    sLog->outString("  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");           
+    sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");
+    sLog->outString("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");
+    sLog->outString("  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");
+    sLog->outString("  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");
+    sLog->outString("  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");
     sLog->outString("  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");
     sLog->outString("                                ██████╗ ██████╗ ██████╗ ███████╗");
     sLog->outString("                                ██╔════╝██╔═══██╗██╔══██╗██╔═══╝");
-    sLog->outString("                                ██║     ██║   ██║██████╔╝█████╗");  
-    sLog->outString("                                ██║     ██║   ██║██╔══██╗██╔══╝");  
+    sLog->outString("                                ██║     ██║   ██║██████╔╝█████╗");
+    sLog->outString("                                ██║     ██║   ██║██╔══██╗██╔══╝");
     sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");
     sLog->outString("                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
 
@@ -141,10 +132,10 @@ extern int main(int argc, char** argv)
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            sLog->outError("Daemon PID: %u\n", pid);
+            sLog->outError("Daemon PID: %u\n", pid); // outError for red color in console
         else
         {
-            sLog->outError("Cannot create PID file %s.\n", pidFile.c_str());
+            sLog->outError("Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
             return 1;
         }
     }
@@ -181,7 +172,7 @@ extern int main(int argc, char** argv)
 
     if (acceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
     {
-        sLog->outError("Auth server can not bind to %s:%d", bind_ip.c_str(), rmport);
+        sLog->outError("Auth server can not bind to %s:%d (possible error: port already in use)", bind_ip.c_str(), rmport);
         return 1;
     }
 
@@ -196,24 +187,24 @@ extern int main(int argc, char** argv)
     Handler.register_handler(SIGTERM, &SignalTERM);
 
 #if defined(_WIN32) || defined(__linux__)
-    
+
     ///- Handle affinity for multiple processors and process priority
     uint32 affinity = sConfigMgr->GetIntDefault("UseProcessors", 0);
     bool highPriority = sConfigMgr->GetBoolDefault("ProcessPriority", false);
 
 #ifdef _WIN32 // Windows
-    
+
     HANDLE hProcess = GetCurrentProcess();
     if (affinity > 0)
     {
         ULONG_PTR appAff;
         ULONG_PTR sysAff;
-        
+
         if (GetProcessAffinityMask(hProcess, &appAff, &sysAff))
         {
             // remove non accessible processors
             ULONG_PTR currentAffinity = affinity & appAff;
-            
+
             if (!currentAffinity)
                 sLog->outError("server.authserver", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the authserver. Accessible processors bitmask (hex): %x", affinity, appAff);
             else if (SetProcessAffinityMask(hProcess, currentAffinity))
@@ -222,7 +213,7 @@ extern int main(int argc, char** argv)
                 sLog->outError("server.authserver", "Can't set used processors (hex): %x", currentAffinity);
         }
     }
-    
+
     if (highPriority)
     {
         if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
@@ -230,9 +221,9 @@ extern int main(int argc, char** argv)
         else
             sLog->outError("server.authserver", "Can't set authserver process priority class.");
     }
-    
+
 #else // Linux
-    
+
     if (affinity > 0)
     {
         cpu_set_t mask;
@@ -259,7 +250,7 @@ extern int main(int argc, char** argv)
         else
             sLog->outString("authserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
     }
-    
+
 #endif
 #endif
 

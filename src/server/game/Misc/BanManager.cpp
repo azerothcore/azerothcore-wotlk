@@ -33,7 +33,7 @@ BanReturn BanManager::BanAccount(std::string const& AccountName, std::string con
 
     ///- Disconnect all affected players (for IP it can be several)
     SQLTransaction trans = LoginDatabase.BeginTransaction();
-        
+
     // pussywizard: check existing ban to prevent overriding by a shorter one! >_>
     PreparedStatement* stmtAccountBanned = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
     stmtAccountBanned->setUInt32(0, AccountID);
@@ -105,7 +105,7 @@ BanReturn BanManager::BanAccountByPlayerName(std::string const& CharacterName, s
         return BAN_LONGER_EXISTS;
 
     // make sure there is only one active ban
-    PreparedStatement * stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
     stmt->setUInt32(0, AccountID);
     trans->Append(stmt);
 
@@ -209,7 +209,7 @@ BanReturn BanManager::BanIP(std::string const& IP, std::string const& Duration, 
 /// Ban an character, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
 BanReturn BanManager::BanCharacter(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author)
 {
-    Player* target = ObjectAccessor::FindPlayerByName(CharacterName, false);    
+    Player* target = ObjectAccessor::FindPlayerByName(CharacterName, false);
     uint32 DurationSecs = TimeStringToSecs(Duration);
     uint32 TargetGUID = 0;
 
