@@ -58,7 +58,7 @@ public:
         void UpdateAI(uint32 diff)
         {
             events.Update(diff);
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -88,7 +88,7 @@ public:
                         }
                         else
                         {
-                            events.PopEvent();
+                            
                             events.RescheduleEvent(2, 2500);
                         }
                     }
@@ -100,14 +100,14 @@ public:
                             c->setActive(true);
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_1);
                         }
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(3, 7000);
                     break;
                 case 3:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_2);
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(4, 14000);
                     break;
                 case 4:
@@ -130,11 +130,11 @@ public:
                                 n2->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                             }
                             // TODO This spell check is invalid
-                            if (SPELL_NECROLYTE_CHANNELING)
-                            {
-                                n1->RemoveAura(SPELL_NECROLYTE_CHANNELING);
-                                n2->RemoveAura(SPELL_NECROLYTE_CHANNELING);
-                            }
+                            //                            if (SPELL_NECROLYTE_CHANNELING)
+                            //                            {
+                            n1->RemoveAura(SPELL_NECROLYTE_CHANNELING);
+                            n2->RemoveAura(SPELL_NECROLYTE_CHANNELING);
+                            //                            }
 
                             for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
                                 if (Creature* c = pInstance->instance->GetCreature(*itr))
@@ -142,25 +142,25 @@ public:
                                     if (c->GetPositionX() < 440.0f)
                                         continue;
                                     if (c->GetPositionY() > 215.0f)
-                                        c->GetMotionMaster()->MoveChase(n2, 0.0f, rand_norm()*2*M_PI);
+                                        c->GetMotionMaster()->MoveChase(n2, 0.0f, rand_norm() * 2 * M_PI);
                                     else
-                                        c->GetMotionMaster()->MoveChase(n1, 0.0f, rand_norm()*2*M_PI);
+                                        c->GetMotionMaster()->MoveChase(n1, 0.0f, rand_norm() * 2 * M_PI);
                                 }
                         }
                     }
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(5, 1);
                     break;
                 case 5:
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_1 : SAY_SYLVANAS_INTRO_1);
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(6, 1000);
                     break;
                 case 6:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_3);
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(7, 5000);
                     break;
                 case 7:
@@ -185,19 +185,19 @@ public:
                                 c->SetDisableGravity(true);
                                 c->SetHover(true);
                                 c->SendMovementFlagUpdate();
-                                float dist = rand_norm()*2.0f;
-                                float angle = rand_norm()*2*M_PI;
-                                c->GetMotionMaster()->MoveTakeoff(0, c->GetPositionX()+dist*cos(angle), c->GetPositionY()+dist*sin(angle), c->GetPositionZ()+6.0f+(float)urand(0,4), 1.5f+frand(0.0f, 1.5f));
+                                float dist = rand_norm() * 2.0f;
+                                float angle = rand_norm() * 2 * M_PI;
+                                c->GetMotionMaster()->MoveTakeoff(0, c->GetPositionX() + dist * cos(angle), c->GetPositionY() + dist * sin(angle), c->GetPositionZ() + 6.0f + (float)urand(0, 4), 1.5f + frand(0.0f, 1.5f));
                             }
                     }
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(8, 7000);
                     break;
                 case 8:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
                             c->CastSpell(c, 69753, false);
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(9, 400);
                     break;
                 case 9:
@@ -211,12 +211,12 @@ public:
                                 c->RemoveAllAuras();
                                 c->GetMotionMaster()->MoveFall(0, true);
                             }
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(10, 1000);
                     break;
                 case 10:
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_2 : SAY_SYLVANAS_INTRO_2);
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(11, 1000);
                     break;
                 case 11:
@@ -232,7 +232,7 @@ public:
                                 c->SendMovementFlagUpdate();
                                 c->CastSpell(c, 69350, true);
                             }
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(12, 2000);
                     break;
                 case 12:
@@ -253,7 +253,7 @@ public:
                                 c->SetReactState(REACT_PASSIVE);
                             }
                     }
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(13, 3000);
                     break;
                 case 13:
@@ -266,14 +266,14 @@ public:
                                     continue;
                                 c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                 float dist = rand_norm();
-                                float angle = rand_norm()*2*M_PI;
+                                float angle = rand_norm() * 2 * M_PI;
                                 c->SetSpeed(MOVE_RUN, 0.8f);
                                 c->SetInCombatWithZone();
                                 c->GetMotionMaster()->MoveChase(me, dist, angle);
-                                c->SetHomePosition(me->GetPositionX()+dist*cos(angle), me->GetPositionY()+dist*sin(angle), me->GetPositionZ(), 0.0f);
+                                c->SetHomePosition(me->GetPositionX() + dist * cos(angle), me->GetPositionY() + dist * sin(angle), me->GetPositionZ(), 0.0f);
                             }
                     }
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(14, 2000);
                     break;
                 case 14:
@@ -287,12 +287,12 @@ public:
                         else
                         {
                             me->CastSpell(me, 59514, false);
-                            for (uint8 i=0; i<2; ++i)
-                                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID+i)))
+                            for (uint8 i = 0; i < 2; ++i)
+                                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID + i)))
                                     c->CastSpell(c, 70513, false);
                         }
                     }
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(15, 2000);
                     break;
                 case 15:
@@ -303,20 +303,20 @@ public:
 
                         if (me->GetEntry() == NPC_JAINA_PART1)
                         {
-                            for (uint8 i=0; i<2; ++i)
-                                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID+i)))
+                            for (uint8 i = 0; i < 2; ++i)
+                                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID + i)))
                                     c->CastSpell(c, 70464, false);
                         }
                     }
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(16, 3000);
                     break;
                 case 16:
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_4 : SAY_SYLVANAS_INTRO_3);
                     if (pInstance)
                     {
-                        for (uint8 i=0; i<2; ++i)
-                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID+i)))
+                        for (uint8 i = 0; i < 2; ++i)
+                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID + i)))
                                 c->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
 
                         for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
@@ -333,13 +333,13 @@ public:
                             }
                         pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_FINISHED_INTRO);
                     }
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(17, 5000);
                     break;
                 case 17:
                     me->setActive(false);
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_5 : SAY_SYLVANAS_INTRO_4);
-                    events.PopEvent();
+                    
                     break;
             }
 
@@ -354,7 +354,7 @@ public:
             summons.Summon(s);
         }
 
-        void SummonedCreatureDespawn(Creature *s)
+        void SummonedCreatureDespawn(Creature* s)
         {
             summons.Despawn(s);
         }
@@ -363,7 +363,7 @@ public:
         void MoveInLineOfSight(Unit*  /*who*/) {}
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_pos_leaderAI(creature);
     }
@@ -396,18 +396,22 @@ public:
             if (pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE)
             {
                 if ((me->GetPositionX() > 490.0f && me->GetPositionX() < 504.0f && me->GetPositionY() > 192.0f && me->GetPositionY() < 206.0f) ||
-                    (me->GetPositionX() > 490.0f && me->GetPositionX() < 504.0f && me->GetPositionY() > 240.0f && me->GetPositionY() < 254.0f))
+                        (me->GetPositionX() > 490.0f && me->GetPositionX() < 504.0f && me->GetPositionY() > 240.0f && me->GetPositionY() < 254.0f))
                 {
                     isInvincible = true;
 
                     // TODO This spell check is invalid
-                    if (SPELL_NECROLYTE_CHANNELING)
-                        me->CastSpell(me, SPELL_NECROLYTE_CHANNELING, false);
+                    //                    if (SPELL_NECROLYTE_CHANNELING)
+                    me->CastSpell(me, SPELL_NECROLYTE_CHANNELING, false);
 
                     if (me->GetPositionY() < 206.0f)
+                    {
                         pInstance->SetData64(DATA_NECROLYTE_1_GUID, me->GetGUID());
+                    }
                     else
+                    {
                         pInstance->SetData64(DATA_NECROLYTE_2_GUID, me->GetGUID());
+                    }
                 }
             }
         }
@@ -421,11 +425,11 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             // TODO This spell check is invalid
-            if (SPELL_NECROLYTE_CHANNELING)
-                me->RemoveAura(SPELL_NECROLYTE_CHANNELING);
+            //            if (SPELL_NECROLYTE_CHANNELING)
+            me->RemoveAura(SPELL_NECROLYTE_CHANNELING);
             events.Reset();
             events.RescheduleEvent(1, 0);
-            events.RescheduleEvent(2, urand(5000,9000));
+            events.RescheduleEvent(2, urand(5000, 9000));
 
             if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_LEADER_FIRST_GUID)))
                 c->AI()->SetData(DATA_START_INTRO, 0);
@@ -434,7 +438,7 @@ public:
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             if (isInvincible && damage >= me->GetHealth())
-                damage = me->GetHealth()-1;
+                damage = me->GetHealth() - 1;
         }
 
         void DoAction(int32 a)
@@ -453,7 +457,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -464,7 +468,7 @@ public:
                 case 2: // Conversion Beam
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
                         me->CastSpell(target, 69578, false);
-                    events.RepeatEvent(urand(20000,25000));
+                    events.RepeatEvent(urand(20000, 25000));
                     break;
             }
 
@@ -474,7 +478,7 @@ public:
         void MoveInLineOfSight(Unit*  /*who*/) {}
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_pos_deathwhisper_necrolyteAI(creature);
     }
@@ -516,47 +520,46 @@ public:
         void UpdateAI(uint32 diff)
         {
             events.Update(diff);
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case 1:
-                {
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GARFROST_GUID)))
-                        {
-                            float angle = c->GetAngle(me);
-                            float x = c->GetPositionX()+cos(angle)*12.0f;
-                            float y = c->GetPositionY()+sin(angle)*12.0f;
-                            me->GetMotionMaster()->MovePoint(2, x, y, c->GetPositionZ());
-                        }
-
-                    uint8 i=0;
-                    while (FBSData[i].entry)
                     {
-                        if (Creature* c = me->SummonCreature(FBSData[i].entry, 688.69f+i*1.8f, FBSSpawnPos.GetPositionY()+(float)irand(-2,2), FBSSpawnPos.GetPositionZ(), 3*M_PI/2))
-                            c->GetMotionMaster()->MovePath(FBSData[i].pathId, false);
-                        ++i;
+                        if (pInstance)
+                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GARFROST_GUID)))
+                            {
+                                float angle = c->GetAngle(me);
+                                float x = c->GetPositionX() + cos(angle) * 12.0f;
+                                float y = c->GetPositionY() + sin(angle) * 12.0f;
+                                me->GetMotionMaster()->MovePoint(2, x, y, c->GetPositionZ());
+                            }
+
+                        uint8 i = 0;
+                        while (FBSData[i].entry)
+                        {
+                            if (Creature* c = me->SummonCreature(FBSData[i].entry, 688.69f + i * 1.8f, FBSSpawnPos.GetPositionY() + (float)irand(-2, 2), FBSSpawnPos.GetPositionZ(), 3 * M_PI / 2))
+                                c->GetMotionMaster()->MovePath(FBSData[i].pathId, false);
+                            ++i;
+                        }
+                        events.RescheduleEvent(2, 3000);
+                        break;
                     }
-                    events.PopEvent();
-                    events.RescheduleEvent(2, 3000);
-                    break;
-                }
                 case 2:
-                    if (Creature* c = me->SummonCreature(NPC_TYRANNUS_VOICE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()-10.0f, me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 1))
+                    if (Creature* c = me->SummonCreature(NPC_TYRANNUS_VOICE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 10.0f, me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 1))
                         c->AI()->Talk(SAY_TYRANNUS_GARFROST);
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(3, 4000);
                     break;
                 case 3:
                     Talk(SAY_GENERAL_GARFROST);
-                    events.PopEvent();
+                    
                     break;
             }
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_pos_after_first_bossAI(creature);
     }
@@ -649,7 +652,7 @@ public:
                     if (killsLeft != 0)
                         return;
                     pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_TUNNEL_WARN);
-                    if (Creature* c = me->SummonCreature(NPC_TYRANNUS_VOICE, 950.16f, -102.17f, 594.90f-10.0f, 5.43f, TEMPSUMMON_TIMED_DESPAWN, 1))
+                    if (Creature* c = me->SummonCreature(NPC_TYRANNUS_VOICE, 950.16f, -102.17f, 594.90f - 10.0f, 5.43f, TEMPSUMMON_TIMED_DESPAWN, 1))
                         c->AI()->Talk(SAY_TYRANNUS_TRAP_TUNNEL);
                     break;
             }
@@ -674,7 +677,7 @@ public:
                     me->SetFacingTo(PTSTyrannusWaitPos2.GetOrientation());
                     break;
                 case 5:
-                    me->GetMotionMaster()->MoveTakeoff(10, me->GetPositionX()+2.0f*cos(me->GetOrientation()), me->GetPositionY()+2.0f*sin(me->GetOrientation()), me->GetPositionZ()+30.0f, 7.0f);
+                    me->GetMotionMaster()->MoveTakeoff(10, me->GetPositionX() + 2.0f * cos(me->GetOrientation()), me->GetPositionY() + 2.0f * sin(me->GetOrientation()), me->GetPositionZ() + 30.0f, 7.0f);
                     break;
                 case 6:
                     me->GetMotionMaster()->MovePoint(4, PTSTyrannusWaitPos3, false);
@@ -759,14 +762,14 @@ public:
                     break;
                 case 60:
                     {
-                        Position startPos[6] = { {927.11f, -72.60f, 592.2f, 1.52f},{922.92f, -72.64f, 592.3f, 1.52f},{930.46f, -72.57f, 592.1f, 1.52f},{934.52f, -72.52f, 592.1f, 1.52f},{934.57f, -77.66f, 592.20f, 1.52f},{927.15f, -77.07f, 592.20f, 1.52f} };
+                        Position startPos[6] = { {927.11f, -72.60f, 592.2f, 1.52f}, {922.92f, -72.64f, 592.3f, 1.52f}, {930.46f, -72.57f, 592.1f, 1.52f}, {934.52f, -72.52f, 592.1f, 1.52f}, {934.57f, -77.66f, 592.20f, 1.52f}, {927.15f, -77.07f, 592.20f, 1.52f} };
                         Position endPos = {926.10f, -46.63f, 591.2f, 1.52f};
-                        for (uint8 i=0; i<6; ++i)
+                        for (uint8 i = 0; i < 6; ++i)
                             if (Creature* s = me->SummonCreature(i < 4 ? NPC_FALLEN_WARRIOR : NPC_WRATHBONE_COLDWRAITH, startPos[i]))
                             {
                                 s->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                 Position finalPos = endPos;
-                                s->MovePosition(finalPos, startPos[i].GetExactDist(&startPos[0]), Position::NormalizeOrientation(startPos[i].GetAngle(&startPos[0])+1.52f));
+                                s->MovePosition(finalPos, startPos[i].GetExactDist(&startPos[0]), Position::NormalizeOrientation(startPos[i].GetAngle(&startPos[0]) + 1.52f));
 
                                 Movement::PointsArray path;
                                 path.push_back(G3D::Vector3(s->GetPositionX(), s->GetPositionY(), s->GetPositionZ()));
@@ -778,17 +781,17 @@ public:
 
                         if (Difficulty(me->GetMap()->GetSpawnMode()) == DUNGEON_DIFFICULTY_HEROIC)
                         {
-                            Position startPos[6] = { {925.485f, -65.67f, 592.5f, 1.4f},{921.77f, -65.10f, 592.5f, 1.4f},{929.19f, -66.24f, 592.5f, 1.4f},{932.46f, -66.74f, 592.5f, 1.4f},{924.66f, -71.03f, 592.5f, 1.4f},{928.81f, -71.66f, 592.5f, 1.4f} };
+                            Position startPos[6] = { {925.485f, -65.67f, 592.5f, 1.4f}, {921.77f, -65.10f, 592.5f, 1.4f}, {929.19f, -66.24f, 592.5f, 1.4f}, {932.46f, -66.74f, 592.5f, 1.4f}, {924.66f, -71.03f, 592.5f, 1.4f}, {928.81f, -71.66f, 592.5f, 1.4f} };
                             Position middlePos = {928.43f, -29.31f, 589.0f, 1.4f};
                             Position endPos = {937.8f, 21.20f, 574.6f, 1.4f};
-                            for (uint8 i=0; i<6; ++i)
+                            for (uint8 i = 0; i < 6; ++i)
                                 if (Creature* s = me->SummonCreature(i < 4 ? NPC_FALLEN_WARRIOR : NPC_WRATHBONE_COLDWRAITH, startPos[i]))
                                 {
                                     s->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                     Position midPos = middlePos;
                                     Position finalPos = endPos;
-                                    s->MovePosition(midPos, startPos[i].GetExactDist(&startPos[0]), Position::NormalizeOrientation(startPos[i].GetAngle(&startPos[0])+1.4f));
-                                    s->MovePosition(finalPos, startPos[i].GetExactDist(&startPos[0]), Position::NormalizeOrientation(startPos[i].GetAngle(&startPos[0])+1.4f));
+                                    s->MovePosition(midPos, startPos[i].GetExactDist(&startPos[0]), Position::NormalizeOrientation(startPos[i].GetAngle(&startPos[0]) + 1.4f));
+                                    s->MovePosition(finalPos, startPos[i].GetExactDist(&startPos[0]), Position::NormalizeOrientation(startPos[i].GetAngle(&startPos[0]) + 1.4f));
 
                                     Movement::PointsArray path;
                                     path.push_back(G3D::Vector3(s->GetPositionX(), s->GetPositionY(), s->GetPositionZ()));
@@ -805,7 +808,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_pos_tyrannus_eventsAI(creature);
     }
@@ -835,14 +838,14 @@ public:
             {
                 if (pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_AFTER_TUNNEL_WARN)
                     me->CastSpell(me, SPELL_TUNNEL_ICICLE, false);
-                timer = urand(16000,24000);
+                timer = urand(16000, 24000);
             }
             else
                 timer -= diff;
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_pos_icicle_triggerAI(creature);
     }
@@ -893,7 +896,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_pos_collapsing_icicleAI(creature);
     }
@@ -945,9 +948,9 @@ public:
 
         void DoAction(int32 p)
         {
-            if (p==1)
+            if (p == 1)
                 summons.DespawnAll();
-            else if (p==2)
+            else if (p == 2)
             {
                 events.Reset();
                 summons.DespawnEntry(NPC_FALLEN_WARRIOR);
@@ -968,10 +971,10 @@ public:
                         c->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_CHEER);
                         float ang = frand(1.92f, 2.36f);
                         float dist = urand(50, 85);
-                        c->GetMotionMaster()->MovePoint(0, TSSpawnPos.GetPositionX()+cos(ang)*dist, TSSpawnPos.GetPositionY()+sin(ang)*dist, 628.2f);
+                        c->GetMotionMaster()->MovePoint(0, TSSpawnPos.GetPositionX() + cos(ang)*dist, TSSpawnPos.GetPositionY() + sin(ang)*dist, 628.2f);
                     }
             }
-            else if (p==3)
+            else if (p == 3)
             {
                 if (pInstance)
                     if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SINDRAGOSA_GUID)))
@@ -1056,7 +1059,7 @@ public:
                         if (Creature* c = me->SummonCreature(NPC_FALLEN_WARRIOR, 1060.95f, 102.79f, 630.2f, 2.01f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                         {
                             float offset = frand(0.0f, 10.0f);
-                            c->GetMotionMaster()->MovePoint(0, 1047.0f+offset, 118.0f+offset, 628.2f);
+                            c->GetMotionMaster()->MovePoint(0, 1047.0f + offset, 118.0f + offset, 628.2f);
                             c->SetHomePosition(*me);
                             for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
                                 if (Creature* s = pInstance->instance->GetCreature(*itr))
@@ -1080,7 +1083,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_pos_martin_or_gorkun_secondAI(creature);
     }
@@ -1115,13 +1118,13 @@ public:
             me->DeleteThreatList();
             me->CombatStop(true);
             me->LoadCreaturesAddon(true);
-            me->SetLootRecipient(NULL);
+            me->SetLootRecipient(nullptr);
             me->ResetPlayerDamageReq();
             me->SetLastDamagedTime(0);
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_pos_freed_slaveAI(creature);
     }
@@ -1174,9 +1177,9 @@ public:
         {
             if ((spell->Id == SPELL_TELEPORT_JAINA || spell->Id == SPELL_TELEPORT_SYLVANAS) && target && target->GetTypeId() == TYPEID_PLAYER)
             {
-                float angle = rand_norm()*2*M_PI;
-                float dist = urand(1,4);
-                target->ToPlayer()->NearTeleportTo(me->GetPositionX()+cos(angle)*dist, me->GetPositionY()+sin(angle)*dist, me->GetPositionZ(), me->GetOrientation());
+                float angle = rand_norm() * 2 * M_PI;
+                float dist = urand(1, 4);
+                target->ToPlayer()->NearTeleportTo(me->GetPositionX() + cos(angle)*dist, me->GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation());
             }
         }
 
@@ -1206,7 +1209,7 @@ public:
         {
             events.Update(diff);
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1219,26 +1222,26 @@ public:
                             c->SetHover(true);
                             c->GetMotionMaster()->MovePoint(0, TSSindragosaPos2);
                         }
-                    events.PopEvent();
+                    
                     break;
                 case 2:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MARTIN_OR_GORKUN_GUID)))
                             c->AI()->Talk(SAY_GENERAL_OUTRO_2);
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(3, me->GetEntry() == NPC_JAINA_PART2 ? 7000 : 8000);
                     break;
                 case 3:
                     Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_OUTRO_1 : SAY_SYLVANAS_OUTRO_1);
                     me->CastSpell(me, me->GetEntry() == NPC_JAINA_PART2 ? SPELL_TELEPORT_JAINA_VISUAL : SPELL_TELEPORT_SYLVANAS_VISUAL, true);
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(4, 2000);
                     break;
                 case 4:
                     me->CastSpell(me, me->GetEntry() == NPC_JAINA_PART2 ? SPELL_TELEPORT_JAINA : SPELL_TELEPORT_SYLVANAS, true);
                     if (GameObject* barrier = me->SummonGameObject(203005, 1055.49f, 115.03f, 628.15f, 2.08f, 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
                         barrierGUID = barrier->GetGUID();
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(5, 1500);
                     break;
                 case 5:
@@ -1248,7 +1251,7 @@ public:
                             if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SINDRAGOSA_GUID)))
                                 c->CastSpell(x->GetPositionX(), x->GetPositionY(), x->GetPositionZ(), SPELL_SINDRAGOSA_FROST_BOMB_POS, true);
                         }
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(6, 5000);
                     events.RescheduleEvent(10, 2000);
                     break;
@@ -1256,7 +1259,7 @@ public:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SINDRAGOSA_GUID)))
                             c->GetMotionMaster()->MovePoint(0, TSSindragosaPos1);
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(7, 4500);
                     break;
                 case 7:
@@ -1266,23 +1269,22 @@ public:
                     if (GameObject* barrier = pInstance->instance->GetGameObject(barrierGUID))
                         barrier->Delete();
                     barrierGUID = 0;
-                    events.PopEvent();
+                    
                     events.RescheduleEvent(8, 2000);
                     break;
                 case 8:
-                    me->GetMotionMaster()->MovePath(me->GetEntry() == NPC_JAINA_PART2 ? PATH_BEGIN_VALUE+16 : PATH_BEGIN_VALUE+17, false);
-                    events.PopEvent();
+                    me->GetMotionMaster()->MovePath(me->GetEntry() == NPC_JAINA_PART2 ? PATH_BEGIN_VALUE + 16 : PATH_BEGIN_VALUE + 17, false);
                     break;
                 case 10:
                     if (Creature* x = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MARTIN_OR_GORKUN_GUID)))
                         x->AI()->DoAction(3);
-                    events.PopEvent();
+                    
                     break;
             }
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_pos_leader_secondAI(creature);
     }
@@ -1298,9 +1300,9 @@ public:
         npc_frostbite_invisible_stalkerAI(Creature* creature) : NullCreatureAI(creature)
         {
             timer = 3500;
-            for (uint8 i = 0; i<3; ++i)
+            for (uint8 i = 0; i < 3; ++i)
             {
-                me->SetOrientation(i*M_PI/3);
+                me->SetOrientation(i * M_PI / 3);
                 me->CastSpell(me, 34740, true);
                 me->CastSpell(me, 34746, true);
             }
@@ -1324,7 +1326,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_frostbite_invisible_stalkerAI(creature);
     }
@@ -1339,11 +1341,11 @@ public:
     {
         PrepareAuraScript(spell_pos_empowered_blizzardAuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
+        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
         {
             PreventDefaultAction();
             if (Unit* caster = GetCaster())
-                caster->CastSpell((float)urand(447,480), (float)urand(200,235), 528.71f, 70131, true);
+                caster->CastSpell((float)urand(447, 480), (float)urand(200, 235), 528.71f, 70131, true);
         }
 
         void Register()
@@ -1352,13 +1354,14 @@ public:
         }
     };
 
-    AuraScript *GetAuraScript() const
+    AuraScript* GetAuraScript() const
     {
         return new spell_pos_empowered_blizzardAuraScript();
     }
 };
 
-const Position slaveFreePos[4] = {
+const Position slaveFreePos[4] =
+{
     {699.82f, -82.68f, 512.6f, 0.0f},
     {643.51f, 79.20f, 511.57f, 0.0f},
     {800.09f, 78.66f, 510.2f, 0.0f},
@@ -1367,29 +1370,29 @@ const Position slaveFreePos[4] = {
 
 class SlaveRunEvent : public BasicEvent
 {
-    public:
-        SlaveRunEvent(Creature& owner) : _owner(owner) { }
+public:
+    SlaveRunEvent(Creature& owner) : _owner(owner) { }
 
-        bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    {
+        uint32 pointId = 0;
+        float minDist = _owner.GetExactDist2dSq(&slaveFreePos[pointId]);
+        for (uint32 i = 1; i < 4; ++i)
         {
-            uint32 pointId = 0;
-            float minDist = _owner.GetExactDist2dSq(&slaveFreePos[pointId]);
-            for (uint32 i=1; i<4; ++i)
+            float dist = _owner.GetExactDist2dSq(&slaveFreePos[i]);
+            if (dist < minDist)
             {
-                float dist = _owner.GetExactDist2dSq(&slaveFreePos[i]);
-                if (dist < minDist)
-                {
-                    minDist = dist;
-                    pointId = i;
-                }
+                minDist = dist;
+                pointId = i;
             }
-            if (minDist < 200.0f*200.0f)
-                _owner.GetMotionMaster()->MovePoint(0, slaveFreePos[pointId], true, false);
-            return true;
         }
+        if (minDist < 200.0f * 200.0f)
+            _owner.GetMotionMaster()->MovePoint(0, slaveFreePos[pointId], true, false);
+        return true;
+    }
 
-    private:
-        Creature& _owner;
+private:
+    Creature& _owner;
 };
 
 class spell_pos_slave_trigger_closest : public SpellScriptLoader
@@ -1412,7 +1415,7 @@ public:
                         {
                             p->RewardPlayerAndGroupAtEvent(36764, caster); // alliance
                             p->RewardPlayerAndGroupAtEvent(36770, caster); // horde
-                            
+
                             target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                             if (Creature* c = target->ToCreature())
                             {
@@ -1443,7 +1446,6 @@ public:
 
     class spell_pos_rimefang_frost_novaSpellScript : public SpellScript
     {
-
         PrepareSpellScript(spell_pos_rimefang_frost_novaSpellScript);
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1478,7 +1480,7 @@ public:
     {
         PrepareAuraScript(spell_pos_blightAuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const* aurEff)
         {
             if (aurEff->GetTotalTicks() >= 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()))
                 if (Unit* target = GetTarget())
@@ -1491,7 +1493,7 @@ public:
         }
     };
 
-    AuraScript *GetAuraScript() const
+    AuraScript* GetAuraScript() const
     {
         return new spell_pos_blightAuraScript();
     }
@@ -1506,7 +1508,7 @@ public:
     {
         PrepareAuraScript(spell_pos_glacial_strikeAuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const* aurEff)
         {
             if (Unit* target = GetTarget())
                 if (target->GetHealth() == target->GetMaxHealth())
@@ -1523,7 +1525,7 @@ public:
         }
     };
 
-    AuraScript *GetAuraScript() const
+    AuraScript* GetAuraScript() const
     {
         return new spell_pos_glacial_strikeAuraScript();
     }
@@ -1531,28 +1533,28 @@ public:
 
 class at_tyrannus_event_starter : public AreaTriggerScript
 {
-    public:
-        at_tyrannus_event_starter() : AreaTriggerScript("at_tyrannus_event_starter") { }
+public:
+    at_tyrannus_event_starter() : AreaTriggerScript("at_tyrannus_event_starter") { }
 
-        bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
-        {
-            InstanceScript* inst = player->GetInstanceScript();
-            if (!inst)
-                return false;
-
-            if (inst->GetData(DATA_INSTANCE_PROGRESS) < INSTANCE_PROGRESS_AFTER_TUNNEL_WARN)
-                return false;
-
-            if (inst->GetData(DATA_GARFROST) == DONE && inst->GetData(DATA_ICK) == DONE && inst->GetData(DATA_TYRANNUS) != DONE && !inst->GetData64(DATA_MARTIN_OR_GORKUN_GUID))
-            {
-                if (Creature* c = inst->instance->SummonCreature(NPC_GORKUN_IRONSKULL_2, TSSpawnPos))
-                    c->GetMotionMaster()->MovePoint(0, TSMidPos);
-
-                inst->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_TYRANNUS_INTRO);
-            }
-
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
+    {
+        InstanceScript* inst = player->GetInstanceScript();
+        if (!inst)
             return false;
+
+        if (inst->GetData(DATA_INSTANCE_PROGRESS) < INSTANCE_PROGRESS_AFTER_TUNNEL_WARN)
+            return false;
+
+        if (inst->GetData(DATA_GARFROST) == DONE && inst->GetData(DATA_ICK) == DONE && inst->GetData(DATA_TYRANNUS) != DONE && !inst->GetData64(DATA_MARTIN_OR_GORKUN_GUID))
+        {
+            if (Creature* c = inst->instance->SummonCreature(NPC_GORKUN_IRONSKULL_2, TSSpawnPos))
+                c->GetMotionMaster()->MovePoint(0, TSMidPos);
+
+            inst->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_TYRANNUS_INTRO);
         }
+
+        return false;
+    }
 };
 
 void AddSC_pit_of_saron()

@@ -114,7 +114,7 @@ Petition const* PetitionMgr::GetPetition(uint32 petitionId) const
     PetitionContainer::const_iterator itr = PetitionStore.find(petitionId);
     if (itr != PetitionStore.end())
         return &itr->second;
-    return NULL;
+    return nullptr;
 }
 
 Petition const* PetitionMgr::GetPetitionByOwnerWithType(uint32 ownerGuid, uint8 type) const
@@ -123,7 +123,7 @@ Petition const* PetitionMgr::GetPetitionByOwnerWithType(uint32 ownerGuid, uint8 
         if (itr->second.ownerGuid == ownerGuid && itr->second.petitionType == type)
             return &itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 void PetitionMgr::AddSignature(uint32 petitionId, uint32 accountId, uint32 playerGuid)
@@ -137,7 +137,7 @@ Signatures const* PetitionMgr::GetSignature(uint32 petitionId) const
     SignatureContainer::const_iterator itr = SignatureStore.find(petitionId);
     if (itr != SignatureStore.end())
         return &itr->second;
-    return NULL;
+    return nullptr;
 }
 
 void PetitionMgr::RemoveSignaturesByPlayer(uint32 playerGuid)
