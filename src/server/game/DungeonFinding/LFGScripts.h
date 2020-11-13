@@ -18,8 +18,8 @@ class Group;
 namespace lfg
 {
 
-class LFGPlayerScript : public PlayerScript
-{
+    class LFGPlayerScript : public PlayerScript
+    {
     public:
         LFGPlayerScript();
 
@@ -29,10 +29,10 @@ class LFGPlayerScript : public PlayerScript
         void OnLogin(Player* player);
         void OnBindToInstance(Player* player, Difficulty difficulty, uint32 mapId, bool permanent);
         void OnMapChanged(Player* player);
-};
+    };
 
-class LFGGroupScript : public GroupScript
-{
+    class LFGGroupScript : public GroupScript
+    {
     public:
         LFGGroupScript();
 
@@ -42,6 +42,6 @@ class LFGGroupScript : public GroupScript
         void OnDisband(Group* group);
         void OnChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid);
         void OnInviteMember(Group* group, uint64 guid);
-};
+    };
 
 } // namespace lfg

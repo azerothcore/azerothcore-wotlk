@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_sys_stat.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
  *  @author and a cast of thousands...
  *
@@ -57,6 +57,10 @@ typedef struct _stati64 ACE_stat;
 #       define ACE_STAT_FUNC_NAME ::_stati64
 #       define ACE_WSTAT_FUNC_NAME ::_wstati64
 #     endif  /* _MSC_VER >= 1400 */
+#   elif defined (__MINGW32__)
+typedef struct _stati64 ACE_stat;
+#     define ACE_STAT_FUNC_NAME ::_stati64
+#     define ACE_WSTAT_FUNC_NAME ::_wstati64
 #   else
 typedef struct stat ACE_stat;
 #     define ACE_STAT_FUNC_NAME ::stat
