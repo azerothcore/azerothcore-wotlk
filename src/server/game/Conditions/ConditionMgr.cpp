@@ -356,17 +356,17 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                 break;
             }
         case CONDITION_IN_WATER:
-        {
-            if (Unit* unit = object->ToUnit())
-                condMeets = unit->IsInWater();
-            break;
-        }
+            {
+                if (Unit* unit = object->ToUnit())
+                    condMeets = unit->IsInWater();
+                break;
+            }
         case CONDITION_DAILY_QUEST_DONE:
-        {
-            if (Player* player = object->ToPlayer())
-                condMeets = player->IsDailyQuestDone(ConditionValue1);
-            break;
-        }
+            {
+                if (Player* player = object->ToPlayer())
+                    condMeets = player->IsDailyQuestDone(ConditionValue1);
+                break;
+            }
         case CONDITION_QUEST_OBJECTIVE_PROGRESS:
             {
                 if (Player* player = object->ToPlayer())
