@@ -365,12 +365,11 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         {
             if (Player* player = object->ToPlayer())
             {
-                uint32 QuestStateCondition1 = player->GetQuestStatus(ConditionValue1);
                 if (
-                    ((ConditionValue2 & (1 << QUEST_STATUS_NONE)) && (QuestStateCondition1 == QUEST_STATUS_NONE)) ||
-                    ((ConditionValue2 & (1 << QUEST_STATUS_COMPLETE)) && (QuestStateCondition1 == QUEST_STATUS_COMPLETE)) ||
-                    ((ConditionValue2 & (1 << QUEST_STATUS_INCOMPLETE)) && (QuestStateCondition1 == QUEST_STATUS_INCOMPLETE)) ||
-                    ((ConditionValue2 & (1 << QUEST_STATUS_FAILED)) && (QuestStateCondition1 == QUEST_STATUS_FAILED)) ||
+                    ((ConditionValue2 & (1 << QUEST_STATUS_NONE)) && (player->GetQuestStatus(ConditionValue1) == QUEST_STATUS_NONE)) ||
+                    ((ConditionValue2 & (1 << QUEST_STATUS_COMPLETE)) && (player->GetQuestStatus(ConditionValue1) == QUEST_STATUS_COMPLETE)) ||
+                    ((ConditionValue2 & (1 << QUEST_STATUS_INCOMPLETE)) && (player->GetQuestStatus(ConditionValue1) == QUEST_STATUS_INCOMPLETE)) ||
+                    ((ConditionValue2 & (1 << QUEST_STATUS_FAILED)) && (player->GetQuestStatus(ConditionValue1) == QUEST_STATUS_FAILED)) ||
                     ((ConditionValue2 & (1 << QUEST_STATUS_REWARDED)) && player->GetQuestRewardStatus(ConditionValue1))
                     )
                 {
@@ -1784,12 +1783,16 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
                     return false;
                 }
               
-            if (cond->ConditionValue2 > 1)
-                sLog->outErrorDb("Quest condition has useless data in value2 (%u)!", cond->ConditionValue2);
-            if (cond->ConditionValue3)
-                sLog->outErrorDb("Quest condition has useless data in value3 (%u)!", cond->ConditionValue3);
-            break;
-        }
+                if (cond->ConditionValue2 > 1)
+                {
+                    sLog->outErrorDb("Quest condition has useless data in value2 (%u)!", cond->ConditionValue2);
+                }
+                if (cond->ConditionValue3)
+                {
+                    sLog->outErrorDb("Quest condition has useless data in value3 (%u)!", cond->ConditionValue3);
+                }
+                break;
+            }
         case CONDITION_QUESTSTATE:
             if (cond->ConditionValue2 >= (1 << MAX_QUEST_STATUS))
             {
