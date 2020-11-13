@@ -22,13 +22,13 @@
 #include "Player.h"
 #include "Vehicle.h"
 #include "ScriptMgr.h"
-#include "ScriptedCreature.h" 
+#include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
 #include "operation_gnomeregan.h"
 
 constexpr bool Debug_Mode = true;
-constexpr bool Player_Multiplier = false; // This is used to scale up the creatures, or to add more depending on players doing quest
+//constexpr bool Player_Multiplier = false; // This is used to scale up the creatures, or to add more depending on players doing quest
 
 class npc_og_suit : public CreatureScript
 {
@@ -39,7 +39,7 @@ class npc_og_suit : public CreatureScript
         {
             npc_og_suitAI(Creature* pCreature) : npc_escortAI(pCreature) {}
 
-            void WaypointReached(uint32 /* point */) { }
+            void WaypointReached(uint32 /* point */) override { }
 
             void SetupMovement(uint32 variation)
             {
@@ -159,14 +159,14 @@ class npc_og_suit : public CreatureScript
                         pEscortAI->Start(true, true, 0, nullptr, false, true);
                     else
                     {
-                        pEscortAI->Start(true, true); 
+                        pEscortAI->Start(true, true);
                         pEscortAI->SetDespawnAtEnd(false);
                     }
                     pEscortAI->SetDespawnAtFar(false);
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(const uint32 diff) override
             {
                 npc_escortAI::UpdateAI(diff);
             }
@@ -191,13 +191,13 @@ class npc_og_infantry : public CreatureScript
             uint32 uiGrenade_timer;
             uint32 uiVariation;
 
-            void Reset()
+            void Reset() override
             {
                 uiGCD = 2500;
                 uiGrenade_timer = urand(10000, 15000);
             }
 
-            void WaypointReached(uint32 i)
+            void WaypointReached(uint32 i) override
             {
                 if (i == 9 && uiVariation <= 3)
                     if (Creature* pSuit = me->FindNearestCreature(NPC_BATTLE_SUIT, 50, true))
@@ -317,7 +317,7 @@ class npc_og_infantry : public CreatureScript
                 }
             }
 
-            void AttackStart(Unit* pWho)
+            void AttackStart(Unit* pWho) override
             {
                 if (!pWho)
                     return;
@@ -332,7 +332,7 @@ class npc_og_infantry : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(const uint32 diff) override
             {
                 npc_escortAI::UpdateAI(diff);
 
@@ -390,12 +390,12 @@ class npc_og_tank : public CreatureScript
 
             uint32 uiGCD;
 
-            void Reset()
+            void Reset() override
             {
                 uiGCD = urand(5000, 7000);
             }
 
-            void WaypointReached(uint32 /* pointId */) { }
+            void WaypointReached(uint32 /* pointId */) override { }
 
             void SetupMovement(uint32 variation)
             {
@@ -494,7 +494,7 @@ class npc_og_tank : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(const uint32 diff) override
             {
                 npc_escortAI::UpdateAI(diff);
 
@@ -529,13 +529,9 @@ class npc_og_i_tank : public CreatureScript
         {
             npc_og_i_tankAI(Creature* pCreature) : npc_escortAI(pCreature) {}
 
-            void Reset()
-            {
-            }
+            void Reset() override { }
 
-            void WaypointReached(uint32 i)
-            {
-            }
+            void WaypointReached(uint32 /* waypointId */) override { }
 
             void SetupMovement(uint32 variation)
             {
@@ -582,7 +578,7 @@ class npc_og_i_tank : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(const uint32 diff) override
             {
                 npc_escortAI::UpdateAI(diff);
 
@@ -611,11 +607,11 @@ class npc_og_assistants : public CreatureScript
                 me->setFaction(35);
             }
 
-            void Reset()
+            void Reset() override
             {
             }
 
-            void WaypointReached(uint32 i)
+            void WaypointReached(uint32 i) override
             {
                 switch (i)
                 {
@@ -659,7 +655,7 @@ class npc_og_assistants : public CreatureScript
             }
 
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(const uint32 diff) override
             {
                 npc_escortAI::UpdateAI(diff);
 
@@ -709,7 +705,7 @@ class npc_og_mekkatorque : public CreatureScript
 
             bool                   decor_p1, decor_p2, decor_p3, decor_p4, decor_p5, decor_p6 = false;
 
-            void Reset()
+            void Reset() override
             {
                 uiStep               = 0;
                 uiTroggs             = 0;
@@ -725,7 +721,7 @@ class npc_og_mekkatorque : public CreatureScript
                 decor_p1 = decor_p2 = decor_p3 = decor_p4 = decor_p5 = decor_p6 = false;
             }
 
-            void WaypointReached(uint32 i)
+            void WaypointReached(uint32 i) override
             {
                 switch (i)
                 {
@@ -857,7 +853,7 @@ class npc_og_mekkatorque : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(const uint32 diff) override
             {
                 DoRefreshWorldStates();
 
@@ -878,11 +874,11 @@ class npc_og_mekkatorque : public CreatureScript
                     switch (uiStep)
                     {
                         case 1:
-                            me->MonsterSay(MEK_1_2, LANG_UNIVERSAL, NULL); 
+                            me->MonsterSay(MEK_1_2, LANG_UNIVERSAL, NULL);
                             if (Debug_Mode) JumpToNextStep(1000); else JumpToNextStep(9000);
                             break;
                         case 2:
-                            me->MonsterSay(MEK_1_3, LANG_UNIVERSAL, NULL); 
+                            me->MonsterSay(MEK_1_3, LANG_UNIVERSAL, NULL);
                             if (Debug_Mode) JumpToNextStep(1000); else JumpToNextStep(5000);
                             break;
                         case 3:
@@ -921,21 +917,21 @@ class npc_og_mekkatorque : public CreatureScript
                             DoUpdateWorldState(WORLDSTATE_IN_PROCCESS, 1);
                             if (npc_og_mekkatorqueAI* pEscortAI = CAST_AI(npc_og_mekkatorqueAI, me->AI()))
                             {
-                                pEscortAI->Start(true, true, pEscortPlayer->GetGUID()); 
+                                pEscortAI->Start(true, true, pEscortPlayer->GetGUID());
                                 pEscortAI->SetDespawnAtFar(false);
                                 pEscortAI->SetDespawnAtEnd(false);
                                 me->setActive(true);
                             }
                             if (Creature* pCogspin = me->FindNearestCreature(NPC_COGSPIN, 20))
                             {
-                                CAST_AI(npc_og_assistants::npc_og_assistantsAI, pCogspin->AI())->Start(true, true, pEscortPlayer->GetGUID()); 
+                                CAST_AI(npc_og_assistants::npc_og_assistantsAI, pCogspin->AI())->Start(true, true, pEscortPlayer->GetGUID());
                                 CAST_AI(npc_og_assistants::npc_og_assistantsAI, pCogspin->AI())->SetDespawnAtFar(false);
                                 CAST_AI(npc_og_assistants::npc_og_assistantsAI, pCogspin->AI())->SetDespawnAtEnd(false);
                                 pCogspin->setActive(true);
                             }
                             if (Creature* pFastblast = me->FindNearestCreature(NPC_FASTBLAST, 20))
                             {
-                                CAST_AI(npc_og_assistants::npc_og_assistantsAI, pFastblast->AI())->Start(true, true, pEscortPlayer->GetGUID()); 
+                                CAST_AI(npc_og_assistants::npc_og_assistantsAI, pFastblast->AI())->Start(true, true, pEscortPlayer->GetGUID());
                                 CAST_AI(npc_og_assistants::npc_og_assistantsAI, pFastblast->AI())->SetDespawnAtFar(false);
                                 CAST_AI(npc_og_assistants::npc_og_assistantsAI, pFastblast->AI())->SetDespawnAtEnd(false);
                                 pFastblast->setActive(true);
@@ -959,14 +955,14 @@ class npc_og_mekkatorque : public CreatureScript
                             DoUpdateWorldState(WORLDSTATE_AIRFIELD_ATTACKED, 1);
                             for (int8 n = 0; n < 3; ++n)
                                 CAST_AI(npc_og_tank::npc_og_tankAI, Tank[n]->AI())->SetupMovement(n);
-                            JumpToNextStep(3300); 
+                            JumpToNextStep(3300);
                             break;
                         case 15:
                             me->MonsterSay(MEK_5_3, LANG_UNIVERSAL, NULL);
                             if (Debug_Mode) JumpToNextStep(1000); else JumpToNextStep(7000);
                             break;
                         case 16:
-                            SetHoldState(false); 
+                            SetHoldState(false);
                             break;
                         case 18:
                             me->MonsterSay(MEK_10_2, LANG_UNIVERSAL, NULL);
@@ -978,7 +974,7 @@ class npc_og_mekkatorque : public CreatureScript
                                 Cannon[n] = me->SummonCreature(NPC_CANNON, CannonSpawn[n], TEMPSUMMON_MANUAL_DESPAWN);
                                 Cannon[n]->CastSpell(Cannon[n], SPELL_TRIGGER, true);
                             }
-                            me->SummonGameObject(GO_RAD_CONTROL, -5072.80f, 441.48f, 410.97f, 2.6f, 0.0f, 0.0f, 0.0f, 0.0f, 0); 
+                            me->SummonGameObject(GO_RAD_CONTROL, -5072.80f, 441.48f, 410.97f, 2.6f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
                             for (int8 n = 0; n < 3; ++n)
                                 BattleSuit[n] = me->SummonCreature(NPC_BATTLE_SUIT, BattleSuitSpawn[n], TEMPSUMMON_MANUAL_DESPAWN);
                             if (Creature* iTank = me->SummonCreature(NPC_I_TANK, iTankSpawn[3], TEMPSUMMON_MANUAL_DESPAWN))
@@ -1004,13 +1000,13 @@ class npc_og_mekkatorque : public CreatureScript
                             else
                                 SetHoldState(false);
                             break;
-                        case 22: 
+                        case 22:
                             if (!ValidateEscortState() || me->FindNearestCreature(NPC_CANNON, 100.0f, true))
                             {
                                 uiStep_timer = 2000;
                                 return;
                             }
-                             
+
                             DoTalk(me, MEK_12_1, SOUND_MEK_12, false);
                             if (Creature* pDriver1 = me->SummonCreature(NPC_INFANTRY, BattleSuitDriverSpawn[0], TEMPSUMMON_MANUAL_DESPAWN))
                                 if (Creature* pDriver2 = me->SummonCreature(NPC_INFANTRY, BattleSuitDriverSpawn[1], TEMPSUMMON_MANUAL_DESPAWN))
@@ -1316,7 +1312,7 @@ class npc_og_mekkatorque : public CreatureScript
                             break;
                     }
                 }
-                else 
+                else
                     uiStep_timer -= diff;
 
                 if (!UpdateVictim())
@@ -1331,7 +1327,7 @@ class npc_og_mekkatorque : public CreatureScript
                 {
                 case 1: // INTRO
                     if (decor_p1 == true) break;
-                    // 8 Gnomeregan banners 
+                    // 8 Gnomeregan banners
                     for (int8 n = 0; n < 8; ++n)
                         me->SummonGameObject(GO_BANNER, decor_gnomeregan_banners[n].m_positionX, decor_gnomeregan_banners[n].m_positionY, decor_gnomeregan_banners[n].m_positionZ, decor_gnomeregan_banners[n].m_orientation, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
 
@@ -1382,12 +1378,12 @@ class npc_og_mekkatorque : public CreatureScript
                 }
             };
 
-            void JustDied(Unit* /*who*/)
+            void JustDied(Unit* /*who*/) override
             {
                 DoCleanup();
             }
 
-            void JustSummoned(Creature* summon)
+            void JustSummoned(Creature* summon) override
             {
                 SummonsGUID.push_back(summon->GetGUID());
             }
@@ -1411,7 +1407,7 @@ class npc_og_mekkatorque : public CreatureScript
                 }
             }
 
-            void EnterCombat(Unit* pWho)
+            void EnterCombat(Unit* pWho) override
             {
                 if (pWho && pWho->ToCreature())
                     SquadAssist(pWho->ToCreature());
@@ -1558,8 +1554,8 @@ class npc_og_mekkatorque : public CreatureScript
             {
                 if (pSpell->Id == SPELL_TRIGGER)
                 {
-                    if (Debug_Mode) 
-                    sLog->outString("SpellHit :: SPELL_TRIGGER, SpellID: %u, Hitter GUID: %u", pSpell->Id, pHitter->GetGUID());
+                    if (Debug_Mode)
+                    ;//sLog->outString("SpellHit :: SPELL_TRIGGER, SpellID: %lu, Hitter GUID: %u", pSpell->Id, pHitter->GetGUID());
                     switch (pHitter->GetEntry())
                     {
                         case NPC_FASTBLAST:
@@ -1614,7 +1610,7 @@ class npc_og_mekkatorque : public CreatureScript
                 return true;
                 if (bControlWP_1) sLog->outString("bControlWP_1"); else sLog->outString("!bControlWP_1");
                 if (bControlWP_2) sLog->outString("bControlWP_2"); else sLog->outString("!bControlWP_2");
-                if (!bControlWP_1 || !bControlWP_2) 
+                if (!bControlWP_1 || !bControlWP_2)
                     return false;
                 else
                 {
@@ -1649,10 +1645,7 @@ class npc_og_mekkatorque : public CreatureScript
                 {
                     for (std::list<uint64>::const_iterator itr = SummonsGUID.begin(); itr != SummonsGUID.end(); ++itr)
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                            if (summon->IsAlive())
-                                summon->DisappearAndDie();
-                            else
-                                summon->DespawnOrUnsummon();
+                            summon->DisappearAndDie(); 
                     SummonsGUID.clear();
                 }
                 if (!BannerList.empty())
@@ -1671,13 +1664,10 @@ class npc_og_mekkatorque : public CreatureScript
 
 typedef npc_og_mekkatorque::npc_og_mekkatorqueAI MekkAI;
 
-        bool OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-        {
-            //if (pQuest->GetQuestId() == QUEST_OPERATION_GNOMEREGAN)
-            {
+        bool OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const* /*pQuest*/) override
+        { 
                 if (!bProcessing)
-                {
-                    //CAST_AI(MekkAI, pCreature->AI())->pEscortQuest = pQuest;
+                { 
                     CAST_AI(MekkAI, pCreature->AI())->pEscortPlayer = pPlayer;
                     pCreature->MonsterSay(MEK_1_1, LANG_UNIVERSAL, NULL);
                     CAST_AI(MekkAI, pCreature->AI())->DoPlaySoundToSet(pCreature, SOUND_MEK_1);
@@ -1693,15 +1683,14 @@ typedef npc_og_mekkatorque::npc_og_mekkatorqueAI MekkAI;
                             CAST_AI(npc_og_i_tank::npc_og_i_tankAI, p_iTank->AI())->SetupMovement(n-1);
                     CAST_AI(MekkAI, pCreature->AI())->JumpToNextStep(4000);
                     bProcessing = true;
-                }
-            }
+                } 
             return true;
         }
 
         bool OnGossipHello(Player* pPlayer, Creature* pCreature) override
         {
             if (!bProcessing)
-            {  
+            {
                 CAST_AI(MekkAI, pCreature->AI())->pEscortPlayer = pPlayer;
                 pCreature->MonsterSay(MEK_1_1, LANG_UNIVERSAL, NULL);
                 CAST_AI(MekkAI, pCreature->AI())->DoPlaySoundToSet(pCreature, SOUND_MEK_1);
@@ -1725,26 +1714,26 @@ typedef npc_og_mekkatorque::npc_og_mekkatorqueAI MekkAI;
         void InitializeDecorations(Creature* me) {
 
             // Player "spawn" platform - from where they land off the helicopter
-            // -- plr spawn platform 
+            // -- plr spawn platform
             me->SummonGameObject(GO_PLR_LANDING_PLATFORM, -5434.71f, 523.177f, 386.959f, 0.575957f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
 
-            // Random gnomish tabkes 
-            for (int8 n = 0; n < 6; ++n) 
+            // Random gnomish tabkes
+            for (int8 n = 0; n < 6; ++n)
                 me->SummonGameObject(GO_CRAP_TABLE, decor_gnomish_tables[n].m_positionX, decor_gnomish_tables[n].m_positionY, decor_gnomish_tables[n].m_positionZ, decor_gnomish_tables[n].m_orientation, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
 
-            // Spawn all teleport disks 
-            for (int8 n = 0; n < 6; ++n) 
+            // Spawn all teleport disks
+            for (int8 n = 0; n < 6; ++n)
                 me->SummonGameObject(GO_TELE_DISK, decor_beginning_teleport_platforms[n].m_positionX, decor_beginning_teleport_platforms[n].m_positionY, decor_beginning_teleport_platforms[n].m_positionZ, decor_beginning_teleport_platforms[n].m_orientation, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
 
-            // Spawn all hazard lights 
+            // Spawn all hazard lights
             for (int8 n = 0; n < 20; ++n)
                 me->SummonGameObject(GO_HAZ_LIGHT, decor_beginning_hazard_lights[n].m_positionX, decor_beginning_hazard_lights[n].m_positionY, decor_beginning_hazard_lights[n].m_positionZ, decor_beginning_hazard_lights[n].m_orientation, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
         }
- 
+
         private:
             bool bProcessing;
 
-    CreatureAI *GetAI(Creature* pCreature) const
+    CreatureAI *GetAI(Creature* pCreature) const override
     {
         return new npc_og_mekkatorqueAI(pCreature);
     }
@@ -1758,25 +1747,23 @@ class npc_og_boltcog : public CreatureScript
         struct npc_og_boltcogAI : public npc_escortAI
         {
             npc_og_boltcogAI(Creature* pCreature) : npc_escortAI(pCreature) {}
-            
+
             uint32 uiThrow_timer;
 
-            void Reset()
+            void Reset() override
             {
                 uiThrow_timer = urand(10000, 25000);
             }
 
-            void WaypointReached(uint32 i)
-            {
-            }
+            void WaypointReached(uint32 /* waypointId */) override { }
 
-            void JustDied(Unit* /*who*/)
+            void JustDied(Unit* /*who*/) override
             {
                 if (Creature* pMekkatorque = me->FindNearestCreature(NPC_MEKKATORQUE, 100.0f, true))
                     CAST_AI(npc_og_mekkatorque::npc_og_mekkatorqueAI, pMekkatorque->AI())->SpecialKill(3);
             }
 
-            void IsSummonedBy(Unit* /*who*/)
+            void IsSummonedBy(Unit* /*who*/) override
             {
                 AddWaypoint(0, -5035.236816f, 708.675232f, 260.499268f);
                 AddWaypoint(1, -5033.954590f, 717.153992f, 260.528778f);
@@ -1796,7 +1783,7 @@ class npc_og_boltcog : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(const uint32 diff) override
             {
                 npc_escortAI::UpdateAI(diff);
 
@@ -1828,7 +1815,7 @@ class npc_og_rl : public CreatureScript
         {
             npc_og_rlAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 
-            void JustDied(Unit* /*who*/)
+            void JustDied(Unit* /*who*/) override
             {
                 if (Creature* pMekkatorque = me->FindNearestCreature(NPC_MEKKATORQUE, 1000, true))
                     CAST_AI(npc_og_mekkatorque::npc_og_mekkatorqueAI, pMekkatorque->AI())->SpecialKill(0);
@@ -1854,7 +1841,7 @@ class npc_og_cannon : public CreatureScript
             uint32 uiHits;
             uint32 uiRocket_timer;
 
-            void Reset()
+            void Reset() override
             {
                 if (uiHits < 5 && !me->HasAura(SPELL_CANNON_SHIELD))
                     me->CastSpell(me, SPELL_CANNON_SHIELD, true);
@@ -1862,7 +1849,7 @@ class npc_og_cannon : public CreatureScript
                 uiRocket_timer = urand(1000, 5000);
             }
 
-            void SpellHit(Unit* pHitter, const SpellInfo* pSpell)
+            void SpellHit(Unit* /*pHitter*/, const SpellInfo* pSpell) override
             {
                 if (pSpell->Id == SPELL_ROCKET)
                 {
@@ -1885,7 +1872,7 @@ class npc_og_cannon : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(const uint32 diff) override
             {
                 if (!UpdateVictim())
                     return;
@@ -1899,7 +1886,7 @@ class npc_og_cannon : public CreatureScript
                     uiRocket_timer -= diff;
             }
 
-            void JustDied(Unit * /*who*/)
+            void JustDied(Unit* /*who*/) override
             {
                 if (Creature* pMekkatorque = me->FindNearestCreature(NPC_MEKKATORQUE, 1000, true))
                     CAST_AI(npc_og_mekkatorque::npc_og_mekkatorqueAI, pMekkatorque->AI())->SpecialKill(1);
@@ -1923,12 +1910,12 @@ class npc_og_bomber : public CreatureScript
 
             bool bAction;
 
-            void Reset()
+            void Reset() override
             {
                 bAction = true;
             }
 
-            void MovementInform(uint32 type, uint32 id)
+            void MovementInform(uint32 type, uint32 id) override
             {
                 if (type == POINT_MOTION_TYPE && id == 1)
                     if (Creature* pMekkatorque = me->FindNearestCreature(NPC_MEKKATORQUE, 300, true))
@@ -1937,7 +1924,7 @@ class npc_og_bomber : public CreatureScript
                 me->DisappearAndDie();
             }
 
-            void MoveInLineOfSight(Unit* who)
+            void MoveInLineOfSight(Unit* who) override
             {
                 if (who->GetTypeId() != TYPEID_UNIT)
                     return;
@@ -1967,15 +1954,13 @@ class npc_og_trogg : public CreatureScript
         {
             npc_og_troggAI(Creature* pCreature) : npc_escortAI(pCreature) {}
 
-            void Reset()
+            void Reset()  override
             {
             }
 
-            void WaypointReached(uint32 i)
-            {
-            }
+            void WaypointReached(uint32 /* waypointId */) override { }
 
-            void IsSummonedBy(Unit* /*who*/)
+            void IsSummonedBy(Unit* /*who*/) override
             {
                 AddWaypoint(0, -5181.290039f, 629.843567f, 398.547211f);
                 AddWaypoint(1, -5182.823730f, 612.078735f, 408.880646f);
@@ -1989,7 +1974,7 @@ class npc_og_trogg : public CreatureScript
                 }
             }
 
-            void JustDied(Unit * /*who*/)
+            void JustDied(Unit* /*who*/) override
             {
                 if (me->GetEntry() == NPC_GASHERIKK)
                     if (Creature* pMekkatorque = me->FindNearestCreature(NPC_MEKKATORQUE, 100, true))
@@ -2015,13 +2000,13 @@ class npc_og_i_infantry : public CreatureScript
             uint32 uiGrenade_timer;
             uint32 uiGCD;
 
-            void Reset()
+            void Reset() override
             {
                 uiGrenade_timer = urand(10000, 15000);
                 uiGCD = 3000;
             }
 
-            void AttackStart(Unit* pWho)
+            void AttackStart(Unit* pWho) override
             {
                 if (!pWho)
                     return;
@@ -2039,7 +2024,7 @@ class npc_og_i_infantry : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(const uint32 diff) override
             {
                 if (!UpdateVictim())
                     return;
@@ -2091,7 +2076,7 @@ class npc_og_camera_vehicle : public CreatureScript
                 }
             }
 
-            void MovementInform(uint32 type, uint32 id)
+            void MovementInform(uint32 type, uint32 /*id*/) override
             {
                 if (type != POINT_MOTION_TYPE)
                     return;
@@ -2126,7 +2111,7 @@ enum
     NPC_GNOME_CITIZEN_MOTIVATED    = 39466,
     NPC_CAPTAIN_TREAD_SPARKNOZZLE  = 39675,
     QUEST_CREDIT_CITIZEN           = 39623,
-    QUEST_CREDIT_MOTIVATED_CITIZEN = 39466, 
+    QUEST_CREDIT_MOTIVATED_CITIZEN = 39466,
     TALK_BROADCAST_ENTRY_MIN       = 100004,
     TALK_BROADCAST_ENTRY_MAX       = 100012,
     TALK_CHARMED                   = 0,
@@ -2142,8 +2127,8 @@ public:
     {
         npc_gnome_citizenAI(Creature* creature) : FollowerAI(creature) { }
 
-        void Reset() { } 
-                 
+        void Reset() { }
+
         void SpellHit(Unit* pWho, const SpellInfo* pSpell)
         {
             if (!pWho || !pWho->IsInWorld() || pWho->GetTypeId() != TYPEID_PLAYER || !pSpell)
@@ -2153,13 +2138,13 @@ public:
                 if (pSpell->Id == SPELL_MOTIVATE && plr->GetQuestStatus(QUEST_A_FEW_GOOD_GNOMES) == QUEST_STATUS_INCOMPLETE)
                 {
                     if (Creature* motivated_gnome = me->SummonCreature(NPC_GNOME_CITIZEN_MOTIVATED, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 40 * MINUTE * IN_MILLISECONDS))
-                    { 
+                    {
                         plr->KilledMonsterCredit(QUEST_CREDIT_CITIZEN, 0);
                         CreatureAI* motivated_gnomeAI = motivated_gnome->AI();
                         if (!motivated_gnomeAI)
                             return;
 
-                        motivated_gnomeAI->Talk(TALK_CHARMED); 
+                        motivated_gnomeAI->Talk(TALK_CHARMED);
                     }
 
                     me->DespawnOrUnsummon();
@@ -2189,11 +2174,11 @@ public:
 
         void MoveInLineOfSight(Unit* pWho)
         {
-            FollowerAI::MoveInLineOfSight(pWho); 
+            FollowerAI::MoveInLineOfSight(pWho);
             if (pWho->GetTypeId() != TYPEID_PLAYER)
-                return; 
+                return;
             Player* plr = pWho->ToPlayer();
-             
+
             if (plr->GetQuestStatus(QUEST_A_FEW_GOOD_GNOMES) != QUEST_STATUS_INCOMPLETE)
                 return;
 
@@ -2204,20 +2189,20 @@ public:
                 me->RemoveAura(23225);
 
             if(!HasFollowState(STATE_FOLLOW_INPROGRESS))
-                StartFollow(plr); 
+                StartFollow(plr);
         }
 
-        void UpdateFollowerAI(const uint32 uiDiff)
-        {  
+        void UpdateFollowerAI(const uint32 /*uiDiff*/)
+        {
             if (me->FindNearestCreature(NPC_CAPTAIN_TREAD_SPARKNOZZLE, 2.f))
-            { 
+            {
                 GetLeaderForFollower()->KilledMonsterCredit(QUEST_CREDIT_MOTIVATED_CITIZEN, 0);
                 SetFollowComplete(true);
                 me->DisappearAndDie();
             }
         }
 
- 
+
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -2235,7 +2220,7 @@ class npc_steamcrank : public CreatureScript
         {
             npc_steamcrankAI(Creature* creature) : ScriptedAI(creature) { }
 
-            void Reset() { }
+            void Reset() override { }
 
             void JumpToNextStep(uint32 uiTimer)
             {
@@ -2248,7 +2233,7 @@ class npc_steamcrank : public CreatureScript
                 }
             }
 
-            void ReceiveEmote(Player* pPlayer, uint32 uiTextEmote)
+            void ReceiveEmote(Player* pPlayer, uint32 uiTextEmote) override
             {
                 switch(uiTextEmote)
                 {
@@ -2282,7 +2267,7 @@ class npc_steamcrank : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 if (_stepTimer <= diff)
                 {
@@ -2436,7 +2421,7 @@ class npc_mekkatorque : public CreatureScript
                 me->CastSpell(me, SPELL_CREATE_TELEPORTER, true);
             }
 
-            void Reset()
+            void Reset() override
             {
             }
 
@@ -2464,7 +2449,7 @@ class npc_mekkatorque : public CreatureScript
                 me->DespawnOrUnsummon();
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(const uint32 diff) override
             {
                 if (_stepTimer <= diff)
                 {
@@ -2488,7 +2473,7 @@ class npc_mekkatorque : public CreatureScript
                                     break;
                                 case 3:
                                     if (Creature* Pad = me->FindNearestCreature(NPC_SUMMONING_PAD, 1.0f, true))
-                                        Pad->DespawnOrUnsummon(); 
+                                        Pad->DespawnOrUnsummon();
                                     break;
                             }
                             break;
@@ -2514,7 +2499,7 @@ class npc_mekkatorque : public CreatureScript
                                     break;
                                 case 4:
                                     if (Creature* Pad = me->FindNearestCreature(NPC_SUMMONING_PAD, 1.0f, true))
-                                        Pad->DespawnOrUnsummon(); 
+                                        Pad->DespawnOrUnsummon();
                                     break;
                             }
                             break;
@@ -2540,7 +2525,7 @@ class npc_mekkatorque : public CreatureScript
                                     break;
                                 case 4:
                                     if (Creature* Pad = me->FindNearestCreature(NPC_SUMMONING_PAD, 1.0f, true))
-                                        Pad->DespawnOrUnsummon(); 
+                                        Pad->DespawnOrUnsummon();
                                     break;
                             }
                             break;
@@ -2595,7 +2580,7 @@ void AddSC_operation_gnomeregan()
     new npc_og_camera_vehicle;
     new npc_og_mekkatorque;
     new npc_og_assistants;
-    new npc_og_i_infantry;
+    new npc_og_i_infantry; 
     new npc_og_infantry;
     new npc_og_boltcog;
     new npc_og_cannon;
