@@ -1550,23 +1550,7 @@ class npc_og_mekkatorque : public CreatureScript
                 }
             }
 
-            void SpellHit(Unit* pHitter, SpellInfo const* pSpell) override
-            {
-                if (pSpell->Id == SPELL_TRIGGER)
-                {
-                    if (Debug_Mode)
-                    ;//sLog->outString("SpellHit :: SPELL_TRIGGER, SpellID: %lu, Hitter GUID: %u", pSpell->Id, pHitter->GetGUID());
-                    switch (pHitter->GetEntry())
-                    {
-                        case NPC_FASTBLAST:
-                            bControlWP_1 = true;
-                            break;
-                        case NPC_COGSPIN:
-                            bControlWP_2 = true;
-                            break;
-                    }
-                }
-            }
+            void SpellHit(Unit* /*pHitter*/, SpellInfo const* /*pSpell*/) override { }
 
             void DoUpdateWorldState(uint32 worldstate, uint32 value)
             {
