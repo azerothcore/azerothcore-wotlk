@@ -71,12 +71,12 @@ public:
         {
             switch (creature->GetEntry())
             {
-            case NPC_THE_BEAST:
-                if (loot == LOOT_SKINNING)
-                {
-                    creature->CastSpell(creature, SPELL_FINKLE_IS_EINHORN, true);
-                }
-                break;
+                case NPC_THE_BEAST:
+                    if (loot == LOOT_SKINNING)
+                    {
+                        creature->CastSpell(creature, SPELL_FINKLE_IS_EINHORN, true);
+                    }
+                    break;
             }
         }
 
@@ -135,8 +135,8 @@ public:
                     if (GetBossState(DATA_GYTH) == DONE)
                         creature->DisappearAndDie();
                     break;
-             }
-         }
+            }
+        }
 
         void OnGameObjectCreate(GameObject* go)
         {
@@ -274,7 +274,7 @@ public:
                     break;
             }
 
-             return true;
+            return true;
         }
 
         void ProcessEvent(WorldObject* /*obj*/, uint32 eventId)
@@ -409,7 +409,7 @@ public:
                             Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3000);
                         break;
                     default:
-                         break;
+                        break;
                 }
             }
         }
@@ -497,8 +497,8 @@ public:
             }
 
             if (GetBossState(DATA_HALL_RUNE_1) == DONE && GetBossState(DATA_HALL_RUNE_2) == DONE && GetBossState(DATA_HALL_RUNE_3) == DONE &&
-                GetBossState(DATA_HALL_RUNE_4) == DONE && GetBossState(DATA_HALL_RUNE_5) == DONE && GetBossState(DATA_HALL_RUNE_6) == DONE &&
-                GetBossState(DATA_HALL_RUNE_7) == DONE)
+                    GetBossState(DATA_HALL_RUNE_4) == DONE && GetBossState(DATA_HALL_RUNE_5) == DONE && GetBossState(DATA_HALL_RUNE_6) == DONE &&
+                    GetBossState(DATA_HALL_RUNE_7) == DONE)
             {
                 SetBossState(DATA_DRAGONSPIRE_ROOM, DONE);
                 if (GameObject* door1 = instance->GetGameObject(go_emberseerin))
@@ -554,33 +554,33 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        protected:
-            EventMap Events;
-            uint64 HighlordOmokk;
-            uint64 ShadowHunterVoshgajin;
-            uint64 WarMasterVoone;
-            uint64 MotherSmolderweb;
-            uint64 UrokDoomhowl;
-            uint64 QuartermasterZigris;
-            uint64 GizrultheSlavener;
-            uint64 Halycon;
-            uint64 OverlordWyrmthalak;
-            uint64 PyroguardEmberseer;
-            uint64 WarchiefRendBlackhand;
-            uint64 Gyth;
-            uint64 LordVictorNefarius;
-            uint64 TheBeast;
-            uint64 GeneralDrakkisath;
-            uint64 go_emberseerin;
-            uint64 go_doors;
-            uint64 go_emberseerout;
-            uint64 go_blackrockaltar;
-            uint64 go_roomrunes[7];
-            uint64 go_emberseerrunes[7];
-            uint64 runecreaturelist[7][5];
-            uint64 go_portcullis_active;
-            uint64 go_portcullis_tobossrooms;
-            uint64 go_urok_pile;
+    protected:
+        EventMap Events;
+        uint64 HighlordOmokk;
+        uint64 ShadowHunterVoshgajin;
+        uint64 WarMasterVoone;
+        uint64 MotherSmolderweb;
+        uint64 UrokDoomhowl;
+        uint64 QuartermasterZigris;
+        uint64 GizrultheSlavener;
+        uint64 Halycon;
+        uint64 OverlordWyrmthalak;
+        uint64 PyroguardEmberseer;
+        uint64 WarchiefRendBlackhand;
+        uint64 Gyth;
+        uint64 LordVictorNefarius;
+        uint64 TheBeast;
+        uint64 GeneralDrakkisath;
+        uint64 go_emberseerin;
+        uint64 go_doors;
+        uint64 go_emberseerout;
+        uint64 go_blackrockaltar;
+        uint64 go_roomrunes[7];
+        uint64 go_emberseerrunes[7];
+        uint64 runecreaturelist[7][5];
+        uint64 go_portcullis_active;
+        uint64 go_portcullis_tobossrooms;
+        uint64 go_urok_pile;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const

@@ -130,7 +130,8 @@ public:
 
                 SwarmTimer = urand(45000, 60000);
                 Talk(SAY_SWARM);
-            } else SwarmTimer -= diff;
+            }
+            else SwarmTimer -= diff;
 
             if (SleepTimer <= diff)
             {
@@ -141,18 +142,21 @@ public:
                 }
                 SleepTimer = 60000;
                 Talk(SAY_SLEEP);
-            } else SleepTimer -= diff;
+            }
+            else SleepTimer -= diff;
             if (AuraTimer <= diff)
             {
                 DoCast(me, SPELL_VAMPIRIC_AURA, true);
                 AuraTimer = urand(10000, 20000);
-            } else AuraTimer -= diff;
+            }
+            else AuraTimer -= diff;
             if (InfernoTimer <= diff)
             {
                 DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true), SPELL_INFERNO);
                 InfernoTimer = 45000;
                 Talk(SAY_INFERNO);
-            } else InfernoTimer -= diff;
+            }
+            else InfernoTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -224,7 +228,8 @@ public:
                     }
                 }
                 CheckTimer = 5000;
-            } else CheckTimer -= diff;
+            }
+            else CheckTimer -= diff;
 
             //Return since we have no target
             if (!UpdateVictim())
@@ -234,7 +239,8 @@ public:
             {
                 DoCast(me, SPELL_IMMOLATION);
                 ImmolationTimer = 5000;
-            } else ImmolationTimer -= diff;
+            }
+            else ImmolationTimer -= diff;
 
             DoMeleeAttackIfReady();
         }

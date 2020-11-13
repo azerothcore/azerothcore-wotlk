@@ -17,41 +17,41 @@
 template<class T>
 class RandomMovementGenerator : public MovementGeneratorMedium< T, RandomMovementGenerator<T> >
 {
-    public:
-        RandomMovementGenerator(float wanderDistance = 0.0f) : _nextMoveTime(0), _moveCount(0), _wanderDistance(wanderDistance), _pathGenerator(nullptr), _currentPoint(RANDOM_POINTS_NUMBER)
+public:
+    RandomMovementGenerator(float wanderDistance = 0.0f) : _nextMoveTime(0), _moveCount(0), _wanderDistance(wanderDistance), _pathGenerator(nullptr), _currentPoint(RANDOM_POINTS_NUMBER)
+    {
+        _initialPosition.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
+        _destinationPoints.reserve(RANDOM_POINTS_NUMBER);
+
+        for (uint8 i = 0; i < RANDOM_POINTS_NUMBER; ++i)
         {
-            _initialPosition.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
-            _destinationPoints.reserve(RANDOM_POINTS_NUMBER);
-
-            for (uint8 i = 0; i < RANDOM_POINTS_NUMBER; ++i)
-            {
-                _validPointsVector[i].reserve(RANDOM_LINKS_COUNT);
-                for (uint8 j = 0; j < RANDOM_LINKS_COUNT; ++j)
-                    _validPointsVector[i].push_back((i + j + RANDOM_POINTS_NUMBER/2 - RANDOM_LINKS_COUNT/2) % RANDOM_POINTS_NUMBER);
-            }
-
-            _validPointsVector[RANDOM_POINTS_NUMBER].reserve(RANDOM_POINTS_NUMBER);
-            for (uint8 i = 0; i < RANDOM_POINTS_NUMBER; ++i)
-                _validPointsVector[RANDOM_POINTS_NUMBER].push_back(i);
+            _validPointsVector[i].reserve(RANDOM_LINKS_COUNT);
+            for (uint8 j = 0; j < RANDOM_LINKS_COUNT; ++j)
+                _validPointsVector[i].push_back((i + j + RANDOM_POINTS_NUMBER / 2 - RANDOM_LINKS_COUNT / 2) % RANDOM_POINTS_NUMBER);
         }
 
-        void _setRandomLocation(T*);
-        void DoInitialize(T*);
-        void DoFinalize(T*);
-        void DoReset(T*);
-        bool DoUpdate(T*, const uint32);
-        bool GetResetPosition(float& x, float& y, float& z);
-        MovementGeneratorType GetMovementGeneratorType() { return RANDOM_MOTION_TYPE; }
+        _validPointsVector[RANDOM_POINTS_NUMBER].reserve(RANDOM_POINTS_NUMBER);
+        for (uint8 i = 0; i < RANDOM_POINTS_NUMBER; ++i)
+            _validPointsVector[RANDOM_POINTS_NUMBER].push_back(i);
+    }
 
-    private:
-        TimeTrackerSmall _nextMoveTime;
-        uint8 _moveCount;
-        float _wanderDistance;
-        PathGenerator* _pathGenerator;
-        std::vector<G3D::Vector3> _destinationPoints;
-        std::vector<uint8> _validPointsVector[RANDOM_POINTS_NUMBER+1];
-        uint8 _currentPoint;
-        std::map<uint16, Movement::PointsArray> _preComputedPaths;
-        Position _initialPosition, _currDestPosition;
+    void _setRandomLocation(T*);
+    void DoInitialize(T*);
+    void DoFinalize(T*);
+    void DoReset(T*);
+    bool DoUpdate(T*, const uint32);
+    bool GetResetPosition(float& x, float& y, float& z);
+    MovementGeneratorType GetMovementGeneratorType() { return RANDOM_MOTION_TYPE; }
+
+private:
+    TimeTrackerSmall _nextMoveTime;
+    uint8 _moveCount;
+    float _wanderDistance;
+    PathGenerator* _pathGenerator;
+    std::vector<G3D::Vector3> _destinationPoints;
+    std::vector<uint8> _validPointsVector[RANDOM_POINTS_NUMBER + 1];
+    uint8 _currentPoint;
+    std::map<uint16, Movement::PointsArray> _preComputedPaths;
+    Position _initialPosition, _currDestPosition;
 };
 #endif

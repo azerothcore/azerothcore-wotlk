@@ -1,6 +1,6 @@
 /*
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/ 
+*/
 
 #ifndef DEF_VIOLET_HOLD_H
 #define DEF_VIOLET_HOLD_H
@@ -79,7 +79,7 @@ enum VHWorldStates
 
 enum Spells
 {
-    SPELL_CONTROL_CRYSTAL_ACTIVATION= 57804,
+    SPELL_CONTROL_CRYSTAL_ACTIVATION = 57804,
     SPELL_ARCANE_LIGHTNING          = 57912,
     SPELL_ARCANE_LIGHTNING_VISUAL   = 57930,
     SPELL_PORTAL_CHANNEL            = 58012,
@@ -153,7 +153,7 @@ const Position BossStartMove6  = {1928.207031f, 852.864441f, 47.200813f, 0.0f};
 const Position CyanigosasSpawnLocation = {1930.281250f, 804.407715f, 52.410946f, 3.139621f};
 const Position MiddleRoomLocation = {1892.291260f, 805.696838f, 38.438862f, 3.139621f};
 
-const uint8 PLocWPCount[6] = {6,9,8,9,6,4};
+const uint8 PLocWPCount[6] = {6, 9, 8, 9, 6, 4};
 
 const Position PortalLocations[] =
 {

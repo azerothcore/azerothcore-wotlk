@@ -68,8 +68,8 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
 
     // Search victim if no, not attackable, or out of range, or friendly (possible in case duel end)
     if (!victim ||
-        !victim->isTargetableForAttack(true, me) || !me->IsWithinDistInMap(victim, max_range) ||
-        me->IsFriendlyTo(victim) || !me->CanSeeOrDetect(victim))
+            !victim->isTargetableForAttack(true, me) || !me->IsWithinDistInMap(victim, max_range) ||
+            me->IsFriendlyTo(victim) || !me->CanSeeOrDetect(victim))
     {
         victim = nullptr;
         acore::NearestAttackableUnitInObjectRangeCheck u_check(me, me, max_range);
@@ -96,7 +96,7 @@ void TotemAI::AttackStart(Unit* /*victim*/)
     // Sentry totem sends ping on attack
     if (me->GetEntry() == SENTRY_TOTEM_ENTRY && me->GetOwner()->GetTypeId() == TYPEID_PLAYER)
     {
-        WorldPacket data(MSG_MINIMAP_PING, (8+4+4));
+        WorldPacket data(MSG_MINIMAP_PING, (8 + 4 + 4));
         data << me->GetGUID();
         data << me->GetPositionX();
         data << me->GetPositionY();
