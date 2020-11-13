@@ -39,7 +39,6 @@ class ACE_Reactor;
 class ACE_Export ACE_LSOCK_Acceptor : public ACE_SOCK_Acceptor
 {
 public:
-  // = Initialization methods.
   /// Default constructor.
   ACE_LSOCK_Acceptor (void);
 
