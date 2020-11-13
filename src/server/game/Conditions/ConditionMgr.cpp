@@ -364,7 +364,9 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         case CONDITION_DAILY_QUEST_DONE:
             {
                 if (Player* player = object->ToPlayer())
+                {
                     condMeets = player->IsDailyQuestDone(ConditionValue1);
+                }
                 break;
             }
         case CONDITION_QUEST_OBJECTIVE_PROGRESS:
