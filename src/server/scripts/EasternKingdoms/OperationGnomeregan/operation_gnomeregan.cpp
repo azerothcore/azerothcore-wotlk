@@ -27,6 +27,7 @@
 #include "HostileRefManager.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
+#include "SpellAuras.h"
 #include "operation_gnomeregan.h"
 
 constexpr bool Debug_Mode = true;
