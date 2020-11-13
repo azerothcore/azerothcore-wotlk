@@ -20,6 +20,7 @@
 #include "Group.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "Vehicle.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h" 
 #include "ScriptedEscortAI.h"
@@ -394,9 +395,7 @@ class npc_og_tank : public CreatureScript
                 uiGCD = urand(5000, 7000);
             }
 
-            void WaypointReached(uint32 i)
-            {
-            }
+            void WaypointReached(uint32 /* pointId */) { }
 
             void SetupMovement(uint32 variation)
             {
@@ -2563,37 +2562,31 @@ class npc_mekkatorque : public CreatureScript
         }
 };
 
-// 39716 is the giver, 39713 is the drivable
-class npc_scuttling_mechano_tank : public CreatureScript
+class npc_shoot_bunny : public CreatureScript
 {
-public:
-    npc_scuttling_mechano_tank() : CreatureScript("npc_scuttling_mechano_tank") { }
+    public:
+        npc_shoot_bunny() : CreatureScript("npc_shoot_bunny") { }
 
-    struct npc_scuttling_mechano_tankAI : public ScriptedAI
-    {
-        npc_scuttling_mechano_tankAI(Creature* creature) : ScriptedAI(creature) { }
-    };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_ONE_STEP_FORWARD) == QUEST_STATUS_INCOMPLETE)
+        struct npc_shoot_bunnyAI : public ScriptedAI
         {
-            Creature* veh = creature->SummonCreature(NPC_DRIVEABLE_MECHANOTANK, creature->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 60 * MINUTE * IN_MILLISECONDS);
-            if (veh)
+            npc_shoot_bunnyAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset()
             {
-                player->EnterVehicle(veh, 0);
-            } 
+                if (me->FindNearestCreature(39711, 3.0f, true))
+                    if(TempSummon* triggerbunny = me->ToTempSummon())
+                        if (Unit* vehSummoner = triggerbunny->GetSummoner())
+                            if (Vehicle* vehicle = vehSummoner->GetVehicleKit())
+                                if (Unit* driver = vehicle->GetPassenger(0))
+                                    driver->CastSpell(driver, SPELL_SHOOT_CREDIT, true);
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_shoot_bunnyAI(creature);
         }
-
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_scuttling_mechano_tankAI(creature);
-    }
 };
-
 
 
 void AddSC_operation_gnomeregan()
@@ -2615,5 +2608,5 @@ void AddSC_operation_gnomeregan()
     new npc_gnome_citizen_motivated;
     new npc_steamcrank;
     new npc_mekkatorque;
-    new npc_scuttling_mechano_tank;
+    new npc_shoot_bunny;
 }

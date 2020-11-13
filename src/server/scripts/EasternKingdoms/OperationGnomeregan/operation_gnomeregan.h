@@ -71,6 +71,10 @@ enum eSpells
     SPELL_RECALL_FINAL          = 74412, // Realy final?
 
     SPELL_RAD_EXPLOSION         = 75545,
+
+    // Press Fire
+    SPELL_SHOOT_CREDIT          = 74184,
+    SPELL_SHOOT_VISUAL          = 74179,
 };
 
 enum eCreatures

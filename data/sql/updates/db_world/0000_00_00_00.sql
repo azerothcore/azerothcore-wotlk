@@ -72,14 +72,41 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_steamcrank', `ainame` = '' WH
 UPDATE `creature_template` SET `ainame` = '' WHERE `entry`=39349;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 39368 OR `entryorguid`=39349;
 
+-- [Q:25285] In and Out
+UPDATE `creature_template` SET `npcflag` = `npcflag`|16777216 WHERE `entry` = 39715;
+DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` = 39715;
+INSERT INTO `npc_spellclick_spells` (`npc_entry`,`spell_id`,`cast_flags`,`user_type`) VALUES
+(39715,74204,1,0);
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 18 AND `SourceGroup` = 39715;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
+(18,39715,74204,0,0,9,0,25285,0,0,0,0,0,"","Spellclick 'Summon Tank' requires quest 'In and Out' active");
+UPDATE `creature_template` SET `spell1` = '74153', `spell2` = '0', `spell3` = '0', `spell4` = '0' WHERE `entry` = '39682';
+DELETE FROM `spell_script_names` WHERE `spell_id` = 74153 AND `ScriptName` = "spell_gen_eject_passenger";
+INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
+(74153,"spell_gen_eject_passenger");
+
 -- [Q:25289] One Step Forward
+UPDATE `creature_template` SET `npcflag` = `npcflag`|16777216 WHERE `entry` = 39716;
+DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` = 39716;
+INSERT INTO `npc_spellclick_spells` (`npc_entry`,`spell_id`,`cast_flags`,`user_type`) VALUES
+(39716,74203,1,0);
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 18 AND `SourceGroup` = 39716;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
+(18,39716,74203,0,0,9,0,25289,0,0,0,0,0,"","Spellclick 'Summon Tank' requires quest 'In and Out' active");
 UPDATE `creature_template` SET `spell1` = '74157', `spell2` = '74159', `spell3` = '74160', `spell4` = '74153' WHERE `entry` = '39713';
 
--- [Q:25295] Press Fire
-UPDATE `creature_template` SET `spell4` = '74174', `spell6` = '74153' WHERE `entry` = '39714';
-UPDATE `creature_template` SET `ScriptName` = 'npc_shoot_bunny' WHERE `entry` = '39707';
+-- [Q:25295] Press Fire 
+UPDATE `creature_template` SET `ScriptName` = 'npc_shoot_bunny' WHERE `entry` = '39711';
 DELETE FROM `spell_scripts` WHERE `id` = '74182';
 INSERT INTO `spell_scripts` (`id`, `command`, `datalong`, `datalong2`) VALUES ('74182', '15', '74179', '2');
+UPDATE `creature_template` SET `spell4` = '74174', `spell6` = '74153' WHERE `entry` = '39714';
+UPDATE `creature_template` SET `npcflag` = `npcflag`|16777216 WHERE `entry` = 39717;
+DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` = 39717;
+INSERT INTO `npc_spellclick_spells` (`npc_entry`,`spell_id`,`cast_flags`,`user_type`) VALUES (39717,74205,1,0);
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 18 AND `SourceGroup` = 39717;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
+(18,39717,74205,0,0,9,0,25295,0,0,0,0,0,"","Spellclick 'Summon Tank' requires quest 'In and Out' active"); 
+
 
 -- [Q:25212] Vent Horizon 
 UPDATE `conditions` SET `ConditionValue1` = '25212' WHERE (`SourceTypeOrReferenceId`='15') AND (`SourceGroup`='11211') AND (`SourceEntry`='0') AND (`ElseGroup`='0') AND (`ConditionTypeOrReference`='9') AND (`ConditionValue1`='25283') AND (`ConditionValue2`='0') AND (`ConditionValue3`='0');
