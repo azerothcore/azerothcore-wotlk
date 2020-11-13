@@ -113,189 +113,190 @@ static TransformStruct Transform[4] =
 
 class boss_zuljin : public CreatureScript
 {
-    public:
+public:
 
-        boss_zuljin()
-            : CreatureScript("boss_zuljin")
+    boss_zuljin()
+        : CreatureScript("boss_zuljin")
+    {
+    }
+
+    struct boss_zuljinAI : public ScriptedAI
+    {
+        boss_zuljinAI(Creature* creature) : ScriptedAI(creature), Summons(me)
         {
+            instance = creature->GetInstanceScript();
+        }
+        InstanceScript* instance;
+
+        uint64 SpiritGUID[4];
+        uint64 ClawTargetGUID;
+        uint64 TankGUID;
+
+        uint32 Phase;
+        uint32 health_20;
+
+        uint32 Intro_Timer;
+        uint32 Berserk_Timer;
+
+        uint32 Whirlwind_Timer;
+        uint32 Grievous_Throw_Timer;
+
+        uint32 Creeping_Paralysis_Timer;
+        uint32 Overpower_Timer;
+
+        uint32 Claw_Rage_Timer;
+        uint32 Lynx_Rush_Timer;
+        uint32 Claw_Counter;
+        uint32 Claw_Loop_Timer;
+
+        uint32 Flame_Whirl_Timer;
+        uint32 Flame_Breath_Timer;
+        uint32 Pillar_Of_Fire_Timer;
+
+        SummonList Summons;
+
+        void Reset()
+        {
+            instance->SetData(DATA_ZULJINEVENT, NOT_STARTED);
+
+            Phase = 0;
+
+            health_20 = me->CountPctFromMaxHealth(20);
+
+            Intro_Timer = 37000;
+            Berserk_Timer = 600000;
+
+            Whirlwind_Timer = 7000;
+            Grievous_Throw_Timer = 8000;
+
+            Creeping_Paralysis_Timer = 7000;
+            Overpower_Timer = 0;
+
+            Claw_Rage_Timer = 5000;
+            Lynx_Rush_Timer = 14000;
+            Claw_Loop_Timer = 0;
+            Claw_Counter = 0;
+
+            Flame_Whirl_Timer = 5000;
+            Flame_Breath_Timer = 6000;
+            Pillar_Of_Fire_Timer = 7000;
+
+            ClawTargetGUID = 0;
+            TankGUID = 0;
+
+            Summons.DespawnAll();
+
+            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 33975);
+            //me->SetUInt32Value(UNIT_VIRTUAL_ITEM_INFO, 218172674);
+            //me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
         }
 
-        struct boss_zuljinAI : public ScriptedAI
+        void EnterCombat(Unit* /*who*/)
         {
-            boss_zuljinAI(Creature* creature) : ScriptedAI(creature), Summons(me)
+            instance->SetData(DATA_ZULJINEVENT, IN_PROGRESS);
+
+            DoZoneInCombat();
+
+            Talk(YELL_INTRO);
+            SpawnAdds();
+            EnterPhase(0);
+        }
+
+        void KilledUnit(Unit* /*victim*/)
+        {
+            if (Intro_Timer)
+                return;
+
+            Talk(YELL_KILL);
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            instance->SetData(DATA_ZULJINEVENT, DONE);
+
+            Talk(YELL_DEATH);
+            Summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
+
+            if (Unit* Temp = ObjectAccessor::GetUnit(*me, SpiritGUID[3]))
+                Temp->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
+        }
+
+        void AttackStart(Unit* who)
+        {
+            if (Phase == 2)
+                AttackStartNoMove(who);
+            else
+                ScriptedAI::AttackStart(who);
+        }
+
+        void DoMeleeAttackIfReady()
+        {
+            if (!me->IsNonMeleeSpellCast(false))
             {
-                instance = creature->GetInstanceScript();
-            }
-            InstanceScript* instance;
-
-            uint64 SpiritGUID[4];
-            uint64 ClawTargetGUID;
-            uint64 TankGUID;
-
-            uint32 Phase;
-            uint32 health_20;
-
-            uint32 Intro_Timer;
-            uint32 Berserk_Timer;
-
-            uint32 Whirlwind_Timer;
-            uint32 Grievous_Throw_Timer;
-
-            uint32 Creeping_Paralysis_Timer;
-            uint32 Overpower_Timer;
-
-            uint32 Claw_Rage_Timer;
-            uint32 Lynx_Rush_Timer;
-            uint32 Claw_Counter;
-            uint32 Claw_Loop_Timer;
-
-            uint32 Flame_Whirl_Timer;
-            uint32 Flame_Breath_Timer;
-            uint32 Pillar_Of_Fire_Timer;
-
-            SummonList Summons;
-
-            void Reset()
-            {
-                instance->SetData(DATA_ZULJINEVENT, NOT_STARTED);
-
-                Phase = 0;
-
-                health_20 = me->CountPctFromMaxHealth(20);
-
-                Intro_Timer = 37000;
-                Berserk_Timer = 600000;
-
-                Whirlwind_Timer = 7000;
-                Grievous_Throw_Timer = 8000;
-
-                Creeping_Paralysis_Timer = 7000;
-                Overpower_Timer = 0;
-
-                Claw_Rage_Timer = 5000;
-                Lynx_Rush_Timer = 14000;
-                Claw_Loop_Timer = 0;
-                Claw_Counter = 0;
-
-                Flame_Whirl_Timer = 5000;
-                Flame_Breath_Timer = 6000;
-                Pillar_Of_Fire_Timer = 7000;
-
-                ClawTargetGUID = 0;
-                TankGUID = 0;
-
-                Summons.DespawnAll();
-
-                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 33975);
-                //me->SetUInt32Value(UNIT_VIRTUAL_ITEM_INFO, 218172674);
-                //me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                instance->SetData(DATA_ZULJINEVENT, IN_PROGRESS);
-
-                DoZoneInCombat();
-
-                Talk(YELL_INTRO);
-                SpawnAdds();
-                EnterPhase(0);
-            }
-
-            void KilledUnit(Unit* /*victim*/)
-            {
-                if (Intro_Timer)
-                    return;
-
-                Talk(YELL_KILL);
-            }
-
-            void JustDied(Unit* /*killer*/)
-            {
-                instance->SetData(DATA_ZULJINEVENT, DONE);
-
-                Talk(YELL_DEATH);
-                Summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
-
-                if (Unit* Temp = ObjectAccessor::GetUnit(*me, SpiritGUID[3]))
-                    Temp->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
-            }
-
-            void AttackStart(Unit* who)
-            {
-                if (Phase == 2)
-                    AttackStartNoMove(who);
-                else
-                    ScriptedAI::AttackStart(who);
-            }
-
-            void DoMeleeAttackIfReady()
-            {
-                if (!me->IsNonMeleeSpellCast(false))
+                if (me->isAttackReady() && me->IsWithinMeleeRange(me->GetVictim()))
                 {
-                    if (me->isAttackReady() && me->IsWithinMeleeRange(me->GetVictim()))
+                    if (Phase == 1 && !Overpower_Timer)
                     {
-                        if (Phase == 1 && !Overpower_Timer)
+                        uint32 health = me->GetVictim()->GetHealth();
+                        me->AttackerStateUpdate(me->GetVictim());
+                        if (me->GetVictim() && health == me->GetVictim()->GetHealth())
                         {
-                            uint32 health = me->GetVictim()->GetHealth();
-                            me->AttackerStateUpdate(me->GetVictim());
-                            if (me->GetVictim() && health == me->GetVictim()->GetHealth())
-                            {
-                                DoCastVictim(SPELL_OVERPOWER, false);
-                                Overpower_Timer = 5000;
-                            }
-                        } else me->AttackerStateUpdate(me->GetVictim());
-                        me->resetAttackTimer();
-                    }
-                }
-            }
-
-            void SpawnAdds()
-            {
-                Creature* creature = nullptr;
-                for (uint8 i = 0; i < 4; ++i)
-                {
-                    creature = me->SummonCreature(SpiritInfo[i].entry, SpiritInfo[i].x, SpiritInfo[i].y, SpiritInfo[i].z, SpiritInfo[i].orient, TEMPSUMMON_DEAD_DESPAWN, 0);
-                    if (creature)
-                    {
-                        creature->CastSpell(creature, SPELL_SPIRIT_AURA, true);
-                        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        SpiritGUID[i] = creature->GetGUID();
-                    }
-                }
-            }
-
-            void DespawnAdds()
-            {
-                for (uint8 i = 0; i < 4; ++i)
-                {
-                    if (SpiritGUID[i])
-                    {
-                        if (Unit* temp = ObjectAccessor::GetUnit(*me, SpiritGUID[i]))
-                        {
-                            temp->SetVisible(false);
-                            temp->setDeathState(DEAD);
+                            DoCastVictim(SPELL_OVERPOWER, false);
+                            Overpower_Timer = 5000;
                         }
                     }
-                    SpiritGUID[i] = 0;
+                    else me->AttackerStateUpdate(me->GetVictim());
+                    me->resetAttackTimer();
                 }
             }
+        }
 
-            void JustSummoned(Creature* summon)
+        void SpawnAdds()
+        {
+            Creature* creature = nullptr;
+            for (uint8 i = 0; i < 4; ++i)
             {
-                Summons.Summon(summon);
-            }
-
-            void SummonedCreatureDespawn(Creature* summon)
-            {
-                Summons.Despawn(summon);
-            }
-
-            void EnterPhase(uint32 NextPhase)
-            {
-                switch (NextPhase)
+                creature = me->SummonCreature(SpiritInfo[i].entry, SpiritInfo[i].x, SpiritInfo[i].y, SpiritInfo[i].z, SpiritInfo[i].orient, TEMPSUMMON_DEAD_DESPAWN, 0);
+                if (creature)
                 {
+                    creature->CastSpell(creature, SPELL_SPIRIT_AURA, true);
+                    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    SpiritGUID[i] = creature->GetGUID();
+                }
+            }
+        }
+
+        void DespawnAdds()
+        {
+            for (uint8 i = 0; i < 4; ++i)
+            {
+                if (SpiritGUID[i])
+                {
+                    if (Unit* temp = ObjectAccessor::GetUnit(*me, SpiritGUID[i]))
+                    {
+                        temp->SetVisible(false);
+                        temp->setDeathState(DEAD);
+                    }
+                }
+                SpiritGUID[i] = 0;
+            }
+        }
+
+        void JustSummoned(Creature* summon)
+        {
+            Summons.Summon(summon);
+        }
+
+        void SummonedCreatureDespawn(Creature* summon)
+        {
+            Summons.Despawn(summon);
+        }
+
+        void EnterPhase(uint32 NextPhase)
+        {
+            switch (NextPhase)
+            {
                 case 0:
                     break;
                 case 1:
@@ -344,30 +345,31 @@ class boss_zuljin : public CreatureScript
                     break;
                 default:
                     break;
-                }
-                Phase = NextPhase;
+            }
+            Phase = NextPhase;
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!TankGUID)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                if (me->GetHealth() < health_20 * (4 - Phase))
+                    EnterPhase(Phase + 1);
             }
 
-            void UpdateAI(uint32 diff)
+            if (Berserk_Timer <= diff)
             {
-                if (!TankGUID)
-                {
-                    if (!UpdateVictim())
-                        return;
+                DoCast(me, SPELL_BERSERK, true);
+                Talk(YELL_BERSERK);
+                Berserk_Timer = 60000;
+            }
+            else Berserk_Timer -= diff;
 
-                    if (me->GetHealth() < health_20 * (4 - Phase))
-                        EnterPhase(Phase + 1);
-                }
-
-                if (Berserk_Timer <= diff)
-                {
-                    DoCast(me, SPELL_BERSERK, true);
-                    Talk(YELL_BERSERK);
-                    Berserk_Timer = 60000;
-                } else Berserk_Timer -= diff;
-
-                switch (Phase)
-                {
+            switch (Phase)
+            {
                 case 0:
                     if (Intro_Timer)
                     {
@@ -375,21 +377,24 @@ class boss_zuljin : public CreatureScript
                         {
                             Talk(YELL_AGGRO);
                             Intro_Timer = 0;
-                        } else Intro_Timer -= diff;
+                        }
+                        else Intro_Timer -= diff;
                     }
 
                     if (Whirlwind_Timer <= diff)
                     {
                         DoCast(me, SPELL_WHIRLWIND);
                         Whirlwind_Timer = urand(15000, 20000);
-                    } else Whirlwind_Timer -= diff;
+                    }
+                    else Whirlwind_Timer -= diff;
 
                     if (Grievous_Throw_Timer <= diff)
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                             DoCast(target, SPELL_GRIEVOUS_THROW, false);
                         Grievous_Throw_Timer = 10000;
-                    } else Grievous_Throw_Timer -= diff;
+                    }
+                    else Grievous_Throw_Timer -= diff;
                     break;
 
                 case 1:
@@ -397,13 +402,15 @@ class boss_zuljin : public CreatureScript
                     {
                         DoCast(me, SPELL_CREEPING_PARALYSIS);
                         Creeping_Paralysis_Timer = 20000;
-                    } else Creeping_Paralysis_Timer -= diff;
+                    }
+                    else Creeping_Paralysis_Timer -= diff;
 
                     if (Overpower_Timer <= diff)
                     {
                         // implemented in DoMeleeAttackIfReady()
                         Overpower_Timer = 0;
-                    } else Overpower_Timer -= diff;
+                    }
+                    else Overpower_Timer -= diff;
                     break;
 
                 case 2:
@@ -455,9 +462,11 @@ class boss_zuljin : public CreatureScript
                                     EnterEvadeMode(); // if (target)
                                     return;
                                 }
-                            } else Claw_Loop_Timer -= diff;
+                            }
+                            else Claw_Loop_Timer -= diff;
                         } //if (TankGUID)
-                    } else Claw_Rage_Timer -= diff;
+                    }
+                    else Claw_Rage_Timer -= diff;
 
                     if (Lynx_Rush_Timer <= diff)
                     {
@@ -503,7 +512,8 @@ class boss_zuljin : public CreatureScript
                                 return;
                             }
                         } //if (TankGUID)
-                    } else Lynx_Rush_Timer -= diff;
+                    }
+                    else Lynx_Rush_Timer -= diff;
 
                     break;
                 case 4:
@@ -511,14 +521,16 @@ class boss_zuljin : public CreatureScript
                     {
                         DoCast(me, SPELL_FLAME_WHIRL);
                         Flame_Whirl_Timer = 12000;
-                    }Flame_Whirl_Timer -= diff;
+                    }
+                    Flame_Whirl_Timer -= diff;
 
                     if (Pillar_Of_Fire_Timer <= diff)
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                             DoCast(target, SPELL_SUMMON_PILLAR);
                         Pillar_Of_Fire_Timer = 10000;
-                    } else Pillar_Of_Fire_Timer -= diff;
+                    }
+                    else Pillar_Of_Fire_Timer -= diff;
 
                     if (Flame_Breath_Timer <= diff)
                     {
@@ -526,59 +538,60 @@ class boss_zuljin : public CreatureScript
                             me->SetInFront(target);
                         DoCast(me, SPELL_FLAME_BREATH);
                         Flame_Breath_Timer = 10000;
-                    } else Flame_Breath_Timer -= diff;
+                    }
+                    else Flame_Breath_Timer -= diff;
                     break;
 
                 default:
                     break;
-                }
-
-                if (!TankGUID)
-                    DoMeleeAttackIfReady();
             }
-        };
 
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return GetInstanceAI<boss_zuljinAI>(creature);
+            if (!TankGUID)
+                DoMeleeAttackIfReady();
         }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetInstanceAI<boss_zuljinAI>(creature);
+    }
 };
 
 class npc_zuljin_vortex : public CreatureScript
 {
-    public:
+public:
 
-        npc_zuljin_vortex()
-            : CreatureScript("npc_zuljin_vortex")
+    npc_zuljin_vortex()
+        : CreatureScript("npc_zuljin_vortex")
+    {
+    }
+
+    struct npc_zuljin_vortexAI : public ScriptedAI
+    {
+        npc_zuljin_vortexAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() { }
+
+        void EnterCombat(Unit* /*target*/) { }
+
+        void SpellHit(Unit* caster, const SpellInfo* spell)
         {
+            if (spell->Id == SPELL_ZAP_INFORM)
+                DoCast(caster, SPELL_ZAP_DAMAGE, true);
         }
 
-        struct npc_zuljin_vortexAI : public ScriptedAI
+        void UpdateAI(uint32 /*diff*/)
         {
-            npc_zuljin_vortexAI(Creature* creature) : ScriptedAI(creature) { }
-
-            void Reset() { }
-
-            void EnterCombat(Unit* /*target*/) { }
-
-            void SpellHit(Unit* caster, const SpellInfo* spell)
-            {
-                if (spell->Id == SPELL_ZAP_INFORM)
-                    DoCast(caster, SPELL_ZAP_DAMAGE, true);
-            }
-
-            void UpdateAI(uint32 /*diff*/)
-            {
-                //if the vortex reach the target, it change his target to another player
-                if (me->IsWithinMeleeRange(me->GetVictim()))
-                    AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_zuljin_vortexAI(creature);
+            //if the vortex reach the target, it change his target to another player
+            if (me->IsWithinMeleeRange(me->GetVictim()))
+                AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));
         }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_zuljin_vortexAI(creature);
+    }
 };
 
 void AddSC_boss_zuljin()

@@ -33,20 +33,19 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  * Win32 <MsgWaitForMultipleObjects>.
  *
  * The ACE_Msg_WFMO_Reactor is an OO event demultiplexor and
- * event handler Reactor. It differs from <ACE_WFMO_Reactor> by
+ * event handler Reactor. It differs from ACE_WFMO_Reactor by
  * its ability to react on Windows messages.  It is needed when
  * the task should serve also as a COM/DCOM server.
  */
 class ACE_Export ACE_Msg_WFMO_Reactor : public ACE_WFMO_Reactor
 {
 public:
-  // = Initialization and termination methods.
-  /// Initialize <ACE_Msg_WFMO_Reactor> with the default size.
+  /// Initialize ACE_Msg_WFMO_Reactor with the default size.
   ACE_Msg_WFMO_Reactor (ACE_Sig_Handler * = 0,
                         ACE_Timer_Queue * = 0);
 
   /**
-   * Initialize <ACE_Msg_WFMO_Reactor> with size @a size.  Two slots will be
+   * Initialize ACE_Msg_WFMO_Reactor with size @a size.  Two slots will be
    * added to the @a size parameter which will store handles used for
    * internal management purposes.
    */
