@@ -40,12 +40,12 @@ bool PetAI::_needToStop()
         return true;
 
     // xinef: dont allow to follow targets out of visibility range
-    if (me->GetExactDist(me->GetVictim()) > me->GetVisibilityRange()-5.0f)
+    if (me->GetExactDist(me->GetVictim()) > me->GetVisibilityRange() - 5.0f)
         return true;
 
     // dont allow pets to follow targets far away from owner
     if (Unit* owner = me->GetCharmerOrOwner())
-        if (owner->GetExactDist(me) >= (owner->GetVisibilityRange()-10.0f))
+        if (owner->GetExactDist(me) >= (owner->GetVisibilityRange() - 10.0f))
             return true;
 
     if (!me->_CanDetectFeignDeathOf(me->GetVictim()))
@@ -95,39 +95,39 @@ bool PetAI::_canMeleeAttack()
         case ENTRY_IMP:
         case ENTRY_WATER_ELEMENTAL:
         case ENTRY_WATER_ELEMENTAL_PERM:
-        {
-            for (uint8 i = 0; i < me->GetPetAutoSpellSize(); ++i)
             {
-                uint32 spellID = me->GetPetAutoSpellOnPos(i);
-                switch (spellID)
+                for (uint8 i = 0; i < me->GetPetAutoSpellSize(); ++i)
                 {
-                    case IMP_FIREBOLT_RANK_1:
-                    case IMP_FIREBOLT_RANK_2:
-                    case IMP_FIREBOLT_RANK_3:
-                    case IMP_FIREBOLT_RANK_4:
-                    case IMP_FIREBOLT_RANK_5:
-                    case IMP_FIREBOLT_RANK_6:
-                    case IMP_FIREBOLT_RANK_7:
-                    case IMP_FIREBOLT_RANK_8:
-                    case IMP_FIREBOLT_RANK_9:
-                    case WATER_ELEMENTAL_WATERBOLT_1:
-                    case WATER_ELEMENTAL_WATERBOLT_2:
+                    uint32 spellID = me->GetPetAutoSpellOnPos(i);
+                    switch (spellID)
                     {
-                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
-                        int32 mana = me->GetPower(POWER_MANA);
+                        case IMP_FIREBOLT_RANK_1:
+                        case IMP_FIREBOLT_RANK_2:
+                        case IMP_FIREBOLT_RANK_3:
+                        case IMP_FIREBOLT_RANK_4:
+                        case IMP_FIREBOLT_RANK_5:
+                        case IMP_FIREBOLT_RANK_6:
+                        case IMP_FIREBOLT_RANK_7:
+                        case IMP_FIREBOLT_RANK_8:
+                        case IMP_FIREBOLT_RANK_9:
+                        case WATER_ELEMENTAL_WATERBOLT_1:
+                        case WATER_ELEMENTAL_WATERBOLT_2:
+                            {
+                                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+                                int32 mana = me->GetPower(POWER_MANA);
 
-                        if (mana >= spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
-                        {
-                            combatRange = spellInfo->GetMaxRange();
-                            return true;
-                        }
+                                if (mana >= spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
+                                {
+                                    combatRange = spellInfo->GetMaxRange();
+                                    return true;
+                                }
+                            }
+                        default:
+                            break;
                     }
-                    default:
-                        break;
                 }
+                return false;
             }
-            return false;
-        }
         default:
             break;
     }
@@ -347,9 +347,9 @@ void PetAI::UpdateAI(uint32 diff)
 void PetAI::UpdateAllies()
 {
     Unit* owner = me->GetCharmerOrOwner();
-    Group* group = NULL;
+    Group* group = nullptr;
 
-    m_updateAlliesTimer = 10*IN_MILLISECONDS;                //update friendly targets every 10 seconds, lesser checks increase performance
+    m_updateAlliesTimer = 10 * IN_MILLISECONDS;              //update friendly targets every 10 seconds, lesser checks increase performance
 
     if (!owner)
         return;
@@ -367,7 +367,7 @@ void PetAI::UpdateAllies()
     m_AllySet.insert(me->GetGUID());
     if (group)                                              //add group
     {
-        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* Target = itr->GetSource();
             if (!Target || !Target->IsInMap(owner) || !group->SameSubGroup(owner->ToPlayer(), Target))
@@ -470,7 +470,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
 
     // Passive pets don't do next target selection
     if (me->HasReactState(REACT_PASSIVE))
-        return NULL;
+        return nullptr;
 
     // Check pet attackers first so we don't drag a bunch of targets to the owner
     if (Unit* myAttacker = me->getAttackerForHelper())
@@ -491,7 +491,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
     // Not sure why we wouldn't have an owner but just in case...
     Unit* owner = me->GetCharmerOrOwner();
     if (!owner)
-        return NULL;
+        return nullptr;
 
     // Check owner attackers
     if (Unit* ownerAttacker = owner->getAttackerForHelper())
@@ -513,7 +513,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
                 return nearTarget;
 
     // Default - no valid targets
-    return NULL;
+    return nullptr;
 }
 
 void PetAI::HandleReturnMovement()
@@ -622,29 +622,29 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
     switch (moveType)
     {
         case POINT_MOTION_TYPE:
-        {
-            // Pet is returning to where stay was clicked. data should be
-            // pet's GUIDLow since we set that as the waypoint ID
-            if (data == me->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
             {
-                ClearCharmInfoFlags();
-                me->GetCharmInfo()->SetIsAtStay(true);
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MoveIdle();
+                // Pet is returning to where stay was clicked. data should be
+                // pet's GUIDLow since we set that as the waypoint ID
+                if (data == me->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
+                {
+                    ClearCharmInfoFlags();
+                    me->GetCharmInfo()->SetIsAtStay(true);
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveIdle();
+                }
+                break;
             }
-            break;
-        }
         case FOLLOW_MOTION_TYPE:
-        {
-            // If data is owner's GUIDLow then we've reached follow point,
-            // otherwise we're probably chasing a creature
-            if (me->GetCharmerOrOwner() && me->GetCharmInfo() && data == me->GetCharmerOrOwner()->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
             {
-                ClearCharmInfoFlags();
-                me->GetCharmInfo()->SetIsFollowing(true);
+                // If data is owner's GUIDLow then we've reached follow point,
+                // otherwise we're probably chasing a creature
+                if (me->GetCharmerOrOwner() && me->GetCharmInfo() && data == me->GetCharmerOrOwner()->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
+                {
+                    ClearCharmInfoFlags();
+                    me->GetCharmInfo()->SetIsFollowing(true);
+                }
+                break;
             }
-            break;
-        }
         default:
             break;
     }
@@ -698,24 +698,24 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
     // Stay - can attack if target is within range or commanded to
     if (me->GetCharmInfo()->HasCommandState(COMMAND_STAY))
         return (me->IsWithinMeleeRange(target) || me->GetCharmInfo()->IsCommandAttack());
-    
+
     //  Pets attacking something (or chasing) should only switch targets if owner tells them to
     if (me->GetVictim() && me->GetVictim() != target)
     {
         // Check if our owner selected this target and clicked "attack"
-        Unit* ownerTarget = NULL;
+        Unit* ownerTarget = nullptr;
         if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
             ownerTarget = owner->GetSelectedUnit();
         else
             ownerTarget = me->GetCharmerOrOwner()->GetVictim();
-    
+
         if (ownerTarget && me->GetCharmInfo()->IsCommandAttack())
             return (target->GetGUID() == ownerTarget->GetGUID());
     }
 
     // Follow
     if (me->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW))
-        return !me->GetCharmInfo()->IsReturning();        
+        return !me->GetCharmInfo()->IsReturning();
 
     // default, though we shouldn't ever get here
     return false;

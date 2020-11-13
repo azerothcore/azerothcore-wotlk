@@ -15,6 +15,9 @@
 #include "ace/Log_Category.h"
 #include "ace/Guard_T.h"
 #include "ace/OS_NS_stdio.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 #if defined (ACE_HAS_THR_C_DEST)
 #  include "ace/TSS_Adapter.h"
@@ -22,7 +25,7 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_TSS)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_TSS)
 
 #if defined (ACE_HAS_THREADS) && (defined (ACE_HAS_THREAD_SPECIFIC_STORAGE) || defined (ACE_HAS_TSS_EMULATION))
 # if defined (ACE_HAS_THR_C_DEST)
@@ -43,7 +46,13 @@ ACE_TSS<TYPE>::~ACE_TSS (void)
 # else
     TYPE *ts_obj = this->ts_value ();
     this->ts_value (0);
+#  if !defined ACE_HAS_LYNXOS_178 || defined ACE_HAS_TSS_EMULATION
+    // A bug in LynxOS-178 causes pthread_setspecific (called from ts_value(0)
+    // above) to call the cleanup function, so we need to avoid calling it here.
     ACE_TSS<TYPE>::cleanup (ts_obj);
+#  else
+    ACE_UNUSED_ARG (ts_obj);
+#  endif
 # endif /* ACE_HAS_THR_C_DEST */
 
     ACE_OS::thr_key_detach (this->key_);
@@ -152,7 +161,7 @@ ACE_TSS<TYPE>::ACE_TSS (TYPE *ts_obj)
                         ACE_TEXT ("ACE_Thread::keycreate() failed!"),
                         ACE_TEXT ("ACE_TSS::ACE_TSS"),
                         MB_OK);
-#else
+#elif !defined (ACE_LACKS_VA_FUNCTIONS)
           ACE_OS::fprintf (stderr,
                            "ACE_Thread::keycreate() failed!");
 #endif /* ACE_HAS_WINCE */
@@ -330,7 +339,7 @@ ACE_TSS<TYPE>::ts_object (TYPE *new_ts_obj)
   return ts_obj;
 }
 
-ACE_ALLOC_HOOK_DEFINE(ACE_TSS_Guard)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_TSS_Guard)
 
 template <class ACE_LOCK> void
 ACE_TSS_Guard<ACE_LOCK>::dump (void) const
