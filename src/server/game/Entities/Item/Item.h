@@ -246,6 +246,8 @@ public:
     uint32 GetCount() const { return GetUInt32Value(ITEM_FIELD_STACK_COUNT); }
     void SetCount(uint32 value) { SetUInt32Value(ITEM_FIELD_STACK_COUNT, value); }
     uint32 GetMaxStackCount() const { return GetTemplate()->GetMaxStackSize(); }
+    // Checks if this item has sockets, whether built-in or added by an upgrade.
+    bool HasSocket() const;
     uint8 GetGemCountWithID(uint32 GemID) const;
     uint8 GetGemCountWithLimitCategory(uint32 limitCategory) const;
     InventoryResult CanBeMergedPartlyWith(ItemTemplate const* proto) const;
