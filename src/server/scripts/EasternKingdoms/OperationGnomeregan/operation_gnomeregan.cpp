@@ -1326,6 +1326,7 @@ class npc_og_mekkatorque : public CreatureScript
             }
 
             void HandleDecorByPhase(Creature* me, int8 p) {
+                return;
                 switch (p)
                 {
                 case 1: // INTRO
@@ -2420,11 +2421,11 @@ class npc_mekkatorque : public CreatureScript
         {
             npc_mekkatorqueAI(Creature* creature) : ScriptedAI(creature)
             {
-                if (Creature* ozzie = me->FindNearestCreature(NPC_OZZIE, 15.0f, true))
+                if (Creature* ozzie = me->FindNearestCreature(NPC_OZZIE, 35.0f, true))
                     _listener = ozzie;
-                else if (Creature* milli = me->FindNearestCreature(NPC_MILLI, 15.0f, true))
+                else if (Creature* milli = me->FindNearestCreature(NPC_MILLI, 35.0f, true))
                     _listener = milli;
-                else if(Creature* tog = me->FindNearestCreature(NPC_TOG, 15.0f, true))
+                else if(Creature* tog = me->FindNearestCreature(NPC_TOG, 35.0f, true))
                     _listener = tog;
                 else
                 {
@@ -2474,6 +2475,7 @@ class npc_mekkatorque : public CreatureScript
                             {
                                 case 0:
                                     me->MonsterSay(MEK1_1_0, LANG_UNIVERSAL, NULL);
+                                    CastCredit();
                                     JumpToNextStep(5000);
                                     break;
                                 case 1:
@@ -2486,8 +2488,7 @@ class npc_mekkatorque : public CreatureScript
                                     break;
                                 case 3:
                                     if (Creature* Pad = me->FindNearestCreature(NPC_SUMMONING_PAD, 1.0f, true))
-                                        Pad->DespawnOrUnsummon();
-                                    CastCredit();
+                                        Pad->DespawnOrUnsummon(); 
                                     break;
                             }
                             break;
@@ -2496,6 +2497,7 @@ class npc_mekkatorque : public CreatureScript
                             {
                                 case 0:
                                     me->MonsterSay(MEK1_2_0, LANG_UNIVERSAL, NULL);
+                                    CastCredit();
                                     JumpToNextStep(5000);
                                     break;
                                 case 1:
@@ -2512,8 +2514,7 @@ class npc_mekkatorque : public CreatureScript
                                     break;
                                 case 4:
                                     if (Creature* Pad = me->FindNearestCreature(NPC_SUMMONING_PAD, 1.0f, true))
-                                        Pad->DespawnOrUnsummon();
-                                    CastCredit();
+                                        Pad->DespawnOrUnsummon(); 
                                     break;
                             }
                             break;
@@ -2522,6 +2523,7 @@ class npc_mekkatorque : public CreatureScript
                             {
                                 case 0:
                                     me->MonsterSay(MEK1_3_0, LANG_UNIVERSAL, NULL);
+                                    CastCredit();
                                     JumpToNextStep(7000);
                                     break;
                                 case 1:
@@ -2538,8 +2540,7 @@ class npc_mekkatorque : public CreatureScript
                                     break;
                                 case 4:
                                     if (Creature* Pad = me->FindNearestCreature(NPC_SUMMONING_PAD, 1.0f, true))
-                                        Pad->DespawnOrUnsummon();
-                                    CastCredit();
+                                        Pad->DespawnOrUnsummon(); 
                                     break;
                             }
                             break;
