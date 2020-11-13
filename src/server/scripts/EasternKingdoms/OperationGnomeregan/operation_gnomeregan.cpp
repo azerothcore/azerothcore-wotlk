@@ -1077,7 +1077,7 @@ class npc_og_mekkatorque : public CreatureScript
                         case 37:
                             if (uiTroggs <= 20)
                             {
-                                if (Creature* pTrogg = me->SummonCreature(NPC_I_TROGG, TroggSpawn, TEMPSUMMON_MANUAL_DESPAWN))
+                                if (me->SummonCreature(NPC_I_TROGG, TroggSpawn, TEMPSUMMON_MANUAL_DESPAWN))
                                     ++uiTroggs;
 
                                 switch (uiTroggs)
@@ -1093,7 +1093,7 @@ class npc_og_mekkatorque : public CreatureScript
                             }
                             else
                             {
-                                if (Creature* pGasherikk = me->SummonCreature(NPC_GASHERIKK, TroggSpawn, TEMPSUMMON_MANUAL_DESPAWN))
+                                if (me->SummonCreature(NPC_GASHERIKK, TroggSpawn, TEMPSUMMON_MANUAL_DESPAWN))
                                 {
                                     DoTalk(me, MEK_15_1, SOUND_MEK_15, true);
                                     ++uiStep;
