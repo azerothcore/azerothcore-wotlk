@@ -19,10 +19,12 @@
 
 #include "Group.h"
 #include "PassiveAI.h"
+#include "SpellInfo.h"
 #include "Player.h"
 #include "Vehicle.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "HostileRefManager.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
 #include "operation_gnomeregan.h"
