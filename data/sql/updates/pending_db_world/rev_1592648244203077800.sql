@@ -4,7 +4,8 @@ ALTER TABLE `player_factionchange_titles`
 	ADD `alliance_comment` TEXT AFTER `alliance_id`,
 	ADD `horde_comment` TEXT AFTER `horde_id`;
 	
-REPLACE INTO `player_factionchange_titles` (`alliance_id`, `alliance_comment`, `horde_id`, `horde_comment`) VALUES
+DELETE FROM `player_factionchange_titles` WHERE `alliance_id`IN (1,2,3,4,5,6,7,8,9,10,11,12,13,14,48,75,113,126,146,147,148,149) AND `horde_id` IN (15,16,17,18,19,20,21,22,23,24,25,26,27,28,47,76,153,127,152,154,151,150);
+INSERT INTO `player_factionchange_titles` (`alliance_id`, `alliance_comment`, `horde_id`, `horde_comment`) VALUES
 (1, "Private <name>", 15, "Scout <name>"),
 (2, "Corporal <name>", 16, "Grunt <name>"),
 (3, "Sergeant <name>", 17, "Sergeant <name>"),
