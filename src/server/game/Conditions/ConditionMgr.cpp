@@ -1799,6 +1799,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
                 sLog->outErrorDb("ConditionType (%u) has invalid state mask (%u), skipped.", cond->ConditionType, cond->ConditionValue2);
                 return false;
             }
+            break;
         case CONDITION_ACTIVE_EVENT:
             {
                 GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
