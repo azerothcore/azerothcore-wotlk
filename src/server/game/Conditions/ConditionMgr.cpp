@@ -365,12 +365,13 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             {
                 if (Player* player = object->ToPlayer())
                 {
+                    uint32 queststateConditionValue1 = player->GetQuestStatus(ConditionValue1);
                     if (
-                        ((ConditionValue2 & (1 << QUEST_STATUS_NONE)) && (player->GetQuestStatus(ConditionValue1) == QUEST_STATUS_NONE)) ||
-                        ((ConditionValue2 & (1 << QUEST_STATUS_COMPLETE)) && (player->GetQuestStatus(ConditionValue1) == QUEST_STATUS_COMPLETE)) ||
-                        ((ConditionValue2 & (1 << QUEST_STATUS_INCOMPLETE)) && (player->GetQuestStatus(ConditionValue1) == QUEST_STATUS_INCOMPLETE)) ||
-                        ((ConditionValue2 & (1 << QUEST_STATUS_FAILED)) && (player->GetQuestStatus(ConditionValue1) == QUEST_STATUS_FAILED)) ||
-                        ((ConditionValue2 & (1 << QUEST_STATUS_REWARDED)) && player->GetQuestRewardStatus(ConditionValue1))
+                        ((ConditionValue2 & (1 << QUEST_STATUS_NONE))       && (queststateConditionValue1 == QUEST_STATUS_NONE)) ||
+                        ((ConditionValue2 & (1 << QUEST_STATUS_COMPLETE))   && (queststateConditionValue1 == QUEST_STATUS_COMPLETE)) ||
+                        ((ConditionValue2 & (1 << QUEST_STATUS_INCOMPLETE)) && (queststateConditionValue1 == QUEST_STATUS_INCOMPLETE)) ||
+                        ((ConditionValue2 & (1 << QUEST_STATUS_FAILED))     && (queststateConditionValue1 == QUEST_STATUS_FAILED)) ||
+                        ((ConditionValue2 & (1 << QUEST_STATUS_REWARDED))   && player->GetQuestRewardStatus(ConditionValue1))
                         )
                     {
                         condMeets = true;
