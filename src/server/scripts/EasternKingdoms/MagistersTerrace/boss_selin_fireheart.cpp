@@ -106,10 +106,10 @@ public:
             events.ScheduleEvent(EVENT_SPELL_DRAIN_LIFE, 2500, 1);
             events.ScheduleEvent(EVENT_SPELL_FEL_EXPLOSION, 2000);
             events.ScheduleEvent(EVENT_DRAIN_CRYSTAL, 14000);
-            
+
             if (IsHeroic())
                 events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 7500, 1);
-         }
+        }
 
         void KilledUnit(Unit* victim)
         {

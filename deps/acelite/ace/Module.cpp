@@ -13,9 +13,13 @@
 #include "ace/Module.inl"
 #endif /* __ACE_INLINE__ */
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Module)
+ACE_ALLOC_HOOK_DEFINE_Tyc(ACE_Module)
 
 template <ACE_SYNCH_DECL, class TIME_POLICY> void
 ACE_Module<ACE_SYNCH_USE, TIME_POLICY>::dump (void) const
