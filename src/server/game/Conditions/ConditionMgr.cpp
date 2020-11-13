@@ -1783,7 +1783,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
                     sLog->outErrorDb("Quest condition specifies non-existing quest (%u), skipped", cond->ConditionValue1);
                     return false;
                 }
-              
+
                 if (cond->ConditionValue2 > 1)
                 {
                     sLog->outErrorDb("Quest condition has useless data in value2 (%u)!", cond->ConditionValue2);
