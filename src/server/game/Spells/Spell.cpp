@@ -4356,21 +4356,21 @@ void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo con
             break;
         case SPELL_FAILED_TOO_MANY_OF_ITEM:
         {
-             uint32 item = 0;
-             for (int8 eff = 0; eff < MAX_SPELL_EFFECTS; eff++)
-             {
-                 if (spellInfo->Effects[eff].ItemType)
-                 {
-                     item = spellInfo->Effects[eff].ItemType;
-                 }
+            uint32 item = 0;
+            for (int8 eff = 0; eff < MAX_SPELL_EFFECTS; eff++)
+            {
+                if (spellInfo->Effects[eff].ItemType)
+                {
+                    item = spellInfo->Effects[eff].ItemType;
+                }
 
-                 ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item);
-                 if (proto && proto->ItemLimitCategory)
-                 {
-                     data << uint32(proto->ItemLimitCategory);
-                 }
-             }
-             break;
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item);
+                if (proto && proto->ItemLimitCategory)
+                {
+                    data << uint32(proto->ItemLimitCategory);
+                }
+            }
+            break;
         }
         case SPELL_FAILED_CUSTOM_ERROR:
             data << uint32(customError);
