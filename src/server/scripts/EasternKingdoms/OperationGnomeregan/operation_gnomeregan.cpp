@@ -1550,7 +1550,7 @@ class npc_og_mekkatorque : public CreatureScript
                 }
             }
 
-            void SpellHit(Unit* pHitter, const SpellInfo* pSpell) override
+            void SpellHit(Unit* pHitter, SpellInfo const* pSpell) override
             {
                 if (pSpell->Id == SPELL_TRIGGER)
                 {
