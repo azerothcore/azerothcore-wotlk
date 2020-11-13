@@ -841,11 +841,11 @@ class npc_og_mekkatorque : public CreatureScript
                         break;
                     case 71:
                         // wtf?
-                        ;//me->SetReactState(REACT_AGGRESSIVE);
-                        if (Creature* pCogspin = me->FindNearestCreature(NPC_COGSPIN, 100.0f))
-                            ;//pCogspin->SetReactState(REACT_AGGRESSIVE);
-                        if (Creature* pFastblast = me->FindNearestCreature(NPC_FASTBLAST, 100.0f))
-                            ;//pFastblast->SetReactState(REACT_AGGRESSIVE);
+                        //me->SetReactState(REACT_AGGRESSIVE);
+                        //if (Creature* pCogspin = me->FindNearestCreature(NPC_COGSPIN, 100.0f))
+                            //pCogspin->SetReactState(REACT_AGGRESSIVE);
+                        //if (Creature* pFastblast = me->FindNearestCreature(NPC_FASTBLAST, 100.0f))
+                            //pFastblast->SetReactState(REACT_AGGRESSIVE);
                         SetHoldState(true);
                         break;
                     case 75:
