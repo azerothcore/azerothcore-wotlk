@@ -930,7 +930,7 @@ public:
         sLog->outString("Re-Loading Page Texts...");
         sObjectMgr->LoadPageTexts();
         handler->SendGlobalGMSysMessage("DB table `page_texts` reloaded.");
-        handler->SendNotification("You need to delete your client cache in order to see the changes.");
+        handler->GetSession()->SendNotification("You need to delete your client cache in order to see the changes.");
         return true;
     }
 
@@ -1132,7 +1132,7 @@ public:
         sLog->outString("Re-Loading Page Text Locale ... ");
         sObjectMgr->LoadPageTextLocales();
         handler->SendGlobalGMSysMessage("DB table `page_text_locale` reloaded.");
-        handler->SendNotification("You need to delete your client cache in order to see the changes.");
+        handler->GetSession()->SendNotification("You need to delete your client cache in order to see the changes.");
         return true;
     }
 
