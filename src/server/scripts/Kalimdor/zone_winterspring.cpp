@@ -71,11 +71,21 @@ public:
             changeEntry = me->GetEntry();
             switch (me->GetEntry())
             {
-                case NPC_SIMONE_NORMAL: changeEntry = NPC_SIMONE_EVIL; break;
-                case NPC_FRANKLIN_NORMAL: changeEntry = NPC_FRANKLIN_EVIL; break;
-                case NPC_ARTORIUS_NORMAL: changeEntry = NPC_ARTORIUS_EVIL; break;
-                case NPC_NELSON_NORMAL: changeEntry = NPC_NELSON_EVIL; break;
-                case NPC_PRECIOUS: changeEntry = NPC_PRECIOUS_EVIL; break;
+                case NPC_SIMONE_NORMAL:
+                    changeEntry = NPC_SIMONE_EVIL;
+                    break;
+                case NPC_FRANKLIN_NORMAL:
+                    changeEntry = NPC_FRANKLIN_EVIL;
+                    break;
+                case NPC_ARTORIUS_NORMAL:
+                    changeEntry = NPC_ARTORIUS_EVIL;
+                    break;
+                case NPC_NELSON_NORMAL:
+                    changeEntry = NPC_NELSON_EVIL;
+                    break;
+                case NPC_PRECIOUS:
+                    changeEntry = NPC_PRECIOUS_EVIL;
+                    break;
             }
         }
 
@@ -146,7 +156,7 @@ public:
         void UpdateAI(uint32 diff)
         {
             events.Update(diff);
-            uint32 eventId = events.GetEvent();
+            uint32 eventId = events.ExecuteEvent();
             if (eventId == EVENT_CHECK_PLAYER)
             {
                 Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
@@ -322,52 +332,52 @@ class DialogueHelper
 public:
     // The array MUST be terminated by {0, 0, 0}
     DialogueHelper(DialogueEntry const* dialogueArray) :
-      _dialogueArray(dialogueArray),
-          _currentEntry(NULL),
-          _actionTimer(0)
-      { }
-      // The array MUST be terminated by {0, 0, 0, 0, 0}
+        _dialogueArray(dialogueArray),
+        _currentEntry(nullptr),
+        _actionTimer(0)
+    { }
+    // The array MUST be terminated by {0, 0, 0, 0, 0}
 
-      /// Function to initialize the dialogue helper for instances. If not used with instances, GetSpeakerByEntry MUST be overwritten to obtain the speakers
-      /// Set if take first entries or second entries
+    /// Function to initialize the dialogue helper for instances. If not used with instances, GetSpeakerByEntry MUST be overwritten to obtain the speakers
+    /// Set if take first entries or second entries
 
-      void StartNextDialogueText(int32 textEntry)
-      {
-          // Find textEntry
-          bool found = false;
+    void StartNextDialogueText(int32 textEntry)
+    {
+        // Find textEntry
+        bool found = false;
 
-          for (DialogueEntry const* entry = _dialogueArray; entry->TextEntry; ++entry)
-          {
-              if (entry->TextEntry == textEntry)
-              {
-                  _currentEntry = entry;
-                  found = true;
-                  break;
-              }
-          }
+        for (DialogueEntry const* entry = _dialogueArray; entry->TextEntry; ++entry)
+        {
+            if (entry->TextEntry == textEntry)
+            {
+                _currentEntry = entry;
+                found = true;
+                break;
+            }
+        }
 
-          if (!found)
-              return;
+        if (!found)
+            return;
 
-          DoNextDialogueStep();
-      }
+        DoNextDialogueStep();
+    }
 
-      void DialogueUpdate(uint32 diff)
-      {
-          if (_actionTimer)
-          {
-              if (_actionTimer <= diff)
-                  DoNextDialogueStep();
-              else
-                  _actionTimer -= diff;
-          }
-      }
+    void DialogueUpdate(uint32 diff)
+    {
+        if (_actionTimer)
+        {
+            if (_actionTimer <= diff)
+                DoNextDialogueStep();
+            else
+                _actionTimer -= diff;
+        }
+    }
 
 protected:
     /// Will be called when a dialogue step was done
     virtual void JustDidDialogueStep(int32 /*entry*/) { }
     /// Will be called to get a speaker, MUST be implemented if not used in instances
-    virtual Creature* GetSpeakerByEntry(int32 /*entry*/) { return NULL; }
+    virtual Creature* GetSpeakerByEntry(int32 /*entry*/) { return nullptr; }
 
 private:
     void DoNextDialogueStep()
@@ -579,23 +589,23 @@ public:
                     SetEscortPaused(true);
                     break;
                 case 41:
-                {
-                    // Search for all nearest lights and respawn them
-                    std::list<GameObject*> eluneLights;
-                    GetGameObjectListWithEntryInGrid(eluneLights, me, GO_ELUNE_LIGHT, 20.0f);
-                    for (std::list<GameObject*>::const_iterator itr = eluneLights.begin(); itr != eluneLights.end(); ++itr)
                     {
-                        if ((*itr)->isSpawned())
-                            continue;
+                        // Search for all nearest lights and respawn them
+                        std::list<GameObject*> eluneLights;
+                        GetGameObjectListWithEntryInGrid(eluneLights, me, GO_ELUNE_LIGHT, 20.0f);
+                        for (std::list<GameObject*>::const_iterator itr = eluneLights.begin(); itr != eluneLights.end(); ++itr)
+                        {
+                            if ((*itr)->isSpawned())
+                                continue;
 
-                        (*itr)->SetRespawnTime(115);
-                        (*itr)->Refresh();
+                            (*itr)->SetRespawnTime(115);
+                            (*itr)->Refresh();
+                        }
+
+                        if (GameObject* altar = me->GetMap()->GetGameObject(_altarGUID))
+                            me->SetFacingToObject(altar);
+                        break;
                     }
-
-                    if (GameObject* altar = me->GetMap()->GetGameObject(_altarGUID))
-                        me->SetFacingToObject(altar);
-                    break;
-                }
                 case 42:
                     // Summon the 2 priestess
                     SetEscortPaused(true);
@@ -724,7 +734,7 @@ public:
                 case NPC_PRIESTESS_DATA_2:
                     return me->GetMap()->GetCreature(_secondPriestessGUID);
                 default:
-                    return NULL;
+                    return nullptr;
             }
 
         }

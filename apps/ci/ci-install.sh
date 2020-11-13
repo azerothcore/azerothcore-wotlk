@@ -3,11 +3,12 @@
 set -e
 
 cat >>conf/config.sh <<CONFIG_SH
-MTHREADS=$(expr $(grep -c ^processor /proc/cpuinfo) + 2)
+MTHREADS=$(($(grep -c ^processor /proc/cpuinfo) + 2))
 CWARNINGS=ON
 CDEBUG=OFF
 CTYPE=Release
 CSCRIPTS=ON
+CUNIT_TESTS=ON
 CSERVERS=ON
 CTOOLS=ON
 CSCRIPTPCH=OFF
@@ -24,6 +25,27 @@ time sudo apt-get install -y git lsb-release sudo ccache
 time ./acore.sh install-deps
 
 case $COMPILER in
+
+  # this is in order to use the "default" gcc version of the OS, without forcing a specific version
+  "gcc" )
+    time sudo apt-get install -y gcc g++
+    echo "CCOMPILERC=\"gcc\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"g++\"" >> ./conf/config.sh
+    ;;
+
+  "gcc10" )
+    time sudo apt-get install -y gcc-10 g++-10
+    echo "CCOMPILERC=\"gcc-10\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"g++-10\"" >> ./conf/config.sh
+    ;;
+
+  # this is in order to use the "default" clang version of the OS, without forcing a specific version
+  "clang" )
+    time sudo apt-get install -y clang
+    echo "CCOMPILERC=\"clang\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"clang++\"" >> ./conf/config.sh
+    ;;
+
   "clang6" )
     time sudo apt-get install -y clang-6.0
     echo "CCOMPILERC=\"clang-6.0\"" >> ./conf/config.sh
@@ -40,8 +62,6 @@ case $COMPILER in
     time sudo apt-get install -y clang-10
     echo "CCOMPILERC=\"clang-10\"" >> ./conf/config.sh
     echo "CCOMPILERCXX=\"clang++-10\"" >> ./conf/config.sh
-    # disable -Werror for clang-10 TODO: remove when this is fixed https://github.com/azerothcore/azerothcore-wotlk/issues/3108
-    echo "CCUSTOMOPTIONS='-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'" >> ./conf/config.sh
     ;;
 
   * )

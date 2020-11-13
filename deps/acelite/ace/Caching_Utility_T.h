@@ -43,7 +43,6 @@ template <class KEY, class VALUE, class CONTAINER, class ITERATOR, class ATTRIBU
 class ACE_Pair_Caching_Utility : private ACE_Copy_Disabled
 {
 public:
-
   typedef ACE_Cleanup_Strategy<KEY, VALUE, CONTAINER> CLEANUP_STRATEGY;
 
   /// Constructor.
@@ -91,9 +90,7 @@ protected:
 template <class KEY, class VALUE, class CONTAINER, class ITERATOR, class ATTRIBUTES>
 class ACE_Recyclable_Handler_Caching_Utility : private ACE_Copy_Disabled
 {
-
 public:
-
   typedef ACE_Recyclable_Handler_Cleanup_Strategy<KEY, VALUE, CONTAINER> CLEANUP_STRATEGY;
   typedef ACE_Cleanup_Strategy<KEY, VALUE, CONTAINER> CLEANUP_STRATEGY_BASE;
 
@@ -202,7 +199,6 @@ template <class KEY, class VALUE, class CONTAINER, class ITERATOR, class ATTRIBU
 class ACE_Handler_Caching_Utility : private ACE_Copy_Disabled
 {
 public:
-
   typedef ACE_Handler_Cleanup_Strategy<KEY, VALUE, CONTAINER> CLEANUP_STRATEGY;
   typedef ACE_Cleanup_Strategy<KEY, VALUE, CONTAINER> CLEANUP_STRATEGY_BASE;
 
@@ -257,7 +253,6 @@ template <class KEY, class VALUE, class CONTAINER, class ITERATOR, class ATTRIBU
 class ACE_Null_Caching_Utility : private ACE_Copy_Disabled
 {
 public:
-
   typedef ACE_Null_Cleanup_Strategy<KEY, VALUE, CONTAINER> CLEANUP_STRATEGY;
   typedef ACE_Cleanup_Strategy<KEY, VALUE, CONTAINER> CLEANUP_STRATEGY_BASE;
 

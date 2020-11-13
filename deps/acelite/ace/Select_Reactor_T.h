@@ -4,7 +4,7 @@
 /**
  *  @file    Select_Reactor_T.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -53,9 +53,6 @@ template <class ACE_SELECT_REACTOR_TOKEN>
 class ACE_Select_Reactor_T : public ACE_Select_Reactor_Impl
 {
 public:
-
-  // = Initialization and termination methods.
-
   /// If @a disable_notify_pipe is non-0 then the reactor will
   /// not create a notification pipe, which will save two I/O handles
   /// but will elide the notify() feature.  If @a mask_signals is
@@ -220,7 +217,6 @@ public:
                                 ACE_Reactor_Mask mask);
 
 #if defined (ACE_WIN32)
-
   // Originally this interface was available for all platforms, but
   // because ACE_HANDLE is an int on non-Win32 platforms, compilers
   // are not able to tell the difference between
@@ -231,7 +227,6 @@ public:
   /// Not implemented.
   virtual int register_handler (ACE_Event_Handler *event_handler,
                                 ACE_HANDLE event_handle = ACE_INVALID_HANDLE);
-
 #endif /* ACE_WIN32 */
 
   /// Not implemented.
@@ -432,9 +427,9 @@ public:
 
   /**
    * Set the maximum number of times that the
-   * <ACE_Select_Reactor_Notify::handle_input> method will iterate and
+   * ACE_Select_Reactor_Notify::handle_input() method will iterate and
    * dispatch the ACE_Event_Handlers that are passed in via the
-   * notify pipe before breaking out of its <recv> loop.  By default,
+   * notify pipe before breaking out of its recv loop.  By default,
    * this is set to -1, which means "iterate until the pipe is empty."
    * Setting this to a value like "1 or 2" will increase "fairness"
    * (and thus prevent starvation) at the expense of slightly higher
@@ -444,9 +439,9 @@ public:
 
   /**
    * Get the maximum number of times that the
-   * <ACE_Select_Reactor_Notify::handle_input> method will iterate and
+   * ACE_Select_Reactor_Notify::handle_input() method will iterate and
    * dispatch the ACE_Event_Handlers that are passed in via the
-   * notify pipe before breaking out of its <recv> loop.
+   * notify pipe before breaking out of its recv loop.
    */
   virtual int max_notify_iterations (void);
 

@@ -60,23 +60,23 @@ class Warden;
 
 class WardenWin : public Warden
 {
-    public:
-        WardenWin();
-        ~WardenWin();
+public:
+    WardenWin();
+    ~WardenWin();
 
-        void Init(WorldSession* session, BigNumber* K);
-        ClientWardenModule* GetModuleForClient();
-        void InitializeModule();
-        void RequestHash();
-        void HandleHashResult(ByteBuffer &buff);
-        void RequestData();
-        void HandleData(ByteBuffer &buff);
+    void Init(WorldSession* session, BigNumber* K);
+    ClientWardenModule* GetModuleForClient();
+    void InitializeModule();
+    void RequestHash();
+    void HandleHashResult(ByteBuffer& buff);
+    void RequestData();
+    void HandleData(ByteBuffer& buff);
 
-    private:
-        uint32 _serverTicks;
-        std::list<uint16> _otherChecksTodo;
-        std::list<uint16> _memChecksTodo;
-        std::list<uint16> _currentChecks;
+private:
+    uint32 _serverTicks;
+    std::list<uint16> _otherChecksTodo;
+    std::list<uint16> _memChecksTodo;
+    std::list<uint16> _currentChecks;
 };
 
 #endif
