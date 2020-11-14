@@ -4,12 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef __TRINITY_SOCIALMGR_H
-#define __TRINITY_SOCIALMGR_H
+#ifndef __ACORE_SOCIALMGR_H
+#define __ACORE_SOCIALMGR_H
 
-#include <ace/Singleton.h>
-#include "DatabaseEnv.h"
 #include "Common.h"
+#include "DatabaseEnv.h"
 
 class SocialMgr;
 class PlayerSocial;
@@ -90,49 +89,49 @@ enum FriendsResult
 class PlayerSocial
 {
     friend class SocialMgr;
-    public:
-        PlayerSocial();
-        ~PlayerSocial();
-        // adding/removing
-        bool AddToSocialList(uint32 friend_guid, bool ignore);
-        void RemoveFromSocialList(uint32 friend_guid, bool ignore);
-        void SetFriendNote(uint32 friendGuid, std::string note);
-        // Packet send's
-        void SendSocialList(Player* player);
-        // Misc
-        bool HasFriend(uint32 friend_guid) const;
-        bool HasIgnore(uint32 ignore_guid) const;
-        uint32 GetPlayerGUID() const { return m_playerGUID; }
-        void SetPlayerGUID(uint32 guid) { m_playerGUID = guid; }
-        uint32 GetNumberOfSocialsWithFlag(SocialFlag flag) const;
-    private:
-        PlayerSocialMap m_playerSocialMap;
-        uint32 m_playerGUID;
+public:
+    PlayerSocial();
+    ~PlayerSocial();
+    // adding/removing
+    bool AddToSocialList(uint32 friend_guid, bool ignore);
+    void RemoveFromSocialList(uint32 friend_guid, bool ignore);
+    void SetFriendNote(uint32 friendGuid, std::string note);
+    // Packet send's
+    void SendSocialList(Player* player);
+    // Misc
+    bool HasFriend(uint32 friend_guid) const;
+    bool HasIgnore(uint32 ignore_guid) const;
+    uint32 GetPlayerGUID() const { return m_playerGUID; }
+    void SetPlayerGUID(uint32 guid) { m_playerGUID = guid; }
+    uint32 GetNumberOfSocialsWithFlag(SocialFlag flag) const;
+private:
+    PlayerSocialMap m_playerSocialMap;
+    uint32 m_playerGUID;
 };
 
 class SocialMgr
 {
-    friend class ACE_Singleton<SocialMgr, ACE_Null_Mutex>;
+private:
+    SocialMgr();
+    ~SocialMgr();
 
-    private:
-        SocialMgr();
-        ~SocialMgr();
+public:
+    static SocialMgr* instance();
 
-    public:
-        // Misc
-        void RemovePlayerSocial(uint32 guid) { m_socialMap.erase(guid); }
+    // Misc
+    void RemovePlayerSocial(uint32 guid) { m_socialMap.erase(guid); }
 
-        void GetFriendInfo(Player* player, uint32 friendGUID, FriendInfo &friendInfo);
-        // Packet management
-        void MakeFriendStatusPacket(FriendsResult result, uint32 friend_guid, WorldPacket* data);
-        void SendFriendStatus(Player* player, FriendsResult result, uint32 friend_guid, bool broadcast);
-        void BroadcastToFriendListers(Player* player, WorldPacket* packet);
-        // Loading
-        PlayerSocial *LoadFromDB(PreparedQueryResult result, uint32 guid);
-    private:
-        SocialMap m_socialMap;
+    void GetFriendInfo(Player* player, uint32 friendGUID, FriendInfo& friendInfo);
+    // Packet management
+    void MakeFriendStatusPacket(FriendsResult result, uint32 friend_guid, WorldPacket* data);
+    void SendFriendStatus(Player* player, FriendsResult result, uint32 friend_guid, bool broadcast);
+    void BroadcastToFriendListers(Player* player, WorldPacket* packet);
+    // Loading
+    PlayerSocial* LoadFromDB(PreparedQueryResult result, uint32 guid);
+private:
+    SocialMap m_socialMap;
 };
 
-#define sSocialMgr ACE_Singleton<SocialMgr, ACE_Null_Mutex>::instance()
-#endif
+#define sSocialMgr SocialMgr::instance()
 
+#endif

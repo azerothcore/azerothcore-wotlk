@@ -28,6 +28,10 @@
 #  include /**/ <sys/socket.h>
 #endif /* !ACE_LACKS_SYS_SOCKET_H */
 
+#if defined (ACE_USES_SOCKET_H)
+#  include /**/ <socket.h>
+#endif /* ACE_USES_SOCKET_H */
+
 #if defined (ACE_USES_SOCKLIB_H)
 #  include /**/ <sockLib.h>
 #endif /* ACE_USES_SOCKLIB_H */
@@ -73,7 +77,7 @@ extern "C"
    struct msghdr
    {
      /// Optional address
-     sockaddr * msg_name;
+     sockaddr *msg_name;
 
      /// Size of address
      int msg_namelen;
@@ -88,8 +92,48 @@ extern "C"
      caddr_t msg_accrights;
 
      int msg_accrightslen;
+
+     /// Control messages, set msg_control to 0 if not using:
+     void *msg_control;
+     int msg_controllen;
    };
+
+   typedef WSACMSGHDR cmsghdr;
 #endif /* ACE_WIN32 */
+
+   // Using msghdr::msg_control and msghdr::msg_controllen portably:
+   // For a parameter of size n, reserve space for ACE_CMSG_SPACE(n) bytes.
+   // This can be extended to the sum of ACE_CMSG_SPACE(n_i) for multiple
+   // parameters.
+   // Pass that buffer's address and length as msg_control/msg_controllen when
+   // invoking sendmsg/recvmsg.  The buffer's address must be aligned to hold an
+   // object of type cmsghdr at the beginning of the buffer.
+   // If the send or recv succeeds, examine the
+   // resulting cmsg structure using the following macros with signatures:
+   // cmsghdr *ACE_CMSG_FIRSTHDR(msghdr *m)
+   // cmsghdr *ACE_CMSG_NXTHDR(msghdr *m, cmsghdr *c)
+   // unsigned char *ACE_CMSG_DATA(cmsghdr *c)
+
+#ifdef ACE_WIN32
+#  define ACE_CMSG_SPACE WSA_CMSG_SPACE
+#  define ACE_CMSG_FIRSTHDR(msg)                                \
+     (((unsigned) (msg)->msg_controllen >= sizeof (WSACMSGHDR)) \
+      ? (LPWSACMSGHDR) (msg)->msg_control : (LPWSACMSGHDR) 0)
+#  define ACE_CMSG_NXTHDR(msg, cmsg)                               \
+      (((cmsg) == 0) ? ACE_CMSG_FIRSTHDR (msg)                     \
+       : ((((PUCHAR) (cmsg) + WSA_CMSGHDR_ALIGN ((cmsg)->cmsg_len) \
+            + sizeof (WSACMSGHDR)) > (PUCHAR) ((msg)->msg_control) \
+           + (msg)->msg_controllen)                                \
+          ? (LPWSACMSGHDR) 0                                       \
+          : (LPWSACMSGHDR) ((PUCHAR) (cmsg)                        \
+                           + WSA_CMSGHDR_ALIGN ((cmsg)->cmsg_len))))
+#  define ACE_CMSG_DATA WSA_CMSG_DATA
+#else
+#  define ACE_CMSG_SPACE CMSG_SPACE
+#  define ACE_CMSG_FIRSTHDR CMSG_FIRSTHDR
+#  define ACE_CMSG_NXTHDR CMSG_NXTHDR
+#  define ACE_CMSG_DATA CMSG_DATA
+#endif
 
 #if defined (ACE_HAS_4_4BSD_SENDMSG_RECVMSG)
    // Control message size to pass a file descriptor.
@@ -215,6 +259,7 @@ extern "C"
 #define ACE_HAS_SOCK_BUF_SIZE_MAX_VALUE SSIZE_MAX
 #endif /* ACE_HAS_SOCK_BUF_SIZE_MAX_VALUE */
 
+#if !defined (ACE_SOCKET_LEN)
 #if defined (ACE_HAS_SOCKLEN_T)
 #  if defined (__hpux)
   /*
@@ -240,6 +285,7 @@ typedef size_t ACE_SOCKET_LEN;
 #else
 typedef int ACE_SOCKET_LEN;
 #endif /* ACE_HAS_SIZET_SOCKET_LEN */
+#endif /* ACE_SOCKET_LEN */
 
 #if defined (ACE_HAS_NETLINK)
 #  include /**/ <asm/types.h>

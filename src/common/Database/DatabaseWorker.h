@@ -14,17 +14,17 @@ class MySQLConnection;
 
 class DatabaseWorker : protected ACE_Task_Base
 {
-    public:
-        DatabaseWorker(ACE_Activation_Queue* new_queue, MySQLConnection* con);
+public:
+    DatabaseWorker(ACE_Activation_Queue* new_queue, MySQLConnection* con);
 
-        ///- Inherited from ACE_Task_Base
-        int svc();
-        int wait() { return ACE_Task_Base::wait(); }
+    ///- Inherited from ACE_Task_Base
+    int svc();
+    int wait() { return ACE_Task_Base::wait(); }
 
-    private:
-        DatabaseWorker() : ACE_Task_Base() { }
-        ACE_Activation_Queue* m_queue;
-        MySQLConnection* m_conn;
+private:
+    DatabaseWorker() : ACE_Task_Base() { }
+    ACE_Activation_Queue* m_queue;
+    MySQLConnection* m_conn;
 };
 
 #endif

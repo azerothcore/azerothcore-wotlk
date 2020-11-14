@@ -140,7 +140,7 @@ public:
                             me->CastSpell(me, SPELL_OVERLOAD, true);
                             return;
                         }
-                            
+
                         Talk(SAY_ENERGY);
                         Talk(EMOTE_DISCHARGE_ENERGY);
 
