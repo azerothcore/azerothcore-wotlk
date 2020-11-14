@@ -1325,7 +1325,7 @@ class npc_og_mekkatorque : public CreatureScript
             }
 
             void HandleDecorByPhase(Creature* me, int8 p) {
-                return;
+                /*
                 switch (p)
                 {
                 case 1: // INTRO
@@ -1379,6 +1379,7 @@ class npc_og_mekkatorque : public CreatureScript
                     decor_p6 = true;
                     break;
                 }
+                */
             };
 
             void JustDied(Unit* /*who*/) override
