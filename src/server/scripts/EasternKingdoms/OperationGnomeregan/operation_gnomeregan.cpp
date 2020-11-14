@@ -2288,6 +2288,7 @@ class npc_steamcrank : public CreatureScript
                         case 6:
                             ForceEmote(EMOTE_ONESHOT_NONE);
                             JumpToNextStep(3000);
+                            break;
                         case 7:
                             me->MonsterSay(STEAM_5, LANG_UNIVERSAL, NULL);
                             JumpToNextStep(5000);
