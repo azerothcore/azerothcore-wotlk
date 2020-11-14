@@ -1324,7 +1324,7 @@ class npc_og_mekkatorque : public CreatureScript
                 DoMeleeAttackIfReady();
             }
 
-            void HandleDecorByPhase(Creature* me, int8 p) {
+            void HandleDecorByPhase(Creature* /*me*/, int8 /*p*/) {
                 /*
                 switch (p)
                 {
