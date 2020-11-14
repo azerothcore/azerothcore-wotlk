@@ -19,7 +19,7 @@ DatabaseWorkerPool<T>::DatabaseWorkerPool() :
     _connections.resize(IDX_SIZE);
 
     WPFatal(mysql_thread_safe(), "Used MySQL library isn't thread-safe.");
-    //WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "AzerothCore does not support MySQL versions below 5.6");
+    WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "AzerothCore does not support MySQL versions below 5.6");
 }
 
 template <class T>
@@ -37,8 +37,8 @@ bool DatabaseWorkerPool<T>::Open(const std::string& infoString, uint8 async_thre
     {
         T* t = new T(_queue, _connectionInfo);
         res &= t->Open();
-        //if (res) // only check mysql version if connection is valid
-            //WPFatal(mysql_get_server_version(t->GetHandle()) >= MIN_MYSQL_SERVER_VERSION, "AzerothCore does not support MySQL versions below 5.6");
+        if (res) // only check mysql version if connection is valid
+            WPFatal(mysql_get_server_version(t->GetHandle()) >= MIN_MYSQL_SERVER_VERSION, "AzerothCore does not support MySQL versions below 5.6");
 
         _connections[IDX_ASYNC][i] = t;
         ++_connectionCount[IDX_ASYNC];
