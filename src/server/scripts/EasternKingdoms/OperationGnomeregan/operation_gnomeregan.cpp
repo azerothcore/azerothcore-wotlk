@@ -1699,8 +1699,9 @@ typedef npc_og_mekkatorque::npc_og_mekkatorqueAI MekkAI;
             return true;
         }
 
-        void InitializeDecorations(Creature* me) {
-
+        void InitializeDecorations(Creature* /*me*/)
+        {
+            /*
             // Player "spawn" platform - from where they land off the helicopter
             // -- plr spawn platform
             me->SummonGameObject(GO_PLR_LANDING_PLATFORM, -5434.71f, 523.177f, 386.959f, 0.575957f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
@@ -1716,6 +1717,7 @@ typedef npc_og_mekkatorque::npc_og_mekkatorqueAI MekkAI;
             // Spawn all hazard lights
             for (int8 n = 0; n < 20; ++n)
                 me->SummonGameObject(GO_HAZ_LIGHT, decor_beginning_hazard_lights[n].m_positionX, decor_beginning_hazard_lights[n].m_positionY, decor_beginning_hazard_lights[n].m_positionZ, decor_beginning_hazard_lights[n].m_orientation, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
+            */
         }
 
         private:
