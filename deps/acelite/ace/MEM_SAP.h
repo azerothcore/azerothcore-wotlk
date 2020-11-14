@@ -72,8 +72,6 @@ public:
 class ACE_Export ACE_MEM_SAP
 {
 public:
-  // = Initialization and termination methods.
-
   typedef ACE_Malloc_T<ACE_MMAP_MEMORY_POOL, ACE_Process_Mutex, ACE_PI_Control_Block> MALLOC_TYPE;
   typedef ACE_MMAP_Memory_Pool_Options MALLOC_OPTIONS;
 

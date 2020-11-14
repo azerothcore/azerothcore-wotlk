@@ -5,6 +5,11 @@
 #include "ace/OS_NS_macros.h"
 #include "ace/OS_Memory.h"
 #include "ace/OS_QoS.h"
+#include "ace/Global_Macros.h"
+
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -107,13 +112,20 @@ ACE_OS::ioctl (ACE_HANDLE handle,
                void *val)
 {
   ACE_OS_TRACE ("ACE_OS::ioctl");
-
-#if defined (ACE_WIN32)
+#if defined (ACE_LACKS_IOCTL)
+  ACE_UNUSED_ARG (handle);
+  ACE_UNUSED_ARG (cmd);
+  ACE_UNUSED_ARG (val);
+  ACE_NOTSUP_RETURN (-1);
+#elif defined (ACE_WIN32)
   ACE_SOCKET sock = (ACE_SOCKET) handle;
   ACE_SOCKCALL_RETURN (::ioctlsocket (sock, cmd, reinterpret_cast<unsigned long *> (val)), int, -1);
 #elif defined (ACE_HAS_IOCTL_INT_3_PARAM)
   ACE_OSCALL_RETURN (::ioctl (handle, cmd, reinterpret_cast<int> (val)),
                      int, -1);
+#elif defined (ACE_MQX)
+  // TBD: See if there is a way to provide this functionality
+  ACE_NOTSUP_RETURN (0);
 #else
   ACE_OSCALL_RETURN (::ioctl (handle, cmd, val), int, -1);
 #endif /* ACE_WIN32 */
@@ -165,11 +177,20 @@ ACE_OS::putmsg (ACE_HANDLE handle, const struct strbuf *ctl,
     {
       // This is the hard case.
       char *buf;
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_ALLOCATOR_RETURN (buf, static_cast<char*>(ACE_Allocator::instance()->malloc(sizeof(char) * (ctl->len + data->len))), -1);
+#else
       ACE_NEW_RETURN (buf, char [ctl->len + data->len], -1);
+#endif /* ACE_HAS_ALLOC_HOOKS */
       ACE_OS::memcpy (buf, ctl->buf, ctl->len);
       ACE_OS::memcpy (buf + ctl->len, data->buf, data->len);
       result = ACE_OS::write (handle, buf, ctl->len + data->len);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_Allocator::instance()->free(buf);
+#else
       delete [] buf;
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
       return static_cast<int> (result);
     }
 #endif /* ACE_HAS_STREAM_PIPES */
