@@ -998,13 +998,10 @@ class npc_og_mekkatorque : public CreatureScript
                             JumpToNextStep(3000);
                             break;
                         case 20:
-                            if(!ValidateEscortState())
-                                uiStep_timer = 2000;
-                            else
-                                SetHoldState(false);
+                            SetHoldState(false);
                             break;
                         case 22:
-                            if (!ValidateEscortState() || me->FindNearestCreature(NPC_CANNON, 100.0f, true))
+                            if (me->FindNearestCreature(NPC_CANNON, 100.0f, true))
                             {
                                 uiStep_timer = 2000;
                                 return;
@@ -1104,13 +1101,8 @@ class npc_og_mekkatorque : public CreatureScript
                             SetHoldState(false);
                             break;
                         case 41:
-                            if(!ValidateEscortState())
-                                uiStep_timer = 2000;
-                            else
-                            {
-                                PartyCast(SPELL_PARACHUTE);
-                                SetHoldState(false);
-                            }
+                            PartyCast(SPELL_PARACHUTE);
+                            SetHoldState(false);
                             break;
                         case 43:
                             SetHoldState(false);
@@ -1590,23 +1582,7 @@ class npc_og_mekkatorque : public CreatureScript
                                 pPlayer->SendUpdateWorldState(Worldstates[n], 0);
                     }
                 }
-            }
-
-            bool ValidateEscortState()
-            {
-                // @todo
-                return true;
-                if (bControlWP_1) sLog->outString("bControlWP_1"); else sLog->outString("!bControlWP_1");
-                if (bControlWP_2) sLog->outString("bControlWP_2"); else sLog->outString("!bControlWP_2");
-                if (!bControlWP_1 || !bControlWP_2)
-                    return false;
-                else
-                {
-                    bControlWP_1 = false;
-                    bControlWP_2 = false;
-                    return true;
-                }
-            }
+            } 
 
             void UpdateBannerState(float radius)
             {
@@ -2450,16 +2426,16 @@ class npc_mekkatorque : public CreatureScript
                             switch (_step)
                             {
                                 case 0:
-                                    me->MonsterSay(MEK1_1_0, LANG_UNIVERSAL, NULL);
+                                    me->AI()->Talk(MEK1_0_0);
                                     CastCredit();
                                     JumpToNextStep(5000);
                                     break;
                                 case 1:
-                                    me->MonsterSay(MEK1_1_1, LANG_UNIVERSAL, NULL);
+                                    me->AI()->Talk(MEK1_0_1);
                                     JumpToNextStep(5000);
                                     break;
                                 case 2:
-                                    _listener->MonsterSay(LIS1_1_0, LANG_UNIVERSAL, NULL);
+                                    _listener->AI()->Talk(MEK1_REPLY);
                                     JumpToNextStep(3000);
                                     break;
                                 case 3:
@@ -2472,20 +2448,20 @@ class npc_mekkatorque : public CreatureScript
                             switch (_step)
                             {
                                 case 0:
-                                    me->MonsterSay(MEK1_2_0, LANG_UNIVERSAL, NULL);
+                                    me->AI()->Talk(MEK1_0_2);
                                     CastCredit();
                                     JumpToNextStep(5000);
                                     break;
                                 case 1:
-                                    me->MonsterSay(MEK1_2_1, LANG_UNIVERSAL, NULL);
+                                    me->AI()->Talk(MEK1_0_3);
                                     JumpToNextStep(5000);
                                     break;
                                 case 2:
-                                    me->MonsterSay(MEK1_2_2, LANG_UNIVERSAL, NULL);
+                                    me->AI()->Talk(MEK1_0_4);
                                     JumpToNextStep(5000);
                                     break;
                                 case 3:
-                                    _listener->MonsterSay(LIS1_2_0, LANG_UNIVERSAL, NULL);
+                                    _listener->AI()->Talk(MEK1_REPLY);
                                     JumpToNextStep(3000);
                                     break;
                                 case 4:
@@ -2498,20 +2474,20 @@ class npc_mekkatorque : public CreatureScript
                             switch (_step)
                             {
                                 case 0:
-                                    me->MonsterSay(MEK1_3_0, LANG_UNIVERSAL, NULL);
+                                    me->AI()->Talk(MEK1_0_5);
                                     CastCredit();
                                     JumpToNextStep(7000);
                                     break;
                                 case 1:
-                                    me->MonsterSay(MEK1_3_1, LANG_UNIVERSAL, NULL);
+                                    me->AI()->Talk(MEK1_0_6);
                                     JumpToNextStep(3000);
                                     break;
                                 case 2:
-                                    me->MonsterSay(MEK1_3_2, LANG_UNIVERSAL, NULL);
+                                    me->AI()->Talk(MEK1_0_7);
                                     JumpToNextStep(3000);
                                     break;
                                 case 3:
-                                    _listener->MonsterSay(LIS1_3_0, LANG_UNIVERSAL, NULL);
+                                    _listener->AI()->Talk(MEK1_REPLY);
                                     JumpToNextStep(3000);
                                     break;
                                 case 4:

@@ -386,117 +386,119 @@ const Position TroggSpawn               = {-5181.74f, 631.21f, 398.54f, 4.7f};
 
 const Position ExplosionBunnySpawn      = {-5183.24f, 608.97f, 410.89f, 4.7f};
 
-//#define SOUND_NAME            soundID // Duration
-#define MEK1_1_0    "They may take our lives, but they'll never take..."
-#define MEK1_1_1    "...our INNOVATION!"
-#define LIS1_1_0    "What? I don't even know what you're talking about! That's terrible!"
-#define MEK1_2_0    "We will not go quietly into the night! We will not vanish without a fight!"
-#define MEK1_2_1    "We're going to live on! We're going to survive! Today we celebrate..."
-#define MEK1_2_2    "...our Autonomy Day!"
-#define LIS1_2_0    "Horrible! Well, all right, maybe it just needs a little cleaning up?"
-#define MEK1_3_0    "What I want out of each and every one of you is a hard-target search of every refuelling station, residence, warehouse, farmhouse, henhouse, outhouse and doghouse in this area."
-#define MEK1_3_1    "Your fugitive's name is Mekgineer Thermaplugg."
-#define MEK1_3_2    "Go get him."
-#define LIS1_3_0    "Hmm, I suppose it could work.  But it could really use a little more umph!"
+// Texts in Prepping the Speech 
+enum MEK_T
+{
+    MEK1_0_0 = 0,
+    MEK1_0_1,
+    MEK1_0_2, 
+    MEK1_0_3, 
+    MEK1_0_4, 
+    MEK1_0_5, 
+    MEK1_0_6, 
+    MEK1_0_7,
 
+    MEK1_REPLY = 0,
+};
 
+enum STEAM_Texts
+{
+    STEAM_0 = 0,
+    STEAM_1,
+    STEAM_2,
+    STEAM_3,
+    STEAM_4,
+    STEAM_5,
+    STEAM_6,
+    STEAM_7,
+    STEAM_8,
+    STEAM_9,
+    STEAM_10,
+    STEAM_11,
+    STEAM_12,
+    STEAM_13,
+    STEAM_14,
+    STEAM_15,
+    STEAM_16,
+    STEAM_17,
+    STEAM_18,
+};
 
-#define STEAM_0 "Well, a bunch of useless gears, let's get to work!"
-#define STEAM_1 "I will teach you everything you must know how to be a real soldier!"
-#define STEAM_2 "First of all, you need to go drill."
-#define STEAM_3 "At the signal, show me how to welcome the commander for the charter!"
-#define STEAM_4 "So recruits saluted his commander!"
-#define STEAM_5 "Great job!"
-#define STEAM_6 "On the battlefield, it is important to intimidate the enemy furious battle roar!"
-#define STEAM_7 "As soon as I give the signal, show me what real fury!"
-#define STEAM_8 "Show me now furious!"
-#define STEAM_9 "Wow, nice!"
-#define STEAM_10 "Remember that the most important factor in any battle - is the spirit!"
-#define STEAM_11 "Get ready to show me how the soldiers should be happy to win!"
-#define STEAM_12 "Let's! Express your enthusiasm!"
-#define STEAM_13 "Terrific!"
-#define STEAM_14 "However, the most important in the battle - to be able to correctly mark earned sweat and blood of victory!"
-#define STEAM_15 "Execute me your best victory dance! Start the alarm!"
-#define STEAM_16 "And now - dance!"
-#define STEAM_17 "Great!"
-#define STEAM_18 "You - are the best squad of recruits that I have ever seen Let's repeat everything!"
-
-
-#define MEK_1_1                 "Граждане и друзья Гномрегана!"
-#define MEK_1_2                 "Сегодня мы отвоюем у подлого предателя Термоштепселя наш славный город!"
-#define MEK_1_3                 "Встанем плечом к плечу в битве за родину!"
+#define MEK_1_1                 "Citizens and Friends of Gnomeregan!"
+#define MEK_1_2                 "Today we could wrest from the vile traitor Thermaplugg our glorious city!"
+#define MEK_1_3                 "Will stand shoulder to shoulder in the battle for the motherland!"
 #define SOUND_MEK_1             17535 // 17150
-#define MEK_2_1                 "Наш народ познал достаточно мук и унижений. Мы были изгоями, рабами, тянущими ярмо боевой машины безумца!"
+#define MEK_2_1                 "Our people have learned enough anguish and humiliation. We were outcasts, slaves pulling the yoke of a madman fighting machine!"
 #define SOUND_MEK_2             17536 // 12200
-#define MEK_3_1                 "Правлению Термоштепселя приходит конец!"
-#define MEK_3_2                 "Объявляю общий сбор!"
+#define MEK_3_1                 "Board Thermaplugg comes to an end!"
+#define MEK_3_2                 "Declare the total collection!"
 #define SOUND_MEK_3             17537 // 7050
-#define MEK_4_1                 "Военная тактика и научный прогресс, вкупе с нашей решимостью, приведут нас к победе!"
-#define MEK_4_2                 "Начинаем наступление!"
+#define MEK_4_1                 "Military tactics and scientific progress, coupled with our determination to lead us to victory!"
+#define MEK_4_2                 "Getting the offensive!"
 #define SOUND_MEK_4             17538 // 10180
-#define MEK_5_1                 "Операция 'Гномреган' НАЧИНАЕТСЯ!"
-#define MEK_5_2                 "Первый этап: захват аэродрома."
-#define MEK_5_3                 "Уничтожтье ракетомёты врага, и мы получим превосходство в воздухе!"
+#define MEK_5_1                 "Operation 'Gnomeregan' BEGINS!"
+#define MEK_5_2                 "First step: the capture of the airport."
+#define MEK_5_3                 "Destroy the enemy Rocket Launcher, and we have air superiority!"
 #define SOUND_MEK_5             17539 // 13500
-#define MEK_6_1                 "Цель в зоне видимости! Орудия к бою! Уничтожить ракетомёты противника!"
+#define MEK_6_1                 "Goal in sight! The guns at the ready! Rocket Launcher to destroy the enemy!"
 #define SOUND_MEK_6             17541 // 6730
-#define MEK_7_1                 "Ха-ха, этот готов! Продолжаем наступление!"
+#define MEK_7_1                 "Ha ha, this is ready! We continue to advance!"
 #define SOUND_MEK_7             17542 // 4970
-#define MEK_8_1                 "Ха-ха, ещё один разбит! Не ослабляйте натиск!"
+#define MEK_8_1                 "Ha-ha, another broken! Do not loosen the onslaught!"
 #define SOUND_MEK_8             17543 // 6160
-#define MEK_9_1                 "Отличная работа! Продолжайте в том же духе."
+#define MEK_9_1                 "Well done! Keep up the good work."
 #define SOUND_MEK_9             17544 // 4140
-#define MEK_10_1                "Аэродром взят, и небо над Гномреганом наше!"
-#define MEK_10_2                "Теперь наши бомбисты могут уничтожить защищённые противотанковые пушки Термоштепселя."
-#define MEK_10_3                "Второй этап операции: захват наземного командного поста!"
+#define MEK_10_1                "The airport was taken, and the sky above our Gnomeregan!"
+#define MEK_10_2                "Now, our bombers can destroy the protected anti-tank guns Thermaplugg."
+#define MEK_10_3                "The second phase of the operation: the capture of ground command post!"
 #define SOUND_MEK_10            17546 // 16970
-#define MEK_11_1                "Наши бомбисты разрушили защиту противотанковых пушек! Уничтожьте их и обеспечьте безопасность наземного командного пункта!"
+#define MEK_11_1                "Our bombers destroyed the protection of anti-tank guns! Destroy them and secure the ground command center!"
 #define SOUND_MEK_11            17547 // 9740
-#define MEK_12_1                "Наземная часть города захвачена. Операция 'Гномреган' проходит с эффективностью 93 процента... Всех хвалю!"
-#define MEK_12_2                "Отключаю защитные радиационные насосы. Отряды, захватите оставшихся боевых роботов и продвигайтесь к главному входу!"
+#define MEK_12_1                "Ground part of the city captured. Operation 'Gnomeregan' pass with 93 percent efficiency ... All praise!"
+#define MEK_12_2                "Turn off the radiation protection pumps. The troops, grab the remaining combat robots and move to the front door!"
 #define SOUND_MEK_12            17548 // 16660
-#define MEK_13_1                "Мы стоим на пороге победы, друзья мои! Третий этап: проникнуть в туннели!"
-#define MEK_13_2                "Как только захватим подземную железную дорогу и погрузочную платформу, мы сможем ворваться в самое сердце города!"
-#define MEK_13_3                "Победа близка!"
+#define MEK_13_1                "We are near victory, my friends! Third step: get into the tunnels!"
+#define MEK_13_2                "As soon seize the underground railroad and the loading dock, we will be able to break into the very heart of the city!"
+#define MEK_13_3                "Victory is near!"
 #define SOUND_MEK_13            17549 // 17600
-#define THERM_1_1               "НИКОГДА!!! Так... Оно включено? Эта кнопка? Раз-два, раз-два... О!"
-#define THERM_1_2               "НИКОГДА!!! Гномреган МОЙ, Меггакрут!"
-#define THERM_1_3               "Думаешь ты просто так войдёшь в МОЙ город?"
-#define THERM_1_4               "Активировать систему однократной атомной защиты! ВЫПУСТИТЬ ТРОГГОВ!"
+#define THERM_1_1               "NEVER! So ... It is included? This button? One, two, one two ... Oh!"
+#define THERM_1_2               "NEVER! Gnomeregan my Meggakrut!"
+#define THERM_1_3               "You think you're just so you come to my city?"
+#define THERM_1_4               "Activate the system once the nuclear defense! ISSUE Troggs!"
 #define SOUND_THERM_1           17569 // 23190
-#define MEK_14_1                "Ёлки-шестерёнки... Да тут, похоже, собрались все трогги города! Солдаты, окопаться!"
-#define MEK_14_2                "Осколочные гранаты и заградительный огонь! ДЕРЖАТЬ СТРОЙ! Отступать нельзя!"
+#define MEK_14_1                "Yes, there seems to have gathered all of troggs! Soldiers dig in!"
+#define MEK_14_2                "Fragmentation grenades and covering fire! HOLD STORY! To retreat is impossible!"
 #define SOUND_MEK_14            17550 // 14230
-#define MEK_15_1                "Тысяча сопливых титанят! Никогда не видел такого огромного трогга! Продолжать обстрел... уничтожить его!!!"
+#define MEK_15_1                "Thousand titanite snotty! I've never seen such a huge troggs! Continue to fire ... destroy it!"
 #define SOUND_MEK_15            17551 // 9560
-#define MEK_16_1                "Слишком уж тихо. Где войска Термоштепселя?"
+#define MEK_16_1                "Too quiet. Where troops Thermaplugg?"
 #define SOUND_MEK_16            17552 // 5520
-#define MEK_17_1                "Что это? Похоже на ядерную бомбу, которая погубила Гномреган... Стоять! Враг идёт!"
+#define MEK_17_1                "What is it? It looks like a nuclear bomb, which killed ... Gnomeregan Whoa! The enemy is coming!"
 #define SOUND_MEK_17            17553 // 9690
-#define BOLTCOG_1               "Нашу защиту вам не преодолеть. МЫ истинные сыны Гномрегана!"
+#define BOLTCOG_1               "Our defense will not be overcome. We are true sons of Gnomeregan!"
 #define SOUND_BOLTCOG_1         17665 // 6100
-#define THERM_2_1               "Нет! Нет, нет, НЕТ! Я не позволю тебе войти в своё королевство, узурпатор!"
-#define THERM_2_2               "Активировать систему атомной защиты!"
-#define THERM_2_3               "ДЕЗИНТЕГРИРОВАТЬ ИХ ВСЕХ!"
+#define THERM_2_1               "No! No, no, NO! I will not allow you to enter his kingdom, the usurper!"
+#define THERM_2_2               "Activate the nuclear defense!"
+#define THERM_2_3               "Disintegrate them all!"
 #define SOUND_THERM_2           17570 // 14640
-#define MEK_18_1                "ЭТО ЛОВУШКА! Здесь работает облучатель!"
+#define MEK_18_1                "It's a trap! It works irradiator!"
 #define SOUND_MEK_18            17554 // 3830
-#define THERM_3_1               "Так и есть. И она в ДВАДЦАТЬ ШЕСТЬ РАЗ мощнее первой!"
-#define THERM_3_2               "Меггакрут, ты ПРОИГРАЛ! Я победил тебя раньше чем ты успел вступить в мой прекрасный город."
-#define THERM_3_3               "А теперь УМРИ!"
-#define THERM_3_4               "О, хотел бы я увидеть лицо этого жулика. Клянусь он... Что? Всё ещё включено? ВЫКЛЮЧИ!!!"
+#define THERM_3_1               "It is. And it is in twenty-six times more powerful than the first!"
+#define THERM_3_2               "Meggakrut, you lose! I've won before you than you have time to join in my beautiful city."
+#define THERM_3_3               "Now, DIE!"
+#define THERM_3_4               "Oh, I'd like to see the face of this rogue. I swear it ... What? All else is included? OFF!"
 #define SOUND_THERM_3           17571 // 22980
-#define IRRADIATOR_1_1          "Облучатель 3000 активирован. Внимание. Чрезвычайная ситуация. У вас осталось 10 минут для того, чтобы оказаться на минимальном безопасном расстоянии."
+#define IRRADIATOR_1_1          "Illuminator 3000 is activated. Attention. Emergency. Do you still have 10 minutes to be at a minimum safe distance."
 #define SOUND_IRRADIATOR_1      17635 // 10830
-#define MEK_19_1                "Десять минут? Мы сто раз обезвредим устройство."
-#define MEK_19_2                "Хинклс, протяни-ка трещащий бронзовый механизм и дай свежей воды! Шестерёнок, швырни мне грязное одеяние трогга и дай горсть медных винтов..."
+#define MEK_19_1                "10 Minutes? We are a hundred times neutralized the device."
+#define MEK_19_2                "Hinkls, stretch-ka popping bronze mechanism, and give fresh water! Gears, Throw me a dirty robe and let troggs handful of copper bolts ..."
 #define SOUND_MEK_19            17556 // 14930
-#define THERM_4_1               "ДЕСЯТЬ МИНУТ?! Ты оставил заводские настройки? Идиот, быстро отдай регулятор!"
+#define THERM_4_1               "10 MINUTES! You left the factory settings? Idiot, quickly give the regulato"
 #define SOUND_THERM_4           17572 // 9970
-#define IRRADIATOR_2_1          "Внимание. Чрезвычайная ситуация. У вас осталось 10 секунд для того, чтобы оказаться на минимальном безопасном расстоянии."
+#define IRRADIATOR_2_1          "Attention. Emergency. Do you still have 10 seconds to be at a minimum safe distance."
 #define SOUND_IRRADIATOR_2      17636 // 7670
-#define MEK_20_1                "Надо убираться отсюда! Ла Форж, скорее телепортируй нас!"
+#define MEK_20_1                "Get out of here! La Forge, but rather will teleport us!"
 #define SOUND_MEK_20            17557 // 4790
-#define MEK_21_1                "Проклятье! Пришлось отступить. Но Термоштепсель проиграл, и он это знает... Он лишь получил небольшую отсрочку."
-#define MEK_21_2                "Мы завладели поверхностью, а когда уровень радиации снизится, вернёмся с вдвое большей армией и отвоюем Гномреган!"
+#define MEK_21_1                "Damn! Had to retreat. But Thermaplugg lost, and he knows it ... He only got a small reprieve."
+#define MEK_21_2                "We took over a surface, and when radiation levels decrease, we will return with an army twice and could wrest Gnomeregan!"
 #define SOUND_MEK_21            17558 // 19280
