@@ -31,7 +31,7 @@
 #include <functional>
 
 class Item;
-struct AccessRequirement;
+struct AccessRequirements;
 struct PlayerClassInfo;
 struct PlayerClassLevelInfo;
 struct PlayerInfo;
@@ -705,7 +705,7 @@ public:
 
     typedef std::unordered_map<uint32, uint32> AreaTriggerScriptContainer;
 
-    typedef std::unordered_map<uint32, AccessRequirement*> AccessRequirementContainer;
+    typedef std::unordered_map<uint32, AccessRequirements*> AccessRequirementContainer;
 
     typedef std::unordered_map<uint32, RepRewardRate > RepRewardRateContainer;
     typedef std::unordered_map<uint32, ReputationOnKillEntry> RepOnKillContainer;
@@ -833,7 +833,7 @@ public:
         return nullptr;
     }
 
-    AccessRequirement const* GetAccessRequirement(uint32 mapid, Difficulty difficulty) const
+    AccessRequirements const* GetAccessRequirement(uint32 mapid, Difficulty difficulty) const
     {
         AccessRequirementContainer::const_iterator itr = _accessRequirementStore.find(MAKE_PAIR32(mapid, difficulty));
         if (itr != _accessRequirementStore.end())

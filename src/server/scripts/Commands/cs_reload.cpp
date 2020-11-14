@@ -55,7 +55,8 @@ public:
         static std::vector<ChatCommand> reloadCommandTable =
         {
             { "auctions",                     SEC_ADMINISTRATOR, true,  &HandleReloadAuctionsCommand,                   "" },
-            { "access_requirement",           SEC_ADMINISTRATOR, true,  &HandleReloadAccessRequirementCommand,          "" },
+            { "dungeon_access_template",      SEC_ADMINISTRATOR, true,  &HandleReloadDungeonAccessCommand,              "" },
+            { "dungeon_access_requirements",  SEC_ADMINISTRATOR, true,  &HandleReloadDungeonAccessCommand,              "" },
             { "achievement_criteria_data",    SEC_ADMINISTRATOR, true,  &HandleReloadAchievementCriteriaDataCommand,    "" },
             { "achievement_reward",           SEC_ADMINISTRATOR, true,  &HandleReloadAchievementRewardCommand,          "" },
             { "all",                          SEC_ADMINISTRATOR, true,  nullptr,                                        "", reloadAllCommandTable },
@@ -175,7 +176,7 @@ public:
         HandleReloadAllGossipsCommand(handler, "");
         HandleReloadAllLocalesCommand(handler, "");
 
-        HandleReloadAccessRequirementCommand(handler, "");
+        HandleReloadDungeonAccessCommand(handler, "");
         HandleReloadMailLevelRewardCommand(handler, "");
         HandleReloadCommandCommand(handler, "");
         HandleReloadReservedNameCommand(handler, "");
@@ -324,11 +325,12 @@ public:
         return true;
     }
 
-    static bool HandleReloadAccessRequirementCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadDungeonAccessCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Access Requirement definitions...");
+        sLog->outString("Re-Loading Dungeon Requirement definitions...");
         sObjectMgr->LoadAccessRequirements();
-        handler->SendGlobalGMSysMessage("DB table `access_requirement` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `dungeon_access_template` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `dungeon_access_requirements` reloaded.");
         return true;
     }
 

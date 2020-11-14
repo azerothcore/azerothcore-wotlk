@@ -1323,6 +1323,13 @@ enum AcoreStrings
     LANG_BG_READY_CHECK_ERROR                     = 30084,
 
     LANG_DEBUG_BG_CONF                            = 30085,
-    LANG_DEBUG_ARENA_CONF                         = 30086
+    LANG_DEBUG_ARENA_CONF                         = 30086,
+
+
+    //Access Requirements
+    LANG_ACCESS_REQUIREMENT_COMPLETE_QUESTS       = 882,
+    LANG_ACCESS_REQUIREMENT_COMPLETE_ACHIEVEMENTS = 883,
+    LANG_ACCESS_REQUIREMENT_OBTAIN_ITEMS          = 884,
+    LANG_ACCESS_REQUIREMENT_HINT                  = 885,
 };
 #endif

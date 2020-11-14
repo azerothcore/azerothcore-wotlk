@@ -405,23 +405,56 @@ namespace lfg
                 lockData = LFG_LOCKSTATUS_TOO_HIGH_LEVEL;
             else if (dungeon->seasonal && !IsSeasonActive(dungeon->id))
                 lockData = LFG_LOCKSTATUS_NOT_IN_SEASON;
-            else if (AccessRequirement const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty)))
+            else if (AccessRequirements const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty)))
             {
-                if (ar->achievement && !player->HasAchieved(ar->achievement))
-                    lockData = LFG_LOCKSTATUS_MISSING_ACHIEVEMENT;
-                else if (ar->reqItemLevel && (float)ar->reqItemLevel > avgItemLevel)
-                    lockData = LFG_LOCKSTATUS_TOO_LOW_GEAR_SCORE;
-                else if (player->GetTeamId() == TEAM_ALLIANCE && ar->quest_A && !player->GetQuestRewardStatus(ar->quest_A))
-                    lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
-                else if (player->GetTeamId() == TEAM_HORDE && ar->quest_H && !player->GetQuestRewardStatus(ar->quest_H))
-                    lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
-                else if (ar->item)
+                //Check if player has the required achievements
+                for (const AccessSubRequirement* achievementRequirement : ar->achievements)
                 {
-                    if (!player->HasItemCount(ar->item) && (!ar->item2 || !player->HasItemCount(ar->item2)))
-                        lockData = LFG_LOCKSTATUS_MISSING_ITEM;
+                    if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == player->GetTeamId(true))
+                    {
+                        if (!player->HasAchieved(achievementRequirement->id))
+                        {
+                            lockData = LFG_LOCKSTATUS_MISSING_ACHIEVEMENT;
+                        }
+                    }
                 }
-                else if (ar->item2 && !player->HasItemCount(ar->item2))
-                    lockData = LFG_LOCKSTATUS_MISSING_ITEM;
+
+                //Check for ilvl
+                if (lockData == 0)
+                {
+                    if (ar->reqItemLevel && (float)ar->reqItemLevel > avgItemLevel)
+                        lockData = LFG_LOCKSTATUS_TOO_LOW_GEAR_SCORE;
+                }
+
+                //Check for quests
+                if (lockData == 0)
+                {
+                    for (const AccessSubRequirement* questRequirement : ar->quests)
+                    {
+                        if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == player->GetTeamId(true))
+                        {
+                            if (!player->GetQuestRewardStatus(questRequirement->id))
+                            {
+                                lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
+                            }
+                        }
+                    }
+                }
+
+                //Check of items
+                if (lockData == 0)
+                {
+                    for (const AccessSubRequirement* itemRequirement : ar->items)
+                    {
+                        if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == player->GetTeamId(true))
+                        {
+                            if (!player->HasItemCount(itemRequirement->id, 1))
+                            {
+                                lockData = LFG_LOCKSTATUS_MISSING_ITEM;
+                            }
+                        }
+                    }
+                }
             }
 
 
