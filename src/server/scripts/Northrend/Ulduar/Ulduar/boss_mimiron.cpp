@@ -175,7 +175,8 @@ enum EVENTS
     EVENT_REINSTALL_ROCKETS                         = 17,
     EVENT_SPELL_RAPID_BURST                         = 18,
     EVENT_SPELL_RAPID_BURST_INTERVAL                = 19,
-    EVENT_SPELL_SPINNING_UP                         = 20,
+    EVENT_LASER_BARRAGE                             = 20, // Spinning Up
+    EVENT_LASER_BARRAGE_END                         = 21,
     EVENT_HAND_PULSE                                = 37,
 
     // ACU:
@@ -1296,15 +1297,18 @@ public:
         uint8 Phase;
         bool fighting;
         bool leftarm;
-        uint32 spinningUpOrientation;
-        uint16 spinningUpTimer;
+        bool spinning;
+        bool direction;
+        uint32 spinTimer;
 
         void Reset()
         {
             Phase = 0;
             fighting = false;
             leftarm = false;
-            spinningUpTimer = 0;
+            spinning = false;
+            direction = false;
+            spinTimer = 250;
             me->SetRegeneratingHealth(false);
             events.Reset();
         }
@@ -1332,7 +1336,7 @@ public:
                         events.ScheduleEvent(EVENT_SPELL_HEAT_WAVE, 10000);
                         events.ScheduleEvent(EVENT_SPELL_ROCKET_STRIKE, 16000);
                         events.ScheduleEvent(EVENT_SPELL_RAPID_BURST, 0);
-                        events.ScheduleEvent(EVENT_SPELL_SPINNING_UP, 30000);
+                        events.ScheduleEvent(EVENT_LASER_BARRAGE, urand(35000, 40000));
                         events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 3000);
                         if (Creature* c = GetMimiron())
                             if (c->AI()->GetData(1))
@@ -1349,17 +1353,13 @@ public:
                         events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 3000);
                         events.ScheduleEvent(EVENT_SPELL_ROCKET_STRIKE, 16000);
                         events.ScheduleEvent(EVENT_HAND_PULSE, 1);
-                        //events.ScheduleEvent(EVENT_SPELL_SPINNING_UP, 30000);
+                        events.ScheduleEvent(EVENT_LASER_BARRAGE, urand(35000, 40000));
                         if (Creature* c = GetMimiron())
                             if (c->AI()->GetData(1))
                                 events.ScheduleEvent(EVENT_FROST_BOMB, 1000);
                         break;
                 }
             }
-        }
-
-        uint32 GetData(uint32  /*id*/) const
-            return spinningUpOrientation;
         }
 
         void DoAction(int32 action)
@@ -1421,20 +1421,27 @@ public:
             if (!fighting)
                 return;
 
-            events.Update(diff);
-
-            if (spinningUpTimer) // executed about a second after starting casting to ensure players can see the correct direction
+            if (spinning)
             {
-                if (spinningUpTimer <= diff)
+                if (spinTimer <= diff)
                 {
-                    float angle = (spinningUpOrientation * 2 * M_PI) / 100.0f;
-                    me->SetOrientation(angle);
-                    me->SetFacingTo(angle);
-                    spinningUpTimer = 0;
+                    if (Creature* leviathan = me->GetVehicleCreatureBase())
+                    {
+                        float orient = leviathan->GetOrientation();
+                        leviathan->SetFacingTo(orient + (direction ? M_PI / 60 : -M_PI / 60));
+                        me->SetOrientation(orient + (direction ? M_PI / 60 : -M_PI / 60));
+                    }
+                    else
+                    {
+                        float orient = me->GetOrientation();
+                        me->SetFacingTo(orient + (direction ? M_PI / 60 : -M_PI / 60));
+                    }
+                    spinTimer = 250;
                 }
-                else
-                    spinningUpTimer -= diff;
+                else spinTimer -= diff;
             }
+
+            events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -1516,18 +1523,26 @@ public:
                     }
                     events.RepeatEvent(1750);
                     break;
-                case EVENT_SPELL_SPINNING_UP:
-                    events.RepeatEvent(45000);
-                    if (Player* p = SelectTargetFromPlayerList(80.0f))
+                case EVENT_LASER_BARRAGE:
+                    me->SetReactState(REACT_PASSIVE);
+                    if (Creature* leviathan = me->GetVehicleCreatureBase())
                     {
-                        float angle = me->GetAngle(p);
-                        spinningUpOrientation = (uint32)((angle * 100.0f) / (2 * M_PI));
-                        spinningUpTimer = 1500;
-                        me->SetOrientation(angle);
-                        me->SetFacingTo(angle);
-                        me->CastSpell(p, SPELL_SPINNING_UP, true);
-                        events.RescheduleEvent((Phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14500);
+                        float orient = leviathan->GetOrientation();
+                        leviathan->CastSpell(leviathan, 14821, true); // temporary, to prevent turning
+                        leviathan->SetFacingTo(orient);
+                        me->SetOrientation(orient);
                     }
+                    direction = urand(0, 1);
+                    spinning = true;
+                    DoCast(SPELL_SPINNING_UP);
+                    events.DelayEvents(14500);
+                    events.RescheduleEvent(EVENT_LASER_BARRAGE, 40000);
+                    events.RescheduleEvent(EVENT_LASER_BARRAGE_END, 14000);
+                    break;
+                case EVENT_LASER_BARRAGE_END:
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    AttackStart(me->GetVictim());
+                    spinning = false;
                     break;
                 case EVENT_FLAME_SUPPRESSION_10:
                     me->CastSpell(me, SPELL_FLAME_SUPPRESSANT_10yd, false);
