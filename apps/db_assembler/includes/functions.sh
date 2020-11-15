@@ -169,7 +169,7 @@ function dbasm_assemble() {
     if [ $with_updates = true ]; then
         updFile="$OUTPUT_FOLDER$database$suffix_upd.sql"
 
-        echo "" > $updFile
+        echo "" > "$updFile"
 
         if [ ! ${#updates[@]} -eq 0 ]; then
             echo "Generating $OUTPUT_FOLDER$database$suffix_upd ..."
@@ -184,8 +184,8 @@ function dbasm_assemble() {
                             continue
                         fi
 
-                        echo "-- $file" >> $updFile
-                        cat "$entry" >> $updFile
+                        echo "-- $file" >> "$updFile"
+                        cat "$entry" >> "$updFile"
                     done
                 fi
             done
