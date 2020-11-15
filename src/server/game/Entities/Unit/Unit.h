@@ -1184,7 +1184,7 @@ public:
     bool HasCommandState(CommandStates state) const { return (_CommandState == state); }
 
     void InitPossessCreateSpells();
-    void InitCharmCreateSpells();
+    void InitCharmCreateSpells(bool withPetBar = true);
     void InitPetActionBar();
     void InitEmptyActionBar(bool withAttack = true);
 
@@ -1872,7 +1872,7 @@ public:
     void RemoveAllMinionsByEntry(uint32 entry);
     void SetCharm(Unit* target, bool apply);
     Unit* GetNextRandomRaidMemberOrPet(float radius);
-    bool SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* aurApp = nullptr);
+    bool SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* aurApp = nullptr, bool withPetBars = true);
     void RemoveCharmedBy(Unit* charmer);
     void RestoreFaction();
 
@@ -2387,6 +2387,8 @@ public:
     Totem* ToTotem() { if (IsTotem()) return reinterpret_cast<Totem*>(this); else return nullptr; }
     TempSummon* ToTempSummon() { if (IsSummon()) return reinterpret_cast<TempSummon*>(this); else return nullptr; }
     const TempSummon* ToTempSummon() const { if (IsSummon()) return reinterpret_cast<const TempSummon*>(this); else return nullptr; }
+
+    uint32 GetOldFactionId() const { return _oldFactionId; }
 
     // pussywizard:
     // MMaps

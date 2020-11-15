@@ -2562,6 +2562,21 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
             break;
     }
 
+    //! Karazhan chess event spells
+    switch (spellInfo->Id)
+    {
+        case 30529:
+        case 37463:
+        case 37461:
+        case 37462:
+        case 37465:
+        case 37453:
+        case 37498:
+        case 37427:
+        case 37406:
+            return false;
+    }
+
     // Special case: effects which determine positivity of whole spell
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {

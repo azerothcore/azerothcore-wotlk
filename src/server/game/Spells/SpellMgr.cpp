@@ -3306,6 +3306,33 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
+            // KARAZHAN CHESS SPELLS 
+            case 30019: // Control Piece
+                //spellInfo->Effects[EFFECT_0].Effect = 0; // SPELL_AURA_BIND_SIGHT
+                spellInfo->Effects[EFFECT_1].Effect = 0; // SPELL_AURA_PERIODIC_DUMMY
+                spellInfo->Effects[EFFECT_2].Effect = 0; // SPELL_AURA_MOD_CHARM
+                //spellInfo->Effects[EFFECT_0].Effect = 0;
+                //spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_CHARM;
+                //spellInfo->Effects[EFFECT_0].BasePoints = 0;
+                //spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_BIND_SIGHT;
+                //spellInfo->Effects[EFFECrT_2].BasePoints = 0;
+                //spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_MOD_POSSESS;
+            break; 
+            case 39384:// Burning Flames
+                spellInfo->Effects[EFFECT_1].Effect = 0; //! Has double damage for some reason
+            break;
+            case 39331: // Game In Session
+                spellInfo->Attributes |= SPELL_ATTR0_CANT_CANCEL;
+            break; 
+            case 37144: // Move
+            case 37146:
+            case 37148: 
+                spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING; 
+            break;
+            case 30284: // Change Facing
+                spellInfo->CategoryRecoveryTime = 5000;
+            break;
+            // END KARAZHAN CHESS SPELLS
             case 38776: // Evergrove Druid Transform Crow
                 spellInfo->DurationIndex = 4; // 120 seconds
                 break;

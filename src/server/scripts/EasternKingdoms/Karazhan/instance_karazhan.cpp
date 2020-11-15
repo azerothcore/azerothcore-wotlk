@@ -37,6 +37,12 @@ public:
             OzDeathCount = 0;
             OptionalBossCount = 0;
         }
+        
+        void Initialize()
+        {
+            ChessTeam = 0;
+            ChessGamePhase = CHESS_PHASE_NOT_STARTED;
+        }
 
         void OnCreatureCreate(Creature* creature) override
         {
@@ -56,6 +62,27 @@ public:
                     break;
                 case NPC_RELAY:
                     m_uiRelayGUID = creature->GetGUID();
+                    break;
+                case NPC_PAWN_H:
+                case NPC_KNIGHT_H:
+                case NPC_QUEEN_H:
+                case NPC_BISHOP_H:
+                case NPC_ROOK_H:
+                case NPC_KING_H:
+                case NPC_PAWN_A:
+                case NPC_KNIGHT_A:
+                case NPC_QUEEN_A:
+                case NPC_BISHOP_A:
+                case NPC_ROOK_A:
+                case NPC_KING_A:
+                    ChessPiecesGUID.insert(creature->GetGUID());
+                    creature->SetHealth(creature->GetMaxHealth());
+                    break;
+                case 22521:
+                    MedivhCheatFiresGUID.insert(creature->GetGUID());
+                    break;
+                case 16816:
+                    ImageGUID = creature->GetGUID();
                     break;
             }
         }
@@ -110,6 +137,56 @@ public:
                         ++OzDeathCount;
                     else if (data == IN_PROGRESS)
                         OzDeathCount = 0;
+                break;
+                case DATA_CHESS_EVENT:
+                    if (data == FAIL || data == DONE || data == NOT_STARTED)
+                        DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
+                    else if (data == IN_PROGRESS)
+                        DoCastSpellOnPlayers(SPELL_GAME_IN_SESSION);
+                    break;
+                case CHESS_EVENT_TEAM:
+                    ChessTeam = data;
+                    break;
+                case DATA_CHESS_REINIT_PIECES:
+                    for (std::set<uint64>::const_iterator i = ChessPiecesGUID.begin(); i != ChessPiecesGUID.end(); ++i)
+                    {
+                        if (Creature* piece = instance->GetCreature(*i))
+                        {
+                            piece->RemoveCharmedBy(piece->GetCharmer());
+                            piece->AttackStop();
+                            piece->setDeathState(JUST_RESPAWNED);
+                            piece->SetHealth(piece->GetMaxHealth());
+                            piece->AI()->DoAction(ACTION_PIECE_RESET);
+                            float x, y, z, o;
+                            piece->GetHomePosition(x, y, z, o);
+                            piece->NearTeleportTo(x, y, z, o);
+                            piece->AI()->DoAction(ACTION_PIECE_RESET_ORIENTATION);
+                            piece->RemoveAurasDueToSpell(SPELL_HAND_OF_MEDIVH);
+                            piece->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        }
+                    }
+
+                    for (std::set<uint64>::const_iterator i = MedivhCheatFiresGUID.begin(); i != MedivhCheatFiresGUID.end(); ++i)
+                        if (Creature* fire = instance->GetCreature(*i))
+                            fire->DespawnOrUnsummon();
+
+                    MedivhCheatFiresGUID.clear();
+                    break;
+                case DATA_CHESS_CHECK_PIECES_ALIVE:
+                    for (std::set<uint64>::const_iterator i = ChessPiecesGUID.begin(); i != ChessPiecesGUID.end(); ++i)
+                    {
+                        if (Creature* piece = instance->GetCreature(*i))
+                        {
+                            if (!piece->IsAlive())
+                            {
+                                piece->setDeathState(JUST_RESPAWNED);
+                                piece->SetHealth(piece->GetMaxHealth());
+                            }
+                        }
+                    }
+                    break;
+                case DATA_CHESS_GAME_PHASE:
+                    ChessGamePhase = data;
                     break;
             }
         }
@@ -130,11 +207,7 @@ public:
                             sideEntrance->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
                         instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
                     }
-                    break;
-                case DATA_CHESS:
-                    if (state == DONE)
-                        DoRespawnGameObject(DustCoveredChest, DAY);
-                    break;
+                    break; 
                 default:
                     break;
             }
@@ -142,10 +215,12 @@ public:
             return true;
         }
 
-        void SetData64(uint32 type, uint64 data) override
+        void OnPlayerEnter(Player* player)
         {
-            if (type == DATA_IMAGE_OF_MEDIVH)
-                ImageGUID = data;
+            if (GetData(DATA_CHESS_EVENT) != IN_PROGRESS)
+                player->RemoveAurasDueToSpell(SPELL_GAME_IN_SESSION);
+
+            player->RemoveAurasDueToSpell(SPELL_CONTROL_PIECE);
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -228,7 +303,10 @@ public:
                     return OperaEvent;
                 case DATA_OPERA_OZ_DEATHCOUNT:
                     return OzDeathCount;
-
+                case CHESS_EVENT_TEAM:
+                    return ChessTeam;
+                case DATA_CHESS_GAME_PHASE:
+                    return ChessGamePhase;
                 case DATA_KILREK:
                     return m_uiKilrekGUID;
                 case DATA_TERESTIAN:
@@ -330,6 +408,10 @@ public:
         uint64 ImageGUID;
         uint64 DustCoveredChest;
         uint64 m_uiRelayGUID;
+        uint32 ChessTeam;
+        uint32 ChessGamePhase;
+        std::set<uint64> ChessPiecesGUID;
+        std::set<uint64> MedivhCheatFiresGUID;
     };
 };
 

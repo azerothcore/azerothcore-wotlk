@@ -6239,8 +6239,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                             return SPELL_FAILED_CANT_BE_CHARMED;
 
                         int32 damage = CalculateSpellDamage(i, target);
-                        if (damage && int32(target->getLevel()) > damage)
-                            return SPELL_FAILED_HIGHLEVEL;
+                        if(m_spellInfo->Id != 30019) // karazhan hack
+                            if (damage && int32(target->getLevel()) > damage)
+                                return SPELL_FAILED_HIGHLEVEL;
                     }
 
                     break;

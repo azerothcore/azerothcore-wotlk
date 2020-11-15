@@ -9524,6 +9524,12 @@ ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTem
 
 bool Unit::IsHostileTo(Unit const* unit) const
 {
+    // Karazhan Chess hack
+    if ((((Unit*)this)->getFaction() == 1689 && unit->ToUnit()->getFaction() == 1690) || (((Unit*)this)->getFaction() == 1690 && unit->ToUnit()->getFaction() == 1689))
+    {
+        return true;
+    } 
+
     return GetReactionTo(unit) <= REP_HOSTILE;
 }
 
@@ -14864,17 +14870,17 @@ void CharmInfo::InitPossessCreateSpells()
         InitEmptyActionBar();
 }
 
-void CharmInfo::InitCharmCreateSpells()
+void CharmInfo::InitCharmCreateSpells(bool withPetBar)
 {
-    InitPetActionBar();
+    if(withPetBar)
+    {
+        InitPetActionBar();
+    }
 
     if (_unit->GetTypeId() == TYPEID_PLAYER)                // charmed players don't have spells
     {
-        //InitEmptyActionBar();
         return;
     }
-
-    //InitPetActionBar();
 
     for (uint32 x = 0; x < MAX_SPELL_CHARM; ++x)
     {
@@ -14887,7 +14893,7 @@ void CharmInfo::InitCharmCreateSpells()
             continue;
         }
 
-        if (spellInfo->IsPassive())
+        if (!withPetBar && spellInfo->IsPassive())
         {
             _unit->CastSpell(_unit, spellInfo, true);
             _charmspells[x].SetActionAndType(spellId, ACT_PASSIVE);
@@ -17281,7 +17287,7 @@ void Unit::SetConfused(bool apply)
     }
 }
 
-bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* aurApp)
+bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* aurApp, bool withPetBar)
 {
     if (!charmer)
         return false;
@@ -17404,7 +17410,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
             GetCharmInfo()->InitPossessCreateSpells();
         else if (type != CHARM_TYPE_VEHICLE)
         {
-            GetCharmInfo()->InitCharmCreateSpells();
+            GetCharmInfo()->InitCharmCreateSpells(withPetBars);
 
             // Xinef: convert charm npcs dont have pet bar so initialize them as defensive helpers
             if (type == CHARM_TYPE_CONVERT && GetTypeId() == TYPEID_UNIT)
