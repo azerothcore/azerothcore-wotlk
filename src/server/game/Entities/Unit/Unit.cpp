@@ -17410,7 +17410,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
             GetCharmInfo()->InitPossessCreateSpells();
         else if (type != CHARM_TYPE_VEHICLE)
         {
-            GetCharmInfo()->InitCharmCreateSpells();
+            GetCharmInfo()->InitCharmCreateSpells(withPetBar);
 
             // Xinef: convert charm npcs dont have pet bar so initialize them as defensive helpers
             if (type == CHARM_TYPE_CONVERT && GetTypeId() == TYPEID_UNIT)

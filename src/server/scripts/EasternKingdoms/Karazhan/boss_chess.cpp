@@ -687,9 +687,10 @@ public:
                         if (Creature* trigger = ObjectAccessor::GetCreature(*me, cell->triggerGUID))
                             if (!cell->pieceGUID)
                                 piece->CastSpell(trigger, SPELL_MOVE_1, false);
+                     
+                    return HandlePieceMove(piece, board[orientation == ORI_SE ? pieceRow - 1 : pieceRow + 1][randomCol]->triggerGUID);
 
                     break;
-                    //return HandlePieceMove(piece, board[orientation == ORI_SE ? pieceRow - 1 : pieceRow + 1][randomCol]->triggerGUID);
                 }
                 case ORI_SW:
                 case ORI_NE:
@@ -719,9 +720,10 @@ public:
                         if (Creature* trigger = ObjectAccessor::GetCreature(*me, cell->triggerGUID))
                             if (!cell->pieceGUID)
                                 piece->CastSpell(trigger, SPELL_MOVE_1, false);
+                    
+                    return HandlePieceMove(piece, board[randomRow][orientation == ORI_SW ? pieceCol - 1 : pieceCol + 1]->triggerGUID);
 
                     break;
-                    //return HandlePieceMove(piece, board[randomRow][orientation == ORI_SW ? pieceCol - 1 : pieceCol + 1]->triggerGUID);
                 }
             }
 
@@ -1049,7 +1051,7 @@ public:
         void EnterEvadeMode()
         {
             // Just stay in place
-            //me->RemoveAllAuras();
+            me->RemoveAllAuras();
             Reset();
         }
 
@@ -1058,7 +1060,7 @@ public:
             if (MovementType != POINT_MOTION_TYPE && destX != 0.0f && destY != 0.0f)
                 return;
 
-            //me->NearTeleportTo(destX, destY, me->GetPositionZ(), 0.0f);
+            me->NearTeleportTo(destX, destY, me->GetPositionZ(), 0.0f);
             currentOrientation = GetDefaultOrientationForTeam();
             me->SetFacingTo(orientations[currentOrientation]);
             teleportToDestDelay = 250;
@@ -1572,19 +1574,19 @@ public:
 
           switch (me->GetEntry())
           {
-          case NPC_PAWN_H:   textID = 20021; break;
-          case NPC_PAWN_A:   textID = 20027; break;
-          case NPC_KNIGHT_H: textID = 20019; break;
-          case NPC_KNIGHT_A: textID = 20025; break;
-          case NPC_QUEEN_H:  textID = 20017; break;
-          case NPC_QUEEN_A:  textID = 20023; break;
-          case NPC_BISHOP_H: textID = 20018; break;
-          case NPC_BISHOP_A: textID = 20023; break;
-          case NPC_ROOK_H:   textID = 20020; break;
-          case NPC_ROOK_A:   textID = 20026; break;
-          case NPC_KING_H:   textID = 20016; break;
-          case NPC_KING_A:   textID = 20028; break;
-          default:           textID = 8990;  break;
+              case NPC_PAWN_H:   textID = 20021; break;
+              case NPC_PAWN_A:   textID = 20027; break;
+              case NPC_KNIGHT_H: textID = 20019; break;
+              case NPC_KNIGHT_A: textID = 20025; break;
+              case NPC_QUEEN_H:  textID = 20017; break;
+              case NPC_QUEEN_A:  textID = 20023; break;
+              case NPC_BISHOP_H: textID = 20018; break;
+              case NPC_BISHOP_A: textID = 20023; break;
+              case NPC_ROOK_H:   textID = 20020; break;
+              case NPC_ROOK_A:   textID = 20026; break;
+              case NPC_KING_H:   textID = 20016; break;
+              case NPC_KING_A:   textID = 20028; break;
+              default:           textID = 8990;  break;
           }
 
           if (ok && !player->HasAura(SPELL_RECENTLY_INGAME))
@@ -1600,37 +1602,36 @@ public:
           if (me->IsCharmed() && me->GetCharmerGUID() == player->GetGUID()) {
               me->RemoveCharmedBy(me->GetCharmer());
               player->StopCastingCharm();
-              sLog->outString("1");
           }
 
           if (action == GOSSIP_ACTION_INFO_DEF + 1)
           {
               player->NearTeleportTo(-11106.92f, -1843.32f, 229.626f, 4.2331f);
-              player->CastSpell(me, SPELL_CONTROL_PIECE, false);
-              //me->AddAura(SPELL_CONTROL_PIECE, player);
+              //player->CastSpell(me, SPELL_CONTROL_PIECE, false);
+              me->AddAura(SPELL_CONTROL_PIECE, player);
               //player->AddAura(SPELL_CONTROL_PIECE, me);
               me->SetCharmedBy(player, CHARM_TYPE_CHARM, NULL, false);
-              //me->InitCharmInfo();
-              //me->GetCharmInfo()->InitCharmCreateSpells(false);
+              me->InitCharmInfo();
+              me->GetCharmInfo()->InitCharmCreateSpells(true);
 
               switch (me->GetEntry())
               {
-              case NPC_KING_H:
-              case NPC_KING_A:
-                  if (InstanceScript* instance = me->GetInstanceScript())
-                  {
-                      uint32 chessPhase = instance->GetData(DATA_CHESS_GAME_PHASE);
+                  case NPC_KING_H:
+                  case NPC_KING_A:
+                      if (InstanceScript* instance = me->GetInstanceScript())
+                      {
+                          uint32 chessPhase = instance->GetData(DATA_CHESS_GAME_PHASE);
 
-                      if (chessPhase == CHESS_PHASE_PVE_WARMUP)
-                          instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_INPROGRESS_PVE);
-                      else if (chessPhase == CHESS_PHASE_PVP_WARMUP)
-                          instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_INPROGRESS_PVP);
-                  }
-                  break;
+                          if (chessPhase == CHESS_PHASE_PVE_WARMUP)
+                              instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_INPROGRESS_PVE);
+                          else if (chessPhase == CHESS_PHASE_PVP_WARMUP)
+                              instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_INPROGRESS_PVP);
+                      }
+                      break;
 
-              default:
-                  sLog->outString("Karazhan Chess, Default hit at %u", me->GetEntry());
-                  break;
+                  default:
+                      sLog->outString("Karazhan Chess, Default hit at %u", me->GetEntry());
+                      break;
               }
           } 
           CloseGossipMenuFor(player); 
@@ -1655,6 +1656,7 @@ public:
         {
             me->SetReactState(REACT_PASSIVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetVisible(false);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

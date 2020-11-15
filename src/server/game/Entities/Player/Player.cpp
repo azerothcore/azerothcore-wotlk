@@ -20917,9 +20917,11 @@ void Player::StopCastingCharm()
         return;
 
     // karazhan hack 
-    if (charm->ToPet() && GetZoneId() == 3457)
+    if (GetZoneId() == 3457)
     {
-        RemovePet(charm->ToPet(), PetSaveMode::PET_SAVE_AS_DELETED, false);
+        SetCharm(charm, false);
+        if(charm->ToPet())
+            RemovePet(charm->ToPet(), PetSaveMode::PET_SAVE_AS_DELETED, false);
     } 
 
     if (charm->GetTypeId() == TYPEID_UNIT)
@@ -20929,6 +20931,7 @@ void Player::StopCastingCharm()
         else if (charm->IsVehicle())
             ExitVehicle();
     }
+
     if (GetCharmGUID())
         charm->RemoveCharmAuras();
 
