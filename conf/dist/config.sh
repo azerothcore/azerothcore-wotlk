@@ -98,15 +98,15 @@ BACKUP_FOLDER="$AC_PATH_ROOT/env/dist/sql/backup/"
 
 # FULL DB
 DB_AUTH_PATHS=(
-    $SRCPATH"/data/sql/base/db_auth/"
+    "$SRCPATH/data/sql/base/db_auth/"
 )
 
 DB_CHARACTERS_PATHS=(
-    $SRCPATH"/data/sql/base/db_characters"
+    "$SRCPATH/data/sql/base/db_characters"
 )
 
 DB_WORLD_PATHS=(
-    $SRCPATH"/data/sql/base/db_world/"
+    "$SRCPATH/data/sql/base/db_world/"
 )
 
 # UPDATES
