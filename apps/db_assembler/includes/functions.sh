@@ -193,9 +193,9 @@ function dbasm_assemble() {
     fi
 
     if [ $with_custom = true ]; then
-        custFile=$OUTPUT_FOLDER$database$suffix_custom".sql"
+        custFile="$OUTPUT_FOLDER$database$suffix_custom.sql"
 
-        echo "" > $custFile
+        echo "" > "$custFile"
 
         if [ ! ${#custom[@]} -eq 0 ]; then
             echo "Generating $OUTPUT_FOLDER$database$suffix_custom ..."
@@ -203,15 +203,15 @@ function dbasm_assemble() {
             for d in "${custom[@]}"
             do
                 echo "Searching on $d ..."
-                if [ ! -z $d ]; then
+                if [ ! -z "$d" ]; then
                     for entry in "$d"/**/*.sql
                     do
                         if [[ ! -e $entry ]]; then
                             continue
                         fi
 
-                        echo "-- $file" >> $custFile
-                        cat "$entry" >> $custFile
+                        echo "-- $file" >> "$custFile"
+                        cat "$entry" >> "$custFile"
                     done
                 fi
             done

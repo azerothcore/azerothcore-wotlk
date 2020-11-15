@@ -127,15 +127,15 @@ DB_WORLD_UPDATES_PATHS=(
 
 # CUSTOM
 DB_AUTH_CUSTOM_PATHS=(
-    $SRCPATH"/data/sql/custom/db_auth/"
+    "$SRCPATH/data/sql/custom/db_auth/"
 )
 
 DB_CHARACTERS_CUSTOM_PATHS=(
-    $SRCPATH"/data/sql/custom/db_characters/"
+    "$SRCPATH/data/sql/custom/db_characters/"
 )
 
 DB_WORLD_CUSTOM_PATHS=(
-    $SRCPATH"/data/sql/custom/db_world/"
+    "$SRCPATH/data/sql/custom/db_world/"
 )
 
 ##############################################
