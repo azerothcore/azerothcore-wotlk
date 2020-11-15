@@ -171,7 +171,11 @@ ACE_Filecache_Hash_Entry::ACE_Hash_Map_Entry (ACE_Filecache_Hash_Entry *next,
 template <>
 ACE_Filecache_Hash_Entry::~ACE_Hash_Map_Entry (void)
 {
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free ((void *) ext_id_);
+#else
   ACE_OS::free ((void *) ext_id_);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
 
 // We need these template specializations since KEY is defined as a
@@ -231,6 +235,8 @@ ACE_Filecache::ACE_Filecache (void)
 ACE_Filecache::~ACE_Filecache (void)
 {
 }
+
+ACE_ALLOC_HOOK_DEFINE(ACE_Filecache)
 
 ACE_Filecache_Object *
 ACE_Filecache::insert_i (const ACE_TCHAR *filename,
@@ -617,6 +623,8 @@ ACE_Filecache_Object::~ACE_Filecache_Object (void)
 
   this->lock_.release ();
 }
+
+ACE_ALLOC_HOOK_DEFINE(ACE_Filecache_Object)
 
 int
 ACE_Filecache_Object::acquire (void)

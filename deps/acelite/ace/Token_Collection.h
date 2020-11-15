@@ -12,7 +12,7 @@
  *
  *  The atomic group operations are not yet implemented.
  *
- *  @author Douglas C. Schmidt (schmidt@cs.wustl.edu)
+ *  @author Douglas C. Schmidt (d.schmidt@vanderbilt.edu)
  *  @author Tim Harrison (harrison@cs.wustl.edu)
  */
 //=============================================================================
