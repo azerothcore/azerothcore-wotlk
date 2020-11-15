@@ -19696,7 +19696,7 @@ bool Player::Satisfy(AccessRequirements const* ar, uint32 target_map, bool repor
                         stream << std::hex << ItemQualityColors[itemTemplate->Quality] << std::dec;
                         stream << "|Hitem:";
                         stream << itemTemplate->ItemId;
-                        stream << "0:0:0:0:0:0:0:0|h[";
+                        stream << ":0:0:0:0:0:0:0:0:0|h[";
                         stream << name;
                         stream << "]|h|r";
 

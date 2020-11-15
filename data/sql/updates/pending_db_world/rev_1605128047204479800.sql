@@ -1,5 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1605128047204479800');
 
+-- SUMMARY: We edit the old table, then we create the new table, then we transfer the rows from the old table to the new table, then we remove no longer used columns from the old table, then we add foreign keys, then we add the strings, then update the .reload command
+
 -- Add new column ID
 ALTER TABLE `access_requirement`
 ADD `id` tinyint(3) unsigned NOT NULL COMMENT 'The dungeon template ID' AUTO_INCREMENT UNIQUE FIRST;
@@ -10,12 +12,8 @@ ADD PRIMARY KEY `id` (`id`),
 DROP INDEX `PRIMARY`,
 DROP INDEX `id`;
 
-
+-- New table
 CREATE TABLE `dungeon_access_requirements` (
-  -- SHITTY METHOD
-  -- `map_id` smallint(3) unsigned NOT NULL COMMENT 'Map ID from instance_template',
-  -- `difficulty` tinyint(1) unsigned NOT NULL COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic',
-  -- GOOD METHOD
   `dungeon_access_id` tinyint(3) unsigned NOT NULL COMMENT 'ID from dungeon_access_template',
   `requirement_type` tinyint(1) unsigned NOT NULL COMMENT '0 = achiev, 1 = quest, 2 = item',
   `requirement_id` mediumint(6) unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
@@ -24,10 +22,7 @@ CREATE TABLE `dungeon_access_requirements` (
   PRIMARY KEY (`dungeon_access_id`, `requirement_type`, `requirement_id`)
 ) COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid' ENGINE='MyISAM' COLLATE 'utf8_general_ci';
 
--- We could also add a constraint like this:
--- SHITTY METHOD
--- ALTER TABLE `dungeon_access_requirements` ADD CONSTRAINT `FK_dungeon_access_requirements__instance_template` FOREIGN KEY (`map_id`) REFERENCES `instance_template` (`map`) ON DELETE CASCADE ON UPDATE CASCADE;
-
+-- Transfer from old table to new table:
 -- ------------------- ITEMS
 
 INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_type`, `requirement_id`, `requirement_hint`, `faction`)
@@ -57,7 +52,6 @@ INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_typ
     FROM `access_requirement`
     WHERE `item2` > 0
 ;
-
 
 -- ------------------ ACHIEVS
 
@@ -98,17 +92,16 @@ INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_typ
 ;
 
 -- REORDER PRIMARY KEY
--- CREATE TABLE `temp` select * from `dungeon_access_requirements` ORDER BY dungeon_access_id, faction; -- without temporary table
 CREATE TEMPORARY TABLE IF NOT EXISTS `temp` select * from `dungeon_access_requirements` ORDER BY dungeon_access_id, faction;
 TRUNCATE `dungeon_access_requirements`;
 ALTER TABLE `dungeon_access_requirements`; 
 INSERT INTO `dungeon_access_requirements` SELECT * FROM `temp`;
--- DROP TABLE `temp`; -- without temporary table
 
-SELECT `id`, `quest_failed_text` FROM `access_requirement` WHERE `quest_failed_text` IS NOT NULL;
+-- Verify result with this
+-- SELECT `id`, `quest_failed_text` FROM `access_requirement` WHERE `quest_failed_text` IS NOT NULL;
 
 
--- remove columns + rename table
+-- Remove columns + rename table
 ALTER TABLE `access_requirement`
 DROP `item`,
 DROP `item2`,
@@ -119,7 +112,7 @@ DROP `quest_failed_text`,
 RENAME TO `dungeon_access_template`,
 COMMENT='Dungeon access template and single requirements';
 
--- rename columns
+-- Rename columns
 ALTER TABLE `dungeon_access_template`
 CHANGE `mapId` `instance_id` mediumint(8) unsigned NOT NULL COMMENT 'Map ID from instance_template' AFTER `id`,
 CHANGE `difficulty` `difficulty` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic' AFTER `instance_id`,
@@ -132,7 +125,8 @@ CHANGE `comment` `comment` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT '
 ALTER TABLE `dungeon_access_template` ADD CONSTRAINT `FK_dungeon_access_template__instance_template` FOREIGN KEY (`instance_id`) REFERENCES `instance_template` (`map`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `dungeon_access_requirements` ADD CONSTRAINT `FK_dungeon_access_requirements__dungeon_access_template` FOREIGN KEY (`dungeon_access_id`) REFERENCES `dungeon_access_template` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- Add the Acore_strings
+
+-- Add the acore_strings
 
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES ('882', 'To enter, you must complete the following quest(s):');
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES ('883', 'To enter, you must complete the following achievement(s):');
@@ -142,4 +136,3 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES ('885', '- Hint:'
 -- Update old command
 UPDATE `command` SET `name` = 'reload dungeon_access_template', `help` = 'Syntax: .reload dungeon_access_template\r Reload dungeon_access_template table.' WHERE `name` = 'reload access_requirement';
 REPLACE INTO `command` (`name`, `security`, `help`) VALUES ('reload dungeon_access_requirements', '3', 'Syntax: .reload dungeon_access_requirements\r Reload dungeon_access_requirements table.');
-

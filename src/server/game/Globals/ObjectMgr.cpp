@@ -6224,7 +6224,7 @@ void ObjectMgr::LoadAccessRequirements()
     } while (access_template_result->NextRow());
 
 
-    sLog->outString(">> Loaded %u access requirement definitions and %u sub requierments in %u ms", count, countSubRequirements, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u rows from dungeon_access_template and %u rows from dungeon_access_requirements in %u ms", count, countSubRequirements, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
