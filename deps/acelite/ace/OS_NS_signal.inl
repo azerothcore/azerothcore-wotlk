@@ -1,6 +1,7 @@
 // -*- C++ -*-
 #include "ace/OS_NS_macros.h"
 #include "ace/OS_NS_errno.h"
+#include "ace/os_include/os_pthread.h"
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -33,10 +34,21 @@ pthread_sigmask (int how, const sigset_t *nsp, sigset_t *osp)
 {
 #if defined (ACE_HAS_PTHREADS) && !defined (ACE_LACKS_PTHREAD_SIGMASK)
   int result;
+# ifdef ACE_PTHREAD_SIGMASK_MACRO
+  ACE_OSCALL_RETURN (ACE_ADAPT_RETVAL (ACE_PTHREAD_SIGMASK_MACRO (how, nsp, osp)
+                                      , result), int, -1);
+# elif defined (ACE_HAS_NONCONST_PTHREAD_SIGMASK)
+  sigset_t *ncnsp = const_cast<sigset_t *>(nsp);
+  ACE_OSCALL_RETURN (ACE_ADAPT_RETVAL (::pthread_sigmask (how, ncnsp, osp),
+                                       result),
+                     int,
+                     -1);
+# else
   ACE_OSCALL_RETURN (ACE_ADAPT_RETVAL (::pthread_sigmask (how, nsp, osp),
                                        result),
                      int,
                      -1);
+# endif /* ACE_HAS_NONCONST__PTHREAD_SIGMASK */
 #else /* !ACE_HAS_PTHREADS && !ACE_LACKS_PTHREAD_SIGMASK */
   ACE_UNUSED_ARG (how);
   ACE_UNUSED_ARG (nsp);
@@ -187,7 +199,8 @@ signal (int signum, ACE_SignalHandler func)
   if (signum == 0)
     return 0;
   else
-# if defined (ACE_WIN32) && !defined (ACE_HAS_WINCE) || !defined (ACE_LACKS_UNIX_SIGNALS)
+#if (defined ACE_WIN32 && !defined ACE_HAS_WINCE) || \
+    (!defined ACE_LACKS_UNIX_SIGNALS && !defined ACE_LACKS_SIGNAL)
 #  if !defined (ACE_HAS_TANDEM_SIGNALS) && !defined (ACE_HAS_LYNXOS4_SIGNALS)
     return ::signal (signum, func);
 #  else
@@ -204,14 +217,14 @@ signal (int signum, ACE_SignalHandler func)
 ACE_INLINE int
 sigprocmask (int how, const sigset_t *nsp, sigset_t *osp)
 {
-#if defined (ACE_LACKS_SIGSET)
+#if defined (ACE_LACKS_SIGSET) || defined (ACE_LACKS_SIGSET_DEFINITIONS) || defined (ACE_LACKS_SIGPROCMASK)
   ACE_UNUSED_ARG (how);
   ACE_UNUSED_ARG (nsp);
   ACE_UNUSED_ARG (osp);
   ACE_NOTSUP_RETURN (-1);
 #else
   ACE_OSCALL_RETURN (::sigprocmask (how, nsp, osp), int, -1);
-#endif /* ACE_LACKS_SIGSET */
+#endif /* ACE_LACKS_SIGSET || ACE_LACKS_SIGSET_DEFINITIONS || ACE_LACKS_SIGPROCMASK */
 }
 
 ACE_INLINE int
