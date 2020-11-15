@@ -1464,31 +1464,31 @@ struct WGWorkshop
         switch (team)
         {
             case TEAM_NEUTRAL:
-                {
-                    // Send warning message to all player to inform a faction attack to a workshop
-                    // alliance / horde attacking a workshop
-                    bf->SendWarningToAllInZone(teamControl ? WorkshopsData[workshopId].attackText : (WorkshopsData[workshopId].attackText + 2));
-                    break;
-                }
+            {
+                // Send warning message to all player to inform a faction attack to a workshop
+                // alliance / horde attacking a workshop
+                bf->SendWarningToAllInZone(teamControl ? WorkshopsData[workshopId].attackText : (WorkshopsData[workshopId].attackText + 2));
+                break;
+            }
             case TEAM_ALLIANCE:
             case TEAM_HORDE:
-                {
-                    // Updating worldstate
-                    state = team == TEAM_ALLIANCE ? BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT : BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT;
-                    bf->SendUpdateWorldState(WorkshopsData[workshopId].worldstate, state);
+            {
+                // Updating worldstate
+                state = team == TEAM_ALLIANCE ? BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT : BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT;
+                bf->SendUpdateWorldState(WorkshopsData[workshopId].worldstate, state);
 
-                    // Warning message
-                    if (!init)                              // workshop taken - alliance
-                        bf->SendWarningToAllInZone(team == TEAM_ALLIANCE ? WorkshopsData[workshopId].takenText : (WorkshopsData[workshopId].takenText + 2));
+                // Warning message
+                if (!init)                              // workshop taken - alliance
+                    bf->SendWarningToAllInZone(team == TEAM_ALLIANCE ? WorkshopsData[workshopId].takenText : (WorkshopsData[workshopId].takenText + 2));
 
-                    // Found associate graveyard and update it
-                    if (workshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-                        if (bf->GetGraveyardById(workshopId))
-                            bf->GetGraveyardById(workshopId)->GiveControlTo(team);
+                // Found associate graveyard and update it
+                if (workshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+                    if (bf->GetGraveyardById(workshopId))
+                        bf->GetGraveyardById(workshopId)->GiveControlTo(team);
 
-                    teamControl = team;
-                    break;
-                }
+                teamControl = team;
+                break;
+            }
         }
 
         if (!init)

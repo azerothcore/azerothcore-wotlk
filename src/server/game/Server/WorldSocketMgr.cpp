@@ -226,8 +226,7 @@ WorldSocketMgr* WorldSocketMgr::instance()
     return &instance;
 }
 
-int
-WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
+int WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 {
     m_UseNoDelay = sConfigMgr->GetBoolDefault ("Network.TcpNodelay", true);
 
@@ -272,8 +271,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
     return 0;
 }
 
-int
-WorldSocketMgr::StartNetwork (uint16 port, const char* address)
+int WorldSocketMgr::StartNetwork (uint16 port, const char* address)
 {
     if (!sLog->IsOutDebug())
         ACE_Log_Msg::instance()->priority_mask (LM_ERROR, ACE_Log_Msg::PROCESS);
@@ -286,8 +284,7 @@ WorldSocketMgr::StartNetwork (uint16 port, const char* address)
     return 0;
 }
 
-void
-WorldSocketMgr::StopNetwork()
+void WorldSocketMgr::StopNetwork()
 {
     if (m_Acceptor)
     {
@@ -305,8 +302,7 @@ WorldSocketMgr::StopNetwork()
     sScriptMgr->OnNetworkStop();
 }
 
-void
-WorldSocketMgr::Wait()
+void WorldSocketMgr::Wait()
 {
     if (m_NetThreadsCount != 0)
     {
@@ -315,8 +311,7 @@ WorldSocketMgr::Wait()
     }
 }
 
-int
-WorldSocketMgr::OnSocketOpen (WorldSocket* sock)
+int WorldSocketMgr::OnSocketOpen (WorldSocket* sock)
 {
     // set some options here
     if (m_SockOutKBuff >= 0)

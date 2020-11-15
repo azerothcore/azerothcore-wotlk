@@ -420,7 +420,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     uint32 mstime = World::GetGameTimeMS();
     /*----------------------*/
-    if(m_clientTimeDelay == 0)
+    if (m_clientTimeDelay == 0)
         m_clientTimeDelay = mstime > movementInfo.time ? std::min(mstime - movementInfo.time, (uint32)100) : 0;
 
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE

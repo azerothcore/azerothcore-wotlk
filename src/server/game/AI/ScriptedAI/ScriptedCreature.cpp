@@ -471,7 +471,7 @@ Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura
 {
     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
     std::vector<Player*> tList;
-    for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+    for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
     {
         if (me->GetDistance(itr->GetSource()) > maxdist || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
             continue;

@@ -37,13 +37,13 @@ bool GameEventMgr::CheckOneGameEvent(uint16 entry) const
     {
         default:
         case GAMEEVENT_NORMAL:
-            {
-                time_t currenttime = time(nullptr);
-                // Get the event information
-                return mGameEvent[entry].start < currenttime
-                       && currenttime < mGameEvent[entry].end
-                       && (currenttime - mGameEvent[entry].start) % (mGameEvent[entry].occurence * MINUTE) < mGameEvent[entry].length * MINUTE;
-            }
+        {
+            time_t currenttime = time(nullptr);
+            // Get the event information
+            return mGameEvent[entry].start < currenttime
+                   && currenttime < mGameEvent[entry].end
+                   && (currenttime - mGameEvent[entry].start) % (mGameEvent[entry].occurence * MINUTE) < mGameEvent[entry].length * MINUTE;
+        }
         // if the state is conditions or nextphase, then the event should be active
         case GAMEEVENT_WORLD_CONDITIONS:
         case GAMEEVENT_WORLD_NEXTPHASE:
@@ -54,18 +54,18 @@ bool GameEventMgr::CheckOneGameEvent(uint16 entry) const
             return false;
         // if inactive world event, check the prerequisite events
         case GAMEEVENT_WORLD_INACTIVE:
+        {
+            time_t currenttime = time(nullptr);
+            for (std::set<uint16>::const_iterator itr = mGameEvent[entry].prerequisite_events.begin(); itr != mGameEvent[entry].prerequisite_events.end(); ++itr)
             {
-                time_t currenttime = time(nullptr);
-                for (std::set<uint16>::const_iterator itr = mGameEvent[entry].prerequisite_events.begin(); itr != mGameEvent[entry].prerequisite_events.end(); ++itr)
-                {
-                    if ((mGameEvent[*itr].state != GAMEEVENT_WORLD_NEXTPHASE && mGameEvent[*itr].state != GAMEEVENT_WORLD_FINISHED) ||   // if prereq not in nextphase or finished state, then can't start this one
-                            mGameEvent[*itr].nextstart > currenttime)               // if not in nextphase state for long enough, can't start this one
-                        return false;
-                }
-                // all prerequisite events are met
-                // but if there are no prerequisites, this can be only activated through gm command
-                return !(mGameEvent[entry].prerequisite_events.empty());
+                if ((mGameEvent[*itr].state != GAMEEVENT_WORLD_NEXTPHASE && mGameEvent[*itr].state != GAMEEVENT_WORLD_FINISHED) ||   // if prereq not in nextphase or finished state, then can't start this one
+                        mGameEvent[*itr].nextstart > currenttime)               // if not in nextphase state for long enough, can't start this one
+                    return false;
             }
+            // all prerequisite events are met
+            // but if there are no prerequisites, this can be only activated through gm command
+            return !(mGameEvent[entry].prerequisite_events.empty());
+        }
     }
 }
 

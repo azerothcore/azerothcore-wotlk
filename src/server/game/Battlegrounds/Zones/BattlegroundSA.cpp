@@ -575,7 +575,7 @@ void BattlegroundSA::DefendersPortalTeleport(GameObject* portal, Player* plr)
 
     uint32 portal_num = 0;
     //get it via X
-    switch( (uint32)portal->GetPositionX() )
+    switch ( (uint32)portal->GetPositionX() )
     {
         case 1394:
             portal_num = 0;
@@ -623,14 +623,14 @@ void BattlegroundSA::EventPlayerDamagedGO(Player* /*player*/, GameObject* go, ui
         {
             case BG_SA_BLUE_GATE:
             case BG_SA_GREEN_GATE:
-                {
-                    GameObject* go = nullptr;
-                    if ((go = GetBGObject(BG_SA_RED_GATE)))
-                        go->SetDestructibleBuildingModifyState(true);
-                    if ((go = GetBGObject(BG_SA_PURPLE_GATE)))
-                        go->SetDestructibleBuildingModifyState(true);
-                    break;
-                }
+            {
+                GameObject* go = nullptr;
+                if ((go = GetBGObject(BG_SA_RED_GATE)))
+                    go->SetDestructibleBuildingModifyState(true);
+                if ((go = GetBGObject(BG_SA_PURPLE_GATE)))
+                    go->SetDestructibleBuildingModifyState(true);
+                break;
+            }
             case BG_SA_RED_GATE:
             case BG_SA_PURPLE_GATE:
                 if (GameObject*  go = GetBGObject(BG_SA_YELLOW_GATE))
@@ -920,7 +920,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
     uint32 npc = 0;
     uint32 flag = 0;
 
-    switch(i)
+    switch (i)
     {
         case BG_SA_LEFT_CAPTURABLE_GY:
             flag = BG_SA_LEFT_FLAG;

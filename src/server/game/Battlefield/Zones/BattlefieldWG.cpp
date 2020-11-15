@@ -542,17 +542,17 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
     {
         case NPC_DWARVEN_SPIRIT_GUIDE:
         case NPC_TAUNKA_SPIRIT_GUIDE:
-            {
-                TeamId teamId = (creature->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE);
-                uint8 graveyardId = GetSpiritGraveyardId(creature->GetAreaId(true));
-                // xinef: little workaround, there are 2 spirit guides in same area
-                if (creature->IsWithinDist2d(5103.0f, 3461.5f, 5.0f))
-                    graveyardId = BATTLEFIELD_WG_GY_WORKSHOP_NW;
+        {
+            TeamId teamId = (creature->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE);
+            uint8 graveyardId = GetSpiritGraveyardId(creature->GetAreaId(true));
+            // xinef: little workaround, there are 2 spirit guides in same area
+            if (creature->IsWithinDist2d(5103.0f, 3461.5f, 5.0f))
+                graveyardId = BATTLEFIELD_WG_GY_WORKSHOP_NW;
 
-                if (m_GraveyardList[graveyardId])
-                    m_GraveyardList[graveyardId]->SetSpirit(creature, teamId);
-                break;
-            }
+            if (m_GraveyardList[graveyardId])
+                m_GraveyardList[graveyardId]->SetSpirit(creature, teamId);
+            break;
+        }
     }
 
     // untested code - not sure if it is valid.
@@ -564,57 +564,57 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
             case NPC_WINTERGRASP_SIEGE_ENGINE_HORDE:
             case NPC_WINTERGRASP_CATAPULT:
             case NPC_WINTERGRASP_DEMOLISHER:
+            {
+                if (!creature->IsSummon() || !creature->ToTempSummon()->GetSummonerGUID())
+                    return;
+
+                Player* creator = ObjectAccessor::FindPlayer(creature->ToTempSummon()->GetSummonerGUID());
+                if (!creator)
+                    return;
+                TeamId team = creator->GetTeamId();
+
+                if (team == TEAM_HORDE)
                 {
-                    if (!creature->IsSummon() || !creature->ToTempSummon()->GetSummonerGUID())
-                        return;
-
-                    Player* creator = ObjectAccessor::FindPlayer(creature->ToTempSummon()->GetSummonerGUID());
-                    if (!creator)
-                        return;
-                    TeamId team = creator->GetTeamId();
-
-                    if (team == TEAM_HORDE)
+                    if (GetData(BATTLEFIELD_WG_DATA_VEHICLE_H) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H))
                     {
-                        if (GetData(BATTLEFIELD_WG_DATA_VEHICLE_H) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H))
-                        {
-                            UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_H, 1);
-                            creature->CastSpell(creature, SPELL_HORDE_FLAG, true);
-                            m_vehicles[team].insert(creature->GetGUID());
-                            UpdateVehicleCountWG();
-                        }
-                        else
-                        {
-                            creature->DespawnOrUnsummon();
-                            return;
-                        }
+                        UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_H, 1);
+                        creature->CastSpell(creature, SPELL_HORDE_FLAG, true);
+                        m_vehicles[team].insert(creature->GetGUID());
+                        UpdateVehicleCountWG();
                     }
                     else
                     {
-                        if (GetData(BATTLEFIELD_WG_DATA_VEHICLE_A) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A))
-                        {
-                            UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_A, 1);
-                            creature->CastSpell(creature, SPELL_ALLIANCE_FLAG, true);
-                            m_vehicles[team].insert(creature->GetGUID());
-                            UpdateVehicleCountWG();
-                        }
-                        else
-                        {
-                            creature->DespawnOrUnsummon();
-                            return;
-                        }
+                        creature->DespawnOrUnsummon();
+                        return;
                     }
-                    break;
                 }
+                else
+                {
+                    if (GetData(BATTLEFIELD_WG_DATA_VEHICLE_A) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A))
+                    {
+                        UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_A, 1);
+                        creature->CastSpell(creature, SPELL_ALLIANCE_FLAG, true);
+                        m_vehicles[team].insert(creature->GetGUID());
+                        UpdateVehicleCountWG();
+                    }
+                    else
+                    {
+                        creature->DespawnOrUnsummon();
+                        return;
+                    }
+                }
+                break;
+            }
             case NPC_WINTERGRASP_SIEGE_ENGINE_TURRET_HORDE:
             case NPC_WINTERGRASP_SIEGE_ENGINE_TURRET_ALLIANCE:
-                {
-                    if (!creature->IsSummon() || !creature->ToTempSummon()->GetSummonerGUID())
-                        return;
+            {
+                if (!creature->IsSummon() || !creature->ToTempSummon()->GetSummonerGUID())
+                    return;
 
-                    if (Unit* owner = creature->ToTempSummon()->GetSummoner())
-                        creature->setFaction(owner->getFaction());
-                    break;
-                }
+                if (Unit* owner = creature->ToTempSummon()->GetSummoner())
+                    creature->setFaction(owner->getFaction());
+                break;
+            }
         }
     }
 }

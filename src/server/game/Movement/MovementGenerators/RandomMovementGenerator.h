@@ -15,7 +15,7 @@
 #define MAX_PATH_LENGHT_FACTOR      1.85f
 
 template<class T>
-class RandomMovementGenerator : public MovementGeneratorMedium< T, RandomMovementGenerator<T> >
+class RandomMovementGenerator : public MovementGeneratorMedium< T, RandomMovementGenerator<T>>
 {
 public:
     RandomMovementGenerator(float wanderDistance = 0.0f) : _nextMoveTime(0), _moveCount(0), _wanderDistance(wanderDistance), _pathGenerator(nullptr), _currentPoint(RANDOM_POINTS_NUMBER)

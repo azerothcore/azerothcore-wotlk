@@ -80,11 +80,11 @@ void Totem::InitSummon()
         CastSpell(this, GetSpell(), true);
 
     // Some totems can have both instant effect and passive spell
-    if(GetSpell(1))
+    if (GetSpell(1))
         CastSpell(this, GetSpell(1), true);
 
     // xinef: this is better than the script, 100% sure to work
-    if(GetEntry() == SENTRY_TOTEM_ENTRY)
+    if (GetEntry() == SENTRY_TOTEM_ENTRY)
     {
         SetReactState(REACT_AGGRESSIVE);
         GetOwner()->CastSpell(this, 6277, true);

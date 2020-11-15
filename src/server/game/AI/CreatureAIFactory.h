@@ -26,8 +26,7 @@ struct CreatureAIFactory : public SelectableAI
 };
 
 template<class REAL_AI>
-inline CreatureAI*
-CreatureAIFactory<REAL_AI>::Create(void* data) const
+inline CreatureAI* CreatureAIFactory<REAL_AI>::Create(void* data) const
 {
     Creature* creature = reinterpret_cast<Creature*>(data);
     return (new REAL_AI(creature));
@@ -53,8 +52,7 @@ struct GameObjectAIFactory : public SelectableGameObjectAI
 };
 
 template<class REAL_GO_AI>
-inline GameObjectAI*
-GameObjectAIFactory<REAL_GO_AI>::Create(void* data) const
+inline GameObjectAI* GameObjectAIFactory<REAL_GO_AI>::Create(void* data) const
 {
     GameObject* go = reinterpret_cast<GameObject*>(data);
     return (new REAL_GO_AI(go));

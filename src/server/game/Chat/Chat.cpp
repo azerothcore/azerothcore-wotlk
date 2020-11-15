@@ -956,34 +956,34 @@ uint32 ChatHandler::extractSpellIdFromLink(char* text)
         case SPELL_LINK_SPELL:
             return id;
         case SPELL_LINK_TALENT:
-            {
-                // talent
-                TalentEntry const* talentEntry = sTalentStore.LookupEntry(id);
-                if (!talentEntry)
-                    return 0;
+        {
+            // talent
+            TalentEntry const* talentEntry = sTalentStore.LookupEntry(id);
+            if (!talentEntry)
+                return 0;
 
-                int32 rank = param1_str ? (uint32)atol(param1_str) : 0;
-                if (rank >= MAX_TALENT_RANK)
-                    return 0;
+            int32 rank = param1_str ? (uint32)atol(param1_str) : 0;
+            if (rank >= MAX_TALENT_RANK)
+                return 0;
 
-                if (rank < 0)
-                    rank = 0;
+            if (rank < 0)
+                rank = 0;
 
-                return talentEntry->RankID[rank];
-            }
+            return talentEntry->RankID[rank];
+        }
         case SPELL_LINK_ENCHANT:
         case SPELL_LINK_TRADE:
             return id;
         case SPELL_LINK_GLYPH:
-            {
-                uint32 glyph_prop_id = param1_str ? (uint32)atol(param1_str) : 0;
+        {
+            uint32 glyph_prop_id = param1_str ? (uint32)atol(param1_str) : 0;
 
-                GlyphPropertiesEntry const* glyphPropEntry = sGlyphPropertiesStore.LookupEntry(glyph_prop_id);
-                if (!glyphPropEntry)
-                    return 0;
+            GlyphPropertiesEntry const* glyphPropEntry = sGlyphPropertiesStore.LookupEntry(glyph_prop_id);
+            if (!glyphPropEntry)
+                return 0;
 
-                return glyphPropEntry->SpellId;
-            }
+            return glyphPropEntry->SpellId;
+        }
     }
 
     // unknown type?
@@ -1034,37 +1034,37 @@ uint64 ChatHandler::extractGuidFromLink(char* text)
     switch (type)
     {
         case SPELL_LINK_PLAYER:
-            {
-                std::string name = idS;
-                if (!normalizePlayerName(name))
-                    return 0;
-
-                if (Player* player = ObjectAccessor::FindPlayerByName(name, false))
-                    return player->GetGUID();
-
-                if (uint64 guid = sObjectMgr->GetPlayerGUIDByName(name))
-                    return guid;
-
+        {
+            std::string name = idS;
+            if (!normalizePlayerName(name))
                 return 0;
-            }
+
+            if (Player* player = ObjectAccessor::FindPlayerByName(name, false))
+                return player->GetGUID();
+
+            if (uint64 guid = sObjectMgr->GetPlayerGUIDByName(name))
+                return guid;
+
+            return 0;
+        }
         case SPELL_LINK_CREATURE:
-            {
-                uint32 lowguid = (uint32)atol(idS);
+        {
+            uint32 lowguid = (uint32)atol(idS);
 
-                if (CreatureData const* data = sObjectMgr->GetCreatureData(lowguid))
-                    return MAKE_NEW_GUID(lowguid, data->id, HIGHGUID_UNIT);
-                else
-                    return 0;
-            }
+            if (CreatureData const* data = sObjectMgr->GetCreatureData(lowguid))
+                return MAKE_NEW_GUID(lowguid, data->id, HIGHGUID_UNIT);
+            else
+                return 0;
+        }
         case SPELL_LINK_GAMEOBJECT:
-            {
-                uint32 lowguid = (uint32)atol(idS);
+        {
+            uint32 lowguid = (uint32)atol(idS);
 
-                if (GameObjectData const* data = sObjectMgr->GetGOData(lowguid))
-                    return MAKE_NEW_GUID(lowguid, data->id, HIGHGUID_GAMEOBJECT);
-                else
-                    return 0;
-            }
+            if (GameObjectData const* data = sObjectMgr->GetGOData(lowguid))
+                return MAKE_NEW_GUID(lowguid, data->id, HIGHGUID_GAMEOBJECT);
+            else
+                return 0;
+        }
     }
 
     // unknown type?

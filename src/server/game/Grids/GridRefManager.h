@@ -16,7 +16,7 @@ template<class OBJECT>
 class GridRefManager : public RefManager<GridRefManager<OBJECT>, OBJECT>
 {
 public:
-    typedef LinkedListHead::Iterator< GridReference<OBJECT> > iterator;
+    typedef LinkedListHead::Iterator< GridReference<OBJECT>> iterator;
 
     GridReference<OBJECT>* getFirst() { return (GridReference<OBJECT>*)RefManager<GridRefManager<OBJECT>, OBJECT>::getFirst(); }
     GridReference<OBJECT>* getLast() { return (GridReference<OBJECT>*)RefManager<GridRefManager<OBJECT>, OBJECT>::getLast(); }

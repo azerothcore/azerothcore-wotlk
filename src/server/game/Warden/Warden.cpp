@@ -283,15 +283,15 @@ std::string Warden::Penalty(WardenCheck* check /*= NULL*/, uint16 checkFailed /*
             return "Kick";
             break;
         case WARDEN_ACTION_BAN:
-            {
-                std::stringstream duration;
-                duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
-                std::string accountName;
-                AccountMgr::GetName(_session->GetAccountId(), accountName);
-                sBan->BanAccount(accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), banReason, "Server");
+        {
+            std::stringstream duration;
+            duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
+            std::string accountName;
+            AccountMgr::GetName(_session->GetAccountId(), accountName);
+            sBan->BanAccount(accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), banReason, "Server");
 
-                return "Ban";
-            }
+            return "Ban";
+        }
         default:
             break;
     }

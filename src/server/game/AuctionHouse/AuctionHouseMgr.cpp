@@ -434,18 +434,18 @@ AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTem
                 houseid = 6;
                 break; // b-elfs,
             default:                       // for unknown case
-                {
-                    FactionTemplateEntry const* u_entry = sFactionTemplateStore.LookupEntry(factionTemplateId);
-                    if (!u_entry)
-                        houseid = 7; // goblin auction house
-                    else if (u_entry->ourMask & FACTION_MASK_ALLIANCE)
-                        houseid = 1; // human auction house
-                    else if (u_entry->ourMask & FACTION_MASK_HORDE)
-                        houseid = 6; // orc auction house
-                    else
-                        houseid = 7; // goblin auction house
-                    break;
-                }
+            {
+                FactionTemplateEntry const* u_entry = sFactionTemplateStore.LookupEntry(factionTemplateId);
+                if (!u_entry)
+                    houseid = 7; // goblin auction house
+                else if (u_entry->ourMask & FACTION_MASK_ALLIANCE)
+                    houseid = 1; // human auction house
+                else if (u_entry->ourMask & FACTION_MASK_HORDE)
+                    houseid = 6; // orc auction house
+                else
+                    houseid = 7; // goblin auction house
+                break;
+            }
         }
     }
 

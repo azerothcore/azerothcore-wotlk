@@ -78,7 +78,7 @@ Group::~Group()
         itr = RollId.begin();
         Roll* r = *itr;
         RollId.erase(itr);
-        delete(r);
+        delete (r);
     }
 
     // Sub group counters clean up
@@ -1950,55 +1950,55 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
     switch (method)
     {
         case INSTANCE_RESET_ALL:
+        {
+            if (leader->GetDifficulty(false) != DUNGEON_DIFFICULTY_NORMAL)
+                break;
+            std::vector<InstanceSave*> toUnbind;
+            BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(leader->GetGUIDLow(), Difficulty(DUNGEON_DIFFICULTY_NORMAL));
+            for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
             {
-                if (leader->GetDifficulty(false) != DUNGEON_DIFFICULTY_NORMAL)
-                    break;
-                std::vector<InstanceSave*> toUnbind;
-                BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(leader->GetGUIDLow(), Difficulty(DUNGEON_DIFFICULTY_NORMAL));
-                for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
-                {
-                    InstanceSave* instanceSave = itr->second.save;
-                    const MapEntry* entry = sMapStore.LookupEntry(itr->first);
-                    if (!entry || entry->IsRaid() || !instanceSave->CanReset())
-                        continue;
+                InstanceSave* instanceSave = itr->second.save;
+                const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+                if (!entry || entry->IsRaid() || !instanceSave->CanReset())
+                    continue;
 
-                    Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
-                    if (!map || map->ToInstanceMap()->Reset(method))
-                    {
-                        leader->SendResetInstanceSuccess(instanceSave->GetMapId());
-                        toUnbind.push_back(instanceSave);
-                    }
-                    else
-                        leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
+                if (!map || map->ToInstanceMap()->Reset(method))
+                {
+                    leader->SendResetInstanceSuccess(instanceSave->GetMapId());
+                    toUnbind.push_back(instanceSave);
                 }
-                for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
-                    sInstanceSaveMgr->UnbindAllFor(*itr);
+                else
+                    leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
             }
-            break;
+            for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
+                sInstanceSaveMgr->UnbindAllFor(*itr);
+        }
+        break;
         case INSTANCE_RESET_CHANGE_DIFFICULTY:
+        {
+            std::vector<InstanceSave*> toUnbind;
+            BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(leader->GetGUIDLow(), leader->GetDifficulty(isRaid));
+            for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
             {
-                std::vector<InstanceSave*> toUnbind;
-                BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(leader->GetGUIDLow(), leader->GetDifficulty(isRaid));
-                for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
-                {
-                    InstanceSave* instanceSave = itr->second.save;
-                    const MapEntry* entry = sMapStore.LookupEntry(itr->first);
-                    if (!entry || entry->IsRaid() != isRaid || !instanceSave->CanReset())
-                        continue;
+                InstanceSave* instanceSave = itr->second.save;
+                const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+                if (!entry || entry->IsRaid() != isRaid || !instanceSave->CanReset())
+                    continue;
 
-                    Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
-                    if (!map || map->ToInstanceMap()->Reset(method))
-                    {
-                        leader->SendResetInstanceSuccess(instanceSave->GetMapId());
-                        toUnbind.push_back(instanceSave);
-                    }
-                    else
-                        leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
+                if (!map || map->ToInstanceMap()->Reset(method))
+                {
+                    leader->SendResetInstanceSuccess(instanceSave->GetMapId());
+                    toUnbind.push_back(instanceSave);
                 }
-                for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
-                    sInstanceSaveMgr->UnbindAllFor(*itr);
+                else
+                    leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
             }
-            break;
+            for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
+                sInstanceSaveMgr->UnbindAllFor(*itr);
+        }
+        break;
     }
 }
 

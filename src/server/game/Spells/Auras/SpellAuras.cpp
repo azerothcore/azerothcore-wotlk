@@ -626,7 +626,7 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
                 if (itr->first->IsInFlight())
                     addUnit = false;
 
-                switch( GetId() )
+                switch ( GetId() )
                 {
                     case 62821: // Ulduar, Hodir, Toasty Fire
                     case 62807: // Ulduar, Hodir, Starlight
@@ -635,11 +635,11 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
                     case 70823:
                     case 70824:
                     case 70825: // Icecrown Citadel, Lord Marrowgar, Coldflame
-                        {
-                            if( itr->first->HasAura(GetId()) )
-                                addUnit = false;
-                        }
-                        break;
+                    {
+                        if ( itr->first->HasAura(GetId()) )
+                            addUnit = false;
+                    }
+                    break;
                 }
             }
             // unit auras can not stack with each other
@@ -1362,17 +1362,17 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                         break;
                     case 44544: // Fingers of Frost
+                    {
+                        // See if we already have the indicator aura. If not, create one.
+                        if (Aura* aur = target->GetAura(74396))
                         {
-                            // See if we already have the indicator aura. If not, create one.
-                            if (Aura* aur = target->GetAura(74396))
-                            {
-                                // Aura already there. Refresh duration and set original charges
-                                aur->SetCharges(2);
-                                aur->RefreshDuration();
-                            }
-                            else
-                                target->AddAura(74396, target);
+                            // Aura already there. Refresh duration and set original charges
+                            aur->SetCharges(2);
+                            aur->RefreshDuration();
                         }
+                        else
+                            target->AddAura(74396, target);
+                    }
                     default:
                         break;
                 }
@@ -1521,7 +1521,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 if (!caster)
                     break;
-                switch(GetId())
+                switch (GetId())
                 {
                     case 61987: // Avenging Wrath
                         // Remove the immunity shield marker on Avenging Wrath removal if Forbearance is not present
@@ -1659,11 +1659,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             switch (target->getPowerType())
                             {
                                 case POWER_MANA:
-                                    {
-                                        int32 basepoints0 = int32(CalculatePct(target->GetMaxPower(POWER_MANA), 2));
-                                        caster->CastCustomSpell(target, 63654, &basepoints0, nullptr, nullptr, true);
-                                        break;
-                                    }
+                                {
+                                    int32 basepoints0 = int32(CalculatePct(target->GetMaxPower(POWER_MANA), 2));
+                                    caster->CastCustomSpell(target, 63654, &basepoints0, nullptr, nullptr, true);
+                                    break;
+                                }
                                 case POWER_RAGE:
                                     triggeredSpellId = 63653;
                                     break;
@@ -1708,21 +1708,21 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
             case SPELLFAMILY_ROGUE:
+            {
+                // Overkill, Master of Subtlety
+                if (caster && GetSpellInfo()->SpellIconID == 250)
                 {
-                    // Overkill, Master of Subtlety
-                    if (caster && GetSpellInfo()->SpellIconID == 250)
-                    {
-                        if (caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 2114, 0))
-                            caster->CastSpell(caster, 31666, true);
+                    if (caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 2114, 0))
+                        caster->CastSpell(caster, 31666, true);
 
-                        if (caster->GetAuraEffectDummy(58426))
-                            caster->CastSpell(caster, 58428, true);
-                    }
-                    // Remove Vanish on stealth remove
-                    if (GetId() == 1784)
-                        target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x800, 0, 0, 0);
-                    break;
+                    if (caster->GetAuraEffectDummy(58426))
+                        caster->CastSpell(caster, 58428, true);
                 }
+                // Remove Vanish on stealth remove
+                if (GetId() == 1784)
+                    target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x800, 0, 0, 0);
+                break;
+            }
 
             case SPELLFAMILY_DEATHKNIGHT:
                 // Blood of the North
@@ -1881,7 +1881,7 @@ bool Aura::IsAuraStronger(Aura const* newAura) const
                 return true;
 
             if (curValue == abs(newEffect->GetAmount()))
-                if(!IsPassive() && !IsPermanent() && GetDuration() < newAura->GetDuration())
+                if (!IsPassive() && !IsPermanent() && GetDuration() < newAura->GetDuration())
                     return true;
         }
     }
@@ -2644,38 +2644,38 @@ void UnitAura::FillTargetMap(std::map<Unit*, uint8>& targets, Unit* caster)
                 {
                     case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
                     case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
-                        {
-                            targetList.push_back(GetUnitOwner());
-                            acore::AnyGroupedUnitInObjectRangeCheck u_check(GetUnitOwner(), GetUnitOwner(), radius, GetSpellInfo()->Effects[effIndex].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID);
-                            acore::UnitListSearcher<acore::AnyGroupedUnitInObjectRangeCheck> searcher(GetUnitOwner(), targetList, u_check);
-                            GetUnitOwner()->VisitNearbyObject(radius, searcher);
-                            break;
-                        }
+                    {
+                        targetList.push_back(GetUnitOwner());
+                        acore::AnyGroupedUnitInObjectRangeCheck u_check(GetUnitOwner(), GetUnitOwner(), radius, GetSpellInfo()->Effects[effIndex].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID);
+                        acore::UnitListSearcher<acore::AnyGroupedUnitInObjectRangeCheck> searcher(GetUnitOwner(), targetList, u_check);
+                        GetUnitOwner()->VisitNearbyObject(radius, searcher);
+                        break;
+                    }
                     case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
-                        {
-                            targetList.push_back(GetUnitOwner());
-                            acore::AnyFriendlyUnitInObjectRangeCheck u_check(GetUnitOwner(), GetUnitOwner(), radius);
-                            acore::UnitListSearcher<acore::AnyFriendlyUnitInObjectRangeCheck> searcher(GetUnitOwner(), targetList, u_check);
-                            GetUnitOwner()->VisitNearbyObject(radius, searcher);
-                            break;
-                        }
+                    {
+                        targetList.push_back(GetUnitOwner());
+                        acore::AnyFriendlyUnitInObjectRangeCheck u_check(GetUnitOwner(), GetUnitOwner(), radius);
+                        acore::UnitListSearcher<acore::AnyFriendlyUnitInObjectRangeCheck> searcher(GetUnitOwner(), targetList, u_check);
+                        GetUnitOwner()->VisitNearbyObject(radius, searcher);
+                        break;
+                    }
                     case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
-                        {
-                            acore::AnyAoETargetUnitInObjectRangeCheck u_check(GetUnitOwner(), GetUnitOwner(), radius); // No GetCharmer in searcher
-                            acore::UnitListSearcher<acore::AnyAoETargetUnitInObjectRangeCheck> searcher(GetUnitOwner(), targetList, u_check);
-                            GetUnitOwner()->VisitNearbyObject(radius, searcher);
-                            break;
-                        }
+                    {
+                        acore::AnyAoETargetUnitInObjectRangeCheck u_check(GetUnitOwner(), GetUnitOwner(), radius); // No GetCharmer in searcher
+                        acore::UnitListSearcher<acore::AnyAoETargetUnitInObjectRangeCheck> searcher(GetUnitOwner(), targetList, u_check);
+                        GetUnitOwner()->VisitNearbyObject(radius, searcher);
+                        break;
+                    }
                     case SPELL_EFFECT_APPLY_AREA_AURA_PET:
                         targetList.push_back(GetUnitOwner());
                         [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                     case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
-                        {
-                            if (Unit* owner = GetUnitOwner()->GetCharmerOrOwner())
-                                if (GetUnitOwner()->IsWithinDistInMap(owner, radius))
-                                    targetList.push_back(owner);
-                            break;
-                        }
+                    {
+                        if (Unit* owner = GetUnitOwner()->GetCharmerOrOwner())
+                            if (GetUnitOwner()->IsWithinDistInMap(owner, radius))
+                                targetList.push_back(owner);
+                        break;
+                    }
                 }
             }
         }

@@ -372,181 +372,181 @@ void Pet::Update(uint32 diff)
     switch (m_deathState)
     {
         case CORPSE:
+        {
+            if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= time(nullptr))
             {
-                if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= time(nullptr))
-                {
-                    Remove(PET_SAVE_NOT_IN_SLOT);               //hunters' pets never get removed because of death, NEVER!
-                    return;
-                }
-                break;
+                Remove(PET_SAVE_NOT_IN_SLOT);               //hunters' pets never get removed because of death, NEVER!
+                return;
             }
+            break;
+        }
         case ALIVE:
+        {
+            // unsummon pet that lost owner
+            Player* owner = GetOwner();
+            if (!owner || (!IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()) && !isPossessed()) || (isControlled() && !owner->GetPetGUID()))
+                //if (!owner || (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) && (owner->GetCharmGUID() && (owner->GetCharmGUID() != GetGUID()))) || (isControlled() && !owner->GetPetGUID()))
             {
-                // unsummon pet that lost owner
-                Player* owner = GetOwner();
-                if (!owner || (!IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()) && !isPossessed()) || (isControlled() && !owner->GetPetGUID()))
-                    //if (!owner || (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) && (owner->GetCharmGUID() && (owner->GetCharmGUID() != GetGUID()))) || (isControlled() && !owner->GetPetGUID()))
+                Remove(PET_SAVE_NOT_IN_SLOT, true);
+                return;
+            }
+
+            if (isControlled())
+            {
+                if (owner->GetPetGUID() != GetGUID())
                 {
-                    Remove(PET_SAVE_NOT_IN_SLOT, true);
+                    sLog->outError("Pet %u is not pet of owner %s, removed", GetEntry(), m_owner->GetName().c_str());
+                    Remove(getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT);
                     return;
                 }
+            }
 
-                if (isControlled())
+            if (m_duration > 0)
+            {
+                if (uint32(m_duration) > diff)
+                    m_duration -= diff;
+                else
                 {
-                    if (owner->GetPetGUID() != GetGUID())
-                    {
-                        sLog->outError("Pet %u is not pet of owner %s, removed", GetEntry(), m_owner->GetName().c_str());
-                        Remove(getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT);
-                        return;
-                    }
+                    Remove(getPetType() != SUMMON_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT);
+                    return;
                 }
+            }
 
-                if (m_duration > 0)
+            // xinef: m_regenTimer is decrased in Creature::Update()
+            // xinef: just check if we can update focus in current period
+            if (getPowerType() == POWER_FOCUS)
+            {
+                m_petRegenTimer -= diff;
+                if (m_petRegenTimer <= int32(0))
                 {
-                    if (uint32(m_duration) > diff)
-                        m_duration -= diff;
-                    else
-                    {
-                        Remove(getPetType() != SUMMON_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT);
-                        return;
-                    }
+                    m_petRegenTimer += PET_FOCUS_REGEN_INTERVAL;
+                    Regenerate(POWER_FOCUS);
                 }
+            }
 
-                // xinef: m_regenTimer is decrased in Creature::Update()
-                // xinef: just check if we can update focus in current period
-                if (getPowerType() == POWER_FOCUS)
+            if (m_tempspell != 0)
+            {
+                Unit* tempspellTarget = m_tempspellTarget;
+                Unit* tempoldTarget = m_tempoldTarget;
+                bool tempspellIsPositive = m_tempspellIsPositive;
+                uint32 tempspell = m_tempspell;
+                Unit* charmer = GetCharmerOrOwner();
+                if (!charmer)
+                    return;
+
+                if (!GetCharmInfo())
+                    return;
+
+                if (tempspellTarget && tempspellTarget->IsAlive())
                 {
-                    m_petRegenTimer -= diff;
-                    if (m_petRegenTimer <= int32(0))
-                    {
-                        m_petRegenTimer += PET_FOCUS_REGEN_INTERVAL;
-                        Regenerate(POWER_FOCUS);
-                    }
-                }
-
-                if (m_tempspell != 0)
-                {
-                    Unit* tempspellTarget = m_tempspellTarget;
-                    Unit* tempoldTarget = m_tempoldTarget;
-                    bool tempspellIsPositive = m_tempspellIsPositive;
-                    uint32 tempspell = m_tempspell;
-                    Unit* charmer = GetCharmerOrOwner();
-                    if (!charmer)
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(tempspell);
+                    if (!spellInfo)
                         return;
+                    float max_range = GetSpellMaxRangeForTarget(tempspellTarget, spellInfo);
+                    if (spellInfo->RangeEntry->type == SPELL_RANGE_MELEE)
+                        max_range -= 2 * MIN_MELEE_REACH;
 
-                    if (!GetCharmInfo())
-                        return;
-
-                    if (tempspellTarget && tempspellTarget->IsAlive())
+                    if (IsWithinLOSInMap(tempspellTarget) && GetDistance(tempspellTarget) < max_range)
                     {
-                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(tempspell);
-                        if (!spellInfo)
-                            return;
-                        float max_range = GetSpellMaxRangeForTarget(tempspellTarget, spellInfo);
-                        if (spellInfo->RangeEntry->type == SPELL_RANGE_MELEE)
-                            max_range -= 2 * MIN_MELEE_REACH;
-
-                        if (IsWithinLOSInMap(tempspellTarget) && GetDistance(tempspellTarget) < max_range)
+                        if (!GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo) && !HasSpellCooldown(tempspell))
                         {
-                            if (!GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo) && !HasSpellCooldown(tempspell))
+                            StopMoving();
+                            GetMotionMaster()->Clear(false);
+                            GetMotionMaster()->MoveIdle();
+
+                            GetCharmInfo()->SetIsCommandAttack(false);
+                            GetCharmInfo()->SetIsAtStay(true);
+                            GetCharmInfo()->SetIsCommandFollow(false);
+                            GetCharmInfo()->SetIsFollowing(false);
+                            GetCharmInfo()->SetIsReturning(false);
+                            GetCharmInfo()->SaveStayPosition(true);
+
+                            CastSpell(tempspellTarget, tempspell, true);
+                            m_tempspell = 0;
+                            m_tempspellTarget = nullptr;
+
+                            if (tempspellIsPositive)
                             {
-                                StopMoving();
-                                GetMotionMaster()->Clear(false);
-                                GetMotionMaster()->MoveIdle();
-
-                                GetCharmInfo()->SetIsCommandAttack(false);
-                                GetCharmInfo()->SetIsAtStay(true);
-                                GetCharmInfo()->SetIsCommandFollow(false);
-                                GetCharmInfo()->SetIsFollowing(false);
-                                GetCharmInfo()->SetIsReturning(false);
-                                GetCharmInfo()->SaveStayPosition(true);
-
-                                CastSpell(tempspellTarget, tempspell, true);
-                                m_tempspell = 0;
-                                m_tempspellTarget = nullptr;
-
-                                if (tempspellIsPositive)
+                                if (tempoldTarget && tempoldTarget->IsAlive())
                                 {
-                                    if (tempoldTarget && tempoldTarget->IsAlive())
-                                    {
-                                        GetCharmInfo()->SetIsCommandAttack(true);
-                                        GetCharmInfo()->SetIsAtStay(false);
-                                        GetCharmInfo()->SetIsFollowing(false);
-                                        GetCharmInfo()->SetIsCommandFollow(false);
-                                        GetCharmInfo()->SetIsReturning(false);
+                                    GetCharmInfo()->SetIsCommandAttack(true);
+                                    GetCharmInfo()->SetIsAtStay(false);
+                                    GetCharmInfo()->SetIsFollowing(false);
+                                    GetCharmInfo()->SetIsCommandFollow(false);
+                                    GetCharmInfo()->SetIsReturning(false);
 
-                                        if (ToCreature() && ToCreature()->IsAIEnabled)
-                                            ToCreature()->AI()->AttackStart(tempoldTarget);
-                                    }
-                                    else
-                                    {
-                                        GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
-                                        GetCharmInfo()->SetIsCommandAttack(false);
-                                        GetCharmInfo()->SetIsAtStay(false);
-                                        GetCharmInfo()->SetIsReturning(true);
-                                        GetCharmInfo()->SetIsCommandFollow(true);
-                                        GetCharmInfo()->SetIsFollowing(false);
-                                        GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
-                                    }
-
-                                    m_tempoldTarget = nullptr;
-                                    m_tempspellIsPositive = false;
+                                    if (ToCreature() && ToCreature()->IsAIEnabled)
+                                        ToCreature()->AI()->AttackStart(tempoldTarget);
                                 }
+                                else
+                                {
+                                    GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+                                    GetCharmInfo()->SetIsCommandAttack(false);
+                                    GetCharmInfo()->SetIsAtStay(false);
+                                    GetCharmInfo()->SetIsReturning(true);
+                                    GetCharmInfo()->SetIsCommandFollow(true);
+                                    GetCharmInfo()->SetIsFollowing(false);
+                                    GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
+                                }
+
+                                m_tempoldTarget = nullptr;
+                                m_tempspellIsPositive = false;
                             }
                         }
                     }
+                }
+                else
+                {
+                    m_tempspell = 0;
+                    m_tempspellTarget = nullptr;
+                    m_tempoldTarget = nullptr;
+                    m_tempspellIsPositive = false;
+
+                    Unit* victim = charmer->GetVictim();
+                    if (victim && victim->IsAlive())
+                    {
+                        StopMoving();
+                        GetMotionMaster()->Clear(false);
+                        GetMotionMaster()->MoveIdle();
+
+                        GetCharmInfo()->SetIsCommandAttack(true);
+                        GetCharmInfo()->SetIsAtStay(false);
+                        GetCharmInfo()->SetIsFollowing(false);
+                        GetCharmInfo()->SetIsCommandFollow(false);
+                        GetCharmInfo()->SetIsReturning(false);
+
+                        if (ToCreature() && ToCreature()->IsAIEnabled)
+                            ToCreature()->AI()->AttackStart(victim);
+                    }
                     else
                     {
-                        m_tempspell = 0;
-                        m_tempspellTarget = nullptr;
-                        m_tempoldTarget = nullptr;
-                        m_tempspellIsPositive = false;
+                        StopMoving();
+                        GetMotionMaster()->Clear(false);
+                        GetMotionMaster()->MoveIdle();
 
-                        Unit* victim = charmer->GetVictim();
-                        if (victim && victim->IsAlive())
-                        {
-                            StopMoving();
-                            GetMotionMaster()->Clear(false);
-                            GetMotionMaster()->MoveIdle();
-
-                            GetCharmInfo()->SetIsCommandAttack(true);
-                            GetCharmInfo()->SetIsAtStay(false);
-                            GetCharmInfo()->SetIsFollowing(false);
-                            GetCharmInfo()->SetIsCommandFollow(false);
-                            GetCharmInfo()->SetIsReturning(false);
-
-                            if (ToCreature() && ToCreature()->IsAIEnabled)
-                                ToCreature()->AI()->AttackStart(victim);
-                        }
-                        else
-                        {
-                            StopMoving();
-                            GetMotionMaster()->Clear(false);
-                            GetMotionMaster()->MoveIdle();
-
-                            GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
-                            GetCharmInfo()->SetIsCommandAttack(false);
-                            GetCharmInfo()->SetIsAtStay(false);
-                            GetCharmInfo()->SetIsReturning(true);
-                            GetCharmInfo()->SetIsCommandFollow(true);
-                            GetCharmInfo()->SetIsFollowing(false);
-                            GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
-                        }
+                        GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+                        GetCharmInfo()->SetIsCommandAttack(false);
+                        GetCharmInfo()->SetIsAtStay(false);
+                        GetCharmInfo()->SetIsReturning(true);
+                        GetCharmInfo()->SetIsCommandFollow(true);
+                        GetCharmInfo()->SetIsFollowing(false);
+                        GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
                     }
                 }
-
-                if (getPetType() == HUNTER_PET)
-                {
-                    m_happinessTimer -= diff;
-                    if (m_happinessTimer <= int32(0))
-                    {
-                        LoseHappiness();
-                        m_happinessTimer += PET_LOSE_HAPPINES_INTERVAL;
-                    }
-                }
-
-                break;
             }
+
+            if (getPetType() == HUNTER_PET)
+            {
+                m_happinessTimer -= diff;
+                if (m_happinessTimer <= int32(0))
+                {
+                    LoseHappiness();
+                    m_happinessTimer += PET_LOSE_HAPPINES_INTERVAL;
+                }
+            }
+
+            break;
+        }
         default:
             break;
     }
@@ -831,225 +831,225 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     switch (petType)
     {
         case HUNTER_PET:
+        {
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
+            SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(petlevel)*PET_XP_FACTOR));
+            break;
+        }
+        case SUMMON_PET:
+        {
+
+            if (pInfo)
+            {
+                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->min_dmg));
+                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(pInfo->max_dmg));
+            }
+            else
             {
                 SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
                 SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
-                SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(petlevel)*PET_XP_FACTOR));
-                break;
             }
-        case SUMMON_PET:
-            {
 
-                if (pInfo)
+            switch (GetEntry())
+            {
+                case NPC_FELGUARD:
                 {
-                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->min_dmg));
-                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(pInfo->max_dmg));
+                    // xinef: Glyph of Felguard, so ugly im crying... no appropriate spell
+                    if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_FELGUARD))
+                        SetModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, 1.0f + float(aurEff->GetAmount() / 100.0f));
+
+                    break;
                 }
-                else
+                case NPC_WATER_ELEMENTAL_PERM:
+                {
+                    AddAura(SPELL_PET_AVOIDANCE, this);
+                    AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                    AddAura(SPELL_MAGE_PET_SCALING_01, this);
+                    AddAura(SPELL_MAGE_PET_SCALING_02, this);
+                    AddAura(SPELL_MAGE_PET_SCALING_03, this);
+                    AddAura(SPELL_MAGE_PET_SCALING_04, this);
+                    ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
+                    break;
+                }
+            }
+            break;
+        }
+        default:
+        {
+            switch (GetEntry())
+            {
+                case NPC_FIRE_ELEMENTAL:
+                {
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 3.5f - petlevel));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 3.5f + petlevel));
+                    AddAura(SPELL_PET_AVOIDANCE, this);
+                    AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                    AddAura(SPELL_FIRE_ELEMENTAL_SCALING_01, this);
+                    AddAura(SPELL_FIRE_ELEMENTAL_SCALING_02, this);
+                    AddAura(SPELL_FIRE_ELEMENTAL_SCALING_03, this);
+                    AddAura(SPELL_FIRE_ELEMENTAL_SCALING_04, this);
+                    break;
+                }
+                case NPC_EARTH_ELEMENTAL:
+                {
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.0f - petlevel));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.0f + petlevel));
+                    AddAura(SPELL_PET_AVOIDANCE, this);
+                    AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                    AddAura(SPELL_EARTH_ELEMENTAL_SCALING_01, this);
+                    AddAura(SPELL_EARTH_ELEMENTAL_SCALING_02, this);
+                    AddAura(SPELL_EARTH_ELEMENTAL_SCALING_03, this);
+                    AddAura(SPELL_EARTH_ELEMENTAL_SCALING_04, this);
+                    break;
+                }
+                case NPC_INFERNAL:
+                {
+                    float highAmt = petlevel / 11.0f;
+                    float lowAmt = petlevel / 12.0f;
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, lowAmt * lowAmt * lowAmt);
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, highAmt * highAmt * highAmt);
+
+                    AddAura(SPELL_PET_AVOIDANCE, this);
+                    AddAura(SPELL_WARLOCK_PET_SCALING_05, this);
+                    AddAura(SPELL_INFERNAL_SCALING_01, this);
+                    AddAura(SPELL_INFERNAL_SCALING_02, this);
+                    AddAura(SPELL_INFERNAL_SCALING_03, this);
+                    AddAura(SPELL_INFERNAL_SCALING_04, this);
+                    break;
+                }
+                case NPC_DOOMGUARD:
+                {
+                    float highAmt = petlevel / 11.0f;
+                    float lowAmt = petlevel / 12.0f;
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, lowAmt * lowAmt * lowAmt);
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, highAmt * highAmt * highAmt);
+
+                    AddAura(SPELL_PET_AVOIDANCE, this);
+                    AddAura(SPELL_WARLOCK_PET_SCALING_01, this);
+                    AddAura(SPELL_WARLOCK_PET_SCALING_02, this);
+                    AddAura(SPELL_WARLOCK_PET_SCALING_03, this);
+                    AddAura(SPELL_WARLOCK_PET_SCALING_04, this);
+                    AddAura(SPELL_WARLOCK_PET_SCALING_05, this);
+                    break;
+                }
+                case NPC_WATER_ELEMENTAL_TEMP:
+                {
+                    AddAura(SPELL_PET_AVOIDANCE, this);
+                    AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                    AddAura(SPELL_MAGE_PET_SCALING_01, this);
+                    AddAura(SPELL_MAGE_PET_SCALING_02, this);
+                    AddAura(SPELL_MAGE_PET_SCALING_03, this);
+                    AddAura(SPELL_MAGE_PET_SCALING_04, this);
+                    ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
+                    break;
+                }
+                case NPC_TREANT: //force of nature
+                {
+                    if (!pInfo)
+                        SetCreateHealth(30 + 30 * petlevel);
+
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - petlevel));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.5f + petlevel));
+
+                    AddAura(SPELL_PET_AVOIDANCE, this);
+                    AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                    AddAura(SPELL_TREANT_SCALING_01, this);
+                    AddAura(SPELL_TREANT_SCALING_02, this);
+                    AddAura(SPELL_TREANT_SCALING_03, this);
+                    AddAura(SPELL_TREANT_SCALING_04, this);
+                    break;
+                }
+                case NPC_SHADOWFIEND:
+                {
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - petlevel));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.5f + petlevel));
+
+                    AddAura(SPELL_PET_AVOIDANCE, this);
+                    AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                    AddAura(SPELL_SHADOWFIEND_SCALING_01, this);
+                    AddAura(SPELL_SHADOWFIEND_SCALING_02, this);
+                    AddAura(SPELL_SHADOWFIEND_SCALING_03, this);
+                    AddAura(SPELL_SHADOWFIEND_SCALING_04, this);
+                    break;
+                }
+                case NPC_FERAL_SPIRIT:
+                {
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 4.0f - petlevel));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 4.0f + petlevel));
+
+                    AddAura(SPELL_PET_AVOIDANCE, this);
+                    AddAura(SPELL_FERAL_SPIRIT_SPIRIT_HUNT, this);
+                    AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                    AddAura(SPELL_FERAL_SPIRIT_SCALING_01, this);
+                    AddAura(SPELL_FERAL_SPIRIT_SCALING_02, this);
+                    AddAura(SPELL_FERAL_SPIRIT_SCALING_03, this);
+                    break;
+                }
+                case NPC_MIRROR_IMAGE: // Mirror Image
+                {
+                    SetDisplayId(owner->GetDisplayId());
+                    if (!pInfo)
+                    {
+                        SetCreateMana(28 + 30 * petlevel);
+                        SetCreateHealth(28 + 10 * petlevel);
+                    }
+
+                    AddAura(SPELL_PET_AVOIDANCE, this);
+                    AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                    AddAura(SPELL_MAGE_PET_SCALING_01, this);
+                    AddAura(SPELL_MAGE_PET_SCALING_02, this);
+                    AddAura(SPELL_MAGE_PET_SCALING_03, this);
+                    AddAura(SPELL_MAGE_PET_SCALING_04, this);
+                    break;
+                }
+                case NPC_EBON_GARGOYLE: // Ebon Gargoyle
+                {
+                    if (!pInfo)
+                    {
+                        SetCreateMana(28 + 10 * petlevel);
+                        SetCreateHealth(28 + 30 * petlevel);
+                    }
+
+                    AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                    AddAura(SPELL_DK_PET_SCALING_01, this);
+                    AddAura(SPELL_DK_PET_SCALING_02, this);
+                    AddAura(SPELL_DK_PET_SCALING_03, this);
+                    break;
+                }
+                case NPC_BLOODWORM:
+                {
+                    // Xinef: Hit / Expertise scaling
+                    AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                    AddAura(SPELL_PET_AVOIDANCE, this);
+                    SetCreateHealth(4 * petlevel);
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - 30 - (petlevel / 4) + owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.006f));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel - 30 + (petlevel / 4) + owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.006f));
+                    SetReactState(REACT_DEFENSIVE);
+                    break;
+                }
+                case NPC_ARMY_OF_THE_DEAD:
+                {
+                    AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                    AddAura(SPELL_DK_PET_SCALING_01, this);
+                    AddAura(SPELL_DK_PET_SCALING_02, this);
+                    AddAura(SPELL_DK_PET_SCALING_03, this);
+                    AddAura(SPELL_PET_AVOIDANCE, this);
+
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
+                    break;
+                }
+                case NPC_GENERIC_IMP:
+                case NPC_GENERIC_VOIDWALKER:
                 {
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
+                    break;
                 }
-
-                switch(GetEntry())
-                {
-                    case NPC_FELGUARD:
-                        {
-                            // xinef: Glyph of Felguard, so ugly im crying... no appropriate spell
-                            if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_FELGUARD))
-                                SetModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, 1.0f + float(aurEff->GetAmount() / 100.0f));
-
-                            break;
-                        }
-                    case NPC_WATER_ELEMENTAL_PERM:
-                        {
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_01, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_02, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_03, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_04, this);
-                            ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
-                            break;
-                        }
-                }
-                break;
             }
-        default:
-            {
-                switch (GetEntry())
-                {
-                    case NPC_FIRE_ELEMENTAL:
-                        {
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 3.5f - petlevel));
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 3.5f + petlevel));
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_FIRE_ELEMENTAL_SCALING_01, this);
-                            AddAura(SPELL_FIRE_ELEMENTAL_SCALING_02, this);
-                            AddAura(SPELL_FIRE_ELEMENTAL_SCALING_03, this);
-                            AddAura(SPELL_FIRE_ELEMENTAL_SCALING_04, this);
-                            break;
-                        }
-                    case NPC_EARTH_ELEMENTAL:
-                        {
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.0f - petlevel));
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.0f + petlevel));
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_EARTH_ELEMENTAL_SCALING_01, this);
-                            AddAura(SPELL_EARTH_ELEMENTAL_SCALING_02, this);
-                            AddAura(SPELL_EARTH_ELEMENTAL_SCALING_03, this);
-                            AddAura(SPELL_EARTH_ELEMENTAL_SCALING_04, this);
-                            break;
-                        }
-                    case NPC_INFERNAL:
-                        {
-                            float highAmt = petlevel / 11.0f;
-                            float lowAmt = petlevel / 12.0f;
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, lowAmt * lowAmt * lowAmt);
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, highAmt * highAmt * highAmt);
-
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_WARLOCK_PET_SCALING_05, this);
-                            AddAura(SPELL_INFERNAL_SCALING_01, this);
-                            AddAura(SPELL_INFERNAL_SCALING_02, this);
-                            AddAura(SPELL_INFERNAL_SCALING_03, this);
-                            AddAura(SPELL_INFERNAL_SCALING_04, this);
-                            break;
-                        }
-                    case NPC_DOOMGUARD:
-                        {
-                            float highAmt = petlevel / 11.0f;
-                            float lowAmt = petlevel / 12.0f;
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, lowAmt * lowAmt * lowAmt);
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, highAmt * highAmt * highAmt);
-
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_WARLOCK_PET_SCALING_01, this);
-                            AddAura(SPELL_WARLOCK_PET_SCALING_02, this);
-                            AddAura(SPELL_WARLOCK_PET_SCALING_03, this);
-                            AddAura(SPELL_WARLOCK_PET_SCALING_04, this);
-                            AddAura(SPELL_WARLOCK_PET_SCALING_05, this);
-                            break;
-                        }
-                    case NPC_WATER_ELEMENTAL_TEMP:
-                        {
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_01, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_02, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_03, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_04, this);
-                            ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
-                            break;
-                        }
-                    case NPC_TREANT: //force of nature
-                        {
-                            if (!pInfo)
-                                SetCreateHealth(30 + 30 * petlevel);
-
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - petlevel));
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.5f + petlevel));
-
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_TREANT_SCALING_01, this);
-                            AddAura(SPELL_TREANT_SCALING_02, this);
-                            AddAura(SPELL_TREANT_SCALING_03, this);
-                            AddAura(SPELL_TREANT_SCALING_04, this);
-                            break;
-                        }
-                    case NPC_SHADOWFIEND:
-                        {
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - petlevel));
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.5f + petlevel));
-
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_SHADOWFIEND_SCALING_01, this);
-                            AddAura(SPELL_SHADOWFIEND_SCALING_02, this);
-                            AddAura(SPELL_SHADOWFIEND_SCALING_03, this);
-                            AddAura(SPELL_SHADOWFIEND_SCALING_04, this);
-                            break;
-                        }
-                    case NPC_FERAL_SPIRIT:
-                        {
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 4.0f - petlevel));
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 4.0f + petlevel));
-
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_FERAL_SPIRIT_SPIRIT_HUNT, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_FERAL_SPIRIT_SCALING_01, this);
-                            AddAura(SPELL_FERAL_SPIRIT_SCALING_02, this);
-                            AddAura(SPELL_FERAL_SPIRIT_SCALING_03, this);
-                            break;
-                        }
-                    case NPC_MIRROR_IMAGE: // Mirror Image
-                        {
-                            SetDisplayId(owner->GetDisplayId());
-                            if (!pInfo)
-                            {
-                                SetCreateMana(28 + 30 * petlevel);
-                                SetCreateHealth(28 + 10 * petlevel);
-                            }
-
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_01, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_02, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_03, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_04, this);
-                            break;
-                        }
-                    case NPC_EBON_GARGOYLE: // Ebon Gargoyle
-                        {
-                            if (!pInfo)
-                            {
-                                SetCreateMana(28 + 10 * petlevel);
-                                SetCreateHealth(28 + 30 * petlevel);
-                            }
-
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_DK_PET_SCALING_01, this);
-                            AddAura(SPELL_DK_PET_SCALING_02, this);
-                            AddAura(SPELL_DK_PET_SCALING_03, this);
-                            break;
-                        }
-                    case NPC_BLOODWORM:
-                        {
-                            // Xinef: Hit / Expertise scaling
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            SetCreateHealth(4 * petlevel);
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - 30 - (petlevel / 4) + owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.006f));
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel - 30 + (petlevel / 4) + owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.006f));
-                            SetReactState(REACT_DEFENSIVE);
-                            break;
-                        }
-                    case NPC_ARMY_OF_THE_DEAD:
-                        {
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_DK_PET_SCALING_01, this);
-                            AddAura(SPELL_DK_PET_SCALING_02, this);
-                            AddAura(SPELL_DK_PET_SCALING_03, this);
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
-                            break;
-                        }
-                    case NPC_GENERIC_IMP:
-                    case NPC_GENERIC_VOIDWALKER:
-                        {
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
-                            break;
-                        }
-                }
-                break;
-            }
+            break;
+        }
     }
 
     // Can be summon and guardian

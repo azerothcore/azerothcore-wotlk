@@ -710,7 +710,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 {
     if (t_diff)
         _dynamicTree.update(t_diff);
-    
+
     /// update worldsessions for existing players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
     {
@@ -2424,14 +2424,14 @@ void Map::RemoveAllObjectsInRemoveList()
         switch (obj->GetTypeId())
         {
             case TYPEID_CORPSE:
-                {
-                    Corpse* corpse = ObjectAccessor::GetCorpse(*obj, obj->GetGUID());
-                    if (!corpse)
-                        sLog->outError("Tried to delete corpse/bones %u that is not in map.", obj->GetGUIDLow());
-                    else
-                        RemoveFromMap(corpse, true);
-                    break;
-                }
+            {
+                Corpse* corpse = ObjectAccessor::GetCorpse(*obj, obj->GetGUID());
+                if (!corpse)
+                    sLog->outError("Tried to delete corpse/bones %u that is not in map.", obj->GetGUIDLow());
+                else
+                    RemoveFromMap(corpse, true);
+                break;
+            }
             case TYPEID_DYNAMICOBJECT:
                 RemoveFromMap((DynamicObject*)obj, true);
                 break;

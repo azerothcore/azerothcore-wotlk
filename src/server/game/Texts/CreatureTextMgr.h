@@ -177,17 +177,17 @@ void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder
     {
         case CHAT_MSG_MONSTER_WHISPER:
         case CHAT_MSG_RAID_BOSS_WHISPER:
+        {
+            if (range == TEXT_RANGE_NORMAL) //ignores team and gmOnly
             {
-                if (range == TEXT_RANGE_NORMAL) //ignores team and gmOnly
-                {
-                    if (!whisperTarget || whisperTarget->GetTypeId() != TYPEID_PLAYER)
-                        return;
-
-                    localizer(const_cast<Player*>(whisperTarget->ToPlayer()));
+                if (!whisperTarget || whisperTarget->GetTypeId() != TYPEID_PLAYER)
                     return;
-                }
-                break;
+
+                localizer(const_cast<Player*>(whisperTarget->ToPlayer()));
+                return;
             }
+            break;
+        }
         default:
             break;
     }
@@ -195,40 +195,40 @@ void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder
     switch (range)
     {
         case TEXT_RANGE_AREA:
-            {
-                uint32 areaId = source->GetAreaId();
-                Map::PlayerList const& players = source->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                    if (itr->GetSource()->GetAreaId() == areaId && (teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
-                        localizer(itr->GetSource());
-                return;
-            }
+        {
+            uint32 areaId = source->GetAreaId();
+            Map::PlayerList const& players = source->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                if (itr->GetSource()->GetAreaId() == areaId && (teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
+                    localizer(itr->GetSource());
+            return;
+        }
         case TEXT_RANGE_ZONE:
-            {
-                uint32 zoneId = source->GetZoneId();
-                Map::PlayerList const& players = source->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                    if (itr->GetSource()->GetZoneId() == zoneId && (teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
-                        localizer(itr->GetSource());
-                return;
-            }
+        {
+            uint32 zoneId = source->GetZoneId();
+            Map::PlayerList const& players = source->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                if (itr->GetSource()->GetZoneId() == zoneId && (teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
+                    localizer(itr->GetSource());
+            return;
+        }
         case TEXT_RANGE_MAP:
-            {
-                Map::PlayerList const& players = source->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                    if ((teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
-                        localizer(itr->GetSource());
-                return;
-            }
+        {
+            Map::PlayerList const& players = source->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                if ((teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
+                    localizer(itr->GetSource());
+            return;
+        }
         case TEXT_RANGE_WORLD:
-            {
-                SessionMap const& smap = sWorld->GetAllSessions();
-                for (SessionMap::const_iterator itr = smap.begin(); itr != smap.end(); ++itr)
-                    if (Player* player = itr->second->GetPlayer())
-                        if ((teamId == TEAM_NEUTRAL || player->GetTeamId() == teamId) && (!gmOnly || player->IsGameMaster()))
-                            localizer(player);
-                return;
-            }
+        {
+            SessionMap const& smap = sWorld->GetAllSessions();
+            for (SessionMap::const_iterator itr = smap.begin(); itr != smap.end(); ++itr)
+                if (Player* player = itr->second->GetPlayer())
+                    if ((teamId == TEAM_NEUTRAL || player->GetTeamId() == teamId) && (!gmOnly || player->IsGameMaster()))
+                        localizer(player);
+            return;
+        }
         case TEXT_RANGE_NORMAL:
         default:
             break;
@@ -239,7 +239,7 @@ void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder
     if (msgType == CHAT_MSG_RAID_BOSS_EMOTE && source->GetMap()->IsDungeon())
         dist = 250.0f;
 
-    acore::PlayerDistWorker<CreatureTextLocalizer<Builder> > worker(source, dist, localizer);
+    acore::PlayerDistWorker<CreatureTextLocalizer<Builder>> worker(source, dist, localizer);
     source->VisitNearbyWorldObject(dist, worker);
 }
 

@@ -309,68 +309,68 @@ void Item::SaveToDB(SQLTransaction& trans)
     {
         case ITEM_NEW:
         case ITEM_CHANGED:
+        {
+            uint8 index = 0;
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(uState == ITEM_NEW ? CHAR_REP_ITEM_INSTANCE : CHAR_UPD_ITEM_INSTANCE);
+            stmt->setUInt32(  index, GetEntry());
+            stmt->setUInt32(++index, GUID_LOPART(GetOwnerGUID()));
+            stmt->setUInt32(++index, GUID_LOPART(GetUInt64Value(ITEM_FIELD_CREATOR)));
+            stmt->setUInt32(++index, GUID_LOPART(GetUInt64Value(ITEM_FIELD_GIFTCREATOR)));
+            stmt->setUInt32(++index, GetCount());
+            stmt->setUInt32(++index, GetUInt32Value(ITEM_FIELD_DURATION));
+
+            std::ostringstream ssSpells;
+            for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+                ssSpells << GetSpellCharges(i) << ' ';
+            stmt->setString(++index, ssSpells.str());
+
+            stmt->setUInt32(++index, GetUInt32Value(ITEM_FIELD_FLAGS));
+
+            std::ostringstream ssEnchants;
+            for (uint8 i = 0; i < MAX_ENCHANTMENT_SLOT; ++i)
             {
-                uint8 index = 0;
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(uState == ITEM_NEW ? CHAR_REP_ITEM_INSTANCE : CHAR_UPD_ITEM_INSTANCE);
-                stmt->setUInt32(  index, GetEntry());
-                stmt->setUInt32(++index, GUID_LOPART(GetOwnerGUID()));
-                stmt->setUInt32(++index, GUID_LOPART(GetUInt64Value(ITEM_FIELD_CREATOR)));
-                stmt->setUInt32(++index, GUID_LOPART(GetUInt64Value(ITEM_FIELD_GIFTCREATOR)));
-                stmt->setUInt32(++index, GetCount());
-                stmt->setUInt32(++index, GetUInt32Value(ITEM_FIELD_DURATION));
-
-                std::ostringstream ssSpells;
-                for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-                    ssSpells << GetSpellCharges(i) << ' ';
-                stmt->setString(++index, ssSpells.str());
-
-                stmt->setUInt32(++index, GetUInt32Value(ITEM_FIELD_FLAGS));
-
-                std::ostringstream ssEnchants;
-                for (uint8 i = 0; i < MAX_ENCHANTMENT_SLOT; ++i)
-                {
-                    ssEnchants << GetEnchantmentId(EnchantmentSlot(i)) << ' ';
-                    ssEnchants << GetEnchantmentDuration(EnchantmentSlot(i)) << ' ';
-                    ssEnchants << GetEnchantmentCharges(EnchantmentSlot(i)) << ' ';
-                }
-                stmt->setString(++index, ssEnchants.str());
-
-                stmt->setInt16 (++index, GetItemRandomPropertyId());
-                stmt->setUInt16(++index, GetUInt32Value(ITEM_FIELD_DURABILITY));
-                stmt->setUInt32(++index, GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME));
-                stmt->setString(++index, m_text);
-                stmt->setUInt32(++index, guid);
-
-                trans->Append(stmt);
-
-                if ((uState == ITEM_CHANGED) && HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
-                {
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GIFT_OWNER);
-                    stmt->setUInt32(0, GUID_LOPART(GetOwnerGUID()));
-                    stmt->setUInt32(1, guid);
-                    trans->Append(stmt);
-                }
-                break;
+                ssEnchants << GetEnchantmentId(EnchantmentSlot(i)) << ' ';
+                ssEnchants << GetEnchantmentDuration(EnchantmentSlot(i)) << ' ';
+                ssEnchants << GetEnchantmentCharges(EnchantmentSlot(i)) << ' ';
             }
-        case ITEM_REMOVED:
+            stmt->setString(++index, ssEnchants.str());
+
+            stmt->setInt16 (++index, GetItemRandomPropertyId());
+            stmt->setUInt16(++index, GetUInt32Value(ITEM_FIELD_DURABILITY));
+            stmt->setUInt32(++index, GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME));
+            stmt->setString(++index, m_text);
+            stmt->setUInt32(++index, guid);
+
+            trans->Append(stmt);
+
+            if ((uState == ITEM_CHANGED) && HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GIFT_OWNER);
+                stmt->setUInt32(0, GUID_LOPART(GetOwnerGUID()));
+                stmt->setUInt32(1, guid);
+                trans->Append(stmt);
+            }
+            break;
+        }
+        case ITEM_REMOVED:
+        {
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+            stmt->setUInt32(0, guid);
+            trans->Append(stmt);
+
+            if (HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
                 stmt->setUInt32(0, guid);
                 trans->Append(stmt);
-
-                if (HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
-                {
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
-                    stmt->setUInt32(0, guid);
-                    trans->Append(stmt);
-                }
-
-                if (!isInTransaction)
-                    CharacterDatabase.CommitTransaction(trans);
-
-                delete this;
-                return;
             }
+
+            if (!isInTransaction)
+                CharacterDatabase.CommitTransaction(trans);
+
+            delete this;
+            return;
+        }
         case ITEM_UNCHANGED:
             break;
     }

@@ -24,7 +24,7 @@ typedef std::vector<KeyFrame>                    KeyFrameVec;
 typedef std::unordered_map<uint32, TransportTemplate> TransportTemplates;
 typedef std::set<MotionTransport*>               TransportSet;
 typedef std::unordered_map<uint32, TransportSet>      TransportMap;
-typedef std::unordered_map<uint32, std::set<uint32> > TransportInstanceMap;
+typedef std::unordered_map<uint32, std::set<uint32>> TransportInstanceMap;
 
 struct KeyFrame
 {

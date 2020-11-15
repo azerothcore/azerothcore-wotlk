@@ -218,9 +218,9 @@ void Player::UpdateResistances(uint32 school)
         value += GetModifierValue(unitMod, TOTAL_VALUE);
 
         AuraEffectList const& mResbyIntellect = GetAuraEffectsByType(SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT);
-        for(AuraEffectList::const_iterator i = mResbyIntellect.begin(); i != mResbyIntellect.end(); ++i)
+        for (AuraEffectList::const_iterator i = mResbyIntellect.begin(); i != mResbyIntellect.end(); ++i)
         {
-            if((*i)->GetMiscValue() & (1 << (school - 1)) )
+            if ((*i)->GetMiscValue() & (1 << (school - 1)) )
                 value += int32(GetStat(Stats((*i)->GetMiscValueB())) * (*i)->GetAmount() / 100.0f);
         }
 
@@ -371,87 +371,87 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
                 val2 = level * 2.0f + GetStat(STAT_STRENGTH) + GetStat(STAT_AGILITY) - 20.0f;
                 break;
             case CLASS_DRUID:
+            {
+                // Check if Predatory Strikes is skilled
+                float mLevelMult = 0.0f;
+                float weapon_bonus = 0.0f;
+                if (IsInFeralForm())
                 {
-                    // Check if Predatory Strikes is skilled
-                    float mLevelMult = 0.0f;
-                    float weapon_bonus = 0.0f;
-                    if (IsInFeralForm())
+                    Unit::AuraEffectList const& mDummy = GetAuraEffectsByType(SPELL_AURA_DUMMY);
+                    for (Unit::AuraEffectList::const_iterator itr = mDummy.begin(); itr != mDummy.end(); ++itr)
                     {
-                        Unit::AuraEffectList const& mDummy = GetAuraEffectsByType(SPELL_AURA_DUMMY);
-                        for (Unit::AuraEffectList::const_iterator itr = mDummy.begin(); itr != mDummy.end(); ++itr)
+                        AuraEffect* aurEff = *itr;
+                        if (aurEff->GetSpellInfo()->SpellIconID == 1563)
                         {
-                            AuraEffect* aurEff = *itr;
-                            if (aurEff->GetSpellInfo()->SpellIconID == 1563)
+                            switch (aurEff->GetEffIndex())
                             {
-                                switch (aurEff->GetEffIndex())
-                                {
-                                    case 0: // Predatory Strikes (effect 0)
-                                        mLevelMult = CalculatePct(1.0f, aurEff->GetAmount());
-                                        break;
-                                    case 1: // Predatory Strikes (effect 1)
-                                        if (Item* mainHand = m_items[EQUIPMENT_SLOT_MAINHAND])
+                                case 0: // Predatory Strikes (effect 0)
+                                    mLevelMult = CalculatePct(1.0f, aurEff->GetAmount());
+                                    break;
+                                case 1: // Predatory Strikes (effect 1)
+                                    if (Item* mainHand = m_items[EQUIPMENT_SLOT_MAINHAND])
+                                    {
+                                        // also gains % attack power from equipped weapon
+                                        ItemTemplate const* proto = mainHand->GetTemplate();
+                                        if (!proto)
+                                            continue;
+
+                                        uint32 ap = proto->getFeralBonus();
+                                        // Get AP Bonuses from weapon
+                                        for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
                                         {
-                                            // also gains % attack power from equipped weapon
-                                            ItemTemplate const* proto = mainHand->GetTemplate();
-                                            if (!proto)
+                                            if (i >= proto->StatsCount)
+                                                break;
+
+                                            if (proto->ItemStat[i].ItemStatType == ITEM_MOD_ATTACK_POWER)
+                                                ap += proto->ItemStat[i].ItemStatValue;
+                                        }
+
+                                        // Get AP Bonuses from weapon spells
+                                        for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+                                        {
+                                            // no spell
+                                            if (!proto->Spells[i].SpellId || proto->Spells[i].SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
                                                 continue;
 
-                                            uint32 ap = proto->getFeralBonus();
-                                            // Get AP Bonuses from weapon
-                                            for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
-                                            {
-                                                if (i >= proto->StatsCount)
-                                                    break;
+                                            // check if it is valid spell
+                                            SpellInfo const* spellproto = sSpellMgr->GetSpellInfo(proto->Spells[i].SpellId);
+                                            if (!spellproto)
+                                                continue;
 
-                                                if (proto->ItemStat[i].ItemStatType == ITEM_MOD_ATTACK_POWER)
-                                                    ap += proto->ItemStat[i].ItemStatValue;
-                                            }
-
-                                            // Get AP Bonuses from weapon spells
-                                            for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-                                            {
-                                                // no spell
-                                                if (!proto->Spells[i].SpellId || proto->Spells[i].SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
-                                                    continue;
-
-                                                // check if it is valid spell
-                                                SpellInfo const* spellproto = sSpellMgr->GetSpellInfo(proto->Spells[i].SpellId);
-                                                if (!spellproto)
-                                                    continue;
-
-                                                for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
-                                                    if (spellproto->Effects[j].ApplyAuraName == SPELL_AURA_MOD_ATTACK_POWER)
-                                                        ap += spellproto->Effects[j].CalcValue();
-                                            }
-
-                                            weapon_bonus = CalculatePct(float(ap), aurEff->GetAmount());
+                                            for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+                                                if (spellproto->Effects[j].ApplyAuraName == SPELL_AURA_MOD_ATTACK_POWER)
+                                                    ap += spellproto->Effects[j].CalcValue();
                                         }
-                                        break;
-                                    default:
-                                        break;
-                                }
+
+                                        weapon_bonus = CalculatePct(float(ap), aurEff->GetAmount());
+                                    }
+                                    break;
+                                default:
+                                    break;
                             }
                         }
                     }
-
-                    switch (GetShapeshiftForm())
-                    {
-                        case FORM_CAT:
-                            val2 = (getLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f + GetStat(STAT_AGILITY) - 20.0f + weapon_bonus + m_baseFeralAP;
-                            break;
-                        case FORM_BEAR:
-                        case FORM_DIREBEAR:
-                            val2 = (getLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + weapon_bonus + m_baseFeralAP;
-                            break;
-                        case FORM_MOONKIN:
-                            val2 = (getLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + m_baseFeralAP;
-                            break;
-                        default:
-                            val2 = GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
-                            break;
-                    }
-                    break;
                 }
+
+                switch (GetShapeshiftForm())
+                {
+                    case FORM_CAT:
+                        val2 = (getLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f + GetStat(STAT_AGILITY) - 20.0f + weapon_bonus + m_baseFeralAP;
+                        break;
+                    case FORM_BEAR:
+                    case FORM_DIREBEAR:
+                        val2 = (getLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + weapon_bonus + m_baseFeralAP;
+                        break;
+                    case FORM_MOONKIN:
+                        val2 = (getLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + m_baseFeralAP;
+                        break;
+                    default:
+                        val2 = GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
+                        break;
+                }
+                break;
+            }
             case CLASS_MAGE:
             case CLASS_PRIEST:
             case CLASS_WARLOCK:
@@ -876,7 +876,7 @@ void Player::ApplyHealthRegenBonus(int32 amount, bool apply)
 
 void Player::UpdateManaRegen()
 {
-    if( HasAuraTypeWithMiscvalue(SPELL_AURA_PREVENT_REGENERATE_POWER, POWER_MANA + 1) )
+    if ( HasAuraTypeWithMiscvalue(SPELL_AURA_PREVENT_REGENERATE_POWER, POWER_MANA + 1) )
     {
         SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER, 0);
         SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, 0);

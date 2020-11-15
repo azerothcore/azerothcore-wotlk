@@ -40,8 +40,8 @@ template<class T>
 class WaypointMovementGenerator;
 
 template<>
-class WaypointMovementGenerator<Creature> : public MovementGeneratorMedium< Creature, WaypointMovementGenerator<Creature> >,
-    public PathMovementBase<Creature, WaypointPath const*>
+class WaypointMovementGenerator<Creature> : public MovementGeneratorMedium< Creature, WaypointMovementGenerator<Creature>>,
+            public PathMovementBase<Creature, WaypointPath const*>
 {
 public:
     WaypointMovementGenerator(uint32 _path_id = 0, bool _repeating = true)

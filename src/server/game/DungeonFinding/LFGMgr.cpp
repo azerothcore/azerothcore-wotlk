@@ -492,11 +492,11 @@ namespace lfg
                     UpdateRoleCheck(gguid); // abort role check and remove from RoleChecksStore
                 break;
             case LFG_STATE_QUEUED: // joining again while in a queue
-                {
-                    LFGQueue& queue = GetQueue(gguid);
-                    queue.RemoveFromQueue(gguid);
-                }
-                break;
+            {
+                LFGQueue& queue = GetQueue(gguid);
+                queue.RemoveFromQueue(gguid);
+            }
+            break;
             case LFG_STATE_PROPOSAL: // if joining again during proposal
                 joinData.result = LFG_JOIN_INTERNAL_ERROR;
                 break;
@@ -769,27 +769,27 @@ namespace lfg
                     UpdateRoleCheck(gguid);                    // No player to update role = LFG_ROLECHECK_ABORTED
                 break;
             case LFG_STATE_PROPOSAL:
+            {
+                // Remove from Proposals
+                LfgProposalContainer::iterator it = ProposalsStore.begin();
+                uint64 pguid = gguid == guid ? GetLeader(gguid) : guid;
+                while (it != ProposalsStore.end())
                 {
-                    // Remove from Proposals
-                    LfgProposalContainer::iterator it = ProposalsStore.begin();
-                    uint64 pguid = gguid == guid ? GetLeader(gguid) : guid;
-                    while (it != ProposalsStore.end())
+                    LfgProposalPlayerContainer::iterator itPlayer = it->second.players.find(pguid);
+                    if (itPlayer != it->second.players.end())
                     {
-                        LfgProposalPlayerContainer::iterator itPlayer = it->second.players.find(pguid);
-                        if (itPlayer != it->second.players.end())
-                        {
-                            // Mark the player/leader of group who left as didn't accept the proposal
-                            itPlayer->second.accept = LFG_ANSWER_DENY;
-                            break;
-                        }
-                        ++it;
+                        // Mark the player/leader of group who left as didn't accept the proposal
+                        itPlayer->second.accept = LFG_ANSWER_DENY;
+                        break;
                     }
-
-                    // Remove from queue - if proposal is found, RemoveProposal will call RemoveFromQueue
-                    if (it != ProposalsStore.end())
-                        RemoveProposal(it, LFG_UPDATETYPE_PROPOSAL_DECLINED);
-                    break;
+                    ++it;
                 }
+
+                // Remove from queue - if proposal is found, RemoveProposal will call RemoveFromQueue
+                if (it != ProposalsStore.end())
+                    RemoveProposal(it, LFG_UPDATETYPE_PROPOSAL_DECLINED);
+                break;
+            }
             case LFG_STATE_NONE:
                 break;
             case LFG_STATE_DUNGEON:

@@ -638,7 +638,7 @@ protected:
     // Player lists, those need to be accessible by inherited classes
     BattlegroundPlayerMap  m_Players;
     // Spirit Guide guid + Player list GUIDS
-    std::map<uint64, std::vector<uint64> >  m_ReviveQueue;
+    std::map<uint64, std::vector<uint64>>  m_ReviveQueue;
 
     // these are important variables used for starting messages
     uint8 m_Events;

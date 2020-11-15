@@ -137,13 +137,13 @@ void UnitAI::DoCast(uint32 spellId)
             target = me->GetVictim();
             break;
         case AITARGET_ENEMY:
-            {
-                const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
-                //float range = GetSpellMaxRange(spellInfo, false);
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0, spellInfo->GetMaxRange(false), playerOnly);
-                break;
-            }
+        {
+            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
+            //float range = GetSpellMaxRange(spellInfo, false);
+            target = SelectTarget(SELECT_TARGET_RANDOM, 0, spellInfo->GetMaxRange(false), playerOnly);
+            break;
+        }
         case AITARGET_ALLY:
             target = me;
             break;
@@ -151,19 +151,19 @@ void UnitAI::DoCast(uint32 spellId)
             target = me;
             break;
         case AITARGET_DEBUFF:
-            {
-                const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
-                float range = spellInfo->GetMaxRange(false);
+        {
+            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
+            float range = spellInfo->GetMaxRange(false);
 
-                DefaultTargetSelector targetSelector(me, range, playerOnly, -(int32)spellId);
-                if (!(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_VICTIM)
-                        && targetSelector(me->GetVictim()))
-                    target = me->GetVictim();
-                else
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 0, targetSelector);
-                break;
-            }
+            DefaultTargetSelector targetSelector(me, range, playerOnly, -(int32)spellId);
+            if (!(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_VICTIM)
+                    && targetSelector(me->GetVictim()))
+                target = me->GetVictim();
+            else
+                target = SelectTarget(SELECT_TARGET_RANDOM, 0, targetSelector);
+            break;
+        }
     }
 
     if (target)

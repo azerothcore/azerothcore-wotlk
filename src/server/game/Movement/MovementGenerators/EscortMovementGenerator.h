@@ -8,7 +8,7 @@ Written by Xinef
 #include "MovementGenerator.h"
 
 template<class T>
-class EscortMovementGenerator : public MovementGeneratorMedium< T, EscortMovementGenerator<T> >
+class EscortMovementGenerator : public MovementGeneratorMedium< T, EscortMovementGenerator<T>>
 {
 public:
     EscortMovementGenerator(Movement::PointsArray* _path = nullptr) : i_recalculateSpeed(false)

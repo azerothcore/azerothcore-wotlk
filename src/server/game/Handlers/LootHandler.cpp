@@ -114,51 +114,51 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
     switch (GUID_HIPART(guid))
     {
         case HIGHGUID_GAMEOBJECT:
-            {
-                GameObject* go = GetPlayer()->GetMap()->GetGameObject(guid);
+        {
+            GameObject* go = GetPlayer()->GetMap()->GetGameObject(guid);
 
-                // do not check distance for GO if player is the owner of it (ex. fishing bobber)
-                if (go && ((go->GetOwnerGUID() == player->GetGUID() || go->IsWithinDistInMap(player, INTERACTION_DISTANCE))))
-                    loot = &go->loot;
+            // do not check distance for GO if player is the owner of it (ex. fishing bobber)
+            if (go && ((go->GetOwnerGUID() == player->GetGUID() || go->IsWithinDistInMap(player, INTERACTION_DISTANCE))))
+                loot = &go->loot;
 
-                break;
-            }
+            break;
+        }
         case HIGHGUID_CORPSE:                               // remove insignia ONLY in BG
+        {
+            Corpse* bones = ObjectAccessor::GetCorpse(*player, guid);
+
+            if (bones && bones->IsWithinDistInMap(player, INTERACTION_DISTANCE))
             {
-                Corpse* bones = ObjectAccessor::GetCorpse(*player, guid);
-
-                if (bones && bones->IsWithinDistInMap(player, INTERACTION_DISTANCE))
-                {
-                    loot = &bones->loot;
-                    shareMoney = false;
-                }
-
-                break;
+                loot = &bones->loot;
+                shareMoney = false;
             }
+
+            break;
+        }
         case HIGHGUID_ITEM:
+        {
+            if (Item* item = player->GetItemByGuid(guid))
             {
-                if (Item* item = player->GetItemByGuid(guid))
-                {
-                    loot = &item->loot;
-                    shareMoney = false;
-                }
-                break;
+                loot = &item->loot;
+                shareMoney = false;
             }
+            break;
+        }
         case HIGHGUID_UNIT:
         case HIGHGUID_VEHICLE:
+        {
+            Creature* creature = player->GetMap()->GetCreature(guid);
+            bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
+            if (lootAllowed && creature->IsWithinDistInMap(player, INTERACTION_DISTANCE))
             {
-                Creature* creature = player->GetMap()->GetCreature(guid);
-                bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
-                if (lootAllowed && creature->IsWithinDistInMap(player, INTERACTION_DISTANCE))
-                {
-                    loot = &creature->loot;
-                    if (creature->IsAlive())
-                        shareMoney = false;
-                }
-                else
-                    player->SendLootError(guid, lootAllowed ? LOOT_ERROR_TOO_FAR : LOOT_ERROR_DIDNT_KILL);
-                break;
+                loot = &creature->loot;
+                if (creature->IsAlive())
+                    shareMoney = false;
             }
+            else
+                player->SendLootError(guid, lootAllowed ? LOOT_ERROR_TOO_FAR : LOOT_ERROR_DIDNT_KILL);
+            break;
+        }
         default:
             return;                                         // unlootable type
     }

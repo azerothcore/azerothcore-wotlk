@@ -282,29 +282,29 @@ int WorldSocket::handle_input(ACE_HANDLE)
     switch (handle_input_missing_data())
     {
         case -1 :
+        {
+            if ((errno == EWOULDBLOCK) ||
+                    (errno == EAGAIN))
             {
-                if ((errno == EWOULDBLOCK) ||
-                        (errno == EAGAIN))
-                {
-                    return Update();                           // interesting line, isn't it ?
-                }
+                return Update();                           // interesting line, isn't it ?
+            }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outStaticDebug("WorldSocket::handle_input: Peer error closing connection errno = %s", ACE_OS::strerror (errno));
+            sLog->outStaticDebug("WorldSocket::handle_input: Peer error closing connection errno = %s", ACE_OS::strerror (errno));
 #endif
 
-                errno = ECONNRESET;
-                return -1;
-            }
+            errno = ECONNRESET;
+            return -1;
+        }
         case 0:
-            {
+        {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outStaticDebug("WorldSocket::handle_input: Peer has closed connection");
+            sLog->outStaticDebug("WorldSocket::handle_input: Peer has closed connection");
 #endif
 
-                errno = ECONNRESET;
-                return -1;
-            }
+            errno = ECONNRESET;
+            return -1;
+        }
         case 1:
             return 1;
         default:
@@ -677,15 +677,15 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
         switch (opcode)
         {
             case CMSG_PING:
+            {
+                try
                 {
-                    try
-                    {
-                        return HandlePing(*new_pct);
-                    }
-                    catch (ByteBufferPositionException const&) {}
-                    sLog->outError("WorldSocket::ReadDataHandler(): client sent malformed CMSG_PING");
-                    return -1;
+                    return HandlePing(*new_pct);
                 }
+                catch (ByteBufferPositionException const&) {}
+                sLog->outError("WorldSocket::ReadDataHandler(): client sent malformed CMSG_PING");
+                return -1;
+            }
             case CMSG_AUTH_SESSION:
                 if (m_Session)
                 {
@@ -698,26 +698,26 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                     m_Session->ResetTimeOutTime(true);
                 return 0;
             default:
+            {
+                ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
+
+                if (m_Session != nullptr)
                 {
-                    ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
+                    // Our Idle timer will reset on any non PING opcodes.
+                    // Catches people idling on the login screen and any lingering ingame connections.
+                    m_Session->ResetTimeOutTime(false);
 
-                    if (m_Session != nullptr)
-                    {
-                        // Our Idle timer will reset on any non PING opcodes.
-                        // Catches people idling on the login screen and any lingering ingame connections.
-                        m_Session->ResetTimeOutTime(false);
-
-                        // OK, give the packet to WorldSession
-                        aptr.release();
-                        m_Session->QueuePacket (new_pct);
-                        return 0;
-                    }
-                    else
-                    {
-                        sLog->outError("WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
-                        return -1;
-                    }
+                    // OK, give the packet to WorldSession
+                    aptr.release();
+                    m_Session->QueuePacket (new_pct);
+                    return 0;
                 }
+                else
+                {
+                    sLog->outError("WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
+                    return -1;
+                }
+            }
         }
     }
     catch (ByteBufferException const&)

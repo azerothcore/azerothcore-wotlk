@@ -293,7 +293,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
             needItemDelay = GetAccountId() != rc_account;
         }
 
-        if( money >= 10 * GOLD )
+        if ( money >= 10 * GOLD )
         {
             CleanStringForMysqlQuery(subject);
             CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<MAIL> %s\", NOW())", GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), player->GetSession()->GetRemoteAddress().c_str(), rc_account, receiver.c_str(), money, subject.c_str());
@@ -503,7 +503,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
                 .AddMoney(m->COD)
                 .SendMailTo(trans, MailReceiver(sender, m->sender), MailSender(MAIL_NORMAL, m->receiver), MAIL_CHECK_MASK_COD_PAYMENT);
 
-                if( m->COD >= 10 * GOLD )
+                if ( m->COD >= 10 * GOLD )
                 {
                     std::string senderName;
                     if (!sObjectMgr->GetPlayerNameByGUID(sender_guid, senderName))

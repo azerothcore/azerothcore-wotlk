@@ -74,14 +74,14 @@ public:
 
     // Visit grid objects
     template<class T>
-    void Visit(TypeContainerVisitor<T, TypeMapContainer<GRID_OBJECT_TYPES> >& visitor)
+    void Visit(TypeContainerVisitor<T, TypeMapContainer<GRID_OBJECT_TYPES>>& visitor)
     {
         visitor.Visit(i_container);
     }
 
     // Visit world objects
     template<class T>
-    void Visit(TypeContainerVisitor<T, TypeMapContainer<WORLD_OBJECT_TYPES> >& visitor)
+    void Visit(TypeContainerVisitor<T, TypeMapContainer<WORLD_OBJECT_TYPES>>& visitor)
     {
         visitor.Visit(i_objects);
     }

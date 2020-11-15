@@ -61,145 +61,145 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
     switch (spellproto->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:
-            {
-                // Pet charge effects (Infernal Awakening, Demon Charge)
-                if (spellproto->SpellVisual[0] == 2816 && spellproto->SpellIconID == 15)
-                    return DIMINISHING_CONTROLLED_STUN;
-                // Gnaw
-                else if (spellproto->Id == 47481)
-                    return DIMINISHING_CONTROLLED_STUN;
-                // Screams of the Past
-                else if (spellproto->Id == 7074)
-                    return DIMINISHING_NONE;
-                break;
-            }
+        {
+            // Pet charge effects (Infernal Awakening, Demon Charge)
+            if (spellproto->SpellVisual[0] == 2816 && spellproto->SpellIconID == 15)
+                return DIMINISHING_CONTROLLED_STUN;
+            // Gnaw
+            else if (spellproto->Id == 47481)
+                return DIMINISHING_CONTROLLED_STUN;
+            // Screams of the Past
+            else if (spellproto->Id == 7074)
+                return DIMINISHING_NONE;
+            break;
+        }
         // Event spells
         case SPELLFAMILY_UNK1:
             return DIMINISHING_NONE;
         case SPELLFAMILY_MAGE:
-            {
-                // Frostbite
-                if (spellproto->Id == 12494)
-                    return DIMINISHING_ROOT;
-                // Shattered Barrier
-                else if (spellproto->Id == 55080)
-                    return DIMINISHING_ROOT;
-                // Deep Freeze
-                else if (spellproto->SpellIconID == 2939 && spellproto->SpellVisual[0] == 9963)
-                    return DIMINISHING_CONTROLLED_STUN;
-                // Frost Nova / Freeze (Water Elemental)
-                else if (spellproto->SpellIconID == 193)
-                    return DIMINISHING_CONTROLLED_ROOT;
-                // Dragon's Breath
-                else if (spellproto->SpellFamilyFlags[0] & 0x800000)
-                    return DIMINISHING_DRAGONS_BREATH;
-                break;
-            }
+        {
+            // Frostbite
+            if (spellproto->Id == 12494)
+                return DIMINISHING_ROOT;
+            // Shattered Barrier
+            else if (spellproto->Id == 55080)
+                return DIMINISHING_ROOT;
+            // Deep Freeze
+            else if (spellproto->SpellIconID == 2939 && spellproto->SpellVisual[0] == 9963)
+                return DIMINISHING_CONTROLLED_STUN;
+            // Frost Nova / Freeze (Water Elemental)
+            else if (spellproto->SpellIconID == 193)
+                return DIMINISHING_CONTROLLED_ROOT;
+            // Dragon's Breath
+            else if (spellproto->SpellFamilyFlags[0] & 0x800000)
+                return DIMINISHING_DRAGONS_BREATH;
+            break;
+        }
         case SPELLFAMILY_WARRIOR:
-            {
-                // Hamstring - limit duration to 10s in PvP
-                if (spellproto->SpellFamilyFlags[0] & 0x2)
-                    return DIMINISHING_LIMITONLY;
-                // Improved Hamstring
-                else if (spellproto->Id == 23694)
-                    return DIMINISHING_ROOT;
-                // Charge Stun (own diminishing)
-                else if (spellproto->SpellFamilyFlags[0] & 0x01000000)
-                    return DIMINISHING_CHARGE;
-                break;
-            }
+        {
+            // Hamstring - limit duration to 10s in PvP
+            if (spellproto->SpellFamilyFlags[0] & 0x2)
+                return DIMINISHING_LIMITONLY;
+            // Improved Hamstring
+            else if (spellproto->Id == 23694)
+                return DIMINISHING_ROOT;
+            // Charge Stun (own diminishing)
+            else if (spellproto->SpellFamilyFlags[0] & 0x01000000)
+                return DIMINISHING_CHARGE;
+            break;
+        }
         case SPELLFAMILY_WARLOCK:
-            {
-                // Curses/etc
-                if ((spellproto->SpellFamilyFlags[0] & 0x80000000) || (spellproto->SpellFamilyFlags[1] & 0x200))
-                    return DIMINISHING_LIMITONLY;
-                // Seduction
-                else if (spellproto->SpellFamilyFlags[1] & 0x10000000)
-                    return DIMINISHING_FEAR;
-                break;
-            }
+        {
+            // Curses/etc
+            if ((spellproto->SpellFamilyFlags[0] & 0x80000000) || (spellproto->SpellFamilyFlags[1] & 0x200))
+                return DIMINISHING_LIMITONLY;
+            // Seduction
+            else if (spellproto->SpellFamilyFlags[1] & 0x10000000)
+                return DIMINISHING_FEAR;
+            break;
+        }
         case SPELLFAMILY_DRUID:
-            {
-                // Pounce
-                if (spellproto->SpellFamilyFlags[0] & 0x20000)
-                    return DIMINISHING_OPENING_STUN;
-                // Cyclone
-                else if (spellproto->SpellFamilyFlags[1] & 0x20)
-                    return DIMINISHING_CYCLONE;
-                // Entangling Roots
-                // Nature's Grasp
-                else if (spellproto->SpellFamilyFlags[0] & 0x00000200)
-                    return DIMINISHING_CONTROLLED_ROOT;
-                // Faerie Fire
-                else if (spellproto->SpellFamilyFlags[0] & 0x400)
-                    return DIMINISHING_LIMITONLY;
-                // Feral Charge Root Effect
-                else if (spellproto->Id == 45334)
-                    return DIMINISHING_NONE;
-                break;
-            }
+        {
+            // Pounce
+            if (spellproto->SpellFamilyFlags[0] & 0x20000)
+                return DIMINISHING_OPENING_STUN;
+            // Cyclone
+            else if (spellproto->SpellFamilyFlags[1] & 0x20)
+                return DIMINISHING_CYCLONE;
+            // Entangling Roots
+            // Nature's Grasp
+            else if (spellproto->SpellFamilyFlags[0] & 0x00000200)
+                return DIMINISHING_CONTROLLED_ROOT;
+            // Faerie Fire
+            else if (spellproto->SpellFamilyFlags[0] & 0x400)
+                return DIMINISHING_LIMITONLY;
+            // Feral Charge Root Effect
+            else if (spellproto->Id == 45334)
+                return DIMINISHING_NONE;
+            break;
+        }
         case SPELLFAMILY_ROGUE:
-            {
-                // Gouge
-                if (spellproto->SpellFamilyFlags[0] & 0x8)
-                    return DIMINISHING_DISORIENT;
-                // Blind
-                else if (spellproto->SpellFamilyFlags[0] & 0x1000000)
-                    return DIMINISHING_FEAR;
-                // Cheap Shot
-                else if (spellproto->SpellFamilyFlags[0] & 0x400)
-                    return DIMINISHING_OPENING_STUN;
-                // Crippling poison - Limit to 10 seconds in PvP (No SpellFamilyFlags)
-                else if (spellproto->SpellIconID == 163)
-                    return DIMINISHING_LIMITONLY;
-                break;
-            }
+        {
+            // Gouge
+            if (spellproto->SpellFamilyFlags[0] & 0x8)
+                return DIMINISHING_DISORIENT;
+            // Blind
+            else if (spellproto->SpellFamilyFlags[0] & 0x1000000)
+                return DIMINISHING_FEAR;
+            // Cheap Shot
+            else if (spellproto->SpellFamilyFlags[0] & 0x400)
+                return DIMINISHING_OPENING_STUN;
+            // Crippling poison - Limit to 10 seconds in PvP (No SpellFamilyFlags)
+            else if (spellproto->SpellIconID == 163)
+                return DIMINISHING_LIMITONLY;
+            break;
+        }
         case SPELLFAMILY_HUNTER:
-            {
-                // Hunter's Mark
-                if ((spellproto->SpellFamilyFlags[0] & 0x400) && spellproto->SpellIconID == 538)
-                    return DIMINISHING_LIMITONLY;
-                // Scatter Shot (own diminishing)
-                else if ((spellproto->SpellFamilyFlags[0] & 0x40000) && spellproto->SpellIconID == 132)
-                    return DIMINISHING_SCATTER_SHOT;
-                // Entrapment (own diminishing)
-                else if (spellproto->SpellVisual[0] == 7484 && spellproto->SpellIconID == 20)
-                    return DIMINISHING_ENTRAPMENT;
-                // Wyvern Sting mechanic is MECHANIC_SLEEP but the diminishing is DIMINISHING_DISORIENT
-                else if ((spellproto->SpellFamilyFlags[1] & 0x1000) && spellproto->SpellIconID == 1721)
-                    return DIMINISHING_DISORIENT;
-                // Freezing Arrow
-                else if (spellproto->SpellFamilyFlags[0] & 0x8)
-                    return DIMINISHING_DISORIENT;
-                break;
-            }
+        {
+            // Hunter's Mark
+            if ((spellproto->SpellFamilyFlags[0] & 0x400) && spellproto->SpellIconID == 538)
+                return DIMINISHING_LIMITONLY;
+            // Scatter Shot (own diminishing)
+            else if ((spellproto->SpellFamilyFlags[0] & 0x40000) && spellproto->SpellIconID == 132)
+                return DIMINISHING_SCATTER_SHOT;
+            // Entrapment (own diminishing)
+            else if (spellproto->SpellVisual[0] == 7484 && spellproto->SpellIconID == 20)
+                return DIMINISHING_ENTRAPMENT;
+            // Wyvern Sting mechanic is MECHANIC_SLEEP but the diminishing is DIMINISHING_DISORIENT
+            else if ((spellproto->SpellFamilyFlags[1] & 0x1000) && spellproto->SpellIconID == 1721)
+                return DIMINISHING_DISORIENT;
+            // Freezing Arrow
+            else if (spellproto->SpellFamilyFlags[0] & 0x8)
+                return DIMINISHING_DISORIENT;
+            break;
+        }
         case SPELLFAMILY_PALADIN:
-            {
-                // Judgement of Justice - limit duration to 10s in PvP
-                if (spellproto->SpellFamilyFlags[0] & 0x100000)
-                    return DIMINISHING_LIMITONLY;
-                // Turn Evil
-                else if ((spellproto->SpellFamilyFlags[1] & 0x804000) && spellproto->SpellIconID == 309)
-                    return DIMINISHING_FEAR;
-                break;
-            }
+        {
+            // Judgement of Justice - limit duration to 10s in PvP
+            if (spellproto->SpellFamilyFlags[0] & 0x100000)
+                return DIMINISHING_LIMITONLY;
+            // Turn Evil
+            else if ((spellproto->SpellFamilyFlags[1] & 0x804000) && spellproto->SpellIconID == 309)
+                return DIMINISHING_FEAR;
+            break;
+        }
         case SPELLFAMILY_SHAMAN:
-            {
-                // Storm, Earth and Fire - Earthgrab
-                if (spellproto->SpellFamilyFlags[2] & 0x4000)
-                    return DIMINISHING_NONE;
-                break;
-            }
+        {
+            // Storm, Earth and Fire - Earthgrab
+            if (spellproto->SpellFamilyFlags[2] & 0x4000)
+                return DIMINISHING_NONE;
+            break;
+        }
         case SPELLFAMILY_DEATHKNIGHT:
-            {
-                // Hungering Cold (no flags)
-                if (spellproto->SpellIconID == 2797)
-                    return DIMINISHING_DISORIENT;
-                // Mark of Blood
-                else if ((spellproto->SpellFamilyFlags[0] & 0x10000000) && spellproto->SpellIconID == 2285)
-                    return DIMINISHING_LIMITONLY;
-                break;
-            }
+        {
+            // Hungering Cold (no flags)
+            if (spellproto->SpellIconID == 2797)
+                return DIMINISHING_DISORIENT;
+            // Mark of Blood
+            else if ((spellproto->SpellFamilyFlags[0] & 0x10000000) && spellproto->SpellIconID == 2285)
+                return DIMINISHING_LIMITONLY;
+            break;
+        }
         default:
             break;
     }
@@ -272,45 +272,45 @@ int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellInfo const
     switch (spellproto->SpellFamilyName)
     {
         case SPELLFAMILY_DRUID:
-            {
-                // Faerie Fire - limit to 40 seconds in PvP (3.1)
-                if (spellproto->SpellFamilyFlags[0] & 0x400)
-                    return 40 * IN_MILLISECONDS;
-                break;
-            }
+        {
+            // Faerie Fire - limit to 40 seconds in PvP (3.1)
+            if (spellproto->SpellFamilyFlags[0] & 0x400)
+                return 40 * IN_MILLISECONDS;
+            break;
+        }
         case SPELLFAMILY_HUNTER:
-            {
-                // Wyvern Sting
-                if (spellproto->SpellFamilyFlags[1] & 0x1000)
-                    return 6 * IN_MILLISECONDS;
-                // Hunter's Mark
-                if (spellproto->SpellFamilyFlags[0] & 0x400)
-                    return 120 * IN_MILLISECONDS;
-                break;
-            }
+        {
+            // Wyvern Sting
+            if (spellproto->SpellFamilyFlags[1] & 0x1000)
+                return 6 * IN_MILLISECONDS;
+            // Hunter's Mark
+            if (spellproto->SpellFamilyFlags[0] & 0x400)
+                return 120 * IN_MILLISECONDS;
+            break;
+        }
         case SPELLFAMILY_PALADIN:
-            {
-                // Repentance - limit to 6 seconds in PvP
-                if (spellproto->SpellFamilyFlags[0] & 0x4)
-                    return 6 * IN_MILLISECONDS;
-                break;
-            }
+        {
+            // Repentance - limit to 6 seconds in PvP
+            if (spellproto->SpellFamilyFlags[0] & 0x4)
+                return 6 * IN_MILLISECONDS;
+            break;
+        }
         case SPELLFAMILY_WARLOCK:
-            {
-                // Banish - limit to 6 seconds in PvP
-                if (spellproto->SpellFamilyFlags[1] & 0x8000000)
-                    return 6 * IN_MILLISECONDS;
-                // Curse of Tongues - limit to 12 seconds in PvP
-                else if (spellproto->SpellFamilyFlags[2] & 0x800)
-                    return 12 * IN_MILLISECONDS;
-                // Curse of Elements - limit to 120 seconds in PvP
-                else if (spellproto->SpellFamilyFlags[1] & 0x200)
-                    return 120 * IN_MILLISECONDS;
-                // Curse of Exhaustion
-                else if (spellproto->SpellFamilyFlags[0] & 0x400000)
-                    return 12 * IN_MILLISECONDS;
-                break;
-            }
+        {
+            // Banish - limit to 6 seconds in PvP
+            if (spellproto->SpellFamilyFlags[1] & 0x8000000)
+                return 6 * IN_MILLISECONDS;
+            // Curse of Tongues - limit to 12 seconds in PvP
+            else if (spellproto->SpellFamilyFlags[2] & 0x800)
+                return 12 * IN_MILLISECONDS;
+            // Curse of Elements - limit to 120 seconds in PvP
+            else if (spellproto->SpellFamilyFlags[1] & 0x200)
+                return 120 * IN_MILLISECONDS;
+            // Curse of Exhaustion
+            else if (spellproto->SpellFamilyFlags[0] & 0x400000)
+                return 12 * IN_MILLISECONDS;
+            break;
+        }
         default:
             break;
     }
@@ -377,40 +377,40 @@ bool SpellMgr::ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg)
             // craft spell for crafting non-existed item (break client recipes list show)
             case SPELL_EFFECT_CREATE_ITEM:
             case SPELL_EFFECT_CREATE_ITEM_2:
+            {
+                if (spellInfo->Effects[i].ItemType == 0)
                 {
-                    if (spellInfo->Effects[i].ItemType == 0)
-                    {
-                        // skip auto-loot crafting spells, its not need explicit item info (but have special fake items sometime)
-                        if (!spellInfo->IsLootCrafting())
-                        {
-                            if (msg)
-                                sLog->outErrorDb("Craft spell %u not have create item entry.", spellInfo->Id);
-                            return false;
-                        }
-
-                    }
-                    // also possible IsLootCrafting case but fake item must exist anyway
-                    else if (!sObjectMgr->GetItemTemplate(spellInfo->Effects[i].ItemType))
+                    // skip auto-loot crafting spells, its not need explicit item info (but have special fake items sometime)
+                    if (!spellInfo->IsLootCrafting())
                     {
                         if (msg)
-                            sLog->outErrorDb("Craft spell %u create not-exist in DB item (Entry: %u) and then...", spellInfo->Id, spellInfo->Effects[i].ItemType);
+                            sLog->outErrorDb("Craft spell %u not have create item entry.", spellInfo->Id);
                         return false;
                     }
 
-                    need_check_reagents = true;
-                    break;
                 }
+                // also possible IsLootCrafting case but fake item must exist anyway
+                else if (!sObjectMgr->GetItemTemplate(spellInfo->Effects[i].ItemType))
+                {
+                    if (msg)
+                        sLog->outErrorDb("Craft spell %u create not-exist in DB item (Entry: %u) and then...", spellInfo->Id, spellInfo->Effects[i].ItemType);
+                    return false;
+                }
+
+                need_check_reagents = true;
+                break;
+            }
             case SPELL_EFFECT_LEARN_SPELL:
+            {
+                SpellInfo const* spellInfo2 = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell);
+                if (!ComputeIsSpellValid(spellInfo2, msg))
                 {
-                    SpellInfo const* spellInfo2 = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell);
-                    if (!ComputeIsSpellValid(spellInfo2, msg))
-                    {
-                        if (msg)
-                            sLog->outErrorDb("Spell %u learn to invalid spell %u, and then...", spellInfo->Id, spellInfo->Effects[i].TriggerSpell);
-                        return false;
-                    }
-                    break;
+                    if (msg)
+                        sLog->outErrorDb("Spell %u learn to invalid spell %u, and then...", spellInfo->Id, spellInfo->Effects[i].TriggerSpell);
+                    return false;
                 }
+                break;
+            }
         }
     }
 
@@ -1072,93 +1072,93 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
     switch (spellId)
     {
         case 58600: // No fly Zone - Dalaran
-            {
-                if (!player)
-                    return false;
+        {
+            if (!player)
+                return false;
 
-                AreaTableEntry const* pArea = sAreaTableStore.LookupEntry(player->GetAreaId());
-                if (!(pArea && pArea->flags & AREA_FLAG_NO_FLY_ZONE))
-                    return false;
-                if (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY))
-                    return false;
-                // Xinef: Underbelly elixir
-                if (player->GetPositionZ() < 637.0f && player->HasAuraType(SPELL_AURA_TRANSFORM))
-                    return false;
-                break;
-            }
+            AreaTableEntry const* pArea = sAreaTableStore.LookupEntry(player->GetAreaId());
+            if (!(pArea && pArea->flags & AREA_FLAG_NO_FLY_ZONE))
+                return false;
+            if (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY))
+                return false;
+            // Xinef: Underbelly elixir
+            if (player->GetPositionZ() < 637.0f && player->HasAuraType(SPELL_AURA_TRANSFORM))
+                return false;
+            break;
+        }
         case 58730: // No fly Zone - Wintergrasp
-            {
-                if (!player)
-                    return false;
+        {
+            if (!player)
+                return false;
 
-                Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
-                if (!Bf || Bf->CanFlyIn() || (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY)))
-                    return false;
-                break;
-            }
+            Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
+            if (!Bf || Bf->CanFlyIn() || (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY)))
+                return false;
+            break;
+        }
         // xinef: northrend flying mounts
         // xinef: NE wisp and spectral gryphon
         case 55164:
         case 55173:
-            {
-                Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
-                return !Bf || Bf->CanFlyIn();
-            }
+        {
+            Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
+            return !Bf || Bf->CanFlyIn();
+        }
         case 57940: // Essence of Wintergrasp OUTSIDE
         case 58045: // Essence of Wintergrasp INSIDE
-            {
-                if (!player)
-                    return false;
+        {
+            if (!player)
+                return false;
 
-                Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-                if (!Bf || player->GetTeamId() != Bf->GetDefenderTeam() || Bf->IsWarTime())
-                    return false;
-                break;
-            }
+            Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+            if (!Bf || player->GetTeamId() != Bf->GetDefenderTeam() || Bf->IsWarTime())
+                return false;
+            break;
+        }
         case 74411: // Battleground - Dampening
-            {
-                if (!player)
-                    return false;
+        {
+            if (!player)
+                return false;
 
-                if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId()))
-                    return bf->IsWarTime();
-                break;
-            }
+            if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId()))
+                return bf->IsWarTime();
+            break;
+        }
         case 68719: // Oil Refinery - Isle of Conquest.
         case 68720: // Quarry - Isle of Conquest.
-            {
-                if (!player)
-                    return false;
+        {
+            if (!player)
+                return false;
 
-                Battleground* bg = player->GetBattleground();
-                if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_IC)
-                    return false;
+            Battleground* bg = player->GetBattleground();
+            if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_IC)
+                return false;
 
-                uint8 nodeType = spellId == 68719 ? NODE_TYPE_REFINERY : NODE_TYPE_QUARRY;
-                uint8 nodeState = player->GetTeamId() == TEAM_ALLIANCE ? NODE_STATE_CONTROLLED_A : NODE_STATE_CONTROLLED_H;
+            uint8 nodeType = spellId == 68719 ? NODE_TYPE_REFINERY : NODE_TYPE_QUARRY;
+            uint8 nodeState = player->GetTeamId() == TEAM_ALLIANCE ? NODE_STATE_CONTROLLED_A : NODE_STATE_CONTROLLED_H;
 
-                return bg->ToBattlegroundIC()->GetNodeState(nodeType) == nodeState;
-            }
+            return bg->ToBattlegroundIC()->GetNodeState(nodeType) == nodeState;
+        }
         case 56618: // Horde Controls Factory Phase Shift
         case 56617: // Alliance Controls Factory Phase Shift
-            {
-                if (!player)
-                    return false;
+        {
+            if (!player)
+                return false;
 
-                Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
+            Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
 
-                if (!bf || bf->GetTypeId() != BATTLEFIELD_WG)
-                    return false;
+            if (!bf || bf->GetTypeId() != BATTLEFIELD_WG)
+                return false;
 
-                // team that controls the workshop in the specified area
-                uint32 team = bf->GetData(newArea);
+            // team that controls the workshop in the specified area
+            uint32 team = bf->GetData(newArea);
 
-                if (team == TEAM_HORDE)
-                    return spellId == 56618;
-                else if (team == TEAM_ALLIANCE)
-                    return spellId == 56617;
-                break;
-            }
+            if (team == TEAM_HORDE)
+                return spellId == 56618;
+            else if (team == TEAM_ALLIANCE)
+                return spellId == 56617;
+            break;
+        }
         // Hellscream's Warsong
         case 73816:
         case 73818:
@@ -1275,7 +1275,7 @@ void SpellMgr::LoadSpellRanks()
     do
     {
         // spellid, rank
-        std::list < std::pair < int32, int32 > > rankChain;
+        std::list < std::pair < int32, int32 >> rankChain;
         int32 currentSpell = -1;
         int32 lastSpell = -1;
 
@@ -1316,7 +1316,7 @@ void SpellMgr::LoadSpellRanks()
         int32 curRank = 0;
         bool valid = true;
         // check spells in chain
-        for (std::list<std::pair<int32, int32> >::iterator itr = rankChain.begin(); itr != rankChain.end(); ++itr)
+        for (std::list<std::pair<int32, int32>>::iterator itr = rankChain.begin(); itr != rankChain.end(); ++itr)
         {
             SpellInfo const* spell = GetSpellInfo(itr->first);
             if (!spell)
@@ -1337,7 +1337,7 @@ void SpellMgr::LoadSpellRanks()
             continue;
         int32 prevRank = 0;
         // insert the chain
-        std::list<std::pair<int32, int32> >::iterator itr = rankChain.begin();
+        std::list<std::pair<int32, int32>>::iterator itr = rankChain.begin();
         do
         {
             ++count;
@@ -2841,32 +2841,32 @@ void SpellMgr::LoadSpellCustomAttr()
                 case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
                 case SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC:
                 case SPELL_EFFECT_ENCHANT_HELD_ITEM:
+                {
+                    // only enchanting profession enchantments procs can stack
+                    if (IsPartOfSkillLine(SKILL_ENCHANTING, i))
                     {
-                        // only enchanting profession enchantments procs can stack
-                        if (IsPartOfSkillLine(SKILL_ENCHANTING, i))
+                        uint32 enchantId = spellInfo->Effects[j].MiscValue;
+                        SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
+                        for (uint8 s = 0; s < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++s)
                         {
-                            uint32 enchantId = spellInfo->Effects[j].MiscValue;
-                            SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
-                            for (uint8 s = 0; s < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++s)
-                            {
-                                if (enchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
-                                    continue;
+                            if (enchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
+                                continue;
 
-                                SpellInfo* procInfo = (SpellInfo*)GetSpellInfo(enchant->spellid[s]);
-                                if (!procInfo)
-                                    continue;
+                            SpellInfo* procInfo = (SpellInfo*)GetSpellInfo(enchant->spellid[s]);
+                            if (!procInfo)
+                                continue;
 
-                                // if proced directly from enchantment, not via proc aura
-                                // NOTE: Enchant Weapon - Blade Ward also has proc aura spell and is proced directly
-                                // however its not expected to stack so this check is good
-                                if (procInfo->HasAura(SPELL_AURA_PROC_TRIGGER_SPELL))
-                                    continue;
+                            // if proced directly from enchantment, not via proc aura
+                            // NOTE: Enchant Weapon - Blade Ward also has proc aura spell and is proced directly
+                            // however its not expected to stack so this check is good
+                            if (procInfo->HasAura(SPELL_AURA_PROC_TRIGGER_SPELL))
+                                continue;
 
-                                procInfo->AttributesCu |= SPELL_ATTR0_CU_ENCHANT_PROC;
-                            }
+                            procInfo->AttributesCu |= SPELL_ATTR0_CU_ENCHANT_PROC;
                         }
-                        break;
                     }
+                    break;
+                }
             }
         }
 
@@ -2877,7 +2877,7 @@ void SpellMgr::LoadSpellCustomAttr()
             {
                 if (spellInfo->Effects[j].Effect)
                 {
-                    switch(spellInfo->Effects[j].Effect)
+                    switch (spellInfo->Effects[j].Effect)
                     {
                         case SPELL_EFFECT_SCHOOL_DAMAGE:
                         case SPELL_EFFECT_WEAPON_DAMAGE:
@@ -3179,7 +3179,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 12579: // Player Winter's Chill
             case 29306: // Naxxramas(Gluth's Zombies): Infected Wound
             case 61920: // Ulduar(Spellbreaker): Supercharge
-            case 63978: // Ulduar(Rubble): Stone Nova 
+            case 63978: // Ulduar(Rubble): Stone Nova
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
                 break;
             case 43138: // North Fleet Reservist Kill Credit
@@ -3192,12 +3192,12 @@ void SpellMgr::LoadSpellCustomAttr()
             case 32684:
             case 57992:
             case 57993:
-                {
-                    SpellEffectInfo info = spellInfo->Effects[EFFECT_0];
-                    spellInfo->Effects[EFFECT_0] = spellInfo->Effects[EFFECT_2];
-                    spellInfo->Effects[EFFECT_2] = info;
-                    break;
-                }
+            {
+                SpellEffectInfo info = spellInfo->Effects[EFFECT_0];
+                spellInfo->Effects[EFFECT_0] = spellInfo->Effects[EFFECT_2];
+                spellInfo->Effects[EFFECT_2] = info;
+                break;
+            }
 
             // Xinef: Cooldown overwrites
             // Jotunheim Rapid-Fire Harpoon: Energy Reserve
@@ -3241,7 +3241,7 @@ void SpellMgr::LoadSpellCustomAttr()
         {
             if (spellInfo->Effects[j].ApplyAuraName && spellInfo->Effects[j].TriggerSpell)
             {
-                switch(spellInfo->Effects[j].ApplyAuraName)
+                switch (spellInfo->Effects[j].ApplyAuraName)
                 {
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
@@ -5131,7 +5131,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 21139:
                 spellInfo->DurationIndex = 328; // 250ms
                 spellInfo->EffectImplicitTargetA[1] = 1;
-                if( spellInfo->Effect[1] )
+                if ( spellInfo->Effect[1] )
                 {
                     spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
                     spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;

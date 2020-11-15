@@ -872,97 +872,97 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         case GROUP_PERMISSION:
         case MASTER_PERMISSION:
         case RESTRICTED_PERMISSION:
+        {
+            // if you are not the round-robin group looter, you can only see
+            // blocked rolled items and quest items, and !ffa items
+            for (uint8 i = 0; i < l.items.size(); ++i)
             {
-                // if you are not the round-robin group looter, you can only see
-                // blocked rolled items and quest items, and !ffa items
-                for (uint8 i = 0; i < l.items.size(); ++i)
+                if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
                 {
-                    if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
-                    {
-                        uint8 slot_type = 0;
+                    uint8 slot_type = 0;
 
-                        if (l.items[i].is_blocked) // for ML & restricted is_blocked = !is_underthreshold
+                    if (l.items[i].is_blocked) // for ML & restricted is_blocked = !is_underthreshold
+                    {
+                        switch (lv.permission)
                         {
-                            switch (lv.permission)
+                            case GROUP_PERMISSION:
+                                slot_type = LOOT_SLOT_TYPE_ROLL_ONGOING;
+                                break;
+                            case MASTER_PERMISSION:
                             {
-                                case GROUP_PERMISSION:
-                                    slot_type = LOOT_SLOT_TYPE_ROLL_ONGOING;
-                                    break;
-                                case MASTER_PERMISSION:
-                                    {
-                                        if (lv.viewer->GetGroup())
-                                        {
-                                            if (lv.viewer->GetGroup()->GetMasterLooterGuid() == lv.viewer->GetGUID())
-                                                slot_type = LOOT_SLOT_TYPE_MASTER;
-                                            else
-                                                slot_type = LOOT_SLOT_TYPE_LOCKED;
-                                        }
-                                        break;
-                                    }
-                                case RESTRICTED_PERMISSION:
-                                    slot_type = LOOT_SLOT_TYPE_LOCKED;
-                                    break;
-                                default:
-                                    continue;
+                                if (lv.viewer->GetGroup())
+                                {
+                                    if (lv.viewer->GetGroup()->GetMasterLooterGuid() == lv.viewer->GetGUID())
+                                        slot_type = LOOT_SLOT_TYPE_MASTER;
+                                    else
+                                        slot_type = LOOT_SLOT_TYPE_LOCKED;
+                                }
+                                break;
                             }
-                        }
-                        else if (l.items[i].rollWinnerGUID)
-                        {
-                            if (l.items[i].rollWinnerGUID == lv.viewer->GetGUID())
-                                slot_type = LOOT_SLOT_TYPE_OWNER;
-                            else
+                            case RESTRICTED_PERMISSION:
+                                slot_type = LOOT_SLOT_TYPE_LOCKED;
+                                break;
+                            default:
                                 continue;
                         }
-                        else if (l.roundRobinPlayer == 0 || lv.viewer->GetGUID() == l.roundRobinPlayer || !l.items[i].is_underthreshold)
-                        {
-                            // no round robin owner or he has released the loot
-                            // or it IS the round robin group owner
-                            // => item is lootable
-                            slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
-                        }
-                        else
-                            // item shall not be displayed.
-                            continue;
-
-                        b << uint8(i) << l.items[i];
-                        b << uint8(slot_type);
-                        ++itemsShown;
                     }
-                }
-                break;
-            }
-        case ROUND_ROBIN_PERMISSION:
-            {
-                for (uint8 i = 0; i < l.items.size(); ++i)
-                {
-                    if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
+                    else if (l.items[i].rollWinnerGUID)
                     {
-                        if (l.roundRobinPlayer != 0 && lv.viewer->GetGUID() != l.roundRobinPlayer)
-                            // item shall not be displayed.
+                        if (l.items[i].rollWinnerGUID == lv.viewer->GetGUID())
+                            slot_type = LOOT_SLOT_TYPE_OWNER;
+                        else
                             continue;
-
-                        b << uint8(i) << l.items[i];
-                        b << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT);
-                        ++itemsShown;
                     }
+                    else if (l.roundRobinPlayer == 0 || lv.viewer->GetGUID() == l.roundRobinPlayer || !l.items[i].is_underthreshold)
+                    {
+                        // no round robin owner or he has released the loot
+                        // or it IS the round robin group owner
+                        // => item is lootable
+                        slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
+                    }
+                    else
+                        // item shall not be displayed.
+                        continue;
+
+                    b << uint8(i) << l.items[i];
+                    b << uint8(slot_type);
+                    ++itemsShown;
                 }
-                break;
             }
+            break;
+        }
+        case ROUND_ROBIN_PERMISSION:
+        {
+            for (uint8 i = 0; i < l.items.size(); ++i)
+            {
+                if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
+                {
+                    if (l.roundRobinPlayer != 0 && lv.viewer->GetGUID() != l.roundRobinPlayer)
+                        // item shall not be displayed.
+                        continue;
+
+                    b << uint8(i) << l.items[i];
+                    b << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT);
+                    ++itemsShown;
+                }
+            }
+            break;
+        }
         case ALL_PERMISSION:
         case OWNER_PERMISSION:
+        {
+            uint8 slot_type = lv.permission == OWNER_PERMISSION ? LOOT_SLOT_TYPE_OWNER : LOOT_SLOT_TYPE_ALLOW_LOOT;
+            for (uint8 i = 0; i < l.items.size(); ++i)
             {
-                uint8 slot_type = lv.permission == OWNER_PERMISSION ? LOOT_SLOT_TYPE_OWNER : LOOT_SLOT_TYPE_ALLOW_LOOT;
-                for (uint8 i = 0; i < l.items.size(); ++i)
+                if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
                 {
-                    if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
-                    {
-                        b << uint8(i) << l.items[i];
-                        b << uint8(slot_type);
-                        ++itemsShown;
-                    }
+                    b << uint8(i) << l.items[i];
+                    b << uint8(slot_type);
+                    ++itemsShown;
                 }
-                break;
             }
+            break;
+        }
         default:
             return b;
     }

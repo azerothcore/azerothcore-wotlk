@@ -506,7 +506,7 @@ private:
     uint32 GetGateIDFromEntry(uint32 id)
     {
         uint32 i = 0;
-        switch(id)
+        switch (id)
         {
             case 190722:
                 i = BG_SA_GREEN_GATE;

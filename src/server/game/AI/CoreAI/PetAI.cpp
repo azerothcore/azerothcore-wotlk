@@ -95,39 +95,39 @@ bool PetAI::_canMeleeAttack()
         case ENTRY_IMP:
         case ENTRY_WATER_ELEMENTAL:
         case ENTRY_WATER_ELEMENTAL_PERM:
+        {
+            for (uint8 i = 0; i < me->GetPetAutoSpellSize(); ++i)
             {
-                for (uint8 i = 0; i < me->GetPetAutoSpellSize(); ++i)
+                uint32 spellID = me->GetPetAutoSpellOnPos(i);
+                switch (spellID)
                 {
-                    uint32 spellID = me->GetPetAutoSpellOnPos(i);
-                    switch (spellID)
+                    case IMP_FIREBOLT_RANK_1:
+                    case IMP_FIREBOLT_RANK_2:
+                    case IMP_FIREBOLT_RANK_3:
+                    case IMP_FIREBOLT_RANK_4:
+                    case IMP_FIREBOLT_RANK_5:
+                    case IMP_FIREBOLT_RANK_6:
+                    case IMP_FIREBOLT_RANK_7:
+                    case IMP_FIREBOLT_RANK_8:
+                    case IMP_FIREBOLT_RANK_9:
+                    case WATER_ELEMENTAL_WATERBOLT_1:
+                    case WATER_ELEMENTAL_WATERBOLT_2:
                     {
-                        case IMP_FIREBOLT_RANK_1:
-                        case IMP_FIREBOLT_RANK_2:
-                        case IMP_FIREBOLT_RANK_3:
-                        case IMP_FIREBOLT_RANK_4:
-                        case IMP_FIREBOLT_RANK_5:
-                        case IMP_FIREBOLT_RANK_6:
-                        case IMP_FIREBOLT_RANK_7:
-                        case IMP_FIREBOLT_RANK_8:
-                        case IMP_FIREBOLT_RANK_9:
-                        case WATER_ELEMENTAL_WATERBOLT_1:
-                        case WATER_ELEMENTAL_WATERBOLT_2:
-                            {
-                                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
-                                int32 mana = me->GetPower(POWER_MANA);
+                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+                        int32 mana = me->GetPower(POWER_MANA);
 
-                                if (mana >= spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
-                                {
-                                    combatRange = spellInfo->GetMaxRange();
-                                    return true;
-                                }
-                            }
-                        default:
-                            break;
+                        if (mana >= spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
+                        {
+                            combatRange = spellInfo->GetMaxRange();
+                            return true;
+                        }
                     }
+                    default:
+                        break;
                 }
-                return false;
             }
+            return false;
+        }
         default:
             break;
     }
@@ -228,7 +228,7 @@ void PetAI::UpdateAI(uint32 diff)
         if (me->IsPet() && me->ToPet()->IsPetGhoul() && me->GetPower(POWER_ENERGY) < 75)
             return;
 
-        typedef std::vector<std::pair<Unit*, Spell*> > TargetSpellList;
+        typedef std::vector<std::pair<Unit*, Spell*>> TargetSpellList;
         TargetSpellList targetSpellStore;
 
         for (uint8 i = 0; i < me->GetPetAutoSpellSize(); ++i)
@@ -622,29 +622,29 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
     switch (moveType)
     {
         case POINT_MOTION_TYPE:
+        {
+            // Pet is returning to where stay was clicked. data should be
+            // pet's GUIDLow since we set that as the waypoint ID
+            if (data == me->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
             {
-                // Pet is returning to where stay was clicked. data should be
-                // pet's GUIDLow since we set that as the waypoint ID
-                if (data == me->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
-                {
-                    ClearCharmInfoFlags();
-                    me->GetCharmInfo()->SetIsAtStay(true);
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveIdle();
-                }
-                break;
+                ClearCharmInfoFlags();
+                me->GetCharmInfo()->SetIsAtStay(true);
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
             }
+            break;
+        }
         case FOLLOW_MOTION_TYPE:
+        {
+            // If data is owner's GUIDLow then we've reached follow point,
+            // otherwise we're probably chasing a creature
+            if (me->GetCharmerOrOwner() && me->GetCharmInfo() && data == me->GetCharmerOrOwner()->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
             {
-                // If data is owner's GUIDLow then we've reached follow point,
-                // otherwise we're probably chasing a creature
-                if (me->GetCharmerOrOwner() && me->GetCharmInfo() && data == me->GetCharmerOrOwner()->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
-                {
-                    ClearCharmInfoFlags();
-                    me->GetCharmInfo()->SetIsFollowing(true);
-                }
-                break;
+                ClearCharmInfoFlags();
+                me->GetCharmInfo()->SetIsFollowing(true);
             }
+            break;
+        }
         default:
             break;
     }

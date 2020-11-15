@@ -506,112 +506,112 @@ void Creature::Update(uint32 diff)
             sLog->outError("Creature (GUID: %u Entry: %u) in wrong state: JUST_DEAD (1)", GetGUIDLow(), GetEntry());
             break;
         case DEAD:
+        {
+            time_t now = time(nullptr);
+            if (m_respawnTime <= now)
             {
-                time_t now = time(nullptr);
-                if (m_respawnTime <= now)
-                {
-                    bool allowed = IsAIEnabled ? AI()->CanRespawn() : true;     // First check if there are any scripts that object to us respawning
-                    if (!allowed)                                               // Will be rechecked on next Update call
-                        break;
-
-                    uint64 dbtableHighGuid = MAKE_NEW_GUID(m_DBTableGuid, GetEntry(), HIGHGUID_UNIT);
-                    time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
-                    if (!linkedRespawntime)             // Can respawn
-                        Respawn();
-                    else                                // the master is dead
-                    {
-                        uint64 targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
-                        if (targetGuid == dbtableHighGuid) // if linking self, never respawn (check delayed to next day)
-                            SetRespawnTime(DAY);
-                        else
-                            m_respawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE); // else copy time from master and add a little
-                        SaveRespawnTime(); // also save to DB immediately
-                    }
-                }
-                break;
-            }
-        case CORPSE:
-            {
-                Unit::Update(diff);
-                // deathstate changed on spells update, prevent problems
-                if (m_deathState != CORPSE)
+                bool allowed = IsAIEnabled ? AI()->CanRespawn() : true;     // First check if there are any scripts that object to us respawning
+                if (!allowed)                                               // Will be rechecked on next Update call
                     break;
 
-                if (m_groupLootTimer && lootingGroupLowGUID)
+                uint64 dbtableHighGuid = MAKE_NEW_GUID(m_DBTableGuid, GetEntry(), HIGHGUID_UNIT);
+                time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
+                if (!linkedRespawntime)             // Can respawn
+                    Respawn();
+                else                                // the master is dead
                 {
-                    if (m_groupLootTimer <= diff)
-                    {
-                        Group* group = sGroupMgr->GetGroupByGUID(lootingGroupLowGUID);
-                        if (group)
-                            group->EndRoll(&loot, GetMap());
-                        m_groupLootTimer = 0;
-                        lootingGroupLowGUID = 0;
-                    }
-                    else m_groupLootTimer -= diff;
-                }
-                else if (m_corpseRemoveTime <= time(nullptr))
-                {
-                    RemoveCorpse(false);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outStaticDebug("Removing corpse... %u ", GetUInt32Value(OBJECT_FIELD_ENTRY));
-#endif
-                }
-                break;
-            }
-        case ALIVE:
-            {
-                Unit::Update(diff);
-
-                // creature can be dead after Unit::Update call
-                // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
-                if (!IsAlive())
-                    break;
-
-                // if creature is charmed, switch to charmed AI
-                if (NeedChangeAI)
-                {
-                    UpdateCharmAI();
-                    NeedChangeAI = false;
-                    IsAIEnabled = true;
-
-                    // xinef: update combat state, if npc is not in combat - return to spawn correctly by calling EnterEvadeMode
-                    SelectVictim();
-                }
-
-                Unit* owner = GetCharmerOrOwner();
-                if (IsCharmed() && !IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()))
-                {
-                    RemoveCharmAuras();
-                }
-
-                if (!IsInEvadeMode() && IsAIEnabled)
-                {
-                    // do not allow the AI to be changed during update
-                    m_AI_locked = true;
-                    i_AI->UpdateAI(diff);
-                    m_AI_locked = false;
-                }
-
-                // creature can be dead after UpdateAI call
-                // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
-                if (!IsAlive())
-                    break;
-
-                m_regenTimer -= diff;
-                if (m_regenTimer <= 0)
-                {
-                    if (!IsInEvadeMode() && (!IsInCombat() || IsPolymorphed())) // regenerate health if not in combat or if polymorphed
-                        RegenerateHealth();
-
-                    if (getPowerType() == POWER_ENERGY)
-                        Regenerate(POWER_ENERGY);
+                    uint64 targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
+                    if (targetGuid == dbtableHighGuid) // if linking self, never respawn (check delayed to next day)
+                        SetRespawnTime(DAY);
                     else
-                        Regenerate(POWER_MANA);
-
-                    m_regenTimer += CREATURE_REGEN_INTERVAL;
+                        m_respawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE); // else copy time from master and add a little
+                    SaveRespawnTime(); // also save to DB immediately
                 }
-                break;
             }
+            break;
+        }
+        case CORPSE:
+        {
+            Unit::Update(diff);
+            // deathstate changed on spells update, prevent problems
+            if (m_deathState != CORPSE)
+                break;
+
+            if (m_groupLootTimer && lootingGroupLowGUID)
+            {
+                if (m_groupLootTimer <= diff)
+                {
+                    Group* group = sGroupMgr->GetGroupByGUID(lootingGroupLowGUID);
+                    if (group)
+                        group->EndRoll(&loot, GetMap());
+                    m_groupLootTimer = 0;
+                    lootingGroupLowGUID = 0;
+                }
+                else m_groupLootTimer -= diff;
+            }
+            else if (m_corpseRemoveTime <= time(nullptr))
+            {
+                RemoveCorpse(false);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outStaticDebug("Removing corpse... %u ", GetUInt32Value(OBJECT_FIELD_ENTRY));
+#endif
+            }
+            break;
+        }
+        case ALIVE:
+        {
+            Unit::Update(diff);
+
+            // creature can be dead after Unit::Update call
+            // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
+            if (!IsAlive())
+                break;
+
+            // if creature is charmed, switch to charmed AI
+            if (NeedChangeAI)
+            {
+                UpdateCharmAI();
+                NeedChangeAI = false;
+                IsAIEnabled = true;
+
+                // xinef: update combat state, if npc is not in combat - return to spawn correctly by calling EnterEvadeMode
+                SelectVictim();
+            }
+
+            Unit* owner = GetCharmerOrOwner();
+            if (IsCharmed() && !IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()))
+            {
+                RemoveCharmAuras();
+            }
+
+            if (!IsInEvadeMode() && IsAIEnabled)
+            {
+                // do not allow the AI to be changed during update
+                m_AI_locked = true;
+                i_AI->UpdateAI(diff);
+                m_AI_locked = false;
+            }
+
+            // creature can be dead after UpdateAI call
+            // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
+            if (!IsAlive())
+                break;
+
+            m_regenTimer -= diff;
+            if (m_regenTimer <= 0)
+            {
+                if (!IsInEvadeMode() && (!IsInCombat() || IsPolymorphed())) // regenerate health if not in combat or if polymorphed
+                    RegenerateHealth();
+
+                if (getPowerType() == POWER_ENERGY)
+                    Regenerate(POWER_ENERGY);
+                else
+                    Regenerate(POWER_MANA);
+
+                m_regenTimer += CREATURE_REGEN_INTERVAL;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -660,38 +660,38 @@ void Creature::Regenerate(Powers power)
     switch (power)
     {
         case POWER_FOCUS:
-            {
-                // For hunter pets.
-                addvalue = 24 * sWorld->getRate(RATE_POWER_FOCUS);
-                break;
-            }
+        {
+            // For hunter pets.
+            addvalue = 24 * sWorld->getRate(RATE_POWER_FOCUS);
+            break;
+        }
         case POWER_ENERGY:
-            {
-                // For deathknight's ghoul.
-                addvalue = 20;
-                break;
-            }
+        {
+            // For deathknight's ghoul.
+            addvalue = 20;
+            break;
+        }
         case POWER_MANA:
+        {
+            // Combat and any controlled creature
+            if (IsInCombat() || GetCharmerOrOwnerGUID())
             {
-                // Combat and any controlled creature
-                if (IsInCombat() || GetCharmerOrOwnerGUID())
+                if (GetEntry() == NPC_IMP || GetEntry() == NPC_WATER_ELEMENTAL_TEMP || GetEntry() == NPC_WATER_ELEMENTAL_PERM)
                 {
-                    if (GetEntry() == NPC_IMP || GetEntry() == NPC_WATER_ELEMENTAL_TEMP || GetEntry() == NPC_WATER_ELEMENTAL_PERM)
-                    {
-                        addvalue = uint32((GetStat(STAT_SPIRIT) / (IsUnderLastManaUseEffect() ? 8.0f : 5.0f) + 17.0f));
-                    }
-                    else if (!IsUnderLastManaUseEffect())
-                    {
-                        float ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA);
-                        float Spirit = GetStat(STAT_SPIRIT);
-
-                        addvalue = uint32((Spirit / 5.0f + 17.0f) * ManaIncreaseRate);
-                    }
+                    addvalue = uint32((GetStat(STAT_SPIRIT) / (IsUnderLastManaUseEffect() ? 8.0f : 5.0f) + 17.0f));
                 }
-                else
-                    addvalue = maxValue / 3;
-                break;
+                else if (!IsUnderLastManaUseEffect())
+                {
+                    float ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA);
+                    float Spirit = GetStat(STAT_SPIRIT);
+
+                    addvalue = uint32((Spirit / 5.0f + 17.0f) * ManaIncreaseRate);
+                }
             }
+            else
+                addvalue = maxValue / 3;
+            break;
+        }
         default:
             return;
     }
@@ -2351,7 +2351,7 @@ void Creature::AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_t
 
     uint32 spellcooldown = spellInfo->RecoveryTime;
     uint32 categorycooldown = spellInfo->CategoryRecoveryTime;
-    if(Player* modOwner = GetSpellModOwner())
+    if (Player* modOwner = GetSpellModOwner())
     {
         modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, spellcooldown);
         modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, categorycooldown);

@@ -57,13 +57,13 @@ protected:
 };
 
 template<class T>
-class ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >
+class ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T>>
 {
 public:
     ChaseMovementGenerator(Unit* target)
-        : TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >(target) {}
+        : TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T>>(target) {}
     ChaseMovementGenerator(Unit* target, float offset, float angle)
-        : TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >(target, offset, angle) {}
+        : TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T>>(target, offset, angle) {}
     ~ChaseMovementGenerator() {}
 
     MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
@@ -81,13 +81,13 @@ public:
 };
 
 template<class T>
-class FollowMovementGenerator : public TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >
+class FollowMovementGenerator : public TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T>>
 {
 public:
     FollowMovementGenerator(Unit* target)
-        : TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >(target) {}
+        : TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T>>(target) {}
     FollowMovementGenerator(Unit* target, float offset, float angle)
-        : TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >(target, offset, angle) {}
+        : TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T>>(target, offset, angle) {}
     ~FollowMovementGenerator() {}
 
     MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }

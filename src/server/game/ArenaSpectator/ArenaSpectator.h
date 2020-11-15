@@ -200,7 +200,7 @@ namespace ArenaSpectator
         if (remove || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH) || aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_GENERIC)
             return true;
 
-        for(uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
+        for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
         {
             if (effMask & (1 << i))
             {

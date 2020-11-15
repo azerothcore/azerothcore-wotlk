@@ -337,17 +337,17 @@ void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket* data, 
     {
         case CHAT_MSG_MONSTER_WHISPER:
         case CHAT_MSG_RAID_BOSS_WHISPER:
+        {
+            if (range == TEXT_RANGE_NORMAL)//ignores team and gmOnly
             {
-                if (range == TEXT_RANGE_NORMAL)//ignores team and gmOnly
-                {
-                    if (!whisperTarget || whisperTarget->GetTypeId() != TYPEID_PLAYER)
-                        return;
-
-                    whisperTarget->ToPlayer()->GetSession()->SendPacket(data);
+                if (!whisperTarget || whisperTarget->GetTypeId() != TYPEID_PLAYER)
                     return;
-                }
-                break;
+
+                whisperTarget->ToPlayer()->GetSession()->SendPacket(data);
+                return;
             }
+            break;
+        }
         default:
             break;
     }
@@ -355,40 +355,40 @@ void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket* data, 
     switch (range)
     {
         case TEXT_RANGE_AREA:
-            {
-                uint32 areaId = source->GetAreaId();
-                Map::PlayerList const& players = source->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                    if (itr->GetSource()->GetAreaId() == areaId && (teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
-                        itr->GetSource()->GetSession()->SendPacket(data);
-                return;
-            }
+        {
+            uint32 areaId = source->GetAreaId();
+            Map::PlayerList const& players = source->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                if (itr->GetSource()->GetAreaId() == areaId && (teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
+                    itr->GetSource()->GetSession()->SendPacket(data);
+            return;
+        }
         case TEXT_RANGE_ZONE:
-            {
-                uint32 zoneId = source->GetZoneId();
-                Map::PlayerList const& players = source->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                    if (itr->GetSource()->GetZoneId() == zoneId && (teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
-                        itr->GetSource()->GetSession()->SendPacket(data);
-                return;
-            }
+        {
+            uint32 zoneId = source->GetZoneId();
+            Map::PlayerList const& players = source->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                if (itr->GetSource()->GetZoneId() == zoneId && (teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
+                    itr->GetSource()->GetSession()->SendPacket(data);
+            return;
+        }
         case TEXT_RANGE_MAP:
-            {
-                Map::PlayerList const& players = source->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                    if ((teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
-                        itr->GetSource()->GetSession()->SendPacket(data);
-                return;
-            }
+        {
+            Map::PlayerList const& players = source->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                if ((teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
+                    itr->GetSource()->GetSession()->SendPacket(data);
+            return;
+        }
         case TEXT_RANGE_WORLD:
-            {
-                SessionMap const& smap = sWorld->GetAllSessions();
-                for (SessionMap::const_iterator itr = smap.begin(); itr != smap.end(); ++itr)
-                    if (Player* player = itr->second->GetPlayer())
-                        if ((teamId == TEAM_NEUTRAL || player->GetTeamId() == teamId) && (!gmOnly || player->IsGameMaster()))
-                            player->GetSession()->SendPacket(data);
-                return;
-            }
+        {
+            SessionMap const& smap = sWorld->GetAllSessions();
+            for (SessionMap::const_iterator itr = smap.begin(); itr != smap.end(); ++itr)
+                if (Player* player = itr->second->GetPlayer())
+                    if ((teamId == TEAM_NEUTRAL || player->GetTeamId() == teamId) && (!gmOnly || player->IsGameMaster()))
+                        player->GetSession()->SendPacket(data);
+            return;
+        }
         case TEXT_RANGE_NORMAL:
         default:
             break;

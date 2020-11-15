@@ -555,14 +555,14 @@ void MotionTransport::DelayedTeleportTransport()
                 obj->AddObjectToRemoveList();
                 break;
             case TYPEID_PLAYER:
-                {
-                    float destX, destY, destZ, destO;
-                    obj->m_movementInfo.transport.pos.GetPosition(destX, destY, destZ, destO);
-                    TransportBase::CalculatePassengerPosition(destX, destY, destZ, &destO, x, y, z, o);
-                    if (!obj->ToPlayer()->TeleportTo(newMapId, destX, destY, destZ, destO, TELE_TO_NOT_LEAVE_TRANSPORT))
-                        _passengers.erase(obj);
-                }
-                break;
+            {
+                float destX, destY, destZ, destO;
+                obj->m_movementInfo.transport.pos.GetPosition(destX, destY, destZ, destO);
+                TransportBase::CalculatePassengerPosition(destX, destY, destZ, &destO, x, y, z, o);
+                if (!obj->ToPlayer()->TeleportTo(newMapId, destX, destY, destZ, destO, TELE_TO_NOT_LEAVE_TRANSPORT))
+                    _passengers.erase(obj);
+            }
+            break;
             default:
                 break;
         }
@@ -605,15 +605,15 @@ void MotionTransport::UpdatePassengerPositions(PassengerSet& passengers)
         switch (passenger->GetTypeId())
         {
             case TYPEID_UNIT:
-                {
-                    Creature* creature = passenger->ToCreature();
-                    GetMap()->CreatureRelocation(creature, x, y, z, o);
+            {
+                Creature* creature = passenger->ToCreature();
+                GetMap()->CreatureRelocation(creature, x, y, z, o);
 
-                    creature->GetTransportHomePosition(x, y, z, o);
-                    CalculatePassengerPosition(x, y, z, &o);
-                    creature->SetHomePosition(x, y, z, o);
-                }
-                break;
+                creature->GetTransportHomePosition(x, y, z, o);
+                CalculatePassengerPosition(x, y, z, &o);
+                creature->SetHomePosition(x, y, z, o);
+            }
+            break;
             case TYPEID_PLAYER:
                 if (passenger->IsInWorld())
                     GetMap()->PlayerRelocation(passenger->ToPlayer(), x, y, z, o);

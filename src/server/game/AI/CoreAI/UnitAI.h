@@ -213,24 +213,24 @@ public:
         {
             case SELECT_TARGET_NEAREST:
             case SELECT_TARGET_TOPAGGRO:
-                {
-                    std::list<Unit*>::iterator itr = targetList.begin();
-                    std::advance(itr, position);
-                    return *itr;
-                }
+            {
+                std::list<Unit*>::iterator itr = targetList.begin();
+                std::advance(itr, position);
+                return *itr;
+            }
             case SELECT_TARGET_FARTHEST:
             case SELECT_TARGET_BOTTOMAGGRO:
-                {
-                    std::list<Unit*>::reverse_iterator ritr = targetList.rbegin();
-                    std::advance(ritr, position);
-                    return *ritr;
-                }
+            {
+                std::list<Unit*>::reverse_iterator ritr = targetList.rbegin();
+                std::advance(ritr, position);
+                return *ritr;
+            }
             case SELECT_TARGET_RANDOM:
-                {
-                    std::list<Unit*>::iterator itr = targetList.begin();
-                    std::advance(itr, urand(position, targetList.size() - 1));
-                    return *itr;
-                }
+            {
+                std::list<Unit*>::iterator itr = targetList.begin();
+                std::advance(itr, urand(position, targetList.size() - 1));
+                return *itr;
+            }
             default:
                 break;
         }

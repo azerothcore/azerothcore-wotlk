@@ -41,6 +41,19 @@ void TempSummon::Update(uint32 diff)
         case TEMPSUMMON_DESPAWNED:
             break;
         case TEMPSUMMON_TIMED_DESPAWN:
+        {
+            if (m_timer <= diff)
+            {
+                UnSummon();
+                return;
+            }
+
+            m_timer -= diff;
+            break;
+        }
+        case TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT:
+        {
+            if (!IsInCombat())
             {
                 if (m_timer <= diff)
                 {
@@ -49,94 +62,81 @@ void TempSummon::Update(uint32 diff)
                 }
 
                 m_timer -= diff;
-                break;
             }
-        case TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT:
-            {
-                if (!IsInCombat())
-                {
-                    if (m_timer <= diff)
-                    {
-                        UnSummon();
-                        return;
-                    }
+            else if (m_timer != m_lifetime)
+                m_timer = m_lifetime;
 
-                    m_timer -= diff;
-                }
-                else if (m_timer != m_lifetime)
-                    m_timer = m_lifetime;
-
-                break;
-            }
+            break;
+        }
 
         case TEMPSUMMON_CORPSE_TIMED_DESPAWN:
+        {
+            if (m_deathState == CORPSE)
             {
-                if (m_deathState == CORPSE)
+                if (m_timer <= diff)
                 {
-                    if (m_timer <= diff)
-                    {
-                        UnSummon();
-                        return;
-                    }
-
-                    m_timer -= diff;
+                    UnSummon();
+                    return;
                 }
-                break;
+
+                m_timer -= diff;
             }
+            break;
+        }
         case TEMPSUMMON_CORPSE_DESPAWN:
+        {
+            // if m_deathState is DEAD, CORPSE was skipped
+            if (m_deathState == CORPSE)
             {
-                // if m_deathState is DEAD, CORPSE was skipped
-                if (m_deathState == CORPSE)
-                {
-                    UnSummon();
-                    return;
-                }
-
-                break;
+                UnSummon();
+                return;
             }
+
+            break;
+        }
         case TEMPSUMMON_DEAD_DESPAWN:
-            {
-                break;
-            }
+        {
+            break;
+        }
         case TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN:
+        {
+            // if m_deathState is DEAD, CORPSE was skipped
+            if (m_deathState == CORPSE)
             {
-                // if m_deathState is DEAD, CORPSE was skipped
-                if (m_deathState == CORPSE)
+                UnSummon();
+                return;
+            }
+
+            if (!IsInCombat())
+            {
+                if (m_timer <= diff)
                 {
                     UnSummon();
                     return;
                 }
-
-                if (!IsInCombat())
-                {
-                    if (m_timer <= diff)
-                    {
-                        UnSummon();
-                        return;
-                    }
-                    else
-                        m_timer -= diff;
-                }
-                else if (m_timer != m_lifetime)
-                    m_timer = m_lifetime;
-                break;
+                else
+                    m_timer -= diff;
             }
+            else if (m_timer != m_lifetime)
+                m_timer = m_lifetime;
+            break;
+        }
         case TEMPSUMMON_TIMED_OR_DEAD_DESPAWN:
+        {
+            if (!IsInCombat() && IsAlive())
             {
-                if (!IsInCombat() && IsAlive())
+                if (m_timer <= diff)
                 {
-                    if (m_timer <= diff)
-                    {
-                        UnSummon();
-                        return;
-                    }
-                    else
-                        m_timer -= diff;
+                    UnSummon();
+                    return;
                 }
-                else if (m_timer != m_lifetime)
-                    m_timer = m_lifetime;
-                break;
+                else
+                    m_timer -= diff;
             }
+            else if (m_timer != m_lifetime)
+                m_timer = m_lifetime;
+            break;
+        }
         default:
             UnSummon();
             sLog->outError("Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);

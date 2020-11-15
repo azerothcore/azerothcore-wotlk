@@ -320,7 +320,7 @@ class TransportBase;
 class SpellCastTargets;
 
 typedef std::list<Unit*> UnitList;
-typedef std::list< std::pair<Aura*, uint8> > DispelChargesList;
+typedef std::list< std::pair<Aura*, uint8>> DispelChargesList;
 
 enum SpellImmuneBlockType
 {

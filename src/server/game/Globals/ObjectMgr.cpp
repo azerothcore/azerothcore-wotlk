@@ -169,12 +169,12 @@ std::string GetScriptCommandName(ScriptCommands command)
             res = "SCRIPT_COMMAND_PLAYMOVIE";
             break;
         default:
-            {
-                char sz[32];
-                sprintf(sz, "Unknown command: %d", command);
-                res = sz;
-                break;
-            }
+        {
+            char sz[32];
+            sprintf(sz, "Unknown command: %d", command);
+            res = sz;
+            break;
+        }
     }
     return res;
 }
@@ -1416,153 +1416,153 @@ void ObjectMgr::LoadLinkedRespawn()
         switch (linkType)
         {
             case CREATURE_TO_CREATURE:
+            {
+                const CreatureData* slave = GetCreatureData(guidLow);
+                if (!slave)
                 {
-                    const CreatureData* slave = GetCreatureData(guidLow);
-                    if (!slave)
-                    {
-                        sLog->outErrorDb("Couldn't get creature data for GUIDLow %u", guidLow);
-                        error = true;
-                        break;
-                    }
-
-                    const CreatureData* master = GetCreatureData(linkedGuidLow);
-                    if (!master)
-                    {
-                        sLog->outErrorDb("Couldn't get creature data for GUIDLow %u", linkedGuidLow);
-                        error = true;
-                        break;
-                    }
-
-                    const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
-                    if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
-                    {
-                        sLog->outErrorDb("Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
-                        error = true;
-                        break;
-                    }
-
-                    if (!(master->spawnMask & slave->spawnMask))  // they must have a possibility to meet (normal/heroic difficulty)
-                    {
-                        sLog->outErrorDb("LinkedRespawn: Creature '%u' linking to '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
-                        error = true;
-                        break;
-                    }
-
-                    guid = MAKE_NEW_GUID(guidLow, slave->id, HIGHGUID_UNIT);
-                    linkedGuid = MAKE_NEW_GUID(linkedGuidLow, master->id, HIGHGUID_UNIT);
+                    sLog->outErrorDb("Couldn't get creature data for GUIDLow %u", guidLow);
+                    error = true;
                     break;
                 }
+
+                const CreatureData* master = GetCreatureData(linkedGuidLow);
+                if (!master)
+                {
+                    sLog->outErrorDb("Couldn't get creature data for GUIDLow %u", linkedGuidLow);
+                    error = true;
+                    break;
+                }
+
+                const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
+                if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
+                {
+                    sLog->outErrorDb("Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
+                    error = true;
+                    break;
+                }
+
+                if (!(master->spawnMask & slave->spawnMask))  // they must have a possibility to meet (normal/heroic difficulty)
+                {
+                    sLog->outErrorDb("LinkedRespawn: Creature '%u' linking to '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
+                    error = true;
+                    break;
+                }
+
+                guid = MAKE_NEW_GUID(guidLow, slave->id, HIGHGUID_UNIT);
+                linkedGuid = MAKE_NEW_GUID(linkedGuidLow, master->id, HIGHGUID_UNIT);
+                break;
+            }
             case CREATURE_TO_GO:
+            {
+                const CreatureData* slave = GetCreatureData(guidLow);
+                if (!slave)
                 {
-                    const CreatureData* slave = GetCreatureData(guidLow);
-                    if (!slave)
-                    {
-                        sLog->outErrorDb("Couldn't get creature data for GUIDLow %u", guidLow);
-                        error = true;
-                        break;
-                    }
-
-                    const GameObjectData* master = GetGOData(linkedGuidLow);
-                    if (!master)
-                    {
-                        sLog->outErrorDb("Couldn't get gameobject data for GUIDLow %u", linkedGuidLow);
-                        error = true;
-                        break;
-                    }
-
-                    const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
-                    if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
-                    {
-                        sLog->outErrorDb("Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
-                        error = true;
-                        break;
-                    }
-
-                    if (!(master->spawnMask & slave->spawnMask))  // they must have a possibility to meet (normal/heroic difficulty)
-                    {
-                        sLog->outErrorDb("LinkedRespawn: Creature '%u' linking to '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
-                        error = true;
-                        break;
-                    }
-
-                    guid = MAKE_NEW_GUID(guidLow, slave->id, HIGHGUID_UNIT);
-                    linkedGuid = MAKE_NEW_GUID(linkedGuidLow, master->id, HIGHGUID_GAMEOBJECT);
+                    sLog->outErrorDb("Couldn't get creature data for GUIDLow %u", guidLow);
+                    error = true;
                     break;
                 }
+
+                const GameObjectData* master = GetGOData(linkedGuidLow);
+                if (!master)
+                {
+                    sLog->outErrorDb("Couldn't get gameobject data for GUIDLow %u", linkedGuidLow);
+                    error = true;
+                    break;
+                }
+
+                const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
+                if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
+                {
+                    sLog->outErrorDb("Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
+                    error = true;
+                    break;
+                }
+
+                if (!(master->spawnMask & slave->spawnMask))  // they must have a possibility to meet (normal/heroic difficulty)
+                {
+                    sLog->outErrorDb("LinkedRespawn: Creature '%u' linking to '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
+                    error = true;
+                    break;
+                }
+
+                guid = MAKE_NEW_GUID(guidLow, slave->id, HIGHGUID_UNIT);
+                linkedGuid = MAKE_NEW_GUID(linkedGuidLow, master->id, HIGHGUID_GAMEOBJECT);
+                break;
+            }
             case GO_TO_GO:
+            {
+                const GameObjectData* slave = GetGOData(guidLow);
+                if (!slave)
                 {
-                    const GameObjectData* slave = GetGOData(guidLow);
-                    if (!slave)
-                    {
-                        sLog->outErrorDb("Couldn't get gameobject data for GUIDLow %u", guidLow);
-                        error = true;
-                        break;
-                    }
-
-                    const GameObjectData* master = GetGOData(linkedGuidLow);
-                    if (!master)
-                    {
-                        sLog->outErrorDb("Couldn't get gameobject data for GUIDLow %u", linkedGuidLow);
-                        error = true;
-                        break;
-                    }
-
-                    const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
-                    if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
-                    {
-                        sLog->outErrorDb("Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
-                        error = true;
-                        break;
-                    }
-
-                    if (!(master->spawnMask & slave->spawnMask))  // they must have a possibility to meet (normal/heroic difficulty)
-                    {
-                        sLog->outErrorDb("LinkedRespawn: Creature '%u' linking to '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
-                        error = true;
-                        break;
-                    }
-
-                    guid = MAKE_NEW_GUID(guidLow, slave->id, HIGHGUID_GAMEOBJECT);
-                    linkedGuid = MAKE_NEW_GUID(linkedGuidLow, master->id, HIGHGUID_GAMEOBJECT);
+                    sLog->outErrorDb("Couldn't get gameobject data for GUIDLow %u", guidLow);
+                    error = true;
                     break;
                 }
+
+                const GameObjectData* master = GetGOData(linkedGuidLow);
+                if (!master)
+                {
+                    sLog->outErrorDb("Couldn't get gameobject data for GUIDLow %u", linkedGuidLow);
+                    error = true;
+                    break;
+                }
+
+                const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
+                if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
+                {
+                    sLog->outErrorDb("Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
+                    error = true;
+                    break;
+                }
+
+                if (!(master->spawnMask & slave->spawnMask))  // they must have a possibility to meet (normal/heroic difficulty)
+                {
+                    sLog->outErrorDb("LinkedRespawn: Creature '%u' linking to '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
+                    error = true;
+                    break;
+                }
+
+                guid = MAKE_NEW_GUID(guidLow, slave->id, HIGHGUID_GAMEOBJECT);
+                linkedGuid = MAKE_NEW_GUID(linkedGuidLow, master->id, HIGHGUID_GAMEOBJECT);
+                break;
+            }
             case GO_TO_CREATURE:
+            {
+                const GameObjectData* slave = GetGOData(guidLow);
+                if (!slave)
                 {
-                    const GameObjectData* slave = GetGOData(guidLow);
-                    if (!slave)
-                    {
-                        sLog->outErrorDb("Couldn't get gameobject data for GUIDLow %u", guidLow);
-                        error = true;
-                        break;
-                    }
-
-                    const CreatureData* master = GetCreatureData(linkedGuidLow);
-                    if (!master)
-                    {
-                        sLog->outErrorDb("Couldn't get creature data for GUIDLow %u", linkedGuidLow);
-                        error = true;
-                        break;
-                    }
-
-                    const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
-                    if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
-                    {
-                        sLog->outErrorDb("Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
-                        error = true;
-                        break;
-                    }
-
-                    if (!(master->spawnMask & slave->spawnMask))  // they must have a possibility to meet (normal/heroic difficulty)
-                    {
-                        sLog->outErrorDb("LinkedRespawn: Creature '%u' linking to '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
-                        error = true;
-                        break;
-                    }
-
-                    guid = MAKE_NEW_GUID(guidLow, slave->id, HIGHGUID_GAMEOBJECT);
-                    linkedGuid = MAKE_NEW_GUID(linkedGuidLow, master->id, HIGHGUID_UNIT);
+                    sLog->outErrorDb("Couldn't get gameobject data for GUIDLow %u", guidLow);
+                    error = true;
                     break;
                 }
+
+                const CreatureData* master = GetCreatureData(linkedGuidLow);
+                if (!master)
+                {
+                    sLog->outErrorDb("Couldn't get creature data for GUIDLow %u", linkedGuidLow);
+                    error = true;
+                    break;
+                }
+
+                const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
+                if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
+                {
+                    sLog->outErrorDb("Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
+                    error = true;
+                    break;
+                }
+
+                if (!(master->spawnMask & slave->spawnMask))  // they must have a possibility to meet (normal/heroic difficulty)
+                {
+                    sLog->outErrorDb("LinkedRespawn: Creature '%u' linking to '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
+                    error = true;
+                    break;
+                }
+
+                guid = MAKE_NEW_GUID(guidLow, slave->id, HIGHGUID_GAMEOBJECT);
+                linkedGuid = MAKE_NEW_GUID(linkedGuidLow, master->id, HIGHGUID_UNIT);
+                break;
+            }
         }
 
         if (!error)
@@ -4728,248 +4728,248 @@ void ObjectMgr::LoadScripts(ScriptsType type)
         switch (tmp.command)
         {
             case SCRIPT_COMMAND_TALK:
+            {
+                if (tmp.Talk.ChatType > CHAT_TYPE_WHISPER && tmp.Talk.ChatType != CHAT_MSG_RAID_BOSS_WHISPER)
                 {
-                    if (tmp.Talk.ChatType > CHAT_TYPE_WHISPER && tmp.Talk.ChatType != CHAT_MSG_RAID_BOSS_WHISPER)
-                    {
-                        sLog->outErrorDb("Table `%s` has invalid talk type (datalong = %u) in SCRIPT_COMMAND_TALK for script id %u",
-                                         tableName.c_str(), tmp.Talk.ChatType, tmp.id);
-                        continue;
-                    }
-                    if (!tmp.Talk.TextID)
-                    {
-                        sLog->outErrorDb("Table `%s` has invalid talk text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u",
-                                         tableName.c_str(), tmp.Talk.TextID, tmp.id);
-                        continue;
-                    }
-                    break;
+                    sLog->outErrorDb("Table `%s` has invalid talk type (datalong = %u) in SCRIPT_COMMAND_TALK for script id %u",
+                                     tableName.c_str(), tmp.Talk.ChatType, tmp.id);
+                    continue;
                 }
+                if (!tmp.Talk.TextID)
+                {
+                    sLog->outErrorDb("Table `%s` has invalid talk text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u",
+                                     tableName.c_str(), tmp.Talk.TextID, tmp.id);
+                    continue;
+                }
+                break;
+            }
 
             case SCRIPT_COMMAND_EMOTE:
+            {
+                if (!sEmotesStore.LookupEntry(tmp.Emote.EmoteID))
                 {
-                    if (!sEmotesStore.LookupEntry(tmp.Emote.EmoteID))
-                    {
-                        sLog->outErrorDb("Table `%s` has invalid emote id (datalong = %u) in SCRIPT_COMMAND_EMOTE for script id %u",
-                                         tableName.c_str(), tmp.Emote.EmoteID, tmp.id);
-                        continue;
-                    }
-                    break;
+                    sLog->outErrorDb("Table `%s` has invalid emote id (datalong = %u) in SCRIPT_COMMAND_EMOTE for script id %u",
+                                     tableName.c_str(), tmp.Emote.EmoteID, tmp.id);
+                    continue;
                 }
+                break;
+            }
 
             case SCRIPT_COMMAND_TELEPORT_TO:
+            {
+                if (!sMapStore.LookupEntry(tmp.TeleportTo.MapID))
                 {
-                    if (!sMapStore.LookupEntry(tmp.TeleportTo.MapID))
-                    {
-                        sLog->outErrorDb("Table `%s` has invalid map (Id: %u) in SCRIPT_COMMAND_TELEPORT_TO for script id %u",
-                                         tableName.c_str(), tmp.TeleportTo.MapID, tmp.id);
-                        continue;
-                    }
-
-                    if (!acore::IsValidMapCoord(tmp.TeleportTo.DestX, tmp.TeleportTo.DestY, tmp.TeleportTo.DestZ, tmp.TeleportTo.Orientation))
-                    {
-                        sLog->outErrorDb("Table `%s` has invalid coordinates (X: %f Y: %f Z: %f O: %f) in SCRIPT_COMMAND_TELEPORT_TO for script id %u",
-                                         tableName.c_str(), tmp.TeleportTo.DestX, tmp.TeleportTo.DestY, tmp.TeleportTo.DestZ, tmp.TeleportTo.Orientation, tmp.id);
-                        continue;
-                    }
-                    break;
+                    sLog->outErrorDb("Table `%s` has invalid map (Id: %u) in SCRIPT_COMMAND_TELEPORT_TO for script id %u",
+                                     tableName.c_str(), tmp.TeleportTo.MapID, tmp.id);
+                    continue;
                 }
+
+                if (!acore::IsValidMapCoord(tmp.TeleportTo.DestX, tmp.TeleportTo.DestY, tmp.TeleportTo.DestZ, tmp.TeleportTo.Orientation))
+                {
+                    sLog->outErrorDb("Table `%s` has invalid coordinates (X: %f Y: %f Z: %f O: %f) in SCRIPT_COMMAND_TELEPORT_TO for script id %u",
+                                     tableName.c_str(), tmp.TeleportTo.DestX, tmp.TeleportTo.DestY, tmp.TeleportTo.DestZ, tmp.TeleportTo.Orientation, tmp.id);
+                    continue;
+                }
+                break;
+            }
 
             case SCRIPT_COMMAND_QUEST_EXPLORED:
+            {
+                Quest const* quest = GetQuestTemplate(tmp.QuestExplored.QuestID);
+                if (!quest)
                 {
-                    Quest const* quest = GetQuestTemplate(tmp.QuestExplored.QuestID);
-                    if (!quest)
-                    {
-                        sLog->outErrorDb("Table `%s` has invalid quest (ID: %u) in SCRIPT_COMMAND_QUEST_EXPLORED in `datalong` for script id %u",
-                                         tableName.c_str(), tmp.QuestExplored.QuestID, tmp.id);
-                        continue;
-                    }
-
-                    if (!quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT))
-                    {
-                        sLog->outErrorDb("Table `%s` has quest (ID: %u) in SCRIPT_COMMAND_QUEST_EXPLORED in `datalong` for script id %u, but quest not have specialflag QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT in quest flags. Script command or quest flags wrong. Quest modified to require objective.",
-                                         tableName.c_str(), tmp.QuestExplored.QuestID, tmp.id);
-
-                        // this will prevent quest completing without objective
-                        const_cast<Quest*>(quest)->SetSpecialFlag(QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT);
-
-                        // continue; - quest objective requirement set and command can be allowed
-                    }
-
-                    if (float(tmp.QuestExplored.Distance) > DEFAULT_VISIBILITY_DISTANCE)
-                    {
-                        sLog->outErrorDb("Table `%s` has too large distance (%u) for exploring objective complete in `datalong2` in SCRIPT_COMMAND_QUEST_EXPLORED in `datalong` for script id %u",
-                                         tableName.c_str(), tmp.QuestExplored.Distance, tmp.id);
-                        continue;
-                    }
-
-                    if (tmp.QuestExplored.Distance && float(tmp.QuestExplored.Distance) > DEFAULT_VISIBILITY_DISTANCE)
-                    {
-                        sLog->outErrorDb("Table `%s` has too large distance (%u) for exploring objective complete in `datalong2` in SCRIPT_COMMAND_QUEST_EXPLORED in `datalong` for script id %u, max distance is %f or 0 for disable distance check",
-                                         tableName.c_str(), tmp.QuestExplored.Distance, tmp.id, DEFAULT_VISIBILITY_DISTANCE);
-                        continue;
-                    }
-
-                    if (tmp.QuestExplored.Distance && float(tmp.QuestExplored.Distance) < INTERACTION_DISTANCE)
-                    {
-                        sLog->outErrorDb("Table `%s` has too small distance (%u) for exploring objective complete in `datalong2` in SCRIPT_COMMAND_QUEST_EXPLORED in `datalong` for script id %u, min distance is %f or 0 for disable distance check",
-                                         tableName.c_str(), tmp.QuestExplored.Distance, tmp.id, INTERACTION_DISTANCE);
-                        continue;
-                    }
-
-                    break;
+                    sLog->outErrorDb("Table `%s` has invalid quest (ID: %u) in SCRIPT_COMMAND_QUEST_EXPLORED in `datalong` for script id %u",
+                                     tableName.c_str(), tmp.QuestExplored.QuestID, tmp.id);
+                    continue;
                 }
+
+                if (!quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT))
+                {
+                    sLog->outErrorDb("Table `%s` has quest (ID: %u) in SCRIPT_COMMAND_QUEST_EXPLORED in `datalong` for script id %u, but quest not have specialflag QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT in quest flags. Script command or quest flags wrong. Quest modified to require objective.",
+                                     tableName.c_str(), tmp.QuestExplored.QuestID, tmp.id);
+
+                    // this will prevent quest completing without objective
+                    const_cast<Quest*>(quest)->SetSpecialFlag(QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT);
+
+                    // continue; - quest objective requirement set and command can be allowed
+                }
+
+                if (float(tmp.QuestExplored.Distance) > DEFAULT_VISIBILITY_DISTANCE)
+                {
+                    sLog->outErrorDb("Table `%s` has too large distance (%u) for exploring objective complete in `datalong2` in SCRIPT_COMMAND_QUEST_EXPLORED in `datalong` for script id %u",
+                                     tableName.c_str(), tmp.QuestExplored.Distance, tmp.id);
+                    continue;
+                }
+
+                if (tmp.QuestExplored.Distance && float(tmp.QuestExplored.Distance) > DEFAULT_VISIBILITY_DISTANCE)
+                {
+                    sLog->outErrorDb("Table `%s` has too large distance (%u) for exploring objective complete in `datalong2` in SCRIPT_COMMAND_QUEST_EXPLORED in `datalong` for script id %u, max distance is %f or 0 for disable distance check",
+                                     tableName.c_str(), tmp.QuestExplored.Distance, tmp.id, DEFAULT_VISIBILITY_DISTANCE);
+                    continue;
+                }
+
+                if (tmp.QuestExplored.Distance && float(tmp.QuestExplored.Distance) < INTERACTION_DISTANCE)
+                {
+                    sLog->outErrorDb("Table `%s` has too small distance (%u) for exploring objective complete in `datalong2` in SCRIPT_COMMAND_QUEST_EXPLORED in `datalong` for script id %u, min distance is %f or 0 for disable distance check",
+                                     tableName.c_str(), tmp.QuestExplored.Distance, tmp.id, INTERACTION_DISTANCE);
+                    continue;
+                }
+
+                break;
+            }
 
             case SCRIPT_COMMAND_KILL_CREDIT:
+            {
+                if (!GetCreatureTemplate(tmp.KillCredit.CreatureEntry))
                 {
-                    if (!GetCreatureTemplate(tmp.KillCredit.CreatureEntry))
-                    {
-                        sLog->outErrorDb("Table `%s` has invalid creature (Entry: %u) in SCRIPT_COMMAND_KILL_CREDIT for script id %u",
-                                         tableName.c_str(), tmp.KillCredit.CreatureEntry, tmp.id);
-                        continue;
-                    }
-                    break;
+                    sLog->outErrorDb("Table `%s` has invalid creature (Entry: %u) in SCRIPT_COMMAND_KILL_CREDIT for script id %u",
+                                     tableName.c_str(), tmp.KillCredit.CreatureEntry, tmp.id);
+                    continue;
                 }
+                break;
+            }
 
             case SCRIPT_COMMAND_RESPAWN_GAMEOBJECT:
+            {
+                GameObjectData const* data = GetGOData(tmp.RespawnGameobject.GOGuid);
+                if (!data)
                 {
-                    GameObjectData const* data = GetGOData(tmp.RespawnGameobject.GOGuid);
-                    if (!data)
-                    {
-                        sLog->outErrorDb("Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id %u",
-                                         tableName.c_str(), tmp.RespawnGameobject.GOGuid, tmp.id);
-                        continue;
-                    }
-
-                    GameObjectTemplate const* info = GetGameObjectTemplate(data->id);
-                    if (!info)
-                    {
-                        sLog->outErrorDb("Table `%s` has gameobject with invalid entry (GUID: %u Entry: %u) in SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id %u",
-                                         tableName.c_str(), tmp.RespawnGameobject.GOGuid, data->id, tmp.id);
-                        continue;
-                    }
-
-                    if (info->type == GAMEOBJECT_TYPE_FISHINGNODE ||
-                            info->type == GAMEOBJECT_TYPE_FISHINGHOLE ||
-                            info->type == GAMEOBJECT_TYPE_DOOR        ||
-                            info->type == GAMEOBJECT_TYPE_BUTTON      ||
-                            info->type == GAMEOBJECT_TYPE_TRAP)
-                    {
-                        sLog->outErrorDb("Table `%s` have gameobject type (%u) unsupported by command SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id %u",
-                                         tableName.c_str(), info->entry, tmp.id);
-                        continue;
-                    }
-                    break;
+                    sLog->outErrorDb("Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id %u",
+                                     tableName.c_str(), tmp.RespawnGameobject.GOGuid, tmp.id);
+                    continue;
                 }
+
+                GameObjectTemplate const* info = GetGameObjectTemplate(data->id);
+                if (!info)
+                {
+                    sLog->outErrorDb("Table `%s` has gameobject with invalid entry (GUID: %u Entry: %u) in SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id %u",
+                                     tableName.c_str(), tmp.RespawnGameobject.GOGuid, data->id, tmp.id);
+                    continue;
+                }
+
+                if (info->type == GAMEOBJECT_TYPE_FISHINGNODE ||
+                        info->type == GAMEOBJECT_TYPE_FISHINGHOLE ||
+                        info->type == GAMEOBJECT_TYPE_DOOR        ||
+                        info->type == GAMEOBJECT_TYPE_BUTTON      ||
+                        info->type == GAMEOBJECT_TYPE_TRAP)
+                {
+                    sLog->outErrorDb("Table `%s` have gameobject type (%u) unsupported by command SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id %u",
+                                     tableName.c_str(), info->entry, tmp.id);
+                    continue;
+                }
+                break;
+            }
 
             case SCRIPT_COMMAND_TEMP_SUMMON_CREATURE:
+            {
+                if (!acore::IsValidMapCoord(tmp.TempSummonCreature.PosX, tmp.TempSummonCreature.PosY, tmp.TempSummonCreature.PosZ, tmp.TempSummonCreature.Orientation))
                 {
-                    if (!acore::IsValidMapCoord(tmp.TempSummonCreature.PosX, tmp.TempSummonCreature.PosY, tmp.TempSummonCreature.PosZ, tmp.TempSummonCreature.Orientation))
-                    {
-                        sLog->outErrorDb("Table `%s` has invalid coordinates (X: %f Y: %f Z: %f O: %f) in SCRIPT_COMMAND_TEMP_SUMMON_CREATURE for script id %u",
-                                         tableName.c_str(), tmp.TempSummonCreature.PosX, tmp.TempSummonCreature.PosY, tmp.TempSummonCreature.PosZ, tmp.TempSummonCreature.Orientation, tmp.id);
-                        continue;
-                    }
-
-                    uint32 entry = tmp.TempSummonCreature.CreatureEntry;
-                    if (!GetCreatureTemplate(entry))
-                    {
-                        sLog->outErrorDb("Table `%s` has invalid creature (Entry: %u) in SCRIPT_COMMAND_TEMP_SUMMON_CREATURE for script id %u",
-                                         tableName.c_str(), tmp.TempSummonCreature.CreatureEntry, tmp.id);
-                        continue;
-                    }
-                    break;
+                    sLog->outErrorDb("Table `%s` has invalid coordinates (X: %f Y: %f Z: %f O: %f) in SCRIPT_COMMAND_TEMP_SUMMON_CREATURE for script id %u",
+                                     tableName.c_str(), tmp.TempSummonCreature.PosX, tmp.TempSummonCreature.PosY, tmp.TempSummonCreature.PosZ, tmp.TempSummonCreature.Orientation, tmp.id);
+                    continue;
                 }
+
+                uint32 entry = tmp.TempSummonCreature.CreatureEntry;
+                if (!GetCreatureTemplate(entry))
+                {
+                    sLog->outErrorDb("Table `%s` has invalid creature (Entry: %u) in SCRIPT_COMMAND_TEMP_SUMMON_CREATURE for script id %u",
+                                     tableName.c_str(), tmp.TempSummonCreature.CreatureEntry, tmp.id);
+                    continue;
+                }
+                break;
+            }
 
             case SCRIPT_COMMAND_OPEN_DOOR:
             case SCRIPT_COMMAND_CLOSE_DOOR:
+            {
+                GameObjectData const* data = GetGOData(tmp.ToggleDoor.GOGuid);
+                if (!data)
                 {
-                    GameObjectData const* data = GetGOData(tmp.ToggleDoor.GOGuid);
-                    if (!data)
-                    {
-                        sLog->outErrorDb("Table `%s` has invalid gameobject (GUID: %u) in %s for script id %u",
-                                         tableName.c_str(), tmp.ToggleDoor.GOGuid, GetScriptCommandName(tmp.command).c_str(), tmp.id);
-                        continue;
-                    }
-
-                    GameObjectTemplate const* info = GetGameObjectTemplate(data->id);
-                    if (!info)
-                    {
-                        sLog->outErrorDb("Table `%s` has gameobject with invalid entry (GUID: %u Entry: %u) in %s for script id %u",
-                                         tableName.c_str(), tmp.ToggleDoor.GOGuid, data->id, GetScriptCommandName(tmp.command).c_str(), tmp.id);
-                        continue;
-                    }
-
-                    if (info->type != GAMEOBJECT_TYPE_DOOR)
-                    {
-                        sLog->outErrorDb("Table `%s` has gameobject type (%u) non supported by command %s for script id %u",
-                                         tableName.c_str(), info->entry, GetScriptCommandName(tmp.command).c_str(), tmp.id);
-                        continue;
-                    }
-
-                    break;
+                    sLog->outErrorDb("Table `%s` has invalid gameobject (GUID: %u) in %s for script id %u",
+                                     tableName.c_str(), tmp.ToggleDoor.GOGuid, GetScriptCommandName(tmp.command).c_str(), tmp.id);
+                    continue;
                 }
+
+                GameObjectTemplate const* info = GetGameObjectTemplate(data->id);
+                if (!info)
+                {
+                    sLog->outErrorDb("Table `%s` has gameobject with invalid entry (GUID: %u Entry: %u) in %s for script id %u",
+                                     tableName.c_str(), tmp.ToggleDoor.GOGuid, data->id, GetScriptCommandName(tmp.command).c_str(), tmp.id);
+                    continue;
+                }
+
+                if (info->type != GAMEOBJECT_TYPE_DOOR)
+                {
+                    sLog->outErrorDb("Table `%s` has gameobject type (%u) non supported by command %s for script id %u",
+                                     tableName.c_str(), info->entry, GetScriptCommandName(tmp.command).c_str(), tmp.id);
+                    continue;
+                }
+
+                break;
+            }
 
             case SCRIPT_COMMAND_REMOVE_AURA:
+            {
+                if (!sSpellMgr->GetSpellInfo(tmp.RemoveAura.SpellID))
                 {
-                    if (!sSpellMgr->GetSpellInfo(tmp.RemoveAura.SpellID))
-                    {
-                        sLog->outErrorDb("Table `%s` using non-existent spell (id: %u) in SCRIPT_COMMAND_REMOVE_AURA for script id %u",
-                                         tableName.c_str(), tmp.RemoveAura.SpellID, tmp.id);
-                        continue;
-                    }
-                    if (tmp.RemoveAura.Flags & ~0x1)                    // 1 bits (0, 1)
-                    {
-                        sLog->outErrorDb("Table `%s` using unknown flags in datalong2 (%u) in SCRIPT_COMMAND_REMOVE_AURA for script id %u",
-                                         tableName.c_str(), tmp.RemoveAura.Flags, tmp.id);
-                        continue;
-                    }
-                    break;
+                    sLog->outErrorDb("Table `%s` using non-existent spell (id: %u) in SCRIPT_COMMAND_REMOVE_AURA for script id %u",
+                                     tableName.c_str(), tmp.RemoveAura.SpellID, tmp.id);
+                    continue;
                 }
+                if (tmp.RemoveAura.Flags & ~0x1)                    // 1 bits (0, 1)
+                {
+                    sLog->outErrorDb("Table `%s` using unknown flags in datalong2 (%u) in SCRIPT_COMMAND_REMOVE_AURA for script id %u",
+                                     tableName.c_str(), tmp.RemoveAura.Flags, tmp.id);
+                    continue;
+                }
+                break;
+            }
 
             case SCRIPT_COMMAND_CAST_SPELL:
+            {
+                if (!sSpellMgr->GetSpellInfo(tmp.CastSpell.SpellID))
                 {
-                    if (!sSpellMgr->GetSpellInfo(tmp.CastSpell.SpellID))
-                    {
-                        sLog->outErrorDb("Table `%s` using non-existent spell (id: %u) in SCRIPT_COMMAND_CAST_SPELL for script id %u",
-                                         tableName.c_str(), tmp.CastSpell.SpellID, tmp.id);
-                        continue;
-                    }
-                    if (tmp.CastSpell.Flags > 4)                      // targeting type
-                    {
-                        sLog->outErrorDb("Table `%s` using unknown target in datalong2 (%u) in SCRIPT_COMMAND_CAST_SPELL for script id %u",
-                                         tableName.c_str(), tmp.CastSpell.Flags, tmp.id);
-                        continue;
-                    }
-                    if (tmp.CastSpell.Flags != 4 && tmp.CastSpell.CreatureEntry & ~0x1)                      // 1 bit (0, 1)
-                    {
-                        sLog->outErrorDb("Table `%s` using unknown flags in dataint (%u) in SCRIPT_COMMAND_CAST_SPELL for script id %u",
-                                         tableName.c_str(), tmp.CastSpell.CreatureEntry, tmp.id);
-                        continue;
-                    }
-                    else if (tmp.CastSpell.Flags == 4 && !GetCreatureTemplate(tmp.CastSpell.CreatureEntry))
-                    {
-                        sLog->outErrorDb("Table `%s` using invalid creature entry in dataint (%u) in SCRIPT_COMMAND_CAST_SPELL for script id %u",
-                                         tableName.c_str(), tmp.CastSpell.CreatureEntry, tmp.id);
-                        continue;
-                    }
-                    break;
+                    sLog->outErrorDb("Table `%s` using non-existent spell (id: %u) in SCRIPT_COMMAND_CAST_SPELL for script id %u",
+                                     tableName.c_str(), tmp.CastSpell.SpellID, tmp.id);
+                    continue;
                 }
+                if (tmp.CastSpell.Flags > 4)                      // targeting type
+                {
+                    sLog->outErrorDb("Table `%s` using unknown target in datalong2 (%u) in SCRIPT_COMMAND_CAST_SPELL for script id %u",
+                                     tableName.c_str(), tmp.CastSpell.Flags, tmp.id);
+                    continue;
+                }
+                if (tmp.CastSpell.Flags != 4 && tmp.CastSpell.CreatureEntry & ~0x1)                      // 1 bit (0, 1)
+                {
+                    sLog->outErrorDb("Table `%s` using unknown flags in dataint (%u) in SCRIPT_COMMAND_CAST_SPELL for script id %u",
+                                     tableName.c_str(), tmp.CastSpell.CreatureEntry, tmp.id);
+                    continue;
+                }
+                else if (tmp.CastSpell.Flags == 4 && !GetCreatureTemplate(tmp.CastSpell.CreatureEntry))
+                {
+                    sLog->outErrorDb("Table `%s` using invalid creature entry in dataint (%u) in SCRIPT_COMMAND_CAST_SPELL for script id %u",
+                                     tableName.c_str(), tmp.CastSpell.CreatureEntry, tmp.id);
+                    continue;
+                }
+                break;
+            }
 
             case SCRIPT_COMMAND_CREATE_ITEM:
+            {
+                if (!GetItemTemplate(tmp.CreateItem.ItemEntry))
                 {
-                    if (!GetItemTemplate(tmp.CreateItem.ItemEntry))
-                    {
-                        sLog->outErrorDb("Table `%s` has nonexistent item (entry: %u) in SCRIPT_COMMAND_CREATE_ITEM for script id %u",
-                                         tableName.c_str(), tmp.CreateItem.ItemEntry, tmp.id);
-                        continue;
-                    }
-                    if (!tmp.CreateItem.Amount)
-                    {
-                        sLog->outErrorDb("Table `%s` SCRIPT_COMMAND_CREATE_ITEM but amount is %u for script id %u",
-                                         tableName.c_str(), tmp.CreateItem.Amount, tmp.id);
-                        continue;
-                    }
-                    break;
+                    sLog->outErrorDb("Table `%s` has nonexistent item (entry: %u) in SCRIPT_COMMAND_CREATE_ITEM for script id %u",
+                                     tableName.c_str(), tmp.CreateItem.ItemEntry, tmp.id);
+                    continue;
                 }
+                if (!tmp.CreateItem.Amount)
+                {
+                    sLog->outErrorDb("Table `%s` SCRIPT_COMMAND_CREATE_ITEM but amount is %u for script id %u",
+                                     tableName.c_str(), tmp.CreateItem.Amount, tmp.id);
+                    continue;
+                }
+                break;
+            }
             default:
                 break;
         }
@@ -5159,11 +5159,11 @@ void ObjectMgr::ValidateSpellScripts()
     for (SpellScriptsContainer::iterator itr = _spellScriptsStore.begin(); itr != _spellScriptsStore.end();)
     {
         SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(itr->first);
-        std::vector<std::pair<SpellScriptLoader*, SpellScriptsContainer::iterator> > SpellScriptLoaders;
+        std::vector<std::pair<SpellScriptLoader*, SpellScriptsContainer::iterator>> SpellScriptLoaders;
         sScriptMgr->CreateSpellScriptLoaders(itr->first, SpellScriptLoaders);
         itr = _spellScriptsStore.upper_bound(itr->first);
 
-        for (std::vector<std::pair<SpellScriptLoader*, SpellScriptsContainer::iterator> >::iterator sitr = SpellScriptLoaders.begin(); sitr != SpellScriptLoaders.end(); ++sitr)
+        for (std::vector<std::pair<SpellScriptLoader*, SpellScriptsContainer::iterator>>::iterator sitr = SpellScriptLoaders.begin(); sitr != SpellScriptLoaders.end(); ++sitr)
         {
             SpellScript* spellScript = sitr->first->GetSpellScript();
             AuraScript* auraScript = sitr->first->GetAuraScript();
@@ -5204,7 +5204,7 @@ void ObjectMgr::ValidateSpellScripts()
 void ObjectMgr::InitializeSpellInfoPrecomputedData()
 {
     uint32 limit = sSpellStore.GetNumRows();
-    for(uint32 i = 0; i <= limit; ++i)
+    for (uint32 i = 0; i <= limit; ++i)
         if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(i))
         {
             const_cast<SpellInfo*>(spellInfo)->SetStackableWithRanks(spellInfo->ComputeIsStackableWithRanks());
@@ -5395,27 +5395,27 @@ void ObjectMgr::LoadInstanceEncounters()
         switch (creditType)
         {
             case ENCOUNTER_CREDIT_KILL_CREATURE:
+            {
+                CreatureTemplate const* creatureInfo = GetCreatureTemplate(creditEntry);
+                if (!creatureInfo)
                 {
-                    CreatureTemplate const* creatureInfo = GetCreatureTemplate(creditEntry);
-                    if (!creatureInfo)
-                    {
-                        sLog->outErrorDb("Table `instance_encounters` has an invalid creature (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
-                        continue;
-                    }
-                    const_cast<CreatureTemplate*>(creatureInfo)->flags_extra |= CREATURE_FLAG_EXTRA_DUNGEON_BOSS;
-                    break;
+                    sLog->outErrorDb("Table `instance_encounters` has an invalid creature (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
+                    continue;
                 }
+                const_cast<CreatureTemplate*>(creatureInfo)->flags_extra |= CREATURE_FLAG_EXTRA_DUNGEON_BOSS;
+                break;
+            }
             case ENCOUNTER_CREDIT_CAST_SPELL:
+            {
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(creditEntry);
+                if (!spellInfo)
                 {
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(creditEntry);
-                    if (!spellInfo)
-                    {
-                        sLog->outErrorDb("Table `instance_encounters` has an invalid spell (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
-                        continue;
-                    }
-                    const_cast<SpellInfo*>(spellInfo)->AttributesCu |= SPELL_ATTR0_CU_ENCOUNTER_REWARD;
-                    break;
+                    sLog->outErrorDb("Table `instance_encounters` has an invalid spell (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
+                    continue;
                 }
+                const_cast<SpellInfo*>(spellInfo)->AttributesCu |= SPELL_ATTR0_CU_ENCOUNTER_REWARD;
+                break;
+            }
             default:
                 sLog->outErrorDb("Table `instance_encounters` has an invalid credit type (%u) for encounter %u (%s), skipped!", creditType, entry, dungeonEncounter->encounterName[0]);
                 continue;
@@ -6343,58 +6343,58 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
     switch (guidhigh)
     {
         case HIGHGUID_ITEM:
-            {
-                ASSERT(_hiItemGuid < 0xFFFFFFFE && "Item guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiItemGuidMutex);
-                return _hiItemGuid++;
-            }
+        {
+            ASSERT(_hiItemGuid < 0xFFFFFFFE && "Item guid overflow!");
+            ACORE_GUARD(ACE_Thread_Mutex, _hiItemGuidMutex);
+            return _hiItemGuid++;
+        }
         case HIGHGUID_UNIT:
-            {
-                ASSERT(_hiCreatureGuid < 0x00FFFFFE && "Creature guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiCreatureGuidMutex);
-                return _hiCreatureGuid++;
-            }
+        {
+            ASSERT(_hiCreatureGuid < 0x00FFFFFE && "Creature guid overflow!");
+            ACORE_GUARD(ACE_Thread_Mutex, _hiCreatureGuidMutex);
+            return _hiCreatureGuid++;
+        }
         case HIGHGUID_PET:
-            {
-                ASSERT(_hiPetGuid < 0x00FFFFFE && "Pet guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiPetGuidMutex);
-                return _hiPetGuid++;
-            }
+        {
+            ASSERT(_hiPetGuid < 0x00FFFFFE && "Pet guid overflow!");
+            ACORE_GUARD(ACE_Thread_Mutex, _hiPetGuidMutex);
+            return _hiPetGuid++;
+        }
         case HIGHGUID_VEHICLE:
-            {
-                ASSERT(_hiVehicleGuid < 0x00FFFFFF && "Vehicle guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiVehicleGuidMutex);
-                return _hiVehicleGuid++;
-            }
+        {
+            ASSERT(_hiVehicleGuid < 0x00FFFFFF && "Vehicle guid overflow!");
+            ACORE_GUARD(ACE_Thread_Mutex, _hiVehicleGuidMutex);
+            return _hiVehicleGuid++;
+        }
         case HIGHGUID_PLAYER:
-            {
-                ASSERT(_hiCharGuid < 0xFFFFFFFE && "Player guid overflow!");
-                return _hiCharGuid++;
-            }
+        {
+            ASSERT(_hiCharGuid < 0xFFFFFFFE && "Player guid overflow!");
+            return _hiCharGuid++;
+        }
         case HIGHGUID_GAMEOBJECT:
-            {
-                ASSERT(_hiGoGuid < 0x00FFFFFE && "Gameobject guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiGoGuidMutex);
-                return _hiGoGuid++;
-            }
+        {
+            ASSERT(_hiGoGuid < 0x00FFFFFE && "Gameobject guid overflow!");
+            ACORE_GUARD(ACE_Thread_Mutex, _hiGoGuidMutex);
+            return _hiGoGuid++;
+        }
         case HIGHGUID_CORPSE:
-            {
-                ASSERT(_hiCorpseGuid < 0xFFFFFFFE && "Corpse guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiCorpseGuidMutex);
-                return _hiCorpseGuid++;
-            }
+        {
+            ASSERT(_hiCorpseGuid < 0xFFFFFFFE && "Corpse guid overflow!");
+            ACORE_GUARD(ACE_Thread_Mutex, _hiCorpseGuidMutex);
+            return _hiCorpseGuid++;
+        }
         case HIGHGUID_DYNAMICOBJECT:
-            {
-                ASSERT(_hiDoGuid < 0xFFFFFFFE && "DynamicObject guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiDoGuidMutex);
-                return _hiDoGuid++;
-            }
+        {
+            ASSERT(_hiDoGuid < 0xFFFFFFFE && "DynamicObject guid overflow!");
+            ACORE_GUARD(ACE_Thread_Mutex, _hiDoGuidMutex);
+            return _hiDoGuid++;
+        }
         case HIGHGUID_MO_TRANSPORT:
-            {
-                ASSERT(_hiMoTransGuid < 0xFFFFFFFE && "MO Transport guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiMoTransGuidMutex);
-                return _hiMoTransGuid++;
-            }
+        {
+            ASSERT(_hiMoTransGuid < 0xFFFFFFFE && "MO Transport guid overflow!");
+            ACORE_GUARD(ACE_Thread_Mutex, _hiMoTransGuidMutex);
+            return _hiMoTransGuid++;
+        }
         default:
             ASSERT(false && "ObjectMgr::GenerateLowGuid - Unknown HIGHGUID type");
             return 0;
@@ -6406,19 +6406,19 @@ uint32 ObjectMgr::GenerateRecycledLowGuid(HighGuid guidHigh)
     switch (guidHigh)
     {
         case HIGHGUID_UNIT:
-            {
-                ASSERT(_hiCreatureRecycledGuid < 0x00FFFFFE && "Creature recycled guid overflow!");
-                if (_hiCreatureRecycledGuid < _hiCreatureRecycledGuidMax)
-                    return _hiCreatureRecycledGuid++;
-                break;
-            }
+        {
+            ASSERT(_hiCreatureRecycledGuid < 0x00FFFFFE && "Creature recycled guid overflow!");
+            if (_hiCreatureRecycledGuid < _hiCreatureRecycledGuidMax)
+                return _hiCreatureRecycledGuid++;
+            break;
+        }
         case HIGHGUID_GAMEOBJECT:
-            {
-                ASSERT(_hiGoRecycledGuid < 0x00FFFFFE && "Gameobject recycled guid overflow!");
-                if (_hiGoRecycledGuid < _hiGoRecycledGuidMax)
-                    return _hiGoRecycledGuid++;
-                break;
-            }
+        {
+            ASSERT(_hiGoRecycledGuid < 0x00FFFFFE && "Gameobject recycled guid overflow!");
+            if (_hiGoRecycledGuid < _hiGoRecycledGuidMax)
+                return _hiGoRecycledGuid++;
+            break;
+        }
         default: // Default case is not handled by the recycler
             break;
     }
@@ -6568,129 +6568,129 @@ void ObjectMgr::LoadGameObjectTemplate()
         switch (got.type)
         {
             case GAMEOBJECT_TYPE_DOOR:                      //0
-                {
-                    if (got.door.lockId)
-                        CheckGOLockId(&got, got.door.lockId, 1);
-                    CheckGONoDamageImmuneId(&got, got.door.noDamageImmune, 3);
-                    break;
-                }
+            {
+                if (got.door.lockId)
+                    CheckGOLockId(&got, got.door.lockId, 1);
+                CheckGONoDamageImmuneId(&got, got.door.noDamageImmune, 3);
+                break;
+            }
             case GAMEOBJECT_TYPE_BUTTON:                    //1
-                {
-                    if (got.button.lockId)
-                        CheckGOLockId(&got, got.button.lockId, 1);
-                    CheckGONoDamageImmuneId(&got, got.button.noDamageImmune, 4);
-                    break;
-                }
+            {
+                if (got.button.lockId)
+                    CheckGOLockId(&got, got.button.lockId, 1);
+                CheckGONoDamageImmuneId(&got, got.button.noDamageImmune, 4);
+                break;
+            }
             case GAMEOBJECT_TYPE_QUESTGIVER:                //2
-                {
-                    if (got.questgiver.lockId)
-                        CheckGOLockId(&got, got.questgiver.lockId, 0);
-                    CheckGONoDamageImmuneId(&got, got.questgiver.noDamageImmune, 5);
-                    break;
-                }
+            {
+                if (got.questgiver.lockId)
+                    CheckGOLockId(&got, got.questgiver.lockId, 0);
+                CheckGONoDamageImmuneId(&got, got.questgiver.noDamageImmune, 5);
+                break;
+            }
             case GAMEOBJECT_TYPE_CHEST:                     //3
-                {
-                    if (got.chest.lockId)
-                        CheckGOLockId(&got, got.chest.lockId, 0);
+            {
+                if (got.chest.lockId)
+                    CheckGOLockId(&got, got.chest.lockId, 0);
 
-                    CheckGOConsumable(&got, got.chest.consumable, 3);
+                CheckGOConsumable(&got, got.chest.consumable, 3);
 
-                    if (got.chest.linkedTrapId)              // linked trap
-                        CheckGOLinkedTrapId(&got, got.chest.linkedTrapId, 7);
-                    break;
-                }
+                if (got.chest.linkedTrapId)              // linked trap
+                    CheckGOLinkedTrapId(&got, got.chest.linkedTrapId, 7);
+                break;
+            }
             case GAMEOBJECT_TYPE_TRAP:                      //6
-                {
-                    if (got.trap.lockId)
-                        CheckGOLockId(&got, got.trap.lockId, 0);
-                    break;
-                }
+            {
+                if (got.trap.lockId)
+                    CheckGOLockId(&got, got.trap.lockId, 0);
+                break;
+            }
             case GAMEOBJECT_TYPE_CHAIR:                     //7
                 CheckAndFixGOChairHeightId(&got, got.chair.height, 1);
                 break;
             case GAMEOBJECT_TYPE_SPELL_FOCUS:               //8
+            {
+                if (got.spellFocus.focusId)
                 {
-                    if (got.spellFocus.focusId)
-                    {
-                        if (!sSpellFocusObjectStore.LookupEntry(got.spellFocus.focusId))
-                            sLog->outErrorDb("GameObject (Entry: %u GoType: %u) have data0=%u but SpellFocus (Id: %u) not exist.",
-                                             entry, got.type, got.spellFocus.focusId, got.spellFocus.focusId);
-                    }
-
-                    if (got.spellFocus.linkedTrapId)        // linked trap
-                        CheckGOLinkedTrapId(&got, got.spellFocus.linkedTrapId, 2);
-                    break;
+                    if (!sSpellFocusObjectStore.LookupEntry(got.spellFocus.focusId))
+                        sLog->outErrorDb("GameObject (Entry: %u GoType: %u) have data0=%u but SpellFocus (Id: %u) not exist.",
+                                         entry, got.type, got.spellFocus.focusId, got.spellFocus.focusId);
                 }
+
+                if (got.spellFocus.linkedTrapId)        // linked trap
+                    CheckGOLinkedTrapId(&got, got.spellFocus.linkedTrapId, 2);
+                break;
+            }
             case GAMEOBJECT_TYPE_GOOBER:                    //10
+            {
+                if (got.goober.lockId)
+                    CheckGOLockId(&got, got.goober.lockId, 0);
+
+                CheckGOConsumable(&got, got.goober.consumable, 3);
+
+                if (got.goober.pageId)                  // pageId
                 {
-                    if (got.goober.lockId)
-                        CheckGOLockId(&got, got.goober.lockId, 0);
-
-                    CheckGOConsumable(&got, got.goober.consumable, 3);
-
-                    if (got.goober.pageId)                  // pageId
-                    {
-                        if (!GetPageText(got.goober.pageId))
-                            sLog->outErrorDb("GameObject (Entry: %u GoType: %u) have data7=%u but PageText (Entry %u) not exist.",
-                                             entry, got.type, got.goober.pageId, got.goober.pageId);
-                    }
-                    CheckGONoDamageImmuneId(&got, got.goober.noDamageImmune, 11);
-                    if (got.goober.linkedTrapId)            // linked trap
-                        CheckGOLinkedTrapId(&got, got.goober.linkedTrapId, 12);
-                    break;
+                    if (!GetPageText(got.goober.pageId))
+                        sLog->outErrorDb("GameObject (Entry: %u GoType: %u) have data7=%u but PageText (Entry %u) not exist.",
+                                         entry, got.type, got.goober.pageId, got.goober.pageId);
                 }
+                CheckGONoDamageImmuneId(&got, got.goober.noDamageImmune, 11);
+                if (got.goober.linkedTrapId)            // linked trap
+                    CheckGOLinkedTrapId(&got, got.goober.linkedTrapId, 12);
+                break;
+            }
             case GAMEOBJECT_TYPE_AREADAMAGE:                //12
-                {
-                    if (got.areadamage.lockId)
-                        CheckGOLockId(&got, got.areadamage.lockId, 0);
-                    break;
-                }
+            {
+                if (got.areadamage.lockId)
+                    CheckGOLockId(&got, got.areadamage.lockId, 0);
+                break;
+            }
             case GAMEOBJECT_TYPE_CAMERA:                    //13
-                {
-                    if (got.camera.lockId)
-                        CheckGOLockId(&got, got.camera.lockId, 0);
-                    break;
-                }
+            {
+                if (got.camera.lockId)
+                    CheckGOLockId(&got, got.camera.lockId, 0);
+                break;
+            }
             case GAMEOBJECT_TYPE_MO_TRANSPORT:              //15
+            {
+                if (got.moTransport.taxiPathId)
                 {
-                    if (got.moTransport.taxiPathId)
-                    {
-                        if (got.moTransport.taxiPathId >= sTaxiPathNodesByPath.size() || sTaxiPathNodesByPath[got.moTransport.taxiPathId].empty())
-                            sLog->outErrorDb("GameObject (Entry: %u GoType: %u) have data0=%u but TaxiPath (Id: %u) not exist.",
-                                             entry, got.type, got.moTransport.taxiPathId, got.moTransport.taxiPathId);
-                    }
-                    if (uint32 transportMap = got.moTransport.mapID)
-                        _transportMaps.insert(transportMap);
-                    break;
+                    if (got.moTransport.taxiPathId >= sTaxiPathNodesByPath.size() || sTaxiPathNodesByPath[got.moTransport.taxiPathId].empty())
+                        sLog->outErrorDb("GameObject (Entry: %u GoType: %u) have data0=%u but TaxiPath (Id: %u) not exist.",
+                                         entry, got.type, got.moTransport.taxiPathId, got.moTransport.taxiPathId);
                 }
+                if (uint32 transportMap = got.moTransport.mapID)
+                    _transportMaps.insert(transportMap);
+                break;
+            }
             case GAMEOBJECT_TYPE_SUMMONING_RITUAL:          //18
                 break;
             case GAMEOBJECT_TYPE_SPELLCASTER:               //22
-                {
-                    // always must have spell
-                    CheckGOSpellId(&got, got.spellcaster.spellId, 0);
-                    break;
-                }
+            {
+                // always must have spell
+                CheckGOSpellId(&got, got.spellcaster.spellId, 0);
+                break;
+            }
             case GAMEOBJECT_TYPE_FLAGSTAND:                 //24
-                {
-                    if (got.flagstand.lockId)
-                        CheckGOLockId(&got, got.flagstand.lockId, 0);
-                    CheckGONoDamageImmuneId(&got, got.flagstand.noDamageImmune, 5);
-                    break;
-                }
+            {
+                if (got.flagstand.lockId)
+                    CheckGOLockId(&got, got.flagstand.lockId, 0);
+                CheckGONoDamageImmuneId(&got, got.flagstand.noDamageImmune, 5);
+                break;
+            }
             case GAMEOBJECT_TYPE_FISHINGHOLE:               //25
-                {
-                    if (got.fishinghole.lockId)
-                        CheckGOLockId(&got, got.fishinghole.lockId, 4);
-                    break;
-                }
+            {
+                if (got.fishinghole.lockId)
+                    CheckGOLockId(&got, got.fishinghole.lockId, 4);
+                break;
+            }
             case GAMEOBJECT_TYPE_FLAGDROP:                  //26
-                {
-                    if (got.flagdrop.lockId)
-                        CheckGOLockId(&got, got.flagdrop.lockId, 0);
-                    CheckGONoDamageImmuneId(&got, got.flagdrop.noDamageImmune, 3);
-                    break;
-                }
+            {
+                if (got.flagdrop.lockId)
+                    CheckGOLockId(&got, got.flagdrop.lockId, 0);
+                CheckGONoDamageImmuneId(&got, got.flagdrop.noDamageImmune, 3);
+                break;
+            }
             case GAMEOBJECT_TYPE_BARBER_CHAIR:              //32
                 CheckAndFixGOChairHeightId(&got, got.barberChair.chairheight, 0);
                 break;
@@ -7258,7 +7258,7 @@ void ObjectMgr::LoadQuestPOI()
     //                                                  0       1   2  3
     QueryResult points = WorldDatabase.Query("SELECT QuestID, Idx1, X, Y FROM quest_poi_points ORDER BY QuestID DESC, Idx2");
 
-    std::vector<std::vector<std::vector<QuestPOIPoint> > > POIs;
+    std::vector<std::vector<std::vector<QuestPOIPoint>>> POIs;
 
     if (points)
     {
@@ -7745,45 +7745,45 @@ void ObjectMgr::LoadGameObjectForQuests()
                 ++count;
                 break;
             case GAMEOBJECT_TYPE_CHEST:
-                {
-                    // scan GO chest with loot including quest items
-                    uint32 loot_id = (itr->second.GetLootId());
+            {
+                // scan GO chest with loot including quest items
+                uint32 loot_id = (itr->second.GetLootId());
 
-                    // find quest loot for GO
-                    if (itr->second.chest.questId || LootTemplates_Gameobject.HaveQuestLootFor(loot_id))
-                    {
-                        itr->second.IsForQuests = true;
-                        ++count;
-                    }
-                    break;
+                // find quest loot for GO
+                if (itr->second.chest.questId || LootTemplates_Gameobject.HaveQuestLootFor(loot_id))
+                {
+                    itr->second.IsForQuests = true;
+                    ++count;
                 }
+                break;
+            }
             case GAMEOBJECT_TYPE_GENERIC:
+            {
+                if (itr->second._generic.questID > 0)            //quests objects
                 {
-                    if (itr->second._generic.questID > 0)            //quests objects
-                    {
-                        itr->second.IsForQuests = true;
-                        ++count;
-                    }
-                    break;
+                    itr->second.IsForQuests = true;
+                    ++count;
                 }
+                break;
+            }
             case GAMEOBJECT_TYPE_SPELL_FOCUS:
+            {
+                if (itr->second.spellFocus.questID > 0)          //quests objects
                 {
-                    if (itr->second.spellFocus.questID > 0)          //quests objects
-                    {
-                        itr->second.IsForQuests = true;
-                        ++count;
-                    }
-                    break;
+                    itr->second.IsForQuests = true;
+                    ++count;
                 }
+                break;
+            }
             case GAMEOBJECT_TYPE_GOOBER:
+            {
+                if (itr->second.goober.questId > 0)              //quests objects
                 {
-                    if (itr->second.goober.questId > 0)              //quests objects
-                    {
-                        itr->second.IsForQuests = true;
-                        ++count;
-                    }
-                    break;
+                    itr->second.IsForQuests = true;
+                    ++count;
                 }
+                break;
+            }
             default:
                 break;
         }

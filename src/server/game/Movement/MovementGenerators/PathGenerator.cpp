@@ -175,8 +175,8 @@ G3D::Vector3 ClosestPointOnLine(const G3D::Vector3& a, const G3D::Vector3& b, co
 
     // Check to see if the point is on the line
     // if not then return the endpoint
-    if(t < 0) return a;
-    if(t > d) return b;
+    if (t < 0) return a;
+    if (t > d) return b;
 
     // get the distance to move from point a
     v *= t;

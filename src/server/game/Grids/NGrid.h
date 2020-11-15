@@ -47,7 +47,7 @@ public:
     int32 getX() const { return i_x; }
     int32 getY() const { return i_y; }
 
-    void link(GridRefManager<NGrid<N, ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES> >* pTo)
+    void link(GridRefManager<NGrid<N, ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES>>* pTo)
     {
         i_Reference.link(pTo, this);
     }
@@ -78,7 +78,7 @@ public:
 
     // Visit all Grids (cells) in NGrid (grid)
     template<class T, class TT>
-    void VisitAllGrids(TypeContainerVisitor<T, TypeMapContainer<TT> >& visitor)
+    void VisitAllGrids(TypeContainerVisitor<T, TypeMapContainer<TT>>& visitor)
     {
         for (uint32 x = 0; x < N; ++x)
             for (uint32 y = 0; y < N; ++y)
@@ -87,14 +87,14 @@ public:
 
     // Visit a single Grid (cell) in NGrid (grid)
     template<class T, class TT>
-    void VisitGrid(const uint32 x, const uint32 y, TypeContainerVisitor<T, TypeMapContainer<TT> >& visitor)
+    void VisitGrid(const uint32 x, const uint32 y, TypeContainerVisitor<T, TypeMapContainer<TT>>& visitor)
     {
         GetGridType(x, y).Visit(visitor);
     }
 
 private:
     uint32 i_gridId;
-    GridReference<NGrid<N, ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES> > i_Reference;
+    GridReference<NGrid<N, ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES>> i_Reference;
     int32 i_x;
     int32 i_y;
     GridType i_cells[N][N];

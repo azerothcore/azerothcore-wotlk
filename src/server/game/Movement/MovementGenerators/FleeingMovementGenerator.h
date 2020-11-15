@@ -10,7 +10,7 @@
 #include "MovementGenerator.h"
 
 template<class T>
-class FleeingMovementGenerator : public MovementGeneratorMedium< T, FleeingMovementGenerator<T> >
+class FleeingMovementGenerator : public MovementGeneratorMedium< T, FleeingMovementGenerator<T>>
 {
 public:
     FleeingMovementGenerator(uint64 fright) : i_frightGUID(fright), i_nextCheckTime(0) {}

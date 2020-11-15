@@ -43,22 +43,22 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
     switch (questGiver->GetTypeId())
     {
         case TYPEID_UNIT:
-            {
+        {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for npc, guid = %u", uint32(GUID_LOPART(guid)));
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for npc, guid = %u", uint32(GUID_LOPART(guid)));
 #endif
-                if (!questGiver->ToCreature()->IsHostileTo(_player)) // do not show quest status to enemies
-                    questStatus = _player->GetQuestDialogStatus(questGiver);
-                break;
-            }
-        case TYPEID_GAMEOBJECT:
-            {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for GameObject guid = %u", uint32(GUID_LOPART(guid)));
-#endif
+            if (!questGiver->ToCreature()->IsHostileTo(_player)) // do not show quest status to enemies
                 questStatus = _player->GetQuestDialogStatus(questGiver);
-                break;
-            }
+            break;
+        }
+        case TYPEID_GAMEOBJECT:
+        {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for GameObject guid = %u", uint32(GUID_LOPART(guid)));
+#endif
+            questStatus = _player->GetQuestDialogStatus(questGiver);
+            break;
+        }
         default:
             sLog->outError("QuestGiver called for unexpected type %u", questGiver->GetTypeId());
             break;
@@ -290,45 +290,45 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
             switch (object->GetTypeId())
             {
                 case TYPEID_UNIT:
+                {
+                    Creature* questgiver = object->ToCreature();
+                    if (!sScriptMgr->OnQuestReward(_player, questgiver, quest, reward))
                     {
-                        Creature* questgiver = object->ToCreature();
-                        if (!sScriptMgr->OnQuestReward(_player, questgiver, quest, reward))
+                        // Send next quest
+                        if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
                         {
-                            // Send next quest
-                            if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
+                            if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(nextQuest, false))
                             {
-                                if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(nextQuest, false))
-                                {
-                                    if (nextQuest->IsAutoAccept())
-                                        _player->AddQuestAndCheckCompletion(nextQuest, object);
-                                    _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
-                                }
+                                if (nextQuest->IsAutoAccept())
+                                    _player->AddQuestAndCheckCompletion(nextQuest, object);
+                                _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
                             }
-
-                            questgiver->AI()->sQuestReward(_player, quest, reward);
                         }
-                        break;
+
+                        questgiver->AI()->sQuestReward(_player, quest, reward);
                     }
+                    break;
+                }
                 case TYPEID_GAMEOBJECT:
+                {
+                    GameObject* questGiver = object->ToGameObject();
+                    if (!sScriptMgr->OnQuestReward(_player, questGiver, quest, reward))
                     {
-                        GameObject* questGiver = object->ToGameObject();
-                        if (!sScriptMgr->OnQuestReward(_player, questGiver, quest, reward))
+                        // Send next quest
+                        if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
                         {
-                            // Send next quest
-                            if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
+                            if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(nextQuest, false))
                             {
-                                if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(nextQuest, false))
-                                {
-                                    if (nextQuest->IsAutoAccept())
-                                        _player->AddQuestAndCheckCompletion(nextQuest, object);
-                                    _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
-                                }
+                                if (nextQuest->IsAutoAccept())
+                                    _player->AddQuestAndCheckCompletion(nextQuest, object);
+                                _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
                             }
-
-                            questGiver->AI()->QuestReward(_player, quest, reward);
                         }
-                        break;
+
+                        questGiver->AI()->QuestReward(_player, quest, reward);
                     }
+                    break;
+                }
                 default:
                     break;
             }
