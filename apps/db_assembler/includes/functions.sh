@@ -145,7 +145,7 @@ function dbasm_assemble() {
     shopt -s globstar
 
     if [ $with_base = true ]; then
-        echo "" > $OUTPUT_FOLDER$database$suffix_base".sql"
+        echo "" > "$OUTPUT_FOLDER$database$suffix_base.sql"
 
 
         if [ ! ${#base[@]} -eq 0 ]; then
@@ -167,9 +167,9 @@ function dbasm_assemble() {
     fi
 
     if [ $with_updates = true ]; then
-        updFile=$OUTPUT_FOLDER$database$suffix_upd".sql"
+        updFile="$OUTPUT_FOLDER$database$suffix_upd.sql"
 
-        echo "" > "$updFile"
+        echo "" > $updFile
 
         if [ ! ${#updates[@]} -eq 0 ]; then
             echo "Generating $OUTPUT_FOLDER$database$suffix_upd ..."
@@ -184,8 +184,8 @@ function dbasm_assemble() {
                             continue
                         fi
 
-                        echo "-- $file" >> "$updFile"
-                        cat "$entry" >> "$updFile"
+                        echo "-- $file" >> $updFile
+                        cat "$entry" >> $updFile
                     done
                 fi
             done
