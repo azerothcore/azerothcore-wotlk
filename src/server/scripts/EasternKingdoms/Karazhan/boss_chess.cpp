@@ -891,7 +891,7 @@ public:
       };
 
       bool OnGossipHello(Player* player, Creature* me) override
-      {
+      { 
           InstanceScript* instance = me->GetInstanceScript();
 
           if (!instance)
@@ -920,7 +920,7 @@ public:
       }
 
       bool OnGossipSelect(Player* player, Creature* me, uint32 /*sender*/, uint32 action) override
-      {
+      { 
           InstanceScript* instance = me->GetInstanceScript();
 
           if (!instance)
@@ -1527,20 +1527,20 @@ public:
       };
 
       bool OnGossipHello(Player* player, Creature* me) override
-      {
+      { 
           InstanceScript* instance = me->GetInstanceScript();
-          sLog->outString("1");
+
           if (!instance)
               return true;
-          sLog->outString("2");
+
           uint32 chessPhase = instance->GetData(DATA_CHESS_GAME_PHASE);
-          sLog->outString("3");
+
           if (player->GetTeamId() == TEAM_ALLIANCE && me->getFaction() != A_FACTION && chessPhase < CHESS_PHASE_PVE_FINISHED)
               return true;
-          sLog->outString("4");
+
           if (player->GetTeamId() == TEAM_HORDE && me->getFaction() != H_FACTION && chessPhase < CHESS_PHASE_PVE_FINISHED)
               return true;
-          sLog->outString("5");
+
           bool ok = true;
           uint32 textID = 0;
           switch (me->GetEntry())
@@ -1569,7 +1569,6 @@ public:
               ok = false;
               break;
           }
-          sLog->outString("switch (me->GetEntry())");
 
           switch (me->GetEntry())
           {
@@ -1587,12 +1586,12 @@ public:
           case NPC_KING_A:   textID = 20028; break;
           default:           textID = 8990;  break;
           }
-          sLog->outString("me->GetEntry(%u)", me->GetEntry());
+
           if (ok && !player->HasAura(SPELL_RECENTLY_INGAME))
               AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Control " + me->GetName(), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-          sLog->outString("AddGossipItemFor");
+
           SendGossipMenuFor(player, textID, me->GetGUID());
-          sLog->outString("return true");
+
           return true;
       }
 
@@ -1606,7 +1605,6 @@ public:
 
           if (action == GOSSIP_ACTION_INFO_DEF + 1)
           {
-              sLog->outString("2");
               player->NearTeleportTo(-11106.92f, -1843.32f, 229.626f, 4.2331f);
               player->CastSpell(me, SPELL_CONTROL_PIECE, false);
               //me->AddAura(SPELL_CONTROL_PIECE, player);
@@ -1634,10 +1632,8 @@ public:
                   sLog->outString("Karazhan Chess, Default hit at %u", me->GetEntry());
                   break;
               }
-          }
-          sLog->outString("3");
-          CloseGossipMenuFor(player);
-          sLog->outString("4");
+          } 
+          CloseGossipMenuFor(player); 
           return true;
       }
 
