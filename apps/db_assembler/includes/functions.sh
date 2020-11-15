@@ -158,7 +158,7 @@ function dbasm_assemble() {
                     for entry in "$d"/**/*.sql
                     do
                         if [[ -e $entry ]]; then
-                            cat "$entry" >> $OUTPUT_FOLDER$database$suffix_base".sql"
+                            cat "$entry" >> "$OUTPUT_FOLDER$database$suffix_base.sql"
                         fi
                     done
                 fi
