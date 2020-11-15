@@ -109,7 +109,6 @@ template <class STREAM>
 class ACE_IOStream : public iostream, public STREAM
 {
 public:
-  // = Initialization and termination methods.
   ACE_IOStream (STREAM &stream,
                   u_int streambuf_size = ACE_STREAMBUF_SIZE);
 

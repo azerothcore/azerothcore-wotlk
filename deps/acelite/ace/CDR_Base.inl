@@ -66,6 +66,9 @@ ACE_CDR::swap_2 (const char *orig, char* target)
   // function.
   *reinterpret_cast<unsigned short *> (target) =
     _byteswap_ushort (*reinterpret_cast<unsigned short const *> (orig));
+#elif defined (ACE_HAS_BUILTIN_BSWAP16)
+  *reinterpret_cast<uint16_t *> (target) =
+    __builtin_bswap16 (*reinterpret_cast<uint16_t const *> (orig));
 #elif defined (ACE_HAS_BSWAP16)
   *reinterpret_cast<uint16_t *> (target) =
     bswap16 (*reinterpret_cast<uint16_t const *> (orig));
@@ -86,8 +89,8 @@ ACE_CDR::swap_2 (const char *orig, char* target)
   __asm rol ax, 8;
   __asm mov [ecx], ax;
 #else
-  ACE_REGISTER ACE_UINT16 usrc = * reinterpret_cast<const ACE_UINT16*> (orig);
-  ACE_REGISTER ACE_UINT16* udst = reinterpret_cast<ACE_UINT16*> (target);
+  ACE_UINT16 usrc = * reinterpret_cast<const ACE_UINT16*> (orig);
+  ACE_UINT16* udst = reinterpret_cast<ACE_UINT16*> (target);
   *udst = (usrc << 8) | (usrc >> 8);
 #endif /* ACE_HAS_PENTIUM */
 }
@@ -100,6 +103,9 @@ ACE_CDR::swap_4 (const char* orig, char* target)
   // function.
   *reinterpret_cast<unsigned long *> (target) =
     _byteswap_ulong (*reinterpret_cast<unsigned long const *> (orig));
+#elif defined (ACE_HAS_BUILTIN_BSWAP32)
+  *reinterpret_cast<uint32_t *> (target) =
+    __builtin_bswap32 (*reinterpret_cast<uint32_t const *> (orig));
 #elif defined (ACE_HAS_BSWAP32)
   *reinterpret_cast<uint32_t *> (target) =
     bswap32 (*reinterpret_cast<uint32_t const *> (orig));
@@ -108,7 +114,7 @@ ACE_CDR::swap_4 (const char* orig, char* target)
     bswap_32 (*reinterpret_cast<uint32_t const *> (orig));
 #elif defined(ACE_HAS_INTEL_ASSEMBLY)
   // We have ACE_HAS_PENTIUM, so we know the sizeof's.
-  ACE_REGISTER unsigned int j =
+  unsigned int j =
     *reinterpret_cast<const unsigned int*> (orig);
   asm ("bswap %1" : "=r" (j) : "0" (j));
   *reinterpret_cast<unsigned int*> (target) = j;
@@ -121,7 +127,7 @@ ACE_CDR::swap_4 (const char* orig, char* target)
   __asm bswap eax;
   __asm mov [ecx], eax;
 #else
-  ACE_REGISTER ACE_UINT32 x = * reinterpret_cast<const ACE_UINT32*> (orig);
+  ACE_UINT32 x = * reinterpret_cast<const ACE_UINT32*> (orig);
   x = (x << 24) | ((x & 0xff00) << 8) | ((x & 0xff0000) >> 8) | (x >> 24);
   * reinterpret_cast<ACE_UINT32*> (target) = x;
 #endif /* ACE_HAS_INTRINSIC_BYTESWAP */
@@ -135,6 +141,9 @@ ACE_CDR::swap_8 (const char* orig, char* target)
   // function.
   *reinterpret_cast<unsigned __int64 *> (target) =
     _byteswap_uint64 (*reinterpret_cast<unsigned __int64 const *> (orig));
+#elif defined (ACE_HAS_BUILTIN_BSWAP64)
+  *reinterpret_cast<uint64_t *> (target) =
+    __builtin_bswap64 (*reinterpret_cast<uint64_t const *> (orig));
 #elif defined (ACE_HAS_BSWAP64)
   *reinterpret_cast<uint64_t *> (target) =
     bswap64 (*reinterpret_cast<uint64_t const *> (orig));
@@ -143,16 +152,14 @@ ACE_CDR::swap_8 (const char* orig, char* target)
     bswap_64 (*reinterpret_cast<uint64_t const *> (orig));
 #elif (defined (__amd64__) || defined (__x86_64__)) && defined(__GNUG__) \
     && !defined(ACE_LACKS_INLINE_ASSEMBLY)
-  ACE_REGISTER unsigned long x =
+  unsigned long x =
     * reinterpret_cast<const unsigned long*> (orig);
   asm ("bswapq %1" : "=r" (x) : "0" (x));
   *reinterpret_cast<unsigned long*> (target) = x;
 #elif defined(ACE_HAS_PENTIUM) && defined(__GNUG__) \
     && !defined(ACE_LACKS_INLINE_ASSEMBLY)
-  ACE_REGISTER unsigned int i =
-    *reinterpret_cast<const unsigned int*> (orig);
-  ACE_REGISTER unsigned int j =
-    *reinterpret_cast<const unsigned int*> (orig + 4);
+  unsigned int i =*reinterpret_cast<const unsigned int*> (orig);
+  unsigned int j = *reinterpret_cast<const unsigned int*> (orig + 4);
   asm ("bswap %1" : "=r" (i) : "0" (i));
   asm ("bswap %1" : "=r" (j) : "0" (j));
   *reinterpret_cast<unsigned int*> (target + 4) = i;
@@ -170,20 +177,17 @@ ACE_CDR::swap_8 (const char* orig, char* target)
   __asm mov [edx], ebx;
 #elif ACE_SIZEOF_LONG == 8
   // 64 bit architecture.
-  ACE_REGISTER unsigned long x =
-    * reinterpret_cast<const unsigned long*> (orig);
-  ACE_REGISTER unsigned long x84 = (x & 0x000000ff000000ffUL) << 24;
-  ACE_REGISTER unsigned long x73 = (x & 0x0000ff000000ff00UL) << 8;
-  ACE_REGISTER unsigned long x62 = (x & 0x00ff000000ff0000UL) >> 8;
-  ACE_REGISTER unsigned long x51 = (x & 0xff000000ff000000UL) >> 24;
+  unsigned long x = * reinterpret_cast<const unsigned long*> (orig);
+  unsigned long x84 = (x & 0x000000ff000000ffUL) << 24;
+  unsigned long x73 = (x & 0x0000ff000000ff00UL) << 8;
+  unsigned long x62 = (x & 0x00ff000000ff0000UL) >> 8;
+  unsigned long x51 = (x & 0xff000000ff000000UL) >> 24;
   x = (x84 | x73 | x62 | x51);
   x = (x << 32) | (x >> 32);
   *reinterpret_cast<unsigned long*> (target) = x;
 #else
-  ACE_REGISTER ACE_UINT32 x =
-    * reinterpret_cast<const ACE_UINT32*> (orig);
-  ACE_REGISTER ACE_UINT32 y =
-    * reinterpret_cast<const ACE_UINT32*> (orig + 4);
+  ACE_UINT32 x = * reinterpret_cast<const ACE_UINT32*> (orig);
+  ACE_UINT32 y = * reinterpret_cast<const ACE_UINT32*> (orig + 4);
   x = (x << 24) | ((x & 0xff00) << 8) | ((x & 0xff0000) >> 8) | (x >> 24);
   y = (y << 24) | ((y & 0xff00) << 8) | ((y & 0xff0000) >> 8) | (y >> 24);
   * reinterpret_cast<ACE_UINT32*> (target) = y;

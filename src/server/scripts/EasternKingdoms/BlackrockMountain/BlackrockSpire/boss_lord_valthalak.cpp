@@ -47,8 +47,8 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN, urand(6000,8000));
-            events.ScheduleEvent(EVENT_SHADOW_WRATH, urand(9000,18000));
+            events.ScheduleEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN, urand(6000, 8000));
+            events.ScheduleEvent(EVENT_SHADOW_WRATH, urand(9000, 18000));
         }
 
         void JustDied(Unit* /*killer*/)
@@ -72,15 +72,15 @@ public:
                 {
                     case EVENT_SUMMON_SPECTRAL_ASSASSIN:
                         DoCast(me, SPELL_SUMMON_SPECTRAL_ASSASSIN);
-                        events.ScheduleEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN, urand(30000,35000));
+                        events.ScheduleEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN, urand(30000, 35000));
                         break;
                     case EVENT_SHADOW_BOLT_VOLLEY:
                         DoCastVictim(SPELL_SHADOW_BOLT_VOLLEY);
-                        events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, urand(4000,6000));
+                        events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, urand(4000, 6000));
                         break;
                     case EVENT_SHADOW_WRATH:
                         DoCastVictim(SPELL_SHADOW_WRATH);
-                        events.ScheduleEvent(EVENT_SHADOW_WRATH, urand(19000,24000));
+                        events.ScheduleEvent(EVENT_SHADOW_WRATH, urand(19000, 24000));
                         break;
                     default:
                         break;
@@ -102,16 +102,16 @@ public:
                 if (HealthBelowPct(15))
                 {
                     DoCast(me, SPELL_FRENZY);
-                    events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, urand(7000,14000));
+                    events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, urand(7000, 14000));
                     frenzy15 = true;
                 }
             }
 
             DoMeleeAttackIfReady();
         }
-        private:
-            bool frenzy40;
-            bool frenzy15;
+    private:
+        bool frenzy40;
+        bool frenzy15;
     };
 
     CreatureAI* GetAI(Creature* creature) const
