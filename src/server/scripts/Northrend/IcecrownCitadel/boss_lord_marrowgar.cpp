@@ -162,13 +162,13 @@ public:
                     _boneSlice = true;
                     break;
                 case EVENT_SPELL_BONE_SPIKE_GRAVEYARD:
-                    {
-                        bool a = me->HasAura(SPELL_BONE_STORM);
-                        if (IsHeroic() || !a)
-                            me->CastSpell(me, SPELL_BONE_SPIKE_GRAVEYARD, a);
-                        events.RepeatEvent(urand(15000, 20000));
-                    }
-                    break;
+                {
+                    bool a = me->HasAura(SPELL_BONE_STORM);
+                    if (IsHeroic() || !a)
+                        me->CastSpell(me, SPELL_BONE_SPIKE_GRAVEYARD, a);
+                    events.RepeatEvent(urand(15000, 20000));
+                }
+                break;
                 case EVENT_SPELL_COLDFLAME:
                     if (!me->HasAura(SPELL_BONE_STORM))
                         me->CastSpell((Unit*)NULL, SPELL_COLDFLAME_NORMAL, false);
@@ -190,37 +190,37 @@ public:
                     events.ScheduleEvent(EVENT_BEGIN_BONE_STORM, 3050);
                     break;
                 case EVENT_BEGIN_BONE_STORM:
-                    {
-                        uint32 _boneStormDuration = RAID_MODE<uint32>(20000, 30000, 20000, 30000);
-                        if (Aura* pStorm = me->GetAura(SPELL_BONE_STORM))
-                            pStorm->SetDuration(int32(_boneStormDuration));
-                        events.ScheduleEvent(EVENT_BONE_STORM_MOVE, 0);
-                        events.ScheduleEvent(EVENT_END_BONE_STORM, _boneStormDuration + 1);
-                    }
-                    break;
+                {
+                    uint32 _boneStormDuration = RAID_MODE<uint32>(20000, 30000, 20000, 30000);
+                    if (Aura* pStorm = me->GetAura(SPELL_BONE_STORM))
+                        pStorm->SetDuration(int32(_boneStormDuration));
+                    events.ScheduleEvent(EVENT_BONE_STORM_MOVE, 0);
+                    events.ScheduleEvent(EVENT_END_BONE_STORM, _boneStormDuration + 1);
+                }
+                break;
                 case EVENT_BONE_STORM_MOVE:
+                {
+                    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
                     {
-                        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
-                        {
-                            events.RepeatEvent(1);
-                            break;
-                        }
-                        events.RepeatEvent(5000);
-                        Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0, BoneStormMoveTargetSelector(me));
-                        if (!unit)
-                        {
-                            if ((unit = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 175.0f, true)))
-                                if (unit->GetPositionX() > -337.0f)
-                                {
-                                    EnterEvadeMode();
-                                    return;
-                                }
-                        }
-                        if (unit)
-                            me->GetMotionMaster()->MoveCharge(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), 25.0f, 1337);
+                        events.RepeatEvent(1);
                         break;
                     }
+                    events.RepeatEvent(5000);
+                    Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0, BoneStormMoveTargetSelector(me));
+                    if (!unit)
+                    {
+                        if ((unit = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 175.0f, true)))
+                            if (unit->GetPositionX() > -337.0f)
+                            {
+                                EnterEvadeMode();
+                                return;
+                            }
+                    }
+                    if (unit)
+                        me->GetMotionMaster()->MoveCharge(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), 25.0f, 1337);
                     break;
+                }
+                break;
                 case EVENT_END_BONE_STORM:
                     me->StopMoving();
                     me->GetMotionMaster()->MovementExpired();
@@ -327,20 +327,20 @@ public:
                 case 0:
                     break;
                 case 1:
+                {
+                    me->m_positionZ = 42.5f;
+                    me->DisableSpline();
+                    me->CastSpell(me, SPELL_COLDFLAME_SUMMON, true);
+                    float nx = me->GetPositionX() + 5.0f * cos(me->GetOrientation());
+                    float ny = me->GetPositionY() + 5.0f * sin(me->GetOrientation());
+                    if (!me->IsWithinLOS(nx, ny, 42.5f))
                     {
-                        me->m_positionZ = 42.5f;
-                        me->DisableSpline();
-                        me->CastSpell(me, SPELL_COLDFLAME_SUMMON, true);
-                        float nx = me->GetPositionX() + 5.0f * cos(me->GetOrientation());
-                        float ny = me->GetPositionY() + 5.0f * sin(me->GetOrientation());
-                        if (!me->IsWithinLOS(nx, ny, 42.5f))
-                        {
-                            break;
-                        }
-                        me->NearTeleportTo(nx, ny, 42.5f, me->GetOrientation());
-                        events.RepeatEvent(450);
+                        break;
                     }
-                    break;
+                    me->NearTeleportTo(nx, ny, 42.5f, me->GetOrientation());
+                    events.RepeatEvent(450);
+                }
+                break;
                 case 2:
                     events.Reset();
                     break;

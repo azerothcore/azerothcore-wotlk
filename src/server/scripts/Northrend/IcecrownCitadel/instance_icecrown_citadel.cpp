@@ -635,22 +635,22 @@ public:
                     break;
                 case NPC_RIMEFANG:
                 case NPC_SPINESTALKER:
+                {
+                    if (GetData(DATA_HAS_LIMITED_ATTEMPTS) && !HeroicAttempts)
+                        return;
+
+                    if (GetBossState(DATA_SINDRAGOSA) == DONE)
+                        return;
+
+                    FrostwyrmGUIDs.erase(creature->GetDBTableGUIDLow());
+                    if (FrostwyrmGUIDs.empty())
                     {
-                        if (GetData(DATA_HAS_LIMITED_ATTEMPTS) && !HeroicAttempts)
-                            return;
-
-                        if (GetBossState(DATA_SINDRAGOSA) == DONE)
-                            return;
-
-                        FrostwyrmGUIDs.erase(creature->GetDBTableGUIDLow());
-                        if (FrostwyrmGUIDs.empty())
-                        {
-                            instance->LoadGrid(SindragosaSpawnPos.GetPositionX(), SindragosaSpawnPos.GetPositionY());
-                            if (Creature* boss = instance->SummonCreature(NPC_SINDRAGOSA, SindragosaSpawnPos))
-                                boss->AI()->DoAction(ACTION_START_FROSTWYRM);
-                        }
-                        break;
+                        instance->LoadGrid(SindragosaSpawnPos.GetPositionX(), SindragosaSpawnPos.GetPositionY());
+                        if (Creature* boss = instance->SummonCreature(NPC_SINDRAGOSA, SindragosaSpawnPos))
+                            boss->AI()->DoAction(ACTION_START_FROSTWYRM);
                     }
+                    break;
+                }
                 case NPC_DEATHSPEAKER_SERVANT:
                     if (Creature* c = unit->SummonCreature(WORLD_TRIGGER, *unit, TEMPSUMMON_TIMED_DESPAWN, 10000))
                     {
@@ -1173,35 +1173,35 @@ public:
                     }
                     break;
                 case DATA_THE_LICH_KING:
+                {
+                    // dramatically increase visibility range during fight to seeing frostmourne room
+                    instance->SetVisibilityRange(state == IN_PROGRESS ? 500.0f : 200.0f);
+
+                    if (state == FAIL)
                     {
-                        // dramatically increase visibility range during fight to seeing frostmourne room
-                        instance->SetVisibilityRange(state == IN_PROGRESS ? 500.0f : 200.0f);
+                        Events.CancelEvent(EVENT_QUAKE_SHATTER);
+                        Events.CancelEvent(EVENT_REBUILD_PLATFORM);
 
-                        if (state == FAIL)
-                        {
-                            Events.CancelEvent(EVENT_QUAKE_SHATTER);
-                            Events.CancelEvent(EVENT_REBUILD_PLATFORM);
-
-                            HandleDropAttempt();
-                        }
-
-                        if (state == DONE)
-                        {
-                            if (GameObject* bolvar = instance->GetGameObject(FrozenBolvarGUID))
-                                bolvar->SetRespawnTime(7 * DAY);
-                            if (GameObject* pillars = instance->GetGameObject(PillarsChainedGUID))
-                                pillars->SetRespawnTime(7 * DAY);
-                            if (GameObject* pillars = instance->GetGameObject(PillarsUnchainedGUID))
-                                pillars->SetRespawnTime(7 * DAY);
-
-                            instance->LoadGrid(JainaSpawnPos.GetPositionX(), JainaSpawnPos.GetPositionY());
-                            instance->SummonCreature(NPC_LADY_JAINA_PROUDMOORE_QUEST, JainaSpawnPos);
-                            instance->SummonCreature(NPC_MURADIN_BRONZEBEARD_QUEST, MuradinSpawnPos);
-                            instance->SummonCreature(NPC_UTHER_THE_LIGHTBRINGER_QUEST, UtherSpawnPos);
-                            instance->SummonCreature(NPC_LADY_SYLVANAS_WINDRUNNER_QUEST, SylvanasSpawnPos);
-                        }
-                        break;
+                        HandleDropAttempt();
                     }
+
+                    if (state == DONE)
+                    {
+                        if (GameObject* bolvar = instance->GetGameObject(FrozenBolvarGUID))
+                            bolvar->SetRespawnTime(7 * DAY);
+                        if (GameObject* pillars = instance->GetGameObject(PillarsChainedGUID))
+                            pillars->SetRespawnTime(7 * DAY);
+                        if (GameObject* pillars = instance->GetGameObject(PillarsUnchainedGUID))
+                            pillars->SetRespawnTime(7 * DAY);
+
+                        instance->LoadGrid(JainaSpawnPos.GetPositionX(), JainaSpawnPos.GetPositionY());
+                        instance->SummonCreature(NPC_LADY_JAINA_PROUDMOORE_QUEST, JainaSpawnPos);
+                        instance->SummonCreature(NPC_MURADIN_BRONZEBEARD_QUEST, MuradinSpawnPos);
+                        instance->SummonCreature(NPC_UTHER_THE_LIGHTBRINGER_QUEST, UtherSpawnPos);
+                        instance->SummonCreature(NPC_LADY_SYLVANAS_WINDRUNNER_QUEST, SylvanasSpawnPos);
+                    }
+                    break;
+                }
                 default:
                     break;
             }
@@ -1346,45 +1346,45 @@ public:
                         SaveToDB();
                     break;
                 case DATA_BLOOD_QUICKENING_STATE:
-                    {
-                        if (data == IN_PROGRESS && BloodQuickeningState != NOT_STARTED)
-                            break;
-                        if (BloodQuickeningState == data)
-                            break;
-                        if (WeeklyQuestId10 != QUEST_BLOOD_QUICKENING_10)
-                            break;
-
-                        switch (data)
-                        {
-                            case IN_PROGRESS:
-                                Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 60000);
-                                BloodQuickeningMinutes = 30;
-                                DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
-                                DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
-                                break;
-                            case DONE:
-                                Events.CancelEvent(EVENT_UPDATE_EXECUTION_TIME);
-                                BloodQuickeningMinutes = 0;
-                                DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
-                                break;
-                            default:
-                                break;
-                        }
-
-                        BloodQuickeningState = data;
-                        SaveToDB();
+                {
+                    if (data == IN_PROGRESS && BloodQuickeningState != NOT_STARTED)
                         break;
+                    if (BloodQuickeningState == data)
+                        break;
+                    if (WeeklyQuestId10 != QUEST_BLOOD_QUICKENING_10)
+                        break;
+
+                    switch (data)
+                    {
+                        case IN_PROGRESS:
+                            Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 60000);
+                            BloodQuickeningMinutes = 30;
+                            DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
+                            DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
+                            break;
+                        case DONE:
+                            Events.CancelEvent(EVENT_UPDATE_EXECUTION_TIME);
+                            BloodQuickeningMinutes = 0;
+                            DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
+                            break;
+                        default:
+                            break;
                     }
+
+                    BloodQuickeningState = data;
+                    SaveToDB();
+                    break;
+                }
                 case DATA_BPC_TRASH_DIED:
+                {
+                    if (++BloodPrinceTrashCount >= 4)
                     {
-                        if (++BloodPrinceTrashCount >= 4)
-                        {
-                            SetBossState(DATA_BLOOD_PRINCE_TRASH, NOT_STARTED);
-                            SetBossState(DATA_BLOOD_PRINCE_TRASH, DONE);
-                        }
-                        SaveToDB();
-                        break;
+                        SetBossState(DATA_BLOOD_PRINCE_TRASH, NOT_STARTED);
+                        SetBossState(DATA_BLOOD_PRINCE_TRASH, DONE);
                     }
+                    SaveToDB();
+                    break;
+                }
                 default:
                     break;
             }
@@ -1716,38 +1716,38 @@ public:
                 switch (eventId)
                 {
                     case EVENT_UPDATE_EXECUTION_TIME:
+                    {
+                        --BloodQuickeningMinutes;
+                        if (BloodQuickeningMinutes)
                         {
-                            --BloodQuickeningMinutes;
-                            if (BloodQuickeningMinutes)
-                            {
-                                Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 60000);
-                                DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
-                                DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
-                            }
-                            else
-                            {
-                                BloodQuickeningState = DONE;
-                                DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
-                                if (Creature* bq = instance->GetCreature(BloodQueenLanaThelGUID))
-                                    bq->AI()->DoAction(ACTION_KILL_MINCHAR);
-                            }
-                            SaveToDB();
-                            break;
+                            Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 60000);
+                            DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
+                            DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
                         }
+                        else
+                        {
+                            BloodQuickeningState = DONE;
+                            DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
+                            if (Creature* bq = instance->GetCreature(BloodQueenLanaThelGUID))
+                                bq->AI()->DoAction(ACTION_KILL_MINCHAR);
+                        }
+                        SaveToDB();
+                        break;
+                    }
                     case EVENT_QUAKE_SHATTER:
-                        {
-                            if (GameObject* platform = instance->GetGameObject(ArthasPlatformGUID))
-                                platform->SetDestructibleState(GO_DESTRUCTIBLE_DAMAGED);
-                            if (GameObject* edge = instance->GetGameObject(FrozenThroneEdgeGUID))
-                                edge->SetGoState(GO_STATE_ACTIVE);
-                            if (GameObject* wind = instance->GetGameObject(FrozenThroneWindGUID))
-                                wind->SetGoState(GO_STATE_READY);
-                            if (GameObject* warning = instance->GetGameObject(FrozenThroneWarningGUID))
-                                warning->SetGoState(GO_STATE_READY);
-                            if (Creature* theLichKing = instance->GetCreature(TheLichKingGUID))
-                                theLichKing->AI()->DoAction(ACTION_RESTORE_LIGHT);
-                            break;
-                        }
+                    {
+                        if (GameObject* platform = instance->GetGameObject(ArthasPlatformGUID))
+                            platform->SetDestructibleState(GO_DESTRUCTIBLE_DAMAGED);
+                        if (GameObject* edge = instance->GetGameObject(FrozenThroneEdgeGUID))
+                            edge->SetGoState(GO_STATE_ACTIVE);
+                        if (GameObject* wind = instance->GetGameObject(FrozenThroneWindGUID))
+                            wind->SetGoState(GO_STATE_READY);
+                        if (GameObject* warning = instance->GetGameObject(FrozenThroneWarningGUID))
+                            warning->SetGoState(GO_STATE_READY);
+                        if (Creature* theLichKing = instance->GetCreature(TheLichKingGUID))
+                            theLichKing->AI()->DoAction(ACTION_RESTORE_LIGHT);
+                        break;
+                    }
                     case EVENT_REBUILD_PLATFORM:
                         if (GameObject* platform = instance->GetGameObject(ArthasPlatformGUID))
                             platform->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
@@ -1871,7 +1871,7 @@ public:
                     break;
             }
         }
-        
+
         void SetPositionTraps(GameObject* go)
         {
             std::vector<Position> trapPositions;

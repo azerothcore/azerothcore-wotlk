@@ -50,7 +50,7 @@ public:
 
         void OnCreatureCreate(Creature* pCreature)
         {
-            switch(pCreature->GetEntry())
+            switch (pCreature->GetEntry())
             {
                 case NPC_SARTHARION:
                     m_uiSartharionGUID = pCreature->GetGUID();
@@ -83,7 +83,7 @@ public:
 
         uint64 GetData64(uint32 uiData) const
         {
-            switch(uiData)
+            switch (uiData)
             {
                 case DATA_SARTHARION:
                     return m_uiSartharionGUID;
@@ -99,7 +99,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/)
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 // Gonna Go When the Volcano Blows (10 player) (2047)
                 case 7326:
@@ -156,7 +156,7 @@ public:
 
         void SetData(uint32 type, uint32 data)
         {
-            switch(type)
+            switch (type)
             {
                 case BOSS_SARTHARION_EVENT:
                 case BOSS_TENEBRON_EVENT:

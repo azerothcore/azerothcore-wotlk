@@ -135,7 +135,7 @@ public:
 
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
 
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(DATA_KING_YMIRON, NOT_STARTED);
                 pInstance->SetData(DATA_YMIRON_ACHIEVEMENT, true);
@@ -155,7 +155,7 @@ public:
         void EnterCombat(Unit*  /*pWho*/)
         {
             Talk(SAY_AGGRO);
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(DATA_KING_YMIRON, IN_PROGRESS);
                 if (pInstance->GetData(DATA_SKADI_THE_RUTHLESS) == DONE)
@@ -170,7 +170,7 @@ public:
 
         void MovementInform(uint32 uiType, uint32 point)
         {
-            if(uiType != POINT_MOTION_TYPE)
+            if (uiType != POINT_MOTION_TYPE)
                 return;
 
             if (point == 0)
@@ -201,119 +201,119 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_YMIRON_HEALTH_CHECK:
+                {
+                    if (me->GetHealth() < std::max(0.0f, float(me->GetMaxHealth() * (1.0f - (IsHeroic() ? 0.2f : 0.334f)*float(BoatNum + 1)))))
                     {
-                        if (me->GetHealth() < std::max(0.0f, float(me->GetMaxHealth() * (1.0f - (IsHeroic() ? 0.2f : 0.334f)*float(BoatNum + 1)))))
-                        {
-                            events.DelayEvents(12000);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                            me->InterruptNonMeleeSpells(true);
-                            me->CastSpell(me, SPELL_SCREAMS_OF_THE_DEAD, true);
-                            me->GetMotionMaster()->Clear();
-                            me->GetMotionMaster()->MovePoint(0, BoatStructure[BoatOrder[BoatNum]].MoveX, BoatStructure[BoatOrder[BoatNum]].MoveY, BoatStructure[BoatOrder[BoatNum]].MoveZ);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                            summons.DespawnAll();
+                        events.DelayEvents(12000);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->InterruptNonMeleeSpells(true);
+                        me->CastSpell(me, SPELL_SCREAMS_OF_THE_DEAD, true);
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MovePoint(0, BoatStructure[BoatOrder[BoatNum]].MoveX, BoatStructure[BoatOrder[BoatNum]].MoveY, BoatStructure[BoatOrder[BoatNum]].MoveZ);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                        summons.DespawnAll();
 
-                            // Spawn flames in previous boat if any
-                            if (BoatNum) // different than 0
-                                if (Creature* cr = me->SummonTrigger(BoatStructure[BoatOrder[BoatNum - 1]].SpawnX, BoatStructure[BoatOrder[BoatNum - 1]].SpawnY, BoatStructure[BoatOrder[BoatNum - 1]].SpawnZ, 0, 1800000))
-                                {
-                                    cr->AddAura(SPELL_FLAMES, cr);
-                                    summons2.Summon(cr);
-                                }
+                        // Spawn flames in previous boat if any
+                        if (BoatNum) // different than 0
+                            if (Creature* cr = me->SummonTrigger(BoatStructure[BoatOrder[BoatNum - 1]].SpawnX, BoatStructure[BoatOrder[BoatNum - 1]].SpawnY, BoatStructure[BoatOrder[BoatNum - 1]].SpawnZ, 0, 1800000))
+                            {
+                                cr->AddAura(SPELL_FLAMES, cr);
+                                summons2.Summon(cr);
+                            }
 
-                            BoatNum++;
-                        }
-
-                        events.RepeatEvent(1000);
-                        break;
+                        BoatNum++;
                     }
+
+                    events.RepeatEvent(1000);
+                    break;
+                }
                 case EVENT_YMIRON_BANE:
-                    {
-                        me->CastSpell(me, IsHeroic() ? SPELL_BANE_H : SPELL_BANE_N, false);
-                        events.RepeatEvent(20000 + rand() % 5000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me, IsHeroic() ? SPELL_BANE_H : SPELL_BANE_N, false);
+                    events.RepeatEvent(20000 + rand() % 5000);
+                    break;
+                }
                 case EVENT_YMIRON_FETID_ROT:
-                    {
-                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_FETID_ROT_H : SPELL_FETID_ROT_N, false);
-                        events.RepeatEvent(10000 + rand() % 3000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_FETID_ROT_H : SPELL_FETID_ROT_N, false);
+                    events.RepeatEvent(10000 + rand() % 3000);
+                    break;
+                }
                 case EVENT_YMIRON_DARK_SLASH:
-                    {
-                        int32 dmg = me->GetVictim()->GetHealth() / 2;
-                        me->CastCustomSpell(me->GetVictim(), SPELL_DARK_SLASH, &dmg, 0, 0, false);
-                        events.RepeatEvent(30000 + rand() % 5000);
-                        break;
-                    }
+                {
+                    int32 dmg = me->GetVictim()->GetHealth() / 2;
+                    me->CastCustomSpell(me->GetVictim(), SPELL_DARK_SLASH, &dmg, 0, 0, false);
+                    events.RepeatEvent(30000 + rand() % 5000);
+                    break;
+                }
                 case EVENT_YMIRON_ACTIVATE_BOAT:
+                {
+                    // Spawn it!
+                    if (Creature* king = me->SummonCreature(BoatStructure[BoatOrder[BoatNum - 1]].npc, BoatStructure[BoatOrder[BoatNum - 1]].SpawnX, BoatStructure[BoatOrder[BoatNum - 1]].SpawnY, BoatStructure[BoatOrder[BoatNum - 1]].SpawnZ, BoatStructure[BoatOrder[BoatNum - 1]].SpawnO, TEMPSUMMON_CORPSE_DESPAWN, 0))
                     {
-                        // Spawn it!
-                        if (Creature* king = me->SummonCreature(BoatStructure[BoatOrder[BoatNum - 1]].npc, BoatStructure[BoatOrder[BoatNum - 1]].SpawnX, BoatStructure[BoatOrder[BoatNum - 1]].SpawnY, BoatStructure[BoatOrder[BoatNum - 1]].SpawnZ, BoatStructure[BoatOrder[BoatNum - 1]].SpawnO, TEMPSUMMON_CORPSE_DESPAWN, 0))
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        king->CastSpell(me, SPELL_CHANNEL_SPIRIT_TO_YMIRON, true);
+                        summons.Summon(king);
+                        king->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                        king->SetDisableGravity(true);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
+                        switch (BoatOrder[BoatNum - 1])
                         {
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                            king->CastSpell(me, SPELL_CHANNEL_SPIRIT_TO_YMIRON, true);
-                            summons.Summon(king);
-                            king->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                            king->SetDisableGravity(true);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                            me->GetMotionMaster()->MoveChase(me->GetVictim());
-                            switch(BoatOrder[BoatNum - 1])
-                            {
-                                case 0:
-                                    events.ScheduleEvent(EVENT_YMIRON_RANULF_ABILITY, 3000, 1);
-                                    break;
-                                case 1:
-                                    events.ScheduleEvent(EVENT_YMIRON_TORGYN_ABILITY, 3000, 1);
-                                    break;
-                                case 2:
-                                    events.ScheduleEvent(EVENT_YMIRON_BJORN_ABILITY, 3000, 1);
-                                    break;
-                                case 3:
-                                    events.ScheduleEvent(EVENT_YMIRON_HALDOR_ABILITY, 3000, 1);
-                                    break;
-                            }
+                            case 0:
+                                events.ScheduleEvent(EVENT_YMIRON_RANULF_ABILITY, 3000, 1);
+                                break;
+                            case 1:
+                                events.ScheduleEvent(EVENT_YMIRON_TORGYN_ABILITY, 3000, 1);
+                                break;
+                            case 2:
+                                events.ScheduleEvent(EVENT_YMIRON_BJORN_ABILITY, 3000, 1);
+                                break;
+                            case 3:
+                                events.ScheduleEvent(EVENT_YMIRON_HALDOR_ABILITY, 3000, 1);
+                                break;
                         }
+                    }
 
-                        break;
-                    }
+                    break;
+                }
                 case EVENT_YMIRON_BJORN_ABILITY:
+                {
+                    if (Creature* sf = me->SummonCreature(NPC_SPIRIT_FOUNT, 385 + rand() % 10, -330 + rand() % 10, 104.756f, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 180000))
                     {
-                        if (Creature* sf = me->SummonCreature(NPC_SPIRIT_FOUNT, 385 + rand() % 10, -330 + rand() % 10, 104.756f, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 180000))
-                        {
-                            summons.Summon(sf);
-                            sf->SetSpeed(MOVE_RUN, 0.4f);
-                            sf->AddAura(IsHeroic() ? SPELL_SPIRIT_FOUNT_H : SPELL_SPIRIT_FOUNT_N, sf);
-                            sf->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            sf->GetMotionMaster()->MoveFollow(me->GetVictim(), 0, rand_norm()*M_PI * 2);
-                        }
-                        break;
+                        summons.Summon(sf);
+                        sf->SetSpeed(MOVE_RUN, 0.4f);
+                        sf->AddAura(IsHeroic() ? SPELL_SPIRIT_FOUNT_H : SPELL_SPIRIT_FOUNT_N, sf);
+                        sf->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        sf->GetMotionMaster()->MoveFollow(me->GetVictim(), 0, rand_norm()*M_PI * 2);
                     }
+                    break;
+                }
                 case EVENT_YMIRON_HALDOR_ABILITY:
-                    {
-                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_SPIRIT_STRIKE_H : SPELL_SPIRIT_STRIKE_N, false);
-                        events.RepeatEvent(5000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_SPIRIT_STRIKE_H : SPELL_SPIRIT_STRIKE_N, false);
+                    events.RepeatEvent(5000);
+                    break;
+                }
                 case EVENT_YMIRON_RANULF_ABILITY:
-                    {
-                        me->CastSpell(me, IsHeroic() ? SPELL_SPIRIT_BURST_H : SPELL_SPIRIT_BURST_N, false);
-                        events.RepeatEvent(10000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me, IsHeroic() ? SPELL_SPIRIT_BURST_H : SPELL_SPIRIT_BURST_N, false);
+                    events.RepeatEvent(10000);
+                    break;
+                }
                 case EVENT_YMIRON_TORGYN_ABILITY:
+                {
+                    for (uint8 i = 0; i < 4; ++i)
                     {
-                        for(uint8 i = 0; i < 4; ++i)
+                        if (Creature* as = me->SummonCreature(NPC_AVENGING_SPIRIT, me->GetPositionX() + rand() % 10, me->GetPositionY() + rand() % 10, me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
                         {
-                            if (Creature* as = me->SummonCreature(NPC_AVENGING_SPIRIT, me->GetPositionX() + rand() % 10, me->GetPositionY() + rand() % 10, me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                            {
-                                summons.Summon(as);
-                                as->SetInCombatWithZone();
-                            }
+                            summons.Summon(as);
+                            as->SetInCombatWithZone();
                         }
-                        events.RepeatEvent(15000);
-                        break;
                     }
+                    events.RepeatEvent(15000);
+                    break;
+                }
 
             }
 
@@ -326,7 +326,7 @@ public:
             summons.DespawnAll();
             summons2.DespawnAll();
 
-            if(pInstance)
+            if (pInstance)
                 pInstance->SetData(DATA_KING_YMIRON, DONE);
         }
 

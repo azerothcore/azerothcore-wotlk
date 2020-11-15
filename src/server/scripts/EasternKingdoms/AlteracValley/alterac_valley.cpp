@@ -138,16 +138,16 @@ public:
                         events.ScheduleEvent(EVENT_ENRAGE, urand(10 * IN_MILLISECONDS, 30 * IN_MILLISECONDS));
                         break;
                     case EVENT_CHECK_RESET:
+                    {
+                        Position const& _homePosition = me->GetHomePosition();
+                        if (me->GetDistance2d(_homePosition.GetPositionX(), _homePosition.GetPositionY()) > 50.0f)
                         {
-                            Position const& _homePosition = me->GetHomePosition();
-                            if (me->GetDistance2d(_homePosition.GetPositionX(), _homePosition.GetPositionY()) > 50.0f)
-                            {
-                                EnterEvadeMode();
-                                return;
-                            }
-                            events.ScheduleEvent(EVENT_CHECK_RESET, 5000);
-                            break;
+                            EnterEvadeMode();
+                            return;
                         }
+                        events.ScheduleEvent(EVENT_CHECK_RESET, 5000);
+                        break;
+                    }
                 }
             }
 

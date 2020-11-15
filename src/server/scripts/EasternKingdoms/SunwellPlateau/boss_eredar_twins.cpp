@@ -178,29 +178,29 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_SHADOW_BLADES, 10000);
                     break;
                 case EVENT_SPELL_SHADOW_NOVA:
-                    {
-                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
-                        if (!target)
-                            target = me->GetVictim();
-                        Talk(EMOTE_SHADOW_NOVA, target);
-                        Talk(YELL_SHADOW_NOVA);
-                        me->CastSpell(target, SPELL_SHADOW_NOVA, false);
-                        events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, urand(30000, 35000));
-                        break;
-                    }
+                {
+                    Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
+                    if (!target)
+                        target = me->GetVictim();
+                    Talk(EMOTE_SHADOW_NOVA, target);
+                    Talk(YELL_SHADOW_NOVA);
+                    me->CastSpell(target, SPELL_SHADOW_NOVA, false);
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, urand(30000, 35000));
+                    break;
+                }
                 case EVENT_SHADOW_IMAGE:
                     me->SummonCreature(NPC_SHADOW_IMAGE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 12000);
                     events.ScheduleEvent(EVENT_SHADOW_IMAGE, 6000);
                     break;
                 case EVENT_SPELL_CONFLAGRATION:
-                    {
-                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
-                        if (!target)
-                            target = me->GetVictim();
-                        me->CastSpell(target, SPELL_CONFLAGRATION, false);
-                        events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, urand(30000, 35000));
-                        break;
-                    }
+                {
+                    Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
+                    if (!target)
+                        target = me->GetVictim();
+                    me->CastSpell(target, SPELL_CONFLAGRATION, false);
+                    events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, urand(30000, 35000));
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();
@@ -320,25 +320,25 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_BLAZE, 3800);
                     break;
                 case EVENT_SPELL_SHADOW_NOVA:
-                    {
-                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
-                        if (!target)
-                            target = me->GetVictim();
-                        me->CastSpell(target, SPELL_SHADOW_NOVA, false);
-                        events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, urand(30000, 35000));
-                        break;
-                    }
+                {
+                    Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
+                    if (!target)
+                        target = me->GetVictim();
+                    me->CastSpell(target, SPELL_SHADOW_NOVA, false);
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, urand(30000, 35000));
+                    break;
+                }
                 case EVENT_SPELL_CONFLAGRATION:
-                    {
-                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
-                        if (!target)
-                            target = me->GetVictim();
-                        Talk(EMOTE_CONFLAGRATION, target);
-                        Talk(YELL_CANFLAGRATION);
-                        me->CastSpell(target, SPELL_CONFLAGRATION, false);
-                        events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, urand(30000, 35000));
-                        break;
-                    }
+                {
+                    Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
+                    if (!target)
+                        target = me->GetVictim();
+                    Talk(EMOTE_CONFLAGRATION, target);
+                    Talk(YELL_CANFLAGRATION);
+                    me->CastSpell(target, SPELL_CONFLAGRATION, false);
+                    events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, urand(30000, 35000));
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();

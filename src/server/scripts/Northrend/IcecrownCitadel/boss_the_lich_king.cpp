@@ -740,15 +740,15 @@ public:
                         tirion->AI()->DoAction(ACTION_BREAK_FROSTMOURNE);
                     break;
                 case ACTION_TELEPORT_BACK:
-                    {
-                        if (_phase == PHASE_FROSTMOURNE)
-                            events.RescheduleEvent(EVENT_START_ATTACK, 1000);
-                        EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
-                        summons.DoAction(ACTION_TELEPORT_BACK, pred);
-                        if (!IsHeroic() && _phase != PHASE_OUTRO && me->IsInCombat() && _lastTalkTimeBuff + 5 <= time(nullptr))
-                            Talk(SAY_LK_FROSTMOURNE_ESCAPE);
-                    }
-                    break;
+                {
+                    if (_phase == PHASE_FROSTMOURNE)
+                        events.RescheduleEvent(EVENT_START_ATTACK, 1000);
+                    EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
+                    summons.DoAction(ACTION_TELEPORT_BACK, pred);
+                    if (!IsHeroic() && _phase != PHASE_OUTRO && me->IsInCombat() && _lastTalkTimeBuff + 5 <= time(nullptr))
+                        Talk(SAY_LK_FROSTMOURNE_ESCAPE);
+                }
+                break;
                 default:
                     break;
             }
@@ -855,13 +855,13 @@ public:
                     summon->SetHomePosition(CenterPosition);
                     break;
                 case NPC_VILE_SPIRIT:
-                    {
-                        summon->SetReactState(REACT_PASSIVE);
-                        summon->GetMotionMaster()->MoveRandom(10.0f);
-                        if (_phase == PHASE_THREE)
-                            summon->m_Events.AddEvent(new VileSpiritActivateEvent(summon), summon->m_Events.CalculateTime(15000));
-                        break;
-                    }
+                {
+                    summon->SetReactState(REACT_PASSIVE);
+                    summon->GetMotionMaster()->MoveRandom(10.0f);
+                    if (_phase == PHASE_THREE)
+                        summon->m_Events.AddEvent(new VileSpiritActivateEvent(summon), summon->m_Events.CalculateTime(15000));
+                    break;
+                }
                 case NPC_STRANGULATE_VEHICLE:
                     summons.Summon(summon);
                     return;
@@ -1084,41 +1084,41 @@ public:
                     events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, (!HealthAbovePct(40) ? 15000 : 20000), EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_DEFILE:
+                {
+                    uint32 evTime = events.GetNextEventTime(EVENT_SUMMON_VALKYR);
+                    // if defile (cast time 2sec) is less than 3 before valkyr appears
+                    // we've to decide
+                    if (evTime && (events.GetTimer() > evTime || evTime - events.GetTimer() < 5000))
                     {
-                        uint32 evTime = events.GetNextEventTime(EVENT_SUMMON_VALKYR);
-                        // if defile (cast time 2sec) is less than 3 before valkyr appears
-                        // we've to decide
-                        if (evTime && (events.GetTimer() > evTime || evTime - events.GetTimer() < 5000))
+                        // if valkyr is less than 1.5 secs after defile (cast time 2 sec) then we've a sync issue, so
+                        // we need to cancel it (break) and schedule a defile to be casted 5 or 4 seconds after valkyr
+                        if (events.GetTimer() > evTime || evTime - events.GetTimer() < 3500)
                         {
-                            // if valkyr is less than 1.5 secs after defile (cast time 2 sec) then we've a sync issue, so
-                            // we need to cancel it (break) and schedule a defile to be casted 5 or 4 seconds after valkyr
-                            if (events.GetTimer() > evTime || evTime - events.GetTimer() < 3500)
-                            {
-                                uint32 t = events.GetTimer() > evTime ? 0 : evTime - events.GetTimer();
-                                events.ScheduleEvent(EVENT_DEFILE, t + (Is25ManRaid() ? 5000 : 4000), EVENT_GROUP_ABILITIES);
-                                break;
-                            }
-
-                            // if valkyr is coming between 1.5 and 3 seconds after defile then we've to
-                            // delay valkyr just a bit
-                            events.RescheduleEvent(EVENT_SUMMON_VALKYR, 5000, EVENT_GROUP_ABILITIES);
+                            uint32 t = events.GetTimer() > evTime ? 0 : evTime - events.GetTimer();
+                            events.ScheduleEvent(EVENT_DEFILE, t + (Is25ManRaid() ? 5000 : 4000), EVENT_GROUP_ABILITIES);
+                            break;
                         }
 
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, DefileTargetSelector(me)))
-                        {
-                            Talk(EMOTE_DEFILE_WARNING);
-                            me->CastSpell(target, SPELL_DEFILE, false);
-                            // defile has a fixed CD (from dbm) that can be variable only
-                            // if no target has been found at the moment (schedule after 1 second)
-                            events.ScheduleEvent(EVENT_DEFILE, 32500, EVENT_GROUP_ABILITIES);
-                        }
-                        else
-                        {
-                            // be sure it happen trying each seconds if no target
-                            events.ScheduleEvent(EVENT_DEFILE, 1000, EVENT_GROUP_ABILITIES);
-                        }
+                        // if valkyr is coming between 1.5 and 3 seconds after defile then we've to
+                        // delay valkyr just a bit
+                        events.RescheduleEvent(EVENT_SUMMON_VALKYR, 5000, EVENT_GROUP_ABILITIES);
                     }
-                    break;
+
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, DefileTargetSelector(me)))
+                    {
+                        Talk(EMOTE_DEFILE_WARNING);
+                        me->CastSpell(target, SPELL_DEFILE, false);
+                        // defile has a fixed CD (from dbm) that can be variable only
+                        // if no target has been found at the moment (schedule after 1 second)
+                        events.ScheduleEvent(EVENT_DEFILE, 32500, EVENT_GROUP_ABILITIES);
+                    }
+                    else
+                    {
+                        // be sure it happen trying each seconds if no target
+                        events.ScheduleEvent(EVENT_DEFILE, 1000, EVENT_GROUP_ABILITIES);
+                    }
+                }
+                break;
                 case EVENT_SOUL_REAPER:
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
@@ -1129,22 +1129,22 @@ public:
                         events.ScheduleEvent(EVENT_SOUL_REAPER, 1000, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SUMMON_VALKYR:
-                    {
-                        me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
-                        Talk(SAY_LK_SUMMON_VALKYR);
-                        me->CastSpell((Unit*)NULL, SUMMON_VALKYR, false);
-                        events.ScheduleEvent(EVENT_SUMMON_VALKYR, 45000, EVENT_GROUP_ABILITIES);
+                {
+                    me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
+                    Talk(SAY_LK_SUMMON_VALKYR);
+                    me->CastSpell((Unit*)NULL, SUMMON_VALKYR, false);
+                    events.ScheduleEvent(EVENT_SUMMON_VALKYR, 45000, EVENT_GROUP_ABILITIES);
 
-                        // schedule a defile (or reschedule it) if next defile event
-                        // doesn't exist ( now > next defile ) or defile is coming too soon
-                        uint32 minTime = (Is25ManRaid() ? 5000 : 4000);
-                        if (uint32 evTime = events.GetNextEventTime(EVENT_DEFILE))
-                            if (events.GetTimer() > evTime || evTime - events.GetTimer() < minTime)
-                            {
-                                events.RescheduleEvent(EVENT_DEFILE, minTime, EVENT_GROUP_ABILITIES);
-                            }
-                    }
-                    break;
+                    // schedule a defile (or reschedule it) if next defile event
+                    // doesn't exist ( now > next defile ) or defile is coming too soon
+                    uint32 minTime = (Is25ManRaid() ? 5000 : 4000);
+                    if (uint32 evTime = events.GetNextEventTime(EVENT_DEFILE))
+                        if (events.GetTimer() > evTime || evTime - events.GetTimer() < minTime)
+                        {
+                            events.RescheduleEvent(EVENT_DEFILE, minTime, EVENT_GROUP_ABILITIES);
+                        }
+                }
+                break;
                 case EVENT_VILE_SPIRITS:
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                     me->CastSpell((Unit*)NULL, SPELL_VILE_SPIRITS, false);
@@ -1427,19 +1427,19 @@ public:
                     }
                     break;
                 case EVENT_INTRO_FORDRING_TALK_1:
-                    {
-                        Talk(SAY_TIRION_INTRO_1);
-                        _events.ScheduleEvent(EVENT_INTRO_LK_TALK_1, 9000);
-                        _events.ScheduleEvent(EVENT_INTRO_FORDRING_TALK_2, 34000);
-                    }
-                    break;
+                {
+                    Talk(SAY_TIRION_INTRO_1);
+                    _events.ScheduleEvent(EVENT_INTRO_LK_TALK_1, 9000);
+                    _events.ScheduleEvent(EVENT_INTRO_FORDRING_TALK_2, 34000);
+                }
+                break;
                 case EVENT_INTRO_FORDRING_TALK_2:
-                    {
-                        Talk(SAY_TIRION_INTRO_2);
-                        _events.ScheduleEvent(EVENT_INTRO_FORDRING_EMOTE_1, 2000);
-                        _events.ScheduleEvent(EVENT_INTRO_FORDRING_CHARGE, 5000);
-                    }
-                    break;
+                {
+                    Talk(SAY_TIRION_INTRO_2);
+                    _events.ScheduleEvent(EVENT_INTRO_FORDRING_EMOTE_1, 2000);
+                    _events.ScheduleEvent(EVENT_INTRO_FORDRING_CHARGE, 5000);
+                }
+                break;
                 case EVENT_INTRO_FORDRING_EMOTE_1:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_POINT_NO_SHEATHE);
                     break;
@@ -2375,29 +2375,29 @@ public:
             switch (_events.ExecuteEvent())
             {
                 case EVENT_RAGING_SPIRIT_UNROOT:
-                    {
-                        me->SetControlled(false, UNIT_STATE_ROOT);
+                {
+                    me->SetControlled(false, UNIT_STATE_ROOT);
 
-                        if (!me->getThreatManager().isThreatListEmpty())
-                            if (Unit* target = me->SelectVictim())
-                                AttackStart(target);
-                        if (!me->GetVictim())
-                        {
-                            bool valid = false;
-                            if (TempSummon* summon = me->ToTempSummon())
-                                if (Unit* summoner = summon->GetSummoner())
-                                    if (summoner->GetTypeId() == TYPEID_PLAYER && summoner->IsAlive() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
-                                    {
-                                        valid = true;
-                                        AttackStart(summoner);
-                                    }
-                            if (!valid)
-                                if (Player* plr = ScriptedAI::SelectTargetFromPlayerList(100.0f, 0, true))
-                                    AttackStart(plr);
-                        }
-                        DoZoneInCombat(nullptr, 150.0f);
+                    if (!me->getThreatManager().isThreatListEmpty())
+                        if (Unit* target = me->SelectVictim())
+                            AttackStart(target);
+                    if (!me->GetVictim())
+                    {
+                        bool valid = false;
+                        if (TempSummon* summon = me->ToTempSummon())
+                            if (Unit* summoner = summon->GetSummoner())
+                                if (summoner->GetTypeId() == TYPEID_PLAYER && summoner->IsAlive() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
+                                {
+                                    valid = true;
+                                    AttackStart(summoner);
+                                }
+                        if (!valid)
+                            if (Player* plr = ScriptedAI::SelectTargetFromPlayerList(100.0f, 0, true))
+                                AttackStart(plr);
                     }
-                    break;
+                    DoZoneInCombat(nullptr, 150.0f);
+                }
+                break;
                 case EVENT_SOUL_SHRIEK:
                     if (!me->HasReactState(REACT_PASSIVE))
                         me->CastSpell(me->GetVictim(), SPELL_SOUL_SHRIEK, false);
@@ -2580,62 +2580,62 @@ public:
             switch (id)
             {
                 case EVENT_CHARGE:
-                    {
-                        bool valid = false;
-                        if (Player* target = ObjectAccessor::GetPlayer(*me, _grabbedPlayer))
-                            if (target->FindMap() == me->GetMap() && target->GetExactDist(me) < 15.0f && !target->GetVehicle())
-                                if (GameObject* platform = ObjectAccessor::GetGameObject(*me, _instance->GetData64(DATA_ARTHAS_PLATFORM)))
+                {
+                    bool valid = false;
+                    if (Player* target = ObjectAccessor::GetPlayer(*me, _grabbedPlayer))
+                        if (target->FindMap() == me->GetMap() && target->GetExactDist(me) < 15.0f && !target->GetVehicle())
+                            if (GameObject* platform = ObjectAccessor::GetGameObject(*me, _instance->GetData64(DATA_ARTHAS_PLATFORM)))
+                            {
+                                std::list<Creature*> triggers;
+                                GetCreatureListWithEntryInGrid(triggers, me, NPC_WORLD_TRIGGER, 150.0f);
+                                triggers.remove_if(HeightDifferenceCheck(platform, 5.0f, true));
+                                if (!triggers.empty())
                                 {
-                                    std::list<Creature*> triggers;
-                                    GetCreatureListWithEntryInGrid(triggers, me, NPC_WORLD_TRIGGER, 150.0f);
-                                    triggers.remove_if(HeightDifferenceCheck(platform, 5.0f, true));
-                                    if (!triggers.empty())
-                                    {
-                                        valid = true;
-                                        triggers.sort(acore::ObjectDistanceOrderPred(me));
+                                    valid = true;
+                                    triggers.sort(acore::ObjectDistanceOrderPred(me));
 
-                                        target->GetMotionMaster()->Clear();
-                                        target->UpdatePosition(*me, true);
-                                        target->StopMovingOnCurrentPos();
+                                    target->GetMotionMaster()->Clear();
+                                    target->UpdatePosition(*me, true);
+                                    target->StopMovingOnCurrentPos();
 
-                                        me->CastSpell(target, SPELL_VALKYR_CARRY, false);
-                                        _destPoint.Relocate(triggers.front());
-                                        _events.Reset();
-                                        _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 1000);
-                                    }
+                                    me->CastSpell(target, SPELL_VALKYR_CARRY, false);
+                                    _destPoint.Relocate(triggers.front());
+                                    _events.Reset();
+                                    _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 1000);
                                 }
-                        if (!valid)
-                        {
-                            _events.Reset();
-                            _events.ScheduleEvent(EVENT_GRAB_PLAYER, 500);
-                            _grabbedPlayer = 0;
-                        }
-                    }
-                    break;
-                case POINT_DROP_PLAYER:
+                            }
+                    if (!valid)
                     {
-                        if (didbelow50pct || dropped)
-                            break;
-                        if (me->GetExactDist(&_destPoint) > 1.5f) // movement was interrupted (probably by a stun, start again)
-                        {
-                            _events.Reset();
-                            _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 0);
-                            break;
-                        }
-                        dropped = true;
                         _events.Reset();
-                        /*Player* p = nullptr;
-                        if (Vehicle* v = me->GetVehicleKit())
-                            if (Unit* passenger = v->GetPassenger(0))
-                                p = passenger->ToPlayer();*/
-                        me->CastSpell((Unit*)NULL, SPELL_EJECT_ALL_PASSENGERS, false);
-
-                        if (IsHeroic())
-                            GoSiphon();
-                        else
-                            me->DespawnOrUnsummon(1000);
+                        _events.ScheduleEvent(EVENT_GRAB_PLAYER, 500);
+                        _grabbedPlayer = 0;
                     }
-                    break;
+                }
+                break;
+                case POINT_DROP_PLAYER:
+                {
+                    if (didbelow50pct || dropped)
+                        break;
+                    if (me->GetExactDist(&_destPoint) > 1.5f) // movement was interrupted (probably by a stun, start again)
+                    {
+                        _events.Reset();
+                        _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 0);
+                        break;
+                    }
+                    dropped = true;
+                    _events.Reset();
+                    /*Player* p = nullptr;
+                    if (Vehicle* v = me->GetVehicleKit())
+                        if (Unit* passenger = v->GetPassenger(0))
+                            p = passenger->ToPlayer();*/
+                    me->CastSpell((Unit*)NULL, SPELL_EJECT_ALL_PASSENGERS, false);
+
+                    if (IsHeroic())
+                        GoSiphon();
+                    else
+                        me->DespawnOrUnsummon(1000);
+                }
+                break;
                 case POINT_START_SIPHON:
                     if (me->GetExactDist(&_destPoint) > 1.5f) // movement was interrupted (probably by a stun, start again)
                     {
@@ -2690,25 +2690,25 @@ public:
                     me->GetMotionMaster()->MovePoint(POINT_START_SIPHON, _destPoint);
                     break;
                 case EVENT_LIFE_SIPHON:
-                    {
-                        Unit* target = nullptr;
-                        Unit::AuraEffectList const& tauntAuras = me->GetAuraEffectsByType(SPELL_AURA_MOD_TAUNT);
-                        if (!tauntAuras.empty())
-                            for (Unit::AuraEffectList::const_reverse_iterator itr = tauntAuras.rbegin(); itr != tauntAuras.rend(); ++itr)
-                                if (Unit* caster = (*itr)->GetCaster())
-                                    if (me->IsValidAttackTarget(caster))
-                                    {
-                                        target = caster;
-                                        break;
-                                    }
-                        if (!target)
-                            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
-                                target = lichKing->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankLKTargetSelector(lichKing, true, false, 100.0f));
-                        if (target)
-                            me->CastSpell(target, SPELL_LIFE_SIPHON, false);
-                        _events.ScheduleEvent(EVENT_LIFE_SIPHON, 2500);
-                    }
-                    break;
+                {
+                    Unit* target = nullptr;
+                    Unit::AuraEffectList const& tauntAuras = me->GetAuraEffectsByType(SPELL_AURA_MOD_TAUNT);
+                    if (!tauntAuras.empty())
+                        for (Unit::AuraEffectList::const_reverse_iterator itr = tauntAuras.rbegin(); itr != tauntAuras.rend(); ++itr)
+                            if (Unit* caster = (*itr)->GetCaster())
+                                if (me->IsValidAttackTarget(caster))
+                                {
+                                    target = caster;
+                                    break;
+                                }
+                    if (!target)
+                        if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                            target = lichKing->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankLKTargetSelector(lichKing, true, false, 100.0f));
+                    if (target)
+                        me->CastSpell(target, SPELL_LIFE_SIPHON, false);
+                    _events.ScheduleEvent(EVENT_LIFE_SIPHON, 2500);
+                }
+                break;
                 default:
                     break;
             }

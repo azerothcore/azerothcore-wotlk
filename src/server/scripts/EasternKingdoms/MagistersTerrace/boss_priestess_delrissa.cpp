@@ -197,34 +197,34 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_RENEW, 7000);
                     break;
                 case EVENT_SPELL_PW_SHIELD:
-                    {
-                        std::list<Creature*> cList = DoFindFriendlyMissingBuff(40.0f, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H));
-                        if (Unit* target = acore::Containers::SelectRandomContainerElement(cList))
-                            me->CastSpell(target, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H), false);
-                        events.ScheduleEvent(EVENT_SPELL_PW_SHIELD, 10000);
-                        break;
-                    }
+                {
+                    std::list<Creature*> cList = DoFindFriendlyMissingBuff(40.0f, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H));
+                    if (Unit* target = acore::Containers::SelectRandomContainerElement(cList))
+                        me->CastSpell(target, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H), false);
+                    events.ScheduleEvent(EVENT_SPELL_PW_SHIELD, 10000);
+                    break;
+                }
                 case EVENT_SPELL_DISPEL:
+                {
+                    Unit* target = nullptr;
+                    switch (urand(0, 2))
                     {
-                        Unit* target = nullptr;
-                        switch (urand(0, 2))
-                        {
-                            case 0:
-                                target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true);
-                                break;
-                            case 1:
-                                target = me;
-                                break;
-                            case 2:
-                                target = ObjectAccessor::GetCreature(*me, acore::Containers::SelectRandomContainerElement(summons));
-                                break;
-                        }
-
-                        if (target)
-                            me->CastSpell(target, SPELL_DISPEL_MAGIC, false);
-                        events.ScheduleEvent(EVENT_SPELL_DISPEL, 12000);
-                        break;
+                        case 0:
+                            target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true);
+                            break;
+                        case 1:
+                            target = me;
+                            break;
+                        case 2:
+                            target = ObjectAccessor::GetCreature(*me, acore::Containers::SelectRandomContainerElement(summons));
+                            break;
                     }
+
+                    if (target)
+                        me->CastSpell(target, SPELL_DISPEL_MAGIC, false);
+                    events.ScheduleEvent(EVENT_SPELL_DISPEL, 12000);
+                    break;
+                }
                 case EVENT_SPELL_IMMUNITY:
                     if (me->HasUnitState(UNIT_STATE_LOST_CONTROL))
                     {
@@ -287,10 +287,10 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
     void RecalculateThreat()
     {
         ThreatContainer::StorageType const& tList = me->getThreatManager().getThreatList();
-        for( ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr )
+        for ( ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr )
         {
             Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->getThreatManager().getThreat(pUnit) )
+            if ( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->getThreatManager().getThreat(pUnit) )
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
                 me->getThreatManager().modifyThreatPercent(pUnit, -100);
@@ -728,22 +728,22 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, 8000);
                     break;
                 case EVENT_SPELL_BLINK:
-                    {
-                        bool InMeleeRange = false;
-                        ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
-                        for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
-                            if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-                                if (target->IsWithinMeleeRange(me))
-                                {
-                                    InMeleeRange = true;
-                                    break;
-                                }
+                {
+                    bool InMeleeRange = false;
+                    ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
+                    for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+                        if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+                            if (target->IsWithinMeleeRange(me))
+                            {
+                                InMeleeRange = true;
+                                break;
+                            }
 
-                        if (InMeleeRange)
-                            me->CastSpell(me, SPELL_BLINK, false);
-                        events.ScheduleEvent(EVENT_SPELL_BLINK, 15000);
-                        break;
-                    }
+                    if (InMeleeRange)
+                        me->CastSpell(me, SPELL_BLINK, false);
+                    events.ScheduleEvent(EVENT_SPELL_BLINK, 15000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();
@@ -1090,17 +1090,17 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_IRON_BOMB, 20000);
                     break;
                 case EVENT_SPELL_RECOMBOBULATE:
-                    {
-                        std::list<Creature*> cList = DoFindFriendlyMissingBuff(30.0f, SPELL_RECOMBOBULATE);
-                        for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
-                            if ((*itr)->IsPolymorphed())
-                            {
-                                me->CastSpell(*itr, SPELL_RECOMBOBULATE, false);
-                                break;
-                            }
-                        events.ScheduleEvent(EVENT_SPELL_RECOMBOBULATE, 10000);
-                        break;
-                    }
+                {
+                    std::list<Creature*> cList = DoFindFriendlyMissingBuff(30.0f, SPELL_RECOMBOBULATE);
+                    for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
+                        if ((*itr)->IsPolymorphed())
+                        {
+                            me->CastSpell(*itr, SPELL_RECOMBOBULATE, false);
+                            break;
+                        }
+                    events.ScheduleEvent(EVENT_SPELL_RECOMBOBULATE, 10000);
+                    break;
+                }
                 case EVENT_SPELL_EXPLOSIVE_SHEEP:
                     me->CastSpell(me, SPELL_HIGH_EXPLOSIVE_SHEEP, false);
                     events.ScheduleEvent(EVENT_SPELL_EXPLOSIVE_SHEEP, 60000);

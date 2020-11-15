@@ -589,23 +589,23 @@ public:
                     SetEscortPaused(true);
                     break;
                 case 41:
+                {
+                    // Search for all nearest lights and respawn them
+                    std::list<GameObject*> eluneLights;
+                    GetGameObjectListWithEntryInGrid(eluneLights, me, GO_ELUNE_LIGHT, 20.0f);
+                    for (std::list<GameObject*>::const_iterator itr = eluneLights.begin(); itr != eluneLights.end(); ++itr)
                     {
-                        // Search for all nearest lights and respawn them
-                        std::list<GameObject*> eluneLights;
-                        GetGameObjectListWithEntryInGrid(eluneLights, me, GO_ELUNE_LIGHT, 20.0f);
-                        for (std::list<GameObject*>::const_iterator itr = eluneLights.begin(); itr != eluneLights.end(); ++itr)
-                        {
-                            if ((*itr)->isSpawned())
-                                continue;
+                        if ((*itr)->isSpawned())
+                            continue;
 
-                            (*itr)->SetRespawnTime(115);
-                            (*itr)->Refresh();
-                        }
-
-                        if (GameObject* altar = me->GetMap()->GetGameObject(_altarGUID))
-                            me->SetFacingToObject(altar);
-                        break;
+                        (*itr)->SetRespawnTime(115);
+                        (*itr)->Refresh();
                     }
+
+                    if (GameObject* altar = me->GetMap()->GetGameObject(_altarGUID))
+                        me->SetFacingToObject(altar);
+                    break;
+                }
                 case 42:
                     // Summon the 2 priestess
                     SetEscortPaused(true);

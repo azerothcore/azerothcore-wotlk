@@ -592,22 +592,22 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_CHECK_WORLD_TREE_DISTANCE:
+                {
+                    // If Archimonde is too close to the world tree this will ENRAGE him
+                    Creature* Check = me->SummonCreature(CREATURE_CHANNEL_TARGET, NordrassilLoc, TEMPSUMMON_TIMED_DESPAWN, 2000);
+                    if (Check)
                     {
-                        // If Archimonde is too close to the world tree this will ENRAGE him
-                        Creature* Check = me->SummonCreature(CREATURE_CHANNEL_TARGET, NordrassilLoc, TEMPSUMMON_TIMED_DESPAWN, 2000);
-                        if (Check)
-                        {
-                            Check->SetVisible(false);
+                        Check->SetVisible(false);
 
-                            if (me->IsWithinDistInMap(Check, 75))
-                            {
-                                events.ScheduleEvent(EVENT_TOO_CLOSE_TO_WORLD_TREE, 0);
-                                break;
-                            }
+                        if (me->IsWithinDistInMap(Check, 75))
+                        {
+                            events.ScheduleEvent(EVENT_TOO_CLOSE_TO_WORLD_TREE, 0);
+                            break;
                         }
-                        events.RepeatEvent(5000);
-                        break;
                     }
+                    events.RepeatEvent(5000);
+                    break;
+                }
                 case EVENT_BELOW_10_PERCENT_HP:
                     DoCastProtection();     // Protection of Elune against Finger and Hand of Death
                     BelowTenPercent = true;

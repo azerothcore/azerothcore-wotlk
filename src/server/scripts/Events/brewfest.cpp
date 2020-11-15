@@ -179,7 +179,7 @@ public:
                 return;
 
             Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+            for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
                 if (Player* player = itr->GetSource())
                 {
                     if (player->CanRewardQuest(qReward, false))
@@ -330,7 +330,7 @@ public:
                     break;
                 case EVENT_SISTERS_CHUCK_MUG:
                     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                    for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                    for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
                     {
                         if (Player* player = itr->GetSource())
                             if (player->HasItemCount(ITEM_DARK_BREW))
@@ -555,44 +555,44 @@ public:
             {
                 case QUEST_BARK_FOR_DROHN:
                 case QUEST_BARK_FOR_VOODOO:
+                {
+                    switch (urand(0, 3))
                     {
-                        switch (urand(0, 3))
-                        {
-                            case 0:
-                                str = "Join with your brothers and sisters at " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + " and drink for the horde!";
-                                break;
-                            case 1:
-                                str = "If you think an orc can hit hard, check out their brew, it hits even harder! See for yourself at " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + ", only at Brewfest!";
-                                break;
-                            case 2:
-                                str = "Celebrate Brewfest with orcs that know what a good drink really is! Check out " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + " at Brewfest!";
-                                break;
-                            case 3:
-                                str = std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + "  knows how to party hard! Check them out at Brewfest!";
-                                break;
-                        }
-                        break;
+                        case 0:
+                            str = "Join with your brothers and sisters at " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + " and drink for the horde!";
+                            break;
+                        case 1:
+                            str = "If you think an orc can hit hard, check out their brew, it hits even harder! See for yourself at " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + ", only at Brewfest!";
+                            break;
+                        case 2:
+                            str = "Celebrate Brewfest with orcs that know what a good drink really is! Check out " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + " at Brewfest!";
+                            break;
+                        case 3:
+                            str = std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + "  knows how to party hard! Check them out at Brewfest!";
+                            break;
                     }
+                    break;
+                }
                 case QUEST_BARK_FOR_BARLEY:
                 case QUEST_BARK_FOR_THUNDERBREW:
+                {
+                    switch (urand(0, 3))
                     {
-                        switch (urand(0, 3))
-                        {
-                            case 0:
-                                str = "Join with your brothers and sisters at " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + " and drink for the alliance!";
-                                break;
-                            case 1:
-                                str = "If you think an dwarf can hit hard, check out their brew, it hits even harder! See for yourself at " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + ", only at Brewfest!";
-                                break;
-                            case 2:
-                                str = "Celebrate Brewfest with dwarves that know what a good drink really is! Check out " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + " at Brewfest!";
-                                break;
-                            case 3:
-                                str = std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + "  knows how to party hard! Check them out at Brewfest!";
-                                break;
-                        }
-                        break;
+                        case 0:
+                            str = "Join with your brothers and sisters at " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + " and drink for the alliance!";
+                            break;
+                        case 1:
+                            str = "If you think an dwarf can hit hard, check out their brew, it hits even harder! See for yourself at " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + ", only at Brewfest!";
+                            break;
+                        case 2:
+                            str = "Celebrate Brewfest with dwarves that know what a good drink really is! Check out " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + " at Brewfest!";
+                            break;
+                        case 3:
+                            str = std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + "  knows how to party hard! Check them out at Brewfest!";
+                            break;
                     }
+                    break;
+                }
             }
 
             return str;
@@ -703,78 +703,78 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_CHECK_HOUR:
+                {
+                    // determine hour
+                    if (AllowStart())
                     {
-                        // determine hour
-                        if (AllowStart())
-                        {
-                            PrepareEvent();
-                            events.RepeatEvent(300000);
-                            return;
-                        }
-                        events.RepeatEvent(2000);
-                        break;
+                        PrepareEvent();
+                        events.RepeatEvent(300000);
+                        return;
                     }
+                    events.RepeatEvent(2000);
+                    break;
+                }
                 case EVENT_SPAWN_MOLE_MACHINE:
+                {
+                    if (me->GetMapId() == 1) // Kalimdor
                     {
-                        if (me->GetMapId() == 1) // Kalimdor
-                        {
-                            float rand = 8 + rand_norm() * 12;
-                            float angle = rand_norm() * 2 * M_PI;
-                            float x = 1201.8f + rand * cos(angle);
-                            float y = -4299.6f + rand * sin(angle);
-                            if (Creature* cr = me->SummonCreature(NPC_MOLE_MACHINE_TRIGGER, x, y, 21.3f, 0.0f))
-                                cr->CastSpell(cr, SPELL_SPAWN_MOLE_MACHINE, true);
-                        }
-                        else if (me->GetMapId() == 0) // EK
-                        {
-                            float rand = rand_norm() * 20;
-                            float angle = rand_norm() * 2 * M_PI;
-                            float x = -5157.1f + rand * cos(angle);
-                            float y = -598.98f + rand * sin(angle);
-                            if (Creature* cr = me->SummonCreature(NPC_MOLE_MACHINE_TRIGGER, x, y, 398.11f, 0.0f))
-                                cr->CastSpell(cr, SPELL_SPAWN_MOLE_MACHINE, true);
-                        }
-                        events.RepeatEvent(3000);
-                        break;
+                        float rand = 8 + rand_norm() * 12;
+                        float angle = rand_norm() * 2 * M_PI;
+                        float x = 1201.8f + rand * cos(angle);
+                        float y = -4299.6f + rand * sin(angle);
+                        if (Creature* cr = me->SummonCreature(NPC_MOLE_MACHINE_TRIGGER, x, y, 21.3f, 0.0f))
+                            cr->CastSpell(cr, SPELL_SPAWN_MOLE_MACHINE, true);
                     }
+                    else if (me->GetMapId() == 0) // EK
+                    {
+                        float rand = rand_norm() * 20;
+                        float angle = rand_norm() * 2 * M_PI;
+                        float x = -5157.1f + rand * cos(angle);
+                        float y = -598.98f + rand * sin(angle);
+                        if (Creature* cr = me->SummonCreature(NPC_MOLE_MACHINE_TRIGGER, x, y, 398.11f, 0.0f))
+                            cr->CastSpell(cr, SPELL_SPAWN_MOLE_MACHINE, true);
+                    }
+                    events.RepeatEvent(3000);
+                    break;
+                }
                 case EVENT_PRE_FINISH_ATTACK:
-                    {
-                        events.CancelEvent(EVENT_SPAWN_MOLE_MACHINE);
-                        events.ScheduleEvent(EVENT_FINISH_ATTACK, 20000);
-                        break;
-                    }
+                {
+                    events.CancelEvent(EVENT_SPAWN_MOLE_MACHINE);
+                    events.ScheduleEvent(EVENT_FINISH_ATTACK, 20000);
+                    break;
+                }
                 case EVENT_FINISH_ATTACK:
-                    {
-                        FinishAttackDueToWin();
-                        events.RescheduleEvent(EVENT_CHECK_HOUR, 60000);
-                        break;
-                    }
+                {
+                    FinishAttackDueToWin();
+                    events.RescheduleEvent(EVENT_CHECK_HOUR, 60000);
+                    break;
+                }
                 case EVENT_BARTENDER_SAY:
+                {
+                    events.RepeatEvent(12000);
+                    Creature* sayer = GetRandomBartender();
+                    if (!sayer)
+                        return;
+
+                    thrown++;
+                    if (thrown == 3)
                     {
-                        events.RepeatEvent(12000);
-                        Creature* sayer = GetRandomBartender();
-                        if (!sayer)
-                            return;
+                        thrown = 0;
+                        sayer->MonsterSay("SOMEONE TRY THIS SUPER BREW!", LANG_UNIVERSAL, 0);
+                        //sayer->CastSpell(sayer, SPELL_CREATE_SUPER_BREW, true);
+                        sayer->SummonCreature(NPC_SUPER_BREW_TRIGGER, sayer->GetPositionX() + 15 * cos(sayer->GetOrientation()), sayer->GetPositionY() + 15 * sin(sayer->GetOrientation()), sayer->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
 
-                        thrown++;
-                        if (thrown == 3)
-                        {
-                            thrown = 0;
-                            sayer->MonsterSay("SOMEONE TRY THIS SUPER BREW!", LANG_UNIVERSAL, 0);
-                            //sayer->CastSpell(sayer, SPELL_CREATE_SUPER_BREW, true);
-                            sayer->SummonCreature(NPC_SUPER_BREW_TRIGGER, sayer->GetPositionX() + 15 * cos(sayer->GetOrientation()), sayer->GetPositionY() + 15 * sin(sayer->GetOrientation()), sayer->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
-
-                        }
-                        else
-                        {
-                            if (urand(0, 1))
-                                sayer->MonsterSay("Chug and chuck! Chug and chuck!", LANG_UNIVERSAL, 0);
-                            else
-                                sayer->MonsterSay("Down the free brew and pelt the Guzzlers with your mug!", LANG_UNIVERSAL, 0);
-                        }
-
-                        break;
                     }
+                    else
+                    {
+                        if (urand(0, 1))
+                            sayer->MonsterSay("Chug and chuck! Chug and chuck!", LANG_UNIVERSAL, 0);
+                        else
+                            sayer->MonsterSay("Down the free brew and pelt the Guzzlers with your mug!", LANG_UNIVERSAL, 0);
+                    }
+
+                    break;
+                }
             }
         }
 

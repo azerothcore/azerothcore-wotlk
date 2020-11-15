@@ -192,12 +192,12 @@ public:
                     events.RepeatEvent(1000);
                     return;
                 case EVENT_CALL_SPARKS:
-                    {
-                        EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
-                        summons.DoAction(ACTION_CALLBACK, pred);
-                        events.ScheduleEvent(EVENT_RESTORE, 2000, 0, 2);
-                        return;
-                    }
+                {
+                    EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
+                    summons.DoAction(ACTION_CALLBACK, pred);
+                    events.ScheduleEvent(EVENT_RESTORE, 2000, 0, 2);
+                    return;
+                }
                 case EVENT_RESTORE:
                     EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
                     summons.DoAction(ACTION_SPARK_DESPAWN, pred);

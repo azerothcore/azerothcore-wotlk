@@ -67,7 +67,7 @@ public:
 
         void OnCreatureCreate(Creature* pCreature)
         {
-            switch(pCreature->GetEntry())
+            switch (pCreature->GetEntry())
             {
                 case NPC_BJARNGRIM:
                     m_uiGeneralBjarngrimGUID = pCreature->GetGUID();
@@ -86,7 +86,7 @@ public:
 
         void OnGameObjectCreate(GameObject* pGo)
         {
-            switch(pGo->GetEntry())
+            switch (pGo->GetEntry())
             {
                 case GO_BJARNGRIM_DOOR:
                     m_uiBjarngrimDoorGUID = pGo->GetGUID();
@@ -120,7 +120,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 7321: //Shatter Resistant (2042)
                     return volkhanAchievement;
@@ -133,7 +133,7 @@ public:
         void SetData(uint32 uiType, uint32 uiData)
         {
             m_auiEncounter[uiType] = uiData;
-            if( uiType == TYPE_LOKEN_INTRO )
+            if ( uiType == TYPE_LOKEN_INTRO )
                 SaveToDB();
 
             // Achievements
@@ -142,10 +142,10 @@ public:
             else if (uiType == DATA_VOLKHAN_ACHIEVEMENT)
                 volkhanAchievement = (bool)uiData;
 
-            if( uiData != DONE )
+            if ( uiData != DONE )
                 return;
 
-            switch(uiType)
+            switch (uiType)
             {
                 case TYPE_BJARNGRIM:
                     HandleGameObject(m_uiBjarngrimDoorGUID, true);
@@ -223,7 +223,7 @@ public:
 
         uint64 GetData64(uint32 uiData) const
         {
-            switch(uiData)
+            switch (uiData)
             {
                 case TYPE_BJARNGRIM:
                     return m_uiGeneralBjarngrimGUID;

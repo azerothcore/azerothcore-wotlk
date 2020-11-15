@@ -148,7 +148,7 @@ public:
 
         void Load(const char* in)
         {
-            if( !in )
+            if ( !in )
                 return;
 
             char dataHead1, dataHead2, dataHead3;

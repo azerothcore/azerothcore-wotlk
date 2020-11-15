@@ -136,7 +136,7 @@ public:
         bool AnyPlayerValid() const
         {
             Map::PlayerList const& playerList = me->GetMap()->GetPlayers();
-            for(Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+            for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
                 if (me->GetDistance(itr->GetSource()) < 130.0f && itr->GetSource()->IsAlive() && !itr->GetSource()->IsGameMaster() && me->CanCreatureAttack(itr->GetSource()) && me->_CanDetectFeignDeathOf(itr->GetSource()))
                     return true;
 
@@ -227,7 +227,7 @@ public:
 
         void JustSummoned(Creature* summon)
         {
-            if(summon->GetEntry() != me->GetEntry())
+            if (summon->GetEntry() != me->GetEntry())
             {
                 summon->GetMotionMaster()->MovePoint(0, *me, false);
                 summon->GetMotionMaster()->MoveFollow(me, 0.1f, 0.0f + M_PI * 0.3f * summons.size());

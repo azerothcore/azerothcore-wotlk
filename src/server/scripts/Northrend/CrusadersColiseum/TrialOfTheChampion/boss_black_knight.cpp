@@ -110,7 +110,7 @@ public:
             me->SetDisplayId(me->GetNativeDisplayId());
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_PASSIVE);
-            if( pInstance )
+            if ( pInstance )
                 pInstance->SetData(BOSS_BLACK_KNIGHT, NOT_STARTED);
 
             //me->SetLootMode(0); // [LOOT]
@@ -130,7 +130,7 @@ public:
                 return;
             }
 
-            if( Phase < 3 && damage >= me->GetHealth() )
+            if ( Phase < 3 && damage >= me->GetHealth() )
             {
                 damage = 0;
                 me->SetHealth(me->GetMaxHealth());
@@ -152,19 +152,19 @@ public:
 
         void DoAction(int32 param)
         {
-            if( param == -1 )
+            if ( param == -1 )
             {
                 summons.DespawnAll();
             }
-            else if( param == 1 )
+            else if ( param == 1 )
             {
-                if( !pInstance )
+                if ( !pInstance )
                     return;
 
                 pInstance->SetData(BOSS_BLACK_KNIGHT, IN_PROGRESS);
                 Talk(TEXT_BK_AGGRO);
                 me->CastSpell((Unit*)NULL, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
-                if( Creature* announcer = pInstance->instance->GetCreature(pInstance->GetData64(DATA_ANNOUNCER)) )
+                if ( Creature* announcer = pInstance->instance->GetCreature(pInstance->GetData64(DATA_ANNOUNCER)) )
                     announcer->DespawnOrUnsummon();
 
                 events.Reset();
@@ -178,7 +178,7 @@ public:
 
         void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell)
         {
-            switch( spell->Id )
+            switch ( spell->Id )
             {
                 case SPELL_BLACK_KNIGHT_RES:
                     me->SetHealth(me->GetMaxHealth());
@@ -192,7 +192,7 @@ public:
 
                     ++Phase;
 
-                    switch( Phase )
+                    switch ( Phase )
                     {
                         case 2:
                             me->SetDisplayId(MODEL_SKELETON);
@@ -223,46 +223,46 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( !UpdateVictim() )
+            if ( !UpdateVictim() )
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_ANNOUNCER_SAY_ZOMBIE:
-                    if( pInstance && !summons.empty() )
-                        if( Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()) )
+                    if ( pInstance && !summons.empty() )
+                        if ( Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()) )
                             ghoul->MonsterYell("[Zombie] .... . Brains ....", LANG_UNIVERSAL, 0);
-                    
+
                     break;
                 case EVENT_SPELL_PLAGUE_STRIKE:
-                    if( me->GetVictim() )
+                    if ( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_PLAGUE_STRIKE, false);
                     events.RepeatEvent(urand(10000, 12000));
                     break;
                 case EVENT_SPELL_ICY_TOUCH:
-                    if( me->GetVictim() )
+                    if ( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_ICY_TOUCH, false);
                     events.RepeatEvent(urand(5000, 6000));
                     break;
                 case EVENT_SPELL_DEATH_RESPITE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
                         me->CastSpell(target, SPELL_DEATH_RESPITE, false);
                     events.RepeatEvent(urand(13000, 15000));
                     break;
                 case EVENT_SPELL_OBLITERATE:
-                    if( me->GetVictim() )
+                    if ( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_OBLITERATE, false);
                     events.RepeatEvent(urand(15000, 17000));
                     break;
                 case EVENT_SPELL_DESECRATION:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
                         me->CastSpell(target, SPELL_DESECRATION, false);
                     events.RepeatEvent(urand(14000, 17000));
                     break;
@@ -271,7 +271,7 @@ public:
                     events.RepeatEvent(urand(2000, 4000));
                     break;
                 case EVENT_SPELL_MARKED_DEATH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.000000f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.000000f, true) )
                         me->CastSpell(target, SPELL_MARKED_DEATH, false);
                     events.RepeatEvent(9000);
                     break;
@@ -283,7 +283,7 @@ public:
         void JustSummoned(Creature* summon)
         {
             summons.Summon(summon);
-            if( Unit* target = summon->SelectNearestTarget(200.0f) )
+            if ( Unit* target = summon->SelectNearestTarget(200.0f) )
             {
                 summon->AI()->AttackStart(target);
                 DoZoneInCombat(summon);
@@ -292,9 +292,9 @@ public:
 
         void KilledUnit(Unit* victim)
         {
-            if( victim->GetTypeId() == TYPEID_PLAYER )
+            if ( victim->GetTypeId() == TYPEID_PLAYER )
             {
-                if( urand(0, 1) )
+                if ( urand(0, 1) )
                     Talk(TEXT_BK_SLAIN_1);
                 else
                     Talk(TEXT_BK_SLAIN_2);
@@ -305,9 +305,9 @@ public:
         {
             me->CastSpell((Unit*)NULL, SPELL_BK_KILL_CREDIT, true);
             Talk(TEXT_BK_DEATH);
-            if( pInstance )
+            if ( pInstance )
                 pInstance->SetData(BOSS_BLACK_KNIGHT, DONE);
-            if( me->ToTempSummon() )
+            if ( me->ToTempSummon() )
                 me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
         }
     };
@@ -335,7 +335,7 @@ public:
 
         void DoAction(int32 param)
         {
-            if( param == 1 )
+            if ( param == 1 )
             {
                 me->SetControlled(false, UNIT_STATE_ROOT);
                 me->DisableRotate(false);
@@ -346,7 +346,7 @@ public:
 
         void WaypointReached(uint32 i)
         {
-            if( i == 12 )
+            if ( i == 12 )
             {
                 SetEscortPaused(true);
                 me->SetOrientation(3.62f);
@@ -354,7 +354,7 @@ public:
                 me->DisableRotate(true);
                 me->SetFacingTo(3.62f);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_MOUNT_SPECIAL);
-                if( InstanceScript* pInstance = me->GetInstanceScript() )
+                if ( InstanceScript* pInstance = me->GetInstanceScript() )
                     pInstance->SetData(DATA_SKELETAL_GRYPHON_LANDED, 0);
             }
         }
@@ -411,7 +411,7 @@ public:
 
         void SpellHitTarget(Unit* target, const SpellInfo* spell)
         {
-            switch(spell->Id)
+            switch (spell->Id)
             {
                 case SPELL_CLAW_N:
                 case SPELL_CLAW_H:
@@ -432,15 +432,15 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( !UpdateVictim() )
+            if ( !UpdateVictim() )
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -449,7 +449,7 @@ public:
                         if (me->GetDistance(target) > 5.0f && me->GetDistance(target) < 30.0f)
                         {
                             me->CastSpell(target, SPELL_LEAP, false);
-                            
+
                             break;
                         }
                     events.RepeatEvent(1000);

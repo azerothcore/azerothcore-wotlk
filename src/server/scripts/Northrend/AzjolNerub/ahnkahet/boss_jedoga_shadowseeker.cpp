@@ -338,52 +338,52 @@ public:
                 switch (events.ExecuteEvent())
                 {
                     case EVENT_JEDOGA_CYCLONE:
-                        {
-                            me->CastSpell(me, IsHeroic() ? SPELL_CYCLONE_STRIKE_H : SPELL_CYCLONE_STRIKE, false);
-                            events.RepeatEvent(urand(10000, 14000));
-                            break;
-                        }
+                    {
+                        me->CastSpell(me, IsHeroic() ? SPELL_CYCLONE_STRIKE_H : SPELL_CYCLONE_STRIKE, false);
+                        events.RepeatEvent(urand(10000, 14000));
+                        break;
+                    }
                     case EVENT_JEDOGA_LIGHTNING_BOLT:
-                        {
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                                me->CastSpell(pTarget, IsHeroic() ? SPELL_LIGHTNING_BOLT_H : SPELL_LIGHTNING_BOLT, false);
+                    {
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            me->CastSpell(pTarget, IsHeroic() ? SPELL_LIGHTNING_BOLT_H : SPELL_LIGHTNING_BOLT, false);
 
-                            events.RepeatEvent(urand(11000, 15000));
-                            break;
-                        }
+                        events.RepeatEvent(urand(11000, 15000));
+                        break;
+                    }
                     case EVENT_JEDOGA_THUNDERSHOCK:
-                        {
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                                me->CastSpell(pTarget, IsHeroic() ? SPELL_THUNDERSHOCK_H : SPELL_THUNDERSHOCK, false);
+                    {
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            me->CastSpell(pTarget, IsHeroic() ? SPELL_THUNDERSHOCK_H : SPELL_THUNDERSHOCK, false);
 
-                            events.RepeatEvent(urand(16000, 22000));
-                            break;
-                        }
+                        events.RepeatEvent(urand(16000, 22000));
+                        break;
+                    }
                     case EVENT_JEDOGA_MOVE_UP:
-                        {
-                            if (!summons.HasEntry(NPC_INITIATE))
-                                break;
-
-                            if (Creature* cr = me->SummonCreature(NPC_JEDOGA_CONTROLLER, 373.48f, -706.00f, -16.18f))
-                            {
-                                cr->CastSpell(cr, SPELL_SACRIFICE_VISUAL, true);
-                                summons.Summon(cr);
-                            }
-
-                            Talk(TEXT_SACRIFICE_1);
-
-                            isFlying = true;
-                            me->GetMotionMaster()->Clear(true);
-                            me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[1]);
+                    {
+                        if (!summons.HasEntry(NPC_INITIATE))
                             break;
+
+                        if (Creature* cr = me->SummonCreature(NPC_JEDOGA_CONTROLLER, 373.48f, -706.00f, -16.18f))
+                        {
+                            cr->CastSpell(cr, SPELL_SACRIFICE_VISUAL, true);
+                            summons.Summon(cr);
                         }
+
+                        Talk(TEXT_SACRIFICE_1);
+
+                        isFlying = true;
+                        me->GetMotionMaster()->Clear(true);
+                        me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[1]);
+                        break;
+                    }
                     case EVENT_JEDOGA_MOVE_DOWN:
-                        {
-                            Talk(TEXT_SACRIFICE_2);
-                            summons.DespawnEntry(NPC_JEDOGA_CONTROLLER);
-                            MoveDown();
-                            break;
-                        }
+                    {
+                        Talk(TEXT_SACRIFICE_2);
+                        summons.DespawnEntry(NPC_JEDOGA_CONTROLLER);
+                        MoveDown();
+                        break;
+                    }
                 }
 
                 DoMeleeAttackIfReady();

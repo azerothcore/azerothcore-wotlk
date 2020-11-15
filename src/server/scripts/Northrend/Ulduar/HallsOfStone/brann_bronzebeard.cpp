@@ -309,7 +309,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(BRANN_BRONZEBEARD, 1);
                 pInstance->SetData(DATA_BRANN_ACHIEVEMENT, true);
@@ -327,20 +327,20 @@ public:
                     Start(false, true, 0, 0, true, false);
                     break;
                 case ACTION_START_TRIBUNAL:
-                    {
-                        Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                        if (!PlayerList.isEmpty())
-                            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                            {
-                                me->setFaction(i->GetSource()->getFaction());
-                                break;
-                            }
+                {
+                    Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
+                    if (!PlayerList.isEmpty())
+                        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                        {
+                            me->setFaction(i->GetSource()->getFaction());
+                            break;
+                        }
 
-                        SetEscortPaused(false);
-                        InitializeEvent();
-                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-                        break;
-                    }
+                    SetEscortPaused(false);
+                    InitializeEvent();
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                    break;
+                }
                 case ACTION_GO_TO_SJONNIR:
                     SetEscortPaused(false);
                     ResetEvent();
@@ -393,148 +393,148 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_KADDRAK_VISUAL:
-                    {
-                        SwitchHeadVisaul(0x1, true);
-                        break;
-                    }
+                {
+                    SwitchHeadVisaul(0x1, true);
+                    break;
+                }
                 case EVENT_MARNAK_VISUAL:
-                    {
-                        SwitchHeadVisaul(0x2, true);
-                        break;
-                    }
+                {
+                    SwitchHeadVisaul(0x2, true);
+                    break;
+                }
                 case EVENT_ABEDNEUM_VISUAL:
-                    {
-                        SwitchHeadVisaul(0x4, true);
-                        break;
-                    }
+                {
+                    SwitchHeadVisaul(0x4, true);
+                    break;
+                }
                 case EVENT_KADDRAK_HEAD: // First
+                {
+                    if (Creature* kaddrak = GetKaddrak())
                     {
-                        if (Creature* kaddrak = GetKaddrak())
-                        {
-                            if (Player* plr = SelectTargetFromPlayerList(100.0f))
-                                kaddrak->CastSpell(plr, DUNGEON_MODE(SPELL_GLARE_OF_THE_TRIBUNAL, SPELL_GLARE_OF_THE_TRIBUNAL_H), true);
-                        }
-
-                        events.RescheduleEvent(EVENT_KADDRAK_SWITCH_EYE, 1500);
-                        events.RepeatEvent(2000 + urand(0, 2000));
-                        break;
+                        if (Player* plr = SelectTargetFromPlayerList(100.0f))
+                            kaddrak->CastSpell(plr, DUNGEON_MODE(SPELL_GLARE_OF_THE_TRIBUNAL, SPELL_GLARE_OF_THE_TRIBUNAL_H), true);
                     }
+
+                    events.RescheduleEvent(EVENT_KADDRAK_SWITCH_EYE, 1500);
+                    events.RepeatEvent(2000 + urand(0, 2000));
+                    break;
+                }
                 case EVENT_KADDRAK_SWITCH_EYE:
+                {
+                    if (Creature* kaddrak = GetKaddrak())
                     {
-                        if (Creature* kaddrak = GetKaddrak())
-                        {
-                            if (urand(0, 1))
-                                kaddrak->UpdatePosition(927.9f, 330.9f, 219.4f, 2.4f, true);
-                            else
-                                kaddrak->UpdatePosition(923.7f, 326.9f, 219.5f, 2.1f, true);
+                        if (urand(0, 1))
+                            kaddrak->UpdatePosition(927.9f, 330.9f, 219.4f, 2.4f, true);
+                        else
+                            kaddrak->UpdatePosition(923.7f, 326.9f, 219.5f, 2.1f, true);
 
-                            kaddrak->StopMovingOnCurrentPos();
-                        }
-
-                        break;
+                        kaddrak->StopMovingOnCurrentPos();
                     }
+
+                    break;
+                }
                 case EVENT_MARNAK_HEAD: // Second
+                {
+                    if (Creature* marnak = GetMarnak())
                     {
-                        if (Creature* marnak = GetMarnak())
+                        if (Creature* cr = me->SummonCreature(NPC_DARK_MATTER_TRIGGER, marnak->GetPositionX(), marnak->GetPositionY(), marnak->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 7000))
                         {
-                            if (Creature* cr = me->SummonCreature(NPC_DARK_MATTER_TRIGGER, marnak->GetPositionX(), marnak->GetPositionY(), marnak->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 7000))
+                            cr->CastSpell(cr, SPELL_DARK_MATTER_VISUAL, true);
+                            if (Player* plr = SelectTargetFromPlayerList(100.0f))
                             {
-                                cr->CastSpell(cr, SPELL_DARK_MATTER_VISUAL, true);
-                                if (Player* plr = SelectTargetFromPlayerList(100.0f))
-                                {
-                                    float speed = me->GetDistance(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ()) / (4000.0f * 0.001f);
-                                    cr->MonsterMoveWithSpeed(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), speed);
-                                }
+                                float speed = me->GetDistance(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ()) / (4000.0f * 0.001f);
+                                cr->MonsterMoveWithSpeed(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), speed);
                             }
                         }
-                        events.RepeatEvent(20000);
-                        break;
                     }
+                    events.RepeatEvent(20000);
+                    break;
+                }
                 case EVENT_ABEDNEUM_HEAD: // Third
+                {
+                    if (GetAbedneum())
                     {
-                        if (GetAbedneum())
-                        {
-                            Player* plr = SelectTargetFromPlayerList(100.0f);
-                            if (!plr)
-                                break;
+                        Player* plr = SelectTargetFromPlayerList(100.0f);
+                        if (!plr)
+                            break;
 
-                            if (Creature* cr = me->SummonCreature(NPC_SEARING_GAZE_TRIGGER, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
-                            {
-                                // summon another abedneum to create double beam, despawn just after trigger despawn
-                                me->SummonCreature(NPC_ABEDNEUM, 897.0f, 326.9f, 223.5f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000);
-                                cr->CastSpell(cr, DUNGEON_MODE(SPELL_SEARING_GAZE, SPELL_SEARING_GAZE_H), true);
-                            }
+                        if (Creature* cr = me->SummonCreature(NPC_SEARING_GAZE_TRIGGER, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
+                        {
+                            // summon another abedneum to create double beam, despawn just after trigger despawn
+                            me->SummonCreature(NPC_ABEDNEUM, 897.0f, 326.9f, 223.5f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000);
+                            cr->CastSpell(cr, DUNGEON_MODE(SPELL_SEARING_GAZE, SPELL_SEARING_GAZE_H), true);
                         }
-                        events.RepeatEvent(30000);
-                        break;
                     }
+                    events.RepeatEvent(30000);
+                    break;
+                }
                 case EVENT_SUMMON_MONSTERS:
-                    {
-                        uint32 Time = 45000 - (2500 * WaveNum);
-                        SummonCreatures(NPC_DARK_RUNE_PROTECTOR, 3);
-                        if (WaveNum > 2)
-                            SummonCreatures(NPC_DARK_RUNE_STORMCALLER, 2);
-                        if (WaveNum > 5)
-                            SummonCreatures(NPC_IRON_GOLEM_CUSTODIAN, 1);
+                {
+                    uint32 Time = 45000 - (2500 * WaveNum);
+                    SummonCreatures(NPC_DARK_RUNE_PROTECTOR, 3);
+                    if (WaveNum > 2)
+                        SummonCreatures(NPC_DARK_RUNE_STORMCALLER, 2);
+                    if (WaveNum > 5)
+                        SummonCreatures(NPC_IRON_GOLEM_CUSTODIAN, 1);
 
-                        WaveNum++;
-                        events.RepeatEvent(Time);
-                        break;
-                    }
+                    WaveNum++;
+                    events.RepeatEvent(Time);
+                    break;
+                }
                 case EVENT_TRIBUNAL_END:
+                {
+                    // Has to be here!
+                    events.Reset();
+                    //DespawnHeads();
+                    summons.DespawnAll();
+
+                    if (pInstance)
                     {
-                        // Has to be here!
-                        events.Reset();
-                        //DespawnHeads();
-                        summons.DespawnAll();
-
-                        if (pInstance)
-                        {
-                            pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, DONE);
-                            pInstance->SetData(BRANN_BRONZEBEARD, 3);
-                            me->CastSpell(me, 59046, true); // credit
-                        }
-
-                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-
-
-                        // Spawn Chest and quest credit
-                        if (Player* plr = SelectTargetFromPlayerList(200.0f))
-                        {
-                            if (GameObject* go = plr->SummonGameObject((IsHeroic() ? GO_TRIBUNAL_CHEST_H : GO_TRIBUNAL_CHEST), 880.406f, 345.164f, 203.706f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0))
-                            {
-                                plr->RemoveGameObject(go, false);
-                                go->SetLootMode(1);
-                                go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
-                            }
-
-                            plr->GroupEventHappens(QUEST_HALLS_OF_STONE, me);
-                        }
-
-                        events.ScheduleEvent(EVENT_GO_TO_SJONNIR, 279000);
-                        break;
+                        pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, DONE);
+                        pInstance->SetData(BRANN_BRONZEBEARD, 3);
+                        me->CastSpell(me, 59046, true); // credit
                     }
+
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+
+
+                    // Spawn Chest and quest credit
+                    if (Player* plr = SelectTargetFromPlayerList(200.0f))
+                    {
+                        if (GameObject* go = plr->SummonGameObject((IsHeroic() ? GO_TRIBUNAL_CHEST_H : GO_TRIBUNAL_CHEST), 880.406f, 345.164f, 203.706f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0))
+                        {
+                            plr->RemoveGameObject(go, false);
+                            go->SetLootMode(1);
+                            go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                        }
+
+                        plr->GroupEventHappens(QUEST_HALLS_OF_STONE, me);
+                    }
+
+                    events.ScheduleEvent(EVENT_GO_TO_SJONNIR, 279000);
+                    break;
+                }
                 case EVENT_GO_TO_SJONNIR:
-                    {
+                {
 
-                        if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
-                            door->SetGoState(GO_STATE_ACTIVE);
-                        SetEscortPaused(false);
-                        ResetEvent();
-                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-                        break;
-                    }
+                    if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
+                        door->SetGoState(GO_STATE_ACTIVE);
+                    SetEscortPaused(false);
+                    ResetEvent();
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                    break;
+                }
                 case EVENT_END:
-                    {
-                        events.Reset();
-                        if (pInstance)
-                            pInstance->SetData(BRANN_BRONZEBEARD, 6);
+                {
+                    events.Reset();
+                    if (pInstance)
+                        pInstance->SetData(BRANN_BRONZEBEARD, 6);
 
-                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                        me->MonsterYell("I'll use the forge to make batches o' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(14279);
-                        break;
-                    }
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                    me->MonsterYell("I'll use the forge to make batches o' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!", LANG_UNIVERSAL, 0);
+                    me->PlayDirectSound(14279);
+                    break;
+                }
             }
 
             if (TalkEvent)
@@ -578,7 +578,7 @@ public:
             for (int i = 0; i < count; ++i)
             {
                 Creature* cr = me->SummonCreature(entry, 946.5971f + urand(0, 6), 383.5330f + urand(0, 6), 205.9943f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
-                if(cr)
+                if (cr)
                 {
                     cr->AI()->AttackStart(me);
                     cr->AddThreat(me, 100.0f);
@@ -590,7 +590,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             ResetEvent();
-            if(pInstance)
+            if (pInstance)
             {
                 if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
                 {
@@ -654,7 +654,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
         // In front of Console
         case 11:
             SetEscortPaused(true);
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, IN_PROGRESS);
                 if (GameObject* tribunal = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_TRIBUNAL_CONSOLE)))
@@ -664,7 +664,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
         // Before Sjonnir's door
         case 27:
             SetEscortPaused(true);
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(BRANN_BRONZEBEARD, 5);
                 me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
@@ -726,19 +726,19 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_DRP_CHARGE:
-                    {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                            me->CastSpell(tgt, SPELL_DRP_CHARGE, false);
+                {
+                    if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        me->CastSpell(tgt, SPELL_DRP_CHARGE, false);
 
-                        events.RepeatEvent(10000);
-                        break;
-                    }
+                    events.RepeatEvent(10000);
+                    break;
+                }
                 case EVENT_DRP_CLEAVE:
-                    {
-                        me->CastSpell(me->GetVictim(), SPELL_DRP_CLEAVE, false);
-                        events.RepeatEvent(7000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me->GetVictim(), SPELL_DRP_CLEAVE, false);
+                    events.RepeatEvent(7000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();
@@ -784,17 +784,17 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_DRS_LIGHTNING_BOLD:
-                    {
-                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_DRS_LIGHTING_BOLT_H : SPELL_DRS_LIGHTING_BOLT, false);
-                        events.RepeatEvent(5000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_DRS_LIGHTING_BOLT_H : SPELL_DRS_LIGHTING_BOLT, false);
+                    events.RepeatEvent(5000);
+                    break;
+                }
                 case EVENT_DRS_SHADOW_WORD_PAIN:
-                    {
-                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_DRS_SHADOW_WORD_PAIN_H : SPELL_DRS_SHADOW_WORD_PAIN, false);
-                        events.RepeatEvent(12000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_DRS_SHADOW_WORD_PAIN_H : SPELL_DRS_SHADOW_WORD_PAIN, false);
+                    events.RepeatEvent(12000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();
@@ -838,17 +838,17 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_IGC_CRUSH:
-                    {
-                        me->CastSpell(me->GetVictim(), SPELL_IGC_CRUSH_ARMOR, false);
-                        events.RepeatEvent(6000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me->GetVictim(), SPELL_IGC_CRUSH_ARMOR, false);
+                    events.RepeatEvent(6000);
+                    break;
+                }
                 case EVENT_IGC_GROUND_SMASH:
-                    {
-                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_IGC_GROUND_SMASH_H : SPELL_IGC_GROUND_SMASH, false);
-                        events.RepeatEvent(5000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_IGC_GROUND_SMASH_H : SPELL_IGC_GROUND_SMASH, false);
+                    events.RepeatEvent(5000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();

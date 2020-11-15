@@ -318,33 +318,33 @@ public:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
                 case EVENT_VAMPIRIC_BITE:
-                    {
-                        Player* target = nullptr;
-                        float maxThreat = 0.0f;
-                        const Map::PlayerList& pl = me->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                            if (Player* p = itr->GetSource())
-                                if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && p->GetDistance(me) < 70.0f)
+                {
+                    Player* target = nullptr;
+                    float maxThreat = 0.0f;
+                    const Map::PlayerList& pl = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                        if (Player* p = itr->GetSource())
+                            if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && p->GetDistance(me) < 70.0f)
+                            {
+                                float th = me->getThreatManager().getThreatWithoutTemp(p);
+                                if (!target || th > maxThreat)
                                 {
-                                    float th = me->getThreatManager().getThreatWithoutTemp(p);
-                                    if (!target || th > maxThreat)
-                                    {
-                                        target = p;
-                                        maxThreat = th;
-                                    }
+                                    target = p;
+                                    maxThreat = th;
                                 }
+                            }
 
-                        if (target)
-                        {
-                            me->CastSpell(target, SPELL_VAMPIRIC_BITE, false);
-                            me->CastSpell((Unit*)NULL, SPELL_VAMPIRIC_BITE_DUMMY, true);
-                            Talk(SAY_VAMPIRIC_BITE);
-                            SetGUID(target->GetGUID(), GUID_VAMPIRE);
-                            target->CastSpell(target, SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY, TRIGGERED_FULL_MASK);
-                            target->CastSpell(target, SPELL_PRESENCE_OF_THE_DARKFALLEN_SE, TRIGGERED_FULL_MASK);
-                        }
+                    if (target)
+                    {
+                        me->CastSpell(target, SPELL_VAMPIRIC_BITE, false);
+                        me->CastSpell((Unit*)NULL, SPELL_VAMPIRIC_BITE_DUMMY, true);
+                        Talk(SAY_VAMPIRIC_BITE);
+                        SetGUID(target->GetGUID(), GUID_VAMPIRE);
+                        target->CastSpell(target, SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY, TRIGGERED_FULL_MASK);
+                        target->CastSpell(target, SPELL_PRESENCE_OF_THE_DARKFALLEN_SE, TRIGGERED_FULL_MASK);
                     }
-                    break;
+                }
+                break;
                 case EVENT_BLOOD_MIRROR:
                     if (me->GetVictim())
                     {

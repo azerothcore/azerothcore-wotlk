@@ -348,29 +348,29 @@ public:
                             m_uiWave_Timer = 1000;
                             break;
                         case 4:
+                        {
+                            Creature* temp = ObjectAccessor::GetCreature(*me, m_uiValrothGUID);
+
+                            if (!temp || !temp->IsAlive())
                             {
-                                Creature* temp = ObjectAccessor::GetCreature(*me, m_uiValrothGUID);
-
-                                if (!temp || !temp->IsAlive())
-                                {
-                                    Talk(SAY_BREAKOUT8);
-                                    m_uiWave_Timer = 5000;
-                                }
-                                else
-                                {
-                                    // xinef: despawn check
-                                    Player* player = GetPlayerForEscort();
-                                    if (!player || me->GetDistance(player) > 60.0f)
-                                    {
-                                        me->DespawnOrUnsummon();
-                                        return;
-                                    }
-
-                                    m_uiWave_Timer = 2500;
-                                    return;                         //return, we don't want m_uiWave to increment now
-                                }
-                                break;
+                                Talk(SAY_BREAKOUT8);
+                                m_uiWave_Timer = 5000;
                             }
+                            else
+                            {
+                                // xinef: despawn check
+                                Player* player = GetPlayerForEscort();
+                                if (!player || me->GetDistance(player) > 60.0f)
+                                {
+                                    me->DespawnOrUnsummon();
+                                    return;
+                                }
+
+                                m_uiWave_Timer = 2500;
+                                return;                         //return, we don't want m_uiWave to increment now
+                            }
+                            break;
+                        }
                         case 5:
                             Talk(SAY_BREAKOUT9);
                             me->RemoveAurasDueToSpell(SPELL_ANTI_MAGIC_ZONE);

@@ -283,12 +283,12 @@ public:
                     me->RemoveAurasDueToSpell(SPELL_DIVE_BOMB_VISUAL);
                     break;
                 case EVENT_SUMMON_DIVE_PHOENIX:
-                    {
-                        Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f, true);
-                        me->SummonCreature(NPC_EMBER_OF_ALAR, target ? *target : *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
-                        me->SummonCreature(NPC_EMBER_OF_ALAR, target ? *target : *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
-                        break;
-                    }
+                {
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f, true);
+                    me->SummonCreature(NPC_EMBER_OF_ALAR, target ? *target : *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
+                    me->SummonCreature(NPC_EMBER_OF_ALAR, target ? *target : *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
+                    break;
+                }
                 case EVENT_REBIRTH_DIVE:
                     me->SetModelVisible(true);
                     me->CastSpell(me, SPELL_REBIRTH_DIVE, false);

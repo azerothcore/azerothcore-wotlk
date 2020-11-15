@@ -283,11 +283,11 @@ public:
                     events.RepeatEvent(1000);
                     return;
                 case EVENT_SHATTER:
-                    {
-                        events.RepeatEvent(10000);
-                        summons.DoAction(ACTION_SHATTER);
-                        break;
-                    }
+                {
+                    events.RepeatEvent(10000);
+                    summons.DoAction(ACTION_SHATTER);
+                    break;
+                }
                 case EVENT_MOVE_TO_ANVIL:
                     GetNextPos();
                     me->GetMotionMaster()->MovePoint(PointID, x, y, z);

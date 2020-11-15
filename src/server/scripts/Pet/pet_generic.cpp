@@ -382,13 +382,13 @@ public:
                 creature->AI()->DoAction(ARGENT_PONY_STATE_BANK);
                 break;
             case GOSSIP_ACTION_MAILBOX:
-                {
-                    creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_MAILBOX);
-                    player->GetSession()->SendShowMailBox(creature->GetGUID());
-                    spellId = player->GetTeamId(true) ? SPELL_AURA_POSTMAN_G : SPELL_AURA_POSTMAN_S;
-                    creature->AI()->DoAction(ARGENT_PONY_STATE_MAILBOX);
-                    break;
-                }
+            {
+                creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_MAILBOX);
+                player->GetSession()->SendShowMailBox(creature->GetGUID());
+                spellId = player->GetTeamId(true) ? SPELL_AURA_POSTMAN_G : SPELL_AURA_POSTMAN_S;
+                creature->AI()->DoAction(ARGENT_PONY_STATE_MAILBOX);
+                break;
+            }
             default:
                 if (action > 60000)
                 {

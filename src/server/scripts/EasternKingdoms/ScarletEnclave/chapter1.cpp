@@ -100,16 +100,16 @@ public:
                     Talk(EYE_TEXT_LAUNCH, me->GetCharmerOrOwnerPlayerOrPlayerItself());
                     break;
                 case EVENT_LAUNCH:
-                    {
-                        me->SetSpeed(MOVE_FLIGHT, 5.0f, true);
+                {
+                    me->SetSpeed(MOVE_FLIGHT, 5.0f, true);
 
-                        const Position EYE_DESTINATION_1 = { me->GetPositionX() - 40.0f, me->GetPositionY(), me->GetPositionZ() + 10.0f, 0.0f };
-                        const Position EYE_DESTINATION_2 = { 1768.0f, -5876.0f, 153.0f, 0.0f };
+                    const Position EYE_DESTINATION_1 = { me->GetPositionX() - 40.0f, me->GetPositionY(), me->GetPositionZ() + 10.0f, 0.0f };
+                    const Position EYE_DESTINATION_2 = { 1768.0f, -5876.0f, 153.0f, 0.0f };
 
-                        me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_1);
-                        me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_2);
-                        break;
-                    }
+                    me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_1);
+                    me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_2);
+                    break;
+                }
                 case EVENT_REGAIN_CONTROL:
                     if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {

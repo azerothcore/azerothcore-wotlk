@@ -740,7 +740,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SARA_P1_DOORS_CLOSE:
                     // Whispers of YS
@@ -758,23 +758,23 @@ public:
                     InformCloud();
                     break;
                 case EVENT_SARA_P1_SPELLS:
-                    {
-                        uint32 spell = RAND(SPELL_SARAS_ANGER_TARGET_SELECTOR, SPELL_SARAS_BLESSING_TARGET_SELECTOR, SPELL_SARAS_FAVOR_TARGET_SELECTOR);
-                        me->CastSpell(me, spell, false);
-                        SpellSounds();
-                        events.RepeatEvent(me->GetMap()->Is25ManRaid() ? urand(0, 3000) : 4000 + urand(0, 2000));
-                        break;
-                    }
+                {
+                    uint32 spell = RAND(SPELL_SARAS_ANGER_TARGET_SELECTOR, SPELL_SARAS_BLESSING_TARGET_SELECTOR, SPELL_SARAS_FAVOR_TARGET_SELECTOR);
+                    me->CastSpell(me, spell, false);
+                    SpellSounds();
+                    events.RepeatEvent(me->GetMap()->Is25ManRaid() ? urand(0, 3000) : 4000 + urand(0, 2000));
+                    break;
+                }
                 case EVENT_SARA_P2_START:
-                    {
-                        EntryCheckPredicate pred(NPC_YOGG_SARON);
-                        summons.DoAction(ACTION_YOGG_SARON_APPEAR, pred);
-                        events.RescheduleEvent(EVENT_SARA_P2_SPAWN_START_TENTACLES, 500, 0, EVENT_PHASE_TWO);
+                {
+                    EntryCheckPredicate pred(NPC_YOGG_SARON);
+                    summons.DoAction(ACTION_YOGG_SARON_APPEAR, pred);
+                    events.RescheduleEvent(EVENT_SARA_P2_SPAWN_START_TENTACLES, 500, 0, EVENT_PHASE_TWO);
 
-                        // Spawn Brain!
-                        me->SummonCreature(NPC_BRAIN_OF_YOGG_SARON, 1981.3f, -25.43f, 265);
-                        break;
-                    }
+                    // Spawn Brain!
+                    me->SummonCreature(NPC_BRAIN_OF_YOGG_SARON, 1981.3f, -25.43f, 265);
+                    break;
+                }
                 case EVENT_SARA_P2_MALADY:
                     me->CastCustomSpell(SPELL_MALADY_OF_THE_MIND, SPELLVALUE_MAX_TARGETS, 1, me, false);
                     events.RepeatEvent(20000);
@@ -805,19 +805,19 @@ public:
                     events.RepeatEvent(30000);
                     break;
                 case EVENT_SARA_P2_OPEN_PORTALS:
-                    {
-                        AddPortals();
-                        EntryCheckPredicate pred(NPC_YOGG_SARON);
-                        summons.DoAction(ACTION_YOGG_SARON_OPEN_PORTAL_YELL, pred);
-                        events.RepeatEvent(80000);
-                        break;
-                    }
+                {
+                    AddPortals();
+                    EntryCheckPredicate pred(NPC_YOGG_SARON);
+                    summons.DoAction(ACTION_YOGG_SARON_OPEN_PORTAL_YELL, pred);
+                    events.RepeatEvent(80000);
+                    break;
+                }
                 case EVENT_SARA_P2_REMOVE_STUN:
-                    {
-                        me->RemoveAura(SPELL_SHATTERED_ILLUSION);
-                        summons.DoAction(ACTION_REMOVE_STUN);
-                        break;
-                    }
+                {
+                    me->RemoveAura(SPELL_SHATTERED_ILLUSION);
+                    summons.DoAction(ACTION_REMOVE_STUN);
+                    break;
+                }
                 case EVENT_SARA_P2_SPAWN_START_TENTACLES:
                     me->SetOrientation(M_PI);
                     me->SetDisplayId(SARA_TRANSFORM_MODEL);
@@ -1057,7 +1057,7 @@ public:
             }
 
             Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+            for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
             {
                 itr->GetSource()->RemoveAura(SPELL_SANITY);
                 itr->GetSource()->RemoveAura(SPELL_INSANE1);
@@ -1326,7 +1326,7 @@ public:
                 {
                     // Stun
                     if (me->GetInstanceScript())
-                        if(Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(NPC_SARA)))
+                        if (Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(NPC_SARA)))
                             sara->AI()->DoAction(MINUTE * IN_MILLISECONDS - std::min((uint32)MINUTE * IN_MILLISECONDS, _induceTimer));
 
                     _induceTimer = 0;
@@ -1340,7 +1340,7 @@ public:
                 return;
 
             summons.DespawnAll();
-            switch(param)
+            switch (param)
             {
                 case ACTION_ILLUSION_STORMWIND:
                     PrepareStormwindIllusion();
@@ -1393,7 +1393,7 @@ public:
 
                     me->CastSpell(me, SPELL_BRAIN_HURT_VISUAL, true);
                     if (me->GetInstanceScript())
-                        if(Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(NPC_SARA)))
+                        if (Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(NPC_SARA)))
                             sara->AI()->DoAction(ACTION_BRAIN_DAMAGED);
                 }
             }
@@ -1594,7 +1594,7 @@ public:
             Map::PlayerList const& pList = me->GetMap()->GetPlayers();
             uint8 num = urand(0, pList.getSize() - 1);
             uint8 count = 0;
-            for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr, ++count)
+            for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr, ++count)
             {
                 if (me->GetDistance(itr->GetSource()) > 10 || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
                     continue;
@@ -2233,17 +2233,17 @@ public:
             switch (events.ExecuteEvent())
             {
                 case 40:
-                    {
-                        uint64 _guid = _targets.at(_current);
-                        ++_current;
+                {
+                    uint64 _guid = _targets.at(_current);
+                    ++_current;
 
-                        if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
-                        {
-                            me->PlayDirectSound(15760, player);
-                            me->MonsterWhisper("Destroy them minion, your master commands it!", player, false);
-                        }
-                        break;
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
+                    {
+                        me->PlayDirectSound(15760, player);
+                        me->MonsterWhisper("Destroy them minion, your master commands it!", player, false);
                     }
+                    break;
+                }
             }
         }
     };
@@ -2298,7 +2298,7 @@ public:
             Map::PlayerList const& pList = GetUnitOwner()->GetMap()->GetPlayers();
             uint8 _offset = urand(0, pList.getSize() - 1);
             uint8 _counter = 0;
-            for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr, ++_counter)
+            for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr, ++_counter)
             {
                 if (itr->GetSource() == GetUnitOwner() || GetUnitOwner()->GetDistance(itr->GetSource()) > 50.0f || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
                     continue;

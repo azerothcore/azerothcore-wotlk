@@ -252,7 +252,7 @@ public:
         bool IsAnyPlayerValid()
         {
             Map::PlayerList const& playerList = me->GetMap()->GetPlayers();
-            for(Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+            for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
                 if (Player* player = itr->GetSource())
                     if (!player->IsGameMaster() && player->IsAlive() && me->GetHomePosition().GetExactDist2d(player) < 52.0f && me->IsWithinLOSInMap(player) && !player->HasAuraType(SPELL_AURA_MOD_INVISIBILITY) && !player->HasAuraType(SPELL_AURA_MOD_STEALTH) && !player->HasAuraType(SPELL_AURA_MOD_UNATTACKABLE))
                         return true;
@@ -689,19 +689,19 @@ public:
             switch (action)
             {
                 case CORPOREALITY_INCREASE:
-                    {
-                        if (_corporeality == (MAX_CORPOREALITY_STATE - 1))
-                            return;
-                        ++_corporeality;
-                        break;
-                    }
+                {
+                    if (_corporeality == (MAX_CORPOREALITY_STATE - 1))
+                        return;
+                    ++_corporeality;
+                    break;
+                }
                 case CORPOREALITY_DECREASE:
-                    {
-                        if (_corporeality == 0)
-                            return;
-                        --_corporeality;
-                        break;
-                    }
+                {
+                    if (_corporeality == 0)
+                        return;
+                    --_corporeality;
+                    break;
+                }
                 default:
                     break;
             }

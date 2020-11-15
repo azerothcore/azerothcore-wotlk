@@ -196,38 +196,38 @@ public:
                         events.ScheduleEvent(EVENT_SUMMON_PROWLERS, 6000, 0, PHASE_ALL);
                         break;
                     case EVENT_MARK_OF_ARLOKK:
+                    {
+                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, urand(1, 3), 0.0f, false, -SPELL_MARK_OF_ARLOKK);
+                        if (!target)
+                            target = me->GetVictim();
+                        if (target)
                         {
-                            Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, urand(1, 3), 0.0f, false, -SPELL_MARK_OF_ARLOKK);
-                            if (!target)
-                                target = me->GetVictim();
-                            if (target)
-                            {
-                                DoCast(target, SPELL_MARK_OF_ARLOKK, true);
-                                Talk(SAY_FEAST_PROWLER, target);
-                            }
-                            events.ScheduleEvent(EVENT_MARK_OF_ARLOKK, urand(120000, 130000));
-                            break;
+                            DoCast(target, SPELL_MARK_OF_ARLOKK, true);
+                            Talk(SAY_FEAST_PROWLER, target);
                         }
+                        events.ScheduleEvent(EVENT_MARK_OF_ARLOKK, urand(120000, 130000));
+                        break;
+                    }
                     case EVENT_TRANSFORM:
-                        {
-                            DoCast(me, SPELL_PANTHER_TRANSFORM); // SPELL_AURA_TRANSFORM
-                            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(EQUIP_UNEQUIP));
-                            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(EQUIP_UNEQUIP));
-                            /*
-                            const CreatureTemplate* cinfo = me->GetCreatureTemplate();
-                            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 35)));
-                            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg +((cinfo->maxdmg/100) * 35)));
-                            me->UpdateDamagePhysical(BASE_ATTACK);
-                            */
-                            me->AttackStop();
-                            DoResetThreat();
-                            me->SetReactState(REACT_PASSIVE);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                            DoCast(me, SPELL_VANISH_VISUAL);
-                            DoCast(me, SPELL_VANISH);
-                            events.ScheduleEvent(EVENT_VANISH, 1000, 0, PHASE_ONE);
-                            break;
-                        }
+                    {
+                        DoCast(me, SPELL_PANTHER_TRANSFORM); // SPELL_AURA_TRANSFORM
+                        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(EQUIP_UNEQUIP));
+                        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(EQUIP_UNEQUIP));
+                        /*
+                        const CreatureTemplate* cinfo = me->GetCreatureTemplate();
+                        me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 35)));
+                        me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg +((cinfo->maxdmg/100) * 35)));
+                        me->UpdateDamagePhysical(BASE_ATTACK);
+                        */
+                        me->AttackStop();
+                        DoResetThreat();
+                        me->SetReactState(REACT_PASSIVE);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                        DoCast(me, SPELL_VANISH_VISUAL);
+                        DoCast(me, SPELL_VANISH);
+                        events.ScheduleEvent(EVENT_VANISH, 1000, 0, PHASE_ONE);
+                        break;
+                    }
                     case EVENT_VANISH:
                         DoCast(me, SPELL_SUPER_INVIS);
                         me->SetWalk(false);
@@ -256,24 +256,24 @@ public:
                         events.ScheduleEvent(EVENT_RAVAGE, urand(10000, 14000), 0, PHASE_TWO);
                         break;
                     case EVENT_TRANSFORM_BACK:
-                        {
-                            me->RemoveAura(SPELL_PANTHER_TRANSFORM); // SPELL_AURA_TRANSFORM
-                            DoCast(me, SPELL_VANISH_VISUAL);
-                            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_DAGGER));
-                            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(WEAPON_DAGGER));
-                            /*
-                            const CreatureTemplate* cinfo = me->GetCreatureTemplate();
-                            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg));
-                            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg));
-                            me->UpdateDamagePhysical(BASE_ATTACK);
-                            */
-                            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
-                            events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(4000, 7000), 0, PHASE_ONE);
-                            events.ScheduleEvent(EVENT_GOUGE, urand(12000, 15000), 0, PHASE_ONE);
-                            events.ScheduleEvent(EVENT_TRANSFORM, urand(16000, 20000), 0, PHASE_ONE);
-                            events.SetPhase(PHASE_ONE);
-                            break;
-                        }
+                    {
+                        me->RemoveAura(SPELL_PANTHER_TRANSFORM); // SPELL_AURA_TRANSFORM
+                        DoCast(me, SPELL_VANISH_VISUAL);
+                        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_DAGGER));
+                        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(WEAPON_DAGGER));
+                        /*
+                        const CreatureTemplate* cinfo = me->GetCreatureTemplate();
+                        me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg));
+                        me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg));
+                        me->UpdateDamagePhysical(BASE_ATTACK);
+                        */
+                        me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
+                        events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(4000, 7000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_GOUGE, urand(12000, 15000), 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_TRANSFORM, urand(16000, 20000), 0, PHASE_ONE);
+                        events.SetPhase(PHASE_ONE);
+                        break;
+                    }
                     default:
                         break;
                 }

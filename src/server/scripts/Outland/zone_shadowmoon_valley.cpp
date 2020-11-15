@@ -183,13 +183,13 @@ public:
                 switch (eventId)
                 {
                     case EVENT_CAST_SUMMON_INFERNAL:
-                        {
-                            if (Unit* infernal = ObjectAccessor::GetUnit(*me, infernalGUID))
-                                if (infernal->GetDisplayId() == MODEL_INVISIBLE)
-                                    me->CastSpell(infernal, SPELL_SUMMON_INFERNAL, true);
-                            events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, 12000);
-                            break;
-                        }
+                    {
+                        if (Unit* infernal = ObjectAccessor::GetUnit(*me, infernalGUID))
+                            if (infernal->GetDisplayId() == MODEL_INVISIBLE)
+                                me->CastSpell(infernal, SPELL_SUMMON_INFERNAL, true);
+                        events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, 12000);
+                        break;
+                    }
                     default:
                         break;
                 }

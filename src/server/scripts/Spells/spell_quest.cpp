@@ -850,9 +850,9 @@ public:
 
         void HandleScript(SpellEffIndex  /*effIndex*/)
         {
-            if(Unit* target = GetHitUnit())
+            if (Unit* target = GetHitUnit())
             {
-                if(Player* p = target->ToPlayer())
+                if (Player* p = target->ToPlayer())
                 {
                     p->CastSpell(p, p->getGender() == GENDER_FEMALE ? SPELL_SCARLET_RAVEN_PRIEST_IMAGE_FEMALE : SPELL_SCARLET_RAVEN_PRIEST_IMAGE_MALE, false);
                 }
@@ -3060,8 +3060,8 @@ public:
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            if(GetOwner())
-                if(Player* player = GetOwner()->ToPlayer())
+            if (GetOwner())
+                if (Player* player = GetOwner()->ToPlayer())
                     player->CompleteQuest(QUEST_CROW_TRANSFORM);
         }
 

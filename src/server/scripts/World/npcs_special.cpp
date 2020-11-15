@@ -107,36 +107,36 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_CLEARWATER_ANNOUNCE:
+                {
+                    time_t curtime = time(nullptr);
+                    tm strdate;
+                    localtime_r(&curtime, &strdate);
+
+                    if (!preWarning && strdate.tm_hour == 13 && strdate.tm_min == 55)
                     {
-                        time_t curtime = time(nullptr);
-                        tm strdate;
-                        localtime_r(&curtime, &strdate);
-
-                        if (!preWarning && strdate.tm_hour == 13 && strdate.tm_min == 55)
-                        {
-                            sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_PRE, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
-                            preWarning = true;
-                        }
-                        if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
-                        {
-                            sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
-                            startWarning = true;
-                        }
-                        if (!finishWarning && strdate.tm_hour == 15 && strdate.tm_min == 0)
-                        {
-                            sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
-                            finishWarning = true;
-                            // no one won - despawn
-                            if (!finished)
-                            {
-                                me->DespawnOrUnsummon();
-                                break;
-                            }
-                        }
-
-                        events.RepeatEvent(1000);
-                        break;
+                        sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_PRE, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
+                        preWarning = true;
                     }
+                    if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
+                    {
+                        sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
+                        startWarning = true;
+                    }
+                    if (!finishWarning && strdate.tm_hour == 15 && strdate.tm_min == 0)
+                    {
+                        sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
+                        finishWarning = true;
+                        // no one won - despawn
+                        if (!finished)
+                        {
+                            me->DespawnOrUnsummon();
+                            break;
+                        }
+                    }
+
+                    events.RepeatEvent(1000);
+                    break;
+                }
             }
         }
     };
@@ -251,30 +251,30 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_RIGGLE_ANNOUNCE:
+                {
+                    time_t curtime = time(nullptr);
+                    tm strdate;
+                    localtime_r(&curtime, &strdate);
+                    if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
                     {
-                        time_t curtime = time(nullptr);
-                        tm strdate;
-                        localtime_r(&curtime, &strdate);
-                        if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
-                        {
-                            sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-                            startWarning = true;
-                        }
-                        if (!finishWarning && strdate.tm_hour == 16 && strdate.tm_min == 0)
-                        {
-                            sCreatureTextMgr->SendChat(me, RIGGLE_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-                            finishWarning = true;
-                            // no one won - despawn
-                            if (!finished)
-                            {
-                                me->DespawnOrUnsummon();
-                                break;
-                            }
-                        }
-
-                        events.RepeatEvent(1000);
-                        break;
+                        sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                        startWarning = true;
                     }
+                    if (!finishWarning && strdate.tm_hour == 16 && strdate.tm_min == 0)
+                    {
+                        sCreatureTextMgr->SendChat(me, RIGGLE_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                        finishWarning = true;
+                        // no one won - despawn
+                        if (!finished)
+                        {
+                            me->DespawnOrUnsummon();
+                            break;
+                        }
+                    }
+
+                    events.RepeatEvent(1000);
+                    break;
+                }
             }
         }
     };
@@ -576,55 +576,55 @@ public:
                 switch (SpawnAssoc->spawnType)
                 {
                     case SPAWNTYPE_ALARMBOT:
+                    {
+                        if (!who->IsWithinDistInMap(me, RANGE_GUARDS_MARK))
+                            return;
+
+                        Aura* markAura = who->GetAura(SPELL_GUARDS_MARK);
+                        if (markAura)
                         {
-                            if (!who->IsWithinDistInMap(me, RANGE_GUARDS_MARK))
-                                return;
-
-                            Aura* markAura = who->GetAura(SPELL_GUARDS_MARK);
-                            if (markAura)
+                            // the target wasn't able to move out of our range within 25 seconds
+                            if (!lastSpawnedGuard)
                             {
-                                // the target wasn't able to move out of our range within 25 seconds
-                                if (!lastSpawnedGuard)
-                                {
-                                    lastSpawnedGuard = SummonGuard();
-
-                                    if (!lastSpawnedGuard)
-                                        return;
-                                }
-
-                                if (markAura->GetDuration() < AURA_DURATION_TIME_LEFT)
-                                    if (!lastSpawnedGuard->GetVictim())
-                                        lastSpawnedGuard->AI()->AttackStart(who);
-                            }
-                            else
-                            {
-                                if (!lastSpawnedGuard)
-                                    lastSpawnedGuard = SummonGuard();
+                                lastSpawnedGuard = SummonGuard();
 
                                 if (!lastSpawnedGuard)
                                     return;
-
-                                lastSpawnedGuard->CastSpell(who, SPELL_GUARDS_MARK, true);
                             }
-                            break;
-                        }
-                    case SPAWNTYPE_TRIPWIRE_ROOFTOP:
-                        {
-                            if (!who->IsWithinDistInMap(me, RANGE_TRIPWIRE))
-                                return;
 
+                            if (markAura->GetDuration() < AURA_DURATION_TIME_LEFT)
+                                if (!lastSpawnedGuard->GetVictim())
+                                    lastSpawnedGuard->AI()->AttackStart(who);
+                        }
+                        else
+                        {
                             if (!lastSpawnedGuard)
                                 lastSpawnedGuard = SummonGuard();
 
                             if (!lastSpawnedGuard)
                                 return;
 
-                            // ROOFTOP only triggers if the player is on the ground
-                            if (!playerTarget->IsFlying() && !lastSpawnedGuard->GetVictim())
-                                lastSpawnedGuard->AI()->AttackStart(who);
-
-                            break;
+                            lastSpawnedGuard->CastSpell(who, SPELL_GUARDS_MARK, true);
                         }
+                        break;
+                    }
+                    case SPAWNTYPE_TRIPWIRE_ROOFTOP:
+                    {
+                        if (!who->IsWithinDistInMap(me, RANGE_TRIPWIRE))
+                            return;
+
+                        if (!lastSpawnedGuard)
+                            lastSpawnedGuard = SummonGuard();
+
+                        if (!lastSpawnedGuard)
+                            return;
+
+                        // ROOFTOP only triggers if the player is on the ground
+                        if (!playerTarget->IsFlying() && !lastSpawnedGuard->GetVictim())
+                            lastSpawnedGuard->AI()->AttackStart(who);
+
+                        break;
+                    }
                 }
             }
         }
@@ -2026,17 +2026,17 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1://xp off
-                {
-                    if (!noXPGain)//does gain xp
-                        doSwitch = true;//switch to don't gain xp
-                }
-                break;
+            {
+                if (!noXPGain)//does gain xp
+                    doSwitch = true;//switch to don't gain xp
+            }
+            break;
             case GOSSIP_ACTION_INFO_DEF + 2://xp on
-                {
-                    if (noXPGain)//doesn't gain xp
-                        doSwitch = true;//switch to gain xp
-                }
-                break;
+            {
+                if (noXPGain)//doesn't gain xp
+                    doSwitch = true;//switch to gain xp
+            }
+            break;
         }
         if (doSwitch)
         {

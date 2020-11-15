@@ -80,18 +80,18 @@ public:
                 _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, _eventId + 1), _owner.m_Events.CalculateTime(3000));
                 break;
             case 14:
-                {
-                    Position homePos = _owner.GetHomePosition();
-                    _owner.SetReactState(REACT_PASSIVE);
-                    _owner.SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                    _owner.SetVisible(false);
-                    _owner.UpdatePosition(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), homePos.GetOrientation(), true);
-                    _owner.StopMovingOnCurrentPos();
-                    _owner.GetMotionMaster()->Clear();
-                    if (InstanceScript* instance = _owner.GetInstanceScript())
-                        instance->SetData(DATA_BATTERED_HILT, 9);
-                }
-                break;
+            {
+                Position homePos = _owner.GetHomePosition();
+                _owner.SetReactState(REACT_PASSIVE);
+                _owner.SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                _owner.SetVisible(false);
+                _owner.UpdatePosition(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), homePos.GetOrientation(), true);
+                _owner.StopMovingOnCurrentPos();
+                _owner.GetMotionMaster()->Clear();
+                if (InstanceScript* instance = _owner.GetInstanceScript())
+                    instance->SetData(DATA_BATTERED_HILT, 9);
+            }
+            break;
         }
         return true;
     }
@@ -226,7 +226,7 @@ public:
                             }
             }
 
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_SYLVANAS_PART1:
                     creature->SetVisible(false);
@@ -374,7 +374,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go)
         {
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_FROSTMOURNE:
                     GO_FrostmourneGUID = go->GetGUID();
@@ -410,7 +410,7 @@ public:
 
         void SetData(uint32 type, uint32 data)
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_INTRO:
                     EncounterMask |= (1 << DATA_INTRO);
@@ -468,32 +468,32 @@ public:
                     }
                     break;
                 case ACTION_SPIRITUAL_REFLECTIONS_COPY:
-                    {
-                        uint8 i = 0;
-                        Map::PlayerList const& pl = instance->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                            if (Player* p = itr->GetSource())
-                                if (p->IsAlive() && !p->IsGameMaster())
-                                    if (Creature* c = instance->GetCreature(NPC_SpiritualReflectionGUID[i++]))
-                                    {
-                                        if (!c->IsAlive())
-                                            c->Respawn();
-                                        c->SetDisableGravity(true);
-                                        c->SetCanFly(true);
-                                        c->SetVisible(true);
+                {
+                    uint8 i = 0;
+                    Map::PlayerList const& pl = instance->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                        if (Player* p = itr->GetSource())
+                            if (p->IsAlive() && !p->IsGameMaster())
+                                if (Creature* c = instance->GetCreature(NPC_SpiritualReflectionGUID[i++]))
+                                {
+                                    if (!c->IsAlive())
+                                        c->Respawn();
+                                    c->SetDisableGravity(true);
+                                    c->SetCanFly(true);
+                                    c->SetVisible(true);
 
-                                        Item* i;
-                                        i = p->GetWeaponForAttack(BASE_ATTACK);
-                                        c->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, i ? i->GetEntry() : 0);
-                                        i = p->GetWeaponForAttack(OFF_ATTACK);
-                                        c->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, i ? i->GetEntry() : 0);
-                                        i = p->GetWeaponForAttack(RANGED_ATTACK);
-                                        c->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, i ? i->GetEntry() : 0);
-                                        p->CastSpell(c, SPELL_HOR_CLONE, true);
-                                        p->CastSpell(c, SPELL_HOR_CLONE_NAME, true);
-                                    }
-                    }
-                    break;
+                                    Item* i;
+                                    i = p->GetWeaponForAttack(BASE_ATTACK);
+                                    c->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, i ? i->GetEntry() : 0);
+                                    i = p->GetWeaponForAttack(OFF_ATTACK);
+                                    c->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, i ? i->GetEntry() : 0);
+                                    i = p->GetWeaponForAttack(RANGED_ATTACK);
+                                    c->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, i ? i->GetEntry() : 0);
+                                    p->CastSpell(c, SPELL_HOR_CLONE, true);
+                                    p->CastSpell(c, SPELL_HOR_CLONE_NAME, true);
+                                }
+                }
+                break;
                 case ACTION_SPIRITUAL_REFLECTIONS_ACTIVATE:
                     if (Creature* fg = instance->GetCreature(NPC_FrostswornGeneralGUID))
                         for (uint8 i = 0; i < 5; ++i)
@@ -590,73 +590,73 @@ public:
                     }
                     break;
                 case DATA_BATTERED_HILT:
-                    {
-                        if (EncounterMask & (1 << DATA_BATTERED_HILT))
-                            return;
+                {
+                    if (EncounterMask & (1 << DATA_BATTERED_HILT))
+                        return;
 
-                        switch(data)
-                        {
-                            case 1: // talked to leader
-                                EncounterMask |= (1 << DATA_BATTERED_HILT);
-                                SaveToDB();
+                    switch (data)
+                    {
+                        case 1: // talked to leader
+                            EncounterMask |= (1 << DATA_BATTERED_HILT);
+                            SaveToDB();
+                            break;
+                        case 2:
+                            if (BatteredHiltStatus)
                                 break;
-                            case 2:
-                                if (BatteredHiltStatus)
-                                    break;
-                                BatteredHiltStatus |= BHSF_STARTED;
-                                if (Creature* c = instance->GetCreature(NPC_AltarBunnyGUID))
-                                    c->CastSpell(c, 70720, true);
-                                if (Creature* c = instance->GetCreature(NPC_UtherGUID))
-                                    c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 1), c->m_Events.CalculateTime(3000));
+                            BatteredHiltStatus |= BHSF_STARTED;
+                            if (Creature* c = instance->GetCreature(NPC_AltarBunnyGUID))
+                                c->CastSpell(c, 70720, true);
+                            if (Creature* c = instance->GetCreature(NPC_UtherGUID))
+                                c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 1), c->m_Events.CalculateTime(3000));
+                            break;
+                        case 3:
+                            if ((BatteredHiltStatus & BHSF_STARTED) == 0 || (BatteredHiltStatus & BHSF_THROWN))
                                 break;
-                            case 3:
-                                if ((BatteredHiltStatus & BHSF_STARTED) == 0 || (BatteredHiltStatus & BHSF_THROWN))
-                                    break;
-                                BatteredHiltStatus |= BHSF_THROWN;
-                                if (Creature* c = instance->GetCreature(NPC_UtherGUID))
-                                {
-                                    c->AI()->Talk(SAY_BATTERED_HILT_LEAP);
-                                    c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 3), c->m_Events.CalculateTime(1500));
-                                }
-                                break;
-                            case 4:
-                                if (Creature* c = instance->GetCreature(NPC_QuelDelarGUID))
-                                {
-                                    c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                                    c->SetSpeed(MOVE_RUN, 2.5f);
-                                }
-                                break;
-                            case 5:
-                                if (Creature* c = instance->GetCreature(NPC_UtherGUID))
-                                    c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 6), c->m_Events.CalculateTime(3000));
-                                break;
-                            case 6:
-                                if (Creature* c = instance->GetCreature(NPC_QuelDelarGUID))
-                                {
-                                    c->SetSpeed(MOVE_RUN, c->GetCreatureTemplate()->speed_run);
-                                    c->GetMotionMaster()->MoveLand(0, c->GetPositionX(), c->GetPositionY(), 707.70f, 7.0f);
-                                }
-                                break;
-                            case 7:
-                                if (Creature* c = instance->GetCreature(NPC_QuelDelarGUID))
-                                {
-                                    c->SetReactState(REACT_AGGRESSIVE);
-                                    c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                                    c->RemoveAurasDueToSpell(70300);
-                                }
-                                break;
-                            case 8:
-                                if (Creature* c = instance->GetCreature(NPC_QuelDelarGUID))
-                                    c->SetInCombatWithZone();
-                                break;
-                            case 9:
-                                EncounterMask |= (1 << DATA_BATTERED_HILT);
-                                BatteredHiltStatus |= BHSF_FINISHED;
-                                SaveToDB();
-                                break;
-                        }
+                            BatteredHiltStatus |= BHSF_THROWN;
+                            if (Creature* c = instance->GetCreature(NPC_UtherGUID))
+                            {
+                                c->AI()->Talk(SAY_BATTERED_HILT_LEAP);
+                                c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 3), c->m_Events.CalculateTime(1500));
+                            }
+                            break;
+                        case 4:
+                            if (Creature* c = instance->GetCreature(NPC_QuelDelarGUID))
+                            {
+                                c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                c->SetSpeed(MOVE_RUN, 2.5f);
+                            }
+                            break;
+                        case 5:
+                            if (Creature* c = instance->GetCreature(NPC_UtherGUID))
+                                c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 6), c->m_Events.CalculateTime(3000));
+                            break;
+                        case 6:
+                            if (Creature* c = instance->GetCreature(NPC_QuelDelarGUID))
+                            {
+                                c->SetSpeed(MOVE_RUN, c->GetCreatureTemplate()->speed_run);
+                                c->GetMotionMaster()->MoveLand(0, c->GetPositionX(), c->GetPositionY(), 707.70f, 7.0f);
+                            }
+                            break;
+                        case 7:
+                            if (Creature* c = instance->GetCreature(NPC_QuelDelarGUID))
+                            {
+                                c->SetReactState(REACT_AGGRESSIVE);
+                                c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                c->RemoveAurasDueToSpell(70300);
+                            }
+                            break;
+                        case 8:
+                            if (Creature* c = instance->GetCreature(NPC_QuelDelarGUID))
+                                c->SetInCombatWithZone();
+                            break;
+                        case 9:
+                            EncounterMask |= (1 << DATA_BATTERED_HILT);
+                            BatteredHiltStatus |= BHSF_FINISHED;
+                            SaveToDB();
+                            break;
                     }
-                    return;
+                }
+                return;
             }
 
             if (data == DONE)
@@ -665,7 +665,7 @@ public:
 
         uint32 GetData(uint32 type) const
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_INTRO:
                 case DATA_FALRIC:
@@ -685,7 +685,7 @@ public:
 
         uint64 GetData64(uint32 type) const
         {
-            switch(type)
+            switch (type)
             {
                 case NPC_DARK_RANGER_LORALEN:
                     return NPC_GuardGUID;
@@ -1101,14 +1101,14 @@ public:
                             outroTimer = 500;
                             break;
                         case 2:
-                            {
-                                uint32 entry = TeamIdInInstance == TEAM_ALLIANCE ? GO_THE_SKYBREAKER : GO_ORGRIMS_HAMMER;
-                                T1 = sTransportMgr->CreateTransport(entry, 0, instance);
+                        {
+                            uint32 entry = TeamIdInInstance == TEAM_ALLIANCE ? GO_THE_SKYBREAKER : GO_ORGRIMS_HAMMER;
+                            T1 = sTransportMgr->CreateTransport(entry, 0, instance);
 
-                                ++outroStep;
-                                outroTimer = TeamIdInInstance == TEAM_ALLIANCE ? 10000 : 10500;
-                            }
-                            break;
+                            ++outroStep;
+                            outroTimer = TeamIdInInstance == TEAM_ALLIANCE ? 10000 : 10500;
+                        }
+                        break;
                         case 3:
                             if (T1)
                                 T1->EnableMovement(false);

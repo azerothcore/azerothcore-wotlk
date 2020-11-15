@@ -60,7 +60,7 @@ public:
 
         void OnCreatureCreate(Creature* pCreature)
         {
-            switch(pCreature->GetEntry())
+            switch (pCreature->GetEntry())
             {
                 case NPC_ELDER_NADOX:
                     Elder_Nadox = pCreature->GetGUID();
@@ -82,7 +82,7 @@ public:
 
         void OnGameObjectCreate(GameObject* pGo)
         {
-            switch(pGo->GetEntry())
+            switch (pGo->GetEntry())
             {
                 case 193564:
                     Prince_TaldaramPlatform = pGo->GetGUID();
@@ -121,7 +121,7 @@ public:
 
         uint64 GetData64(uint32 identifier) const
         {
-            switch(identifier)
+            switch (identifier)
             {
                 case DATA_ELDER_NADOX:
                     return Elder_Nadox;
@@ -142,7 +142,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 7317: // Respect Your Elders (2038)
                     return nadoxAchievement;
@@ -154,7 +154,7 @@ public:
 
         void SetData(uint32 type, uint32 data)
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_HERALD_VOLAZJ_EVENT:
                 case DATA_AMANITAR_EVENT:
@@ -185,7 +185,7 @@ public:
 
         uint32 GetData(uint32 type) const
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_ELDER_NADOX_EVENT:
                 case DATA_PRINCE_TALDARAM_EVENT:

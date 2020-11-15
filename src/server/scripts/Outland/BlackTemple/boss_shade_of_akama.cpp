@@ -169,25 +169,25 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_SHADE_GATHER_NPCS:
-                    {
-                        std::list<Creature*> ChannelerList;
-                        me->GetCreaturesWithEntryInRange(ChannelerList, 100.0f, NPC_ASHTONGUE_CHANNELER);
-                        for (std::list<Creature*>::const_iterator itr = ChannelerList.begin(); itr != ChannelerList.end(); ++itr)
-                            summonsChanneler.Summon(*itr);
+                {
+                    std::list<Creature*> ChannelerList;
+                    me->GetCreaturesWithEntryInRange(ChannelerList, 100.0f, NPC_ASHTONGUE_CHANNELER);
+                    for (std::list<Creature*>::const_iterator itr = ChannelerList.begin(); itr != ChannelerList.end(); ++itr)
+                        summonsChanneler.Summon(*itr);
 
-                        std::list<Creature*> SpawnerList;
-                        me->GetCreaturesWithEntryInRange(SpawnerList, 100.0f, NPC_CREATURE_GENERATOR_AKAMA);
-                        for (std::list<Creature*>::const_iterator itr = SpawnerList.begin(); itr != SpawnerList.end(); ++itr)
-                            summonsGenerator.Summon(*itr);
+                    std::list<Creature*> SpawnerList;
+                    me->GetCreaturesWithEntryInRange(SpawnerList, 100.0f, NPC_CREATURE_GENERATOR_AKAMA);
+                    for (std::list<Creature*>::const_iterator itr = SpawnerList.begin(); itr != SpawnerList.end(); ++itr)
+                        summonsGenerator.Summon(*itr);
 
-                        summonsChanneler.Respawn();
-                        summonsGenerator.Respawn();
-                        ChannelersAction(ACTION_CHANNELERS_START_CHANNEL);
+                    summonsChanneler.Respawn();
+                    summonsGenerator.Respawn();
+                    ChannelersAction(ACTION_CHANNELERS_START_CHANNEL);
 
-                        if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_AKAMA_SHADE)))
-                            akama->Respawn(true);
-                        break;
-                    }
+                    if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_AKAMA_SHADE)))
+                        akama->Respawn(true);
+                    break;
+                }
                 case EVENT_SHADE_RESET_ENCOUNTER:
                     me->SetVisible(true);
                     summonsGenerator.Respawn();

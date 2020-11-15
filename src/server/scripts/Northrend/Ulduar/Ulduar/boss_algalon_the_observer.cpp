@@ -385,26 +385,26 @@ public:
             switch (action)
             {
                 case ACTION_START_INTRO:
-                    {
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                        me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_INSTANTLY_APPEAR_MODEL);
-                        me->SetDisableGravity(true);
-                        me->CastSpell(me, SPELL_ARRIVAL, true);
-                        me->CastSpell(me, SPELL_RIDE_THE_LIGHTNING, true);
-                        me->GetMotionMaster()->MovePoint(POINT_ALGALON_LAND, AlgalonLandPos);
-                        me->SetHomePosition(AlgalonLandPos);
-                        Movement::MoveSplineInit init(me);
-                        init.MoveTo(AlgalonLandPos.GetPositionX(), AlgalonLandPos.GetPositionY(), AlgalonLandPos.GetPositionZ());
-                        init.SetOrientationFixed(true);
-                        init.Launch();
-                        events.Reset();
-                        events.SetPhase(PHASE_ROLE_PLAY);
-                        events.ScheduleEvent(EVENT_INTRO_1, 5000, 0, PHASE_ROLE_PLAY);
-                        events.ScheduleEvent(EVENT_INTRO_2, 15000, 0, PHASE_ROLE_PLAY);
-                        events.ScheduleEvent(EVENT_INTRO_3, 23000, 0, PHASE_ROLE_PLAY);
-                        events.ScheduleEvent(EVENT_INTRO_FINISH, 36000, 0, PHASE_ROLE_PLAY);
-                        break;
-                    }
+                {
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_INSTANTLY_APPEAR_MODEL);
+                    me->SetDisableGravity(true);
+                    me->CastSpell(me, SPELL_ARRIVAL, true);
+                    me->CastSpell(me, SPELL_RIDE_THE_LIGHTNING, true);
+                    me->GetMotionMaster()->MovePoint(POINT_ALGALON_LAND, AlgalonLandPos);
+                    me->SetHomePosition(AlgalonLandPos);
+                    Movement::MoveSplineInit init(me);
+                    init.MoveTo(AlgalonLandPos.GetPositionX(), AlgalonLandPos.GetPositionY(), AlgalonLandPos.GetPositionZ());
+                    init.SetOrientationFixed(true);
+                    init.Launch();
+                    events.Reset();
+                    events.SetPhase(PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_1, 5000, 0, PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_2, 15000, 0, PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_3, 23000, 0, PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_FINISH, 36000, 0, PHASE_ROLE_PLAY);
+                    break;
+                }
                 case ACTION_DESPAWN_ALGALON:
                     _fightWon = true;
                     events.Reset();
@@ -536,19 +536,19 @@ public:
                     summon->CastSpell(summon, SPELL_COSMIC_SMASH_VISUAL_STATE, true);
                     break;
                 case NPC_ALGALON_STALKER_ASTEROID_TARGET_02:
-                    {
-                        float x = summon->GetPositionX();
-                        float y = summon->GetPositionY();
-                        float z = summon->GetPositionZ() + 35.0f;
-                        float o = summon->GetOrientation();
+                {
+                    float x = summon->GetPositionX();
+                    float y = summon->GetPositionY();
+                    float z = summon->GetPositionZ() + 35.0f;
+                    float o = summon->GetOrientation();
 
-                        summon->GetMotionMaster()->Clear();
-                        summon->SetHomePosition(x, y, z, o);
-                        summon->UpdatePosition(x, y, z, o, true);
-                        summon->StopMovingOnCurrentPos();
-                        summon->m_Events.AddEvent(new CosmicSmashDamageEvent(summon), summon->m_Events.CalculateTime(4000));
-                        break;
-                    }
+                    summon->GetMotionMaster()->Clear();
+                    summon->SetHomePosition(x, y, z, o);
+                    summon->UpdatePosition(x, y, z, o, true);
+                    summon->StopMovingOnCurrentPos();
+                    summon->m_Events.AddEvent(new CosmicSmashDamageEvent(summon), summon->m_Events.CalculateTime(4000));
+                    break;
+                }
                 case NPC_UNLEASHED_DARK_MATTER:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
                         if (summon->Attack(target, true))
@@ -667,29 +667,29 @@ public:
                     events.RepeatEvent(25500);
                     break;
                 case EVENT_ACTIVATE_LIVING_CONSTELLATION:
+                {
+                    if (events.GetPhaseMask() & PHASE_MASK_NO_UPDATE)
                     {
-                        if (events.GetPhaseMask() & PHASE_MASK_NO_UPDATE)
-                        {
-                            events.RepeatEvent(4000);
-                            break;
-                        }
-                        CallConstellations();
-                        //me->CastSpell(me, SPELL_TRIGGER_3_ADDS, true);
-                        events.RepeatEvent(50000);
+                        events.RepeatEvent(4000);
                         break;
                     }
+                    CallConstellations();
+                    //me->CastSpell(me, SPELL_TRIGGER_3_ADDS, true);
+                    events.RepeatEvent(50000);
+                    break;
+                }
                 case EVENT_BIG_BANG:
-                    {
-                        Talk(SAY_ALGALON_BIG_BANG);
-                        Talk(EMOTE_ALGALON_BIG_BANG);
+                {
+                    Talk(SAY_ALGALON_BIG_BANG);
+                    Talk(EMOTE_ALGALON_BIG_BANG);
 
-                        EntryCheckPredicate pred(NPC_LIVING_CONSTELLATION);
-                        summons.DoAction(ACTION_BIG_BANG, pred);
+                    EntryCheckPredicate pred(NPC_LIVING_CONSTELLATION);
+                    summons.DoAction(ACTION_BIG_BANG, pred);
 
-                        me->CastSpell((Unit*)NULL, SPELL_BIG_BANG, false);
-                        events.RepeatEvent(90500);
-                        break;
-                    }
+                    me->CastSpell((Unit*)NULL, SPELL_BIG_BANG, false);
+                    events.RepeatEvent(90500);
+                    break;
+                }
                 case EVENT_ASCEND_TO_THE_HEAVENS:
                     Talk(SAY_ALGALON_ASCEND);
                     me->CastSpell((Unit*)NULL, SPELL_ASCEND_TO_THE_HEAVENS, false);

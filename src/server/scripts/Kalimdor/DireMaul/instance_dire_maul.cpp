@@ -48,14 +48,14 @@ public:
                         gameobject->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_GORDOK_TRIBUTE:
-                    {
-                        uint32 fullLootMode = 0x3F;
-                        for (uint32 i = 0; i < _northWingBosses; ++i)
-                            fullLootMode >>= 1;
+                {
+                    uint32 fullLootMode = 0x3F;
+                    for (uint32 i = 0; i < _northWingBosses; ++i)
+                        fullLootMode >>= 1;
 
-                        gameobject->SetLootMode(fullLootMode);
-                        break;
-                    }
+                    gameobject->SetLootMode(fullLootMode);
+                    break;
+                }
             }
         }
 

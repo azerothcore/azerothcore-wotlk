@@ -65,7 +65,7 @@ public:
     {
         ClearGossipMenuFor(player);
 
-        switch(uiAction)
+        switch (uiAction)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
                 CloseGossipMenuFor(player);
@@ -146,7 +146,7 @@ public:
 
             events.Update(diff);
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -299,10 +299,10 @@ struct violet_hold_trashAI : public npc_escortAI
         if (!bAddedWP)
         {
             bAddedWP = true;
-            switch(PLoc)
+            switch (PLoc)
             {
                 case 0:
-                    for(int i = 0; i < 6; i++)
+                    for (int i = 0; i < 6; i++)
                         AddWaypoint(i, FirstPortalTrashWPs[i][0] + irand(-1, 1), FirstPortalTrashWPs[i][1] + irand(-1, 1), FirstPortalTrashWPs[i][2] + irand(-1, 1), 0);
                     me->SetHomePosition(FirstPortalTrashWPs[5][0], FirstPortalTrashWPs[5][1], FirstPortalTrashWPs[5][2], 3.149439f);
                     break;
@@ -310,34 +310,34 @@ struct violet_hold_trashAI : public npc_escortAI
                     bAlt = (bool)urand(0, 1);
                     if (!bAlt)
                     {
-                        for(int i = 0; i < 9; i++)
+                        for (int i = 0; i < 9; i++)
                             AddWaypoint(i, SecondPortalTrashWPs1[i][0] + irand(-1, 1), SecondPortalTrashWPs1[i][1] + irand(-1, 1), SecondPortalTrashWPs1[i][2], 0);
                         me->SetHomePosition(SecondPortalTrashWPs1[8][0] + irand(-1, 1), SecondPortalTrashWPs1[8][1] + irand(-1, 1), SecondPortalTrashWPs1[8][2] + irand(-1, 1), 3.149439f);
                     }
                     else
                     {
-                        for(int i = 0; i < 8; i++)
+                        for (int i = 0; i < 8; i++)
                             AddWaypoint(i, SecondPortalTrashWPs2[i][0] + irand(-1, 1), SecondPortalTrashWPs2[i][1] + irand(-1, 1), SecondPortalTrashWPs2[i][2], 0);
                         me->SetHomePosition(SecondPortalTrashWPs2[7][0], SecondPortalTrashWPs2[7][1], SecondPortalTrashWPs2[7][2], 3.149439f);
                     }
                     break;
                 case 2:
-                    for(int i = 0; i < 8; i++)
+                    for (int i = 0; i < 8; i++)
                         AddWaypoint(i, ThirdPortalTrashWPs[i][0] + irand(-1, 1), ThirdPortalTrashWPs[i][1] + irand(-1, 1), ThirdPortalTrashWPs[i][2], 0);
                     me->SetHomePosition(ThirdPortalTrashWPs[7][0], ThirdPortalTrashWPs[7][1], ThirdPortalTrashWPs[7][2], 3.149439f);
                     break;
                 case 3:
-                    for(int i = 0; i < 9; i++)
+                    for (int i = 0; i < 9; i++)
                         AddWaypoint(i, FourthPortalTrashWPs[i][0] + irand(-1, 1), FourthPortalTrashWPs[i][1] + irand(-1, 1), FourthPortalTrashWPs[i][2], 0);
                     me->SetHomePosition(FourthPortalTrashWPs[8][0], FourthPortalTrashWPs[8][1], FourthPortalTrashWPs[8][2], 3.149439f);
                     break;
                 case 4:
-                    for(int i = 0; i < 6; i++)
+                    for (int i = 0; i < 6; i++)
                         AddWaypoint(i, FifthPortalTrashWPs[i][0] + irand(-1, 1), FifthPortalTrashWPs[i][1] + irand(-1, 1), FifthPortalTrashWPs[i][2], 0);
                     me->SetHomePosition(FifthPortalTrashWPs[5][0], FifthPortalTrashWPs[5][1], FifthPortalTrashWPs[5][2], 3.149439f);
                     break;
                 case 5:
-                    for(int i = 0; i < 4; i++)
+                    for (int i = 0; i < 4; i++)
                         AddWaypoint(i, SixthPoralTrashWPs[i][0] + irand(-1, 1), SixthPoralTrashWPs[i][1] + irand(-1, 1), SixthPoralTrashWPs[i][2], 0);
                     me->SetHomePosition(SixthPoralTrashWPs[3][0], SixthPoralTrashWPs[3][1], SixthPoralTrashWPs[3][2], 3.149439f);
                     break;
@@ -1016,30 +1016,30 @@ public:
             if (!pInstance)
                 return;
 
-            switch(uiBoss)
+            switch (uiBoss)
             {
                 case 1:
-                    if(uiWPointId == 2)
+                    if (uiWPointId == 2)
                         FinishPointReached();
                     break;
                 case 2:
-                    if(uiWPointId == 2)
+                    if (uiWPointId == 2)
                         FinishPointReached();
                     break;
                 case 3:
-                    if(uiWPointId == 1)
+                    if (uiWPointId == 1)
                         FinishPointReached();
                     break;
                 case 4:
-                    if(uiWPointId == 0)
+                    if (uiWPointId == 0)
                         FinishPointReached();
                     break;
                 case 5:
-                    if(uiWPointId == 0)
+                    if (uiWPointId == 0)
                         FinishPointReached();
                     break;
                 case 6:
-                    if(uiWPointId == 4)
+                    if (uiWPointId == 4)
                         FinishPointReached();
                     break;
             }
@@ -1049,23 +1049,23 @@ public:
         {
             npc_escortAI::UpdateAI(diff);
 
-            if(!bAddedWPs)
+            if (!bAddedWPs)
             {
                 bAddedWPs = true;
-                switch(uiBoss)
+                switch (uiBoss)
                 {
                     case 1:
-                        for(int i = 0; i < 3; i++)
+                        for (int i = 0; i < 3; i++)
                             AddWaypoint(i, SaboteurFinalPos1[i][0], SaboteurFinalPos1[i][1], SaboteurFinalPos1[i][2], 0);
                         me->SetHomePosition(SaboteurFinalPos1[2][0], SaboteurFinalPos1[2][1], SaboteurFinalPos1[2][2], 4.762346f);
                         break;
                     case 2:
-                        for(int i = 0; i < 3; i++)
+                        for (int i = 0; i < 3; i++)
                             AddWaypoint(i, SaboteurFinalPos2[i][0], SaboteurFinalPos2[i][1], SaboteurFinalPos2[i][2], 0);
                         me->SetHomePosition(SaboteurFinalPos2[2][0], SaboteurFinalPos2[2][1], SaboteurFinalPos2[2][2], 1.862674f);
                         break;
                     case 3:
-                        for(int i = 0; i < 2; i++)
+                        for (int i = 0; i < 2; i++)
                             AddWaypoint(i, SaboteurFinalPos3[i][0], SaboteurFinalPos3[i][1], SaboteurFinalPos3[i][2], 0);
                         me->SetHomePosition(SaboteurFinalPos3[1][0], SaboteurFinalPos3[1][1], SaboteurFinalPos3[1][2], 5.500638f);
                         break;
@@ -1078,7 +1078,7 @@ public:
                         me->SetHomePosition(SaboteurFinalPos5[0], SaboteurFinalPos5[1], SaboteurFinalPos5[2], 1.100841f);
                         break;
                     case 6:
-                        for(int i = 0; i < 5; i++)
+                        for (int i = 0; i < 5; i++)
                             AddWaypoint(i, SaboteurFinalPos6[i][0], SaboteurFinalPos6[i][1], SaboteurFinalPos6[i][2], 0);
                         me->SetHomePosition(SaboteurFinalPos6[4][0], SaboteurFinalPos6[4][1], SaboteurFinalPos6[4][2], 0.983031f);
                         break;

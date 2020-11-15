@@ -412,7 +412,7 @@ public:
                     events.RepeatEvent(20000);
                     return;
                 case EVENT_SUMMON:
-                    if(summons.size() < 20)
+                    if (summons.size() < 20)
                         if (Creature* lift = DoSummonFlyer(NPC_MECHANOLIFT, me, 30.0f, 50.0f, 0))
                             lift->GetMotionMaster()->MoveRandom(100);
 
@@ -454,9 +454,9 @@ public:
                     return;
             }
 
-            if(me->isAttackReady() && !me->HasUnitState(UNIT_STATE_STUNNED))
+            if (me->isAttackReady() && !me->HasUnitState(UNIT_STATE_STUNNED))
             {
-                if(me->IsWithinCombatRange(me->GetVictim(), 15.0f))
+                if (me->IsWithinCombatRange(me->GetVictim(), 15.0f))
                 {
                     me->CastSpell(me->GetVictim(), SPELL_BATTERING_RAM, false);
                     me->resetAttackTimer();
@@ -1018,7 +1018,7 @@ public:
             _switchTargetTimer += diff;
             if (_switchTargetTimer >= 30000)
             {
-                if(Unit* target = me->SelectNearbyTarget(nullptr, 200.0f))
+                if (Unit* target = me->SelectNearbyTarget(nullptr, 200.0f))
                 {
                     if (target->GetVehicleBase() && target->GetVehicleBase()->GetEntry() == NPC_SEAT)
                     {

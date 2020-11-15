@@ -486,12 +486,12 @@ public:
                     target = DoSelectLowestHpFriendly(50, 0);
                     break;
                 case ABILITY_TARGET_BUFF:
-                    {
-                        std::list<Creature*> templist = DoFindFriendlyMissingBuff(50, PlayerAbility[PlayerClass][random].spell);
-                        if (!templist.empty())
-                            target = *(templist.begin());
-                    }
-                    break;
+                {
+                    std::list<Creature*> templist = DoFindFriendlyMissingBuff(50, PlayerAbility[PlayerClass][random].spell);
+                    if (!templist.empty())
+                        target = *(templist.begin());
+                }
+                break;
             }
             if (target)
                 DoCast(target, PlayerAbility[PlayerClass][random].spell, false);

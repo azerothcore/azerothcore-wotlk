@@ -123,39 +123,39 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_AMANITAR_SPAWN:
-                    {
-                        SpawnAdds();
-                        events.RepeatEvent(urand(35000, 40000));
-                        break;
-                    }
+                {
+                    SpawnAdds();
+                    events.RepeatEvent(urand(35000, 40000));
+                    break;
+                }
                 case EVENT_AMANITAR_ROOTS:
-                    {
-                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                            me->CastSpell(pTarget, SPELL_ENTANGLING_ROOTS, false);
+                {
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        me->CastSpell(pTarget, SPELL_ENTANGLING_ROOTS, false);
 
-                        events.RepeatEvent(urand(15000, 20000));
-                        break;
-                    }
+                    events.RepeatEvent(urand(15000, 20000));
+                    break;
+                }
                 case EVENT_AMANITAR_BASH:
-                    {
-                        me->CastSpell(me->GetVictim(), SPELL_BASH, false);
-                        events.RepeatEvent(urand(15000, 20000));
-                        break;
-                    }
+                {
+                    me->CastSpell(me->GetVictim(), SPELL_BASH, false);
+                    events.RepeatEvent(urand(15000, 20000));
+                    break;
+                }
                 case EVENT_AMANITAR_BOLT:
-                    {
-                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                            me->CastSpell(pTarget, SPELL_VENOM_BOLT_VOLLEY, false);
+                {
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        me->CastSpell(pTarget, SPELL_VENOM_BOLT_VOLLEY, false);
 
-                        events.RepeatEvent(urand(15000, 20000));
-                        break;
-                    }
+                    events.RepeatEvent(urand(15000, 20000));
+                    break;
+                }
                 case EVENT_AMANITAR_MINI:
-                    {
-                        me->CastSpell(me, SPELL_MINI, false);
-                        events.RepeatEvent(30000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me, SPELL_MINI, false);
+                    events.RepeatEvent(30000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();

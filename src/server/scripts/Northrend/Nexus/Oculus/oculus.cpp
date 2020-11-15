@@ -74,10 +74,10 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if(creature->IsQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        if(creature->GetInstanceScript()->GetData(DATA_DRAKOS) == DONE)
+        if (creature->GetInstanceScript()->GetData(DATA_DRAKOS) == DONE)
         {
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_DRAKES, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             SendGossipMenuFor(player, GOSSIP_TEXTID_DRAKES, creature->GetGUID());
@@ -89,10 +89,10 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
         player->PlayerTalkClass->GetGossipMenu().ClearMenu();
-        switch(creature->GetEntry())
+        switch (creature->GetEntry())
         {
             case NPC_VERDISA:
-                switch(uiAction)
+                switch (uiAction)
                 {
                     case GOSSIP_ACTION_INFO_DEF + 1:
                         if (!HAS_ESSENCE(player))
@@ -108,14 +108,14 @@ public:
                         }
                         break;
                     case GOSSIP_ACTION_INFO_DEF + 2:
-                        {
-                            ItemPosCountVec dest;
-                            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_EMERALD_ESSENCE, 1);
-                            if (msg == EQUIP_ERR_OK)
-                                player->StoreNewItem(dest, ITEM_EMERALD_ESSENCE, true);
-                            CloseGossipMenuFor(player);
-                            break;
-                        }
+                    {
+                        ItemPosCountVec dest;
+                        uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_EMERALD_ESSENCE, 1);
+                        if (msg == EQUIP_ERR_OK)
+                            player->StoreNewItem(dest, ITEM_EMERALD_ESSENCE, true);
+                        CloseGossipMenuFor(player);
+                        break;
+                    }
                     case GOSSIP_ACTION_INFO_DEF + 3:
                         if (!HAS_ESSENCE(player))
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_VERDISA1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
@@ -124,7 +124,7 @@ public:
                 }
                 break;
             case NPC_BELGARISTRASZ:
-                switch(uiAction)
+                switch (uiAction)
                 {
                     case GOSSIP_ACTION_INFO_DEF + 1:
                         if (!HAS_ESSENCE(player))
@@ -140,14 +140,14 @@ public:
                         }
                         break;
                     case GOSSIP_ACTION_INFO_DEF + 2:
-                        {
-                            ItemPosCountVec dest;
-                            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_RUBY_ESSENCE, 1);
-                            if (msg == EQUIP_ERR_OK)
-                                player->StoreNewItem(dest, ITEM_RUBY_ESSENCE, true);
-                            CloseGossipMenuFor(player);
-                            break;
-                        }
+                    {
+                        ItemPosCountVec dest;
+                        uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_RUBY_ESSENCE, 1);
+                        if (msg == EQUIP_ERR_OK)
+                            player->StoreNewItem(dest, ITEM_RUBY_ESSENCE, true);
+                        CloseGossipMenuFor(player);
+                        break;
+                    }
                     case GOSSIP_ACTION_INFO_DEF + 3:
                         if (!HAS_ESSENCE(player))
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BELGARISTRASZ1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
@@ -156,7 +156,7 @@ public:
                 }
                 break;
             case NPC_ETERNOS:
-                switch(uiAction)
+                switch (uiAction)
                 {
                     case GOSSIP_ACTION_INFO_DEF + 1:
                         if (!HAS_ESSENCE(player))
@@ -172,15 +172,15 @@ public:
                         }
                         break;
                     case GOSSIP_ACTION_INFO_DEF + 2:
-                        {
-                            ItemPosCountVec dest;
-                            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_AMBER_ESSENCE, 1);
-                            if (msg == EQUIP_ERR_OK)
-                                player->StoreNewItem(dest, ITEM_AMBER_ESSENCE, true);
+                    {
+                        ItemPosCountVec dest;
+                        uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_AMBER_ESSENCE, 1);
+                        if (msg == EQUIP_ERR_OK)
+                            player->StoreNewItem(dest, ITEM_AMBER_ESSENCE, true);
 
-                            CloseGossipMenuFor(player);
-                            break;
-                        }
+                        CloseGossipMenuFor(player);
+                        break;
+                    }
                     case GOSSIP_ACTION_INFO_DEF + 3:
                         if (!HAS_ESSENCE(player))
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ETERNOS1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
@@ -274,12 +274,12 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell)
         {
-            for( uint8 i = 0; i < 8; ++i )
-                if( me->m_spells[i] == spell->Id )
+            for ( uint8 i = 0; i < 8; ++i )
+                if ( me->m_spells[i] == spell->Id )
                 {
-                    if( target && target->IsAlive() && !target->CanFly() && target->IsHostileTo(me) && !spell->IsTargetingArea())
+                    if ( target && target->IsAlive() && !target->CanFly() && target->IsHostileTo(me) && !spell->IsTargetingArea())
                     {
-                        if( Unit* charmer = me->GetCharmer() )
+                        if ( Unit* charmer = me->GetCharmer() )
                             Unit::Kill(charmer, charmer, false);
                     }
                     break;
@@ -288,20 +288,20 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( JustSummoned )
+            if ( JustSummoned )
             {
                 despawnTimer = 1;
                 JustSummoned = false;
-                if( m_pInstance )
+                if ( m_pInstance )
                 {
-                    if( !m_pInstance->IsEncounterInProgress() || m_pInstance->GetData(DATA_EREGOS) == IN_PROGRESS )
+                    if ( !m_pInstance->IsEncounterInProgress() || m_pInstance->GetData(DATA_EREGOS) == IN_PROGRESS )
                     {
-                        if( me->GetVehicleKit() && me->IsSummon() )
-                            if( !me->GetVehicleKit()->GetPassenger(0) )
+                        if ( me->GetVehicleKit() && me->IsSummon() )
+                            if ( !me->GetVehicleKit()->GetPassenger(0) )
                             {
-                                if( m_pInstance->GetData(DATA_UROM) == DONE )
+                                if ( m_pInstance->GetData(DATA_UROM) == DONE )
                                 {
-                                    switch( me->GetEntry() )
+                                    switch ( me->GetEntry() )
                                     {
                                         case 27692:
                                             me->m_spells[5] = 50344;

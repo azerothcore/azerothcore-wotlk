@@ -505,7 +505,7 @@ public:
 
         void WaypointReached(uint32 uiPointId) override
         {
-            switch(uiPointId)
+            switch (uiPointId)
             {
                 // Starting waypoint, After reaching uther and jaina
                 case 0:

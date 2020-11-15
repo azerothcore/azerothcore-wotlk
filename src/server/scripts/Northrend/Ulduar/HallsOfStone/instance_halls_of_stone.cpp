@@ -77,7 +77,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go)
         {
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_KADDRAK:
                     goKaddrakGUID = go->GetGUID();
@@ -122,7 +122,7 @@ public:
 
         void OnCreatureCreate(Creature* creature)
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_SJONNIR:
                     SjonnirGUID = creature->GetGUID();
@@ -135,7 +135,7 @@ public:
 
         uint64 GetData64(uint32 id) const
         {
-            switch(id)
+            switch (id)
             {
                 case GO_TRIBUNAL_CONSOLE:
                     return goTribunalConsoleGUID;
@@ -166,7 +166,7 @@ public:
 
         uint32 GetData(uint32 id) const
         {
-            switch(id)
+            switch (id)
             {
                 case BOSS_KRYSTALLUS:
                 case BOSS_MAIDEN_OF_GRIEF:
@@ -180,7 +180,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 7590: // Brann Spankin' New (2154)
                     return brannAchievement;
@@ -270,7 +270,7 @@ public:
                 for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 {
                     loadStream >> Encounter[i];
-                    if( Encounter[i] == IN_PROGRESS )
+                    if ( Encounter[i] == IN_PROGRESS )
                         Encounter[i] = NOT_STARTED;
                 }
             }

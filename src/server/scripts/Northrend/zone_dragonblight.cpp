@@ -107,12 +107,12 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( running )
+            if ( running )
             {
-                if( Player* p = ObjectAccessor::GetPlayer(*me, pGUID) )
-                    if( p->GetPositionZ() < 1.0f && !secondpart )
+                if ( Player* p = ObjectAccessor::GetPlayer(*me, pGUID) )
+                    if ( p->GetPositionZ() < 1.0f && !secondpart )
                     {
-                        if( p->HasAura(DEEPDIVING_PEARL_BUFF) )
+                        if ( p->HasAura(DEEPDIVING_PEARL_BUFF) )
                         {
                             NextStep(500);
                             secondpart = true;
@@ -124,81 +124,81 @@ public:
                         }
                     }
 
-                if( timer != 0 )
+                if ( timer != 0 )
                 {
                     timer -= diff;
-                    if( timer < 0 )
+                    if ( timer < 0 )
                         timer = 0;
                 }
                 else
-                    switch( step )
+                    switch ( step )
                     {
                         case 0:
                             NextStep(10000);
                             break;
                         case 1:
+                        {
+                            Creature* c = me->SummonCreature(NPC_OACHANOA, 2406.24f, 1701.98f, 0.1f, 0.3f, TEMPSUMMON_TIMED_DESPAWN, 90000, 0);
+                            if ( !c )
                             {
-                                Creature* c = me->SummonCreature(NPC_OACHANOA, 2406.24f, 1701.98f, 0.1f, 0.3f, TEMPSUMMON_TIMED_DESPAWN, 90000, 0);
-                                if( !c )
-                                {
-                                    Reset();
-                                    return;
-                                }
-                                c->SetCanFly(true);
-                                c->GetMotionMaster()->MovePoint(0, 2406.25f, 1701.98f, 0.1f);
-                                oachanoaGUID = c->GetGUID();
-                                NextStep(3000);
-                                break;
+                                Reset();
+                                return;
                             }
+                            c->SetCanFly(true);
+                            c->GetMotionMaster()->MovePoint(0, 2406.25f, 1701.98f, 0.1f);
+                            oachanoaGUID = c->GetGUID();
+                            NextStep(3000);
+                            break;
+                        }
                         case 2:
+                        {
+                            Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
+                            if ( !p )
                             {
-                                Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
-                                if( !p )
-                                {
-                                    Reset();
-                                    return;
-                                }
-                                std::string text = (OACHANOA_T_1_1 + p->GetName() + OACHANOA_T_1_2);
-                                Say(text, true);
-                                NextStep(6000);
-                                break;
+                                Reset();
+                                return;
                             }
+                            std::string text = (OACHANOA_T_1_1 + p->GetName() + OACHANOA_T_1_2);
+                            Say(text, true);
+                            NextStep(6000);
+                            break;
+                        }
                         case 3:
                             Say(OACHANOA_T_2, true);
                             NextStep(6000);
                             break;
                         case 4:
+                        {
+                            Say(OACHANOA_T_3, true);
+                            Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
+                            if ( !p )
                             {
-                                Say(OACHANOA_T_3, true);
-                                Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
-                                if( !p )
-                                {
-                                    Reset();
-                                    return;
-                                }
-                                p->CastSpell(p, DEEPDIVING_PEARL_BUFF, true);
-                                NextStep(30000);
-                                break;
+                                Reset();
+                                return;
                             }
+                            p->CastSpell(p, DEEPDIVING_PEARL_BUFF, true);
+                            NextStep(30000);
+                            break;
+                        }
                         case 5:
                             DespawnOachanoa();
                             Reset();
                             break;
                         case 6:
+                        {
+                            Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
+                            if ( !p )
                             {
-                                Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
-                                if( !p )
-                                {
-                                    Reset();
-                                    return;
-                                }
-
-                                std::string text = (OACHANOA_T_4_1 + p->GetName() + OACHANOA_T_4_2);
-                                Say(text, true);
-
-                                NextStep(6000);
-                                break;
+                                Reset();
+                                return;
                             }
+
+                            std::string text = (OACHANOA_T_4_1 + p->GetName() + OACHANOA_T_4_2);
+                            Say(text, true);
+
+                            NextStep(6000);
+                            break;
+                        }
                         case 7:
                             Say(OACHANOA_T_5, false);
                             NextStep(6000);
@@ -208,28 +208,28 @@ public:
                             NextStep(6000);
                             break;
                         case 9:
+                        {
+                            Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
+                            if ( !p )
                             {
-                                Player* p = ObjectAccessor::GetPlayer(*me, pGUID);
-                                if( !p )
-                                {
-                                    Reset();
-                                    return;
-                                }
-                                const char* name_races[RACE_DRAENEI] = {"human", "orc", "dwarf", "nightelf", "undead", "tauren", "gnome", "troll", "", "bloodelf", "draenei"};
-                                if( p->getRace() > 11 )
-                                {
-                                    Reset();
-                                    return;
-                                }
-
-                                std::string text = (OACHANOA_T_7_1 + std::string(name_races[p->getRace() - 1]));
-                                Say(text, true);
-
-                                p->AreaExploredOrEventHappens(12032);
-
-                                DespawnOachanoa();
                                 Reset();
+                                return;
                             }
+                            const char* name_races[RACE_DRAENEI] = {"human", "orc", "dwarf", "nightelf", "undead", "tauren", "gnome", "troll", "", "bloodelf", "draenei"};
+                            if ( p->getRace() > 11 )
+                            {
+                                Reset();
+                                return;
+                            }
+
+                            std::string text = (OACHANOA_T_7_1 + std::string(name_races[p->getRace() - 1]));
+                            Say(text, true);
+
+                            p->AreaExploredOrEventHappens(12032);
+
+                            DespawnOachanoa();
+                            Reset();
+                        }
                     }
             }
         }
@@ -249,12 +249,12 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if(!player || !go)
+        if (!player || !go)
             return true;
 
         Creature* t = player->FindNearestCreature(NPC_CONVERSING_WITH_THE_DEPTHS_TRIGGER, 10.0f, true);
-        if(t && t->AI() && CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI()))
-            if(!CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->running)
+        if (t && t->AI() && CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI()))
+            if (!CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->running)
                 CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->Start(player->GetGUID());
 
         return true;
@@ -360,72 +360,72 @@ public:
                     events.ScheduleEvent(EVENT_FIGHT_2, 6000);
                     break;
                 case EVENT_FIGHT_2:
-                    {
-                        if (phase)
-                            randomWhisper();
+                {
+                    if (phase)
+                        randomWhisper();
 
-                        Creature* cr = nullptr;
-                        float x, y, z;
-                        if (phase < 3)
+                    Creature* cr = nullptr;
+                    float x, y, z;
+                    if (phase < 3)
+                    {
+                        for (uint8 i = 0; i < count[phase]; ++i)
                         {
-                            for (uint8 i = 0; i < count[phase]; ++i)
-                            {
-                                me->GetNearPoint(me, x, y, z, me->GetCombatReach(), 10.0f, rand_norm() * 2 * M_PI);
-                                if ((cr = me->SummonCreature(randEntry(), x, y, z + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
-                                {
-                                    cr->CastSpell(cr, SPELL_TELEPORT_EFFECT, true);
-                                    cr->AI()->AttackStart(me);
-                                    cr->AddThreat(me, 100.0f);
-                                }
-                            }
-                        }
-                        else if (phase == 3)
-                        {
-                            me->GetNearPoint(me, x, y, z, me->GetCombatReach(), 20.0f, rand_norm() * 2 * M_PI);
-                            if ((cr = me->SummonCreature(NPC_INFINITE_TIMERENDER, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
+                            me->GetNearPoint(me, x, y, z, me->GetCombatReach(), 10.0f, rand_norm() * 2 * M_PI);
+                            if ((cr = me->SummonCreature(randEntry(), x, y, z + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
                             {
                                 cr->CastSpell(cr, SPELL_TELEPORT_EFFECT, true);
                                 cr->AI()->AttackStart(me);
+                                cr->AddThreat(me, 100.0f);
                             }
-
-                            events.ScheduleEvent(EVENT_CHECK_FINISH, 20000);
-                            return;
                         }
-
-                        ++phase;
-                        events.ScheduleEvent(EVENT_FIGHT_2, 35000);
-                        break;
                     }
-                case EVENT_CHECK_FINISH:
+                    else if (phase == 3)
                     {
-                        if (me->FindNearestCreature(NPC_INFINITE_TIMERENDER, 50.0f))
+                        me->GetNearPoint(me, x, y, z, me->GetCombatReach(), 20.0f, rand_norm() * 2 * M_PI);
+                        if ((cr = me->SummonCreature(NPC_INFINITE_TIMERENDER, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
                         {
-                            events.RepeatEvent(5000);
-                            return;
+                            cr->CastSpell(cr, SPELL_TELEPORT_EFFECT, true);
+                            cr->AI()->AttackStart(me);
                         }
 
-                        if (Player* player = getSummoner())
-                            player->GroupEventHappens(IsFuture() ? QUEST_MYSTERY_OF_THE_INFINITE : QUEST_MYSTERY_OF_THE_INFINITE_REDUX, me);
+                        events.ScheduleEvent(EVENT_CHECK_FINISH, 20000);
+                        return;
+                    }
 
-                        me->MonsterWhisper(IsFuture() ? "Look, $N, the hourglass has revealed Nozdormu!" : "What the heck? Nozdormu is up there!", getSummoner());
-                        events.ScheduleEvent(EVENT_FINISH_EVENT, 6000);
-                        break;
-                    }
-                case EVENT_FINISH_EVENT:
+                    ++phase;
+                    events.ScheduleEvent(EVENT_FIGHT_2, 35000);
+                    break;
+                }
+                case EVENT_CHECK_FINISH:
+                {
+                    if (me->FindNearestCreature(NPC_INFINITE_TIMERENDER, 50.0f))
                     {
-                        me->MonsterWhisper(IsFuture() ? "Farewell, $N. Keep us alive and get some better equipment!" : "I feel like I'm being pulled away through time. Thanks for the help....", getSummoner());
-                        me->DespawnOrUnsummon(500);
-                        if (getFuture())
-                            getFuture()->DespawnOrUnsummon(500);
-                        break;
+                        events.RepeatEvent(5000);
+                        return;
                     }
+
+                    if (Player* player = getSummoner())
+                        player->GroupEventHappens(IsFuture() ? QUEST_MYSTERY_OF_THE_INFINITE : QUEST_MYSTERY_OF_THE_INFINITE_REDUX, me);
+
+                    me->MonsterWhisper(IsFuture() ? "Look, $N, the hourglass has revealed Nozdormu!" : "What the heck? Nozdormu is up there!", getSummoner());
+                    events.ScheduleEvent(EVENT_FINISH_EVENT, 6000);
+                    break;
+                }
+                case EVENT_FINISH_EVENT:
+                {
+                    me->MonsterWhisper(IsFuture() ? "Farewell, $N. Keep us alive and get some better equipment!" : "I feel like I'm being pulled away through time. Thanks for the help....", getSummoner());
+                    me->DespawnOrUnsummon(500);
+                    if (getFuture())
+                        getFuture()->DespawnOrUnsummon(500);
+                    break;
+                }
             }
         }
 
         void randomWhisper()
         {
             std::string text = "";
-            switch(urand(0, IsFuture() ? 7 : 5))
+            switch (urand(0, IsFuture() ? 7 : 5))
             {
                 case 0:
                     text = IsFuture() ? "What? Am I here alone. We both have a stake at this, you know!" : "This equipment looks cool and all, but couldn't we have done a little better? Are you even raiding?";
@@ -986,33 +986,33 @@ public:
                     events.ScheduleEvent(17, 12000);
                     break;
                 case 17: // kill vegard
-                    {
-                        WretchedGhoulCleaner cleaner;
-                        acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
-                        me->VisitNearbyGridObject(150.0f, worker);
+                {
+                    WretchedGhoulCleaner cleaner;
+                    acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
+                    me->VisitNearbyGridObject(150.0f, worker);
 
-                        if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE, 150.0f, true))
-                            if (Creature* v = me->FindNearestCreature(NPC_SAC_VEGARD_1, 50.0f, true))
-                                if (Creature* b = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_VEH_1, 150.0f, true))
+                    if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE, 150.0f, true))
+                        if (Creature* v = me->FindNearestCreature(NPC_SAC_VEGARD_1, 50.0f, true))
+                            if (Creature* b = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_VEH_1, 150.0f, true))
+                            {
+                                c->CastSpell(v, SPELL_SAC_KILL_VEGARD, true);
+                                v->SetDisplayId(11686);
+                                v->DespawnOrUnsummon(1000);
+                                b->CastSpell(b, SPELL_SAC_HOLY_BOMB_EXPLOSION, true);
+                                b->CastSpell(b, SPELL_SAC_SUMMON_GO_2, true);
+                                if (Unit* vb = c->GetVehicleBase())
                                 {
-                                    c->CastSpell(v, SPELL_SAC_KILL_VEGARD, true);
-                                    v->SetDisplayId(11686);
-                                    v->DespawnOrUnsummon(1000);
-                                    b->CastSpell(b, SPELL_SAC_HOLY_BOMB_EXPLOSION, true);
-                                    b->CastSpell(b, SPELL_SAC_SUMMON_GO_2, true);
-                                    if (Unit* vb = c->GetVehicleBase())
-                                    {
-                                        if (Unit* pass = vb->GetVehicleKit()->GetPassenger(0))
-                                            if (pass->GetTypeId() == TYPEID_UNIT)
-                                                pass->ToCreature()->DespawnOrUnsummon(1);
-                                        vb->RemoveAllAuras();
-                                        vb->ToCreature()->DespawnOrUnsummon(1);
-                                    }
-                                    c->ToCreature()->DespawnOrUnsummon(1);
+                                    if (Unit* pass = vb->GetVehicleKit()->GetPassenger(0))
+                                        if (pass->GetTypeId() == TYPEID_UNIT)
+                                            pass->ToCreature()->DespawnOrUnsummon(1);
+                                    vb->RemoveAllAuras();
+                                    vb->ToCreature()->DespawnOrUnsummon(1);
                                 }
+                                c->ToCreature()->DespawnOrUnsummon(1);
+                            }
 
-                    }
-                    break;
+                }
+                break;
                 case 18: // summon vegard
                     me->CastSpell(me, SPELL_SAC_SUMMON_VEGARD_SKELETON, true);
                     break;
@@ -1528,88 +1528,88 @@ public:
                     switch (talkWing)
                     {
                         case 0: // Pinnacle of Naxxramas
+                        {
+                            switch (urand (0, 1))
                             {
-                                switch (urand (0, 1))
-                                {
-                                    case 0:
-                                        ChangeImage(NPC_IMAGE_OF_KELTHUZAD, MODEL_IMAGE_OF_KELTHUZAD, SAY_KELTHUZAD_1);
-                                        _events.ScheduleEvent(EVENT_KELTHUZAD_2, 8000);
-                                        break;
-                                    case 1:
-                                        ChangeImage(NPC_IMAGE_OF_SAPPHIRON, MODEL_IMAGE_OF_SAPPHIRON, SAY_SAPPHIRON);
-                                        break;
-                                }
+                                case 0:
+                                    ChangeImage(NPC_IMAGE_OF_KELTHUZAD, MODEL_IMAGE_OF_KELTHUZAD, SAY_KELTHUZAD_1);
+                                    _events.ScheduleEvent(EVENT_KELTHUZAD_2, 8000);
+                                    break;
+                                case 1:
+                                    ChangeImage(NPC_IMAGE_OF_SAPPHIRON, MODEL_IMAGE_OF_SAPPHIRON, SAY_SAPPHIRON);
+                                    break;
                             }
-                            break;
+                        }
+                        break;
                         case 1: // Death knight wing of Naxxramas
+                        {
+                            switch (urand (0, 2))
                             {
-                                switch (urand (0, 2))
-                                {
-                                    case 0:
-                                        ChangeImage(NPC_IMAGE_OF_RAZUVIOUS, MODEL_IMAGE_OF_RAZUVIOUS, SAY_RAZUVIOUS);
-                                        break;
-                                    case 1:
-                                        ChangeImage(NPC_IMAGE_OF_GOTHIK, MODEL_IMAGE_OF_GOTHIK, SAY_GOTHIK);
-                                        break;
-                                    case 2:
-                                        ChangeImage(NPC_IMAGE_OF_THANE, MODEL_IMAGE_OF_THANE, SAY_DEATH_KNIGHTS_1);
-                                        _events.ScheduleEvent(EVENT_DEATH_KNIGHTS_2, 10000);
-                                        break;
-                                }
+                                case 0:
+                                    ChangeImage(NPC_IMAGE_OF_RAZUVIOUS, MODEL_IMAGE_OF_RAZUVIOUS, SAY_RAZUVIOUS);
+                                    break;
+                                case 1:
+                                    ChangeImage(NPC_IMAGE_OF_GOTHIK, MODEL_IMAGE_OF_GOTHIK, SAY_GOTHIK);
+                                    break;
+                                case 2:
+                                    ChangeImage(NPC_IMAGE_OF_THANE, MODEL_IMAGE_OF_THANE, SAY_DEATH_KNIGHTS_1);
+                                    _events.ScheduleEvent(EVENT_DEATH_KNIGHTS_2, 10000);
+                                    break;
                             }
-                            break;
+                        }
+                        break;
                         case 2: // Blighted abomination wing of Naxxramas
+                        {
+                            switch (urand (0, 3))
                             {
-                                switch (urand (0, 3))
-                                {
-                                    case 0:
-                                        ChangeImage(NPC_IMAGE_OF_PATCHWERK, MODEL_IMAGE_OF_PATCHWERK, SAY_PATCHWERK);
-                                        break;
-                                    case 1:
-                                        ChangeImage(NPC_IMAGE_OF_GROBBULUS, MODEL_IMAGE_OF_GROBBULUS, SAY_GROBBULUS);
-                                        break;
-                                    case 2:
-                                        ChangeImage(NPC_IMAGE_OF_THADDIUS, MODEL_IMAGE_OF_THADDIUS, SAY_THADDIUS);
-                                        break;
-                                    case 3:
-                                        ChangeImage(NPC_IMAGE_OF_GLUTH, MODEL_IMAGE_OF_GLUTH, SAY_GLUTH);
-                                        break;
-                                }
+                                case 0:
+                                    ChangeImage(NPC_IMAGE_OF_PATCHWERK, MODEL_IMAGE_OF_PATCHWERK, SAY_PATCHWERK);
+                                    break;
+                                case 1:
+                                    ChangeImage(NPC_IMAGE_OF_GROBBULUS, MODEL_IMAGE_OF_GROBBULUS, SAY_GROBBULUS);
+                                    break;
+                                case 2:
+                                    ChangeImage(NPC_IMAGE_OF_THADDIUS, MODEL_IMAGE_OF_THADDIUS, SAY_THADDIUS);
+                                    break;
+                                case 3:
+                                    ChangeImage(NPC_IMAGE_OF_GLUTH, MODEL_IMAGE_OF_GLUTH, SAY_GLUTH);
+                                    break;
                             }
-                            break;
+                        }
+                        break;
                         case 3: // Accursed spider wing of Naxxramas
+                        {
+                            switch (urand (0, 2))
                             {
-                                switch (urand (0, 2))
-                                {
-                                    case 0:
-                                        ChangeImage(NPC_IMAGE_OF_ANUBREKHAN, MODEL_IMAGE_OF_ANUBREKHAN, SAY_ANUBREKHAN);
-                                        break;
-                                    case 1:
-                                        ChangeImage(NPC_IMAGE_OF_FAERLINA, MODEL_IMAGE_OF_FAERLINA, SAY_FAERLINA);
-                                        break;
-                                    case 2:
-                                        ChangeImage(NPC_IMAGE_OF_MAEXXNA, MODEL_IMAGE_OF_MAEXXNA, SAY_MAEXXNA);
-                                        break;
-                                }
+                                case 0:
+                                    ChangeImage(NPC_IMAGE_OF_ANUBREKHAN, MODEL_IMAGE_OF_ANUBREKHAN, SAY_ANUBREKHAN);
+                                    break;
+                                case 1:
+                                    ChangeImage(NPC_IMAGE_OF_FAERLINA, MODEL_IMAGE_OF_FAERLINA, SAY_FAERLINA);
+                                    break;
+                                case 2:
+                                    ChangeImage(NPC_IMAGE_OF_MAEXXNA, MODEL_IMAGE_OF_MAEXXNA, SAY_MAEXXNA);
+                                    break;
                             }
-                            break;
+                        }
+                        break;
                         case 4: // Dread plague wing of Naxxramas
+                        {
+                            switch (urand (0, 2))
                             {
-                                switch (urand (0, 2))
-                                {
-                                    case 0:
-                                        ChangeImage(NPC_IMAGE_OF_NOTH, MODEL_IMAGE_OF_NOTH, SAY_NOTH);
-                                        break;
-                                    case 1:
-                                        ChangeImage(NPC_IMAGE_OF_HEIGAN, MODEL_IMAGE_OF_HEIGAN, SAY_HEIGAN_1);
-                                        _events.ScheduleEvent(EVENT_HEIGAN_2, 8000);
-                                        break;
-                                    case 2:
-                                        ChangeImage(NPC_IMAGE_OF_LOATHEB, MODEL_IMAGE_OF_LOATHEB, SAY_LOATHEB);
-                                        break;
-                                }
+                                case 0:
+                                    ChangeImage(NPC_IMAGE_OF_NOTH, MODEL_IMAGE_OF_NOTH, SAY_NOTH);
+                                    break;
+                                case 1:
+                                    ChangeImage(NPC_IMAGE_OF_HEIGAN, MODEL_IMAGE_OF_HEIGAN, SAY_HEIGAN_1);
+                                    _events.ScheduleEvent(EVENT_HEIGAN_2, 8000);
+                                    break;
+                                case 2:
+                                    ChangeImage(NPC_IMAGE_OF_LOATHEB, MODEL_IMAGE_OF_LOATHEB, SAY_LOATHEB);
+                                    break;
                             }
-                            break;
+                        }
+                        break;
                         case 5: // Home
                             _events.ScheduleEvent(EVENT_START_RANDOM, 30000);
                             break;

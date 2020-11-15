@@ -686,47 +686,47 @@ public:
                     me->PlayDirectSound(11966);
                     break;
                 case 2:
-                    {
-                        if (Unit* trigger = getTrigger())
-                            me->CastSpell(trigger, SPELL_START_FIRE, true);
-                        break;
-                    }
+                {
+                    if (Unit* trigger = getTrigger())
+                        me->CastSpell(trigger, SPELL_START_FIRE, true);
+                    break;
+                }
                 case 3:
+                {
+                    counter++;
+                    if (counter > 10)
                     {
-                        counter++;
-                        if (counter > 10)
+                        if (counter > 12)
                         {
-                            if (counter > 12)
-                            {
-                                bool failed = false;
-                                for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                                    if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
-                                        if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
-                                        {
-                                            failed = true;
-                                            break;
-                                        }
+                            bool failed = false;
+                            for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
+                                if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
+                                    if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                                    {
+                                        failed = true;
+                                        break;
+                                    }
 
-                                FinishEvent(failed);
-                            }
-                            return;
+                            FinishEvent(failed);
                         }
-                        if (counter == 5)
-                        {
-                            me->MonsterYell("The sky is dark. The fire burns. You strive in vain as Fate's wheel turns.", LANG_UNIVERSAL, 0);
-                            me->PlayDirectSound(12570);
-                        }
-                        else if (counter == 10)
-                        {
-                            me->MonsterYell("The town still burns. A cleansing fire! Time is short, I'll soon retire!", LANG_UNIVERSAL, 0);
-                            me->PlayDirectSound(12571);
-                        }
-
-                        if (Unit* trigger = getTrigger())
-                            me->CastSpell(trigger, SPELL_START_FIRE, true);
-                        events.RepeatEvent(12000);
-                        break;
+                        return;
                     }
+                    if (counter == 5)
+                    {
+                        me->MonsterYell("The sky is dark. The fire burns. You strive in vain as Fate's wheel turns.", LANG_UNIVERSAL, 0);
+                        me->PlayDirectSound(12570);
+                    }
+                    else if (counter == 10)
+                    {
+                        me->MonsterYell("The town still burns. A cleansing fire! Time is short, I'll soon retire!", LANG_UNIVERSAL, 0);
+                        me->PlayDirectSound(12571);
+                    }
+
+                    if (Unit* trigger = getTrigger())
+                        me->CastSpell(trigger, SPELL_START_FIRE, true);
+                    events.RepeatEvent(12000);
+                    break;
+                }
             }
 
             if (Unmount)
@@ -1103,103 +1103,103 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_HH_PLAYER_TALK:
-                    {
-                        talkCount++;
-                        Player* player = GetRhymePlayer();
-                        if (!player)
-                            return;
+                {
+                    talkCount++;
+                    Player* player = GetRhymePlayer();
+                    if (!player)
+                        return;
 
-                        switch (talkCount)
-                        {
-                            case 1:
-                                player->MonsterSay("Horseman rise...", LANG_UNIVERSAL, 0);
-                                break;
-                            case 2:
-                                player->MonsterSay("Your time is nigh...", LANG_UNIVERSAL, 0);
-                                if (Creature* trigger = me->SummonTrigger(1765.28f, 1347.46f, 17.5514f, 0.0f, 15 * IN_MILLISECONDS))
-                                    trigger->CastSpell(trigger, SPELL_EARTH_EXPLOSION, true);
-                                break;
-                            case 3:
-                                me->GetMotionMaster()->MovePath(236820, false);
-                                me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
-                                player->MonsterSay("You felt death once...", LANG_UNIVERSAL, 0);
-                                me->MonsterSay("It is over, your search is done. Let fate choose now, the righteous one.", LANG_UNIVERSAL, 0);
-                                me->PlayDirectSound(SOUND_AGGRO);
-                                break;
-                            case 4:
-                                me->CastSpell(me, SPELL_SHAKE_CAMERA_MEDIUM, true);
-                                player->MonsterSay("Now, know demise!", LANG_UNIVERSAL, 0);
-                                talkCount = 0;
-                                return; // pop and return, skip repeat
-                        }
-                        events.RepeatEvent(2000);
-                        break;
-                    }
-                case EVENT_HORSEMAN_FOLLOW:
+                    switch (talkCount)
                     {
-                        if (Player* player = GetRhymePlayer())
-                        {
-                            me->GetMotionMaster()->MoveIdle();
-                            AttackStart(player);
-                            me->GetMotionMaster()->MoveChase(player);
-                        }
-                        break;
-                    }
-                case EVENT_HORSEMAN_CLEAVE:
-                    {
-                        me->CastSpell(me->GetVictim(), SPELL_HORSEMAN_CLEAVE, false);
-                        events.RepeatEvent(8000);
-                        break;
-                    }
-                case EVENT_HORSEMAN_WHIRLWIND:
-                    {
-                        if (me->HasAuraEffect(SPELL_HORSEMAN_WHIRLWIND, EFFECT_0))
-                        {
-                            me->RemoveAura(SPELL_HORSEMAN_WHIRLWIND);
-                            events.RepeatEvent(15000);
+                        case 1:
+                            player->MonsterSay("Horseman rise...", LANG_UNIVERSAL, 0);
                             break;
-                        }
-                        me->CastSpell(me, SPELL_HORSEMAN_WHIRLWIND, true);
-                        events.RepeatEvent(6000);
-                        break;
-                    }
-                case EVENT_HORSEMAN_CHECK_HEALTH:
-                    {
-                        if (me->GetHealth() == me->GetMaxHealth())
-                        {
-                            me->CastSpell(me, SPELL_BODY_RESTORED_INFO, true);
-                            return;
-                        }
-
-                        events.RepeatEvent(1000);
-                        break;
-                    }
-                case EVENT_HORSEMAN_CONFLAGRATION:
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                            me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
-
-                        events.RepeatEvent(12500);
-                        break;
-                    }
-                case EVENT_SUMMON_PUMPKIN:
-                    {
-                        if (talkCount < 4)
-                        {
-                            events.RepeatEvent(1);
-                            talkCount++;
-                            me->CastSpell(me, SPELL_SUMMON_PUMPKIN, false);
-                        }
-                        else
-                        {
-                            me->MonsterSay("Soldiers arise, stand and fight! Bring victory at last to this fallen knight!", LANG_UNIVERSAL, 0);
-                            me->PlayDirectSound(SOUND_SPROUT);
-                            events.RepeatEvent(15000);
+                        case 2:
+                            player->MonsterSay("Your time is nigh...", LANG_UNIVERSAL, 0);
+                            if (Creature* trigger = me->SummonTrigger(1765.28f, 1347.46f, 17.5514f, 0.0f, 15 * IN_MILLISECONDS))
+                                trigger->CastSpell(trigger, SPELL_EARTH_EXPLOSION, true);
+                            break;
+                        case 3:
+                            me->GetMotionMaster()->MovePath(236820, false);
+                            me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
+                            player->MonsterSay("You felt death once...", LANG_UNIVERSAL, 0);
+                            me->MonsterSay("It is over, your search is done. Let fate choose now, the righteous one.", LANG_UNIVERSAL, 0);
+                            me->PlayDirectSound(SOUND_AGGRO);
+                            break;
+                        case 4:
+                            me->CastSpell(me, SPELL_SHAKE_CAMERA_MEDIUM, true);
+                            player->MonsterSay("Now, know demise!", LANG_UNIVERSAL, 0);
                             talkCount = 0;
-                        }
-
+                            return; // pop and return, skip repeat
+                    }
+                    events.RepeatEvent(2000);
+                    break;
+                }
+                case EVENT_HORSEMAN_FOLLOW:
+                {
+                    if (Player* player = GetRhymePlayer())
+                    {
+                        me->GetMotionMaster()->MoveIdle();
+                        AttackStart(player);
+                        me->GetMotionMaster()->MoveChase(player);
+                    }
+                    break;
+                }
+                case EVENT_HORSEMAN_CLEAVE:
+                {
+                    me->CastSpell(me->GetVictim(), SPELL_HORSEMAN_CLEAVE, false);
+                    events.RepeatEvent(8000);
+                    break;
+                }
+                case EVENT_HORSEMAN_WHIRLWIND:
+                {
+                    if (me->HasAuraEffect(SPELL_HORSEMAN_WHIRLWIND, EFFECT_0))
+                    {
+                        me->RemoveAura(SPELL_HORSEMAN_WHIRLWIND);
+                        events.RepeatEvent(15000);
                         break;
                     }
+                    me->CastSpell(me, SPELL_HORSEMAN_WHIRLWIND, true);
+                    events.RepeatEvent(6000);
+                    break;
+                }
+                case EVENT_HORSEMAN_CHECK_HEALTH:
+                {
+                    if (me->GetHealth() == me->GetMaxHealth())
+                    {
+                        me->CastSpell(me, SPELL_BODY_RESTORED_INFO, true);
+                        return;
+                    }
+
+                    events.RepeatEvent(1000);
+                    break;
+                }
+                case EVENT_HORSEMAN_CONFLAGRATION:
+                {
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
+
+                    events.RepeatEvent(12500);
+                    break;
+                }
+                case EVENT_SUMMON_PUMPKIN:
+                {
+                    if (talkCount < 4)
+                    {
+                        events.RepeatEvent(1);
+                        talkCount++;
+                        me->CastSpell(me, SPELL_SUMMON_PUMPKIN, false);
+                    }
+                    else
+                    {
+                        me->MonsterSay("Soldiers arise, stand and fight! Bring victory at last to this fallen knight!", LANG_UNIVERSAL, 0);
+                        me->PlayDirectSound(SOUND_SPROUT);
+                        events.RepeatEvent(15000);
+                        talkCount = 0;
+                    }
+
+                    break;
+                }
             }
 
             if (inFight)
@@ -1250,15 +1250,15 @@ public:
                     me->CastSpell(caster, SPELL_THROW_HEAD_BACK, true);
                     break;
                 case SPELL_THROW_HEAD:
-                    {
-                        me->CastSpell(me, SPELL_HEAD_VISUAL_LAND, true);
-                        if (Player* player = me->SelectNearestPlayer(50.0f))
-                            me->GetMotionMaster()->MoveFleeing(player);
+                {
+                    me->CastSpell(me, SPELL_HEAD_VISUAL_LAND, true);
+                    if (Player* player = me->SelectNearestPlayer(50.0f))
+                        me->GetMotionMaster()->MoveFleeing(player);
 
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        timer = 26000;
-                        break;
-                    }
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    timer = 26000;
+                    break;
+                }
                 case SPELL_HORSEMAN_BODY_PHASE:
                     pct = 67;
                     break;

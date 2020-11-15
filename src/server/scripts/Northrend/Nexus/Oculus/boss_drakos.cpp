@@ -91,10 +91,10 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(DATA_DRAKOS, DONE);
-                for( uint8 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetData64(DATA_DCD_1 + i) )
-                        if( GameObject* pGo = ObjectAccessor::GetGameObject(*me, guid) )
-                            if( pGo->GetGoState() != GO_STATE_ACTIVE )
+                for ( uint8 i = 0; i < 3; ++i )
+                    if ( uint64 guid = pInstance->GetData64(DATA_DCD_1 + i) )
+                        if ( GameObject* pGo = ObjectAccessor::GetGameObject(*me, guid) )
+                            if ( pGo->GetGoState() != GO_STATE_ACTIVE )
                             {
                                 pGo->SetLootState(GO_READY);
                                 pGo->UseDoorOrButton(0, false);
@@ -113,55 +113,55 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( !UpdateVictim() )
+            if ( !UpdateVictim() )
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_MAGIC_PULL:
-                    {
-                        Talk(SAY_PULL);
-                        //me->MonsterTextEmote(TEXT_MAGIC_PULL, 0, true);
+                {
+                    Talk(SAY_PULL);
+                    //me->MonsterTextEmote(TEXT_MAGIC_PULL, 0, true);
 
-                        me->CastSpell(me, SPELL_MAGIC_PULL, false);
-                        events.RepeatEvent(urand(15000, 25000));
-                        events.ScheduleEvent(EVENT_SUMMON_x4, 1500);
-                    }
-                    break;
+                    me->CastSpell(me, SPELL_MAGIC_PULL, false);
+                    events.RepeatEvent(urand(15000, 25000));
+                    events.ScheduleEvent(EVENT_SUMMON_x4, 1500);
+                }
+                break;
                 case EVENT_THUNDERING_STOMP:
-                    {
-                        Talk(SAY_STOMP);
+                {
+                    Talk(SAY_STOMP);
 
-                        me->CastSpell(me, SPELL_THUNDERING_STOMP, false);
-                        events.RepeatEvent(urand(10000, 20000));
-                    }
-                    break;
+                    me->CastSpell(me, SPELL_THUNDERING_STOMP, false);
+                    events.RepeatEvent(urand(10000, 20000));
+                }
+                break;
                 case EVENT_SUMMON:
-                    {
-                        for( uint8 i = 0; i < 2; ++i )
-                        {
-                            float angle = rand_norm() * 2 * M_PI;
-                            me->SummonCreature(NPC_UNSTABLE_SPHERE, me->GetPositionX() + 5.0f * cos(angle), me->GetPositionY() + 5.0f * sin(angle), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 18000);
-                        }
-                        events.RepeatEvent(2000);
-                    }
-                    break;
-                case EVENT_SUMMON_x4:
-                    for( uint8 i = 0; i < 4; ++i )
+                {
+                    for ( uint8 i = 0; i < 2; ++i )
                     {
                         float angle = rand_norm() * 2 * M_PI;
                         me->SummonCreature(NPC_UNSTABLE_SPHERE, me->GetPositionX() + 5.0f * cos(angle), me->GetPositionY() + 5.0f * sin(angle), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 18000);
                     }
-                    
+                    events.RepeatEvent(2000);
+                }
+                break;
+                case EVENT_SUMMON_x4:
+                    for ( uint8 i = 0; i < 4; ++i )
+                    {
+                        float angle = rand_norm() * 2 * M_PI;
+                        me->SummonCreature(NPC_UNSTABLE_SPHERE, me->GetPositionX() + 5.0f * cos(angle), me->GetPositionY() + 5.0f * sin(angle), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 18000);
+                    }
+
                     break;
             }
         }
@@ -194,10 +194,10 @@ public:
 
         void MovementInform(uint32 type, uint32 id)
         {
-            if( type != POINT_MOTION_TYPE || id != 1 )
+            if ( type != POINT_MOTION_TYPE || id != 1 )
                 return;
 
-            if( !located )
+            if ( !located )
                 gonext = true;
         }
 
@@ -219,21 +219,21 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( timer == 0 )
+            if ( timer == 0 )
                 me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
 
             timer += diff;
 
-            if( timer > 10000 )
+            if ( timer > 10000 )
             {
-                if( !located )
+                if ( !located )
                     me->GetMotionMaster()->MoveIdle();
                 located = true;
                 me->CastSpell(me, SPELL_UNSTABLE_SPHERE_PULSE, true);
                 timer -= 2000;
             }
 
-            if( !located && gonext )
+            if ( !located && gonext )
             {
                 PickNewLocation();
                 gonext = false;

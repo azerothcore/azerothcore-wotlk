@@ -81,14 +81,14 @@ public:
                         c->SetVisible(true);
                     return;
                 }
-                else if(c->IsVisible())
+                else if (c->IsVisible())
                     c->SetVisible(false);
             }
         }
 
         void OnCreatureCreate(Creature* creature)
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_KELESETH:
                     NPC_KelesethGUID = creature->GetGUID();
@@ -119,7 +119,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go)
         {
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_BELLOW_1:
                     GO_ForgeBellowGUID[0] = go->GetGUID();
@@ -170,7 +170,7 @@ public:
 
         void SetData(uint32 type, uint32 data)
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_KELESETH:
                     m_auiEncounter[0] = data;
@@ -183,34 +183,34 @@ public:
                 case DATA_DALRONN_AND_SKARVALD:
                     if (data == NOT_STARTED)
                     {
-                        if( Creature* c = instance->GetCreature(NPC_DalronnGUID) )
-                            if( c->isDead() )
+                        if ( Creature* c = instance->GetCreature(NPC_DalronnGUID) )
+                            if ( c->isDead() )
                             {
                                 c->AI()->DoAction(-1);
                                 c->Respawn();
                             }
-                        if( Creature* c = instance->GetCreature(NPC_SkarvaldGUID) )
-                            if( c->isDead() )
+                        if ( Creature* c = instance->GetCreature(NPC_SkarvaldGUID) )
+                            if ( c->isDead() )
                                 c->Respawn();
-                        if( Creature* c = instance->GetCreature(NPC_DalronnGhostGUID) )
+                        if ( Creature* c = instance->GetCreature(NPC_DalronnGhostGUID) )
                         {
                             c->AI()->DoAction(-1);
                             c->DespawnOrUnsummon();
                         }
                         NPC_DalronnGhostGUID = 0;
-                        if( Creature* c = instance->GetCreature(NPC_SkarvaldGhostGUID) )
+                        if ( Creature* c = instance->GetCreature(NPC_SkarvaldGhostGUID) )
                             c->DespawnOrUnsummon();
                         NPC_SkarvaldGhostGUID = 0;
                     }
                     if (data == DONE)
                     {
-                        if( Creature* c = instance->GetCreature(NPC_DalronnGhostGUID) )
+                        if ( Creature* c = instance->GetCreature(NPC_DalronnGhostGUID) )
                         {
                             c->AI()->DoAction(-1);
                             c->DespawnOrUnsummon();
                         }
                         NPC_DalronnGhostGUID = 0;
-                        if( Creature* c = instance->GetCreature(NPC_SkarvaldGhostGUID) )
+                        if ( Creature* c = instance->GetCreature(NPC_SkarvaldGhostGUID) )
                             c->DespawnOrUnsummon();
                         NPC_SkarvaldGhostGUID = 0;
                     }
@@ -218,7 +218,7 @@ public:
                     m_auiEncounter[1] = data;
                     break;
                 case DATA_UNLOCK_SKARVALD_LOOT:
-                    if( Creature* c = instance->GetCreature(NPC_SkarvaldGUID) )
+                    if ( Creature* c = instance->GetCreature(NPC_SkarvaldGUID) )
                     {
                         c->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE | UNIT_DYNFLAG_TAPPED | UNIT_DYNFLAG_TAPPED_BY_PLAYER);
                         c->SetLootMode(1);
@@ -232,7 +232,7 @@ public:
                     }
                     break;
                 case DATA_UNLOCK_DALRONN_LOOT:
-                    if( Creature* c = instance->GetCreature(NPC_DalronnGUID) )
+                    if ( Creature* c = instance->GetCreature(NPC_DalronnGUID) )
                     {
                         c->AI()->DoAction(-1);
                         c->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE | UNIT_DYNFLAG_TAPPED | UNIT_DYNFLAG_TAPPED_BY_PLAYER);
@@ -286,7 +286,7 @@ public:
 
         uint64 GetData64(uint32 id) const
         {
-            switch(id)
+            switch (id)
             {
                 case DATA_KELESETH:
                     return NPC_KelesethGUID;
@@ -302,7 +302,7 @@ public:
 
         uint32 GetData(uint32 id) const
         {
-            switch(id)
+            switch (id)
             {
                 case DATA_KELESETH:
                 case DATA_DALRONN_AND_SKARVALD:
@@ -363,7 +363,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 7231: // On The Rocks
                     return bRocksAchiev;

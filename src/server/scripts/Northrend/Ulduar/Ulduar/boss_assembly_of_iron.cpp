@@ -170,12 +170,12 @@ void RespawnAssemblyOfIron(InstanceScript* pInstance, Creature* me)
 
 void RestoreAssemblyHealth(uint64 guid1, uint64 guid2, Creature* me)
 {
-    if(Creature* cr = ObjectAccessor::GetCreature(*me, guid1))
-        if(cr->IsAlive())
+    if (Creature* cr = ObjectAccessor::GetCreature(*me, guid1))
+        if (cr->IsAlive())
             cr->SetHealth(cr->GetMaxHealth());
 
-    if(Creature* cr2 = ObjectAccessor::GetCreature(*me, guid2))
-        if(cr2->IsAlive())
+    if (Creature* cr2 = ObjectAccessor::GetCreature(*me, guid2))
+        if (cr2->IsAlive())
             cr2->SetHealth(cr2->GetMaxHealth());
 
 }
@@ -327,7 +327,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_FUSION_PUNCH:
                     me->CastSpell(me->GetVictim(), SPELL_FUSION_PUNCH, false);
@@ -496,18 +496,18 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_RUNE_OF_POWER:
-                    {
-                        Unit* target = DoSelectLowestHpFriendly(60);
-                        if (!target || !target->IsAlive())
-                            target = me;
+                {
+                    Unit* target = DoSelectLowestHpFriendly(60);
+                    if (!target || !target->IsAlive())
+                        target = me;
 
-                        me->CastSpell(target, SPELL_RUNE_OF_POWER, true);
-                        events.RepeatEvent(60000);
-                        break;
-                    }
+                    me->CastSpell(target, SPELL_RUNE_OF_POWER, true);
+                    events.RepeatEvent(60000);
+                    break;
+                }
                 case EVENT_SHIELD_OF_RUNES:
                     me->CastSpell(me, SPELL_SHIELD_OF_RUNES, false);
                     events.RescheduleEvent(EVENT_SHIELD_OF_RUNES, urand(27000, 34000));
@@ -784,39 +784,39 @@ public:
                     events.RepeatEvent(urand(10000, 25000));
                     break;
                 case EVENT_LIGHTNING_TENDRILS:
-                    {
-                        // Reschedule old
-                        events.RepeatEvent(35000);
-                        events.DelayEvents(18000);
-                        Talk(SAY_BRUNDIR_FLIGHT);
+                {
+                    // Reschedule old
+                    events.RepeatEvent(35000);
+                    events.DelayEvents(18000);
+                    Talk(SAY_BRUNDIR_FLIGHT);
 
-                        _flyPhase = true;
-                        _flyTarget = me->GetVictim();
-                        me->SetRegeneratingHealth(false);
-                        me->SetDisableGravity(true);
+                    _flyPhase = true;
+                    _flyTarget = me->GetVictim();
+                    me->SetRegeneratingHealth(false);
+                    me->SetDisableGravity(true);
 
-                        me->CombatStop();
-                        me->StopMoving();
-                        me->SetReactState(REACT_PASSIVE);
-                        me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-                        me->SendMonsterMove(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
+                    me->CombatStop();
+                    me->StopMoving();
+                    me->SetReactState(REACT_PASSIVE);
+                    me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                    me->SendMonsterMove(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
 
-                        me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
-                        me->CastSpell(me, 61883, true);
-                        events.ScheduleEvent(EVENT_LIGHTNING_LAND, 16000);
+                    me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
+                    me->CastSpell(me, 61883, true);
+                    events.ScheduleEvent(EVENT_LIGHTNING_LAND, 16000);
 
-                        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
-                        break;
-                    }
+                    me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
+                    break;
+                }
                 case EVENT_LIGHTNING_LAND:
-                    {
-                        float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
-                        me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
-                        _flyPhase = false;
-                        events.ScheduleEvent(EVENT_LAND_LAND, 1000);
-                        break;
-                    }
+                {
+                    float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
+                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
+                    _flyPhase = false;
+                    events.ScheduleEvent(EVENT_LAND_LAND, 1000);
+                    break;
+                }
                 case EVENT_LAND_LAND:
                     me->SetCanFly(false);
                     me->SetReactState(REACT_AGGRESSIVE);

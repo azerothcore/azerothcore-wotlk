@@ -185,7 +185,7 @@ public:
 
             _events.Update(diff);
 
-            switch(_events.ExecuteEvent())
+            switch (_events.ExecuteEvent())
             {
                 case EVENT_SPELL_FIREBLAST:
                     DoCastVictim(SPELL_FIREBLAST);
@@ -238,7 +238,7 @@ public:
         {
             _events.Update(diff);
 
-            switch(_events.ExecuteEvent())
+            switch (_events.ExecuteEvent())
             {
                 // Don't need to repeat this events because, once new spirits are summoned
                 // those new spirits will summon new spirits. If we repeated we would have

@@ -79,71 +79,71 @@ public:
         switch (disableType)
         {
             case DISABLE_TYPE_SPELL:
+            {
+                if (!sSpellMgr->GetSpellInfo(entry))
                 {
-                    if (!sSpellMgr->GetSpellInfo(entry))
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
-                        handler->SetSentErrorMessage(true);
-                        return false;
-                    }
-                    disableTypeStr = "spell";
-                    break;
+                    handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
+                disableTypeStr = "spell";
+                break;
+            }
             case DISABLE_TYPE_QUEST:
+            {
+                if (!sObjectMgr->GetQuestTemplate(entry))
                 {
-                    if (!sObjectMgr->GetQuestTemplate(entry))
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
-                        handler->SetSentErrorMessage(true);
-                        return false;
-                    }
-                    disableTypeStr = "quest";
-                    break;
+                    handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
+                disableTypeStr = "quest";
+                break;
+            }
             case DISABLE_TYPE_MAP:
+            {
+                if (!sMapStore.LookupEntry(entry))
                 {
-                    if (!sMapStore.LookupEntry(entry))
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
-                        handler->SetSentErrorMessage(true);
-                        return false;
-                    }
-                    disableTypeStr = "map";
-                    break;
+                    handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
+                disableTypeStr = "map";
+                break;
+            }
             case DISABLE_TYPE_BATTLEGROUND:
+            {
+                if (!sBattlemasterListStore.LookupEntry(entry))
                 {
-                    if (!sBattlemasterListStore.LookupEntry(entry))
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_NO_BATTLEGROUND_FOUND);
-                        handler->SetSentErrorMessage(true);
-                        return false;
-                    }
-                    disableTypeStr = "battleground";
-                    break;
+                    handler->PSendSysMessage(LANG_COMMAND_NO_BATTLEGROUND_FOUND);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
+                disableTypeStr = "battleground";
+                break;
+            }
             case DISABLE_TYPE_OUTDOORPVP:
+            {
+                if (entry > MAX_OUTDOORPVP_TYPES)
                 {
-                    if (entry > MAX_OUTDOORPVP_TYPES)
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_NO_OUTDOOR_PVP_FORUND);
-                        handler->SetSentErrorMessage(true);
-                        return false;
-                    }
-                    disableTypeStr = "outdoorpvp";
-                    break;
+                    handler->PSendSysMessage(LANG_COMMAND_NO_OUTDOOR_PVP_FORUND);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
+                disableTypeStr = "outdoorpvp";
+                break;
+            }
             case DISABLE_TYPE_VMAP:
+            {
+                if (!sMapStore.LookupEntry(entry))
                 {
-                    if (!sMapStore.LookupEntry(entry))
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
-                        handler->SetSentErrorMessage(true);
-                        return false;
-                    }
-                    disableTypeStr = "vmap";
-                    break;
+                    handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
+                disableTypeStr = "vmap";
+                break;
+            }
             default:
                 break;
         }

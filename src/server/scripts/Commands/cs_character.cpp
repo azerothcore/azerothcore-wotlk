@@ -889,7 +889,7 @@ public:
                 uint64 _guid = result->Fetch()[0].GetUInt64();
                 char buff[20];
                 sprintf(buff, "%u", (uint32)_guid);
-                switch(PlayerDumpWriter().WriteDump(buff, uint32(_guid)))
+                switch (PlayerDumpWriter().WriteDump(buff, uint32(_guid)))
                 {
                     case DUMP_SUCCESS:
                         handler->PSendSysMessage(LANG_COMMAND_EXPORT_SUCCESS);
@@ -907,7 +907,7 @@ public:
                         handler->SetSentErrorMessage(true);
                         return false;
                 }
-            } while(result->NextRow());
+            } while (result->NextRow());
         }
 
         if (!fileStr || !playerStr)

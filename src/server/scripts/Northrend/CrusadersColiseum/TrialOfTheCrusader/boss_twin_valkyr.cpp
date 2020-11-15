@@ -101,9 +101,9 @@ struct boss_twin_valkyrAI : public ScriptedAI
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_HASTE_SPELLS, true);
 
         events.Reset();
-        if( me->GetEntry() == NPC_LIGHTBANE )
+        if ( me->GetEntry() == NPC_LIGHTBANE )
         {
-            if( pInstance )
+            if ( pInstance )
                 pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21853);
 
             // special events here
@@ -112,7 +112,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
             events.RescheduleEvent(EVENT_SPECIAL, 45000);
         }
         events.RescheduleEvent(EVENT_SPELL_SPIKE, urand(5000, 8000));
-        if( IsHeroic() )
+        if ( IsHeroic() )
             events.RescheduleEvent(EVENT_SPELL_TOUCH, urand(10000, 25000), 1);
 
         me->SetDisableGravity(true);
@@ -128,14 +128,14 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     void DoAction(int32 a)
     {
-        switch( a )
+        switch ( a )
         {
             case -1:
                 summons.DespawnAll();
-                if( pInstance && me->GetEntry() == NPC_LIGHTBANE )
+                if ( pInstance && me->GetEntry() == NPC_LIGHTBANE )
                 {
                     uint32 essenceId1 = 0, empoweredId1 = 0, touchId1 = 0, essenceId2 = 0, empoweredId2 = 0, touchId2 = 0;
-                    switch( me->GetMap()->GetDifficulty() )
+                    switch ( me->GetMap()->GetDifficulty() )
                     {
                         case 0:
                             essenceId1 = 65684;
@@ -202,15 +202,15 @@ struct boss_twin_valkyrAI : public ScriptedAI
         me->setActive(true);
         me->LowerPlayerDamageReq(me->GetMaxHealth());
         DoZoneInCombat();
-        if( Creature* twin = GetSister() )
-            if( !twin->IsInCombat() )
-                if( Unit* target = twin->SelectNearestTarget(200.0f) )
+        if ( Creature* twin = GetSister() )
+            if ( !twin->IsInCombat() )
+                if ( Unit* target = twin->SelectNearestTarget(200.0f) )
                     twin->AI()->AttackStart(target);
 
         Talk(SAY_AGGRO);
         me->CastSpell(me, me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_SURGE : SPELL_DARK_SURGE, true);
 
-        if( pInstance && me->GetEntry() == NPC_LIGHTBANE )
+        if ( pInstance && me->GetEntry() == NPC_LIGHTBANE )
             pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21853);
     }
 
@@ -251,13 +251,13 @@ struct boss_twin_valkyrAI : public ScriptedAI
     void UpdateSharedHealth()
     {
         // lightbane synchronizes
-        if( me->GetEntry() == NPC_LIGHTBANE )
-            if( Creature* twin = GetSister() )
-                if( twin->IsAlive() && me->IsAlive() )
+        if ( me->GetEntry() == NPC_LIGHTBANE )
+            if ( Creature* twin = GetSister() )
+                if ( twin->IsAlive() && me->IsAlive() )
                 {
                     int32 d = CAST_AI(boss_twin_valkyrAI, twin->AI())->LastSynchroHP - (int32)twin->GetHealth();
                     int32 newhealth = (int32)me->GetHealth() - d;
-                    if( newhealth <= 0 )
+                    if ( newhealth <= 0 )
                         newhealth = 1;
                     me->SetHealth( (uint32)newhealth );
                     twin->SetHealth(me->GetHealth());
@@ -267,188 +267,188 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     void UpdateAI(uint32 diff)
     {
-        if( !UpdateVictim() )
+        if ( !UpdateVictim() )
             return;
 
         UpdateSharedHealth();
         events.Update(diff);
 
-        if( me->HasUnitState(UNIT_STATE_CASTING) )
+        if ( me->HasUnitState(UNIT_STATE_CASTING) )
             return;
 
-        switch( events.ExecuteEvent() )
+        switch ( events.ExecuteEvent() )
         {
             case 0:
                 break;
             case EVENT_BERSERK:
                 me->CastSpell(me, SPELL_BERSERK, true);
                 Talk(SAY_BERSERK);
-                if( Creature* twin = GetSister() )
+                if ( Creature* twin = GetSister() )
                 {
                     twin->CastSpell(twin, SPELL_BERSERK, true);
                     twin->AI()->Talk(SAY_BERSERK);
                 }
-                
+
                 break;
             case EVENT_SUMMON_BALLS_1:
             case EVENT_SUMMON_BALLS_2:
             case EVENT_SUMMON_BALLS_3:
+            {
+                uint8 eventId = events.ExecuteEvent();
+                uint8 count = 0;
+                if ( IsHeroic() )
+                    count = eventId == EVENT_SUMMON_BALLS_3 ? 36 : 6;
+                else
+                    count = eventId == EVENT_SUMMON_BALLS_3 ? 24 : 4;
+                for ( uint8 i = 0; i < count; ++i )
                 {
-                    uint8 eventId = events.ExecuteEvent();
-                    uint8 count = 0;
-                    if( IsHeroic() )
-                        count = eventId == EVENT_SUMMON_BALLS_3 ? 36 : 6;
-                    else
-                        count = eventId == EVENT_SUMMON_BALLS_3 ? 24 : 4;
-                    for( uint8 i = 0; i < count; ++i )
-                    {
-                        float angle = rand_norm() * 2 * M_PI;
-                        if( Creature* ball = me->SummonCreature((i % 2) ? NPC_CONCENTRATED_DARK : NPC_CONCENTRATED_LIGHT, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + sin(angle) * 47.0f, Locs[LOC_CENTER].GetPositionZ() + 1.5f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500) )
-                            boss_twin_valkyrAI::JustSummoned(ball);
-                    }
-                    
-                    switch( eventId )
-                    {
-                        case EVENT_SUMMON_BALLS_1:
-                            events.RescheduleEvent(EVENT_SUMMON_BALLS_2, 8000);
-                            break;
-                        case EVENT_SUMMON_BALLS_2:
-                            events.RescheduleEvent(EVENT_SUMMON_BALLS_3, 8000);
-                            break;
-                        case EVENT_SUMMON_BALLS_3:
-                            events.RescheduleEvent(EVENT_SUMMON_BALLS_1, 15000);
-                            break;
-                    }
+                    float angle = rand_norm() * 2 * M_PI;
+                    if ( Creature* ball = me->SummonCreature((i % 2) ? NPC_CONCENTRATED_DARK : NPC_CONCENTRATED_LIGHT, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + sin(angle) * 47.0f, Locs[LOC_CENTER].GetPositionZ() + 1.5f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500) )
+                        boss_twin_valkyrAI::JustSummoned(ball);
                 }
-                break;
+
+                switch ( eventId )
+                {
+                    case EVENT_SUMMON_BALLS_1:
+                        events.RescheduleEvent(EVENT_SUMMON_BALLS_2, 8000);
+                        break;
+                    case EVENT_SUMMON_BALLS_2:
+                        events.RescheduleEvent(EVENT_SUMMON_BALLS_3, 8000);
+                        break;
+                    case EVENT_SUMMON_BALLS_3:
+                        events.RescheduleEvent(EVENT_SUMMON_BALLS_1, 15000);
+                        break;
+                }
+            }
+            break;
             case EVENT_SPELL_SPIKE:
                 me->CastSpell(me->GetVictim(), me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_TWIN_SPIKE : SPELL_DARK_TWIN_SPIKE, false);
                 events.RepeatEvent(urand(7000, 10000));
                 break;
             case EVENT_SPELL_TOUCH:
+            {
+                uint32 essenceId = 0;
+                switch ( me->GetEntry() )
                 {
-                    uint32 essenceId = 0;
-                    switch( me->GetEntry() )
-                    {
-                        case NPC_LIGHTBANE:
-                            switch( GetDifficulty() )
-                            {
-                                case 0:
-                                    essenceId = 65684;
-                                    break;
-                                case 1:
-                                    essenceId = 67176;
-                                    break;
-                                case 2:
-                                    essenceId = 67177;
-                                    break;
-                                case 3:
-                                    essenceId = 67178;
-                                    break;
-                            }
-                            break;
-                        case NPC_DARKBANE:
-                            switch( GetDifficulty() )
-                            {
-                                case 0:
-                                    essenceId = 65686;
-                                    break;
-                                case 1:
-                                    essenceId = 67222;
-                                    break;
-                                case 2:
-                                    essenceId = 67223;
-                                    break;
-                                case 3:
-                                    essenceId = 67224;
-                                    break;
-                            }
-                            break;
-                    }
-
-                    /*
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, essenceId) )
-                        me->CastSpell(target, me->GetEntry()==NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, false);
-                    events.RepeatEvent(urand(45000,50000));
-                    */
-
-                    std::vector<uint64> tList;
-                    Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                    if (pList.getSize())
-                    {
-                        for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                            if (Player* plr = itr->GetSource())
-                                if (Creature* sister = GetSister())
-                                    if ((!me->GetVictim() || me->GetVictim()->GetGUID() != plr->GetGUID()) && (!sister->GetVictim() || sister->GetVictim()->GetGUID() != plr->GetGUID()) && plr->HasAura(essenceId))
-                                        tList.push_back(plr->GetGUID());
-
-                        if (!tList.empty())
-                            if (Player* target = ObjectAccessor::GetPlayer(*me, tList[urand(0, tList.size() - 1)]))
-                            {
-                                me->CastSpell(target, me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, false);
-                                events.RepeatEvent(urand(45000, 50000));
+                    case NPC_LIGHTBANE:
+                        switch ( GetDifficulty() )
+                        {
+                            case 0:
+                                essenceId = 65684;
                                 break;
-                            }
-                    }
-                    events.RepeatEvent(10000);
+                            case 1:
+                                essenceId = 67176;
+                                break;
+                            case 2:
+                                essenceId = 67177;
+                                break;
+                            case 3:
+                                essenceId = 67178;
+                                break;
+                        }
+                        break;
+                    case NPC_DARKBANE:
+                        switch ( GetDifficulty() )
+                        {
+                            case 0:
+                                essenceId = 65686;
+                                break;
+                            case 1:
+                                essenceId = 67222;
+                                break;
+                            case 2:
+                                essenceId = 67223;
+                                break;
+                            case 3:
+                                essenceId = 67224;
+                                break;
+                        }
+                        break;
                 }
-                break;
-            case EVENT_SPECIAL:
+
+                /*
+                if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, essenceId) )
+                    me->CastSpell(target, me->GetEntry()==NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, false);
+                events.RepeatEvent(urand(45000,50000));
+                */
+
+                std::vector<uint64> tList;
+                Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+                if (pList.getSize())
                 {
-                    uint8 s;
-                    do s = urand(0, 3);
-                    while( SpecialMask & (1 << s) && (SpecialMask & 0xF) != 0xF );
-                    SpecialMask |= (1 << s);
-                    switch( s )
-                    {
-                        case 0: // light vortex
-                            me->CastSpell((Unit*)NULL, SPELL_LIGHT_VORTEX, false);
-                            Talk(EMOTE_VORTEX);
-                            Talk(SAY_LIGHT);
-                            if( Creature* twin = GetSister() )
-                                twin->AI()->Talk(SAY_LIGHT);
+                    for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                        if (Player* plr = itr->GetSource())
+                            if (Creature* sister = GetSister())
+                                if ((!me->GetVictim() || me->GetVictim()->GetGUID() != plr->GetGUID()) && (!sister->GetVictim() || sister->GetVictim()->GetGUID() != plr->GetGUID()) && plr->HasAura(essenceId))
+                                    tList.push_back(plr->GetGUID());
+
+                    if (!tList.empty())
+                        if (Player* target = ObjectAccessor::GetPlayer(*me, tList[urand(0, tList.size() - 1)]))
+                        {
+                            me->CastSpell(target, me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, false);
+                            events.RepeatEvent(urand(45000, 50000));
                             break;
-                        case 1: // dark vortex
-                            if( Creature* twin = GetSister() )
-                            {
-                                twin->CastSpell((Unit*)NULL, SPELL_DARK_VORTEX, false);
-                                twin->AI()->Talk(EMOTE_VORTEX);
-                                twin->AI()->Talk(SAY_NIGHT);
-                                Talk(SAY_NIGHT);
-                            }
-                            break;
-                        case 2: // light pact
-                            Talk(EMOTE_TWINK_PACT);
-                            Talk(SAY_TWINK_PACT);
-                            if( Creature* twin = GetSister() )
-                            {
-                                twin->AI()->Talk(SAY_TWINK_PACT);
-                                twin->AI()->DoAction(-3);
-                            }
-                            me->CastSpell(me, SPELL_LIGHT_SHIELD, true);
-                            me->CastSpell(me, SPELL_LIGHT_TWIN_PACT, false);
-                            break;
-                        case 3: // dark pact
-                            if( Creature* twin = GetSister() )
-                            {
-                                twin->AI()->Talk(EMOTE_TWINK_PACT);
-                                twin->AI()->Talk(SAY_TWINK_PACT);
-                                Talk(SAY_TWINK_PACT);
-                                twin->CastSpell(twin, SPELL_DARK_SHIELD, true);
-                                twin->CastSpell(twin, SPELL_DARK_TWIN_PACT, false);
-                                DoAction(-3);
-                            }
-                            break;
-                    }
-                    if( (SpecialMask & 0xF) == 0xF )
-                        SpecialMask = 0;
-                    events.RepeatEvent(45000);
-                    events.DelayEventsToMax(15000, 1); // no touch of light/darkness during special abilities!
+                        }
                 }
-                break;
+                events.RepeatEvent(10000);
+            }
+            break;
+            case EVENT_SPECIAL:
+            {
+                uint8 s;
+                do s = urand(0, 3);
+                while ( SpecialMask & (1 << s) && (SpecialMask & 0xF) != 0xF );
+                SpecialMask |= (1 << s);
+                switch ( s )
+                {
+                    case 0: // light vortex
+                        me->CastSpell((Unit*)NULL, SPELL_LIGHT_VORTEX, false);
+                        Talk(EMOTE_VORTEX);
+                        Talk(SAY_LIGHT);
+                        if ( Creature* twin = GetSister() )
+                            twin->AI()->Talk(SAY_LIGHT);
+                        break;
+                    case 1: // dark vortex
+                        if ( Creature* twin = GetSister() )
+                        {
+                            twin->CastSpell((Unit*)NULL, SPELL_DARK_VORTEX, false);
+                            twin->AI()->Talk(EMOTE_VORTEX);
+                            twin->AI()->Talk(SAY_NIGHT);
+                            Talk(SAY_NIGHT);
+                        }
+                        break;
+                    case 2: // light pact
+                        Talk(EMOTE_TWINK_PACT);
+                        Talk(SAY_TWINK_PACT);
+                        if ( Creature* twin = GetSister() )
+                        {
+                            twin->AI()->Talk(SAY_TWINK_PACT);
+                            twin->AI()->DoAction(-3);
+                        }
+                        me->CastSpell(me, SPELL_LIGHT_SHIELD, true);
+                        me->CastSpell(me, SPELL_LIGHT_TWIN_PACT, false);
+                        break;
+                    case 3: // dark pact
+                        if ( Creature* twin = GetSister() )
+                        {
+                            twin->AI()->Talk(EMOTE_TWINK_PACT);
+                            twin->AI()->Talk(SAY_TWINK_PACT);
+                            Talk(SAY_TWINK_PACT);
+                            twin->CastSpell(twin, SPELL_DARK_SHIELD, true);
+                            twin->CastSpell(twin, SPELL_DARK_TWIN_PACT, false);
+                            DoAction(-3);
+                        }
+                        break;
+                }
+                if ( (SpecialMask & 0xF) == 0xF )
+                    SpecialMask = 0;
+                events.RepeatEvent(45000);
+                events.DelayEventsToMax(15000, 1); // no touch of light/darkness during special abilities!
+            }
+            break;
             case EVENT_REMOVE_DUAL_WIELD:
                 me->SetCanDualWield(false);
-                
+
                 break;
         }
 
@@ -459,13 +459,13 @@ struct boss_twin_valkyrAI : public ScriptedAI
     {
         DoAction(-1);
         Talk(SAY_DEATH);
-        if( pInstance )
+        if ( pInstance )
         {
             pInstance->SetData(TYPE_VALKYR, DONE);
             pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POWERING_UP);
         }
-        if( Creature* twin = GetSister() )
-            if( twin->IsAlive() )
+        if ( Creature* twin = GetSister() )
+            if ( twin->IsAlive() )
             {
                 twin->SetHealth(1);
                 Unit::Kill(twin, twin);
@@ -484,18 +484,18 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     void KilledUnit(Unit* who)
     {
-        if( who->GetTypeId() == TYPEID_PLAYER )
+        if ( who->GetTypeId() == TYPEID_PLAYER )
         {
             int32 id = urand(0, 1) ? SAY_KILL_PLAYER_1 : SAY_KILL_PLAYER_2;
             Talk(id);
-            if( Creature* twin = GetSister() )
+            if ( Creature* twin = GetSister() )
                 twin->AI()->Talk(id);
         }
     }
 
     void EnterEvadeMode()
     {
-        if( pInstance )
+        if ( pInstance )
             pInstance->SetData(TYPE_FAILED, 0);
     }
 };
@@ -516,9 +516,9 @@ public:
         {
             me->SetFlag(UNIT_FIELD_AURASTATE, 1 << (19 - 1));
             SetEquipmentSlots(false, EQUIP_MAIN_2, EQUIP_OFFHAND_2, EQUIP_RANGED_2);
-            if( Creature* c = me->SummonCreature(NPC_DARK_ESSENCE, Locs[LOC_DARKESS_1]) )
+            if ( Creature* c = me->SummonCreature(NPC_DARK_ESSENCE, Locs[LOC_DARKESS_1]) )
                 boss_twin_valkyrAI::JustSummoned(c);
-            if( Creature* c = me->SummonCreature(NPC_DARK_ESSENCE, Locs[LOC_DARKESS_2]) )
+            if ( Creature* c = me->SummonCreature(NPC_DARK_ESSENCE, Locs[LOC_DARKESS_2]) )
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
@@ -542,9 +542,9 @@ public:
         {
             me->SetFlag(UNIT_FIELD_AURASTATE, 1 << (22 - 1));
             SetEquipmentSlots(false, EQUIP_MAIN_1, EQUIP_OFFHAND_1, EQUIP_RANGED_1);
-            if( Creature* c = me->SummonCreature(NPC_LIGHT_ESSENCE, Locs[LOC_LIGHTESS_1]) )
+            if ( Creature* c = me->SummonCreature(NPC_LIGHT_ESSENCE, Locs[LOC_LIGHTESS_1]) )
                 boss_twin_valkyrAI::JustSummoned(c);
-            if( Creature* c = me->SummonCreature(NPC_LIGHT_ESSENCE, Locs[LOC_LIGHTESS_2]) )
+            if ( Creature* c = me->SummonCreature(NPC_LIGHT_ESSENCE, Locs[LOC_LIGHTESS_2]) )
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
@@ -559,100 +559,100 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        switch( creature->GetEntry() )
+        switch ( creature->GetEntry() )
         {
             case NPC_LIGHT_ESSENCE:
+            {
+                uint32 essenceId = 0;
+                uint32 effect2Id = 0;
+                //uint32 empoweredId = 0;
+                uint32 touchId1 = 0;
+                //uint32 touchId2 = 0;
+                switch ( creature->GetMap()->GetDifficulty() )
                 {
-                    uint32 essenceId = 0;
-                    uint32 effect2Id = 0;
-                    //uint32 empoweredId = 0;
-                    uint32 touchId1 = 0;
-                    //uint32 touchId2 = 0;
-                    switch( creature->GetMap()->GetDifficulty() )
-                    {
-                        case 0:
-                            essenceId = 65684;
-                            //empoweredId = 65724;
-                            touchId1 = 65950;
-                            //touchId2 = 66001;
-                            effect2Id = 65827;
-                            break;
-                        case 1:
-                            essenceId = 67176;
-                            //empoweredId = 67213;
-                            touchId1 = 67296;
-                            //touchId2 = 67281;
-                            effect2Id = 67179;
-                            break;
-                        case 2:
-                            essenceId = 67177;
-                            //empoweredId = 67214;
-                            touchId1 = 67297;
-                            //touchId2 = 67282;
-                            effect2Id = 67180;
-                            break;
-                        case 3:
-                            essenceId = 67178;
-                            //empoweredId = 67215;
-                            touchId1 = 67298;
-                            //touchId2 = 67283;
-                            effect2Id = 67181;
-                            break;
-                    }
-                    player->RemoveAura(essenceId);
-                    player->RemoveAura(effect2Id);
-                    player->RemoveAura(touchId1);
-                    //player->RemoveAura(touchId2); // dont remove black touch here - only white can have black touch - so white changing to white - so no change of color
-                    //player->RemoveAura(empoweredId); // apply new empowered?
-                    player->CastSpell(player, SPELL_LIGHT_ESSENCE, true);
+                    case 0:
+                        essenceId = 65684;
+                        //empoweredId = 65724;
+                        touchId1 = 65950;
+                        //touchId2 = 66001;
+                        effect2Id = 65827;
+                        break;
+                    case 1:
+                        essenceId = 67176;
+                        //empoweredId = 67213;
+                        touchId1 = 67296;
+                        //touchId2 = 67281;
+                        effect2Id = 67179;
+                        break;
+                    case 2:
+                        essenceId = 67177;
+                        //empoweredId = 67214;
+                        touchId1 = 67297;
+                        //touchId2 = 67282;
+                        effect2Id = 67180;
+                        break;
+                    case 3:
+                        essenceId = 67178;
+                        //empoweredId = 67215;
+                        touchId1 = 67298;
+                        //touchId2 = 67283;
+                        effect2Id = 67181;
+                        break;
                 }
-                break;
+                player->RemoveAura(essenceId);
+                player->RemoveAura(effect2Id);
+                player->RemoveAura(touchId1);
+                //player->RemoveAura(touchId2); // dont remove black touch here - only white can have black touch - so white changing to white - so no change of color
+                //player->RemoveAura(empoweredId); // apply new empowered?
+                player->CastSpell(player, SPELL_LIGHT_ESSENCE, true);
+            }
+            break;
             case NPC_DARK_ESSENCE:
+            {
+                uint32 essenceId = 0;
+                uint32 effect2Id = 0;
+                //uint32 empoweredId = 0;
+                //uint32 touchId1 = 0;
+                uint32 touchId2 = 0;
+                switch ( creature->GetMap()->GetDifficulty() )
                 {
-                    uint32 essenceId = 0;
-                    uint32 effect2Id = 0;
-                    //uint32 empoweredId = 0;
-                    //uint32 touchId1 = 0;
-                    uint32 touchId2 = 0;
-                    switch( creature->GetMap()->GetDifficulty() )
-                    {
-                        case 0:
-                            essenceId = 65686;
-                            //empoweredId = 65748;
-                            //touchId1 = 65950;
-                            touchId2 = 66001;
-                            effect2Id = 65811;
-                            break;
-                        case 1:
-                            essenceId = 67222;
-                            //empoweredId = 67216;
-                            //touchId1 = 67296;
-                            touchId2 = 67281;
-                            effect2Id = 67511;
-                            break;
-                        case 2:
-                            essenceId = 67223;
-                            //empoweredId = 67217;
-                            //touchId1 = 67297;
-                            touchId2 = 67282;
-                            effect2Id = 67512;
-                            break;
-                        case 3:
-                            essenceId = 67224;
-                            //empoweredId = 67218;
-                            //touchId1 = 67298;
-                            touchId2 = 67283;
-                            effect2Id = 67513;
-                            break;
-                    }
-                    player->RemoveAura(essenceId);
-                    player->RemoveAura(effect2Id);
-                    //player->RemoveAura(touchId1); // dont remove white touch here - only black can have white touch - so black changing to black - so no change of color
-                    player->RemoveAura(touchId2);
-                    //player->RemoveAura(empoweredId); // apply new empowered?
-                    player->CastSpell(player, SPELL_DARK_ESSENCE, true);
+                    case 0:
+                        essenceId = 65686;
+                        //empoweredId = 65748;
+                        //touchId1 = 65950;
+                        touchId2 = 66001;
+                        effect2Id = 65811;
+                        break;
+                    case 1:
+                        essenceId = 67222;
+                        //empoweredId = 67216;
+                        //touchId1 = 67296;
+                        touchId2 = 67281;
+                        effect2Id = 67511;
+                        break;
+                    case 2:
+                        essenceId = 67223;
+                        //empoweredId = 67217;
+                        //touchId1 = 67297;
+                        touchId2 = 67282;
+                        effect2Id = 67512;
+                        break;
+                    case 3:
+                        essenceId = 67224;
+                        //empoweredId = 67218;
+                        //touchId1 = 67298;
+                        touchId2 = 67283;
+                        effect2Id = 67513;
+                        break;
                 }
-                break;
+                player->RemoveAura(essenceId);
+                player->RemoveAura(effect2Id);
+                //player->RemoveAura(touchId1); // dont remove white touch here - only black can have white touch - so black changing to black - so no change of color
+                player->RemoveAura(touchId2);
+                //player->RemoveAura(empoweredId); // apply new empowered?
+                player->CastSpell(player, SPELL_DARK_ESSENCE, true);
+            }
+            break;
             default:
                 break;
         }
@@ -692,10 +692,10 @@ public:
 
         void MovementInform(uint32 type, uint32 id)
         {
-            if( type != POINT_MOTION_TYPE || id != 0 )
+            if ( type != POINT_MOTION_TYPE || id != 0 )
                 return;
 
-            if( urand(0, 2) )
+            if ( urand(0, 2) )
                 me->DespawnOrUnsummon(0);
         }
 
@@ -707,10 +707,10 @@ public:
 
         void UpdateAI(uint32  /*diff*/)
         {
-            if( despawning )
+            if ( despawning )
                 return;
 
-            if( me->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE )
+            if ( me->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE )
                 MoveToNextPoint();
         }
     };
@@ -728,15 +728,15 @@ public:
         void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
         {
             uint16 count = absorbAmount / 1000;
-            if( !count || !GetOwner() )
+            if ( !count || !GetOwner() )
                 return;
 
-            if( const SpellInfo* se = GetAura()->GetSpellInfo() )
-                if( Unit* owner = GetOwner()->ToUnit() )
+            if ( const SpellInfo* se = GetAura()->GetSpellInfo() )
+                if ( Unit* owner = GetOwner()->ToUnit() )
                 {
                     uint32 auraId = 0;
                     uint32 empoweredId = 0;
-                    switch( se->Id )
+                    switch ( se->Id )
                     {
                         case 65686:
                             auraId = 67590;
@@ -771,15 +771,15 @@ public:
                             empoweredId = 65724;
                             break;
                     }
-                    if( !owner->HasAura(auraId) )
+                    if ( !owner->HasAura(auraId) )
                     {
                         owner->CastSpell(owner, SPELL_POWERING_UP, true);
-                        if( --count == 0 )
+                        if ( --count == 0 )
                             return;
                     }
-                    if( Aura* aur = owner->GetAura(auraId) )
+                    if ( Aura* aur = owner->GetAura(auraId) )
                     {
-                        if( aur->GetStackAmount() + count < 100 )
+                        if ( aur->GetStackAmount() + count < 100 )
                         {
                             aur->ModStackAmount(count);
 
@@ -820,15 +820,15 @@ public:
         {
             PreventDefaultAction();
             Unit* caster = GetCaster();
-            if( !caster )
+            if ( !caster )
                 return;
-            if( caster->GetMap()->GetId() == 649 )
+            if ( caster->GetMap()->GetId() == 649 )
             {
                 uint32 excludedID = GetSpellInfo()->ExcludeTargetAuraSpell;
                 Map::PlayerList const& pl = caster->GetMap()->GetPlayers();
-                for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                    if( Player* plr = itr->GetSource() )
-                        if( plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) )
+                for ( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
+                    if ( Player* plr = itr->GetSource() )
+                        if ( plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) )
                         {
                             uint32 absorb = 0;
                             uint32 resist = 0;

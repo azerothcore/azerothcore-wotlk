@@ -182,7 +182,7 @@ public:
 
         void DoAction(int32 actionId) override
         {
-            switch(actionId)
+            switch (actionId)
             {
                 case ACTION_START_INTRO:
                     events.ScheduleEvent(EVENT_START_INTRO, 0);
@@ -196,7 +196,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_PRE_INTRO_1:
                     if (pInstance)
@@ -1456,7 +1456,7 @@ public:
             if (me->IsNonMeleeSpellCast(false, true, true))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_LK_CHECK_COMBAT:
                     if (me->isActiveObject()) // during fight
@@ -1508,29 +1508,29 @@ public:
                     }
                     break;
                 case EVENT_LK_START_FOLLOWING:
-                    {
-                        me->SetSpeed(MOVE_RUN, 9.0f / 7.0f);
-                        Movement::PointsArray path;
-                        path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                        for (uint8 i = 0; i <= 2; ++i)
-                            path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
-                        me->GetMotionMaster()->MoveSplinePath(&path);
-                    }
-                    break;
+                {
+                    me->SetSpeed(MOVE_RUN, 9.0f / 7.0f);
+                    Movement::PointsArray path;
+                    path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                    for (uint8 i = 0; i <= 2; ++i)
+                        path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
+                    me->GetMotionMaster()->MoveSplinePath(&path);
+                }
+                break;
                 case EVENT_LK_REMORSELESS_WINTER:
-                    {
-                        me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
-                        Talk(SAY_LK_IW_1_SUMMON);
-                        me->CastSpell(me, SPELL_REMORSELESS_WINTER, true);
-                        Movement::PointsArray path;
-                        path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                        for (uint8 i = 3; i < PATH_WP_COUNT - 1; ++i)
-                            path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
-                        me->GetMotionMaster()->MoveSplinePath(&path);
-                        me->GetMotionMaster()->propagateSpeedChange();
-                        events.ScheduleEvent(EVENT_LK_SUMMON, 1000);
-                    }
-                    break;
+                {
+                    me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
+                    Talk(SAY_LK_IW_1_SUMMON);
+                    me->CastSpell(me, SPELL_REMORSELESS_WINTER, true);
+                    Movement::PointsArray path;
+                    path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                    for (uint8 i = 3; i < PATH_WP_COUNT - 1; ++i)
+                        path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
+                    me->GetMotionMaster()->MoveSplinePath(&path);
+                    me->GetMotionMaster()->propagateSpeedChange();
+                    events.ScheduleEvent(EVENT_LK_SUMMON, 1000);
+                }
+                break;
                 case EVENT_LK_SUMMON:
                     switch (currentWall)
                     {
@@ -1641,7 +1641,7 @@ public:
 
         void DoAction(int32 actionId) override
         {
-            switch(actionId)
+            switch (actionId)
             {
                 case ACTION_START_INTRO:
                     events.ScheduleEvent(EVENT_LK_SAY_AGGRO, 0);
@@ -1683,7 +1683,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_LK_SAY_AGGRO:
                     if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(NPC_LICH_KING_BOSS)))
@@ -1714,69 +1714,69 @@ public:
                     events.ScheduleEvent(EVENT_SAY_LEAVE, 3500);
                     break;
                 case EVENT_SAY_LEAVE:
-                    {
-                        Map::PlayerList const& pl = pInstance->instance->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                            if (Player* p = itr->GetSource())
-                                p->KilledMonsterCredit(me->GetEntry(), 0); // for quest
+                {
+                    Map::PlayerList const& pl = pInstance->instance->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                        if (Player* p = itr->GetSource())
+                            p->KilledMonsterCredit(me->GetEntry(), 0); // for quest
 
-                        Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_LEAVE : SAY_SYLVANAS_LEAVE);
-                        me->GetMotionMaster()->MovePoint(0, LeaderEscapePos);
-                        events.ScheduleEvent(EVENT_ADD_GOSSIP, 8000);
-                    }
-                    break;
+                    Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_LEAVE : SAY_SYLVANAS_LEAVE);
+                    me->GetMotionMaster()->MovePoint(0, LeaderEscapePos);
+                    events.ScheduleEvent(EVENT_ADD_GOSSIP, 8000);
+                }
+                break;
                 case EVENT_ADD_GOSSIP:
                     me->RemoveAura(me->GetEntry() == NPC_JAINA_PART2 ? SPELL_JAINA_ICE_BARRIER : SPELL_SYLVANAS_CLOAK_OF_DARKNESS);
                     me->SetFacingTo(LeaderEscapePos.GetOrientation());
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     break;
                 case EVENT_START_RUN:
+                {
+                    pInstance->SetData(ACTION_START_LK_FIGHT, 1);
+                    me->setActive(true);
+                    MoveToNextStopPoint();
+                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(NPC_LICH_KING_BOSS)))
                     {
-                        pInstance->SetData(ACTION_START_LK_FIGHT, 1);
-                        me->setActive(true);
-                        MoveToNextStopPoint();
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(NPC_LICH_KING_BOSS)))
-                        {
-                            c->setActive(true);
-                            c->SetInCombatWithZone();
-                            c->RemoveAura(me->GetEntry() == NPC_JAINA_PART2 ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING);
-                            c->AI()->DoAction(ACTION_START_LK_FIGHT_REAL);
-                        }
+                        c->setActive(true);
+                        c->SetInCombatWithZone();
+                        c->RemoveAura(me->GetEntry() == NPC_JAINA_PART2 ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING);
+                        c->AI()->DoAction(ACTION_START_LK_FIGHT_REAL);
                     }
-                    break;
+                }
+                break;
                 case EVENT_SAY_LEADER_STOP_TEXT:
+                {
+                    int32 textId = 0;
+                    switch (currentStopPoint)
                     {
-                        int32 textId = 0;
-                        switch (currentStopPoint)
-                        {
-                            case 1:
-                                textId = SAY_SYLVANAS_IW_1;
-                                break;
-                            case 2:
-                                textId = SAY_SYLVANAS_IW_2;
-                                break;
-                            case 3:
-                                textId = SAY_SYLVANAS_IW_3;
-                                break;
-                            case 4:
-                                textId = SAY_SYLVANAS_IW_4;
-                                break;
-                            case 5:
-                                textId = SAY_SYLVANAS_END;
-                                break;
-                        }
-                        if (me->GetEntry() == NPC_JAINA_PART2)
-                            textId += 10;
-                        Talk(textId);
-                        if (currentStopPoint <= 4)
-                            me->CastSpell((Unit*)NULL, (me->GetEntry() == NPC_JAINA_PART2 ? SPELL_DESTROY_WALL_JAINA : SPELL_DESTROY_WALL_SYLVANAS), false);
-                        else
-                        {
-                            me->SetFacingTo(PathWaypoints[PATH_WP_COUNT - 1].GetOrientation());
-                            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
-                        }
+                        case 1:
+                            textId = SAY_SYLVANAS_IW_1;
+                            break;
+                        case 2:
+                            textId = SAY_SYLVANAS_IW_2;
+                            break;
+                        case 3:
+                            textId = SAY_SYLVANAS_IW_3;
+                            break;
+                        case 4:
+                            textId = SAY_SYLVANAS_IW_4;
+                            break;
+                        case 5:
+                            textId = SAY_SYLVANAS_END;
+                            break;
                     }
-                    break;
+                    if (me->GetEntry() == NPC_JAINA_PART2)
+                        textId += 10;
+                    Talk(textId);
+                    if (currentStopPoint <= 4)
+                        me->CastSpell((Unit*)NULL, (me->GetEntry() == NPC_JAINA_PART2 ? SPELL_DESTROY_WALL_JAINA : SPELL_DESTROY_WALL_SYLVANAS), false);
+                    else
+                    {
+                        me->SetFacingTo(PathWaypoints[PATH_WP_COUNT - 1].GetOrientation());
+                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+                    }
+                }
+                break;
                 case EVENT_SAY_OPENING:
                     Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_OPENING : SAY_SYLVANAS_OPENING);
                     break;

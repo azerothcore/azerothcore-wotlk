@@ -35,7 +35,7 @@ public:
                 {
                     braziersUsed = 1;
                 }
-                else if(braziersUsed == 2)
+                else if (braziersUsed == 2)
                 {
                     instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_N), true);
                     instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_S), true);

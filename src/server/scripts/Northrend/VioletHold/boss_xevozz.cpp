@@ -91,7 +91,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -103,45 +103,45 @@ public:
                     me->CastSpell(me->GetVictim(), SPELL_ARCANE_BUFFET, false);
                     break;
                 case EVENT_SUMMON_SPHERES:
+                {
+                    Talk(SAY_SUMMON_ENERGY);
+                    spheres.DespawnAll();
+                    uint32 entry1 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3);
+                    me->CastSpell((Unit*)NULL, entry1, true);
+                    if (IsHeroic())
                     {
-                        Talk(SAY_SUMMON_ENERGY);
-                        spheres.DespawnAll();
-                        uint32 entry1 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3);
-                        me->CastSpell((Unit*)NULL, entry1, true);
-                        if (IsHeroic())
-                        {
-                            uint32 entry2;
-                            do { entry2 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3); }
-                            while (entry1 == entry2);
-                            me->CastSpell((Unit*)NULL, entry2, true);
-                        }
-                        events.RepeatEvent(45000);
-                        events.RescheduleEvent(EVENT_SPELL_ARCANE_BUFFET, 5000);
-                        events.RescheduleEvent(EVENT_CHECK_DISTANCE, 6000);
+                        uint32 entry2;
+                        do { entry2 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3); }
+                        while (entry1 == entry2);
+                        me->CastSpell((Unit*)NULL, entry2, true);
                     }
-                    break;
+                    events.RepeatEvent(45000);
+                    events.RescheduleEvent(EVENT_SPELL_ARCANE_BUFFET, 5000);
+                    events.RescheduleEvent(EVENT_CHECK_DISTANCE, 6000);
+                }
+                break;
                 case EVENT_CHECK_DISTANCE:
+                {
+                    bool found = false;
+                    if (pInstance)
+                        for (std::list<uint64>::iterator itr = spheres.begin(); itr != spheres.end(); ++itr)
+                            if (Creature* c = pInstance->instance->GetCreature(*itr))
+                                if (me->GetDistance(c) < 3.0f)
+                                {
+                                    c->CastSpell(me, SPELL_ARCANE_POWER, false);
+                                    c->DespawnOrUnsummon(8000);
+                                    found = true;
+                                }
+                    if (found)
                     {
-                        bool found = false;
-                        if (pInstance)
-                            for (std::list<uint64>::iterator itr = spheres.begin(); itr != spheres.end(); ++itr)
-                                if (Creature* c = pInstance->instance->GetCreature(*itr))
-                                    if (me->GetDistance(c) < 3.0f)
-                                    {
-                                        c->CastSpell(me, SPELL_ARCANE_POWER, false);
-                                        c->DespawnOrUnsummon(8000);
-                                        found = true;
-                                    }
-                        if (found)
-                        {
-                            Talk(SAY_CHARGED);
-                            events.RepeatEvent(9000);
-                            events.RescheduleEvent(EVENT_SUMMON_SPHERES, 10000);
-                        }
-                        else
-                            events.RepeatEvent(2000);
+                        Talk(SAY_CHARGED);
+                        events.RepeatEvent(9000);
+                        events.RescheduleEvent(EVENT_SUMMON_SPHERES, 10000);
                     }
-                    break;
+                    else
+                        events.RepeatEvent(2000);
+                }
+                break;
             }
 
             DoMeleeAttackIfReady();

@@ -202,7 +202,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_PATCHWERK:
                     _patchwerkGUID = creature->GetGUID();
@@ -268,7 +268,7 @@ public:
                 return;
             }
 
-            switch(pGo->GetEntry())
+            switch (pGo->GetEntry())
             {
                 case GO_PATCHWERK_GATE:
                     _patchwerkGateGUID = pGo->GetGUID();
@@ -482,14 +482,14 @@ public:
                 case 13234:
                 case 13235:
                 case 13236:
-                    {
-                        uint8 count = 0;
-                        for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                            if (GetBossState(i) == NOT_STARTED)
-                                ++count;
+                {
+                    uint8 count = 0;
+                    for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                        if (GetBossState(i) == NOT_STARTED)
+                            ++count;
 
-                        return !count && immortalAchievement;
-                    }
+                    return !count && immortalAchievement;
+                }
 
                 default:
                     return false;
@@ -498,7 +498,7 @@ public:
 
         void SetData(uint32 id, uint32 data) override
         {
-            switch(id)
+            switch (id)
             {
                 case DATA_ABOMINATION_KILLED:
                     abominationsKilled++;
@@ -625,7 +625,7 @@ public:
                 return false;
 
             // Bosses data
-            switch(bossId)
+            switch (bossId)
             {
                 case BOSS_KELTHUZAD:
                     if (state == NOT_STARTED)
@@ -822,7 +822,7 @@ public:
                     if (Creature* kelthuzad = instance->GetCreature(_kelthuzadGUID))
                         kelthuzad->AI()->Talk(_currentWingTaunt);
                     ++_currentWingTaunt;
-                    
+
                     break;
             }
         }

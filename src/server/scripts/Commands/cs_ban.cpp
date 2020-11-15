@@ -122,11 +122,11 @@ public:
                 }
                 break;
             case BAN_NOTFOUND:
-                {
-                    handler->PSendSysMessage(LANG_BAN_NOTFOUND, "character", name.c_str());
-                    handler->SetSentErrorMessage(true);
-                    return false;
-                }
+            {
+                handler->PSendSysMessage(LANG_BAN_NOTFOUND, "character", name.c_str());
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
             default:
                 break;
         }

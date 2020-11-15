@@ -429,37 +429,37 @@ public:
                     Talk(EMOTE_STONE_GRIP);
                     return;
                 case EVENT_FOCUSED_EYEBEAM:
+                {
+                    events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 13000 + rand() % 5000);
+                    Unit* target = nullptr;
+                    Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+                    for (auto itr = pList.begin(); itr != pList.end(); ++itr)
                     {
-                        events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 13000 + rand() % 5000);
-                        Unit* target = nullptr;
-                        Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                        for(auto itr = pList.begin(); itr != pList.end(); ++itr)
-                        {
-                            if (itr->GetSource()->GetPositionZ() < 420)
-                                continue;
+                        if (itr->GetSource()->GetPositionZ() < 420)
+                            continue;
 
-                            target = itr->GetSource();
-                            if (urand(0, 3) == 3)
-                                break;
-                        }
-                        if (!target)
+                        target = itr->GetSource();
+                        if (urand(0, 3) == 3)
                             break;
-
-                        if (Creature* eye = me->SummonCreature(NPC_EYE_LEFT, target->GetPositionX(), target->GetPositionY() - 6, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 12000))
-                        {
-                            eye->GetMotionMaster()->MoveFollow(target, 0.01f, M_PI * 3 / 2, MOTION_SLOT_CONTROLLED);
-                            me->CastSpell(eye, SPELL_FOCUSED_EYEBEAM_LEFT, true);
-                        }
-                        if (Creature* eye2 = me->SummonCreature(NPC_EYE_RIGHT, target->GetPositionX(), target->GetPositionY() + 6, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 12000))
-                        {
-                            eye2->GetMotionMaster()->MoveFollow(target, 0.01f, M_PI / 2, MOTION_SLOT_CONTROLLED);
-                            eye2->CastSpell(me, SPELL_FOCUSED_EYEBEAM_RIGHT, true);
-                        }
-
-                        Talk(EMOTE_EYES);
-                        events.DelayEvents(12000, 0);
-                        return;
                     }
+                    if (!target)
+                        break;
+
+                    if (Creature* eye = me->SummonCreature(NPC_EYE_LEFT, target->GetPositionX(), target->GetPositionY() - 6, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 12000))
+                    {
+                        eye->GetMotionMaster()->MoveFollow(target, 0.01f, M_PI * 3 / 2, MOTION_SLOT_CONTROLLED);
+                        me->CastSpell(eye, SPELL_FOCUSED_EYEBEAM_LEFT, true);
+                    }
+                    if (Creature* eye2 = me->SummonCreature(NPC_EYE_RIGHT, target->GetPositionX(), target->GetPositionY() + 6, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 12000))
+                    {
+                        eye2->GetMotionMaster()->MoveFollow(target, 0.01f, M_PI / 2, MOTION_SLOT_CONTROLLED);
+                        eye2->CastSpell(me, SPELL_FOCUSED_EYEBEAM_RIGHT, true);
+                    }
+
+                    Talk(EMOTE_EYES);
+                    events.DelayEvents(12000, 0);
+                    return;
+                }
                 case EVENT_RESTORE_ARM_LEFT:
                     // shouldn't happen
                     AttachLeftArm();
@@ -559,7 +559,7 @@ public:
         {
             float x, y, z;
             // left arm
-            if( me->GetEntry() == NPC_LEFT_ARM )
+            if ( me->GetEntry() == NPC_LEFT_ARM )
             {
                 x = 1776.97f;
                 y = -44.8396f;

@@ -272,7 +272,7 @@ public:
 
         void SmallIcicles(bool enable)
         {
-            if( enable )
+            if ( enable )
                 me->CastSpell(me, SPELL_ICICLE_BOSS_AURA, true);
             else
                 me->RemoveAura(SPELL_ICICLE_BOSS_AURA);
@@ -280,19 +280,19 @@ public:
 
         void SpellHitTarget(Unit* target, const SpellInfo* spell)
         {
-            switch( spell->Id )
+            switch ( spell->Id )
             {
                 case SPELL_ICICLE_TBBA:
                     me->CastSpell(target, SPELL_ICICLE_VISUAL_UNPACKED, true);
                     break;
                 case SPELL_FLASH_FREEZE_VISUAL:
-                    {
-                        std::list<Creature*> fires;
-                        me->GetCreaturesWithEntryInRange(fires, 200.0f, NPC_TOASTY_FIRE);
-                        for (std::list<Creature*>::iterator itr = fires.begin(); itr != fires.end(); ++itr)
-                            (*itr)->AI()->DoAction(1); // remove it
-                    }
-                    break;
+                {
+                    std::list<Creature*> fires;
+                    me->GetCreaturesWithEntryInRange(fires, 200.0f, NPC_TOASTY_FIRE);
+                    for (std::list<Creature*>::iterator itr = fires.begin(); itr != fires.end(); ++itr)
+                        (*itr)->AI()->DoAction(1); // remove it
+                }
+                break;
             }
         }
 
@@ -322,9 +322,9 @@ public:
                     events.Reset();
                     summons.DespawnAll();
 
-                    if( GameObject* d = me->FindNearestGameObject(GO_HODIR_FROZEN_DOOR, 250.0f))
+                    if ( GameObject* d = me->FindNearestGameObject(GO_HODIR_FROZEN_DOOR, 250.0f))
                     {
-                        if( d->GetGoState() != GO_STATE_ACTIVE )
+                        if ( d->GetGoState() != GO_STATE_ACTIVE )
                         {
                             d->SetLootState(GO_READY);
                             d->UseDoorOrButton(0, false);
@@ -332,7 +332,7 @@ public:
                     }
                     if (GameObject* d = me->FindNearestGameObject(GO_HODIR_DOOR, 250.0f))
                     {
-                        if( d->GetGoState() != GO_STATE_ACTIVE )
+                        if ( d->GetGoState() != GO_STATE_ACTIVE )
                         {
                             d->SetLootState(GO_READY);
                             d->UseDoorOrButton(0, false);
@@ -350,13 +350,13 @@ public:
 
                     // spawn appropriate chests
                     uint32 chestId = me->GetMap()->Is25ManRaid() ? GO_HODIR_CHEST_NORMAL_HERO : GO_HODIR_CHEST_NORMAL;
-                    if( GameObject* go = me->SummonGameObject(chestId, 1969.115f, -212.94f, 432.687f, 3 * M_PI / 2, 0, 0, 0, 0, 0) )
+                    if ( GameObject* go = me->SummonGameObject(chestId, 1969.115f, -212.94f, 432.687f, 3 * M_PI / 2, 0, 0, 0, 0, 0) )
                         go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
 
-                    if( hardmode )
+                    if ( hardmode )
                     {
                         uint32 chestId2 = me->GetMap()->Is25ManRaid() ? GO_HODIR_CHEST_HARD_HERO : GO_HODIR_CHEST_HARD;
-                        if( GameObject* go = me->SummonGameObject(chestId2, 2031.207f, -213.236f, 432.687f, 3 * M_PI / 2, 0, 0, 0, 0, 0) )
+                        if ( GameObject* go = me->SummonGameObject(chestId2, 2031.207f, -213.236f, 432.687f, 3 * M_PI / 2, 0, 0, 0, 0, 0) )
                             go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
                     }
                 }
@@ -388,12 +388,12 @@ public:
                 return;
             }
 
-            if( !berserk && (me->GetPositionX() < 1940.0f || me->GetPositionX() > 2070.0f || me->GetPositionY() < -300.0f || me->GetPositionY() > -155.0f) )
+            if ( !berserk && (me->GetPositionX() < 1940.0f || me->GetPositionX() > 2070.0f || me->GetPositionY() < -300.0f || me->GetPositionY() > -155.0f) )
                 events.RescheduleEvent(EVENT_BERSERK, 1);
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
             switch (events.ExecuteEvent())
@@ -401,60 +401,60 @@ public:
                 case 0:
                     break;
                 case EVENT_BERSERK:
-                    {
-                        berserk = true;
-                        me->CastSpell(me, SPELL_BERSERK, true);
-                        me->MonsterYell(TEXT_HODIR_BERSERK, LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_HODIR_BERSERK, 0);
-                    }
-                    break;
+                {
+                    berserk = true;
+                    me->CastSpell(me, SPELL_BERSERK, true);
+                    me->MonsterYell(TEXT_HODIR_BERSERK, LANG_UNIVERSAL, 0);
+                    me->PlayDirectSound(SOUND_HODIR_BERSERK, 0);
+                }
+                break;
                 case EVENT_HARD_MODE_MISSED:
-                    {
-                        hardmode = false;
-                        me->MonsterTextEmote(TEXTEMOTE_HODIR_HARD_MODE_MISSED, 0);
-                    }
-                    break;
+                {
+                    hardmode = false;
+                    me->MonsterTextEmote(TEXTEMOTE_HODIR_HARD_MODE_MISSED, 0);
+                }
+                break;
                 case EVENT_FLASH_FREEZE:
+                {
+                    std::list<Unit*> targets;
+                    Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                        targets.push_back(itr->GetSource());
+                    targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+                    targets.remove_if(acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+                    acore::Containers::RandomResizeList(targets, (RAID_MODE(2, 3)));
+                    for (std::list<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                     {
-                        std::list<Unit*> targets;
-                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                            targets.push_back(itr->GetSource());
-                        targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-                        targets.remove_if(acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-                        acore::Containers::RandomResizeList(targets, (RAID_MODE(2,3)));
-                        for (std::list<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                        {
-                            float prevZ = (*itr)->GetPositionZ();
-                            (*itr)->m_positionZ = 432.7f;
-                            (*itr)->CastSpell((*itr), SPELL_ICICLE_VISUAL_PACKED, true);
-                            (*itr)->m_positionZ = prevZ;
-                        }
+                        float prevZ = (*itr)->GetPositionZ();
+                        (*itr)->m_positionZ = 432.7f;
+                        (*itr)->CastSpell((*itr), SPELL_ICICLE_VISUAL_PACKED, true);
+                        (*itr)->m_positionZ = prevZ;
+                    }
 
-                        me->CastSpell((Unit*)NULL, SPELL_FLASH_FREEZE_CAST, false);
-                        me->MonsterTextEmote("Hodir begins to cast Flash Freeze!", 0, true);
-                        me->MonsterYell(TEXT_HODIR_FLASH_FREEZE, LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
-                        SmallIcicles(false);
-                        events.RepeatEvent(55000 + urand(0, 10000));
-                        events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, Is25ManRaid() ? 12000 : 24000);
-                        events.ScheduleEvent(EVENT_FROZEN_BLOWS, 15000);
-                        events.RescheduleEvent(EVENT_FREEZE, 20000);
-                    }
-                    break;
+                    me->CastSpell((Unit*)NULL, SPELL_FLASH_FREEZE_CAST, false);
+                    me->MonsterTextEmote("Hodir begins to cast Flash Freeze!", 0, true);
+                    me->MonsterYell(TEXT_HODIR_FLASH_FREEZE, LANG_UNIVERSAL, 0);
+                    me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
+                    SmallIcicles(false);
+                    events.RepeatEvent(55000 + urand(0, 10000));
+                    events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, Is25ManRaid() ? 12000 : 24000);
+                    events.ScheduleEvent(EVENT_FROZEN_BLOWS, 15000);
+                    events.RescheduleEvent(EVENT_FREEZE, 20000);
+                }
+                break;
                 case EVENT_SMALL_ICICLES_ENABLE:
-                    {
-                        SmallIcicles(true);
-                    }
-                    break;
+                {
+                    SmallIcicles(true);
+                }
+                break;
                 case EVENT_FROZEN_BLOWS:
-                    {
-                        me->MonsterTextEmote("Hodir gains Frozen Blows!", 0, true);
-                        me->MonsterTextEmote(TEXTEMOTE_HODIR_FROZEN_BLOWS, 0);
-                        me->PlayDirectSound(SOUND_HODIR_FROZEN_BLOWS, 0);
-                        me->CastSpell(me, SPELL_FROZEN_BLOWS, true);
-                    }
-                    break;
+                {
+                    me->MonsterTextEmote("Hodir gains Frozen Blows!", 0, true);
+                    me->MonsterTextEmote(TEXTEMOTE_HODIR_FROZEN_BLOWS, 0);
+                    me->PlayDirectSound(SOUND_HODIR_FROZEN_BLOWS, 0);
+                    me->CastSpell(me, SPELL_FROZEN_BLOWS, true);
+                }
+                break;
                 case EVENT_FREEZE:
                     if (Player* plr = SelectTargetFromPlayerList(50.0f, SPELL_FLASH_FREEZE_TRAPPED_PLAYER))
                         me->CastSpell(plr, SPELL_FREEZE, false);
@@ -475,7 +475,7 @@ public:
         void SpawnHelpers()
         {
             char faction = 'A';
-            if( hhd[0][0].id )
+            if ( hhd[0][0].id )
             {
                 Map::PlayerList const& cl = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = cl.begin(); itr != cl.end(); ++itr)
@@ -487,25 +487,25 @@ public:
             }
 
             uint8 cnt = 0;
-            if( faction )
-                for( uint8 k = 0; k < 4; ++k )
+            if ( faction )
+                for ( uint8 k = 0; k < 4; ++k )
                 {
-                    if( (faction == 'A' && ( k > 1 || (k == 1 && RAID_MODE(1, 0)) )) ||
+                    if ( (faction == 'A' && ( k > 1 || (k == 1 && RAID_MODE(1, 0)) )) ||
                             (faction == 'H' && ( k < 2 || (k == 3 && RAID_MODE(1, 0)) )) )
                         continue;
 
-                    for( uint8 i = 0; i < 4; ++i )
+                    for ( uint8 i = 0; i < 4; ++i )
                     {
-                        if( !hhd[k][i].id )
+                        if ( !hhd[k][i].id )
                             continue;
 
-                        if( Creature* h_p = me->SummonCreature(hhd[k][i].id, hhd[k][i].x, hhd[k][i].y, 432.69f, M_PI / 2) )
+                        if ( Creature* h_p = me->SummonCreature(hhd[k][i].id, hhd[k][i].x, hhd[k][i].y, 432.69f, M_PI / 2) )
                         {
                             h_p->setFaction(1665);
-                            if( cnt < 8 )
+                            if ( cnt < 8 )
                                 Helpers[cnt++] = h_p->GetGUID();
 
-                            if( Creature* c = h_p->SummonCreature(NPC_FLASH_FREEZE_NPC, h_p->GetPositionX(), h_p->GetPositionY(), h_p->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000) )
+                            if ( Creature* c = h_p->SummonCreature(NPC_FLASH_FREEZE_NPC, h_p->GetPositionX(), h_p->GetPositionY(), h_p->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000) )
                             {
                                 c->CastSpell(h_p, SPELL_FLASH_FREEZE_TRAPPED_NPC, true);
                                 JustSummoned(c);
@@ -517,9 +517,9 @@ public:
 
         void KilledUnit(Unit* who)
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if ( who->GetTypeId() == TYPEID_PLAYER )
             {
-                if( urand(0, 1) )
+                if ( urand(0, 1) )
                 {
                     me->MonsterYell(TEXT_HODIR_SLAIN_1, LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_HODIR_SLAIN_1, 0);
@@ -612,7 +612,7 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( timer1 <= diff )
+            if ( timer1 <= diff )
             {
                 me->CastSpell(me, (me->GetEntry() == 33169 ? SPELL_ICICLE_FALL_EFFECT_UNPACKED : SPELL_ICICLE_FALL_EFFECT_PACKED), true);
                 me->CastSpell(me, SPELL_ICICLE_VISUAL_FALLING, false);
@@ -713,7 +713,7 @@ public:
         {
             if (a == 1)
             {
-                if( GameObject* fire = me->FindNearestGameObject(194300, 1.0f) )
+                if ( GameObject* fire = me->FindNearestGameObject(194300, 1.0f) )
                 {
                     fire->SetOwnerGUID(0);
                     fire->Delete();
@@ -724,7 +724,7 @@ public:
 
         void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
         {
-            switch( spell->Id )
+            switch ( spell->Id )
             {
                 case SPELL_ICE_SHARDS_SMALL:
                 case SPELL_ICE_SHARDS_BIG:
@@ -771,7 +771,7 @@ public:
 
         void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
-            if(spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
+            if (spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
             {
                 events.Reset();
                 events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 2000);
@@ -782,27 +782,27 @@ public:
         {
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_TRY_FREE_HELPER:
-                    {
-                        if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
-                            if( pInstance )
-                                if( uint64 g = pInstance->GetData64(TYPE_HODIR) )
-                                    if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
-                                    {
-                                        AttackStart(hodir);
-                                        ScheduleAbilities();
-                                        break;
-                                    }
-                        events.RepeatEvent(2000);
-                    }
-                    break;
+                {
+                    if ( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
+                        if ( pInstance )
+                            if ( uint64 g = pInstance->GetData64(TYPE_HODIR) )
+                                if ( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
+                                {
+                                    AttackStart(hodir);
+                                    ScheduleAbilities();
+                                    break;
+                                }
+                    events.RepeatEvent(2000);
+                }
+                break;
                 case EVENT_PRIEST_DISPELL_MAGIC:
                     me->CastCustomSpell(SPELL_PRIEST_DISPELL_MAGIC, SPELLVALUE_MAX_TARGETS, 1, (Unit*)NULL, false);
                     events.RepeatEvent(7000);
@@ -867,7 +867,7 @@ public:
 
         void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
-            if(spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
+            if (spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
             {
                 events.Reset();
                 events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 2000);
@@ -878,27 +878,27 @@ public:
         {
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_TRY_FREE_HELPER:
-                    {
-                        if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
-                            if( pInstance )
-                                if( uint64 g = pInstance->GetData64(TYPE_HODIR) )
-                                    if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
-                                    {
-                                        AttackStart(hodir);
-                                        ScheduleAbilities();
-                                        break;
-                                    }
-                        events.RepeatEvent(2000);
-                    }
-                    break;
+                {
+                    if ( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
+                        if ( pInstance )
+                            if ( uint64 g = pInstance->GetData64(TYPE_HODIR) )
+                                if ( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
+                                {
+                                    AttackStart(hodir);
+                                    ScheduleAbilities();
+                                    break;
+                                }
+                    events.RepeatEvent(2000);
+                }
+                break;
                 case EVENT_DRUID_WRATH:
                     if (Unit* victim = me->GetVictim())
                         me->CastSpell(victim, SPELL_DRUID_WRATH, false);
@@ -964,7 +964,7 @@ public:
 
         void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
-            if(spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
+            if (spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
             {
                 events.Reset();
                 events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 2000);
@@ -982,27 +982,27 @@ public:
         {
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_TRY_FREE_HELPER:
-                    {
-                        if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
-                            if( pInstance )
-                                if( uint64 g = pInstance->GetData64(TYPE_HODIR) )
-                                    if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
-                                    {
-                                        AttackStart(hodir);
-                                        ScheduleAbilities();
-                                        break;
-                                    }
-                        events.RepeatEvent(2000);
-                    }
-                    break;
+                {
+                    if ( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
+                        if ( pInstance )
+                            if ( uint64 g = pInstance->GetData64(TYPE_HODIR) )
+                                if ( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
+                                {
+                                    AttackStart(hodir);
+                                    ScheduleAbilities();
+                                    break;
+                                }
+                    events.RepeatEvent(2000);
+                }
+                break;
                 case EVENT_SHAMAN_LAVA_BURST:
                     if (Unit* victim = me->GetVictim())
                         me->CastSpell(victim, SPELL_SHAMAN_LAVA_BURST, false);
@@ -1065,7 +1065,7 @@ public:
 
         void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
-            if(spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
+            if (spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
             {
                 events.Reset();
                 events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 2000);
@@ -1076,27 +1076,27 @@ public:
         {
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_TRY_FREE_HELPER:
-                    {
-                        if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
-                            if( pInstance )
-                                if( uint64 g = pInstance->GetData64(TYPE_HODIR) )
-                                    if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
-                                    {
-                                        AttackStart(hodir);
-                                        ScheduleAbilities();
-                                        break;
-                                    }
-                        events.RepeatEvent(2000);
-                    }
-                    break;
+                {
+                    if ( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
+                        if ( pInstance )
+                            if ( uint64 g = pInstance->GetData64(TYPE_HODIR) )
+                                if ( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
+                                {
+                                    AttackStart(hodir);
+                                    ScheduleAbilities();
+                                    break;
+                                }
+                    events.RepeatEvent(2000);
+                }
+                break;
                 case EVENT_MAGE_FIREBALL:
                     if (Unit* victim = me->GetVictim())
                         me->CastSpell(victim, SPELL_MAGE_FIREBALL, false);
@@ -1107,27 +1107,27 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_MAGE_MELT_ICE:
-                    {
-                        std::list<Creature*> FB;
-                        bool found = false;
-                        me->GetCreaturesWithEntryInRange(FB, 150.0f, NPC_FLASH_FREEZE_NPC);
-                        for( std::list<Creature*>::const_iterator itr = FB.begin(); itr != FB.end(); ++itr )
-                            if( !((*itr)->HasAura(SPELL_MAGE_MELT_ICE)) )
-                            {
-                                me->CastSpell((*itr), SPELL_MAGE_MELT_ICE, false);
-                                found = true;
-                                break;
-                            }
-
-                        if( found )
+                {
+                    std::list<Creature*> FB;
+                    bool found = false;
+                    me->GetCreaturesWithEntryInRange(FB, 150.0f, NPC_FLASH_FREEZE_NPC);
+                    for ( std::list<Creature*>::const_iterator itr = FB.begin(); itr != FB.end(); ++itr )
+                        if ( !((*itr)->HasAura(SPELL_MAGE_MELT_ICE)) )
                         {
-                            events.DelayEvents(2000);
-                            events.RepeatEvent(1999);
+                            me->CastSpell((*itr), SPELL_MAGE_MELT_ICE, false);
+                            found = true;
                             break;
                         }
-                        events.RepeatEvent(5000);
+
+                    if ( found )
+                    {
+                        events.DelayEvents(2000);
+                        events.RepeatEvent(1999);
+                        break;
                     }
-                    break;
+                    events.RepeatEvent(5000);
+                }
+                break;
             }
         }
 
@@ -1334,7 +1334,7 @@ public:
                 if (target->GetTypeId() == TYPEID_PLAYER)
                 {
                     caster->ToCreature()->AI()->SetData(1, 1);
-                    if( Creature* c = target->SummonCreature(NPC_FLASH_FREEZE_PLR, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 5 * 60 * 1000) )
+                    if ( Creature* c = target->SummonCreature(NPC_FLASH_FREEZE_PLR, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 5 * 60 * 1000) )
                     {
                         c->CastSpell(target, SPELL_FLASH_FREEZE_TRAPPED_PLAYER, true);
                         caster->ToCreature()->AI()->JustSummoned(c);
@@ -1342,7 +1342,7 @@ public:
                 }
                 else if (target->GetTypeId() == TYPEID_UNIT)
                 {
-                    if( Creature* c = target->SummonCreature(NPC_FLASH_FREEZE_NPC, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000) )
+                    if ( Creature* c = target->SummonCreature(NPC_FLASH_FREEZE_NPC, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000) )
                     {
                         c->CastSpell(target, SPELL_FLASH_FREEZE_TRAPPED_NPC, true);
                         caster->ToCreature()->AI()->JustSummoned(c);

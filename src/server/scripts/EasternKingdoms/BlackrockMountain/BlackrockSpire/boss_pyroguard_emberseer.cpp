@@ -196,35 +196,35 @@ public:
                     switch (eventId)
                     {
                         case EVENT_RESPAWN:
-                            {
-                                // Respawn all Blackhand Incarcerators
-                                std::list<Creature*> creatureList;
-                                GetCreatureListWithEntryInGrid(creatureList, me, NPC_BLACKHAND_INCARCERATOR, 35.0f);
-                                for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
-                                    if (Creature* creature = *itr)
-                                    {
-                                        if (!creature->IsAlive())
-                                            creature->Respawn();
-
-                                        creature->AI()->SetData(1, 2);
-                                    }
-                                me->AddAura(SPELL_ENCAGED_EMBERSEER, me);
-                                instance->SetBossState(DATA_PYROGAURD_EMBERSEER, NOT_STARTED);
-                                break;
-                            }
-                        case EVENT_PRE_FIGHT_1:
-                            {
-                                // Set data on all Blackhand Incarcerators
-                                std::list<Creature*> creatureList;
-                                GetCreatureListWithEntryInGrid(creatureList, me, NPC_BLACKHAND_INCARCERATOR, 35.0f);
-                                for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                        {
+                            // Respawn all Blackhand Incarcerators
+                            std::list<Creature*> creatureList;
+                            GetCreatureListWithEntryInGrid(creatureList, me, NPC_BLACKHAND_INCARCERATOR, 35.0f);
+                            for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                                if (Creature* creature = *itr)
                                 {
-                                    if (Creature* creature = *itr)
-                                        creature->AI()->SetData(1, 1);
+                                    if (!creature->IsAlive())
+                                        creature->Respawn();
+
+                                    creature->AI()->SetData(1, 2);
                                 }
-                                events.ScheduleEvent(EVENT_PRE_FIGHT_2, 32000);
-                                break;
+                            me->AddAura(SPELL_ENCAGED_EMBERSEER, me);
+                            instance->SetBossState(DATA_PYROGAURD_EMBERSEER, NOT_STARTED);
+                            break;
+                        }
+                        case EVENT_PRE_FIGHT_1:
+                        {
+                            // Set data on all Blackhand Incarcerators
+                            std::list<Creature*> creatureList;
+                            GetCreatureListWithEntryInGrid(creatureList, me, NPC_BLACKHAND_INCARCERATOR, 35.0f);
+                            for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                            {
+                                if (Creature* creature = *itr)
+                                    creature->AI()->SetData(1, 1);
                             }
+                            events.ScheduleEvent(EVENT_PRE_FIGHT_2, 32000);
+                            break;
+                        }
                         case EVENT_PRE_FIGHT_2:
                             me->CastSpell(me, SPELL_FREEZE_ANIM);
                             me->CastSpell(me, SPELL_EMBERSEER_GROWING);
@@ -236,22 +236,22 @@ public:
                             events.ScheduleEvent(EVENT_FIRE_SHIELD, 3000);
                             break;
                         case EVENT_PLAYER_CHECK:
-                            {
-                                // Check to see if all players in instance have aura SPELL_EMBERSEER_START before starting event
-                                bool _hasAura = false;
-                                Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                    if (Player* player = itr->GetSource()->ToPlayer())
-                                        if (player->HasAura(SPELL_EMBERSEER_OBJECT_VISUAL))
-                                            _hasAura = true;
+                        {
+                            // Check to see if all players in instance have aura SPELL_EMBERSEER_START before starting event
+                            bool _hasAura = false;
+                            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                                if (Player* player = itr->GetSource()->ToPlayer())
+                                    if (player->HasAura(SPELL_EMBERSEER_OBJECT_VISUAL))
+                                        _hasAura = true;
 
-                                if (_hasAura)
-                                {
-                                    events.ScheduleEvent(EVENT_PRE_FIGHT_1, 1000);
-                                    instance->SetBossState(DATA_PYROGAURD_EMBERSEER, IN_PROGRESS);
-                                }
-                                break;
+                            if (_hasAura)
+                            {
+                                events.ScheduleEvent(EVENT_PRE_FIGHT_1, 1000);
+                                instance->SetBossState(DATA_PYROGAURD_EMBERSEER, IN_PROGRESS);
                             }
+                            break;
+                        }
                         case EVENT_ENTER_COMBAT:
                             AttackStart(me->SelectNearestPlayer(30.0f));
                             break;
@@ -378,14 +378,14 @@ public:
                     switch (eventId)
                     {
                         case EVENT_ENCAGED_EMBERSEER:
-                            {
-                                if (me->GetPositionX() == me->GetHomePosition().GetPositionX())
-                                    if (!me->HasAura(SPELL_ENCAGE_EMBERSEER))
-                                        if (Creature* Emberseer = me->FindNearestCreature(NPC_PYROGAURD_EMBERSEER, 30.0f, true))
-                                            DoCast(Emberseer, SPELL_ENCAGE_EMBERSEER);
-                                break;
+                        {
+                            if (me->GetPositionX() == me->GetHomePosition().GetPositionX())
+                                if (!me->HasAura(SPELL_ENCAGE_EMBERSEER))
+                                    if (Creature* Emberseer = me->FindNearestCreature(NPC_PYROGAURD_EMBERSEER, 30.0f, true))
+                                        DoCast(Emberseer, SPELL_ENCAGE_EMBERSEER);
+                            break;
 
-                            }
+                        }
                     }
                 }
                 return;

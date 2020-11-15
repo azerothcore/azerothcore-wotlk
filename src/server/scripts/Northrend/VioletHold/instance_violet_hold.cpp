@@ -117,7 +117,7 @@ public:
 
         void OnCreatureCreate(Creature* creature)
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_SINCLARI:
                     NPC_SinclariGUID = creature->GetGUID();
@@ -172,7 +172,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go)
         {
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_ACTIVATION_CRYSTAL:
                     HandleGameObject(0, false, go); // make go not used yet
@@ -212,16 +212,16 @@ public:
 
         void SetData(uint32 type, uint32 data)
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_ACTIVATE_DEFENSE_SYSTEM:
-                    {
-                        if (data)
-                            bDefensesUsed = true;
-                        const Position pos = {1919.09546f, 812.29724f, 86.2905f, M_PI};
-                        instance->SummonCreature(NPC_DEFENSE_SYSTEM, pos, 0, 6499);
-                    }
-                    break;
+                {
+                    if (data)
+                        bDefensesUsed = true;
+                    const Position pos = {1919.09546f, 812.29724f, 86.2905f, M_PI};
+                    instance->SummonCreature(NPC_DEFENSE_SYSTEM, pos, 0, 6499);
+                }
+                break;
                 case DATA_START_INSTANCE:
                     if (EncounterStatus == NOT_STARTED)
                     {
@@ -282,7 +282,7 @@ public:
 
         void SetData64(uint32 type, uint64 data)
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_ADD_TRASH_MOB:
                     trashMobs.insert(data);
@@ -296,7 +296,7 @@ public:
 
         uint32 GetData(uint32 type) const
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_ENCOUNTER_STATUS:
                     return (uint32)EncounterStatus;
@@ -315,7 +315,7 @@ public:
 
         uint64 GetData64(uint32 identifier) const
         {
-            switch(identifier)
+            switch (identifier)
             {
                 case DATA_TELEPORTATION_PORTAL_GUID:
                     return NPC_PortalGUID;
@@ -338,7 +338,7 @@ public:
         {
             Creature* pBoss = nullptr;
 
-            switch(uiBoss)
+            switch (uiBoss)
             {
                 case BOSS_MORAGG:
                     HandleGameObject(GO_MoraggCellGUID, true);
@@ -405,68 +405,68 @@ public:
         void Update(uint32 diff)
         {
             events.Update(diff);
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_CHECK_PLAYERS:
-                    {
-                        if( DoNeedCleanup(false) )
-                            InstanceCleanup();
-                        events.RepeatEvent(CLEANUP_CHECK_INTERVAL);
-                    }
-                    break;
+                {
+                    if ( DoNeedCleanup(false) )
+                        InstanceCleanup();
+                    events.RepeatEvent(CLEANUP_CHECK_INTERVAL);
+                }
+                break;
                 case EVENT_GUARDS_FALL_BACK:
-                    {
-                        for (uint8 i = 0; i < 4; ++i)
-                            if (Creature* c = instance->GetCreature(NPC_GuardGUID[i]))
-                            {
-                                c->SetReactState(REACT_PASSIVE);
-                                c->CombatStop();
-                                c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                                c->GetMotionMaster()->MovePoint(0, guardMovePosition);
-                            }
-                        events.RescheduleEvent(EVENT_GUARDS_DISAPPEAR, 5000);
-                    }
-                    break;
-                case EVENT_GUARDS_DISAPPEAR:
-                    {
-                        for (uint8 i = 0; i < 4; ++i)
-                            if (Creature* c = instance->GetCreature(NPC_GuardGUID[i]))
-                                c->SetVisible(false);
-                        events.RescheduleEvent(EVENT_SINCLARI_FALL_BACK, 2000);
-                    }
-                    break;
-                case EVENT_SINCLARI_FALL_BACK:
-                    {
-                        if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
+                {
+                    for (uint8 i = 0; i < 4; ++i)
+                        if (Creature* c = instance->GetCreature(NPC_GuardGUID[i]))
                         {
+                            c->SetReactState(REACT_PASSIVE);
+                            c->CombatStop();
                             c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                            c->GetMotionMaster()->MovePoint(0, sinclariOutsidePosition);
+                            c->GetMotionMaster()->MovePoint(0, guardMovePosition);
                         }
-                        SetData(DATA_ACTIVATE_DEFENSE_SYSTEM, 0);
-                        events.RescheduleEvent(EVENT_START_ENCOUNTER, 4000);
-                    }
-                    break;
-                case EVENT_START_ENCOUNTER:
+                    events.RescheduleEvent(EVENT_GUARDS_DISAPPEAR, 5000);
+                }
+                break;
+                case EVENT_GUARDS_DISAPPEAR:
+                {
+                    for (uint8 i = 0; i < 4; ++i)
+                        if (Creature* c = instance->GetCreature(NPC_GuardGUID[i]))
+                            c->SetVisible(false);
+                    events.RescheduleEvent(EVENT_SINCLARI_FALL_BACK, 2000);
+                }
+                break;
+                case EVENT_SINCLARI_FALL_BACK:
+                {
+                    if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
                     {
-                        if (Creature* c = instance->GetCreature(NPC_DoorSealGUID))
-                            c->RemoveAllAuras(); // just to be sure...
-                        GateHealth = 100;
-                        HandleGameObject(GO_MainGateGUID, false);
-                        DoUpdateWorldState(WORLD_STATE_VH_SHOW, 1);
-                        DoUpdateWorldState(WORLD_STATE_VH_PRISON_STATE, (uint32)GateHealth);
-                        DoUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, (uint32)WaveCount);
-
-                        for (std::vector<uint64>::iterator itr = GO_ActivationCrystalGUID.begin(); itr != GO_ActivationCrystalGUID.end(); ++itr)
-                            if (GameObject* go = instance->GetGameObject(*itr))
-                            {
-                                HandleGameObject(0, false, go); // not used yet
-                                go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // make it useable
-                            }
-                        events.RescheduleEvent(EVENT_SUMMON_PORTAL, 4000);
+                        c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                        c->GetMotionMaster()->MovePoint(0, sinclariOutsidePosition);
                     }
-                    break;
+                    SetData(DATA_ACTIVATE_DEFENSE_SYSTEM, 0);
+                    events.RescheduleEvent(EVENT_START_ENCOUNTER, 4000);
+                }
+                break;
+                case EVENT_START_ENCOUNTER:
+                {
+                    if (Creature* c = instance->GetCreature(NPC_DoorSealGUID))
+                        c->RemoveAllAuras(); // just to be sure...
+                    GateHealth = 100;
+                    HandleGameObject(GO_MainGateGUID, false);
+                    DoUpdateWorldState(WORLD_STATE_VH_SHOW, 1);
+                    DoUpdateWorldState(WORLD_STATE_VH_PRISON_STATE, (uint32)GateHealth);
+                    DoUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, (uint32)WaveCount);
+
+                    for (std::vector<uint64>::iterator itr = GO_ActivationCrystalGUID.begin(); itr != GO_ActivationCrystalGUID.end(); ++itr)
+                        if (GameObject* go = instance->GetGameObject(*itr))
+                        {
+                            HandleGameObject(0, false, go); // not used yet
+                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // make it useable
+                        }
+                    events.RescheduleEvent(EVENT_SUMMON_PORTAL, 4000);
+                }
+                break;
                 case EVENT_SUMMON_PORTAL:
                     ++WaveCount;
                     DoUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, (uint32)WaveCount);
@@ -515,7 +515,7 @@ public:
 
         void OnPlayerEnter(Player* plr)
         {
-            if( DoNeedCleanup(plr->IsAlive()) )
+            if ( DoNeedCleanup(plr->IsAlive()) )
                 InstanceCleanup();
 
             if (EncounterStatus == IN_PROGRESS)
@@ -534,20 +534,20 @@ public:
         {
             uint8 aliveCount = 0;
             Map::PlayerList const& pl = instance->GetPlayers();
-            for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                if( Player* plr = itr->GetSource() )
-                    if( plr->IsAlive() && !plr->IsGameMaster() && !plr->HasAura(27827)/*spirit of redemption aura*/ )
+            for ( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
+                if ( Player* plr = itr->GetSource() )
+                    if ( plr->IsAlive() && !plr->IsGameMaster() && !plr->HasAura(27827)/*spirit of redemption aura*/ )
                         ++aliveCount;
 
             bool need = enter ? aliveCount <= 1 : aliveCount == 0;
-            if( !need && CLEANED )
+            if ( !need && CLEANED )
                 CLEANED = false;
             return need;
         }
 
         void InstanceCleanup()
         {
-            if( CLEANED )
+            if ( CLEANED )
                 return;
             CLEANED = true;
 
@@ -630,7 +630,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case CRITERIA_DEFENSELESS:
                     return GateHealth == 100 && !bDefensesUsed;

@@ -79,46 +79,46 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if(!UpdateVictim())
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case EVENT_STORM:
-                    {
-                        me->CastSpell(me->GetVictim(), DUNGEON_MODE(STORM_OF_GRIEF, STORM_OF_GRIEF_H), true);
-                        events.RepeatEvent(10000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me->GetVictim(), DUNGEON_MODE(STORM_OF_GRIEF, STORM_OF_GRIEF_H), true);
+                    events.RepeatEvent(10000);
+                    break;
+                }
                 case EVENT_SHOCK:
-                    {
-                        me->CastSpell(me->GetVictim(), DUNGEON_MODE(SHOCK_OF_SORROW, SHOCK_OF_SORROW_H), false);
-                        Talk(SAY_STUN);
+                {
+                    me->CastSpell(me->GetVictim(), DUNGEON_MODE(SHOCK_OF_SORROW, SHOCK_OF_SORROW_H), false);
+                    Talk(SAY_STUN);
 
-                        events.RepeatEvent(16000 + rand() % 6000);
-                        break;
-                    }
+                    events.RepeatEvent(16000 + rand() % 6000);
+                    break;
+                }
                 case EVENT_PILLAR:
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
-                            me->CastSpell(target, DUNGEON_MODE(PILLAR_OF_WOE, PILLAR_OF_WOE_H), false);
+                {
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
+                        me->CastSpell(target, DUNGEON_MODE(PILLAR_OF_WOE, PILLAR_OF_WOE_H), false);
 
-                        events.RepeatEvent(12000 + rand() % 8000);
-                        break;
-                    }
+                    events.RepeatEvent(12000 + rand() % 8000);
+                    break;
+                }
                 case EVENT_PARTING:
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
-                            me->CastSpell(target, PARTING_SORROW, false);
+                {
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
+                        me->CastSpell(target, PARTING_SORROW, false);
 
-                        events.RepeatEvent(6000 + rand() % 10000);
-                        break;
-                    }
+                    events.RepeatEvent(6000 + rand() % 10000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();

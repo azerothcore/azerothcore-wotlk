@@ -2420,53 +2420,53 @@ public:
                     handler->SendSysMessage(LANG_MOVEGENS_CONFUSED);
                     break;
                 case CHASE_MOTION_TYPE:
-                    {
-                        Unit* target = nullptr;
-                        if (unit->GetTypeId() == TYPEID_PLAYER)
-                            target = static_cast<ChaseMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
-                        else
-                            target = static_cast<ChaseMovementGenerator<Creature> const*>(movementGenerator)->GetTarget();
+                {
+                    Unit* target = nullptr;
+                    if (unit->GetTypeId() == TYPEID_PLAYER)
+                        target = static_cast<ChaseMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
+                    else
+                        target = static_cast<ChaseMovementGenerator<Creature> const*>(movementGenerator)->GetTarget();
 
-                        if (!target)
-                            handler->SendSysMessage(LANG_MOVEGENS_CHASE_NULL);
-                        else if (target->GetTypeId() == TYPEID_PLAYER)
-                            handler->PSendSysMessage(LANG_MOVEGENS_CHASE_PLAYER, target->GetName().c_str(), target->GetGUIDLow());
-                        else
-                            handler->PSendSysMessage(LANG_MOVEGENS_CHASE_CREATURE, target->GetName().c_str(), target->GetGUIDLow());
-                        break;
-                    }
+                    if (!target)
+                        handler->SendSysMessage(LANG_MOVEGENS_CHASE_NULL);
+                    else if (target->GetTypeId() == TYPEID_PLAYER)
+                        handler->PSendSysMessage(LANG_MOVEGENS_CHASE_PLAYER, target->GetName().c_str(), target->GetGUIDLow());
+                    else
+                        handler->PSendSysMessage(LANG_MOVEGENS_CHASE_CREATURE, target->GetName().c_str(), target->GetGUIDLow());
+                    break;
+                }
                 case FOLLOW_MOTION_TYPE:
-                    {
-                        Unit* target = nullptr;
-                        if (unit->GetTypeId() == TYPEID_PLAYER)
-                            target = static_cast<FollowMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
-                        else
-                            target = static_cast<FollowMovementGenerator<Creature> const*>(movementGenerator)->GetTarget();
+                {
+                    Unit* target = nullptr;
+                    if (unit->GetTypeId() == TYPEID_PLAYER)
+                        target = static_cast<FollowMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
+                    else
+                        target = static_cast<FollowMovementGenerator<Creature> const*>(movementGenerator)->GetTarget();
 
-                        if (!target)
-                            handler->SendSysMessage(LANG_MOVEGENS_FOLLOW_NULL);
-                        else if (target->GetTypeId() == TYPEID_PLAYER)
-                            handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_PLAYER, target->GetName().c_str(), target->GetGUIDLow());
-                        else
-                            handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_CREATURE, target->GetName().c_str(), target->GetGUIDLow());
-                        break;
-                    }
+                    if (!target)
+                        handler->SendSysMessage(LANG_MOVEGENS_FOLLOW_NULL);
+                    else if (target->GetTypeId() == TYPEID_PLAYER)
+                        handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_PLAYER, target->GetName().c_str(), target->GetGUIDLow());
+                    else
+                        handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_CREATURE, target->GetName().c_str(), target->GetGUIDLow());
+                    break;
+                }
                 case HOME_MOTION_TYPE:
-                    {
-                        if (unit->GetTypeId() == TYPEID_UNIT)
-                            handler->PSendSysMessage(LANG_MOVEGENS_HOME_CREATURE, x, y, z);
-                        else
-                            handler->SendSysMessage(LANG_MOVEGENS_HOME_PLAYER);
-                        break;
-                    }
+                {
+                    if (unit->GetTypeId() == TYPEID_UNIT)
+                        handler->PSendSysMessage(LANG_MOVEGENS_HOME_CREATURE, x, y, z);
+                    else
+                        handler->SendSysMessage(LANG_MOVEGENS_HOME_PLAYER);
+                    break;
+                }
                 case FLIGHT_MOTION_TYPE:
                     handler->SendSysMessage(LANG_MOVEGENS_FLIGHT);
                     break;
                 case POINT_MOTION_TYPE:
-                    {
-                        handler->PSendSysMessage(LANG_MOVEGENS_POINT, x, y, z);
-                        break;
-                    }
+                {
+                    handler->PSendSysMessage(LANG_MOVEGENS_POINT, x, y, z);
+                    break;
+                }
                 case FLEEING_MOTION_TYPE:
                     handler->SendSysMessage(LANG_MOVEGENS_FEAR);
                     break;

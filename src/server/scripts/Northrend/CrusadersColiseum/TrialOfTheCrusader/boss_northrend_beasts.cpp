@@ -100,7 +100,7 @@ public:
 
         void AttackStart(Unit* who)
         {
-            if( who->GetGUID() != TargetGUID )
+            if ( who->GetGUID() != TargetGUID )
                 return;
             ScriptedAI::AttackStart(who);
         }
@@ -109,26 +109,26 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( !TargetGUID && !me->GetVehicle() )
+            if ( !TargetGUID && !me->GetVehicle() )
                 return;
 
             Unit* t = ObjectAccessor::GetUnit(*me, TargetGUID);
-            if( !t && !(t = me->GetVehicleBase()) )
+            if ( !t && !(t = me->GetVehicleBase()) )
                 return;
 
-            if( t->isDead() )
+            if ( t->isDead() )
             {
                 t->RemoveAura(SPELL_CHANGE_VEHICLE);
                 me->RemoveAllAuras();
                 me->DeleteThreatList();
                 me->CombatStop(true);
                 me->SetHealth(me->GetMaxHealth());
-                if( pInstance )
-                    if( Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK)) )
-                        if( gormok->IsAlive() )
-                            if( Vehicle* vk = gormok->GetVehicleKit() )
-                                for( uint8 i = 0; i < 4; ++i )
-                                    if( !vk->GetPassenger(i) )
+                if ( pInstance )
+                    if ( Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK)) )
+                        if ( gormok->IsAlive() )
+                            if ( Vehicle* vk = gormok->GetVehicleKit() )
+                                for ( uint8 i = 0; i < 4; ++i )
+                                    if ( !vk->GetPassenger(i) )
                                     {
                                         me->EnterVehicleUnattackable(gormok, i);
                                         Reset();
@@ -140,52 +140,52 @@ public:
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_SPELL_SNOBOLLED:
-                    if( t->GetTypeId() == TYPEID_PLAYER )
+                    if ( t->GetTypeId() == TYPEID_PLAYER )
                         me->CastSpell((Unit*)NULL, SPELL_SNOBOLLED, true);
-                    
+
                     break;
                 case EVENT_SPELL_BATTER:
-                    if( t->GetTypeId() == TYPEID_PLAYER )
+                    if ( t->GetTypeId() == TYPEID_PLAYER )
                         me->CastSpell(t, SPELL_BATTER);
                     events.RepeatEvent(urand(6000, 8000));
                     break;
                 case EVENT_SPELL_FIRE_BOMB:
+                {
+                    if ( t->GetTypeId() != TYPEID_PLAYER && pInstance )
                     {
-                        if( t->GetTypeId() != TYPEID_PLAYER && pInstance )
+                        std::vector<uint64> validPlayers;
+                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+                        Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK));
+
+                        for ( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                         {
-                            std::vector<uint64> validPlayers;
-                            Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                            Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK));
-
-                            for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                            {
-                                if( Player* p = itr->GetSource() )
-                                    if( p->IsAlive() && p->GetGUID() != TargetGUID && (!gormok || !p->IsWithinMeleeRange(gormok)) )
-                                        validPlayers.push_back(p->GetGUID());
-                            }
-
-                            if( !validPlayers.empty() )
-                                if( Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))) )
-                                    if( Creature* trigger = me->SummonCreature(NPC_FIRE_BOMB, *p, TEMPSUMMON_TIMED_DESPAWN, 60000) )
-                                    {
-                                        me->CastSpell(trigger, SPELL_FIRE_BOMB_AURA, true); // periodic damage aura, speed 14.0f
-                                        me->CastSpell(trigger, SPELL_FIRE_BOMB); // visual + initial damage 4k
-                                    }
+                            if ( Player* p = itr->GetSource() )
+                                if ( p->IsAlive() && p->GetGUID() != TargetGUID && (!gormok || !p->IsWithinMeleeRange(gormok)) )
+                                    validPlayers.push_back(p->GetGUID());
                         }
 
-                        events.RepeatEvent(urand(20000, 30000));
+                        if ( !validPlayers.empty() )
+                            if ( Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))) )
+                                if ( Creature* trigger = me->SummonCreature(NPC_FIRE_BOMB, *p, TEMPSUMMON_TIMED_DESPAWN, 60000) )
+                                {
+                                    me->CastSpell(trigger, SPELL_FIRE_BOMB_AURA, true); // periodic damage aura, speed 14.0f
+                                    me->CastSpell(trigger, SPELL_FIRE_BOMB); // visual + initial damage 4k
+                                }
                     }
-                    break;
+
+                    events.RepeatEvent(urand(20000, 30000));
+                }
+                break;
                 case EVENT_SPELL_HEAD_CRACK:
-                    if( t->GetTypeId() == TYPEID_PLAYER )
+                    if ( t->GetTypeId() == TYPEID_PLAYER )
                         me->CastSpell(t, SPELL_HEAD_CRACK);
                     events.RepeatEvent(urand(30000, 35000));
                     break;
@@ -196,17 +196,17 @@ public:
 
         void JustDied(Unit* /*pKiller*/)
         {
-            if( Unit* t = ObjectAccessor::GetUnit(*me, TargetGUID))
+            if ( Unit* t = ObjectAccessor::GetUnit(*me, TargetGUID))
             {
                 t->RemoveAura(SPELL_CHANGE_VEHICLE);
-                if( t->IsAlive() )
+                if ( t->IsAlive() )
                     t->RemoveAurasDueToSpell(SPELL_SNOBOLLED);
             }
         }
 
         void DoAction(int32 param)
         {
-            if( param == 1 && !TargetGUID )
+            if ( param == 1 && !TargetGUID )
                 me->DespawnOrUnsummon();
         }
     };
@@ -252,9 +252,9 @@ public:
             events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, urand(16000, 24000));
 
             // refresh snobold position
-            if( Vehicle* vk = me->GetVehicleKit() )
-                for( uint8 i = 0; i < 4; ++i )
-                    if( Unit* snobold = vk->GetPassenger(i) )
+            if ( Vehicle* vk = me->GetVehicleKit() )
+                for ( uint8 i = 0; i < 4; ++i )
+                    if ( Unit* snobold = vk->GetPassenger(i) )
                         snobold->SendMovementFlagUpdate();
         }
 
@@ -267,22 +267,22 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( !UpdateVictim() )
+            if ( !UpdateVictim() )
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_SPELL_IMPALE:
-                    if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
+                    if ( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED) )
                     {
-                        if( Unit* victim = me->GetVictim() )
+                        if ( Unit* victim = me->GetVictim() )
                             me->CastSpell(victim, SPELL_IMPALE, false);
                         events.RepeatEvent(urand(9000, 10000));
                     }
@@ -294,21 +294,21 @@ public:
                     events.RepeatEvent(urand(20000, 25000));
                     break;
                 case EVENT_PICK_SNOBOLD_TARGET:
-                    if( Vehicle* vk = me->GetVehicleKit() )
-                        for( uint8 i = 0; i < 4; ++i )
-                            if( Unit* snobold = vk->GetPassenger(i) )
+                    if ( Vehicle* vk = me->GetVehicleKit() )
+                        for ( uint8 i = 0; i < 4; ++i )
+                            if ( Unit* snobold = vk->GetPassenger(i) )
                             {
                                 std::vector<uint64> validPlayers;
                                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                                for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
+                                for ( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                                 {
-                                    if( Player* p = itr->GetSource() )
-                                        if( p->IsAlive() && !p->GetVehicleKit() && !p->IsMounted() && !p->GetVehicle() && !p->IsGameMaster() )
+                                    if ( Player* p = itr->GetSource() )
+                                        if ( p->IsAlive() && !p->GetVehicleKit() && !p->IsMounted() && !p->GetVehicle() && !p->IsGameMaster() )
                                             validPlayers.push_back(p->GetGUID());
                                 }
 
-                                if( !validPlayers.empty() )
-                                    if( Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))) )
+                                if ( !validPlayers.empty() )
+                                    if ( Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))) )
                                     {
                                         snobold->ChangeSeat(4); // switch to hand
                                         me->setAttackTimer(BASE_ATTACK, 3000);
@@ -321,46 +321,46 @@ public:
                     events.RepeatEvent(urand(16000, 24000));
                     break;
                 case EVENT_RELEASE_SNOBOLD:
+                {
+                    me->CastSpell(me, SPELL_RISING_ANGER, true);
+                    Player* p = ObjectAccessor::GetPlayer(*me, PlayerGUID);
+                    if ( p && p->IsAlive() && !p->GetVehicleKit() && !p->IsMounted() && !p->GetVehicle() )
                     {
-                        me->CastSpell(me, SPELL_RISING_ANGER, true);
-                        Player* p = ObjectAccessor::GetPlayer(*me, PlayerGUID);
-                        if( p && p->IsAlive() && !p->GetVehicleKit() && !p->IsMounted() && !p->GetVehicle() )
-                        {
-                            if( Vehicle* vk = me->GetVehicleKit() )
-                                if( Unit* snobold = vk->GetPassenger(4) )
+                        if ( Vehicle* vk = me->GetVehicleKit() )
+                            if ( Unit* snobold = vk->GetPassenger(4) )
+                            {
+                                if ( snobold->GetTypeId() == TYPEID_UNIT )
                                 {
-                                    if( snobold->GetTypeId() == TYPEID_UNIT )
-                                    {
-                                        CAST_AI(npc_snobold_vassal::npc_snobold_vassalAI, snobold->ToCreature()->AI())->TargetGUID = PlayerGUID;
-                                        snobold->ToCreature()->AI()->AttackStart(p);
-                                    }
-                                    //Talk(EMOTE_SNOBOLLED);
-                                    p->CastSpell(p, SPELL_CHANGE_VEHICLE, true);
-                                    snobold->EnterVehicle(p, 0);
-                                    //snobold->ClearUnitState(UNIT_STATE_ONVEHICLE);
+                                    CAST_AI(npc_snobold_vassal::npc_snobold_vassalAI, snobold->ToCreature()->AI())->TargetGUID = PlayerGUID;
+                                    snobold->ToCreature()->AI()->AttackStart(p);
                                 }
-                        }
-                        else if( Vehicle* vk = me->GetVehicleKit() )
-                        {
-                            events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, 5000); // player not found (died? left instance?), pick new one faster!
-                            if( Unit* snobold = vk->GetPassenger(4) )
-                                if( snobold->GetTypeId() == TYPEID_UNIT )
-                                {
-                                    bool needDespawn = true;
-                                    for( uint8 i = 0; i < 4; ++i )
-                                        if( !vk->GetPassenger(i) )
-                                        {
-                                            snobold->ChangeSeat(i);
-                                            needDespawn = false;
-                                            break;
-                                        }
-                                    if( needDespawn )
-                                        snobold->ToCreature()->DespawnOrUnsummon();
-                                }
-                        }
-                        PlayerGUID = 0;
+                                //Talk(EMOTE_SNOBOLLED);
+                                p->CastSpell(p, SPELL_CHANGE_VEHICLE, true);
+                                snobold->EnterVehicle(p, 0);
+                                //snobold->ClearUnitState(UNIT_STATE_ONVEHICLE);
+                            }
                     }
-                    break;
+                    else if ( Vehicle* vk = me->GetVehicleKit() )
+                    {
+                        events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, 5000); // player not found (died? left instance?), pick new one faster!
+                        if ( Unit* snobold = vk->GetPassenger(4) )
+                            if ( snobold->GetTypeId() == TYPEID_UNIT )
+                            {
+                                bool needDespawn = true;
+                                for ( uint8 i = 0; i < 4; ++i )
+                                    if ( !vk->GetPassenger(i) )
+                                    {
+                                        snobold->ChangeSeat(i);
+                                        needDespawn = false;
+                                        break;
+                                    }
+                                if ( needDespawn )
+                                    snobold->ToCreature()->DespawnOrUnsummon();
+                            }
+                    }
+                    PlayerGUID = 0;
+                }
+                break;
             }
 
             DoMeleeAttackIfReady();
@@ -370,7 +370,7 @@ public:
         {
             summons.DoAction(1);
 
-            if( pInstance )
+            if ( pInstance )
                 pInstance->SetData(TYPE_GORMOK, DONE);
         }
 
@@ -381,7 +381,7 @@ public:
 
         void DoAction(int32 param)
         {
-            switch( param )
+            switch ( param )
             {
                 case -1:
                     summons.DespawnAll();
@@ -394,7 +394,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            if( pInstance )
+            if ( pInstance )
                 pInstance->SetData(TYPE_FAILED, 1);
         }
     };
@@ -476,16 +476,16 @@ struct boss_jormungarAI : public ScriptedAI
 
     void DoAction(int32 param)
     {
-        switch( param )
+        switch ( param )
         {
             case -1:
-                if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+                if ( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
                     events.RescheduleEvent(EVENT_SUBMERGE, 1500);
                 break;
             case -2:
-                if( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+                if ( me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
                     bIsStationary = true; // it will come out mobile soon
-                else if( me->GetDisplayId() == _MODEL_STATIONARY )
+                else if ( me->GetDisplayId() == _MODEL_STATIONARY )
                     events.RescheduleEvent(EVENT_SUBMERGE, 1000);
                 else
                     events.CancelEvent(EVENT_SUBMERGE);
@@ -498,7 +498,7 @@ struct boss_jormungarAI : public ScriptedAI
     void ScheduleEvents()
     {
         events.Reset();
-        if( me->GetDisplayId() == _MODEL_STATIONARY )
+        if ( me->GetDisplayId() == _MODEL_STATIONARY )
         {
             me->SetAttackTime(BASE_ATTACK, 1500);
             events.RescheduleEvent(EVENT_SPELL_SPRAY, (me->GetEntry() == NPC_ACIDMAW ? 20000 : 15000));
@@ -511,7 +511,7 @@ struct boss_jormungarAI : public ScriptedAI
             events.RescheduleEvent(EVENT_SPELL_SPEW, urand(15000, 30000));
             events.RescheduleEvent(EVENT_SPELL_SLIME_POOL, 15000);
         }
-        if( !me->HasAura(SPELL_ENRAGE) )
+        if ( !me->HasAura(SPELL_ENRAGE) )
             events.RescheduleEvent(EVENT_SUBMERGE, urand(45000, 50000));
     }
 
@@ -528,11 +528,11 @@ struct boss_jormungarAI : public ScriptedAI
 
     void AttackStart(Unit* who)
     {
-        if( me->GetDisplayId() == _MODEL_STATIONARY )
+        if ( me->GetDisplayId() == _MODEL_STATIONARY )
         {
-            if( !who )
+            if ( !who )
                 return;
-            if( me->Attack(who, true) )
+            if ( me->Attack(who, true) )
                 DoStartNoMovement(who);
         }
         else
@@ -541,77 +541,77 @@ struct boss_jormungarAI : public ScriptedAI
 
     void UpdateAI(uint32 diff)
     {
-        if( !UpdateVictim() )
+        if ( !UpdateVictim() )
             return;
 
         events.Update(diff);
 
-        if( me->HasUnitState(UNIT_STATE_CASTING) )
+        if ( me->HasUnitState(UNIT_STATE_CASTING) )
             return;
 
-        switch( events.ExecuteEvent() )
+        switch ( events.ExecuteEvent() )
         {
             case 0:
                 break;
             case EVENT_SUBMERGE:
-                {
-                    bIsStationary = (me->GetDisplayId() == _MODEL_STATIONARY);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                    me->CastSpell(me, SPELL_SUBMERGE_0, false);
-                    Talk(EMOTE_SUBMERGE);
+            {
+                bIsStationary = (me->GetDisplayId() == _MODEL_STATIONARY);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->CastSpell(me, SPELL_SUBMERGE_0, false);
+                Talk(EMOTE_SUBMERGE);
 
-                    // second one submerge 1.5sec after the first one, used also for synchronizing
-                    if( pInstance )
-                        if( Creature* c = ObjectAccessor::GetCreature(*me, pInstance->GetData64(_TYPE_OTHER)) )
-                            c->AI()->DoAction(-1);
+                // second one submerge 1.5sec after the first one, used also for synchronizing
+                if ( pInstance )
+                    if ( Creature* c = ObjectAccessor::GetCreature(*me, pInstance->GetData64(_TYPE_OTHER)) )
+                        c->AI()->DoAction(-1);
 
-                    events.Reset();
-                    events.RescheduleEvent(EVENT_MOVE_UNDERGROUND, 2500);
-                }
-                break;
+                events.Reset();
+                events.RescheduleEvent(EVENT_MOVE_UNDERGROUND, 2500);
+            }
+            break;
             case EVENT_MOVE_UNDERGROUND:
+            {
+                float angle = me->GetAngle(Locs[LOC_CENTER].GetPositionX() + urand(0, 20) - 10.0f, Locs[LOC_CENTER].GetPositionY() + urand(0, 20) - 10.0f), dist = urand(10, 35);
+                if ( Creature* c = me->SummonCreature(NPC_WORLD_TRIGGER, *me, TEMPSUMMON_TIMED_DESPAWN, 6000) )
                 {
-                    float angle = me->GetAngle(Locs[LOC_CENTER].GetPositionX() + urand(0, 20) - 10.0f, Locs[LOC_CENTER].GetPositionY() + urand(0, 20) - 10.0f), dist = urand(10, 35);
-                    if( Creature* c = me->SummonCreature(NPC_WORLD_TRIGGER, *me, TEMPSUMMON_TIMED_DESPAWN, 6000) )
-                    {
-                        c->SetSpeed(MOVE_RUN, 2.5f);
-                        c->CastSpell(c, SPELL_CHURNING_GROUND, true);
-                        c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
-                        c->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ());
-                    }
-                    me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
-                    me->StopMovingOnCurrentPos();
-                    DoResetThreat();
-                    
-                    events.RescheduleEvent(EVENT_EMERGE, 6000);
+                    c->SetSpeed(MOVE_RUN, 2.5f);
+                    c->CastSpell(c, SPELL_CHURNING_GROUND, true);
+                    c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
+                    c->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ());
                 }
-                break;
+                me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
+                me->StopMovingOnCurrentPos();
+                DoResetThreat();
+
+                events.RescheduleEvent(EVENT_EMERGE, 6000);
+            }
+            break;
             case EVENT_EMERGE:
+            {
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
+                me->StopMoving();
+                if ( bIsStationary )
                 {
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveIdle();
-                    me->StopMoving();
-                    if( bIsStationary )
-                    {
-                        me->SetNativeDisplayId(_MODEL_MOBILE);
-                        SetCombatMovement(true);
-                        if( Unit* victim = me->GetVictim() )
-                            me->GetMotionMaster()->MoveChase(victim);
-                    }
-                    else
-                    {
-                        me->SetNativeDisplayId(_MODEL_STATIONARY);
-                        SetCombatMovement(false);
-                    }
-                    me->RemoveAurasDueToSpell(SPELL_SUBMERGE_0);
-                    me->CastSpell(me, SPELL_EMERGE_0, false);
-                    Talk(EMOTE_EMERGE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                    ScheduleEvents();
+                    me->SetNativeDisplayId(_MODEL_MOBILE);
+                    SetCombatMovement(true);
+                    if ( Unit* victim = me->GetVictim() )
+                        me->GetMotionMaster()->MoveChase(victim);
                 }
-                break;
+                else
+                {
+                    me->SetNativeDisplayId(_MODEL_STATIONARY);
+                    SetCombatMovement(false);
+                }
+                me->RemoveAurasDueToSpell(SPELL_SUBMERGE_0);
+                me->CastSpell(me, SPELL_EMERGE_0, false);
+                Talk(EMOTE_EMERGE);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                ScheduleEvents();
+            }
+            break;
             case EVENT_SPELL_SPRAY:
-                if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
+                if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
                     me->CastSpell(target, _SPELL_SPRAY, false);
                 events.RepeatEvent(20000);
                 break;
@@ -620,7 +620,7 @@ struct boss_jormungarAI : public ScriptedAI
                 events.RepeatEvent(urand(15000, 30000));
                 break;
             case EVENT_SPELL_BITE:
-                if( Unit* victim = me->GetVictim() )
+                if ( Unit* victim = me->GetVictim() )
                     me->CastSpell(victim, _SPELL_BITE, false);
                 events.RepeatEvent(20000);
                 break;
@@ -629,15 +629,15 @@ struct boss_jormungarAI : public ScriptedAI
                 events.RepeatEvent(urand(15000, 30000));
                 break;
             case EVENT_SPELL_SLIME_POOL:
-                if( Creature* c = me->SummonCreature(NPC_SLIME_POOL, *me, TEMPSUMMON_TIMED_DESPAWN, 30000) )
+                if ( Creature* c = me->SummonCreature(NPC_SLIME_POOL, *me, TEMPSUMMON_TIMED_DESPAWN, 30000) )
                     c->CastSpell(c, SPELL_SLIME_POOL_EFFECT, true);
                 events.RepeatEvent(30000);
                 break;
         }
 
-        if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+        if ( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
         {
-            if( me->GetDisplayId() == _MODEL_STATIONARY )
+            if ( me->GetDisplayId() == _MODEL_STATIONARY )
                 DoSpellAttackIfReady(_SPELL_SPIT);
             else
                 DoMeleeAttackIfReady();
@@ -646,10 +646,10 @@ struct boss_jormungarAI : public ScriptedAI
 
     void JustDied(Unit* /*pKiller*/)
     {
-        if( pInstance )
+        if ( pInstance )
         {
-            if( Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(_TYPE_OTHER)) )
-                if( c->IsAlive() )
+            if ( Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(_TYPE_OTHER)) )
+                if ( c->IsAlive() )
                     c->AI()->DoAction(-2);
             pInstance->SetData(TYPE_JORMUNGAR, DONE);
         }
@@ -659,7 +659,7 @@ struct boss_jormungarAI : public ScriptedAI
     {
         events.Reset();
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        if( pInstance )
+        if ( pInstance )
             pInstance->SetData(TYPE_FAILED, 1);
     }
 };
@@ -806,9 +806,9 @@ public:
         bool DoTrampleIfValid()
         {
             Map::PlayerList const& lPlayers = me->GetMap()->GetPlayers();
-            for( Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr )
-                if( Unit* p = itr->GetSource() )
-                    if( p->IsAlive() && p->GetExactDist(me) <= 12.0f )
+            for ( Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr )
+                if ( Unit* p = itr->GetSource() )
+                    if ( p->IsAlive() && p->GetExactDist(me) <= 12.0f )
                     {
                         DoCastAOE(SPELL_TRAMPLE);
                         return true;
@@ -819,7 +819,7 @@ public:
 
         void MovementInform(uint32  /*type*/, uint32 id)
         {
-            if( id == EVENT_CHARGE )
+            if ( id == EVENT_CHARGE )
             {
                 events.Reset();
                 events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, urand(5000, 15000));
@@ -833,7 +833,7 @@ public:
                 me->UpdatePosition(destX, destY, destZ, angle, true);
                 me->StopMovingOnCurrentPos();
 
-                if( !DoTrampleIfValid() )
+                if ( !DoTrampleIfValid() )
                 {
                     me->CastSpell(me, SPELL_STAGGERED_DAZE, true);
                     me->CastSpell((Unit*)NULL, SPELL_TRAMPLE, true);
@@ -852,20 +852,20 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( !UpdateVictim() )
+            if ( !UpdateVictim() )
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_SPELL_FEROCIOUS_BUTT:
-                    if( Unit* victim = me->GetVictim() )
+                    if ( Unit* victim = me->GetVictim() )
                         me->CastSpell(victim, SPELL_FEROCIOUS_BUTT, false);
                     events.RepeatEvent(urand(15000, 30000));
                     break;
@@ -874,7 +874,7 @@ public:
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_ARCTIC_BREATH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true) )
                         me->CastSpell(target, SPELL_ARCTIC_BREATH, false);
                     events.RepeatEvent(urand(20000, 30000));
                     break;
@@ -892,11 +892,11 @@ public:
                 case EVENT_SPELL_MASSIVE_CRASH:
                     me->GetMotionMaster()->Clear();
                     me->CastSpell((Unit*)NULL, SPELL_MASSIVE_CRASH, false);
-                    
+
                     events.RescheduleEvent(EVENT_GAZE, 2000);
                     break;
                 case EVENT_GAZE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true) )
                     {
                         TargetGUID = target->GetGUID();
                         me->SetUInt64Value(UNIT_FIELD_TARGET, TargetGUID);
@@ -914,48 +914,48 @@ public:
                         me->GetMotionMaster()->MovementExpired();
                         me->SetReactState(REACT_AGGRESSIVE);
                     }
-                    
+
                     break;
                 case EVENT_JUMP_BACK:
-                    {
-                        float angle;
-                        if( Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID) )
-                            angle = me->GetAngle(target);
-                        else // in case something went wrong
-                            angle = rand_norm() * 2 * M_PI;
+                {
+                    float angle;
+                    if ( Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID) )
+                        angle = me->GetAngle(target);
+                    else // in case something went wrong
+                        angle = rand_norm() * 2 * M_PI;
 
-                        float jumpangle = angle >= M_PI ? angle - M_PI : angle + M_PI;
-                        float dist = 50.0f;
-                        if( angle > 1.0f && angle < 2.0f ) // near main gate
-                            dist = 46.0f;
-                        destX = Locs[LOC_CENTER].GetPositionX() + cos(angle) * dist;
-                        destY = Locs[LOC_CENTER].GetPositionY() + sin(angle) * dist;
-                        destZ = Locs[LOC_CENTER].GetPositionZ() + 1.0f;
-                        me->StopMoving();
-                        me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX() + cos(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionY() + sin(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionZ() + 1.0f, 40.0f, 12.0f);
+                    float jumpangle = angle >= M_PI ? angle - M_PI : angle + M_PI;
+                    float dist = 50.0f;
+                    if ( angle > 1.0f && angle < 2.0f ) // near main gate
+                        dist = 46.0f;
+                    destX = Locs[LOC_CENTER].GetPositionX() + cos(angle) * dist;
+                    destY = Locs[LOC_CENTER].GetPositionY() + sin(angle) * dist;
+                    destZ = Locs[LOC_CENTER].GetPositionZ() + 1.0f;
+                    me->StopMoving();
+                    me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX() + cos(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionY() + sin(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionZ() + 1.0f, 40.0f, 12.0f);
 
-                        events.RescheduleEvent(EVENT_TRAMPLE, 1500);
+                    events.RescheduleEvent(EVENT_TRAMPLE, 1500);
 
-                        if( pInstance )
-                            switch( GetDifficulty() )
-                            {
-                                case RAID_DIFFICULTY_10MAN_NORMAL:
-                                    pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MASSIVE_CRASH);
-                                    pInstance->DoCastSpellOnPlayers(SPELL_SURGE_OF_ADRENALINE);
-                                    break;
-                                case RAID_DIFFICULTY_25MAN_NORMAL:
-                                    pInstance->DoRemoveAurasDueToSpellOnPlayers(67660);
-                                    pInstance->DoCastSpellOnPlayers(SPELL_SURGE_OF_ADRENALINE);
-                                    break;
-                                case RAID_DIFFICULTY_10MAN_HEROIC:
-                                    pInstance->DoRemoveAurasDueToSpellOnPlayers(67661);
-                                    break;
-                                case RAID_DIFFICULTY_25MAN_HEROIC:
-                                    pInstance->DoRemoveAurasDueToSpellOnPlayers(67662);
-                                    break;
-                            }
-                    }
-                    break;
+                    if ( pInstance )
+                        switch ( GetDifficulty() )
+                        {
+                            case RAID_DIFFICULTY_10MAN_NORMAL:
+                                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MASSIVE_CRASH);
+                                pInstance->DoCastSpellOnPlayers(SPELL_SURGE_OF_ADRENALINE);
+                                break;
+                            case RAID_DIFFICULTY_25MAN_NORMAL:
+                                pInstance->DoRemoveAurasDueToSpellOnPlayers(67660);
+                                pInstance->DoCastSpellOnPlayers(SPELL_SURGE_OF_ADRENALINE);
+                                break;
+                            case RAID_DIFFICULTY_10MAN_HEROIC:
+                                pInstance->DoRemoveAurasDueToSpellOnPlayers(67661);
+                                break;
+                            case RAID_DIFFICULTY_25MAN_HEROIC:
+                                pInstance->DoRemoveAurasDueToSpellOnPlayers(67662);
+                                break;
+                        }
+                }
+                break;
                 case EVENT_TRAMPLE:
                     //Talk(EMOTE_TRAMPLE_START);
                     me->DisableSpline();
@@ -963,10 +963,10 @@ public:
                     me->GetMotionMaster()->MoveCharge(destX, destY, destZ + 1.0f, 65.0f);
                     me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
                     events.RescheduleEvent(EVENT_CHECK_TRAMPLE_PLAYERS, 100);
-                    
+
                     break;
                 case EVENT_CHECK_TRAMPLE_PLAYERS:
-                    if( DoTrampleIfValid() )
+                    if ( DoTrampleIfValid() )
                     {
                         events.Reset();
                         events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, urand(5000, 15000));
@@ -982,11 +982,11 @@ public:
                     break;
                 case EVENT_REFRESH_POSITION:
                     //me->SetFacingTo(me->GetOrientation());
-                    
+
                     break;
             }
 
-            if( me->GetReactState() != REACT_PASSIVE )
+            if ( me->GetReactState() != REACT_PASSIVE )
                 DoMeleeAttackIfReady();
         }
 
@@ -994,28 +994,28 @@ public:
         {
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            if( pInstance )
+            if ( pInstance )
                 pInstance->SetData(TYPE_FAILED, 1);
         }
 
         void JustDied(Unit* /*killer*/)
         {
-            if( !pInstance )
+            if ( !pInstance )
                 return;
 
             pInstance->SetData(TYPE_ICEHOWL, DONE);
 
             Player* plr = nullptr;
-            if( !pInstance->instance->GetPlayers().isEmpty() )
+            if ( !pInstance->instance->GetPlayers().isEmpty() )
                 plr = pInstance->instance->GetPlayers().begin()->GetSource();
 
-            if( !plr )
+            if ( !plr )
                 return;
 
             // remove loot for the other faction (items are invisible for players, done in conditions), so corpse can be skinned
-            for( std::vector<LootItem>::iterator itr = me->loot.items.begin(); itr != me->loot.items.end(); ++itr )
-                if( ItemTemplate const* iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
-                    if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && plr->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && plr->GetTeamId() != TEAM_ALLIANCE) )
+            for ( std::vector<LootItem>::iterator itr = me->loot.items.begin(); itr != me->loot.items.end(); ++itr )
+                if ( ItemTemplate const* iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
+                    if ( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && plr->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && plr->GetTeamId() != TEAM_ALLIANCE) )
                     {
                         (*itr).count = 0;
                         (*itr).is_looted = true;

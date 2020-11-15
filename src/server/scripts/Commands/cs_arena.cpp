@@ -130,7 +130,7 @@ public:
         std::string name = arena->GetName();
         arena->Disband();
 
-        delete(arena);
+        delete (arena);
 
         handler->PSendSysMessage(LANG_ARENA_DISBAND, name.c_str(), teamId);
         return true;

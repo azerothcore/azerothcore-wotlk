@@ -453,16 +453,16 @@ public:
                     events.ScheduleEvent(EVENT_LAND_GROUND, 0);
                     break;
                 case POINT_LAND_GROUND:
-                    {
-                        me->SetDisableGravity(false);
-                        me->SetHover(false);
-                        me->SetCanFly(false);
-                        me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        if (Unit* target = me->SelectVictim())
-                            AttackStart(target);
-                        break;
-                    }
+                {
+                    me->SetDisableGravity(false);
+                    me->SetHover(false);
+                    me->SetCanFly(false);
+                    me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    if (Unit* target = me->SelectVictim())
+                        AttackStart(target);
+                    break;
+                }
                 default:
                     break;
             }
@@ -619,36 +619,36 @@ public:
                     me->GetMotionMaster()->MovePoint(POINT_AIR_PHASE_FAR, SindragosaAirPosFar);
                     break;
                 case EVENT_FROST_BOMB:
+                {
+                    ++_bombCount;
+                    float destX, destY, destZ;
+                    std::list<GameObject*> gl;
+                    me->GetGameObjectListWithEntryInGrid(gl, GO_ICE_BLOCK, SIZE_OF_GRIDS);
+                    uint8 triesLeft = 10;
+                    do
                     {
-                        ++_bombCount;
-                        float destX, destY, destZ;
-                        std::list<GameObject*> gl;
-                        me->GetGameObjectListWithEntryInGrid(gl, GO_ICE_BLOCK, SIZE_OF_GRIDS);
-                        uint8 triesLeft = 10;
-                        do
-                        {
-                            destX = float(rand_norm()) * 75.0f + 4350.0f;
-                            destY = float(rand_norm()) * 75.0f + 2450.0f;
-                            destZ = 205.0f; // random number close to ground, get exact in next call
-                            me->UpdateGroundPositionZ(destX, destY, destZ);
-                            bool ok = true;
-                            for (std::list<GameObject*>::const_iterator itr = gl.begin(); itr != gl.end(); ++itr)
-                                if ((*itr)->GetExactDist2dSq(destX, destY) < 3.0f * 3.0f)
-                                {
-                                    ok = false;
-                                    break;
-                                }
-                            if (ok)
+                        destX = float(rand_norm()) * 75.0f + 4350.0f;
+                        destY = float(rand_norm()) * 75.0f + 2450.0f;
+                        destZ = 205.0f; // random number close to ground, get exact in next call
+                        me->UpdateGroundPositionZ(destX, destY, destZ);
+                        bool ok = true;
+                        for (std::list<GameObject*>::const_iterator itr = gl.begin(); itr != gl.end(); ++itr)
+                            if ((*itr)->GetExactDist2dSq(destX, destY) < 3.0f * 3.0f)
+                            {
+                                ok = false;
                                 break;
-                        } while (--triesLeft);
+                            }
+                        if (ok)
+                            break;
+                    } while (--triesLeft);
 
-                        me->CastSpell(destX, destY, destZ, SPELL_FROST_BOMB_TRIGGER, false);
-                        if (_bombCount >= 4)
-                            events.ScheduleEvent(EVENT_LAND, 5500);
-                        else
-                            events.ScheduleEvent(EVENT_FROST_BOMB, 6000);
-                        break;
-                    }
+                    me->CastSpell(destX, destY, destZ, SPELL_FROST_BOMB_TRIGGER, false);
+                    if (_bombCount >= 4)
+                        events.ScheduleEvent(EVENT_LAND, 5500);
+                    else
+                        events.ScheduleEvent(EVENT_FROST_BOMB, 6000);
+                    break;
+                }
                 case EVENT_LAND:
                     me->GetMotionMaster()->MovePoint(POINT_LAND, SindragosaFlyInPos);
                     break;
@@ -1644,29 +1644,29 @@ public:
                         _events.ScheduleEvent(EVENT_FROST_BREATH_RIMEFANG, 5000);
                     break;
                 case EVENT_ICY_BLAST:
-                    {
-                        _icyBlastCounter = RAID_MODE<uint8>(5, 7, 6, 8);
-                        me->SetReactState(REACT_PASSIVE);
+                {
+                    _icyBlastCounter = RAID_MODE<uint8>(5, 7, 6, 8);
+                    me->SetReactState(REACT_PASSIVE);
 
-                        me->GetMotionMaster()->MoveIdle();
-                        me->StopMoving();
-                        me->SendMeleeAttackStop(me->GetVictim());
+                    me->GetMotionMaster()->MoveIdle();
+                    me->StopMoving();
+                    me->SendMeleeAttackStop(me->GetVictim());
 
-                        me->AttackStop();
-                        me->SetCanFly(true);
-                        me->SetDisableGravity(true);
-                        me->SetHover(true);
-                        me->SendMovementFlagUpdate();
-                        float floorZ = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f);
-                        float destZ;
-                        if (floorZ > 190.0f) destZ = floorZ + 25.0f;
-                        else destZ = me->GetPositionZ() + 25.0f;
-                        me->GetMotionMaster()->MoveTakeoff(0, me->GetPositionX(), me->GetPositionY(), destZ, me->GetSpeed(MOVE_RUN));
-                        float moveTime = fabs(destZ - me->GetPositionZ()) / (me->GetSpeed(MOVE_RUN) * 0.001f);
-                        _events.ScheduleEvent(EVENT_ICY_BLAST, uint32(moveTime) + urand(60000, 70000));
-                        _events.ScheduleEvent(EVENT_ICY_BLAST_CAST, uint32(moveTime) + 250);
-                        break;
-                    }
+                    me->AttackStop();
+                    me->SetCanFly(true);
+                    me->SetDisableGravity(true);
+                    me->SetHover(true);
+                    me->SendMovementFlagUpdate();
+                    float floorZ = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f);
+                    float destZ;
+                    if (floorZ > 190.0f) destZ = floorZ + 25.0f;
+                    else destZ = me->GetPositionZ() + 25.0f;
+                    me->GetMotionMaster()->MoveTakeoff(0, me->GetPositionX(), me->GetPositionY(), destZ, me->GetSpeed(MOVE_RUN));
+                    float moveTime = fabs(destZ - me->GetPositionZ()) / (me->GetSpeed(MOVE_RUN) * 0.001f);
+                    _events.ScheduleEvent(EVENT_ICY_BLAST, uint32(moveTime) + urand(60000, 70000));
+                    _events.ScheduleEvent(EVENT_ICY_BLAST_CAST, uint32(moveTime) + 250);
+                    break;
+                }
                 case EVENT_ICY_BLAST_CAST:
                     if (--_icyBlastCounter)
                     {

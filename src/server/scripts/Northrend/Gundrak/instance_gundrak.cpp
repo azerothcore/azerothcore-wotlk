@@ -178,12 +178,12 @@ public:
                         altar->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_ECK_THE_FEROCIOUS_INIT:
-                    {
-                        Position pos = {1624.70f, 891.43f, 95.08f, 1.2f};
-                        if (instance->IsHeroic())
-                            instance->SummonCreature(NPC_ECK_THE_FEROCIOUS, pos);
-                        break;
-                    }
+                {
+                    Position pos = {1624.70f, 891.43f, 95.08f, 1.2f};
+                    if (instance->IsHeroic())
+                        instance->SummonCreature(NPC_ECK_THE_FEROCIOUS, pos);
+                    break;
+                }
             }
             return true;
         }

@@ -172,46 +172,46 @@ public:
                     m_auiEncounter[2] = data;
                     break;
                 case DATA_AZGALOREVENT:
+                {
+                    m_auiEncounter[3] = data;
+                    if (data == DONE)
                     {
-                        m_auiEncounter[3] = data;
-                        if (data == DONE)
+                        if (ArchiYell)
+                            break;
+
+                        ArchiYell = true;
+
+                        Creature* creature = instance->GetCreature(Azgalor);
+                        if (creature)
                         {
-                            if (ArchiYell)
-                                break;
+                            Creature* unit = creature->SummonCreature(NPC_WORLD_TRIGGER_TINY, creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
 
-                            ArchiYell = true;
-
-                            Creature* creature = instance->GetCreature(Azgalor);
-                            if (creature)
+                            Map* map = creature->GetMap();
+                            if (map->IsDungeon() && unit)
                             {
-                                Creature* unit = creature->SummonCreature(NPC_WORLD_TRIGGER_TINY, creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                                unit->SetVisible(false);
+                                Map::PlayerList const& PlayerList = map->GetPlayers();
+                                if (PlayerList.isEmpty())
+                                    return;
 
-                                Map* map = creature->GetMap();
-                                if (map->IsDungeon() && unit)
+                                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 {
-                                    unit->SetVisible(false);
-                                    Map::PlayerList const& PlayerList = map->GetPlayers();
-                                    if (PlayerList.isEmpty())
-                                        return;
-
-                                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                                    if (i->GetSource())
                                     {
-                                        if (i->GetSource())
-                                        {
-                                            WorldPacket packet;
-                                            ChatHandler::BuildChatPacket(packet, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, unit, i->GetSource(), YELL_EFFORTS);
-                                            i->GetSource()->GetSession()->SendPacket(&packet);
+                                        WorldPacket packet;
+                                        ChatHandler::BuildChatPacket(packet, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, unit, i->GetSource(), YELL_EFFORTS);
+                                        i->GetSource()->GetSession()->SendPacket(&packet);
 
-                                            WorldPacket data2(SMSG_PLAY_SOUND, 4);
-                                            data2 << 10986;
-                                            i->GetSource()->GetSession()->SendPacket(&data2);
-                                        }
+                                        WorldPacket data2(SMSG_PLAY_SOUND, 4);
+                                        data2 << 10986;
+                                        i->GetSource()->GetSession()->SendPacket(&data2);
                                     }
                                 }
                             }
                         }
                     }
-                    break;
+                }
+                break;
                 case DATA_ARCHIMONDEEVENT:
                     m_auiEncounter[4] = data;
                     break;

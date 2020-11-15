@@ -181,7 +181,7 @@ public:
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
-            if(instance)
+            if (instance)
                 instance->SetData(DATA_SVALA_SORROWGRAVE, DONE);
         }
 
@@ -225,32 +225,32 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK4, 9000);
                     break;
                 case 30:
-                    {
-                        WorldPacket data(SMSG_SPLINE_MOVE_SET_HOVER, 9);
-                        data.append(me->GetPackGUID());
-                        me->SendMessageToSet(&data, false);
-                        break;
-                    }
+                {
+                    WorldPacket data(SMSG_SPLINE_MOVE_SET_HOVER, 9);
+                    data.append(me->GetPackGUID());
+                    me->SendMessageToSet(&data, false);
+                    break;
+                }
                 case EVENT_SVALA_TALK4:
-                    {
-                        me->CastSpell(me, SPELL_SVALA_TRANSFORMING1, true);
-                        me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
-                        me->SetCorpseDelay(sWorld->getIntConfig(CONFIG_CORPSE_DECAY_ELITE));
-                        me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                        if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
-                            Arthas->InterruptNonMeleeSpells(false);
-                        me->RemoveAllAuras();
-                        me->SetWalk(false);
-                        events2.ScheduleEvent(EVENT_SVALA_TALK5, 2000);
+                {
+                    me->CastSpell(me, SPELL_SVALA_TRANSFORMING1, true);
+                    me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
+                    me->SetCorpseDelay(sWorld->getIntConfig(CONFIG_CORPSE_DECAY_ELITE));
+                    me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
+                        Arthas->InterruptNonMeleeSpells(false);
+                    me->RemoveAllAuras();
+                    me->SetWalk(false);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK5, 2000);
 
-                        std::list<Creature*> creatureList;
-                        me->GetCreaturesWithEntryInRange(creatureList, 100.0f, NPC_DRAGONFLAYER_SPECTATOR);
-                        for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
-                            (*itr)->AI()->SetData(1, 2);
+                    std::list<Creature*> creatureList;
+                    me->GetCreaturesWithEntryInRange(creatureList, 100.0f, NPC_DRAGONFLAYER_SPECTATOR);
+                    for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                        (*itr)->AI()->SetData(1, 2);
 
-                        break;
-                    }
+                    break;
+                }
                 case EVENT_SVALA_TALK5:
                     Talk(TALK_INTRO_S2);
                     events2.ScheduleEvent(EVENT_SVALA_TALK6, 12000);
@@ -302,16 +302,16 @@ public:
                     events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, urand(8000, 12000));
                     break;
                 case EVENT_SORROWGRAVE_FLAMES2:
+                {
+                    std::list<Creature*> braziers;
+                    me->GetCreaturesWithEntryInRange(braziers, 100.0f, NPC_FLAME_BRAZIER);
+                    if (!braziers.empty())
                     {
-                        std::list<Creature*> braziers;
-                        me->GetCreaturesWithEntryInRange(braziers, 100.0f, NPC_FLAME_BRAZIER);
-                        if (!braziers.empty())
-                        {
-                            for (std::list<Creature*>::const_iterator itr = braziers.begin(); itr != braziers.end(); ++itr)
-                                (*itr)->CastCustomSpell(SPELL_BALL_OF_FLAME, SPELLVALUE_MAX_TARGETS, 1, (*itr), true);
-                        }
-                        break;
+                        for (std::list<Creature*>::const_iterator itr = braziers.begin(); itr != braziers.end(); ++itr)
+                            (*itr)->CastCustomSpell(SPELL_BALL_OF_FLAME, SPELLVALUE_MAX_TARGETS, 1, (*itr), true);
                     }
+                    break;
+                }
                 case EVENT_SORROWGRAVE_RITUAL:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     {

@@ -88,15 +88,15 @@ public:
                         events.ScheduleEvent(EVENT_DEMORALIZING_SHOUT, urand(15000, 20000));
                         break;
                     case EVENT_INSPIRE:
-                        {
-                            std::list<Creature*> healers = DoFindFriendlyMissingBuff(45.0f, SPELL_INSPIRE);
-                            if (!healers.empty())
-                                DoCast(acore::Containers::SelectRandomContainerElement(healers), SPELL_INSPIRE);
+                    {
+                        std::list<Creature*> healers = DoFindFriendlyMissingBuff(45.0f, SPELL_INSPIRE);
+                        if (!healers.empty())
+                            DoCast(acore::Containers::SelectRandomContainerElement(healers), SPELL_INSPIRE);
 
-                            DoCast(me, SPELL_INSPIRE);
-                            events.ScheduleEvent(EVENT_INSPIRE, urand(20000, 26000));
-                            break;
-                        }
+                        DoCast(me, SPELL_INSPIRE);
+                        events.ScheduleEvent(EVENT_INSPIRE, urand(20000, 26000));
+                        break;
+                    }
                     case EVENT_KNOCKDOWN:
                         DoCastVictim(SPELL_KNOCKDOWN);
                         events.ScheduleEvent(EVENT_KNOCKDOWN, urand(12000, 15000));

@@ -126,7 +126,7 @@ public:
             else if (spell->Id == SPELL_HEAT_BUFF)
             {
                 if (Aura* a = me->GetAura(SPELL_HEAT_BUFF))
-                    if( a->GetStackAmount() >= RAID_MODE(10, 20) )
+                    if ( a->GetStackAmount() >= RAID_MODE(10, 20) )
                     {
                         if (RAID_MODE(1, 0) && a->GetStackAmount() > 10) // prevent going over 10 on 10man version
                             a->ModStackAmount(-1);
@@ -139,7 +139,7 @@ public:
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
-            if( damage >= RAID_MODE(3000U, 5000U) && me->GetAura(S_BRITTLE) )
+            if ( damage >= RAID_MODE(3000U, 5000U) && me->GetAura(S_BRITTLE) )
             {
                 me->CastSpell(me, SPELL_SHATTER, true);
                 Unit::Kill(attacker, me);
@@ -210,7 +210,7 @@ public:
             bShattered = false;
             lastShatterMSTime = 0;
 
-            if( InstanceScript* m_pInstance = me->GetInstanceScript() )
+            if ( InstanceScript* m_pInstance = me->GetInstanceScript() )
             {
                 m_pInstance->SetData(TYPE_IGNIS, NOT_STARTED);
                 m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_STOKIN_THE_FURNACE_EVENT);
@@ -223,7 +223,7 @@ public:
 
             std::list<Creature*> icl;
             me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
-            for( std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr )
+            for ( std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr )
             {
                 if (!(*itr)->IsAlive())
                 {
@@ -248,7 +248,7 @@ public:
             me->PlayDirectSound(SOUND_AGGRO);
             DoZoneInCombat();
 
-            if( InstanceScript* m_pInstance = me->GetInstanceScript() )
+            if ( InstanceScript* m_pInstance = me->GetInstanceScript() )
             {
                 m_pInstance->SetData(TYPE_IGNIS, IN_PROGRESS);
                 m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_STOKIN_THE_FURNACE_EVENT);
@@ -282,7 +282,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/)
         {
-            if( rand() % 2 )
+            if ( rand() % 2 )
             {
                 me->MonsterYell(TEXT_SLAY_1, LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_SLAY_1);
@@ -299,12 +299,12 @@ public:
             me->MonsterYell(TEXT_DEATH, LANG_UNIVERSAL, 0);
             me->PlayDirectSound(SOUND_DEATH);
 
-            if( me->GetInstanceScript() )
+            if ( me->GetInstanceScript() )
                 me->GetInstanceScript()->SetData(TYPE_IGNIS, DONE);
 
             std::list<Creature*> icl;
             me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
-            for( std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr )
+            for ( std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr )
                 if ((*itr)->IsAlive() && (*itr)->IsInCombat())
                     Unit::Kill(*itr, *itr);
         }
@@ -325,7 +325,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if( me->GetPositionX() < 490.0f || me->GetPositionX() > 690.0f || me->GetPositionY() < 130.0f || me->GetPositionY() > 410.0f )
+            if ( me->GetPositionX() < 490.0f || me->GetPositionX() > 690.0f || me->GetPositionY() < 130.0f || me->GetPositionY() > 410.0f )
             {
                 EnterEvadeMode();
                 return;
@@ -352,7 +352,7 @@ public:
                     events.RepeatEvent(RAID_MODE(40000, 30000));
                     break;
                 case EVENT_SPELL_SCORCH:
-                    if( rand() % 2 )
+                    if ( rand() % 2 )
                     {
                         me->MonsterYell(TEXT_SCORCH_1, LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(SOUND_SCORCH_1);
@@ -379,48 +379,48 @@ public:
                     events.RepeatEvent(25000);
                     break;
                 case EVENT_GRAB:
+                {
+                    std::list<Creature*> icl;
+                    me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
+
+                    std::vector<uint64> playerGUIDs;
+                    Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+                    Player* temp = nullptr;
+
+                    for ( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                     {
-                        std::list<Creature*> icl;
-                        me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
-
-                        std::vector<uint64> playerGUIDs;
-                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                        Player* temp = nullptr;
-
-                        for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                        {
-                            temp = itr->GetSource();
-                            if( !temp->IsAlive() || temp->GetExactDist2d(me) > 90.0f )
-                                continue;
-                            if( me->GetVictim() && temp->GetGUID() == me->GetVictim()->GetGUID() )
-                                continue;
-                            bool found = false;
-                            for( std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr )
-                                if( (*itr)->GetVictim() && (*itr)->GetVictim()->GetGUID() == temp->GetGUID() )
-                                {
-                                    found = true;
-                                    break;
-                                }
-
-                            if( !found )
-                                playerGUIDs.push_back(temp->GetGUID());
-                        }
-
-                        if( !playerGUIDs.empty() )
-                        {
-                            int8 pos = urand(0, playerGUIDs.size() - 1);
-                            if( Player* pTarget = ObjectAccessor::GetPlayer(*me, playerGUIDs.at(pos)) )
+                        temp = itr->GetSource();
+                        if ( !temp->IsAlive() || temp->GetExactDist2d(me) > 90.0f )
+                            continue;
+                        if ( me->GetVictim() && temp->GetGUID() == me->GetVictim()->GetGUID() )
+                            continue;
+                        bool found = false;
+                        for ( std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr )
+                            if ( (*itr)->GetVictim() && (*itr)->GetVictim()->GetGUID() == temp->GetGUID() )
                             {
-                                me->MonsterYell(TEXT_SLAG_POT, LANG_UNIVERSAL, 0);
-                                me->PlayDirectSound(SOUND_SLAG_POT);
-                                me->CastSpell(pTarget, SPELL_GRAB, false);
+                                found = true;
+                                break;
                             }
-                        }
 
-                        events.RepeatEvent(24000); // +6000 below
-                        events.DelayEvents(6000);
+                        if ( !found )
+                            playerGUIDs.push_back(temp->GetGUID());
                     }
-                    break;
+
+                    if ( !playerGUIDs.empty() )
+                    {
+                        int8 pos = urand(0, playerGUIDs.size() - 1);
+                        if ( Player* pTarget = ObjectAccessor::GetPlayer(*me, playerGUIDs.at(pos)) )
+                        {
+                            me->MonsterYell(TEXT_SLAG_POT, LANG_UNIVERSAL, 0);
+                            me->PlayDirectSound(SOUND_SLAG_POT);
+                            me->CastSpell(pTarget, SPELL_GRAB, false);
+                        }
+                    }
+
+                    events.RepeatEvent(24000); // +6000 below
+                    events.DelayEvents(6000);
+                }
+                break;
             }
 
             DoMeleeAttackIfReady();

@@ -141,7 +141,7 @@ public:
 
         void SetData(uint32 type, uint32 /*data*/) override
         {
-            switch(type)
+            switch (type)
             {
                 case ACTION_SHANDY_INTRO:
                     if (Creature* aquanos = me->FindNearestCreature(NPC_AQUANOS_ENTRY, 30, true))
@@ -156,7 +156,7 @@ public:
                     _events.ScheduleEvent(EVENT_OUTRO_DH, 10 * MINUTE * IN_MILLISECONDS);
                     break;
                 default:
-                    if(_lSource == type && _canWash)
+                    if (_lSource == type && _canWash)
                     {
                         _canWash = false;
                         _events.ScheduleEvent(EVENT_INTRO_DH2, type == ACTION_UNMENTIONABLES ? 4000 : 10000);
@@ -236,7 +236,7 @@ public:
         if (player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_A) == QUEST_STATUS_INCOMPLETE ||
                 player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_H) == QUEST_STATUS_INCOMPLETE)
         {
-            if(player->GetTeamId() == TEAM_ALLIANCE)
+            if (player->GetTeamId() == TEAM_ALLIANCE)
                 AddGossipItemFor(player, 0, "Arcanist Tybalin said you might be able to lend me a certain tabard.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
             else
                 AddGossipItemFor(player, 0, "Magister Hathorel said you might be able to lend me a certain tabard.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
@@ -575,15 +575,15 @@ public:
                         events.ScheduleEvent(EVENT_BLINK, 3 * IN_MILLISECONDS);
                         break;
                     case EVENT_BLINK:
-                        {
-                            DoCast(me, SPELL_IMPROVED_BLINK);
-                            Position pos;
-                            me->GetRandomNearPosition(pos, (urand(15, 40)));
-                            me->GetMotionMaster()->MovePoint(0, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-                            events.ScheduleEvent(EVENT_DESPAWN, 3 * IN_MILLISECONDS);
-                            events.ScheduleEvent(EVENT_DESPAWN_VISUAL, 2.5 * IN_MILLISECONDS);
-                            break;
-                        }
+                    {
+                        DoCast(me, SPELL_IMPROVED_BLINK);
+                        Position pos;
+                        me->GetRandomNearPosition(pos, (urand(15, 40)));
+                        me->GetMotionMaster()->MovePoint(0, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+                        events.ScheduleEvent(EVENT_DESPAWN, 3 * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_DESPAWN_VISUAL, 2.5 * IN_MILLISECONDS);
+                        break;
+                    }
                     case EVENT_DESPAWN_VISUAL:
                         DoCast(me, SPELL_TELEPORT_VISUAL);
                         break;

@@ -291,35 +291,35 @@ void OPvPCapturePointTF::ChangeState()
     switch (m_State)
     {
         case OBJECTIVESTATE_ALLIANCE:
-            {
-                m_TowerState = TF_TOWERSTATE_A;
-                artkit = 2;
-                uint32 alliance_towers = ((OutdoorPvPTF*)m_PvP)->GetAllianceTowersControlled();
-                if (alliance_towers < TF_TOWER_NUM)
-                    ((OutdoorPvPTF*)m_PvP)->SetAllianceTowersControlled(++alliance_towers);
+        {
+            m_TowerState = TF_TOWERSTATE_A;
+            artkit = 2;
+            uint32 alliance_towers = ((OutdoorPvPTF*)m_PvP)->GetAllianceTowersControlled();
+            if (alliance_towers < TF_TOWER_NUM)
+                ((OutdoorPvPTF*)m_PvP)->SetAllianceTowersControlled(++alliance_towers);
 
-                sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_A));
+            sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_A));
 
-                for (PlayerSet::iterator itr = m_activePlayers[0].begin(); itr != m_activePlayers[0].end(); ++itr)
-                    if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                        player->AreaExploredOrEventHappens(TF_ALLY_QUEST);
-                break;
-            }
+            for (PlayerSet::iterator itr = m_activePlayers[0].begin(); itr != m_activePlayers[0].end(); ++itr)
+                if (Player* player = ObjectAccessor::FindPlayer(*itr))
+                    player->AreaExploredOrEventHappens(TF_ALLY_QUEST);
+            break;
+        }
         case OBJECTIVESTATE_HORDE:
-            {
-                m_TowerState = TF_TOWERSTATE_H;
-                artkit = 1;
-                uint32 horde_towers = ((OutdoorPvPTF*)m_PvP)->GetHordeTowersControlled();
-                if (horde_towers < TF_TOWER_NUM)
-                    ((OutdoorPvPTF*)m_PvP)->SetHordeTowersControlled(++horde_towers);
+        {
+            m_TowerState = TF_TOWERSTATE_H;
+            artkit = 1;
+            uint32 horde_towers = ((OutdoorPvPTF*)m_PvP)->GetHordeTowersControlled();
+            if (horde_towers < TF_TOWER_NUM)
+                ((OutdoorPvPTF*)m_PvP)->SetHordeTowersControlled(++horde_towers);
 
-                sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_H));
+            sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_H));
 
-                for (PlayerSet::iterator itr = m_activePlayers[1].begin(); itr != m_activePlayers[1].end(); ++itr)
-                    if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                        player->AreaExploredOrEventHappens(TF_HORDE_QUEST);
-                break;
-            }
+            for (PlayerSet::iterator itr = m_activePlayers[1].begin(); itr != m_activePlayers[1].end(); ++itr)
+                if (Player* player = ObjectAccessor::FindPlayer(*itr))
+                    player->AreaExploredOrEventHappens(TF_HORDE_QUEST);
+            break;
+        }
         case OBJECTIVESTATE_NEUTRAL:
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
         case OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE:

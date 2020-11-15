@@ -77,13 +77,13 @@ public:
         {
             me->SetLootMode(0);
             events.Reset();
-            if( me->GetEntry() == NPC_SKARVALD )
+            if ( me->GetEntry() == NPC_SKARVALD )
             {
                 if (pInstance)
                     pInstance->SetData(DATA_DALRONN_AND_SKARVALD, NOT_STARTED);
             }
             else // NPC_SKARVALD_GHOST
-                if( Unit* target = me->SelectNearestTarget(50.0f) )
+                if ( Unit* target = me->SelectNearestTarget(50.0f) )
                 {
                     me->AddThreat(target, 0.0f);
                     AttackStart(target);
@@ -92,7 +92,7 @@ public:
 
         void DoAction(int32 param)
         {
-            switch(param)
+            switch (param)
             {
                 case 1:
                     events.RescheduleEvent(EVENT_MATE_DIED, 3500);
@@ -112,8 +112,8 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(DATA_DALRONN_AND_SKARVALD, IN_PROGRESS);
-                if( Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_DALRONN)) )
-                    if( !c->IsInCombat() && who )
+                if ( Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_DALRONN)) )
+                    if ( !c->IsInCombat() && who )
                     {
                         c->AddThreat(who, 0.0f);
                         c->AI()->AttackStart(who);
@@ -129,13 +129,13 @@ public:
 
         void JustDied(Unit*  /*Killer*/)
         {
-            if( me->GetEntry() != NPC_SKARVALD )
+            if ( me->GetEntry() != NPC_SKARVALD )
                 return;
-            if( pInstance )
+            if ( pInstance )
             {
-                if( Creature* dalronn = pInstance->instance->GetCreature(pInstance->GetData64(DATA_DALRONN)) )
+                if ( Creature* dalronn = pInstance->instance->GetCreature(pInstance->GetData64(DATA_DALRONN)) )
                 {
-                    if( dalronn->isDead() )
+                    if ( dalronn->isDead() )
                     {
                         Talk(YELL_SKARVALD_SKA_DIEDFIRST);
                         pInstance->SetData(DATA_DALRONN_AND_SKARVALD, DONE);
@@ -160,10 +160,10 @@ public:
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -171,7 +171,7 @@ public:
                     Talk(YELL_SKARVALD_DAL_DIEDFIRST);
                     break;
                 case EVENT_SPELL_CHARGE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, (IsHeroic() ? 100.0f : 30.0f), true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, (IsHeroic() ? 100.0f : 30.0f), true) )
                     {
                         ScriptedAI::DoResetThreat();
                         me->AddThreat(target, 10000.0f);
@@ -180,7 +180,7 @@ public:
                     events.RepeatEvent(urand(5000, 10000));
                     break;
                 case EVENT_SPELL_STONE_STRIKE:
-                    if( me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()) )
+                    if ( me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()) )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_STONE_STRIKE, false);
                         events.RepeatEvent(urand(5000, 10000));
@@ -221,13 +221,13 @@ public:
             me->SetLootMode(0);
             events.Reset();
             summons.DespawnAll();
-            if( me->GetEntry() == NPC_DALRONN )
+            if ( me->GetEntry() == NPC_DALRONN )
             {
                 if (pInstance)
                     pInstance->SetData(DATA_DALRONN_AND_SKARVALD, NOT_STARTED);
             }
             else // NPC_DALRONN_GHOST
-                if( Unit* target = me->SelectNearestTarget(50.0f) )
+                if ( Unit* target = me->SelectNearestTarget(50.0f) )
                 {
                     me->AddThreat(target, 0.0f);
                     AttackStart(target);
@@ -236,7 +236,7 @@ public:
 
         void DoAction(int32 param)
         {
-            switch(param)
+            switch (param)
             {
                 case -1:
                     summons.DespawnAll();
@@ -252,7 +252,7 @@ public:
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_SHADOW_BOLT, 1000);
             events.RescheduleEvent(EVENT_SPELL_DEBILITATE, 5000);
-            if( IsHeroic() )
+            if ( IsHeroic() )
                 events.RescheduleEvent(EVENT_SPELL_SUMMON_SKELETONS, 10000);
 
             if (me->GetEntry() == NPC_DALRONN)
@@ -261,8 +261,8 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(DATA_DALRONN_AND_SKARVALD, IN_PROGRESS);
-                if( Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SKARVALD)) )
-                    if( !c->IsInCombat() && who )
+                if ( Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SKARVALD)) )
+                    if ( !c->IsInCombat() && who )
                     {
                         c->AddThreat(who, 0.0f);
                         c->AI()->AttackStart(who);
@@ -283,13 +283,13 @@ public:
 
         void JustDied(Unit*  /*Killer*/)
         {
-            if( me->GetEntry() != NPC_DALRONN )
+            if ( me->GetEntry() != NPC_DALRONN )
                 return;
-            if( pInstance )
+            if ( pInstance )
             {
-                if( Creature* skarvald = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SKARVALD)) )
+                if ( Creature* skarvald = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SKARVALD)) )
                 {
-                    if( skarvald->isDead() )
+                    if ( skarvald->isDead() )
                     {
                         Talk(YELL_DALRONN_DAL_DIEDFIRST);
                         pInstance->SetData(DATA_DALRONN_AND_SKARVALD, DONE);
@@ -313,10 +313,10 @@ public:
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -327,12 +327,12 @@ public:
                     Talk(YELL_DALRONN_SKA_DIEDFIRST);
                     break;
                 case EVENT_SPELL_SHADOW_BOLT:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 42.0f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 42.0f, true) )
                         me->CastSpell(target, SPELL_SHADOW_BOLT, false);
                     events.RepeatEvent(2500);
                     break;
                 case EVENT_SPELL_DEBILITATE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true) )
                     {
                         me->CastSpell(target, SPELL_DEBILITATE, false);
                         events.RepeatEvent(urand(5000, 10000));

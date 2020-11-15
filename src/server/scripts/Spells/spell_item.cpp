@@ -784,7 +784,7 @@ public:
             {
                 LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
 
-                switch(GetSpellInfo()->Id)
+                switch (GetSpellInfo()->Id)
                 {
                     case SPELL_GREAT_FEAST:
                         if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE))
@@ -1100,11 +1100,11 @@ public:
                     caster->CastSpell(caster, SPELL_ABLUTION_RUNIC, true);
                     break;
                 case POWER_MANA:
-                    {
-                        int32 mana = CalculatePct(caster->GetMaxPower(POWER_MANA), 5.0f);
-                        caster->CastCustomSpell(SPELL_ABLUTION_MANA, SPELLVALUE_BASE_POINT0, mana, caster, true);
-                        break;
-                    }
+                {
+                    int32 mana = CalculatePct(caster->GetMaxPower(POWER_MANA), 5.0f);
+                    caster->CastCustomSpell(SPELL_ABLUTION_MANA, SPELLVALUE_BASE_POINT0, mana, caster, true);
+                    break;
+                }
                 case POWER_RAGE:
                     caster->CastSpell(caster, SPELL_ABLUTION_RAGE, true);
                     break;

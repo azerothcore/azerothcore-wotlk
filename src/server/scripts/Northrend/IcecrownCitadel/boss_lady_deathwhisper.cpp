@@ -357,43 +357,43 @@ public:
                     events.RepeatEvent(urand(22000, 30000));
                     break;
                 case EVENT_SPELL_DOMINATE_MIND_25:
+                {
+                    Talk(SAY_DOMINATE_MIND);
+
+                    std::vector<Player*> validPlayers;
+                    Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                        if (Player* plr = itr->GetSource())
+                            if (plr->IsAlive() && !plr->IsGameMaster() && plr->GetExactDist2dSq(me) < (150.0f * 150.0f))
+                                if (!me->GetVictim() || me->GetVictim()->GetGUID() != plr->GetGUID())
+                                {
+                                    // shouldn't be casted on any victim of summoned mobs
+                                    bool valid = true;
+                                    for (std::list<uint64>::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                                        if (Creature* c = ObjectAccessor::GetCreature(*me, (*itr)))
+                                            if (c->IsAlive() && c->GetVictim() && c->GetVictim()->GetGUID() == plr->GetGUID())
+                                            {
+                                                valid = false;
+                                                break;
+                                            }
+                                    if (valid)
+                                        validPlayers.push_back(plr);
+                                }
+
+                    std::vector<Player*>::iterator begin = validPlayers.begin(), end = validPlayers.end();
+
+                    std::random_device rd;
+                    std::shuffle(begin, end, std::default_random_engine{rd()});
+
+                    for (uint8 i = 0; i < RAID_MODE<uint8>(0, 1, 1, 3) && i < validPlayers.size(); i++)
                     {
-                        Talk(SAY_DOMINATE_MIND);
-
-                        std::vector<Player*> validPlayers;
-                        Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                            if (Player* plr = itr->GetSource())
-                                if (plr->IsAlive() && !plr->IsGameMaster() && plr->GetExactDist2dSq(me) < (150.0f * 150.0f))
-                                    if (!me->GetVictim() || me->GetVictim()->GetGUID() != plr->GetGUID())
-                                    {
-                                        // shouldn't be casted on any victim of summoned mobs
-                                        bool valid = true;
-                                        for (std::list<uint64>::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                                            if (Creature* c = ObjectAccessor::GetCreature(*me, (*itr)))
-                                                if (c->IsAlive() && c->GetVictim() && c->GetVictim()->GetGUID() == plr->GetGUID())
-                                                {
-                                                    valid = false;
-                                                    break;
-                                                }
-                                        if (valid)
-                                            validPlayers.push_back(plr);
-                                    }
-
-                        std::vector<Player*>::iterator begin = validPlayers.begin(), end = validPlayers.end();
-
-                        std::random_device rd;
-                        std::shuffle(begin, end, std::default_random_engine{rd()});
-
-                        for (uint8 i = 0; i < RAID_MODE<uint8>(0, 1, 1, 3) && i < validPlayers.size(); i++)
-                        {
-                            Unit* target = validPlayers[i];
-                            me->CastSpell(target, SPELL_DOMINATE_MIND_25, true);
-                        }
-
-                        events.RepeatEvent(urand(40000, 45000));
+                        Unit* target = validPlayers[i];
+                        me->CastSpell(target, SPELL_DOMINATE_MIND_25, true);
                     }
-                    break;
+
+                    events.RepeatEvent(urand(40000, 45000));
+                }
+                break;
                 case EVENT_SPELL_SHADOW_BOLT:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                         me->CastSpell(target, SPELL_SHADOW_BOLT, false);
@@ -424,21 +424,21 @@ public:
                     events.RepeatEvent(45000);
                     break;
                 case EVENT_SPELL_SUMMON_SHADE:
-                    {
-                        uint8 count = 1;
-                        if (GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL)
-                            count = 2;
-                        else if (GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
-                            count = 3;
+                {
+                    uint8 count = 1;
+                    if (GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL)
+                        count = 2;
+                    else if (GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
+                        count = 3;
 
-                        std::list<Unit*> targets;
-                        SelectTargetList(targets, NonTankTargetSelector(me, true), count, SELECT_TARGET_RANDOM);
-                        if (!targets.empty())
-                            for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                                me->CastSpell(*itr, SPELL_SUMMON_SHADE, true);
-                    }
-                    events.RepeatEvent(12000);
-                    break;
+                    std::list<Unit*> targets;
+                    SelectTargetList(targets, NonTankTargetSelector(me, true), count, SELECT_TARGET_RANDOM);
+                    if (!targets.empty())
+                        for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                            me->CastSpell(*itr, SPELL_SUMMON_SHADE, true);
+                }
+                events.RepeatEvent(12000);
+                break;
             }
 
             if (me->HasAura(SPELL_MANA_BARRIER))

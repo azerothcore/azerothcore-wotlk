@@ -179,7 +179,7 @@ public:
 
             if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
             {
-                if(!_justSpawned) /* Don't open the door if we just spawned and are still doing the RP */
+                if (!_justSpawned) /* Don't open the door if we just spawned and are still doing the RP */
                     go->SetGoState(GO_STATE_ACTIVE);
             }
             _justSpawned = false;
@@ -277,7 +277,7 @@ public:
                             go->SetPhaseMask(2, true);
                         }
                     }
-                    
+
                     break;
                 case EVENT_SUMMON_SOLDIER:
                     if (Creature* cr = me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonPositions[urand(0, 5)], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
@@ -361,28 +361,28 @@ public:
                     events.RepeatEvent(50000);
                     break;
                 case EVENT_SPELL_DETONATE_MANA:
+                {
+                    std::vector<Unit*> unitList;
+                    ThreatContainer::StorageType const& threatList = me->getThreatManager().getThreatList();
+                    for (auto itr : threatList)
                     {
-                        std::vector<Unit*> unitList;
-                        ThreatContainer::StorageType const& threatList = me->getThreatManager().getThreatList();
-                        for (auto itr : threatList)
-                        {
-                            if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER
-                                    && itr->getTarget()->getPowerType() == POWER_MANA
-                                    && itr->getTarget()->GetPower(POWER_MANA))
-                                unitList.push_back(itr->getTarget());
-                        }
-
-                        if (!unitList.empty())
-                        {
-                            auto itr = unitList.begin();
-                            advance(itr, urand(0, unitList.size() - 1));
-                            me->CastSpell(*itr, SPELL_DETONATE_MANA, false);
-                            Talk(SAY_SPECIAL);
-                        }
-
-                        events.RepeatEvent(30000);
-                        break;
+                        if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER
+                                && itr->getTarget()->getPowerType() == POWER_MANA
+                                && itr->getTarget()->GetPower(POWER_MANA))
+                            unitList.push_back(itr->getTarget());
                     }
+
+                    if (!unitList.empty())
+                    {
+                        auto itr = unitList.begin();
+                        advance(itr, urand(0, unitList.size() - 1));
+                        me->CastSpell(*itr, SPELL_DETONATE_MANA, false);
+                        Talk(SAY_SPECIAL);
+                    }
+
+                    events.RepeatEvent(30000);
+                    break;
+                }
                 case EVENT_SECOND_PHASE_HEALTH_CHECK:
                     if (me->HealthBelowPct(45))
                     {
@@ -527,7 +527,7 @@ public:
                     if (me->HealthBelowPct(35))
                     {
                         me->CastSpell(me, SPELL_FRENZY, true);
-                        
+
                         break;
                     }
                     events.RepeatEvent(1000);

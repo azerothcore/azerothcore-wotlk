@@ -164,7 +164,7 @@ public:
 
         void DoAction(int32 param)
         {
-            switch( param )
+            switch ( param )
             {
                 case 1:
                     hardmodeAvailable = false;
@@ -196,18 +196,18 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( !UpdateVictim() )
+            if ( !UpdateVictim() )
                 return;
 
-            if( !berserk && (me->GetPositionX() < 1720.0f || me->GetPositionX() > 1940.0f || me->GetPositionY() < 20.0f || me->GetPositionY() > 210.0f) )
+            if ( !berserk && (me->GetPositionX() < 1720.0f || me->GetPositionX() > 1940.0f || me->GetPositionY() < 20.0f || me->GetPositionY() > 210.0f) )
                 events.RescheduleEvent(EVENT_BERSERK, 1);
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -218,33 +218,33 @@ public:
                     me->PlayDirectSound(SOUND_VEZAX_BERSERK, 0);
                     break;
                 case EVENT_SPELL_VEZAX_SHADOW_CRASH:
-                    {
-                        events.RepeatEvent(10000);
+                {
+                    events.RepeatEvent(10000);
 
-                        std::vector<Player*> players;
-                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                        for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                        {
-                            Player* temp = itr->GetSource();
-                            if( temp->IsAlive() && temp->GetDistance(me) > 15.0f )
-                                players.push_back(temp);
-                        }
-                        if (!players.empty())
-                        {
-                            me->setAttackTimer(BASE_ATTACK, 2000);
-                            Player* target = players.at(urand(0, players.size() - 1));
-                            me->SetUInt64Value(UNIT_FIELD_TARGET, target->GetGUID());
-                            me->CastSpell(target, SPELL_VEZAX_SHADOW_CRASH, false);
-                            events.ScheduleEvent(EVENT_RESTORE_TARGET, 750);
-                        }
+                    std::vector<Player*> players;
+                    Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+                    for ( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
+                    {
+                        Player* temp = itr->GetSource();
+                        if ( temp->IsAlive() && temp->GetDistance(me) > 15.0f )
+                            players.push_back(temp);
                     }
-                    break;
+                    if (!players.empty())
+                    {
+                        me->setAttackTimer(BASE_ATTACK, 2000);
+                        Player* target = players.at(urand(0, players.size() - 1));
+                        me->SetUInt64Value(UNIT_FIELD_TARGET, target->GetGUID());
+                        me->CastSpell(target, SPELL_VEZAX_SHADOW_CRASH, false);
+                        events.ScheduleEvent(EVENT_RESTORE_TARGET, 750);
+                    }
+                }
+                break;
                 case EVENT_RESTORE_TARGET:
                     if (me->GetVictim())
                         me->SetUInt64Value(UNIT_FIELD_TARGET, me->GetVictim()->GetGUID());
                     break;
                 case EVENT_SPELL_SEARING_FLAMES:
-                    if(!me->HasAura(SPELL_SARONITE_BARRIER))
+                    if (!me->HasAura(SPELL_SARONITE_BARRIER))
                         me->CastSpell(me->GetVictim(), SPELL_SEARING_FLAMES, false);
                     events.RepeatEvent( me->GetMap()->Is25ManRaid() ? 8000 : 15000 );
                     break;
@@ -256,61 +256,61 @@ public:
                     events.DelayEvents(10000, 1);
                     break;
                 case EVENT_SPELL_MARK_OF_THE_FACELESS:
-                    {
-                        std::vector<Player*> outside;
-                        std::vector<Player*> inside;
-                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                        for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                            if( Player* tmp = itr->GetSource() )
-                                if( tmp->IsAlive() )
-                                {
-                                    if( tmp->GetDistance(me) > 15.0f )
-                                        outside.push_back(tmp);
-                                    else
-                                        inside.push_back(tmp);
-                                }
+                {
+                    std::vector<Player*> outside;
+                    std::vector<Player*> inside;
+                    Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+                    for ( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
+                        if ( Player* tmp = itr->GetSource() )
+                            if ( tmp->IsAlive() )
+                            {
+                                if ( tmp->GetDistance(me) > 15.0f )
+                                    outside.push_back(tmp);
+                                else
+                                    inside.push_back(tmp);
+                            }
 
-                        Player* t = nullptr;
-                        if( outside.size() >= uint8(me->GetMap()->Is25ManRaid() ? 9 : 4) )
-                            t = outside.at(urand(0, outside.size() - 1));
-                        else if( !inside.empty() )
-                            t = inside.at(urand(0, inside.size() - 1));
+                    Player* t = nullptr;
+                    if ( outside.size() >= uint8(me->GetMap()->Is25ManRaid() ? 9 : 4) )
+                        t = outside.at(urand(0, outside.size() - 1));
+                    else if ( !inside.empty() )
+                        t = inside.at(urand(0, inside.size() - 1));
 
-                        if (t)
-                            me->CastSpell(t, SPELL_MARK_OF_THE_FACELESS_AURA, false);
+                    if (t)
+                        me->CastSpell(t, SPELL_MARK_OF_THE_FACELESS_AURA, false);
 
-                        events.RepeatEvent(40000);
-                    }
-                    break;
+                    events.RepeatEvent(40000);
+                }
+                break;
                 case EVENT_SPELL_SUMMON_SARONITE_VAPORS:
+                {
+                    vaporsCount++;
+                    me->CastSpell(me, SPELL_SUMMON_SARONITE_VAPORS, false);
+                    me->MonsterTextEmote("A cloud of saronite vapors coalesces nearby!", 0, true);
+
+                    if ( vaporsCount < 6 || !hardmodeAvailable )
+                        events.RepeatEvent(30000);
+                    else
                     {
-                        vaporsCount++;
-                        me->CastSpell(me, SPELL_SUMMON_SARONITE_VAPORS, false);
-                        me->MonsterTextEmote("A cloud of saronite vapors coalesces nearby!", 0, true);
+                        for ( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
+                            if ( Creature* sv = ObjectAccessor::GetCreature(*me, *itr) )
+                            {
+                                sv->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                sv->GetMotionMaster()->MoveIdle();
+                                sv->GetMotionMaster()->MoveCharge(1852.78f, 81.38f, 342.461f, 28.0f);
+                            }
 
-                        if( vaporsCount < 6 || !hardmodeAvailable )
-                            events.RepeatEvent(30000);
-                        else
-                        {
-                            for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
-                                if( Creature* sv = ObjectAccessor::GetCreature(*me, *itr) )
-                                {
-                                    sv->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                    sv->GetMotionMaster()->MoveIdle();
-                                    sv->GetMotionMaster()->MoveCharge(1852.78f, 81.38f, 342.461f, 28.0f);
-                                }
-
-                            events.DelayEvents(12000, 0);
-                            events.DelayEvents(12000, 1);
-                            events.ScheduleEvent(EVENT_SARONITE_VAPORS_SWIRL, 6000);
-                        }
+                        events.DelayEvents(12000, 0);
+                        events.DelayEvents(12000, 1);
+                        events.ScheduleEvent(EVENT_SARONITE_VAPORS_SWIRL, 6000);
                     }
-                    break;
+                }
+                break;
                 case EVENT_SARONITE_VAPORS_SWIRL:
                     if (summons.size())
                     {
                         me->MonsterTextEmote("The saronite vapors mass and swirl violently, merging into a monstrous form!", 0, true);
-                        if( Creature* sv = ObjectAccessor::GetCreature(*me, *(summons.begin())) )
+                        if ( Creature* sv = ObjectAccessor::GetCreature(*me, *(summons.begin())) )
                             sv->CastSpell(sv, SPELL_SARONITE_ANIMUS_FORMATION_VISUAL, true);
 
                         events.ScheduleEvent(EVENT_SPELL_SUMMON_SARONITE_ANIMUS, 2000);
@@ -325,7 +325,7 @@ public:
                         me->PlayDirectSound(SOUND_VEZAX_HARDMODE, 0);
 
                         me->CastSpell(me, SPELL_SARONITE_BARRIER, true);
-                        if( Creature* sv = ObjectAccessor::GetCreature(*me, *(summons.begin())) )
+                        if ( Creature* sv = ObjectAccessor::GetCreature(*me, *(summons.begin())) )
                             sv->CastSpell(sv, SPELL_SUMMON_SARONITE_ANIMUS, true);
 
                         events.ScheduleEvent(EVENT_DESPAWN_SARONITE_VAPORS, 2500);
@@ -349,8 +349,8 @@ public:
             me->MonsterYell(TEXT_VEZAX_DEATH, LANG_UNIVERSAL, 0);
             me->PlayDirectSound(SOUND_VEZAX_DEATH, 0);
 
-            if( GameObject* door = me->FindNearestGameObject(GO_VEZAX_DOOR, 500.0f) )
-                if( door->GetGoState() != GO_STATE_ACTIVE )
+            if ( GameObject* door = me->FindNearestGameObject(GO_VEZAX_DOOR, 500.0f) )
+                if ( door->GetGoState() != GO_STATE_ACTIVE )
                 {
                     door->SetLootState(GO_READY);
                     door->UseDoorOrButton(0, false);
@@ -359,9 +359,9 @@ public:
 
         void KilledUnit(Unit* who)
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if ( who->GetTypeId() == TYPEID_PLAYER )
             {
-                if( urand(0, 1) )
+                if ( urand(0, 1) )
                 {
                     me->MonsterYell(TEXT_VEZAX_SLAIN_1, LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_VEZAX_SLAIN_1, 0);
@@ -413,8 +413,8 @@ public:
             me->CastSpell(me, SPELL_SARONITE_VAPORS_AURA, true);
 
             // killed saronite vapors, hard mode unavailable
-            if( pInstance )
-                if( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_VEZAX)) )
+            if ( pInstance )
+                if ( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_VEZAX)) )
                     vezax->AI()->DoAction(1);
         }
     };
@@ -435,8 +435,8 @@ public:
         npc_ulduar_saronite_animusAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             pInstance = pCreature->GetInstanceScript();
-            if( pInstance )
-                if( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_VEZAX)) )
+            if ( pInstance )
+                if ( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_VEZAX)) )
                     vezax->AI()->JustSummoned(me);
             timer = 0;
             me->SetInCombatWithZone();
@@ -449,8 +449,8 @@ public:
         {
             me->DespawnOrUnsummon(3000);
 
-            if( pInstance )
-                if( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_VEZAX)) )
+            if ( pInstance )
+                if ( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_VEZAX)) )
                     vezax->AI()->DoAction(2);
         }
 
@@ -488,9 +488,9 @@ public:
                         return;
 
                     target->CastSpell(target, SPELL_AURA_OF_DESPAIR_2, true);
-                    if( target->HasSpell(SPELL_SHAMANISTIC_RAGE) )
+                    if ( target->HasSpell(SPELL_SHAMANISTIC_RAGE) )
                         caster->CastSpell(target, SPELL_CORRUPTED_RAGE, true);
-                    else if( target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 2) )
+                    else if ( target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 2) )
                         caster->CastSpell(target, SPELL_CORRUPTED_WISDOM, true);
                 }
         }

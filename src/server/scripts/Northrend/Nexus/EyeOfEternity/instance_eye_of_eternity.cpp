@@ -88,7 +88,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_MALYGOS:
                     NPC_MalygosGUID = creature->GetGUID();
@@ -98,7 +98,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_IRIS_N:
                 case GO_IRIS_H:
@@ -115,7 +115,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_IRIS_ACTIVATED:
                     if (EncounterStatus == NOT_STARTED)
@@ -125,7 +125,7 @@ public:
                     break;
                 case DATA_ENCOUNTER_STATUS:
                     EncounterStatus = data;
-                    switch(data)
+                    switch (data)
                     {
                         case NOT_STARTED:
                             bPokeAchiev = false;
@@ -175,7 +175,7 @@ public:
 
         uint64 GetData64(uint32 type) const override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_MALYGOS_GUID:
                     return NPC_MalygosGUID;
@@ -185,7 +185,7 @@ public:
 
         void ProcessEvent(WorldObject* /*unit*/, uint32 eventId) override
         {
-            switch(eventId)
+            switch (eventId)
             {
                 case 20158:
                     if (GameObject* go = instance->GetGameObject(GO_PlatformGUID))
@@ -210,7 +210,7 @@ public:
 
         void Load(const char* in) override
         {
-            if( !in )
+            if ( !in )
             {
                 OUT_LOAD_INST_DATA_FAIL;
                 return;
@@ -223,10 +223,10 @@ public:
             std::istringstream loadStream(in);
             loadStream >> dataHead1 >> dataHead2 >> data0;
 
-            if( dataHead1 == 'E' && dataHead2 == 'E' )
+            if ( dataHead1 == 'E' && dataHead2 == 'E' )
             {
                 EncounterStatus = data0;
-                switch(EncounterStatus)
+                switch (EncounterStatus)
                 {
                     case IN_PROGRESS:
                         EncounterStatus = NOT_STARTED;
@@ -247,7 +247,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case ACHIEV_CRITERIA_A_POKE_IN_THE_EYE_10:
                 case ACHIEV_CRITERIA_A_POKE_IN_THE_EYE_25:

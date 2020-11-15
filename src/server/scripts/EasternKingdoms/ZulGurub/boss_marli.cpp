@@ -139,60 +139,60 @@ public:
                         events.ScheduleEvent(EVENT_SPAWN_SPIDER, urand(12000, 17000));
                         break;
                     case EVENT_TRANSFORM:
-                        {
-                            Talk(SAY_TRANSFORM);
-                            DoCast(me, SPELL_SPIDER_FORM); // SPELL_AURA_TRANSFORM
-                            /*
-                            CreatureTemplate const* cinfo = me->GetCreatureTemplate();
-                            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 35)));
-                            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg +((cinfo->maxdmg/100) * 35)));
-                            me->UpdateDamagePhysical(BASE_ATTACK);
-                            */
-                            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true); // hack
-                            DoCastVictim(SPELL_ENVOLWINGWEB);
-                            if (DoGetThreat(me->GetVictim()))
-                                DoModifyThreatPercent(me->GetVictim(), -100);
-                            events.ScheduleEvent(EVENT_CHARGE_PLAYER, 1500, 0, PHASE_THREE);
-                            events.ScheduleEvent(EVENT_TRANSFORM_BACK, 25000, 0, PHASE_THREE);
-                            events.SetPhase(PHASE_THREE);
-                            break;
-                        }
+                    {
+                        Talk(SAY_TRANSFORM);
+                        DoCast(me, SPELL_SPIDER_FORM); // SPELL_AURA_TRANSFORM
+                        /*
+                        CreatureTemplate const* cinfo = me->GetCreatureTemplate();
+                        me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 35)));
+                        me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg +((cinfo->maxdmg/100) * 35)));
+                        me->UpdateDamagePhysical(BASE_ATTACK);
+                        */
+                        me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true); // hack
+                        DoCastVictim(SPELL_ENVOLWINGWEB);
+                        if (DoGetThreat(me->GetVictim()))
+                            DoModifyThreatPercent(me->GetVictim(), -100);
+                        events.ScheduleEvent(EVENT_CHARGE_PLAYER, 1500, 0, PHASE_THREE);
+                        events.ScheduleEvent(EVENT_TRANSFORM_BACK, 25000, 0, PHASE_THREE);
+                        events.SetPhase(PHASE_THREE);
+                        break;
+                    }
                     case EVENT_CHARGE_PLAYER:
+                    {
+                        Unit* target = nullptr;
+                        int i = 0;
+                        while (i++ < 3) // max 3 tries to get a random target with power_mana
                         {
-                            Unit* target = nullptr;
-                            int i = 0;
-                            while (i++ < 3) // max 3 tries to get a random target with power_mana
-                            {
-                                target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);  // not aggro leader
-                                if (target && target->getPowerType() == POWER_MANA)
-                                    break;
-                            }
-                            if (target)
-                            {
-                                DoCast(target, SPELL_CHARGE);
-                                AttackStart(target);
-                            }
-                            events.ScheduleEvent(EVENT_CHARGE_PLAYER, 8000, 0, PHASE_THREE);
-                            break;
+                            target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);  // not aggro leader
+                            if (target && target->getPowerType() == POWER_MANA)
+                                break;
                         }
+                        if (target)
+                        {
+                            DoCast(target, SPELL_CHARGE);
+                            AttackStart(target);
+                        }
+                        events.ScheduleEvent(EVENT_CHARGE_PLAYER, 8000, 0, PHASE_THREE);
+                        break;
+                    }
                     case EVENT_TRANSFORM_BACK:
-                        {
-                            me->RemoveAura(SPELL_SPIDER_FORM);
-                            /*
-                            CreatureTemplate const* cinfo = me->GetCreatureTemplate();
-                            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 1)));
-                            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg +((cinfo->maxdmg/100) * 1)));
-                            me->UpdateDamagePhysical(BASE_ATTACK);
-                            */
-                            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
-                            events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 12000, 0, PHASE_TWO);
-                            events.ScheduleEvent(EVENT_TRANSFORM, 45000, 0, PHASE_TWO);
-                            events.ScheduleEvent(EVENT_POISON_VOLLEY, 15000);
-                            events.ScheduleEvent(EVENT_SPAWN_SPIDER, 30000);
-                            events.ScheduleEvent(EVENT_TRANSFORM, urand(35000, 60000), 0, PHASE_TWO);
-                            events.SetPhase(PHASE_TWO);
-                            break;
-                        }
+                    {
+                        me->RemoveAura(SPELL_SPIDER_FORM);
+                        /*
+                        CreatureTemplate const* cinfo = me->GetCreatureTemplate();
+                        me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 1)));
+                        me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg +((cinfo->maxdmg/100) * 1)));
+                        me->UpdateDamagePhysical(BASE_ATTACK);
+                        */
+                        me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
+                        events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 12000, 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_TRANSFORM, 45000, 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_POISON_VOLLEY, 15000);
+                        events.ScheduleEvent(EVENT_SPAWN_SPIDER, 30000);
+                        events.ScheduleEvent(EVENT_TRANSFORM, urand(35000, 60000), 0, PHASE_TWO);
+                        events.SetPhase(PHASE_TWO);
+                        break;
+                    }
                     default:
                         break;
                 }

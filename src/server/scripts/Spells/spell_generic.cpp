@@ -124,7 +124,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            for( std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
+            for ( std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
             {
                 if ((*itr)->GetTypeId() != TYPEID_PLAYER || (*itr)->ToPlayer()->IsAlive())
                 {
@@ -2585,45 +2585,45 @@ public:
                 case SPELL_COPY_WEAPON_AURA:
                 case SPELL_COPY_WEAPON_2_AURA:
                 case SPELL_COPY_WEAPON_3_AURA:
-                    {
-                        prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID);
+                {
+                    prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID);
 
-                        if (Player* player = caster->ToPlayer())
-                        {
-                            if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
-                                target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, mainItem->GetEntry());
-                        }
-                        else
-                            target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID));
-                        break;
+                    if (Player* player = caster->ToPlayer())
+                    {
+                        if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+                            target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, mainItem->GetEntry());
                     }
+                    else
+                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID));
+                    break;
+                }
                 case SPELL_COPY_OFFHAND_AURA:
                 case SPELL_COPY_OFFHAND_2_AURA:
-                    {
-                        prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) + 1;
+                {
+                    prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) + 1;
 
-                        if (Player* player = caster->ToPlayer())
-                        {
-                            if (Item* offItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
-                                target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, offItem->GetEntry());
-                        }
-                        else
-                            target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1));
-                        break;
+                    if (Player* player = caster->ToPlayer())
+                    {
+                        if (Item* offItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+                            target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, offItem->GetEntry());
                     }
+                    else
+                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1));
+                    break;
+                }
                 case SPELL_COPY_RANGED_AURA:
-                    {
-                        prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) + 2;
+                {
+                    prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) + 2;
 
-                        if (Player* player = caster->ToPlayer())
-                        {
-                            if (Item* rangedItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
-                                target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, rangedItem->GetEntry());
-                        }
-                        else
-                            target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2));
-                        break;
+                    if (Player* player = caster->ToPlayer())
+                    {
+                        if (Item* rangedItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
+                            target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, rangedItem->GetEntry());
                     }
+                    else
+                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2));
+                    break;
+                }
                 default:
                     break;
             }
@@ -3371,50 +3371,50 @@ public:
             switch (effIndex)
             {
                 case EFFECT_0: // On spells wich trigger the damaging spell (and also the visual)
+                {
+                    uint32 spellId;
+
+                    switch (GetSpellInfo()->Id)
                     {
-                        uint32 spellId;
-
-                        switch (GetSpellInfo()->Id)
-                        {
-                            case SPELL_BREAK_SHIELD_TRIGGER_UNK:
-                            case SPELL_BREAK_SHIELD_TRIGGER_CAMPAING_WARHORSE:
-                                spellId = SPELL_BREAK_SHIELD_DAMAGE_10K;
-                                break;
-                            case SPELL_BREAK_SHIELD_TRIGGER_FACTION_MOUNTS:
-                            case SPELL_BREAK_SHIELD_TRIGGER_SUNDERING_THURST:
-                                spellId = SPELL_BREAK_SHIELD_DAMAGE_2K;
-                                break;
-                            default:
-                                return;
-                        }
-
-                        if (Unit* rider = GetCaster()->GetCharmer())
-                            rider->CastSpell(target, spellId, false);
-                        else
-                            GetCaster()->CastSpell(target, spellId, false);
-                        break;
+                        case SPELL_BREAK_SHIELD_TRIGGER_UNK:
+                        case SPELL_BREAK_SHIELD_TRIGGER_CAMPAING_WARHORSE:
+                            spellId = SPELL_BREAK_SHIELD_DAMAGE_10K;
+                            break;
+                        case SPELL_BREAK_SHIELD_TRIGGER_FACTION_MOUNTS:
+                        case SPELL_BREAK_SHIELD_TRIGGER_SUNDERING_THURST:
+                            spellId = SPELL_BREAK_SHIELD_DAMAGE_2K;
+                            break;
+                        default:
+                            return;
                     }
+
+                    if (Unit* rider = GetCaster()->GetCharmer())
+                        rider->CastSpell(target, spellId, false);
+                    else
+                        GetCaster()->CastSpell(target, spellId, false);
+                    break;
+                }
                 case EFFECT_1: // On damaging spells, for removing a defend layer
+                {
+                    Unit::AuraApplicationMap const& auras = target->GetAppliedAuras();
+                    for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
                     {
-                        Unit::AuraApplicationMap const& auras = target->GetAppliedAuras();
-                        for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                        if (Aura* aura = itr->second->GetBase())
                         {
-                            if (Aura* aura = itr->second->GetBase())
+                            SpellInfo const* auraInfo = aura->GetSpellInfo();
+                            if (auraInfo && auraInfo->SpellIconID == 2007 && aura->HasEffectType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN))
                             {
-                                SpellInfo const* auraInfo = aura->GetSpellInfo();
-                                if (auraInfo && auraInfo->SpellIconID == 2007 && aura->HasEffectType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN))
-                                {
-                                    aura->ModStackAmount(-1, AURA_REMOVE_BY_ENEMY_SPELL);
-                                    // Remove dummys from rider (Necessary for updating visual shields)
-                                    if (Unit* rider = target->GetCharmer())
-                                        if (Aura* defend = rider->GetAura(aura->GetId()))
-                                            defend->ModStackAmount(-1, AURA_REMOVE_BY_ENEMY_SPELL);
-                                    break;
-                                }
+                                aura->ModStackAmount(-1, AURA_REMOVE_BY_ENEMY_SPELL);
+                                // Remove dummys from rider (Necessary for updating visual shields)
+                                if (Unit* rider = target->GetCharmer())
+                                    if (Aura* defend = rider->GetAura(aura->GetId()))
+                                        defend->ModStackAmount(-1, AURA_REMOVE_BY_ENEMY_SPELL);
+                                break;
                             }
                         }
-                        break;
                     }
+                    break;
+                }
                 default:
                     break;
             }
@@ -3498,53 +3498,53 @@ public:
             switch (effIndex)
             {
                 case EFFECT_0: // On spells wich trigger the damaging spell (and also the visual)
+                {
+                    uint32 spellId;
+
+                    switch (GetSpellInfo()->Id)
                     {
-                        uint32 spellId;
-
-                        switch (GetSpellInfo()->Id)
-                        {
-                            case SPELL_CHARGE_TRIGGER_TRIAL_CHAMPION:
-                                spellId = SPELL_CHARGE_CHARGING_EFFECT_20K_1;
-                                break;
-                            case SPELL_CHARGE_TRIGGER_FACTION_MOUNTS:
-                                spellId = SPELL_CHARGE_CHARGING_EFFECT_8K5;
-                                break;
-                            default:
-                                return;
-                        }
-
-                        // If target isn't a training dummy there's a chance of failing the charge
-                        if (!target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE) && roll_chance_f(12.5f))
-                            spellId = SPELL_CHARGE_MISS_EFFECT;
-
-                        if (Unit* vehicle = GetCaster()->GetVehicleBase())
-                            vehicle->CastSpell(target, spellId, false);
-                        else
-                            GetCaster()->CastSpell(target, spellId, false);
-                        break;
+                        case SPELL_CHARGE_TRIGGER_TRIAL_CHAMPION:
+                            spellId = SPELL_CHARGE_CHARGING_EFFECT_20K_1;
+                            break;
+                        case SPELL_CHARGE_TRIGGER_FACTION_MOUNTS:
+                            spellId = SPELL_CHARGE_CHARGING_EFFECT_8K5;
+                            break;
+                        default:
+                            return;
                     }
+
+                    // If target isn't a training dummy there's a chance of failing the charge
+                    if (!target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE) && roll_chance_f(12.5f))
+                        spellId = SPELL_CHARGE_MISS_EFFECT;
+
+                    if (Unit* vehicle = GetCaster()->GetVehicleBase())
+                        vehicle->CastSpell(target, spellId, false);
+                    else
+                        GetCaster()->CastSpell(target, spellId, false);
+                    break;
+                }
                 case EFFECT_1: // On damaging spells, for removing a defend layer
                 case EFFECT_2:
+                {
+                    Unit::AuraApplicationMap const& auras = target->GetAppliedAuras();
+                    for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
                     {
-                        Unit::AuraApplicationMap const& auras = target->GetAppliedAuras();
-                        for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                        if (Aura* aura = itr->second->GetBase())
                         {
-                            if (Aura* aura = itr->second->GetBase())
+                            SpellInfo const* auraInfo = aura->GetSpellInfo();
+                            if (auraInfo && auraInfo->SpellIconID == 2007 && aura->HasEffectType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN))
                             {
-                                SpellInfo const* auraInfo = aura->GetSpellInfo();
-                                if (auraInfo && auraInfo->SpellIconID == 2007 && aura->HasEffectType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN))
-                                {
-                                    aura->ModStackAmount(-1, AURA_REMOVE_BY_ENEMY_SPELL);
-                                    // Remove dummys from rider (Necessary for updating visual shields)
-                                    if (Unit* rider = target->GetCharmer())
-                                        if (Aura* defend = rider->GetAura(aura->GetId()))
-                                            defend->ModStackAmount(-1, AURA_REMOVE_BY_ENEMY_SPELL);
-                                    break;
-                                }
+                                aura->ModStackAmount(-1, AURA_REMOVE_BY_ENEMY_SPELL);
+                                // Remove dummys from rider (Necessary for updating visual shields)
+                                if (Unit* rider = target->GetCharmer())
+                                    if (Aura* defend = rider->GetAura(aura->GetId()))
+                                        defend->ModStackAmount(-1, AURA_REMOVE_BY_ENEMY_SPELL);
+                                break;
                             }
                         }
-                        break;
                     }
+                    break;
+                }
             }
         }
 
@@ -3942,105 +3942,105 @@ public:
             {
                 case NPC_ARGENT_STEED_ASPIRANT:
                 case NPC_STORMWIND_STEED:
-                    {
-                        if (player->HasAchieved(ACHIEVEMENT_CHAMPION_STORMWIND))
-                            return SPELL_PENNANT_STORMWIND_CHAMPION;
-                        else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_STORMWIND) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_STORMWIND))
-                            return SPELL_PENNANT_STORMWIND_VALIANT;
-                        else
-                            return SPELL_PENNANT_STORMWIND_ASPIRANT;
-                    }
+                {
+                    if (player->HasAchieved(ACHIEVEMENT_CHAMPION_STORMWIND))
+                        return SPELL_PENNANT_STORMWIND_CHAMPION;
+                    else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_STORMWIND) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_STORMWIND))
+                        return SPELL_PENNANT_STORMWIND_VALIANT;
+                    else
+                        return SPELL_PENNANT_STORMWIND_ASPIRANT;
+                }
                 case NPC_GNOMEREGAN_MECHANOSTRIDER:
-                    {
-                        if (player->HasAchieved(ACHIEVEMENT_CHAMPION_GNOMEREGAN))
-                            return SPELL_PENNANT_GNOMEREGAN_CHAMPION;
-                        else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_GNOMEREGAN) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_GNOMEREGAN))
-                            return SPELL_PENNANT_GNOMEREGAN_VALIANT;
-                        else
-                            return SPELL_PENNANT_GNOMEREGAN_ASPIRANT;
-                    }
+                {
+                    if (player->HasAchieved(ACHIEVEMENT_CHAMPION_GNOMEREGAN))
+                        return SPELL_PENNANT_GNOMEREGAN_CHAMPION;
+                    else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_GNOMEREGAN) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_GNOMEREGAN))
+                        return SPELL_PENNANT_GNOMEREGAN_VALIANT;
+                    else
+                        return SPELL_PENNANT_GNOMEREGAN_ASPIRANT;
+                }
                 case NPC_DARK_SPEAR_RAPTOR:
-                    {
-                        if (player->HasAchieved(ACHIEVEMENT_CHAMPION_SEN_JIN))
-                            return SPELL_PENNANT_SEN_JIN_CHAMPION;
-                        else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_SEN_JIN) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_SEN_JIN))
-                            return SPELL_PENNANT_SEN_JIN_VALIANT;
-                        else
-                            return SPELL_PENNANT_SEN_JIN_ASPIRANT;
-                    }
+                {
+                    if (player->HasAchieved(ACHIEVEMENT_CHAMPION_SEN_JIN))
+                        return SPELL_PENNANT_SEN_JIN_CHAMPION;
+                    else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_SEN_JIN) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_SEN_JIN))
+                        return SPELL_PENNANT_SEN_JIN_VALIANT;
+                    else
+                        return SPELL_PENNANT_SEN_JIN_ASPIRANT;
+                }
                 case NPC_ARGENT_HAWKSTRIDER_ASPIRANT:
                 case NPC_SILVERMOON_HAWKSTRIDER:
-                    {
-                        if (player->HasAchieved(ACHIEVEMENT_CHAMPION_SILVERMOON))
-                            return SPELL_PENNANT_SILVERMOON_CHAMPION;
-                        else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_SILVERMOON) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_SILVERMOON))
-                            return SPELL_PENNANT_SILVERMOON_VALIANT;
-                        else
-                            return SPELL_PENNANT_SILVERMOON_ASPIRANT;
-                    }
+                {
+                    if (player->HasAchieved(ACHIEVEMENT_CHAMPION_SILVERMOON))
+                        return SPELL_PENNANT_SILVERMOON_CHAMPION;
+                    else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_SILVERMOON) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_SILVERMOON))
+                        return SPELL_PENNANT_SILVERMOON_VALIANT;
+                    else
+                        return SPELL_PENNANT_SILVERMOON_ASPIRANT;
+                }
                 case NPC_DARNASSIAN_NIGHTSABER:
-                    {
-                        if (player->HasAchieved(ACHIEVEMENT_CHAMPION_DARNASSUS))
-                            return SPELL_PENNANT_DARNASSUS_CHAMPION;
-                        else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_DARNASSUS) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_DARNASSUS))
-                            return SPELL_PENNANT_DARNASSUS_VALIANT;
-                        else
-                            return SPELL_PENNANT_DARNASSUS_ASPIRANT;
-                    }
+                {
+                    if (player->HasAchieved(ACHIEVEMENT_CHAMPION_DARNASSUS))
+                        return SPELL_PENNANT_DARNASSUS_CHAMPION;
+                    else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_DARNASSUS) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_DARNASSUS))
+                        return SPELL_PENNANT_DARNASSUS_VALIANT;
+                    else
+                        return SPELL_PENNANT_DARNASSUS_ASPIRANT;
+                }
                 case NPC_EXODAR_ELEKK:
-                    {
-                        if (player->HasAchieved(ACHIEVEMENT_CHAMPION_THE_EXODAR))
-                            return SPELL_PENNANT_EXODAR_CHAMPION;
-                        else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_THE_EXODAR) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_THE_EXODAR))
-                            return SPELL_PENNANT_EXODAR_VALIANT;
-                        else
-                            return SPELL_PENNANT_EXODAR_ASPIRANT;
-                    }
+                {
+                    if (player->HasAchieved(ACHIEVEMENT_CHAMPION_THE_EXODAR))
+                        return SPELL_PENNANT_EXODAR_CHAMPION;
+                    else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_THE_EXODAR) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_THE_EXODAR))
+                        return SPELL_PENNANT_EXODAR_VALIANT;
+                    else
+                        return SPELL_PENNANT_EXODAR_ASPIRANT;
+                }
                 case NPC_IRONFORGE_RAM:
-                    {
-                        if (player->HasAchieved(ACHIEVEMENT_CHAMPION_IRONFORGE))
-                            return SPELL_PENNANT_IRONFORGE_CHAMPION;
-                        else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_IRONFORGE) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_IRONFORGE))
-                            return SPELL_PENNANT_IRONFORGE_VALIANT;
-                        else
-                            return SPELL_PENNANT_IRONFORGE_ASPIRANT;
-                    }
+                {
+                    if (player->HasAchieved(ACHIEVEMENT_CHAMPION_IRONFORGE))
+                        return SPELL_PENNANT_IRONFORGE_CHAMPION;
+                    else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_IRONFORGE) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_IRONFORGE))
+                        return SPELL_PENNANT_IRONFORGE_VALIANT;
+                    else
+                        return SPELL_PENNANT_IRONFORGE_ASPIRANT;
+                }
                 case NPC_FORSAKEN_WARHORSE:
-                    {
-                        if (player->HasAchieved(ACHIEVEMENT_CHAMPION_UNDERCITY))
-                            return SPELL_PENNANT_UNDERCITY_CHAMPION;
-                        else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_UNDERCITY) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_UNDERCITY))
-                            return SPELL_PENNANT_UNDERCITY_VALIANT;
-                        else
-                            return SPELL_PENNANT_UNDERCITY_ASPIRANT;
-                    }
+                {
+                    if (player->HasAchieved(ACHIEVEMENT_CHAMPION_UNDERCITY))
+                        return SPELL_PENNANT_UNDERCITY_CHAMPION;
+                    else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_UNDERCITY) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_UNDERCITY))
+                        return SPELL_PENNANT_UNDERCITY_VALIANT;
+                    else
+                        return SPELL_PENNANT_UNDERCITY_ASPIRANT;
+                }
                 case NPC_ORGRIMMAR_WOLF:
-                    {
-                        if (player->HasAchieved(ACHIEVEMENT_CHAMPION_ORGRIMMAR))
-                            return SPELL_PENNANT_ORGRIMMAR_CHAMPION;
-                        else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_ORGRIMMAR) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_ORGRIMMAR))
-                            return SPELL_PENNANT_ORGRIMMAR_VALIANT;
-                        else
-                            return SPELL_PENNANT_ORGRIMMAR_ASPIRANT;
-                    }
+                {
+                    if (player->HasAchieved(ACHIEVEMENT_CHAMPION_ORGRIMMAR))
+                        return SPELL_PENNANT_ORGRIMMAR_CHAMPION;
+                    else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_ORGRIMMAR) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_ORGRIMMAR))
+                        return SPELL_PENNANT_ORGRIMMAR_VALIANT;
+                    else
+                        return SPELL_PENNANT_ORGRIMMAR_ASPIRANT;
+                }
                 case NPC_THUNDER_BLUFF_KODO:
-                    {
-                        if (player->HasAchieved(ACHIEVEMENT_CHAMPION_THUNDER_BLUFF))
-                            return SPELL_PENNANT_THUNDER_BLUFF_CHAMPION;
-                        else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_THUNDER_BLUFF) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_THUNDER_BLUFF))
-                            return SPELL_PENNANT_THUNDER_BLUFF_VALIANT;
-                        else
-                            return SPELL_PENNANT_THUNDER_BLUFF_ASPIRANT;
-                    }
+                {
+                    if (player->HasAchieved(ACHIEVEMENT_CHAMPION_THUNDER_BLUFF))
+                        return SPELL_PENNANT_THUNDER_BLUFF_CHAMPION;
+                    else if (player->GetQuestRewardStatus(QUEST_VALIANT_OF_THUNDER_BLUFF) || player->GetQuestRewardStatus(QUEST_A_VALIANT_OF_THUNDER_BLUFF))
+                        return SPELL_PENNANT_THUNDER_BLUFF_VALIANT;
+                    else
+                        return SPELL_PENNANT_THUNDER_BLUFF_ASPIRANT;
+                }
                 case NPC_ARGENT_WARHORSE:
-                    {
-                        if (player->HasAchieved(ACHIEVEMENT_CHAMPION_ALLIANCE) || player->HasAchieved(ACHIEVEMENT_CHAMPION_HORDE))
-                            return player->getClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_CHAMPION : SPELL_PENNANT_ARGENT_CRUSADE_CHAMPION;
-                        else if (player->HasAchieved(ACHIEVEMENT_ARGENT_VALOR))
-                            return player->getClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_VALIANT : SPELL_PENNANT_ARGENT_CRUSADE_VALIANT;
-                        else
-                            return player->getClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_ASPIRANT : SPELL_PENNANT_ARGENT_CRUSADE_ASPIRANT;
-                    }
+                {
+                    if (player->HasAchieved(ACHIEVEMENT_CHAMPION_ALLIANCE) || player->HasAchieved(ACHIEVEMENT_CHAMPION_HORDE))
+                        return player->getClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_CHAMPION : SPELL_PENNANT_ARGENT_CRUSADE_CHAMPION;
+                    else if (player->HasAchieved(ACHIEVEMENT_ARGENT_VALOR))
+                        return player->getClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_VALIANT : SPELL_PENNANT_ARGENT_CRUSADE_VALIANT;
+                    else
+                        return player->getClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_ASPIRANT : SPELL_PENNANT_ARGENT_CRUSADE_ASPIRANT;
+                }
                 default:
                     return 0;
             }

@@ -2281,23 +2281,23 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
-                {
-                    CloseGossipMenuFor(player);
+            {
+                CloseGossipMenuFor(player);
 
-                    if (auto thrall_ai = CAST_AI(npc_thrall_bfu::npc_thrall_bfuAI, creature->AI()))
+                if (auto thrall_ai = CAST_AI(npc_thrall_bfu::npc_thrall_bfuAI, creature->AI()))
+                {
+                    if (Creature* sylvannas = GetClosestCreatureWithEntry(creature, NPC_SYLVANAS, 50.0f))
                     {
-                        if (Creature* sylvannas = GetClosestCreatureWithEntry(creature, NPC_SYLVANAS, 50.0f))
-                        {
-                            thrall_ai->sylvanasfollowGUID = sylvannas->GetGUID();
-                            thrall_ai->Start(true, true, player->GetGUID());
-                            thrall_ai->SetDespawnAtEnd(false);
-                            thrall_ai->SetDespawnAtFar(false);
-                        }
-                        else
-                            thrall_ai->sylvanasfollowGUID = 0;
+                        thrall_ai->sylvanasfollowGUID = sylvannas->GetGUID();
+                        thrall_ai->Start(true, true, player->GetGUID());
+                        thrall_ai->SetDespawnAtEnd(false);
+                        thrall_ai->SetDespawnAtFar(false);
                     }
-                    break;
+                    else
+                        thrall_ai->sylvanasfollowGUID = 0;
                 }
+                break;
+            }
         }
 
         return true;
@@ -2494,41 +2494,41 @@ public:
                     bStepping = true;
                     break;
                 case NPC_KHANOK:
-                    {
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 0);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_DONE_H, 1);
-                        FollowThrall();
-                        SetEscortPaused(false);
-                        std::list<Creature*> SanktumList;
-                        me->GetCreatureListWithEntryInGrid(SanktumList, NPC_FELGUARD_MORADEUR, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DREADLORD, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(SanktumList, NPC_TREACHEROUS_GUARDIAN_H, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DOCTOR_H, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(SanktumList, NPC_CHEMIST_H, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(SanktumList, NPC_BETRAYER_H, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(SanktumList, NPC_FELBEAST_H, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DOOMGUARD_PILLARGER, 1000.0f);
-                        if (!SanktumList.empty())
-                            for (std::list<Creature*>::iterator itr = SanktumList.begin(); itr != SanktumList.end(); itr++)
-                                (*itr)->DespawnOrUnsummon();
-                        break;
-                    }
+                {
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 0);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_DONE_H, 1);
+                    FollowThrall();
+                    SetEscortPaused(false);
+                    std::list<Creature*> SanktumList;
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_FELGUARD_MORADEUR, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DREADLORD, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_TREACHEROUS_GUARDIAN_H, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DOCTOR_H, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_CHEMIST_H, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_BETRAYER_H, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_FELBEAST_H, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DOOMGUARD_PILLARGER, 1000.0f);
+                    if (!SanktumList.empty())
+                        for (std::list<Creature*>::iterator itr = SanktumList.begin(); itr != SanktumList.end(); itr++)
+                            (*itr)->DespawnOrUnsummon();
+                    break;
+                }
                 case NPC_VARIMATHRAS:
-                    {
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 0);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_DONE_H, 1);
-                        std::list<Creature*> ThroneList;
-                        me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_OVERLORD, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_INVADER, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_DREADWHISPER, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(ThroneList, NPC_VARIMATHRAS_PORTAL, 1000.0f);
-                        if (!ThroneList.empty())
-                            for (std::list<Creature*>::iterator itr = ThroneList.begin(); itr != ThroneList.end(); itr++)
-                                (*itr)->DespawnOrUnsummon();
-                        SetEscortPaused(false);
-                        SetRun(false);
-                        break;
-                    }
+                {
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 0);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_DONE_H, 1);
+                    std::list<Creature*> ThroneList;
+                    me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_OVERLORD, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_INVADER, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_DREADWHISPER, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(ThroneList, NPC_VARIMATHRAS_PORTAL, 1000.0f);
+                    if (!ThroneList.empty())
+                        for (std::list<Creature*>::iterator itr = ThroneList.begin(); itr != ThroneList.end(); itr++)
+                            (*itr)->DespawnOrUnsummon();
+                    SetEscortPaused(false);
+                    SetRun(false);
+                    break;
+                }
                 default:
                     break;
             }
@@ -3045,19 +3045,19 @@ public:
                             JumpToNextStep(5 * IN_MILLISECONDS);
                             break;
                         case 16:
-                            {
-                                std::list<Creature*> PlagueList;
-                                me->GetCreatureListWithEntryInGrid(PlagueList, NPC_PLAGUE_TRIGGER, 50.0f);
-                                if (!PlagueList.empty())
-                                    for (std::list<Creature*>::iterator itr = PlagueList.begin(); itr != PlagueList.end(); itr++)
-                                        (*itr)->DespawnOrUnsummon();
-                                SetEscortPaused(false);
-                                SetRun(false);
-                                if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                                    sylvanas->GetMotionMaster()->MovePath(NPC_SYLVANAS * 1000, false);
-                                JumpToNextStep(3 * IN_MILLISECONDS);
-                                break;
-                            }
+                        {
+                            std::list<Creature*> PlagueList;
+                            me->GetCreatureListWithEntryInGrid(PlagueList, NPC_PLAGUE_TRIGGER, 50.0f);
+                            if (!PlagueList.empty())
+                                for (std::list<Creature*>::iterator itr = PlagueList.begin(); itr != PlagueList.end(); itr++)
+                                    (*itr)->DespawnOrUnsummon();
+                            SetEscortPaused(false);
+                            SetRun(false);
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                sylvanas->GetMotionMaster()->MovePath(NPC_SYLVANAS * 1000, false);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        }
                         case 17:
                             bStepping = false;
                             JumpToNextStep(0);
@@ -3068,11 +3068,11 @@ public:
                             JumpToNextStep(6 * IN_MILLISECONDS);
                             break;
                         case 19:
-                            {
-                                SpawnWave(2);
-                                JumpToNextStep(3 * IN_MILLISECONDS);
-                                break;
-                            }
+                        {
+                            SpawnWave(2);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        }
                         case 20:
                             if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
                                 valimathras->AI()->Talk(SAY_VALIMATHRAS_INTRO_0);
@@ -3108,17 +3108,17 @@ public:
                             JumpToNextStep(1 * IN_MILLISECONDS);
                             break;
                         case 26:
-                            {
-                                Talk(THRALL_SAY_COURTYARD_3);
-                                me->CastSpell(me, SPELL_TIDAL_WAVE_SUMMON);
-                                std::list<Creature*> HelperList;
-                                me->GetCreatureListWithEntryInGrid(HelperList, NPC_SLINGER_TRIGGER, 1000.0f);
-                                if (!HelperList.empty())
-                                    for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
-                                        (*itr)->DespawnOrUnsummon();
-                                JumpToNextStep(5 * IN_MILLISECONDS);
-                                break;
-                            }
+                        {
+                            Talk(THRALL_SAY_COURTYARD_3);
+                            me->CastSpell(me, SPELL_TIDAL_WAVE_SUMMON);
+                            std::list<Creature*> HelperList;
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_SLINGER_TRIGGER, 1000.0f);
+                            if (!HelperList.empty())
+                                for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
+                                    (*itr)->DespawnOrUnsummon();
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        }
                         // Start COURTYARD_FIGHT
                         case 27:
                             FollowThrall();
@@ -3131,20 +3131,20 @@ public:
                             JumpToNextStep(0);
                             break;
                         case 28:
-                            {
-                                EnableAttack = true;
-                                DoCast(me, SPELL_HEROIC_VANGUARD, true);
-                                std::list<Creature*> HostileEndList;
-                                me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_TREACHEROUS_GUARDIAN_H, 1000.0f);
-                                me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_DOCTOR_H, 1000.0f);
-                                me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_CHEMIST_H, 1000.0f);
-                                if (!HostileEndList.empty())
-                                    for (std::list<Creature*>::iterator itr = HostileEndList.begin(); itr != HostileEndList.end(); itr++)
-                                        (*itr)->setFaction(FACTION_HOSTILE);
-                                SpawnWave(4);
-                                JumpToNextStep(10 * IN_MILLISECONDS);
-                                break;
-                            }
+                        {
+                            EnableAttack = true;
+                            DoCast(me, SPELL_HEROIC_VANGUARD, true);
+                            std::list<Creature*> HostileEndList;
+                            me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_TREACHEROUS_GUARDIAN_H, 1000.0f);
+                            me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_DOCTOR_H, 1000.0f);
+                            me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_CHEMIST_H, 1000.0f);
+                            if (!HostileEndList.empty())
+                                for (std::list<Creature*>::iterator itr = HostileEndList.begin(); itr != HostileEndList.end(); itr++)
+                                    (*itr)->setFaction(FACTION_HOSTILE);
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        }
                         case 29:
                             SpawnWave(4);
                             JumpToNextStep(10 * IN_MILLISECONDS);
@@ -3216,25 +3216,25 @@ public:
                             break;
                         // End COURTYARD_FIGHT
                         case 46:
-                            {
-                                FollowThrall();
-                                std::list<Creature*> HostileList;
-                                me->GetCreatureListWithEntryInGrid(HostileList, NPC_TREACHEROUS_GUARDIAN_H, 1000.0f);
-                                me->GetCreatureListWithEntryInGrid(HostileList, NPC_DOCTOR_H, 1000.0f);
-                                me->GetCreatureListWithEntryInGrid(HostileList, NPC_CHEMIST_H, 1000.0f);
-                                me->GetCreatureListWithEntryInGrid(HostileList, NPC_BLIGHT_SLINGER, 1000.0f);
-                                if (!HostileList.empty())
-                                    for (std::list<Creature*>::iterator itr = HostileList.begin(); itr != HostileList.end(); itr++)
-                                        (*itr)->DespawnOrUnsummon();
-                                for (uint8 i = 0; i < 7; ++i)
-                                    me->SummonGameObject(GO_HORDE_BANNER, ThrallSpawn[i + 37].x, ThrallSpawn[i + 37].y, ThrallSpawn[i + 37].z, ThrallSpawn[i + 37].o, 0.0f, 0.0f, 0.0f, 0.0f, 120 * IN_MILLISECONDS);
-                                SpawnWave(6);
-                                SetEscortPaused(false);
-                                bStepping = false;
-                                SetRun(false);
-                                JumpToNextStep(0 * IN_MILLISECONDS);
-                                break;
-                            }
+                        {
+                            FollowThrall();
+                            std::list<Creature*> HostileList;
+                            me->GetCreatureListWithEntryInGrid(HostileList, NPC_TREACHEROUS_GUARDIAN_H, 1000.0f);
+                            me->GetCreatureListWithEntryInGrid(HostileList, NPC_DOCTOR_H, 1000.0f);
+                            me->GetCreatureListWithEntryInGrid(HostileList, NPC_CHEMIST_H, 1000.0f);
+                            me->GetCreatureListWithEntryInGrid(HostileList, NPC_BLIGHT_SLINGER, 1000.0f);
+                            if (!HostileList.empty())
+                                for (std::list<Creature*>::iterator itr = HostileList.begin(); itr != HostileList.end(); itr++)
+                                    (*itr)->DespawnOrUnsummon();
+                            for (uint8 i = 0; i < 7; ++i)
+                                me->SummonGameObject(GO_HORDE_BANNER, ThrallSpawn[i + 37].x, ThrallSpawn[i + 37].y, ThrallSpawn[i + 37].z, ThrallSpawn[i + 37].o, 0.0f, 0.0f, 0.0f, 0.0f, 120 * IN_MILLISECONDS);
+                            SpawnWave(6);
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            SetRun(false);
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                        }
                         case 47:
                             Talk(THRALL_SAY_COURTYARD_5);
                             JumpToNextStep(5 * IN_MILLISECONDS);
@@ -3556,15 +3556,15 @@ public:
                             JumpToNextStep(6 * IN_MILLISECONDS);
                             break;
                         case 115:
-                            {
-                                std::list<GameObject*> SaronitList;
-                                GetGameObjectListWithEntryInGrid(SaronitList, me, GO_BLOCKED_PASSAGE, 80.0f);
-                                for (std::list<GameObject*>::const_iterator itr = SaronitList.begin(); itr != SaronitList.end(); ++itr)
-                                    if (GameObject* saronit = (*itr))
-                                        saronit->UseDoorOrButton();
-                                JumpToNextStep(5 * IN_MILLISECONDS);
-                                break;
-                            }
+                        {
+                            std::list<GameObject*> SaronitList;
+                            GetGameObjectListWithEntryInGrid(SaronitList, me, GO_BLOCKED_PASSAGE, 80.0f);
+                            for (std::list<GameObject*>::const_iterator itr = SaronitList.begin(); itr != SaronitList.end(); ++itr)
+                                if (GameObject* saronit = (*itr))
+                                    saronit->UseDoorOrButton();
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        }
                         case 116:
                             Talk(THRALL_SAY_SANCTUM_7);
                             UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 1);
@@ -3829,17 +3829,17 @@ public:
                             JumpToNextStep(5 * IN_MILLISECONDS);
                             break;
                         case 155:
-                            {
-                                std::list<Creature*> HelperList;
-                                me->GetCreatureListWithEntryInGrid(HelperList, NPC_SW_SOLDIER, 100.0f);
-                                me->GetCreatureListWithEntryInGrid(HelperList, NPC_JAINA, 100.0f);
-                                me->GetCreatureListWithEntryInGrid(HelperList, NPC_WRYNN, 100.0f);
-                                if (!HelperList.empty())
-                                    for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
-                                        (*itr)->DespawnOrUnsummon();
-                                JumpToNextStep(8 * IN_MILLISECONDS);
-                                break;
-                            }
+                        {
+                            std::list<Creature*> HelperList;
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_SW_SOLDIER, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_JAINA, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_WRYNN, 100.0f);
+                            if (!HelperList.empty())
+                                for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
+                                    (*itr)->DespawnOrUnsummon();
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        }
                         case 156:
                             Talk(THRALL_SAY_THRONE_7);
                             SetEscortPaused(false);

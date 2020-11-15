@@ -169,56 +169,56 @@ public:
             {
                 case NPC_SNIVEL_ALLY:
                 case NPC_SNIVEL_HORDE:
+                {
+                    switch (time)
                     {
-                        switch (time)
-                        {
-                            case 1:
-                                me->MonsterSay("What are you staring at? Haven't you ever seen a genius before?", LANG_UNIVERSAL, 0);
-                                return false;
-                            case 2:
-                                me->MonsterSay("This'll teach you to mind your own business!", LANG_UNIVERSAL, 0);
-                                return true;
-                        }
-                        break;
+                        case 1:
+                            me->MonsterSay("What are you staring at? Haven't you ever seen a genius before?", LANG_UNIVERSAL, 0);
+                            return false;
+                        case 2:
+                            me->MonsterSay("This'll teach you to mind your own business!", LANG_UNIVERSAL, 0);
+                            return true;
                     }
+                    break;
+                }
                 case NPC_SNIVEL_ALLY+1:
                 case NPC_SNIVEL_HORDE+1:
+                {
+                    switch (time)
                     {
-                        switch (time)
-                        {
-                            case 1:
-                                me->MonsterSay("That's right. I'd like to list some of these 'fireworks'.", LANG_UNIVERSAL, 0);
-                                return false;
-                            case 2:
-                                me->MonsterSay("Those'll net me a nice profit when I return from the South Seas.", LANG_UNIVERSAL, 0);
-                                return false;
-                            case 3:
-                                me->MonsterSay("You... Don't think I don't see you. Leave me alone!", LANG_UNIVERSAL, 0);
-                                return true;
-                        }
-                        break;
+                        case 1:
+                            me->MonsterSay("That's right. I'd like to list some of these 'fireworks'.", LANG_UNIVERSAL, 0);
+                            return false;
+                        case 2:
+                            me->MonsterSay("Those'll net me a nice profit when I return from the South Seas.", LANG_UNIVERSAL, 0);
+                            return false;
+                        case 3:
+                            me->MonsterSay("You... Don't think I don't see you. Leave me alone!", LANG_UNIVERSAL, 0);
+                            return true;
                     }
+                    break;
+                }
 
                 case NPC_SNIVEL_ALLY+2:
                 case NPC_SNIVEL_HORDE+2:
+                {
+                    switch (time)
                     {
-                        switch (time)
-                        {
-                            case 1:
-                                me->MonsterSay("Thanks for the great cut and shave, buddy.", LANG_UNIVERSAL, 0);
-                                return false;
-                            case 2:
-                                me->MonsterSay("Here's a little something extra since I'll be away.", LANG_UNIVERSAL, 0);
-                                return false;
-                            case 3:
-                                me->MonsterSay("On second thought, keep the whole bag. I have to, uh, get going.", LANG_UNIVERSAL, 0);
-                                return false;
-                            case 4:
-                                me->MonsterSay("Did you really think you could corner me this easily?", LANG_UNIVERSAL, 0);
-                                return true;
-                        }
-                        break;
+                        case 1:
+                            me->MonsterSay("Thanks for the great cut and shave, buddy.", LANG_UNIVERSAL, 0);
+                            return false;
+                        case 2:
+                            me->MonsterSay("Here's a little something extra since I'll be away.", LANG_UNIVERSAL, 0);
+                            return false;
+                        case 3:
+                            me->MonsterSay("On second thought, keep the whole bag. I have to, uh, get going.", LANG_UNIVERSAL, 0);
+                            return false;
+                        case 4:
+                            me->MonsterSay("Did you really think you could corner me this easily?", LANG_UNIVERSAL, 0);
+                            return true;
                     }
+                    break;
+                }
             }
 
             return true;
@@ -374,19 +374,19 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_CALL_BAXTER:
-                    {
-                        EntryCheckPredicate pred(NPC_APOTHECARY_BAXTER);
-                        summons.DoAction(ACTION_RELEASE_HELPER, pred);
-                        
-                        break;
-                    }
+                {
+                    EntryCheckPredicate pred(NPC_APOTHECARY_BAXTER);
+                    summons.DoAction(ACTION_RELEASE_HELPER, pred);
+
+                    break;
+                }
                 case EVENT_CALL_FRYE:
-                    {
-                        EntryCheckPredicate pred(NPC_APOTHECARY_FRYE);
-                        summons.DoAction(ACTION_RELEASE_HELPER, pred);
-                        
-                        break;
-                    }
+                {
+                    EntryCheckPredicate pred(NPC_APOTHECARY_FRYE);
+                    summons.DoAction(ACTION_RELEASE_HELPER, pred);
+
+                    break;
+                }
                 case EVENT_SPELL_PERFUME_SPRAY:
                     me->CastSpell(me->GetVictim(), SPELL_ALLURING_PERFUME_SPRAY, false);
                     events.RepeatEvent(6000);

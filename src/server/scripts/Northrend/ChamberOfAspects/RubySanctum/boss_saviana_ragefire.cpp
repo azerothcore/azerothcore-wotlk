@@ -125,16 +125,16 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_FLIGHT:
-                    {
-                        me->SetReactState(REACT_PASSIVE);
-                        me->AttackStop();
-                        me->SetDisableGravity(true);
-                        me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, false);
-                        events.ScheduleEvent(EVENT_FLIGHT, 50000);
-                        events.DelayEvents(15000);
-                        events.ScheduleEvent(EVENT_AIR_MOVEMENT, 2000);
-                        break;
-                    }
+                {
+                    me->SetReactState(REACT_PASSIVE);
+                    me->AttackStop();
+                    me->SetDisableGravity(true);
+                    me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, false);
+                    events.ScheduleEvent(EVENT_FLIGHT, 50000);
+                    events.DelayEvents(15000);
+                    events.ScheduleEvent(EVENT_AIR_MOVEMENT, 2000);
+                    break;
+                }
                 case EVENT_CONFLAGRATION:
                     me->CastCustomSpell(SPELL_CONFLAGRATION, SPELLVALUE_MAX_TARGETS, RAID_MODE(3, 6, 3, 6), me, true);
                     break;

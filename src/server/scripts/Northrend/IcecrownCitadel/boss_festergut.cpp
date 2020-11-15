@@ -219,19 +219,19 @@ public:
                     events.DelayEventsToMax(20000, 1); // delay EVENT_VILE_GAS
                     break;
                 case EVENT_VILE_GAS:
-                    {
-                        std::list<Unit*> targets;
-                        uint32 minTargets = RAID_MODE<uint32>(3, 8, 3, 8);
-                        SelectTargetList(targets, minTargets, SELECT_TARGET_RANDOM, -5.0f, true);
-                        float minDist = 0.0f;
-                        if (targets.size() >= minTargets)
-                            minDist = -5.0f;
+                {
+                    std::list<Unit*> targets;
+                    uint32 minTargets = RAID_MODE<uint32>(3, 8, 3, 8);
+                    SelectTargetList(targets, minTargets, SELECT_TARGET_RANDOM, -5.0f, true);
+                    float minDist = 0.0f;
+                    if (targets.size() >= minTargets)
+                        minDist = -5.0f;
 
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, minDist, true))
-                            me->CastSpell(target, SPELL_VILE_GAS, false);
-                        events.ScheduleEvent(EVENT_VILE_GAS, urand(28000, 35000), 1);
-                        break;
-                    }
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, minDist, true))
+                        me->CastSpell(target, SPELL_VILE_GAS, false);
+                    events.ScheduleEvent(EVENT_VILE_GAS, urand(28000, 35000), 1);
+                    break;
+                }
                 case EVENT_GASTRIC_BLOAT:
                     me->CastSpell(me->GetVictim(), SPELL_GASTRIC_BLOAT, false);
                     events.ScheduleEvent(EVENT_GASTRIC_BLOAT, urand(15000, 17500));

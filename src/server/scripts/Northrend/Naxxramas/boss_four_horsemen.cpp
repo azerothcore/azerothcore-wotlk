@@ -151,7 +151,7 @@ public:
 
         void MoveToCorner()
         {
-            switch(me->GetEntry())
+            switch (me->GetEntry())
             {
                 case NPC_THANE_KORTHAZZ:
                     currentWaypoint = 0;
@@ -310,7 +310,7 @@ public:
                 case EVENT_BERSERK:
                     Talk(SAY_SPECIAL);
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    
+
                     return;
                 case EVENT_SPELL_PRIMARY:
                     Talk(SAY_TAUNT);

@@ -158,61 +158,61 @@ public:
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
             switch ( events.ExecuteEvent() )
             {
                 case EVENT_CHECK_HEALTH:
+                {
+                    events.RepeatEvent(1000);
+                    if (HealthBelowPct(50))
                     {
-                        events.RepeatEvent(1000);
-                        if (HealthBelowPct(50))
-                        {
-                            events.CancelEvent(EVENT_CHECK_HEALTH);
-                            events.ScheduleEvent(EVENT_SUMMON_GUARD, 100);
-                        }
-                        break;
+                        events.CancelEvent(EVENT_CHECK_HEALTH);
+                        events.ScheduleEvent(EVENT_SUMMON_GUARD, 100);
                     }
+                    break;
+                }
                 case EVENT_SUMMON_GUARD:
-                    {
-                        Talk(EMOTE_HATCHES, me);
-                        SummonHelpers(false);
-                        break;
-                    }
+                {
+                    Talk(EMOTE_HATCHES, me);
+                    SummonHelpers(false);
+                    break;
+                }
                 case EVENT_BROOD_RAGE:
-                    {
-                        if (Creature* pSwarmer = me->FindNearestCreature(NPC_AHNKAHAR_SWARMER, 40, true))
-                            me->CastSpell(pSwarmer, SPELL_BROOD_RAGE_H, true);
+                {
+                    if (Creature* pSwarmer = me->FindNearestCreature(NPC_AHNKAHAR_SWARMER, 40, true))
+                        me->CastSpell(pSwarmer, SPELL_BROOD_RAGE_H, true);
 
-                        events.RepeatEvent(10000);
-                        break;
-                    }
+                    events.RepeatEvent(10000);
+                    break;
+                }
                 case EVENT_PLAGUE:
-                    {
-                        me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_BROOD_PLAGUE, SPELL_BROOD_PLAGUE_H), false);
-                        events.RepeatEvent(12000 + rand() % 5000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_BROOD_PLAGUE, SPELL_BROOD_PLAGUE_H), false);
+                    events.RepeatEvent(12000 + rand() % 5000);
+                    break;
+                }
                 case EVENT_SWARMER:
-                    {
-                        SummonHelpers(true);
-                        events.RepeatEvent(10000);
-                        break;
-                    }
+                {
+                    SummonHelpers(true);
+                    events.RepeatEvent(10000);
+                    break;
+                }
                 case EVENT_CHECK_HOME:
+                {
+                    if (me->HasAura(SPELL_ENRAGE))
+                        break;
+
+                    if (me->GetPositionZ() < 24)
                     {
-                        if (me->HasAura(SPELL_ENRAGE))
-                            break;
-
-                        if (me->GetPositionZ() < 24)
-                        {
-                            me->CastSpell(me, SPELL_ENRAGE, true);
-                            break;
-                        }
-
-                        events.RepeatEvent(2000);
+                        me->CastSpell(me, SPELL_ENRAGE, true);
                         break;
                     }
+
+                    events.RepeatEvent(2000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();

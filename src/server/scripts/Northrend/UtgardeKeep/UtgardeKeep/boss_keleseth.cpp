@@ -61,7 +61,7 @@ public:
                 if (Unit* s = t->GetSummoner())
                 {
                     PrisonerGUID = s->GetGUID();
-                    if( me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic() )
+                    if ( me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic() )
                     {
                         const int32 dmg = 2000;
                         c->CastCustomSpell(s, SPELL_FROST_TOMB_AURA, NULL, &dmg, NULL, true);
@@ -90,7 +90,7 @@ public:
             {
                 if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
                 {
-                    if( !p->HasAura(SPELL_FROST_TOMB_AURA) )
+                    if ( !p->HasAura(SPELL_FROST_TOMB_AURA) )
                         Unit::Kill(me, me);
                 }
                 else
@@ -160,7 +160,7 @@ public:
 
         void AttackStart(Unit* who)
         {
-            if( !who )
+            if ( !who )
                 return;
 
             UnitAI::AttackStartCaster(who, 12.0f);
@@ -173,10 +173,10 @@ public:
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -185,8 +185,8 @@ public:
                     events.RepeatEvent(urand(4000, 5000));
                     break;
                 case EVENT_FROST_TOMB:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
-                        if( !target->HasAura(SPELL_FROST_TOMB_AURA) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
+                        if ( !target->HasAura(SPELL_FROST_TOMB_AURA) )
                         {
                             Talk(SAY_FROST_TOMB_EMOTE, target);
                             Talk(SAY_FROST_TOMB);
@@ -202,8 +202,8 @@ public:
                     {
                         float dist = rand_norm() * 4 + 3.0f;
                         float angle = rand_norm() * 2 * M_PI;
-                        if( Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000) )
-                            if( Unit* target = c->SelectNearestTarget(250.0f) )
+                        if ( Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000) )
+                            if ( Unit* target = c->SelectNearestTarget(250.0f) )
                             {
                                 c->AddThreat(target, 5.0f);
                                 DoZoneInCombat(c);
@@ -254,7 +254,7 @@ public:
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_DECREPIFY, urand(10000, 20000));
-            if( IsHeroic() )
+            if ( IsHeroic() )
                 events.RescheduleEvent(EVENT_SPELL_BONE_ARMOR, urand(25000, 120000));
         }
 
@@ -280,9 +280,9 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( pInstance && pInstance->GetData(DATA_KELESETH) != IN_PROGRESS )
+            if ( pInstance && pInstance->GetData(DATA_KELESETH) != IN_PROGRESS )
             {
-                if( me->IsAlive() )
+                if ( me->IsAlive() )
                     Unit::Kill(me, me);
                 return;
             }
@@ -292,20 +292,20 @@ public:
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_SPELL_DECREPIFY:
-                    if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+                    if ( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
                         me->CastSpell(me->GetVictim(), SPELL_DECREPIFY, false);
                     events.RepeatEvent(urand(15000, 25000));
                     break;
                 case EVENT_SPELL_BONE_ARMOR:
-                    if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+                    if ( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
                         me->CastSpell((Unit*)NULL, SPELL_BONE_ARMOR, false);
                     events.RepeatEvent(urand(40000, 120000));
                     break;
@@ -325,7 +325,7 @@ public:
                     break;
             }
 
-            if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
+            if ( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
                 DoMeleeAttackIfReady();
         }
     };
@@ -345,7 +345,7 @@ public:
         {
             PreventDefaultAction();
             if (aurEff->GetTickNumber() == 1)
-                if( Unit* target = GetTarget() )
+                if ( Unit* target = GetTarget() )
                     target->CastSpell((Unit*)NULL, SPELL_FROST_TOMB_SUMMON, true);
         }
 

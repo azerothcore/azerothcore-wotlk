@@ -142,73 +142,73 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
         switch (player->GetTeamId())
         {
             case TEAM_ALLIANCE:
+            {
+                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(SI_AREATRIGGER_A);
+                if (atEntry)
                 {
-                    AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(SI_AREATRIGGER_A);
-                    if (atEntry)
+                    // 5.0f is safe-distance
+                    if (player->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
                     {
-                        // 5.0f is safe-distance
-                        if (player->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
+                        // he dropped it further, summon mound
+                        GameObject* go = sObjectMgr->IsGameObjectStaticTransport(SI_SILITHYST_MOUND) ? new StaticTransport() : new GameObject();
+                        Map* map = player->GetMap();
+                        if (!map)
                         {
-                            // he dropped it further, summon mound
-                            GameObject* go = sObjectMgr->IsGameObjectStaticTransport(SI_SILITHYST_MOUND) ? new StaticTransport() : new GameObject();
-                            Map* map = player->GetMap();
-                            if (!map)
-                            {
-                                delete go;
-                                return true;
-                            }
+                            delete go;
+                            return true;
+                        }
 
-                            if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), SI_SILITHYST_MOUND, map, player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
-                            {
-                                delete go;
-                                return true;
-                            }
+                        if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), SI_SILITHYST_MOUND, map, player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
+                        {
+                            delete go;
+                            return true;
+                        }
 
-                            go->SetRespawnTime(0);
+                        go->SetRespawnTime(0);
 
-                            if (!map->AddToMap(go))
-                            {
-                                delete go;
-                                return true;
-                            }
+                        if (!map->AddToMap(go))
+                        {
+                            delete go;
+                            return true;
                         }
                     }
                 }
-                break;
+            }
+            break;
             case TEAM_HORDE:
+            {
+                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(SI_AREATRIGGER_H);
+                if (atEntry)
                 {
-                    AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(SI_AREATRIGGER_H);
-                    if (atEntry)
+                    // 5.0f is safe-distance
+                    if (player->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
                     {
-                        // 5.0f is safe-distance
-                        if (player->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
+                        // he dropped it further, summon mound
+                        GameObject* go = sObjectMgr->IsGameObjectStaticTransport(SI_SILITHYST_MOUND) ? new StaticTransport() : new GameObject();
+                        Map* map = player->GetMap();
+                        if (!map)
                         {
-                            // he dropped it further, summon mound
-                            GameObject* go = sObjectMgr->IsGameObjectStaticTransport(SI_SILITHYST_MOUND) ? new StaticTransport() : new GameObject();
-                            Map* map = player->GetMap();
-                            if (!map)
-                            {
-                                delete go;
-                                return true;
-                            }
+                            delete go;
+                            return true;
+                        }
 
-                            if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), SI_SILITHYST_MOUND, map, player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
-                            {
-                                delete go;
-                                return true;
-                            }
+                        if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), SI_SILITHYST_MOUND, map, player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
+                        {
+                            delete go;
+                            return true;
+                        }
 
-                            go->SetRespawnTime(0);
+                        go->SetRespawnTime(0);
 
-                            if (!map->AddToMap(go))
-                            {
-                                delete go;
-                                return true;
-                            }
+                        if (!map->AddToMap(go))
+                        {
+                            delete go;
+                            return true;
                         }
                     }
                 }
-                break;
+            }
+            break;
             default:
                 break;
         }

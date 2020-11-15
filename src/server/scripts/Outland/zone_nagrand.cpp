@@ -465,27 +465,27 @@ public:
             switch (waypointId)
             {
                 case 3:
-                    {
-                        Talk(SAY_KUR_MORE);
+                {
+                    Talk(SAY_KUR_MORE);
 
-                        if (Creature* cr = me->SummonCreature(NPC_KUR_MURK_PUTRIFIER, kurenaiAmbushB[0], kurenaiAmbushB[1], kurenaiAmbushB[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000))
-                            cr->AI()->Talk(SAY_KUR_MORE_TWO);
+                    if (Creature* cr = me->SummonCreature(NPC_KUR_MURK_PUTRIFIER, kurenaiAmbushB[0], kurenaiAmbushB[1], kurenaiAmbushB[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000))
+                        cr->AI()->Talk(SAY_KUR_MORE_TWO);
 
-                        me->SummonCreature(NPC_KUR_MURK_PUTRIFIER, kurenaiAmbushB[0] - 2.5f, kurenaiAmbushB[1] - 2.5f, kurenaiAmbushB[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        me->SummonCreature(NPC_KUR_MURK_SCAVENGER, kurenaiAmbushB[0] + 2.5f, kurenaiAmbushB[1] + 2.5f, kurenaiAmbushB[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        me->SummonCreature(NPC_KUR_MURK_SCAVENGER, kurenaiAmbushB[0] + 2.5f, kurenaiAmbushB[1] - 2.5f, kurenaiAmbushB[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        break;
-                    }
+                    me->SummonCreature(NPC_KUR_MURK_PUTRIFIER, kurenaiAmbushB[0] - 2.5f, kurenaiAmbushB[1] - 2.5f, kurenaiAmbushB[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+                    me->SummonCreature(NPC_KUR_MURK_SCAVENGER, kurenaiAmbushB[0] + 2.5f, kurenaiAmbushB[1] + 2.5f, kurenaiAmbushB[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+                    me->SummonCreature(NPC_KUR_MURK_SCAVENGER, kurenaiAmbushB[0] + 2.5f, kurenaiAmbushB[1] - 2.5f, kurenaiAmbushB[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+                    break;
+                }
                 case 7:
-                    {
-                        Talk(SAY_KUR_COMPLETE);
+                {
+                    Talk(SAY_KUR_COMPLETE);
 
-                        if (Player* player = GetPlayerForEscort())
-                            player->GroupEventHappens(QUEST_TOTEM_KARDASH_A, me);
+                    if (Player* player = GetPlayerForEscort())
+                        player->GroupEventHappens(QUEST_TOTEM_KARDASH_A, me);
 
-                        SetRun();
-                        break;
-                    }
+                    SetRun();
+                    break;
+                }
             }
         }
 

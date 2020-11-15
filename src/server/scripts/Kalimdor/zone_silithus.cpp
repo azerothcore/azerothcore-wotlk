@@ -636,20 +636,20 @@ public:
                         Fandral->CastSpell(-8127, 1525, 17.5f, 33806, true);
                         break;
                     case 51:
+                    {
+                        uint32 entries[4] = { 15423, 15424, 15414, 15422 };
+                        Unit* mob = nullptr;
+                        for (uint8 i = 0; i < 4; ++i)
                         {
-                            uint32 entries[4] = { 15423, 15424, 15414, 15422 };
-                            Unit* mob = nullptr;
-                            for (uint8 i = 0; i < 4; ++i)
+                            mob = player->FindNearestCreature(entries[i], 50, me);
+                            while (mob)
                             {
-                                mob = player->FindNearestCreature(entries[i], 50, me);
-                                while (mob)
-                                {
-                                    mob->RemoveFromWorld();
-                                    mob = player->FindNearestCreature(15423, 50, me);
-                                }
+                                mob->RemoveFromWorld();
+                                mob = player->FindNearestCreature(15423, 50, me);
                             }
-                            break;
                         }
+                        break;
+                    }
                     case 52:
                         Fandral->GetMotionMaster()->MoveCharge(-8028.75f, 1538.795f, 2.61f, 4);
                         Fandral->AI()->Talk(ANACHRONOS_SAY_9, me);
@@ -1211,41 +1211,41 @@ private:
         switch (type)
         {
             case TEMPLAR:
-                {
-                    if (player->HasItemCount(ITEM_TEMPLAR_FIRE))
-                        result |= FIRE;
-                    if (player->HasItemCount(ITEM_TEMPLAR_WATER))
-                        result |= WATER;
-                    if (player->HasItemCount(ITEM_TEMPLAR_EARTH))
-                        result |= EARTH;
-                    if (player->HasItemCount(ITEM_TEMPLAR_AIR))
-                        result |= AIR;
-                    break;
-                }
+            {
+                if (player->HasItemCount(ITEM_TEMPLAR_FIRE))
+                    result |= FIRE;
+                if (player->HasItemCount(ITEM_TEMPLAR_WATER))
+                    result |= WATER;
+                if (player->HasItemCount(ITEM_TEMPLAR_EARTH))
+                    result |= EARTH;
+                if (player->HasItemCount(ITEM_TEMPLAR_AIR))
+                    result |= AIR;
+                break;
+            }
             case DUKE:
-                {
-                    if (player->HasItemCount(ITEM_DUKE_FIRE))
-                        result |= FIRE;
-                    if (player->HasItemCount(ITEM_DUKE_WATER))
-                        result |= WATER;
-                    if (player->HasItemCount(ITEM_DUKE_EARTH))
-                        result |= EARTH;
-                    if (player->HasItemCount(ITEM_DUKE_AIR))
-                        result |= AIR;
-                    break;
-                }
+            {
+                if (player->HasItemCount(ITEM_DUKE_FIRE))
+                    result |= FIRE;
+                if (player->HasItemCount(ITEM_DUKE_WATER))
+                    result |= WATER;
+                if (player->HasItemCount(ITEM_DUKE_EARTH))
+                    result |= EARTH;
+                if (player->HasItemCount(ITEM_DUKE_AIR))
+                    result |= AIR;
+                break;
+            }
             case ROYAL:
-                {
-                    if (player->HasItemCount(ITEM_ROYAL_FIRE))
-                        result |= FIRE;
-                    if (player->HasItemCount(ITEM_ROYAL_WATER))
-                        result |= WATER;
-                    if (player->HasItemCount(ITEM_ROYAL_EARTH))
-                        result |= EARTH;
-                    if (player->HasItemCount(ITEM_ROYAL_AIR))
-                        result |= AIR;
-                    break;
-                }
+            {
+                if (player->HasItemCount(ITEM_ROYAL_FIRE))
+                    result |= FIRE;
+                if (player->HasItemCount(ITEM_ROYAL_WATER))
+                    result |= WATER;
+                if (player->HasItemCount(ITEM_ROYAL_EARTH))
+                    result |= EARTH;
+                if (player->HasItemCount(ITEM_ROYAL_AIR))
+                    result |= AIR;
+                break;
+            }
             default:
                 break;
         }
@@ -1312,68 +1312,68 @@ public:
         switch (gossipId)
         {
             case GOSSIPID_LESSER_WS:
+            {
+                if (rank >= 1) // 1 or 2 or 3
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_RANDOM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                else
                 {
-                    if (rank >= 1) // 1 or 2 or 3
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_RANDOM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    else
-                    {
-                        go->CastSpell(player, SPELL_PUNISHMENT);
-                        break;
-                    }
-
-                    uint8 item = GetItems(player, TEMPLAR);
-                    if (item & FIRE)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_FIRE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    if (item & WATER)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_WATER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    if (item & EARTH)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_EARTH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                    if (item & AIR)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_AIR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                    go->CastSpell(player, SPELL_PUNISHMENT);
                     break;
                 }
+
+                uint8 item = GetItems(player, TEMPLAR);
+                if (item & FIRE)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_FIRE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                if (item & WATER)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_WATER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                if (item & EARTH)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_EARTH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                if (item & AIR)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TEMPLAR_AIR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                break;
+            }
             case GOSSIPID_WS:
+            {
+                if (rank >= 2) // 2 or 3
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_RANDOM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+                else
                 {
-                    if (rank >= 2) // 2 or 3
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_RANDOM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                    else
-                    {
-                        go->CastSpell(player, SPELL_PUNISHMENT);
-                        break;
-                    }
-
-                    uint8 item = GetItems(player, DUKE);
-                    if (item & FIRE)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_FIRE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-                    if (item & WATER)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_WATER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
-                    if (item & EARTH)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_EARTH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-                    if (item & AIR)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_AIR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+                    go->CastSpell(player, SPELL_PUNISHMENT);
                     break;
                 }
+
+                uint8 item = GetItems(player, DUKE);
+                if (item & FIRE)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_FIRE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
+                if (item & WATER)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_WATER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
+                if (item & EARTH)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_EARTH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+                if (item & AIR)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_DUKE_AIR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+                break;
+            }
             case GOSSIPID_GREATER_WS:
+            {
+                if (rank == 3) // 3
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_RANDOM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+                else
                 {
-                    if (rank == 3) // 3
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_RANDOM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-                    else
-                    {
-                        go->CastSpell(player, SPELL_PUNISHMENT);
-                        break;
-                    }
-
-                    uint8 item = GetItems(player, ROYAL);
-                    if (item & FIRE)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_FIRE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
-                    if (item & WATER)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_WATER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
-                    if (item & EARTH)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_EARTH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
-                    if (item & AIR)
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_AIR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 15);
+                    go->CastSpell(player, SPELL_PUNISHMENT);
                     break;
                 }
+
+                uint8 item = GetItems(player, ROYAL);
+                if (item & FIRE)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_FIRE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
+                if (item & WATER)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_WATER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
+                if (item & EARTH)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_EARTH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
+                if (item & AIR)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ROYAL_AIR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 15);
+                break;
+            }
             default:
                 break;
         }

@@ -640,25 +640,25 @@ public:
                     summons.DoAction(ACTION_PLAY_EMOTE);
                     break;
                 case EVENT_START_COUNTDOWN_13:
+                {
+                    uint8 first = 1;
+                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     {
-                        uint8 first = 1;
-                        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                        if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                         {
-                            if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                            {
-                                Position pos = LightOfDawnPos[first];
-                                summon->SetHomePosition(pos);
-                                summon->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, false);
-                            }
-                            first = first == 0 ? 1 : 0;
+                            Position pos = LightOfDawnPos[first];
+                            summon->SetHomePosition(pos);
+                            summon->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, false);
                         }
-                        Position pos = LightOfDawnPos[first];
-                        me->SetHomePosition(pos);
-                        me->SetWalk(false);
-                        me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, true);
-                        me->CastSpell(me, SPELL_THE_MIGHT_OF_MOGRAINE, true);
-                        break;
+                        first = first == 0 ? 1 : 0;
                     }
+                    Position pos = LightOfDawnPos[first];
+                    me->SetHomePosition(pos);
+                    me->SetWalk(false);
+                    me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, true);
+                    me->CastSpell(me, SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                    break;
+                }
                 case EVENT_START_COUNTDOWN_14:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SummonCreatureGroup(5);
@@ -668,45 +668,45 @@ public:
                     battleStarted = ENCOUNTER_STATE_OUTRO;
                     break;
                 case EVENT_FINISH_FIGHT_2:
+                {
+                    summons.DespawnEntry(NPC_RAMPAGING_ABOMINATION);
+                    summons.DespawnEntry(NPC_ACHERUS_GHOUL);
+                    summons.DespawnEntry(NPC_WARRIOR_OF_THE_FROZEN_WASTES);
+                    summons.DespawnEntry(NPC_FLESH_BEHEMOTH);
+                    summons.DespawnEntry(NPC_DEFENDER_OF_THE_LIGHT);
+
+                    if (Creature* orbaz = GetEntryFromSummons(NPC_ORBAZ_BLOODBANE))
                     {
-                        summons.DespawnEntry(NPC_RAMPAGING_ABOMINATION);
-                        summons.DespawnEntry(NPC_ACHERUS_GHOUL);
-                        summons.DespawnEntry(NPC_WARRIOR_OF_THE_FROZEN_WASTES);
-                        summons.DespawnEntry(NPC_FLESH_BEHEMOTH);
-                        summons.DespawnEntry(NPC_DEFENDER_OF_THE_LIGHT);
-
-                        if (Creature* orbaz = GetEntryFromSummons(NPC_ORBAZ_BLOODBANE))
-                        {
-                            orbaz->SetReactState(REACT_PASSIVE);
-                            orbaz->AI()->Talk(EMOTE_LIGHT_OF_DAWN04);
-                            orbaz->GetMotionMaster()->MovePoint(2, LightOfDawnPos[2], true, true);
-                            orbaz->DespawnOrUnsummon(7000);
-                        }
-
-                        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                            if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                            {
-                                summon->CombatStop(true);
-                                summon->DeleteThreatList();
-                                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                                summon->SetReactState(REACT_PASSIVE);
-                                summon->GetMotionMaster()->Clear(false);
-                            }
-                        me->CombatStop(true);
-                        me->DeleteThreatList();
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                        me->SetReactState(REACT_PASSIVE);
-                        me->GetMotionMaster()->Clear(false);
-
-                        // Position main stars
-                        summons.DoAction(ACTION_POSITION_NPCS);
-
-                        me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2276.66f, -5273.60f, 81.86f, 5.14f, TEMPSUMMON_CORPSE_DESPAWN);
-                        me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2272.11f, -5279.08f, 82.01f, 5.69f, TEMPSUMMON_CORPSE_DESPAWN);
-                        me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2285.11f, -5276.73f, 82.08f, 4.23f, TEMPSUMMON_CORPSE_DESPAWN);
-                        me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2290.06f, -5286.41f, 82.51f, 3.16f, TEMPSUMMON_CORPSE_DESPAWN);
-                        break;
+                        orbaz->SetReactState(REACT_PASSIVE);
+                        orbaz->AI()->Talk(EMOTE_LIGHT_OF_DAWN04);
+                        orbaz->GetMotionMaster()->MovePoint(2, LightOfDawnPos[2], true, true);
+                        orbaz->DespawnOrUnsummon(7000);
                     }
+
+                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                        if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                        {
+                            summon->CombatStop(true);
+                            summon->DeleteThreatList();
+                            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            summon->SetReactState(REACT_PASSIVE);
+                            summon->GetMotionMaster()->Clear(false);
+                        }
+                    me->CombatStop(true);
+                    me->DeleteThreatList();
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetReactState(REACT_PASSIVE);
+                    me->GetMotionMaster()->Clear(false);
+
+                    // Position main stars
+                    summons.DoAction(ACTION_POSITION_NPCS);
+
+                    me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2276.66f, -5273.60f, 81.86f, 5.14f, TEMPSUMMON_CORPSE_DESPAWN);
+                    me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2272.11f, -5279.08f, 82.01f, 5.69f, TEMPSUMMON_CORPSE_DESPAWN);
+                    me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2285.11f, -5276.73f, 82.08f, 4.23f, TEMPSUMMON_CORPSE_DESPAWN);
+                    me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2290.06f, -5286.41f, 82.51f, 3.16f, TEMPSUMMON_CORPSE_DESPAWN);
+                    break;
+                }
                 case EVENT_FINISH_FIGHT_3:
                     if (Creature* koltira = GetEntryFromSummons(NPC_KOLTIRA_DEATHWEAVER))
                     {
@@ -1113,17 +1113,17 @@ public:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     break;
                 case EVENT_OUTRO_SCENE_60:
+                {
+                    Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
+                    if (!PlayerList.isEmpty())
                     {
-                        Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                        if (!PlayerList.isEmpty())
-                        {
-                            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                                if (i->GetSource()->IsAlive() && me->IsWithinDistInMap(i->GetSource(), 100))
-                                    i->GetSource()->CastSpell(i->GetSource(), SPELL_THE_LIGHT_OF_DAWN_Q, false);
-                        }
-                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                        break;
+                        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                            if (i->GetSource()->IsAlive() && me->IsWithinDistInMap(i->GetSource(), 100))
+                                i->GetSource()->CastSpell(i->GetSource(), SPELL_THE_LIGHT_OF_DAWN_Q, false);
                     }
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                    break;
+                }
                 case EVENT_OUTRO_SCENE_61:
                     summons.DespawnAll();
                     me->DespawnOrUnsummon(1);

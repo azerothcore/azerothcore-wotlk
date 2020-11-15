@@ -122,28 +122,28 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_HATEFUL_BOLT, urand(5000, 7500) * (events.GetNextEventTime(EVENT_SPELL_BERSERK) == 0 ? 1 : 2));
                     break;
                 case EVENT_SPELL_ASTRAL_FLARE:
+                {
+                    me->CastSpell(me, RAND(SPELL_SUMMON_ASTRAL_FLARE1, SPELL_SUMMON_ASTRAL_FLARE2, SPELL_SUMMON_ASTRAL_FLARE3, SPELL_SUMMON_ASTRAL_FLARE4), false);
+                    int32 mana = CalculatePct(me->GetMaxPower(POWER_MANA), 10);
+                    me->ModifyPower(POWER_MANA, -mana);
+                    if (me->GetPowerPct(POWER_MANA) < 10.0f)
                     {
-                        me->CastSpell(me, RAND(SPELL_SUMMON_ASTRAL_FLARE1, SPELL_SUMMON_ASTRAL_FLARE2, SPELL_SUMMON_ASTRAL_FLARE3, SPELL_SUMMON_ASTRAL_FLARE4), false);
-                        int32 mana = CalculatePct(me->GetMaxPower(POWER_MANA), 10);
-                        me->ModifyPower(POWER_MANA, -mana);
-                        if (me->GetPowerPct(POWER_MANA) < 10.0f)
-                        {
-                            Talk(SAY_EVOCATE);
-                            me->CastSpell(me, SPELL_EVOCATION, false);
+                        Talk(SAY_EVOCATE);
+                        me->CastSpell(me, SPELL_EVOCATION, false);
 
-                            events.DelayEvents(20000);
-                            events.ScheduleEvent(EVENT_SPELL_ASTRAL_FLARE, 20000);
-                        }
-                        else
-                        {
-                            if (roll_chance_i(50))
-                                Talk(SAY_SUMMON);
-
-                            events.ScheduleEvent(EVENT_SPELL_ASTRAL_FLARE, 10000);
-                        }
-
-                        break;
+                        events.DelayEvents(20000);
+                        events.ScheduleEvent(EVENT_SPELL_ASTRAL_FLARE, 20000);
                     }
+                    else
+                    {
+                        if (roll_chance_i(50))
+                            Talk(SAY_SUMMON);
+
+                        events.ScheduleEvent(EVENT_SPELL_ASTRAL_FLARE, 10000);
+                    }
+
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();

@@ -92,21 +92,21 @@ public:
         {
             events.Reset();
             me->SetReactState(REACT_PASSIVE);
-            if( pInstance )
+            if ( pInstance )
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, NOT_STARTED);
         }
 
         void MovementInform(uint32 type, uint32 id)
         {
-            if( type == POINT_MOTION_TYPE && id == 1 )
+            if ( type == POINT_MOTION_TYPE && id == 1 )
                 me->SetFacingTo(3 * M_PI / 2);
         }
 
         void KilledUnit(Unit* who)
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if ( who->GetTypeId() == TYPEID_PLAYER )
             {
-                if( urand(0, 1) )
+                if ( urand(0, 1) )
                     Talk(TEXT_EADRIC_SLAIN_1);
                 else
                     Talk(TEXT_EADRIC_SLAIN_2);
@@ -120,7 +120,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_HAMMER_RIGHTEOUS, 25000);
             Talk(TEXT_EADRIC_AGGRO);
             me->CastSpell(me, SPELL_VENGEANCE, false);
-            if( pInstance )
+            if ( pInstance )
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
 
@@ -132,10 +132,10 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
-            if( damage >= me->GetHealth() )
+            if ( damage >= me->GetHealth() )
             {
                 damage = me->GetHealth() - 1;
-                if( me->getFaction() != 35 )
+                if ( me->getFaction() != 35 )
                 {
                     me->CastSpell((Unit*)NULL, 68575, true); // achievements
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, 68574, me); // paletress' spell credits encounter, but shouldn't credit achievements
@@ -146,7 +146,7 @@ public:
                     me->SetRegeneratingHealth(false);
                     _EnterEvadeMode();
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    if( pInstance )
+                    if ( pInstance )
                         pInstance->SetData(BOSS_ARGENT_CHALLENGE, DONE);
                 }
             }
@@ -154,15 +154,15 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( !UpdateVictim() )
+            if ( !UpdateVictim() )
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -172,7 +172,7 @@ public:
                     events.RepeatEvent(16000);
                     break;
                 case EVENT_SPELL_HAMMER_RIGHTEOUS:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 55.0f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 55.0f, true) )
                     {
                         char buffer[100];
                         sprintf(buffer, "Eadric the Pure targets %s with the Hammer of the Righteous!", target->GetName().c_str());
@@ -216,28 +216,28 @@ public:
         {
             events.Reset();
             summoned = false;
-            if( MemoryGUID )
+            if ( MemoryGUID )
             {
-                if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
+                if ( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
                     memory->DespawnOrUnsummon();
                 MemoryGUID = 0;
             }
             me->SetReactState(REACT_PASSIVE);
-            if( pInstance )
+            if ( pInstance )
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, NOT_STARTED);
         }
 
         void MovementInform(uint32 type, uint32 id)
         {
-            if( type == POINT_MOTION_TYPE && id == 1 )
+            if ( type == POINT_MOTION_TYPE && id == 1 )
                 me->SetFacingTo(3 * M_PI / 2);
         }
 
         void KilledUnit(Unit* who)
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if ( who->GetTypeId() == TYPEID_PLAYER )
             {
-                if( urand(0, 1) )
+                if ( urand(0, 1) )
                     Talk(TEXT_PALETRESS_SLAIN_1);
                 else
                     Talk(TEXT_PALETRESS_SLAIN_2);
@@ -251,22 +251,22 @@ public:
             events.ScheduleEvent(EVENT_SPELL_SMITE, urand(2000, 3000));
             me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
             Talk(TEXT_PALETRESS_AGGRO);
-            if( pInstance )
+            if ( pInstance )
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
 
         void DoAction(int32 param)
         {
-            if( param == 1 )
+            if ( param == 1 )
             {
                 MemoryGUID = 0;
                 me->RemoveAura(SPELL_SHIELD);
                 Talk(TEXT_PALETRESS_MEMORY_DEFEATED);
             }
-            else if( param == (-1) )
+            else if ( param == (-1) )
             {
-                if( MemoryGUID )
-                    if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
+                if ( MemoryGUID )
+                    if ( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
                     {
                         memory->DespawnOrUnsummon();
                         MemoryGUID = 0;
@@ -279,11 +279,11 @@ public:
             //if( me->HasAura(SPELL_SHIELD) )
             //  return;
 
-            if( damage >= me->GetHealth() )
+            if ( damage >= me->GetHealth() )
             {
                 damage = me->GetHealth() - 1;
 
-                if( me->getFaction() != 35 )
+                if ( me->getFaction() != 35 )
                 {
                     me->CastSpell((Unit*)NULL, 68574, true); // achievements
                     me->setFaction(35);
@@ -293,7 +293,7 @@ public:
                     me->SetRegeneratingHealth(false);
                     _EnterEvadeMode();
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    if( pInstance )
+                    if ( pInstance )
                     {
                         pInstance->SetData(BOSS_ARGENT_CHALLENGE, DONE);
                         pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 68206);
@@ -304,7 +304,7 @@ public:
 
         void JustSummoned(Creature* summon)
         {
-            if( pInstance )
+            if ( pInstance )
                 pInstance->SetData(DATA_MEMORY_ENTRY, summon->GetEntry());
             MemoryGUID = summon->GetGUID();
         }
@@ -318,12 +318,12 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( !UpdateVictim() )
+            if ( !UpdateVictim() )
                 return;
 
             events.Update(diff);
 
-            if( !summoned && HealthBelowPct(25) )
+            if ( !summoned && HealthBelowPct(25) )
             {
                 me->InterruptNonMeleeSpells(true);
                 Talk(TEXT_PALETRESS_MEMORY_SUMMON);
@@ -337,32 +337,32 @@ public:
                 return;
             }
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_SPELL_SMITE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
                         me->CastSpell(target, SPELL_SMITE, false);
                     events.RepeatEvent(urand(3000, 4000));
                     break;
                 case EVENT_SPELL_HOLY_FIRE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_HOLY_FIRE, false);
                     events.RepeatEvent(urand(9000, 12000));
                     break;
                 case EVENT_SPELL_RENEW:
-                    if( !MemoryGUID )
+                    if ( !MemoryGUID )
                     {
                         break;
                     }
-                    if( urand(0, 1) )
+                    if ( urand(0, 1) )
                         me->CastSpell(me, SPELL_RENEW, false);
-                    else if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
-                        if( memory->IsAlive() )
+                    else if ( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
+                        if ( memory->IsAlive() )
                             me->CastSpell(memory, SPELL_RENEW, false);
                     events.RepeatEvent(urand(15000, 17000));
                     break;
@@ -402,8 +402,8 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             me->DespawnOrUnsummon(20000);
-            if( pInstance )
-                if( Creature* paletress = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_PALETRESS)) )
+            if ( pInstance )
+                if ( Creature* paletress = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_PALETRESS)) )
                     paletress->AI()->DoAction(1);
         }
 
@@ -413,21 +413,21 @@ public:
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_MEMORY_SCALE:
                     me->SetObjectScale(1.0f);
                     events.ScheduleEvent(EVENT_MEMORY_START_ATTACK, 5000);
-                    
+
                     break;
                 case EVENT_MEMORY_START_ATTACK:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    if( Unit* target = me->SelectNearestTarget(200.0f) )
+                    if ( Unit* target = me->SelectNearestTarget(200.0f) )
                     {
                         AttackStart(target);
                         DoZoneInCombat();
@@ -438,12 +438,12 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_WAKING_NIGHTMARE, urand(20000, 30000));
                     break;
                 case EVENT_SPELL_OLD_WOUNDS:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f, true) )
                         me->CastSpell(target, SPELL_OLD_WOUNDS, true);
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_SPELL_SHADOWS_PAST:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true) )
                         me->CastSpell(target, SPELL_SHADOWS_PAST, false);
                     events.RepeatEvent(urand(15000, 20000));
                     break;
@@ -533,9 +533,9 @@ public:
 
         void WaypointReached(uint32 uiPoint)
         {
-            if( uiPoint == 1 )
+            if ( uiPoint == 1 )
             {
-                switch( uiWaypoint )
+                switch ( uiWaypoint )
                 {
                     case 0:
                         me->SetFacingTo(5.4f);
@@ -553,10 +553,10 @@ public:
         void SetData(uint32 uiType, uint32 /*uiData*/)
         {
             AddWaypoint(0, me->GetPositionX(), 660.0f, 411.80f);
-            switch( me->GetEntry() )
+            switch ( me->GetEntry() )
             {
                 case NPC_ARGENT_LIGHTWIELDER:
-                    switch( uiType )
+                    switch ( uiType )
                     {
                         case 0:
                             AddWaypoint(1, 716.321f, 647.047f, 411.93f);
@@ -570,7 +570,7 @@ public:
                     }
                     break;
                 case NPC_ARGENT_MONK:
-                    switch( uiType )
+                    switch ( uiType )
                     {
                         case 0:
                             AddWaypoint(1, 717.86f, 649.0f, 411.923f);
@@ -584,7 +584,7 @@ public:
                     }
                     break;
                 case NPC_PRIESTESS:
-                    switch( uiType )
+                    switch ( uiType )
                     {
                         case 0:
                             AddWaypoint(1, 719.872f, 650.94f, 411.93f);
@@ -605,7 +605,7 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
-            if( bCheck && damage >= me->GetHealth() )
+            if ( bCheck && damage >= me->GetHealth() )
             {
                 bCheck = false;
                 damage = me->GetHealth() - 1;
@@ -617,25 +617,25 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            switch( me->GetEntry() )
+            switch ( me->GetEntry() )
             {
                 case NPC_ARGENT_MONK:
                     events.RescheduleEvent(EVENT_MONK_SPELL_FLURRY_OF_BLOWS, 5000);
                     events.RescheduleEvent(EVENT_MONK_SPELL_PUMMEL, 7000);
-                    if( IsHeroic() )
+                    if ( IsHeroic() )
                         bCheck = true;
                     break;
                 case NPC_PRIESTESS:
                     events.RescheduleEvent(EVENT_PRIESTESS_SPELL_HOLY_SMITE, urand(5000, 8000));
                     events.RescheduleEvent(EVENT_PRIESTESS_SPELL_SHADOW_WORD_PAIN, urand(3000, 6000));
                     events.RescheduleEvent(EVENT_PRIESTESS_SPELL_FOUNTAIN_OF_LIGHT, urand(8000, 15000));
-                    if( IsHeroic() )
+                    if ( IsHeroic() )
                         events.RescheduleEvent(EVENT_PRIESTESS_SPELL_MIND_CONTROL_H, 12000);
                     break;
                 case NPC_ARGENT_LIGHTWIELDER:
                     events.RescheduleEvent(EVENT_LIGHTWIELDER_SPELL_BLAZING_LIGHT, urand(12000, 15000));
                     events.RescheduleEvent(EVENT_LIGHTWIELDER_SPELL_CLEAVE, urand(3000, 5000));
-                    if( IsHeroic() )
+                    if ( IsHeroic() )
                         events.RescheduleEvent(EVENT_LIGHTWIELDER_SPELL_UNBALANCING_STRIKE_H, urand(8000, 12000));
                     break;
             }
@@ -645,15 +645,15 @@ public:
         {
             npc_escortAI::UpdateAI(diff);
 
-            if( !UpdateVictim() )
+            if ( !UpdateVictim() )
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -663,18 +663,18 @@ public:
                     events.RepeatEvent(urand(12000, 18000));
                     break;
                 case EVENT_MONK_SPELL_PUMMEL:
-                    if( me->GetVictim() )
+                    if ( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_PUMMEL, false);
                     events.RepeatEvent(urand(8000, 11000));
                     break;
 
                 case EVENT_PRIESTESS_SPELL_HOLY_SMITE:
-                    if( me->GetVictim() )
+                    if ( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_HOLY_SMITE, false);
                     events.RepeatEvent(urand(6000, 8000));
                     break;
                 case EVENT_PRIESTESS_SPELL_SHADOW_WORD_PAIN:
-                    if( me->GetVictim() )
+                    if ( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_SHADOW_WORD_PAIN, false);
                     events.RepeatEvent(urand(12000, 15000));
                     break;
@@ -683,27 +683,27 @@ public:
                     events.RepeatEvent(urand(35000, 45000));
                     break;
                 case EVENT_PRIESTESS_SPELL_MIND_CONTROL_H:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_MIND_CONTROL_H, false);
                     events.RepeatEvent(urand(22000, 30000));
                     break;
 
                 case EVENT_LIGHTWIELDER_SPELL_BLAZING_LIGHT:
-                    {
-                        Unit* target = DoSelectLowestHpFriendly(40.0f);
-                        if( !target )
-                            target = me;
-                        me->CastSpell(target, SPELL_BLAZING_LIGHT, false);
-                        events.RepeatEvent(urand(8000, 12000));
-                    }
-                    break;
+                {
+                    Unit* target = DoSelectLowestHpFriendly(40.0f);
+                    if ( !target )
+                        target = me;
+                    me->CastSpell(target, SPELL_BLAZING_LIGHT, false);
+                    events.RepeatEvent(urand(8000, 12000));
+                }
+                break;
                 case EVENT_LIGHTWIELDER_SPELL_CLEAVE:
-                    if( me->GetVictim() )
+                    if ( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
                     events.RepeatEvent(urand(6000, 8000));
                     break;
                 case EVENT_LIGHTWIELDER_SPELL_UNBALANCING_STRIKE_H:
-                    if( me->GetVictim() )
+                    if ( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_UNBALANCING_STRIKE_H, false);
                     events.RepeatEvent(urand(12000, 15000));
                     break;
@@ -715,7 +715,7 @@ public:
         void JustDied(Unit* /*pKiller*/)
         {
             me->DespawnOrUnsummon(10000);
-            if( pInstance )
+            if ( pInstance )
                 pInstance->SetData(DATA_ARGENT_SOLDIER_DEFEATED, 0);
         }
     };
@@ -738,12 +738,12 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             std::list<WorldObject*> tmplist;
-            for( std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if( (*itr)->ToUnit()->HasInArc(M_PI, GetCaster()) )
+            for ( std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                if ( (*itr)->ToUnit()->HasInArc(M_PI, GetCaster()) )
                     tmplist.push_back(*itr);
 
             targets.clear();
-            for( std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr )
+            for ( std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr )
                 targets.push_back(*itr);
         }
 
@@ -771,7 +771,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            for( std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
+            for ( std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
             {
                 if ((*itr)->GetTypeId() == TYPEID_UNIT)
                     if ((*itr)->ToCreature()->GetEntry() == NPC_FOUNTAIN_OF_LIGHT)
@@ -807,8 +807,8 @@ public:
 
         void HandleAfterEffectAbsorb(AuraEffect*   /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
         {
-            if( Unit* attacker = dmgInfo.GetAttacker() )
-                if( GetOwner() && attacker->GetGUID() != GetOwner()->GetGUID() )
+            if ( Unit* attacker = dmgInfo.GetAttacker() )
+                if ( GetOwner() && attacker->GetGUID() != GetOwner()->GetGUID() )
                 {
                     int32 damage = (int32)(absorbAmount * 0.25f);
                     GetOwner()->ToUnit()->CastCustomSpell(attacker, 33619, &damage, nullptr, nullptr, true);

@@ -966,37 +966,37 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_INVOCATION_OF_BLOOD:
+                {
+                    uint32 visualSpellId = 0;
+                    Creature* current = instance->instance->GetCreature(instance->GetData64(invocationOrder[currentInvocationIndex]));
+                    if (++currentInvocationIndex >= 3)
+                        currentInvocationIndex = 0;
+                    Creature* next = instance->instance->GetCreature(instance->GetData64(invocationOrder[currentInvocationIndex]));
+                    switch (invocationOrder[currentInvocationIndex])
                     {
-                        uint32 visualSpellId = 0;
-                        Creature* current = instance->instance->GetCreature(instance->GetData64(invocationOrder[currentInvocationIndex]));
-                        if (++currentInvocationIndex >= 3)
-                            currentInvocationIndex = 0;
-                        Creature* next = instance->instance->GetCreature(instance->GetData64(invocationOrder[currentInvocationIndex]));
-                        switch (invocationOrder[currentInvocationIndex])
-                        {
-                            case DATA_PRINCE_KELESETH_GUID:
-                                visualSpellId = 71080;
-                                break;
-                            case DATA_PRINCE_TALDARAM_GUID:
-                                visualSpellId = 71081;
-                                break;
-                            case DATA_PRINCE_VALANAR_GUID:
-                                visualSpellId = 71070;
-                                break;
-                        }
-                        if (!visualSpellId || !current || !next || !current->IsInCombat() || !next->IsInCombat())
-                        {
-                            EnterEvadeMode();
-                            return;
-                        }
-                        next->SetHealth(current->GetHealth());
-                        current->AI()->DoAction(ACTION_REMOVE_INVOCATION);
-                        current->SetHealth(1);
-                        current->CastSpell((Unit*)NULL, visualSpellId, true);
-                        next->AI()->Talk(1);
+                        case DATA_PRINCE_KELESETH_GUID:
+                            visualSpellId = 71080;
+                            break;
+                        case DATA_PRINCE_TALDARAM_GUID:
+                            visualSpellId = 71081;
+                            break;
+                        case DATA_PRINCE_VALANAR_GUID:
+                            visualSpellId = 71070;
+                            break;
                     }
-                    events.ScheduleEvent(EVENT_INVOCATION_OF_BLOOD, 46000);
-                    break;
+                    if (!visualSpellId || !current || !next || !current->IsInCombat() || !next->IsInCombat())
+                    {
+                        EnterEvadeMode();
+                        return;
+                    }
+                    next->SetHealth(current->GetHealth());
+                    current->AI()->DoAction(ACTION_REMOVE_INVOCATION);
+                    current->SetHealth(1);
+                    current->CastSpell((Unit*)NULL, visualSpellId, true);
+                    next->AI()->Talk(1);
+                }
+                events.ScheduleEvent(EVENT_INVOCATION_OF_BLOOD, 46000);
+                break;
                 case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     Talk(SAY_VALANAR_BERSERK);

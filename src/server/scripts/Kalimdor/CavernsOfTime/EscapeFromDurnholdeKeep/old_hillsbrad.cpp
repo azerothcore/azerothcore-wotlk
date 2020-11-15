@@ -696,16 +696,16 @@ public:
                     }
                     break;
                 case EVENT_THRALL_FACE_TARETHA:
-                    {
-                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                        if (!players.isEmpty())
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                if (Player* player = itr->GetSource())
-                                    player->KilledMonsterCredit(20156, 0);
+                {
+                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                    if (!players.isEmpty())
+                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                            if (Player* player = itr->GetSource())
+                                player->KilledMonsterCredit(20156, 0);
 
-                        me->SetFacingTo(5.76f);
-                        break;
-                    }
+                    me->SetFacingTo(5.76f);
+                    break;
+                }
                 case EVENT_THRALL_TALK_4:
                     Talk(SAY_GREET_TARETHA);
                     break;

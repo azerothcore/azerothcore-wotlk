@@ -87,7 +87,7 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(DATA_VAROS, NOT_STARTED);
-                if( pInstance->GetData(DATA_CC_COUNT) < 10 )
+                if ( pInstance->GetData(DATA_CC_COUNT) < 10 )
                 {
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->CastSpell(me, 50053, true);
@@ -144,88 +144,88 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if( !UpdateVictim() )
+            if ( !UpdateVictim() )
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if ( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent() )
+            switch ( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_AMPLIFY_MAGIC:
-                    {
-                        if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
-                            me->CastSpell(target, SPELL_AMPLIFY_MAGIC, false);
-                        events.RepeatEvent(urand(17500, 22500));
-                    }
-                    break;
+                {
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
+                        me->CastSpell(target, SPELL_AMPLIFY_MAGIC, false);
+                    events.RepeatEvent(urand(17500, 22500));
+                }
+                break;
                 case EVENT_CALL_AZURE_RING_CAPTAIN_1:
                 case EVENT_CALL_AZURE_RING_CAPTAIN_2:
                 case EVENT_CALL_AZURE_RING_CAPTAIN_3:
                 case EVENT_CALL_AZURE_RING_CAPTAIN_4:
+                {
+                    Talk(SAY_AZURE);
+                    Talk(SAY_AZURE_EMOTE);
+                    switch ( events.ExecuteEvent() )
                     {
-                        Talk(SAY_AZURE);
-                        Talk(SAY_AZURE_EMOTE);
-                        switch( events.ExecuteEvent() )
+                        case EVENT_CALL_AZURE_RING_CAPTAIN_1:
+                            me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_1, true);
+                            events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_2, 16000);
+                            break;
+                        case EVENT_CALL_AZURE_RING_CAPTAIN_2:
+                            me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_2, true);
+                            events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_3, 16000);
+                            break;
+                        case EVENT_CALL_AZURE_RING_CAPTAIN_3:
+                            me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_3, true);
+                            events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_4, 16000);
+                            break;
+                        case EVENT_CALL_AZURE_RING_CAPTAIN_4:
+                            me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_4, true);
+                            events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_1, 16000);
+                            break;
+                    }
+                    if ( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
+                    {
+                        if ( Creature* trigger = me->SummonCreature(NPC_ARCANE_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13000) )
                         {
-                            case EVENT_CALL_AZURE_RING_CAPTAIN_1:
-                                me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_1, true);
-                                events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_2, 16000);
-                                break;
-                            case EVENT_CALL_AZURE_RING_CAPTAIN_2:
-                                me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_2, true);
-                                events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_3, 16000);
-                                break;
-                            case EVENT_CALL_AZURE_RING_CAPTAIN_3:
-                                me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_3, true);
-                                events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_4, 16000);
-                                break;
-                            case EVENT_CALL_AZURE_RING_CAPTAIN_4:
-                                me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_4, true);
-                                events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_1, 16000);
-                                break;
-                        }
-                        if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
-                        {
-                            if( Creature* trigger = me->SummonCreature(NPC_ARCANE_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13000) )
-                            {
-                                if( Creature* c = me->FindNearestCreature(NPC_AZURE_RING_CAPTAIN, 500.0f, true) )
-                                    c->CastSpell(trigger, SPELL_ARCANE_BEAM_VISUAL, true);
-                                trigger->GetMotionMaster()->MoveChase(target, 0.1f);
-                                trigger->CastSpell(me, SPELL_ARCANE_BEAM_PERIODIC_DAMAGE, true);
-                            }
+                            if ( Creature* c = me->FindNearestCreature(NPC_AZURE_RING_CAPTAIN, 500.0f, true) )
+                                c->CastSpell(trigger, SPELL_ARCANE_BEAM_VISUAL, true);
+                            trigger->GetMotionMaster()->MoveChase(target, 0.1f);
+                            trigger->CastSpell(me, SPELL_ARCANE_BEAM_PERIODIC_DAMAGE, true);
                         }
                     }
-                    break;
+                }
+                break;
                 case EVENT_ENERGIZE_CORES_THIN:
-                    {
-                        me->SetControlled(false, UNIT_STATE_ROOT);
-                        me->DisableRotate(false);
-                        me->SetOrientation(ZapAngle);
-                        me->CastSpell(me, SPELL_ENERGIZE_CORES_THIN, true);
-                        events.ScheduleEvent(EVENT_ENERGIZE_CORES_DAMAGE, 4500);
-                    }
-                    break;
+                {
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    me->DisableRotate(false);
+                    me->SetOrientation(ZapAngle);
+                    me->CastSpell(me, SPELL_ENERGIZE_CORES_THIN, true);
+                    events.ScheduleEvent(EVENT_ENERGIZE_CORES_DAMAGE, 4500);
+                }
+                break;
                 case EVENT_ENERGIZE_CORES_DAMAGE:
-                    {
-                        me->SetOrientation(ZapAngle);
-                        me->DisableRotate(true);
-                        me->DisableSpline();
-                        me->SetFacingTo(ZapAngle);
-                        me->SetControlled(true, UNIT_STATE_ROOT);
-                        me->CastSpell((Unit*)NULL, SPELL_ENERGIZE_CORES, false);
-                        ZapAngle += M_PI / 2;
-                        if( ZapAngle >= 2 * M_PI )
-                            ZapAngle -= 2 * M_PI;
-                        events.ScheduleEvent(EVENT_ENERGIZE_CORES_THIN, 2000);
-                    }
-                    break;
+                {
+                    me->SetOrientation(ZapAngle);
+                    me->DisableRotate(true);
+                    me->DisableSpline();
+                    me->SetFacingTo(ZapAngle);
+                    me->SetControlled(true, UNIT_STATE_ROOT);
+                    me->CastSpell((Unit*)NULL, SPELL_ENERGIZE_CORES, false);
+                    ZapAngle += M_PI / 2;
+                    if ( ZapAngle >= 2 * M_PI )
+                        ZapAngle -= 2 * M_PI;
+                    events.ScheduleEvent(EVENT_ENERGIZE_CORES_THIN, 2000);
+                }
+                break;
             }
         }
     };

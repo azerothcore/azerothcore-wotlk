@@ -170,22 +170,22 @@ public:
                         events.ScheduleEvent(EVENT_TAILSWIPE, 15000);
                         break;
                     case EVENT_BURNINGADRENALINE_CASTER:
-                        {
-                            Unit* target = nullptr;
+                    {
+                        Unit* target = nullptr;
 
-                            uint8 i = 0;
-                            while (i < 3)   // max 3 tries to get a random target with power_mana
-                            {
-                                ++i;
-                                target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true); // not aggro leader
-                                if (target && target->getPowerType() == POWER_MANA)
-                                    i = 3;
-                            }
-                            if (target)                                     // cast on self (see below)
-                                target->CastSpell(target, SPELL_BURNINGADRENALINE, true);
+                        uint8 i = 0;
+                        while (i < 3)   // max 3 tries to get a random target with power_mana
+                        {
+                            ++i;
+                            target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true); // not aggro leader
+                            if (target && target->getPowerType() == POWER_MANA)
+                                i = 3;
                         }
-                        events.ScheduleEvent(EVENT_BURNINGADRENALINE_CASTER, 15000);
-                        break;
+                        if (target)                                     // cast on self (see below)
+                            target->CastSpell(target, SPELL_BURNINGADRENALINE, true);
+                    }
+                    events.ScheduleEvent(EVENT_BURNINGADRENALINE_CASTER, 15000);
+                    break;
                     case EVENT_BURNINGADRENALINE_TANK:
                         // have the victim cast the spell on himself otherwise the third effect aura will be applied to Vael instead of the player
                         me->GetVictim()->CastSpell(me->GetVictim(), SPELL_BURNINGADRENALINE, true);

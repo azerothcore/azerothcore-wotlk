@@ -228,51 +228,51 @@ public:
                             events.ScheduleEvent(EVENT_MAGMA_BLAST, 2500);
                             break;
                         case EVENT_SUBMERGE:
+                        {
+                            if (!_isBanished)
                             {
-                                if (!_isBanished)
+                                // TODO: There is a spell to summon him
+                                me->AttackStop();
+                                DoResetThreat();
+                                me->SetReactState(REACT_PASSIVE);
+                                me->InterruptNonMeleeSpells(false);
+                                me->setFaction(35);
+                                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
+                                me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
+                                instance->SetData(DATA_RAGNAROS_ADDS, 0);
+
+                                if (!_hasSubmergedOnce)
                                 {
-                                    // TODO: There is a spell to summon him
-                                    me->AttackStop();
-                                    DoResetThreat();
-                                    me->SetReactState(REACT_PASSIVE);
-                                    me->InterruptNonMeleeSpells(false);
-                                    me->setFaction(35);
-                                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
-                                    me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
-                                    instance->SetData(DATA_RAGNAROS_ADDS, 0);
+                                    Talk(SAY_REINFORCEMENTS1);
 
-                                    if (!_hasSubmergedOnce)
-                                    {
-                                        Talk(SAY_REINFORCEMENTS1);
+                                    // summon 8 elementals
+                                    for (uint8 i = 0; i < 8; ++i)
+                                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                            if (Creature* summoned = me->SummonCreature(12143, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
+                                                summoned->AI()->AttackStart(target);
 
-                                        // summon 8 elementals
-                                        for (uint8 i = 0; i < 8; ++i)
-                                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                                                if (Creature* summoned = me->SummonCreature(12143, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
-                                                    summoned->AI()->AttackStart(target);
+                                    _hasSubmergedOnce = true;
+                                    _isBanished = true;
+                                    _emergeTimer = 90000;
 
-                                        _hasSubmergedOnce = true;
-                                        _isBanished = true;
-                                        _emergeTimer = 90000;
-
-                                    }
-                                    else
-                                    {
-                                        Talk(SAY_REINFORCEMENTS2);
-
-                                        for (uint8 i = 0; i < 8; ++i)
-                                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                                                if (Creature* summoned = me->SummonCreature(12143, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
-                                                    summoned->AI()->AttackStart(target);
-
-                                        _isBanished = true;
-                                        _emergeTimer = 90000;
-                                    }
                                 }
-                                events.ScheduleEvent(EVENT_SUBMERGE, 180000);
-                                break;
+                                else
+                                {
+                                    Talk(SAY_REINFORCEMENTS2);
+
+                                    for (uint8 i = 0; i < 8; ++i)
+                                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                            if (Creature* summoned = me->SummonCreature(12143, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
+                                                summoned->AI()->AttackStart(target);
+
+                                    _isBanished = true;
+                                    _emergeTimer = 90000;
+                                }
                             }
+                            events.ScheduleEvent(EVENT_SUBMERGE, 180000);
+                            break;
+                        }
                         default:
                             break;
                     }

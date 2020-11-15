@@ -230,12 +230,12 @@ public:
                 case 69796:
                 case 69798:
                 case 69801:
-                    {
-                        uint32 index = getOozeFloodSpellIndex(spell->Id);
-                        if (target->GetGUID() == _oozeFloodDummyGUIDs[index][0] || target->GetGUID() == _oozeFloodDummyGUIDs[index][1])
-                            target->CastSpell((Unit*)NULL, spell->Effects[0].CalcValue(), false);
-                    }
-                    break;
+                {
+                    uint32 index = getOozeFloodSpellIndex(spell->Id);
+                    if (target->GetGUID() == _oozeFloodDummyGUIDs[index][0] || target->GetGUID() == _oozeFloodDummyGUIDs[index][1])
+                        target->CastSpell((Unit*)NULL, spell->Effects[0].CalcValue(), false);
+                }
+                break;
             }
         }
 
@@ -295,20 +295,20 @@ public:
                     events.ScheduleEvent(EVENT_ROTFACE_OOZE_FLOOD, 25000);
                     break;
                 case EVENT_ROTFACE_VILE_GAS:
-                    {
-                        std::list<Unit*> targets;
-                        uint32 minTargets = RAID_MODE<uint32>(3, 8, 3, 8);
-                        SelectTargetList(targets, minTargets, SELECT_TARGET_RANDOM, -5.0f, true);
-                        float minDist = 0.0f;
-                        if (targets.size() >= minTargets)
-                            minDist = -5.0f;
+                {
+                    std::list<Unit*> targets;
+                    uint32 minTargets = RAID_MODE<uint32>(3, 8, 3, 8);
+                    SelectTargetList(targets, minTargets, SELECT_TARGET_RANDOM, -5.0f, true);
+                    float minDist = 0.0f;
+                    if (targets.size() >= minTargets)
+                        minDist = -5.0f;
 
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, minDist, true))
-                            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
-                                professor->CastSpell(target, SPELL_VILE_GAS_H, true); // triggered, to skip LoS check
-                    }
-                    events.ScheduleEvent(EVENT_ROTFACE_VILE_GAS, urand(15000, 20000));
-                    break;
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, minDist, true))
+                        if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+                            professor->CastSpell(target, SPELL_VILE_GAS_H, true); // triggered, to skip LoS check
+                }
+                events.ScheduleEvent(EVENT_ROTFACE_VILE_GAS, urand(15000, 20000));
+                break;
                 default:
                     break;
             }

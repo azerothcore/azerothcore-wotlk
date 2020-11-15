@@ -200,19 +200,19 @@ public:
                 switch (eventId)
                 {
                     case EVENT_SHIMMER:
-                        {
-                            // Remove old vulnerabilty spell
-                            if (CurrentVurln_Spell)
-                                me->RemoveAurasDueToSpell(CurrentVurln_Spell);
+                    {
+                        // Remove old vulnerabilty spell
+                        if (CurrentVurln_Spell)
+                            me->RemoveAurasDueToSpell(CurrentVurln_Spell);
 
-                            // Cast new random vulnerabilty on self
-                            uint32 spell = RAND(SPELL_FIRE_VULNERABILITY, SPELL_FROST_VULNERABILITY, SPELL_SHADOW_VULNERABILITY, SPELL_NATURE_VULNERABILITY, SPELL_ARCANE_VULNERABILITY);
-                            DoCast(me, spell);
-                            CurrentVurln_Spell = spell;
-                            Talk(EMOTE_SHIMMER);
-                            events.ScheduleEvent(EVENT_SHIMMER, 45000);
-                            break;
-                        }
+                        // Cast new random vulnerabilty on self
+                        uint32 spell = RAND(SPELL_FIRE_VULNERABILITY, SPELL_FROST_VULNERABILITY, SPELL_SHADOW_VULNERABILITY, SPELL_NATURE_VULNERABILITY, SPELL_ARCANE_VULNERABILITY);
+                        DoCast(me, spell);
+                        CurrentVurln_Spell = spell;
+                        Talk(EMOTE_SHIMMER);
+                        events.ScheduleEvent(EVENT_SHIMMER, 45000);
+                        break;
+                    }
                     case EVENT_BREATH_1:
                         DoCastVictim(Breath1_Spell);
                         events.ScheduleEvent(EVENT_BREATH_1, 60000);
@@ -222,28 +222,28 @@ public:
                         events.ScheduleEvent(EVENT_BREATH_2, 60000);
                         break;
                     case EVENT_AFFLICTION:
+                    {
+                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                         {
-                            Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                            if (Player* player = itr->GetSource()->ToPlayer())
                             {
-                                if (Player* player = itr->GetSource()->ToPlayer())
+                                DoCast(player, RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN), true);
+
+                                if (player->HasAura(SPELL_BROODAF_BLUE) &&
+                                        player->HasAura(SPELL_BROODAF_BLACK) &&
+                                        player->HasAura(SPELL_BROODAF_RED) &&
+                                        player->HasAura(SPELL_BROODAF_BRONZE) &&
+                                        player->HasAura(SPELL_BROODAF_GREEN))
                                 {
-                                    DoCast(player, RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN), true);
-
-                                    if (player->HasAura(SPELL_BROODAF_BLUE) &&
-                                            player->HasAura(SPELL_BROODAF_BLACK) &&
-                                            player->HasAura(SPELL_BROODAF_RED) &&
-                                            player->HasAura(SPELL_BROODAF_BRONZE) &&
-                                            player->HasAura(SPELL_BROODAF_GREEN))
-                                    {
-                                        DoCast(player, SPELL_CHROMATIC_MUT_1);
-                                    }
-
+                                    DoCast(player, SPELL_CHROMATIC_MUT_1);
                                 }
+
                             }
                         }
-                        events.ScheduleEvent(EVENT_AFFLICTION, 10000);
-                        break;
+                    }
+                    events.ScheduleEvent(EVENT_AFFLICTION, 10000);
+                    break;
                     case EVENT_FRENZY:
                         DoCast(me, SPELL_FRENZY);
                         events.ScheduleEvent(EVENT_FRENZY, urand(10000, 15000));

@@ -102,7 +102,7 @@ public:
             if (!me->IsAlive())
                 return;
 
-            switch(param)
+            switch (param)
             {
                 case ACTION_WATER_ELEMENT_HIT:
                     if (pInstance)

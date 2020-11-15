@@ -128,7 +128,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -215,13 +215,13 @@ public:
                     events.RepeatEvent(1500);
                     break;
                 case EVENT_SPELL_SUMMON_HAILSTONE:
-                    {
-                        float dist = (float)urand(3, 10);
-                        float angle = rand_norm() * 2 * M_PI;
-                        me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_HAILSTONE, false);
-                        events.RepeatEvent(30000);
-                    }
-                    break;
+                {
+                    float dist = (float)urand(3, 10);
+                    float angle = rand_norm() * 2 * M_PI;
+                    me->CastSpell(MinionSummonPos.GetPositionX() + cos(angle)*dist, MinionSummonPos.GetPositionY() + sin(angle)*dist, MinionSummonPos.GetPositionZ(), SPELL_SUMMON_HAILSTONE, false);
+                    events.RepeatEvent(30000);
+                }
+                break;
                 case EVENT_SPELL_SUMMON_COLDWAVE:
                     for (uint8 i = 0; i < 2; ++i)
                     {

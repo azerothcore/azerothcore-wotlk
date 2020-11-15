@@ -81,23 +81,23 @@ void OPvPCapturePointZM_Beacon::ChangeState()
     switch (m_State)
     {
         case OBJECTIVESTATE_ALLIANCE:
-            {
-                m_TowerState = ZM_TOWERSTATE_A;
-                uint32 alliance_towers = ((OutdoorPvPZM*)m_PvP)->GetAllianceTowersControlled();
-                if (alliance_towers < ZM_NUM_BEACONS)
-                    ((OutdoorPvPZM*)m_PvP)->SetAllianceTowersControlled(++alliance_towers);
-                sWorld->SendZoneText(ZM_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(ZMBeaconCaptureA[m_TowerType]));
-                break;
-            }
+        {
+            m_TowerState = ZM_TOWERSTATE_A;
+            uint32 alliance_towers = ((OutdoorPvPZM*)m_PvP)->GetAllianceTowersControlled();
+            if (alliance_towers < ZM_NUM_BEACONS)
+                ((OutdoorPvPZM*)m_PvP)->SetAllianceTowersControlled(++alliance_towers);
+            sWorld->SendZoneText(ZM_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(ZMBeaconCaptureA[m_TowerType]));
+            break;
+        }
         case OBJECTIVESTATE_HORDE:
-            {
-                m_TowerState = ZM_TOWERSTATE_H;
-                uint32 horde_towers = ((OutdoorPvPZM*)m_PvP)->GetHordeTowersControlled();
-                if (horde_towers < ZM_NUM_BEACONS)
-                    ((OutdoorPvPZM*)m_PvP)->SetHordeTowersControlled(++horde_towers);
-                sWorld->SendZoneText(ZM_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(ZMBeaconCaptureH[m_TowerType]));
-                break;
-            }
+        {
+            m_TowerState = ZM_TOWERSTATE_H;
+            uint32 horde_towers = ((OutdoorPvPZM*)m_PvP)->GetHordeTowersControlled();
+            if (horde_towers < ZM_NUM_BEACONS)
+                ((OutdoorPvPZM*)m_PvP)->SetHordeTowersControlled(++horde_towers);
+            sWorld->SendZoneText(ZM_GRAVEYARD_ZONE, sObjectMgr->GetAcoreStringForDBCLocale(ZMBeaconCaptureH[m_TowerType]));
+            break;
+        }
         case OBJECTIVESTATE_NEUTRAL:
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
         case OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE:

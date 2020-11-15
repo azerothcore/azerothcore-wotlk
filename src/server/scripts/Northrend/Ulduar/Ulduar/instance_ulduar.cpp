@@ -232,7 +232,7 @@ public:
 
         void OnCreatureCreate(Creature* creature)
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_LEVIATHAN:
                     m_uiLeviathanGUID = creature->GetGUID();
@@ -290,17 +290,17 @@ public:
                     m_uiAlgalonGUID = creature->GetGUID();
                     break;
                 case NPC_HARPOON_FIRE_STATE:
-                    {
-                        if( creature->GetPositionX() > 595 )
-                            m_RazorscaleHarpoonFireStateGUID[3] = creature->GetGUID();
-                        else if( creature->GetPositionX() > 585 )
-                            m_RazorscaleHarpoonFireStateGUID[2] = creature->GetGUID();
-                        else if( creature->GetPositionX() > 575 )
-                            m_RazorscaleHarpoonFireStateGUID[1] = creature->GetGUID();
-                        else
-                            m_RazorscaleHarpoonFireStateGUID[0] = creature->GetGUID();
-                    }
-                    break;
+                {
+                    if ( creature->GetPositionX() > 595 )
+                        m_RazorscaleHarpoonFireStateGUID[3] = creature->GetGUID();
+                    else if ( creature->GetPositionX() > 585 )
+                        m_RazorscaleHarpoonFireStateGUID[2] = creature->GetGUID();
+                    else if ( creature->GetPositionX() > 575 )
+                        m_RazorscaleHarpoonFireStateGUID[1] = creature->GetGUID();
+                    else
+                        m_RazorscaleHarpoonFireStateGUID[0] = creature->GetGUID();
+                }
+                break;
                 case NPC_MIMIRON_LEVIATHAN_MKII:
                     m_MimironLeviathanMKIIguid = creature->GetGUID();
                     break;
@@ -389,13 +389,13 @@ public:
             {
                 // Flame Leviathan
                 case GO_REPAIR_STATION_TRAP:
-                    {
-                        if(m_RepairSGUID[0])
-                            m_RepairSGUID[1] = gameObject->GetGUID();
-                        else
-                            m_RepairSGUID[0] = gameObject->GetGUID();
-                        break;
-                    }
+                {
+                    if (m_RepairSGUID[0])
+                        m_RepairSGUID[1] = gameObject->GetGUID();
+                    else
+                        m_RepairSGUID[0] = gameObject->GetGUID();
+                    break;
+                }
                 case GO_LIGHTNING_WALL1:
                     m_lightningWalls[0] = gameObject->GetGUID();
                     OpenIfDone(TYPE_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
@@ -502,15 +502,15 @@ public:
                 case GO_HODIR_FROZEN_DOOR:
                 case GO_HODIR_DOOR:
                     if (GetData(TYPE_HODIR) == DONE)
-                        if( gameObject->GetGoState() != GO_STATE_ACTIVE )
+                        if ( gameObject->GetGoState() != GO_STATE_ACTIVE )
                         {
                             gameObject->SetLootState(GO_READY);
                             gameObject->UseDoorOrButton(0, false);
                         }
                     break;
                 case GO_VEZAX_DOOR:
-                    if( GetData(TYPE_VEZAX) == DONE )
-                        if( gameObject->GetGoState() != GO_STATE_ACTIVE )
+                    if ( GetData(TYPE_VEZAX) == DONE )
+                        if ( gameObject->GetGoState() != GO_STATE_ACTIVE )
                         {
                             gameObject->SetLootState(GO_READY);
                             gameObject->UseDoorOrButton(0, false);
@@ -569,7 +569,7 @@ public:
 
         void SetData(uint32 type, uint32 data)
         {
-            switch(type)
+            switch (type)
             {
                 case TYPE_LEVIATHAN:
                     m_auiEncounter[type] = data;
@@ -621,16 +621,16 @@ public:
                 case EVENT_TOWER_OF_STORM_DESTROYED:
                 case EVENT_TOWER_OF_FROST_DESTROYED:
                 case EVENT_TOWER_OF_FLAMES_DESTROYED:
-                    {
-                        instance->LoadGrid(364.0f, -16.0f); //make sure leviathan is loaded
-                        m_leviathanTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED] = data;
-                        GameObject* gobj = nullptr;
-                        if ((gobj = instance->GetGameObject(m_leviathanVisualTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED][0])))
-                            gobj->SetGoState(GO_STATE_ACTIVE);
-                        if ((gobj = instance->GetGameObject(m_leviathanVisualTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED][1])))
-                            gobj->SetGoState(GO_STATE_ACTIVE);
-                        return;
-                    }
+                {
+                    instance->LoadGrid(364.0f, -16.0f); //make sure leviathan is loaded
+                    m_leviathanTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED] = data;
+                    GameObject* gobj = nullptr;
+                    if ((gobj = instance->GetGameObject(m_leviathanVisualTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED][0])))
+                        gobj->SetGoState(GO_STATE_ACTIVE);
+                    if ((gobj = instance->GetGameObject(m_leviathanVisualTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED][1])))
+                        gobj->SetGoState(GO_STATE_ACTIVE);
+                    return;
+                }
 
                 case DATA_VEHICLE_SPAWN:
                     SpawnLeviathanEncounterVehicles(data);
@@ -730,7 +730,7 @@ public:
 
         uint64 GetData64(uint32 data) const
         {
-            switch(data)
+            switch (data)
             {
                 // Bosses
                 case TYPE_LEVIATHAN:
@@ -850,7 +850,7 @@ public:
 
         uint32 GetData(uint32 type) const
         {
-            switch(type)
+            switch (type)
             {
                 case TYPE_LEVIATHAN:
                 case TYPE_IGNIS:

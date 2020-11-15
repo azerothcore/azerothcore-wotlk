@@ -133,7 +133,7 @@ public:
 
         void PrepareSummons()
         {
-            switch(currentQuest)
+            switch (currentQuest)
             {
                 case QUEST_BFV_FALLEN_HEROES:
                     me->SummonCreature(NPC_ELDRETH, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
@@ -219,92 +219,92 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_VALHALAS_FIRST:
+                {
+                    switch (currentQuest)
                     {
-                        switch (currentQuest)
-                        {
-                            case QUEST_BFV_FALLEN_HEROES:
-                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->MonsterYell("$N and comrades in arms have chosen to accept honorable combat within the sacred confines of Valhalas.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                break;
-                            case QUEST_BFV_DARK_MASTER:
-                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->MonsterYell("$N has accepted the challenge of Khit'rix the Dark Master. May the gods show mercy upon him for Khit'rix surely will not.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                break;
-                            case QUEST_BFV_SIGRID:
-                                PrepareSummons();
-                                me->MonsterTextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", NULL, true);
-                                break;
-                            case QUEST_BFV_CARNAGE:
-                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->MonsterYell("From the bowels of the Underhalls comes Carnage. Brave and foolish $N has accepted the challenge. $N and his group stand ready to face the monstrosity.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                break;
-                            case QUEST_BFV_THANE:
-                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->MonsterYell("Thane Banahogg returns to Valhalas for the first time in ages to prove that the vrykul are the only beings worthy to fight within its sacred ring. Will $N prove him wrong?", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                break;
-                            case QUEST_BFV_FINAL:
-                                events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
-                                me->MonsterYell("From the depths of Icecrown Citadel, one of the Lich King's chosen comes to put an end to the existence of $N and his friends.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                break;
-                        }
-
-                        me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f);
-                        me->SetPosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f, me->GetOrientation());
-                        break;
+                        case QUEST_BFV_FALLEN_HEROES:
+                            events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
+                            me->MonsterYell("$N and comrades in arms have chosen to accept honorable combat within the sacred confines of Valhalas.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            break;
+                        case QUEST_BFV_DARK_MASTER:
+                            events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
+                            me->MonsterYell("$N has accepted the challenge of Khit'rix the Dark Master. May the gods show mercy upon him for Khit'rix surely will not.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            break;
+                        case QUEST_BFV_SIGRID:
+                            PrepareSummons();
+                            me->MonsterTextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", NULL, true);
+                            break;
+                        case QUEST_BFV_CARNAGE:
+                            events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
+                            me->MonsterYell("From the bowels of the Underhalls comes Carnage. Brave and foolish $N has accepted the challenge. $N and his group stand ready to face the monstrosity.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            break;
+                        case QUEST_BFV_THANE:
+                            events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
+                            me->MonsterYell("Thane Banahogg returns to Valhalas for the first time in ages to prove that the vrykul are the only beings worthy to fight within its sacred ring. Will $N prove him wrong?", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            break;
+                        case QUEST_BFV_FINAL:
+                            events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
+                            me->MonsterYell("From the depths of Icecrown Citadel, one of the Lich King's chosen comes to put an end to the existence of $N and his friends.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            break;
                     }
+
+                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f);
+                    me->SetPosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f, me->GetOrientation());
+                    break;
+                }
                 case EVENT_VALHALAS_SECOND:
+                {
+                    switch (currentQuest)
                     {
-                        switch (currentQuest)
+                        case QUEST_BFV_FALLEN_HEROES:
+                            me->MonsterYell("There can only be one outcome to such a battle: death for one side or the other. Let $n prove himself upon the bones of these outsiders who have fallen before!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                            me->MonsterTextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", NULL, true);
+                            break;
+                        case QUEST_BFV_DARK_MASTER:
+                            me->MonsterTextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", NULL, true);
+                            break;
+                        case QUEST_BFV_CARNAGE:
+                            me->MonsterTextEmote("Lumbering in from the south, the smell of Carnage precedes him!", NULL, true);
+                            break;
+                        case QUEST_BFV_THANE:
+                            me->MonsterTextEmote("Thane Banahogg appears upon the overlook to the southeast!", NULL, true);
+                            break;
+                        case QUEST_BFV_FINAL:
+                            me->MonsterYell("Warriors of Jotunheim, I present to you, Blood Prince Sandoval!", LANG_UNIVERSAL, nullptr);
+                            me->MonsterTextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", NULL, true);
+                            break;
+                    }
+
+                    PrepareSummons();
+                    break;
+                }
+                case EVENT_VALHALAS_THIRD:
+                {
+                    me->MonsterYell("In defeating him, he and his fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                    events.ScheduleEvent(EVENT_VALHALAS_THIRD + 2, 7000);
+                    break;
+                }
+                case EVENT_VALHALAS_THIRD+2:
+                {
+                    me->MonsterYell("ALL HAIL $N, CHAMPION OF VALHALAS! ", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID2));
+                    break;
+                }
+                case EVENT_VALHALAS_CHECK_PLAYER:
+                {
+                    bool fail = true;
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
+                        if (me->GetDistance(player) < 100.0f)
                         {
-                            case QUEST_BFV_FALLEN_HEROES:
-                                me->MonsterYell("There can only be one outcome to such a battle: death for one side or the other. Let $n prove himself upon the bones of these outsiders who have fallen before!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                me->MonsterTextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", NULL, true);
-                                break;
-                            case QUEST_BFV_DARK_MASTER:
-                                me->MonsterTextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", NULL, true);
-                                break;
-                            case QUEST_BFV_CARNAGE:
-                                me->MonsterTextEmote("Lumbering in from the south, the smell of Carnage precedes him!", NULL, true);
-                                break;
-                            case QUEST_BFV_THANE:
-                                me->MonsterTextEmote("Thane Banahogg appears upon the overlook to the southeast!", NULL, true);
-                                break;
-                            case QUEST_BFV_FINAL:
-                                me->MonsterYell("Warriors of Jotunheim, I present to you, Blood Prince Sandoval!", LANG_UNIVERSAL, nullptr);
-                                me->MonsterTextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", NULL, true);
-                                break;
+                            fail = false;
+                            CheckSummons();
                         }
 
-                        PrepareSummons();
-                        break;
-                    }
-                case EVENT_VALHALAS_THIRD:
-                    {
-                        me->MonsterYell("In defeating him, he and his fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                        events.ScheduleEvent(EVENT_VALHALAS_THIRD + 2, 7000);
-                        break;
-                    }
-                case EVENT_VALHALAS_THIRD+2:
-                    {
-                        me->MonsterYell("ALL HAIL $N, CHAMPION OF VALHALAS! ", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID2));
-                        break;
-                    }
-                case EVENT_VALHALAS_CHECK_PLAYER:
-                    {
-                        bool fail = true;
-                        if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                            if (me->GetDistance(player) < 100.0f)
-                            {
-                                fail = false;
-                                CheckSummons();
-                            }
+                    if (fail)
+                        EnterEvadeMode();
 
-                        if (fail)
-                            EnterEvadeMode();
-
-                        events.RepeatEvent(5000);
-                        break;
-                    }
+                    events.RepeatEvent(5000);
+                    break;
+                }
             }
         }
     };
@@ -740,17 +740,17 @@ public:
                     Talk(1);
                     break;
                 case 15:
-                    {
-                        uint8 i = 1;
-                        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr, ++i)
-                            if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                                if (summon->GetEntry() == NPC_DISGUISED_CRUSADER)
-                                {
-                                    summon->GetMotionMaster()->Clear(false);
-                                    summon->GetMotionMaster()->MovePoint(1, 6165.3f + 3 * i, 2759.85f + 1.5f * i, 573.914f);
-                                }
-                        break;
-                    }
+                {
+                    uint8 i = 1;
+                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr, ++i)
+                        if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                            if (summon->GetEntry() == NPC_DISGUISED_CRUSADER)
+                            {
+                                summon->GetMotionMaster()->Clear(false);
+                                summon->GetMotionMaster()->MovePoint(1, 6165.3f + 3 * i, 2759.85f + 1.5f * i, 573.914f);
+                            }
+                    break;
+                }
                 case 17:
                     SetEscortPaused(true);
                     events.ScheduleEvent(EVENT_START_SCENE, 7000);
@@ -875,19 +875,19 @@ public:
                     events.ScheduleEvent(EVENT_SCENE_0 + 15, 3000);
                     break;
                 case EVENT_SCENE_0+15:
-                    {
-                        me->CastSpell(me, SPELL_TIRION_SMASH_HEART, true);
-                        events.ScheduleEvent(EVENT_SCENE_0 + 16, 1200);
-                        uint8 i = 0;
-                        for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr, ++i)
-                            if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                                if (summon->GetEntry() == NPC_DISGUISED_CRUSADER)
-                                {
-                                    summon->SetWalk(false);
-                                    summon->GetMotionMaster()->MovePoint(2, 6132.38f + 4 * cos(2 * M_PI * (i / 3.0)), 2760.76f + 4 * sin(2 * M_PI * (i / 3.0)), me->GetPositionZ());
-                                }
-                        break;
-                    }
+                {
+                    me->CastSpell(me, SPELL_TIRION_SMASH_HEART, true);
+                    events.ScheduleEvent(EVENT_SCENE_0 + 16, 1200);
+                    uint8 i = 0;
+                    for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr, ++i)
+                        if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                            if (summon->GetEntry() == NPC_DISGUISED_CRUSADER)
+                            {
+                                summon->SetWalk(false);
+                                summon->GetMotionMaster()->MovePoint(2, 6132.38f + 4 * cos(2 * M_PI * (i / 3.0)), 2760.76f + 4 * sin(2 * M_PI * (i / 3.0)), me->GetPositionZ());
+                            }
+                    break;
+                }
                 case EVENT_SCENE_0+16:
                     me->CastSpell(me, SPELL_HEART_EXPLOSION, true);
                     me->CastSpell(me, SPELL_HEART_EXPLOSION_EFF, true);
@@ -909,65 +909,65 @@ public:
                     events.ScheduleEvent(EVENT_SCENE_0 + 18, 1000);
                     break;
                 case EVENT_SCENE_0+18:
+                {
+                    DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_TALK, 6);
+
+                    std::list<Creature*> zealotList;
+                    Position pos1 = {6160.0f, 2765.0f, 573.92f, 0.0f};
+                    Position pos2 = {6115.0f, 2742.0f, 573.92f, 0.0f};
+                    me->GetCreaturesWithEntryInRange(zealotList, 100.0f, NPC_CHOSEN_ZEALOT);
+                    for (std::list<Creature*>::const_iterator itr = zealotList.begin(); itr != zealotList.end(); ++itr)
                     {
-                        DoSummonAction(NPC_TIRION_LICH_KING, ACTION_SUMMON_TALK, 6);
-
-                        std::list<Creature*> zealotList;
-                        Position pos1 = {6160.0f, 2765.0f, 573.92f, 0.0f};
-                        Position pos2 = {6115.0f, 2742.0f, 573.92f, 0.0f};
-                        me->GetCreaturesWithEntryInRange(zealotList, 100.0f, NPC_CHOSEN_ZEALOT);
-                        for (std::list<Creature*>::const_iterator itr = zealotList.begin(); itr != zealotList.end(); ++itr)
+                        (*itr)->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
+                        if ((*itr)->GetPositionX() > 6150.0f)
                         {
-                            (*itr)->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
-                            if ((*itr)->GetPositionX() > 6150.0f)
-                            {
-                                Position tpos = pos1;
-                                (*itr)->MovePosition(tpos, frand(1.0f, 14.0f), frand(3.14f, 4.14f));
-                                (*itr)->GetMotionMaster()->MovePoint(3, tpos.GetPositionX(), tpos.GetPositionY(), tpos.GetPositionZ());
-                            }
-                            else
-                            {
-                                Position tpos = pos2;
-                                (*itr)->MovePosition(tpos, frand(1.0f, 14.0f), frand(0.0f, 1.0f));
-                                (*itr)->GetMotionMaster()->MovePoint(3, tpos.GetPositionX(), tpos.GetPositionY(), tpos.GetPositionZ());
-                            }
+                            Position tpos = pos1;
+                            (*itr)->MovePosition(tpos, frand(1.0f, 14.0f), frand(3.14f, 4.14f));
+                            (*itr)->GetMotionMaster()->MovePoint(3, tpos.GetPositionX(), tpos.GetPositionY(), tpos.GetPositionZ());
                         }
-
-                        events.ScheduleEvent(EVENT_SCENE_0 + 19, 3000);
-                        break;
+                        else
+                        {
+                            Position tpos = pos2;
+                            (*itr)->MovePosition(tpos, frand(1.0f, 14.0f), frand(0.0f, 1.0f));
+                            (*itr)->GetMotionMaster()->MovePoint(3, tpos.GetPositionX(), tpos.GetPositionY(), tpos.GetPositionZ());
+                        }
                     }
+
+                    events.ScheduleEvent(EVENT_SCENE_0 + 19, 3000);
+                    break;
+                }
                 case EVENT_SCENE_0+19:
                     me->SummonCreatureGroup(1);
                     events.ScheduleEvent(EVENT_SCENE_0 + 20, 3700);
                     break;
                 case EVENT_SCENE_0+20:
-                    {
-                        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                            if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                            {
-                                summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                                if (summon->GetEntry() >= NPC_TIRION_EBON_KNIGHT && summon->GetEntry() <= NPC_TIRION_MOGRAINE)
-                                {
-                                    if (summon->GetEntry() == NPC_TIRION_MOGRAINE)
-                                        summon->SetHomePosition(6135.97f, 2753.84f, 573.92f, 3.70f);
-                                    else
-                                        summon->SetHomePosition(6138.36f + frand(-2.0f, 2.0f), 2749.25f + frand(-2.0f, 2.0f), 573.92f, 2.03f);
-                                }
-                            }
-                        DoSummonAction(NPC_TIRION_THASSARIAN, ACTION_SUMMON_TALK, 0);
-                        std::list<Creature*> zealotList;
-                        me->GetCreaturesWithEntryInRange(zealotList, 100.0f, NPC_CHOSEN_ZEALOT);
-                        Unit* target = me->FindNearestCreature(NPC_TIRION_MOGRAINE, 100.0f);
-                        for (std::list<Creature*>::const_iterator itr = zealotList.begin(); itr != zealotList.end(); ++itr)
+                {
+                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                        if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                         {
-                            if (!target)
-                                target = (*itr)->SelectNearestTarget(40.0f);
-                            if (target)
-                                (*itr)->AI()->AttackStart(target);
+                            summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                            if (summon->GetEntry() >= NPC_TIRION_EBON_KNIGHT && summon->GetEntry() <= NPC_TIRION_MOGRAINE)
+                            {
+                                if (summon->GetEntry() == NPC_TIRION_MOGRAINE)
+                                    summon->SetHomePosition(6135.97f, 2753.84f, 573.92f, 3.70f);
+                                else
+                                    summon->SetHomePosition(6138.36f + frand(-2.0f, 2.0f), 2749.25f + frand(-2.0f, 2.0f), 573.92f, 2.03f);
+                            }
                         }
-
-                        break;
+                    DoSummonAction(NPC_TIRION_THASSARIAN, ACTION_SUMMON_TALK, 0);
+                    std::list<Creature*> zealotList;
+                    me->GetCreaturesWithEntryInRange(zealotList, 100.0f, NPC_CHOSEN_ZEALOT);
+                    Unit* target = me->FindNearestCreature(NPC_TIRION_MOGRAINE, 100.0f);
+                    for (std::list<Creature*>::const_iterator itr = zealotList.begin(); itr != zealotList.end(); ++itr)
+                    {
+                        if (!target)
+                            target = (*itr)->SelectNearestTarget(40.0f);
+                        if (target)
+                            (*itr)->AI()->AttackStart(target);
                     }
+
+                    break;
+                }
                 case EVENT_SCENE_0+30:
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
@@ -1328,55 +1328,55 @@ public:
                     me->DespawnOrUnsummon(1);
                     break;
                 case EVENT_START_FLIGHT:
+                {
+                    WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
+                    if (!path || path->empty())
                     {
-                        WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
-                        if (!path || path->empty())
-                        {
-                            me->DespawnOrUnsummon(1);
-                            return;
-                        }
-
-                        Movement::PointsArray pathPoints;
-                        pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-                        uint32 wpCounter = 1;
-                        WPPath::const_iterator itr;
-                        while ((itr = path->find(wpCounter++)) != path->end())
-                        {
-                            WayPoint* wp = itr->second;
-                            pathPoints.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
-                        }
-
-                        me->GetMotionMaster()->MoveSplinePath(&pathPoints);
-                        events.ScheduleEvent(EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE, 60000);
-                        events.ScheduleEvent(EVENT_SYNCHRONIZE_SHIELDS, 5000);
-                        break;
+                        me->DespawnOrUnsummon(1);
+                        return;
                     }
+
+                    Movement::PointsArray pathPoints;
+                    pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+
+                    uint32 wpCounter = 1;
+                    WPPath::const_iterator itr;
+                    while ((itr = path->find(wpCounter++)) != path->end())
+                    {
+                        WayPoint* wp = itr->second;
+                        pathPoints.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+                    }
+
+                    me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                    events.ScheduleEvent(EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE, 60000);
+                    events.ScheduleEvent(EVENT_SYNCHRONIZE_SHIELDS, 5000);
+                    break;
+                }
                 case EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE:
+                {
+                    // Check if path is finished
+                    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != ESCORT_MOTION_TYPE)
                     {
-                        // Check if path is finished
-                        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != ESCORT_MOTION_TYPE)
-                        {
-                            me->DespawnOrUnsummon(1);
-                            return;
-                        }
-
-                        // Check fire count
-                        uint8 fireCount = 0;
-                        if (Vehicle* kit = me->GetVehicleKit())
-                            for (uint8 seat = 3; seat <= 5; ++seat)
-                                if (Unit* banner = kit->GetPassenger(seat))
-                                    if (banner->HasAura(SPELL_COSMETIC_FIRE))
-                                        fireCount++;
-
-                        if (fireCount)
-                            Unit::DealDamage(me, me, 3000 * fireCount, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_FIRE);
-                        else // Heal
-                            me->ModifyHealth(2000);
-
-                        events.ScheduleEvent(EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE, 4000);
-                        break;
+                        me->DespawnOrUnsummon(1);
+                        return;
                     }
+
+                    // Check fire count
+                    uint8 fireCount = 0;
+                    if (Vehicle* kit = me->GetVehicleKit())
+                        for (uint8 seat = 3; seat <= 5; ++seat)
+                            if (Unit* banner = kit->GetPassenger(seat))
+                                if (banner->HasAura(SPELL_COSMETIC_FIRE))
+                                    fireCount++;
+
+                    if (fireCount)
+                        Unit::DealDamage(me, me, 3000 * fireCount, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_FIRE);
+                    else // Heal
+                        me->ModifyHealth(2000);
+
+                    events.ScheduleEvent(EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE, 4000);
+                    break;
+                }
                 case EVENT_SYNCHRONIZE_SHIELDS:
                     if (Vehicle* kit = me->GetVehicleKit())
                     {
@@ -1586,18 +1586,18 @@ public:
                     switch (me->GetEntry())
                     {
                         case NPC_CHARGE_TARGET:
-                            {
-                                if (!me->HasAura(SPELL_CHARGE_DEFEND))
-                                    DoCast(SPELL_CHARGE_DEFEND);
-                                break;
-                            }
+                        {
+                            if (!me->HasAura(SPELL_CHARGE_DEFEND))
+                                DoCast(SPELL_CHARGE_DEFEND);
+                            break;
+                        }
                         case NPC_RANGED_TARGET:
-                            {
-                                Aura* defend = me->GetAura(SPELL_RANGED_DEFEND);
-                                if (!defend || defend->GetStackAmount() < 3 || defend->GetDuration() <= 8000)
-                                    DoCast(SPELL_RANGED_DEFEND);
-                                break;
-                            }
+                        {
+                            Aura* defend = me->GetAura(SPELL_RANGED_DEFEND);
+                            if (!defend || defend->GetStackAmount() < 3 || defend->GetDuration() <= 8000)
+                                DoCast(SPELL_RANGED_DEFEND);
+                            break;
+                        }
                     }
                     isVulnerable = false;
                     events.ScheduleEvent(EVENT_DUMMY_RECAST_DEFEND, 5000);
@@ -1774,212 +1774,212 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPAWN:
+                {
+                    if (Creature* Dalfors = DoSummon(NPC_CRUSADER_LORD_DALFORS, DalforsPos[0]))
                     {
-                        if (Creature* Dalfors = DoSummon(NPC_CRUSADER_LORD_DALFORS, DalforsPos[0]))
-                        {
-                            guidDalfors = Dalfors->GetGUID();
-                            Dalfors->GetMotionMaster()->MovePoint(0, DalforsPos[1]);
-                        }
-                        if (Creature* Priest1 = DoSummon(NPC_ARGENT_BATTLE_PRIEST, Priest1Pos[0]))
-                        {
-                            guidPriest[0] = Priest1->GetGUID();
-                            Priest1->GetMotionMaster()->MovePoint(0, Priest1Pos[1]);
-                        }
-                        if (Creature* Priest2 = DoSummon(NPC_ARGENT_BATTLE_PRIEST, Priest2Pos[0]))
-                        {
-                            guidPriest[1] = Priest2->GetGUID();
-                            Priest2->GetMotionMaster()->MovePoint(0, Priest2Pos[1]);
-                        }
-                        if (Creature* Priest3 = DoSummon(NPC_ARGENT_BATTLE_PRIEST, Priest3Pos[0]))
-                        {
-                            guidPriest[2] = Priest3->GetGUID();
-                            Priest3->GetMotionMaster()->MovePoint(0, Priest3Pos[1]);
-                        }
-                        if (Creature* Mason1 = DoSummon(NPC_ARGENT_MASON, Mason1Pos[0]))
-                        {
-                            guidMason[0] = Mason1->GetGUID();
-                            Mason1->GetMotionMaster()->MovePoint(0, Mason1Pos[1]);
-                        }
-                        if (Creature* Mason2 = DoSummon(NPC_ARGENT_MASON, Mason2Pos[0]))
-                        {
-                            guidMason[1] = Mason2->GetGUID();
-                            Mason2->GetMotionMaster()->MovePoint(0, Mason2Pos[1]);
-                        }
-                        if (Creature* Mason3 = DoSummon(NPC_ARGENT_MASON, Mason3Pos[0]))
-                        {
-                            guidMason[2] = Mason3->GetGUID();
-                            Mason3->GetMotionMaster()->MovePoint(0, Mason3Pos[1]);
-                        }
-                        events.ScheduleEvent(EVENT_INTRO_1, 15000);
+                        guidDalfors = Dalfors->GetGUID();
+                        Dalfors->GetMotionMaster()->MovePoint(0, DalforsPos[1]);
                     }
-                    break;
+                    if (Creature* Priest1 = DoSummon(NPC_ARGENT_BATTLE_PRIEST, Priest1Pos[0]))
+                    {
+                        guidPriest[0] = Priest1->GetGUID();
+                        Priest1->GetMotionMaster()->MovePoint(0, Priest1Pos[1]);
+                    }
+                    if (Creature* Priest2 = DoSummon(NPC_ARGENT_BATTLE_PRIEST, Priest2Pos[0]))
+                    {
+                        guidPriest[1] = Priest2->GetGUID();
+                        Priest2->GetMotionMaster()->MovePoint(0, Priest2Pos[1]);
+                    }
+                    if (Creature* Priest3 = DoSummon(NPC_ARGENT_BATTLE_PRIEST, Priest3Pos[0]))
+                    {
+                        guidPriest[2] = Priest3->GetGUID();
+                        Priest3->GetMotionMaster()->MovePoint(0, Priest3Pos[1]);
+                    }
+                    if (Creature* Mason1 = DoSummon(NPC_ARGENT_MASON, Mason1Pos[0]))
+                    {
+                        guidMason[0] = Mason1->GetGUID();
+                        Mason1->GetMotionMaster()->MovePoint(0, Mason1Pos[1]);
+                    }
+                    if (Creature* Mason2 = DoSummon(NPC_ARGENT_MASON, Mason2Pos[0]))
+                    {
+                        guidMason[1] = Mason2->GetGUID();
+                        Mason2->GetMotionMaster()->MovePoint(0, Mason2Pos[1]);
+                    }
+                    if (Creature* Mason3 = DoSummon(NPC_ARGENT_MASON, Mason3Pos[0]))
+                    {
+                        guidMason[2] = Mason3->GetGUID();
+                        Mason3->GetMotionMaster()->MovePoint(0, Mason3Pos[1]);
+                    }
+                    events.ScheduleEvent(EVENT_INTRO_1, 15000);
+                }
+                break;
                 case EVENT_INTRO_1:
-                    {
-                        if (Creature* Dalfors = ObjectAccessor::GetCreature(*me, guidDalfors))
-                            Dalfors->AI()->Talk(DALFORS_SAY_PRE_1);
-                        events.ScheduleEvent(EVENT_INTRO_2, 5000);
-                    }
-                    break;
+                {
+                    if (Creature* Dalfors = ObjectAccessor::GetCreature(*me, guidDalfors))
+                        Dalfors->AI()->Talk(DALFORS_SAY_PRE_1);
+                    events.ScheduleEvent(EVENT_INTRO_2, 5000);
+                }
+                break;
                 case EVENT_INTRO_2:
+                {
+                    if (Creature* Dalfors = ObjectAccessor::GetCreature(*me, guidDalfors))
                     {
-                        if (Creature* Dalfors = ObjectAccessor::GetCreature(*me, guidDalfors))
-                        {
-                            Dalfors->SetFacingTo(6.215f);
-                            Dalfors->AI()->Talk(DALFORS_SAY_PRE_2);
-                        }
-                        events.ScheduleEvent(EVENT_INTRO_3, 5000);
+                        Dalfors->SetFacingTo(6.215f);
+                        Dalfors->AI()->Talk(DALFORS_SAY_PRE_2);
                     }
-                    break;
+                    events.ScheduleEvent(EVENT_INTRO_3, 5000);
+                }
+                break;
                 case EVENT_INTRO_3:
+                {
+                    if (Creature* Dalfors = ObjectAccessor::GetCreature(*me, guidDalfors))
                     {
-                        if (Creature* Dalfors = ObjectAccessor::GetCreature(*me, guidDalfors))
-                        {
-                            Dalfors->GetMotionMaster()->MovePoint(0, DalforsPos[2]);
-                            Dalfors->SetHomePosition(DalforsPos[2]);
-                        }
-                        if (Creature* Priest1 = ObjectAccessor::GetCreature(*me, guidPriest[0]))
-                        {
-                            Priest1->SetFacingTo(5.7421f);
-                            Priest1->SetHomePosition(Priest1Pos[1]);
-                        }
-                        if (Creature* Priest2 = ObjectAccessor::GetCreature(*me, guidPriest[1]))
-                        {
-                            Priest2->SetFacingTo(5.7421f);
-                            Priest2->SetHomePosition(Priest2Pos[1]);
-                        }
-                        if (Creature* Priest3 = ObjectAccessor::GetCreature(*me, guidPriest[2]))
-                        {
-                            Priest3->SetFacingTo(5.7421f);
-                            Priest3->SetHomePosition(Priest3Pos[1]);
-                        }
-                        if (Creature* Mason1 = ObjectAccessor::GetCreature(*me, guidMason[0]))
-                        {
-                            Mason1->GetMotionMaster()->MovePoint(0, Mason1Pos[2]);
-                            Mason1->SetHomePosition(Mason1Pos[2]);
-                        }
-                        if (Creature* Mason2 = ObjectAccessor::GetCreature(*me, guidMason[1]))
-                        {
-                            Mason2->GetMotionMaster()->MovePoint(0, Mason2Pos[2]);
-                            Mason2->SetHomePosition(Mason2Pos[2]);
-                        }
-                        if (Creature* Mason3 = ObjectAccessor::GetCreature(*me, guidMason[2]))
-                        {
-                            Mason3->GetMotionMaster()->MovePoint(0, Mason3Pos[2]);
-                            Mason3->SetHomePosition(Mason3Pos[2]);
-                        }
-                        events.ScheduleEvent(EVENT_START_FIGHT, 5000);
-                        events.ScheduleEvent(EVENT_MASON_ACTION, 15000);
+                        Dalfors->GetMotionMaster()->MovePoint(0, DalforsPos[2]);
+                        Dalfors->SetHomePosition(DalforsPos[2]);
                     }
-                    break;
+                    if (Creature* Priest1 = ObjectAccessor::GetCreature(*me, guidPriest[0]))
+                    {
+                        Priest1->SetFacingTo(5.7421f);
+                        Priest1->SetHomePosition(Priest1Pos[1]);
+                    }
+                    if (Creature* Priest2 = ObjectAccessor::GetCreature(*me, guidPriest[1]))
+                    {
+                        Priest2->SetFacingTo(5.7421f);
+                        Priest2->SetHomePosition(Priest2Pos[1]);
+                    }
+                    if (Creature* Priest3 = ObjectAccessor::GetCreature(*me, guidPriest[2]))
+                    {
+                        Priest3->SetFacingTo(5.7421f);
+                        Priest3->SetHomePosition(Priest3Pos[1]);
+                    }
+                    if (Creature* Mason1 = ObjectAccessor::GetCreature(*me, guidMason[0]))
+                    {
+                        Mason1->GetMotionMaster()->MovePoint(0, Mason1Pos[2]);
+                        Mason1->SetHomePosition(Mason1Pos[2]);
+                    }
+                    if (Creature* Mason2 = ObjectAccessor::GetCreature(*me, guidMason[1]))
+                    {
+                        Mason2->GetMotionMaster()->MovePoint(0, Mason2Pos[2]);
+                        Mason2->SetHomePosition(Mason2Pos[2]);
+                    }
+                    if (Creature* Mason3 = ObjectAccessor::GetCreature(*me, guidMason[2]))
+                    {
+                        Mason3->GetMotionMaster()->MovePoint(0, Mason3Pos[2]);
+                        Mason3->SetHomePosition(Mason3Pos[2]);
+                    }
+                    events.ScheduleEvent(EVENT_START_FIGHT, 5000);
+                    events.ScheduleEvent(EVENT_MASON_ACTION, 15000);
+                }
+                break;
                 case EVENT_MASON_ACTION:
+                {
+                    if (Creature* Mason1 = ObjectAccessor::GetCreature(*me, guidMason[0]))
                     {
-                        if (Creature* Mason1 = ObjectAccessor::GetCreature(*me, guidMason[0]))
-                        {
-                            Mason1->SetFacingTo(2.8972f);
-                            Mason1->AI()->SetData(1, 1); // triggers SAI actions on npc
-                        }
-                        if (Creature* Mason2 = ObjectAccessor::GetCreature(*me, guidMason[1]))
-                        {
-                            Mason2->SetFacingTo(3.1241f);
-                            Mason2->AI()->SetData(1, 1); // triggers SAI actions on npc
-                        }
-                        if (Creature* Mason3 = ObjectAccessor::GetCreature(*me, guidMason[2]))
-                        {
-                            Mason3->SetFacingTo(3.6651f);
-                            Mason3->AI()->SetData(1, 1); // triggers SAI actions on npc
-                        }
+                        Mason1->SetFacingTo(2.8972f);
+                        Mason1->AI()->SetData(1, 1); // triggers SAI actions on npc
                     }
-                    break;
+                    if (Creature* Mason2 = ObjectAccessor::GetCreature(*me, guidMason[1]))
+                    {
+                        Mason2->SetFacingTo(3.1241f);
+                        Mason2->AI()->SetData(1, 1); // triggers SAI actions on npc
+                    }
+                    if (Creature* Mason3 = ObjectAccessor::GetCreature(*me, guidMason[2]))
+                    {
+                        Mason3->SetFacingTo(3.6651f);
+                        Mason3->AI()->SetData(1, 1); // triggers SAI actions on npc
+                    }
+                }
+                break;
                 case EVENT_START_FIGHT:
-                    {
-                        if (Creature* LK = GetClosestCreatureWithEntry(me, NPC_LK, 100))
-                            LK->AI()->Talk(LK_TALK_1);
-                        if (Creature* Dalfors = ObjectAccessor::GetCreature(*me, guidDalfors))
-                            Dalfors->AI()->Talk(DALFORS_SAY_START);
-                        events.ScheduleEvent(EVENT_WAVE_SPAWN, 1000);
-                    }
-                    break;
+                {
+                    if (Creature* LK = GetClosestCreatureWithEntry(me, NPC_LK, 100))
+                        LK->AI()->Talk(LK_TALK_1);
+                    if (Creature* Dalfors = ObjectAccessor::GetCreature(*me, guidDalfors))
+                        Dalfors->AI()->Talk(DALFORS_SAY_START);
+                    events.ScheduleEvent(EVENT_WAVE_SPAWN, 1000);
+                }
+                break;
                 case EVENT_WAVE_SPAWN:
-                    {
-                        if (PhaseCount == 3)
-                        {
-                            if (Creature* LK = GetClosestCreatureWithEntry(me, NPC_LK, 100))
-                                LK->AI()->Talk(LK_TALK_2);
-                        }
-                        else if (PhaseCount == 6)
-                        {
-                            if (Creature* LK = GetClosestCreatureWithEntry(me, NPC_LK, 100))
-                                LK->AI()->Talk(LK_TALK_3);
-                        }
-                        if (Creature* tempsum = DoSummon(NPC_SCOURGE_DRUDGE, Mason3Pos[0]))
-                        {
-                            tempsum->SetHomePosition(DalforsPos[2]);
-                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                        }
-                        if (urand(0, 1) == 0)
-                        {
-                            if (Creature* tempsum = DoSummon(NPC_HIDEOUS_PLAGEBRINGER, Mason1Pos[0]))
-                            {
-                                tempsum->SetHomePosition(DalforsPos[2]);
-                                tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                            }
-                            if (Creature* tempsum = DoSummon(NPC_HIDEOUS_PLAGEBRINGER, Mason2Pos[0]))
-                            {
-                                tempsum->SetHomePosition(DalforsPos[2]);
-                                tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                            }
-                        }
-                        else
-                        {
-                            if (Creature* tempsum = DoSummon(NPC_REANIMATED_CAPTAIN, Mason1Pos[0]))
-                            {
-                                tempsum->SetHomePosition(DalforsPos[2]);
-                                tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                            }
-                            if (Creature* tempsum = DoSummon(NPC_REANIMATED_CAPTAIN, Mason2Pos[0]))
-                            {
-                                tempsum->SetHomePosition(DalforsPos[2]);
-                                tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                            }
-                        }
-
-                        PhaseCount++;
-
-                        if (PhaseCount < 8)
-                            events.ScheduleEvent(EVENT_WAVE_SPAWN, urand(10000, 20000));
-                        else
-                            events.ScheduleEvent(EVENT_HALOF, urand(10000, 20000));
-                    }
-                    break;
-                case EVENT_HALOF:
+                {
+                    if (PhaseCount == 3)
                     {
                         if (Creature* LK = GetClosestCreatureWithEntry(me, NPC_LK, 100))
-                            LK->AI()->Talk(LK_TALK_4);
-                        if (Creature* tempsum = DoSummon(NPC_SCOURGE_DRUDGE, Mason1Pos[0]))
-                        {
-                            tempsum->SetHomePosition(DalforsPos[2]);
-                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                        }
-                        if (Creature* tempsum = DoSummon(NPC_SCOURGE_DRUDGE, Mason2Pos[0]))
-                        {
-                            tempsum->SetHomePosition(DalforsPos[2]);
-                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                        }
-                        if (Creature* tempsum = DoSummon(NPC_HALOF_THE_DEATHBRINGER, DalforsPos[0]))
-                        {
-                            HalofSpawned = true;
-                            guidHalof = tempsum->GetGUID();
-                            tempsum->SetHomePosition(DalforsPos[2]);
-                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                        }
+                            LK->AI()->Talk(LK_TALK_2);
                     }
-                    break;
-                case EVENT_ENDED:
+                    else if (PhaseCount == 6)
                     {
-                        Summons.DespawnAll();
-                        me->DespawnOrUnsummon();
+                        if (Creature* LK = GetClosestCreatureWithEntry(me, NPC_LK, 100))
+                            LK->AI()->Talk(LK_TALK_3);
                     }
-                    break;
+                    if (Creature* tempsum = DoSummon(NPC_SCOURGE_DRUDGE, Mason3Pos[0]))
+                    {
+                        tempsum->SetHomePosition(DalforsPos[2]);
+                        tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
+                    }
+                    if (urand(0, 1) == 0)
+                    {
+                        if (Creature* tempsum = DoSummon(NPC_HIDEOUS_PLAGEBRINGER, Mason1Pos[0]))
+                        {
+                            tempsum->SetHomePosition(DalforsPos[2]);
+                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
+                        }
+                        if (Creature* tempsum = DoSummon(NPC_HIDEOUS_PLAGEBRINGER, Mason2Pos[0]))
+                        {
+                            tempsum->SetHomePosition(DalforsPos[2]);
+                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
+                        }
+                    }
+                    else
+                    {
+                        if (Creature* tempsum = DoSummon(NPC_REANIMATED_CAPTAIN, Mason1Pos[0]))
+                        {
+                            tempsum->SetHomePosition(DalforsPos[2]);
+                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
+                        }
+                        if (Creature* tempsum = DoSummon(NPC_REANIMATED_CAPTAIN, Mason2Pos[0]))
+                        {
+                            tempsum->SetHomePosition(DalforsPos[2]);
+                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
+                        }
+                    }
+
+                    PhaseCount++;
+
+                    if (PhaseCount < 8)
+                        events.ScheduleEvent(EVENT_WAVE_SPAWN, urand(10000, 20000));
+                    else
+                        events.ScheduleEvent(EVENT_HALOF, urand(10000, 20000));
+                }
+                break;
+                case EVENT_HALOF:
+                {
+                    if (Creature* LK = GetClosestCreatureWithEntry(me, NPC_LK, 100))
+                        LK->AI()->Talk(LK_TALK_4);
+                    if (Creature* tempsum = DoSummon(NPC_SCOURGE_DRUDGE, Mason1Pos[0]))
+                    {
+                        tempsum->SetHomePosition(DalforsPos[2]);
+                        tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
+                    }
+                    if (Creature* tempsum = DoSummon(NPC_SCOURGE_DRUDGE, Mason2Pos[0]))
+                    {
+                        tempsum->SetHomePosition(DalforsPos[2]);
+                        tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
+                    }
+                    if (Creature* tempsum = DoSummon(NPC_HALOF_THE_DEATHBRINGER, DalforsPos[0]))
+                    {
+                        HalofSpawned = true;
+                        guidHalof = tempsum->GetGUID();
+                        tempsum->SetHomePosition(DalforsPos[2]);
+                        tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
+                    }
+                }
+                break;
+                case EVENT_ENDED:
+                {
+                    Summons.DespawnAll();
+                    me->DespawnOrUnsummon();
+                }
+                break;
             }
 
             if (PhaseCount == 8)

@@ -138,19 +138,19 @@ public:
                     SaveToDB();
                     break;
                 case DATA_BOMBS_PLACED:
-                    {
-                        if (_barrelCount >= 5 || _encounterProgress > ENCOUNTER_PROGRESS_NONE)
-                            return;
+                {
+                    if (_barrelCount >= 5 || _encounterProgress > ENCOUNTER_PROGRESS_NONE)
+                        return;
 
-                        DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, ++_barrelCount);
-                        if (_barrelCount == 5)
-                        {
-                            _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 4000);
-                            _events.ScheduleEvent(EVENT_FINAL_BARRELS_FLAME, 12000);
-                            _events.ScheduleEvent(EVENT_SUMMON_LIEUTENANT, 18000);
-                        }
-                        break;
+                    DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, ++_barrelCount);
+                    if (_barrelCount == 5)
+                    {
+                        _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 4000);
+                        _events.ScheduleEvent(EVENT_FINAL_BARRELS_FLAME, 12000);
+                        _events.ScheduleEvent(EVENT_SUMMON_LIEUTENANT, 18000);
                     }
+                    break;
+                }
                 case DATA_THRALL_ADD_FLAG:
                     if (Creature* thrall = instance->GetCreature(_thrallGUID))
                         thrall->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -182,87 +182,87 @@ public:
             switch (_events.ExecuteEvent())
             {
                 case EVENT_INITIAL_BARRELS_FLAME:
-                    {
-                        instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
-                        instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
+                {
+                    instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
+                    instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
 
-                        for (std::set<uint64>::const_iterator itr = _prisonersSet.begin(); itr != _prisonersSet.end(); ++itr)
-                            if (Creature* orc = instance->GetCreature(*itr))
-                            {
-                                uint8 index = orc->GetDistance(instancePositions[0]) < 80.0f ? 0 : 1;
-                                Position pos(instancePositions[index]);
-                                orc->MovePosition(pos, frand(1.0f, 3.0f) + 15.0f * (float)rand_norm(), (float)rand_norm() * static_cast<float>(2 * M_PI));
-                                orc->GetMotionMaster()->MovePoint(1, pos);
-                                orc->SetStandState(UNIT_STAND_STATE_STAND);
-                            }
+                    for (std::set<uint64>::const_iterator itr = _prisonersSet.begin(); itr != _prisonersSet.end(); ++itr)
+                        if (Creature* orc = instance->GetCreature(*itr))
+                        {
+                            uint8 index = orc->GetDistance(instancePositions[0]) < 80.0f ? 0 : 1;
+                            Position pos(instancePositions[index]);
+                            orc->MovePosition(pos, frand(1.0f, 3.0f) + 15.0f * (float)rand_norm(), (float)rand_norm() * static_cast<float>(2 * M_PI));
+                            orc->GetMotionMaster()->MovePoint(1, pos);
+                            orc->SetStandState(UNIT_STAND_STATE_STAND);
+                        }
 
-                        for (std::set<uint64>::const_iterator itr = _initalFlamesSet.begin(); itr != _initalFlamesSet.end(); ++itr)
-                            if (GameObject* gobject = instance->GetGameObject(*itr))
-                            {
-                                gobject->SetRespawnTime(0);
-                                gobject->UpdateObjectVisibility(true);
-                            }
-                        break;
-                    }
+                    for (std::set<uint64>::const_iterator itr = _initalFlamesSet.begin(); itr != _initalFlamesSet.end(); ++itr)
+                        if (GameObject* gobject = instance->GetGameObject(*itr))
+                        {
+                            gobject->SetRespawnTime(0);
+                            gobject->UpdateObjectVisibility(true);
+                        }
+                    break;
+                }
                 case EVENT_FINAL_BARRELS_FLAME:
-                    {
-                        instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
-                        instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
+                {
+                    instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
+                    instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
 
-                        if (_encounterProgress == ENCOUNTER_PROGRESS_NONE)
+                    if (_encounterProgress == ENCOUNTER_PROGRESS_NONE)
+                    {
+                        Map::PlayerList const& players = instance->GetPlayers();
+                        if (!players.isEmpty())
+                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                                if (Player* player = itr->GetSource())
+                                    player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER, 0);
+                    }
+
+                    for (std::set<uint64>::const_iterator itr = _finalFlamesSet.begin(); itr != _finalFlamesSet.end(); ++itr)
+                        if (GameObject* gobject = instance->GetGameObject(*itr))
                         {
-                            Map::PlayerList const& players = instance->GetPlayers();
-                            if (!players.isEmpty())
-                                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                    if (Player* player = itr->GetSource())
-                                        player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER, 0);
+                            gobject->SetRespawnTime(0);
+                            gobject->UpdateObjectVisibility(true);
                         }
 
-                        for (std::set<uint64>::const_iterator itr = _finalFlamesSet.begin(); itr != _finalFlamesSet.end(); ++itr)
-                            if (GameObject* gobject = instance->GetGameObject(*itr))
-                            {
-                                gobject->SetRespawnTime(0);
-                                gobject->UpdateObjectVisibility(true);
-                            }
+                    for (std::set<uint64>::const_iterator itr = _prisonersSet.begin(); itr != _prisonersSet.end(); ++itr)
+                        if (Creature* orc = instance->GetCreature(*itr))
+                            if (roll_chance_i(25))
+                                orc->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
 
-                        for (std::set<uint64>::const_iterator itr = _prisonersSet.begin(); itr != _prisonersSet.end(); ++itr)
-                            if (Creature* orc = instance->GetCreature(*itr))
-                                if (roll_chance_i(25))
-                                    orc->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-
-                        SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_BARRELS);
-                        DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, 0);
-                        break;
-                    }
+                    SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_BARRELS);
+                    DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, 0);
+                    break;
+                }
                 case EVENT_SUMMON_LIEUTENANT:
+                {
+                    instance->LoadGrid(instancePositions[2].GetPositionX(), instancePositions[2].GetPositionY());
+                    if (Creature* drake = instance->SummonCreature(NPC_LIEUTENANT_DRAKE, instancePositions[2]))
                     {
-                        instance->LoadGrid(instancePositions[2].GetPositionX(), instancePositions[2].GetPositionY());
-                        if (Creature* drake = instance->SummonCreature(NPC_LIEUTENANT_DRAKE, instancePositions[2]))
-                        {
-                            drake->AI()->Talk(0);
-                        }
-                        [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                        drake->AI()->Talk(0);
                     }
+                    [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                }
                 case EVENT_THRALL_REPOSITION:
+                {
+                    if (Creature* thrall = instance->GetCreature(_thrallGUID))
                     {
-                        if (Creature* thrall = instance->GetCreature(_thrallGUID))
+                        if (!thrall->IsAlive())
                         {
-                            if (!thrall->IsAlive())
-                            {
-                                ++_attemptsCount;
-                                EnsureGridLoaded();
-                                thrall->SetVisible(false);
-                                Reposition(thrall);
-                                thrall->setDeathState(DEAD);
-                                thrall->Respawn();
-                                thrall->SetVisible(true);
-                                SaveToDB();
-                            }
-                            else
-                                thrall->AI()->Reset();
+                            ++_attemptsCount;
+                            EnsureGridLoaded();
+                            thrall->SetVisible(false);
+                            Reposition(thrall);
+                            thrall->setDeathState(DEAD);
+                            thrall->Respawn();
+                            thrall->SetVisible(true);
+                            SaveToDB();
                         }
-                        break;
+                        else
+                            thrall->AI()->Reset();
                     }
+                    break;
+                }
             }
         }
 

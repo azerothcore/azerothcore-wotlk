@@ -531,15 +531,15 @@ public:
                     DoCast(me, SPELL_BERSERK2);
                     break;
                 case EVENT_SLIME_PUDDLE:
-                    {
-                        std::list<Unit*> targets;
-                        SelectTargetList(targets, 2, SELECT_TARGET_RANDOM, 0.0f, true);
-                        if (!targets.empty())
-                            for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                                me->CastSpell(*itr, SPELL_SLIME_PUDDLE_TRIGGER, true);
-                        events.ScheduleEvent(EVENT_SLIME_PUDDLE, 35000, EVENT_GROUP_ABILITIES);
-                    }
-                    break;
+                {
+                    std::list<Unit*> targets;
+                    SelectTargetList(targets, 2, SELECT_TARGET_RANDOM, 0.0f, true);
+                    if (!targets.empty())
+                        for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                            me->CastSpell(*itr, SPELL_SLIME_PUDDLE_TRIGGER, true);
+                    events.ScheduleEvent(EVENT_SLIME_PUDDLE, 35000, EVENT_GROUP_ABILITIES);
+                }
+                break;
                 case EVENT_UNSTABLE_EXPERIMENT:
                     Talk(EMOTE_UNSTABLE_EXPERIMENT);
                     me->CastSpell(me, SPELL_UNSTABLE_EXPERIMENT, false);
@@ -553,46 +553,46 @@ public:
                     switch (_phase)
                     {
                         case 2:
-                            {
-                                SpellInfo const* spell = sSpellMgr->GetSpellInfo(SPELL_CREATE_CONCOCTION);
-                                me->CastSpell(me, SPELL_CREATE_CONCOCTION, false);
-                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250);
-                                break;
-                            }
+                        {
+                            SpellInfo const* spell = sSpellMgr->GetSpellInfo(SPELL_CREATE_CONCOCTION);
+                            me->CastSpell(me, SPELL_CREATE_CONCOCTION, false);
+                            events.ScheduleEvent(EVENT_PHASE_TRANSITION, sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250);
+                            break;
+                        }
                         case 3:
-                            {
-                                SpellInfo const* spell = sSpellMgr->GetSpellInfo(SPELL_GUZZLE_POTIONS);
-                                me->CastSpell(me, SPELL_GUZZLE_POTIONS, false);
-                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250);
-                                break;
-                            }
+                        {
+                            SpellInfo const* spell = sSpellMgr->GetSpellInfo(SPELL_GUZZLE_POTIONS);
+                            me->CastSpell(me, SPELL_GUZZLE_POTIONS, false);
+                            events.ScheduleEvent(EVENT_PHASE_TRANSITION, sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250);
+                            break;
+                        }
                         default:
                             break;
                     }
                     break;
                 case EVENT_PHASE_TRANSITION:
+                {
+                    switch (_phase)
                     {
-                        switch (_phase)
-                        {
-                            case 2:
-                                if (Creature* face = me->FindNearestCreature(NPC_TEAR_GAS_TARGET_STALKER, 50.0f))
-                                    me->SetFacingToObject(face);
-                                me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                Talk(SAY_TRANSFORM_1);
-                                events.ScheduleEvent(EVENT_RESUME_ATTACK, 5500);
-                                break;
-                            case 3:
-                                if (Creature* face = me->FindNearestCreature(NPC_TEAR_GAS_TARGET_STALKER, 50.0f))
-                                    me->SetFacingToObject(face);
-                                me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                Talk(SAY_TRANSFORM_2);
-                                events.ScheduleEvent(EVENT_RESUME_ATTACK, 8500);
-                                break;
-                            default:
-                                break;
-                        }
+                        case 2:
+                            if (Creature* face = me->FindNearestCreature(NPC_TEAR_GAS_TARGET_STALKER, 50.0f))
+                                me->SetFacingToObject(face);
+                            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            Talk(SAY_TRANSFORM_1);
+                            events.ScheduleEvent(EVENT_RESUME_ATTACK, 5500);
+                            break;
+                        case 3:
+                            if (Creature* face = me->FindNearestCreature(NPC_TEAR_GAS_TARGET_STALKER, 50.0f))
+                                me->SetFacingToObject(face);
+                            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            Talk(SAY_TRANSFORM_2);
+                            events.ScheduleEvent(EVENT_RESUME_ATTACK, 8500);
+                            break;
+                        default:
+                            break;
                     }
-                    break;
+                }
+                break;
                 case EVENT_RESUME_ATTACK:
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetStandState(UNIT_STAND_STATE_STAND);

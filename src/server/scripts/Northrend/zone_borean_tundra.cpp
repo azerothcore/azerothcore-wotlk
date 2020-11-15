@@ -1002,47 +1002,47 @@ public:
                 switch (me->GetEntry())
                 {
                     case NPC_WARMAGE_HOLLISTER:
+                    {
+                        if (!orbList.empty())
                         {
-                            if (!orbList.empty())
+                            for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
                             {
-                                for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
-                                {
-                                    if (Creature* pOrb = *itr)
-                                        if (pOrb->GetPositionY() > 6680)
-                                            DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
-                                }
+                                if (Creature* pOrb = *itr)
+                                    if (pOrb->GetPositionY() > 6680)
+                                        DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
                             }
-                            m_uiTimer = urand(90000, 120000);
                         }
-                        break;
+                        m_uiTimer = urand(90000, 120000);
+                    }
+                    break;
                     case NPC_WARMAGE_CALANDRA:
+                    {
+                        if (!orbList.empty())
                         {
-                            if (!orbList.empty())
+                            for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
                             {
-                                for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
-                                {
-                                    if (Creature* pOrb = *itr)
-                                        if ((pOrb->GetPositionY() < 6680) && (pOrb->GetPositionY() > 6630))
-                                            DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
-                                }
+                                if (Creature* pOrb = *itr)
+                                    if ((pOrb->GetPositionY() < 6680) && (pOrb->GetPositionY() > 6630))
+                                        DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
                             }
-                            m_uiTimer = urand(90000, 120000);
                         }
-                        break;
+                        m_uiTimer = urand(90000, 120000);
+                    }
+                    break;
                     case NPC_WARMAGE_WATKINS:
+                    {
+                        if (!orbList.empty())
                         {
-                            if (!orbList.empty())
+                            for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
                             {
-                                for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
-                                {
-                                    if (Creature* pOrb = *itr)
-                                        if (pOrb->GetPositionY() < 6630)
-                                            DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
-                                }
+                                if (Creature* pOrb = *itr)
+                                    if (pOrb->GetPositionY() < 6630)
+                                        DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
                             }
-                            m_uiTimer = urand(90000, 120000);
                         }
-                        break;
+                        m_uiTimer = urand(90000, 120000);
+                    }
+                    break;
                 }
             }
             else m_uiTimer -= uiDiff;

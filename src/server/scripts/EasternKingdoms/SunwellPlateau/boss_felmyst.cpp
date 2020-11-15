@@ -267,7 +267,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_RESTORE_COMBAT:
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -328,17 +328,17 @@ public:
                     me->CastSpell(me, SPELL_SUMMON_DEMONIC_VAPOR, true);
                     break;
                 case EVENT_FLIGHT_BREATH1:
-                    {
-                        Position pos = {1447.0f + urand(0, 2) * 25.0f, 705.0f, 50.0f, 4.71f};
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_START1, pos, false, true);
-                        break;
-                    }
+                {
+                    Position pos = {1447.0f + urand(0, 2) * 25.0f, 705.0f, 50.0f, 4.71f};
+                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_START1, pos, false, true);
+                    break;
+                }
                 case EVENT_FLIGHT_BREATH2:
-                    {
-                        Position pos = {1447.0f + urand(0, 2) * 25.0f, 515.0f, 50.0f, 1.57f};
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_START2, pos, false, true);
-                        break;
-                    }
+                {
+                    Position pos = {1447.0f + urand(0, 2) * 25.0f, 515.0f, 50.0f, 1.57f};
+                    me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_START2, pos, false, true);
+                    break;
+                }
                 case EVENT_FLIGHT_EMOTE:
                     Talk(EMOTE_BREATH);
                     break;

@@ -206,16 +206,16 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_CHECK_PLAYER:
+                {
+                    Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
+                    if (!player || me->GetDistance2d(player) > 100.0f)
                     {
-                        Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
-                        if (!player || me->GetDistance2d(player) > 100.0f)
-                        {
-                            EnterEvadeMode();
-                            return;
-                        }
-                        events.RepeatEvent(2000);
-                        break;
+                        EnterEvadeMode();
+                        return;
                     }
+                    events.RepeatEvent(2000);
+                    break;
+                }
                 case EVENT_SUMMON_ARCHERS:
                     SummonArchers();
                     break;

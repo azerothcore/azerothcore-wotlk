@@ -138,26 +138,26 @@ public:
             switch (type)
             {
                 case TYPE_AEONUS:
-                    {
-                        encounters[type] = DONE;
-                        SaveToDB();
+                {
+                    encounters[type] = DONE;
+                    SaveToDB();
 
-                        if (Creature* medivh = instance->GetCreature(_medivhGUID))
-                            medivh->AI()->DoAction(ACTION_OUTRO);
+                    if (Creature* medivh = instance->GetCreature(_medivhGUID))
+                        medivh->AI()->DoAction(ACTION_OUTRO);
 
-                        Map::PlayerList const& players = instance->GetPlayers();
-                        if (!players.isEmpty())
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                if (Player* player = itr->GetSource())
-                                {
-                                    if (player->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
-                                        player->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);
+                    Map::PlayerList const& players = instance->GetPlayers();
+                    if (!players.isEmpty())
+                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                            if (Player* player = itr->GetSource())
+                            {
+                                if (player->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
+                                    player->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);
 
-                                    if (player->GetQuestStatus(QUEST_MASTER_TOUCH) == QUEST_STATUS_INCOMPLETE)
-                                        player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
-                                }
-                        break;
-                    }
+                                if (player->GetQuestStatus(QUEST_MASTER_TOUCH) == QUEST_STATUS_INCOMPLETE)
+                                    player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
+                            }
+                    break;
+                }
                 case TYPE_CHRONO_LORD_DEJA:
                 case TYPE_TEMPORUS:
                     encounters[type] = DONE;

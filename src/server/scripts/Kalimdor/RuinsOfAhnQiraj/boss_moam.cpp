@@ -74,21 +74,21 @@ public:
             switch (action)
             {
                 case ACTION_STONE_PHASE_END:
-                    {
-                        me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
-                        events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-                        _isStonePhase = false;
-                        break;
-                    }
+                {
+                    me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
+                    events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
+                    _isStonePhase = false;
+                    break;
+                }
                 case ACTION_STONE_PHASE_START:
-                    {
-                        DoCast(me, SPELL_SUMMON_MANA_FIEND_1);
-                        DoCast(me, SPELL_SUMMON_MANA_FIEND_2);
-                        DoCast(me, SPELL_SUMMON_MANA_FIEND_3);
-                        DoCast(me, SPELL_ENERGIZE);
-                        events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
-                        break;
-                    }
+                {
+                    DoCast(me, SPELL_SUMMON_MANA_FIEND_1);
+                    DoCast(me, SPELL_SUMMON_MANA_FIEND_2);
+                    DoCast(me, SPELL_SUMMON_MANA_FIEND_3);
+                    DoCast(me, SPELL_ENERGIZE);
+                    events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
+                    break;
+                }
                 default:
                     break;
             }
@@ -128,22 +128,22 @@ public:
                         DoAction(ACTION_STONE_PHASE_START);
                         break;
                     case EVENT_DRAIN_MANA:
+                    {
+                        std::list<Unit*> targetList;
                         {
-                            std::list<Unit*> targetList;
-                            {
-                                const std::list<HostileReference*>& threatlist = me->getThreatManager().getThreatList();
-                                for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-                                    if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER && (*itr)->getTarget()->getPowerType() == POWER_MANA)
-                                        targetList.push_back((*itr)->getTarget());
-                            }
+                            const std::list<HostileReference*>& threatlist = me->getThreatManager().getThreatList();
+                            for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+                                if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER && (*itr)->getTarget()->getPowerType() == POWER_MANA)
+                                    targetList.push_back((*itr)->getTarget());
+                        }
 
-                            acore::Containers::RandomResizeList(targetList, 5);
+                        acore::Containers::RandomResizeList(targetList, 5);
 
-                            for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
-                                DoCast(*itr, SPELL_DRAIN_MANA);
+                        for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+                            DoCast(*itr, SPELL_DRAIN_MANA);
 
-                            events.ScheduleEvent(EVENT_DRAIN_MANA, urand(5000, 15000));
-                            break;
+                        events.ScheduleEvent(EVENT_DRAIN_MANA, urand(5000, 15000));
+                        break;
                         }/*
                         case EVENT_WIDE_SLASH:
                             DoCast(me, SPELL_WIDE_SLASH);

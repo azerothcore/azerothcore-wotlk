@@ -182,7 +182,7 @@ public:
                 {
                     me->RemoveAurasDueToSpell(67541);
                     me->GetMotionMaster()->MoveCharge(11779.30f, -7065.43f, 24.92f, me->GetSpeed(MOVE_RUN), EVENT_CHARGE);
-                    switch(summon->GetEntry())
+                    switch (summon->GetEntry())
                     {
                         case NPC_SCOURGE_ZOMBIE:
                             events.ScheduleEvent(EVENT_SPAWN_WAVE_2, 3000);
@@ -251,33 +251,33 @@ public:
                             c->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                     break;
                 case EVENT_SOLDIERS_RUN_AWAY:
+                {
+                    uint8 count = 0;
+                    for (SummonList::iterator itr = summons.begin(); itr != summons.end();)
                     {
-                        uint8 count = 0;
-                        for (SummonList::iterator itr = summons.begin(); itr != summons.end();)
+                        ++count;
+                        if (Creature* c = ObjectAccessor::GetCreature(*me, *itr))
                         {
-                            ++count;
-                            if (Creature* c = ObjectAccessor::GetCreature(*me, *itr))
+                            c->SetWalk(false);
+                            c->GetMotionMaster()->MovePoint(0, 11863.35f, -7073.44f, 27.40f);
+                        }
+                        SummonList::iterator itr2 = itr++;
+                        summons.erase(itr2);
+                        if (count >= 5)
+                        {
+                            if (!summons.empty())
                             {
-                                c->SetWalk(false);
-                                c->GetMotionMaster()->MovePoint(0, 11863.35f, -7073.44f, 27.40f);
+                                events.RepeatEvent(5000);
+                                return;
                             }
-                            SummonList::iterator itr2 = itr++;
-                            summons.erase(itr2);
-                            if (count >= 5)
+                            else
                             {
-                                if (!summons.empty())
-                                {
-                                    events.RepeatEvent(5000);
-                                    return;
-                                }
-                                else
-                                {
-                                    return;
-                                }
+                                return;
                             }
                         }
                     }
-                    break;
+                }
+                break;
                 case EVENT_GO_FIGHTPOINT:
                     me->SetWalk(true);
                     me->GetMotionMaster()->MovePoint(0, 11779.30f, -7065.43f, 24.92f);
@@ -306,52 +306,52 @@ public:
                         {
                             // emerge cast tr false 66947
                             case EVENT_SPAWN_WAVE_1:
-                                {
-                                    Position spawnPos;
-                                    c->GetPosition(&spawnPos);
-                                    spawnPos.m_orientation = 5.80f;
-                                    spawnPos.m_positionX += 5.0f * cos(4.5f);
-                                    spawnPos.m_positionY += 5.0f * sin(4.5f);
-                                    for (uint8 i = 0; i < 5; ++i)
-                                        if (me->SummonCreature(NPC_SCOURGE_ZOMBIE, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
-                                        {
-                                            spawnPos.m_positionX += 2.5f * cos(4.5f);
-                                            spawnPos.m_positionY += 2.5f * sin(4.5f);
-                                        }
-                                }
-                                break;
+                            {
+                                Position spawnPos;
+                                c->GetPosition(&spawnPos);
+                                spawnPos.m_orientation = 5.80f;
+                                spawnPos.m_positionX += 5.0f * cos(4.5f);
+                                spawnPos.m_positionY += 5.0f * sin(4.5f);
+                                for (uint8 i = 0; i < 5; ++i)
+                                    if (me->SummonCreature(NPC_SCOURGE_ZOMBIE, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
+                                    {
+                                        spawnPos.m_positionX += 2.5f * cos(4.5f);
+                                        spawnPos.m_positionY += 2.5f * sin(4.5f);
+                                    }
+                            }
+                            break;
                             case EVENT_SPAWN_WAVE_2:
-                                {
-                                    Position spawnPos;
-                                    c->GetPosition(&spawnPos);
-                                    spawnPos.m_orientation = 5.80f;
-                                    spawnPos.m_positionX += 7.0f * cos(4.0f);
-                                    spawnPos.m_positionY += 7.0f * sin(4.0f);
-                                    for (uint8 i = 0; i < 3; ++i)
-                                        if (Creature* s = me->SummonCreature(NPC_GHOUL_INVADER, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
-                                        {
-                                            s->CastSpell(s, 66947, false); // emerge effect
-                                            spawnPos.m_positionX += 4.0f * cos(4.5f);
-                                            spawnPos.m_positionY += 4.0f * sin(4.5f);
-                                        }
-                                }
-                                break;
+                            {
+                                Position spawnPos;
+                                c->GetPosition(&spawnPos);
+                                spawnPos.m_orientation = 5.80f;
+                                spawnPos.m_positionX += 7.0f * cos(4.0f);
+                                spawnPos.m_positionY += 7.0f * sin(4.0f);
+                                for (uint8 i = 0; i < 3; ++i)
+                                    if (Creature* s = me->SummonCreature(NPC_GHOUL_INVADER, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
+                                    {
+                                        s->CastSpell(s, 66947, false); // emerge effect
+                                        spawnPos.m_positionX += 4.0f * cos(4.5f);
+                                        spawnPos.m_positionY += 4.0f * sin(4.5f);
+                                    }
+                            }
+                            break;
                             case EVENT_SPAWN_WAVE_3:
-                                {
-                                    Position spawnPos;
-                                    c->GetPosition(&spawnPos);
-                                    spawnPos.m_orientation = 5.80f;
-                                    spawnPos.m_positionX += 8.0f * cos(4.0f);
-                                    spawnPos.m_positionY += 8.0f * sin(4.0f);
-                                    for (uint8 i = 0; i < 3; ++i)
-                                        if (Creature* s = me->SummonCreature(NPC_CRYPT_RAIDER, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
-                                        {
-                                            s->CastSpell(s, 66947, false); // emerge effect
-                                            spawnPos.m_positionX += 4.0f * cos(4.5f);
-                                            spawnPos.m_positionY += 4.0f * sin(4.5f);
-                                        }
-                                }
-                                break;
+                            {
+                                Position spawnPos;
+                                c->GetPosition(&spawnPos);
+                                spawnPos.m_orientation = 5.80f;
+                                spawnPos.m_positionX += 8.0f * cos(4.0f);
+                                spawnPos.m_positionY += 8.0f * sin(4.0f);
+                                for (uint8 i = 0; i < 3; ++i)
+                                    if (Creature* s = me->SummonCreature(NPC_CRYPT_RAIDER, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
+                                    {
+                                        s->CastSpell(s, 66947, false); // emerge effect
+                                        spawnPos.m_positionX += 4.0f * cos(4.5f);
+                                        spawnPos.m_positionY += 4.0f * sin(4.5f);
+                                    }
+                            }
+                            break;
                         }
                     }
                     events.ScheduleEvent(EVENT_SUMMONS_ATTACK, 3000);

@@ -254,11 +254,11 @@ public:
                     events.DelayEvents(5000, 0);
                     break;
                 case EVENT_RESPAWN_FERAL_DEFENDER:
-                    {
-                        EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
-                        summons.DoAction(ACTION_FERAL_RESPAWN, pred);
-                        break;
-                    }
+                {
+                    EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
+                    summons.DoAction(ACTION_FERAL_RESPAWN, pred);
+                    break;
+                }
                 case EVENT_ENRAGE:
                     me->MonsterTextEmote("You waste my time!", 0);
                     me->PlayDirectSound(SOUND_BERSERK);

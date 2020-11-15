@@ -142,12 +142,12 @@ public:
                     me->CastSpell(me, SPELL_SPRINT, true);
                     break;
                 case EVENT_MOVE_TO_NEXT_POINT:
-                    {
-                        float x = 210 + frand(0.0f, 35.0f);
-                        float y = -65.0f - frand(0.0f, 35.0f);
-                        me->GetMotionMaster()->MovePoint(1, x, y, me->GetPositionZ());
-                        break;
-                    }
+                {
+                    float x = 210 + frand(0.0f, 35.0f);
+                    float y = -65.0f - frand(0.0f, 35.0f);
+                    me->GetMotionMaster()->MovePoint(1, x, y, me->GetPositionZ());
+                    break;
+                }
                 case EVENT_FINISH_BLADE_DANCE:
                     events.SetPhase(0);
                     me->GetMotionMaster()->Clear();

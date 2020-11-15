@@ -148,73 +148,73 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_PRINCE_BLOODTHIRST:
-                    {
-                        me->CastSpell(me->GetVictim(), SPELL_BLOODTHIRST, false);
-                        events.RepeatEvent(10000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me->GetVictim(), SPELL_BLOODTHIRST, false);
+                    events.RepeatEvent(10000);
+                    break;
+                }
                 case EVENT_PRINCE_FLAME_SPHERES:
+                {
+                    me->CastSpell(me->GetVictim(), SPELL_CONJURE_FLAME_SPHERE, false);
+                    events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
+                    Creature* cr;
+                    if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * IN_MILLISECONDS)))
+                        summons.Summon(cr);
+
+                    if (me->GetMap()->IsHeroic())
                     {
-                        me->CastSpell(me->GetVictim(), SPELL_CONJURE_FLAME_SPHERE, false);
-                        events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
-                        Creature* cr;
-                        if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * IN_MILLISECONDS)))
+                        if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * IN_MILLISECONDS)))
                             summons.Summon(cr);
 
-                        if (me->GetMap()->IsHeroic())
-                        {
-                            if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * IN_MILLISECONDS)))
-                                summons.Summon(cr);
-
-                            if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * IN_MILLISECONDS)))
-                                summons.Summon(cr);
-                        }
-                        events.RepeatEvent(15000);
-                        break;
+                        if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * IN_MILLISECONDS)))
+                            summons.Summon(cr);
                     }
+                    events.RepeatEvent(15000);
+                    break;
+                }
                 case EVENT_PRINCE_VANISH:
+                {
+                    //Count alive players
+                    uint8 count = 0;
+                    Unit* pTarget;
+                    std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
+                    for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
                     {
-                        //Count alive players
-                        uint8 count = 0;
-                        Unit* pTarget;
-                        std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
-                        for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
-                        {
-                            pTarget = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                            if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
-                                count++;
-                        }
-                        //He only vanishes if there are 3 or more alive players
-                        if (count > 2)
-                        {
-                            Talk(SAY_VANISH);
-                            me->CastSpell(me, SPELL_VANISH, false);
-
-                            events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
-                            events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
-                            events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499);
-                            if (Unit* pEmbraceTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                                vanishTarget = pEmbraceTarget->GetGUID();
-                        }
-                        break;
+                        pTarget = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
+                        if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
+                            count++;
                     }
+                    //He only vanishes if there are 3 or more alive players
+                    if (count > 2)
+                    {
+                        Talk(SAY_VANISH);
+                        me->CastSpell(me, SPELL_VANISH, false);
+
+                        events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
+                        events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
+                        events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499);
+                        if (Unit* pEmbraceTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            vanishTarget = pEmbraceTarget->GetGUID();
+                    }
+                    break;
+                }
                 case EVENT_PRINCE_VANISH_RUN:
+                {
+                    if (Unit* vT = ObjectAccessor::GetUnit(*me, vanishTarget))
                     {
-                        if (Unit* vT = ObjectAccessor::GetUnit(*me, vanishTarget))
-                        {
-                            me->UpdatePosition(vT->GetPositionX(), vT->GetPositionY(), vT->GetPositionZ(), me->GetAngle(vT), true);
-                            me->CastSpell(vT, SPELL_EMBRACE_OF_THE_VAMPYR, false);
-                            me->RemoveAura(SPELL_VANISH);
-                        }
+                        me->UpdatePosition(vT->GetPositionX(), vT->GetPositionY(), vT->GetPositionZ(), me->GetAngle(vT), true);
+                        me->CastSpell(vT, SPELL_EMBRACE_OF_THE_VAMPYR, false);
+                        me->RemoveAura(SPELL_VANISH);
+                    }
 
-                        events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20000);
-                        break;
-                    }
+                    events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20000);
+                    break;
+                }
                 case EVENT_PRINCE_RESCHEDULE:
-                    {
-                        ScheduleEvents();
-                        break;
-                    }
+                {
+                    ScheduleEvents();
+                    break;
+                }
             }
 
             if (me->IsVisible())

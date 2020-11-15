@@ -348,22 +348,22 @@ public:
                 SendGossipMenuFor(player, 9229, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
+            {
+                if (!player->HasItemCount(24573))
                 {
-                    if (!player->HasItemCount(24573))
+                    ItemPosCountVec dest;
+                    uint32 itemId = 24573;
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1, nullptr);
+                    if (msg == EQUIP_ERR_OK)
                     {
-                        ItemPosCountVec dest;
-                        uint32 itemId = 24573;
-                        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1, nullptr);
-                        if (msg == EQUIP_ERR_OK)
-                        {
-                            player->StoreNewItem(dest, itemId, true);
-                        }
-                        else
-                            player->SendEquipError(msg, nullptr, nullptr, itemId);
+                        player->StoreNewItem(dest, itemId, true);
                     }
-                    SendGossipMenuFor(player, 9231, creature->GetGUID());
-                    break;
+                    else
+                        player->SendEquipError(msg, nullptr, nullptr, itemId);
                 }
+                SendGossipMenuFor(player, 9231, creature->GetGUID());
+                break;
+            }
         }
         return true;
     }

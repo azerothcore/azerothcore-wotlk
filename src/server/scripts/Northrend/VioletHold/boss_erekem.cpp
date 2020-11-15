@@ -104,7 +104,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -147,14 +147,14 @@ public:
                     events.RepeatEvent(urand(15000, 25000));
                     break;
                 case EVENT_SPELL_STORMSTRIKE:
-                    {
-                        Creature* pGuard1 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_1_GUID));
-                        Creature* pGuard2 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_2_GUID));
-                        if (pGuard1 && !pGuard1->IsAlive() && pGuard2 && !pGuard2->IsAlive()) // both dead
-                            me->CastSpell(me->GetVictim(), SPELL_STORMSTRIKE, false);
-                        events.RepeatEvent(3000);
-                    }
-                    break;
+                {
+                    Creature* pGuard1 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_1_GUID));
+                    Creature* pGuard2 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_2_GUID));
+                    if (pGuard1 && !pGuard1->IsAlive() && pGuard2 && !pGuard2->IsAlive()) // both dead
+                        me->CastSpell(me->GetVictim(), SPELL_STORMSTRIKE, false);
+                    events.RepeatEvent(3000);
+                }
+                break;
             }
 
             DoMeleeAttackIfReady();
@@ -269,7 +269,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

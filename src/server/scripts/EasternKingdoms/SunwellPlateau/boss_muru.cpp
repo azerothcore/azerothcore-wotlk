@@ -294,19 +294,19 @@ public:
                     me->CastSpell(me, SPELL_BLACK_HOLE_PASSIVE, true);
                     break;
                 case EVENT_SWITCH_BLACK_HOLE_TARGET:
-                    {
-                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                            if (Player* player = itr->GetSource())
-                                if (me->GetDistance2d(player) < 15.0f && player->GetPositionZ() < 72.0f && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
-                                {
-                                    me->GetMotionMaster()->MovePoint(0, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), false, true);
-                                    events.ScheduleEvent(EVENT_SWITCH_BLACK_HOLE_TARGET, 5000);
-                                    return;
-                                }
-                        events.ScheduleEvent(EVENT_SWITCH_BLACK_HOLE_TARGET, 500);
-                        break;
-                    }
+                {
+                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                        if (Player* player = itr->GetSource())
+                            if (me->GetDistance2d(player) < 15.0f && player->GetPositionZ() < 72.0f && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
+                            {
+                                me->GetMotionMaster()->MovePoint(0, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), false, true);
+                                events.ScheduleEvent(EVENT_SWITCH_BLACK_HOLE_TARGET, 5000);
+                                return;
+                            }
+                    events.ScheduleEvent(EVENT_SWITCH_BLACK_HOLE_TARGET, 500);
+                    break;
+                }
             }
         }
     };

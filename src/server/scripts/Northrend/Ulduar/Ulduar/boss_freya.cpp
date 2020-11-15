@@ -490,7 +490,7 @@ public:
             events.ScheduleEvent(EVENT_FREYA_BERSERK, 600000);
             events.SetPhase(EVENT_PHASE_ADDS);
 
-            if( !m_pInstance )
+            if ( !m_pInstance )
                 return;
 
             if (m_pInstance->GetData(TYPE_FREYA) != DONE)
@@ -574,24 +574,24 @@ public:
                     events.RepeatEvent(60000);
                     break;
                 case EVENT_FREYA_LIFEBINDER:
+                {
+                    events.RepeatEvent(45000);
+                    float x, y, z;
+                    for (uint8 i = 0; i < 10; ++i)
                     {
-                        events.RepeatEvent(45000);
-                        float x, y, z;
-                        for (uint8 i = 0; i < 10; ++i)
+                        x = me->GetPositionX() + urand(7, 25);
+                        y = me->GetPositionY() + urand(7, 25);
+                        z = me->GetMap()->GetHeight(x, y, MAX_HEIGHT) + 0.5f;
+                        if (me->IsWithinLOS(x, y, z))
                         {
-                            x = me->GetPositionX() + urand(7, 25);
-                            y = me->GetPositionY() + urand(7, 25);
-                            z = me->GetMap()->GetHeight(x, y, MAX_HEIGHT) + 0.5f;
-                            if (me->IsWithinLOS(x, y, z))
-                            {
-                                me->CastSpell(x, y, z, SPELL_SUMMON_LIFEBINDER, true);
-                                return;
-                            }
+                            me->CastSpell(x, y, z, SPELL_SUMMON_LIFEBINDER, true);
+                            return;
                         }
-
-                        me->CastSpell(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), SPELL_SUMMON_LIFEBINDER, true);
-                        break;
                     }
+
+                    me->CastSpell(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), SPELL_SUMMON_LIFEBINDER, true);
+                    break;
+                }
                 case EVENT_FREYA_SUNBEAM:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                         me->CastSpell(target, SPELL_SUNBEAM, false);
@@ -606,22 +606,22 @@ public:
                     _trioKilled = 0;
                     break;
                 case EVENT_FREYA_NATURE_BOMB:
+                {
+                    uint8 _minCount = me->GetMap()->Is25ManRaid() ? urand(7, 10) : urand(3, 4);
+                    Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
                     {
-                        uint8 _minCount = me->GetMap()->Is25ManRaid() ? urand(7, 10) : urand(3, 4);
-                        Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                        for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                        {
-                            if (me->GetDistance(itr->GetSource()) > 70 || !itr->GetSource()->IsAlive())
-                                continue;
+                        if (me->GetDistance(itr->GetSource()) > 70 || !itr->GetSource()->IsAlive())
+                            continue;
 
-                            me->CastSpell(itr->GetSource(), SPELL_NATURE_BOMB_FLIGHT, true);
+                        me->CastSpell(itr->GetSource(), SPELL_NATURE_BOMB_FLIGHT, true);
 
-                            if (!(--_minCount))
-                                break;
-                        }
-                        events.RepeatEvent(18000);
-                        break;
+                        if (!(--_minCount))
+                            break;
                     }
+                    events.RepeatEvent(18000);
+                    break;
+                }
                 case EVENT_FREYA_BERSERK:
                     me->MonsterYell("You have strayed too far, wasted too much time!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_BERSERK);

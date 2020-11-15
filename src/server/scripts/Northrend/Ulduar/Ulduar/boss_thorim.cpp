@@ -652,7 +652,7 @@ public:
         Player* GetArenaPlayer()
         {
             Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+            for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
                 if (Player* p = itr->GetSource())
                     if (p->GetPositionX() > 2085 && p->GetPositionX() < 2185 && p->GetPositionY() < -214 && p->GetPositionY() > -305 && p->IsAlive() && p->GetPositionZ() < 425)
                         return p;
@@ -680,26 +680,26 @@ public:
 
                     break;
                 case EVENT_THORIM_AGGRO2:
-                    {
-                        me->MonsterYell("I remember you... In the mountains... But you... what is this? Where am--", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_AGGRO2);
+                {
+                    me->MonsterYell("I remember you... In the mountains... But you... what is this? Where am--", LANG_UNIVERSAL, 0);
+                    me->PlayDirectSound(SOUND_AGGRO2);
 
-                        EntryCheckPredicate pred(NPC_SIF);
-                        summons.DoAction(ACTION_SIF_START_TALK, pred);
-                        break;
-                    }
+                    EntryCheckPredicate pred(NPC_SIF);
+                    summons.DoAction(ACTION_SIF_START_TALK, pred);
+                    break;
+                }
                 case EVENT_THORIM_START_PHASE1:
-                    {
-                        events.ScheduleEvent(EVENT_THORIM_STORMHAMMER, 8000, 0, EVENT_PHASE_START);
-                        events.ScheduleEvent(EVENT_THORIM_CHARGE_ORB, 14000, 0, EVENT_PHASE_START);
-                        events.ScheduleEvent(EVENT_THORIM_FILL_ARENA, 0, 0, EVENT_PHASE_START);
-                        events.ScheduleEvent(EVENT_THORIM_LIGHTNING_ORB, 5000, 0, EVENT_PHASE_START); // checked every 5 secs if there are players on arena
-                        events.ScheduleEvent(EVENT_THORIM_NOT_REACH_IN_TIME, 300000, 0, EVENT_PHASE_START);
+                {
+                    events.ScheduleEvent(EVENT_THORIM_STORMHAMMER, 8000, 0, EVENT_PHASE_START);
+                    events.ScheduleEvent(EVENT_THORIM_CHARGE_ORB, 14000, 0, EVENT_PHASE_START);
+                    events.ScheduleEvent(EVENT_THORIM_FILL_ARENA, 0, 0, EVENT_PHASE_START);
+                    events.ScheduleEvent(EVENT_THORIM_LIGHTNING_ORB, 5000, 0, EVENT_PHASE_START); // checked every 5 secs if there are players on arena
+                    events.ScheduleEvent(EVENT_THORIM_NOT_REACH_IN_TIME, 300000, 0, EVENT_PHASE_START);
 
-                        EntryCheckPredicate pred(NPC_SIF);
-                        summons.DoAction(ACTION_SIF_START_DOMINION, pred);
-                        break;
-                    }
+                    EntryCheckPredicate pred(NPC_SIF);
+                    summons.DoAction(ACTION_SIF_START_DOMINION, pred);
+                    break;
+                }
                 case EVENT_THORIM_STORMHAMMER:
                     me->CastCustomSpell(SPELL_STORMHAMMER, SPELLVALUE_MAX_TARGETS, 1, me->GetVictim(), false);
                     events.RepeatEvent(16000);
@@ -711,23 +711,23 @@ public:
                     PlaySpecial();
                     break;
                 case EVENT_THORIM_LIGHTNING_ORB:
+                {
+                    if (GetArenaPlayer())
                     {
-                        if (GetArenaPlayer())
-                        {
-                            // Player found, repeat and return
-                            events.RepeatEvent(5000);
-                            return;
-                        }
-
-                        // No players found
-                        me->MonsterYell("Failures! Weaklings!", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_AWIPE);
-                        me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-
-                        _isArenaEmpty = true;
-                        events.CancelEvent(EVENT_THORIM_NOT_REACH_IN_TIME);
-                        break;
+                        // Player found, repeat and return
+                        events.RepeatEvent(5000);
+                        return;
                     }
+
+                    // No players found
+                    me->MonsterYell("Failures! Weaklings!", LANG_UNIVERSAL, 0);
+                    me->PlayDirectSound(SOUND_AWIPE);
+                    me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+
+                    _isArenaEmpty = true;
+                    events.CancelEvent(EVENT_THORIM_NOT_REACH_IN_TIME);
+                    break;
+                }
                 case EVENT_THORIM_NOT_REACH_IN_TIME:
                     _isArenaEmpty = true;
                     events.CancelEvent(EVENT_THORIM_LIGHTNING_ORB);
@@ -1438,7 +1438,7 @@ public:
                 cr->SetPosition(_leftHand ? 2235.0f : 2221.0f, _nextTriggerPos, cr->GetPositionZ(), 0.0f);
                 cr->StopMovingOnCurrentPos();
             }
-            if( Creature* cr = ObjectAccessor::GetCreature(*me, _leftHand ? _triggerLeftGUID[1] : _triggerRightGUID[1]) )
+            if ( Creature* cr = ObjectAccessor::GetCreature(*me, _leftHand ? _triggerLeftGUID[1] : _triggerRightGUID[1]) )
             {
                 if (cast)
                     cr->CastSpell(cr, SPELL_RUNIC_SMASH_DAMAGE, true);
