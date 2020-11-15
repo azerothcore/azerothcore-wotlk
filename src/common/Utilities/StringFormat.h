@@ -9,7 +9,7 @@
 
 #include "fmt/printf.h"
 
-namespace ACORE
+namespace acore
 {
     /// Default AC string format function.
     template<typename Format, typename... Args>

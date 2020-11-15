@@ -18,18 +18,20 @@ ChannelMgr::~ChannelMgr()
 
 ChannelMgr* ChannelMgr::forTeam(TeamId teamId)
 {
+    static ChannelMgr allianceChannelMgr(TEAM_ALLIANCE);
+    static ChannelMgr hordeChannelMgr(TEAM_HORDE);
+
     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
-        return ACE_Singleton<AllianceChannelMgr, ACE_Null_Mutex>::instance();        // cross-faction
+        return &allianceChannelMgr;        // cross-faction
 
     if (teamId == TEAM_ALLIANCE)
-        return ACE_Singleton<AllianceChannelMgr, ACE_Null_Mutex>::instance();
+        return &allianceChannelMgr;
 
     if (teamId == TEAM_HORDE)
-        return ACE_Singleton<HordeChannelMgr, ACE_Null_Mutex>::instance();
+        return &hordeChannelMgr;
 
-    return NULL;
+    return nullptr;
 }
-
 
 void ChannelMgr::LoadChannels()
 {
@@ -68,16 +70,14 @@ void ChannelMgr::LoadChannels()
                 Field* banFields = banResult->Fetch();
                 if (!banFields)
                     break;
-                newChannel->AddBan(banFields[0].GetUInt32(), banFields[1].GetUInt32());     
-            }
-            while (banResult->NextRow());
+                newChannel->AddBan(banFields[0].GetUInt32(), banFields[1].GetUInt32());
+            } while (banResult->NextRow());
         }
 
-        if (channelDBId > ChannelMgr::_channelIdMax) 
+        if (channelDBId > ChannelMgr::_channelIdMax)
             ChannelMgr::_channelIdMax = channelDBId;
         ++count;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     sLog->outString(">> Loaded %u channels for %s in %ums", count, _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
@@ -118,7 +118,7 @@ Channel* ChannelMgr::GetChannel(std::string const& name, Player* player, bool pk
             player->GetSession()->SendPacket(&data);
         }
 
-        return NULL;
+        return nullptr;
     }
 
     return i->second;

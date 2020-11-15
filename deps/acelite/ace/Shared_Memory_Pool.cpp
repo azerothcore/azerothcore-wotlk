@@ -38,6 +38,11 @@ int
 ACE_Shared_Memory_Pool::in_use (ACE_OFF_T &offset,
                                 size_t &counter)
 {
+#ifndef ACE_HAS_SYSV_IPC
+  ACE_UNUSED_ARG (offset);
+  ACE_UNUSED_ARG (counter);
+  ACE_NOTSUP_RETURN (-1);
+#else
   offset = 0;
   SHM_TABLE *st = reinterpret_cast<SHM_TABLE *> (this->base_addr_);
   shmid_ds buf;
@@ -54,8 +59,8 @@ ACE_Shared_Memory_Pool::in_use (ACE_OFF_T &offset,
       offset += buf.shm_segsz;
       // ACELIB_DEBUG ((LM_DEBUG,  ACE_TEXT ("(%P|%t) segment size = %d, offset = %d\n"), buf.shm_segsz, offset));
     }
-
   return 0;
+#endif
 }
 
 int
@@ -63,6 +68,12 @@ ACE_Shared_Memory_Pool::find_seg (const void* const searchPtr,
                                   ACE_OFF_T &offset,
                                   size_t &counter)
 {
+#ifndef ACE_HAS_SYSV_IPC
+  ACE_UNUSED_ARG (searchPtr);
+  ACE_UNUSED_ARG (offset);
+  ACE_UNUSED_ARG (counter);
+  ACE_NOTSUP_RETURN (-1);
+#else
   offset = 0;
   SHM_TABLE *st = reinterpret_cast<SHM_TABLE *> (this->base_addr_);
   shmid_ds buf;
@@ -92,6 +103,7 @@ ACE_Shared_Memory_Pool::find_seg (const void* const searchPtr,
     }
 
   return 0;
+#endif
 }
 
 int
@@ -111,7 +123,7 @@ ACE_Shared_Memory_Pool::commit_backing_store_name (size_t rounded_bytes,
                       "exceeded max number of segments = %d, base = %u, offset = %u\n",
                        counter,
                        this->base_addr_,
-                       offset),
+                       static_cast<unsigned int>(offset)),
                       -1);
   else
     {
@@ -232,16 +244,22 @@ ACE_Shared_Memory_Pool::ACE_Shared_Memory_Pool (
       this->segment_size_ = options->segment_size_;
     }
 
+#ifndef ACE_HAS_SYSV_IPC
+  ACE_UNUSED_ARG (backing_store_name);
+#else
   if (backing_store_name)
     {
       // Convert the string into a number that is used as the segment
       // key.
 
-      int segment_key;
+      int segment_key = 0;
+#if !defined (ACE_LACKS_SSCANF)
       int result = ::sscanf (ACE_TEXT_ALWAYS_CHAR (backing_store_name),
                              "%d",
                              &segment_key);
-
+#else
+      int result = 0;
+#endif /* ACE_LACKS_SSCANF */
       if (result == 0 || result == EOF)
         // The conversion to a number failed so hash with crc32
         // ACE::crc32 is also used in <SV_Semaphore_Simple>.
@@ -257,6 +275,7 @@ ACE_Shared_Memory_Pool::ACE_Shared_Memory_Pool (
     }
   else
     this->base_shm_key_ = ACE_DEFAULT_SHM_KEY;
+#endif // ACE_HAS_SYSV_IPC
 
   if (this->signal_handler_.register_handler (SIGSEGV, this) == -1)
     ACELIB_ERROR ((LM_ERROR,
@@ -365,7 +384,9 @@ ACE_Shared_Memory_Pool::init_acquire (size_t nbytes,
            counter < this->max_segments_;
            counter++)
         {
+#ifdef ACE_HAS_SYSV_IPC
           st[counter].key_ = this->base_shm_key_ + counter;
+#endif
           st[counter].shmid_ = 0;
           st[counter].used_ = 0;
         }
