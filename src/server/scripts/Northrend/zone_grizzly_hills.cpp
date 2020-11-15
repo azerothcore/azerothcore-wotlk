@@ -964,7 +964,7 @@ public:
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
-            if (apply && who->ToPlayer())
+            if (apply && who && who->ToPlayer())
             {
                 DoCast(me, SPELL_VEHICLE_WARHEAD_FUSE);
                 _faction = who->ToPlayer()->GetTeamId();
@@ -985,19 +985,25 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* /*spellInfo*/) override
         {
-            if (caster->GetEntry() == NPC_HORDE_LUMBERBOAT || caster->GetEntry() == NPC_ALLIANCE_LUMBERBOAT)
+            if (caster && (caster->GetEntry() == NPC_HORDE_LUMBERBOAT || caster->GetEntry() == NPC_ALLIANCE_LUMBERBOAT))
+            {
                 FinishQuest(true, _faction);
+            }
         }
 
         void FinishQuest(bool success, uint32 faction)
         {
             if (_finished)
+            {
                 return;
+            }
 
             _finished = true;
 
             if (success)
+            {
                 DoCast(me, faction == ALLIANCE ? SPELL_ALLIANCE_KILL_CREDIT_TORPEDO : SPELL_HORDE_KILL_CREDIT_TORPEDO);
+            }
 
             DoCast(me, SPELL_DETONATE);
             me->RemoveAllAuras();
@@ -1034,14 +1040,20 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARHEAD_Z_CHECK) || !sSpellMgr->GetSpellInfo(SPELL_WARHEAD_SEEKING_LUMBERSHIP) || !sSpellMgr->GetSpellInfo(SPELL_WARHEAD_FUSE))
-                return false;
-            return true;
+            return !(
+                    !sSpellMgr->GetSpellInfo(SPELL_WARHEAD_Z_CHECK)
+                    || !sSpellMgr->GetSpellInfo(SPELL_WARHEAD_SEEKING_LUMBERSHIP)
+                    || !sSpellMgr->GetSpellInfo(SPELL_WARHEAD_FUSE)
+                );
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             Unit* caster = GetCaster();
+            if (!caster)
+            {
+                return;
+            }
 
             caster->CastSpell(caster, SPELL_WARHEAD_Z_CHECK, true);
             caster->CastSpell(caster, SPELL_WARHEAD_SEEKING_LUMBERSHIP, true);
@@ -1078,17 +1090,17 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PARACHUTE) || !sSpellMgr->GetSpellInfo(SPELL_TORPEDO_EXPLOSION))
-                return false;
-            return true;
+            return !(!sSpellMgr->GetSpellInfo(SPELL_PARACHUTE) || !sSpellMgr->GetSpellInfo(SPELL_TORPEDO_EXPLOSION));
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             Unit* caster = GetCaster();
             Player* player = GetHitPlayer();
-            if (!player)
+            if (!player || !caster)
+            {
                 return;
+            }
 
             player->ExitVehicle();
             float horizontalSpeed = 3.0f;
@@ -1098,8 +1110,10 @@ public:
 
             std::list<Creature*> explosionBunnys;
             caster->GetCreatureListWithEntryInGrid(explosionBunnys, NPC_ALLIANCE_LUMBERBOAT_EXPLOSIONS, 90.0f);
-            for (std::list<Creature*>::const_iterator itr = explosionBunnys.begin(); itr != explosionBunnys.end(); ++itr)
+            for (auto itr = explosionBunnys.begin(); itr != explosionBunnys.end(); ++itr)
+            {
                 (*itr)->CastSpell((*itr), SPELL_TORPEDO_EXPLOSION, true);
+            }
         }
 
         void Register() override
@@ -1134,8 +1148,12 @@ public:
             PreventDefaultAction();
 
             if (_posZ != GetTarget()->GetPositionZ())
+            {
                 if (Creature* target = GetTarget()->ToCreature())
+                {
                     target->AI()->DoAction(0);
+                }
+            }
         }
 
     private:
@@ -1167,8 +1185,12 @@ public:
         void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (Unit* rocketUnit = GetTarget()->GetVehicleBase())
+            {
                 if (Creature* rocketCrea = rocketUnit->ToCreature())
+                {
                     rocketCrea->AI()->DoAction(0);
+                }
+            }
         }
 
         void Register() override
