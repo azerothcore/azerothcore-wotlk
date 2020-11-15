@@ -1499,6 +1499,7 @@ public:
     QuestGiverStatus GetQuestDialogStatus(Object* questGiver);
 
     void SetDailyQuestStatus(uint32 quest_id);
+    bool IsDailyQuestDone(uint32 quest_id);
     void SetWeeklyQuestStatus(uint32 quest_id);
     void SetMonthlyQuestStatus(uint32 quest_id);
     void SetSeasonalQuestStatus(uint32 quest_id);

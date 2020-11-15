@@ -962,6 +962,13 @@ bool Item::GemsFitSockets() const
     return true;
 }
 
+bool Item::HasSocket() const
+{
+    // There can only be one socket added, and it's always in slot `PRISMATIC_ENCHANTMENT_SLOT`.
+    //     Built-in sockets                        Socket from upgrade
+    return this->GetTemplate()->Socket[0].Color || this->GetEnchantmentId(EnchantmentSlot(PRISMATIC_ENCHANTMENT_SLOT));
+}
+
 uint8 Item::GetGemCountWithID(uint32 GemID) const
 {
     uint8 count = 0;

@@ -34,7 +34,6 @@ typedef ACE_Unbounded_Set<ACE_NS_WString> ACE_WSTRING_SET;
 class ACE_Export ACE_Name_Binding
 {
 public:
-  // = Initialization and termination.
   /// Main constructor that initializes all the fields.
   ACE_Name_Binding (const ACE_NS_WString &n,
                     const ACE_NS_WString &v,
@@ -75,7 +74,7 @@ typedef ACE_Unbounded_Set_Iterator<ACE_NS_WString> ACE_PWSTRING_ITERATOR;
  * @class ACE_Name_Space
  *
  * @brief Abstract base class that provides an abstract interface to
- * the database without exposing any implemenation details.
+ * the database without exposing any implementation details.
  *
  * Manages a Naming Service Name Space. Provides the basic
  * methods -- bind, unbind, rebind, find, and listnames.

@@ -1,7 +1,5 @@
 #include "ace/ATM_QoS.h"
 
-
-
 #if defined (ACE_HAS_ATM)
 
 #if !defined (__ACE_INLINE__)

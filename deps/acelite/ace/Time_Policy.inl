@@ -82,11 +82,4 @@ ACE_Delegating_Time_Policy::set_delegate (ACE_Dynamic_Time_Policy_Base const * d
     }
 }
 
-ACE_INLINE ACE_Delegating_Time_Policy&
-ACE_Delegating_Time_Policy::operator =(ACE_Delegating_Time_Policy const & pol)
-{
-  this->delegate_ = pol.delegate_;
-  return *this;
-}
-
 ACE_END_VERSIONED_NAMESPACE_DECL

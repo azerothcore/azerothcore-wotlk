@@ -13,8 +13,8 @@
 // Open versioned namespace, if enabled by the user.
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE (ACE_ARGV_Queue_Entry)
-ACE_ALLOC_HOOK_DEFINE (ACE_ARGV)
+ACE_ALLOC_HOOK_DEFINE_Tt (ACE_ARGV_Queue_Entry_T)
+ACE_ALLOC_HOOK_DEFINE_Tt (ACE_ARGV_T)
 
 template <typename CHAR_TYPE>
 void
@@ -88,8 +88,14 @@ ACE_ARGV_T<CHAR_TYPE>::ACE_ARGV_T (const CHAR_TYPE buf[],
     return;
 
   // Make an internal copy of the string.
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_ALLOCATOR(this->buf_,
+                          static_cast<char*> (ACE_Allocator::instance()->malloc(sizeof (CHAR_TYPE) * (ACE_OS::strlen (buf) + 1))));
+#else
   ACE_NEW (this->buf_,
            CHAR_TYPE[ACE_OS::strlen (buf) + 1]);
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
   ACE_OS::strcpy (this->buf_, buf);
 
   // Create this->argv_.
@@ -201,8 +207,13 @@ ACE_ARGV_T<CHAR_TYPE>::ACE_ARGV_T (CHAR_TYPE *first_argv[],
   ACE_OS::strcat (this->buf_, second_buf);
 
   //   Delete the first and second buffers
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free (first_buf);
+  ACE_Allocator::instance()->free (second_buf);
+#else
   delete [] first_buf;
   delete [] second_buf;
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
 
 template <typename CHAR_TYPE>
@@ -260,11 +271,19 @@ ACE_ARGV_T<CHAR_TYPE>::add (const CHAR_TYPE *next_arg, bool quote_arg)
       for (int i = 0; this->argv_[i] != 0; i++)
         ACE_OS::free ((void *) this->argv_[i]);
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_Allocator::instance()->free (this->argv_);
+#else
       delete [] this->argv_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
       this->argv_ = 0;
     }
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free (this->buf_);
+#else
   delete [] this->buf_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
   this->buf_ = 0;
 
   return 0;
@@ -290,10 +309,21 @@ ACE_ARGV_T<CHAR_TYPE>::~ACE_ARGV_T (void)
 
   if (this->argv_ != 0)
     for (int i = 0; this->argv_[i] != 0; i++)
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_Allocator::instance()->free ((void *) this->argv_[i]);
+#else
       ACE_OS::free ((void *) this->argv_[i]);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
+
+
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free (this->argv_);
+  ACE_Allocator::instance()->free (this->buf_);
+#else
   delete [] this->argv_;
   delete [] this->buf_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
 
 // Create buf_ out of the queue_.  This is only used in the
@@ -309,11 +339,21 @@ ACE_ARGV_T<CHAR_TYPE>::create_buf_from_queue (void)
   if (this->argc_ <= 0)
     return -1;
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free (this->buf_);
+#else
   delete [] this->buf_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_ALLOCATOR_RETURN (this->buf_,
+                        static_cast<char*> (ACE_Allocator::instance()->malloc(sizeof (CHAR_TYPE) * (this->length_ + this->argc_))),
+                        -1);
+#else
   ACE_NEW_RETURN (this->buf_,
                   CHAR_TYPE[this->length_ + this->argc_],
                   -1);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
   // Get an iterator over the queue
   ACE_Unbounded_Queue_Iterator<ACE_ARGV_Queue_Entry_T<CHAR_TYPE> > iter (this->queue_);
