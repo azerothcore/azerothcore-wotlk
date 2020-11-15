@@ -158,8 +158,10 @@ class npc_og_suit : public CreatureScript
                 }
                 if (npc_og_suitAI* pEscortAI = CAST_AI(npc_og_suitAI, me->AI()))
                 {
-                    if (variation == 5)
+                    if (variation == 5) 
+                    {
                         pEscortAI->Start(true, true, 0, nullptr, false, true);
+                    }
                     else
                     {
                         pEscortAI->Start(true, true);
