@@ -2402,7 +2402,7 @@ Rate.Drop.Item.ReferencedAmount = 1
 Rate.XP.Kill    = 1
 Rate.XP.Quest   = 1
 Rate.XP.Explore = 1
-Rate.XP.Pet	 	= 1
+Rate.XP.Pet     = 1
 
 #
 #    Rate.XP.BattlegroundKill
