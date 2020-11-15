@@ -1359,7 +1359,6 @@ public:
         }
 
         uint32 GetData(uint32  /*id*/) const
-        {
             return spinningUpOrientation;
         }
 
