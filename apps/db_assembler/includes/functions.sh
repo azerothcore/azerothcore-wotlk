@@ -176,8 +176,8 @@ function dbasm_assemble() {
 
             for d in "${updates[@]}"
             do
-                echo "Searching on "$d" ..."
-                if [ ! -z "$d" ]; then
+                echo "Searching on $d ..."
+                if [ ! -z $d ]; then
                     for entry in "$d"/**/*.sql
                     do
                         if [[ ! -e $entry ]]; then
