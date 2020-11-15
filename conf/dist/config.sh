@@ -111,18 +111,18 @@ DB_WORLD_PATHS=(
 
 # UPDATES
 DB_AUTH_UPDATES_PATHS=(
-    $SRCPATH"/data/sql/updates/db_auth/"
-    $SRCPATH"/data/sql/updates/pending_db_auth/"
+    "$SRCPATH/data/sql/updates/db_auth/"
+    "$SRCPATH/data/sql/updates/pending_db_auth/"
 )
 
 DB_CHARACTERS_UPDATES_PATHS=(
-    $SRCPATH"/data/sql/updates/db_characters/"
-    $SRCPATH"/data/sql/updates/pending_db_characters/"
+    "$SRCPATH/data/sql/updates/db_characters/"
+    "$SRCPATH/data/sql/updates/pending_db_characters/"
 )
 
 DB_WORLD_UPDATES_PATHS=(
-    $SRCPATH"/data/sql/updates/db_world/"
-    $SRCPATH"/data/sql/updates/pending_db_world/"
+    "$SRCPATH/data/sql/updates/db_world/"
+    "$SRCPATH/data/sql/updates/pending_db_world/"
 )
 
 # CUSTOM
