@@ -20916,12 +20916,11 @@ void Player::StopCastingCharm()
     if (!charm)
         return;
 
-    // karazhan hack
-    if(charm->HasAura(30019))
+    // karazhan hack 
+    if (charm->ToPet() && GetZoneId() == 3457)
     {
-        charm->RemoveAura(30019); 
-        RemoveAura(30019);
-    }
+        RemovePet(charm->ToPet(), PetSaveMode::PET_SAVE_AS_DELETED, false);
+    } 
 
     if (charm->GetTypeId() == TYPEID_UNIT)
     {
