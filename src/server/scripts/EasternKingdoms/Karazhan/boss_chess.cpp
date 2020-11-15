@@ -1,9 +1,10 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
+#include "HostileRefManager.h"
 #include "ScriptedEscortAI.h"
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
+#include "ScriptedFollowerAI.h"
+#include "ScriptedGossip.h"
+#include "ObjectMgr.h" 
 #include "World.h" 
 #include "Player.h"
 #include "SpellInfo.h"
@@ -887,91 +888,92 @@ public:
             }
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
-        {
-            InstanceScript* instance = me->GetInstanceScript();
+      };
 
-            if (!instance)
-                return true;
+      bool OnGossipHello(Player* player, Creature* me) override
+      {
+          InstanceScript* instance = me->GetInstanceScript();
 
-            KarazhanChessGamePhase chessPhase = (KarazhanChessGamePhase)instance->GetData(DATA_CHESS_GAME_PHASE);
+          if (!instance)
+              return true;
 
-            switch (chessPhase)
-            {
-                case CHESS_PHASE_NOT_STARTED:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We want to play a game against you!", GOSSIP_SENDER_MAIN, MEDIVH_GOSSIP_START_PVE);
-                    break;
+          KarazhanChessGamePhase chessPhase = (KarazhanChessGamePhase)instance->GetData(DATA_CHESS_GAME_PHASE);
 
-                case CHESS_PHASE_INPROGRESS_PVE:
-                case CHESS_PHASE_INPROGRESS_PVP:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Restart", GOSSIP_SENDER_MAIN, MEDIVH_GOSSIP_RESTART); // We want to player another game against you
-                    break;
+          switch (chessPhase)
+          {
+          case CHESS_PHASE_NOT_STARTED:
+              AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We want to play a game against you!", GOSSIP_SENDER_MAIN, MEDIVH_GOSSIP_START_PVE);
+              break;
 
-                case CHESS_PHASE_PVE_FINISHED:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP", GOSSIP_SENDER_MAIN, MEDIVH_GOSSIP_START_PVP); // We'd like to fight each other
-                    break;
-            }
+          case CHESS_PHASE_INPROGRESS_PVE:
+          case CHESS_PHASE_INPROGRESS_PVP:
+              AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Restart", GOSSIP_SENDER_MAIN, MEDIVH_GOSSIP_RESTART); // We want to player another game against you
+              break;
 
-            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID()); 
-            return true;
-        }
+          case CHESS_PHASE_PVE_FINISHED:
+              AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP", GOSSIP_SENDER_MAIN, MEDIVH_GOSSIP_START_PVP); // We'd like to fight each other
+              break;
+          }
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId)
-        {
-            InstanceScript* instance = me->GetInstanceScript();
+          SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+          return true;
+      }
 
-            if (!instance)
-                return true;
+      bool OnGossipSelect(Player* player, Creature* me, uint32 /*sender*/, uint32 action) override
+      {
+          InstanceScript* instance = me->GetInstanceScript();
 
-            uint32 chessPhase = instance->GetData(DATA_CHESS_GAME_PHASE);
-            instance->SetData(CHESS_EVENT_TEAM, chessPhase < CHESS_PHASE_PVE_FINISHED ? player->GetTeamId() : TEAM_NEUTRAL);
+          if (!instance)
+              return true;
 
-            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-            CloseGossipMenuFor(player);
-            switch (action)
-            {
-                case MEDIVH_GOSSIP_START_PVE:
-                    instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_PVE_WARMUP);
-                    // ENSURE_AI(npc_echo_of_medivh::npc_echo_of_medivhAI, me->AI())->SetupBoard();
-                    SetupBoard();
-                    instance->SetData(DATA_CHESS_EVENT, IN_PROGRESS);
-                    instance->DoCastSpellOnPlayers(SPELL_GAME_IN_SESSION);
-                    break;
+          uint32 chessPhase = instance->GetData(DATA_CHESS_GAME_PHASE);
+          instance->SetData(CHESS_EVENT_TEAM, chessPhase < CHESS_PHASE_PVE_FINISHED ? player->GetTeamId() : TEAM_NEUTRAL);
 
-                case MEDIVH_GOSSIP_RESTART:
-                    instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_FAILED);
-                    instance->SetData(DATA_CHESS_REINIT_PIECES, 0);
-                    // ENSURE_AI(npc_echo_of_medivh::npc_echo_of_medivhAI, me->AI())->deadCount[DEAD_ALLIANCE] = 0;
-                    // ENSURE_AI(npc_echo_of_medivh::npc_echo_of_medivhAI, me->AI())->deadCount[DEAD_HORDE] = 0;
-                    deadCount[DEAD_ALLIANCE] = 0;
-                    deadCount[DEAD_HORDE] = 0;
-                    //ENSURE_AI(npc_echo_of_medivh::npc_echo_of_medivhAI, me->AI())->RemoveCheats();
+          CloseGossipMenuFor(player);
+          switch (action)
+          {
+          case MEDIVH_GOSSIP_START_PVE:
+              instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_PVE_WARMUP);
+              ENSURE_AI(npc_echo_of_medivh::npc_echo_of_medivhAI, me->AI())->SetupBoard();
+              //SetupBoard();
+              instance->SetData(DATA_CHESS_EVENT, IN_PROGRESS);
+              instance->DoCastSpellOnPlayers(SPELL_GAME_IN_SESSION);
+              break;
 
-                    if (instance->GetData(DATA_CHESS_EVENT) == IN_PROGRESS)
-                        instance->SetData(DATA_CHESS_EVENT, NOT_STARTED);
-                    else if (instance->GetData(DATA_CHESS_EVENT) == SPECIAL)
-                        instance->SetData(DATA_CHESS_EVENT, DONE);
+          case MEDIVH_GOSSIP_RESTART:
+              instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_FAILED);
+              instance->SetData(DATA_CHESS_REINIT_PIECES, 0);
+              ENSURE_AI(npc_echo_of_medivh::npc_echo_of_medivhAI, me->AI())->deadCount[DEAD_ALLIANCE] = 0;
+              ENSURE_AI(npc_echo_of_medivh::npc_echo_of_medivhAI, me->AI())->deadCount[DEAD_HORDE] = 0;
+              //deadCount[DEAD_ALLIANCE] = 0;
+              //deadCount[DEAD_HORDE] = 0;
+              //ENSURE_AI(npc_echo_of_medivh::npc_echo_of_medivhAI, me->AI())->RemoveCheats();
 
-                    instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
-                    instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_NOT_STARTED);
-                    break;
+              if (instance->GetData(DATA_CHESS_EVENT) == IN_PROGRESS)
+                  instance->SetData(DATA_CHESS_EVENT, NOT_STARTED);
+              else if (instance->GetData(DATA_CHESS_EVENT) == SPECIAL)
+                  instance->SetData(DATA_CHESS_EVENT, DONE);
 
-                case MEDIVH_GOSSIP_START_PVP:
-                    instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_PVP_WARMUP);
-                    // ENSURE_AI(npc_echo_of_medivh::npc_echo_of_medivhAI, me->AI())->SetupBoard();
-                    SetupBoard();
-                    instance->SetData(DATA_CHESS_EVENT, SPECIAL);
-                    instance->DoCastSpellOnPlayers(SPELL_GAME_IN_SESSION);
-                    break;
+              instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GAME_IN_SESSION);
+              instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_NOT_STARTED);
+              break;
 
-                default:
-                    //sLog.outError("Chess event: unknown action %u", action);
-                    break;
-            }
+          case MEDIVH_GOSSIP_START_PVP:
+              instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_PVP_WARMUP);
+              ENSURE_AI(npc_echo_of_medivh::npc_echo_of_medivhAI, me->AI())->SetupBoard();
+              //SetupBoard();
+              instance->SetData(DATA_CHESS_EVENT, SPECIAL);
+              instance->DoCastSpellOnPlayers(SPELL_GAME_IN_SESSION);
+              break;
 
-            return true;
-        }
-    };
+          default:
+              //sLog.outError("Chess event: unknown action %u", action);
+              break;
+          }
+
+          return true;
+      }
+
 };
 
 class npc_chesspiece : public CreatureScript
@@ -1522,118 +1524,125 @@ public:
             }
         }
 
-        bool GossipHello(Player* player, bool  /*reportUse*/)
-        {
-            InstanceScript* instance = me->GetInstanceScript();
+      };
 
-            if (!instance)
-                return true;
+      bool OnGossipHello(Player* player, Creature* me) override
+      {
+          InstanceScript* instance = me->GetInstanceScript();
+          sLog->outString("1");
+          if (!instance)
+              return true;
+          sLog->outString("2");
+          uint32 chessPhase = instance->GetData(DATA_CHESS_GAME_PHASE);
+          sLog->outString("3");
+          if (player->GetTeamId() == TEAM_ALLIANCE && me->getFaction() != A_FACTION && chessPhase < CHESS_PHASE_PVE_FINISHED)
+              return true;
+          sLog->outString("4");
+          if (player->GetTeamId() == TEAM_HORDE && me->getFaction() != H_FACTION && chessPhase < CHESS_PHASE_PVE_FINISHED)
+              return true;
+          sLog->outString("5");
+          bool ok = true;
+          uint32 textID = 0;
+          switch (me->GetEntry())
+          {
+          case NPC_PAWN_H:
+          case NPC_PAWN_A:
+          case NPC_KNIGHT_H:
+          case NPC_KNIGHT_A:
+          case NPC_QUEEN_H:
+          case NPC_QUEEN_A:
+          case NPC_BISHOP_H:
+          case NPC_BISHOP_A:
+          case NPC_ROOK_H:
+          case NPC_ROOK_A:
+              if (chessPhase != CHESS_PHASE_INPROGRESS_PVE && chessPhase != CHESS_PHASE_INPROGRESS_PVP)
+                  ok = false;
+              break;
 
-            uint32 chessPhase = instance->GetData(DATA_CHESS_GAME_PHASE);
+          case NPC_KING_H:
+          case NPC_KING_A:
+              if (chessPhase != CHESS_PHASE_INPROGRESS_PVE && chessPhase != CHESS_PHASE_INPROGRESS_PVP && chessPhase != CHESS_PHASE_PVE_WARMUP && chessPhase != CHESS_PHASE_PVP_WARMUP)
+                  ok = false;
+              break;
 
-            if (player->GetTeamId() == TEAM_ALLIANCE && me->getFaction() != A_FACTION && chessPhase < CHESS_PHASE_PVE_FINISHED)
-                return true;
+          default:
+              ok = false;
+              break;
+          }
+          sLog->outString("switch (me->GetEntry())");
 
-            if (player->GetTeamId() == TEAM_HORDE && me->getFaction() != H_FACTION && chessPhase < CHESS_PHASE_PVE_FINISHED)
-                return true;
+          switch (me->GetEntry())
+          {
+          case NPC_PAWN_H:   textID = 20021; break;
+          case NPC_PAWN_A:   textID = 20027; break;
+          case NPC_KNIGHT_H: textID = 20019; break;
+          case NPC_KNIGHT_A: textID = 20025; break;
+          case NPC_QUEEN_H:  textID = 20017; break;
+          case NPC_QUEEN_A:  textID = 20023; break;
+          case NPC_BISHOP_H: textID = 20018; break;
+          case NPC_BISHOP_A: textID = 20023; break;
+          case NPC_ROOK_H:   textID = 20020; break;
+          case NPC_ROOK_A:   textID = 20026; break;
+          case NPC_KING_H:   textID = 20016; break;
+          case NPC_KING_A:   textID = 20028; break;
+          default:           textID = 8990;  break;
+          }
+          sLog->outString("me->GetEntry(%u)", me->GetEntry());
+          if (ok && !player->HasAura(SPELL_RECENTLY_INGAME))
+              AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Control " + me->GetName(), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+          sLog->outString("AddGossipItemFor");
+          SendGossipMenuFor(player, textID, me->GetGUID());
+          sLog->outString("return true");
+          return true;
+      }
 
-            bool ok = true;
-            uint32 textID = 0;
+      bool OnGossipSelect(Player* player, Creature* me, uint32 /*sender*/, uint32 action) override
+      {
+          if (me->IsCharmed() && me->GetCharmerGUID() == player->GetGUID()) {
+              me->RemoveCharmedBy(me->GetCharmer());
+              player->StopCastingCharm();
+              sLog->outString("1");
+          }
 
-            switch (me->GetEntry())
-            {
-                case NPC_PAWN_H:
-                case NPC_PAWN_A:
-                case NPC_KNIGHT_H:
-                case NPC_KNIGHT_A:
-                case NPC_QUEEN_H:
-                case NPC_QUEEN_A:
-                case NPC_BISHOP_H:
-                case NPC_BISHOP_A:
-                case NPC_ROOK_H:
-                case NPC_ROOK_A:
-                    if (chessPhase != CHESS_PHASE_INPROGRESS_PVE && chessPhase != CHESS_PHASE_INPROGRESS_PVP)
-                        ok = false;
-                    break;
+          if (action == GOSSIP_ACTION_INFO_DEF + 1)
+          {
+              sLog->outString("2");
+              player->NearTeleportTo(-11106.92f, -1843.32f, 229.626f, 4.2331f);
+              player->CastSpell(me, SPELL_CONTROL_PIECE, false);
+              //me->AddAura(SPELL_CONTROL_PIECE, player);
+              //player->AddAura(SPELL_CONTROL_PIECE, me);
+              me->SetCharmedBy(player, CHARM_TYPE_CHARM, NULL, false);
+              //me->InitCharmInfo();
+              //me->GetCharmInfo()->InitCharmCreateSpells(false);
 
-                case NPC_KING_H:
-                case NPC_KING_A:
-                    if (chessPhase != CHESS_PHASE_INPROGRESS_PVE && chessPhase != CHESS_PHASE_INPROGRESS_PVP && chessPhase != CHESS_PHASE_PVE_WARMUP && chessPhase != CHESS_PHASE_PVP_WARMUP)
-                        ok = false;
-                    break;
+              switch (me->GetEntry())
+              {
+              case NPC_KING_H:
+              case NPC_KING_A:
+                  if (InstanceScript* instance = me->GetInstanceScript())
+                  {
+                      uint32 chessPhase = instance->GetData(DATA_CHESS_GAME_PHASE);
 
-                default:
-                    ok = false;
-                    break;
-            }
+                      if (chessPhase == CHESS_PHASE_PVE_WARMUP)
+                          instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_INPROGRESS_PVE);
+                      else if (chessPhase == CHESS_PHASE_PVP_WARMUP)
+                          instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_INPROGRESS_PVP);
+                  }
+                  break;
 
-            switch (me->GetEntry())
-            {
-                case NPC_PAWN_H:   textID = 20021; break;
-                case NPC_PAWN_A:   textID = 20027; break;
-                case NPC_KNIGHT_H: textID = 20019; break;
-                case NPC_KNIGHT_A: textID = 20025; break;
-                case NPC_QUEEN_H:  textID = 20017; break;
-                case NPC_QUEEN_A:  textID = 20023; break;
-                case NPC_BISHOP_H: textID = 20018; break;
-                case NPC_BISHOP_A: textID = 20023; break;
-                case NPC_ROOK_H:   textID = 20020; break;
-                case NPC_ROOK_A:   textID = 20026; break;
-                case NPC_KING_H:   textID = 20016; break;
-                case NPC_KING_A:   textID = 20028; break;
-                default:           textID = 8990;  break;
-            }
+              default:
+                  sLog->outString("Karazhan Chess, Default hit at %u", me->GetEntry());
+                  break;
+              }
+          }
+          sLog->outString("3");
+          CloseGossipMenuFor(player);
+          sLog->outString("4");
+          return true;
+      }
 
-            if (ok && !player->HasAura(SPELL_RECENTLY_INGAME))
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Control " + me->GetName(), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-            SendGossipMenuFor(player, textID, me->GetGUID());
-            return true;
-        }
-         
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
-        {
-            if (me->IsCharmed() && me->GetCharmerGUID() == player->GetGUID()) { 
-                me->RemoveCharmedBy(me->GetCharmer());
-                player->StopCastingCharm();
-            }
-
-            if (action == GOSSIP_ACTION_INFO_DEF + 1)
-            {
-                player->NearTeleportTo(-11106.92f, -1843.32f, 229.626f, 4.2331f);
-                player->CastSpell(me, SPELL_CONTROL_PIECE, false);
-                //me->AddAura(SPELL_CONTROL_PIECE, player);
-                //player->AddAura(SPELL_CONTROL_PIECE, me);
-                me->SetCharmedBy(player, CHARM_TYPE_CHARM, NULL, false);
-                //me->InitCharmInfo();
-                //me->GetCharmInfo()->InitCharmCreateSpells(false);
-
-                switch (me->GetEntry())
-                {
-                    case NPC_KING_H:
-                    case NPC_KING_A:
-                        if (InstanceScript* instance = me->GetInstanceScript())
-                        {
-                            uint32 chessPhase = instance->GetData(DATA_CHESS_GAME_PHASE);
-
-                            if (chessPhase == CHESS_PHASE_PVE_WARMUP)
-                                instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_INPROGRESS_PVE);
-                            else if (chessPhase == CHESS_PHASE_PVP_WARMUP)
-                                instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_INPROGRESS_PVP);
-                        }
-                        break;
-
-                    default:
-                        sLog->outString("Karazhan Chess, Default hit at %u", me->GetEntry());
-                        break;
-                }
-            }
-            CloseGossipMenuFor(player);
-            return true;
-        }
-    };
 };
-
+ 
 class npc_chess_move_trigger : public CreatureScript
 {
 public:
