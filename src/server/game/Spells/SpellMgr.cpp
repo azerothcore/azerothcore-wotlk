@@ -2663,7 +2663,7 @@ void SpellMgr::LoadSpellInfoStore()
             mSpellInfoMap[i] = new SpellInfo(spellEntry);
     }
 
-    sLog->outString(">> Loaded SpellInfo store in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded spell custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
@@ -2672,14 +2672,14 @@ void SpellMgr::UnloadSpellInfoStore()
     for (uint32 i = 0; i < mSpellInfoMap.size(); ++i)
     {
         if (mSpellInfoMap[i])
-            delete GetSpellInfoStoreSize[i];
+            delete mSpellInfoMap[i];
     }
     mSpellInfoMap.clear();
 }
 
 void SpellMgr::UnloadSpellInfoImplicitTargetConditionLists()
 {
-    for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
+    for (uint32 i = 0; i < mSpellInfoMap.size(); ++i)
     {
         if (mSpellInfoMap[i])
             mSpellInfoMap[i]->_UnloadImplicitTargetConditionLists();
@@ -2704,7 +2704,7 @@ void SpellMgr::LoadSpellSpecificAndAuraState()
     sLog->outString();
 }
 
-void SpellMgr::LoadSpellInfoCustomAttributes()
+void SpellMgr::LoadSpellCustomAttr()
 {
     uint32 oldMSTime = getMSTime();
     uint32 customAttrTime = getMSTime();
@@ -2852,7 +2852,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                                 if (enchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
                                     continue;
 
-                                SpellInfo* procInfo = _GetSpellInfo(enchant->spellid[s]);
+                                SpellInfo* procInfo = (SpellInfo*)GetSpellInfo(enchant->spellid[s]);
                                 if (!procInfo)
                                     continue;
 
@@ -3261,7 +3261,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
 
     CreatureAI::FillAISpellInfo();
 
-    sLog->outString(">> Loaded SpellInfo custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded spell custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
@@ -3280,7 +3280,7 @@ inline void ApplySpellFix(std::initializer_list<uint32> spellIds, void(*fix)(Spe
     }
 }
 
-void SpellMgr::LoadSpellInfoCorrections()
+void SpellMgr::LoadDbcDataCorrections()
 {
     uint32 oldMSTime = getMSTime();
 
@@ -4591,6 +4591,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_HEAL;
     });
 
+<<<<<<< HEAD
     // Winterfin First Responder
     ApplySpellFix({ 48739 }, [](SpellEntry* spellInfo)
     {
@@ -6815,28 +6816,31 @@ void SpellMgr::LoadSpellInfoCorrections()
 
     });
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
+=======
+    for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
+>>>>>>> parent of ac9d74bd... step 1 - rename
     {
-        SpellInfo* spellInfo = mSpellInfoMap[i];
+        SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
         if (!spellInfo)
             continue;
 
         for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
         {
-            switch (spellInfo->Effects[j].Effect)
+            switch (spellInfo->Effect[j])
             {
                 case SPELL_EFFECT_CHARGE:
                 case SPELL_EFFECT_CHARGE_DEST:
                 case SPELL_EFFECT_JUMP:
                 case SPELL_EFFECT_JUMP_DEST:
                 case SPELL_EFFECT_LEAP_BACK:
-                    if (!spellInfo->Speed && !spellInfo->SpellFamilyName)
-                        spellInfo->Speed = SPEED_CHARGE;
+                    if (!spellInfo->speed && !spellInfo->SpellFamilyName)
+                        spellInfo->speed = SPEED_CHARGE;
                     break;
             }
 
             // Xinef: i hope this will fix the problem with not working resurrection
-            if (spellInfo->Effects[j].Effect == SPELL_EFFECT_SELF_RESURRECT)
-                spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+            if (spellInfo->Effect[j] == SPELL_EFFECT_SELF_RESURRECT)
+                spellInfo->EffectImplicitTargetA[j] = TARGET_UNIT_CASTER;
         }
 
         // Xinef: Fix range for trajectories and triggered spells
@@ -6845,7 +6849,7 @@ void SpellMgr::LoadSpellInfoCorrections()
                 if (SpellEntry* spellInfo2 = (SpellEntry*)sSpellStore.LookupEntry(spellInfo->EffectTriggerSpell[j]))
                     spellInfo2->rangeIndex = 187; // 300yd
 
-        if (spellInfo->ActiveIconID == 2158)  // flight
+        if (spellInfo->activeIconID == 2158)  // flight
             spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
 
         switch (spellInfo->SpellFamilyName)
@@ -6853,7 +6857,7 @@ void SpellMgr::LoadSpellInfoCorrections()
             case SPELLFAMILY_PALADIN:
                 // Seals of the Pure should affect Seal of Righteousness
                 if (spellInfo->SpellIconID == 25 && (spellInfo->Attributes & SPELL_ATTR0_PASSIVE))
-                    spellInfo->Effects[EFFECT_0].SpellClassMask[1] |= 0x20000000;
+                    spellInfo->EffectSpellClassMask[0][1] |= 0x20000000;
                 break;
             case SPELLFAMILY_DEATHKNIGHT:
                 // Icy Touch - extend FamilyFlags (unused value) for Sigil of the Frozen Conscience to use
@@ -6963,6 +6967,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     LockEntry* key = const_cast<LockEntry*>(sLockStore.LookupEntry(36)); // 3366 Opening, allows to open without proper key
     key->Type[2] = LOCK_KEY_NONE;
 
-    sLog->outString(">> Loading SpellInfo dbc data corrections  in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loading spell dbc data corrections  in %u ms", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
