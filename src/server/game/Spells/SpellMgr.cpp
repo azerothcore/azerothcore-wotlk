@@ -4561,11 +4561,10 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;
     });
 
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
+    // Playback Speech
+    ApplySpellFix({ 74209 }, [](SpellEntry* spellInfo)
     {
-
+        spellInfo->DurationIndex = 1;
     });
 
     ApplySpellFix({
