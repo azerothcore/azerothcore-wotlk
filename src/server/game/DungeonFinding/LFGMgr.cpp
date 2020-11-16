@@ -441,7 +441,7 @@ namespace lfg
                     }
                 }
 
-                //Check of items
+                // Check required items
                 if (lockData == 0)
                 {
                     for (const AccessSubRequirement* itemRequirement : ar->items)
