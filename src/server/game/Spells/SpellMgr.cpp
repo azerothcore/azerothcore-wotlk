@@ -4382,11 +4382,183 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->StackAmount = 0;
     });
 
-    ApplySpellFix({
+    // Glyph of blocking
+    ApplySpellFix({ 58375 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectTriggerSpell[0] = 58374;
+    });
 
+    // Sweeping Strikes stance change
+    ApplySpellFix({ 12328 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_NOT_SHAPESHIFT;
+    });
+
+    // Damage Shield
+    ApplySpellFix({ 59653 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+        spellInfo->spellLevel = 0;
+    });
+
+    ApplySpellFix({
+        20230,  // Retaliation
+        871,    // Shield Wall
+        1719    // Recklessness
         }, [](SpellEntry* spellInfo)
     {
+        // Strange shared cooldown
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_CATEGORY_COOLDOWN_MODS;
+    });
 
+    // Vigilance
+    ApplySpellFix({ 50720 }, [](SpellEntry* spellInfo)
+    {
+        // fixes bug with empowered renew, single target aura
+        spellInfo->SpellFamilyName = SPELLFAMILY_WARRIOR;
+    });
+
+    // Sunder Armor
+    ApplySpellFix({ 58567 }, [](SpellEntry* spellInfo)
+    {
+        // trigger, remove spellfamilyflags because of glyph of sunder armor
+        spellInfo->SpellFamilyFlags = flag96(0x0, 0x0, 0x0);
+    });
+
+    // Sunder Armor - Old Ranks
+    ApplySpellFix({ 7405, 8380, 11596, 11597, 25225, 47467 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectTriggerSpell[EFFECT_0] = 11971;
+        spellInfo->Effect[EFFECT_0] = SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE;
+    });
+
+    // Improved Spell Reflection
+    ApplySpellFix({ 59725 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_UNIT_CASTER_AREA_PARTY;
+    });
+
+    // Shadow Weaving
+    ApplySpellFix({ 15257, 15331, 15332 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
+        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+    });
+
+    // Hymn of Hope
+    ApplySpellFix({ 64904 }, [](SpellEntry* spellInfo)
+    {
+        // rewrite part of aura system or swap effects...
+        spellInfo->EffectApplyAuraName[1] = SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT;
+        spellInfo->Effect[2] = spellInfo->Effect[0];
+        spellInfo->Effect[0] = 0;
+        spellInfo->EffectDieSides[2] = spellInfo->EffectDieSides[0];
+        spellInfo->EffectImplicitTargetA[2] = spellInfo->EffectImplicitTargetB[0];
+        spellInfo->EffectRadiusIndex[2] = spellInfo->EffectRadiusIndex[0];
+        spellInfo->EffectBasePoints[2] = spellInfo->EffectBasePoints[0];
+    });
+
+    // Divine Hymn
+    ApplySpellFix({ 64844 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+        spellInfo->spellLevel = 0;
+    });
+
+    ApplySpellFix({
+        14898,  // Spiritual Healing affects prayer of mending
+        15349,
+        15354,
+        15355,
+        15356,
+        47562,  // Divine Providence affects prayer of mending
+        47564,
+        47565,
+        47566,
+        47567,
+        47586,  // Twin Disciplines affects prayer of mending
+        47587,
+        47588,
+        52802,
+        52803
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectSpellClassMask[0][1] |= 0x20; // prayer of mending
+    });
+
+    // Power Infusion
+    ApplySpellFix({ 10060 }, [](SpellEntry* spellInfo)
+    {
+        // hack to fix stacking with arcane power
+        spellInfo->Effect[EFFECT_2] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->EffectApplyAuraName[EFFECT_2] = SPELL_AURA_ADD_PCT_MODIFIER;
+        spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_TARGET_ALLY;
+    });
+
+    // Lifebloom final bloom
+    ApplySpellFix({ 33778 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+        spellInfo->spellLevel = 0;
+        spellInfo->SpellFamilyFlags = flag96(0, 0x10, 0);
+    });
+
+    // Clearcasting
+    ApplySpellFix({ 16870 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = 31; // 8 secs
+    });
+
+    // Owlkin Frenzy
+    ApplySpellFix({ 48391 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_NOT_SHAPESHIFT;
+    });
+
+    // Item T10 Restoration 4P Bonus
+    ApplySpellFix({ 70691 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
+    });
+
+    ApplySpellFix({
+        770,    // Faerie Fire
+        16857   // Faerie Fire (Feral)
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx &= ~SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE;
+    });
+
+    // Feral Charge - Cat
+    ApplySpellFix({ 49376, 61138, 61132, 50259 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+    });
+
+    // Glyph of Barkskin
+    ApplySpellFix({ 63058 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectApplyAuraName[EFFECT_0] = SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_CHANCE;
+    });
+
+    // Resurrection Sickness
+    ApplySpellFix({ 15007 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->SpellFamilyName = SPELLFAMILY_GENERIC;
+    });
+
+    // Luck of the Draw
+    ApplySpellFix({ 72221 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+    });
+
+    // Bind
+    ApplySpellFix({ 3286 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Targets = 0; // neutral innkeepers not friendly?
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+        spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;
     });
 
     ApplySpellFix({
@@ -4397,178 +4569,28 @@ void SpellMgr::LoadDbcDataCorrections()
     });
 
     ApplySpellFix({
-
+        2641, // Dismiss Pet
+        23356 // Taming Lesson
         }, [](SpellEntry* spellInfo)
     {
-
+        // remove creaturetargettype
+        spellInfo->TargetCreatureType = 0;
     });
 
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
+    // Aspect of the Viper
+    ApplySpellFix({ 34074 }, [](SpellEntry* spellInfo)
     {
-
+        spellInfo->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->EffectImplicitTargetA[2] = 1;
+        spellInfo->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
     });
 
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
+    // Strength of Wrynn
+    ApplySpellFix({ 60509 }, [](SpellEntry* spellInfo)
     {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
+        spellInfo->EffectBasePoints[2] = 1500;
+        spellInfo->EffectBasePoints[1] = 150;
+        spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_HEAL;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
