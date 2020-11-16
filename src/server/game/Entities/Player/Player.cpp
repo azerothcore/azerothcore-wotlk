@@ -1776,6 +1776,14 @@ void Player::Update(uint32 p_time)
     {
         if (p_time >= m_zoneUpdateTimer)
         {
+            if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
+            {
+                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
+                if (!(atEntry || IsInAreaTriggerRadius(atEntry) || AREA_FLAG_CAPITAL))
+                {
+                    RemoveRestState();
+                }
+            }
             uint32 newzone, newarea;
             GetZoneAndAreaId(newzone, newarea, true);
             m_last_zone_id = newzone;
@@ -7687,17 +7695,15 @@ void Player::UpdateArea(uint32 newArea)
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 
-    if (isInn)
+    if (isInn || areaFlags & AREA_FLAG_CAPITAL)
     {
         SetRestState(0);
         if (sWorld->IsFFAPvPRealm())
             RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
     }
-    else if (!(areaFlags & AREA_FLAG_CAPITAL))
+    else
     {
-        AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
-        if (!atEntry || !IsInAreaTriggerRadius(atEntry))
-            RemoveRestState();
+        RemoveRestState();
     }
 }
 
