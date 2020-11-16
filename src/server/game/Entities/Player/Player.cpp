@@ -1778,8 +1778,10 @@ void Player::Update(uint32 p_time)
         {
             if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
             {
+                uint32 zoneId = GetZoneId();
+                AreaTableEntry const* zone = sAreaTableStore.LookupEntry(zoneId);
                 AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
-                if (!(atEntry || IsInAreaTriggerRadius(atEntry)))
+                if (!(atEntry || IsInAreaTriggerRadius(atEntry) || zone->flags & AREA_FLAG_CAPITAL))
                 {
                     RemoveRestState();
                 }
