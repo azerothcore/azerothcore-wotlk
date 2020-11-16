@@ -5070,7 +5070,6 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({
         55849,  // Power Spark (ground +50% dmg aura)
         56438,  // Arcane Overload (-50% dmg taken) - this is to prevent apply -> unapply -> apply ... dunno whether it's correct
-
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
