@@ -3765,12 +3765,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectSpellClassMask[0][2] = 0x8000000;
     });
 
-    /* Judgements Facing    -- SCEICCO: not sure this is offylike
-    ApplySpellFix({ 20271, 53407, 53408 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->FacingCasterFlags |= SPELL_FACING_FLAG_INFRONT;
-    }); */
-
     // Seal of Light trigger
     ApplySpellFix({ 20167 }, [](SpellEntry* spellInfo)
     {
