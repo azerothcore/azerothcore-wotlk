@@ -4591,7 +4591,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_HEAL;
     });
 
-<<<<<<< HEAD
     // Winterfin First Responder
     ApplySpellFix({ 48739 }, [](SpellEntry* spellInfo)
     {
@@ -5119,10 +5118,23 @@ void SpellMgr::LoadDbcDataCorrections()
     // Surge of Power (Phase 3)
     ApplySpellFix({
         57407,  // N
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+        spellInfo->InterruptFlags = 0;
+        spellInfo->EffectRadiusIndex[0] = 28;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
+        spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
+        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+    });
+
+    // Surge of Power (Phase 3)
+    ApplySpellFix({
         60936   // H
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->MaxAffectedTargets = (i == 60936 ? 3 : 1);
+        spellInfo->MaxAffectedTargets = 3;
         spellInfo->InterruptFlags = 0;
         spellInfo->EffectRadiusIndex[0] = 28;
         spellInfo->AttributesEx4 |= SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
@@ -6662,163 +6674,518 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetB[0] = 0;
     });
 
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
+    // Rallying the Troops
+    ApplySpellFix({ 47394 }, [](SpellEntry* spellInfo)
     {
+        spellInfo->excludeTargetAuraSpell = 47394;
+    });
 
+    // A Tangled Skein
+    ApplySpellFix({ 51165, 51173 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
     });
 
     ApplySpellFix({
-
+        69563,  // A Cloudlet of Classy Cologne
+        69445,  // A Perfect Puff of Perfume
+        69489   // Bonbon Blitz
         }, [](SpellEntry* spellInfo)
     {
+        spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_CASTER;
+    });
 
+    // Control
+    ApplySpellFix({ 30790 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectMiscValue[1] = 0;
+    });
+
+    // Reclusive Runemaster
+    ApplySpellFix({ 48028 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
+        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
+    });
+
+    // Mastery of
+    ApplySpellFix({ 65147 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Category = 1244;
+        spellInfo->CategoryRecoveryTime = 1500;
+    });
+
+    // Weakness to Lightning
+    ApplySpellFix({ 46432 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 &= ~SPELL_ATTR3_DEATH_PERSISTENT;
+    });
+
+    // Wrangle Some Aether Rays!
+    ApplySpellFix({ 40856 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = 27; // 3000ms
+    });
+
+    // The Black Knight's Orders
+    ApplySpellFix({ 63163 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectBasePoints[0] = 52390;
+    });
+
+    // The Warp Rifts
+    ApplySpellFix({ 34888 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = 5; // 300 secs
+    });
+
+    // The Smallest Creatures
+    ApplySpellFix({ 38544 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectMiscValueB[0] = 427;
+        spellInfo->EffectImplicitTargetA[0] = 1;
+        spellInfo->Effect[1] = 0;
+    });
+
+    // Ridding the red rocket
+    ApplySpellFix({ 49177 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectBasePoints[0] = 1; // corrects seat id (points - 1 = seatId)
+    });
+
+    // The Iron Colossus
+    ApplySpellFix({ 56513, 56524 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = (spellInfo->Id == 56524 ? 6000 : 2000);
+    });
+
+    // Kaw the Mammoth Destroyer
+    ApplySpellFix({ 46260 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+    });
+
+    // That's Abominable
+    ApplySpellFix({ 59565 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectMiscValueB[0] = 1721; // controlable guardian
+    });
+
+    // Investigate the Blue Recluse (1920)
+    // Investigate the Alchemist Shop (1960)
+    ApplySpellFix({ 9095 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+        spellInfo->EffectRadiusIndex[0] = 13;
+    });
+
+    // Dragonmaw Race: All parts
+    ApplySpellFix({
+        40890   // Oldie's Rotten Pumpkin
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+        spellInfo->EffectTriggerSpell[0] = 40905;
+        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+    });
+
+    // Trope's Slime Cannon
+    ApplySpellFix({ 40909 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+        spellInfo->EffectTriggerSpell[0] = 40905;
+        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+    });
+
+    // Corlok's Skull Barrage
+    ApplySpellFix({ 40894 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+        spellInfo->EffectTriggerSpell[0] = 40900;
+        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+    });
+
+    // Ichman's Blazing Fireball
+    ApplySpellFix({ 40928 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+        spellInfo->EffectTriggerSpell[0] = 40929;
+        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+    });
+
+    // Mulverick's Great Balls of Lightning
+    ApplySpellFix({ 40930 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+        spellInfo->EffectTriggerSpell[0] = 40931;
+        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+    });
+
+    // Sky Shatter
+    ApplySpellFix({ 40945 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+        spellInfo->EffectTriggerSpell[0] = 41064;
+        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+    });
+
+    // Gauging the Resonant Frequency (10594)
+    ApplySpellFix({ 37390 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectMiscValueB[0] = 181;
+    });
+
+    // Where in the World is Hemet Nesingwary? (12521)
+    ApplySpellFix({ 50860 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectBasePoints[0] = 50860;
+    });
+
+    ApplySpellFix({ 50861 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectBasePoints[0] = 0;
+    });
+
+    // Krolmir, Hammer of Storms (13010)
+    ApplySpellFix({ 56606, 56541 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectBasePoints[0] = 1;
+    });
+
+    // Blightbeasts be Damned! (12072)
+    ApplySpellFix({ 47424 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
+    });
+
+    // Leading the Charge (13380), All Infra-Green bomber quests
+    ApplySpellFix({ 59059 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
+    });
+
+    // Dark Horizon (12664), Reunited (12663)
+    ApplySpellFix({ 52190 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectBasePoints[EFFECT_0] = 52391 - 1;
+    });
+
+    // The Sum is Greater than the Parts (13043) - Chained Grip
+    ApplySpellFix({ 60540 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectMiscValue[EFFECT_0] = 300;
+    });
+
+    // Not a Bug (13342)
+    ApplySpellFix({ 60531 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
+    });
+
+    // Frankly,  It Makes No Sense... (10672)
+    ApplySpellFix({ 37851 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+    });
+
+    // Honor Challenge (12939)
+    ApplySpellFix({ 21855 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+    });
+
+    // Convocation at Zol'Heb (12730)
+    ApplySpellFix({ 52956 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_DEST_AREA_ENTRY;
+    });
+
+    // Mangletooth Quests (http://www.wowhead.com/npc=3430)
+    ApplySpellFix({ 7764, 10767, 16610, 16612, 16618, 17013 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK;
+    });
+
+    //Crushing the Crown
+    ApplySpellFix({ 71024 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DYNOBJ_NONE;
+    });
+
+    // Battle for the Undercity
+    ApplySpellFix({
+        59892   // Cyclone fall
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[EFFECT_0] = SPELL_EFFECT_APPLY_AREA_AURA_FRIEND;
+        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS;
+        spellInfo->AttributesEx &= ~SPELL_ATTR0_CANT_CANCEL;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+    });
+
+    // enchant Lightweave Embroidery
+    ApplySpellFix({ 55637 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectMiscValue[1] = 126;
+    });
+
+    // Magic Broom
+    ApplySpellFix({ 47977 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[0] = 0;
+        spellInfo->Effect[1] = 0;
+    });
+
+    // Titanium Seal of Dalaran, Toss your luck
+    ApplySpellFix({ 60476 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
+    });
+
+    // Mind Amplification Dish, change charm aura
+    ApplySpellFix({ 26740 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_CHARM;
+    });
+
+    // Persistent Shield (fixes idiocity)
+    ApplySpellFix({ 26467 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE;
+        spellInfo->EffectTriggerSpell[0] = 26470;
+    });
+
+    // Deadly Swiftness
+    ApplySpellFix({ 31255 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectTriggerSpell[0] = 22588;
+    });
+
+    // Black Magic enchant
+    ApplySpellFix({ 59630 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
+    });
+
+    // Precious's Ribbon
+    ApplySpellFix({ 72968 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
     });
 
     ApplySpellFix({
-
+        71646,  // Item - Bauble of True Blood 10m
+        71607,  // Item - Bauble of True Blood 25m
+        71610,  // Item - Althor's Abacus trigger 10m
+        71641   // Item - Althor's Abacus trigger 25m
         }, [](SpellEntry* spellInfo)
     {
-
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+        spellInfo->spellLevel = 0;
     });
 
+    // Drain Life - Bryntroll
     ApplySpellFix({
-
+        71838,  // N
+        71839   // H
         }, [](SpellEntry* spellInfo)
     {
-
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_RESISTANCES;
     });
 
+    // Alchemist's Stone
+    ApplySpellFix({ 17619 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
+    });
+
+    // Gnomish Death Ray
+    ApplySpellFix({ 13278, 13280 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ENEMY;
+    });
+
+    // Stormchops
+    ApplySpellFix({ 43730 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[1] = 1;
+        spellInfo->EffectImplicitTargetB[1] = 0;
+    });
+
+    // Savory Deviate Delight (transformations), allow to mount while transformed
+    ApplySpellFix({ 8219, 8220, 8221, 8222 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Attributes &= ~SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
+    });
+
+    // Clamlette Magnifique
+    ApplySpellFix({ 72623 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectBasePoints[EFFECT_0] = spellInfo->EffectBasePoints[EFFECT_1];
+    });
+
+    // Compact Harvest Reaper
+    ApplySpellFix({ 4078 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = 6; // 10 minutes
+    });
+
+    // Dragon Kite, Tuskarr Kite - Kite String
+    ApplySpellFix({ 45192 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->rangeIndex = 6; // 100yd
+    });
+
+    // Frigid Frostling, Infrigidate
+    ApplySpellFix({ 74960 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[EFFECT_0] = 9; // 20yd
+    });
+
+    // Apple Trap
+    ApplySpellFix({ 43450 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_SRC_AREA_ENEMY;
+        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_CASTER;
+        spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
+    });
+
+    // Dark Iron Attack - spawn mole machine
+    ApplySpellFix({ 43563 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[2] = 0; // summon GO's manually
+    });
+
+    // Throw Mug visual
+    ApplySpellFix({ 42300 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+    });
+
+    // Dark Iron knockback Aura
+    ApplySpellFix({ 42299 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+        spellInfo->EffectMiscValue[0] = 100;
+        spellInfo->EffectBasePoints[0] = 79;
+    });
+
+    // Chug and Chuck!
+    ApplySpellFix({ 42436 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
+        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
+        spellInfo->MaxAffectedTargets = 0;
+        spellInfo->excludeCasterAuraSpell = 42299;
+    });
+
+    // Catch the Wild Wolpertinger!
+    ApplySpellFix({ 41621 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
+    });
+
+    // Brewfest quests
+    ApplySpellFix({ 47134, 51798 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[0] = 0;
+    });
+
+    // The Heart of The Storms (12998)
+    ApplySpellFix({ 43528 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = 18;
+        spellInfo->EffectImplicitTargetA[0] = 25;
+    });
+
+    // Water splash
+    ApplySpellFix({ 42348 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[0] = 0;
+    });
+
+    // Summon Lantersn
+    ApplySpellFix({ 44255, 44231 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+        spellInfo->EffectImplicitTargetB[0] = 0;
+    });
+
+    // Throw Head Back
+    ApplySpellFix({ 42401 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_NEARBY_ENTRY;
+    });
+
+    // Various food
+    ApplySpellFix({ 65418 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectTriggerSpell[2] = 65410;
+    });
+
+    ApplySpellFix({ 65422 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectTriggerSpell[2] = 65414;
+    });
+
+    ApplySpellFix({ 65419 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectTriggerSpell[2] = 65416;
+    });
+
+    ApplySpellFix({ 65420 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectTriggerSpell[2] = 65412;
+    });
+
+    ApplySpellFix({ 65421 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectTriggerSpell[2] = 65415;
+    });
+
+    // Stamp Out Bonfire
+    ApplySpellFix({ 45437 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
+        spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_NEARBY_ENTRY;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+    });
+
+    // Light Bonfire (DND)
+    ApplySpellFix({ 29831 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+    });
+
+    // Infernal
+    ApplySpellFix({ 33240 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ANY;
+        spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_UNIT_TARGET_ANY;
+        spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_TARGET_ANY;
+    });
+
+    // Check for SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER
     ApplySpellFix({
-
+        47476,  // Deathknight - Strangulate
+        15487,  // Priest - Silence
+        5211,   // Druid - Bash  - R1
+        6798,   // Druid - Bash  - R2
+        8983    // Druid - Bash  - R3
         }, [](SpellEntry* spellInfo)
     {
-
+        spellInfo->AttributesEx7 |= SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER;
     });
 
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-
-    ApplySpellFix({
-
-        }, [](SpellEntry* spellInfo)
-    {
-
-    });
-    for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
-=======
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
->>>>>>> parent of ac9d74bd... step 1 - rename
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
         if (!spellInfo)
