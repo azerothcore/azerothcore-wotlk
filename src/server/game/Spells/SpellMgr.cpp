@@ -5427,1238 +5427,312 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
     });
 
-    // Trial of the Champion, Death's Respite
-    ApplySpellFix({ 68306 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = 25;
-        spellInfo->EffectImplicitTargetA[1] = 25;
-    });
-
-    // Trial of the Champion, Eadric Achievement (The Faceroller)
-    ApplySpellFix({ 68197 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ALLY;
-        spellInfo->Attributes |= SPELL_ATTR0_CASTABLE_WHILE_DEAD;
-    });
-
-    // Trial of the Champion, Earth Shield
-    ApplySpellFix({ 67530 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL; // will trigger 67537
-    });
-
-    // Trial of the Champion, Hammer of the Righteous
-    ApplySpellFix({ 66867 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
-    });
-
-    // Trial of the Champion, Summon Risen Jaeren/Arelas
-    ApplySpellFix({ 67705, 67715 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
-    });
-
-    // Trial of the Champion, Ghoul Explode
-    ApplySpellFix({ 67751 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
-        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
-        spellInfo->EffectRadiusIndex[0] = 12;
-        spellInfo->EffectImplicitTargetA[1] = TARGET_SRC_CASTER;
-        spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_SRC_AREA_ENTRY;
-        spellInfo->EffectRadiusIndex[1] = 12;
-        spellInfo->EffectImplicitTargetA[2] = TARGET_SRC_CASTER;
-        spellInfo->EffectImplicitTargetB[2] = TARGET_UNIT_SRC_AREA_ENTRY;
-        spellInfo->EffectRadiusIndex[2] = 12;
-    });
-
-    // Trial of the Champion, Desecration
-    ApplySpellFix({ 67778, 67877 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectTriggerSpell[0] = 68766;
-    });
-
-    // Trial of the Crusader, Jaraxxus Intro spell
-    ApplySpellFix({ 67888 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
-        spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-    });
-
-    // Trial of the Crusader, Lich King Intro spell
-    ApplySpellFix({ 68193 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
-    });
-
-    // Trial of the Crusader, Gormok, player vehicle spell, CUSTOM! (default jump to hand, not used)
-    ApplySpellFix({ 66342 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_SET_VEHICLE_ID;
-        spellInfo->EffectMiscValue[0] = 496;
-        spellInfo->DurationIndex = 21;
-        spellInfo->rangeIndex = 13;
-        spellInfo->EffectImplicitTargetA[0] = 25;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_CHANGE_MAP;
-    });
-
-    // Trial of the Crusader, Gormok, Fire Bomb
-    ApplySpellFix({ 66313 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-        spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_TARGET_ANY;
-        spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;
-        spellInfo->EffectImplicitTargetB[1] = TARGET_DEST_TARGET_ANY;
-        spellInfo->Effect[1] = 0;
-    });
-
-    ApplySpellFix({ 66317 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
-        spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-    });
-
-    ApplySpellFix({ 66318 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->speed = 14.0f;
-        spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
-        spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-    });
-
-    ApplySpellFix({ 66320, 67472, 67473, 67475 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = 7;
-        spellInfo->EffectRadiusIndex[1] = 7;
-    });
-
-    // Trial of the Crusader, Acidmaw & Dreadscale, Emerge
-    ApplySpellFix({ 66947 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
-    });
-
-    // Trial of the Crusader, Jaraxxus, Curse of the Nether
-    ApplySpellFix({ 66211 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->excludeTargetAuraSpell = 66209; // exclude Touch of Jaraxxus
-    });
-
-    // Trial of the Crusader, Jaraxxus, Summon Volcano
-    ApplySpellFix({ 66258, 67901 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->DurationIndex = 85; // summon for 18 seconds, 15 not enough
-    });
-
-    // Trial of the Crusader, Jaraxxus, Spinning Pain Spike
-    ApplySpellFix({ 66281 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = 26;
-    });
-
-    ApplySpellFix({ 66287 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->EffectApplyAuraName[1] = SPELL_AURA_MOD_TAUNT;
-        spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_NEARBY_ENTRY;
-        spellInfo->Effect[2] = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->EffectApplyAuraName[2] = SPELL_AURA_MOD_STUN;
-        spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
-        spellInfo->DurationIndex = 35; // 4 secs
-    });
-
-    // Trial of the Crusader, Jaraxxus, Fel Fireball
-    ApplySpellFix({ 66532, 66963, 66964, 66965 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
-    });
-
-    // tempfix, make Nether Power not stealable
-    ApplySpellFix({ 66228, 67106, 67107, 67108 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_STEALABLE;
-    });
-
-    // Trial of the Crusader, Faction Champions, Druid - Tranquality
-    ApplySpellFix({ 66086, 67974, 67975, 67976 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA_FRIEND;
-    });
-
-    // Trial of the Crusader, Faction Champions, Shaman - Earth Shield
-    ApplySpellFix({ 66063 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-        spellInfo->EffectTriggerSpell[0] = 66064;
-    });
-
-    // Trial of the Crusader, Faction Champions, Priest - Mana Burn
-    ApplySpellFix({ 66100 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectBasePoints[0] = 5;
-        spellInfo->EffectDieSides[0] = 0;
-    });
-
-    ApplySpellFix({ 68026 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectBasePoints[0] = 8;
-        spellInfo->EffectDieSides[0] = 0;
-    });
-
-    ApplySpellFix({ 68027 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectBasePoints[0] = 6;
-        spellInfo->EffectDieSides[0] = 0;
-    });
-
-    ApplySpellFix({ 68028 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectBasePoints[0] = 10;
-        spellInfo->EffectDieSides[0] = 0;
-    });
-
-    // Trial of the Crusader, Twin Valkyr, Touch of Light/Darkness, Light/Dark Surge
     ApplySpellFix({
-        65950   // light 0
+
         }, [](SpellEntry* spellInfo)
     {
-        //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-        spellInfo->EffectImplicitTargetA[0] = 6;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+
     });
 
     ApplySpellFix({
-        65767   // light surge 0
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 65686;
+
     });
 
     ApplySpellFix({
-        67296   // light 1
+
         }, [](SpellEntry* spellInfo)
     {
-        //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-        spellInfo->EffectImplicitTargetA[0] = 6;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+
     });
 
     ApplySpellFix({
-        67274   // light surge 1
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 67222;
+
     });
 
     ApplySpellFix({
-        67297   // light 2
+
         }, [](SpellEntry* spellInfo)
     {
-        //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-        spellInfo->EffectImplicitTargetA[0] = 6;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+
     });
 
     ApplySpellFix({
-        67275   // light surge 2
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 67223;
+
     });
 
     ApplySpellFix({
-        67298   // light 3
+
         }, [](SpellEntry* spellInfo)
     {
-        //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-        spellInfo->EffectImplicitTargetA[0] = 6;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+
     });
 
     ApplySpellFix({
-        67276   // light surge 3
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 67224;
+
     });
 
     ApplySpellFix({
-        66001   // dark 0
+
         }, [](SpellEntry* spellInfo)
     {
-        //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-        spellInfo->EffectImplicitTargetA[0] = 6;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+
     });
 
     ApplySpellFix({
-        65769   // dark surge 0
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 65684;
+
     });
 
     ApplySpellFix({
-        67281   // dark 1
+
         }, [](SpellEntry* spellInfo)
     {
-        //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-        spellInfo->EffectImplicitTargetA[0] = 6;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+
     });
 
     ApplySpellFix({
-        67265   // dark surge 1
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 67176;
+
     });
 
     ApplySpellFix({
-        67282   // dark 2
+
         }, [](SpellEntry* spellInfo)
     {
-        //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-        spellInfo->EffectImplicitTargetA[0] = 6;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+
     });
 
     ApplySpellFix({
-        67266   // dark surge 2
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 67177;
+
     });
 
     ApplySpellFix({
-        67283   // dark 3
+
         }, [](SpellEntry* spellInfo)
     {
-        //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-        spellInfo->EffectImplicitTargetA[0] = 6;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+
     });
 
     ApplySpellFix({
-        67267   // dark surge 3
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 67178;
-    });
 
-    // Trial of the Crusader, Twin Valkyr, Twin's Pact
-    ApplySpellFix({ 65875, 67303, 67304, 67305, 65876, 67306, 67307, 67308 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
-    });
-
-    // Trial of the Crusader, Anub'arak, Emerge
-    ApplySpellFix({ 65982 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
-    });
-
-    // Trial of the Crusader, Anub'arak, Penetrating Cold
-    ApplySpellFix({ 66013, 67700, 68509, 68510 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = 12; // 100yd
-    });
-
-    // Trial of the Crusader, Anub'arak, Shadow Strike
-    ApplySpellFix({ 66134 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
-        spellInfo->Effect[0] = 0;
-    });
-
-    // Trial of the Crusader, Anub'arak, Pursuing Spikes
-    ApplySpellFix({ 65920, 65922, 65923 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-        //spellInfo->EffectTriggerSpell[0] = 0;
-    });
-
-    // Trial of the Crusader, Anub'arak, Summon Scarab
-    ApplySpellFix({ 66339 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->DurationIndex = 35;
-        spellInfo->EffectImplicitTargetA[0] = 25;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-    });
-
-    // Trial of the Crusader, Anub'arak, Achievements: The Traitor King
-    ApplySpellFix({
-        68186,  // Anub'arak Scarab Achievement 10
-        68515   // Anub'arak Scarab Achievement 25
-        }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
-        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
-        spellInfo->Attributes |= SPELL_ATTR0_CASTABLE_WHILE_DEAD;
-    });
-
-    // Trial of the Crusader, Anub'arak, Spider Frenzy
-    ApplySpellFix({ 66129 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-    });
-
-    // Soul Sickness
-    ApplySpellFix({ 69131 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
-        spellInfo->EffectAmplitude[0] = 8000;
-        spellInfo->EffectTriggerSpell[0] = 69133;
-    });
-
-    // Phantom Blast
-    ApplySpellFix({ 68982, 70322 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
-    });
-
-    // Empowered Blizzard
-    ApplySpellFix({ 70131 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-    });
-
-    // Ice Lance Volley
-    ApplySpellFix({ 70464 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
-        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
-        spellInfo->EffectRadiusIndex[0] = 25;
     });
 
     ApplySpellFix({
-        70513,   // Multi-Shot
-        59514    // Shriek of the Highborne
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CONE_ENTRY;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-    });
 
-    // Icicle
-    ApplySpellFix({ 69428, 69426 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->InterruptFlags = 0;
-        spellInfo->AuraInterruptFlags = 0;
-        spellInfo->ChannelInterruptFlags = 0;
-    });
-
-    ApplySpellFix({ 70525, 70639 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->EffectImplicitTargetA[2] = TARGET_SRC_CASTER;
-        spellInfo->EffectImplicitTargetB[2] = TARGET_UNIT_SRC_AREA_ENTRY;
-        spellInfo->EffectRadiusIndex[2] = 30; // 500yd
-    });
-
-    // Frost Nova
-    ApplySpellFix({ 68198 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->rangeIndex = 13;
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-    });
-
-    // Blight
-    ApplySpellFix({ 69604, 70286 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->MaxAffectedTargets = 1;
-        spellInfo->AttributesEx3 |= (SPELL_ATTR3_IGNORE_HIT_RESULT | SPELL_ATTR3_ONLY_TARGET_PLAYERS);
-    });
-
-    // Chilling Wave
-    ApplySpellFix({ 68778, 70333 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_TARGET_ENEMY;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-    });
-
-    ApplySpellFix({ 68786, 70336 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= (SPELL_ATTR3_IGNORE_HIT_RESULT | SPELL_ATTR3_ONLY_TARGET_PLAYERS);
-        spellInfo->Effect[2] = SPELL_EFFECT_DUMMY;
-    });
-
-    // Pursuit
-    ApplySpellFix({ 68987 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;
-        spellInfo->EffectImplicitTargetB[1] = 0;
-        spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
-        spellInfo->EffectImplicitTargetB[2] = 0;
-        spellInfo->rangeIndex = 6; // 100yd
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-    });
-
-    ApplySpellFix({ 69029, 70850 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[2] = 0;
-    });
-
-    // Explosive Barrage
-    ApplySpellFix({ 69263 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_STUN;
-    });
-
-    // Overlord's Brand
-    ApplySpellFix({ 69172 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->procFlags = DONE_HIT_PROC_FLAG_MASK & ~PROC_FLAG_DONE_PERIODIC;
-        spellInfo->procChance = 100;
-    });
-
-    // Icy Blast
-    ApplySpellFix({ 69232 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectTriggerSpell[1] = 69238;
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-    });
-
-    ApplySpellFix({ 69233, 69646 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-    });
-
-    ApplySpellFix({ 69238, 69628 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-        spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_DYNOBJ_NONE;
-        spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DEST;
-        spellInfo->EffectImplicitTargetB[1] = TARGET_DEST_DYNOBJ_NONE;
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-    });
-
-    // Hoarfrost
-    ApplySpellFix({ 69246, 69245, 69645 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-    });
-
-    // Devour Humanoid
-    ApplySpellFix({ 69503 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->ChannelInterruptFlags |= 0;
-        spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING;
-    });
-
-    // Falric: Defiling Horror
-    ApplySpellFix({ 72435, 72452 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;
-        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_200_YARDS;
-    });
-
-    // Frostsworn General - Throw Shield
-    ApplySpellFix({ 69222, 73076 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_TARGET_ENEMY;
-    });
-
-    // Halls of Reflection Clone
-    ApplySpellFix({ 69828 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
-    });
-
-    // Summon Ice Wall
-    ApplySpellFix({ 69768 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-    });
-
-    ApplySpellFix({ 69767 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_TARGET_ANY;
-        spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_TARGET_ANY;
-    });
-
-    // Essence of the Captured
-    ApplySpellFix({ 73035, 70719 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->rangeIndex = 13;
-    });
-
-    // Achievement Check
-    ApplySpellFix({ 72830 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;
     });
 
     ApplySpellFix({
-        70781,  // Light's Hammer Teleport
-        70856,  // Oratory of the Damned Teleport
-        70857,  // Rampart of Skulls Teleport
-        70858,  // Deathbringer's Rise Teleport
-        70859,  // Upper Spire Teleport
-        70860,  // Frozen Throne Teleport
-        70861   // Sindragosa's Lair Teleport
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DB;   // this target is for SPELL_EFFECT_TELEPORT_UNITS
-        spellInfo->EffectImplicitTargetB[1] = 0;
-        spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_TARGET_ANY;
-        spellInfo->EffectImplicitTargetB[2] = 0;
+
     });
 
     ApplySpellFix({
-        70960,  // Bone Flurry
-        71258   // Adrenaline Rush (Ymirjar Battle-Maiden)
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_2;
-    });
 
-    // Saber Lash (Lord Marrowgar)
-    ApplySpellFix({ 69055, 70814 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = 8;    // 5yd
-    });
-
-    // Impaled (Lord Marrowgar)
-    ApplySpellFix({ 69065 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[0] = 0;   // remove stun so Dispersion can be used
-    });
-
-    // Cold Flame (Lord Marrowgar)
-    ApplySpellFix({ 72701, 72702, 72703, 72704 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
-        spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DEST;
-        spellInfo->EffectImplicitTargetB[1] = 0;
-        spellInfo->DurationIndex = 9;   // 30 secs instead of 12, need him for longer, but will stop his actions after 12 secs
-    });
-
-    ApplySpellFix({ 69138 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[0] = 0;
-        spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DEST;
-        spellInfo->DurationIndex = 9;   // 30 secs instead of 12, need him for longer, but will stop his actions after 12 secs
-    });
-
-    ApplySpellFix({ 69146, 70823, 70824, 70825 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = 15;   // 3yd instead of 5yd
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
-    });
-
-    // Dark Martyrdom (Lady Deathwhisper)
-    ApplySpellFix({ 70897 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
     });
 
     ApplySpellFix({
-        69075,  // Bone Storm (Lord Marrowgar)
-        70834,  // Bone Storm (Lord Marrowgar)
-        70835,  // Bone Storm (Lord Marrowgar)
-        70836,  // Bone Storm (Lord Marrowgar)
-        72378,  // Blood Nova (Deathbringer Saurfang)
-        73058,  // Blood Nova (Deathbringer Saurfang)
-        72769,  // Scent of Blood (Deathbringer Saurfang)
-        72385,  // Boiling Blood (Deathbringer Saurfang)
-        72441,  // Boiling Blood (Deathbringer Saurfang)
-        72442,  // Boiling Blood (Deathbringer Saurfang)
-        72443,  // Boiling Blood (Deathbringer Saurfang)
-        71160,  // Plague Stench (Stinky)
-        71161,  // Plague Stench (Stinky)
-        71123,  // Decimate (Stinky & Precious)
-        71464   // Divine Surge (Sister Svalna)
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectRadiusIndex[0] = 12;   // 100yd
-    });
 
-    // Shadow's Fate
-    ApplySpellFix({ 71169 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-    });
-
-    // Lock Players and Tap Chest
-    ApplySpellFix({ 72347 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx3 &= ~SPELL_ATTR3_NO_INITIAL_AGGRO;
-    });
-
-    // Award Reputation - Boss Kill
-    ApplySpellFix({ 73843, 73844, 73845, 73846 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_50000_YARDS;
-    });
-
-    // Death Plague (Rotting Frost Giant)
-    ApplySpellFix({ 72864 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->excludeTargetAuraSpell = 0;
-    });
-
-    // Gunship Battle, spell Below Zero
-    ApplySpellFix({ 69705 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-    });
-
-    // Resistant Skin (Deathbringer Saurfang adds)
-    ApplySpellFix({ 72723 }, [](SpellEntry* spellInfo)
-    {
-        // this spell initially granted Shadow damage immunity, however it was removed but the data was left in client
-        spellInfo->Effect[2] = 0;
-    });
-
-    // Mark of the Fallen Champion (Deathbringer Saurfang)
-    ApplySpellFix({ 72255, 72444, 72445, 72446 }, [](SpellEntry* spellInfo)
-    {
-        // Patch 3.3.2 (2010-01-02): Deathbringer Saurfang will no longer gain blood power from Mark of the Fallen Champion.
-        // prevented in script, effect needed for Prayer of Mending
-        spellInfo->AttributesEx3 &= ~SPELL_ATTR3_CANT_TRIGGER_PROC;
-    });
-
-    // Coldflame Jets (Traps after Saurfang)
-    ApplySpellFix({ 70460 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->DurationIndex = 1;   // 10 seconds
     });
 
     ApplySpellFix({
-        70461,  // Coldflame Jets (Traps after Saurfang)
-        71289   // Dominate Mind (Lady Deathwhisper)
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-    });
 
-    // Severed Essence (Val'kyr Herald)
-    ApplySpellFix({ 71906, 71942 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ENEMY;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
     });
 
     ApplySpellFix({
-        71159,  // Awaken Plagued Zombies (Precious)
-        71302   // Awaken Ymirjar Fallen (Ymirjar Deathbringer)
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->DurationIndex = 21;
-    });
 
-    // Blood Prince Council, Invocation of Blood
-    ApplySpellFix({ 70981, 70982, 70952 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[0] = 0; // clear share health aura
-    });
-
-    // Ymirjar Frostbinder, Frozen Orb
-    ApplySpellFix({ 71274 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = 6;
-    });
-
-    // Ooze Flood (Rotface)
-    ApplySpellFix({ 69783, 69797, 69799, 69802 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx |= SPELL_ATTR1_CANT_TARGET_SELF;
-    });
-
-    // Volatile Ooze Beam Protection
-    ApplySpellFix({ 70530 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA; // blizzard typo, 65 instead of 6, aura itself is defined (dummy)
-    });
-
-    // Professor Putricide, Gaseous Bloat (Orange Ooze Channel)
-    ApplySpellFix({ 70672, 72455, 72832, 72833 }, [](SpellEntry* spellInfo)
-    {
-        // copied attributes from Green Ooze Channel
-        spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
     });
 
     ApplySpellFix({
-        71412,  // Green Ooze Summon (Professor Putricide)
-        71415   // Orange Ooze Summon (Professor Putricide)
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+
     });
 
     ApplySpellFix({
-        71621,  // Create Concoction (Professor Putricide)
-        72850,
-        72851,
-        72852,
-        71893,  // Guzzle Potions (Professor Putricide)
-        73120,
-        73121,
-        73122
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->CastingTimeIndex = 15; // 4 sec
-    });
 
-    // Mutated Plague (Professor Putricide)
-    ApplySpellFix({ 72454, 72464, 72506, 72507 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_RESISTANCES;
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
-    });
-
-    // Unbound Plague (Professor Putricide) (needs target selection script)
-    ApplySpellFix({ 70911, 72854, 72855, 72856 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_TARGET_ENEMY;
-    });
-
-    // Mutated Transformation (Professor Putricide)
-    ApplySpellFix({ 70402, 72511, 72512, 72513 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
-    });
-
-    // Empowered Flare (Blood Prince Council)
-    ApplySpellFix({ 71708, 72785, 72786, 72787 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
     });
 
     ApplySpellFix({
-        71518,  // Unholy Infusion Quest Credit (Professor Putricide)
-        72934,  // Blood Infusion Quest Credit (Blood-Queen Lana'thel)
-        72289   // Frost Infusion Quest Credit (Sindragosa)
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;   // another missing radius
-    });
 
-    // Swarming Shadows
-    ApplySpellFix({ 71266, 72890 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AreaGroupId = 0; // originally, these require area 4522, which is... outside of Icecrown Citadel
     });
 
     ApplySpellFix({
-        71301,  // Summon Dream Portal (Valithria Dreamwalker)
-        71977   // Summon Nightmare Portal (Valithria Dreamwalker)
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-    });
 
-    // Column of Frost (visual marker)
-    ApplySpellFix({ 70715 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->DurationIndex = 32; // 6 seconds (missing)
-    });
-
-    // Mana Void (periodic aura)
-    ApplySpellFix({ 71085 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->DurationIndex = 9; // 30 seconds (missing)
-    });
-
-    // Summon Suppressor (needs target selection script)
-    ApplySpellFix({ 70936 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-        spellInfo->EffectImplicitTargetB[0] = 0;
-    });
-
-    // Corruption
-    ApplySpellFix({ 70602 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
     });
 
     ApplySpellFix({
-        72706,  // Achievement Check (Valithria Dreamwalker)
-        71357   // Order Whelp
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;   // 200yd
-    });
 
-    // Sindragosa's Fury
-    ApplySpellFix({ 70598 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-    });
-
-    // Tail Smash (Sindragosa)
-    ApplySpellFix({ 71077 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_CASTER_BACK;
-        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_DEST_AREA_ENEMY;
-        spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_CASTER_BACK;
-        spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_DEST_AREA_ENEMY;
-    });
-
-    // Frost Bomb
-    ApplySpellFix({ 69846 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->speed = 0.0f;    // This spell's summon happens instantly
-    });
-
-    // Mystic Buffet (Sindragosa)
-    ApplySpellFix({ 70127, 72528, 72529, 72530 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Effect[1] = 0; // remove obsolete spell effect with no targets
-    });
-
-    // Sindragosa, Frost Aura
-    ApplySpellFix({ 70084, 71050, 71051, 71052 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Attributes &= ~SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
-    });
-
-    // Ice Lock
-    ApplySpellFix({ 71614 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->Mechanic = MECHANIC_STUN;
-    });
-
-    // Lich King, Infest
-    ApplySpellFix({ 70541, 73779, 73780, 73781 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-    });
-
-    // Lich King, Necrotic Plague
-    ApplySpellFix({ 70337, 73912, 73913, 73914, 70338, 73785, 73786, 73787 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
     });
 
     ApplySpellFix({
-        69099,  // Ice Pulse 10n
-        73776,  // Ice Pulse 25n
-        73777,  // Ice Pulse 10h
-        73778   // Ice Pulse 25h
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
-    });
 
-    // Fury of Frostmourne
-    ApplySpellFix({ 72350 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
-        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
     });
 
     ApplySpellFix({
-        72351,  // Fury of Frostmourne
-        72431,  // Jump (removes Fury of Frostmourne debuff)
-        72429,  // Mass Resurrection
-        73159   // Play Movie
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
-    });
 
-    // Raise Dead
-    ApplySpellFix({ 72376 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->MaxAffectedTargets = 4;
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
-    });
-
-    // Jump
-    ApplySpellFix({ 71809 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->rangeIndex = 5; // 40yd
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS; // 10yd
-        spellInfo->EffectMiscValue[0] = 190;
-    });
-
-    // Broken Frostmourne
-    ApplySpellFix({ 72405 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_200_YARDS;   // 200yd
-    });
-
-    // Summon Shadow Trap
-    ApplySpellFix({ 73540 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->DurationIndex = 3;   // 60 seconds
-    });
-
-    // Shadow Trap (visual)
-    ApplySpellFix({ 73530 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->DurationIndex = 28;          // 5 seconds
-    });
-
-    // Shadow Trap
-    ApplySpellFix({ 73529 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_10_YARDS;   // 10yd
-    });
-
-    // Shadow Trap (searcher)
-    ApplySpellFix({ 74282 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_3_YARDS;   // 3yd
-    });
-
-    // Raging Spirit Visual
-    ApplySpellFix({ 69198 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->rangeIndex = 13; // 50000yd
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-    });
-
-    // Defile
-    ApplySpellFix({ 72762 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->DurationIndex = 559; // 53 seconds
-        spellInfo->excludeCasterAuraSpell = 0;
-        spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
-        spellInfo->AttributesEx6 |= (SPELL_ATTR6_CAN_TARGET_INVISIBLE | SPELL_ATTR6_CAN_TARGET_UNTARGETABLE);
-    });
-
-    // Defile
-    ApplySpellFix({ 72743 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->DurationIndex = 22; // 45 seconds
-    });
-
-    ApplySpellFix({ 72754, 73708, 73709, 73710 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;   // 200yd
-        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_200_YARDS;   // 200yd
-    });
-
-    // Val'kyr Target Search
-    ApplySpellFix({ 69030 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;   // 200yd
-        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_200_YARDS;   // 200yd
-        spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
-    });
-
-    // Harvest Souls
-    ApplySpellFix({ 73654, 74295, 74296, 74297 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
-        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
-        spellInfo->EffectRadiusIndex[2] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
-    });
-
-    // Restore Soul
-    ApplySpellFix({ 72595, 73650 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;   // 200yd
-    });
-
-    // Kill Frostmourne Players
-    ApplySpellFix({ 75127 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_50000_YARDS;    // 50000yd
-    });
-
-    // Harvest Soul
-    ApplySpellFix({ 73655 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
-    });
-
-    // Destroy Soul
-    ApplySpellFix({ 74086 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;   // 200yd
-    });
-
-    // Summon Spirit Bomb
-    ApplySpellFix({ 74302, 74342 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;   // 200yd
-        spellInfo->MaxAffectedTargets = 1;
-    });
-
-    // Summon Spirit Bomb
-    ApplySpellFix({ 74341, 74343 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;   // 200yd
-        spellInfo->MaxAffectedTargets = 3;
-    });
-
-    // Summon Spirit Bomb
-    ApplySpellFix({ 73579 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_25_YARDS;   // 25yd
-    });
-
-    // Trigger Vile Spirit (Inside, Heroic)
-    ApplySpellFix({ 73582 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
-    });
-
-    // Scale Aura (used during Dominate Mind from Lady Deathwhisper)
-    ApplySpellFix({ 73261 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
-    });
-
-    // Leap to a Random Location
-    ApplySpellFix({ 70485 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->rangeIndex = 6; // 100yd
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS;
-        spellInfo->EffectMiscValue[0] = 100;
-    });
-
-    // Empowered Blood
-    ApplySpellFix({ 70227, 70232 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AreaGroupId = 2452; // Whole icc instead of Crimson Halls only, remove when area calculation is fixed
-    });
-
-    ApplySpellFix({ 74509 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_20_YARDS;
-        spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_20_YARDS;
-    });
-
-    // Rallying Shout
-    ApplySpellFix({ 75414 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_20_YARDS;
-    });
-
-    // Barrier Channel
-    ApplySpellFix({ 76221 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->ChannelInterruptFlags &= ~(AURA_INTERRUPT_FLAG_TURNING | AURA_INTERRUPT_FLAG_MOVE);
-        spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_UNIT_NEARBY_ENTRY;
-    });
-
-    // Intimidating Roar
-    ApplySpellFix({ 74384 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_100_YARDS;
-        spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_100_YARDS;
     });
 
     ApplySpellFix({
-        74562,  // Fiery Combustion
-        74792   // Soul Consumption
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REDIRECTED;
-    });
 
-    // Combustion
-    ApplySpellFix({ 75883, 75884 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_6_YARDS;
-        spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_6_YARDS;
-    });
-
-    // Consumption
-    ApplySpellFix({ 75875, 75876 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_6_YARDS;
-        spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_6_YARDS;
-        spellInfo->EffectMechanic[EFFECT_0] = 0;
-        spellInfo->EffectMechanic[EFFECT_1] = MECHANIC_SNARE;
-    });
-
-    // Soul Consumption
-    ApplySpellFix({ 74799 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_12_YARDS;
-    });
-
-    // Twilight Cutter
-    ApplySpellFix({ 74769, 77844, 77845, 77846 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_100_YARDS;
-    });
-
-    // Twilight Mending
-    ApplySpellFix({ 75509 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_100_YARDS;
-        spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_100_YARDS;
-    });
-
-    // Meteor Strike
-    ApplySpellFix({ 74637 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->speed = 0;
-    });
-
-    //Blazing Aura
-    ApplySpellFix({ 75885, 75886 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
     });
 
     ApplySpellFix({
-        75952,  //Meteor Strike
-        74629   //Combustion Periodic
+
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+
     });
 
-    // Going Bearback
-    ApplySpellFix({ 54897 }, [](SpellEntry* spellInfo)
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
-        spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
-        spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
+
     });
 
-    // Still At It
-    ApplySpellFix({ 51931, 51932, 51933 }, [](SpellEntry* spellInfo)
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectImplicitTargetA[0] = 38;
-        spellInfo->EffectImplicitTargetB[0] = 0;
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
     });
 
     ApplySpellFix({
