@@ -502,7 +502,13 @@ ACE_OS::strstr (wchar_t *s, const wchar_t *t)
 ACE_INLINE char *
 ACE_OS::strtok (char *s, const char *tokens)
 {
+#if !defined (ACE_LACKS_STRTOK)
   return ::strtok (s, tokens);
+#else
+  ACE_UNUSED_ARG (s);
+  ACE_UNUSED_ARG (tokens);
+  ACE_NOTSUP_RETURN (0);
+#endif /* ACE_LACKS_STRTOK */
 }
 
 #if defined (ACE_HAS_WCHAR) && !defined (ACE_LACKS_WCSTOK)
