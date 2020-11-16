@@ -2521,7 +2521,7 @@ Rate.InstanceResetTime = 1
 
 #
 #    Rate.Pet.LevelXP
-#        Description: Modifies the amount of experience required to leveling up a pet.
+#        Description: Modifies the amount of experience required to level up a pet.
 #					  The lower the rate the less experience is required.
 #        Default:     0.05
 #   
