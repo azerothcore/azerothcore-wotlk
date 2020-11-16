@@ -3472,7 +3472,6 @@ void SpellMgr::LoadDbcDataCorrections()
         51124,  // Killing Machine
         54741,  // Firestarter
         57761,  // Fireball!
-        39805,  // Lightning Overload
         64823,  // Item - Druid T8 Balance 4P Bonus
         34477,  // Misdirection
         44401,  // Missile Barrage
