@@ -688,6 +688,9 @@ public:
     SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : nullptr; }
     uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
 
+private:
+    SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
+
     // Talent Additional Set
     bool IsAdditionalTalentSpell(uint32 spellId) const;
 
@@ -722,8 +725,8 @@ public:
     void LoadSpellInfoStore();
     void UnloadSpellInfoStore();
     void UnloadSpellInfoImplicitTargetConditionLists();
-    void LoadSpellCustomAttr();
-    void LoadDbcDataCorrections();
+    void LoadSpellInfoCustomAttributes();
+    void LoadSpellInfoCorrections();
     void LoadSpellSpecificAndAuraState();
 
 private:
