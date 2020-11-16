@@ -4591,6 +4591,1303 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_HEAL;
     });
 
+    // Winterfin First Responder
+    ApplySpellFix({ 48739 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectBasePoints[0] = 1;
+        spellInfo->EffectRealPointsPerLevel[0] = 0;
+        spellInfo->EffectDieSides[0] = 0;
+        spellInfo->EffectDamageMultiplier[0] = 0;
+        spellInfo->EffectBonusMultiplier[0] = 0;
+    });
+
+    // Army of the Dead (trigger npc aura)
+    ApplySpellFix({ 49099 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectAmplitude[0] = 15000;
+    });
+
+    // Isle of Conquest
+    ApplySpellFix({ 66551 }, [](SpellEntry* spellInfo)
+    {
+        // Teleport in, missing range
+        spellInfo->rangeIndex = 13; // 50000yd
+    });
+
+    // A'dal's Song of Battle
+    ApplySpellFix({ 39953 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_SRC_CASTER;
+        spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_SRC_CASTER;
+        spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_SRC_CASTER;
+        spellInfo->EffectImplicitTargetB[EFFECT_0] = TARGET_UNIT_SRC_AREA_ALLY;
+        spellInfo->EffectImplicitTargetB[EFFECT_1] = TARGET_UNIT_SRC_AREA_ALLY;
+        spellInfo->EffectImplicitTargetB[EFFECT_2] = TARGET_UNIT_SRC_AREA_ALLY;
+        spellInfo->DurationIndex = 367; // 2 Hours
+    });
+
+    ApplySpellFix({
+        57607,  // WintergraspCatapult - Spell Plague Barrel - EffectRadiusIndex
+        57619,  // WintergraspDemolisher - Spell Hourl Boulder - EffectRadiusIndex
+        57610   // Cannon (Siege Turret)
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_25_YARDS; // SPELL_EFFECT_WMO_DAMAGE
+    });
+
+    // WintergraspCannon - Spell Fire Cannon - EffectRadiusIndex
+    ApplySpellFix({ 51422 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS; // SPELL_EFFECT_SCHOOL_DAMAGE
+    });
+
+    // WintergraspDemolisher - Spell Ram -  EffectRadiusIndex
+    ApplySpellFix({ 54107 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_3_YARDS; // SPELL_EFFECT_KNOCK_BACK
+        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_3_YARDS; // SPELL_EFFECT_SCHOOL_DAMAGE
+        spellInfo->EffectRadiusIndex[2] = EFFECT_RADIUS_3_YARDS; // SPELL_EFFECT_WEAPON_DAMAGE
+    });
+
+    // WintergraspSiegeEngine - Spell Ram - EffectRadiusIndex
+    ApplySpellFix({ 51678 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS; // SPELL_EFFECT_KNOCK_BACK
+        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_10_YARDS; // SPELL_EFFECT_SCHOOL_DAMAGE
+        spellInfo->EffectRadiusIndex[2] = EFFECT_RADIUS_20_YARDS; // SPELL_EFFECT_WEAPON_DAMAGE
+    });
+
+    // WintergraspCatapult - Spell Plague Barrell - Range
+    ApplySpellFix({ 57606 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->rangeIndex = 164; // "Catapult Range"
+    });
+
+    // Boulder (Demolisher)
+    ApplySpellFix({ 50999 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
+    });
+
+    // Flame Breath (Catapult)
+    ApplySpellFix({ 50990 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[EFFECT_0] = 19; // 18yd
+    });
+
+    // Jormungar Bite
+    ApplySpellFix({ 56103 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_UNIT_TARGET_ENEMY;
+        spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
+    });
+
+    // Throw Proximity Bomb
+    ApplySpellFix({ 34095 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ENEMY;
+        spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
+    });
+
+    ApplySpellFix({
+        53348,  // DEATH KNIGHT SCARLET FIRE ARROW
+        53117   // BALISTA
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 5000;
+        spellInfo->CategoryRecoveryTime = 5000;
+    });
+
+    // Teleport To Molten Core
+    ApplySpellFix({ 25139 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
+    });
+
+    // Landen Stilwell Transform
+    ApplySpellFix({ 31310 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
+    });
+
+    // Shadowstalker Stealth
+    ApplySpellFix({ 5916 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRealPointsPerLevel[EFFECT_0] = 5.0f;
+    });
+
+    // Sneak
+    ApplySpellFix({ 22766 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRealPointsPerLevel[EFFECT_0] = 5.0f;
+    });
+
+    // Murmur's Touch
+    ApplySpellFix({ 38794, 33711 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+        spellInfo->EffectTriggerSpell[0] = 33760;
+    });
+
+    // Negaton Field
+    ApplySpellFix({
+        36729,  // Normal
+        38834   // Heroic
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+    });
+
+    // Curse of the Doomsayer NORMAL
+    ApplySpellFix({ 36173 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectTriggerSpell[0] = 36174; // Currently triggers heroic version...
+    });
+
+    // Crystal Channel
+    ApplySpellFix({ 34156 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->rangeIndex = 35; // 35yd;
+        spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
+    });
+
+    // Debris
+    ApplySpellFix({ 36449 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
+    });
+
+    // Soul Channel
+    ApplySpellFix({ 30531 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+    });
+
+    // Debris Visual
+    ApplySpellFix({ 30632 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_DYNOBJ_ALLY;
+    });
+
+    // Activate Sunblade Protecto
+    ApplySpellFix({ 46475, 46476 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->rangeIndex = 14; // 60yd
+    });
+
+    // Break Ice
+    ApplySpellFix({ 46638 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 &= ~SPELL_ATTR3_ONLY_TARGET_PLAYERS; // Obvious fail, it targets gameobject...
+    });
+
+    // Sinister Reflection Clone
+    ApplySpellFix({ 45785 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->speed = 0.0f;
+    });
+
+    // Armageddon
+    ApplySpellFix({ 45909 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->speed = 8.0f;
+    });
+
+    // Spell Absorption
+    ApplySpellFix({ 41034 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[EFFECT_2] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->EffectApplyAuraName[EFFECT_2] = SPELL_AURA_SCHOOL_ABSORB;
+        spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_CASTER;
+        spellInfo->EffectMiscValue[EFFECT_2] = SPELL_SCHOOL_MASK_MAGIC;
+    });
+
+    // Shared Bonds
+    ApplySpellFix({ 41363 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_1;
+    });
+
+    ApplySpellFix({
+        41485,  // Deadly Poison
+        41487   // Envenom
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+    });
+
+    // Parasitic Shadowfiend
+    ApplySpellFix({ 41914 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+    });
+
+    // Teleport Maiev
+    ApplySpellFix({ 41221 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->rangeIndex = 13; // 0-50000yd
+    });
+
+    // Watery Grave Explosion
+    ApplySpellFix({ 37852 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
+    });
+
+    // Amplify Damage
+    ApplySpellFix({ 39095 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+    });
+
+    // Energy Feedback
+    ApplySpellFix({ 44335 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+    });
+
+    ApplySpellFix({
+        31984,  // Finger of Death
+        35354   // Hand of Death
+        }, [](SpellEntry* spellInfo)
+    {
+        // Spell doesn't need to ignore invulnerabilities
+        spellInfo->Attributes = SPELL_ATTR0_ABILITY;
+    });
+
+    // Finger of Death
+    ApplySpellFix({ 32111 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->CastingTimeIndex = 0;    // We only need the animation, no damage
+    });
+
+    // Flame Breath, catapult spell
+    ApplySpellFix({ 50989 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Attributes &= ~SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION;
+    });
+
+    // Koralon, Flaming Cinder 
+    ApplySpellFix({ 66690 }, [](SpellEntry* spellInfo)
+    {
+        // missing radius index
+        spellInfo->EffectRadiusIndex[0] = 12; //100yd
+        spellInfo->MaxAffectedTargets = 1;
+    });
+
+    // Acid Volley
+    ApplySpellFix({ 54714, 29325 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+    });
+
+    // Summon Plagued Warrior
+    ApplySpellFix({ 29237 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
+        spellInfo->Effect[1] = spellInfo->Effect[2] = 0;
+    });
+
+    // Icebolt
+    ApplySpellFix({ 28526 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+    });
+
+    // Infected Wound
+    ApplySpellFix({ 29306 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+    });
+
+    // Hopeless
+    ApplySpellFix({ 29125 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
+    });
+
+    // Jagged Knife
+    ApplySpellFix({ 55550 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_REQ_AMMO;
+    });
+
+    // Moorabi - Transformation
+    ApplySpellFix({ 55098 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
+    ApplySpellFix({
+        55521,  // Poisoned Spear (Normal)
+        58967,  // Poisoned Spear (Heroic)
+        55348,  // Throw (Normal)
+        58966   // Throw (Heroic)
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_REQ_AMMO;
+    });
+
+    // Charged Chaotic rift aura, trigger
+    ApplySpellFix({ 47737 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->rangeIndex = 37; // 50yd
+    });
+
+    // Vanish
+    ApplySpellFix({ 55964 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[1] = 0;
+        spellInfo->Effect[2] = 0;
+    });
+
+    // Trollgore - Summon Drakkari Invader
+    ApplySpellFix({ 49456, 49457, 49458 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DB;
+    });
+
+    ApplySpellFix({
+        48278,  // Paralyse
+        47669   // Awaken subboss
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+        spellInfo->EffectImplicitTargetB[0] = 0;
+    });
+
+    // Flame Breath
+    ApplySpellFix({ 47592 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectAmplitude[0] = 200;
+    });
+
+    // Skarvald, Charge
+    ApplySpellFix({ 43651 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->rangeIndex = 13; // 0-50000yd
+    });
+
+    // Ingvar the Plunderer, Woe Strike
+    ApplySpellFix({ 42730 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectTriggerSpell[1] = 42739;
+    });
+
+    ApplySpellFix({ 59735 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectTriggerSpell[1] = 59736;
+    });
+
+    // Ingvar the Plunderer, Ingvar transform
+    ApplySpellFix({ 42796 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
+    });
+
+    ApplySpellFix({
+        42772,  // Hurl Dagger (Normal)
+        59685   // Hurl Dagger (Heroic)
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_REQ_AMMO;
+    });
+
+    // Control Crystal Activation
+    ApplySpellFix({ 57804 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = 1;
+        spellInfo->EffectImplicitTargetB[0] = 0;
+    });
+
+    // Destroy Door Seal
+    ApplySpellFix({ 58040 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ChannelInterruptFlags &= ~(AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE);
+    });
+
+    // Ichoron, Water Blast
+    ApplySpellFix({ 54237, 59520 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+    });
+
+    // Krik'thir - Mind Flay
+    ApplySpellFix({ 52586, 59367 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
+    });
+
+    // Glare of the Tribunal
+    ApplySpellFix({ 50988, 59870 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+        spellInfo->EffectImplicitTargetB[0] = 0;
+    });
+
+    // Static Charge
+    ApplySpellFix({ 50835, 59847 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ALLY;
+    });
+
+    // Lava Strike damage
+    ApplySpellFix({ 57697 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+    });
+
+    // Lava Strike trigger
+    ApplySpellFix({ 57578 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+    });
+
+    // Gift of Twilight Shadow/Fire
+    ApplySpellFix({ 57835, 58766 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_1;
+    });
+
+    // Pyrobuffet
+    ApplySpellFix({ 57557 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->excludeTargetAuraSpell = 56911;
+    });
+
+    // Arcane Barrage
+    ApplySpellFix({ 56397 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ENEMY;
+        spellInfo->EffectImplicitTargetB[0] = 0;
+        spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ENEMY;
+        spellInfo->EffectImplicitTargetB[1] = 0;
+        spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_TARGET_ENEMY;
+        spellInfo->EffectImplicitTargetB[2] = 0;
+    });
+
+    ApplySpellFix({
+        55849,  // Power Spark (ground +50% dmg aura)
+        56438,  // Arcane Overload (-50% dmg taken) - this is to prevent apply -> unapply -> apply ... dunno whether it's correct
+
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+    });
+
+    // Vortex (Control Vehicle)
+    ApplySpellFix({ 56263 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+    });
+
+    // Haste (Nexus Lord, increase run speed of the disk)
+    ApplySpellFix({ 57060 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_VEHICLE;
+    });
+
+    // Arcane Overload
+    ApplySpellFix({ 56430 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->EffectTriggerSpell[0] = 56429;
+    });
+
+    // Summon Arcane Bomb
+    ApplySpellFix({ 56429 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+        spellInfo->EffectImplicitTargetB[0] = 0;
+        spellInfo->EffectImplicitTargetA[1] = 0;
+        spellInfo->EffectImplicitTargetB[1] = 0;
+        spellInfo->EffectImplicitTargetA[2] = 0;
+        spellInfo->EffectImplicitTargetB[2] = 0;
+    });
+
+    // Destroy Platform Event
+    ApplySpellFix({ 59099 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[1] = 22;
+        spellInfo->EffectImplicitTargetB[1] = 15;
+        spellInfo->EffectImplicitTargetA[2] = 22;
+        spellInfo->EffectImplicitTargetB[2] = 15;
+    });
+
+    // Surge of Power (Phase 3)
+    ApplySpellFix({
+        57407,  // N
+        60936   // H
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = (i == 60936 ? 3 : 1);
+        spellInfo->InterruptFlags = 0;
+        spellInfo->EffectRadiusIndex[0] = 28;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
+        spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
+        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+    });
+
+    // Wyrmrest Drake - Life Burst
+    ApplySpellFix({ 57143 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[0] = 0;
+        spellInfo->EffectImplicitTargetA[0] = 0;
+        spellInfo->EffectImplicitTargetB[0] = 0;
+        spellInfo->EffectImplicitTargetA[1] = TARGET_SRC_CASTER;
+        spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_SRC_AREA_ALLY;
+        spellInfo->EffectPointsPerComboPoint[1] = 2500;
+        spellInfo->EffectBasePoints[1] = 2499;
+        spellInfo->rangeIndex = 1;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+    });
+
+    //Alexstrasza - Gift
+    ApplySpellFix({ 61028 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+    });
+
+    // Vortex (freeze anim)
+    ApplySpellFix({ 55883 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+    });
+
+    // Hurl Pyrite
+    ApplySpellFix({ 62490 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[EFFECT_1] = 0;
+    });
+
+    // Ulduar, Mimiron, Magnetic Core (summon)
+    ApplySpellFix({ 64444 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_CASTER;
+    });
+
+    // Ulduar, Mimiron, bomb bot explosion
+    ApplySpellFix({ 63801 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectMiscValue[1] = 17286;
+    });
+
+    // Ulduar, Mimiron, Summon Flames Initial
+    ApplySpellFix({ 64563 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+        spellInfo->EffectImplicitTargetB[0] = 0;
+    });
+
+    // Ulduar, Mimiron, Flames (damage)
+    ApplySpellFix({ 64566 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+    });
+
+    // Ulduar, Hodir, Starlight
+    ApplySpellFix({ 62807 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[0] = 16; // 1yd
+    });
+
+    // Ulduar, General Vezax, Mark of the Faceless
+    ApplySpellFix({ 63278 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[0] = 0;
+    });
+
+    // Boom (XT-002)
+    ApplySpellFix({ 62834 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[EFFECT_1] = 0;
+    });
+
+    // Supercharge
+    ApplySpellFix({ 61920 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+    });
+
+    // Lightning Whirl
+    ApplySpellFix({ 61916 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 3;
+    });
+
+    ApplySpellFix({ 63482 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 8;
+    });
+
+    // Stone Grip, remove absorb aura
+    ApplySpellFix({ 62056, 63985 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[1] = 0;
+    });
+
+    // Sentinel Blast
+    ApplySpellFix({ 64389, 64678 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Dispel = DISPEL_MAGIC;
+    });
+
+    // Potent Pheromones
+    ApplySpellFix({ 62619 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY;
+    });
+
+    // Healthy spore summon periodic
+    ApplySpellFix({ 62566 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectAmplitude[0] = 2000;
+        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
+    });
+
+    // Brightleaf Essence trigger
+    ApplySpellFix({ 62968 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[1] = 0; // duplicate
+    });
+
+    // Potent Pheromones
+    ApplySpellFix({ 64321 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+        spellInfo->AttributesEx |= SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY;
+    });
+
+    // Lightning Orb Charged
+    ApplySpellFix({ 62186 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectAmplitude[0] = 5000; // Duration 5 secs, amplitude 8 secs...
+    });
+
+    // Lightning Pillar
+    ApplySpellFix({ 62976 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->rangeIndex = 6;
+        spellInfo->DurationIndex = 28;
+    });
+
+    // Sif's Blizzard
+    ApplySpellFix({ 62576, 62602 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[0] = 14; // 8yd
+        spellInfo->EffectRadiusIndex[1] = 14; // 8yd
+    });
+
+    // Protective Gaze
+    ApplySpellFix({ 64175 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 25000;
+    });
+
+    // Shadow Beacon
+    ApplySpellFix({ 64465 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectTriggerSpell[0] = 64467; // why do they need two script effects :/ (this one has visual effect)
+    });
+
+    // Sanity
+    ApplySpellFix({ 63050 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+    });
+
+    // Shadow Nova
+    ApplySpellFix({ 62714, 65209 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+    });
+
+    // Cosmic Smash (Algalon the Observer)
+    ApplySpellFix({ 62293 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_CASTER;
+    });
+
+    // Cosmic Smash (Algalon the Observer)
+    ApplySpellFix({ 62311, 64596 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->EffectRadiusIndex[0] = 12; // 100yd
+        spellInfo->rangeIndex = 13;  // 50000yd
+    });
+
+    // Constellation Phase Effect
+    ApplySpellFix({ 65509 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+    });
+
+    // Black Hole
+    ApplySpellFix({ 62168, 65250, 62169 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
+    });
+
+    // Ground Slam
+    ApplySpellFix({ 62625 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
+    // Onyxia's Lair, Onyxia, Flame Breath (TriggerSpell = 0 and spamming errors in console)
+    ApplySpellFix({ 18435 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[1] = 0;
+    });
+
+    // Onyxia's Lair, Onyxia, Create Onyxia Spawner
+    ApplySpellFix({ 17647 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = 37;
+    });
+
+    ApplySpellFix({
+        17646,  // Onyxia's Lair, Onyxia, Summon Onyxia Whelp
+        68968   // Onyxia's Lair, Onyxia, Summon Lair Guard
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+        spellInfo->rangeIndex = 13;
+        spellInfo->DurationIndex = 5;
+    });
+
+    // Onyxia's Lair, Onyxia, Eruption
+    ApplySpellFix({ 17731, 69294 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
+        spellInfo->CastingTimeIndex = 3;
+        spellInfo->EffectRadiusIndex[1] = 19; // 18yd instead of 13yd to make sure all cracks erupt
+    });
+
+    // Onyxia's Lair, Onyxia, Breath
+    ApplySpellFix({
+        18576, 18578, 18579, 18580, 18581, 18582, 18583, 18609, 18611, 18612, 18613, 18614, 18615, 18616, 18584,
+        18585, 18586, 18587, 18588, 18589, 18590, 18591, 18592, 18593, 18594, 18595, 18564, 18565, 18566, 18567,
+        18568, 18569, 18570, 18571, 18572, 18573, 18574, 18575, 18596, 18597, 18598, 18599, 18600, 18601, 18602,
+        18603, 18604, 18605, 18606, 18607, 18617, 18619, 18620, 18621, 18622, 18623, 18624, 18625, 18626, 18627,
+        18628, 18618, 18351, 18352, 18353, 18354, 18355, 18356, 18357, 18358, 18359, 18360, 18361, 17086, 17087,
+        17088, 17089, 17090, 17091, 17092, 17093, 17094, 17095, 17097, 22267, 22268, 21132, 21133, 21135, 21136,
+        21137, 21138, 21139
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = 328; // 250ms
+        spellInfo->EffectImplicitTargetA[1] = 1;
+        if (spellInfo->Effect[1])
+        {
+            spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
+            spellInfo->EffectAmplitude[1] = ((spellInfo->CastingTimeIndex == 170) ? 50 : 215);
+        }
+    });
+
+    ApplySpellFix({
+        48760,  // Oculus, Teleport to Coldarra DND
+        49305   // Oculus, Teleport to Boss 1 DND
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = 25;
+        spellInfo->EffectImplicitTargetB[0] = 17;
+    });
+
+    // Oculus, Drake spell Stop Time
+    ApplySpellFix({ 49838 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+        spellInfo->excludeTargetAuraSpell = 51162; // exclude planar shift
+        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_150_YARDS;
+    });
+
+    // Oculus, Varos Cloudstrider, Energize Cores
+    ApplySpellFix({ 61407, 62136, 56251, 54069 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CONE_ENTRY;
+        spellInfo->EffectImplicitTargetB[0] = 0;
+    });
+
+    // Halls of Lightning, Arc Weld
+    ApplySpellFix({ 59086 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = 1;
+    });
+
+    // Halls of Lightning, Arcing Burn
+    ApplySpellFix({ 52671, 59834 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
+
+    ApplySpellFix({
+
+        }, [](SpellEntry* spellInfo)
+    {
+
+    });
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
