@@ -1779,7 +1779,7 @@ void Player::Update(uint32 p_time)
             if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
             {
                 AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
-                if (!(atEntry || IsInAreaTriggerRadius(atEntry) || AREA_FLAG_CAPITAL))
+                if (!(atEntry || IsInAreaTriggerRadius(atEntry)))
                 {
                     RemoveRestState();
                 }
