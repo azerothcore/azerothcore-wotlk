@@ -3345,13 +3345,16 @@ bool Spell::UpdateChanneledTargetList()
     return channelTargetEffectMask == 0;
 }
 
-
-void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura)
+SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura)
 {
     if (m_CastItem)
+    {
         m_castItemGUID = m_CastItem->GetGUID();
+    }
     else
+    {
         m_castItemGUID = 0;
+    }
 
     InitExplicitTargets(*targets);
 
@@ -3381,26 +3384,30 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     m_spellState = SPELL_STATE_PREPARING;
 
     if (triggeredByAura)
+    {
         m_triggeredByAuraSpell  = triggeredByAura->GetSpellInfo();
+    }
 
     // create and add update event for this spell
     SpellEvent* Event = new SpellEvent(this);
     m_caster->m_Events.AddEvent(Event, m_caster->m_Events.CalculateTime(1));
+
+    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, m_caster))
+    {
+        SendCastResult(SPELL_FAILED_SPELL_UNAVAILABLE);
+        finish(false);
+        return SPELL_FAILED_SPELL_UNAVAILABLE;
+    }
 
     //Prevent casting at cast another spell (ServerSide check)
     if (!(_triggeredCastFlags & TRIGGERED_IGNORE_CAST_IN_PROGRESS) && m_caster->IsNonMeleeSpellCast(false, true, true, m_spellInfo->Id == 75) && m_cast_count)
     {
         SendCastResult(SPELL_FAILED_SPELL_IN_PROGRESS);
         finish(false);
-        return;
+        return SPELL_FAILED_SPELL_IN_PROGRESS;
     }
 
-    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, m_caster))
-    {
-        SendCastResult(SPELL_FAILED_SPELL_UNAVAILABLE);
-        finish(false);
-        return;
-    }
+
     LoadScripts();
 
     OnSpellLaunch();
@@ -3427,7 +3434,7 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
         SendCastResult(result);
 
         finish(false);
-        return;
+        return result;
     }
 
     // Prepare data for triggers
@@ -3446,7 +3453,7 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     {
         SendCastResult(SPELL_FAILED_MOVING);
         finish(false);
-        return;
+        return SPELL_FAILED_MOVING;
     }
 
     // xinef: if spell have nearby target entry only, do not allow to cast if no targets are found
@@ -3502,7 +3509,7 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
             {
                 SendCastResult(SPELL_FAILED_CASTER_AURASTATE);
                 finish(false);
-                return;
+                return SPELL_FAILED_CASTER_AURASTATE;
             }
         }
     }
@@ -3554,6 +3561,8 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
         if (!(_triggeredCastFlags & TRIGGERED_IGNORE_GCD))
             TriggerGlobalCooldown();
     }
+
+    return SPELL_CAST_OK;
 }
 
 void Spell::cancel(bool bySelf)
