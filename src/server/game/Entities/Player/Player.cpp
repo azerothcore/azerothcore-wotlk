@@ -1780,8 +1780,8 @@ void Player::Update(uint32 p_time)
             {
                 uint32 zoneId = GetZoneId();
                 AreaTableEntry const* zone = sAreaTableStore.LookupEntry(zoneId);
-                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
-                if (!(atEntry || IsInAreaTriggerRadius(atEntry) || zone->flags & AREA_FLAG_CAPITAL))
+                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());            // Warsong Hold. Only inn that doesn't work so ugly hack it is :)
+                if (!(atEntry || IsInAreaTriggerRadius(atEntry) || zone->flags & AREA_FLAG_CAPITAL || sAreaTableStore.LookupEntry(4129)))
                 {
                     RemoveRestState();
                 }
@@ -7697,11 +7697,10 @@ void Player::UpdateArea(uint32 newArea)
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 
-    if (isInn || areaFlags & AREA_FLAG_CAPITAL)
+    uint32 const areaRestFlag = (GetTeamId() == ALLIANCE) ? AREA_FLAG_REST_ZONE_ALLIANCE : AREA_FLAG_REST_ZONE_HORDE;
+    if (area && areaFlags & areaRestFlag)
     {
         SetRestState(0);
-        if (sWorld->IsFFAPvPRealm())
-            RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
     }
     else
     {
