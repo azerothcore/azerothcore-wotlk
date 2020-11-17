@@ -179,7 +179,7 @@ public:
                                     if (p->IsAlive())
                                         ++count;
                             ticks = (a->GetDuration() / int32(a->GetSpellInfo()->Effects[0].Amplitude)) + 1;
-                            int32 dmg = (ticks*dmgPerTick)/count;
+                            int32 dmg = (ticks * dmgPerTick) / count;
                             caster->CastCustomSpell(GetTarget(), 72373, NULL, &dmg, NULL, true);
                         }
         }

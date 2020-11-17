@@ -11,6 +11,12 @@
 
 ScriptPointVector const SystemMgr::_empty;
 
+SystemMgr* SystemMgr::instance()
+{
+    static SystemMgr instance;
+    return &instance;
+}
+
 void SystemMgr::LoadScriptWaypoints()
 {
     uint32 oldMSTime = getMSTime();
@@ -65,8 +71,7 @@ void SystemMgr::LoadScriptWaypoints()
 
         m_mPointMoveMap[uiEntry].push_back(temp);
         ++count;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Script Waypoint nodes in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();

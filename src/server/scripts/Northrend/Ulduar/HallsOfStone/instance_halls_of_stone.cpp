@@ -18,7 +18,7 @@ public:
 
     struct instance_halls_of_stone_InstanceMapScript : public InstanceScript
     {
-        instance_halls_of_stone_InstanceMapScript(Map* map) : InstanceScript(map){ Initialize(); }
+        instance_halls_of_stone_InstanceMapScript(Map* map) : InstanceScript(map) { Initialize(); }
 
         uint32 Encounter[MAX_ENCOUNTER];
 
@@ -31,12 +31,15 @@ public:
         uint64 goSjonnirDoorGUID;
         uint64 goLeftPipeGUID;
         uint64 goRightPipeGUID;
+        uint64 goTribunalDoorGUID;
 
         uint64 SjonnirGUID;
         uint64 BrannGUID;
 
         bool brannAchievement;
         bool sjonnirAchievement;
+        bool isMaidenOfGriefDead;
+        bool isKrystalusDead;
 
         void Initialize()
         {
@@ -51,12 +54,15 @@ public:
             goSjonnirDoorGUID = 0;
             goLeftPipeGUID = 0;
             goRightPipeGUID = 0;
+            goTribunalDoorGUID = 0;
 
             SjonnirGUID = 0;
             BrannGUID = 0;
 
             brannAchievement = false;
             sjonnirAchievement = false;
+            isMaidenOfGriefDead = false;
+            isKrystalusDead = false;
         }
 
         bool IsEncounterInProgress() const
@@ -69,33 +75,37 @@ public:
             return false;
         }
 
-        void OnGameObjectCreate(GameObject *go)
+        void OnGameObjectCreate(GameObject* go)
         {
             switch(go->GetEntry())
             {
-                case GO_KADDRAK: 
+                case GO_KADDRAK:
                     goKaddrakGUID = go->GetGUID();
                     break;
-                case GO_ABEDNEUM: 
+                case GO_ABEDNEUM:
                     goAbedneumGUID = go->GetGUID();
                     if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
-                case GO_MARNAK: 
-                    goMarnakGUID = go->GetGUID(); 
+                case GO_MARNAK:
+                    goMarnakGUID = go->GetGUID();
                     break;
-                case GO_TRIBUNAL_CONSOLE: 
-                    goTribunalConsoleGUID = go->GetGUID(); 
+                case GO_TRIBUNAL_CONSOLE:
+                    goTribunalConsoleGUID = go->GetGUID();
                     break;
-                case GO_SKY_FLOOR: 
+                case GO_TRIBUNAL_ACCESS_DOOR:
+                    goTribunalDoorGUID = go->GetGUID();
+                    go->SetGoState(GO_STATE_READY);
+                    break;
+                case GO_SKY_FLOOR:
                     goSkyRoomFloorGUID = go->GetGUID();
                     if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
-                case GO_SJONNIR_CONSOLE: 
+                case GO_SJONNIR_CONSOLE:
                     goSjonnirConsoleGUID = go->GetGUID();
                     break;
-                case GO_SJONNIR_DOOR: 
+                case GO_SJONNIR_DOOR:
                     goSjonnirDoorGUID = go->GetGUID();
                     if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
@@ -110,16 +120,16 @@ public:
         }
 
 
-        void OnCreatureCreate(Creature *creature)
+        void OnCreatureCreate(Creature* creature)
         {
             switch(creature->GetEntry())
             {
-            case NPC_SJONNIR:   
-                SjonnirGUID = creature->GetGUID();
-                break;
-            case NPC_BRANN:
-                BrannGUID = creature->GetGUID();
-                break;
+                case NPC_SJONNIR:
+                    SjonnirGUID = creature->GetGUID();
+                    break;
+                case NPC_BRANN:
+                    BrannGUID = creature->GetGUID();
+                    break;
             }
         }
 
@@ -127,17 +137,29 @@ public:
         {
             switch(id)
             {
-                case GO_TRIBUNAL_CONSOLE:       return goTribunalConsoleGUID;
-                case GO_SJONNIR_CONSOLE:        return goSjonnirConsoleGUID;
-                case GO_SJONNIR_DOOR:           return goSjonnirDoorGUID;
-                case GO_LEFT_PIPE:              return goLeftPipeGUID;
-                case GO_RIGHT_PIPE:             return goRightPipeGUID;
-                case GO_KADDRAK:                return goKaddrakGUID;
-                case GO_MARNAK:                 return goMarnakGUID;
-                case GO_ABEDNEUM:               return goAbedneumGUID;
+                case GO_TRIBUNAL_CONSOLE:
+                    return goTribunalConsoleGUID;
+                case GO_TRIBUNAL_ACCESS_DOOR:
+                    return goTribunalDoorGUID;
+                case GO_SJONNIR_CONSOLE:
+                    return goSjonnirConsoleGUID;
+                case GO_SJONNIR_DOOR:
+                    return goSjonnirDoorGUID;
+                case GO_LEFT_PIPE:
+                    return goLeftPipeGUID;
+                case GO_RIGHT_PIPE:
+                    return goRightPipeGUID;
+                case GO_KADDRAK:
+                    return goKaddrakGUID;
+                case GO_MARNAK:
+                    return goMarnakGUID;
+                case GO_ABEDNEUM:
+                    return goAbedneumGUID;
 
-                case NPC_SJONNIR:               return SjonnirGUID;
-                case NPC_BRANN:                 return BrannGUID;
+                case NPC_SJONNIR:
+                    return SjonnirGUID;
+                case NPC_BRANN:
+                    return BrannGUID;
             }
             return 0;
         }
@@ -173,6 +195,16 @@ public:
             if (type < MAX_ENCOUNTER)
                 Encounter[type] = data;
 
+            if (data == DONE)
+            {
+                isMaidenOfGriefDead = (type == BOSS_MAIDEN_OF_GRIEF ? true : isMaidenOfGriefDead);
+                isKrystalusDead = (type == BOSS_KRYSTALLUS ? true : isKrystalusDead);
+            }
+
+            if (isMaidenOfGriefDead && isKrystalusDead)
+                if (GameObject* tribunalDoor = instance->GetGameObject(goTribunalDoorGUID))
+                    tribunalDoor->SetGoState(GO_STATE_ACTIVE);
+
             if (type == BOSS_TRIBUNAL_OF_AGES && data == DONE)
             {
                 if (GameObject* pA = instance->GetGameObject(goAbedneumGUID))
@@ -181,7 +213,7 @@ public:
                     pF->SetGoState(GO_STATE_ACTIVE);
 
                 // Make sjonnir attackable
-                if (Creature *cr = instance->GetCreature(SjonnirGUID))
+                if (Creature* cr = instance->GetCreature(SjonnirGUID))
                     cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             }
             if (type == BOSS_TRIBUNAL_OF_AGES && data == NOT_STARTED)
@@ -202,7 +234,7 @@ public:
                 sjonnirAchievement = (bool)data;
                 return;
             }
-            
+
             if (data == DONE)
                 SaveToDB();
         }

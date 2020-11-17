@@ -18,7 +18,7 @@ Model::Model( std::string path ) : IsCollidable(false), IsBad(false)
     }
     Header.Read(Stream);
     if (Header.OffsetBoundingNormals > 0 && Header.OffsetBoundingVertices > 0 &&
-        Header.OffsetBoundingTriangles > 0 && Header.BoundingRadius > 0.0f)
+            Header.OffsetBoundingTriangles > 0 && Header.BoundingRadius > 0.0f)
     {
         IsCollidable = true;
         ReadVertices();

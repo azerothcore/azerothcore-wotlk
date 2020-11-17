@@ -327,7 +327,7 @@ public:
         }
 
         if ((node->x == 0.0f && node->y == 0.0f && node->z == 0.0f) ||
-            !MapManager::IsValidMapCoord(node->map_id, node->x, node->y, node->z))
+                !MapManager::IsValidMapCoord(node->map_id, node->x, node->y, node->z))
         {
             handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, node->x, node->y, node->map_id);
             handler->SetSentErrorMessage(true);

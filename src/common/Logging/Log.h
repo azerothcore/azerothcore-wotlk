@@ -9,7 +9,6 @@
 
 #include "Common.h"
 #include <ace/Task.h>
-#include <ace/Singleton.h>
 
 class WorldPacket;
 
@@ -59,7 +58,7 @@ enum LogTypes
     LOG_TYPE_CRASH  = 9,
     LOG_TYPE_CHAT   = 10,
     LOG_TYPE_PERF   = 11,
-    LOG_TYPE_MULTITH= 12,
+    LOG_TYPE_MULTITH = 12,
     MAX_LOG_TYPES
 };
 
@@ -71,7 +70,7 @@ enum LogLevel
     LOGL_DEBUG
 };
 
-const int LogLevels = int(LOGL_DEBUG)+1;
+const int LogLevels = int(LOGL_DEBUG) + 1;
 
 enum ColorTypes
 {
@@ -92,109 +91,113 @@ enum ColorTypes
     WHITE
 };
 
-const int Colors = int(WHITE)+1;
+const int Colors = int(WHITE) + 1;
 
 class Log
 {
-    friend class ACE_Singleton<Log, ACE_Thread_Mutex>;
+private:
+    Log();
+    ~Log();
+    Log(Log const&) = delete;
+    Log(Log&&) = delete;
+    Log& operator=(Log const&) = delete;
+    Log& operator=(Log&&) = delete;
 
-    private:
-        Log();
-        ~Log();
+public:
+    static Log* instance();
 
-    public:
-        void Initialize();
+    void Initialize();
 
-        void ReloadConfig();
+    void ReloadConfig();
 
-        void InitColors(const std::string& init_str);
-        void SetColor(bool stdout_stream, ColorTypes color);
-        void ResetColor(bool stdout_stream);
+    void InitColors(const std::string& init_str);
+    void SetColor(bool stdout_stream, ColorTypes color);
+    void ResetColor(bool stdout_stream);
 
-        void outDB(LogTypes type, const char * str);
-        void outString(const char * str, ...)                   ATTR_PRINTF(2, 3);
-        void outString();
-        void outStringInLine(const char * str, ...)             ATTR_PRINTF(2, 3);
-        void outError(const char * err, ...)                    ATTR_PRINTF(2, 3);
-        void outCrash(const char * err, ...)                    ATTR_PRINTF(2, 3);
-        void outBasic(const char * str, ...)                    ATTR_PRINTF(2, 3);
-        void outDetail(const char * str, ...)                   ATTR_PRINTF(2, 3);
-        void outSQLDev(const char * str, ...)                   ATTR_PRINTF(2, 3);
-        void outDebug(DebugLogFilters f, const char* str, ...)  ATTR_PRINTF(3, 4);
-        void outStaticDebug(const char * str, ...)              ATTR_PRINTF(2, 3);
-        void outErrorDb(const char * str, ...)                  ATTR_PRINTF(2, 3);
-        void outChar(const char * str, ...)                     ATTR_PRINTF(2, 3);
-        void outCommand(uint32 account, const char * str, ...)  ATTR_PRINTF(3, 4);
-        void outChat(const char * str, ...)                     ATTR_PRINTF(2, 3);
-        void outRemote(const char * str, ...)                   ATTR_PRINTF(2, 3);
-        void outSQLDriver(const char* str, ...)                 ATTR_PRINTF(2, 3);
-        void outMisc(const char * str, ...)                     ATTR_PRINTF(2, 3); // pussywizard
-        void outCharDump(const char * str, uint32 account_id, uint32 guid, const char * name);
+    void outDB(LogTypes type, const char* str);
+    void outString(const char* str, ...)                   ATTR_PRINTF(2, 3);
+    void outString();
+    void outStringInLine(const char* str, ...)             ATTR_PRINTF(2, 3);
+    void outError(const char* err, ...)                    ATTR_PRINTF(2, 3);
+    void outCrash(const char* err, ...)                    ATTR_PRINTF(2, 3);
+    void outBasic(const char* str, ...)                    ATTR_PRINTF(2, 3);
+    void outDetail(const char* str, ...)                   ATTR_PRINTF(2, 3);
+    void outSQLDev(const char* str, ...)                   ATTR_PRINTF(2, 3);
+    void outDebug(DebugLogFilters f, const char* str, ...)  ATTR_PRINTF(3, 4);
+    void outStaticDebug(const char* str, ...)              ATTR_PRINTF(2, 3);
+    void outErrorDb(const char* str, ...)                  ATTR_PRINTF(2, 3);
+    void outChar(const char* str, ...)                     ATTR_PRINTF(2, 3);
+    void outCommand(uint32 account, const char* str, ...)  ATTR_PRINTF(3, 4);
+    void outChat(const char* str, ...)                     ATTR_PRINTF(2, 3);
+    void outRemote(const char* str, ...)                   ATTR_PRINTF(2, 3);
+    void outSQLDriver(const char* str, ...)                 ATTR_PRINTF(2, 3);
+    void outMisc(const char* str, ...)                     ATTR_PRINTF(2, 3);  // pussywizard
+    void outCharDump(const char* str, uint32 account_id, uint32 guid, const char* name);
 
-        static void outTimestamp(FILE* file);
-        static std::string GetTimestampStr();
+    static void outTimestamp(FILE* file);
+    static std::string GetTimestampStr();
 
-        void SetLogLevel(char * Level);
-        void SetLogFileLevel(char * Level);
-        void SetSQLDriverQueryLogging(bool newStatus) { m_sqlDriverQueryLogging = newStatus; }
-        void SetRealmID(uint32 id) { realm = id; }
+    void SetLogLevel(char* Level);
+    void SetLogFileLevel(char* Level);
+    void SetSQLDriverQueryLogging(bool newStatus) { m_sqlDriverQueryLogging = newStatus; }
+    void SetRealmID(uint32 id) { realm = id; }
 
-        bool IsOutDebug() const { return m_logLevel > 2 || (m_logFileLevel > 2 && logfile); }
-        bool IsOutCharDump() const { return m_charLog_Dump; }
+    bool IsOutDebug() const { return m_logLevel > 2 || (m_logFileLevel > 2 && logfile); }
+    bool IsOutCharDump() const { return m_charLog_Dump; }
 
-        bool GetLogDB() const { return m_enableLogDB; }
-        void SetLogDB(bool enable) { m_enableLogDB = enable; }
-        bool GetSQLDriverQueryLogging() const { return m_sqlDriverQueryLogging; }
-    private:
-        FILE* openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode);
-        FILE* openGmlogPerAccount(uint32 account);
+    bool GetLogDB() const { return m_enableLogDB; }
+    void SetLogDB(bool enable) { m_enableLogDB = enable; }
+    bool GetSQLDriverQueryLogging() const { return m_sqlDriverQueryLogging; }
+private:
+    FILE* openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode);
+    FILE* openGmlogPerAccount(uint32 account);
 
-        FILE* raLogfile;
-        FILE* logfile;
-        FILE* gmLogfile;
-        FILE* charLogfile;
-        FILE* dberLogfile;
-        FILE* chatLogfile;
-        FILE* sqlLogFile;
-        FILE* sqlDevLogFile;
-        FILE* miscLogFile;
+    FILE* raLogfile;
+    FILE* logfile;
+    FILE* gmLogfile;
+    FILE* charLogfile;
+    FILE* dberLogfile;
+    FILE* chatLogfile;
+    FILE* sqlLogFile;
+    FILE* sqlDevLogFile;
+    FILE* miscLogFile;
 
-        // cache values for after initilization use (like gm log per account case)
-        std::string m_logsDir;
-        std::string m_logsTimestamp;
+    // cache values for after initilization use (like gm log per account case)
+    std::string m_logsDir;
+    std::string m_logsTimestamp;
 
-        // gm log control
-        bool m_gmlog_per_account;
-        std::string m_gmlog_filename_format;
+    // gm log control
+    bool m_gmlog_per_account;
+    std::string m_gmlog_filename_format;
 
-        bool m_enableLogDB;
-        uint32 realm;
+    bool m_enableLogDB;
+    uint32 realm;
 
-        // log coloring
-        bool m_colored;
-        ColorTypes m_colors[4];
+    // log coloring
+    bool m_colored;
+    ColorTypes m_colors[4];
 
-        // log levels:
-        // false: errors only, true: full query logging
-        bool m_sqlDriverQueryLogging;
+    // log levels:
+    // false: errors only, true: full query logging
+    bool m_sqlDriverQueryLogging;
 
-        // log levels:
-        // 0 minimum/string, 1 basic/error, 2 detail, 3 full/debug
-        uint8 m_dbLogLevel;
-        uint8 m_logLevel;
-        uint8 m_logFileLevel;
-        bool m_dbChar;
-        bool m_dbRA;
-        bool m_dbGM;
-        bool m_dbChat;
-        bool m_charLog_Dump;
-        bool m_charLog_Dump_Separate;
-        std::string m_dumpsDir;
+    // log levels:
+    // 0 minimum/string, 1 basic/error, 2 detail, 3 full/debug
+    uint8 m_dbLogLevel;
+    uint8 m_logLevel;
+    uint8 m_logFileLevel;
+    bool m_dbChar;
+    bool m_dbRA;
+    bool m_dbGM;
+    bool m_dbChat;
+    bool m_charLog_Dump;
+    bool m_charLog_Dump_Separate;
+    std::string m_dumpsDir;
 
-        DebugLogFilters m_DebugLogMask;
+    DebugLogFilters m_DebugLogMask;
 };
 
-#define sLog ACE_Singleton<Log, ACE_Thread_Mutex>::instance()
+#define sLog Log::instance()
 
 #endif
 

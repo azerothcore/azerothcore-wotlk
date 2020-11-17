@@ -14,7 +14,6 @@ EndScriptData */
 /* ContentData
 npc_archmage_malin
 npc_bartleby
-npc_lady_katrana_prestor
 npc_tyrion
 npc_tyrion_spybot
 npc_marzon_silent_blade
@@ -83,7 +82,7 @@ public:
             AttackStart(pAttacker);
         }
 
-        void DamageTaken(Unit* pDoneBy, uint32 &uiDamage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* pDoneBy, uint32& uiDamage, DamageEffectType, SpellSchoolMask)
         {
             if (pDoneBy && (uiDamage >= me->GetHealth() || me->HealthBelowPctDamaged(15, uiDamage)))
             {
@@ -96,59 +95,6 @@ public:
             }
         }
     };
-};
-
-/*######
-## npc_lady_katrana_prestor
-######*/
-
-#define GOSSIP_ITEM_KAT_1 "Pardon the intrusion, Lady Prestor, but Highlord Bolvar suggested that I seek your advice."
-#define GOSSIP_ITEM_KAT_2 "My apologies, Lady Prestor."
-#define GOSSIP_ITEM_KAT_3 "Begging your pardon, Lady Prestor. That was not my intent."
-#define GOSSIP_ITEM_KAT_4 "Thank you for your time, Lady Prestor."
-
-class npc_lady_katrana_prestor : public CreatureScript
-{
-public:
-    npc_lady_katrana_prestor() : CreatureScript("npc_lady_katrana_prestor") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KAT_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, 2694, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KAT_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, 2695, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KAT_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, 2696, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+3:
-                CloseGossipMenuFor(player);
-                player->AreaExploredOrEventHappens(4185);
-                break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(4185) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KAT_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-        SendGossipMenuFor(player, 2693, creature->GetGUID());
-
-        return true;
-    }
 };
 
 /*######
@@ -308,7 +254,8 @@ public:
                             uiPhase = 0;
                             break;
                     }
-                } else uiTimer -= uiDiff;
+                }
+                else uiTimer -= uiDiff;
             }
             npc_escortAI::UpdateAI(uiDiff);
 
@@ -497,10 +444,10 @@ public:
                             uiPhase = 4;
                             break;
                         case 4:
-                           SetEscortPaused(false);
-                           uiPhase = 0;
-                           uiTimer = 0;
-                           break;
+                            SetEscortPaused(false);
+                            uiPhase = 0;
+                            uiTimer = 0;
+                            break;
                         case 5:
                             if (Creature* pGuard = me->FindNearestCreature(NPC_STORMWIND_ROYAL, 10.0f, true))
                                 pGuard->AI()->Talk(SAY_GUARD_1);
@@ -542,7 +489,8 @@ public:
                             uiPhase = 0;
                             break;
                     }
-                } else uiTimer -= uiDiff;
+                }
+                else uiTimer -= uiDiff;
             }
             npc_escortAI::UpdateAI(uiDiff);
 
@@ -586,7 +534,6 @@ public:
 void AddSC_stormwind_city()
 {
     new npc_bartleby();
-    new npc_lady_katrana_prestor();
     new npc_tyrion();
     new npc_tyrion_spybot();
     new npc_lord_gregor_lescovar();
