@@ -7181,7 +7181,9 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
         if (!spellInfo)
+        {
             continue;
+        }
 
         for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
         {
@@ -7193,23 +7195,37 @@ void SpellMgr::LoadDbcDataCorrections()
                 case SPELL_EFFECT_JUMP_DEST:
                 case SPELL_EFFECT_LEAP_BACK:
                     if (!spellInfo->speed && !spellInfo->SpellFamilyName)
+                    {
                         spellInfo->speed = SPEED_CHARGE;
+                    }
                     break;
             }
 
             // Xinef: i hope this will fix the problem with not working resurrection
             if (spellInfo->Effect[j] == SPELL_EFFECT_SELF_RESURRECT)
+            {
                 spellInfo->EffectImplicitTargetA[j] = TARGET_UNIT_CASTER;
+            }
         }
 
         // Xinef: Fix range for trajectories and triggered spells
         for (uint8 j = 0; j < 3; ++j)
+        {
             if (spellInfo->rangeIndex == 1 && (spellInfo->EffectImplicitTargetA[j] == TARGET_DEST_TRAJ || spellInfo->EffectImplicitTargetB[j] == TARGET_DEST_TRAJ))
+            {
                 if (SpellEntry* spellInfo2 = (SpellEntry*)sSpellStore.LookupEntry(spellInfo->EffectTriggerSpell[j]))
+                {
                     spellInfo2->rangeIndex = 187; // 300yd
+                }
+            }
+
+        }
+
 
         if (spellInfo->activeIconID == 2158)  // flight
+        {
             spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
+        }
 
         switch (spellInfo->SpellFamilyName)
         {
