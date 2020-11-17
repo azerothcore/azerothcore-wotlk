@@ -13,6 +13,7 @@ Documentation:
 
 Bash:
   - ./*.sh
+  - apps/**/*.sh
 
 Cmake:
   - ./*.cmake
