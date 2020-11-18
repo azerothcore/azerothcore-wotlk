@@ -4,7 +4,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1605128047204479800');
 
 -- Add new column ID
 ALTER TABLE `access_requirement`
-ADD `id` tinyint(3) unsigned NOT NULL COMMENT 'The dungeon template ID' AUTO_INCREMENT UNIQUE FIRST;
+ADD `id` tinyint unsigned NOT NULL COMMENT 'The dungeon template ID' AUTO_INCREMENT UNIQUE FIRST;
 
 -- Set new primary key
 ALTER TABLE `access_requirement`
@@ -14,11 +14,11 @@ DROP INDEX `id`;
 
 -- New table
 CREATE TABLE `dungeon_access_requirements` (
-  `dungeon_access_id` tinyint(3) unsigned NOT NULL COMMENT 'ID from dungeon_access_template',
-  `requirement_type` tinyint(1) unsigned NOT NULL COMMENT '0 = achiev, 1 = quest, 2 = item',
-  `requirement_id` mediumint(6) unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
+  `dungeon_access_id` tinyint unsigned NOT NULL COMMENT 'ID from dungeon_access_template',
+  `requirement_type` tinyint unsigned NOT NULL COMMENT '0 = achiev, 1 = quest, 2 = item',
+  `requirement_id` mediumint unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
   `requirement_hint` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Optional msg shown ingame to player if he cannot enter with extra info',
-  `faction` tinyint(1) unsigned NOT NULL DEFAULT 0 COMMENT '0 = Alliance, 1 = Horde, 2 = both',
+  `faction` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '0 = Alliance, 1 = Horde, 2 = both',
   PRIMARY KEY (`dungeon_access_id`, `requirement_type`, `requirement_id`)
 ) COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid' ENGINE='MyISAM' COLLATE 'utf8_general_ci';
 
@@ -117,11 +117,11 @@ COMMENT='Dungeon access template and single requirements';
 
 -- Rename columns
 ALTER TABLE `dungeon_access_template`
-CHANGE `mapId` `instance_id` mediumint(8) unsigned NOT NULL COMMENT 'Map ID from instance_template' AFTER `id`,
-CHANGE `difficulty` `difficulty` tinyint(1) unsigned NOT NULL DEFAULT 0 COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic' AFTER `instance_id`,
-CHANGE `level_min` `min_level` tinyint(2) unsigned NOT NULL DEFAULT 0 AFTER `difficulty`,
-CHANGE `level_max` `max_level` tinyint(2) unsigned NOT NULL DEFAULT 0 AFTER `min_level`,
-CHANGE `item_level` `min_item_level` smallint(3) unsigned NOT NULL DEFAULT 0 COMMENT 'Min ilvl required to enter' AFTER `max_level`,
+CHANGE `mapId` `instance_id` mediumint unsigned NOT NULL COMMENT 'Map ID from instance_template' AFTER `id`,
+CHANGE `difficulty` `difficulty` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic' AFTER `instance_id`,
+CHANGE `level_min` `min_level` tinyint unsigned NOT NULL DEFAULT 0 AFTER `difficulty`,
+CHANGE `level_max` `max_level` tinyint unsigned NOT NULL DEFAULT 0 AFTER `min_level`,
+CHANGE `item_level` `min_item_level` smallint unsigned NOT NULL DEFAULT 0 COMMENT 'Min ilvl required to enter' AFTER `max_level`,
 CHANGE `comment` `comment` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic' AFTER `min_item_level`;
 
 -- Add KEY CONSTRAINTS
