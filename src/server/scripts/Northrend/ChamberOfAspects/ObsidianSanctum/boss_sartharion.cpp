@@ -446,7 +446,7 @@ public:
                     case EVENT_SARTHARION_BOUNDARY:
                     {
                         Unit const* victim = me->GetVictim();
-                        if (victim && victim->GetPositionX() < SartharionBoundary[0] || victim->GetPositionX() > SartharionBoundary[1] || victim->GetPositionY() < SartharionBoundary[2] || victim->GetPositionY() > SartharionBoundary[3]) // https://github.com/TrinityCore/TrinityCore/blob/3.3.5/src/server/scripts/Northrend/ChamberOfAspects/ObsidianSanctum/instance_obsidian_sanctum.cpp#L31
+                        if (victim && (victim->GetPositionX() < SartharionBoundary[0] || victim->GetPositionX() > SartharionBoundary[1] || victim->GetPositionY() < SartharionBoundary[2] || victim->GetPositionY() > SartharionBoundary[3])) // https://github.com/TrinityCore/TrinityCore/blob/3.3.5/src/server/scripts/Northrend/ChamberOfAspects/ObsidianSanctum/instance_obsidian_sanctum.cpp#L31
                         {
                             EnterEvadeMode();
                         }
