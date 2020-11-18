@@ -3517,6 +3517,16 @@ Calculate.Gameoject.Zone.Area.Data = 0
 
 LFG.Location.All = 0
 
+#    Dungeon Access Requirements Print modes
+#
+#     Format the output in chat when a player does not meet the requirements for a dungeon to one of the following outputs:
+#         0 = display no extra information, only "requirements not met"
+#         1 = Display only one requirement at a time(BlizzLike)
+#         2 = display in full details, list of items, achievements and quest with cliceakble links
+#        Default: 1
+#  
+AccessRequirementsPrintMode = 1
+
 #
 #    ICC Buff
 #       Description: Specify ICC buff

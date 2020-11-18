@@ -19572,7 +19572,6 @@ bool Player::Satisfy(AccessRequirements const* ar, uint32 target_map, bool repor
             }
         }
 
-
         //Check all achievements
         Player* leader = this;
         uint64 leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
@@ -19611,115 +19610,135 @@ bool Player::Satisfy(AccessRequirements const* ar, uint32 target_map, bool repor
         {
             if (report)
             {
-                if (missingQuests.size())
+                uint8 requirementPrintMode = sWorld->getIntConfig(CONFIG_REQUIREMENTS_PRINT_MODE);
+
+                if (requirementPrintMode == 0)
                 {
-                    ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_QUESTS);
-                    for (const AccessSubRequirement* missingReq : missingQuests)
-                    {
-                        Quest const* questTemplate = sObjectMgr->GetQuestTemplate(missingReq->id);
-                        if (!questTemplate)
-                            continue;
-
-                        std::string questTitle = questTemplate->GetTitle();
-                        if (QuestLocale const* questLocale = sObjectMgr->GetQuestLocale(questTemplate->GetQuestId()))
-                            ObjectMgr::GetLocaleString(questLocale->Title, loc_idx, questTitle);
-
-                        std::stringstream stream;
-                        stream << "|cffff7c0a|Hquest:";
-                        stream << questTemplate->GetQuestId();
-                        stream << ":";
-                        stream << questTemplate->GetQuestLevel();
-                        stream << "|h[";
-                        stream << questTitle;
-                        stream << "]|h|r";
-
-                        if (missingReq->hint.empty())
-                        {
-                            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
-                        }
-                        else
-                        {
-                            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_HINT, loc_idx), missingReq->hint.c_str());
-                        }
-
-                    }
+                    //Just print out tha requirements are not met
+                    ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_NOT_MET);
                 }
-
-                if (missingAchievements.size())
+                else if(requirementPrintMode == 1)
                 {
-                    ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_ACHIEVEMENTS);
-                    for (const AccessSubRequirement* missingReq : missingAchievements)
-                    {
-                        AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry(missingReq->id);
-                        if (!achievementEntry)
-                            continue;
-
-                        std::string name = *achievementEntry->name;
-
-                        std::stringstream stream;
-                        stream << "|cffff7c0a|Hachievement:";
-                        stream << missingReq->id;
-                        stream << ":";
-                        stream << std::hex << GetGUID() << std::dec;
-                        stream << ":0:0:0:0:0:0:0:0|h[";
-                        stream << name;
-                        stream << "]|h|r";
-
-                        if(missingReq->hint.empty())
-                        {
-                            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
-                        }
-                        else
-                        {
-                            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_HINT, loc_idx), missingReq->hint.c_str());
-                        }
-
-                    }
+                    //Blizzlike method of printing out the requirements
+                    if (missingQuests.size() && !missingQuests[0]->hint.empty())
+                        ChatHandler(GetSession()).PSendSysMessage("%s", missingQuests[0]->hint.c_str());
+                    else if (mapDiff->hasErrorMessage) // if (missingAchievement) covered by this case
+                        SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
+                    else if (missingItems.size())
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), LevelMin, sObjectMgr->GetItemTemplate(missingItems[0]->id)->Name1.c_str());
+                    else if (LevelMin)
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
                 }
-
-                if (missingItems.size())
+                else
                 {
-                    ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_OBTAIN_ITEMS);
-                    for (const AccessSubRequirement* missingReq : missingItems)
+                    //Pretty way of printing out requirements
+                    if (missingQuests.size())
                     {
-                        const ItemTemplate* itemTemplate = sObjectMgr->GetItemTemplate(missingReq->id);
-                        if (!itemTemplate)
-                            continue;
-
-                        //Get the localised name
-                        std::string name = itemTemplate->Name1;
-                        if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemTemplate->ItemId))
-                            ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
-
-                        std::stringstream stream;
-                        stream << "|c";
-                        stream << std::hex << ItemQualityColors[itemTemplate->Quality] << std::dec;
-                        stream << "|Hitem:";
-                        stream << itemTemplate->ItemId;
-                        stream << ":0:0:0:0:0:0:0:0:0|h[";
-                        stream << name;
-                        stream << "]|h|r";
-
-                        if (missingReq->hint.empty())
+                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_QUESTS);
+                        for (const AccessSubRequirement* missingReq : missingQuests)
                         {
-                            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
-                        }
-                        else
-                        {
-                            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_HINT, loc_idx), missingReq->hint.c_str());
+                            Quest const* questTemplate = sObjectMgr->GetQuestTemplate(missingReq->id);
+                            if (!questTemplate)
+                                continue;
+
+                            std::string questTitle = questTemplate->GetTitle();
+                            if (QuestLocale const* questLocale = sObjectMgr->GetQuestLocale(questTemplate->GetQuestId()))
+                                ObjectMgr::GetLocaleString(questLocale->Title, loc_idx, questTitle);
+
+                            std::stringstream stream;
+                            stream << "|cffff7c0a|Hquest:";
+                            stream << questTemplate->GetQuestId();
+                            stream << ":";
+                            stream << questTemplate->GetQuestLevel();
+                            stream << "|h[";
+                            stream << questTitle;
+                            stream << "]|h|r";
+
+                            if (missingReq->hint.empty())
+                            {
+                                ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+                            }
+                            else
+                            {
+                                ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_HINT, loc_idx), missingReq->hint.c_str());
+                            }
                         }
                     }
-                }
 
-                if (mapDiff->hasErrorMessage)
-                {
-                    SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
-                }
-                else if (LevelMin)
-                {
-                    GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
-                }
+                    if (missingAchievements.size())
+                    {
+                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_ACHIEVEMENTS);
+                        for (const AccessSubRequirement* missingReq : missingAchievements)
+                        {
+                            AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry(missingReq->id);
+                            if (!achievementEntry)
+                                continue;
 
+                            std::string name = *achievementEntry->name;
+
+                            std::stringstream stream;
+                            stream << "|cffff7c0a|Hachievement:";
+                            stream << missingReq->id;
+                            stream << ":";
+                            stream << std::hex << GetGUID() << std::dec;
+                            stream << ":0:0:0:0:0:0:0:0|h[";
+                            stream << name;
+                            stream << "]|h|r";
+
+                            if (missingReq->hint.empty())
+                            {
+                                ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+                            }
+                            else
+                            {
+                                ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_HINT, loc_idx), missingReq->hint.c_str());
+                            }
+                        }
+                    }
+
+                    if (missingItems.size())
+                    {
+                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_OBTAIN_ITEMS);
+                        for (const AccessSubRequirement* missingReq : missingItems)
+                        {
+                            const ItemTemplate* itemTemplate = sObjectMgr->GetItemTemplate(missingReq->id);
+                            if (!itemTemplate)
+                                continue;
+
+                            //Get the localised name
+                            std::string name = itemTemplate->Name1;
+                            if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemTemplate->ItemId))
+                                ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+
+                            std::stringstream stream;
+                            stream << "|c";
+                            stream << std::hex << ItemQualityColors[itemTemplate->Quality] << std::dec;
+                            stream << "|Hitem:";
+                            stream << itemTemplate->ItemId;
+                            stream << ":0:0:0:0:0:0:0:0:0|h[";
+                            stream << name;
+                            stream << "]|h|r";
+
+                            if (missingReq->hint.empty())
+                            {
+                                ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+                            }
+                            else
+                            {
+                                ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_HINT, loc_idx), missingReq->hint.c_str());
+                            }
+                        }
+                    }
+
+                    if (mapDiff->hasErrorMessage)
+                    {
+                        SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
+                    }
+                    else if (LevelMin)
+                    {
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
+                    }
+                }
             }
             return false;
         }
