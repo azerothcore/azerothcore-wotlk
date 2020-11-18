@@ -4320,6 +4320,17 @@ void SpellMgr::LoadDbcDataCorrections()
             case 63058:
                 spellInfo->EffectApplyAuraName[EFFECT_0] = SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_CHANCE;
                 break;
+            // Thorns
+            case 467:
+            case 782:
+            case 1075:
+            case 8914:
+            case 9756:
+            case 9910:
+            case 26992:
+            case 53307:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
 
 
             /////////////////////////////////
