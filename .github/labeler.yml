@@ -12,6 +12,7 @@ Documentation:
   - ./*.md
 
 Bash:
+  - ./*.sh
   - apps/**/*.sh
   - conf/**/*.sh
   - deps/**/*.sh
