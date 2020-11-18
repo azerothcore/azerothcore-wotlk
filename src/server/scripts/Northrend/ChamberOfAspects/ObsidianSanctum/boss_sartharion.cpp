@@ -396,11 +396,11 @@ public:
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
             // Temporal hack, by some case some melee spells can bypass this aura damage reduction
-            if (me->HasAura(SPELL_GIFT_OF_TWILIGHT_FIRE))
-            {
-                damage = 0;
-                return;
-            }
+            //if (me->HasAura(SPELL_GIFT_OF_TWILIGHT_FIRE))
+            //{
+                //damage = 0;
+                //return;
+            //}
 
             if (!usedBerserk && me->HealthBelowPctDamaged(30, damage))
             {
@@ -432,7 +432,9 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             extraEvents.Update(diff);
 
@@ -787,7 +789,7 @@ struct boss_sartharion_dragonAI : public BossAI
             me->SetCanFly(false);
         }
 
-        if (!isCalledBySartharion)
+        if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
         {
             switch (me->GetEntry())
             {
@@ -830,14 +832,16 @@ struct boss_sartharion_dragonAI : public BossAI
 
         // Despawn minions only if not called by Sartharion
         if (!isCalledBySartharion)
+        {
             summons.DespawnAll();
+        }
 
         switch (me->GetEntry())
         {
             case NPC_TENEBRON:
             {
                 Talk(SAY_TENEBRON_DEATH);
-                if (!isCalledBySartharion)
+                if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
                 {
                     instance->SetBossState(DATA_SHADRON, DONE);
                 }
@@ -851,7 +855,7 @@ struct boss_sartharion_dragonAI : public BossAI
                     sartharion->RemoveAura(SPELL_GIFT_OF_TWILIGHT_FIRE);
                 }
 
-                if (!isCalledBySartharion)
+                if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
                 {
                     instance->SetBossState(DATA_SHADRON, DONE);
                 }
@@ -861,7 +865,7 @@ struct boss_sartharion_dragonAI : public BossAI
             {
                 Talk(SAY_VESPERON_DEATH);
                 instance->DoAction(ACTION_CLEAR_PORTAL);
-                if (!isCalledBySartharion)
+                if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
                 {
                     instance->SetBossState(DATA_VESPERON, DONE);
                 }
