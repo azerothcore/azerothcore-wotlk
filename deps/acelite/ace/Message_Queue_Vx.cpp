@@ -14,6 +14,8 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 // class ACE_Message_Queue_Vx //
 ////////////////////////////////
 
+ACE_ALLOC_HOOK_DEFINE (ACE_Message_Queue_Vx);
+
 void
 ACE_Message_Queue_Vx::dump (void) const
 {
@@ -339,15 +341,6 @@ ACE_Message_Queue_Vx::wait_not_empty_cond (ACE_Time_Value *)
   // Always return here, and let the VxWorks message queue handle blocking.
   return 0;
 }
-
-#if ! defined (ACE_NEEDS_FUNC_DEFINITIONS)
-int
-ACE_Message_Queue_Vx::peek_dequeue_head (ACE_Message_Block *&,
-                                         ACE_Time_Value *)
-{
-  ACE_NOTSUP_RETURN (-1);
-}
-#endif /* ! ACE_NEEDS_FUNC_DEFINITIONS */
 
 #endif /* ACE_VXWORKS */
 

@@ -18,7 +18,7 @@
 #include <map>
 #include <ace/INET_Addr.h>
 
- // Searcher for map of structs
+// Searcher for map of structs
 template<typename T, class S> struct Finder
 {
     T val_;
@@ -440,7 +440,7 @@ public:
                 part[0] == right.part[0] &&
                 part[1] == right.part[1] &&
                 part[2] == right.part[2]
-                );
+            );
     }
 
     inline bool operator!=(flag96 const& right) const
@@ -541,20 +541,20 @@ bool CompareValues(ComparisionType type, T val1, T val2)
 {
     switch (type)
     {
-    case COMP_TYPE_EQ:
-        return val1 == val2;
-    case COMP_TYPE_HIGH:
-        return val1 > val2;
-    case COMP_TYPE_LOW:
-        return val1 < val2;
-    case COMP_TYPE_HIGH_EQ:
-        return val1 >= val2;
-    case COMP_TYPE_LOW_EQ:
-        return val1 <= val2;
-    default:
-        // incorrect parameter
-        ABORT();
-        return false;
+        case COMP_TYPE_EQ:
+            return val1 == val2;
+        case COMP_TYPE_HIGH:
+            return val1 > val2;
+        case COMP_TYPE_LOW:
+            return val1 < val2;
+        case COMP_TYPE_HIGH_EQ:
+            return val1 >= val2;
+        case COMP_TYPE_LOW_EQ:
+            return val1 <= val2;
+        default:
+            // incorrect parameter
+            ABORT();
+            return false;
     }
 }
 
