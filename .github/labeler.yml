@@ -12,8 +12,10 @@ Documentation:
   - ./*.md
 
 Bash:
-  - ./*.sh
   - apps/**/*.sh
+  - conf/**/*.sh
+  - deps/**/*.sh
+  - modules/**/*.sh
 
 Cmake:
   - ./*.cmake
