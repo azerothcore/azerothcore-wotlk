@@ -240,8 +240,8 @@ void SocialMgr::GetFriendInfo(Player* player, uint64 friendGUID, FriendInfo& fri
 
     TeamId teamId = player->GetTeamId();
     AccountTypes security = player->GetSession()->GetSecurity();
-    bool allowTwoSideWhoList = sGameConfig->GetBoolConfig("AllowTwoSide.WhoList");
-    AccountTypes gmLevelInWhoList = AccountTypes(sGameConfig->GetIntConfig("GM.InWhoList.Level"));
+    bool allowTwoSideWhoList = sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_WHO_LIST);
+    AccountTypes gmLevelInWhoList = AccountTypes(sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_WHO_LIST));
 
     auto const& itr = player->GetSocial()->m_playerSocialMap.find(friendGUID);
     if (itr != player->GetSocial()->m_playerSocialMap.end())
