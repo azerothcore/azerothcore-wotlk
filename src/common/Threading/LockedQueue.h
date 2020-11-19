@@ -15,7 +15,7 @@
 
 namespace ACE_Based
 {
-    template <class T, class LockType, typename StorageType = std::deque<T> >
+    template <class T, class LockType, typename StorageType = std::deque<T>>
     class LockedQueue
     {
         //! Lock access to the queue.
