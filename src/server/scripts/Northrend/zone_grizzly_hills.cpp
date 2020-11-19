@@ -898,10 +898,8 @@ public:
 
     struct npc_rocket_propelled_warheadAI : public VehicleAI
     {
-        npc_rocket_propelled_warheadAI(Creature* creature) : VehicleAI(creature)
+        npc_rocket_propelled_warheadAI(Creature* creature) : VehicleAI(creature), _finished(false), _faction(ALLIANCE)
         {
-            _finished = false;
-            _faction = ALLIANCE;
         }
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
@@ -982,11 +980,9 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            return !(
-                    !sSpellMgr->GetSpellInfo(SPELL_WARHEAD_Z_CHECK)
-                    || !sSpellMgr->GetSpellInfo(SPELL_WARHEAD_SEEKING_LUMBERSHIP)
-                    || !sSpellMgr->GetSpellInfo(SPELL_WARHEAD_FUSE)
-                );
+            return sSpellMgr->GetSpellInfo(SPELL_WARHEAD_Z_CHECK)
+                    && sSpellMgr->GetSpellInfo(SPELL_WARHEAD_SEEKING_LUMBERSHIP)
+                    && sSpellMgr->GetSpellInfo(SPELL_WARHEAD_FUSE);
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1032,7 +1028,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            return !(!sSpellMgr->GetSpellInfo(SPELL_PARACHUTE) || !sSpellMgr->GetSpellInfo(SPELL_TORPEDO_EXPLOSION));
+            return sSpellMgr->GetSpellInfo(SPELL_PARACHUTE) && sSpellMgr->GetSpellInfo(SPELL_TORPEDO_EXPLOSION);
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1078,7 +1074,11 @@ public:
 
     class spell_z_check_AuraScript : public AuraScript
     {
+    public:
+        spell_z_check_AuraScript() : AuraScript(), _posZ(0) {}
+
         PrepareAuraScript(spell_z_check_AuraScript);
+
 
         void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
