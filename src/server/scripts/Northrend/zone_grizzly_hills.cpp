@@ -898,7 +898,7 @@ public:
 
     struct npc_rocket_propelled_warheadAI : public VehicleAI
     {
-        npc_rocket_propelled_warheadAI(Creature* creature) : VehicleAI(creature), _finished(false), _faction(ALLIANCE)
+        npc_rocket_propelled_warheadAI(Creature* creature) : VehicleAI(creature), _faction(ALLIANCE), _finished(false)
         {
         }
 
