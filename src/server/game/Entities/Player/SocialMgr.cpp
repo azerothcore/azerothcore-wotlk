@@ -5,7 +5,6 @@
  */
 
 #include "SocialMgr.h"
-
 #include "DatabaseEnv.h"
 #include "WorldSession.h"
 #include "WorldPacket.h"
