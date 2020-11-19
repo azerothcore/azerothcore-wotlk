@@ -4528,8 +4528,7 @@ void SpellMgr::LoadDbcDataCorrections()
     });
 
     // Glyph of Barkskin
-    ApplySpellFix({ 
-    }, [](SpellEntry* spellInfo)
+    ApplySpellFix({ 63058 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectApplyAuraName[EFFECT_0] = SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_CHANCE;
     });
