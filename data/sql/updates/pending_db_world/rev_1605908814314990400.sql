@@ -2466,4 +2466,5 @@ INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verified
 
 -- quest_request_items_locale
 DELETE FROM `quest_request_items_locale` WHERE `ID`=9483 AND `locale`='frFR';
-INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES (9483, 'frFR', 'Ce n\'est pas parce que je suis en pèlerinage que je dois abandonner tous les plaisirs de la vie. Cela fait des siècles que je n\'ai pas degusté un bon vin.$b$bJ\'en arriverais presque à tuer pour une bouteille d\'esprit-de-vin cénarien !$b$bJe sais, je sais, ce n\'est pas du tout la mode de boire quelque chose produit par les elfes de la nuit.', 18019);
+INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES 
+(9483, 'frFR', 'Ce n\'est pas parce que je suis en pèlerinage que je dois abandonner tous les plaisirs de la vie. Cela fait des siècles que je n\'ai pas degusté un bon vin.$b$bJ\'en arriverais presque à tuer pour une bouteille d\'esprit-de-vin cénarien !$b$bJe sais, je sais, ce n\'est pas du tout la mode de boire quelque chose produit par les elfes de la nuit.', 18019);
