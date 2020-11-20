@@ -50,7 +50,7 @@ static bool operator == (const GameObjectModel& mdl, const GameObjectModel& mdl2
 }
 */
 
-typedef RegularGrid2D<GameObjectModel, BIHWrap<GameObjectModel> > ParentTree;
+typedef RegularGrid2D<GameObjectModel, BIHWrap<GameObjectModel>> ParentTree;
 
 struct DynTreeImpl : public ParentTree/*, public Intersectable*/
 {
