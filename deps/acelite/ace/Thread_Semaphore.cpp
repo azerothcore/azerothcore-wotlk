@@ -3,12 +3,16 @@
  *
  * Originally in Synch.cpp
  *
- * @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ * @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 
 #include "ace/Thread_Semaphore.h"
 
 #if defined (ACE_HAS_THREADS)
+
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 #if !defined (__ACE_INLINE__)
 #include "ace/Thread_Semaphore.inl"
@@ -20,6 +24,8 @@
 
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
+
+ACE_ALLOC_HOOK_DEFINE(ACE_Thread_Semaphore)
 
 void
 ACE_Thread_Semaphore::dump (void) const

@@ -1,0 +1,25 @@
+DB:
+  - data/**/*.sql
+
+CORE:
+  - any: ['src/**/*', '!src/server/scripts/*']
+
+Script:
+  - src/server/scripts/**/*.cpp
+  - src/server/scripts/**/*.h
+
+Documentation:
+  - ./*.md
+
+Bash:
+  - ./*.sh
+  - apps/**/*.sh
+  - conf/**/*.sh
+  - deps/**/*.sh
+  - modules/**/*.sh
+
+Cmake:
+  - ./*.cmake
+
+Workflow:
+  - .github/workflows/*

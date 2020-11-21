@@ -157,26 +157,26 @@ class OutdoorPvPZM;
 
 class OPvPCapturePointZM_Beacon : public OPvPCapturePoint
 {
-    public:
+public:
 
-        OPvPCapturePointZM_Beacon(OutdoorPvP* pvp, ZM_BeaconType type);
+    OPvPCapturePointZM_Beacon(OutdoorPvP* pvp, ZM_BeaconType type);
 
-        void ChangeState();
+    void ChangeState();
 
-        void SendChangePhase();
+    void SendChangePhase();
 
-        void FillInitialWorldStates(WorldPacket & data);
+    void FillInitialWorldStates(WorldPacket& data);
 
-        // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* player);
-        void HandlePlayerLeave(Player* player);
+    // used when player is activated/inactivated in the area
+    bool HandlePlayerEnter(Player* player);
+    void HandlePlayerLeave(Player* player);
 
-        void UpdateTowerState();
+    void UpdateTowerState();
 
-    protected:
+protected:
 
-        ZM_BeaconType m_TowerType;
-        uint32 m_TowerState;
+    ZM_BeaconType m_TowerType;
+    uint32 m_TowerState;
 };
 
 enum ZM_GraveYardState
@@ -188,71 +188,71 @@ enum ZM_GraveYardState
 
 class OPvPCapturePointZM_GraveYard : public OPvPCapturePoint
 {
-    public:
+public:
 
-        OPvPCapturePointZM_GraveYard(OutdoorPvP* pvp);
+    OPvPCapturePointZM_GraveYard(OutdoorPvP* pvp);
 
-        bool Update(uint32 diff);
+    bool Update(uint32 diff);
 
-        void ChangeState() {}
+    void ChangeState() {}
 
-        void FillInitialWorldStates(WorldPacket & data);
+    void FillInitialWorldStates(WorldPacket& data);
 
-        void UpdateTowerState();
+    void UpdateTowerState();
 
-        int32 HandleOpenGo(Player* player, uint64 guid);
+    int32 HandleOpenGo(Player* player, uint64 guid);
 
-        void SetBeaconState(TeamId controlling_teamId); // not good atm
+    void SetBeaconState(TeamId controlling_teamId); // not good atm
 
-        bool HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
+    bool HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
 
-        bool HandleDropFlag(Player* player, uint32 spellId);
+    bool HandleDropFlag(Player* player, uint32 spellId);
 
-        bool CanTalkTo(Player* player, Creature* creature, GossipMenuItems const& gso);
+    bool CanTalkTo(Player* player, Creature* creature, GossipMenuItems const& gso);
 
-        uint32 GetGraveYardState() const;
+    uint32 GetGraveYardState() const;
 
-    private:
+private:
 
-        uint32 m_GraveYardState;
+    uint32 m_GraveYardState;
 
-    protected:
+protected:
 
-        TeamId m_BothControllingFactionId;
-        uint64 m_FlagCarrierGUID;
+    TeamId m_BothControllingFactionId;
+    uint64 m_FlagCarrierGUID;
 };
 
 class OutdoorPvPZM : public OutdoorPvP
 {
-    public:
+public:
 
-        OutdoorPvPZM();
+    OutdoorPvPZM();
 
-        bool SetupOutdoorPvP();
+    bool SetupOutdoorPvP();
 
-        void HandlePlayerEnterZone(Player* player, uint32 zone);
-        void HandlePlayerLeaveZone(Player* player, uint32 zone);
+    void HandlePlayerEnterZone(Player* player, uint32 zone);
+    void HandlePlayerLeaveZone(Player* player, uint32 zone);
 
-        bool Update(uint32 diff);
+    bool Update(uint32 diff);
 
-        void FillInitialWorldStates(WorldPacket &data);
+    void FillInitialWorldStates(WorldPacket& data);
 
-        void SendRemoveWorldStates(Player* player);
+    void SendRemoveWorldStates(Player* player);
 
-        void HandleKillImpl(Player* player, Unit* killed);
+    void HandleKillImpl(Player* player, Unit* killed);
 
-        uint32 GetAllianceTowersControlled() const;
-        void SetAllianceTowersControlled(uint32 count);
+    uint32 GetAllianceTowersControlled() const;
+    void SetAllianceTowersControlled(uint32 count);
 
-        uint32 GetHordeTowersControlled() const;
-        void SetHordeTowersControlled(uint32 count);
+    uint32 GetHordeTowersControlled() const;
+    void SetHordeTowersControlled(uint32 count);
 
-    private:
+private:
 
-        OPvPCapturePointZM_GraveYard * m_GraveYard;
+    OPvPCapturePointZM_GraveYard* m_GraveYard;
 
-        uint32 m_AllianceTowersControlled;
-        uint32 m_HordeTowersControlled;
+    uint32 m_AllianceTowersControlled;
+    uint32 m_HordeTowersControlled;
 };
 
 // todo: flag carrier death/leave/mount/activitychange should give back the gossip options

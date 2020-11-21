@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_GRIDLOADER_H
-#define TRINITY_GRIDLOADER_H
+#ifndef ACORE_GRIDLOADER_H
+#define ACORE_GRIDLOADER_H
 
 /**
   @class GridLoader
