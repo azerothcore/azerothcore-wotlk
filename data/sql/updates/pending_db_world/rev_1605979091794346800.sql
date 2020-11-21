@@ -26,7 +26,7 @@ INSERT INTO `creature` VALUES
 /* Lightning Charged Iron Dwarf unsheath weapons and emote ready */
 DELETE FROM `creature_addon` WHERE `guid` IN (136609,136610,136771,136774);
 INSERT INTO `creature_addon` (`guid`, `bytes2`, `emote`) VALUES 
-('136609', '1', '333'),
-('136610', '1', '0'),
-('136771', '1', '0'),
-('136774', '1', '333');
+(136609, 1, 333),
+(136610, 1, 0),
+(136771, 1, 0),
+(136774, 1, 333);
