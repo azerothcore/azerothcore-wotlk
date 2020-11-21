@@ -2663,13 +2663,13 @@ void SpellMgr::LoadSpellInfoStore()
             mSpellInfoMap[i] = new SpellInfo(spellEntry);
     }
 
-    sLog->outString(">> Loaded spell custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded SpellInfo store in %u ms", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
 void SpellMgr::UnloadSpellInfoStore()
 {
-    for (uint32 i = 0; i < mSpellInfoMap.size(); ++i)
+    for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         if (mSpellInfoMap[i])
             delete mSpellInfoMap[i];
@@ -2679,7 +2679,7 @@ void SpellMgr::UnloadSpellInfoStore()
 
 void SpellMgr::UnloadSpellInfoImplicitTargetConditionLists()
 {
-    for (uint32 i = 0; i < mSpellInfoMap.size(); ++i)
+    for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         if (mSpellInfoMap[i])
             mSpellInfoMap[i]->_UnloadImplicitTargetConditionLists();
@@ -2704,7 +2704,7 @@ void SpellMgr::LoadSpellSpecificAndAuraState()
     sLog->outString();
 }
 
-void SpellMgr::LoadSpellCustomAttr()
+void SpellMgr::LoadSpellInfoCustomAttributes()
 {
     uint32 oldMSTime = getMSTime();
     uint32 customAttrTime = getMSTime();
@@ -2852,7 +2852,7 @@ void SpellMgr::LoadSpellCustomAttr()
                                 if (enchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
                                     continue;
 
-                                SpellInfo* procInfo = (SpellInfo*)GetSpellInfo(enchant->spellid[s]);
+                                SpellInfo* procInfo = _GetSpellInfo(enchant->spellid[s]);
                                 if (!procInfo)
                                     continue;
 
@@ -3261,26 +3261,26 @@ void SpellMgr::LoadSpellCustomAttr()
 
     CreatureAI::FillAISpellInfo();
 
-    sLog->outString(">> Loaded spell custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded SpellInfo custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
-inline void ApplySpellFix(std::initializer_list<uint32> spellIds, void(*fix)(SpellEntry*))
+inline void ApplySpellFix(std::initializer_list<uint32> spellIds, void(*fix)(SpellInfo*))
 {
     for (uint32 spellId : spellIds)
     {
-        SpellEntry const* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(spellId);
+        SpellInfo const* spellInfo = (SpellInfo*)sSpellStore.LookupEntry(spellId);
         if (!spellInfo)
         {
             sLog->outErrorDb("Spell info correction specified for non-existing spell %u", spellId);
             continue;
         }
 
-        fix(const_cast<SpellEntry*>(spellInfo));
+        fix(const_cast<SpellInfo*>(spellInfo));
     }
 }
 
-void SpellMgr::LoadDbcDataCorrections()
+void SpellMgr::LoadSpellInfoCorrections()
 {
     uint32 oldMSTime = getMSTime();
 
@@ -3327,7 +3327,7 @@ void SpellMgr::LoadDbcDataCorrections()
         52612   // Summon Skeletons
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectMiscValueB[0] = 64;
+        spellInfo->Effects[0].MiscValueB = 64;
     });
 
     ApplySpellFix({
@@ -3348,7 +3348,7 @@ void SpellMgr::LoadDbcDataCorrections()
         42835   // Spout, remove damage effect, only anim is needed
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = 0;
+        spellInfo->Effects[0].Effect = 0;
     });
 
     ApplySpellFix({
@@ -3380,7 +3380,7 @@ void SpellMgr::LoadDbcDataCorrections()
     //They Must Burn Bomb Aura (self)
     ApplySpellFix({ 36350 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[0] = 36325; // They Must Burn Bomb Drop (DND)
+        spellInfo->Effects[0].TriggerSpell = 36325; // They Must Burn Bomb Drop (DND)
     });
 
     // Mana Shield (rank 2)
@@ -3543,7 +3543,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Elemental Oath
     ApplySpellFix({ 51466, 51470 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[EFFECT_1] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
         spellInfo->EffectApplyAuraName[EFFECT_1] = SPELL_AURA_ADD_FLAT_MODIFIER;
         spellInfo->EffectMiscValue[EFFECT_1] = SPELLMOD_EFFECT2;
         spellInfo->EffectSpellClassMask[EFFECT_1] = flag96(0x00000000, 0x00004000, 0x00000000);
@@ -3606,7 +3606,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 57994 }, [](SpellEntry* spellInfo)
     {
         // improper data for EFFECT_1 in 3.3.5 DBC, but is correct in 4.x
-        spellInfo->Effect[EFFECT_1] = SPELL_EFFECT_MODIFY_THREAT_PERCENT;
+        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_MODIFY_THREAT_PERCENT;
         spellInfo->EffectBasePoints[EFFECT_1] = -6; // -5%
     });
 
@@ -3847,9 +3847,9 @@ void SpellMgr::LoadDbcDataCorrections()
     // Wild Hunt
     ApplySpellFix({ 62758, 62762 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
         spellInfo->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-        spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
         spellInfo->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
     });
 
@@ -3863,7 +3863,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Roar of Sacrifice
     ApplySpellFix({ 53480 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
         spellInfo->EffectApplyAuraName[1] = SPELL_AURA_SPLIT_DAMAGE_PCT;
         spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ALLY;
         spellInfo->EffectDieSides[1] = 1;
@@ -3874,7 +3874,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Silencing Shot
     ApplySpellFix({ 34490, 41084, 42671 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->speed = 0.0f;
+        spellInfo->Speed= 0.0f;
     });
 
     // Monstrous Bite
@@ -3947,13 +3947,13 @@ void SpellMgr::LoadDbcDataCorrections()
         58428   // Overkill
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = SPELL_EFFECT_SCRIPT_EFFECT;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_SCRIPT_EFFECT;
     });
 
     // Honor Among Thieves
     ApplySpellFix({ 51698, 51700, 51701 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[0] = 51699;
+        spellInfo->Effects[0].TriggerSpell = 51699;
     });
 
     ApplySpellFix({
@@ -3986,21 +3986,21 @@ void SpellMgr::LoadDbcDataCorrections()
     // Blood Tap visual cd reset
     ApplySpellFix({ 47804 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[2] = 0;
-        spellInfo->Effect[1] = 0;
+        spellInfo->Effects[2].Effect = 0;
+        spellInfo->Effects[1].Effect = 0;
         spellInfo->runeCostID = 442;
     });
 
     // Chains of Ice
     ApplySpellFix({ 45524 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[EFFECT_2] = 0;
+        spellInfo->Effects[EFFECT_2].Effect = 0;
     });
 
     // Impurity
     ApplySpellFix({ 49220, 49633, 49635, 49636, 49638 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
         spellInfo->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
         spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
         spellInfo->SpellFamilyName = SPELLFAMILY_DEATHKNIGHT;
@@ -4009,7 +4009,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Deadly Aggression (Deadly Gladiator's Death Knight Relic, item: 42620)
     ApplySpellFix({ 60549 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = 0;
+        spellInfo->Effects[1].Effect = 0;
     });
 
     // Magic Suppression
@@ -4028,7 +4028,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Dancing Rune Weapon
     ApplySpellFix({ 49028 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[2].Effect = 0;
         spellInfo->procFlags |= PROC_FLAG_DONE_MELEE_AUTO_ATTACK;
     });
 
@@ -4042,7 +4042,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // T9 blood plague crit bonus
     ApplySpellFix({ 67118 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = 0;
+        spellInfo->Effects[1].Effect = 0;
     });
 
     // Pestilence
@@ -4257,7 +4257,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Improved Demonic Tactics
     ApplySpellFix({ 54347, 54348, 54349 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[EFFECT_1] = spellInfo->Effect[EFFECT_0];
+        spellInfo->Effects[EFFECT_1].Effect = spellInfo->Effects[EFFECT_0].Effect;
         spellInfo->EffectApplyAuraName[EFFECT_1] = spellInfo->EffectApplyAuraName[EFFECT_0];
         spellInfo->EffectImplicitTargetA[EFFECT_1] = spellInfo->EffectImplicitTargetA[EFFECT_0];
         spellInfo->EffectMiscValue[EFFECT_0] = SPELLMOD_EFFECT1;
@@ -4267,7 +4267,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Rain of Fire (Doomguard)
     ApplySpellFix({ 42227 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->speed = 0.0f;
+        spellInfo->Speed= 0.0f;
     });
 
     // Ritual Enslavement
@@ -4310,20 +4310,20 @@ void SpellMgr::LoadDbcDataCorrections()
     // Blazing Speed
     ApplySpellFix({ 31641, 31642 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[0] = 31643;
+        spellInfo->Effects[0].TriggerSpell = 31643;
     });
 
     // Summon Water Elemental (permanent)
     ApplySpellFix({ 70908 }, [](SpellEntry* spellInfo)
     {
         // treat it as pet
-        spellInfo->Effect[0] = SPELL_EFFECT_SUMMON_PET;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_SUMMON_PET;
     });
 
     // // Burnout, trigger
     ApplySpellFix({ 44450 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = SPELL_EFFECT_POWER_BURN;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_POWER_BURN;
     });
 
     // Mirror Image - Summon Spells
@@ -4377,7 +4377,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Glyph of blocking
     ApplySpellFix({ 58375 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[0] = 58374;
+        spellInfo->Effects[0].TriggerSpell = 58374;
     });
 
     // Sweeping Strikes stance change
@@ -4420,8 +4420,8 @@ void SpellMgr::LoadDbcDataCorrections()
     // Sunder Armor - Old Ranks
     ApplySpellFix({ 7405, 8380, 11596, 11597, 25225, 47467 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[EFFECT_0] = 11971;
-        spellInfo->Effect[EFFECT_0] = SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE;
+        spellInfo->Effects[EFFECT_0].TriggerSpell = 11971;
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE;
     });
 
     // Improved Spell Reflection
@@ -4442,8 +4442,8 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         // rewrite part of aura system or swap effects...
         spellInfo->EffectApplyAuraName[1] = SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT;
-        spellInfo->Effect[2] = spellInfo->Effect[0];
-        spellInfo->Effect[0] = 0;
+        spellInfo->Effects[2].Effect = spellInfo->Effects[0].Effect;
+        spellInfo->Effects[0].Effect = 0;
         spellInfo->EffectDieSides[2] = spellInfo->EffectDieSides[0];
         spellInfo->EffectImplicitTargetA[2] = spellInfo->EffectImplicitTargetB[0];
         spellInfo->EffectRadiusIndex[2] = spellInfo->EffectRadiusIndex[0];
@@ -4482,7 +4482,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 10060 }, [](SpellEntry* spellInfo)
     {
         // hack to fix stacking with arcane power
-        spellInfo->Effect[EFFECT_2] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_APPLY_AURA;
         spellInfo->EffectApplyAuraName[EFFECT_2] = SPELL_AURA_ADD_PCT_MODIFIER;
         spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_TARGET_ALLY;
     });
@@ -4571,7 +4571,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Aspect of the Viper
     ApplySpellFix({ 34074 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[2].Effect = SPELL_EFFECT_APPLY_AURA;
         spellInfo->EffectImplicitTargetA[2] = 1;
         spellInfo->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
     });
@@ -4719,7 +4719,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 38794, 33711 }, [](SpellEntry* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
-        spellInfo->EffectTriggerSpell[0] = 33760;
+        spellInfo->Effects[0].TriggerSpell = 33760;
     });
 
     // Negaton Field
@@ -4734,7 +4734,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Curse of the Doomsayer NORMAL
     ApplySpellFix({ 36173 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[0] = 36174; // Currently triggers heroic version...
+        spellInfo->Effects[0].TriggerSpell = 36174; // Currently triggers heroic version...
     });
 
     // Crystal Channel
@@ -4777,19 +4777,19 @@ void SpellMgr::LoadDbcDataCorrections()
     // Sinister Reflection Clone
     ApplySpellFix({ 45785 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->speed = 0.0f;
+        spellInfo->Speed= 0.0f;
     });
 
     // Armageddon
     ApplySpellFix({ 45909 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->speed = 8.0f;
+        spellInfo->Speed= 8.0f;
     });
 
     // Spell Absorption
     ApplySpellFix({ 41034 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[EFFECT_2] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_APPLY_AURA;
         spellInfo->EffectApplyAuraName[EFFECT_2] = SPELL_AURA_SCHOOL_ABSORB;
         spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_CASTER;
         spellInfo->EffectMiscValue[EFFECT_2] = SPELL_SCHOOL_MASK_MAGIC;
@@ -4878,8 +4878,8 @@ void SpellMgr::LoadDbcDataCorrections()
     // Summon Plagued Warrior
     ApplySpellFix({ 29237 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
-        spellInfo->Effect[1] = spellInfo->Effect[2] = 0;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
+        spellInfo->Effects[1].Effect = spellInfo->Effects[2].Effect = 0;
     });
 
     // Icebolt
@@ -4931,8 +4931,8 @@ void SpellMgr::LoadDbcDataCorrections()
     // Vanish
     ApplySpellFix({ 55964 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[1].Effect = 0;
+        spellInfo->Effects[2].Effect = 0;
     });
 
     // Trollgore - Summon Drakkari Invader
@@ -4965,12 +4965,12 @@ void SpellMgr::LoadDbcDataCorrections()
     // Ingvar the Plunderer, Woe Strike
     ApplySpellFix({ 42730 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[1] = 42739;
+        spellInfo->Effects[1].TriggerSpell = 42739;
     });
 
     ApplySpellFix({ 59735 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[1] = 59736;
+        spellInfo->Effects[1].TriggerSpell = 59736;
     });
 
     // Ingvar the Plunderer, Ingvar transform
@@ -5074,7 +5074,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
     });
 
-    // Haste (Nexus Lord, increase run speed of the disk)
+    // Haste (Nexus Lord, increase run Speedof the disk)
     ApplySpellFix({ 57060 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_VEHICLE;
@@ -5083,8 +5083,8 @@ void SpellMgr::LoadDbcDataCorrections()
     // Arcane Overload
     ApplySpellFix({ 56430 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->EffectTriggerSpell[0] = 56429;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->Effects[0].TriggerSpell = 56429;
     });
 
     // Summon Arcane Bomb
@@ -5138,7 +5138,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Wyrmrest Drake - Life Burst
     ApplySpellFix({ 57143 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = 0;
+        spellInfo->Effects[0].Effect = 0;
         spellInfo->EffectImplicitTargetA[0] = 0;
         spellInfo->EffectImplicitTargetB[0] = 0;
         spellInfo->EffectImplicitTargetA[1] = TARGET_SRC_CASTER;
@@ -5164,7 +5164,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Hurl Pyrite
     ApplySpellFix({ 62490 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[EFFECT_1] = 0;
+        spellInfo->Effects[EFFECT_1].Effect = 0;
     });
 
     // Ulduar, Mimiron, Magnetic Core (summon)
@@ -5204,13 +5204,13 @@ void SpellMgr::LoadDbcDataCorrections()
     // Ulduar, General Vezax, Mark of the Faceless
     ApplySpellFix({ 63278 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = 0;
+        spellInfo->Effects[EFFECT_0].Effect = 0;
     });
 
     // Boom (XT-002)
     ApplySpellFix({ 62834 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[EFFECT_1] = 0;
+        spellInfo->Effects[EFFECT_1].Effect = 0;
     });
 
     // Supercharge
@@ -5233,7 +5233,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Stone Grip, remove absorb aura
     ApplySpellFix({ 62056, 63985 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = 0;
+        spellInfo->Effects[EFFECT_1].Effect = 0;
     });
 
     // Sentinel Blast
@@ -5258,7 +5258,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Brightleaf Essence trigger
     ApplySpellFix({ 62968 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = 0; // duplicate
+        spellInfo->Effects[EFFECT_1].Effect = 0; // duplicate
     });
 
     // Potent Pheromones
@@ -5297,7 +5297,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Shadow Beacon
     ApplySpellFix({ 64465 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[0] = 64467; // why do they need two script effects :/ (this one has visual effect)
+        spellInfo->Effects[0].TriggerSpell = 64467; // why do they need two script effects :/ (this one has visual effect)
     });
 
     // Sanity
@@ -5347,7 +5347,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Onyxia's Lair, Onyxia, Flame Breath (TriggerSpell = 0 and spamming errors in console)
     ApplySpellFix({ 18435 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = 0;
+        spellInfo->Effects[EFFECT_1].Effect = 0;
     });
 
     // Onyxia's Lair, Onyxia, Create Onyxia Spawner
@@ -5370,7 +5370,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Onyxia's Lair, Onyxia, Eruption
     ApplySpellFix({ 17731, 69294 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
+        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_DUMMY;
         spellInfo->CastingTimeIndex = 3;
         spellInfo->EffectRadiusIndex[1] = 19; // 18yd instead of 13yd to make sure all cracks erupt
     });
@@ -5388,9 +5388,9 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->DurationIndex = 328; // 250ms
         spellInfo->EffectImplicitTargetA[1] = 1;
-        if (spellInfo->Effect[1])
+        if (spellInfo->Effects[EFFECT_1].Effect)
         {
-            spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
             spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
             spellInfo->EffectAmplitude[1] = ((spellInfo->CastingTimeIndex == 170) ? 50 : 215);
         }
@@ -5455,7 +5455,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Trial of the Champion, Hammer of the Righteous
     ApplySpellFix({ 66867 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
     });
 
     // Trial of the Champion, Summon Risen Jaeren/Arelas
@@ -5481,7 +5481,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Trial of the Champion, Desecration
     ApplySpellFix({ 67778, 67877 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[0] = 68766;
+        spellInfo->Effects[0].TriggerSpell = 68766;
     });
 
     // Trial of the Crusader, Jaraxxus Intro spell
@@ -5501,7 +5501,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Trial of the Crusader, Gormok, player vehicle spell, CUSTOM! (default jump to hand, not used)
     ApplySpellFix({ 66342 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
         spellInfo->EffectApplyAuraName[0] = SPELL_AURA_SET_VEHICLE_ID;
         spellInfo->EffectMiscValue[0] = 496;
         spellInfo->DurationIndex = 21;
@@ -5518,7 +5518,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_TARGET_ANY;
         spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;
         spellInfo->EffectImplicitTargetB[1] = TARGET_DEST_TARGET_ANY;
-        spellInfo->Effect[1] = 0;
+        spellInfo->Effects[EFFECT_1].Effect = 0;
     });
 
     ApplySpellFix({ 66317 }, [](SpellEntry* spellInfo)
@@ -5532,7 +5532,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
         spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->speed = 14.0f;
+        spellInfo->Speed= 14.0f;
         spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
@@ -5570,10 +5570,10 @@ void SpellMgr::LoadDbcDataCorrections()
 
     ApplySpellFix({ 66287 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
         spellInfo->EffectApplyAuraName[1] = SPELL_AURA_MOD_TAUNT;
         spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_NEARBY_ENTRY;
-        spellInfo->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_APPLY_AURA;
         spellInfo->EffectApplyAuraName[2] = SPELL_AURA_MOD_STUN;
         spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
         spellInfo->DurationIndex = 35; // 4 secs
@@ -5594,14 +5594,14 @@ void SpellMgr::LoadDbcDataCorrections()
     // Trial of the Crusader, Faction Champions, Druid - Tranquality
     ApplySpellFix({ 66086, 67974, 67975, 67976 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA_FRIEND;
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AREA_AURA_FRIEND;
     });
 
     // Trial of the Crusader, Faction Champions, Shaman - Earth Shield
     ApplySpellFix({ 66063 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-        spellInfo->EffectTriggerSpell[0] = 66064;
+        spellInfo->Effects[0].TriggerSpell = 66064;
     });
 
     // Trial of the Crusader, Faction Champions, Priest - Mana Burn
@@ -5637,8 +5637,8 @@ void SpellMgr::LoadDbcDataCorrections()
         //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
         spellInfo->EffectImplicitTargetA[0] = 6;
         spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[EFFECT_1].Effect = 0;
+        spellInfo->Effects[EFFECT_2].Effect = 0;
     });
 
     ApplySpellFix({
@@ -5655,8 +5655,8 @@ void SpellMgr::LoadDbcDataCorrections()
         //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
         spellInfo->EffectImplicitTargetA[0] = 6;
         spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[EFFECT_1].Effect = 0;
+        spellInfo->Effects[EFFECT_2].Effect = 0;
     });
 
     ApplySpellFix({
@@ -5673,8 +5673,8 @@ void SpellMgr::LoadDbcDataCorrections()
         //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
         spellInfo->EffectImplicitTargetA[0] = 6;
         spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[EFFECT_1].Effect = 0;
+        spellInfo->Effects[EFFECT_2].Effect = 0;
     });
 
     ApplySpellFix({
@@ -5691,8 +5691,8 @@ void SpellMgr::LoadDbcDataCorrections()
         //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
         spellInfo->EffectImplicitTargetA[0] = 6;
         spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[EFFECT_1].Effect = 0;
+        spellInfo->Effects[EFFECT_2].Effect = 0;
     });
 
     ApplySpellFix({
@@ -5709,8 +5709,8 @@ void SpellMgr::LoadDbcDataCorrections()
         //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
         spellInfo->EffectImplicitTargetA[0] = 6;
         spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[EFFECT_1].Effect = 0;
+        spellInfo->Effects[EFFECT_2].Effect = 0;
     });
 
     ApplySpellFix({
@@ -5727,8 +5727,8 @@ void SpellMgr::LoadDbcDataCorrections()
         //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
         spellInfo->EffectImplicitTargetA[0] = 6;
         spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[1].Effect = 0;
+        spellInfo->Effects[2].Effect = 0;
     });
 
     ApplySpellFix({
@@ -5745,8 +5745,8 @@ void SpellMgr::LoadDbcDataCorrections()
         //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
         spellInfo->EffectImplicitTargetA[0] = 6;
         spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[1].Effect = 0;
+        spellInfo->Effects[2].Effect = 0;
     });
 
     ApplySpellFix({
@@ -5763,8 +5763,8 @@ void SpellMgr::LoadDbcDataCorrections()
         //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
         spellInfo->EffectImplicitTargetA[0] = 6;
         spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[1].Effect = 0;
+        spellInfo->Effects[2].Effect = 0;
     });
 
     ApplySpellFix({
@@ -5777,8 +5777,8 @@ void SpellMgr::LoadDbcDataCorrections()
     // Trial of the Crusader, Twin Valkyr, Twin's Pact
     ApplySpellFix({ 65875, 67303, 67304, 67305, 65876, 67306, 67307, 67308 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[1].Effect = 0;
+        spellInfo->Effects[2].Effect = 0;
     });
 
     // Trial of the Crusader, Anub'arak, Emerge
@@ -5797,14 +5797,14 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 66134 }, [](SpellEntry* spellInfo)
     {
         spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
-        spellInfo->Effect[0] = 0;
+        spellInfo->Effects[0].Effect = 0;
     });
 
     // Trial of the Crusader, Anub'arak, Pursuing Spikes
     ApplySpellFix({ 65920, 65922, 65923 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-        //spellInfo->EffectTriggerSpell[0] = 0;
+        //spellInfo->Effects[0].TriggerSpell = 0;
     });
 
     // Trial of the Crusader, Anub'arak, Summon Scarab
@@ -5837,7 +5837,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
         spellInfo->EffectAmplitude[0] = 8000;
-        spellInfo->EffectTriggerSpell[0] = 69133;
+        spellInfo->Effects[0].TriggerSpell = 69133;
     });
 
     // Phantom Blast
@@ -5879,8 +5879,8 @@ void SpellMgr::LoadDbcDataCorrections()
 
     ApplySpellFix({ 70525, 70639 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = 0;
-        spellInfo->Effect[1] = 0;
+        spellInfo->Effects[0].Effect = 0;
+        spellInfo->Effects[1].Effect = 0;
         spellInfo->EffectImplicitTargetA[2] = TARGET_SRC_CASTER;
         spellInfo->EffectImplicitTargetB[2] = TARGET_UNIT_SRC_AREA_ENTRY;
         spellInfo->EffectRadiusIndex[2] = 30; // 500yd
@@ -5910,7 +5910,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 68786, 70336 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= (SPELL_ATTR3_IGNORE_HIT_RESULT | SPELL_ATTR3_ONLY_TARGET_PLAYERS);
-        spellInfo->Effect[2] = SPELL_EFFECT_DUMMY;
+        spellInfo->Effects[2].Effect = SPELL_EFFECT_DUMMY;
     });
 
     // Pursuit
@@ -5928,7 +5928,7 @@ void SpellMgr::LoadDbcDataCorrections()
 
     ApplySpellFix({ 69029, 70850 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[2].Effect = 0;
     });
 
     // Explosive Barrage
@@ -5947,7 +5947,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Icy Blast
     ApplySpellFix({ 69232 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[1] = 69238;
+        spellInfo->Effects[1].TriggerSpell = 69238;
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
     });
 
@@ -5994,8 +5994,8 @@ void SpellMgr::LoadDbcDataCorrections()
     // Halls of Reflection Clone
     ApplySpellFix({ 69828 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = 0;
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[1].Effect = 0;
+        spellInfo->Effects[2].Effect = 0;
     });
 
     // Summon Ice Wall
@@ -6057,7 +6057,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Impaled (Lord Marrowgar)
     ApplySpellFix({ 69065 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = 0;   // remove stun so Dispersion can be used
+        spellInfo->Effects[0].Effect = 0;   // remove stun so Dispersion can be used
     });
 
     // Cold Flame (Lord Marrowgar)
@@ -6071,7 +6071,7 @@ void SpellMgr::LoadDbcDataCorrections()
 
     ApplySpellFix({ 69138 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = 0;
+        spellInfo->Effects[0].Effect = 0;
         spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DEST;
         spellInfo->DurationIndex = 9;   // 30 secs instead of 12, need him for longer, but will stop his actions after 12 secs
     });
@@ -6143,7 +6143,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 72723 }, [](SpellEntry* spellInfo)
     {
         // this spell initially granted Shadow damage immunity, however it was removed but the data was left in client
-        spellInfo->Effect[2] = 0;
+        spellInfo->Effects[2].Effect = 0;
     });
 
     // Mark of the Fallen Champion (Deathbringer Saurfang)
@@ -6173,7 +6173,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ENEMY;
         spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->Effect[1] = 0;
+        spellInfo->Effects[1].Effect = 0;
     });
 
     ApplySpellFix({
@@ -6187,7 +6187,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Blood Prince Council, Invocation of Blood
     ApplySpellFix({ 70981, 70982, 70952 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = 0; // clear share health aura
+        spellInfo->Effects[0].Effect = 0; // clear share health aura
     });
 
     // Ymirjar Frostbinder, Frozen Orb
@@ -6205,7 +6205,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Volatile Ooze Beam Protection
     ApplySpellFix({ 70530 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA; // blizzard typo, 65 instead of 6, aura itself is defined (dummy)
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA; // blizzard typo, 65 instead of 6, aura itself is defined (dummy)
     });
 
     // Professor Putricide, Gaseous Bloat (Orange Ooze Channel)
@@ -6338,13 +6338,13 @@ void SpellMgr::LoadDbcDataCorrections()
     // Frost Bomb
     ApplySpellFix({ 69846 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->speed = 0.0f;    // This spell's summon happens instantly
+        spellInfo->Speed= 0.0f;    // This spell's summon happens instantly
     });
 
     // Mystic Buffet (Sindragosa)
     ApplySpellFix({ 70127, 72528, 72529, 72530 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = 0; // remove obsolete spell effect with no targets
+        spellInfo->Effects[1].Effect = 0; // remove obsolete spell effect with no targets
     });
 
     // Sindragosa, Frost Aura
@@ -6633,7 +6633,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Meteor Strike
     ApplySpellFix({ 74637 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->speed = 0;
+        spellInfo->Speed= 0;
     });
 
     //Blazing Aura
@@ -6653,7 +6653,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Going Bearback
     ApplySpellFix({ 54897 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
+        spellInfo->Effects[1].Effect = SPELL_EFFECT_DUMMY;
         spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
         spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
         spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
@@ -6734,9 +6734,9 @@ void SpellMgr::LoadDbcDataCorrections()
     // The Smallest Creatures
     ApplySpellFix({ 38544 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectMiscValueB[0] = 427;
+        spellInfo->Effects[0].MiscValueB = 427;
         spellInfo->EffectImplicitTargetA[0] = 1;
-        spellInfo->Effect[1] = 0;
+        spellInfo->Effects[1].Effect = 0;
     });
 
     // Ridding the red rocket
@@ -6760,7 +6760,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // That's Abominable
     ApplySpellFix({ 59565 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectMiscValueB[0] = 1721; // controlable guardian
+        spellInfo->Effects[0].MiscValueB = 1721; // controlable guardian
     });
 
     // Investigate the Blue Recluse (1920)
@@ -6777,8 +6777,8 @@ void SpellMgr::LoadDbcDataCorrections()
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->EffectTriggerSpell[0] = 40905;
-        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->Effects[0].TriggerSpell = 40905;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
         spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
     });
 
@@ -6786,8 +6786,8 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 40909 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->EffectTriggerSpell[0] = 40905;
-        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->Effects[0].TriggerSpell = 40905;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
         spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
     });
 
@@ -6795,8 +6795,8 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 40894 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->EffectTriggerSpell[0] = 40900;
-        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->Effects[0].TriggerSpell = 40900;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
         spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
     });
 
@@ -6804,8 +6804,8 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 40928 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->EffectTriggerSpell[0] = 40929;
-        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->Effects[0].TriggerSpell = 40929;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
         spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
     });
 
@@ -6813,8 +6813,8 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 40930 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->EffectTriggerSpell[0] = 40931;
-        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->Effects[0].TriggerSpell = 40931;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
         spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
     });
 
@@ -6822,15 +6822,15 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 40945 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->EffectTriggerSpell[0] = 41064;
-        spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+        spellInfo->Effects[0].TriggerSpell = 41064;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
         spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
     });
 
     // Gauging the Resonant Frequency (10594)
     ApplySpellFix({ 37390 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectMiscValueB[0] = 181;
+        spellInfo->Effects[0].MiscValueB = 181;
     });
 
     // Where in the World is Hemet Nesingwary? (12521)
@@ -6916,7 +6916,7 @@ void SpellMgr::LoadDbcDataCorrections()
         59892   // Cyclone fall
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[EFFECT_0] = SPELL_EFFECT_APPLY_AREA_AURA_FRIEND;
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AREA_AURA_FRIEND;
         spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS;
         spellInfo->AttributesEx &= ~SPELL_ATTR0_CANT_CANCEL;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
@@ -6931,8 +6931,8 @@ void SpellMgr::LoadDbcDataCorrections()
     // Magic Broom
     ApplySpellFix({ 47977 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = 0;
-        spellInfo->Effect[1] = 0;
+        spellInfo->Effects[0].Effect = 0;
+        spellInfo->Effects[1].Effect = 0;
     });
 
     // Titanium Seal of Dalaran, Toss your luck
@@ -6951,13 +6951,13 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 26467 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE;
-        spellInfo->EffectTriggerSpell[0] = 26470;
+        spellInfo->Effects[0].TriggerSpell = 26470;
     });
 
     // Deadly Swiftness
     ApplySpellFix({ 31255 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[0] = 22588;
+        spellInfo->Effects[0].TriggerSpell = 22588;
     });
 
     // Black Magic enchant
@@ -7047,13 +7047,13 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_SRC_AREA_ENEMY;
         spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_CASTER;
-        spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
+        spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
     });
 
     // Dark Iron Attack - spawn mole machine
     ApplySpellFix({ 43563 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[2] = 0; // summon GO's manually
+        spellInfo->Effects[2].Effect = 0; // summon GO's manually
     });
 
     // Throw Mug visual
@@ -7082,13 +7082,13 @@ void SpellMgr::LoadDbcDataCorrections()
     // Catch the Wild Wolpertinger!
     ApplySpellFix({ 41621 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
+        spellInfo->Effecst[0].Effect = SPELL_EFFECT_DUMMY;
     });
 
     // Brewfest quests
     ApplySpellFix({ 47134, 51798 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = 0;
+        spellInfo->Effects[0].Effect = 0;
     });
 
     // The Heart of The Storms (12998)
@@ -7101,7 +7101,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Water splash
     ApplySpellFix({ 42348 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[0] = 0;
+        spellInfo->Effects[0].Effect = 0;
     });
 
     // Summon Lantersn
@@ -7120,33 +7120,33 @@ void SpellMgr::LoadDbcDataCorrections()
     // Various food
     ApplySpellFix({ 65418 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[2] = 65410;
+        spellInfo->Effects[2].TriggerSpell = 65410;
     });
 
     ApplySpellFix({ 65422 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[2] = 65414;
+        spellInfo->Effects[2].TriggerSpell = 65414;
     });
 
     ApplySpellFix({ 65419 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[2] = 65416;
+        spellInfo->Effects[2].TriggerSpell = 65416;
     });
 
     ApplySpellFix({ 65420 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[2] = 65412;
+        spellInfo->Effects[2].TriggerSpell = 65412;
     });
 
     ApplySpellFix({ 65421 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectTriggerSpell[2] = 65415;
+        spellInfo->Effects[2].TriggerSpell = 65415;
     });
 
     // Stamp Out Bonfire
     ApplySpellFix({ 45437 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
+        spellInfo->Effects[1].Effect = SPELL_EFFECT_DUMMY;
         spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_NEARBY_ENTRY;
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
     });
@@ -7177,9 +7177,9 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx7 |= SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER;
     });
 
-    for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
+    for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
-        SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
+        SpellInfo* spellInfo = mSpellInfoMap[i];
         if (!spellInfo)
         {
             continue;
@@ -7187,22 +7187,22 @@ void SpellMgr::LoadDbcDataCorrections()
 
         for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
         {
-            switch (spellInfo->Effect[j])
+            switch (spellInfo->Effects[j].Effect)
             {
                 case SPELL_EFFECT_CHARGE:
                 case SPELL_EFFECT_CHARGE_DEST:
                 case SPELL_EFFECT_JUMP:
                 case SPELL_EFFECT_JUMP_DEST:
                 case SPELL_EFFECT_LEAP_BACK:
-                    if (!spellInfo->speed && !spellInfo->SpellFamilyName)
+                    if (!spellInfo->Speed&& !spellInfo->SpellFamilyName)
                     {
-                        spellInfo->speed = SPEED_CHARGE;
+                        spellInfo->Speed= SPEED_CHARGE;
                     }
                     break;
             }
 
             // Xinef: i hope this will fix the problem with not working resurrection
-            if (spellInfo->Effect[j] == SPELL_EFFECT_SELF_RESURRECT)
+            if (spellInfo->Effects[j].Effect == SPELL_EFFECT_SELF_RESURRECT)
             {
                 spellInfo->EffectImplicitTargetA[j] = TARGET_UNIT_CASTER;
             }
@@ -7213,7 +7213,7 @@ void SpellMgr::LoadDbcDataCorrections()
         {
             if (spellInfo->rangeIndex == 1 && (spellInfo->EffectImplicitTargetA[j] == TARGET_DEST_TRAJ || spellInfo->EffectImplicitTargetB[j] == TARGET_DEST_TRAJ))
             {
-                if (SpellEntry* spellInfo2 = (SpellEntry*)sSpellStore.LookupEntry(spellInfo->EffectTriggerSpell[j]))
+                if (SpellEntry* spellInfo2 = (SpellEntry*)sSpellStore.LookupEntry(spellInfo->Effects[j].TriggerSpell))
                 {
                     spellInfo2->rangeIndex = 187; // 300yd
                 }
