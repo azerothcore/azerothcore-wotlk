@@ -1,4 +1,4 @@
-DELETE FROM `creature_text` WHERE `CreatureID` in(25317,25220,25222);
+DELETE FROM `creature_text` WHERE `CreatureID` IN (25317,25220,25222);
 INSERT INTO `creature_text` (`CreatureID`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `BroadcastTextId`, `comment`) VALUES
 (25317, 0, 0, 'What''s the matter, $c?  Think you''re too good to stand in line with the rest of us?', 12, 0, 100, 0, 0, 0, 24758, 'Civilian Recruit to Player'),
 (25220, 0, 0, 'Miner.', 12, 7, 100, 66, 0, 0, 24377, 'Civilian Recruit to Generic Quest Trigger - LAB'),
@@ -40,18 +40,19 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (25220, 9, 2289.469, 5244.898, 11.45096, 'Civilian Recruit'),
 (25220, 10, 2291.772, 5243.933, 11.45096, 'Civilian Recruit'),
 (25220, 11, 2294.129, 5242.708, 11.45096, 'Civilian Recruit'),
+-- P12 this is blizzlike behavior, with it - they will end up on the table.
 -- (25220, 12, 2298.062, 5241.932, 12.3176, 'Civilian Recruit'),
 (25220, 12, 2297.330, 5241.240, 11.46370, 'Civilian Recruit'),
 (25220, 13, 2303.019, 5253.306, 11.50584, 'Civilian Recruit'),
 (25220, 14, 2308.73, 5256.926, 11.50584, 'Civilian Recruit'),
 (25220, 15, 2320.826, 5259.258, 11.25584, 'Civilian Recruit');
 
-DELETE FROM  `creature` WHERE `guid` IN(108008,108007,108006,108005,108004,108003,108002,108001,108000);
+DELETE FROM  `creature` WHERE `guid` IN (108008,108007,108006,108005,108004,108003,108002,108001,108000);
 
-UPDATE `creature_template` SET `AIName`='SmartAI' WHERE  `entry`IN(24959,25220,25307);
-DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid`IN(-107575,-107574);
-DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid`IN(25220,25307);
-DELETE FROM `smart_scripts` WHERE `source_type`=9 AND `entryorguid`IN(2522000,2522001);
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry` IN (24959,25220,25307);
+DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (-107575,-107574);
+DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (25220,25307);
+DELETE FROM `smart_scripts` WHERE `source_type`=9 AND `entryorguid` IN (2522000,2522001);
 
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (-107575, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Generic Quest Trigger - LAB - On Spawn - Set Active'),
@@ -97,32 +98,32 @@ SET @GUID := -117794;
 UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=25317;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@GUID AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(@GUID,0,0,0,1,0,100,0,8000,8000,12000,12000,5,36,0,0,0,0,0,1,0,0,0,0,0,0,0,"Civilian Recruit - Out of Combat - Play Emote 36"),
-(@GUID,0,1,0,1,0,100,0,35000,40000,35000,40000,80,11779400,0,0,0,0,0,1,0,0,0,0,0,0,0,"Civilian Recruit - Out of Combat - Run Script");
+(@GUID,0,0,0,1,0,100,0,8000,8000,12000,12000,5,36,0,0,0,0,0,1,0,0,0,0,0,0,0,'Civilian Recruit - Out of Combat - Play Emote 36'),
+(@GUID,0,1,0,1,0,100,0,35000,40000,35000,40000,80,11779400,0,0,0,0,0,1,0,0,0,0,0,0,0,'Civilian Recruit - Out of Combat - Run Script');
 
 -- Actionlist SAI
 SET @ENTRY := 11779400;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=9;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(@ENTRY,9,0,0,0,0,100,0,2000,2000,0,0,1,1,6000,0,0,0,0,1,0,0,0,0,0,0,0,"Civilian Recruit - On Script - Say Line 1"),
-(@ENTRY,9,1,0,0,0,100,0,6000,6000,0,0,1,2,6000,0,0,0,0,10,117790,25317,0,0,0,0,0,"Civilian Recruit - On Script - Say Line 2"),
-(@ENTRY,9,2,0,0,0,100,0,6000,6000,0,0,1,3,6000,0,0,0,0,1,0,0,0,0,0,0,0,"Civilian Recruit - On Script - Say Line 3");
+(@ENTRY,9,0,0,0,0,100,0,2000,2000,0,0,1,1,6000,0,0,0,0,1,0,0,0,0,0,0,0,'Civilian Recruit - On Script - Say Line 1'),
+(@ENTRY,9,1,0,0,0,100,0,6000,6000,0,0,1,2,6000,0,0,0,0,10,117790,25317,0,0,0,0,0,'Civilian Recruit - On Script - Say Line 2'),
+(@ENTRY,9,2,0,0,0,100,0,6000,6000,0,0,1,3,6000,0,0,0,0,1,0,0,0,0,0,0,0,'Civilian Recruit - On Script - Say Line 3');
 
 -- Civilian Recruit SAI
 SET @GUID := -117788;
 UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=25317;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@GUID AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(@GUID,0,0,0,1,0,100,0,8000,8000,12000,12000,5,36,0,0,0,0,0,1,0,0,0,0,0,0,0,"Civilian Recruit - Out of Combat - Play Emote 36"),
-(@GUID,0,1,0,1,0,100,0,35000,40000,35000,40000,80,11778800,0,0,0,0,0,1,0,0,0,0,0,0,0,"Civilian Recruit - Out of Combat - Run Script");
+(@GUID,0,0,0,1,0,100,0,8000,8000,12000,12000,5,36,0,0,0,0,0,1,0,0,0,0,0,0,0,'Civilian Recruit - Out of Combat - Play Emote 36'),
+(@GUID,0,1,0,1,0,100,0,35000,40000,35000,40000,80,11778800,0,0,0,0,0,1,0,0,0,0,0,0,0,'Civilian Recruit - Out of Combat - Run Script');
 
 -- Actionlist SAI
 SET @ENTRY := 11778800;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=9;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(@ENTRY,9,0,0,0,0,100,0,2000,2000,0,0,1,1,6000,0,0,0,0,1,0,0,0,0,0,0,0,"Civilian Recruit - On Script - Say Line 1"),
-(@ENTRY,9,1,0,0,0,100,0,6000,6000,0,0,1,2,6000,0,0,0,0,10,117789,25317,0,0,0,0,0,"Civilian Recruit - On Script - Say Line 2"),
-(@ENTRY,9,2,0,0,0,100,0,6000,6000,0,0,1,3,6000,0,0,0,0,1,0,0,0,0,0,0,0,"Civilian Recruit - On Script - Say Line 3");
+(@ENTRY,9,0,0,0,0,100,0,2000,2000,0,0,1,1,6000,0,0,0,0,1,0,0,0,0,0,0,0,'Civilian Recruit - On Script - Say Line 1'),
+(@ENTRY,9,1,0,0,0,100,0,6000,6000,0,0,1,2,6000,0,0,0,0,10,117789,25317,0,0,0,0,0,'Civilian Recruit - On Script - Say Line 2'),
+(@ENTRY,9,2,0,0,0,100,0,6000,6000,0,0,1,3,6000,0,0,0,0,1,0,0,0,0,0,0,0,'Civilian Recruit - On Script - Say Line 3');
 
 
 DELETE FROM `creature_text` WHERE `CreatureID`=25317 AND `GroupID` >=1;
