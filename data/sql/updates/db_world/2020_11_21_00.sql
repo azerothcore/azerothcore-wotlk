@@ -1,3 +1,19 @@
+-- DB update 2020_11_18_00 -> 2020_11_21_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_11_18_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_11_18_00 2020_11_21_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1605908814314990400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1605908814314990400');
 
 -- quest_offer_reward_locale
@@ -2468,3 +2484,12 @@ INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verified
 DELETE FROM `quest_request_items_locale` WHERE `ID`=9483 AND `locale`='frFR';
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES 
 (9483, 'frFR', 'Ce n\'est pas parce que je suis en pèlerinage que je dois abandonner tous les plaisirs de la vie. Cela fait des siècles que je n\'ai pas degusté un bon vin.$b$bJ\'en arriverais presque à tuer pour une bouteille d\'esprit-de-vin cénarien !$b$bJe sais, je sais, ce n\'est pas du tout la mode de boire quelque chose produit par les elfes de la nuit.', 18019);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
