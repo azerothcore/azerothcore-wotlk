@@ -7,7 +7,7 @@ CORE:
 Script:
   - src/server/scripts/**/*.cpp
   - src/server/scripts/**/*.h
-  
+
 UnitTests:
   - src/test/**/*
 
