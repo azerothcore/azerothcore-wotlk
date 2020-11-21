@@ -1428,7 +1428,7 @@ public:
                     if (Creature* leviathan = me->GetVehicleCreatureBase())
                     {
                         float orient = leviathan->GetOrientation();
-                        leviathan->SetFacingTo(orient + (direction ? M_PI / 60 : -M_PI / 60));
+                        me->SetFacingTo(orient + (direction ? M_PI / 60 : -M_PI / 60));
                         me->SetOrientation(orient + (direction ? M_PI / 60 : -M_PI / 60));
                     }
                     else
@@ -1529,7 +1529,7 @@ public:
                     {
                         float orient = leviathan->GetOrientation();
                         leviathan->CastSpell(leviathan, 14821, true); // temporary, to prevent turning
-                        leviathan->SetFacingTo(orient);
+                        me->SetFacingTo(orient);
                         me->SetOrientation(orient);
                     }
                     direction = urand(0, 1);
