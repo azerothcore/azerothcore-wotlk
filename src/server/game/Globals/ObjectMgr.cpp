@@ -6118,8 +6118,8 @@ void ObjectMgr::LoadAccessRequirements()
 
         _accessRequirementStore.clear();                                  // need for reload case
     }
-    //                                                               0   1            2           3          4          5
-    QueryResult access_template_result = WorldDatabase.Query("SELECT id, instance_id, difficulty, min_level, max_level, min_item_level FROM dungeon_access_template");
+    //                                                               0       1            2           3          4            5
+    QueryResult access_template_result = WorldDatabase.Query("SELECT id, instance_id, difficulty, min_level, max_level, min_avg_item_level FROM dungeon_access_template");
     if (!access_template_result)
     {
         sLog->outString(">> Loaded 0 access requirement definitions. DB table `dungeon_access_template` is empty.");
