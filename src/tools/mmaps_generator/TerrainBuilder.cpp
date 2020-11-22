@@ -421,7 +421,7 @@ namespace MMAP
                 {
                     float quadHeight = 0;
                     uint32 validCount = 0;
-                    for(uint32 idx = 0; idx < 3; idx++)
+                    for (uint32 idx = 0; idx < 3; idx++)
                     {
                         float h = lverts_copy[ltris[idx] * 3 + 1];
                         if (h != INVALID_MAP_LIQ_HEIGHT && h < INVALID_MAP_LIQ_HEIGHT_MAX)
@@ -435,7 +435,7 @@ namespace MMAP
                     if (validCount > 0 && validCount < 3)
                     {
                         quadHeight /= validCount;
-                        for(uint32 idx = 0; idx < 3; idx++)
+                        for (uint32 idx = 0; idx < 3; idx++)
                         {
                             float h = lverts[ltris[idx] * 3 + 1];
                             if (h == INVALID_MAP_LIQ_HEIGHT || h > INVALID_MAP_LIQ_HEIGHT_MAX)
@@ -457,7 +457,7 @@ namespace MMAP
                 {
                     float minLLevel = INVALID_MAP_LIQ_HEIGHT_MAX;
                     float maxLLevel = INVALID_MAP_LIQ_HEIGHT;
-                    for(uint32 x = 0; x < 3; x++)
+                    for (uint32 x = 0; x < 3; x++)
                     {
                         float h = lverts[ltris[x] * 3 + 1];
                         if (minLLevel > h)
@@ -469,7 +469,7 @@ namespace MMAP
 
                     float maxTLevel = INVALID_MAP_LIQ_HEIGHT;
                     float minTLevel = INVALID_MAP_LIQ_HEIGHT_MAX;
-                    for(uint32 x = 0; x < 6; x++)
+                    for (uint32 x = 0; x < 6; x++)
                     {
                         float h = tverts[ttris[x] * 3 + 1];
                         if (maxTLevel < h)
@@ -579,21 +579,21 @@ namespace MMAP
                     break;
             }
 
-            /*
-                0-----1 .... 128
-                |\    |
-                | \ T |
-                |  \  |
-                | B \ |
-                |    \|
-                129---130 ... 386
-                |\    |
-                | \   |
-                |  \  |
-                |   \ |
-                |    \|
-                258---259 ... 515
-            */
+        /*
+            0-----1 .... 128
+            |\    |
+            | \ T |
+            |  \  |
+            | B \ |
+            |    \|
+            129---130 ... 386
+            |\    |
+            | \   |
+            |  \  |
+            |   \ |
+            |    \|
+            258---259 ... 515
+        */
 
     }
 
@@ -914,7 +914,7 @@ namespace MMAP
         // pretty silly thing, as we parse entire file and load only the tile we need
         // but we don't expect this file to be too large
         char* buf = new char[512];
-        while(fgets(buf, 512, fp))
+        while (fgets(buf, 512, fp))
         {
             float p0[3], p1[3];
             uint32 mid, tx, ty;
