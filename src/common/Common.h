@@ -80,7 +80,6 @@
 #include "Threading/LockedQueue.h"
 #include "Threading/Threading.h"
 
-#include <ace/Basic_Types.h>
 #include <ace/Stack_Trace.h>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
