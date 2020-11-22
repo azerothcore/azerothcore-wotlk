@@ -8,7 +8,7 @@
 #define ACORE_MAPMANAGER_H
 
 #include "Define.h"
-#include <ace/Thread_Mutex.h>
+#include <mutex>
 #include "Common.h"
 #include "Map.h"
 #include "Object.h"
@@ -130,7 +130,7 @@ private:
     MapManager(const MapManager&);
     MapManager& operator=(const MapManager&);
 
-    ACE_Thread_Mutex Lock;
+    std::mutex Lock;
     MapMapType i_maps;
     IntervalTimer i_timer[4]; // continents, bgs/arenas, instances, total from the beginning
     uint8 mapUpdateStep;

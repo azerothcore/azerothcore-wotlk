@@ -149,7 +149,7 @@ const std::string& WorldSocket::GetRemoteAddress(void) const
 
 int WorldSocket::SendPacket(WorldPacket const& pct)
 {
-    ACE_GUARD_RETURN (LockType, Guard, m_OutBufferLock, -1);
+    GUARD_RETURN( m_OutBufferLock, -1);
 
     if (closing_)
         return -1;
@@ -316,7 +316,7 @@ int WorldSocket::handle_input(ACE_HANDLE)
 
 int WorldSocket::handle_output(ACE_HANDLE)
 {
-    ACE_GUARD_RETURN (LockType, Guard, m_OutBufferLock, -1);
+    GUARD_RETURN( m_OutBufferLock, -1);
 
     if (closing_)
         return -1;
@@ -425,7 +425,7 @@ int WorldSocket::handle_close(ACE_HANDLE h, ACE_Reactor_Mask)
 {
     // Critical section
     {
-        ACE_GUARD_RETURN (LockType, Guard, m_OutBufferLock, -1);
+        GUARD_RETURN( m_OutBufferLock, -1);
 
         closing_ = true;
 
@@ -435,7 +435,7 @@ int WorldSocket::handle_close(ACE_HANDLE h, ACE_Reactor_Mask)
 
     // Critical section
     {
-        ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
+        GUARD_RETURN( m_SessionLock, -1);
 
         m_Session = nullptr;
     }
@@ -453,7 +453,7 @@ int WorldSocket::Update(void)
         return 0;
 
     {
-        ACE_GUARD_RETURN (LockType, Guard, m_OutBufferLock, 0);
+        GUARD_RETURN( m_OutBufferLock, 0);
         if (m_OutBuffer->length() == 0 && msg_queue()->is_empty())
             return 0;
     }
@@ -699,7 +699,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                 return 0;
             default:
                 {
-                    ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
+                    GUARD_RETURN( m_SessionLock, -1);
 
                     if (m_Session != nullptr)
                     {
@@ -1055,7 +1055,7 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
 
             if (max_count && m_OverSpeedPings > max_count)
             {
-                ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
+                GUARD_RETURN(m_SessionLock, -1);
 
                 if (m_Session && AccountMgr::IsPlayerAccount(m_Session->GetSecurity()))
                 {
@@ -1076,7 +1076,7 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
 
     // critical section
     {
-        ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
+        GUARD_RETURN(m_SessionLock, -1);
 
         if (m_Session)
         {

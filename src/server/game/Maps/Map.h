@@ -13,8 +13,8 @@
 #include "DetourNavMeshQuery.h"
 
 #include "Define.h"
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
+
+#include <mutex>
 
 #include "DBCStructure.h"
 #include "GridDefines.h"
@@ -577,8 +577,8 @@ private:
 
 protected:
 
-    ACE_Thread_Mutex Lock;
-    ACE_Thread_Mutex GridLock;
+    std::mutex Lock;
+    std::mutex GridLock;
     ACE_RW_Thread_Mutex MMapLock;
 
     MapEntry const* i_mapEntry;

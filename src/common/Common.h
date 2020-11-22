@@ -75,14 +75,12 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <mutex>
 
 #include "Threading/LockedQueue.h"
 #include "Threading/Threading.h"
 
 #include <ace/Basic_Types.h>
-#include <ace/Guard_T.h>
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
 #include <ace/Stack_Trace.h>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
@@ -194,7 +192,7 @@ typedef std::vector<std::string> StringVector;
 #define MAX_QUERY_LEN 32*1024
 
 #define ACORE_GUARD(MUTEX, LOCK) \
-  ACE_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
+  std::lock_guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
     if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 //! For proper implementation of multiple-read, single-write pattern, use

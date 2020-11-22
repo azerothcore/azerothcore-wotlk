@@ -69,7 +69,7 @@ Map* MapManager::CreateBaseMap(uint32 id)
 
     if (map == nullptr)
     {
-        ACORE_GUARD(ACE_Thread_Mutex, Lock);
+        ACORE_GUARD(std::mutex, Lock);
 
         map = FindBaseMap(id);
         if (map == nullptr) // pussywizard: check again after acquiring mutex

@@ -4,7 +4,7 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include <ace/Guard_T.h>
+
 
 #include "Cryptography/BigNumber.h"
 #include <openssl/bn.h>

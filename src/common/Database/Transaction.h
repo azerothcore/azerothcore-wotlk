@@ -39,7 +39,7 @@ private:
     bool _cleanedUp;
 
 };
-typedef acore::AutoPtr<Transaction, ACE_Thread_Mutex> SQLTransaction;
+typedef acore::AutoPtr<Transaction, std::mutex> SQLTransaction;
 
 /*! Low level class*/
 class TransactionTask : public SQLOperation
