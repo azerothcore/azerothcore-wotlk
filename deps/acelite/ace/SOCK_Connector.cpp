@@ -4,6 +4,9 @@
 #include "ace/OS_NS_unistd.h"
 #include "ace/OS_NS_sys_socket.h"
 #include "ace/os_include/os_fcntl.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 #if !defined (ACE_HAS_WINCE)
 #include "ace/OS_QoS.h"
@@ -193,6 +196,19 @@ ACE_SOCK_Connector::connect (ACE_SOCK_Stream &new_stream,
                                        local_sap) == -1)
     return -1;
 
+#if defined(ACE_WIN32) && defined(ACE_HAS_IPV6)
+  // On windows, the IPv4-mapped IPv6 address format can only be used on a dual-stack socket.
+  const ACE_INET_Addr& remote_address = static_cast<const ACE_INET_Addr&>(remote_sap);
+  if (remote_address.is_ipv4_mapped_ipv6()) {
+    int zero = 0;
+    ACE_OS::setsockopt(new_stream.get_handle(),
+      IPPROTO_IPV6,
+      IPV6_V6ONLY,
+      (char *)&zero,
+      sizeof(zero));
+  }
+#endif
+
   int result = ACE_OS::connect (new_stream.get_handle (),
                                 reinterpret_cast<sockaddr *> (remote_sap.get_addr ()),
                                 remote_sap.get_size ());
@@ -227,6 +243,19 @@ ACE_SOCK_Connector::connect (ACE_SOCK_Stream &new_stream,
                                        timeout,
                                        local_sap) == -1)
     return -1;
+
+#if defined(ACE_WIN32) && defined(ACE_HAS_IPV6)
+  // On windows, the IPv4-mapped IPv6 address format can only be used on a dual-stack socket.
+  const ACE_INET_Addr& remote_address = static_cast<const ACE_INET_Addr&>(remote_sap);
+  if (remote_address.is_ipv4_mapped_ipv6()) {
+    int zero = 0;
+    ACE_OS::setsockopt(new_stream.get_handle(),
+      IPPROTO_IPV6,
+      IPV6_V6ONLY,
+      (char *)&zero,
+      sizeof(zero));
+  }
+#endif
 
   int result = ACE_OS::connect (new_stream.get_handle (),
                                 reinterpret_cast<sockaddr *> (remote_sap.get_addr ()),

@@ -1495,6 +1495,7 @@ public:
     QuestGiverStatus GetQuestDialogStatus(Object* questGiver);
 
     void SetDailyQuestStatus(uint32 quest_id);
+    bool IsDailyQuestDone(uint32 quest_id);
     void SetWeeklyQuestStatus(uint32 quest_id);
     void SetMonthlyQuestStatus(uint32 quest_id);
     void SetSeasonalQuestStatus(uint32 quest_id);
@@ -1669,7 +1670,7 @@ public:
 
     void RemoveMail(uint32 id);
 
-    void AddMail(Mail* mail) { m_mailCache.push_front(mail); }// for call from WorldSession::SendMailTo
+    void AddMail(Mail* mail) { totalMailCount++; m_mailCache.push_front(mail); }// for call from WorldSession::SendMailTo
     uint32 GetMailSize() { return totalMailCount; }
     uint32 GetMailCacheSize() { return m_mailCache.size();}
     Mail* GetMail(uint32 id);
@@ -1682,7 +1683,7 @@ public:
     /*********************************************************/
 
     uint8 unReadMails;
-    uint64 totalMailCount;
+    uint32 totalMailCount;
     time_t m_nextMailDelivereTime;
 
     typedef std::unordered_map<uint32, Item*> ItemMap;

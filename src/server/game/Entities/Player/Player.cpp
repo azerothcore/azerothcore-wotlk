@@ -1776,6 +1776,16 @@ void Player::Update(uint32 p_time)
     {
         if (p_time >= m_zoneUpdateTimer)
         {
+            if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
+            {
+                uint32 zoneId = GetZoneId();
+                AreaTableEntry const* zone = sAreaTableStore.LookupEntry(zoneId);
+                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());            // Warsong Hold. Only inn that doesn't work so ugly hack it is :)
+                if (!(atEntry || IsInAreaTriggerRadius(atEntry) || zone->flags & AREA_FLAG_CAPITAL || sAreaTableStore.LookupEntry(4129)))
+                {
+                    RemoveRestState();
+                }
+            }
             uint32 newzone, newarea;
             GetZoneAndAreaId(newzone, newarea, true);
             m_last_zone_id = newzone;
@@ -3696,7 +3706,6 @@ void Player::UpdateNextMailTimeAndUnreads()
 
 void Player::AddNewMailDeliverTime(time_t deliver_time)
 {
-    ++totalMailCount;
     sWorld->UpdateGlobalPlayerMails(GetGUIDLow(), totalMailCount, false);
     if (deliver_time <= time(nullptr))                      // ready now
     {
@@ -7688,17 +7697,14 @@ void Player::UpdateArea(uint32 newArea)
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 
-    if (isInn)
+    uint32 const areaRestFlag = (GetTeamId() == TEAM_ALLIANCE) ? AREA_FLAG_REST_ZONE_ALLIANCE : AREA_FLAG_REST_ZONE_HORDE;
+    if (area && areaFlags & areaRestFlag)
     {
         SetRestState(0);
-        if (sWorld->IsFFAPvPRealm())
-            RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
     }
-    else if (!(areaFlags & AREA_FLAG_CAPITAL))
+    else
     {
-        AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
-        if (!atEntry || !IsInAreaTriggerRadius(atEntry))
-            RemoveRestState();
+        RemoveRestState();
     }
 }
 
@@ -7993,7 +7999,7 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
 
     uint8 attacktype = Player::GetAttackBySlot(slot);
 
-    if (proto->Socket[0].Color)                              //only (un)equipping of items with sockets can influence metagems, so no need to waste time with normal items
+    if (item->HasSocket())                              //only (un)equipping of items with sockets can influence metagems, so no need to waste time with normal items
         CorrectMetaGemEnchants(slot, apply);
 
     if (attacktype < MAX_ATTACK)
@@ -19065,7 +19071,7 @@ void Player::_LoadMailInit(PreparedQueryResult resultMailCount, PreparedQueryRes
     //Set count for all mails used to display correct size later one
     if (resultMailCount)
     {
-        totalMailCount = uint64((*resultMailCount)[0].GetUInt64());
+        totalMailCount = uint32((*resultMailCount)[0].GetUInt32());
         sWorld->UpdateGlobalPlayerMails(GetGUIDLow(), totalMailCount, false);
     }
 
@@ -19097,10 +19103,12 @@ void Player::_LoadMail()
     }
 
     //This should in theory always be < 100
-    for (PlayerMails::iterator itr = GetMailBegin(); itr != GetMailEnd(); ++itr)
+    for (PlayerMails::iterator itr = GetMailBegin(); itr != GetMailEnd();)
     {
-        delete *itr;
+        Mail* m = *itr;
         m_mailCache.erase(itr);
+        if(m)
+            delete m;
         itr = GetMailBegin();
     }
 
@@ -20093,6 +20101,8 @@ void Player::_SaveMail(SQLTransaction& trans)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
             stmt->setUInt32(0, m->messageID);
             trans->Append(stmt);
+            if (totalMailCount > 0)
+                totalMailCount--;
         }
     }
 
@@ -22575,7 +22585,7 @@ bool Player::EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot)
         if (i == slot)
             continue;
         Item* pItem2 = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-        if (pItem2 && !pItem2->IsBroken() && pItem2->GetTemplate()->Socket[0].Color)
+        if (pItem2 && !pItem2->IsBroken() && pItem2->HasSocket())
         {
             for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot <= PRISMATIC_ENCHANTMENT_SLOT; ++enchant_slot)
             {
@@ -22657,7 +22667,7 @@ void Player::CorrectMetaGemEnchants(uint8 exceptslot, bool apply)
 
         Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
 
-        if (!pItem || !pItem->GetTemplate()->Socket[0].Color)
+        if (!pItem || !pItem->HasSocket())
             continue;
 
         for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + 3; ++enchant_slot)
@@ -23619,6 +23629,22 @@ void Player::SetDailyQuestStatus(uint32 quest_id)
             m_DailyQuestChanged = true;
         }
     }
+}
+
+bool Player::IsDailyQuestDone(uint32 quest_id)
+{
+    if (sObjectMgr->GetQuestTemplate(quest_id))
+    {
+        for (uint32 quest_daily_idx = 0; quest_daily_idx < PLAYER_MAX_DAILY_QUESTS; ++quest_daily_idx)
+        {
+            if (GetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1 + quest_daily_idx) == quest_id)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void Player::SetWeeklyQuestStatus(uint32 quest_id)

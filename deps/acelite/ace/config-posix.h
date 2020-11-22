@@ -58,6 +58,11 @@
 #       define ACE_HAS_PTHREADS
 #     endif /* ACE_HAS_PTHREADS */
 
+#     if defined (_POSIX_CLOCK_SELECTION) && (_POSIX_CLOCK_SELECTION-0 != -1)
+#       if !defined (ACE_HAS_CONDATTR_SETCLOCK) && !defined (ACE_LACKS_CONDATTR_SETCLOCK)
+#         define ACE_HAS_CONDATTR_SETCLOCK
+#       endif
+#     endif
 #   endif /* _POSIX_THREADS */
 # endif /* ACE_HAS_THREADS */
 #endif /* !ACE_MT_SAFE */
@@ -67,5 +72,20 @@
 #  define ACE_HAS_POSIX_MESSAGE_PASSING
 # endif /* ACE_HAS_POSIX_MESSAGE_PASSING */
 #endif /* _POSIX_MESSAGE_PASSING */
+
+#if defined (_POSIX_MONOTONIC_CLOCK) && (_POSIX_MONOTONIC_CLOCK-0 != -1)
+#  if !defined (ACE_HAS_CLOCK_GETTIME_MONOTONIC) && !defined (ACE_LACKS_CLOCK_MONOTONIC)
+#    define ACE_HAS_CLOCK_GETTIME_MONOTONIC
+#  endif
+#endif
+
+#if defined (ACE_HAS_CONDATTR_SETCLOCK) && defined (ACE_HAS_CLOCK_GETTIME_MONOTONIC)
+#  if !defined (ACE_HAS_POSIX_MONOTONIC_CONDITIONS)
+#    define ACE_HAS_POSIX_MONOTONIC_CONDITIONS
+#  endif
+#  if !defined (ACE_HAS_MONOTONIC_CONDITIONS)
+#    define ACE_HAS_MONOTONIC_CONDITIONS
+#  endif
+#endif
 
 #endif /* ACE_CONFIG_POSIX_H */
