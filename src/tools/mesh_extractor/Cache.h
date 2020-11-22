@@ -24,7 +24,7 @@ public:
 
     void Insert(K key, T* val)
     {
-        std::lock_guard<std::mutex> guard(_mutex);
+        std::lock_guard<std::mutex> guard(mutex);
 
         if (_items.size() > FlushLimit)
             Clear();
@@ -33,7 +33,7 @@ public:
 
     T* Get(K key)
     {
-        RETURN_GUAD(mutex, false);
+        GUARD_RETURN(mutex, nullptr);
         typename std::map<K, T*>::iterator itr = _items.find(key);
         if (itr != _items.end())
             return itr->second;
