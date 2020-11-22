@@ -747,7 +747,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
     if (diff > delay)
         diff = delay;
     _lastAuctionListItemsMSTime = now + delay - diff;
-    ACORE_GUARD(std::mutex, AsyncAuctionListingMgr::GetTempLock());
+    std::lock_guard<std::mutex> lock(AsyncAuctionListingMgr::GetTempLock());
     AsyncAuctionListingMgr::GetTempList().push_back( AuctionListItemsDelayEvent(delay - diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, getAll) );
 }
 

@@ -89,13 +89,13 @@ protected:
     {
         /// Tries to acquire lock. If lock is acquired by another thread
         /// the calling parent will just try another connection
-        return m_Mutex.tryacquire() != -1;
+        return m_Mutex.try_lock();
     }
 
     void Unlock()
     {
         /// Called by parent databasepool. Will let other threads access this connection
-        m_Mutex.release();
+        m_Mutex.unlock();
     }
 
     MYSQL* GetHandle()  { return m_Mysql; }

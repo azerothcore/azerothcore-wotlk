@@ -404,7 +404,7 @@ void Map::EnsureGridCreated(const GridCoord& p)
 {
     if (getNGrid(p.x_coord, p.y_coord)) // pussywizard
         return;
-    ACORE_GUARD(std::mutex, GridLock);
+    std::lock_guard<std::mutex> lock(GridLock);
     EnsureGridCreated_i(p);
 }
 

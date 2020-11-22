@@ -330,7 +330,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
     // pussywizard: logon flood protection:
     {
-        ACORE_GUARD(std::mutex, LastLoginAttemptMutex);
+        std::lock_guard<std::mutex> lock(LastLoginAttemptMutex);
         std::string ipaddr = socket().getRemoteAddress();
         uint32 currTime = time(nullptr);
         std::map<std::string, uint32>::iterator itr = LastLoginAttemptTimeForIP.find(ipaddr);

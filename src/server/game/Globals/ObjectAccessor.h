@@ -228,7 +228,7 @@ public:
     //non-static functions
     void AddUpdateObject(Object* obj)
     {
-        ACORE_GUARD(std::mutex, i_objectLock);
+        std::lock_guard<std::mutex> lock(i_objectLock);
         if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
             i_objects.insert(obj);
         else
@@ -237,7 +237,7 @@ public:
 
     void RemoveUpdateObject(Object* obj)
     {
-        ACORE_GUARD(std::mutex, i_objectLock);
+        std::lock_guard<std::mutex> lock(i_objectLock);
         if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
             i_objects.erase(obj);
         else

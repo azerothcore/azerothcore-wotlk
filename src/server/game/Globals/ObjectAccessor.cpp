@@ -447,13 +447,13 @@ void ObjectAccessor::RemoveOldCorpses()
 
 void ObjectAccessor::AddDelayedCorpseAction(Corpse* corpse, uint8 action, uint32 mapId, uint32 instanceId)
 {
-    ACORE_GUARD(std::mutex, DelayedCorpseLock);
+    std::lock_guard<std::mutex> lock(DelayedCorpseLock);
     i_delayedCorpseActions.push_back(DelayedCorpseAction(corpse, action, mapId, instanceId));
 }
 
 void ObjectAccessor::ProcessDelayedCorpseActions()
 {
-    ACORE_GUARD(std::mutex, DelayedCorpseLock);
+    std::lock_guard<std::mutex> lock(DelayedCorpseLock);
     for (std::list<DelayedCorpseAction>::iterator itr = i_delayedCorpseActions.begin(); itr != i_delayedCorpseActions.end(); ++itr)
     {
         DelayedCorpseAction a = (*itr);
