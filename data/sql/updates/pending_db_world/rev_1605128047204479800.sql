@@ -121,8 +121,8 @@ CHANGE `mapId` `instance_id` mediumint unsigned NOT NULL COMMENT 'Map ID from in
 CHANGE `difficulty` `difficulty` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic' AFTER `instance_id`,
 CHANGE `level_min` `min_level` tinyint unsigned NOT NULL DEFAULT 0 AFTER `difficulty`,
 CHANGE `level_max` `max_level` tinyint unsigned NOT NULL DEFAULT 0 AFTER `min_level`,
-CHANGE `item_level` `min_item_level` smallint unsigned NOT NULL DEFAULT 0 COMMENT 'Min ilvl required to enter' AFTER `max_level`,
-CHANGE `comment` `comment` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic' AFTER `min_item_level`;
+CHANGE `item_level` `min_avg_item_level` smallint unsigned NOT NULL DEFAULT 0 COMMENT 'Min average ilvl required to enter' AFTER `max_level`,
+CHANGE `comment` `comment` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic' AFTER `min_avg_item_level`;
 
 -- Add KEY CONSTRAINTS
 ALTER TABLE `dungeon_access_template` ADD CONSTRAINT `FK_dungeon_access_template__instance_template` FOREIGN KEY (`instance_id`) REFERENCES `instance_template` (`map`) ON DELETE CASCADE ON UPDATE CASCADE;
