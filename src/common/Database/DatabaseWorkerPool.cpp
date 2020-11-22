@@ -10,8 +10,7 @@
 #define MIN_MYSQL_SERVER_VERSION 50600u
 #define MIN_MYSQL_CLIENT_VERSION 50600u
 
-template <class T>
-DatabaseWorkerPool<T>::DatabaseWorkerPool() :
+template <class T> DatabaseWorkerPool<T>::DatabaseWorkerPool() :
     _mqueue(new ACE_Message_Queue<ACE_SYNCH>(2 * 1024 * 1024, 2 * 1024 * 1024)),
     _queue(new ACE_Activation_Queue(_mqueue))
 {

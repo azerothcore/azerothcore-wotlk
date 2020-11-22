@@ -96,7 +96,7 @@ namespace MMAP
         ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         // make sure the mmap is loaded and ready to load tiles
-        if(!loadMapData(mapId))
+        if (!loadMapData(mapId))
             return false;
 
         // get this mmap data
@@ -148,7 +148,7 @@ namespace MMAP
         ASSERT(data);
 
         size_t result = fread(data, fileHeader.size, 1, file);
-        if(!result)
+        if (!result)
         {
             sLog->outError("MMAP:loadMap: Bad header or data in mmap %03u%02i%02i.mmtile", mapId, x, y);
             fclose(file);
