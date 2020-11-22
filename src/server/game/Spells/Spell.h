@@ -19,6 +19,7 @@ class GameObject;
 class DynamicObject;
 class WorldObject;
 class Aura;
+class SpellImplicitTargetInfo;
 class SpellScript;
 class ByteBuffer;
 

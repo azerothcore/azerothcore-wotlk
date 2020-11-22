@@ -5811,7 +5811,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 66339 }, [](SpellInfo* spellInfo)
     {
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(35);
-        spellInfo->Effects[0].TargetA = SpellImplicitTargetInfo(25);
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(25);
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
     });
 
@@ -7002,7 +7002,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Gnomish Death Ray
     ApplySpellFix({ 13278, 13280 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
     });
 
     // Stormchops
@@ -7082,7 +7082,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Catch the Wild Wolpertinger!
     ApplySpellFix({ 41621 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
     });
 
     // Brewfest quests
@@ -7177,9 +7177,9 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx7 |= SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER;
     });
 
-    for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
+    for (auto i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
-        SpellInfo* spellInfo = mSpellInfoMap[i];
+        auto& spellInfo = mSpellInfoMap[i];
         if (!spellInfo)
         {
             continue;
@@ -7209,17 +7209,18 @@ void SpellMgr::LoadSpellInfoCorrections()
         }
 
         // Xinef: Fix range for trajectories and triggered spells
-        for (uint8 j = 0; j < 3; ++j)
-        {
-            if (spellInfo->RangeEntry == sSpellRangeStore.LookupEntry(1) && (spellInfo->Effects[j].TargetA == SpellImplicitTargetInfo(TARGET_DEST_TRAJ) || spellInfo->Effects[j].TargetB == SpellImplicitTargetInfo(TARGET_DEST_TRAJ)))
-            {
-                if (SpellInfo* spellInfo2 = (SpellInfo*)sSpellStore.LookupEntry(spellInfo->Effects[j].TriggerSpell))
-                {
-                    spellInfo2->RangeEntry = sSpellRangeStore.LookupEntry(187); // 300yd
-                }
-            }
+        //for (uint8 j = 0; j < 3; ++j)
+        //{
+        //                                                                                  no operator "==" matches these operands                                                 no operator "==" matches these operands
+        //    if (spellInfo->RangeEntry == sSpellRangeStore.LookupEntry(1) && (spellInfo->Effects[j].TargetA == SpellImplicitTargetInfo(TARGET_DEST_TRAJ) || spellInfo->Effects[j].TargetB == SpellImplicitTargetInfo(TARGET_DEST_TRAJ)))
+        //    {
+        //        if (SpellInfo* spellInfo2 = (SpellInfo*)sSpellStore.LookupEntry(spellInfo->Effects[j].TriggerSpell))
+        //        {
+        //            spellInfo2->RangeEntry = sSpellRangeStore.LookupEntry(187); // 300yd
+        //        }
+        //    }
 
-        }
+        //}
 
 
         if (spellInfo->ActiveIconID == 2158)  // flight
