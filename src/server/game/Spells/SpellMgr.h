@@ -722,8 +722,8 @@ public:
     void LoadSpellInfoStore();
     void UnloadSpellInfoStore();
     void UnloadSpellInfoImplicitTargetConditionLists();
-    void LoadSpellCustomAttr();
-    void LoadDbcDataCorrections();
+    void LoadSpellInfoCustomAttributes();
+    void LoadSpellInfoCorrections();
     void LoadSpellSpecificAndAuraState();
 
 private:

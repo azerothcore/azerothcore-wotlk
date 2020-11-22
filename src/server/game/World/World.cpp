@@ -1489,11 +1489,11 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Game Graveyard...");
     sGraveyard->LoadGraveyardFromDB();
 
-    sLog->outString("Loading spell dbc data corrections...");
-    sSpellMgr->LoadDbcDataCorrections();
-
     sLog->outString("Loading SpellInfo store...");
     sSpellMgr->LoadSpellInfoStore();
+
+    sLog->outString("Loading SpellInfo corrections...");
+    sSpellMgr->LoadSpellInfoCorrections();
 
     sLog->outString("Loading Spell Rank Data...");
     sSpellMgr->LoadSpellRanks();
@@ -1504,8 +1504,8 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading SkillLineAbilityMultiMap Data...");
     sSpellMgr->LoadSkillLineAbilityMap();
 
-    sLog->outString("Loading spell custom attributes...");
-    sSpellMgr->LoadSpellCustomAttr();
+    sLog->outString("Loading SpellInfo custom attributes...");
+    sSpellMgr->LoadSpellInfoCustomAttributes();
 
     sLog->outString("Loading GameObject models...");
     LoadGameObjectModelList();

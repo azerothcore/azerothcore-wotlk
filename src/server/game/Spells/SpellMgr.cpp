@@ -3374,7 +3374,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         42821   // Headless Horseman - Wisp Flight Missile
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 6; // 100 yards
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6); // 100 yards
     });
 
     //They Must Burn Bomb Aura (self)
@@ -3590,7 +3590,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         27937   // Anchor to Skulls
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 13;
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13);
     });
 
     // Wrath of the Plaguebringer
@@ -3974,7 +3974,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Killing Spree (teleport)
     ApplySpellFix({ 57840 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 6; // 100 yards
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6); // 100 yards
     });
 
     // Killing Spree
@@ -4604,7 +4604,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 66551 }, [](SpellEntry* spellInfo)
     {
         // Teleport in, missing range
-        spellInfo->rangeIndex = 13; // 50000yd
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
     });
 
     // A'dal's Song of Battle
@@ -7342,6 +7342,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     LockEntry* key = const_cast<LockEntry*>(sLockStore.LookupEntry(36)); // 3366 Opening, allows to open without proper key
     key->Type[2] = LOCK_KEY_NONE;
 
-    sLog->outString(">> Loading spell dbc data corrections  in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loading SpellInfo  corrections  in %u ms", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
