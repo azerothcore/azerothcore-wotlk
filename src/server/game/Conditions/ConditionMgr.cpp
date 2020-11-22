@@ -361,6 +361,32 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                     condMeets = unit->IsInWater();
                 break;
             }
+        case CONDITION_QUESTSTATE:
+            {
+                if (Player* player = object->ToPlayer())
+                {
+                    uint32 queststateConditionValue1 = player->GetQuestStatus(ConditionValue1);
+                    if (
+                        ((ConditionValue2 & (1 << QUEST_STATUS_NONE))       && (queststateConditionValue1 == QUEST_STATUS_NONE)) ||
+                        ((ConditionValue2 & (1 << QUEST_STATUS_COMPLETE))   && (queststateConditionValue1 == QUEST_STATUS_COMPLETE)) ||
+                        ((ConditionValue2 & (1 << QUEST_STATUS_INCOMPLETE)) && (queststateConditionValue1 == QUEST_STATUS_INCOMPLETE)) ||
+                        ((ConditionValue2 & (1 << QUEST_STATUS_FAILED))     && (queststateConditionValue1 == QUEST_STATUS_FAILED)) ||
+                        ((ConditionValue2 & (1 << QUEST_STATUS_REWARDED))   && player->GetQuestRewardStatus(ConditionValue1))
+                        )
+                    {
+                        condMeets = true;
+                    }
+                }
+                break;
+            }
+        case CONDITION_DAILY_QUEST_DONE:
+            {
+                if (Player* player = object->ToPlayer())
+                {
+                    condMeets = player->IsDailyQuestDone(ConditionValue1);
+                }
+                break;
+            }
         case CONDITION_QUEST_OBJECTIVE_PROGRESS:
             {
                 if (Player* player = object->ToPlayer())
@@ -552,6 +578,12 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
             break;
         case CONDITION_IN_WATER:
             mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
+            break;
+        case CONDITION_QUESTSTATE:
+            mask |= GRID_MAP_TYPE_MASK_PLAYER;
+            break;
+        case CONDITION_DAILY_QUEST_DONE:
+            mask |= GRID_MAP_TYPE_MASK_PLAYER;
             break;
         case CONDITION_QUEST_OBJECTIVE_PROGRESS:
             mask |= GRID_MAP_TYPE_MASK_PLAYER;
@@ -1619,11 +1651,9 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
                              cond->SourceEntry, uint32(cond->ConditionType));
             return false;
         case CONDITION_STAND_STATE:
-        case CONDITION_DAILY_QUEST_DONE:
         case CONDITION_CHARMED:
         case CONDITION_PET_TYPE:
         case CONDITION_TAXI:
-        case CONDITION_QUESTSTATE:
             sLog->outErrorDb("SourceEntry %u in `condition` table has a ConditionType that is not yet supported on AzerothCore (%u), ignoring.",
                              cond->SourceEntry, uint32(cond->ConditionType));
             return false;
@@ -1756,6 +1786,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         case CONDITION_QUESTTAKEN:
         case CONDITION_QUEST_NONE:
         case CONDITION_QUEST_COMPLETE:
+        case CONDITION_DAILY_QUEST_DONE:
         case CONDITION_QUEST_SATISFY_EXCLUSIVE:
             {
                 if (!sObjectMgr->GetQuestTemplate(cond->ConditionValue1))
@@ -1765,11 +1796,22 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
                 }
 
                 if (cond->ConditionValue2 > 1)
+                {
                     sLog->outErrorDb("Quest condition has useless data in value2 (%u)!", cond->ConditionValue2);
+                }
                 if (cond->ConditionValue3)
+                {
                     sLog->outErrorDb("Quest condition has useless data in value3 (%u)!", cond->ConditionValue3);
+                }
                 break;
             }
+        case CONDITION_QUESTSTATE:
+            if (cond->ConditionValue2 >= (1 << MAX_QUEST_STATUS))
+            {
+                sLog->outErrorDb("ConditionType (%u) has invalid state mask (%u), skipped.", cond->ConditionType, cond->ConditionValue2);
+                return false;
+            }
+            break;
         case CONDITION_ACTIVE_EVENT:
             {
                 GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();

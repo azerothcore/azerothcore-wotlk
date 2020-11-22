@@ -360,7 +360,7 @@ std::string Log::GetTimestampStr()
 
 void Log::outDB(LogTypes type, const char* str)
 {
-    if(!str || std::string(str).empty() || type >= MAX_LOG_TYPES)
+    if (!str || std::string(str).empty() || type >= MAX_LOG_TYPES)
         return;
 
     std::string new_str(str);
