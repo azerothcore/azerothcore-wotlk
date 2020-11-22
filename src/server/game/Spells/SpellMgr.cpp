@@ -2657,10 +2657,37 @@ void SpellMgr::LoadSpellInfoStore()
     UnloadSpellInfoStore();
     mSpellInfoMap.resize(sSpellStore.GetNumRows(), nullptr);
 
-    for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
+    for (SpellEntry const* spellEntry : sSpellStore)
     {
-        if (SpellEntry const* spellEntry = sSpellStore.LookupEntry(i))
-            mSpellInfoMap[i] = new SpellInfo(spellEntry);
+        mSpellInfoMap[spellEntry->Id] = new SpellInfo(spellEntry);
+    }
+
+    for (uint32 spellIndex = 0; spellIndex < GetSpellInfoStoreSize(); ++spellIndex) {
+        if (!mSpellInfoMap[spellIndex])
+            continue;
+
+        for (auto const& effect : mSpellInfoMap[spellIndex]->Effects)
+        {
+            if (effect.Effect >= TOTAL_SPELL_EFFECTS)
+            {
+                sLog->outErrorDb("TOTAL_SPELL_EFFECTS must be at least %u, spellIndex %u", effect.Effect + 1, spellIndex);
+            }
+
+            if (effect.ApplyAuraName >= TOTAL_AURAS)
+            {
+                sLog->outErrorDb("TOTAL_AURAS must be at least %u, spellIndex %u", effect.ApplyAuraName + 1, spellIndex);
+            }
+
+            if (effect.TargetA.GetTarget() >= TOTAL_SPELL_TARGETS)
+            {
+                sLog->outErrorDb("TOTAL_SPELL_TARGETS must be at least %u, spellIndex %u", effect.TargetA.GetTarget() + 1, spellIndex);
+            }
+
+            if (effect.TargetB.GetTarget() >= TOTAL_SPELL_TARGETS)
+            {
+                sLog->outErrorDb("TOTAL_SPELL_TARGETS must be at least %u, spellIndex %u", effect.TargetB.GetTarget() + 1, spellIndex);
+            }
+        }
     }
 
     sLog->outString(">> Loaded SpellInfo store in %u ms", GetMSTimeDiffToNow(oldMSTime));
@@ -2671,8 +2698,7 @@ void SpellMgr::UnloadSpellInfoStore()
 {
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
-        if (mSpellInfoMap[i])
-            delete mSpellInfoMap[i];
+        delete mSpellInfoMap[i];
     }
     mSpellInfoMap.clear();
 }
@@ -3223,6 +3249,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                 spellInfo->Effects[EFFECT_0].MiscValue = 127;
                 break;
         }
+        spellInfo->_InitializeExplicitTargetMask();
     }
 
     // Xinef: addition for binary spells, ommit spells triggering other spells
@@ -7209,18 +7236,29 @@ void SpellMgr::LoadSpellInfoCorrections()
         }
 
         // Xinef: Fix range for trajectories and triggered spells
-        //for (uint8 j = 0; j < 3; ++j)
-        //{
-        //                                                                                  no operator "==" matches these operands                                                 no operator "==" matches these operands
-        //    if (spellInfo->RangeEntry == sSpellRangeStore.LookupEntry(1) && (spellInfo->Effects[j].TargetA == SpellImplicitTargetInfo(TARGET_DEST_TRAJ) || spellInfo->Effects[j].TargetB == SpellImplicitTargetInfo(TARGET_DEST_TRAJ)))
-        //    {
-        //        if (SpellInfo* spellInfo2 = (SpellInfo*)sSpellStore.LookupEntry(spellInfo->Effects[j].TriggerSpell))
-        //        {
-        //            spellInfo2->RangeEntry = sSpellRangeStore.LookupEntry(187); // 300yd
-        //        }
-        //    }
+        for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+        {
+            if (spellInfo->RangeEntry != sSpellRangeStore.LookupEntry(1))
+            {
+                continue;
+            }
 
-        //}
+            if (!spellInfo->Effects[j].IsEffect())
+            {
+                return;
+            }
+
+            if (spellInfo->Effects[j].TargetA.GetTarget() != TARGET_DEST_TRAJ && spellInfo->Effects[j].TargetB.GetTarget() != TARGET_DEST_TRAJ)
+            {
+                continue;
+            }
+
+            // Get triggered spell if any
+            if (SpellInfo * spellInfoTrigger = const_cast<SpellInfo*>(GetSpellInfo(spellInfo->Effects[j].TriggerSpell)))
+            {
+                spellInfoTrigger->RangeEntry = sSpellRangeStore.LookupEntry(187); // 300yd
+            }
+        }
 
 
         if (spellInfo->ActiveIconID == 2158)  // flight
