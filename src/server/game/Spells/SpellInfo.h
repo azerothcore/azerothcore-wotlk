@@ -360,6 +360,14 @@ public:
     uint32 ActiveIconID;
     char* SpellName[16];
     char* Rank[16];
+    int32 EffectDieSides[MAX_SPELL_EFFECTS];
+    float EffectDamageMultiplier[MAX_SPELL_EFFECTS];
+    float EffectRealPointsPerLevel[MAX_SPELL_EFFECTS];
+    float EffectBonusMultiplier[MAX_SPELL_EFFECTS];
+    uint32 CastingTimeIndex;
+    uint32 Category;
+    float EffectPointsPerComboPoint[MAX_SPELL_EFFECTS];
+    uint32 EffectMechanic[MAX_SPELL_EFFECTS];
     uint32 MaxTargetLevel;
     uint32 MaxAffectedTargets;
     uint32 SpellFamilyName;
