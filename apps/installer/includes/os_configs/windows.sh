@@ -13,5 +13,6 @@ echo "!!README!!: Please install openssl and mysql libraries manually following 
 
 choco install -y --skip-checksums cmake git git.install microsoft-build-tools
 choco install -y --skip-checksums  mysql --version 5.6.12
+# TODO: this is wrong, need to fix the mysql version and add boost but apparently no one cares about windows.sh
 
 echo "!!README!!: Please remember to install openssl and mysql libraries manually following our wiki"

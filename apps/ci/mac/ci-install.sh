@@ -10,5 +10,5 @@ time brew reinstall openssl@1.1
 ##########################################
 
 time brew update
-time brew install openssl readline ace coreutils bash bash-completion mysql ccache
+time brew install openssl readline ace boost coreutils bash bash-completion mysql ccache
 
