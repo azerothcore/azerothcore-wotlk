@@ -2,7 +2,7 @@ FROM ubuntu:20.04
 
 # install the required dependencies to compile AzerothCore
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt install -y git cmake make gcc g++ clang libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev libace-6.4.5 libace-dev
+RUN apt update && apt install -y git cmake make gcc g++ clang libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev libace-6.4.5 libace-dev libboost-all-dev
 
 # copy the sources from the host machine to the Docker container
 ADD .git /azerothcore/.git

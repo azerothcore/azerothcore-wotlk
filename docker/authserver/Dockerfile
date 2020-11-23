@@ -9,7 +9,7 @@ ENV TZ=Etc/UTC
 ENV DEBIAN_FRONTEND=noninteractive
 
 # install the required dependencies to run the authserver
-RUN apt update && apt install -y libmysqlclient-dev libssl-dev libace-6.4.5 libace-dev net-tools tzdata;
+RUN apt update && apt install -y libmysqlclient-dev libssl-dev libace-6.4.5 libace-dev libboost-all-dev net-tools tzdata;
 
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
