@@ -101,9 +101,8 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          set BOOST_ROOT=%BOOST_ROOT_1_72_0%
           mkdir -p build && cd build
-          cmake .. -DTOOLS=ON -DBOOST_ROOT=%BOOST_ROOT_1_72_0%
+          cmake .. -DTOOLS=ON
           cmake --build . --config Release --parallel 4
       - name: Copy dll files
         shell: bash
