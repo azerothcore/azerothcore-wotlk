@@ -97,7 +97,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Configure OS
-        run: choco install --no-progress openssl boost-msvc-14.1
+        run: choco install --no-progress openssl
       - name: Build
         shell: bash
         run: |
