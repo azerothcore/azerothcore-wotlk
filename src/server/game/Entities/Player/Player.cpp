@@ -1776,6 +1776,16 @@ void Player::Update(uint32 p_time)
     {
         if (p_time >= m_zoneUpdateTimer)
         {
+            if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
+            {
+                uint32 zoneId = GetZoneId();
+                AreaTableEntry const* zone = sAreaTableStore.LookupEntry(zoneId);
+                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());            // Warsong Hold. Only inn that doesn't work so ugly hack it is :)
+                if (!(atEntry || IsInAreaTriggerRadius(atEntry) || zone->flags & AREA_FLAG_CAPITAL || sAreaTableStore.LookupEntry(4129)))
+                {
+                    RemoveRestState();
+                }
+            }
             uint32 newzone, newarea;
             GetZoneAndAreaId(newzone, newarea, true);
             m_last_zone_id = newzone;
@@ -7504,7 +7514,7 @@ void Player::ModifyHonorPoints(int32 value, SQLTransaction* trans /*=NULL*/)
         newValue = 0;
     SetHonorPoints(uint32(newValue));
 
-    if (trans && !trans->null())
+    if (trans)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_HONOR_POINTS);
         stmt->setUInt32(0, newValue);
@@ -7520,7 +7530,7 @@ void Player::ModifyArenaPoints(int32 value, SQLTransaction* trans /*=NULL*/)
         newValue = 0;
     SetArenaPoints(uint32(newValue));
 
-    if (trans && !trans->null())
+    if (trans)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_ARENA_POINTS);
         stmt->setUInt32(0, newValue);
@@ -7687,17 +7697,14 @@ void Player::UpdateArea(uint32 newArea)
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 
-    if (isInn)
+    uint32 const areaRestFlag = (GetTeamId() == TEAM_ALLIANCE) ? AREA_FLAG_REST_ZONE_ALLIANCE : AREA_FLAG_REST_ZONE_HORDE;
+    if (area && areaFlags & areaRestFlag)
     {
         SetRestState(0);
-        if (sWorld->IsFFAPvPRealm())
-            RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
     }
-    else if (!(areaFlags & AREA_FLAG_CAPITAL))
+    else
     {
-        AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
-        if (!atEntry || !IsInAreaTriggerRadius(atEntry))
-            RemoveRestState();
+        RemoveRestState();
     }
 }
 
@@ -20118,7 +20125,7 @@ void Player::_SaveMail(SQLTransaction& trans)
 
 void Player::_SaveQuestStatus(SQLTransaction& trans)
 {
-    bool isTransaction = !trans.null();
+    bool isTransaction = static_cast<bool>(trans);
     if (!isTransaction)
         trans = CharacterDatabase.BeginTransaction();
 
