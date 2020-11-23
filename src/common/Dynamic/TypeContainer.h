@@ -32,7 +32,7 @@ template<class OBJECT> struct ContainerMapList
 template<> struct ContainerMapList<TypeNull>                /* nothing is in type null */
 {
 };
-template<class H, class T> struct ContainerMapList<TypeList<H, T> >
+template<class H, class T> struct ContainerMapList<TypeList<H, T>>
 {
     ContainerMapList<H> _elements;
     ContainerMapList<T> _TailElements;
@@ -50,7 +50,7 @@ template<class OBJECT> struct ContainerArrayList
 // termination condition
 template<> struct ContainerArrayList<TypeNull> { };
 // recursion
-template<class H, class T> struct ContainerArrayList<TypeList<H, T> >
+template<class H, class T> struct ContainerArrayList<TypeList<H, T>>
 {
     ContainerArrayList<H> _elements;
     ContainerArrayList<T> _TailElements;
@@ -67,7 +67,7 @@ template<class OBJECT> struct ContainerList
 
 /* TypeNull is underfined */
 template<> struct ContainerList<TypeNull> { };
-template<class H, class T> struct ContainerList<TypeList<H, T> >
+template<class H, class T> struct ContainerList<TypeList<H, T>>
 {
     ContainerList<H> _elements;
     ContainerMapList<T> _TailElements;
