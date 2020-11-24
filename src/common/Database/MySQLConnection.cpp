@@ -541,3 +541,13 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo)
             return false;
     }
 }
+
+bool MySQLConnection::LockIfReady()
+{
+    return m_Mutex.try_lock();
+}
+
+void MySQLConnection::Unlock()
+{
+    m_Mutex.unlock();
+}
