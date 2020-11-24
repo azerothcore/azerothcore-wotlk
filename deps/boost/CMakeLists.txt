@@ -29,12 +29,12 @@ include (CheckCXXSourceCompiles)
 
 if (WIN32)
   # On windows the requirements are higher according to the wiki.
-  set(BOOST_REQUIRED_VERSION 1.59)
+  set(BOOST_REQUIRED_VERSION 1.70)
 else()
-  set(BOOST_REQUIRED_VERSION 1.58)
+  set(BOOST_REQUIRED_VERSION 1.65)
 endif()
 
-find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED system program_options iostreams)
+find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED system filesystem program_options iostreams)
 
 add_library(boost INTERFACE)
 
