@@ -262,7 +262,7 @@ void DatabaseWorkerPool<T>::DirectCommitTransaction(SQLTransaction& transaction)
 template <class T>
 void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, PreparedStatement* stmt)
 {
-    if (trans.null())
+    if (!trans)
         Execute(stmt);
     else
         trans->Append(stmt);
@@ -271,7 +271,7 @@ void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, PreparedState
 template <class T>
 void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, const char* sql)
 {
-    if (trans.null())
+    if (!trans)
         Execute(sql);
     else
         trans->Append(sql);
