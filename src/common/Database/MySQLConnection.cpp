@@ -17,6 +17,7 @@
 #include <mysql.h>
 #include <mysqld_error.h>
 #include <errmsg.h>
+#include <chrono>
 #include <thread>
 
 #ifdef _WIN32
@@ -47,12 +48,13 @@ MySQLConnection::MySQLConnection(ACE_Activation_Queue* queue, MySQLConnectionInf
 
 MySQLConnection::~MySQLConnection()
 {
-    ASSERT (m_Mysql); /// MySQL context must be present at this point
+    m_stmts.clear();
 
-    for (size_t i = 0; i < m_stmts.size(); ++i)
-        delete m_stmts[i];
-
-    mysql_close(m_Mysql);
+    if (m_Mysql)
+    {
+        mysql_close(m_Mysql);
+        m_Mysql = nullptr;
+    }
 }
 
 void MySQLConnection::Close()
@@ -61,10 +63,9 @@ void MySQLConnection::Close()
     delete this;
 }
 
-bool MySQLConnection::Open()
+uint32 MySQLConnection::Open()
 {
-    MYSQL* mysqlInit;
-    mysqlInit = mysql_init(NULL);
+    MYSQL* mysqlInit = mysql_init(nullptr);
     if (!mysqlInit)
     {
         sLog->outError("Could not initialize Mysql connection to database `%s`", m_connectionInfo.database.c_str());
@@ -73,7 +74,6 @@ bool MySQLConnection::Open()
 
     int port;
     char const* unix_socket;
-    //unsigned int timeout = 10;
 
     mysql_options(mysqlInit, MYSQL_SET_CHARSET_NAME, "utf8");
     //mysql_options(mysqlInit, MYSQL_OPT_READ_TIMEOUT, (char const*)&timeout);
@@ -106,59 +106,41 @@ bool MySQLConnection::Open()
     }
 #endif
 
-    // Possible improvement for future: make ATTEMPTS and SECONDS configurable values
-    uint32 const ATTEMPTS = 180;
+    m_Mysql = mysql_real_connect(
+                  mysqlInit,
+                  m_connectionInfo.host.c_str(),
+                  m_connectionInfo.user.c_str(),
+                  m_connectionInfo.password.c_str(),
+                  m_connectionInfo.database.c_str(),
+                  port,
+                  unix_socket,
+                  0);
 
-    uint32 count = 0;
-    do
+    if (m_Mysql)
     {
-        m_Mysql = mysql_real_connect(
-                      mysqlInit,
-                      m_connectionInfo.host.c_str(),
-                      m_connectionInfo.user.c_str(),
-                      m_connectionInfo.password.c_str(),
-                      m_connectionInfo.database.c_str(),
-                      port,
-                      unix_socket,
-                      0);
-
-        if (m_Mysql)
+        if (!m_reconnecting)
         {
-            if (!m_reconnecting)
-            {
-                sLog->outSQLDriver("MySQL client library: %s", mysql_get_client_info());
-                sLog->outSQLDriver("MySQL server ver: %s ", mysql_get_server_info(m_Mysql));
-                // MySQL version above 5.1 IS required in both client and server and there is no known issue with different versions above 5.1
-                // if (mysql_get_server_version(m_Mysql) != mysql_get_client_version())
-                //     sLog->outInfo(LOG_FILTER_SQL, "[WARNING] MySQL client/server version mismatch; may conflict with behaviour of prepared statements.");
-            }
+            sLog->outSQLDriver("> MySQL client library: %s", mysql_get_client_info());
+            sLog->outSQLDriver("> MySQL server ver: %s ", mysql_get_server_info(m_Mysql));
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDetail("Connected to MySQL database at %s", m_connectionInfo.host.c_str());
-#endif
-            mysql_autocommit(m_Mysql, 1);
-
-            // set connection properties to UTF8 to properly handle locales for different
-            // server configs - core sends data in UTF8, so MySQL must expect UTF8 too
-            mysql_set_character_set(m_Mysql, "utf8");
-            return PrepareStatements();
+            /*if (mysql_get_server_version(m_Mysql) != mysql_get_client_version())
+                LOG_WARN("sql.driver", "[WARNING] MySQL client/server version mismatch; may conflict with behaviour of prepared statements.");*/
         }
-        else
-        {
-            count++;
-            sLog->outError("Could not connect to MySQL database at %s: %s\n", m_connectionInfo.host.c_str(), mysql_error(mysqlInit));
-            sLog->outError("Retrying in 10 seconds...\n\n");
-            std::this_thread::sleep_for(10s);
-        }
-    } while (!m_Mysql && count < ATTEMPTS);
 
-    sLog->outError(
-        "Could not connect to MySQL database at %s: %s after %d attempts\n",
-        m_connectionInfo.host.c_str(),
-        mysql_error(mysqlInit),
-        ATTEMPTS);
+        sLog->outSQLDriver("Connected to MySQL database at %s", m_connectionInfo.host.c_str());
+
+        mysql_autocommit(m_Mysql, 1);
+
+        // set connection properties to UTF8 to properly handle locales for different
+        // server configs - core sends data in UTF8, so MySQL must expect UTF8 too
+        mysql_set_character_set(m_Mysql, "utf8");
+        return 0;
+    }
+
+    sLog->outError("Could not connect to MySQL database at %s: %s", m_connectionInfo.host.c_str(), mysql_error(mysqlInit));
+    uint32 errorCode = mysql_errno(mysqlInit);
     mysql_close(mysqlInit);
-    return false;
+    return errorCode;
 }
 
 bool MySQLConnection::PrepareStatements()
@@ -307,7 +289,6 @@ bool MySQLConnection::_Query(PreparedStatement* stmt, MYSQL_RES** pResult, uint6
         *pFieldCount = mysql_stmt_field_count(msql_STMT);
 
         return true;
-
     }
 }
 

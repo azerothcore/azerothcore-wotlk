@@ -18,7 +18,6 @@
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseWorkerPool.h"
-
 #include "CliRunnable.h"
 #include "Log.h"
 #include "Master.h"
@@ -30,6 +29,7 @@
 #include "ScriptMgr.h"
 #include "BigNumber.h"
 #include "OpenSSLCrypto.h"
+#include "DatabaseLoader.h"
 #include <ace/Sig_Handler.h>
 
 #ifdef _WIN32
@@ -397,78 +397,16 @@ bool Master::_StartDB()
     MySQL::Library_Init();
 
     sLog->SetLogDB(false);
-    std::string dbstring;
-    uint8 async_threads, synch_threads;
 
-    dbstring = sConfigMgr->GetStringDefault("WorldDatabaseInfo", "");
-    if (dbstring.empty())
+    // Load databases
+    DatabaseLoader loader(DatabaseLoader::DATABASE_NONE);
+    loader
+        .AddDatabase(LoginDatabase, "Login")
+        .AddDatabase(CharacterDatabase, "Character")
+        .AddDatabase(WorldDatabase, "World");
+
+    if (!loader.Load())
     {
-        sLog->outError("World database not specified in configuration file");
-        return false;
-    }
-
-    async_threads = uint8(sConfigMgr->GetIntDefault("WorldDatabase.WorkerThreads", 1));
-    if (async_threads < 1 || async_threads > 32)
-    {
-        sLog->outError("World database: invalid number of worker threads specified. "
-                       "Please pick a value between 1 and 32.");
-        return false;
-    }
-
-    synch_threads = uint8(sConfigMgr->GetIntDefault("WorldDatabase.SynchThreads", 1));
-    ///- Initialise the world database
-    if (!WorldDatabase.Open(dbstring, async_threads, synch_threads))
-    {
-        sLog->outError("Cannot connect to world database %s", dbstring.c_str());
-        return false;
-    }
-
-    ///- Get character database info from configuration file
-    dbstring = sConfigMgr->GetStringDefault("CharacterDatabaseInfo", "");
-    if (dbstring.empty())
-    {
-        sLog->outError("Character database not specified in configuration file");
-        return false;
-    }
-
-    async_threads = uint8(sConfigMgr->GetIntDefault("CharacterDatabase.WorkerThreads", 1));
-    if (async_threads < 1 || async_threads > 32)
-    {
-        sLog->outError("Character database: invalid number of worker threads specified. "
-                       "Please pick a value between 1 and 32.");
-        return false;
-    }
-
-    synch_threads = uint8(sConfigMgr->GetIntDefault("CharacterDatabase.SynchThreads", 2));
-
-    ///- Initialise the Character database
-    if (!CharacterDatabase.Open(dbstring, async_threads, synch_threads))
-    {
-        sLog->outError("Cannot connect to Character database %s", dbstring.c_str());
-        return false;
-    }
-
-    ///- Get login database info from configuration file
-    dbstring = sConfigMgr->GetStringDefault("LoginDatabaseInfo", "");
-    if (dbstring.empty())
-    {
-        sLog->outError("Login database not specified in configuration file");
-        return false;
-    }
-
-    async_threads = uint8(sConfigMgr->GetIntDefault("LoginDatabase.WorkerThreads", 1));
-    if (async_threads < 1 || async_threads > 32)
-    {
-        sLog->outError("Login database: invalid number of worker threads specified. "
-                       "Please pick a value between 1 and 32.");
-        return false;
-    }
-
-    synch_threads = uint8(sConfigMgr->GetIntDefault("LoginDatabase.SynchThreads", 1));
-    ///- Initialise the login database
-    if (!LoginDatabase.Open(dbstring, async_threads, synch_threads))
-    {
-        sLog->outError("Cannot connect to login database %s", dbstring.c_str());
         return false;
     }
 
@@ -489,6 +427,7 @@ bool Master::_StartDB()
         sLog->outError("Realm ID must range from 1 to 255");
         return false;
     }
+
     sLog->outString("Realm running as realm ID %d", realmID);
 
     ///- Initialize the DB logging system

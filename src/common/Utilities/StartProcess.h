@@ -19,8 +19,7 @@ namespace acore
     /// When an input path is given, the file will be routed to the processes stdin.
     /// When the process is marked as secure no arguments are leaked to logs.
     /// Note that most executables expect it's name as the first argument.
-    int StartProcess(std::string const& executable, std::vector<std::string> const& args,
-                     std::string const& logger, std::string input_file = "", bool secure = false);                                   
+    int StartProcess(std::string const& executable, std::vector<std::string> const& args, std::string input_file = "", bool secure = false);                                   
 
     /// Platform and library independent representation
     /// of asynchronous process results
@@ -42,8 +41,7 @@ namespace acore
     /// When an input path is given, the file will be routed to the processes stdin.
     /// When the process is marked as secure no arguments are leaked to logs.
     /// Note that most executables expect it's name as the first argument.
-    std::shared_ptr<AsyncProcessResult> StartAsyncProcess(std::string executable, std::vector<std::string> args,
-            std::string logger, std::string input_file = "", bool secure = false);
+    std::shared_ptr<AsyncProcessResult> StartAsyncProcess(std::string executable, std::vector<std::string> args, std::string input_file = "", bool secure = false);
 
     /// Searches for the given executable in the PATH variable
     /// and returns a non-empty string when it was found.

@@ -70,6 +70,7 @@ FOREACH(subdir ${sub_DIRS})
     if(EXISTS "${subdir}/CMakeLists.txt")
         message("Loading module: ${subdir_rel}")
         add_subdirectory("${subdir_rel}")
+        AC_ADD_MODULE(${subdir_rel})
     endif()
 ENDFOREACH()
 

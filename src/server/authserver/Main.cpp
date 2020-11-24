@@ -18,7 +18,6 @@
 #include <ace/Sig_Handler.h>
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
-
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "Configuration/Config.h"
@@ -28,6 +27,7 @@
 #include "SignalHandler.h"
 #include "RealmList.h"
 #include "RealmAcceptor.h"
+#include "DatabaseLoader.h"
 
 #ifdef __linux__
 #include <sched.h>
@@ -294,31 +294,15 @@ bool StartDB()
 {
     MySQL::Library_Init();
 
-    std::string dbstring = sConfigMgr->GetStringDefault("LoginDatabaseInfo", "");
-    if (dbstring.empty())
-    {
-        sLog->outError("Database not specified");
-        return false;
-    }
+    // Load databases
+    // NOTE: While authserver is singlethreaded you should keep synch_threads == 1.
+    // Increasing it is just silly since only 1 will be used ever.
+    DatabaseLoader loader(DatabaseLoader::DATABASE_NONE);
+    loader
+        .AddDatabase(LoginDatabase, "Login");
 
-    int32 worker_threads = sConfigMgr->GetIntDefault("LoginDatabase.WorkerThreads", 1);
-    if (worker_threads < 1 || worker_threads > 32)
+    if (!loader.Load())
     {
-        sLog->outError("Improper value specified for LoginDatabase.WorkerThreads, defaulting to 1.");
-        worker_threads = 1;
-    }
-
-    int32 synch_threads = sConfigMgr->GetIntDefault("LoginDatabase.SynchThreads", 1);
-    if (synch_threads < 1 || synch_threads > 32)
-    {
-        sLog->outError("Improper value specified for LoginDatabase.SynchThreads, defaulting to 1.");
-        synch_threads = 1;
-    }
-
-    // NOTE: While authserver is singlethreaded you should keep synch_threads == 1. Increasing it is just silly since only 1 will be used ever.
-    if (!LoginDatabase.Open(dbstring.c_str(), uint8(worker_threads), uint8(synch_threads)))
-    {
-        sLog->outError("Cannot connect to database");
         return false;
     }
 
