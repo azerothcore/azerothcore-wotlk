@@ -1,3 +1,19 @@
+-- DB update 2020_11_24_00 -> 2020_11_24_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_11_24_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_11_24_00 2020_11_24_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1605979091794346800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1605979091794346800');
 
 /* Add extra mobs to The Antechamber in 25-man version of Ulduar */
@@ -30,3 +46,12 @@ INSERT INTO `creature_addon` (`guid`, `bytes2`, `emote`) VALUES
 (136610, 1, 0),
 (136771, 1, 0),
 (136774, 1, 333);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
