@@ -238,7 +238,7 @@ private:
 
     char const* GetDatabaseName() const;
 
-    ACE_Message_Queue<ACE_SYNCH>*  _mqueue;
+    ACE_Message_Queue<ACE_SYNCH>* _mqueue;
     //! Queue shared by async worker threads.
     ACE_Activation_Queue* _queue;
     std::vector<std::vector<T*>> _connections;
