@@ -16,11 +16,9 @@ end//
 
 create procedure sp_DelAccAccessByAccNRealm(vAcctId int, vRealm int)
 begin
-    set vRealm = IFNULL(nullif(vRealm, ''), -1);
-
     DELETE FROM account_access 
     WHERE id = vAcctId
-    and realmid = vRealmid;
+    and realmid = IFNULL(nullif(vRealm, ''), -1);
 end//
 
 create procedure sp_DelAccBanByAcc(vAcctId int)

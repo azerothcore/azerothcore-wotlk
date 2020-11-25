@@ -97,7 +97,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_UPD_MUTE_TIME, "call sp_UpdAccMuteByAcc(?, ?, ?, ?)", CONNECTION_ASYNC); //AccountID int, Age bigint, MuteRason nvarchar(256), MuteBy nvarchar(64) //adjusted order to put ID first.
     PrepareStatement(LOGIN_UPD_MUTE_TIME_LOGIN, "call sp_UpdAccMuteTimeByAcc(?, ?)", CONNECTION_ASYNC); //AccountID int, Age bigint //adjusted order to put ID first.
     PrepareStatement(LOGIN_UPD_LAST_IP, "call sp_UpdAccLastIpByUser(?, ?)", CONNECTION_ASYNC); //UserName nvarchar(32), IP nvarchar(64) //adjusted order to put UserName first.
-    PrepareStatement(LOGIN_UPD_LAST_ATTEMPT_IP, "call sp_UpdAccLastAttemptIpByUser", CONNECTION_ASYNC); //UserName nvarchar(32), IP nvarchar(64) //adjusted order to put UserName first.
+    PrepareStatement(LOGIN_UPD_LAST_ATTEMPT_IP, "call sp_UpdAccLastAttemptIpByUser(?, ?)", CONNECTION_ASYNC); //UserName nvarchar(32), IP nvarchar(64) //adjusted order to put UserName first.
     PrepareStatement(LOGIN_UPD_ACCOUNT_ONLINE, "call sp_UpdAccOnlineByAcc(?, ?)", CONNECTION_ASYNC); //AccountID int, Online int //adjusted order to put ID first.
     PrepareStatement(LOGIN_UPD_UPTIME_PLAYERS, "call sp_UpdUptimeByRealmNStart(?, ?, ?, ?)", CONNECTION_ASYNC); //RealmID int, Start int, Uptime int, MaxPlayers smallint //adjusted order in calling procedure.
 }
