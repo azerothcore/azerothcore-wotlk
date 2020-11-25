@@ -45,36 +45,36 @@ public:
 
         void Initialize()
         {
-           SvalaSorrowgrave = 0;
-           GortokPalehoof   = 0;
-           SkadiRuthless    = 0;
-           KingYmiron       = 0;
-           FrenziedWorgen   = 0;
-           RavenousFurbolg  = 0;
-           MassiveJormungar = 0;
-           FerociousRhino   = 0;
-           Grauf            = 0;
+            SvalaSorrowgrave = 0;
+            GortokPalehoof   = 0;
+            SkadiRuthless    = 0;
+            KingYmiron       = 0;
+            FrenziedWorgen   = 0;
+            RavenousFurbolg  = 0;
+            MassiveJormungar = 0;
+            FerociousRhino   = 0;
+            Grauf            = 0;
 
-           SvalaMirrorGUID  = 0;
-           StatisGenerator  = 0;
-           SkadiHits        = 0;
-           SkadiInRange     = 0;
-           SkadiRuthlessDoor= 0;
-           YmironDoor       = 0;
-           FightStatus      = 0;
+            SvalaMirrorGUID  = 0;
+            StatisGenerator  = 0;
+            SkadiHits        = 0;
+            SkadiInRange     = 0;
+            SkadiRuthlessDoor = 0;
+            YmironDoor       = 0;
+            FightStatus      = 0;
 
-           svalaAchievement = false;
-           skadiAchievement = false;
-           ymironAchievement = false;
-           
-           for(uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-               Encounters[i] = NOT_STARTED;
+            svalaAchievement = false;
+            skadiAchievement = false;
+            ymironAchievement = false;
+
+            for(uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                Encounters[i] = NOT_STARTED;
         }
 
         bool IsEncounterInProgress() const
         {
             for(uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                if(Encounters[i] == IN_PROGRESS) 
+                if(Encounters[i] == IN_PROGRESS)
                     return true;
 
             return false;
@@ -83,15 +83,33 @@ public:
         {
             switch(pCreature->GetEntry())
             {
-                case NPC_SVALA_SORROWGRAVE: SvalaSorrowgrave = pCreature->GetGUID();         break;
-                case NPC_GORTOK_PALEHOOF: GortokPalehoof = pCreature->GetGUID();           break;
-                case NPC_SKADI_THE_RUTHLESS: SkadiRuthless = pCreature->GetGUID();            break;
-                case NPC_KING_YMIRON: KingYmiron = pCreature->GetGUID();               break;
-                case NPC_FRENZIED_WORGEN: FrenziedWorgen = pCreature->GetGUID();           break;
-                case NPC_RAVENOUS_FURBOLG: RavenousFurbolg = pCreature->GetGUID();          break;
-                case NPC_MASSIVE_JORMUNGAR: MassiveJormungar = pCreature->GetGUID();         break;
-                case NPC_FEROCIOUS_RHINO: FerociousRhino = pCreature->GetGUID();           break;
-                case NPC_GARUF: Grauf = pCreature->GetGUID();                    break;
+                case NPC_SVALA_SORROWGRAVE:
+                    SvalaSorrowgrave = pCreature->GetGUID();
+                    break;
+                case NPC_GORTOK_PALEHOOF:
+                    GortokPalehoof = pCreature->GetGUID();
+                    break;
+                case NPC_SKADI_THE_RUTHLESS:
+                    SkadiRuthless = pCreature->GetGUID();
+                    break;
+                case NPC_KING_YMIRON:
+                    KingYmiron = pCreature->GetGUID();
+                    break;
+                case NPC_FRENZIED_WORGEN:
+                    FrenziedWorgen = pCreature->GetGUID();
+                    break;
+                case NPC_RAVENOUS_FURBOLG:
+                    RavenousFurbolg = pCreature->GetGUID();
+                    break;
+                case NPC_MASSIVE_JORMUNGAR:
+                    MassiveJormungar = pCreature->GetGUID();
+                    break;
+                case NPC_FEROCIOUS_RHINO:
+                    FerociousRhino = pCreature->GetGUID();
+                    break;
+                case NPC_GARUF:
+                    Grauf = pCreature->GetGUID();
+                    break;
             }
         }
 
@@ -102,14 +120,14 @@ public:
                 case GO_SKADI_THE_RUTHLESS_DOOR:
                     SkadiRuthlessDoor = pGo->GetGUID();
                     if (Encounters[DATA_SKADI_THE_RUTHLESS] == DONE)
-                        HandleGameObject(0,true,pGo);
+                        HandleGameObject(0, true, pGo);
                     break;
                 case GO_KING_YMIRON_DOOR:
                     YmironDoor = pGo->GetGUID();
-                    if (Encounters[DATA_KING_YMIRON] == DONE) 
-                        HandleGameObject(0,true,pGo);
+                    if (Encounters[DATA_KING_YMIRON] == DONE)
+                        HandleGameObject(0, true, pGo);
                     break;
-                case GO_GORK_PALEHOOF_SPHERE: 
+                case GO_GORK_PALEHOOF_SPHERE:
                     StatisGenerator = pGo->GetGUID();
                     break;
                 case GO_SVALA_MIRROR:
@@ -143,16 +161,16 @@ public:
                 case DATA_SKADI_THE_RUTHLESS:
                     if (data == DONE)
                     {
-                        HandleGameObject(SkadiRuthlessDoor,true);
+                        HandleGameObject(SkadiRuthlessDoor, true);
                         // Make ymiron attackable
-                        if (Creature *cr = instance->GetCreature(KingYmiron))
+                        if (Creature* cr = instance->GetCreature(KingYmiron))
                             cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     }
                     Encounters[type] = data;
                     break;
                 case DATA_KING_YMIRON:
                     if (data == DONE)
-                        HandleGameObject(YmironDoor,true);
+                        HandleGameObject(YmironDoor, true);
                     Encounters[type] = data;
                     break;
                 case SKADI_HITS:
@@ -212,7 +230,8 @@ public:
                     if (Encounters[i] == IN_PROGRESS)
                         Encounters[i] = NOT_STARTED;
 
-            } else OUT_LOAD_INST_DATA_FAIL;
+            }
+            else OUT_LOAD_INST_DATA_FAIL;
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }
@@ -221,12 +240,18 @@ public:
         {
             switch(type)
             {
-                case DATA_SVALA_SORROWGRAVE:        return Encounters[0];
-                case DATA_GORTOK_PALEHOOF:          return Encounters[1];
-                case DATA_SKADI_THE_RUTHLESS:       return Encounters[2];
-                case DATA_KING_YMIRON:              return Encounters[3];
-                case SKADI_HITS:                    return SkadiHits;
-                case SKADI_IN_RANGE:                return SkadiInRange;
+                case DATA_SVALA_SORROWGRAVE:
+                    return Encounters[0];
+                case DATA_GORTOK_PALEHOOF:
+                    return Encounters[1];
+                case DATA_SKADI_THE_RUTHLESS:
+                    return Encounters[2];
+                case DATA_KING_YMIRON:
+                    return Encounters[3];
+                case SKADI_HITS:
+                    return SkadiHits;
+                case SKADI_IN_RANGE:
+                    return SkadiInRange;
             }
             return 0;
         }
@@ -235,19 +260,32 @@ public:
         {
             switch(identifier)
             {
-                case DATA_SVALA_SORROWGRAVE:          return SvalaSorrowgrave;
-                case DATA_GORTOK_PALEHOOF:            return GortokPalehoof;
-                case DATA_SKADI_THE_RUTHLESS:         return SkadiRuthless;
-                case DATA_KING_YMIRON:                return KingYmiron;
-                case DATA_NPC_FRENZIED_WORGEN:        return FrenziedWorgen;
-                case DATA_NPC_RAVENOUS_FURBOLG:       return RavenousFurbolg;
-                case DATA_NPC_MASSIVE_JORMUNGAR:      return MassiveJormungar;
-                case DATA_NPC_FEROCIOUS_RHINO:        return FerociousRhino;
-                case YMIRON_DOOR:                     return YmironDoor;
-                case STATIS_GENERATOR:                return StatisGenerator;
-                case SKADI_DOOR:                      return SkadiRuthlessDoor;
-                case DATA_GRAUF:                      return Grauf;
-                case GO_SVALA_MIRROR:                 return SvalaMirrorGUID;
+                case DATA_SVALA_SORROWGRAVE:
+                    return SvalaSorrowgrave;
+                case DATA_GORTOK_PALEHOOF:
+                    return GortokPalehoof;
+                case DATA_SKADI_THE_RUTHLESS:
+                    return SkadiRuthless;
+                case DATA_KING_YMIRON:
+                    return KingYmiron;
+                case DATA_NPC_FRENZIED_WORGEN:
+                    return FrenziedWorgen;
+                case DATA_NPC_RAVENOUS_FURBOLG:
+                    return RavenousFurbolg;
+                case DATA_NPC_MASSIVE_JORMUNGAR:
+                    return MassiveJormungar;
+                case DATA_NPC_FEROCIOUS_RHINO:
+                    return FerociousRhino;
+                case YMIRON_DOOR:
+                    return YmironDoor;
+                case STATIS_GENERATOR:
+                    return StatisGenerator;
+                case SKADI_DOOR:
+                    return SkadiRuthlessDoor;
+                case DATA_GRAUF:
+                    return Grauf;
+                case GO_SVALA_MIRROR:
+                    return SvalaMirrorGUID;
             }
 
             return 0;

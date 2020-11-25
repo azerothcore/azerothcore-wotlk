@@ -37,7 +37,7 @@ public:
 
         bool IsEncounterInProgress() const
         {
-            for( uint8 i=0; i<MAX_ENCOUNTER; ++i )
+            for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
                 if( m_auiEncounter[i] == IN_PROGRESS )
                     return true;
 
@@ -165,7 +165,7 @@ public:
             {
                 case ACHIEV_CRITERIA_MANY_WHELPS_10_PLAYER:
                 case ACHIEV_CRITERIA_MANY_WHELPS_25_PLAYER:
-                    return ManyWhelpsCounter>=50;
+                    return ManyWhelpsCounter >= 50;
                 case ACHIEV_CRITERIA_DEEP_BREATH_10_PLAYER:
                 case ACHIEV_CRITERIA_DEEP_BREATH_25_PLAYER:
                     return bDeepBreath;

@@ -77,9 +77,9 @@ public:
             Player* player = receiver->ToPlayer();
 
             if (player && player->HasItemCount(11169, 1, false) &&
-                player->HasItemCount(11172, 11, false) &&
-                player->HasItemCount(11173, 1, false) &&
-                !player->HasItemCount(11522, 1, true))
+                    player->HasItemCount(11172, 11, false) &&
+                    player->HasItemCount(11173, 1, false) &&
+                    !player->HasItemCount(11522, 1, true))
             {
                 ItemPosCountVec dest;
                 uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 11522, 1, nullptr);
@@ -101,7 +101,8 @@ public:
                 {
                     me->setFaction(91);
                     isFriendly = false;
-                } else SwitchFactionTimer -= diff;
+                }
+                else SwitchFactionTimer -= diff;
             }
 
             if (!UpdateVictim())
@@ -114,20 +115,23 @@ public:
                     if (me->GetVictim()->GetTypeId() == TYPEID_PLAYER)
                         SendItem(me->GetVictim());
                     SendItemTimer = 5000;
-                } else SendItemTimer -= diff;
+                }
+                else SendItemTimer -= diff;
             }
 
             if (FrostShockTimer <= diff)
             {
                 DoCastVictim(SPELL_FROST_SHOCK);
                 FrostShockTimer = 15000;
-            } else FrostShockTimer -= diff;
+            }
+            else FrostShockTimer -= diff;
 
             if (AquaJetTimer <= diff)
             {
                 DoCast(me, SPELL_AQUA_JET);
                 AquaJetTimer = 15000;
-            } else AquaJetTimer -= diff;
+            }
+            else AquaJetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -336,23 +340,23 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 1675, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, 1676, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 SendGossipMenuFor(player, 1677, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                 SendGossipMenuFor(player, 1678, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 SendGossipMenuFor(player, 1679, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+5:

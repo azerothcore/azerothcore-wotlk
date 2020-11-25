@@ -1,4 +1,4 @@
-//  -*- MPC -*- now wouldn't this be cool...
+//  -*- MPC -*-
 project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, uuid, filecache, versioned_namespace, pkgconfig, support_ostream {
   avoids       = ace_for_tao
   sharedname   = ACE
@@ -92,6 +92,7 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
     Lock.cpp
     Log_Category.cpp
     Log_Msg.cpp
+    Log_Msg_Android_Logcat.cpp
     Log_Msg_Backend.cpp
     Log_Msg_Callback.cpp
     Log_Msg_IPC.cpp
@@ -120,6 +121,7 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
     Message_Queue_Vx.cpp
     Method_Request.cpp
     MMAP_Memory_Pool.cpp
+    MQX_Filesystem.cpp
     Msg_WFMO_Reactor.cpp
     Monitor_Admin.cpp
     Monitor_Admin_Manager.cpp
@@ -134,6 +136,7 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
     Netlink_Addr.cpp
     Notification_Strategy.cpp
     Notification_Queue.cpp
+    Null_Mutex.cpp
     Obchunk.cpp
     Object_Manager.cpp
     Object_Manager_Base.cpp
@@ -143,6 +146,7 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
     OS_main.cpp
     OS_NS_arpa_inet.cpp
     OS_NS_ctype.cpp
+    OS_NS_devctl.cpp
     OS_NS_dirent.cpp
     OS_NS_dlfcn.cpp
     OS_NS_errno.cpp
@@ -298,6 +302,7 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
     Auto_IncDec_T.cpp
     Auto_Ptr.cpp
     Based_Pointer_T.cpp
+    Bound_Ptr.cpp
     Cache_Map_Manager_T.cpp
     Cached_Connect_Strategy_T.cpp
     Caching_Strategies_T.cpp
@@ -464,7 +469,6 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
     Version.h
     Versioned_Namespace.h
     ace_wchar.h
-    ace_wchar.inl
     checked_iterator.h
     config-*.h
     config.h
@@ -478,7 +482,6 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
 
   Documentation_Files {
     README
-    ../VERSION
   }
 
   Pkgconfig_Files {
@@ -494,6 +497,7 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
     ../bin/add_rel_link.sh
     ../bin/depgen.pl
     ../bin/ace_install_pkgconfig.pl
+    ../bin/generate_export_file.pl
   }
   InstallData_Files {
     gendir = include
@@ -502,7 +506,7 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
   InstallData_Files {
     gendir = .
     ../README
-    ../VERSION
+    ../VERSION.txt
     ../PROBLEM-REPORT-FORM
     ../NEWS
     ../COPYING

@@ -124,7 +124,8 @@ public:
                             phase = 0;
                             break;
                     }
-                } else timer -= diff;
+                }
+                else timer -= diff;
             }
 
             if (!UpdateVictim())
@@ -134,13 +135,15 @@ public:
             {
                 DoCastVictim(SPELL_MOCKING_BLOW);
                 mockingBlowTimer = 5000;
-            } else mockingBlowTimer -= diff;
+            }
+            else mockingBlowTimer -= diff;
 
             if (shieldBashTimer <= diff)
             {
                 DoCastVictim(SPELL_MOCKING_BLOW);
                 shieldBashTimer = 8000;
-            } else shieldBashTimer -= diff;
+            }
+            else shieldBashTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
