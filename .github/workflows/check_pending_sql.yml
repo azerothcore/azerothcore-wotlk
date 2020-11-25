@@ -18,7 +18,7 @@ jobs:
       - name: Semicolon check
         run: |
          for i in `find data/sql/updates/pending* -name "*.sql" -type f`; do
-         if [[ $(tail -c 2 "$i") != ";"  ]]; then
+         if [[ $(tail -c 4 "$i") != ";"  ]]; then
             echo "Missing Semicolon at the end of the file. (;)"
             exit 1
          else
