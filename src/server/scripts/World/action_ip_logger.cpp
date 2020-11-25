@@ -134,8 +134,7 @@ public:
             stmt->setUInt32(0, playerGuid);
             stmt->setUInt32(1, characterGuid);
             stmt->setUInt8(2, aType);
-            stmt->setUInt32(3, playerGuid);
-            stmt->setString(4, systemNote.c_str());
+            stmt->setString(3, systemNote.c_str());
             LoginDatabase.Execute(stmt);
         }
         else // ... but for failed login, we query last_attempt_ip from account table. Which we do with an unique query
@@ -145,8 +144,7 @@ public:
             stmt->setUInt32(0, playerGuid);
             stmt->setUInt32(1, characterGuid);
             stmt->setUInt8(2, aType);
-            stmt->setUInt32(3, playerGuid);
-            stmt->setString(4, systemNote.c_str());
+            stmt->setString(3, systemNote.c_str());
             LoginDatabase.Execute(stmt);
         }
         return;
@@ -230,8 +228,8 @@ public:
         stmt->setUInt32(0, playerGuid);
         stmt->setUInt32(1, characterGuid);
         stmt->setUInt8(2, aType);
-        stmt->setString(3, currentIp.c_str()); // We query the ip here.
-        stmt->setString(4, systemNote.c_str());
+        stmt->setString(3, systemNote.c_str());
+        stmt->setString(4, currentIp.c_str()); // We query the ip here.
         // Seeing as the time differences should be minimal, we do not get unixtime and the timestamp right now;
         // Rather, we let it be added with the SQL query.
 
@@ -293,8 +291,7 @@ public:
         stmt2->setUInt32(0, playerGuid);
         stmt2->setUInt32(1, characterGuid);
         stmt2->setUInt8(2, aType);
-        stmt2->setUInt32(3, playerGuid);
-        stmt2->setString(4, systemNote.c_str());
+        stmt2->setString(3, systemNote.c_str());
         // Seeing as the time differences should be minimal, we do not get unixtime and the timestamp right now;
         // Rather, we let it be added with the SQL query.
 

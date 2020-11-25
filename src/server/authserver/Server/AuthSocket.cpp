@@ -303,9 +303,9 @@ void AuthSocket::_SetVSFields(const std::string& rI)
     s_hex = s.AsHexStr();
 
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_VS);
-    stmt->setString(0, v_hex);
-    stmt->setString(1, s_hex);
-    stmt->setString(2, _login);
+    stmt->setString(0, _login);
+    stmt->setString(1, v_hex);
+    stmt->setString(2, s_hex);
     LoginDatabase.Execute(stmt);
 
     OPENSSL_free(v_hex);
@@ -711,11 +711,11 @@ bool AuthSocket::_HandleLogonProof()
         const char* K_hex = K.AsHexStr();
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
-        stmt->setString(0, K_hex);
-        stmt->setString(1, socket().getRemoteAddress().c_str());
-        stmt->setUInt32(2, GetLocaleByName(_localizationName));
-        stmt->setString(3, _os);
-        stmt->setString(4, _login);
+        stmt->setString(0, _login);
+        stmt->setString(1, K_hex);
+        stmt->setString(2, socket().getRemoteAddress().c_str());
+        stmt->setUInt32(3, GetLocaleByName(_localizationName));
+        stmt->setString(4, _os);
         LoginDatabase.DirectExecute(stmt);
 
         OPENSSL_free((void*)K_hex);

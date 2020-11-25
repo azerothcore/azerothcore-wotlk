@@ -998,8 +998,8 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     CharacterDatabase.Execute(stmt);
 
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_ONLINE);
-    stmt->setUInt32(0, realmID);
-    stmt->setUInt32(1, GetAccountId());
+    stmt->setUInt32(0, GetAccountId());
+    stmt->setUInt32(1, realmID);
     LoginDatabase.Execute(stmt);
 
     pCurrChar->SetInGameTime(World::GetGameTimeMS());

@@ -143,9 +143,9 @@ namespace AccountMgr
 
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_USERNAME);
 
-        stmt->setString(0, newUsername);
-        stmt->setString(1, CalculateShaPassHash(newUsername, newPassword));
-        stmt->setUInt32(2, accountId);
+        stmt->setUInt32(0, accountId);
+        stmt->setString(1, newUsername);
+        stmt->setString(2, CalculateShaPassHash(newUsername, newPassword));
 
         LoginDatabase.Execute(stmt);
 
@@ -173,8 +173,8 @@ namespace AccountMgr
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_PASSWORD);
 
-        stmt->setString(0, CalculateShaPassHash(username, newPassword));
-        stmt->setUInt32(1, accountId);
+        stmt->setUInt32(0, accountId);
+        stmt->setString(1, CalculateShaPassHash(username, newPassword));
 
         LoginDatabase.Execute(stmt);
 

@@ -1424,6 +1424,7 @@ public:
             if (itemNameStr && itemNameStr[0])
             {
                 std::string itemName = itemNameStr + 1;
+                WorldDatabase.EscapeString(itemName);
 
                 PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ITEM_TEMPLATE_BY_NAME);
                 stmt->setString(0, itemName);
@@ -2216,6 +2217,7 @@ public:
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
         std::string muteBy = "";
+        stmt->setUInt32(0, accountId);
         if (handler->GetSession())
             muteBy = handler->GetSession()->GetPlayerName();
         else
@@ -2226,7 +2228,7 @@ public:
             // Target is online, mute will be in effect right away.
             int64 muteTime = time(nullptr) + notSpeakTime * MINUTE;
             target->GetSession()->m_muteTime = muteTime;
-            stmt->setInt64(0, muteTime);
+            stmt->setInt64(1, muteTime);
             std::string nameLink = handler->playerLink(targetName);
 
             if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
@@ -2238,12 +2240,11 @@ public:
         {
             // Target is offline, mute will be in effect starting from the next login.
             int32 muteTime = -int32(notSpeakTime * MINUTE);
-            stmt->setInt64(0, muteTime);
+            stmt->setInt64(1, muteTime);
         }
 
-        stmt->setString(1, muteReasonStr);
-        stmt->setString(2, muteBy);
-        stmt->setUInt32(3, accountId);
+        stmt->setString(2, muteReasonStr);
+        stmt->setString(3, muteBy);
         LoginDatabase.Execute(stmt);
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_MUTE);
         stmt->setUInt32(0, accountId);

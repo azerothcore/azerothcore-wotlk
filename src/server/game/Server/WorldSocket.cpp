@@ -815,8 +815,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     // As we don't know if attempted login process by ip works, we update last_attempt_ip right away
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LAST_ATTEMPT_IP);
 
-    stmt->setString(0, address);
-    stmt->setString(1, account);
+    stmt->setString(0, account);
+    stmt->setString(1, address);
 
     LoginDatabase.Execute(stmt);
     // This also allows to check for possible "hack" attempts on account
@@ -855,8 +855,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME_LOGIN);
 
-        stmt->setInt64(0, mutetime);
-        stmt->setUInt32(1, id);
+        stmt->setUInt32(0, id);
+        stmt->setInt64(1, mutetime);
 
         LoginDatabase.Execute(stmt);
     }
@@ -976,8 +976,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     // Update the last_ip in the database as it was successful for login
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LAST_IP);
 
-    stmt->setString(0, address);
-    stmt->setString(1, account);
+    stmt->setString(0, account);
+    stmt->setString(1, address);
 
     LoginDatabase.Execute(stmt);
 
