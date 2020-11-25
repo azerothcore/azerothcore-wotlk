@@ -16,4 +16,3 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `quest_details` WHERE `ID` = 12593;
 INSERT INTO `quest_details` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `EmoteDelay1`, `VerifiedBuild`) VALUES
 (12593, 396, 397, 396, 396, 500, 1000, 1000, 1000, 20886);
-
