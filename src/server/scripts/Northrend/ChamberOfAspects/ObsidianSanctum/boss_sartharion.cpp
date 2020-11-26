@@ -870,9 +870,12 @@ struct boss_sartharion_dragonAI : public BossAI
             case NPC_SHADRON:
             {
                 Talk(SAY_SHADRON_DEATH);
-                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                if (isCalledBySartharion)
                 {
-                    sartharion->RemoveAura(SPELL_GIFT_OF_TWILIGHT_FIRE);
+                    if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                    {
+                        sartharion->RemoveAura(SPELL_GIFT_OF_TWILIGHT_FIRE);
+                    }
                 }
 
                 if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
@@ -1018,12 +1021,11 @@ public:
         void Reset() override
         {
             boss_sartharion_dragonAI::Reset();
-            extraEvents.Reset();
-
             if (!isCalledBySartharion)
             {
                 summons2.DespawnAll();
             }
+
             events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20000);
             events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10000);
             events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15000);
@@ -1050,16 +1052,12 @@ public:
 
         void HandleExtraEvent(uint32 const eventId) override
         {
-            switch (eventId)
+            if (eventId == EVENT_MINIDRAKE_SPEECH)
             {
-                case EVENT_MINIDRAKE_SPEECH:
-                {
-                    Talk(SAY_TENEBRON_RESPOND);
-                    me->SetCanFly(true);
-                    me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                    me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
-                    break;
-                }
+                Talk(SAY_TENEBRON_RESPOND);
+                me->SetCanFly(true);
+                me->SetSpeed(MOVE_FLIGHT, 3.0f);
+                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
             }
         }
 
@@ -1237,16 +1235,12 @@ public:
 
         void HandleExtraEvent(uint32 const eventId) override
         {
-            switch (eventId)
+            if (eventId == EVENT_MINIDRAKE_SPEECH)
             {
-                case EVENT_MINIDRAKE_SPEECH:
-                {
-                    Talk(SAY_SHADRON_RESPOND);
-                    me->SetCanFly(true);
-                    me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                    me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
-                    break;
-                }
+                Talk(SAY_SHADRON_RESPOND);
+                me->SetCanFly(true);
+                me->SetSpeed(MOVE_FLIGHT, 3.0f);
+                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
             }
         }
 
@@ -1357,16 +1351,12 @@ public:
 
         void HandleExtraEvent(uint32 const eventId) override
         {
-            switch (eventId)
+            if (eventId == EVENT_MINIDRAKE_SPEECH)
             {
-                case EVENT_MINIDRAKE_SPEECH:
-                {
-                    Talk(SAY_SHADRON_RESPOND);
-                    me->SetCanFly(true);
-                    me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                    me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
-                    break;
-                }
+                Talk(SAY_SHADRON_RESPOND);
+                me->SetCanFly(true);
+                me->SetSpeed(MOVE_FLIGHT, 3.0f);
+                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
             }
         }
 
