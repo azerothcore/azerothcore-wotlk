@@ -295,10 +295,11 @@ public:
                 }
 
                 dragon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                dragon->SetFullHealth();
+
                 ++dragonsCount;
                 me->AddLootMode(1 << dragonsCount);
 
-                dragon->SetFullHealth();
                 switch (dragons[i])
                 {
                     case DATA_TENEBRON:
@@ -397,11 +398,11 @@ public:
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
             // Temporal hack, by some case some melee spells can bypass this aura damage reduction
-            //if (me->HasAura(SPELL_GIFT_OF_TWILIGHT_FIRE))
-            //{
-                //damage = 0;
-                //return;
-            //}
+            if (me->HasAura(SPELL_GIFT_OF_TWILIGHT_FIRE))
+            {
+                damage = 0;
+                return;
+            }
 
             if (!usedBerserk && me->HealthBelowPctDamaged(30, damage))
             {
