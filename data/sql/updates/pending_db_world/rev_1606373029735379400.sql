@@ -19,4 +19,4 @@ UPDATE `creature_text` SET `Text`='He\'s... too powerful. Heroes, quickly... com
 UPDATE `creature_text` SET `Text`='He\'s... too powerful. Heroes, quickly... come to me! We must leave this place at once! I will do what I can do hold him in place while we flee.' WHERE  `CreatureID`=37554 AND `GroupID`=102 AND `ID`=0;
 UPDATE `broadcast_text` SET `FemaleText`='He\'s... too powerful. Heroes, quickly... come to me! We must leave this place at once! I will do what I can do hold him in place while we flee.' WHERE  `ID`=37168;
 UPDATE `broadcast_text` SET `FemaleText`='He is too powerful, we must leave this place at once! My magic will hold him in place for only a short time! Come quickly, heroes!' WHERE  `ID`=36821;
-UPDATE `broadcast_text` SET `MaleText`='Your allies have arrived Jaina, just as you promised. You will all become powerful agents of the Scourge' WHERE  `ID`=37172;
+UPDATE `broadcast_text` SET `MaleText`='Your allies have arrived Jaina, just as you promised. You will all become powerful agents of the Scourge.' WHERE  `ID`=37172;
