@@ -129,6 +129,7 @@ enum Misc
     MAX_AREA_TRIGGER_COUNT                      = 2,
     MAX_CYCLONE_COUNT                           = 5,
     MAX_TENEBORN_EGGS_SUMMONS                   = 6,
+    MAX_SARTHARION_BOUNDARY_POS                 = 4,
 };
 
 enum Events
@@ -206,7 +207,7 @@ const Position AreaTriggerSummonPos[MAX_AREA_TRIGGER_COUNT] =
     { 3242.84f, 553.979f, 58.8272f, 0.0f },
 };
 
-const float SartharionBoundary[4] =
+const float SartharionBoundary[MAX_SARTHARION_BOUNDARY_POS] =
 {
     3218.86f,   // South X
     3275.69f,   // North X
