@@ -158,6 +158,7 @@ enum Events
     EVENT_SARTHARION_CALL_VESPERON              = 32,
 
     EVENT_SARTHARION_BOUNDARY                   = 33,
+    EVENT_MINIDRAKE_SPEECH                      = 34,
 };
 
 const Position portalPos[4] =
@@ -707,7 +708,6 @@ struct boss_sartharion_dragonAI : public BossAI
 {
     boss_sartharion_dragonAI(Creature* pCreature, uint32 bossId) : BossAI(pCreature, bossId),
         portalGUID(0),
-        speechTimer(0),
         isCalledBySartharion(false)
     {
     }
@@ -723,7 +723,6 @@ struct boss_sartharion_dragonAI : public BossAI
         me->SetCanFly(false);
         me->ResetLootMode();
         portalGUID = 0;
-        speechTimer = 0;
         isCalledBySartharion = false;
         instance->DoAction(ACTION_CLEAR_PORTAL);
     }
@@ -733,7 +732,7 @@ struct boss_sartharion_dragonAI : public BossAI
         if (param == ACTION_CALL_DRAGON && !isCalledBySartharion)
         {
             isCalledBySartharion = true;
-            ++speechTimer;
+            extraEvents.ScheduleEvent(EVENT_MINIDRAKE_SPEECH, 4000);
         }
     }
 
@@ -936,35 +935,10 @@ struct boss_sartharion_dragonAI : public BossAI
 
     void UpdateAI(uint32 diff) final
     {
-        // Call speach
-        if (speechTimer)
+        extraEvents.Update(diff);
+        while (uint32 const eventId = extraEvents.ExecuteEvent())
         {
-            speechTimer += diff;
-            if (speechTimer >= 4000)
-            {
-                switch (me->GetEntry())
-                {
-                    case NPC_TENEBRON:
-                    {
-                        Talk(SAY_TENEBRON_RESPOND);
-                        break;
-                    }
-                    case NPC_SHADRON:
-                    {
-                        Talk(SAY_SHADRON_RESPOND);
-                        break;
-                    }
-                    case NPC_VESPERON:
-                    {
-                        Talk(SAY_VESPERON_RESPOND);
-                        break;
-                    }
-                }
-                me->SetCanFly(true);
-                me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
-                speechTimer = 0;
-            }
+            HandleExtraEvent(eventId);
         }
 
         if (!UpdateVictim())
@@ -1001,6 +975,7 @@ struct boss_sartharion_dragonAI : public BossAI
         RemoveTwilightPortal();
     }
 
+    virtual void HandleExtraEvent(uint32 const eventId) { }
 protected:
     void RemoveTwilightPortal()
     {
@@ -1015,8 +990,8 @@ protected:
         }
     }
 
+    EventMap extraEvents;
     uint64 portalGUID;
-    uint32 speechTimer;
     bool isCalledBySartharion;
 };
 
@@ -1043,6 +1018,8 @@ public:
         void Reset() override
         {
             boss_sartharion_dragonAI::Reset();
+            extraEvents.Reset();
+
             if (!isCalledBySartharion)
             {
                 summons2.DespawnAll();
@@ -1069,6 +1046,21 @@ public:
             }
 
             boss_sartharion_dragonAI::JustDied(killer);
+        }
+
+        void HandleExtraEvent(uint32 const eventId) override
+        {
+            switch (eventId)
+            {
+                case EVENT_MINIDRAKE_SPEECH:
+                {
+                    Talk(SAY_TENEBRON_RESPOND);
+                    me->SetCanFly(true);
+                    me->SetSpeed(MOVE_FLIGHT, 3.0f);
+                    me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                    break;
+                }
+            }
         }
 
         void ExecuteEvent(uint32 eventId) override
@@ -1225,7 +1217,14 @@ public:
             {
                 // Acolytes are dead
                 if (!summons.HasEntry(NPC_ACOLYTE_OF_SHADRON))
+                {
                     instance->DoAction(ACTION_CLEAR_PORTAL);
+                }
+
+                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                {
+                    sartharion->RemoveAurasDueToSpell(SPELL_GIFT_OF_TWILIGHT_FIRE);
+                }
             }
             else
             {
@@ -1234,6 +1233,21 @@ public:
             }
 
             events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30000);
+        }
+
+        void HandleExtraEvent(uint32 const eventId) override
+        {
+            switch (eventId)
+            {
+                case EVENT_MINIDRAKE_SPEECH:
+                {
+                    Talk(SAY_SHADRON_RESPOND);
+                    me->SetCanFly(true);
+                    me->SetSpeed(MOVE_FLIGHT, 3.0f);
+                    me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                    break;
+                }
+            }
         }
 
         void ExecuteEvent(uint32 eventId) override
@@ -1283,6 +1297,7 @@ public:
                 {
                     Talk(WHISPER_SUMMON_DICIPLE);
                     DoCastAOE(static_cast<uint32>((isCalledBySartharion ? SPELL_GIFT_OF_TWILIGHT_FIRE : SPELL_GIFT_OF_TWILIGHT_SHADOW)), true);
+
                     if (Creature* acolyte = me->SummonCreature((isCalledBySartharion ? NPC_ACOLYTE_OF_SHADRON : NPC_DISCIPLE_OF_SHADRON), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
                     {
                         // TODO: inpect JustSummoned
@@ -1338,6 +1353,21 @@ public:
             }
 
             events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30000);
+        }
+
+        void HandleExtraEvent(uint32 const eventId) override
+        {
+            switch (eventId)
+            {
+                case EVENT_MINIDRAKE_SPEECH:
+                {
+                    Talk(SAY_SHADRON_RESPOND);
+                    me->SetCanFly(true);
+                    me->SetSpeed(MOVE_FLIGHT, 3.0f);
+                    me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                    break;
+                }
+            }
         }
 
         void ExecuteEvent(uint32 eventId) override
