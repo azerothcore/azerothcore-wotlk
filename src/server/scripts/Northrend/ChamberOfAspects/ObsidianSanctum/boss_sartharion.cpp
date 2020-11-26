@@ -210,7 +210,7 @@ const float SartharionBoundary[4] =
 {
     3218.86f,   // South X
     3275.69f,   // North X
-    484.68f,    // East Y
+    466.2f,     // East Y
     572.4f      // West Y
 };
 
@@ -263,7 +263,7 @@ public:
 
         void EnterCombat(Unit* pWho) override
         {
-            if (pWho && (pWho->GetPositionX() < SartharionBoundary[0] || pWho->GetPositionX() > SartharionBoundary[1] || pWho->GetPositionY() < SartharionBoundary[2] || pWho->GetPositionY() > SartharionBoundary[3]))
+            if (pWho && !IsTargetInBounds(pWho))
             {
                 EnterEvadeMode();
                 return;
@@ -445,13 +445,14 @@ public:
                 {
                     case EVENT_SARTHARION_BOUNDARY:
                     {
-                        Unit const* victim = me->GetVictim();
-                        if (victim && (victim->GetPositionX() < SartharionBoundary[0] || victim->GetPositionX() > SartharionBoundary[1] || victim->GetPositionY() < SartharionBoundary[2] || victim->GetPositionY() > SartharionBoundary[3])) // https://github.com/TrinityCore/TrinityCore/blob/3.3.5/src/server/scripts/Northrend/ChamberOfAspects/ObsidianSanctum/instance_obsidian_sanctum.cpp#L31
+                        if (!IsTargetInBounds(me->GetVictim()))
                         {
                             EnterEvadeMode();
                         }
-
-                        extraEvents.RepeatEvent(250);
+                        else
+                        {
+                            extraEvents.RepeatEvent(250);
+                        }
                         break;
                     }
                     case EVENT_SARTHARION_SUMMON_LAVA:
@@ -671,6 +672,17 @@ public:
             }
 
             dragonsCount = 0;
+        }
+
+        bool IsTargetInBounds(Unit const* victim) const
+        {
+            if (!victim || victim->GetPositionX() < SartharionBoundary[0] || victim->GetPositionX() > SartharionBoundary[1] || victim->GetPositionY() < SartharionBoundary[2] || victim->GetPositionY() > SartharionBoundary[3])
+            {
+                return false;
+            }
+
+            return true;
+
         }
 
         EventMap extraEvents;
