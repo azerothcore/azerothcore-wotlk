@@ -1,4 +1,4 @@
-unamestr=`uname`
+unamestr=$(uname)
 if [[ "$unamestr" == 'Darwin' ]]; then
    AC_PATH_ROOT=$(greadlink -f "$AC_PATH_APPS/../")
 else
