@@ -129,7 +129,7 @@ enum Misc
     MAX_AREA_TRIGGER_COUNT                      = 2,
     MAX_CYCLONE_COUNT                           = 5,
     MAX_TENEBORN_EGGS_SUMMONS                   = 6,
-    MAX_SARTHARION_BOUNDARY_POS                 = 4,
+    MAX_BOUNDARY_POSITIONS                      = 4,
 };
 
 enum Events
@@ -207,13 +207,15 @@ const Position AreaTriggerSummonPos[MAX_AREA_TRIGGER_COUNT] =
     { 3242.84f, 553.979f, 58.8272f, 0.0f },
 };
 
-const float SartharionBoundary[MAX_SARTHARION_BOUNDARY_POS] =
+const float SartharionBoundary[MAX_BOUNDARY_POSITIONS] =
 {
     3218.86f,   // South X
     3275.69f,   // North X
-    466.2f,     // East Y
+    484.68f,    // East Y
     572.4f      // West Y
 };
+
+const Position bigIslandMiddlePos = { 3242.822754f, 477.279816f, 57.430473f };
 
 const uint32 dragons[MAX_DRAGONS] = { DATA_TENEBRON, DATA_VESPERON, DATA_SHADRON };
 
@@ -678,13 +680,18 @@ public:
 
         bool IsTargetInBounds(Unit const* victim) const
         {
-            if (!victim || victim->GetPositionX() < SartharionBoundary[0] || victim->GetPositionX() > SartharionBoundary[1] || victim->GetPositionY() < SartharionBoundary[2] || victim->GetPositionY() > SartharionBoundary[3])
+            if (!victim || victim->GetPositionX() < SartharionBoundary[0] || victim->GetPositionX() > SartharionBoundary[1] || victim->GetPositionY() > SartharionBoundary[3])
             {
                 return false;
             }
 
-            return true;
+            // Big island handling
+            if (victim->GetPositionY() < SartharionBoundary[2])
+            {
+                return victim->GetDistance(bigIslandMiddlePos) <= 6.0f;
+            }
 
+            return true;
         }
 
         EventMap extraEvents;
