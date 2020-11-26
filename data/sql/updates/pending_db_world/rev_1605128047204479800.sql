@@ -135,7 +135,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (882, 'To enter, 
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (883, 'To enter, you must complete the following achievement(s):');
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (884, 'To enter, you must have the following item(s) in your inventory:');
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (885, '- Hint:');
-INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (886, 'Requirements to enter not met');
+INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (886, 'You cannot enter. Access requirements not met.');
 
 -- Update old command
 UPDATE `command` SET `name` = 'reload dungeon_access_template', `help` = 'Syntax: .reload dungeon_access_template\r Reload dungeon_access_template table.' WHERE `name` = 'reload access_requirement';

@@ -405,10 +405,10 @@ namespace lfg
                 lockData = LFG_LOCKSTATUS_TOO_HIGH_LEVEL;
             else if (dungeon->seasonal && !IsSeasonActive(dungeon->id))
                 lockData = LFG_LOCKSTATUS_NOT_IN_SEASON;
-            else if (AccessRequirements const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty)))
+            else if (DungeonProgressionRequirements const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty)))
             {
                 //Check if player has the required achievements
-                for (const AccessSubRequirement* achievementRequirement : ar->achievements)
+                for (const ProgressionRequirement* achievementRequirement : ar->achievements)
                 {
                     if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == player->GetTeamId(true))
                     {
@@ -429,7 +429,7 @@ namespace lfg
                 //Check for quests
                 if (lockData == 0)
                 {
-                    for (const AccessSubRequirement* questRequirement : ar->quests)
+                    for (const ProgressionRequirement* questRequirement : ar->quests)
                     {
                         if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == player->GetTeamId(true))
                         {
@@ -444,7 +444,7 @@ namespace lfg
                 // Check required items
                 if (lockData == 0)
                 {
-                    for (const AccessSubRequirement* itemRequirement : ar->items)
+                    for (const ProgressionRequirement* itemRequirement : ar->items)
                     {
                         if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == player->GetTeamId(true))
                         {

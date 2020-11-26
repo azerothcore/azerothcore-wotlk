@@ -876,21 +876,21 @@ enum PlayerCharmedAISpells
 #define MAX_PLAYER_SUMMON_DELAY                   (2*MINUTE)
 #define MAX_MONEY_AMOUNT                       (0x7FFFFFFF-1)
 
-struct AccessSubRequirement
+struct ProgressionRequirement
 {
     uint32 id;
     TeamId faction;
     std::string hint;
 };
 
-struct AccessRequirements
+struct DungeonProgressionRequirements
 {
     uint8  levelMin;
     uint8  levelMax;
     uint16 reqItemLevel;
-    std::vector<AccessSubRequirement*> quests;
-    std::vector<AccessSubRequirement*> items;
-    std::vector<AccessSubRequirement*> achievements;
+    std::vector<ProgressionRequirement*> quests;
+    std::vector<ProgressionRequirement*> items;
+    std::vector<ProgressionRequirement*> achievements;
 };
 
 enum CharDeleteMethod
@@ -2479,7 +2479,7 @@ public:
     uint32 GetPendingBind() const { return _pendingBindId; }
     void SendRaidInfo();
     void SendSavedInstances();
-    bool Satisfy(AccessRequirements const* ar, uint32 target_map, bool report = false);
+    bool Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map, bool report = false);
     bool CheckInstanceLoginValid();
     bool CheckInstanceCount(uint32 instanceId) const;
 

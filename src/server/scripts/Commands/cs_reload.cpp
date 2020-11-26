@@ -327,10 +327,9 @@ public:
 
     static bool HandleReloadDungeonAccessCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Dungeon Requirement definitions...");
+        sLog->outString("Re-Loading Dungeon Access Requirement definitions...");
         sObjectMgr->LoadAccessRequirements();
-        handler->SendGlobalGMSysMessage("DB table `dungeon_access_template` reloaded.");
-        handler->SendGlobalGMSysMessage("DB table `dungeon_access_requirements` reloaded.");
+        handler->SendGlobalGMSysMessage("DB tables `dungeon_access_template` AND `dungeon_access_requirements` reloaded.");
         return true;
     }
 

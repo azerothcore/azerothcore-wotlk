@@ -3519,13 +3519,13 @@ LFG.Location.All = 0
 
 #    Dungeon Access Requirements Print modes
 #
-#     Format the output in chat when a player does not meet the requirements for a dungeon to one of the following outputs:
-#         0 = display no extra information, only "requirements not met"
-#         1 = Display only one requirement at a time(BlizzLike)
-#         2 = display in full details, list of items, achievements and quest with cliceakble links
+#     Select the preferred format to display information to the player who cannot enter a portal dungeon because when has not met the access requirements:
+#         0 = Display no extra information, only "Requirements  not met"
+#         1 = Display only one requirement at a time (BlizzLike, like in the LFG interface)
+#         2 = Display detailed requirements, all at once, with clickable links
 #        Default: 1
 #  
-AccessRequirementsPrintMode = 1
+DungeonAccessRequirementsPrintMode = 1
 
 #
 #    ICC Buff

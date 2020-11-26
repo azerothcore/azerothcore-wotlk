@@ -6137,82 +6137,81 @@ void ObjectMgr::LoadAccessRequirements()
         Field* fields = access_template_result->Fetch();
 
         //Get the common variables for the access requirements 
-        uint32 accessID = fields[0].GetUInt32();
+        uint8 dungeon_access_id = fields[0].GetUInt8();
         uint32 mapid = fields[1].GetUInt32();
         uint8 difficulty = fields[2].GetUInt8();
-        uint32 requirement_ID = MAKE_PAIR32(mapid, difficulty);
 
         //Set up the access requirements
-        AccessRequirements* ar = new AccessRequirements();
+        DungeonProgressionRequirements* ar = new DungeonProgressionRequirements();
         ar->levelMin     = fields[3].GetUInt8();
         ar->levelMax     = fields[4].GetUInt8();
         ar->reqItemLevel = fields[5].GetUInt16();
 
         //                                                                  0                 1               2                 3 
-        QueryResult sub_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_hint, faction FROM dungeon_access_requirements where dungeon_access_id = %u", accessID);
-        if (sub_requirements_results)
+        QueryResult progression_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_hint, faction FROM dungeon_access_requirements where dungeon_access_id = %u", dungeon_access_id);
+        if (progression_requirements_results)
         {
             do 
             {
-                Field* subFields = sub_requirements_results->Fetch();
+                Field* progression_requirement_row = progression_requirements_results->Fetch();
 
-                uint8 requirement_type       = subFields[0].GetUInt8();
-                uint32 requirement_id        = subFields[1].GetUInt32();
-                std::string requirement_hint = subFields[2].GetString();
-                uint8 requirement_faction    = subFields[3].GetUInt8();
+                uint8 requirement_type       = progression_requirement_row[0].GetUInt8();
+                uint32 requirement_id        = progression_requirement_row[1].GetUInt32();
+                std::string requirement_hint = progression_requirement_row[2].GetString();
+                uint8 requirement_faction    = progression_requirement_row[3].GetUInt8();
 
-                AccessSubRequirement* subRequirement = new AccessSubRequirement();
-                subRequirement->id           = requirement_id;
-                subRequirement->hint         = requirement_hint;
-                subRequirement->faction      = (TeamId)requirement_faction;
+                ProgressionRequirement* progression_requirement = new ProgressionRequirement();
+                progression_requirement->id           = requirement_id;
+                progression_requirement->hint         = requirement_hint;
+                progression_requirement->faction      = (TeamId)requirement_faction;
 
                 switch (requirement_type)
                 {
                 case 0:
                 {
                     //Achievement
-                    if (!sAchievementStore.LookupEntry(subRequirement->id))
+                    if (!sAchievementStore.LookupEntry(progression_requirement->id))
                     {
-                        sLog->outErrorDb("Required Achievement %u not exist for map %u difficulty %u, remove quest done requirement.", subRequirement->id, mapid, difficulty);
-                        delete subRequirement;
+                        sLog->outErrorDb("Required Achievement %u not exist for map %u difficulty %u, remove quest done requirement.", progression_requirement->id, mapid, difficulty);
+                        delete progression_requirement;
                         break;
                     }
 
-                    ar->achievements.push_back(subRequirement);
+                    ar->achievements.push_back(progression_requirement);
                     break;
                 }
                 case 1:
                 {
                     //Quest
-                    if (!GetQuestTemplate(subRequirement->id))
+                    if (!GetQuestTemplate(progression_requirement->id))
                     {
-                        sLog->outErrorDb("Required for faction %u Quest %u not exist for map %u difficulty %u, remove quest done requirement.", requirement_faction, subRequirement->id, mapid, difficulty);
-                        subRequirement->id = 0;
+                        sLog->outErrorDb("Required for faction %u Quest %u not exist for map %u difficulty %u, remove quest done requirement.", requirement_faction, progression_requirement->id, mapid, difficulty);
+                        progression_requirement->id = 0;
                     }
-                    ar->quests.push_back(subRequirement);
+                    ar->quests.push_back(progression_requirement);
                     break;
                 }
                 case 2:
                 {
                     //Item
-                    ItemTemplate const* pProto = GetItemTemplate(subRequirement->id);
+                    ItemTemplate const* pProto = GetItemTemplate(progression_requirement->id);
                     if (!pProto)
                     {
-                        sLog->outError("Key item %u does not exist for map %u difficulty %u, removing key requirement.", subRequirement->id, mapid, difficulty);
-                        subRequirement->id = 0;
-                        delete subRequirement;
+                        sLog->outError("Key item %u does not exist for map %u difficulty %u, removing key requirement.", progression_requirement->id, mapid, difficulty);
+                        progression_requirement->id = 0;
+                        delete progression_requirement;
                         break;
                     }
-                    ar->items.push_back(subRequirement);
+                    ar->items.push_back(progression_requirement);
                     break;
                 }
                 default:
-                    delete subRequirement;
+                    delete progression_requirement;
                     break;
                 }
 
 
-            } while (sub_requirements_results->NextRow());
+            } while (progression_requirements_results->NextRow());
         }
 
         countSubRequirements += ar->achievements.size();
@@ -6220,7 +6219,7 @@ void ObjectMgr::LoadAccessRequirements()
         countSubRequirements += ar->items.size();
         count++;
 
-        _accessRequirementStore[requirement_ID] = ar;
+        _accessRequirementStore[MAKE_PAIR32(mapid, difficulty)] = ar;
     } while (access_template_result->NextRow());
 
 

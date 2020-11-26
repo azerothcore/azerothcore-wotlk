@@ -19541,7 +19541,7 @@ void Player::SendSavedInstances()
     }
 }
 
-bool Player::Satisfy(AccessRequirements const* ar, uint32 target_map, bool report)
+bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map, bool report)
 {
     if (!IsGameMaster() && ar)
     {
@@ -19567,8 +19567,8 @@ bool Player::Satisfy(AccessRequirements const* ar, uint32 target_map, bool repor
         }
 
         //Check all items
-        std::vector<const AccessSubRequirement*> missingItems;
-        for (const AccessSubRequirement* itemRequirement : ar->items)
+        std::vector<const ProgressionRequirement*> missingItems;
+        for (const ProgressionRequirement* itemRequirement : ar->items)
         {
             if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == GetTeamId(true))
             {
@@ -19585,8 +19585,8 @@ bool Player::Satisfy(AccessRequirements const* ar, uint32 target_map, bool repor
         if (leaderGuid != GetGUID())
             leader = HashMapHolder<Player>::Find(leaderGuid);
 
-        std::vector<const AccessSubRequirement*> missingAchievements;
-        for (const AccessSubRequirement* achievementRequirement : ar->achievements)
+        std::vector<const ProgressionRequirement*> missingAchievements;
+        for (const ProgressionRequirement* achievementRequirement : ar->achievements)
         {
             if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == GetTeamId(true))
             {
@@ -19598,8 +19598,8 @@ bool Player::Satisfy(AccessRequirements const* ar, uint32 target_map, bool repor
         }
 
         //Check all quests
-        std::vector<const AccessSubRequirement*> missingQuests;
-        for (const AccessSubRequirement* questRequirement : ar->quests)
+        std::vector<const ProgressionRequirement*> missingQuests;
+        for (const ProgressionRequirement* questRequirement : ar->quests)
         {
             if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == GetTeamId(true))
             {
@@ -19617,7 +19617,7 @@ bool Player::Satisfy(AccessRequirements const* ar, uint32 target_map, bool repor
         {
             if (report)
             {
-                uint8 requirementPrintMode = sWorld->getIntConfig(CONFIG_REQUIREMENTS_PRINT_MODE);
+                uint8 requirementPrintMode = sWorld->getIntConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PRINT_MODE);
 
                 if (requirementPrintMode == 0)
                 {
@@ -19642,7 +19642,7 @@ bool Player::Satisfy(AccessRequirements const* ar, uint32 target_map, bool repor
                     if (missingQuests.size())
                     {
                         ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_QUESTS);
-                        for (const AccessSubRequirement* missingReq : missingQuests)
+                        for (const ProgressionRequirement* missingReq : missingQuests)
                         {
                             Quest const* questTemplate = sObjectMgr->GetQuestTemplate(missingReq->id);
                             if (!questTemplate)
@@ -19675,7 +19675,7 @@ bool Player::Satisfy(AccessRequirements const* ar, uint32 target_map, bool repor
                     if (missingAchievements.size())
                     {
                         ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_ACHIEVEMENTS);
-                        for (const AccessSubRequirement* missingReq : missingAchievements)
+                        for (const ProgressionRequirement* missingReq : missingAchievements)
                         {
                             AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry(missingReq->id);
                             if (!achievementEntry)
@@ -19706,7 +19706,7 @@ bool Player::Satisfy(AccessRequirements const* ar, uint32 target_map, bool repor
                     if (missingItems.size())
                     {
                         ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_OBTAIN_ITEMS);
-                        for (const AccessSubRequirement* missingReq : missingItems)
+                        for (const ProgressionRequirement* missingReq : missingItems)
                         {
                             const ItemTemplate* itemTemplate = sObjectMgr->GetItemTemplate(missingReq->id);
                             if (!itemTemplate)
