@@ -732,7 +732,7 @@ struct boss_sartharion_dragonAI : public BossAI
         if (param == ACTION_CALL_DRAGON && !isCalledBySartharion)
         {
             isCalledBySartharion = true;
-            extraEvents.ScheduleEvent(EVENT_MINIDRAKE_SPEECH, 4000);
+            extraEvents.RescheduleEvent(EVENT_MINIDRAKE_SPEECH, 4000);
         }
     }
 
