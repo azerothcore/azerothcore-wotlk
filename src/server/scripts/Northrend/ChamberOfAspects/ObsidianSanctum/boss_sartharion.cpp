@@ -978,7 +978,7 @@ struct boss_sartharion_dragonAI : public BossAI
         RemoveTwilightPortal();
     }
 
-    virtual void HandleExtraEvent(uint32 const eventId) { }
+    virtual void HandleExtraEvent(uint32 const /*eventId*/) { }
 protected:
     void RemoveTwilightPortal()
     {
