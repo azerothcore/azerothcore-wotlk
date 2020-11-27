@@ -3032,20 +3032,22 @@ void Player::SetInWater(bool apply)
 
 bool Player::IsInAreaTriggerRadius(const AreaTrigger* trigger) const
 {
+    static const float delta = 5.0f;
+
     if (!trigger || GetMapId() != trigger->map)
         return false;
 
-    if (trigger->radius > 0.f)
+    if (trigger->radius > 0)
     {
         // if we have radius check it
         float dist = GetDistance(trigger->x, trigger->y, trigger->z);
-        if (dist > trigger->radius)
+        if (dist > trigger->radius + delta)
             return false;
     }
     else
     {
-        Position center = {trigger->x, trigger->y, trigger->z, trigger->orientation};
-        if (!IsWithinBox(center, trigger->length / 2.f, trigger->width / 2.f, trigger->height / 2.f))
+        Position center(trigger->x, trigger->y, trigger->z, trigger->orientation);
+        if (IsWithinBox(center, trigger->length / 2 + delta, trigger->width / 2 + delta, trigger->height / 2 + delta))
             return false;
     }
 
