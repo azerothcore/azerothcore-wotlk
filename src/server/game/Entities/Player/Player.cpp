@@ -7676,7 +7676,7 @@ void Player::UpdateArea(uint32 newArea)
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 
-    uint32 const areaRestFlag = (GetTeamId() == ALLIANCE) ? AREA_FLAG_REST_ZONE_ALLIANCE : AREA_FLAG_REST_ZONE_HORDE;
+    uint32 const areaRestFlag = (GetTeamId(true) == ALLIANCE) ? AREA_FLAG_REST_ZONE_ALLIANCE : AREA_FLAG_REST_ZONE_HORDE;
     if (area && area->flags & areaRestFlag)
         SetRestFlag(REST_FLAG_IN_FACTION_AREA);
     else
