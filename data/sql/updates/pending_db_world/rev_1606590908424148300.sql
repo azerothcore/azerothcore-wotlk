@@ -1,16 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1606590908424148300');
 
-/*
- * Update by Silker | github.com/Si1ker
- * Copyright (C) | www.azerothcore.org
-*/
-
-/*
-References:
-https://www.youtube.com/watch?v=FkKoxtykUn0
-https://www.youtube.com/watch?v=QHWpZexZODY
-*/
-
 -- Update level range for Val'kyr Battle-maiden (59-60)
 UPDATE `creature_template` SET `maxlevel`=60 WHERE `entry`=31095;
 
