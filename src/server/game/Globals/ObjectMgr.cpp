@@ -6172,7 +6172,7 @@ void ObjectMgr::LoadAccessRequirements()
                     //Achievement
                     if (!sAchievementStore.LookupEntry(progression_requirement->id))
                     {
-                        sLog->outErrorDb("Required Achievement %u not exist for map %u difficulty %u, remove quest done requirement.", progression_requirement->id, mapid, difficulty);
+                        sLog->outErrorDb("Required Achievement %u for faction %u not exist for map %u difficulty %u, remove or fix achievement requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
                         delete progression_requirement;
                         break;
                     }
@@ -6185,7 +6185,7 @@ void ObjectMgr::LoadAccessRequirements()
                     //Quest
                     if (!GetQuestTemplate(progression_requirement->id))
                     {
-                        sLog->outErrorDb("Required for faction %u Quest %u not exist for map %u difficulty %u, remove quest done requirement.", requirement_faction, progression_requirement->id, mapid, difficulty);
+                        sLog->outErrorDb("Required quest %u for faction %u does not exist for map %u difficulty %u, remove or fix quest requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
                         progression_requirement->id = 0;
                     }
                     ar->quests.push_back(progression_requirement);
@@ -6197,7 +6197,7 @@ void ObjectMgr::LoadAccessRequirements()
                     ItemTemplate const* pProto = GetItemTemplate(progression_requirement->id);
                     if (!pProto)
                     {
-                        sLog->outError("Key item %u does not exist for map %u difficulty %u, removing key requirement.", progression_requirement->id, mapid, difficulty);
+                        sLog->outError("Key item %u for faction %u does not exist for map %u difficulty %u, remove or fix item requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
                         progression_requirement->id = 0;
                         delete progression_requirement;
                         break;
