@@ -745,6 +745,8 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_areaUpdateId = 0;
     m_team = TEAM_NEUTRAL;
 
+    m_needsZoneUpdate = false;
+
     m_nextSave = SavingSystemMgr::IncreaseSavingMaxValue(1);
     m_additionalSaveTimer = 0;
     m_additionalSaveMask = 0;
@@ -6926,6 +6928,15 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation, bool t
 {
     if (!Unit::UpdatePosition(x, y, z, orientation, teleport))
         return false;
+
+    // Update player zone if needed
+    if (m_needsZoneUpdate)
+    {
+        uint32 newZone, newArea;
+        GetZoneAndAreaId(newZone, newArea);
+        UpdateZone(newZone, newArea);
+        m_needsZoneUpdate = false;
+    }
 
     if (GetGroup())
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
