@@ -16,7 +16,7 @@
 #include "Database/DatabaseEnv.h"
 #include "Configuration/Config.h"
 
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Master.h"
 
 #ifndef _ACORE_CORE_CONFIG

@@ -7,7 +7,7 @@
 #include "MapManager.h"
 #include "InstanceSaveMgr.h"
 #include "DatabaseEnv.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "ObjectAccessor.h"
 #include "Transport.h"
 #include "GridDefines.h"

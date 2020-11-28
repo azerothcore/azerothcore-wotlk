@@ -11,7 +11,7 @@
 #include "Database/DatabaseEnv.h"
 #include "ByteBuffer.h"
 #include "Configuration/Config.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "RealmList.h"
 #include "AuthSocket.h"
 #include "AuthCodes.h"

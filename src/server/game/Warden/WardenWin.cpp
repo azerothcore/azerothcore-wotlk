@@ -9,7 +9,7 @@
 #include "Common.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Opcodes.h"
 #include "ByteBuffer.h"
 #include <openssl/md5.h>

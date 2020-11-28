@@ -8,7 +8,7 @@
 #include "DBCFileLoader.h"
 #include "DBCfmt.h"
 #include "Errors.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "SharedDefines.h"
 #include "SpellMgr.h"
 #include "TransportMgr.h"

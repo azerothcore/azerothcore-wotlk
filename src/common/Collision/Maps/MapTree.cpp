@@ -8,7 +8,7 @@
 #include "ModelInstance.h"
 #include "VMapManager2.h"
 #include "VMapDefinitions.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Errors.h"
 
 #include <string>

@@ -20,7 +20,7 @@
 #include "Group.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "MapManager.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"

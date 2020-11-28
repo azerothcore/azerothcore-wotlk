@@ -10,7 +10,7 @@
 
 #include "Common.h"
 #include "Config.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "RARunnable.h"
 #include "World.h"
 

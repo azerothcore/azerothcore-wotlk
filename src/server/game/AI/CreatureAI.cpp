@@ -10,7 +10,7 @@
 #include "World.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "MapReference.h"
 #include "Player.h"
 #include "CreatureTextMgr.h"

@@ -5,7 +5,7 @@
  */
 
 #include "DatabaseEnv.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 
 ResultSet::ResultSet(MYSQL_RES* result, MYSQL_FIELD* fields, uint64 rowCount, uint32 fieldCount) :
     _rowCount(rowCount),

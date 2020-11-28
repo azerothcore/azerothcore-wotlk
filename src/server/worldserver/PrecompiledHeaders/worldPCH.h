@@ -2,7 +2,7 @@
 
 #include "Common.h"
 #include "World.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Database/DatabaseEnv.h"
 #include "Configuration/Config.h"
 #include "Util.h"

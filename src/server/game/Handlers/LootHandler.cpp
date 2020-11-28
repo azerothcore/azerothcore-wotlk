@@ -5,7 +5,7 @@
  */
 
 #include "Common.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Corpse.h"
 #include "Creature.h"
 #include "GameObject.h"

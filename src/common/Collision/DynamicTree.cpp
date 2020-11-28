@@ -9,7 +9,7 @@
 //#include "RegularGrid.h"
 #include "BoundingIntervalHierarchyWrapper.h"
 
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "RegularGrid.h"
 #include "Timer.h"
 #include "GameObjectModel.h"

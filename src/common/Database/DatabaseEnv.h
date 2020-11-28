@@ -9,7 +9,7 @@
 
 #include "Common.h"
 #include "Errors.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 
 #include "Field.h"
 #include "QueryResult.h"

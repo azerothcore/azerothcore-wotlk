@@ -10,7 +10,7 @@
 #include "WorldModel.h"
 
 #include "GameObjectModel.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "GameObject.h"
 #include "Creature.h"
 #include "TemporarySummon.h"

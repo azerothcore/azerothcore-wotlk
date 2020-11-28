@@ -11,7 +11,7 @@
 #include "Group.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Map.h"
 #include "Player.h"
 #include "Pet.h"

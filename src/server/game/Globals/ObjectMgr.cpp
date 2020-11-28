@@ -19,7 +19,7 @@
 #include "InstanceSaveMgr.h"
 #include "Language.h"
 #include "LFGMgr.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
 #include "Pet.h"

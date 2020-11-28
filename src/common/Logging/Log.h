@@ -93,19 +93,56 @@ enum ColorTypes
 
 const int Colors = int(WHITE) + 1;
 
-class Log
+class ILog
+{
+public:
+    virtual ~ILog() {}
+    virtual void Initialize() = 0;
+    virtual void ReloadConfig() = 0;
+    virtual void InitColors(const std::string& init_str) = 0;
+    virtual void SetColor(bool stdout_stream, ColorTypes color) = 0;
+    virtual void ResetColor(bool stdout_stream) = 0;
+    virtual void outDB(LogTypes type, const char* str) = 0;
+    virtual void outString(const char* str, ...)                  = 0;
+    virtual void outString() = 0;
+    virtual void outStringInLine(const char* str, ...)            = 0;
+    virtual void outError(const char* err, ...)                   = 0;
+    virtual void outCrash(const char* err, ...)                   = 0;
+    virtual void outBasic(const char* str, ...)                   = 0;
+    virtual void outDetail(const char* str, ...)                  = 0;
+    virtual void outSQLDev(const char* str, ...)                  = 0;
+    virtual void outDebug(DebugLogFilters f, const char* str, ...) = 0;
+    virtual void outStaticDebug(const char* str, ...)             = 0;
+    virtual void outErrorDb(const char* str, ...)                 = 0;
+    virtual void outChar(const char* str, ...)                    = 0;
+    virtual void outCommand(uint32 account, const char* str, ...) = 0;
+    virtual void outChat(const char* str, ...)                    = 0;
+    virtual void outRemote(const char* str, ...)                  = 0;
+    virtual void outSQLDriver(const char* str, ...)               = 0;
+    virtual void outMisc(const char* str, ...)                    = 0;
+    virtual void outCharDump(const char* str, uint32 account_id, uint32 guid, const char* name) = 0;
+    virtual void SetLogLevel(char* Level) = 0;
+    virtual void SetLogFileLevel(char* Level) = 0;
+    virtual void SetSQLDriverQueryLogging(bool newStatus) = 0;
+    virtual void SetRealmID(uint32 id) = 0;
+    virtual bool IsOutDebug() const = 0;
+    virtual bool IsOutCharDump() const = 0;
+    virtual bool GetLogDB() const = 0;
+    virtual void SetLogDB(bool enable) = 0;
+    virtual bool GetSQLDriverQueryLogging() const = 0;
+};
+
+class Log : public ILog
 {
 private:
-    Log();
-    ~Log();
     Log(Log const&) = delete;
     Log(Log&&) = delete;
     Log& operator=(Log const&) = delete;
     Log& operator=(Log&&) = delete;
 
 public:
-    static Log* instance();
-
+    Log();
+    ~Log();
     void Initialize();
 
     void ReloadConfig();
@@ -196,8 +233,6 @@ private:
 
     DebugLogFilters m_DebugLogMask;
 };
-
-#define sLog Log::instance()
 
 #endif
 

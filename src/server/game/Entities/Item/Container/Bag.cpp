@@ -9,7 +9,7 @@
 #include "DatabaseEnv.h"
 
 #include "Bag.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "UpdateData.h"
 #include "Player.h"
 

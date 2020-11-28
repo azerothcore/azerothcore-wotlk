@@ -8,7 +8,7 @@
 #include "ByteBuffer.h"
 #include "WorldPacket.h"
 #include "UpdateData.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Opcodes.h"
 #include "World.h"
 #include "zlib.h"

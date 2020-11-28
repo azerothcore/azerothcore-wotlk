@@ -7,7 +7,7 @@
 #include "MySQLConnection.h"
 #include "QueryHolder.h"
 #include "PreparedStatement.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 
 bool SQLQueryHolder::SetQuery(size_t index, const char* sql)
 {

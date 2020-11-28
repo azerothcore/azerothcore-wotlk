@@ -6,7 +6,7 @@
 
 #include "DatabaseEnv.h"
 #include "Mail.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "World.h"
 #include "ObjectMgr.h"
 #include "Player.h"

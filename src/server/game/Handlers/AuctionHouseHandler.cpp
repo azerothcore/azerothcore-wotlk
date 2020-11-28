@@ -11,7 +11,7 @@
 #include "WorldSession.h"
 
 #include "AuctionHouseMgr.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Language.h"
 #include "Opcodes.h"
 #include "UpdateMask.h"

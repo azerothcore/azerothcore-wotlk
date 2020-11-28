@@ -2,7 +2,7 @@
 #include "MapManager.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 
 Graveyard* Graveyard::instance()
 {

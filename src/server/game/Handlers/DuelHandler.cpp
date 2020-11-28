@@ -7,7 +7,7 @@
 #include "Common.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Opcodes.h"
 #include "UpdateData.h"
 #include "Player.h"

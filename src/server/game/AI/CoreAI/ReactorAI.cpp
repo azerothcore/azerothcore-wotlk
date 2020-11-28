@@ -7,7 +7,7 @@
 #include "ByteBuffer.h"
 #include "ReactorAI.h"
 #include "Errors.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "ObjectAccessor.h"
 #include "CreatureAIImpl.h"
 

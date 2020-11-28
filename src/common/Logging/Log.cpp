@@ -65,12 +65,6 @@ Log::~Log()
     miscLogFile = NULL;
 }
 
-Log* Log::instance()
-{
-    static Log instance;
-    return &instance;
-}
-
 void Log::SetLogLevel(char* Level)
 {
     int32 NewLevel = atoi((char*)Level);

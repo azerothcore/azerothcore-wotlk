@@ -27,7 +27,7 @@
 #include <atomic>
 #include <set>
 
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"

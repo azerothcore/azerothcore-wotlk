@@ -5,7 +5,7 @@
  */
 
 #include "LootMgr.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "ObjectMgr.h"
 #include "World.h"
 #include "Util.h"

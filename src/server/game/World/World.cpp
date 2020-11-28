@@ -12,7 +12,7 @@
 #include "DatabaseEnv.h"
 #include "Config.h"
 #include "GitRevision.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Opcodes.h"
 #include "WorldSession.h"
 #include "WorldPacket.h"

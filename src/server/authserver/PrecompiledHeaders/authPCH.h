@@ -1,6 +1,6 @@
 #include "Configuration/Config.h"
 #include "Database/DatabaseEnv.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "RealmList.h"
 #include "RealmSocket.h"
 #include "Common.h"

@@ -5,7 +5,7 @@
  */
 
 #include "DatabaseEnv.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "World.h"
 #include "Util.h"
 #include "SkillDiscovery.h"

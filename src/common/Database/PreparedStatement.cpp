@@ -6,7 +6,7 @@
 
 #include "PreparedStatement.h"
 #include "MySQLConnection.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 
 PreparedStatement::PreparedStatement(uint32 index) :
     m_stmt(NULL),

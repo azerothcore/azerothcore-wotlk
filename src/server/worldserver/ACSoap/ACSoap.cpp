@@ -7,7 +7,7 @@
 #include "ACSoap.h"
 #include "soapH.h"
 #include "soapStub.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "World.h"
 
 void ACSoapRunnable::run()

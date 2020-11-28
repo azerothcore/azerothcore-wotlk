@@ -6,7 +6,7 @@
 
 #include "CalendarMgr.h"
 #include "QueryResult.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Player.h"
 #include "GuildMgr.h"
 #include "ObjectAccessor.h"

@@ -6,7 +6,7 @@
 
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "WorldPacket.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"

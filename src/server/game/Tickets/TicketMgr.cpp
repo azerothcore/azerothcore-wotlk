@@ -8,7 +8,7 @@
 #include "TicketMgr.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Chat.h"

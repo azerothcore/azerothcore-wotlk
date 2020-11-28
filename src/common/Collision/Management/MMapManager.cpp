@@ -6,7 +6,7 @@
 
 #include "MapManager.h"
 #include "MMapManager.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 
 namespace MMAP
 {

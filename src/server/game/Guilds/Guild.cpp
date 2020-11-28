@@ -12,7 +12,7 @@
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Language.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Opcodes.h"

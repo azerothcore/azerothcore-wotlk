@@ -40,7 +40,7 @@
 #include "InstanceScript.h"
 #include "Language.h"
 #include "LFGMgr.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "LootItemStorage.h"
 #include "MapInstanced.h"
 #include "MapManager.h"

@@ -15,7 +15,7 @@
 #include "Battleground.h"
 #include "Chat.h"
 #include "Language.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Player.h"
 #include "Object.h"
 #include "Opcodes.h"

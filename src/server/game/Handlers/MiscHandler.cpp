@@ -9,7 +9,7 @@
 #include "DatabaseEnv.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Player.h"
 #include "GossipDef.h"
 #include "World.h"

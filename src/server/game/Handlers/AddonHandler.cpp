@@ -8,7 +8,7 @@
 #include "AddonHandler.h"
 #include "DatabaseEnv.h"
 #include "Opcodes.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 
 AddonHandler::AddonHandler()
 {

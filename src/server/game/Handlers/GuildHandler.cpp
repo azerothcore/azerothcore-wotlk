@@ -10,7 +10,7 @@
 #include "World.h"
 #include "ObjectMgr.h"
 #include "GuildMgr.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "Opcodes.h"
 #include "Guild.h"
 #include "GossipDef.h"

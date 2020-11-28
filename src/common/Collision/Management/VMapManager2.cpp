@@ -27,7 +27,7 @@
 #include <ace/Null_Mutex.h>
 #include "DisableMgr.h"
 #include "DBCStores.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "VMapDefinitions.h"
 
 using G3D::Vector3;

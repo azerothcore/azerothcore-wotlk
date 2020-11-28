@@ -25,7 +25,7 @@
 #include "MapRefManager.h"
 #include "DynamicTree.h"
 #include "GameObjectModel.h"
-#include "Log.h"
+#include "SingletonMgr.h"
 #include "DataMap.h"
 #include <bitset>
 #include <list>
