@@ -4,11 +4,11 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1606604290694357400');
 
 DELETE FROM `creature` WHERE (`id` = 34199) AND (`guid` IN (136610));
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(136610, 34199, 603, 0, 0, 3, 1, 26239, 1, 1544.111572, -27.753988, 420.966705, 3.015931, 604800, 5, 0, 471835, 0, 0, 0, 0, 0, '', 0);
+(136610, 34199, 603, 0, 0, 3, 1, 26239, 1, 1544.11, -27.754, 420.967, 3.01593, 604800, 0, 0, 471835, 0, 0, 0, 0, 0, '', 0);
 
 DELETE FROM `creature` WHERE (`id` = 34199) AND (`guid` IN (136771));
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(136771, 34199, 603, 0, 0, 2, 1, 26239, 1, 1544.370605, -20.35191, 420.966736, 3.109381, 604800, 5, 0, 471835, 0, 0, 0, 0, 0, '', 0);
+(136771, 34199, 603, 0, 0, 2, 1, 26239, 1, 1544.37, -20.3519, 420.967, 3.10938, 604800, 0, 0, 471835, 0, 0, 0, 0, 0, '', 0);
 
 DELETE FROM `creature_addon` WHERE (`guid` IN (136771));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES
