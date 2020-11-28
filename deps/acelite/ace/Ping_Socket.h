@@ -38,11 +38,7 @@ class ACE_INET_Addr;
 class ACE_Export ACE_Ping_Socket : public ACE_ICMP_Socket
 {
   typedef ACE_ICMP_Socket inherited;
-
 public:
-
-  // = Initialization and termination methods.
-
   /// Default constructor.
   ACE_Ping_Socket (void);
 

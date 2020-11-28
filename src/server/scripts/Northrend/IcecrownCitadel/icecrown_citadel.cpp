@@ -407,11 +407,11 @@ public:
                     _events.ScheduleEvent(EVENT_TIRION_INTRO_4, 18000);
                     _events.ScheduleEvent(EVENT_TIRION_INTRO_5, 31000);
                     _events.ScheduleEvent(EVENT_LK_INTRO_1, 35000);
-                    _events.ScheduleEvent(EVENT_TIRION_INTRO_6, 51000);
+                    _events.ScheduleEvent(EVENT_TIRION_INTRO_6, 49000);
                     _events.ScheduleEvent(EVENT_LK_INTRO_2, 58000);
                     _events.ScheduleEvent(EVENT_LK_INTRO_3, 74000);
                     _events.ScheduleEvent(EVENT_LK_INTRO_4, 86000); // sound last 21 seconds (five more)
-                    _events.ScheduleEvent(EVENT_BOLVAR_INTRO_1, 105000);
+                    _events.ScheduleEvent(EVENT_BOLVAR_INTRO_1, 107000);
                     _events.ScheduleEvent(EVENT_LK_INTRO_5, 113000);
 
                     if (_instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE)
@@ -1946,34 +1946,40 @@ public:
         void HandleEvent(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            float range = 0.0f;
+            uint32 trapId = 0;
             switch (GetSpellInfo()->Effects[effIndex].MiscValue)
             {
                 case EVENT_AWAKEN_WARD_1:
+                    trapId = GO_SPIRIT_ALARM_1;
+                    break;
                 case EVENT_AWAKEN_WARD_2:
-                    range = 100.0f;
+                    trapId = GO_SPIRIT_ALARM_2;
                     break;
                 case EVENT_AWAKEN_WARD_3:
+                    trapId = GO_SPIRIT_ALARM_3;
+                    break;
                 case EVENT_AWAKEN_WARD_4:
-                    range = 50.0f;
+                    trapId = GO_SPIRIT_ALARM_4;
                     break;
                 default:
                     return;
             }
 
+            if (GameObject* trap = GetCaster()->FindNearestGameObject(trapId, 5.0f))
+            {
+                trap->SetRespawnTime(trap->GetGOInfo()->GetAutoCloseTime() / IN_MILLISECONDS);
+            }
+
             std::list<Creature*> wards;
-            GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, range);
+            GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, 150.0f);
             wards.sort(acore::ObjectDistanceOrderPred(GetCaster()));
             for (std::list<Creature*>::iterator itr = wards.begin(); itr != wards.end(); ++itr)
             {
                 if ((*itr)->IsAlive() && (*itr)->HasAura(SPELL_STONEFORM))
                 {
-                    if (Player* target = (*itr)->SelectNearestPlayer(150.0f))
-                    {
-                        (*itr)->AI()->Talk(SAY_TRAP_ACTIVATE);
-                        (*itr)->RemoveAurasDueToSpell(SPELL_STONEFORM);
-                        (*itr)->AI()->AttackStart(target);
-                    }
+                    (*itr)->AI()->Talk(SAY_TRAP_ACTIVATE);
+                    (*itr)->RemoveAurasDueToSpell(SPELL_STONEFORM);
+                    (*itr)->AI()->SetData(1, 1);
                     break;
                 }
             }
