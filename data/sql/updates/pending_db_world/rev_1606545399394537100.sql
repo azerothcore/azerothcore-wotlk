@@ -7,3 +7,4 @@ UPDATE `creature_template` SET `minlevel` = 83, `maxlevel` = 83 WHERE `entry` IN
 -- Snobold Vassal 10 Normal & Heroic, and 25 Normal & Heroic
 
 UPDATE `creature_template` SET `minlevel` = 82, `maxlevel` = 82 WHERE `entry` IN (34800,35441,35442,35443);
+
