@@ -7,7 +7,6 @@
 #ifndef QUERYRESULT_H
 #define QUERYRESULT_H
 
-#include "AutoPtr.h"
 #include <ace/Thread_Mutex.h>
 
 #include "Errors.h"
@@ -52,7 +51,7 @@ private:
     MYSQL_FIELD* _fields;
 };
 
-typedef acore::AutoPtr<ResultSet, ACE_Thread_Mutex> QueryResult;
+typedef std::shared_ptr<ResultSet> QueryResult;
 
 class PreparedResultSet
 {
@@ -97,7 +96,7 @@ private:
 
 };
 
-typedef acore::AutoPtr<PreparedResultSet, ACE_Thread_Mutex> PreparedQueryResult;
+typedef std::shared_ptr<PreparedResultSet> PreparedQueryResult;
 
 #endif
 
