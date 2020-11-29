@@ -226,7 +226,7 @@ void ObjectAccessor::SaveAllPlayers()
 
 Corpse* ObjectAccessor::GetCorpseForPlayerGUID(uint64 guid)
 {
-    ACORE_READ_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    ACORE_READ_GUARD(std::shared_mutex, i_corpseLock);
 
     Player2CorpsesMapType::iterator iter = i_player2corpse.find(guid);
     if (iter == i_player2corpse.end())
@@ -243,7 +243,7 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse, bool final)
 
     if (!final)
     {
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        ACORE_WRITE_GUARD(std::shared_mutex, i_corpseLock);
         Player2CorpsesMapType::iterator iter = i_player2corpse.find(corpse->GetOwnerGUID());
         if (iter == i_player2corpse.end())
             return;
@@ -270,7 +270,7 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse, bool final)
 
     // Critical section
     {
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        ACORE_WRITE_GUARD(std::shared_mutex, i_corpseLock);
 
         // build mapid*cellid -> guid_set map
         CellCoord cellCoord = acore::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
@@ -286,7 +286,7 @@ void ObjectAccessor::AddCorpse(Corpse* corpse)
 
     // Critical section
     {
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        ACORE_WRITE_GUARD(std::shared_mutex, i_corpseLock);
 
         ASSERT(i_player2corpse.find(corpse->GetOwnerGUID()) == i_player2corpse.end());
         i_player2corpse[corpse->GetOwnerGUID()] = corpse;
@@ -299,7 +299,7 @@ void ObjectAccessor::AddCorpse(Corpse* corpse)
 
 void ObjectAccessor::AddCorpsesToGrid(GridCoord const& gridpair, GridType& grid, Map* map)
 {
-    ACORE_READ_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    ACORE_READ_GUARD(std::shared_mutex, i_corpseLock);
 
     for (Player2CorpsesMapType::iterator iter = i_player2corpse.begin(); iter != i_player2corpse.end(); ++iter)
     {
@@ -387,7 +387,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
         }
 
         // pussywizard: for deleting bones
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        ACORE_WRITE_GUARD(std::shared_mutex, i_corpseLock);
         i_playerBones.push_back(bones->GetGUID());
     }
 
@@ -414,7 +414,7 @@ void ObjectAccessor::RemoveOldCorpses()
 
     // pussywizard: for deleting bones
     std::list<uint64>::iterator next2;
-    ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    ACORE_WRITE_GUARD(std::shared_mutex, i_corpseLock);
     for (std::list<uint64>::iterator itr = i_playerBones.begin(); itr != i_playerBones.end(); itr = next2)
     {
         next2 = itr;

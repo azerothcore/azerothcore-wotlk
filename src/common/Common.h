@@ -75,6 +75,7 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <shared_mutex>
 
 #include "Threading/LockedQueue.h"
 #include "Threading/Threading.h"
@@ -199,13 +200,13 @@ typedef std::vector<std::string> StringVector;
 //! For proper implementation of multiple-read, single-write pattern, use
 //! ACE_RW_Mutex as underlying @MUTEX
 # define ACORE_WRITE_GUARD(MUTEX, LOCK) \
-  ACE_Write_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
+  std::unique_lock< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
     if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 //! For proper implementation of multiple-read, single-write pattern, use
 //! ACE_RW_Mutex as underlying @MUTEX
 # define ACORE_READ_GUARD(MUTEX, LOCK) \
-  ACE_Read_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
+  std::shared_lock< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
     if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 namespace acore

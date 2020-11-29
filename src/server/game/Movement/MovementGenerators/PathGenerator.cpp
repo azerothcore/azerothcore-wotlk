@@ -39,7 +39,7 @@ PathGenerator::PathGenerator(const Unit* owner) :
     {
         MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
 
-        ACORE_READ_GUARD(ACE_RW_Thread_Mutex, mmap->GetManagerLock());
+        ACORE_READ_GUARD(std::shared_mutex, mmap->GetManagerMutex());
         _navMesh = mmap->GetNavMesh(mapId);
         _navMeshQuery = mmap->GetNavMeshQuery(mapId, _sourceUnit->GetInstanceId());
     }
@@ -87,7 +87,7 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
 
     // pussywizard: mutex with new that can be release at any moment, DON'T FORGET TO RELEASE ON EVERY RETURN !!!
     const Map* base = _sourceUnit->GetBaseMap();
-    ACE_RW_Thread_Mutex& mmapLock = (base ? base->GetMMapLock() : MMAP::MMapFactory::createOrGetMMapManager()->GetMMapGeneralLock());
+    std::shared_mutex& mmapLock = (base ? base->GetMMapMutex() : MMAP::MMapFactory::createOrGetMMapManager()->GetMMapGeneralMutex());
     mmapLock.acquire_read();
 
     // make sure navMesh works - we can run on map w/o mmap
@@ -195,13 +195,13 @@ private:
     MUTEX_TYPE& _mutex;
 };
 
-void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 const& endPos, ACE_RW_Thread_Mutex& mmapLock)
+void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 const& endPos, std::shared_mutex& mmapLock)
 {
     bool endInWaterFar = false;
     bool cutToFirstHigher = false;
 
     {
-        MutexReleaser<ACE_RW_Thread_Mutex> mutexReleaser(mmapLock);
+        MutexReleaser<std::shared_mutex> mutexReleaser(mmapLock);
 
         // *** getting start/end poly logic ***
 

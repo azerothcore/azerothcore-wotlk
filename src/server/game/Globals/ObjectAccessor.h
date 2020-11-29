@@ -34,7 +34,7 @@ class HashMapHolder
 public:
 
     typedef std::unordered_map<uint64, T*> MapType;
-    typedef ACE_RW_Thread_Mutex LockType;
+    typedef std::shared_mutex LockType;
 
     static void Insert(T* o)
     {
@@ -273,7 +273,7 @@ private:
     std::list<uint64> i_playerBones;
 
     ACE_Thread_Mutex i_objectLock;
-    ACE_RW_Thread_Mutex i_corpseLock;
+    std::shared_mutex i_corpseLock;
     std::list<DelayedCorpseAction> i_delayedCorpseActions;
     mutable ACE_Thread_Mutex DelayedCorpseLock;
 };
