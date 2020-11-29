@@ -142,7 +142,7 @@ add_subdirectory(src)
 
 CU_RUN_HOOK("AFTER_SRC_LOAD")
 
-if( UNIT_TESTS )
+if( BUILD_TESTING )
     # we use these flags to get code coverage
     set(UNIT_TEST_CXX_FLAGS "-fprofile-arcs -ftest-coverage -fno-inline")
 
