@@ -59,7 +59,8 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 (31099, 0, 0, 'deDE', '%s gerät in Raserei!'),
 (31099, 0, 0, 'frFR', '%s entre en frénésie!'),
 (31099, 0, 0, 'esES', '¡%s entra en frenesí!'),
-(31099, 0, 0, 'esMX', '¡%s entra en frenesí!');
+(31099, 0, 0, 'esMX', '¡%s entra en frenesí!'),
+(31099, 0, 0, 'ruRU', '%s получает бешеный!');
 
 -- Update AIName to Patchwerk and build SAI
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=31099;
