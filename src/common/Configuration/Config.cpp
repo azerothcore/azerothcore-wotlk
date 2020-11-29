@@ -8,42 +8,106 @@
 #include "Errors.h"
 #include "Log.h"
 #include "Util.h"
-#include <ace/Configuration_Import_Export.h>
+
 #include <memory>
 #include <mutex>
+#include <fstream>
+#include <unordered_map>
+#include <string>
+#include <algorithm>
+#include <sstream>
 
 namespace
 {
-    std::unique_ptr<ACE_Configuration_Heap> _config;
+    using config_container = std::unordered_map<std::string, std::string>;
+
+    config_container _config;
     std::vector<std::string> _modulesConfigFiles;
     std::string _initConfigFile;
-    std::mutex _configLock;
+    std::mutex _configMutex;
 
-    // Defined here as it must not be exposed to end-users.
-    bool GetValueHelper(const char* name, ACE_TString& result)
+    void tolower(std::string& in)
     {
-        std::lock_guard<std::mutex> guard(_configLock);
+        std::transform(in.begin(), in.end(), in.begin(),
+            [](unsigned char c) { return std::tolower(c); });
+    }
 
-        if (!_config.get())
-            return false;
+    // taken from https://stackoverflow.com/a/1798170
+    std::string trim(const std::string& str,
+                     const std::string& whitespace = " \t")
+    {
+        const auto strBegin = str.find_first_not_of(whitespace);
+        if (strBegin == std::string::npos)
+            return ""; // no content
 
-        ACE_TString section_name;
-        ACE_Configuration_Section_Key section_key;
-        const ACE_Configuration_Section_Key& root_key = _config->root_section();
+        const auto strEnd = str.find_last_not_of(whitespace);
+        const auto strRange = strEnd - strBegin + 1;
 
-        int i = 0;
+        return str.substr(strBegin, strRange);
+    }
 
-        while (!_config->enumerate_sections(root_key, i, section_name))
+    std::string reduce(const std::string& str,
+                       const std::string& fill = " ",
+                       const std::string& whitespace = " \t")
+    {
+        // trim first
+        auto result = trim(str, whitespace);
+
+        // replace sub ranges
+        auto beginSpace = result.find_first_of(whitespace);
+        while (beginSpace != std::string::npos)
         {
-            _config->open_section(root_key, section_name.c_str(), 0, section_key);
+            const auto endSpace = result.find_first_not_of(whitespace, beginSpace);
+            const auto range = endSpace - beginSpace;
 
-            if (!_config->get_string_value(section_key, name, result))
-                return true;
+            result.replace(beginSpace, range, fill);
 
-            ++i;
+            const auto newStart = beginSpace + fill.length();
+            beginSpace = result.find_first_of(whitespace, newStart);
         }
 
-        return false;
+        return result;
+    }
+
+    bool LoadData(std::string const& file, config_container &result)
+    {
+        std::ifstream in(file);
+
+        if (in.fail())
+            return false;
+
+        while (in.good())
+        {
+            std::string line;
+            std::getline(in, line);
+
+            if (!line.length())
+                continue;
+
+            line = reduce(line);
+
+            if (line[0] == '#' || line[0] == '[')
+                continue;
+
+            auto const equal_pos = line.find('=');
+
+            if (equal_pos == std::string::npos || equal_pos == line.length())
+                return false;
+
+            auto entry = reduce(line.substr(0, equal_pos - 1));
+            tolower(entry);
+
+            auto value = reduce(line.substr(equal_pos + 1));
+
+            if (value[0] == '"' && value[value.length() - 1] == '"')
+                value = value.substr(1, value.length() - 2);
+            else if ((value[0] == '"') != (value[value.length() - 1] == '"'))
+                return false;
+
+            result[entry] = value;
+        }
+
+        return true;
     }
 }
 
@@ -57,25 +121,17 @@ bool ConfigMgr::LoadInitial(std::string const& file)
 {
     ASSERT(file.c_str());
 
-    std::lock_guard<std::mutex> guard(_configLock);
-
-    _config.reset(new ACE_Configuration_Heap());
-    if (!_config->open())
-        if (LoadData(file))
-            return true;
-
-    _config.reset();
-    return false;
+    std::lock_guard<std::mutex> lock(_configMutex);
+    _config.clear();
+    return LoadData(file, _config);
 }
 
 bool ConfigMgr::LoadMore(std::string const& file)
 {
     ASSERT(file.c_str());
-    ASSERT(_config);
 
-    std::lock_guard<std::mutex> guard(_configLock);
-
-    return LoadData(file);
+    std::lock_guard<std::mutex> guard(_configMutex);
+    return LoadData(file, _config);
 }
 
 bool ConfigMgr::Reload()
@@ -88,112 +144,46 @@ bool ConfigMgr::Reload()
     return true;
 }
 
-bool ConfigMgr::LoadData(std::string const& file)
-{
-    ACE_Ini_ImpExp config_importer(*_config.get());
-    if (!config_importer.import_config(file.c_str()))
-        return true;
 
-    return false;
-}
 
 std::string ConfigMgr::GetStringDefault(std::string const& name, const std::string& def, bool logUnused /*= true*/)
 {
-    ACE_TString val;
+    std::string name_lower = name;
+    tolower(name_lower);
 
-    if (GetValueHelper(name.c_str(), val))
-    {
-        std::string value = val.c_str();
-        value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
-        return value;
-    }
-    else
-    {
-        if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%s)", name.c_str(), def.c_str());
+    std::lock_guard<std::mutex> lock(_configMutex);
 
-        return def;
-    }
+    auto const i = _config.find(name_lower);
+
+    if (i != _config.end())
+        return i->second;
+
+    if (logUnused)
+        sLog->outError("-> Not found option '%s'. The default value is used (%s)", name.c_str(), def.c_str());
+
+    return def;
 }
 
 bool ConfigMgr::GetBoolDefault(std::string const& name, bool def, bool logUnused /*= true*/)
 {
-    ACE_TString val;
-
-    if (!GetValueHelper(name.c_str(), val))
-    {
-        if (logUnused)
-            def ? sLog->outError("-> Not found option '%s'. The default value is used (Yes)", name.c_str()) : sLog->outError("-> Not found option '%s'. The default value is used (No)", name.c_str());
-
-        return def;
-    }
-
-    return StringToBool(val.c_str());
+    auto const val = GetStringDefault(name, def ? "Yes" : "No", logUnused);
+    return StringToBool(val);
 }
 
 int ConfigMgr::GetIntDefault(std::string const& name, int def, bool logUnused /*= true*/)
 {
-    ACE_TString val;
-
-    if (GetValueHelper(name.c_str(), val))
-        return std::stoi(val.c_str());
-    else
-    {
-        if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%i)", name.c_str(), def);
-
-        return def;
-    }
+    std::stringstream str;
+    str << def;
+    auto const val = GetStringDefault(name, str.str(), logUnused);
+    return std::stoi(val);
 }
 
 float ConfigMgr::GetFloatDefault(std::string const& name, float def, bool logUnused /*= true*/)
 {
-    ACE_TString val;
-
-    if (GetValueHelper(name.c_str(), val))
-        return std::stof(val.c_str());
-    else
-    {
-        if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%f)", name.c_str(), def);
-
-        return def;
-    }
-}
-
-std::list<std::string> ConfigMgr::GetKeysByString(std::string const& name)
-{
-    std::lock_guard<std::mutex> guard(_configLock);
-
-    std::list<std::string> keys;
-    if (!_config.get())
-        return keys;
-
-    ACE_TString section_name;
-    ACE_Configuration_Section_Key section_key;
-    const ACE_Configuration_Section_Key& root_key = _config->root_section();
-
-    int i = 0;
-
-    while (!_config->enumerate_sections(root_key, i++, section_name))
-    {
-        _config->open_section(root_key, section_name.c_str(), 0, section_key);
-
-        ACE_TString key_name;
-        ACE_Configuration::VALUETYPE type;
-
-        int j = 0;
-
-        while (!_config->enumerate_values(section_key, j++, key_name, type))
-        {
-            std::string temp = key_name.c_str();
-
-            if (temp.find(name) != std::string::npos)
-                keys.push_back(temp);
-        }
-    }
-
-    return keys;
+    std::stringstream str;
+    str << def;
+    auto const val = GetStringDefault(name, str.str(), logUnused);
+    return std::stof(val);
 }
 
 void ConfigMgr::SetConfigList(std::string const& fileName, std::string const& modulesConfigList /*= ""*/)

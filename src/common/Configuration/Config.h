@@ -40,8 +40,6 @@ public:
     int GetIntDefault(std::string const& name, int def, bool logUnused = true);
     float GetFloatDefault(std::string const& name, float def, bool logUnused = true);
 
-    std::list<std::string> GetKeysByString(std::string const& name);
-
     bool isDryRun() { return dryRun; }
     void setDryRun(bool mode) { dryRun = mode; }
 
@@ -49,8 +47,6 @@ public:
 
 private:
     bool dryRun = false;
-
-    bool LoadData(std::string const& file);
 };
 
 #define sConfigMgr ConfigMgr::instance()
