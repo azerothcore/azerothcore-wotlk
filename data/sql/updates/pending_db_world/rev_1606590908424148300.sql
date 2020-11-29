@@ -18,13 +18,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- Update SAI, unit_flag and update level range for Knight of the Ebon Blade (57-58)
 UPDATE `creature_template` SET `minlevel`=57, `unit_flags`=557056, `AIName`='SmartAI' WHERE `entry`=31094;
-
 DELETE FROM `smart_scripts` WHERE `entryorguid`=31094 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(31094, 0, 0, 0, 0, 0, 100, 0, 7250, 12750, 8250, 13750, 0, 11, 52372, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Knight of the Ebon Blade - In Combat - Cast Icy Touch'),
+(31094, 0, 0, 0, 0, 0, 100, 0, 9250, 14750, 10250, 15750, 0, 11, 52372, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Knight of the Ebon Blade - In Combat - Cast Icy Touch'),
 (31094, 0, 1, 0, 0, 0, 100, 0, 4500, 6200, 5500, 7200, 0, 11, 52374, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Knight of the Ebon Blade - In Combat - Cast Blood Strike'),
 (31094, 0, 2, 0, 0, 0, 100, 0, 3500, 9100, 4500, 11000, 0, 11, 52373, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Knight of the Ebon Blade - In Combat - Cast Plague Strike'),
 (31094, 0, 3, 0, 0, 0, 100, 0, 5200, 15500, 6200, 17500, 0, 11, 52375, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Knight of the Ebon Blade - In Combat - Cast Death Coil');
+(31094, 0, 4, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 70, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Knight of the Ebon Blade - On Death - Respawn');
 
 -- Add missing Knight of the Ebon Blade corpses on lower level
 DELETE FROM `creature` WHERE `guid` IN (200153, 200154, 200155, 200156, 200157);
@@ -48,4 +48,27 @@ UPDATE `creature` SET `position_x`=2410.179, `position_y`=-5621.223, `position_z
 UPDATE `creature` SET `position_x`=2411.769, `position_y`=-5624.546, `position_z`=420.652 WHERE `guid`=130485;
 UPDATE `creature` SET `position_x`=2413.665, `position_y`=-5627.342, `position_z`=420.652 WHERE `guid`=130487;
 UPDATE `creature` SET `position_x`=2415.735, `position_y`=-5629.859, `position_z`=420.651 WHERE `guid`=130486;
+
+-- Add Patchwerk texts
+DELETE FROM `creature_text` WHERE `CreatureID`=31099 AND `GroupID`=0;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
+(31099, 0, 0, '%s goes into a frenzy!', 41, 0, 100, 0, 0, 0, 38630, 0, 'Patchwerk emote Frenzy - Ebon Hold');
+/* Add translations for Spanish */
+DELETE FROM `creature_text_locale` WHERE `CreatureID`=31099 AND `GroupID`=0;
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES 
+(31099, 0, 0, 'esES', '%s entra en frenesí!');
+(31099, 0, 0, 'esMX', '%s entra en frenesí!');
+
+-- Update AIName to Patchwerk and build SAI
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=31099;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=31099 AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+(31099, 0, 0, 0, 0, 0, 100, 0, 1000, 2000, 1500, 1500, 0, 11, 58412, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Patchwerk - In Combat - Cast Hateful Strike'),
+(31099, 0, 1, 0, 2, 0, 100, 1, 0, 4, 0, 0, 0, 11, 28131, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Patchwerk - On 5% HP - Cast self Frenzy'),
+(31099, 0, 2, 0, 2, 0, 100, 1, 0, 4, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Patchwerk - On 5% HP - Say Line 0');
+
+-- Make spell 'Scourge hook' to only target players
+DELETE FROM `conditions` WHERE `SourceEntry`=50335 AND `ConditionTypeOrReference`=31;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `Comment`) VALUES 
+(17, 0, 50335, 0, 0, 31, 1, 4, 0, 0, 0, 0, 0, 'Spell force target - \'Scourge Hook\' - Player only');
 
