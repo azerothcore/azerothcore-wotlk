@@ -14,135 +14,132 @@
 #include <cassert>
 #include <mutex>
 
-namespace ACE_Based
+template <class T, class LockType = std::mutex, typename StorageType = std::deque<T>>
+class LockedQueue
 {
-    template <class T, class LockType = std::mutex, typename StorageType = std::deque<T>>
-    class LockedQueue
+    //! Lock access to the queue.
+    LockType _lock;
+
+    //! Storage backing the queue.
+    StorageType _queue;
+
+    //! Cancellation flag.
+    volatile bool _canceled;
+
+public:
+
+    //! Create a LockedQueue.
+    LockedQueue()
+        : _canceled(false)
     {
-        //! Lock access to the queue.
-        LockType _lock;
+    }
 
-        //! Storage backing the queue.
-        StorageType _queue;
+    //! Destroy a LockedQueue.
+    virtual ~LockedQueue()
+    {
+    }
 
-        //! Cancellation flag.
-        volatile bool _canceled;
+    //! Adds an item to the queue.
+    void add(const T& item)
+    {
+        lock();
 
-    public:
+        //ASSERT(!this->_canceled);
+        // throw Cancellation_Exception();
 
-        //! Create a LockedQueue.
-        LockedQueue()
-            : _canceled(false)
-        {
-        }
+        _queue.push_back(item);
 
-        //! Destroy a LockedQueue.
-        virtual ~LockedQueue()
-        {
-        }
+        unlock();
+    }
 
-        //! Adds an item to the queue.
-        void add(const T& item)
-        {
-            lock();
+    //! Gets the next result in the queue, if any.
+    bool next(T& result)
+    {
+        // ACE_Guard<LockType> g(this->_lock);
+        RETURN_GUARD(this->_lock, false);
 
-            //ASSERT(!this->_canceled);
-            // throw Cancellation_Exception();
+        if (_queue.empty())
+            return false;
 
-            _queue.push_back(item);
+        //ASSERT (!_queue.empty() || !this->_canceled);
+        // throw Cancellation_Exception();
+        result = _queue.front();
+        _queue.pop_front();
 
+        return true;
+    }
+
+    template<class Checker>
+    bool next(T& result, Checker& check)
+    {
+        std::lock_guard<LockType> g(this->_lock);
+
+        if (_queue.empty())
+            return false;
+
+        result = _queue.front();
+        if (!check.Process(result))
+            return false;
+
+        _queue.pop_front();
+        return true;
+    }
+
+    //! Peeks at the top of the queue. Check if the queue is empty before calling! Remember to unlock after use if autoUnlock == false.
+    T& peek(bool autoUnlock = false)
+    {
+        lock();
+
+        T& result = _queue.front();
+
+        if (autoUnlock)
             unlock();
-        }
 
-        //! Gets the next result in the queue, if any.
-        bool next(T& result)
-        {
-            // ACE_Guard<LockType> g(this->_lock);
-            RETURN_GUARD(this->_lock, false);
+        return result;
+    }
 
-            if (_queue.empty())
-                return false;
+    //! Cancels the queue.
+    void cancel()
+    {
+        lock();
 
-            //ASSERT (!_queue.empty() || !this->_canceled);
-            // throw Cancellation_Exception();
-            result = _queue.front();
-            _queue.pop_front();
+        _canceled = true;
 
-            return true;
-        }
+        unlock();
+    }
 
-        template<class Checker>
-        bool next(T& result, Checker& check)
-        {
-            std::lock_guard<LockType> g(this->_lock);
+    //! Checks if the queue is cancelled.
+    bool cancelled()
+    {
+        ACE_Guard<LockType> g(this->_lock);
+        return _canceled;
+    }
 
-            if (_queue.empty())
-                return false;
+    //! Locks the queue for access.
+    void lock()
+    {
+        this->_lock.lock();
+    }
 
-            result = _queue.front();
-            if (!check.Process(result))
-                return false;
+    //! Unlocks the queue.
+    void unlock()
+    {
+        this->_lock.unlock();
+    }
 
-            _queue.pop_front();
-            return true;
-        }
+    ///! Calls pop_front of the queue
+    void pop_front()
+    {
+        ACE_GUARD (LockType, g, this->_lock);
+        _queue.pop_front();
+    }
 
-        //! Peeks at the top of the queue. Check if the queue is empty before calling! Remember to unlock after use if autoUnlock == false.
-        T& peek(bool autoUnlock = false)
-        {
-            lock();
-
-            T& result = _queue.front();
-
-            if (autoUnlock)
-                unlock();
-
-            return result;
-        }
-
-        //! Cancels the queue.
-        void cancel()
-        {
-            lock();
-
-            _canceled = true;
-
-            unlock();
-        }
-
-        //! Checks if the queue is cancelled.
-        bool cancelled()
-        {
-            ACE_Guard<LockType> g(this->_lock);
-            return _canceled;
-        }
-
-        //! Locks the queue for access.
-        void lock()
-        {
-            this->_lock.lock();
-        }
-
-        //! Unlocks the queue.
-        void unlock()
-        {
-            this->_lock.unlock();
-        }
-
-        ///! Calls pop_front of the queue
-        void pop_front()
-        {
-            ACE_GUARD (LockType, g, this->_lock);
-            _queue.pop_front();
-        }
-
-        ///! Checks if we're empty or not with locks held
-        bool empty()
-        {
+    ///! Checks if we're empty or not with locks held
+    bool empty()
+    {
             
-            RETURN_GUARD(this->_lock, false);
-            return _queue.empty();
-        }
-    };
-}
+        RETURN_GUARD(this->_lock, false);
+        return _queue.empty();
+    }
+};
 #endif

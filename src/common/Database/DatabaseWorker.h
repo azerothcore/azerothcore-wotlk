@@ -19,7 +19,7 @@ class DatabaseWorker
 {
 public:
     DatabaseWorker() = delete;
-    DatabaseWorker(ACE_Based::LockedQueue<SQLOperation*>* new_queue, MySQLConnection* con);
+    DatabaseWorker(LockedQueue<SQLOperation*>* new_queue, MySQLConnection* con);
 
     void shutdown();
 
@@ -29,7 +29,7 @@ private:
     std::atomic_bool m_shutdown;
     std::thread m_thread;
 
-    ACE_Based::LockedQueue<SQLOperation*>* const m_queue;
+    LockedQueue<SQLOperation*>* const m_queue;
     MySQLConnection* const m_conn;
 };
 

@@ -35,7 +35,7 @@ MySQLConnection::MySQLConnection(MySQLConnectionInfo& connInfo) :
 {
 }
 
-MySQLConnection::MySQLConnection(ACE_Based::LockedQueue<SQLOperation*>* queue, MySQLConnectionInfo& connInfo) :
+MySQLConnection::MySQLConnection(LockedQueue<SQLOperation*>* queue, MySQLConnectionInfo& connInfo) :
     m_reconnecting(false),
     m_prepareError(false),
     m_queue(queue),

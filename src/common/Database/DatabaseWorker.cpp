@@ -12,7 +12,7 @@
 
 #include <queue>
 
-DatabaseWorker::DatabaseWorker(ACE_Based::LockedQueue<SQLOperation*>* new_queue, MySQLConnection* con) :
+DatabaseWorker::DatabaseWorker(LockedQueue<SQLOperation*>* new_queue, MySQLConnection* con) :
     m_queue(new_queue),
     m_conn(con),
     m_thread(&DatabaseWorker::work, this)
