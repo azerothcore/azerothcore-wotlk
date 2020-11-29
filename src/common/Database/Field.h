@@ -9,7 +9,6 @@
 
 #include "Common.h"
 #include "Log.h"
-#include "Log.h"
 
 #include <mysql.h>
 
