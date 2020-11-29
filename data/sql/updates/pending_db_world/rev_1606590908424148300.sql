@@ -23,7 +23,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (31094, 0, 0, 0, 0, 0, 100, 0, 9250, 14750, 10250, 15750, 0, 11, 52372, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Knight of the Ebon Blade - In Combat - Cast Icy Touch'),
 (31094, 0, 1, 0, 0, 0, 100, 0, 4500, 6200, 5500, 7200, 0, 11, 52374, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Knight of the Ebon Blade - In Combat - Cast Blood Strike'),
 (31094, 0, 2, 0, 0, 0, 100, 0, 3500, 9100, 4500, 11000, 0, 11, 52373, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Knight of the Ebon Blade - In Combat - Cast Plague Strike'),
-(31094, 0, 3, 0, 0, 0, 100, 0, 5200, 15500, 6200, 17500, 0, 11, 52375, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Knight of the Ebon Blade - In Combat - Cast Death Coil');
+(31094, 0, 3, 0, 0, 0, 100, 0, 5200, 15500, 6200, 17500, 0, 11, 52375, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Knight of the Ebon Blade - In Combat - Cast Death Coil'),
 (31094, 0, 4, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 70, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Knight of the Ebon Blade - On Death - Respawn');
 
 -- Add missing Knight of the Ebon Blade corpses on lower level
@@ -56,7 +56,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 /* Add translations for Spanish */
 DELETE FROM `creature_text_locale` WHERE `CreatureID`=31099 AND `GroupID`=0;
 INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES 
-(31099, 0, 0, 'esES', '%s entra en frenesí!');
+(31099, 0, 0, 'esES', '%s entra en frenesí!'),
 (31099, 0, 0, 'esMX', '%s entra en frenesí!');
 
 -- Update AIName to Patchwerk and build SAI
