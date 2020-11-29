@@ -4,3 +4,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1606594157029530500');
 
 DELETE FROM spell_custom_attr WHERE spell_id = 64412;
 
+-- Correct spell High King Maulgar, 'Death Coil' to be applied as negative buff
+
+INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES ('33130', '28672');
+
