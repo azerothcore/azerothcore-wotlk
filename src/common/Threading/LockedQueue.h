@@ -7,16 +7,16 @@
 #ifndef LOCKEDQUEUE_H
 #define LOCKEDQUEUE_H
 
-#include <ace/Guard_T.h>
-#include <ace/Thread_Mutex.h>
-#include <deque>
-#include <assert.h>
 #include "Debugging/Errors.h"
 #include "PolicyLock.h"
 
+#include <deque>
+#include <cassert>
+#include <mutex>
+
 namespace ACE_Based
 {
-    template <class T, class LockType, typename StorageType = std::deque<T>>
+    template <class T, class LockType = std::mutex, typename StorageType = std::deque<T>>
     class LockedQueue
     {
         //! Lock access to the queue.

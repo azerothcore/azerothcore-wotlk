@@ -9,13 +9,14 @@
 
 #include "DatabaseWorkerPool.h"
 #include "MySQLConnection.h"
+#include "Threading/LockedQueue.h"
 
 class WorldDatabaseConnection : public MySQLConnection
 {
 public:
     //- Constructors for sync and async connections
     WorldDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) { }
-    WorldDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) { }
+    WorldDatabaseConnection(ACE_Based::LockedQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) { }
 
     //- Loads database type specific prepared statements
     void DoPrepareStatements();

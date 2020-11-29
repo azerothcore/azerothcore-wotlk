@@ -7,24 +7,30 @@
 #ifndef _WORKERTHREAD_H
 #define _WORKERTHREAD_H
 
-#include <ace/Task.h>
-#include <ace/Activation_Queue.h>
+#include <thread>
+#include <atomic>
+
+#include "Threading/LockedQueue.h"
 
 class MySQLConnection;
+class SQLOperation;
 
-class DatabaseWorker : protected ACE_Task_Base
+class DatabaseWorker
 {
 public:
-    DatabaseWorker(ACE_Activation_Queue* new_queue, MySQLConnection* con);
+    DatabaseWorker() = delete;
+    DatabaseWorker(ACE_Based::LockedQueue<SQLOperation*>* new_queue, MySQLConnection* con);
 
-    ///- Inherited from ACE_Task_Base
-    int svc();
-    int wait() { return ACE_Task_Base::wait(); }
+    void shutdown();
 
 private:
-    DatabaseWorker() : ACE_Task_Base() { }
-    ACE_Activation_Queue* m_queue;
-    MySQLConnection* m_conn;
+    void work();
+
+    std::atomic_bool m_shutdown;
+    std::thread m_thread;
+
+    ACE_Based::LockedQueue<SQLOperation*>* const m_queue;
+    MySQLConnection* const m_conn;
 };
 
 #endif

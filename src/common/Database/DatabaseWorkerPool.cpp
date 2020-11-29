@@ -10,9 +10,7 @@
 #define MIN_MYSQL_SERVER_VERSION 50600u
 #define MIN_MYSQL_CLIENT_VERSION 50600u
 
-template <class T> DatabaseWorkerPool<T>::DatabaseWorkerPool() :
-    _mqueue(new ACE_Message_Queue<ACE_SYNCH>(2 * 1024 * 1024, 2 * 1024 * 1024)),
-    _queue(new ACE_Activation_Queue(_mqueue))
+template <class T> DatabaseWorkerPool<T>::DatabaseWorkerPool()
 {
     memset(_connectionCount, 0, sizeof(_connectionCount));
     _connections.resize(IDX_SIZE);
@@ -34,7 +32,7 @@ bool DatabaseWorkerPool<T>::Open(const std::string& infoString, uint8 async_thre
     _connections[IDX_ASYNC].resize(async_threads);
     for (uint8 i = 0; i < async_threads; ++i)
     {
-        T* t = new T(_queue, _connectionInfo);
+        T* t = new T(&_queue, _connectionInfo);
         res &= t->Open();
         if (res) // only check mysql version if connection is valid
             WPFatal(mysql_get_server_version(t->GetHandle()) >= MIN_MYSQL_SERVER_VERSION, "AzerothCore does not support MySQL versions below 5.6");
@@ -71,13 +69,13 @@ void DatabaseWorkerPool<T>::Close()
     //! Shuts down delaythreads for this connection pool by underlying deactivate().
     //! The next dequeue attempt in the worker thread tasks will result in an error,
     //! ultimately ending the worker thread task.
-    _queue->queue()->close();
+    _queue.empty();
 
     for (uint8 i = 0; i < _connectionCount[IDX_ASYNC]; ++i)
     {
         T* t = _connections[IDX_ASYNC][i];
         DatabaseWorker* worker = t->m_worker;
-        worker->wait();     //! Block until no more threads are running this task.
+        worker->shutdown();     //! Block until no more threads are running this task.
         delete worker;
         t->Close();         //! Closes the actualy MySQL connection.
     }
@@ -91,10 +89,6 @@ void DatabaseWorkerPool<T>::Close()
     //! meaning there can be no concurrent access at this point.
     for (uint8 i = 0; i < _connectionCount[IDX_SYNCH]; ++i)
         _connections[IDX_SYNCH][i]->Close();
-
-    //! Deletes the ACE_Activation_Queue object and its underlying ACE_Message_Queue
-    delete _queue;
-    delete _mqueue;
 
     sLog->outSQLDriver("All connections on DatabasePool '%s' closed.", GetDatabaseName());
 }

@@ -9,6 +9,7 @@
 #include "DatabaseWorkerPool.h"
 #include "Transaction.h"
 #include "Util.h"
+#include "Threading/LockedQueue.h"
 
 #ifndef _MYSQLCONNECTION_H
 #define _MYSQLCONNECTION_H
@@ -60,7 +61,7 @@ class MySQLConnection
 
 public:
     MySQLConnection(MySQLConnectionInfo& connInfo);                               //! Constructor for synchronous connections.
-    MySQLConnection(ACE_Activation_Queue* queue, MySQLConnectionInfo& connInfo);  //! Constructor for asynchronous connections.
+    MySQLConnection(ACE_Based::LockedQueue<SQLOperation*>* queue, MySQLConnectionInfo& connInfo);  //! Constructor for asynchronous connections.
     virtual ~MySQLConnection();
 
     virtual bool Open();
@@ -115,11 +116,11 @@ private:
     bool _HandleMySQLErrno(uint32 errNo);
 
 private:
-    ACE_Activation_Queue* m_queue;                      //! Queue shared with other asynchronous connections.
-    DatabaseWorker*       m_worker;                     //! Core worker task.
-    MYSQL*                m_Mysql;                      //! MySQL Handle.
-    MySQLConnectionInfo&  m_connectionInfo;             //! Connection info (used for logging)
-    ConnectionFlags       m_connectionFlags;            //! Connection flags (for preparing relevant statements)
+    ACE_Based::LockedQueue<SQLOperation*>* const m_queue;   //! Queue shared with other asynchronous connections.
+    DatabaseWorker*       m_worker;                         //! Core worker task.
+    MYSQL*                m_Mysql;                          //! MySQL Handle.
+    MySQLConnectionInfo&  m_connectionInfo;                 //! Connection info (used for logging)
+    ConnectionFlags       m_connectionFlags;                //! Connection flags (for preparing relevant statements)
     std::mutex      m_Mutex;
 };
 

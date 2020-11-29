@@ -20,6 +20,7 @@
 #include "QueryHolder.h"
 #include "AdhocStatement.h"
 #include "StringFormat.h"
+#include "Threading/LockedQueue.h"
 
 class PingOperation : public SQLOperation
 {
@@ -219,7 +220,7 @@ private:
 
     void Enqueue(SQLOperation* op)
     {
-        _queue->enqueue(op);
+        _queue.add(op);
     }
 
     //! Gets a free connection in the synchronous connection pool.
@@ -234,11 +235,10 @@ private:
         IDX_SIZE
     };
 
-    ACE_Message_Queue<ACE_SYNCH>*   _mqueue;
-    ACE_Activation_Queue*           _queue;             //! Queue shared by async worker threads.
-    std::vector<std::vector<T*>>    _connections;
-    uint32                          _connectionCount[2];       //! Counter of MySQL connections;
-    MySQLConnectionInfo             _connectionInfo;
+    ACE_Based::LockedQueue<SQLOperation*>   _queue;             //! Queue shared by async worker threads.
+    std::vector<std::vector<T*>>            _connections;
+    uint32                                  _connectionCount[2];       //! Counter of MySQL connections;
+    MySQLConnectionInfo                     _connectionInfo;
 };
 
 #endif

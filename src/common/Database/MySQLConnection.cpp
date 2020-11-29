@@ -14,6 +14,7 @@
 #include "Timer.h"
 #include "Log.h"
 #include "Duration.h"
+#include "Threading/LockedQueue.h"
 #include <mysql.h>
 #include <mysqld_error.h>
 #include <errmsg.h>
@@ -34,7 +35,7 @@ MySQLConnection::MySQLConnection(MySQLConnectionInfo& connInfo) :
 {
 }
 
-MySQLConnection::MySQLConnection(ACE_Activation_Queue* queue, MySQLConnectionInfo& connInfo) :
+MySQLConnection::MySQLConnection(ACE_Based::LockedQueue<SQLOperation*>* queue, MySQLConnectionInfo& connInfo) :
     m_reconnecting(false),
     m_prepareError(false),
     m_queue(queue),

@@ -10,24 +10,24 @@
 #include "MySQLConnection.h"
 #include "MySQLThreading.h"
 
-DatabaseWorker::DatabaseWorker(ACE_Activation_Queue* new_queue, MySQLConnection* con) :
-    m_queue(new_queue),
-    m_conn(con)
-{
-    /// Assign thread to task
-    activate();
-}
+#include <queue>
 
-int DatabaseWorker::svc()
+DatabaseWorker::DatabaseWorker(ACE_Based::LockedQueue<SQLOperation*>* new_queue, MySQLConnection* con) :
+    m_queue(new_queue),
+    m_conn(con),
+    m_thread(&DatabaseWorker::work, this)
+{}
+
+void DatabaseWorker::work()
 {
     if (!m_queue)
-        return -1;
+        return;
 
-    SQLOperation* request = NULL;
-    while (1)
+    while (!m_shutdown)
     {
-        request = (SQLOperation*)(m_queue->dequeue());
-        if (!request)
+        SQLOperation* request;
+
+        if (!m_queue->next(request))
             break;
 
         request->SetConnection(m_conn);
@@ -35,6 +35,10 @@ int DatabaseWorker::svc()
 
         delete request;
     }
+}
 
-    return 0;
+void DatabaseWorker::shutdown()
+{
+    m_shutdown = true;
+    m_thread.join();
 }
