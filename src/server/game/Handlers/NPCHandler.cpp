@@ -10,7 +10,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
 #include "Player.h"

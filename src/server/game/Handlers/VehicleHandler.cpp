@@ -9,7 +9,7 @@
 #include "Opcodes.h"
 #include "Vehicle.h"
 #include "Player.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
 
 void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvData)

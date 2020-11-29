@@ -5,7 +5,7 @@
  */
 
 #include "Common.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Opcodes.h"

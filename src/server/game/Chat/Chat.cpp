@@ -16,7 +16,7 @@
 #include "Chat.h"
 #include "GridNotifiersImpl.h"
 #include "Language.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "UpdateMask.h"

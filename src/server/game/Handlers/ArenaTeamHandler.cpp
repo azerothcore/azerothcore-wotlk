@@ -11,7 +11,7 @@
 #include "DatabaseEnv.h"
 
 #include "ArenaTeam.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include "SocialMgr.h"
 #include "ArenaTeamMgr.h"

@@ -19,7 +19,7 @@
 #include "Group.h"
 #include "Guild.h"
 #include "Language.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuras.h"

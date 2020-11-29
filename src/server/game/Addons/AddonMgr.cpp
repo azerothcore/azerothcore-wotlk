@@ -6,7 +6,7 @@
 
 #include "AddonMgr.h"
 #include "DatabaseEnv.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Timer.h"
 
 #include <list>

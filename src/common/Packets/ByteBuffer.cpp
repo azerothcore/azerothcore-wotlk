@@ -6,7 +6,7 @@
 
 #include "ByteBuffer.h"
 #include "Common.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 
 #include <ace/Stack_Trace.h>
 #include <sstream>

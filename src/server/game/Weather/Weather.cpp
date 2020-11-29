@@ -12,7 +12,7 @@
 #include "WorldPacket.h"
 #include "Player.h"
 #include "World.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include "Util.h"
 #include "ScriptMgr.h"

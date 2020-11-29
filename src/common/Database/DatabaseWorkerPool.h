@@ -15,7 +15,7 @@
 #include "Transaction.h"
 #include "DatabaseWorker.h"
 #include "PreparedStatement.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "QueryResult.h"
 #include "QueryHolder.h"
 #include "AdhocStatement.h"

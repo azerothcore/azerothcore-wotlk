@@ -28,7 +28,7 @@
 #include "SHA1.h"
 #include "WorldSession.h"
 #include "WorldSocketMgr.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "PacketLog.h"
 #include "ScriptMgr.h"
 #include "AccountMgr.h"

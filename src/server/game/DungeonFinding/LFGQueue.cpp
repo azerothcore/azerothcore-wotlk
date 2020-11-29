@@ -21,7 +21,7 @@
 #include "Group.h"
 #include "LFGQueue.h"
 #include "LFGMgr.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include "World.h"
 #include "GroupMgr.h"

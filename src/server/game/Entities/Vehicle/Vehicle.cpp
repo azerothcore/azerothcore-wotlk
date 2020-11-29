@@ -5,7 +5,7 @@
  */
 
 #include "Common.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include "Vehicle.h"
 #include "Unit.h"

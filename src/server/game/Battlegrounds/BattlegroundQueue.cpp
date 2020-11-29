@@ -10,7 +10,7 @@
 #include "BattlegroundQueue.h"
 #include "Chat.h"
 #include "Group.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"

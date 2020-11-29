@@ -7,7 +7,7 @@
 #include "Common.h"
 #include "Player.h"
 #include "GridNotifiers.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "CellImpl.h"
 #include "Map.h"
 #include "MapManager.h"

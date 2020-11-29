@@ -18,7 +18,7 @@
 #include "PathGenerator.h"
 #include "Map.h"
 #include "Creature.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "CellImpl.h"
 #include "Cell.h"
 

@@ -22,7 +22,7 @@
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "Configuration/Config.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "GitRevision.h"
 #include "Util.h"
 #include "SignalHandler.h"

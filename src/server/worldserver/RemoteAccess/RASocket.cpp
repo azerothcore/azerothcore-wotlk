@@ -12,7 +12,7 @@
 #include "Configuration/Config.h"
 #include "Database/DatabaseEnv.h"
 #include "AccountMgr.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "RASocket.h"
 #include "Util.h"
 #include "Duration.h"

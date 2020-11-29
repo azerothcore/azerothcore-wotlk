@@ -6,7 +6,7 @@
 
 #include "Config.h"
 #include "Errors.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Util.h"
 #include <ace/Configuration_Import_Export.h>
 #include <memory>

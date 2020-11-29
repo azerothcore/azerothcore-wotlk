@@ -7,7 +7,7 @@
 #ifndef _OBJECTMGR_H
 #define _OBJECTMGR_H
 
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Object.h"
 #include "Bag.h"
 #include "Creature.h"

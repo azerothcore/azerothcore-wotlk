@@ -8,7 +8,7 @@
 #include "Player.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 
 void WorldSession::HandleGrantLevel(WorldPacket& recvData)
 {

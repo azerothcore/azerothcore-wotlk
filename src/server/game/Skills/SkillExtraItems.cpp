@@ -6,7 +6,7 @@
 
 #include "SkillExtraItems.h"
 #include "DatabaseEnv.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Player.h"
 #include "ObjectMgr.h"
 #include <map>

@@ -8,7 +8,7 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "Errors.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "StringFormat.h"
 #include <sstream>
 

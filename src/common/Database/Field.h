@@ -8,8 +8,8 @@
 #define AZEROTHCORE_FIELD_H
 
 #include "Common.h"
-#include "SingletonMgr.h"
-#include "SingletonMgr.h"
+#include "Log.h"
+#include "Log.h"
 
 #include <mysql.h>
 

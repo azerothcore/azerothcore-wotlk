@@ -10,7 +10,7 @@
 
 #include "WeatherMgr.h"
 #include "Weather.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "WorldPacket.h"

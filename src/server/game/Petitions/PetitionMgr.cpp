@@ -5,7 +5,7 @@ Xinef
 #include "PetitionMgr.h"
 #include "Timer.h"
 #include "QueryResult.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "DatabaseEnv.h"
 
 

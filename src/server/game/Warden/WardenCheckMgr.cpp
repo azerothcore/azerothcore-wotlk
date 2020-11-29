@@ -7,7 +7,7 @@
 #include "Common.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Database/DatabaseEnv.h"
 #include "Util.h"
 #include "WardenCheckMgr.h"

@@ -7,7 +7,7 @@
 #include "Define.h"
 #include "ArenaTeamMgr.h"
 #include "World.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
 #include "ObjectAccessor.h"

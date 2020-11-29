@@ -8,7 +8,7 @@
 #include "GridDefines.h"
 #include "WaypointManager.h"
 #include "MapManager.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 
 WaypointMgr::WaypointMgr()
 {

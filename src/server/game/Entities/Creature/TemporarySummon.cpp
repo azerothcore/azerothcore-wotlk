@@ -4,7 +4,7 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
 #include "CreatureAI.h"
 #include "ObjectMgr.h"

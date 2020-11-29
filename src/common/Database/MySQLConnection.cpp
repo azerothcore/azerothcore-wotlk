@@ -12,7 +12,7 @@
 #include "PreparedStatement.h"
 #include "DatabaseWorker.h"
 #include "Timer.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Duration.h"
 #include <mysql.h>
 #include <mysqld_error.h>

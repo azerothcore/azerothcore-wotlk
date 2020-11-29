@@ -6,12 +6,13 @@ CollectSourceFiles(
 add_executable(
         unit_tests
         ${PRIVATE_SOURCES}
-)
+        mocks/LogMock.h)
 
 target_link_libraries(
         unit_tests
         game
         gtest_main
+        gmock_main
         game-interface
 )
 

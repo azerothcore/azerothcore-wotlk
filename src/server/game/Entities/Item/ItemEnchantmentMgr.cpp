@@ -8,7 +8,7 @@
 #include <functional>
 #include "ItemEnchantmentMgr.h"
 #include "DatabaseEnv.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include <list>
 #include <vector>

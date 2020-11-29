@@ -7,7 +7,7 @@
 #ifdef _WIN32
 
 #include "Common.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include <cstring>
 #include <windows.h>
 #include <winsvc.h>

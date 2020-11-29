@@ -5,7 +5,7 @@
  */
 
 #include "Totem.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Group.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"

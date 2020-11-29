@@ -8,7 +8,7 @@
 #include "DatabaseEnv.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "UpdateMask.h"
 #include "World.h"
 #include "ObjectMgr.h"

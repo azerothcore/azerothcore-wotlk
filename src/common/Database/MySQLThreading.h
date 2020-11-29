@@ -7,7 +7,7 @@
 #ifndef _MYSQLTHREADING_H
 #define _MYSQLTHREADING_H
 
-#include "SingletonMgr.h"
+#include "Log.h"
 
 class MySQL
 {

@@ -9,7 +9,7 @@
 #include <ace/SString.h>
 
 #include "RealmSocket.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 
 RealmSocket::Session::Session(void) { }
 

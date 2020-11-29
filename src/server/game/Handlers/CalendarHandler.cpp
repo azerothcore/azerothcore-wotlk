@@ -23,7 +23,7 @@ Copied events should probably have a new owner
 */
 
 #include "InstanceSaveMgr.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SocialMgr.h"

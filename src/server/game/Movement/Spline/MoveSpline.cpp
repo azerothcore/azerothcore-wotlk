@@ -6,7 +6,7 @@
 
 #include "MoveSpline.h"
 #include <sstream>
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Creature.h"
 
 namespace Movement

@@ -10,7 +10,7 @@
 #include "WorldPacket.h"
 #include "PoolMgr.h"
 #include "Language.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "MapManager.h"
 #include "GossipDef.h"
 #include "Player.h"

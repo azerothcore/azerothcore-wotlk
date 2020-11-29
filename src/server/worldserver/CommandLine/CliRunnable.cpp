@@ -18,7 +18,7 @@
 #include "Chat.h"
 #include "CliRunnable.h"
 #include "Language.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "MapManager.h"
 #include "Player.h"
 #include "Util.h"

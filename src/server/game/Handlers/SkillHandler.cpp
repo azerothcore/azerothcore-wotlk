@@ -6,7 +6,7 @@
 
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"

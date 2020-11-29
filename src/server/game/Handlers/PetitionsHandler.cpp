@@ -12,7 +12,7 @@
 #include "ObjectMgr.h"
 #include "ArenaTeamMgr.h"
 #include "GuildMgr.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Opcodes.h"
 #include "Guild.h"
 #include "ArenaTeam.h"

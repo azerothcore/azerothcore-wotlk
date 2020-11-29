@@ -10,7 +10,7 @@
 #include "WorldSession.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Opcodes.h"
 #include "Spell.h"
 #include "Vehicle.h"

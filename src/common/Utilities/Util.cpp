@@ -7,7 +7,7 @@
 #include "Util.h"
 #include "Common.h"
 #include "utf8.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "DatabaseWorker.h"
 #include "SQLOperation.h"
 #include "Errors.h"

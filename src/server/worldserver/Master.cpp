@@ -20,7 +20,7 @@
 #include "DatabaseWorkerPool.h"
 
 #include "CliRunnable.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "Master.h"
 #include "RARunnable.h"
 #include "ACSoap.h"

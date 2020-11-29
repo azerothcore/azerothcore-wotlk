@@ -8,7 +8,7 @@
 #include "DatabaseEnv.h"
 #include "Group.h"
 #include "GroupMgr.h"
-#include "SingletonMgr.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
