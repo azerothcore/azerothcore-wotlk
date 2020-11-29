@@ -55,16 +55,16 @@ public:
 
     static std::list<AuctionListItemsDelayEvent>& GetList() { return auctionListingList; }
     static std::list<AuctionListItemsDelayEvent>& GetTempList() { return auctionListingListTemp; }
-    static ACE_Thread_Mutex& GetLock() { return auctionListingLock; }
-    static ACE_Thread_Mutex& GetTempLock() { return auctionListingTempLock; }
+    static std::mutex& GetLock() { return auctionListingLock; }
+    static std::mutex& GetTempLock() { return auctionListingTempLock; }
 
 private:
     static uint32 auctionListingDiff;
     static bool auctionListingAllowed;
     static std::list<AuctionListItemsDelayEvent> auctionListingList;
     static std::list<AuctionListItemsDelayEvent> auctionListingListTemp;
-    static ACE_Thread_Mutex auctionListingLock;
-    static ACE_Thread_Mutex auctionListingTempLock;
+    static std::mutex auctionListingLock;
+    static std::mutex auctionListingTempLock;
 };
 
 #endif

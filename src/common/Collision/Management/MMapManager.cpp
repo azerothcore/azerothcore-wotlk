@@ -86,14 +86,14 @@ namespace MMAP
         if (!map)
         {
             sLog->outMisc("ZOMG! MoveMaps: BaseMap not found!");
-            return this->MMapLock;
+            return this->MMapMutex;
         }
         return map->GetMMapMutex();
     }
 
     bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
     {
-        ACORE_WRITE_GUARD(std::shared_mutex, MMapManagerLock);
+        ACORE_WRITE_GUARD(std::shared_mutex, MMapManagerMutex);
 
         // make sure the mmap is loaded and ready to load tiles
         if (!loadMapData(mapId))
@@ -188,7 +188,7 @@ namespace MMAP
 
     bool MMapManager::unloadMap(uint32 mapId, int32 x, int32 y)
     {
-        ACORE_WRITE_GUARD(std::shared_mutex, MMapManagerLock);
+        ACORE_WRITE_GUARD(std::shared_mutex, MMapManagerMutex);
 
         // check if we have this map loaded
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
@@ -245,7 +245,7 @@ namespace MMAP
 
     bool MMapManager::unloadMap(uint32 mapId)
     {
-        ACORE_WRITE_GUARD(std::shared_mutex, MMapManagerLock);
+        ACORE_WRITE_GUARD(std::shared_mutex, MMapManagerMutex);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
         {
@@ -291,7 +291,7 @@ namespace MMAP
 
     bool MMapManager::unloadMapInstance(uint32 mapId, uint32 instanceId)
     {
-        ACORE_WRITE_GUARD(std::shared_mutex, MMapManagerLock);
+        ACORE_WRITE_GUARD(std::shared_mutex, MMapManagerMutex);
 
         // check if we have this map loaded
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
@@ -326,7 +326,7 @@ namespace MMAP
     dtNavMesh const* MMapManager::GetNavMesh(uint32 mapId)
     {
         // pussywizard: moved to calling function
-        //ACORE_READ_GUARD(std::shared_mutex, MMapManagerLock);
+        //ACORE_READ_GUARD(std::shared_mutex, MMapManagerMutex);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
             return NULL;
@@ -337,7 +337,7 @@ namespace MMAP
     dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId, uint32 instanceId)
     {
         // pussywizard: moved to calling function
-        //ACORE_READ_GUARD(std::shared_mutex, MMapManagerLock);
+        //ACORE_READ_GUARD(std::shared_mutex, MMapManagerMutex);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
             return NULL;

@@ -74,7 +74,7 @@ void OutdoorPvPSI::HandlePlayerLeaveZone(Player* player, uint32 zone)
 
 bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
 {
-    ACORE_GUARD(ACE_Thread_Mutex, sOutdoorPvPMgr->_lock);
+    ACORE_GUARD(std::mutex, sOutdoorPvPMgr->_lock);
 
     switch (trigger)
     {

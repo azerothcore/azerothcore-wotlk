@@ -261,7 +261,7 @@ namespace VMAP
     WorldModel* VMapManager2::acquireModelInstance(const std::string& basepath, const std::string& filename)
     {
         //! Critical section, thread safe access to iLoadedModelFiles
-        ACORE_GUARD(ACE_Thread_Mutex, LoadedModelFilesLock);
+        ACORE_GUARD(std::mutex, LoadedModelFilesLock);
 
         ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
         if (model == iLoadedModelFiles.end())
@@ -286,7 +286,7 @@ namespace VMAP
     void VMapManager2::releaseModelInstance(const std::string& filename)
     {
         //! Critical section, thread safe access to iLoadedModelFiles
-        ACORE_GUARD(ACE_Thread_Mutex, LoadedModelFilesLock);
+        ACORE_GUARD(std::mutex, LoadedModelFilesLock);
         ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
         if (model == iLoadedModelFiles.end())
         {

@@ -228,7 +228,7 @@ public:
     //non-static functions
     void AddUpdateObject(Object* obj)
     {
-        ACORE_GUARD(ACE_Thread_Mutex, i_objectLock);
+        ACORE_GUARD(std::mutex, i_objectLock);
         if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
             i_objects.insert(obj);
         else
@@ -237,7 +237,7 @@ public:
 
     void RemoveUpdateObject(Object* obj)
     {
-        ACORE_GUARD(ACE_Thread_Mutex, i_objectLock);
+        ACORE_GUARD(std::mutex, i_objectLock);
         if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
             i_objects.erase(obj);
         else
@@ -272,10 +272,10 @@ private:
     Player2CorpsesMapType i_player2corpse;
     std::list<uint64> i_playerBones;
 
-    ACE_Thread_Mutex i_objectLock;
+    std::mutex i_objectLock;
     std::shared_mutex i_corpseLock;
     std::list<DelayedCorpseAction> i_delayedCorpseActions;
-    mutable ACE_Thread_Mutex DelayedCorpseLock;
+    mutable std::mutex DelayedCorpseLock;
 };
 
 #define sObjectAccessor ObjectAccessor::instance()
