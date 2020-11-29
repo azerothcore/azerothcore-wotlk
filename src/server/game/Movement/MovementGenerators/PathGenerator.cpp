@@ -87,8 +87,8 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
 
     // pussywizard: mutex with new that can be release at any moment, DON'T FORGET TO RELEASE ON EVERY RETURN !!!
     const Map* base = _sourceUnit->GetBaseMap();
-    std::shared_mutex& mmapLock = (base ? base->GetMMapMutex() : MMAP::MMapFactory::createOrGetMMapManager()->GetMMapGeneralMutex());
-    mmapLock.acquire_read();
+    std::shared_mutex& mmapMutex = (base ? base->GetMMapMutex() : MMAP::MMapFactory::createOrGetMMapManager()->GetMMapGeneralMutex());
+    mmapMutex.lock_shared();
 
     // make sure navMesh works - we can run on map w/o mmap
     // check if the start and end point have a .mmtile loaded (can we pass via not loaded tile on the way?)
@@ -98,11 +98,11 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
     {
         BuildShortcut();
         _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
-        mmapLock.release();
+        mmapMutex.unlock_shared();
         return true;
     }
 
-    BuildPolyPath(start, dest, mmapLock);
+    BuildPolyPath(start, dest, mmapMutex);
     return true;
 }
 
@@ -186,22 +186,22 @@ G3D::Vector3 ClosestPointOnLine(const G3D::Vector3& a, const G3D::Vector3& b, co
 }
 
 template <class MUTEX_TYPE>
-class MutexReleaser
+class ReadMutexReleaser
 {
 public:
-    MutexReleaser(MUTEX_TYPE& mutex) : _mutex(mutex) {}
-    ~MutexReleaser() { _mutex.release(); }
+    ReadMutexReleaser(MUTEX_TYPE& mutex) : _mutex(mutex) {}
+    ~ReadMutexReleaser() { _mutex.unlock_shared(); }
 private:
     MUTEX_TYPE& _mutex;
 };
 
-void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 const& endPos, std::shared_mutex& mmapLock)
+void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 const& endPos, std::shared_mutex& mmapMutex)
 {
     bool endInWaterFar = false;
     bool cutToFirstHigher = false;
 
     {
-        MutexReleaser<std::shared_mutex> mutexReleaser(mmapLock);
+        ReadMutexReleaser<std::shared_mutex> mutexReleaser(mmapMutex);
 
         // *** getting start/end poly logic ***
 

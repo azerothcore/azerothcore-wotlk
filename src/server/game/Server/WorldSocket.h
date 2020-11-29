@@ -82,7 +82,7 @@ public:
 
     /// Mutex type used for various synchronizations.
     typedef std::mutex LockType;
-    typedef ACE_Guard<LockType> GuardType;
+    typedef std::lock_guard<LockType> GuardType;
 
     /// Check if socket is closed.
     bool IsClosed (void) const;

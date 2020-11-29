@@ -80,7 +80,7 @@ namespace MMAP
         return uint32(x << 16 | y);
     }
 
-    std::shared_lock& MMapManager::GetMMapMutex(uint32 mapId)
+    std::shared_mutex& MMapManager::GetMMapMutex(uint32 mapId)
     {
         Map* map = sMapMgr->FindBaseMap(mapId);
         if (!map)
