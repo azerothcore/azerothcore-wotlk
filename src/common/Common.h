@@ -197,13 +197,13 @@ typedef std::vector<std::string> StringVector;
   std::lock_guard< MUTEX > ACORE_GUARD_OBJECT (LOCK);
 
 //! For proper implementation of multiple-read, single-write pattern, use
-//! ACE_RW_Mutex as underlying @MUTEX
+//! std::mutex as underlying @MUTEX
 # define ACORE_WRITE_GUARD(MUTEX, LOCK) \
   std::unique_lock< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
     if (!ACORE_GUARD_OBJECT) ASSERT(false);
 
 //! For proper implementation of multiple-read, single-write pattern, use
-//! ACE_RW_Mutex as underlying @MUTEX
+//! std::shared_mutex as underlying @MUTEX
 # define ACORE_READ_GUARD(MUTEX, LOCK) \
   std::shared_lock< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
     if (!ACORE_GUARD_OBJECT) ASSERT(false);
