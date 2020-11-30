@@ -2938,7 +2938,7 @@ Arena.AutoDistributeInterval = 7
 
 #
 #    Arena.GamesRequired
-#        Description: Number of arena matches team must participate in to be eligible for arena point distribution.
+#        Description: Number of arena matches teams must participate in to be eligible for arena point distribution.
 #        Default:     10
 
 Arena.GamesRequired = 10
