@@ -406,7 +406,6 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
                 PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_SUM_REALM_CHARACTERS);
                 stmt->setUInt32(0, GetAccountId());
 
-                _charCreateCallback.FreeResult();
                 _charCreateCallback.SetFutureResult(LoginDatabase.AsyncQuery(stmt));
                 _charCreateCallback.NextStage();
             }
@@ -439,7 +438,6 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
                 PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_SUM_CHARS);
                 stmt->setUInt32(0, GetAccountId());
 
-                _charCreateCallback.FreeResult();
                 _charCreateCallback.SetFutureResult(CharacterDatabase.AsyncQuery(stmt));
                 _charCreateCallback.NextStage();
             }
@@ -464,8 +462,6 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
 
                 bool allowTwoSideAccounts = !sWorld->IsPvPRealm() || sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_ACCOUNTS) || !AccountMgr::IsPlayerAccount(GetSecurity());
                 uint32 skipCinematics = sWorld->getIntConfig(CONFIG_SKIP_CINEMATICS);
-
-                _charCreateCallback.FreeResult();
 
                 if (!allowTwoSideAccounts || skipCinematics == 1 || createInfo->Class == CLASS_DEATH_KNIGHT)
                 {

@@ -2820,8 +2820,7 @@ void World::UpdateRealmCharCount(uint32 accountId)
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_COUNT);
     stmt->setUInt32(0, accountId);
     stmt->setUInt32(1, accountId);
-    PreparedQueryResultFuture result = CharacterDatabase.AsyncQuery(stmt);
-    m_realmCharCallbacks.insert(result);
+    m_realmCharCallbacks.emplace_back(CharacterDatabase.AsyncQuery(stmt).share());
 }
 
 void World::_UpdateRealmCharCount(PreparedQueryResult resultCharCount)
@@ -3159,20 +3158,17 @@ void World::ProcessQueryCallbacks()
 {
     PreparedQueryResult result;
 
-    while (!m_realmCharCallbacks.is_empty())
-    {
-        ACE_Future<PreparedQueryResult> lResult;
-        ACE_Time_Value timeout = ACE_Time_Value::zero;
-        if (m_realmCharCallbacks.next_readable(lResult, &timeout) != 1)
-            break;
+    std::vector<PreparedQueryResultSharedFuture> new_queue;
 
-        if (lResult.ready())
-        {
-            lResult.get(result);
-            _UpdateRealmCharCount(result);
-            lResult.cancel();
-        }
+    for (auto &v : m_realmCharCallbacks)
+    {
+        if (IsFutureReady(v))
+            _UpdateRealmCharCount(v.get());
+        else
+            new_queue.push_back(v);
     }
+
+    m_realmCharCallbacks = std::move(new_queue);
 }
 
 void World::LoadGlobalPlayerDataStore()

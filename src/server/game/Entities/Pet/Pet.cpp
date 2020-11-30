@@ -101,7 +101,7 @@ SpellCastResult Pet::TryLoadFromDB(Player* owner, bool current /*= false*/, PetT
     stmt->setUInt32(0, owner->GetGUIDLow());
     stmt->setUInt8(1, uint8(current ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
 
-    PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (!result)
         return SPELL_FAILED_NO_PET;

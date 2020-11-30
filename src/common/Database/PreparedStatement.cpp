@@ -438,19 +438,10 @@ std::string MySQLPreparedStatement::getQueryString(std::string const& sqlPattern
 }
 
 //- Execution
-PreparedStatementTask::PreparedStatementTask(PreparedStatement* stmt) :
+PreparedStatementTask::PreparedStatementTask(PreparedStatement* stmt, bool async) :
     m_stmt(stmt),
-    m_has_result(false)
-{
-}
-
-PreparedStatementTask::PreparedStatementTask(PreparedStatement* stmt, PreparedQueryResultFuture result) :
-    m_stmt(stmt),
-    m_has_result(true),
-    m_result(result)
-{
-}
-
+    m_async(async)
+{}
 
 PreparedStatementTask::~PreparedStatementTask()
 {
@@ -459,18 +450,25 @@ PreparedStatementTask::~PreparedStatementTask()
 
 bool PreparedStatementTask::Execute()
 {
-    if (m_has_result)
+    if (!m_async)
+        return m_conn->Execute(m_stmt);
+
+    auto result = m_conn->Query(m_stmt);
+
+    if (!result || !result->GetRowCount())
     {
-        PreparedResultSet* result = m_conn->Query(m_stmt);
-        if (!result || !result->GetRowCount())
-        {
-            delete result;
-            m_result.set(PreparedQueryResult(NULL));
-            return false;
-        }
-        m_result.set(PreparedQueryResult(result));
-        return true;
+        delete result;
+        m_result.set_value(PreparedQueryResult(NULL));
+        return false;
     }
 
-    return m_conn->Execute(m_stmt);
+    m_result.set_value(PreparedQueryResult(result));
+
+    return true;
+}
+
+PreparedQueryResultFuture PreparedStatementTask::Future()
+{
+    ASSERT(m_async);
+    return m_result.get_future();
 }

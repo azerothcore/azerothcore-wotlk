@@ -27661,7 +27661,7 @@ bool Player::IsPetDismissed()
     stmt->setUInt32(0, GetGUIDLow());
     stmt->setUInt8(1, uint8(PET_SAVE_NOT_IN_SLOT));
 
-    if (PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt))
+    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
         return true;
 
     return false;

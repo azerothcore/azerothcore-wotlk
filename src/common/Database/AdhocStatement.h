@@ -7,24 +7,26 @@
 #ifndef _ADHOCSTATEMENT_H
 #define _ADHOCSTATEMENT_H
 
-#include <ace/Future.h>
 #include "SQLOperation.h"
 
-typedef ACE_Future<QueryResult> QueryResultFuture;
+#include <future>
+
+typedef std::promise<QueryResult> QueryResultPromise;
+
 /*! Raw, ad-hoc query. */
 class BasicStatementTask : public SQLOperation
 {
 public:
     BasicStatementTask(const char* sql);
-    BasicStatementTask(const char* sql, QueryResultFuture result);
+    BasicStatementTask(const char* sql, QueryResultPromise *result);
     ~BasicStatementTask();
 
     bool Execute();
 
 private:
     const char* m_sql;      //- Raw query to be executed
-    bool m_has_result;
-    QueryResultFuture m_result;
+    const bool m_has_result;
+    QueryResultPromise * const m_result;
 };
 
 #endif

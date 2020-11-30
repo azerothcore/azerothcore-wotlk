@@ -7,8 +7,6 @@
 #ifndef _DATABASEWORKERPOOL_H
 #define _DATABASEWORKERPOOL_H
 
-#include <ace/Thread_Mutex.h>
-
 #include "Common.h"
 #include "Callback.h"
 #include "MySQLConnection.h"
@@ -130,14 +128,14 @@ public:
         Asynchronous query (with resultset) methods.
     */
 
-    //! Enqueues a query in string format that will set the value of the QueryResultFuture return object as soon as the query is executed.
+    //! Enqueues a query in string format that will set the value of the QueryResultPromise return object as soon as the query is executed.
     //! The return value is then processed in ProcessQueryCallback methods.
-    QueryResultFuture AsyncQuery(const char* sql);
+    QueryResultPromise AsyncQuery(const char* sql);
 
-    //! Enqueues a query in string format -with variable args- that will set the value of the QueryResultFuture return object as soon as the query is executed.
+    //! Enqueues a query in string format -with variable args- that will set the value of the QueryResultPromise return object as soon as the query is executed.
     //! The return value is then processed in ProcessQueryCallback methods.
     template<typename Format, typename... Args>
-    QueryResultFuture AsyncPQuery(Format&& sql, Args&& ... args)
+    QueryResultPromise AsyncPQuery(Format&& sql, Args&& ... args)
     {
         if (acore::IsFormatEmptyOrNull(sql))
             return QueryResult(nullptr);
@@ -145,12 +143,12 @@ public:
         return AsyncQuery(acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
     }
 
-    //! Enqueues a query in prepared format that will set the value of the PreparedQueryResultFuture return object as soon as the query is executed.
+    //! Enqueues a query in prepared format that will set the value of the PreparedQueryResultPromise return object as soon as the query is executed.
     //! The return value is then processed in ProcessQueryCallback methods.
     //! Statement must be prepared with CONNECTION_ASYNC flag.
     PreparedQueryResultFuture AsyncQuery(PreparedStatement* stmt);
 
-    //! Enqueues a vector of SQL operations (can be both adhoc and prepared) that will set the value of the QueryResultHolderFuture
+    //! Enqueues a vector of SQL operations (can be both adhoc and prepared) that will set the value of the QueryResultHolderPromise
     //! return object as soon as the query is executed.
     //! The return value is then processed in ProcessQueryCallback methods.
     //! Any prepared statements added to this holder need to be prepared with the CONNECTION_ASYNC flag.

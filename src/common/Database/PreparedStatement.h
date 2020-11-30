@@ -8,7 +8,7 @@
 #define _PREPAREDSTATEMENT_H
 
 #include "SQLOperation.h"
-#include <ace/Future.h>
+#include <future>
 
 #ifdef __APPLE__
 #undef TYPE_BOOL
@@ -136,21 +136,24 @@ private:
     MYSQL_BIND* m_bind;
 };
 
-typedef ACE_Future<PreparedQueryResult> PreparedQueryResultFuture;
+typedef std::promise<PreparedQueryResult> PreparedQueryResultPromise;
+typedef std::future<PreparedQueryResult> PreparedQueryResultFuture;
+typedef std::shared_future<PreparedQueryResult> PreparedQueryResultSharedFuture;
 
 //- Lower-level class, enqueuable operation
 class PreparedStatementTask : public SQLOperation
 {
 public:
-    PreparedStatementTask(PreparedStatement* stmt);
-    PreparedStatementTask(PreparedStatement* stmt, PreparedQueryResultFuture result);
+    PreparedStatementTask(PreparedStatement* stmt, bool async);
     ~PreparedStatementTask();
 
     bool Execute();
 
+    PreparedQueryResultFuture Future();
+
 protected:
-    PreparedStatement* m_stmt;
-    bool m_has_result;
-    PreparedQueryResultFuture m_result;
+    PreparedStatement* const m_stmt;
+    const bool m_async;
+    PreparedQueryResultPromise m_result;
 };
 #endif

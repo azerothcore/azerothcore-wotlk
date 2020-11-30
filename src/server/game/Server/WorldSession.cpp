@@ -1175,7 +1175,6 @@ void WorldSession::ProcessQueryCallbackPlayer()
         std::string param = _charRenameCallback.GetParam();
         _charRenameCallback.GetResult(result);
         HandleChangePlayerNameOpcodeCallBack(result, param);
-        _charRenameCallback.FreeResult();
     }
 
     //- HandleOpenItemOpcode
@@ -1186,15 +1185,13 @@ void WorldSession::ProcessQueryCallbackPlayer()
         uint32 itemLowGUID = _openWrappedItemCallback.GetThirdParam();
         _openWrappedItemCallback.GetResult(result);
         HandleOpenWrappedItemCallback(result, bagIndex, slot, itemLowGUID);
-        _openWrappedItemCallback.FreeResult();
     }
 
     //- Player - ActivateSpec
-    if (_loadActionsSwitchSpecCallback.ready())
+    if (IsFutureReady(_loadActionsSwitchSpecCallback))
     {
-        _loadActionsSwitchSpecCallback.get(result);
+        result = _loadActionsSwitchSpecCallback.get();
         HandleLoadActionsSwitchSpec(result);
-        _loadActionsSwitchSpecCallback.cancel();
     }
 }
 
@@ -1208,16 +1205,14 @@ void WorldSession::ProcessQueryCallbackPet()
         uint64 param = _sendStabledPetCallback.GetParam();
         _sendStabledPetCallback.GetResult(result);
         SendStablePetCallback(result, param);
-        _sendStabledPetCallback.FreeResult();
         return;
     }
 
     //- HandleStablePet
-    if (_stablePetCallback.ready())
+    if (IsFutureReady(_stablePetCallback))
     {
-        _stablePetCallback.get(result);
+        result = _stablePetCallback.get();
         HandleStablePetCallback(result);
-        _stablePetCallback.cancel();
         return;
     }
 
@@ -1227,7 +1222,6 @@ void WorldSession::ProcessQueryCallbackPet()
         uint32 param = _unstablePetCallback.GetParam();
         _unstablePetCallback.GetResult(result);
         HandleUnstablePetCallback(result, param);
-        _unstablePetCallback.FreeResult();
         return;
     }
 
@@ -1237,7 +1231,6 @@ void WorldSession::ProcessQueryCallbackPet()
         uint32 param = _stableSwapCallback.GetParam();
         _stableSwapCallback.GetResult(result);
         HandleStableSwapPetCallback(result, param);
-        _stableSwapCallback.FreeResult();
         return;
     }
 
@@ -1271,24 +1264,14 @@ void WorldSession::ProcessQueryCallbackPet()
     }
 
     //- LoadPetFromDB second part
-    if (_loadPetFromDBSecondCallback.ready())
+    if (IsFutureReady(_loadPetFromDBSecondCallback))
     {
         Player* player = GetPlayer();
-        if (!player)
+        if (player && player->IsInWorld())
         {
-            _loadPetFromDBSecondCallback.cancel();
-        }
-        else if (!player->IsInWorld())
-        {
-            // wait
-        }
-        else
-        {
-            SQLQueryHolder* param;
-            _loadPetFromDBSecondCallback.get(param);
+            SQLQueryHolder* param = _loadPetFromDBSecondCallback.get();
             HandleLoadPetFromDBSecondCallback((LoadPetFromDBQueryHolder*)param);
             delete param;
-            _loadPetFromDBSecondCallback.cancel();
         }
         return;
     }
@@ -1299,27 +1282,23 @@ void WorldSession::ProcessQueryCallbackLogin()
     PreparedQueryResult result;
 
     //! HandleCharEnumOpcode
-    if (_charEnumCallback.ready())
+    if (IsFutureReady(_charEnumCallback))
     {
-        _charEnumCallback.get(result);
+        result = _charEnumCallback.get();
         HandleCharEnum(result);
-        _charEnumCallback.cancel();
     }
 
     if (_charCreateCallback.IsReady())
     {
         _charCreateCallback.GetResult(result);
         HandleCharCreateCallback(result, _charCreateCallback.GetParam());
-        // Don't call FreeResult() here, the callback handler will do that depending on the events in the callback chain
     }
 
     //! HandlePlayerLoginOpcode
-    if (_charLoginCallback.ready())
+    if (IsFutureReady(_charLoginCallback))
     {
-        SQLQueryHolder* param;
-        _charLoginCallback.get(param);
+        SQLQueryHolder* param = _charLoginCallback.get();
         HandlePlayerLoginFromDB((LoginQueryHolder*)param);
-        _charLoginCallback.cancel();
     }
 }
 

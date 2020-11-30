@@ -16,11 +16,14 @@
 #include "SharedDefines.h"
 #include "QueryResult.h"
 #include "Callback.h"
+#include "Database/PreparedStatement.h"
 
 #include <map>
 #include <set>
 #include <list>
 #include <atomic>
+#include <vector>
+#include <future>
 
 class Object;
 class WorldPacket;
@@ -940,7 +943,7 @@ private:
     AutobroadcastsWeightMap m_AutobroadcastsWeights;
 
     void ProcessQueryCallbacks();
-    ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
+    std::vector<PreparedQueryResultSharedFuture> m_realmCharCallbacks;
 };
 
 #define sWorld World::instance()

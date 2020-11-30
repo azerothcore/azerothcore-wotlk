@@ -587,7 +587,7 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
         stmt->setUInt32(0, _player->GetGUIDLow());
         stmt->setUInt8(1, uint8(_player->GetTemporaryUnsummonedPetNumber() ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
 
-        if (PreparedQueryResult _result = CharacterDatabase.AsyncQuery(stmt))
+        if (PreparedQueryResult _result = CharacterDatabase.Query(stmt))
         {
             Field* fields = _result->Fetch();
 

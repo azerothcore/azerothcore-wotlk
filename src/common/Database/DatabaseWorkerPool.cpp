@@ -106,7 +106,7 @@ void DatabaseWorkerPool<T>::Execute(const char* sql)
 template <class T>
 void DatabaseWorkerPool<T>::Execute(PreparedStatement* stmt)
 {
-    PreparedStatementTask* task = new PreparedStatementTask(stmt);
+    PreparedStatementTask* task = new PreparedStatementTask(stmt, false);
     Enqueue(task);
 }
 
@@ -170,10 +170,10 @@ PreparedQueryResult DatabaseWorkerPool<T>::Query(PreparedStatement* stmt)
 }
 
 template <class T>
-QueryResultFuture DatabaseWorkerPool<T>::AsyncQuery(const char* sql)
+QueryResultPromise DatabaseWorkerPool<T>::AsyncQuery(const char* sql)
 {
-    QueryResultFuture res;
-    BasicStatementTask* task = new BasicStatementTask(sql, res);
+    QueryResultPromise res;
+    BasicStatementTask* task = new BasicStatementTask(sql, &res);
     Enqueue(task);
     return res;         //! Actual return value has no use yet
 }
@@ -181,19 +181,17 @@ QueryResultFuture DatabaseWorkerPool<T>::AsyncQuery(const char* sql)
 template <class T>
 PreparedQueryResultFuture DatabaseWorkerPool<T>::AsyncQuery(PreparedStatement* stmt)
 {
-    PreparedQueryResultFuture res;
-    PreparedStatementTask* task = new PreparedStatementTask(stmt, res);
+    auto const task = new PreparedStatementTask(stmt, true);
     Enqueue(task);
-    return res;
+    return task->Future();
 }
 
 template <class T>
 QueryResultHolderFuture DatabaseWorkerPool<T>::DelayQueryHolder(SQLQueryHolder* holder)
 {
-    QueryResultHolderFuture res;
-    SQLQueryHolderTask* task = new SQLQueryHolderTask(holder, res);
+    auto const task = new SQLQueryHolderTask(holder);
     Enqueue(task);
-    return res;     //! Fool compiler, has no use yet
+    return task->Future();
 }
 
 template <class T>

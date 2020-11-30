@@ -158,9 +158,6 @@ void SQLQueryHolder::SetSize(size_t size)
 
 bool SQLQueryHolderTask::Execute()
 {
-    //the result can't be ready as we are processing it right now
-    ASSERT(!m_result.ready());
-
     if (!m_holder)
         return false;
 
@@ -192,6 +189,11 @@ bool SQLQueryHolderTask::Execute()
         }
     }
 
-    m_result.set(m_holder);
+    m_result.set_value(m_holder);
     return true;
+}
+
+QueryResultHolderFuture SQLQueryHolderTask::Future()
+{
+    return m_result.get_future();
 }
