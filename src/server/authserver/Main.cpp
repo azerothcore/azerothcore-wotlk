@@ -46,22 +46,6 @@ bool stopEvent = false;                                     // Setting it to tru
 
 LoginDatabaseWorkerPool LoginDatabase;                      // Accessor to the authserver database
 
-/// Handle authserver's termination signals
-class AuthServerSignalHandler : public acore::SignalHandler
-{
-public:
-    virtual void HandleSignal(int sigNum)
-    {
-        switch (sigNum)
-        {
-            case SIGINT:
-            case SIGTERM:
-                stopEvent = true;
-                break;
-        }
-    }
-};
-
 /// Print out the usage string for this program on the console.
 void usage(const char* prog)
 {
@@ -179,12 +163,14 @@ extern int main(int argc, char** argv)
     sLog->outString("Authserver listening to %s:%d", bind_ip.c_str(), rmport);
 
     // Initialize the signal handlers
-    AuthServerSignalHandler SignalINT, SignalTERM;
+    acore::SignalHandler signalHandler;
+    auto const handler = [](int) { stopEvent = true; };
 
-    // Register authservers's signal handlers
-    ACE_Sig_Handler Handler;
-    Handler.register_handler(SIGINT, &SignalINT);
-    Handler.register_handler(SIGTERM, &SignalTERM);
+    signalHandler.handle_signal(SIGINT, handler);
+    signalHandler.handle_signal(SIGTERM, handler);
+#ifdef _WIN32
+    signalHandler.handle_signal(SIGBREAK, handler);
+#endif
 
 #if defined(_WIN32) || defined(__linux__)
 
