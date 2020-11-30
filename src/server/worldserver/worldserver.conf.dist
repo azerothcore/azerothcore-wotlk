@@ -3525,7 +3525,23 @@ LFG.Location.All = 0
 #         2 = Display detailed requirements, all at once, with clickable links
 #        Default: 1
 #  
-DungeonAccessRequirementsPrintMode = 1
+DungeonAccessRequirements.PrintMode = 1
+
+#    DungeonAccessRequirement.PortalAvgIlevelCheck
+#
+#    	 Description: Allow average ilvl to be checked when entering via portal and deny the entry if minimum average is not met.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#  
+DungeonAccessRequirement.PortalAvgIlevelCheck = 0
+
+#    DungeonAccessRequirement.LFGLevelDBCOverride
+#
+#    	 Description: Will check dungeon_access_requirements talbe to check if player can join a specific dungeon with the LFG tool
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#  
+DungeonAccessRequirement.LFGLevelDBCOverride = 0
 
 #
 #    ICC Buff

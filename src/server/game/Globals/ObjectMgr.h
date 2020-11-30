@@ -705,7 +705,7 @@ public:
 
     typedef std::unordered_map<uint32, uint32> AreaTriggerScriptContainer;
 
-    typedef std::unordered_map<uint32, DungeonProgressionRequirements*> AccessRequirementContainer;
+    typedef std::unordered_map<uint32, DungeonProgressionRequirements*> DungeonProgressionRequirementsContainer;
 
     typedef std::unordered_map<uint32, RepRewardRate > RepRewardRateContainer;
     typedef std::unordered_map<uint32, ReputationOnKillEntry> RepOnKillContainer;
@@ -835,7 +835,7 @@ public:
 
     DungeonProgressionRequirements const* GetAccessRequirement(uint32 mapid, Difficulty difficulty) const
     {
-        AccessRequirementContainer::const_iterator itr = _accessRequirementStore.find(MAKE_PAIR32(mapid, difficulty));
+        DungeonProgressionRequirementsContainer::const_iterator itr = _accessRequirementStore.find(MAKE_PAIR32(mapid, difficulty));
         if (itr != _accessRequirementStore.end())
             return itr->second;
         return nullptr;
@@ -1385,7 +1385,7 @@ private:
     AreaTriggerContainer _areaTriggerStore;
     AreaTriggerTeleportContainer _areaTriggerTeleportStore;
     AreaTriggerScriptContainer _areaTriggerScriptStore;
-    AccessRequirementContainer _accessRequirementStore;
+    DungeonProgressionRequirementsContainer _accessRequirementStore;
     DungeonEncounterContainer _dungeonEncounterStore;
 
     RepRewardRateContainer _repRewardRateStore;

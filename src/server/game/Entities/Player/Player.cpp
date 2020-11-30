@@ -19610,10 +19610,20 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
             }
         }
 
+        //Check if ILVL check is required here
+        uint16 minRequiredIlvl = 0;
+        if (sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PORTAL_CHECK_ILVL))
+        {
+            uint16 currentIlvl = (uint16)GetAverageItemLevelForDF();
+            if(ar->reqItemLevel > currentIlvl)
+                minRequiredIlvl = currentIlvl;
+        }
+
+
         Difficulty target_difficulty = GetDifficulty(mapEntry->IsRaid());
         MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(target_map, target_difficulty);
         LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
-        if (LevelMin || LevelMax || missingItems.size() || missingQuests.size() || missingAchievements.size())
+        if (LevelMin || LevelMax || minRequiredIlvl || missingItems.size() || missingQuests.size() || missingAchievements.size())
         {
             if (report)
             {
@@ -19621,7 +19631,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
 
                 if (requirementPrintMode == 0)
                 {
-                    //Just print out tha requirements are not met
+                    //Just print out the requirements are not met
                     ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_NOT_MET);
                 }
                 else if(requirementPrintMode == 1)
@@ -19635,6 +19645,8 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                         GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), LevelMin, sObjectMgr->GetItemTemplate(missingItems[0]->id)->Name1.c_str());
                     else if (LevelMin)
                         GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
+                    else if(minRequiredIlvl)
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, minRequiredIlvl);
                 }
                 else
                 {
@@ -19737,6 +19749,12 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                         }
                     }
 
+                    if (minRequiredIlvl)
+                    {
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, minRequiredIlvl);
+                    }
+
+
                     if (mapDiff->hasErrorMessage)
                     {
                         SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
@@ -19745,6 +19763,11 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     {
                         GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
                     }
+                    else if (LevelMax)
+                    {
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_ACCESS_REQUIREMENT_MAX_LEVEL), LevelMax);
+                    }
+
                 }
             }
             return false;

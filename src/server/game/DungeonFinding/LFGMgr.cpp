@@ -399,22 +399,33 @@ namespace lfg
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
             else if (dungeon->difficulty > DUNGEON_DIFFICULTY_NORMAL && (!mapEntry || !mapEntry->IsRaid()) && sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUIDLow(), dungeon->map, Difficulty(dungeon->difficulty)))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
-            else if (dungeon->minlevel > level)
+            else if (dungeon->minlevel > level && !sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE))
                 lockData = LFG_LOCKSTATUS_TOO_LOW_LEVEL;
-            else if (dungeon->maxlevel < level)
+            else if (dungeon->maxlevel < level && !sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE))
                 lockData = LFG_LOCKSTATUS_TOO_HIGH_LEVEL;
             else if (dungeon->seasonal && !IsSeasonActive(dungeon->id))
                 lockData = LFG_LOCKSTATUS_NOT_IN_SEASON;
             else if (DungeonProgressionRequirements const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty)))
             {
-                //Check if player has the required achievements
-                for (const ProgressionRequirement* achievementRequirement : ar->achievements)
+                if (sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE))
                 {
-                    if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == player->GetTeamId(true))
+                    if (ar->levelMin > level)
+                        lockData = LFG_LOCKSTATUS_TOO_LOW_LEVEL;
+                    else if (ar->levelMax < level)
+                        lockData = LFG_LOCKSTATUS_TOO_HIGH_LEVEL;
+                }
+
+                if (lockData == 0)
+                {
+                    //Check if player has the required achievements
+                    for (const ProgressionRequirement* achievementRequirement : ar->achievements)
                     {
-                        if (!player->HasAchieved(achievementRequirement->id))
+                        if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == player->GetTeamId(true))
                         {
-                            lockData = LFG_LOCKSTATUS_MISSING_ACHIEVEMENT;
+                            if (!player->HasAchieved(achievementRequirement->id))
+                            {
+                                lockData = LFG_LOCKSTATUS_MISSING_ACHIEVEMENT;
+                            }
                         }
                     }
                 }

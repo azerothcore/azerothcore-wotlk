@@ -337,7 +337,7 @@ ObjectMgr::~ObjectMgr()
         for (DungeonEncounterList::iterator encounterItr = itr->second.begin(); encounterItr != itr->second.end(); ++encounterItr)
             delete *encounterItr;
 
-    for (AccessRequirementContainer::iterator itr = _accessRequirementStore.begin(); itr != _accessRequirementStore.end(); ++itr)
+    for (DungeonProgressionRequirementsContainer::iterator itr = _accessRequirementStore.begin(); itr != _accessRequirementStore.end(); ++itr)
         delete itr->second;
 }
 
@@ -6096,7 +6096,7 @@ void ObjectMgr::LoadAccessRequirements()
 
     if (!_accessRequirementStore.empty())
     {
-        for (AccessRequirementContainer::iterator itr = _accessRequirementStore.begin(); itr != _accessRequirementStore.end(); ++itr)
+        for (DungeonProgressionRequirementsContainer::iterator itr = _accessRequirementStore.begin(); itr != _accessRequirementStore.end(); ++itr)
         {
             for (auto questItr = itr->second->quests.begin(); questItr != itr->second->quests.end(); ++questItr)
             {
@@ -6129,7 +6129,7 @@ void ObjectMgr::LoadAccessRequirements()
 
 
     uint32 count = 0;
-    uint32 countSubRequirements = 0;
+    uint32 countProgressionRequirements = 0;
 
 
     do
@@ -6172,7 +6172,7 @@ void ObjectMgr::LoadAccessRequirements()
                     //Achievement
                     if (!sAchievementStore.LookupEntry(progression_requirement->id))
                     {
-                        sLog->outErrorDb("Required Achievement %u for faction %u not exist for map %u difficulty %u, remove or fix achievement requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
+                        sLog->outErrorDb("Required achievement %u for faction %u not exist for map %u difficulty %u, remove or fix achievement requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
                         delete progression_requirement;
                         break;
                     }
@@ -6207,6 +6207,7 @@ void ObjectMgr::LoadAccessRequirements()
                 }
                 default:
                     delete progression_requirement;
+                    sLog->outError("requirement_type of %u is not valid for map %u difficulty %u. Please use 0 for achievements, 1 for quest, 2 for items or remove this entry from the db.", requirement_type, mapid, difficulty);
                     break;
                 }
 
@@ -6214,16 +6215,16 @@ void ObjectMgr::LoadAccessRequirements()
             } while (progression_requirements_results->NextRow());
         }
 
-        countSubRequirements += ar->achievements.size();
-        countSubRequirements += ar->quests.size();
-        countSubRequirements += ar->items.size();
+        countProgressionRequirements += ar->achievements.size();
+        countProgressionRequirements += ar->quests.size();
+        countProgressionRequirements += ar->items.size();
         count++;
 
         _accessRequirementStore[MAKE_PAIR32(mapid, difficulty)] = ar;
     } while (access_template_result->NextRow());
 
 
-    sLog->outString(">> Loaded %u rows from dungeon_access_template and %u rows from dungeon_access_requirements in %u ms", count, countSubRequirements, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u rows from dungeon_access_template and %u rows from dungeon_access_requirements in %u ms", count, countProgressionRequirements, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
