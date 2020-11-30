@@ -19,9 +19,9 @@ namespace VMAP
 
     class VMapFactory
     {
-        public:
-            static IVMapManager* createOrGetVMapManager();
-            static void clear();
+    public:
+        static IVMapManager* createOrGetVMapManager();
+        static void clear();
     };
 
 }

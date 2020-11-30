@@ -4,7 +4,7 @@
 /**
  *  @file     Pagefile_Memory_Pool.h
  *
- *  @author Dougls C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Dougls C. Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Prashant Jain <pjain@cs.wustl.edu>
  */
 //=============================================================================
