@@ -87,7 +87,6 @@ class ACE_Service_Gestalt;
 class ACE_Export ACE_Base_Thread_Adapter
 {
 public:
-
   virtual ~ACE_Base_Thread_Adapter (void);
 
   /// Virtual method invoked by the thread entry point.

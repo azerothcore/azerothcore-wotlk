@@ -27,6 +27,8 @@
 #    CHARACTER DELETE OPTIONS
 #    ITEM DELETE OPTIONS
 #    CUSTOM SERVER OPTIONS
+#    PACKET SPOOF PROTECTION SETTINGS
+#    DEBUG
 #
 ###################################################################################################
 
@@ -404,7 +406,7 @@ CleanCharacterDB = 0
 #                     Before use this feature, make a backup of your database.
 #
 #        Example:     14 - (CLEANING_FLAG_SKILLS + CLEANING_FLAG_SPELLS + CLEANING_FLAG_TALENTS
-#                           2+4+8 => 14. This will clean up skills, talents and spells will 
+#                           2+4+8 => 14. This will clean up skills, talents and spells will
 #                           remain enabled after the next cleanup)
 #        Default:     0  - (All cleanup methods will be disabled after the next cleanup)
 
@@ -987,6 +989,22 @@ MinCharterName = 2
 #        Default:     2
 
 MinPetName = 2
+
+#
+#    Guild.CharterCost
+#    ArenaTeam.CharterCost.2v2
+#    ArenaTeam.CharterCost.3v3
+#    ArenaTeam.CharterCost.5v5
+#        Description: Amount of money (in Copper) the petitions costs.
+#        Default:     1000 - (10 Silver)
+#                     800000 - (80 Gold)
+#                     1200000 - (120 Gold)
+#                     2000000 - (200 Gold)
+
+Guild.CharterCost = 1000
+ArenaTeam.CharterCost.2v2 = 800000
+ArenaTeam.CharterCost.3v3 = 1200000
+ArenaTeam.CharterCost.5v5 = 2000000
 
 #
 #    MaxWhoListReturns
@@ -2151,7 +2169,7 @@ GM.LogTrade = 1
 #        Description: GM character starting level.
 #        Default:     1
 
-GM.StartLevel = 80
+GM.StartLevel = 1
 
 #
 #    GM.AllowInvite
@@ -2374,14 +2392,17 @@ Rate.Drop.Item.ReferencedAmount = 1
 #    Rate.XP.Kill
 #    Rate.XP.Quest
 #    Rate.XP.Explore
+#    Rate.XP.Pet
 #        Description: Experience rates (outside battleground)
 #        Default:     1 - (Rate.XP.Kill)
 #                     1 - (Rate.XP.Quest)
 #                     1 - (Rate.XP.Explore)
+#                     1	- (Rate.XP.Pet)
 
 Rate.XP.Kill    = 1
 Rate.XP.Quest   = 1
 Rate.XP.Explore = 1
+Rate.XP.Pet     = 1
 
 #
 #    Rate.XP.BattlegroundKill
@@ -2497,6 +2518,14 @@ Rate.MoveSpeed = 1
 #        Default:     1
 
 Rate.InstanceResetTime = 1
+
+#
+#    Rate.Pet.LevelXP
+#        Description: Modifies the amount of experience required to level up a pet.
+#					  The lower the rate the less experience is required.
+#        Default:     0.05
+#   
+Rate.Pet.LevelXP = 0.05
 
 #
 #    SkillGain.Crafting
@@ -2745,6 +2774,73 @@ Battleground.TrackDeserters.Enable = 1
 #                     2 - (Experimental, Try to have even teams)
 
 Battleground.InvitationType = 0
+
+#
+#    Battleground.ReportAFK.Timer
+#         Description: After a few minutes that battle started you can report the player.
+#         Default:     4
+
+Battleground.ReportAFK.Timer = 4
+
+#
+#    Battleground.ReportAFK
+#        Description: Number of reports needed to kick someone AFK from Battleground.
+#        Range:       1-9
+#        Default:     3
+
+Battleground.ReportAFK = 3
+
+#    Battleground.DisableQuestShareInBG
+#        Description: Disables the ability to share quests while in a Battleground.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.DisableQuestShareInBG = 0
+
+#
+#    Battleground.DisableReadyCheckInBG
+#        Description: Disables the ability to send a Ready Check survey while in a Battleground.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.DisableReadyCheckInBG = 0
+
+#
+#     Battleground.RewardWinnerHonorFirst
+#     Battleground.RewardWinnerArenaFirst
+#     Battleground.RewardWinnerHonorLast
+#     Battleground.RewardWinnerArenaLast
+#     Battleground.RewardLoserHonorFirst
+#     Battleground.RewardLoserHonorLast
+#        Description: Random Battlegrounds / call to the arms rewards
+#        Default:     30 - Battleground.RewardWinnerHonorFirst
+#                     25 - Battleground.RewardWinnerArenaFirst
+#                     15 - Battleground.RewardWinnerHonorLast
+#                     0  - Battleground.RewardWinnerArenaLast
+#                     5  - Battleground.RewardLoserHonorFirst
+#                     5  - Battleground.RewardLoserHonorLast
+#
+
+Battleground.RewardWinnerHonorFirst = 30
+Battleground.RewardWinnerArenaFirst = 25
+Battleground.RewardWinnerHonorLast  = 15
+Battleground.RewardWinnerArenaLast  = 0
+Battleground.RewardLoserHonorFirst  = 5
+Battleground.RewardLoserHonorLast   = 5
+
+#
+#    Battleground.PlayerRespawn
+#        Description: Battleground player resurrection interval (in seconds).
+#        Default:     30
+
+Battleground.PlayerRespawn = 30
+
+#
+#    Battleground.BuffRespawn
+#        Description: Battleground buff respawn time (in seconds).
+#        Default:     180 (Recommended 10+)
+
+Battleground.BuffRespawn = 180
 
 #
 ###################################################################################################
@@ -3207,6 +3303,15 @@ Guild.AllowMultipleGuildMaster = 0
 ShowKickInWorld = 0
 
 #
+#     ShowMuteInWorld
+#        Description: Determines whether a message is broadcast to the entire server when a
+#                     player gets muted.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+ShowMuteInWorld = 0
+
+#
 #     ShowBanInWorld
 #        Description: Determines whether a message is broadcast to the entire server when a
 #                     player gets banned.
@@ -3224,6 +3329,7 @@ ShowBanInWorld = 0
 #                     0     - (Disabled)
 
 RecordUpdateTimeDiffInterval = 60000
+
 #
 #     MinRecordUpdateTimeDiff
 #        Description: Only record update time diff which is greater than this value.
@@ -3450,14 +3556,13 @@ ICC.Buff.Alliance = 73828
 ###################################################################################################
 
 ###################################################################################################
-#
-# Packet Spoof Protection Settings
+# PACKET SPOOF PROTECTION SETTINGS
 #
 # These settings determine which action to take when harmful packet spoofing is detected.
 #
 #    PacketSpoof.Policy
 #        Description: Determines the course of action when packet spoofing is detected.
-#        Values:     0 - Log only 
+#        Values:     0 - Log only
 #                    1 - Log + kick
 #                    2 - Log + kick + ban
 
@@ -3483,4 +3588,25 @@ PacketSpoof.BanMode = 0
 PacketSpoof.BanDuration = 86400
 
 #
-################################################################################################### 
+###################################################################################################
+
+###################################################################################################
+# DEBUG
+#
+#    Debug.Battleground
+#        Description: Enable or disable Battleground 1v0 mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.Battleground = 0
+
+#
+#    Debug.Arena
+#        Description: Enable or disable Arena 1v1 mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.Arena = 0
+
+#
+###################################################################################################

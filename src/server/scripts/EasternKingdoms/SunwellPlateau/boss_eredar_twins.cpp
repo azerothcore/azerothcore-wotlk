@@ -56,7 +56,7 @@ enum Misc
 
     EVENT_SPELL_SHADOW_BLADES   = 1,
     EVENT_SPELL_SHADOW_NOVA     = 2,
-    EVENT_SPELL_CONFOUNDING_BLOW= 3,
+    EVENT_SPELL_CONFOUNDING_BLOW = 3,
     EVENT_SHADOW_IMAGE          = 4,
     EVENT_SPELL_ENRAGE          = 5,
     EVENT_SPELL_CONFLAGRATION   = 6,
@@ -94,7 +94,7 @@ public:
 
                 uint32 timer = events.GetNextEventTime(EVENT_SPELL_SHADOW_NOVA);
                 events.CancelEvent(EVENT_SPELL_SHADOW_NOVA);
-                events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, timer-events.GetTimer());
+                events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, timer - events.GetTimer());
             }
         }
 
@@ -126,7 +126,7 @@ public:
 
         void KilledUnit(Unit* victim)
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0,1))
+            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
                 Talk(YELL_SAC_KILL);
         }
 
@@ -178,29 +178,29 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_SHADOW_BLADES, 10000);
                     break;
                 case EVENT_SPELL_SHADOW_NOVA:
-                {
-                    Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
-                    if (!target)
-                        target = me->GetVictim();
-                    Talk(EMOTE_SHADOW_NOVA, target);
-                    Talk(YELL_SHADOW_NOVA);
-                    me->CastSpell(target, SPELL_SHADOW_NOVA, false);
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, urand(30000, 35000));
-                    break;
-                }
+                    {
+                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
+                        if (!target)
+                            target = me->GetVictim();
+                        Talk(EMOTE_SHADOW_NOVA, target);
+                        Talk(YELL_SHADOW_NOVA);
+                        me->CastSpell(target, SPELL_SHADOW_NOVA, false);
+                        events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, urand(30000, 35000));
+                        break;
+                    }
                 case EVENT_SHADOW_IMAGE:
                     me->SummonCreature(NPC_SHADOW_IMAGE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 12000);
                     events.ScheduleEvent(EVENT_SHADOW_IMAGE, 6000);
                     break;
                 case EVENT_SPELL_CONFLAGRATION:
-                {
-                    Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
-                    if (!target)
-                        target = me->GetVictim();
-                    me->CastSpell(target, SPELL_CONFLAGRATION, false);
-                    events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, urand(30000, 35000));
-                    break;
-                }   
+                    {
+                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
+                        if (!target)
+                            target = me->GetVictim();
+                        me->CastSpell(target, SPELL_CONFLAGRATION, false);
+                        events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, urand(30000, 35000));
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
@@ -242,7 +242,7 @@ public:
 
                 uint32 timer = events.GetNextEventTime(EVENT_SPELL_CONFLAGRATION);
                 events.CancelEvent(EVENT_SPELL_CONFLAGRATION);
-                events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, timer-events.GetTimer());
+                events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, timer - events.GetTimer());
             }
         }
 
@@ -274,7 +274,7 @@ public:
 
         void KilledUnit(Unit* victim)
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0,1))
+            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
                 Talk(YELL_SAC_KILL);
         }
 
@@ -320,25 +320,25 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_BLAZE, 3800);
                     break;
                 case EVENT_SPELL_SHADOW_NOVA:
-                {
-                    Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
-                    if (!target)
-                        target = me->GetVictim();
-                    me->CastSpell(target, SPELL_SHADOW_NOVA, false);
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, urand(30000, 35000));
-                    break;
-                }
+                    {
+                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
+                        if (!target)
+                            target = me->GetVictim();
+                        me->CastSpell(target, SPELL_SHADOW_NOVA, false);
+                        events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, urand(30000, 35000));
+                        break;
+                    }
                 case EVENT_SPELL_CONFLAGRATION:
-                {
-                    Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
-                    if (!target)
-                        target = me->GetVictim();
-                    Talk(EMOTE_CONFLAGRATION, target);
-                    Talk(YELL_CANFLAGRATION);
-                    me->CastSpell(target, SPELL_CONFLAGRATION, false);
-                    events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, urand(30000, 35000));
-                    break;
-                }   
+                    {
+                        Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 100.0f);
+                        if (!target)
+                            target = me->GetVictim();
+                        Talk(EMOTE_CONFLAGRATION, target);
+                        Talk(YELL_CANFLAGRATION);
+                        me->CastSpell(target, SPELL_CONFLAGRATION, false);
+                        events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, urand(30000, 35000));
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
@@ -353,153 +353,153 @@ public:
 
 class spell_eredar_twins_apply_dark_touched : public SpellScriptLoader
 {
-    public:
-        spell_eredar_twins_apply_dark_touched() : SpellScriptLoader("spell_eredar_twins_apply_dark_touched") { }
+public:
+    spell_eredar_twins_apply_dark_touched() : SpellScriptLoader("spell_eredar_twins_apply_dark_touched") { }
 
-        class spell_eredar_twins_apply_dark_touched_SpellScript : public SpellScript
+    class spell_eredar_twins_apply_dark_touched_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_eredar_twins_apply_dark_touched_SpellScript);
+
+        void HandleApplyTouch()
         {
-            PrepareSpellScript(spell_eredar_twins_apply_dark_touched_SpellScript);
-
-            void HandleApplyTouch()
-            {
-                if (Player* target = GetHitPlayer())
-                    target->CastSpell(target, SPELL_DARK_TOUCHED, true);
-            }
-
-            void Register()
-            {
-                AfterHit += SpellHitFn(spell_eredar_twins_apply_dark_touched_SpellScript::HandleApplyTouch);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_eredar_twins_apply_dark_touched_SpellScript();
+            if (Player* target = GetHitPlayer())
+                target->CastSpell(target, SPELL_DARK_TOUCHED, true);
         }
+
+        void Register()
+        {
+            AfterHit += SpellHitFn(spell_eredar_twins_apply_dark_touched_SpellScript::HandleApplyTouch);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_eredar_twins_apply_dark_touched_SpellScript();
+    }
 };
 
 class spell_eredar_twins_apply_flame_touched : public SpellScriptLoader
 {
-    public:
-        spell_eredar_twins_apply_flame_touched() : SpellScriptLoader("spell_eredar_twins_apply_flame_touched") { }
+public:
+    spell_eredar_twins_apply_flame_touched() : SpellScriptLoader("spell_eredar_twins_apply_flame_touched") { }
 
-        class spell_eredar_twins_apply_flame_touched_SpellScript : public SpellScript
+    class spell_eredar_twins_apply_flame_touched_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_eredar_twins_apply_flame_touched_SpellScript);
+
+        void HandleApplyTouch()
         {
-            PrepareSpellScript(spell_eredar_twins_apply_flame_touched_SpellScript);
-
-            void HandleApplyTouch()
-            {
-                if (Player* target = GetHitPlayer())
-                    target->CastSpell(target, SPELL_FLAME_TOUCHED, true);
-            }
-
-            void Register()
-            {
-                AfterHit += SpellHitFn(spell_eredar_twins_apply_flame_touched_SpellScript::HandleApplyTouch);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_eredar_twins_apply_flame_touched_SpellScript();
+            if (Player* target = GetHitPlayer())
+                target->CastSpell(target, SPELL_FLAME_TOUCHED, true);
         }
+
+        void Register()
+        {
+            AfterHit += SpellHitFn(spell_eredar_twins_apply_flame_touched_SpellScript::HandleApplyTouch);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_eredar_twins_apply_flame_touched_SpellScript();
+    }
 };
 
 class spell_eredar_twins_handle_touch : public SpellScriptLoader
 {
-    public:
-        spell_eredar_twins_handle_touch() : SpellScriptLoader("spell_eredar_twins_handle_touch") { }
+public:
+    spell_eredar_twins_handle_touch() : SpellScriptLoader("spell_eredar_twins_handle_touch") { }
 
-        class spell_eredar_twins_handle_touch_SpellScript : public SpellScript
+    class spell_eredar_twins_handle_touch_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_eredar_twins_handle_touch_SpellScript);
+
+        SpellCastResult CheckCast()
         {
-            PrepareSpellScript(spell_eredar_twins_handle_touch_SpellScript);
+            if (GetCaster()->HasAura(SPELL_DARK_FLAME))
+                return SPELL_FAILED_DONT_REPORT;
 
-            SpellCastResult CheckCast()
+            if (GetSpellInfo()->Id == SPELL_DARK_TOUCHED)
             {
-                if (GetCaster()->HasAura(SPELL_DARK_FLAME))
+                if (GetCaster()->HasAura(SPELL_FLAME_TOUCHED))
+                {
+                    GetCaster()->RemoveAurasDueToSpell(SPELL_FLAME_TOUCHED);
+                    GetCaster()->CastSpell(GetCaster(), SPELL_DARK_FLAME, true);
                     return SPELL_FAILED_DONT_REPORT;
-
-                if (GetSpellInfo()->Id == SPELL_DARK_TOUCHED)
-                {
-                    if (GetCaster()->HasAura(SPELL_FLAME_TOUCHED))
-                    {
-                        GetCaster()->RemoveAurasDueToSpell(SPELL_FLAME_TOUCHED);
-                        GetCaster()->CastSpell(GetCaster(), SPELL_DARK_FLAME, true);
-                        return SPELL_FAILED_DONT_REPORT;
-                    }
                 }
-                else // if (m_spellInfo->Id == SPELL_FLAME_TOUCHED)
-                {
-                    if (GetCaster()->HasAura(SPELL_DARK_TOUCHED))
-                    {
-                        GetCaster()->RemoveAurasDueToSpell(SPELL_DARK_TOUCHED);
-                        GetCaster()->CastSpell(GetCaster(), SPELL_DARK_FLAME, true);
-                        return SPELL_FAILED_DONT_REPORT;
-                    }
-                }
-                return SPELL_CAST_OK;
             }
-
-            void Register()
+            else // if (m_spellInfo->Id == SPELL_FLAME_TOUCHED)
             {
-                OnCheckCast += SpellCheckCastFn(spell_eredar_twins_handle_touch_SpellScript::CheckCast);
+                if (GetCaster()->HasAura(SPELL_DARK_TOUCHED))
+                {
+                    GetCaster()->RemoveAurasDueToSpell(SPELL_DARK_TOUCHED);
+                    GetCaster()->CastSpell(GetCaster(), SPELL_DARK_FLAME, true);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
             }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_eredar_twins_handle_touch_SpellScript();
+            return SPELL_CAST_OK;
         }
+
+        void Register()
+        {
+            OnCheckCast += SpellCheckCastFn(spell_eredar_twins_handle_touch_SpellScript::CheckCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_eredar_twins_handle_touch_SpellScript();
+    }
 };
 
 class spell_eredar_twins_blaze : public SpellScriptLoader
 {
-    public:
-        spell_eredar_twins_blaze() : SpellScriptLoader("spell_eredar_twins_blaze") { }
+public:
+    spell_eredar_twins_blaze() : SpellScriptLoader("spell_eredar_twins_blaze") { }
 
-        class spell_eredar_twins_blaze_SpellScript : public SpellScript
+    class spell_eredar_twins_blaze_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_eredar_twins_blaze_SpellScript);
+
+        void HandleScript(SpellEffIndex effIndex)
         {
-            PrepareSpellScript(spell_eredar_twins_blaze_SpellScript);
-
-            void HandleScript(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-                if (Unit* target = GetHitUnit())
-                    target->CastSpell(target, SPELL_BLAZE_SUMMON, true);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_eredar_twins_blaze_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_eredar_twins_blaze_SpellScript();
+            PreventHitDefaultEffect(effIndex);
+            if (Unit* target = GetHitUnit())
+                target->CastSpell(target, SPELL_BLAZE_SUMMON, true);
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_eredar_twins_blaze_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_eredar_twins_blaze_SpellScript();
+    }
 };
 
 class AreaTrigger_at_sunwell_eredar_twins : public AreaTriggerScript
 {
-    public:
+public:
 
-        AreaTrigger_at_sunwell_eredar_twins() : AreaTriggerScript("at_sunwell_eredar_twins") {}
+    AreaTrigger_at_sunwell_eredar_twins() : AreaTriggerScript("at_sunwell_eredar_twins") {}
 
-        bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
-        {
-            if (InstanceScript* instance = player->GetInstanceScript())
-                if (instance->GetBossState(DATA_EREDAR_TWINS_INTRO) != DONE)
-                {
-                    instance->SetBossState(DATA_EREDAR_TWINS_INTRO, DONE);
-                    if (Creature* creature = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_LADY_SACROLASH)))
-                        creature->AI()->Talk(YELL_INTRO_SAC);
-                    if (Creature* creature = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_GRAND_WARLOCK_ALYTHESS)))
-                        creature->AI()->Talk(YELL_INTRO_ALY);
-                }
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+            if (instance->GetBossState(DATA_EREDAR_TWINS_INTRO) != DONE)
+            {
+                instance->SetBossState(DATA_EREDAR_TWINS_INTRO, DONE);
+                if (Creature* creature = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_LADY_SACROLASH)))
+                    creature->AI()->Talk(YELL_INTRO_SAC);
+                if (Creature* creature = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_GRAND_WARLOCK_ALYTHESS)))
+                    creature->AI()->Talk(YELL_INTRO_ALY);
+            }
 
-            return true;
-        }
+        return true;
+    }
 };
 
 void AddSC_boss_eredar_twins()
