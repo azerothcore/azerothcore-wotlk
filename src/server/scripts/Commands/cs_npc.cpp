@@ -68,38 +68,38 @@ struct MechanicImmune
 
 MechanicImmune const mechanicImmunes[MAX_MECHANIC] =
 {
-    { MECHANIC_NONE             , "MECHANIC_NONE"               },
-    { MECHANIC_CHARM            , "MECHANIC_CHARM"              },
-    { MECHANIC_DISORIENTED      , "MECHANIC_DISORIENTED"        },
-    { MECHANIC_DISARM           , "MECHANIC_DISARM"             },
-    { MECHANIC_DISTRACT         , "MECHANIC_DISTRACT"           },
-    { MECHANIC_FEAR             , "MECHANIC_FEAR"               },
-    { MECHANIC_GRIP             , "MECHANIC_GRIP"               },
-    { MECHANIC_ROOT             , "MECHANIC_ROOT"               },
-    { MECHANIC_SLOW_ATTACK      , "MECHANIC_SLOW_ATTACK"        },
-    { MECHANIC_SILENCE          , "MECHANIC_SILENCE"            },
-    { MECHANIC_SLEEP            , "MECHANIC_SLEEP"              },
-    { MECHANIC_SNARE            , "MECHANIC_SNARE"              },
-    { MECHANIC_STUN             , "MECHANIC_STUN"               },
-    { MECHANIC_FREEZE           , "MECHANIC_FREEZE"             },
-    { MECHANIC_KNOCKOUT         , "MECHANIC_KNOCKOUT"           },
-    { MECHANIC_BLEED            , "MECHANIC_BLEED"              },
-    { MECHANIC_BANDAGE          , "MECHANIC_BANDAGE"            },
-    { MECHANIC_POLYMORPH        , "MECHANIC_POLYMORPH"          },
-    { MECHANIC_BANISH           , "MECHANIC_BANISH"             },
-    { MECHANIC_SHIELD           , "MECHANIC_SHIELD"             },
-    { MECHANIC_SHACKLE          , "MECHANIC_SHACKLE"            },
-    { MECHANIC_MOUNT            , "MECHANIC_MOUNT"              },
-    { MECHANIC_INFECTED         , "MECHANIC_INFECTED"           },
-    { MECHANIC_TURN             , "MECHANIC_TURN"               },
-    { MECHANIC_HORROR           , "MECHANIC_HORROR"             },
-    { MECHANIC_INVULNERABILITY  , "MECHANIC_INVULNERABILITY"    },
-    { MECHANIC_INTERRUPT        , "MECHANIC_INTERRUPT"          },
-    { MECHANIC_DAZE             , "MECHANIC_DAZE"               },
-    { MECHANIC_DISCOVERY        , "MECHANIC_DISCOVERY"          },
-    { MECHANIC_IMMUNE_SHIELD    , "MECHANIC_IMMUNE_SHIELD"      },
-    { MECHANIC_SAPPED           , "MECHANIC_SAPPED"             },
-    { MECHANIC_ENRAGED          , "MECHANIC_ENRAGED"            },
+    { MECHANIC_NONE, "MECHANIC_NONE"               },
+    { MECHANIC_CHARM, "MECHANIC_CHARM"              },
+    { MECHANIC_DISORIENTED, "MECHANIC_DISORIENTED"        },
+    { MECHANIC_DISARM, "MECHANIC_DISARM"             },
+    { MECHANIC_DISTRACT, "MECHANIC_DISTRACT"           },
+    { MECHANIC_FEAR, "MECHANIC_FEAR"               },
+    { MECHANIC_GRIP, "MECHANIC_GRIP"               },
+    { MECHANIC_ROOT, "MECHANIC_ROOT"               },
+    { MECHANIC_SLOW_ATTACK, "MECHANIC_SLOW_ATTACK"        },
+    { MECHANIC_SILENCE, "MECHANIC_SILENCE"            },
+    { MECHANIC_SLEEP, "MECHANIC_SLEEP"              },
+    { MECHANIC_SNARE, "MECHANIC_SNARE"              },
+    { MECHANIC_STUN, "MECHANIC_STUN"               },
+    { MECHANIC_FREEZE, "MECHANIC_FREEZE"             },
+    { MECHANIC_KNOCKOUT, "MECHANIC_KNOCKOUT"           },
+    { MECHANIC_BLEED, "MECHANIC_BLEED"              },
+    { MECHANIC_BANDAGE, "MECHANIC_BANDAGE"            },
+    { MECHANIC_POLYMORPH, "MECHANIC_POLYMORPH"          },
+    { MECHANIC_BANISH, "MECHANIC_BANISH"             },
+    { MECHANIC_SHIELD, "MECHANIC_SHIELD"             },
+    { MECHANIC_SHACKLE, "MECHANIC_SHACKLE"            },
+    { MECHANIC_MOUNT, "MECHANIC_MOUNT"              },
+    { MECHANIC_INFECTED, "MECHANIC_INFECTED"           },
+    { MECHANIC_TURN, "MECHANIC_TURN"               },
+    { MECHANIC_HORROR, "MECHANIC_HORROR"             },
+    { MECHANIC_INVULNERABILITY, "MECHANIC_INVULNERABILITY"    },
+    { MECHANIC_INTERRUPT, "MECHANIC_INTERRUPT"          },
+    { MECHANIC_DAZE, "MECHANIC_DAZE"               },
+    { MECHANIC_DISCOVERY, "MECHANIC_DISCOVERY"          },
+    { MECHANIC_IMMUNE_SHIELD, "MECHANIC_IMMUNE_SHIELD"      },
+    { MECHANIC_SAPPED, "MECHANIC_SAPPED"             },
+    { MECHANIC_ENRAGED, "MECHANIC_ENRAGED"            },
 };
 
 class npc_commandscript : public CommandScript
@@ -149,7 +149,7 @@ public:
             { "model",          SEC_ADMINISTRATOR,  false, &HandleNpcSetModelCommand,          "" },
             { "movetype",       SEC_ADMINISTRATOR,  false, &HandleNpcSetMoveTypeCommand,       "" },
             { "phase",          SEC_ADMINISTRATOR,  false, &HandleNpcSetPhaseCommand,          "" },
-            { "spawndist",      SEC_ADMINISTRATOR,  false, &HandleNpcSetSpawnDistCommand,      "" },
+            { "wanderdistance", SEC_ADMINISTRATOR,  false, &HandleNpcSetWanderDistanceCommand, "" },
             { "spawntime",      SEC_ADMINISTRATOR,  false, &HandleNpcSetSpawnTimeCommand,      "" },
             { "data",           SEC_ADMINISTRATOR,  false, &HandleNpcSetDataCommand,           "" },
             //{ TODO: fix or remove these commands
@@ -295,7 +295,8 @@ public:
             return false;
         }
 
-        uint32 vendor_entry = vendor ? vendor->GetEntry() : 0;
+        char* addMulti = strtok(nullptr, " ");
+        uint32 vendor_entry = addMulti ? handler->GetSession()->GetCurrentVendor() : vendor->GetEntry();
 
         if (!sObjectMgr->IsVendorItemValid(vendor_entry, itemId, maxcount, incrtime, extendedcost, handler->GetSession()->GetPlayer()))
         {
@@ -441,15 +442,15 @@ public:
         {
             if (((Pet*)creature)->getPetType() == HUNTER_PET)
             {
-                creature->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr->GetXPForLevel(lvl)/4);
+                creature->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr->GetXPForLevel(lvl) / 4);
                 creature->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             }
             ((Pet*)creature)->GivePetLevel(lvl);
         }
         else
         {
-            creature->SetMaxHealth(100 + 30*lvl);
-            creature->SetHealth(100 + 30*lvl);
+            creature->SetMaxHealth(100 + 30 * lvl);
+            creature->SetHealth(100 + 30 * lvl);
             creature->SetLevel(lvl);
             creature->SaveToDB();
         }
@@ -518,7 +519,8 @@ public:
         }
         uint32 itemId = atol(pitem);
 
-        if (!sObjectMgr->RemoveVendorItem(vendor->GetEntry(), itemId))
+        char* addMulti = strtok(NULL, " ");
+        if (!sObjectMgr->RemoveVendorItem(addMulti ? handler->GetSession()->GetCurrentVendor() : vendor->GetEntry(), itemId))
         {
             handler->PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId);
             handler->SetSentErrorMessage(true);
@@ -603,10 +605,11 @@ public:
     static bool HandleNpcSetOriginalFaction(ChatHandler* handler, const char* /*args*/)
     {
         Player* me = handler->GetSession()->GetPlayer();
-        Creature* creature = me->GetSelectedUnit()->ToCreature();
 
         if (!me)
             return false;
+
+        Creature* creature = me->GetSelectedUnit()->ToCreature();
 
         if (!creature)
             return false;
@@ -719,7 +722,7 @@ public:
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 Entry = target->GetEntry();
 
-        int64 curRespawnDelay = target->GetRespawnTimeEx()-time(nullptr);
+        int64 curRespawnDelay = target->GetRespawnTimeEx() - time(nullptr);
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);
@@ -788,8 +791,7 @@ public:
                 handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, creatureTemplate->Name.c_str(), x, y, z, mapId);
 
                 ++count;
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
         }
 
         handler->PSendSysMessage(LANG_COMMAND_NEAR_NPC_MESSAGE, distance, count);
@@ -934,7 +936,7 @@ public:
     * Valid movement types are:
     * <ul>
     * <li> stay - NPC wont move </li>
-    * <li> random - NPC will move randomly according to the spawndist </li>
+    * <li> random - NPC will move randomly according to the wander_distance </li>
     * <li> way - NPC will move with given waypoints set </li>
     * </ul>
     * additional parameter: NODEL - so no waypoints are deleted, if you
@@ -1106,7 +1108,7 @@ public:
     }
 
     //set spawn dist of creature
-    static bool HandleNpcSetSpawnDistCommand(ChatHandler* handler, const char* args)
+    static bool HandleNpcSetWanderDistanceCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
             return false;
@@ -1119,7 +1121,7 @@ public:
         }
 
         MovementGeneratorType mtype = IDLE_MOTION_TYPE;
-        if (option >0.0f)
+        if (option > 0.0f)
             mtype = RANDOM_MOTION_TYPE;
 
         Creature* creature = handler->getSelectedCreature();
@@ -1130,7 +1132,7 @@ public:
         else
             return false;
 
-        creature->SetRespawnRadius((float)option);
+        creature->SetWanderDistance((float)option);
         creature->SetDefaultMovementType(mtype);
         creature->GetMotionMaster()->Initialize();
         if (creature->IsAlive())                                // dead creature will reset movement generator at respawn
@@ -1139,7 +1141,7 @@ public:
             creature->Respawn();
         }
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_DISTANCE);
+        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_WANDER_DISTANCE);
 
         stmt->setFloat(0, option);
         stmt->setUInt8(1, uint8(mtype));
@@ -1147,7 +1149,7 @@ public:
 
         WorldDatabase.Execute(stmt);
 
-        handler->PSendSysMessage(LANG_COMMAND_SPAWNDIST, option);
+        handler->PSendSysMessage(LANG_COMMAND_WANDER_DISTANCE, option);
         return true;
     }
 
@@ -1211,9 +1213,15 @@ public:
         char lastchar = args[strlen(args) - 1];
         switch (lastchar)
         {
-        case '?':   creature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);      break;
-        case '!':   creature->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);   break;
-        default:    creature->HandleEmoteCommand(EMOTE_ONESHOT_TALK);          break;
+            case '?':
+                creature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                break;
+            case '!':
+                creature->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                break;
+            default:
+                creature->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                break;
         }
 
         return true;
@@ -1383,7 +1391,7 @@ public:
         // place pet before player
         float x, y, z;
         player->GetClosePoint (x, y, z, creatureTarget->GetObjectSize(), CONTACT_DISTANCE);
-        pet->Relocate(x, y, z, M_PI-player->GetOrientation());
+        pet->Relocate(x, y, z, M_PI - player->GetOrientation());
 
         // set pet to defensive mode by default (some classes can't control controlled pets in fact).
         pet->SetReactState(REACT_DEFENSIVE);
@@ -1439,7 +1447,7 @@ public:
 
         group_member                 = new FormationInfo;
         group_member->follow_angle   = (creature->GetAngle(chr) - chr->GetOrientation()) * 180 / M_PI;
-        group_member->follow_dist    = sqrtf(pow(chr->GetPositionX() - creature->GetPositionX(), int(2))+pow(chr->GetPositionY() - creature->GetPositionY(), int(2)));
+        group_member->follow_dist    = sqrtf(pow(chr->GetPositionX() - creature->GetPositionX(), int(2)) + pow(chr->GetPositionY() - creature->GetPositionY(), int(2)));
         group_member->leaderGUID     = leaderGUID;
         group_member->groupAI        = 0;
 

@@ -157,7 +157,6 @@ template <class CONCRETE>
 class ACE_Based_Pointer : public ACE_Based_Pointer_Basic<CONCRETE>
 {
 public:
-  // = Initialization method.
   /// Constructor.  See constructor for ACE_Based_Pointer_Basic for
   /// details.
   ACE_Based_Pointer (void);

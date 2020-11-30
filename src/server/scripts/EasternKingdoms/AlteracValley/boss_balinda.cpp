@@ -61,7 +61,8 @@ public:
             {
                 DoCastVictim(SPELL_WATERBOLT);
                 waterBoltTimer = 5 * IN_MILLISECONDS;
-            } else waterBoltTimer -= diff;
+            }
+            else waterBoltTimer -= diff;
 
             // check if creature is not outside of building
             if (resetTimer < diff)
@@ -70,7 +71,8 @@ public:
                     if (me->GetDistance2d(pBalinda->GetHomePosition().GetPositionX(), pBalinda->GetHomePosition().GetPositionY()) > 50)
                         EnterEvadeMode();
                 resetTimer = 5 * IN_MILLISECONDS;
-            } else resetTimer -= diff;
+            }
+            else resetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -145,31 +147,36 @@ public:
                 if (summons.empty())
                     me->SummonCreature(NPC_WATER_ELEMENTAL, 0, 0, 0, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 45 * IN_MILLISECONDS);
                 waterElementalTimer = 50 * IN_MILLISECONDS;
-            } else waterElementalTimer -= diff;
+            }
+            else waterElementalTimer -= diff;
 
             if (arcaneExplosionTimer < diff)
             {
                 DoCastVictim(SPELL_ARCANE_EXPLOSION);
                 arcaneExplosionTimer =  urand(5 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
-            } else arcaneExplosionTimer -= diff;
+            }
+            else arcaneExplosionTimer -= diff;
 
             if (coneOfColdTimer < diff)
             {
                 DoCastVictim(SPELL_CONE_OF_COLD);
                 coneOfColdTimer = urand(10 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
-            } else coneOfColdTimer -= diff;
+            }
+            else coneOfColdTimer -= diff;
 
             if (fireBoltTimer < diff)
             {
                 DoCastVictim(SPELL_FIREBALL);
                 fireBoltTimer = urand(5 * IN_MILLISECONDS, 9 * IN_MILLISECONDS);
-            } else fireBoltTimer -= diff;
+            }
+            else fireBoltTimer -= diff;
 
             if (frostboltTimer < diff)
             {
                 DoCastVictim(SPELL_FROSTBOLT);
                 frostboltTimer = urand(4 * IN_MILLISECONDS, 12 * IN_MILLISECONDS);
-            } else frostboltTimer -= diff;
+            }
+            else frostboltTimer -= diff;
 
             // check if creature is not outside of building
             if (resetTimer < diff)
@@ -180,7 +187,8 @@ public:
                     Talk(YELL_EVADE);
                 }
                 resetTimer = 5 * IN_MILLISECONDS;
-            } else resetTimer -= diff;
+            }
+            else resetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
