@@ -18,7 +18,7 @@ template <class T, class LockType = std::mutex, typename StorageType = std::dequ
 class LockedQueue
 {
     //! Lock access to the queue.
-    LockType _lock;
+    mutable LockType _lock;
 
     //! Storage backing the queue.
     StorageType _queue;
@@ -55,7 +55,6 @@ public:
     //! Gets the next result in the queue, if any.
     bool next(T& result)
     {
-        // ACE_Guard<LockType> g(this->_lock);
         RETURN_GUARD(this->_lock, false);
 
         if (_queue.empty())
@@ -109,9 +108,9 @@ public:
     }
 
     //! Checks if the queue is cancelled.
-    bool cancelled()
+    bool cancelled() const
     {
-        ACE_Guard<LockType> g(this->_lock);
+        std::lock_guard<LockType> g(_lock);
         return _canceled;
     }
 
@@ -130,14 +129,13 @@ public:
     ///! Calls pop_front of the queue
     void pop_front()
     {
-        ACE_GUARD (LockType, g, this->_lock);
+        std::lock_guard<LockType> g(_lock);
         _queue.pop_front();
     }
 
     ///! Checks if we're empty or not with locks held
-    bool empty()
+    bool empty() const
     {
-            
         RETURN_GUARD(this->_lock, false);
         return _queue.empty();
     }
