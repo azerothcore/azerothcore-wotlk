@@ -7277,7 +7277,7 @@ void Player::RewardReputation(Quest const* quest)
 
 void Player::RewardOtherBonusTalentPoints(uint32 bonusTalentPoints)
 {
-    if (bonusTalentPoints && bonusTalentPoints > 0)
+    if (bonusTalentPoints)
     {
         m_otherBonusTalentCount += bonusTalentPoints;
     }
