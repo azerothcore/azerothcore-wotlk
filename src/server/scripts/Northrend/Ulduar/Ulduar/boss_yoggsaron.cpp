@@ -301,10 +301,9 @@ enum Misc
 struct LocationsXY
 {
     float x, y, z, o;
-    uint32 id;
 };
 
-static LocationsXY YoggPortalLoc[] =
+static LocationsXY yoggPortalLoc[] =
 {
     {1970.48f, -9.75f, 325.5f, 0},
     {1992.76f, -10.21f, 325.5f, 0},
@@ -547,7 +546,7 @@ public:
             // Spawn Portals
             for (uint8 i = 0; i < RAID_MODE(4, 10); ++i)
             {
-                if ((cr = me->SummonCreature(NPC_DESCEND_INTO_MADNESS, YoggPortalLoc[i].x, YoggPortalLoc[i].y, YoggPortalLoc[i].z, 0, TEMPSUMMON_TIMED_DESPAWN, 25000)))
+                if ((cr = me->SummonCreature(NPC_DESCEND_INTO_MADNESS, yoggPortalLoc[i].x, yoggPortalLoc[i].y, yoggPortalLoc[i].z, 0, TEMPSUMMON_TIMED_DESPAWN, 25000)))
                 {
                     cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE);
                     cr->SetArmor(_currentIllusion);
