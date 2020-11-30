@@ -233,10 +233,10 @@ private:
         IDX_SIZE
     };
 
-    LockedQueue<SQLOperation*>   _queue;             //! Queue shared by async worker threads.
-    std::vector<std::vector<T*>>            _connections;
-    uint32                                  _connectionCount[2];       //! Counter of MySQL connections;
-    MySQLConnectionInfo                     _connectionInfo;
+    LockedQueue<SQLOperation*>      _queue;             //! Queue shared by async worker threads.
+    std::vector<std::vector<T*>>    _connections;
+    uint32                          _connectionCount[2];       //! Counter of MySQL connections;
+    MySQLConnectionInfo             _connectionInfo;
 };
 
 #endif
