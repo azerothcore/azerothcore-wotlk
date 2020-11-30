@@ -1,5 +1,4 @@
 // -*- C++ -*-
-// $Id: ACE_export.h 91683 2010-09-09 09:07:49Z johnnyw $
 // Definition for Win32 Export directives.
 // This file is generated automatically by
 // generate_export_file.pl
@@ -8,7 +7,7 @@
 #ifndef ACE_EXPORT_H
 #define ACE_EXPORT_H
 
-#include "ace/config-lite.h"
+#include /**/ "ace/config-lite.h"
 
 #if defined (ACE_AS_STATIC_LIBS)
 
@@ -43,21 +42,10 @@
 #  define ACE_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK)
 #endif     /* ACE_HAS_DLL */
 
-// Added by hand to help with ACE_OS namespace
-#if defined (__TANDEM) && defined (USE_EXPLICIT_EXPORT)
-#define ACE_NAMESPACE_STORAGE_CLASS ACE_EXPORT_MACRO extern
-#else
 #define ACE_NAMESPACE_STORAGE_CLASS extern ACE_EXPORT_MACRO
-#endif
 
 #if defined (__ACE_INLINE__)
-#  if defined (_MSC_VER) || defined (__MINGW32__) || defined (CYGWIN32) || \
-      (defined (__SUNPRO_CC) && __SUNPRO_CC >= 0x560) || \
-      (defined (__HP_aCC) && (__HP_aCC >= 60500))
-#    define ACE_NAMESPACE_INLINE_FUNCTION inline
-#  else
-#    define ACE_NAMESPACE_INLINE_FUNCTION ACE_NAMESPACE_STORAGE_CLASS inline
-#  endif
+#  define ACE_NAMESPACE_INLINE_FUNCTION inline
 #  define ACE_INLINE_TEMPLATE_FUNCTION inline
 #else
 #  define ACE_NAMESPACE_INLINE_FUNCTION ACE_NAMESPACE_STORAGE_CLASS

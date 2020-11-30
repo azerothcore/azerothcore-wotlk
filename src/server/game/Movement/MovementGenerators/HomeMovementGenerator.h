@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_HOMEMOVEMENTGENERATOR_H
-#define TRINITY_HOMEMOVEMENTGENERATOR_H
+#ifndef ACORE_HOMEMOVEMENTGENERATOR_H
+#define ACORE_HOMEMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
 
@@ -17,21 +17,21 @@ class HomeMovementGenerator;
 template <>
 class HomeMovementGenerator<Creature> : public MovementGeneratorMedium< Creature, HomeMovementGenerator<Creature> >
 {
-    public:
+public:
 
-        HomeMovementGenerator() : arrived(false), i_recalculateTravel(false) {}
-        ~HomeMovementGenerator() {}
+    HomeMovementGenerator() : arrived(false), i_recalculateTravel(false) {}
+    ~HomeMovementGenerator() {}
 
-        void DoInitialize(Creature*);
-        void DoFinalize(Creature*);
-        void DoReset(Creature*);
-        bool DoUpdate(Creature*, const uint32);
-        MovementGeneratorType GetMovementGeneratorType() { return HOME_MOTION_TYPE; }
-        void unitSpeedChanged() { i_recalculateTravel = true; }
+    void DoInitialize(Creature*);
+    void DoFinalize(Creature*);
+    void DoReset(Creature*);
+    bool DoUpdate(Creature*, const uint32);
+    MovementGeneratorType GetMovementGeneratorType() { return HOME_MOTION_TYPE; }
+    void unitSpeedChanged() { i_recalculateTravel = true; }
 
-    private:
-        void _setTargetLocation(Creature*);
-        bool arrived : 1;
-        bool i_recalculateTravel : 1;
+private:
+    void _setTargetLocation(Creature*);
+    bool arrived : 1;
+    bool i_recalculateTravel : 1;
 };
 #endif
