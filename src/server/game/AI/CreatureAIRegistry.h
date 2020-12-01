@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_CREATUREAIREGISTRY_H
-#define TRINITY_CREATUREAIREGISTRY_H
+#ifndef ACORE_CREATUREAIREGISTRY_H
+#define ACORE_CREATUREAIREGISTRY_H
 
 namespace AIRegistry
 {

@@ -17,55 +17,55 @@ EndScriptData */
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript
 {
-    public:
-        instance_temple_of_ahnqiraj() : InstanceMapScript("instance_temple_of_ahnqiraj", 531) { }
+public:
+    instance_temple_of_ahnqiraj() : InstanceMapScript("instance_temple_of_ahnqiraj", 531) { }
 
-        InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    {
+        return new instance_temple_of_ahnqiraj_InstanceMapScript(map);
+    }
+
+    struct instance_temple_of_ahnqiraj_InstanceMapScript : public InstanceScript
+    {
+        instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map) { }
+
+        //If Vem is dead...
+        bool IsBossDied[3];
+
+        //Storing Skeram, Vem and Kri.
+        uint64 SkeramGUID;
+        uint64 VemGUID;
+        uint64 KriGUID;
+        uint64 VeklorGUID;
+        uint64 VeknilashGUID;
+        uint64 ViscidusGUID;
+
+        uint32 BugTrioDeathCount;
+
+        uint32 CthunPhase;
+
+        void Initialize()
         {
-            return new instance_temple_of_ahnqiraj_InstanceMapScript(map);
+            IsBossDied[0] = false;
+            IsBossDied[1] = false;
+            IsBossDied[2] = false;
+
+            SkeramGUID = 0;
+            VemGUID = 0;
+            KriGUID = 0;
+            VeklorGUID = 0;
+            VeknilashGUID = 0;
+            ViscidusGUID = 0;
+
+            BugTrioDeathCount = 0;
+
+            CthunPhase = 0;
         }
 
-        struct instance_temple_of_ahnqiraj_InstanceMapScript : public InstanceScript
+        void OnCreatureCreate(Creature* creature)
         {
-            instance_temple_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map) { }
-
-            //If Vem is dead...
-            bool IsBossDied[3];
-
-            //Storing Skeram, Vem and Kri.
-            uint64 SkeramGUID;
-            uint64 VemGUID;
-            uint64 KriGUID;
-            uint64 VeklorGUID;
-            uint64 VeknilashGUID;
-            uint64 ViscidusGUID;
-
-            uint32 BugTrioDeathCount;
-
-            uint32 CthunPhase;
-
-            void Initialize()
+            switch (creature->GetEntry())
             {
-                IsBossDied[0] = false;
-                IsBossDied[1] = false;
-                IsBossDied[2] = false;
-
-                SkeramGUID = 0;
-                VemGUID = 0;
-                KriGUID = 0;
-                VeklorGUID = 0;
-                VeknilashGUID = 0;
-                ViscidusGUID = 0;
-
-                BugTrioDeathCount = 0;
-
-                CthunPhase = 0;
-            }
-
-            void OnCreatureCreate(Creature* creature)
-            {
-                switch (creature->GetEntry())
-                {
                 case NPC_SKERAM:
                     SkeramGUID = creature->GetGUID();
                     break;
@@ -84,19 +84,19 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                 case NPC_VISCIDUS:
                     ViscidusGUID = creature->GetGUID();
                     break;
-                }
             }
+        }
 
-            bool IsEncounterInProgress() const
-            {
-                //not active in AQ40
-                return false;
-            }
+        bool IsEncounterInProgress() const
+        {
+            //not active in AQ40
+            return false;
+        }
 
-            uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const
+        {
+            switch (type)
             {
-                switch (type)
-                {
                 case DATA_VEMISDEAD:
                     if (IsBossDied[0])
                         return 1;
@@ -117,14 +117,14 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
 
                 case DATA_CTHUN_PHASE:
                     return CthunPhase;
-                }
-                return 0;
             }
+            return 0;
+        }
 
-            uint64 GetData64(uint32 identifier) const
+        uint64 GetData64(uint32 identifier) const
+        {
+            switch (identifier)
             {
-                switch (identifier)
-                {
                 case DATA_SKERAM:
                     return SkeramGUID;
                 case DATA_VEM:
@@ -137,14 +137,14 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                     return VeknilashGUID;
                 case DATA_VISCIDUS:
                     return ViscidusGUID;
-                }
-                return 0;
-            }                                                       // end GetData64
+            }
+            return 0;
+        }                                                       // end GetData64
 
-            void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data)
+        {
+            switch (type)
             {
-                switch (type)
-                {
                 case DATA_VEM_DEATH:
                     IsBossDied[0] = true;
                     break;
@@ -164,9 +164,9 @@ class instance_temple_of_ahnqiraj : public InstanceMapScript
                 case DATA_CTHUN_PHASE:
                     CthunPhase = data;
                     break;
-                }
             }
-        };
+        }
+    };
 
 };
 
