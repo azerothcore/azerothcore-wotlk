@@ -388,17 +388,17 @@ protected:
 
 struct QuestStatusData
 {
-    QuestStatusData(): Status(QUEST_STATUS_NONE), Timer(0), PlayerCount(0), Explored(false)
+    QuestStatusData() 
     {
         memset(ItemCount, 0, QUEST_ITEM_OBJECTIVES_COUNT * sizeof(uint16));
         memset(CreatureOrGOCount, 0, QUEST_OBJECTIVES_COUNT * sizeof(uint16));
     }
 
-    QuestStatus Status;
-    uint32 Timer;
+    QuestStatus Status{QUEST_STATUS_NONE};
+    uint32 Timer{0};
     uint16 ItemCount[QUEST_ITEM_OBJECTIVES_COUNT];
     uint16 CreatureOrGOCount[QUEST_OBJECTIVES_COUNT];
-    uint16 PlayerCount;
-    bool Explored;
+    uint16 PlayerCount{0};
+    bool Explored{false};
 };
 #endif

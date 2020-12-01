@@ -578,7 +578,7 @@ class EventMap
     typedef std::multimap<uint32, uint32> EventStore;
 
 public:
-    EventMap() : _time(0), _phase(0), _lastEvent(0) { }
+    EventMap()  { }
 
     /**
     * @name Reset
@@ -908,9 +908,9 @@ public:
     }
 
 private:
-    uint32 _time;
-    uint32 _phase;
-    uint32 _lastEvent;
+    uint32 _time{0};
+    uint32 _phase{0};
+    uint32 _lastEvent{0};
 
     EventStore _eventMap;
 };

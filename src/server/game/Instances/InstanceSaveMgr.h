@@ -27,10 +27,10 @@ class InstanceSave;
 
 struct InstancePlayerBind
 {
-    InstanceSave* save;
+    InstanceSave* save{nullptr};
     bool perm : 1;
     bool extended : 1;
-    InstancePlayerBind() : save(nullptr), perm(false), extended(false) {}
+    InstancePlayerBind() :  perm(false), extended(false) {}
 };
 
 typedef std::unordered_map< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
@@ -101,7 +101,7 @@ class InstanceSaveManager
     friend class InstanceSave;
 
 private:
-    InstanceSaveManager() : lock_instLists(false) {};
+    InstanceSaveManager()  {};
     ~InstanceSaveManager();
 
 public:
@@ -111,11 +111,11 @@ public:
 
     struct InstResetEvent
     {
-        uint8 type; // 0 - unused, 1-4 warnings about pending reset, 5 - reset
+        uint8 type{0}; // 0 - unused, 1-4 warnings about pending reset, 5 - reset
         Difficulty difficulty: 8;
-        uint16 mapid;
+        uint16 mapid{0};
 
-        InstResetEvent() : type(0), difficulty(DUNGEON_DIFFICULTY_NORMAL), mapid(0) {}
+        InstResetEvent() :  difficulty(DUNGEON_DIFFICULTY_NORMAL) {}
         InstResetEvent(uint8 t, uint32 _mapid, Difficulty d)
             : type(t), difficulty(d), mapid(_mapid) {}
     };
@@ -183,7 +183,7 @@ protected:
 private:
     void _ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool warn, time_t resetTime);
     void _ResetSave(InstanceSaveHashMap::iterator& itr);
-    bool lock_instLists;
+    bool lock_instLists{false};
     InstanceSaveHashMap m_instanceSaveById;
     ResetTimeByMapDifficultyMap m_resetTimeByMapDifficulty;
     ResetTimeByMapDifficultyMap m_resetExtendedTimeByMapDifficulty;

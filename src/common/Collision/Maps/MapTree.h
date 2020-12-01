@@ -19,9 +19,9 @@ namespace VMAP
 
     struct LocationInfo
     {
-        LocationInfo(): hitInstance(0), hitModel(0), ground_Z(-G3D::inf()) { }
-        const ModelInstance* hitInstance;
-        const GroupModel* hitModel;
+        LocationInfo():  ground_Z(-G3D::inf()) { }
+        const ModelInstance* hitInstance{0};
+        const GroupModel* hitModel{0};
         float ground_Z;
     };
 
@@ -73,14 +73,13 @@ namespace VMAP
 
     struct AreaInfo
     {
-        AreaInfo(): result(false), ground_Z(-G3D::inf()), flags(0), adtId(0),
-            rootId(0), groupId(0) { }
-        bool result;
+        AreaInfo():  ground_Z(-G3D::inf()) { }
+        bool result{false};
         float ground_Z;
-        uint32 flags;
-        int32 adtId;
-        int32 rootId;
-        int32 groupId;
+        uint32 flags{0};
+        int32 adtId{0};
+        int32 rootId{0};
+        int32 groupId{0};
     };
 }                                                           // VMAP
 

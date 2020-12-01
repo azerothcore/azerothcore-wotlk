@@ -1026,9 +1026,9 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
 
 struct RedirectThreatInfo
 {
-    RedirectThreatInfo() : _targetGUID(0), _threatPct(0) { }
-    uint64 _targetGUID;
-    uint32 _threatPct;
+    RedirectThreatInfo()  { }
+    uint64 _targetGUID{0};
+    uint32 _threatPct{0};
 
     uint64 GetTargetGUID() const { return _targetGUID; }
     uint32 GetThreatPct() const { return _threatPct; }

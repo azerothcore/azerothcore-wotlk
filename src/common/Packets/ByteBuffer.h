@@ -55,7 +55,7 @@ public:
     const static size_t DEFAULT_SIZE = 0x1000;
 
     // constructor
-    ByteBuffer() : _rpos(0), _wpos(0)
+    ByteBuffer()  
     {
         _storage.reserve(DEFAULT_SIZE);
     }
@@ -505,7 +505,7 @@ public:
     void hexlike(bool outString = false) const;
 
 protected:
-    size_t _rpos, _wpos;
+    size_t _rpos{0}, _wpos{0};
     std::vector<uint8> _storage;
 };
 

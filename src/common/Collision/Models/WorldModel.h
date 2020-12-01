@@ -24,12 +24,12 @@ namespace VMAP
     class MeshTriangle
     {
     public:
-        MeshTriangle() : idx0(0), idx1(0), idx2(0) { }
+        MeshTriangle()  { }
         MeshTriangle(uint32 na, uint32 nb, uint32 nc): idx0(na), idx1(nb), idx2(nc) { }
 
-        uint32 idx0;
-        uint32 idx1;
-        uint32 idx2;
+        uint32 idx0{0};
+        uint32 idx1{0};
+        uint32 idx2{0};
     };
 
     class WmoLiquid
@@ -47,13 +47,13 @@ namespace VMAP
         bool writeToFile(FILE* wf);
         static bool readFromFile(FILE* rf, WmoLiquid*& liquid);
     private:
-        WmoLiquid(): iTilesX(0), iTilesY(0), iType(0), iHeight(0), iFlags(0) { }
-        uint32 iTilesX;       //!< number of tiles in x direction, each
-        uint32 iTilesY;
+        WmoLiquid() { }
+        uint32 iTilesX{0};       //!< number of tiles in x direction, each
+        uint32 iTilesY{0};
         G3D::Vector3 iCorner; //!< the lower corner
-        uint32 iType;         //!< liquid type
-        float* iHeight;       //!< (tilesX + 1)*(tilesY + 1) height values
-        uint8* iFlags;        //!< info if liquid tile is used
+        uint32 iType{0};         //!< liquid type
+        float* iHeight{0};       //!< (tilesX + 1)*(tilesY + 1) height values
+        uint8* iFlags{0};        //!< info if liquid tile is used
     public:
         void getPosInfo(uint32& tilesX, uint32& tilesY, G3D::Vector3& corner) const;
     };
@@ -62,7 +62,7 @@ namespace VMAP
     class GroupModel
     {
     public:
-        GroupModel(): iMogpFlags(0), iGroupWMOID(0), iLiquid(0) { }
+        GroupModel() { }
         GroupModel(const GroupModel& other);
         GroupModel(uint32 mogpFlags, uint32 groupWMOID, const G3D::AABox& bound):
             iBound(bound), iMogpFlags(mogpFlags), iGroupWMOID(groupWMOID), iLiquid(0) { }
@@ -82,12 +82,12 @@ namespace VMAP
         uint32 GetWmoID() const { return iGroupWMOID; }
     protected:
         G3D::AABox iBound;
-        uint32 iMogpFlags;// 0x8 outdor; 0x2000 indoor
-        uint32 iGroupWMOID;
+        uint32 iMogpFlags{0};// 0x8 outdor; 0x2000 indoor
+        uint32 iGroupWMOID{0};
         std::vector<G3D::Vector3> vertices;
         std::vector<MeshTriangle> triangles;
         BIH meshTree;
-        WmoLiquid* iLiquid;
+        WmoLiquid* iLiquid{0};
     public:
         void getMeshData(std::vector<G3D::Vector3>& vertices, std::vector<MeshTriangle>& triangles, WmoLiquid*& liquid);
     };
@@ -95,7 +95,7 @@ namespace VMAP
     class WorldModel
     {
     public:
-        WorldModel(): RootWMOID(0) { }
+        WorldModel() { }
 
         //! pass group models to WorldModel and create BIH. Passed vector is swapped with old geometry!
         void setGroupModels(std::vector<GroupModel>& models);
@@ -106,7 +106,7 @@ namespace VMAP
         bool writeFile(const std::string& filename);
         bool readFile(const std::string& filename);
     protected:
-        uint32 RootWMOID;
+        uint32 RootWMOID{0};
         std::vector<GroupModel> groupModels;
         BIH groupTree;
     public:

@@ -15,12 +15,12 @@ class Player;
 class GroupReference : public Reference<Group, Player>
 {
 protected:
-    uint8 iSubGroup;
+    uint8 iSubGroup{0};
     void targetObjectBuildLink();
     void targetObjectDestroyLink();
     void sourceObjectDestroyLink();
 public:
-    GroupReference() : Reference<Group, Player>(), iSubGroup(0) {}
+    GroupReference() : Reference<Group, Player>() {}
     ~GroupReference() { unlink(); }
     GroupReference* next() { return (GroupReference*)Reference<Group, Player>::next(); }
     GroupReference const* next() const { return (GroupReference const*)Reference<Group, Player>::next(); }

@@ -237,14 +237,13 @@ enum LevelRequirementVsMode
 
 struct ZoneDynamicInfo
 {
-    ZoneDynamicInfo() : MusicId(0), WeatherId(0), WeatherGrade(0.0f),
-        OverrideLightId(0), LightFadeInTime(0) { }
+    ZoneDynamicInfo()  { }
 
-    uint32 MusicId;
-    uint32 WeatherId;
-    float WeatherGrade;
-    uint32 OverrideLightId;
-    uint32 LightFadeInTime;
+    uint32 MusicId{0};
+    uint32 WeatherId{0};
+    float WeatherGrade{0.0f};
+    uint32 OverrideLightId{0};
+    uint32 LightFadeInTime{0};
 };
 
 #if defined(__GNUC__)

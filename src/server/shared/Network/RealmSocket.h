@@ -59,9 +59,9 @@ private:
     ssize_t noblk_send(ACE_Message_Block& message_block);
 
     ACE_Message_Block input_buffer_;
-    Session* session_;
+    Session* session_{nullptr};
     std::string _remoteAddress;
-    uint16 _remotePort;
+    uint16 _remotePort{0};
 };
 
 #endif /* __REALMSOCKET_H__ */

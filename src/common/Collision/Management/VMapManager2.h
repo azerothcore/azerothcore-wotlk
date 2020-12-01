@@ -52,14 +52,14 @@ namespace VMAP
     class ManagedModel
     {
     public:
-        ManagedModel() : iModel(0), iRefCount(0) { }
+        ManagedModel()  { }
         void setModel(WorldModel* model) { iModel = model; }
         WorldModel* getModel() { return iModel; }
         void incRefCount() { ++iRefCount; }
         int decRefCount() { return --iRefCount; }
     protected:
-        WorldModel* iModel;
-        int iRefCount;
+        WorldModel* iModel{0};
+        int iRefCount{0};
     };
 
     typedef std::unordered_map<uint32, StaticMapTree*> InstanceTreeMap;
