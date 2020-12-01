@@ -7,6 +7,8 @@
 #ifndef _TRANSACTION_H
 #define _TRANSACTION_H
 
+#include <utility>
+
 #include "SQLOperation.h"
 
 //- Forward declare (don't include header to prevent circular includes)
@@ -48,7 +50,7 @@ class TransactionTask : public SQLOperation
     friend class DatabaseWorker;
 
 public:
-    TransactionTask(SQLTransaction trans) : m_trans(trans) { } ;
+    TransactionTask(SQLTransaction trans) : m_trans(std::move(trans)) { } ;
     ~TransactionTask() { };
 
 protected:
