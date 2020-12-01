@@ -1196,8 +1196,8 @@ void PatcherRunnable::run() { }
 
 // Preload MD5 hashes of existing patch files on server
 #ifndef _WIN32
+#include <cerrno>
 #include <dirent.h>
-#include <errno.h>
 void Patcher::LoadPatchesInfo()
 {
     DIR* dirp;
