@@ -102,8 +102,8 @@ public:
     //    return (t != NULL);
     //}
 
-    ContainerMapList<OBJECT_TYPES>& GetElements(void) { return i_elements; }
-    const ContainerMapList<OBJECT_TYPES>& GetElements(void) const { return i_elements;}
+    ContainerMapList<OBJECT_TYPES>& GetElements() { return i_elements; }
+    const ContainerMapList<OBJECT_TYPES>& GetElements() const { return i_elements;}
 
 private:
     ContainerMapList<OBJECT_TYPES> i_elements;

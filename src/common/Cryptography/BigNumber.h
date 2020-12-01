@@ -72,7 +72,7 @@ public:
     BigNumber ModExp(BigNumber const& bn1, BigNumber const& bn2);
     BigNumber Exp(BigNumber const&);
 
-    int32 GetNumBytes(void);
+    int32 GetNumBytes();
 
     struct bignum_st* BN() { return _bn; }
 

@@ -2127,7 +2127,7 @@ public:
             m_DelayedOperations |= operation;
     }
 
-    void CheckAreaExploreAndOutdoor(void);
+    void CheckAreaExploreAndOutdoor();
 
     static TeamId TeamIdForRace(uint8 race);
     TeamId GetTeamId(bool original = false) const { return original ? TeamIdForRace(getRace(true)) : m_team; };

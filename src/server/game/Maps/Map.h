@@ -336,7 +336,7 @@ public:
     bool UnloadGrid(NGridType& ngrid);
     virtual void UnloadAll();
 
-    uint32 GetId(void) const { return i_mapEntry->MapID; }
+    uint32 GetId() const { return i_mapEntry->MapID; }
 
     static bool ExistMap(uint32 mapid, int gx, int gy);
     static bool ExistVMap(uint32 mapid, int gx, int gy);

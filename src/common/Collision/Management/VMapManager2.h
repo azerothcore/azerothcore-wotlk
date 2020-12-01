@@ -85,7 +85,7 @@ namespace VMAP
         static std::string getMapFileName(unsigned int mapId);
 
         VMapManager2();
-        ~VMapManager2(void);
+        ~VMapManager2();
 
         int loadMap(const char* pBasePath, unsigned int mapId, int x, int y);
 

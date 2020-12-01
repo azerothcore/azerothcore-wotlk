@@ -43,7 +43,7 @@ public:
         return i_cells[x][y];
     }
 
-    uint32 GetGridId(void) const { return i_gridId; }
+    uint32 GetGridId() const { return i_gridId; }
     int32 getX() const { return i_x; }
     int32 getY() const { return i_y; }
 
