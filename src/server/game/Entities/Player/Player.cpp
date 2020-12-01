@@ -82,7 +82,8 @@
 #include "LuaEngine.h"
 #endif
 
-#define ZONE_UPDATE_INTERVAL (2*IN_MILLISECONDS)
+// Zone Interval should be 1 second
+#define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
 #define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
 #define PLAYER_SKILL_VALUE_INDEX(x) (PLAYER_SKILL_INDEX(x)+1)
@@ -744,8 +745,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_areaUpdateId = 0;
     m_team = TEAM_NEUTRAL;
-
-    m_needsZoneUpdate = false;
 
     m_nextSave = SavingSystemMgr::IncreaseSavingMaxValue(1);
     m_additionalSaveTimer = 0;
@@ -6929,15 +6928,6 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation, bool t
     if (!Unit::UpdatePosition(x, y, z, orientation, teleport))
         return false;
 
-    // Update player zone if needed
-    if (m_needsZoneUpdate)
-    {
-        uint32 newZone, newArea;
-        GetZoneAndAreaId(newZone, newArea);
-        UpdateZone(newZone, newArea);
-        m_needsZoneUpdate = false;
-    }
-
     if (GetGroup())
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
@@ -7689,7 +7679,7 @@ void Player::UpdateArea(uint32 newArea)
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 
-    uint32 const areaRestFlag = (GetTeamId() == TEAM_ALLIANCE) ? AREA_FLAG_REST_ZONE_ALLIANCE : AREA_FLAG_REST_ZONE_HORDE;
+    uint32 const areaRestFlag = (GetTeamId(true) == TEAM_ALLIANCE) ? AREA_FLAG_REST_ZONE_ALLIANCE : AREA_FLAG_REST_ZONE_HORDE;
     if (area && area->flags & areaRestFlag)
         SetRestFlag(REST_FLAG_IN_FACTION_AREA);
     else

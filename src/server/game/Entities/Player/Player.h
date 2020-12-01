@@ -1894,8 +1894,6 @@ public:
     void UpdateZone(uint32 newZone, uint32 newArea);
     void UpdateArea(uint32 newArea);
 
-    void SetNeedsZoneUpdate(bool needsUpdate) { m_needsZoneUpdate = needsUpdate; }
-
     uint32 GetZoneId(bool forceRecalc = false) const override;
     uint32 GetAreaId(bool forceRecalc = false) const override;
     void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc = false) const override;
@@ -2955,8 +2953,6 @@ protected:
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
 
     uint8 m_grantableLevels;
-
-    bool m_needsZoneUpdate;
 
     AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
 
