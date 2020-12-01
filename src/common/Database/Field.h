@@ -172,7 +172,7 @@ public:
 
         if (data.raw)
             return *reinterpret_cast<int64*>(data.value);
-        return static_cast<int64>(strtol((char*)data.value, NULL, 10));
+        return static_cast<int64>(strtol((char*)data.value, nullptr, 10));
     }
 
     float GetFloat() const
@@ -214,7 +214,7 @@ public:
     char const* GetCString() const
     {
         if (!data.value)
-            return NULL;
+            return nullptr;
 
 #ifdef ACORE_DEBUG
         if (IsNumeric())
@@ -244,7 +244,7 @@ public:
 
     bool IsNull() const
     {
-        return data.value == NULL;
+        return data.value == nullptr;
     }
 
 protected:
@@ -275,7 +275,7 @@ protected:
     void CleanUp()
     {
         delete[] ((char*)data.value);
-        data.value = NULL;
+        data.value = nullptr;
     }
 
     static size_t SizeForType(MYSQL_FIELD* field)

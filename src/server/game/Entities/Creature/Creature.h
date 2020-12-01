@@ -448,7 +448,7 @@ public:
     uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
 
     void Update(uint32 time) override;                         // overwrited Unit::Update
-    void GetRespawnPosition(float& x, float& y, float& z, float* ori = NULL, float* dist = NULL) const;
+    void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr, float* dist = nullptr) const;
 
     void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
     uint32 GetCorpseDelay() const { return m_corpseDelay; }
@@ -530,7 +530,7 @@ public:
 
     bool HasSpell(uint32 spellID) const override;
 
-    bool UpdateEntry(uint32 entry, const CreatureData* data = NULL, bool changelevel = true );
+    bool UpdateEntry(uint32 entry, const CreatureData* data = nullptr, bool changelevel = true );
     bool UpdateStats(Stats stat) override;
     bool UpdateAllStats() override;
     void UpdateResistances(uint32 school) override;
@@ -720,7 +720,7 @@ public:
 
 protected:
     bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
-    bool InitEntry(uint32 entry, const CreatureData* data = NULL);
+    bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
 
     // vendor items
     VendorItemCounts m_vendorItemCounts;
