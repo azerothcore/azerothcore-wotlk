@@ -4,7 +4,7 @@
 /**
  *  @file   Strategies_T.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -82,13 +82,10 @@ template <class SVC_HANDLER>
 class ACE_Creation_Strategy
 {
 public:
-
   // Useful STL-style traits.
   typedef typename SVC_HANDLER::addr_type    addr_type;
   typedef SVC_HANDLER                        handler_type;
   typedef typename SVC_HANDLER::stream_type  stream_type;
-
-  // = Initialization and termination methods.
 
   /// Default constructor.
   ACE_Creation_Strategy (ACE_Thread_Manager * = 0,
@@ -139,11 +136,9 @@ template <class SVC_HANDLER>
 class ACE_Singleton_Strategy : public ACE_Creation_Strategy<SVC_HANDLER>
 {
 public:
-
   // Useful STL-style traits.
   typedef ACE_Creation_Strategy<SVC_HANDLER> base_type;
 
-  // = Initialization and termination methods.
   ACE_Singleton_Strategy (SVC_HANDLER * = 0,
                           ACE_Thread_Manager * = 0);
   int open (SVC_HANDLER *,
@@ -496,14 +491,12 @@ template <class SVC_HANDLER, ACE_PEER_ACCEPTOR_1>
 class ACE_Accept_Strategy
 {
 public:
-
   // Useful STL-style traits.
   typedef ACE_PEER_ACCEPTOR_ADDR             addr_type;
   typedef ACE_PEER_ACCEPTOR                  acceptor_type;
   typedef SVC_HANDLER                        handler_type;
   typedef typename SVC_HANDLER::stream_type  stream_type;
 
-  // = Initialization and termination methods.
   /// Default constructor.
   ACE_Accept_Strategy (ACE_Reactor *reactor = ACE_Reactor::instance ());
 
@@ -563,14 +556,12 @@ template <class SVC_HANDLER, ACE_PEER_CONNECTOR_1>
 class ACE_Connect_Strategy
 {
 public:
-
   // Useful STL-style traits.
   typedef ACE_PEER_CONNECTOR_ADDR            addr_type;
   typedef ACE_PEER_CONNECTOR                 connector_type;
   typedef SVC_HANDLER                        handler_type;
   typedef typename SVC_HANDLER::stream_type  stream_type;
 
-  // = Initialization and termination methods.
   /// Default constructor.
   ACE_Connect_Strategy (void);
 
@@ -629,13 +620,10 @@ template <class SVC_HANDLER>
 class ACE_Scheduling_Strategy
 {
 public:
-
   // Useful STL-style traits.
   typedef typename SVC_HANDLER::addr_type    addr_type;
   typedef SVC_HANDLER                        handler_type;
   typedef typename SVC_HANDLER::stream_type  stream_type;
-
-  // = Initialization and termination methods.
 
   /// Constructor
   ACE_Scheduling_Strategy (SVC_HANDLER * = 0);
@@ -669,11 +657,9 @@ class ACE_Schedule_All_Reactive_Strategy
   : public ACE_Scheduling_Strategy<SVC_HANDLER>
 {
 public:
-
   // Useful STL-style traits.
   typedef ACE_Scheduling_Strategy<SVC_HANDLER> base_type;
 
-  // = Initialization and termination methods.
   /// Constructor
   ACE_Schedule_All_Reactive_Strategy (SVC_HANDLER * = 0);
 
@@ -708,11 +694,9 @@ class ACE_Schedule_All_Threaded_Strategy
   : public ACE_Scheduling_Strategy<SVC_HANDLER>
 {
 public:
-
   // Useful STL-style traits.
   typedef ACE_Scheduling_Strategy<SVC_HANDLER> base_type;
 
-  // = Initialization and termination methods.
   /// Constructor
   ACE_Schedule_All_Threaded_Strategy (SVC_HANDLER * = 0);
 
