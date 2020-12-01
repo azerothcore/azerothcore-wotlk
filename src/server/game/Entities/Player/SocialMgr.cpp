@@ -163,7 +163,7 @@ void PlayerSocial::SendSocialList(Player* player, uint32 flags)
 
     data.put<uint32>(countPos, totalCount);
     player->GetSession()->SendPacket(&data);
-    LOG_DEBUG("network", "WORLD: Sent SMSG_CONTACT_LIST");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_CONTACT_LIST");
 }
 
 bool PlayerSocial::_checkContact(uint64 guid, SocialFlag flags) const
