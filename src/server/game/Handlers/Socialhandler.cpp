@@ -12,7 +12,6 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "QueryCallback.h"
 #include "SocialMgr.h"
 #include "World.h"
 
