@@ -13,11 +13,11 @@
 #include "Player.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
-#include <Config.h>
+#include "ScriptMgr.h"
 
 ArenaTeam::ArenaTeam()
     : TeamId(0), Type(0), TeamName(), CaptainGuid(0), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
-    BorderStyle(0), BorderColor(0)
+      BorderStyle(0), BorderColor(0)
 {
     Stats.WeekGames   = 0;
     Stats.SeasonGames = 0;
@@ -250,8 +250,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
         // Put the player in the team
         Members.push_back(newMember);
         sWorld->UpdateGlobalPlayerArenaTeam(GUID_LOPART(newMember.Guid), GetSlot(), GetId());
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     if (Empty() || !captainPresentInTeam)
     {
@@ -391,7 +390,7 @@ void ArenaTeam::Disband()
 
 void ArenaTeam::Roster(WorldSession* session)
 {
-    Player* player = NULL;
+    Player* player = nullptr;
 
     uint8 unk308 = 0;
     std::string tempName;
@@ -434,7 +433,7 @@ void ArenaTeam::Roster(WorldSession* session)
 
 void ArenaTeam::Query(WorldSession* session)
 {
-    WorldPacket data(SMSG_ARENA_TEAM_QUERY_RESPONSE, 4*7+GetName().size()+1);
+    WorldPacket data(SMSG_ARENA_TEAM_QUERY_RESPONSE, 4 * 7 + GetName().size() + 1);
     data << uint32(GetId());                                // team id
     data << GetName();                                      // team name
     data << uint32(GetType());                              // arena team type (2=2x2, 3=3x3 or 5=5x5)
@@ -451,7 +450,7 @@ void ArenaTeam::Query(WorldSession* session)
 
 void ArenaTeam::SendStats(WorldSession* session)
 {
-    WorldPacket data(SMSG_ARENA_TEAM_STATS, 4*7);
+    WorldPacket data(SMSG_ARENA_TEAM_STATS, 4 * 7);
     data << uint32(GetId());                                // team id
     data << uint32(Stats.Rating);                           // rating
     data << uint32(Stats.WeekGames);                        // games this week
@@ -474,10 +473,10 @@ void ArenaTeam::NotifyStatsChanged()
 void ArenaTeam::Inspect(WorldSession* session, uint64 guid)
 {
     ArenaTeamMember* member = GetMember(guid);
-    if (!member)
+    if (!member || GetSlot() >= MAX_ARENA_SLOT)
         return;
 
-    WorldPacket data(MSG_INSPECT_ARENA_TEAMS, 8+1+4*6);
+    WorldPacket data(MSG_INSPECT_ARENA_TEAMS, 8 + 1 + 4 * 6);
     data << uint64(guid);                                   // player guid
     data << uint8(GetSlot());                               // slot (0...2)
     data << uint32(GetId());                                // arena team id
@@ -496,7 +495,7 @@ void ArenaTeamMember::ModifyPersonalRating(Player* player, int32 mod, uint32 typ
     else
         PersonalRating += mod;
 
-    if (player)
+    if (player && ArenaTeam::GetSlotByType(type) < 3)
     {
         player->SetArenaTeamInfoField(ArenaTeam::GetSlotByType(type), ARENA_TEAM_PERSONAL_RATING, PersonalRating);
         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_PERSONAL_RATING, PersonalRating, type);
@@ -530,7 +529,7 @@ void ArenaTeam::BroadcastPacket(WorldPacket* packet)
 
 void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3)
 {
-    WorldPacket data(SMSG_ARENA_TEAM_EVENT, 1+1+1);
+    WorldPacket data(SMSG_ARENA_TEAM_EVENT, 1 + 1 + 1);
     data << uint8(event);
     data << uint8(strCount);
     switch (strCount)
@@ -580,13 +579,27 @@ void ArenaTeam::MassInviteToEvent(WorldSession* session)
 
 uint8 ArenaTeam::GetSlotByType(uint32 type)
 {
+    uint8 slot = 0xFF;
     switch (type)
     {
-        case ARENA_TEAM_2v2: return 0;
-        case ARENA_TEAM_3v3: return 1;
-        case ARENA_TEAM_5v5: return 2;
+        case ARENA_TEAM_2v2:
+            slot = 0;
+            break;
+        case ARENA_TEAM_3v3:
+            slot = 1;
+            break;
+        case ARENA_TEAM_5v5:
+            slot = 2;
+            break;
         default:
             break;
+    }
+    //Get the changed slot type
+    sScriptMgr->OnGetSlotByType(type, slot);
+
+    if (slot != 0xFF)
+    {
+        return slot;
     }
     sLog->outError("FATAL: Unknown arena team type %u for some arena team", type);
     return 0xFF;
@@ -623,6 +636,8 @@ uint32 ArenaTeam::GetPoints(uint32 memberRating)
         points *= 0.76f;
     else if (Type == ARENA_TEAM_3v3)
         points *= 0.88f;
+
+    sScriptMgr->OnGetArenaPoints(this, points);
 
     points *= sWorld->getRate(RATE_ARENA_POINTS);
 
@@ -803,8 +818,8 @@ void ArenaTeam::MemberLost(Player* player, uint32 againstMatchmakerRating, int32
             itr->ModifyMatchmakerRating(MatchmakerRatingChange, GetSlot());
 
             // Update personal played stats
-            itr->WeekGames +=1;
-            itr->SeasonGames +=1;
+            itr->WeekGames += 1;
+            itr->SeasonGames += 1;
 
             // update the unit fields
             player->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_GAMES_WEEK,  itr->WeekGames);
@@ -833,8 +848,8 @@ void ArenaTeam::MemberWon(Player* player, uint32 againstMatchmakerRating, int32 
             }
 
             // update personal stats
-            itr->WeekGames +=1;
-            itr->SeasonGames +=1;
+            itr->WeekGames += 1;
+            itr->SeasonGames += 1;
             itr->SeasonWins += 1;
             itr->WeekWins += 1;
             // update unit fields
@@ -950,5 +965,5 @@ ArenaTeamMember* ArenaTeam::GetMember(uint64 guid)
         if (itr->Guid == guid)
             return &(*itr);
 
-    return NULL;
+    return nullptr;
 }
