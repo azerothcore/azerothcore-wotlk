@@ -267,7 +267,7 @@ public:
 
     void Remove(AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT) override;
 
-    void FillTargetMap(std::map<Unit*, uint8>& targets, Unit* caster);
+    void FillTargetMap(std::map<Unit*, uint8>& targets, Unit* caster) override;
 
     // Allow Apply Aura Handler to modify and access m_AuraDRGroup
     void SetDiminishGroup(DiminishingGroup group) { m_AuraDRGroup = group; }
@@ -285,6 +285,6 @@ protected:
 public:
     void Remove(AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT) override;
 
-    void FillTargetMap(std::map<Unit*, uint8>& targets, Unit* caster);
+    void FillTargetMap(std::map<Unit*, uint8>& targets, Unit* caster) override;
 };
 #endif
