@@ -136,7 +136,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (883, 'To enter, 
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (884, 'To enter, you must have the following item(s) in your inventory:');
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (885, '- Hint:');
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (886, 'You cannot enter. Access requirements not met.');
-INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (887, 'You require at least %u average ilvl to be able to enter the instance. You currently have: %u average ilvl.');
+INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (887, 'To be able to enter, your equipment's average item level must be superior or equal to %u. Your current equipment's average ilevel is: %u.');
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (888, 'You must be at below level %u to enter.');
 
 -- Update old command
