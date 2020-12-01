@@ -6185,7 +6185,7 @@ void ObjectMgr::LoadAccessRequirements()
                     //Quest
                     if (!GetQuestTemplate(progression_requirement->id))
                     {
-                        sLog->outErrorDb("Required quest %u for faction %u does not exist for map %u difficulty %u, remove or fix quest requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
+                        sLog->outErrorDb("Required quest %u for faction %u does not exist for map %u difficulty %u, remove or fix this quest requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
                         progression_requirement->id = 0;
                     }
                     ar->quests.push_back(progression_requirement);
