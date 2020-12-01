@@ -75,3 +75,6 @@ DELETE FROM `conditions` WHERE `SourceEntry`=50335 AND `ConditionTypeOrReference
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `Comment`) VALUES 
 (17, 0, 50335, 0, 0, 31, 1, 4, 0, 0, 0, 0, 0, 'Spell force target - \'Scourge Hook\' - Player only');
 
+-- Adjust Patchwerk spawn time
+UPDATE `creature` SET `spawntimesecs`=120 WHERE `guid`=130542;
+
