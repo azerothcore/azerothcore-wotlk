@@ -3529,18 +3529,18 @@ DungeonAccessRequirements.PrintMode = 1
 
 #    DungeonAccessRequirement.PortalAvgIlevelCheck
 #
-#    	 Description: Allow average ilvl to be checked when entering via portal and deny the entry if minimum average is not met.
-#        Default:     0 - (Disabled)
+#    	 Description: Enable average item level requirement when entering a dungeon/raid's portal (= deny the entry if player has too low average ilevel, like in LFG).
+#        Default:     0 - (Disabled  -> Blizzlike)
 #                     1 - (Enabled)
-#  
+  
 DungeonAccessRequirement.PortalAvgIlevelCheck = 0
 
 #    DungeonAccessRequirement.LFGLevelDBCOverride
 #
-#    	 Description: Will check dungeon_access_requirements talbe to check if player can join a specific dungeon with the LFG tool
+#    	 Description: If enabled, use `min_level` and `max_level` values from table `dungeon_access_requirements` to list or to hide a dungeon from the LFG window.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
-#  
+  
 DungeonAccessRequirement.LFGLevelDBCOverride = 0
 
 #

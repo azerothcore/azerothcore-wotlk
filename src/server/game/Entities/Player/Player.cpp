@@ -19610,7 +19610,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
             }
         }
 
-        //Check if ILVL check is required here
+        //Check if avg ILVL requirement is allowed
         uint16 minRequiredIlvl = 0;
         if (sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PORTAL_CHECK_ILVL))
         {
@@ -19754,7 +19754,6 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                         ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, minRequiredIlvl);
                     }
 
-
                     if (mapDiff->hasErrorMessage)
                     {
                         SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
@@ -19767,7 +19766,6 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     {
                         GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_ACCESS_REQUIREMENT_MAX_LEVEL), LevelMax);
                     }
-
                 }
             }
             return false;

@@ -409,9 +409,9 @@ namespace lfg
             {
                 if (sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE))
                 {
-                    if (ar->levelMin > level)
+                    if (ar->levelMin > 0 && ar->levelMin > level)
                         lockData = LFG_LOCKSTATUS_TOO_LOW_LEVEL;
-                    else if (ar->levelMax < level)
+                    else if (ar->levelMax > 0 && ar->levelMax < level)
                         lockData = LFG_LOCKSTATUS_TOO_HIGH_LEVEL;
                 }
 

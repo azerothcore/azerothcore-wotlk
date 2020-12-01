@@ -6172,7 +6172,7 @@ void ObjectMgr::LoadAccessRequirements()
                     //Achievement
                     if (!sAchievementStore.LookupEntry(progression_requirement->id))
                     {
-                        sLog->outErrorDb("Required achievement %u for faction %u not exist for map %u difficulty %u, remove or fix achievement requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
+                        sLog->outErrorDb("Required achievement %u for faction %u does not exist for map %u difficulty %u, remove or fix this achievement requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
                         delete progression_requirement;
                         break;
                     }
@@ -6186,6 +6186,7 @@ void ObjectMgr::LoadAccessRequirements()
                     if (!GetQuestTemplate(progression_requirement->id))
                     {
                         sLog->outErrorDb("Required quest %u for faction %u does not exist for map %u difficulty %u, remove or fix this quest requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
+                        delete progression_requirement;
                         progression_requirement->id = 0;
                     }
                     ar->quests.push_back(progression_requirement);
@@ -6206,8 +6207,8 @@ void ObjectMgr::LoadAccessRequirements()
                     break;
                 }
                 default:
-                    delete progression_requirement;
                     sLog->outError("requirement_type of %u is not valid for map %u difficulty %u. Please use 0 for achievements, 1 for quest, 2 for items or remove this entry from the db.", requirement_type, mapid, difficulty);
+                    delete progression_requirement;
                     break;
                 }
 
