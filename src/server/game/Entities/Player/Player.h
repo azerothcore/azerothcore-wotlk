@@ -2158,6 +2158,14 @@ public:
     void UpdateSkillsToMaxSkillsForLevel();             // for .levelup
     void ModifySkillBonus(uint32 skillid, int32 val, bool talent);
 
+    /**
+     * A talent point boost.
+     * Usage:
+     * 1). Hot update situation (occurred when character is online, like PlayerScript:OnAchiComplete):
+     *     Right after calling this function, character can reward talent points by calling function player->InitTalentForLevel().
+     *
+     * 2). Data initing situation (like PlayerScript:OnLoadFromDB)
+     */
     void RewardOtherBonusTalentPoints(uint32 bonusTalentPoints);
 
     /*********************************************************/
