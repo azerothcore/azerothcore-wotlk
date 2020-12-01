@@ -356,10 +356,10 @@ protected:
         int numLeaves{0};
         int sumObjects{0};
         int minObjects{0x0FFFFFFF};
-        int maxObjects{0xFFFFFFFF};
+        int maxObjects{-1}; // 0xFFFFFFFF
         int sumDepth{0};
         int minDepth{0x0FFFFFFF};
-        int maxDepth{0xFFFFFFFF};
+        int maxDepth{-1}; // 0xFFFFFFFF
         int numLeavesN[6];
         int numBVH2{0};
 
