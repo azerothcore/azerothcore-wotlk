@@ -5,6 +5,9 @@
 #include "ace/SPIPE_Stream.inl"
 #endif /* __ACE_INLINE__ */
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
@@ -31,6 +34,7 @@ ACE_SPIPE_Stream::ACE_SPIPE_Stream (void)
 // the *total* number of trailing arguments, *not* a couple of the
 // number of tuple pairs!
 
+#ifndef ACE_LACKS_VA_FUNCTIONS
 ssize_t
 ACE_SPIPE_Stream::send (size_t n, ...) const
 {
@@ -41,9 +45,16 @@ ACE_SPIPE_Stream::send (size_t n, ...) const
 #if defined (ACE_HAS_ALLOCA)
   iovp = (iovec *) alloca (total_tuples * sizeof (iovec));
 #else
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_ALLOCATOR_RETURN (iovp, (iovec *)
+                        ACE_Allocator::instance ()->malloc (total_tuples *
+                                                            sizeof (iovec)),
+                        -1);
+# else
   ACE_NEW_RETURN (iovp,
                   iovec[total_tuples],
                   -1);
+# endif /* ACE_HAS_ALLOC_HOOKS */
 #endif /* !defined (ACE_HAS_ALLOCA) */
 
   va_start (argp, n);
@@ -56,7 +67,11 @@ ACE_SPIPE_Stream::send (size_t n, ...) const
 
   ssize_t result = ACE_OS::writev (this->get_handle (), iovp, total_tuples);
 #if !defined (ACE_HAS_ALLOCA)
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_Allocator::instance ()->free (iovp);
+# else
   delete [] iovp;
+# endif /* ACE_HAS_ALLOC_HOOKS */
 #endif /* !defined (ACE_HAS_ALLOCA) */
   va_end (argp);
   return result;
@@ -78,9 +93,16 @@ ACE_SPIPE_Stream::recv (size_t n, ...) const
 #if defined (ACE_HAS_ALLOCA)
   iovp = (iovec *) alloca (total_tuples * sizeof (iovec));
 #else
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_ALLOCATOR_RETURN (iovp, (iovec *)
+                        ACE_Allocator::instance ()->malloc (total_tuples *
+                                                            sizeof (iovec)),
+                        -1);
+# else
   ACE_NEW_RETURN (iovp,
                   iovec[total_tuples],
                   -1);
+# endif /* ACE_HAS_ALLOC_HOOKS */
 #endif /* !defined (ACE_HAS_ALLOCA) */
 
   va_start (argp, n);
@@ -93,10 +115,15 @@ ACE_SPIPE_Stream::recv (size_t n, ...) const
 
   ssize_t result = ACE_OS::readv (this->get_handle (), iovp, total_tuples);
 #if !defined (ACE_HAS_ALLOCA)
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_Allocator::instance ()->free (iovp);
+# else
   delete [] iovp;
+# endif /* ACE_HAS_ALLOC_HOOKS */
 #endif /* !defined (ACE_HAS_ALLOCA) */
   va_end (argp);
   return result;
 }
+#endif // ACE_LACKS_VA_FUNCTIONS
 
 ACE_END_VERSIONED_NAMESPACE_DECL

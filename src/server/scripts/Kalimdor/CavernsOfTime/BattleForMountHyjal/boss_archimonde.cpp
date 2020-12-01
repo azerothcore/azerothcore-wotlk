@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
- /* ScriptData
- SDName: Boss_Archimonde
- SD%Complete: 85
- SDComment: Doomfires not completely offlike due to core limitations for random moving. Tyrande and second phase not fully implemented.
- SDCategory: Caverns of Time, Mount Hyjal
- EndScriptData */
+/* ScriptData
+SDName: Boss_Archimonde
+SD%Complete: 85
+SDComment: Doomfires not completely offlike due to core limitations for random moving. Tyrande and second phase not fully implemented.
+SDCategory: Caverns of Time, Mount Hyjal
+EndScriptData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -119,7 +119,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) { }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             damage = 0;
         }
@@ -164,7 +164,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) { }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             damage = 0;
         }
@@ -207,7 +207,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) { }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             damage = 0;
         }
@@ -256,7 +256,7 @@ public:
     struct boss_archimondeAI : public BossAI
     {
         boss_archimondeAI(Creature* creature) : BossAI(creature, BOSS_ARCHIMONDE), summons(me),
-        Enraged(false), BelowTenPercent(false), HasProtected(false), IsChanneling(false)
+            Enraged(false), BelowTenPercent(false), HasProtected(false), IsChanneling(false)
         {
             instance = creature->GetInstanceScript();
         }
@@ -316,7 +316,7 @@ public:
                 return;
 
             // Now lets get archimode threat list
-            ThreatContainer::StorageType const &t_list = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
 
             if (t_list.empty())
                 return;
@@ -426,7 +426,7 @@ public:
                 if (victim && me->IsWithinMeleeRange(victim))
                     return false;
 
-                ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
                 if (threatlist.empty())
                     return false;
 
@@ -493,12 +493,12 @@ public:
         void SummonDoomfire(Unit* target)
         {
             Unit* doomfire1 = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT,
-                target->GetPositionX() + 15.0f, target->GetPositionY() + 15.0f, target->GetPositionZ(), 0,
-                TEMPSUMMON_TIMED_DESPAWN, 27000);
+                                                 target->GetPositionX() + 15.0f, target->GetPositionY() + 15.0f, target->GetPositionZ(), 0,
+                                                 TEMPSUMMON_TIMED_DESPAWN, 27000);
 
             Unit* doomfire2 = me->SummonCreature(CREATURE_DOOMFIRE,
-                target->GetPositionX() - 15.0f, target->GetPositionY() - 15.0f, target->GetPositionZ(), 0,
-                TEMPSUMMON_TIMED_DESPAWN, 27000);
+                                                 target->GetPositionX() - 15.0f, target->GetPositionY() - 15.0f, target->GetPositionZ(), 0,
+                                                 TEMPSUMMON_TIMED_DESPAWN, 27000);
 
             doomfire1->SetVisible(false);
             doomfire2->SetVisible(false);
@@ -548,7 +548,7 @@ public:
                     me->SetVisible(false);
                     me->setFaction(35);
                 }
-                
+
                 if ((instance->GetData(DATA_AZGALOREVENT) >= DONE) && (!me->IsVisible() || (me->getFaction() == 35)))
                 {
                     me->setFaction(1720);
@@ -592,22 +592,22 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_CHECK_WORLD_TREE_DISTANCE:
-                {
-                    // If Archimonde is too close to the world tree this will ENRAGE him
-                    Creature* Check = me->SummonCreature(CREATURE_CHANNEL_TARGET, NordrassilLoc, TEMPSUMMON_TIMED_DESPAWN, 2000);
-                    if (Check)
                     {
-                        Check->SetVisible(false);
-
-                        if (me->IsWithinDistInMap(Check, 75))
+                        // If Archimonde is too close to the world tree this will ENRAGE him
+                        Creature* Check = me->SummonCreature(CREATURE_CHANNEL_TARGET, NordrassilLoc, TEMPSUMMON_TIMED_DESPAWN, 2000);
+                        if (Check)
                         {
-                            events.ScheduleEvent(EVENT_TOO_CLOSE_TO_WORLD_TREE, 0);
-                            break;
+                            Check->SetVisible(false);
+
+                            if (me->IsWithinDistInMap(Check, 75))
+                            {
+                                events.ScheduleEvent(EVENT_TOO_CLOSE_TO_WORLD_TREE, 0);
+                                break;
+                            }
                         }
+                        events.RepeatEvent(5000);
+                        break;
                     }
-                    events.RepeatEvent(5000);
-                    break;
-                }
                 case EVENT_BELOW_10_PERCENT_HP:
                     DoCastProtection();     // Protection of Elune against Finger and Hand of Death
                     BelowTenPercent = true;
@@ -685,29 +685,29 @@ public:
 
 class spell_red_sky_effect : public SpellScriptLoader
 {
-    public:
-        spell_red_sky_effect() : SpellScriptLoader("spell_red_sky_effect") { }
+public:
+    spell_red_sky_effect() : SpellScriptLoader("spell_red_sky_effect") { }
 
-        class spell_red_sky_effect_SpellScript : public SpellScript
+    class spell_red_sky_effect_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_red_sky_effect_SpellScript);
+
+        void HandleHit(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_red_sky_effect_SpellScript);
-
-            void HandleHit(SpellEffIndex /*effIndex*/)
-            {
-                if (GetHitUnit())
-                    PreventHitDamage();
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_red_sky_effect_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_red_sky_effect_SpellScript();
+            if (GetHitUnit())
+                PreventHitDamage();
         }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_red_sky_effect_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_red_sky_effect_SpellScript();
+    }
 };
 
 class spell_finger_of_death : public SpellScriptLoader

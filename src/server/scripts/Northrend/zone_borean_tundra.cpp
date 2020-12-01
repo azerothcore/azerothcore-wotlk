@@ -69,8 +69,8 @@ public:
             owner->CastSpell(owner, SPELL_SUBDUED, true);
             GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
             owner->setFaction(35);
-            owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-            owner->DespawnOrUnsummon(3*MINUTE*IN_MILLISECONDS);
+            owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
         }
 
         void Register()
@@ -109,7 +109,7 @@ public:
 
     struct npc_sinkhole_kill_creditAI : public NullCreatureAI
     {
-        npc_sinkhole_kill_creditAI(Creature* creature) : NullCreatureAI(creature){ }
+        npc_sinkhole_kill_creditAI(Creature* creature) : NullCreatureAI(creature) { }
 
         uint32 phaseTimer;
         uint8  phase;
@@ -196,7 +196,8 @@ public:
                         CreatureAI::EnterEvadeMode();
                         break;
                 }
-            } else phaseTimer -= diff;
+            }
+            else phaseTimer -= diff;
 
         }
 
@@ -281,7 +282,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(QUEST_ACES_HIGH) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_ACES_HIGH_DAILY) == QUEST_STATUS_INCOMPLETE) //It's the same dragon for both quests.
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_C_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_C_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
@@ -290,7 +291,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
 
@@ -327,7 +328,7 @@ public:
     {
         if (player->GetQuestStatus(QUEST_SPIRITS_WATCH_OVER_US) == QUEST_STATUS_INCOMPLETE)
             AddGossipItemFor(player, GOSSIP_MENU_ID_NPC_IRUK, GOSSIP_OPTION_SEARCH_CORPSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        
+
         SendGossipMenuFor(player, NPC_TEXT_THIS_YOUNG_TUSKARR, creature->GetGUID());
 
         return true;
@@ -336,13 +337,13 @@ public:
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        
+
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             player->CastSpell(player, SPELL_CREATE_TOTEM_OF_ISSLIRUK, true);
             CloseGossipMenuFor(player);
         }
-        
+
         return true;
     }
 };
@@ -427,7 +428,7 @@ public:
 
     struct npc_lurgglbrAI : public npc_escortAI
     {
-        npc_lurgglbrAI(Creature* creature) : npc_escortAI(creature){ }
+        npc_lurgglbrAI(Creature* creature) : npc_escortAI(creature) { }
 
         uint32 IntroTimer;
         uint32 IntroPhase;
@@ -505,7 +506,8 @@ public:
                             IntroTimer = 0;
                             break;
                     }
-                } else IntroTimer -= diff;
+                }
+                else IntroTimer -= diff;
             }
             npc_escortAI::UpdateAI(diff);
 
@@ -777,7 +779,7 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            if (Player* player=GetPlayerForEscort())
+            if (Player* player = GetPlayerForEscort())
                 player->FailQuest(QUEST_ESCAPING_THE_MIST);
         }
 
@@ -854,7 +856,7 @@ public:
 
         void Reset()
         {
-            Bonker_agro=0;
+            Bonker_agro = 0;
             SetDespawnAtFar(false);
         }
 
@@ -875,7 +877,7 @@ public:
                 }
                 DoMeleeAttackIfReady();
             }
-            else Bonker_agro=0;
+            else Bonker_agro = 0;
         }
 
         void WaypointReached(uint32 waypointId)
@@ -1000,46 +1002,46 @@ public:
                 switch (me->GetEntry())
                 {
                     case NPC_WARMAGE_HOLLISTER:
-                    {
-                        if (!orbList.empty())
                         {
-                            for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
+                            if (!orbList.empty())
                             {
-                                if (Creature* pOrb = *itr)
-                                    if (pOrb->GetPositionY() > 6680)
-                                        DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
+                                for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
+                                {
+                                    if (Creature* pOrb = *itr)
+                                        if (pOrb->GetPositionY() > 6680)
+                                            DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
+                                }
                             }
+                            m_uiTimer = urand(90000, 120000);
                         }
-                        m_uiTimer = urand(90000, 120000);
-                    }
                         break;
                     case NPC_WARMAGE_CALANDRA:
-                    {
-                        if (!orbList.empty())
                         {
-                            for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
+                            if (!orbList.empty())
                             {
-                                if (Creature* pOrb = *itr)
-                                    if ((pOrb->GetPositionY() < 6680) && (pOrb->GetPositionY() > 6630))
-                                        DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
+                                for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
+                                {
+                                    if (Creature* pOrb = *itr)
+                                        if ((pOrb->GetPositionY() < 6680) && (pOrb->GetPositionY() > 6630))
+                                            DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
+                                }
                             }
+                            m_uiTimer = urand(90000, 120000);
                         }
-                        m_uiTimer = urand(90000, 120000);
-                    }
                         break;
                     case NPC_WARMAGE_WATKINS:
-                    {
-                        if (!orbList.empty())
                         {
-                            for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
+                            if (!orbList.empty())
                             {
-                                if (Creature* pOrb = *itr)
-                                    if (pOrb->GetPositionY() < 6630)
-                                        DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
+                                for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
+                                {
+                                    if (Creature* pOrb = *itr)
+                                        if (pOrb->GetPositionY() < 6630)
+                                            DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
+                                }
                             }
+                            m_uiTimer = urand(90000, 120000);
                         }
-                        m_uiTimer = urand(90000, 120000);
-                    }
                         break;
                 }
             }
@@ -1096,8 +1098,8 @@ public:
     {
         npc_hidden_cultistAI(Creature* creature) : ScriptedAI(creature)
         {
-           uiEmoteState = creature->GetUInt32Value(UNIT_NPC_EMOTESTATE);
-           uiNpcFlags = creature->GetUInt32Value(UNIT_NPC_FLAGS);
+            uiEmoteState = creature->GetUInt32Value(UNIT_NPC_EMOTESTATE);
+            uiNpcFlags = creature->GetUInt32Value(UNIT_NPC_FLAGS);
         }
 
         uint32 uiEmoteState;
@@ -1169,7 +1171,10 @@ public:
                                 uiEventPhase = 2;
                                 break;
                             case NPC_TOM_HEGGER:
-                                Talk(SAY_HIDDEN_CULTIST_3);
+                                if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
+                                {
+                                    Talk(SAY_HIDDEN_CULTIST_3, player);
+                                }
                                 uiEventTimer = 5000;
                                 uiEventPhase = 2;
                                 break;
@@ -1200,7 +1205,8 @@ public:
                         }
                         break;
                 }
-            }else uiEventTimer -= uiDiff;
+            }
+            else uiEventTimer -= uiDiff;
 
             if (!UpdateVictim())
                 return;
@@ -1239,7 +1245,7 @@ public:
         }
 
         if (player->HasAura(SPELL_RIGHTEOUS_VISION) && player->GetQuestStatus(QUEST_THE_HUNT_IS_ON) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, charGossipItem, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, charGossipItem, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         if (creature->IsVendor())
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
@@ -1253,7 +1259,7 @@ public:
     {
         ClearGossipMenuFor(player);
 
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
             creature->AI()->SetGUID(player->GetGUID());
@@ -1359,9 +1365,9 @@ public:
             }
         }
 
-        private:
-            EventMap _events;
-            uint64 _playerGUID;
+    private:
+        EventMap _events;
+        uint64 _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

@@ -17,8 +17,8 @@ if [ ! -d "$J_PATH/.git" ]; then
     git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" reset --hard "$J_VER_REQ"
 else
     # legacy code, with new rev of joiner the update process is internally handled
-    _cur_branch=`git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" rev-parse --abbrev-ref HEAD`
-    _cur_ver=`git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" name-rev --tags --name-only $_cur_branch`
+    _cur_branch=$(git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" rev-parse --abbrev-ref HEAD)
+    _cur_ver=$(git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" name-rev --tags --name-only $_cur_branch)
     if [ "$_cur_ver" != "$J_VER_REQ" ]; then
         git --git-dir="$J_PATH/.git" --work-tree="$J_PATH/" rev-parse && git --git-dir="$J_PATH/.git" --work-tree="$J_PATH/" fetch --tags origin master --quiet
         git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" reset --hard "$J_VER_REQ"
