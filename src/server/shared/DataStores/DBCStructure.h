@@ -906,11 +906,11 @@ struct FactionTemplateEntry
 
         if (entry.faction)
         {
-            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (enemyFaction[i] == entry.faction)
+            for (unsigned int i : enemyFaction)
+                if (i == entry.faction)
                     return false;
-            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (friendFaction[i] == entry.faction)
+            for (unsigned int i : friendFaction)
+                if (i == entry.faction)
                     return true;
         }
         return (friendlyMask & entry.ourMask) || (ourMask & entry.friendlyMask);
@@ -919,11 +919,11 @@ struct FactionTemplateEntry
     {
         if (entry.faction)
         {
-            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (enemyFaction[i] == entry.faction)
+            for (unsigned int i : enemyFaction)
+                if (i == entry.faction)
                     return true;
-            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (friendFaction[i] == entry.faction)
+            for (unsigned int i : friendFaction)
+                if (i == entry.faction)
                     return false;
         }
         return (hostileMask & entry.ourMask) != 0;
@@ -931,8 +931,8 @@ struct FactionTemplateEntry
     bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) != 0; }
     bool IsNeutralToAll() const
     {
-        for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-            if (enemyFaction[i] != 0)
+        for (unsigned int i : enemyFaction)
+            if (i != 0)
                 return false;
         return hostileMask == 0 && friendlyMask == 0;
     }

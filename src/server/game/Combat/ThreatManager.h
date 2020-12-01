@@ -229,10 +229,8 @@ public:
         if (threatList.empty())
             return;
 
-        for (ThreatContainer::StorageType::iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+        for (auto ref : threatList)
         {
-            HostileReference* ref = (*itr);
-
             if (predicate(ref->getTarget()))
             {
                 ref->setThreat(0);
