@@ -6197,7 +6197,7 @@ void ObjectMgr::LoadAccessRequirements()
                     ItemTemplate const* pProto = GetItemTemplate(progression_requirement->id);
                     if (!pProto)
                     {
-                        sLog->outError("Key item %u for faction %u does not exist for map %u difficulty %u, remove or fix item requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
+                        sLog->outError("Required item %u for faction %u does not exist for map %u difficulty %u, remove or fix this item requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
                         progression_requirement->id = 0;
                         delete progression_requirement;
                         break;
