@@ -15,7 +15,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (45280, 'deDE', 'Oberhemd', 'Ich habe Ulduar in Hard Mode getestet und alles was ich bekam war dieses blöde T-Shirt!', 15050),
 (45049, 'deDE', 'Ritterlanze [PH]', '', 15050),
 (44945, 'deDE', 'Formel: Waffe - Titanwache', '', 15050),
-(44432, 'deDE', 'Glyphe der Totenerweckung', '', 15050),
+(44432, 'deDE', 'Glyphe ''Totenerweckung''', '', 15050),
 (44392, 'deDE', 'Halskette der Durchdringung', '', 15050),
 (44391, 'deDE', 'Stahlgusshalsreif', '', 15050),
 (36970, 'deDE', 'Zauberfoliant des Leidens (Rang 8)', '', 15050),
