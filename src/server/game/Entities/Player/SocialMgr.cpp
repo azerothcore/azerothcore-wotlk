@@ -143,7 +143,7 @@ void PlayerSocial::SendSocialList(Player* player)
 
     uint32 size = m_playerSocialMap.size();
 
-    WorldPacket data(SMSG_CONTACT_LIST, (4+4+size*25));     // just can guess size
+    WorldPacket data(SMSG_CONTACT_LIST, (4 + 4 + size * 25)); // just can guess size
     data << uint32(7);                                      // 0x1 = Friendlist update. 0x2 = Ignorelist update. 0x4 = Mutelist update.
     data << uint32(size);                                   // friends count
 
@@ -202,7 +202,7 @@ SocialMgr* SocialMgr::instance()
     return &instance;
 }
 
-void SocialMgr::GetFriendInfo(Player* player, uint32 friendGUID, FriendInfo &friendInfo)
+void SocialMgr::GetFriendInfo(Player* player, uint32 friendGUID, FriendInfo& friendInfo)
 {
     if (!player)
         return;
@@ -311,7 +311,7 @@ void SocialMgr::BroadcastToFriendListers(Player* player, WorldPacket* packet)
 
 PlayerSocial* SocialMgr::LoadFromDB(PreparedQueryResult result, uint32 guid)
 {
-    PlayerSocial *social = &m_socialMap[guid];
+    PlayerSocial* social = &m_socialMap[guid];
     social->SetPlayerGUID(guid);
 
     if (!result)
@@ -334,8 +334,7 @@ PlayerSocial* SocialMgr::LoadFromDB(PreparedQueryResult result, uint32 guid)
         // client's friends list and ignore list limit
         if (social->m_playerSocialMap.size() >= (SOCIALMGR_FRIEND_LIMIT + SOCIALMGR_IGNORE_LIMIT))
             break;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     return social;
 }

@@ -6,7 +6,8 @@
 #ifndef ACORE_SPELLAURADEFINES_H
 #define ACORE_SPELLAURADEFINES_H
 
-#define MAX_AURAS 64                                        // client support up to 255, but it will cause problems with group auras updating
+#define MAX_AURAS 255                                        // Client Limit
+#define MAX_AURAS_GROUP_UPDATE 64                            // Limit of SMSG_PARY_MEMBER_STATS_FULL and SMSG_PARTY_MEMBER_STATS
 
 enum AURA_FLAGS
 {
@@ -232,7 +233,7 @@ enum AuraType
     SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT = 182,
     SPELL_AURA_MOD_CRITICAL_THREAT = 183,
     SPELL_AURA_MOD_ATTACKER_MELEE_HIT_CHANCE = 184,
-    SPELL_AURA_MOD_ATTACKER_RANGED_HIT_CHANCE= 185,
+    SPELL_AURA_MOD_ATTACKER_RANGED_HIT_CHANCE = 185,
     SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE = 186,
     SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_CHANCE = 187,
     SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_CHANCE = 188,

@@ -64,79 +64,79 @@ enum Events
 
 class boss_ragnaros : public CreatureScript
 {
-    public:
-        boss_ragnaros() : CreatureScript("boss_ragnaros") { }
+public:
+    boss_ragnaros() : CreatureScript("boss_ragnaros") { }
 
-        struct boss_ragnarosAI : public BossAI
+    struct boss_ragnarosAI : public BossAI
+    {
+        boss_ragnarosAI(Creature* creature) : BossAI(creature, BOSS_RAGNAROS)
         {
-            boss_ragnarosAI(Creature* creature) : BossAI(creature, BOSS_RAGNAROS)
-            {
-                _introState = 0;
-                me->SetReactState(REACT_PASSIVE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            }
+            _introState = 0;
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        }
 
-            void Reset() override
-            {
-                BossAI::Reset();
-                _emergeTimer = 90000;
-                _hasYelledMagmaBurst = false;
-                _hasSubmergedOnce = false;
-                _isBanished = false;
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-            }
+        void Reset() override
+        {
+            BossAI::Reset();
+            _emergeTimer = 90000;
+            _hasYelledMagmaBurst = false;
+            _hasSubmergedOnce = false;
+            _isBanished = false;
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+        }
 
-            void EnterCombat(Unit* victim) override
-            {
-                BossAI::EnterCombat(victim);
-                events.ScheduleEvent(EVENT_ERUPTION, 15000);
-                events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000);
-                events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000);
-                events.ScheduleEvent(EVENT_LAVA_BURST, 10000);
-                events.ScheduleEvent(EVENT_ELEMENTAL_FIRE, 3000);
-                events.ScheduleEvent(EVENT_MAGMA_BLAST, 2000);
-                events.ScheduleEvent(EVENT_SUBMERGE, 180000);
-            }
-            
-            void JustDied(Unit* killer) override
-            {
-                BossAI::JustDied(killer);
-                me->SetFacingTo(DEATH_ORIENTATION);
-            }
+        void EnterCombat(Unit* victim) override
+        {
+            BossAI::EnterCombat(victim);
+            events.ScheduleEvent(EVENT_ERUPTION, 15000);
+            events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000);
+            events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000);
+            events.ScheduleEvent(EVENT_LAVA_BURST, 10000);
+            events.ScheduleEvent(EVENT_ELEMENTAL_FIRE, 3000);
+            events.ScheduleEvent(EVENT_MAGMA_BLAST, 2000);
+            events.ScheduleEvent(EVENT_SUBMERGE, 180000);
+        }
 
-            void KilledUnit(Unit* /*victim*/) override
-            {
-                if (urand(0, 99) < 25)
-                    Talk(SAY_KILL);
-            }
+        void JustDied(Unit* killer) override
+        {
+            BossAI::JustDied(killer);
+            me->SetFacingTo(DEATH_ORIENTATION);
+        }
 
-            void AttackStart(Unit* target) override
-            {
-                if (target && me->Attack(target, true))
-                    DoStartNoMovement(target);
-            }
+        void KilledUnit(Unit* /*victim*/) override
+        {
+            if (urand(0, 99) < 25)
+                Talk(SAY_KILL);
+        }
 
-            void UpdateAI(uint32 diff) override
+        void AttackStart(Unit* target) override
+        {
+            if (target && me->Attack(target, true))
+                DoStartNoMovement(target);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_introState != 2)
             {
-                if (_introState != 2)
+                if (!_introState)
                 {
-                    if (!_introState)
-                    {
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
-                        events.ScheduleEvent(EVENT_INTRO_1, 4000);
-                        events.ScheduleEvent(EVENT_INTRO_2, 23000);
-                        events.ScheduleEvent(EVENT_INTRO_3, 42000);
-                        events.ScheduleEvent(EVENT_INTRO_4, 43000);
-                        events.ScheduleEvent(EVENT_INTRO_5, 53000);
-                        _introState = 1;
-                    }
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+                    events.ScheduleEvent(EVENT_INTRO_1, 4000);
+                    events.ScheduleEvent(EVENT_INTRO_2, 23000);
+                    events.ScheduleEvent(EVENT_INTRO_3, 42000);
+                    events.ScheduleEvent(EVENT_INTRO_4, 43000);
+                    events.ScheduleEvent(EVENT_INTRO_5, 53000);
+                    _introState = 1;
+                }
 
-                    events.Update(diff);
+                events.Update(diff);
 
-                    while (uint32 eventId = events.ExecuteEvent())
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
                     {
-                        switch (eventId)
-                        {
                         case EVENT_INTRO_1:
                             Talk(SAY_ARRIVAL1_RAG);
                             break;
@@ -158,76 +158,76 @@ class boss_ragnaros : public CreatureScript
                             break;
                         default:
                             break;
-                        }
                     }
                 }
-                else
+            }
+            else
+            {
+                if (_isBanished && ((_emergeTimer <= diff) || (instance->GetData(DATA_RAGNAROS_ADDS)) > 8))
                 {
-                    if (_isBanished && ((_emergeTimer <= diff) || (instance->GetData(DATA_RAGNAROS_ADDS)) > 8))
-                    {
-                        //Become unbanished again
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        me->setFaction(14);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                            AttackStart(target);
-                        instance->SetData(DATA_RAGNAROS_ADDS, 0);
-                        _isBanished = false;
-                    }
-                    else if (_isBanished)
-                    {
-                        _emergeTimer -= diff;
-                        return;
-                    }
+                    //Become unbanished again
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->setFaction(14);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        AttackStart(target);
+                    instance->SetData(DATA_RAGNAROS_ADDS, 0);
+                    _isBanished = false;
+                }
+                else if (_isBanished)
+                {
+                    _emergeTimer -= diff;
+                    return;
+                }
 
-                    if (!UpdateVictim())
-                        return;
+                if (!UpdateVictim())
+                    return;
 
-                    events.Update(diff);
+                events.Update(diff);
 
-                    while (uint32 eventId = events.ExecuteEvent())
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
                     {
-                        switch (eventId)
-                        {
-                            case EVENT_ERUPTION:
-                                DoCastVictim(SPELL_ERRUPTION);
-                                events.ScheduleEvent(EVENT_ERUPTION, urand(20000, 45000));
-                                break;
-                            case EVENT_WRATH_OF_RAGNAROS:
-                                DoCastVictim(SPELL_WRATH_OF_RAGNAROS);
-                                if (urand(0, 1))
-                                    Talk(SAY_WRATH);
-                                events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 25000);
-                                break;
-                            case EVENT_HAND_OF_RAGNAROS:
-                                DoCast(me, SPELL_HAND_OF_RAGNAROS);
-                                if (urand(0, 1))
-                                    Talk(SAY_HAND);
-                                events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 20000);
-                                break;
-                            case EVENT_LAVA_BURST:
-                                DoCastVictim(SPELL_LAVA_BURST);
-                                events.ScheduleEvent(EVENT_LAVA_BURST, 10000);
-                                break;
-                            case EVENT_ELEMENTAL_FIRE:
-                                DoCastVictim(SPELL_ELEMENTAL_FIRE);
-                                events.ScheduleEvent(EVENT_ELEMENTAL_FIRE, urand(10000, 14000));
-                                break;
-                            case EVENT_MAGMA_BLAST:
-                                if (!me->IsWithinMeleeRange(me->GetVictim()))
+                        case EVENT_ERUPTION:
+                            DoCastVictim(SPELL_ERRUPTION);
+                            events.ScheduleEvent(EVENT_ERUPTION, urand(20000, 45000));
+                            break;
+                        case EVENT_WRATH_OF_RAGNAROS:
+                            DoCastVictim(SPELL_WRATH_OF_RAGNAROS);
+                            if (urand(0, 1))
+                                Talk(SAY_WRATH);
+                            events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 25000);
+                            break;
+                        case EVENT_HAND_OF_RAGNAROS:
+                            DoCast(me, SPELL_HAND_OF_RAGNAROS);
+                            if (urand(0, 1))
+                                Talk(SAY_HAND);
+                            events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 20000);
+                            break;
+                        case EVENT_LAVA_BURST:
+                            DoCastVictim(SPELL_LAVA_BURST);
+                            events.ScheduleEvent(EVENT_LAVA_BURST, 10000);
+                            break;
+                        case EVENT_ELEMENTAL_FIRE:
+                            DoCastVictim(SPELL_ELEMENTAL_FIRE);
+                            events.ScheduleEvent(EVENT_ELEMENTAL_FIRE, urand(10000, 14000));
+                            break;
+                        case EVENT_MAGMA_BLAST:
+                            if (!me->IsWithinMeleeRange(me->GetVictim()))
+                            {
+                                DoCastVictim(SPELL_MAGMA_BLAST);
+                                if (!_hasYelledMagmaBurst)
                                 {
-                                    DoCastVictim(SPELL_MAGMA_BLAST);
-                                    if (!_hasYelledMagmaBurst)
-                                    {
-                                        Talk(SAY_MAGMABURST);
-                                        _hasYelledMagmaBurst = true;
-                                    }
+                                    Talk(SAY_MAGMABURST);
+                                    _hasYelledMagmaBurst = true;
                                 }
-                                events.ScheduleEvent(EVENT_MAGMA_BLAST, 2500);
-                                break;
-                            case EVENT_SUBMERGE:
+                            }
+                            events.ScheduleEvent(EVENT_MAGMA_BLAST, 2500);
+                            break;
+                        case EVENT_SUBMERGE:
                             {
                                 if (!_isBanished)
                                 {
@@ -273,60 +273,60 @@ class boss_ragnaros : public CreatureScript
                                 events.ScheduleEvent(EVENT_SUBMERGE, 180000);
                                 break;
                             }
-                            default:
-                                break;
-                        }
+                        default:
+                            break;
                     }
-
-                    DoMeleeAttackIfReady();
                 }
+
+                DoMeleeAttackIfReady();
             }
-
-        private:
-            float const DEATH_ORIENTATION = 4.0f;
-            uint32 _emergeTimer;
-            uint8 _introState;
-            bool _hasYelledMagmaBurst;
-            bool _hasSubmergedOnce;
-            bool _isBanished;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return GetInstanceAI<boss_ragnarosAI>(creature);
         }
+
+    private:
+        float const DEATH_ORIENTATION = 4.0f;
+        uint32 _emergeTimer;
+        uint8 _introState;
+        bool _hasYelledMagmaBurst;
+        bool _hasSubmergedOnce;
+        bool _isBanished;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetInstanceAI<boss_ragnarosAI>(creature);
+    }
 };
 
 class npc_son_of_flame : public CreatureScript
 {
-    public:
-        npc_son_of_flame() : CreatureScript("npc_SonOfFlame") { }
+public:
+    npc_son_of_flame() : CreatureScript("npc_SonOfFlame") { }
 
-        struct npc_son_of_flameAI : public ScriptedAI
+    struct npc_son_of_flameAI : public ScriptedAI
+    {
+        npc_son_of_flameAI(Creature* creature) : ScriptedAI(creature)
         {
-            npc_son_of_flameAI(Creature* creature) : ScriptedAI(creature)
-            {
-                instance = me->GetInstanceScript();
-            }
-
-            void JustDied(Unit* /*killer*/) override { instance->SetData(DATA_RAGNAROS_ADDS, 1); }
-
-            void UpdateAI(uint32 /*diff*/) override
-            {
-                if (!UpdateVictim())
-                    return;
-
-                DoMeleeAttackIfReady();
-            }
-
-        private:
-            InstanceScript* instance;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return GetInstanceAI<npc_son_of_flameAI>(creature);
+            instance = me->GetInstanceScript();
         }
+
+        void JustDied(Unit* /*killer*/) override { instance->SetData(DATA_RAGNAROS_ADDS, 1); }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+    private:
+        InstanceScript* instance;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetInstanceAI<npc_son_of_flameAI>(creature);
+    }
 };
 
 void AddSC_boss_ragnaros()

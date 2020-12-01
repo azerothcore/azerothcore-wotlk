@@ -22,9 +22,9 @@
 #include <cmath>
 
 template<class T, typename D>
-void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool initial)
+void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool initial)
 {
-    if (!i_target.isValid() || !i_target->IsInWorld() || !owner->IsInMap(i_target.getTarget())) 
+    if (!i_target.isValid() || !i_target->IsInWorld() || !owner->IsInMap(i_target.getTarget()))
         return;
 
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE))
@@ -39,16 +39,21 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
     if (owner->GetMapId() == 631 && owner->GetTransport() && owner->GetTransport()->IsMotionTransport() && i_target->GetTransport() && i_target->GetTransport()->IsMotionTransport()) // for ICC, if both on a motion transport => don't use mmaps
         sameTransport = owner->GetTypeId() == TYPEID_UNIT && i_target->isInAccessiblePlaceFor(owner->ToCreature());
     bool useMMaps = MMAP::MMapFactory::IsPathfindingEnabled(owner->FindMap()) && !sameTransport;
-    bool forceDest = (owner->FindMap() && owner->FindMap()->IsDungeon() && !isPlayerPet) || // force in instances to prevent exploiting
-                     (owner->GetTypeId() == TYPEID_UNIT && ((owner->IsPet() && owner->HasUnitState(UNIT_STATE_FOLLOW)) || // allow pets following their master to cheat while generating paths
-                     ((Creature*)owner)->isWorldBoss() || ((Creature*)owner)->IsDungeonBoss())) || // force for all bosses, even not in instances
+    bool forceDest =
+                     // (owner->FindMap() && owner->FindMap()->IsDungeon() && !isPlayerPet) || // force in instances to prevent exploiting
+                     (owner->GetTypeId() == TYPEID_UNIT && ((owner->IsPet() && owner->HasUnitState(UNIT_STATE_FOLLOW)))) || // allow pets following their master to cheat while generating paths
+                     // ((Creature*)owner)->isWorldBoss() || ((Creature*)owner)->IsDungeonBoss())) || // force for all bosses, even not in instances
                      (owner->GetMapId() == 572 && (owner->GetPositionX() < 1275.0f || i_target->GetPositionX() < 1275.0f)) || // pussywizard: Ruins of Lordaeron - special case (acid)
                      sameTransport || // nothing to comment, can't find path on transports so allow it
-                     (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()); // for .npc follow
+                     (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) // for .npc follow*/
+    ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
     bool forcePoint = ((!isPlayerPet || owner->GetMapId() == 618) && (forceDest || !useMMaps)) || sameTransport;
 
     if (owner->GetTypeId() == TYPEID_UNIT && !i_target->isInAccessiblePlaceFor(owner->ToCreature()) && !sameTransport && !forceDest && !forcePoint)
+    {
+        owner->ToCreature()->SetCannotReachTarget(true);
         return;
+    }
 
     lastOwnerXYZ.Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ());
     lastTargetXYZ.Relocate(i_target->GetPositionX(), i_target->GetPositionY(), i_target->GetPositionZ());
@@ -63,10 +68,10 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
             return;
 
         bool inRange = i_target->GetRandomContactPoint(owner, x, y, z, forcePoint);
-        if (useMMaps && !inRange && (!isPlayerPet || i_target->GetPositionZ()-z > 50.0f))
+        if (useMMaps && !inRange && (!isPlayerPet || i_target->GetPositionZ() - z > 50.0f))
         {
             //useMMaps = false;
-            owner->m_targetsNotAcceptable[i_target->GetGUID()] = MMapTargetData(sWorld->GetGameTime()+DISALLOW_TIME_AFTER_FAIL, owner, i_target.getTarget());
+            owner->m_targetsNotAcceptable[i_target->GetGUID()] = MMapTargetData(sWorld->GetGameTime() + DISALLOW_TIME_AFTER_FAIL, owner, i_target.getTarget());
             return;
         }
 
@@ -115,7 +120,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
 
         // Xinef: Fix follow angle for hostile units
         if (angle == 0.0f && owner->GetVictim() && owner->GetVictim()->GetGUID() == i_target->GetGUID())
-            angle = MapManager::NormalizeOrientation(i_target->GetAngle(owner)-i_target->GetOrientation());
+            angle = MapManager::NormalizeOrientation(i_target->GetAngle(owner) - i_target->GetOrientation());
         // to at i_offset distance from target and i_angle from target facing
         bool inRange = i_target->GetClosePoint(x, y, z, size, dist, angle, owner, forcePoint);
         if (!inRange && (forceDest || !useMMaps) && owner->HasUnitState(UNIT_STATE_FOLLOW) && fabs(i_target->GetPositionZ() - z) > 25.0f)
@@ -154,7 +159,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
                                 else
                                     z = i_target->GetPositionZ();
 
-                                init.MoveTo(x,y,z);
+                                init.MoveTo(x, y, z);
                                 if (i_angle == 0.f)
                                     init.SetFacing(i_target.getTarget());
                                 init.SetWalk(((D*)this)->EnableWalking());
@@ -164,7 +169,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
                             if (pillar->GetGoState() == GO_STATE_ACTIVE || (pillar->GetGoState() == GO_STATE_READY && pillar->ToTransport()->GetPathProgress() > 0))
                             {
                                 Position pos;
-                                owner->GetFirstCollisionPositionForTotem(pos, owner->GetExactDist2d(i_target.getTarget()), owner->GetAngle(i_target.getTarget())-owner->GetOrientation(), false);
+                                owner->GetFirstCollisionPositionForTotem(pos, owner->GetExactDist2d(i_target.getTarget()), owner->GetAngle(i_target.getTarget()) - owner->GetOrientation(), false);
                                 x = pos.GetPositionX();
                                 y = pos.GetPositionY();
                                 z = 28.28f;
@@ -184,10 +189,15 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
         if (result)
         {
             float maxDist = MELEE_RANGE + owner->GetMeleeReach() + i_target->GetMeleeReach();
-            if (!forceDest && (i_path->GetPathType() & PATHFIND_NOPATH || (!i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist*maxDist)))
+            if (!forceDest && (i_path->GetPathType() & PATHFIND_NOPATH || (!i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist * maxDist)))
             {
+                if (owner->GetTypeId() == TYPEID_UNIT) 
+                {
+                    owner->ToCreature()->SetCannotReachTarget(false);
+                }
+
                 lastPathingFailMSTime = World::GetGameTimeMS();
-                owner->m_targetsNotAcceptable[i_target->GetGUID()] = MMapTargetData(sWorld->GetGameTime()+DISALLOW_TIME_AFTER_FAIL, owner, i_target.getTarget());
+                owner->m_targetsNotAcceptable[i_target->GetGUID()] = MMapTargetData(sWorld->GetGameTime() + DISALLOW_TIME_AFTER_FAIL, owner, i_target.getTarget());
                 return;
             }
             else
@@ -203,13 +213,20 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
                 return;
             }
         }
-
-        // if failed to generate, just use normal MoveTo
+        else
+        {
+            // evade first
+            if (owner->GetTypeId() == TYPEID_UNIT)
+            {
+                owner->ToCreature()->SetCannotReachTarget(true);
+            }
+            // then use normal MoveTo - if we have to
+        }
     }
 
     owner->AddUnitState(UNIT_STATE_CHASE);
 
-    init.MoveTo(x,y,z);
+    init.MoveTo(x, y, z);
     // Using the same condition for facing target as the one that is used for SetInFront on movement end
     // - applies to ChaseMovementGenerator mostly
     if (i_angle == 0.f)
@@ -220,7 +237,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
 }
 
 template<class T, typename D>
-bool TargetedMovementGeneratorMedium<T,D>::DoUpdate(T* owner, uint32 time_diff)
+bool TargetedMovementGeneratorMedium<T, D>::DoUpdate(T* owner, uint32 time_diff)
 {
     if (!i_target.isValid() || !i_target->IsInWorld())
         return false;
@@ -288,10 +305,10 @@ bool TargetedMovementGeneratorMedium<T,D>::DoUpdate(T* owner, uint32 time_diff)
             if (TransportBase* transport = owner->GetDirectTransport())
                 transport->CalculatePassengerPosition(dest.x, dest.y, dest.z);
 
-        float dist = (dest - G3D::Vector3(i_target->GetPositionX(),i_target->GetPositionY(),i_target->GetPositionZ())).squaredLength();
+        float dist = (dest - G3D::Vector3(i_target->GetPositionX(), i_target->GetPositionY(), i_target->GetPositionZ())).squaredLength();
         float targetMoveDistSq = i_target->GetExactDistSq(&lastTargetXYZ);
-        if (dist >= allowed_dist_sq || (!i_offset && targetMoveDistSq >= 1.5f*1.5f))
-            if (targetMoveDistSq >= 0.1f*0.1f || owner->GetExactDistSq(&lastOwnerXYZ) >= 0.1f*0.1f)
+        if (dist >= allowed_dist_sq || (!i_offset && targetMoveDistSq >= 1.5f * 1.5f))
+            if (targetMoveDistSq >= 0.1f * 0.1f || owner->GetExactDistSq(&lastOwnerXYZ) >= 0.1f * 0.1f)
                 _setTargetLocation(owner, false);
     }
 
@@ -332,7 +349,7 @@ template<class T>
 void ChaseMovementGenerator<T>::_reachTarget(T* owner)
 {
     if (owner->IsWithinMeleeRange(this->i_target.getTarget()))
-        owner->Attack(this->i_target.getTarget(),true);
+        owner->Attack(this->i_target.getTarget(), true);
 }
 
 template<>
@@ -450,14 +467,14 @@ void FollowMovementGenerator<Creature>::MovementInform(Creature* unit)
 }
 
 //-----------------------------------------------//
-template void TargetedMovementGeneratorMedium<Player,ChaseMovementGenerator<Player> >::_setTargetLocation(Player*, bool initial);
-template void TargetedMovementGeneratorMedium<Player,FollowMovementGenerator<Player> >::_setTargetLocation(Player*, bool initial);
-template void TargetedMovementGeneratorMedium<Creature,ChaseMovementGenerator<Creature> >::_setTargetLocation(Creature*, bool initial);
-template void TargetedMovementGeneratorMedium<Creature,FollowMovementGenerator<Creature> >::_setTargetLocation(Creature*, bool initial);
-template bool TargetedMovementGeneratorMedium<Player,ChaseMovementGenerator<Player> >::DoUpdate(Player*, uint32);
-template bool TargetedMovementGeneratorMedium<Player,FollowMovementGenerator<Player> >::DoUpdate(Player*, uint32);
-template bool TargetedMovementGeneratorMedium<Creature,ChaseMovementGenerator<Creature> >::DoUpdate(Creature*, uint32);
-template bool TargetedMovementGeneratorMedium<Creature,FollowMovementGenerator<Creature> >::DoUpdate(Creature*, uint32);
+template void TargetedMovementGeneratorMedium<Player, ChaseMovementGenerator<Player> >::_setTargetLocation(Player*, bool initial);
+template void TargetedMovementGeneratorMedium<Player, FollowMovementGenerator<Player> >::_setTargetLocation(Player*, bool initial);
+template void TargetedMovementGeneratorMedium<Creature, ChaseMovementGenerator<Creature> >::_setTargetLocation(Creature*, bool initial);
+template void TargetedMovementGeneratorMedium<Creature, FollowMovementGenerator<Creature> >::_setTargetLocation(Creature*, bool initial);
+template bool TargetedMovementGeneratorMedium<Player, ChaseMovementGenerator<Player> >::DoUpdate(Player*, uint32);
+template bool TargetedMovementGeneratorMedium<Player, FollowMovementGenerator<Player> >::DoUpdate(Player*, uint32);
+template bool TargetedMovementGeneratorMedium<Creature, ChaseMovementGenerator<Creature> >::DoUpdate(Creature*, uint32);
+template bool TargetedMovementGeneratorMedium<Creature, FollowMovementGenerator<Creature> >::DoUpdate(Creature*, uint32);
 
 template void ChaseMovementGenerator<Player>::_reachTarget(Player*);
 template void ChaseMovementGenerator<Creature>::_reachTarget(Creature*);

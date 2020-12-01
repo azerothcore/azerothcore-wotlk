@@ -158,7 +158,7 @@ public:
    *
    * @param base        Existing section in which to open the named section.
    * @param sub_section Name of the section to open.
-   * @param create      If zero, the named section must exist. If non-zero,
+   * @param create      If false, the named section must exist, otherwise
    *                    the named section will be created if it does not exist.
    * @param result      Reference; receives the section key for the new
    *                    section.
@@ -168,7 +168,7 @@ public:
    */
   virtual int open_section (const ACE_Configuration_Section_Key &base,
                             const ACE_TCHAR *sub_section,
-                            int create,
+                            bool create,
                             ACE_Configuration_Section_Key& result) = 0;
 
   /// Removes a named section.
@@ -355,7 +355,7 @@ public:
   int expand_path (const ACE_Configuration_Section_Key& key,
                    const ACE_TString& path_in,
                    ACE_Configuration_Section_Key& key_out,
-                   int create = 1);
+                   bool create = true);
 
   /**
    * Determine if the contents of this object is the same as the
@@ -447,20 +447,20 @@ protected:
 class ACE_Export ACE_Configuration_Win32Registry : public ACE_Configuration
 {
 public:
-
   /**
    * Constructor for registry configuration database.  hKey is the
    * base registry key to attach to.  This class takes ownership of
    * hKey, it will invoke <RegCloseKey> on it upon destruction.
    */
-  explicit ACE_Configuration_Win32Registry (HKEY hKey);
+  explicit ACE_Configuration_Win32Registry (HKEY hKey,
+                                            u_long security_access = KEY_ALL_ACCESS);
 
   /// Destructor
   virtual ~ACE_Configuration_Win32Registry (void);
 
   virtual int open_section (const ACE_Configuration_Section_Key& base,
                             const ACE_TCHAR* sub_section,
-                            int create,
+                            bool create,
                             ACE_Configuration_Section_Key& result);
 
   virtual int remove_section (const ACE_Configuration_Section_Key& key,
@@ -520,7 +520,8 @@ public:
    */
   static HKEY resolve_key (HKEY hKey,
                            const ACE_TCHAR* path,
-                           int create = 1);
+                           bool create = true,
+                           u_long security_access = KEY_ALL_ACCESS);
   virtual bool operator== (const ACE_Configuration_Win32Registry &rhs) const;
   virtual bool operator!= (const ACE_Configuration_Win32Registry &rhs) const;
 
@@ -533,6 +534,8 @@ protected:
   ACE_Configuration_Win32Registry (void);
   ACE_Configuration_Win32Registry (const ACE_Configuration_Win32Registry& rhs);
   ACE_Configuration_Win32Registry& operator= (const ACE_Configuration_Win32Registry& rhs);
+
+  const u_long security_access_;
 };
 #endif /* ACE_WIN32 && !ACE_LACKS_WIN32_REGISTRY */
 
@@ -735,6 +738,9 @@ public:
 
   /// The sub section iterator
   SUBSECTION_HASH::ITERATOR* section_iter_;
+
+  ACE_ALLOC_HOOK_DECLARE;
+
 protected:
   /// Destructor - will delete the iterators
   virtual ~ACE_Configuration_Section_Key_Heap (void);
@@ -763,7 +769,6 @@ protected:
 class ACE_Export ACE_Configuration_Heap : public ACE_Configuration
 {
 public:
-
   /// Default ctor
   ACE_Configuration_Heap (void);
 
@@ -805,7 +810,7 @@ public:
 
   virtual int open_section (const ACE_Configuration_Section_Key& base,
                             const ACE_TCHAR* sub_section,
-                            int create, ACE_Configuration_Section_Key& result);
+                            bool create, ACE_Configuration_Section_Key& result);
 
   virtual int remove_section (const ACE_Configuration_Section_Key& key,
                               const ACE_TCHAR* sub_section,
@@ -857,8 +862,8 @@ public:
 private:
   /// @a sub_section may not contain path separators
   int open_simple_section (const ACE_Configuration_Section_Key &base,
-                            const ACE_TCHAR *sub_section,
-                            int create, ACE_Configuration_Section_Key &result);
+                           const ACE_TCHAR *sub_section,
+                           bool create, ACE_Configuration_Section_Key &result);
   /// Adds a new section
   int add_section (const ACE_Configuration_Section_Key &base,
                    const ACE_TCHAR *sub_section,

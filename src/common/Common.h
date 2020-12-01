@@ -79,11 +79,9 @@
 #include "Threading/LockedQueue.h"
 #include "Threading/Threading.h"
 
-#include <ace/Basic_Types.h>
 #include <ace/Guard_T.h>
 #include <ace/RW_Thread_Mutex.h>
 #include <ace/Thread_Mutex.h>
-#include <ace/OS_NS_time.h>
 #include <ace/Stack_Trace.h>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
@@ -108,7 +106,6 @@
 
 #define I32FMT "%08I32X"
 #define I64FMT "%016I64X"
-#define snprintf _snprintf
 #define atoll _atoi64
 #define vsnprintf _vsnprintf
 #define llabs _abs64
@@ -137,11 +134,11 @@ inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
 enum TimeConstants
 {
     MINUTE          = 60,
-    HOUR            = MINUTE*60,
-    DAY             = HOUR*24,
-    WEEK            = DAY*7,
-    MONTH           = DAY*30,
-    YEAR            = MONTH*12,
+    HOUR            = MINUTE * 60,
+    DAY             = HOUR * 24,
+    WEEK            = DAY * 7,
+    MONTH           = DAY * 30,
+    YEAR            = MONTH * 12,
     IN_MILLISECONDS = 1000
 };
 

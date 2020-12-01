@@ -62,7 +62,7 @@ public:
     }
 
     // Registration Email can NOT be changed apart from GM level users. Thus, we do not require to log them...
-    // ACCOUNT_CHANGE_EMAIL = 4 
+    // ACCOUNT_CHANGE_EMAIL = 4
     void OnEmailChange(uint32 accountId) override
     {
         AccountIPLogAction(accountId, ACCOUNT_CHANGE_EMAIL); // ... they get logged by gm command logger anyway
@@ -76,7 +76,7 @@ public:
 
     /* It's impossible to log the account logout process out of character selection - shouldn't matter anyway,
      * as ip doesn't change through playing (obviously).*/
-     // ACCOUNT_LOGOUT = 6
+    // ACCOUNT_LOGOUT = 6
     void AccountIPLogAction(uint32 accountId, IPLoggingTypes aType)
     {
         if (!sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
@@ -94,32 +94,32 @@ public:
         // Avoids Magicnumbers in SQL table
         switch (aType)
         {
-        case ACCOUNT_LOGIN:
-            systemNote = "Logged on Successful AccountLogin";
-            break;
-        case ACCOUNT_FAIL_LOGIN:
-            systemNote = "Logged on Failed AccountLogin";
-            break;
-        case ACCOUNT_CHANGE_PW:
-            systemNote = "Logged on Successful Account Password Change";
-            break;
-        case ACCOUNT_CHANGE_PW_FAIL:
-            systemNote = "Logged on Failed Account Password Change";
-            break;
-        case ACCOUNT_CHANGE_EMAIL:
-            systemNote = "Logged on Successful Account Email Change";
-            break;
-        case ACCOUNT_CHANGE_EMAIL_FAIL:
-            systemNote = "Logged on Failed Account Email Change";
-            break;
+            case ACCOUNT_LOGIN:
+                systemNote = "Logged on Successful AccountLogin";
+                break;
+            case ACCOUNT_FAIL_LOGIN:
+                systemNote = "Logged on Failed AccountLogin";
+                break;
+            case ACCOUNT_CHANGE_PW:
+                systemNote = "Logged on Successful Account Password Change";
+                break;
+            case ACCOUNT_CHANGE_PW_FAIL:
+                systemNote = "Logged on Failed Account Password Change";
+                break;
+            case ACCOUNT_CHANGE_EMAIL:
+                systemNote = "Logged on Successful Account Email Change";
+                break;
+            case ACCOUNT_CHANGE_EMAIL_FAIL:
+                systemNote = "Logged on Failed Account Email Change";
+                break;
             /*case ACCOUNT_LOGOUT:
                 systemNote = "Logged on AccountLogout"; //Can not be logged
                 break;*/
-                // Neither should happen. Ever. Period. If it does, call Ghostbusters and all your local software defences to investigate.
-        case UNKNOWN_ACTION:
-        default:
-            systemNote = "ERROR! Unknown action!";
-            break;
+            // Neither should happen. Ever. Period. If it does, call Ghostbusters and all your local software defences to investigate.
+            case UNKNOWN_ACTION:
+            default:
+                systemNote = "ERROR! Unknown action!";
+                break;
         }
 
         // Once we have done everything, we can insert the new log.
@@ -202,26 +202,26 @@ public:
         // ... with this switch, so that we have a more accurate phrasing of what type it is
         switch (aType)
         {
-        case CHARACTER_CREATE:
-            systemNote = "Logged on CharacterCreate";
-            break;
-        case CHARACTER_LOGIN:
-            systemNote = "Logged on CharacterLogin";
-            break;
-        case CHARACTER_LOGOUT:
-            systemNote = "Logged on CharacterLogout";
-            break;
-        case CHARACTER_DELETE:
-            systemNote = "Logged on CharacterDelete";
-            break;
-        case CHARACTER_FAILED_DELETE:
-            systemNote = "Logged on Failed CharacterDelete";
-            break;
+            case CHARACTER_CREATE:
+                systemNote = "Logged on CharacterCreate";
+                break;
+            case CHARACTER_LOGIN:
+                systemNote = "Logged on CharacterLogin";
+                break;
+            case CHARACTER_LOGOUT:
+                systemNote = "Logged on CharacterLogout";
+                break;
+            case CHARACTER_DELETE:
+                systemNote = "Logged on CharacterDelete";
+                break;
+            case CHARACTER_FAILED_DELETE:
+                systemNote = "Logged on Failed CharacterDelete";
+                break;
             // Neither should happen. Ever. Period. If it does, call Mythbusters.
-        case UNKNOWN_ACTION:
-        default:
-            systemNote = "ERROR! Unknown action!";
-            break;
+            case UNKNOWN_ACTION:
+            default:
+                systemNote = "ERROR! Unknown action!";
+                break;
         }
 
         // Once we have done everything, we can insert the new log.
@@ -274,17 +274,17 @@ public:
         // Avoids Magicnumbers in SQL table
         switch (aType)
         {
-        case CHARACTER_DELETE:
-            systemNote = "Logged on CharacterDelete";
-            break;
-        case CHARACTER_FAILED_DELETE:
-            systemNote = "Logged on Failed CharacterDelete";
-            break;
+            case CHARACTER_DELETE:
+                systemNote = "Logged on CharacterDelete";
+                break;
+            case CHARACTER_FAILED_DELETE:
+                systemNote = "Logged on Failed CharacterDelete";
+                break;
             // Neither should happen. Ever. Period. If it does, call to whatever god you have for mercy and guidance.
-        case UNKNOWN_ACTION:
-        default:
-            systemNote = "ERROR! Unknown action!";
-            break;
+            case UNKNOWN_ACTION:
+            default:
+                systemNote = "ERROR! Unknown action!";
+                break;
         }
 
         // Once we have done everything, we can insert the new log.

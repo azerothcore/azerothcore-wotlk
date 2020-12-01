@@ -11,7 +11,6 @@
 #include <ace/Svc_Handler.h>
 #include <ace/SOCK_Stream.h>
 #include <ace/Message_Block.h>
-#include <ace/Basic_Types.h>
 #include "Common.h"
 
 class RealmSocket : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH>
@@ -35,17 +34,17 @@ public:
     virtual ~RealmSocket(void);
 
     size_t recv_len(void) const;
-    bool recv_soft(char *buf, size_t len);
-    bool recv(char *buf, size_t len);
+    bool recv_soft(char* buf, size_t len);
+    bool recv(char* buf, size_t len);
     void recv_skip(size_t len);
 
-    bool send(const char *buf, size_t len);
+    bool send(const char* buf, size_t len);
 
     const std::string& getRemoteAddress(void) const;
 
     uint16 getRemotePort(void) const;
 
-    virtual int open(void *);
+    virtual int open(void*);
 
     virtual int close(u_long);
 
@@ -57,7 +56,7 @@ public:
     void set_session(Session* session);
 
 private:
-    ssize_t noblk_send(ACE_Message_Block &message_block);
+    ssize_t noblk_send(ACE_Message_Block& message_block);
 
     ACE_Message_Block input_buffer_;
     Session* session_;
