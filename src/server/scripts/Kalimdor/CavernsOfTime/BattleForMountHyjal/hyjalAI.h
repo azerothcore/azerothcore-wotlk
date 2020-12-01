@@ -35,8 +35,9 @@ struct Wave
     bool IsBoss;                                            // Simply used to inform the wave summoner that the next wave contains a boss to halt all waves after that
 };
 
-const Wave AllianceWaves[]=                                // Waves that will be summoned in the Alliance Base
-{   // Rage Winterchill Wave 1-8
+const Wave AllianceWaves[] =                               // Waves that will be summoned in the Alliance Base
+{
+    // Rage Winterchill Wave 1-8
     {{GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, 0, 0, 0, 0, 0, 0, 0, 0}, 120000, false},
     {{GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, CRYPT_FIEND, CRYPT_FIEND, 0, 0, 0, 0, 0, 0}, 120000, false},
     {{GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, CRYPT_FIEND, CRYPT_FIEND, CRYPT_FIEND, CRYPT_FIEND, CRYPT_FIEND, CRYPT_FIEND, 0, 0, 0, 0, 0, 0}, 120000, false},
@@ -60,8 +61,9 @@ const Wave AllianceWaves[]=                                // Waves that will be
     {{ANETHERON, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 0, true}
 };
 
-const Wave HordeWaves[]=                                   // Waves that are summoned in the Horde base
-{   // Kaz'Rogal Wave 1-8
+const Wave HordeWaves[] =                                  // Waves that are summoned in the Horde base
+{
+    // Kaz'Rogal Wave 1-8
     {{GHOUL, GHOUL, GHOUL, GHOUL, ABOMINATION, ABOMINATION, ABOMINATION, ABOMINATION, BANSHEE, BANSHEE, NECROMANCER, NECROMANCER, 0, 0, 0, 0, 0, 0}, 180000, false},
     {{GHOUL, GHOUL, GHOUL, GHOUL, GARGOYLE, GARGOYLE, GARGOYLE, GARGOYLE, GARGOYLE, GARGOYLE, GARGOYLE, GARGOYLE, GARGOYLE, GARGOYLE, 0, 0, 0, 0}, 180000, false},
     {{GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, GHOUL, CRYPT_FIEND, CRYPT_FIEND, CRYPT_FIEND, CRYPT_FIEND, CRYPT_FIEND, CRYPT_FIEND, NECROMANCER, NECROMANCER, 0, 0, 0, 0}, 180000, false},
@@ -136,61 +138,61 @@ struct hyjalAI : public npc_escortAI
 
     void SummonCreature(uint32 entry, float Base[4][3]);    // Summons a creature for that wave in that base
 
-                                                            // Summons the next wave, calls SummonCreature
+    // Summons the next wave, calls SummonCreature
     void SummonNextWave(const Wave wave[18], uint32 Count, float Base[4][3]);
 
     void StartEvent(Player* player);                        // Begins the event by gossip click
 
     uint32 GetInstanceData(uint32 Event);                   // Gets instance data for this instance, used to check if raid has gotten past a certain point and can access the next phase
 
-    public:
-        InstanceScript* instance;
+public:
+    InstanceScript* instance;
 
-        uint64 PlayerGUID;
-        uint64 BossGUID[2];
-        uint64 VeinGUID[14];
+    uint64 PlayerGUID;
+    uint64 BossGUID[2];
+    uint64 VeinGUID[14];
 
-        uint32 NextWaveTimer;
-        uint32 WaveCount;
-        uint32 CheckTimer;
-        uint32 Faction;
-        uint32 EnemyCount;
-        uint32 RetreatTimer;
+    uint32 NextWaveTimer;
+    uint32 WaveCount;
+    uint32 CheckTimer;
+    uint32 Faction;
+    uint32 EnemyCount;
+    uint32 RetreatTimer;
 
-        bool EventBegun;
-        bool FirstBossDead;
-        bool SecondBossDead;
-        bool Summon;
-        bool bRetreat;
-        bool Debug;
-        bool VeinsSpawned[2];
-        uint8 InfernalCount;
-        SummonList Summons;
-        bool Overrun;
-        bool Teleported;
-        bool WaitForTeleport;
-        uint32 TeleportTimer;
-        uint32 OverrunCounter;
-        uint32 OverrunCounter2;
-        uint32 InfernalPoint;
-        uint32 RespawnTimer;
-        bool DoRespawn;
-        bool DoHide;
-        bool IsDummy;
-        uint32 MassTeleportTimer;
-        bool DoMassTeleport;
-        uint64 DummyGuid;
+    bool EventBegun;
+    bool FirstBossDead;
+    bool SecondBossDead;
+    bool Summon;
+    bool bRetreat;
+    bool Debug;
+    bool VeinsSpawned[2];
+    uint8 InfernalCount;
+    SummonList Summons;
+    bool Overrun;
+    bool Teleported;
+    bool WaitForTeleport;
+    uint32 TeleportTimer;
+    uint32 OverrunCounter;
+    uint32 OverrunCounter2;
+    uint32 InfernalPoint;
+    uint32 RespawnTimer;
+    bool DoRespawn;
+    bool DoHide;
+    bool IsDummy;
+    uint32 MassTeleportTimer;
+    bool DoMassTeleport;
+    uint64 DummyGuid;
 
-        struct Spell
-        {
-            uint32 SpellId;
-            uint32 Cooldown;
-            uint32 TargetType;
-        } Spells[HYJAL_AI_MAX_SPELLS];
+    struct Spell
+    {
+        uint32 SpellId;
+        uint32 Cooldown;
+        uint32 TargetType;
+    } Spells[HYJAL_AI_MAX_SPELLS];
 
-    private:
-        uint32 SpellTimer[3];
-        //std::list<uint64> CreatureList;
+private:
+    uint32 SpellTimer[3];
+    //std::list<uint64> CreatureList;
 };
 #endif
 

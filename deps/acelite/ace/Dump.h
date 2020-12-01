@@ -127,6 +127,8 @@ public:
   /// Interface to the Singleton instance of the object database.
   static ACE_ODB *instance (void);
 
+  ACE_ALLOC_HOOK_DECLARE;
+
 private:
   ACE_ODB (void); // Ensure we have a Singleton...
 

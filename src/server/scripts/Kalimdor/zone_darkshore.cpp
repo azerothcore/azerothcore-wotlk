@@ -80,48 +80,48 @@ public:
                 spawnTimer = 0;
                 switch (phase)
                 {
-                case 0:
-                    if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f, true) && !me->FindNearestCreature(NPC_GREYMIST_HUNTER, 80.0f, true))
-                    {
-                        Player *player = me->SelectNearestPlayer(100.0f);
-                        if (!player)
-                            return;
+                    case 0:
+                        if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f, true) && !me->FindNearestCreature(NPC_GREYMIST_HUNTER, 80.0f, true))
+                        {
+                            Player* player = me->SelectNearestPlayer(100.0f);
+                            if (!player)
+                                return;
 
-                        phase++;
-                        for (int i = 0; i < 3; ++i)
-                            if (Creature* cr = me->SummonCreature(NPC_GREYMIST_COASTRUNNER, me->GetPositionX()+irand(-5, 5), me->GetPositionY()+irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                            phase++;
+                            for (int i = 0; i < 3; ++i)
+                                if (Creature* cr = me->SummonCreature(NPC_GREYMIST_COASTRUNNER, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                                    cr->AI()->AttackStart(player);
+                        }
+                        return;
+                    case 1:
+                        if (!me->FindNearestCreature(NPC_GREYMIST_COASTRUNNER, 80.0f))
+                        {
+                            Player* player = me->SelectNearestPlayer(100.0f);
+                            if (!player)
+                                return;
+
+                            phase++;
+                            for (int i = 0; i < 2; ++i)
+                                if (Creature* cr = me->SummonCreature(NPC_GREYMIST_WARRIOR, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                                    cr->AI()->AttackStart(player);
+                        }
+                        return;
+                    case 2:
+                        if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f))
+                        {
+                            Player* player = me->SelectNearestPlayer(100.0f);
+                            if (!player)
+                                return;
+
+                            phase++;
+                            if (Creature* cr = me->SummonCreature(NPC_GREYMIST_HUNTER, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
                                 cr->AI()->AttackStart(player);
-                    }
-                    return;
-                case 1:
-                    if (!me->FindNearestCreature(NPC_GREYMIST_COASTRUNNER, 80.0f))
-                    {
-                        Player *player = me->SelectNearestPlayer(100.0f);
-                        if (!player)
-                            return;
 
-                        phase++;
-                        for (int i = 0; i < 2; ++i)
-                            if (Creature* cr = me->SummonCreature(NPC_GREYMIST_WARRIOR, me->GetPositionX()+irand(-5, 5), me->GetPositionY()+irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                                cr->AI()->AttackStart(player);
-                    }
-                    return;
-                case 2:
-                    if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f))
-                    {
-                        Player *player = me->SelectNearestPlayer(100.0f);
-                        if (!player)
-                            return;
-
-                        phase++;
-                        if (Creature* cr = me->SummonCreature(NPC_GREYMIST_HUNTER, me->GetPositionX()+irand(-5, 5), me->GetPositionY()+irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                            cr->AI()->AttackStart(player);
-
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        me->SetVisible(true);
-                        AttackStart(player);
-                    }
-                    return;
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            me->SetVisible(true);
+                            AttackStart(player);
+                        }
+                        return;
                 }
             }
 
@@ -195,7 +195,7 @@ public:
 
             if (!me->GetVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && who->GetEntry() == NPC_LILADRIS)
             {
-                if (me->IsWithinDistInMap(who, INTERACTION_DISTANCE*5))
+                if (me->IsWithinDistInMap(who, INTERACTION_DISTANCE * 5))
                 {
                     if (Player* player = GetLeaderForFollower())
                     {
@@ -469,7 +469,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
 
@@ -486,7 +486,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_GYROMAST_REV) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_INSERT_KEY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_INSERT_KEY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
