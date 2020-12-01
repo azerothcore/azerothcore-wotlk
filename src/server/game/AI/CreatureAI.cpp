@@ -118,8 +118,8 @@ void CreatureAI::MoveInLineOfSight(Unit* who)
     // pussywizard: civilian, non-combat pet or any other NOT HOSTILE TO ANYONE (!)
     if (me->IsMoveInLineOfSightDisabled())
         if (me->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET ||      // nothing more to do, return
-            !who->IsInCombat() ||                                         // if not in combat, nothing more to do
-            !me->IsWithinDist(who, ATTACK_DISTANCE))                      // if in combat and in dist - neutral to all can actually assist other creatures
+                !who->IsInCombat() ||                                         // if not in combat, nothing more to do
+                !me->IsWithinDist(who, ATTACK_DISTANCE))                      // if in combat and in dist - neutral to all can actually assist other creatures
             return;
 
     if (me->CanStartAttack(who))
@@ -246,9 +246,10 @@ bool CreatureAI::_EnterEvadeMode()
     me->DeleteThreatList();
     me->CombatStop(true);
     me->LoadCreaturesAddon(true);
-    me->SetLootRecipient(NULL);
+    me->SetLootRecipient(nullptr);
     me->ResetPlayerDamageReq();
     me->SetLastDamagedTime(0);
+    me->SetCannotReachTarget(false);
 
     if (me->IsInEvadeMode())
         return false;

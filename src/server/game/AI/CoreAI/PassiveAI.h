@@ -12,65 +12,65 @@
 
 class PassiveAI : public CreatureAI
 {
-    public:
-        explicit PassiveAI(Creature* c);
+public:
+    explicit PassiveAI(Creature* c);
 
-        void MoveInLineOfSight(Unit*) {}
-        void AttackStart(Unit*) {}
-        void UpdateAI(uint32);
+    void MoveInLineOfSight(Unit*) {}
+    void AttackStart(Unit*) {}
+    void UpdateAI(uint32);
 
-        static int Permissible(const Creature*) { return PERMIT_BASE_IDLE;  }
+    static int Permissible(const Creature*) { return PERMIT_BASE_IDLE;  }
 };
 
 class PossessedAI : public CreatureAI
 {
-    public:
-        explicit PossessedAI(Creature* c);
+public:
+    explicit PossessedAI(Creature* c);
 
-        void MoveInLineOfSight(Unit*) {}
-        void AttackStart(Unit* target);
-        void UpdateAI(uint32);
-        void EnterEvadeMode() {}
+    void MoveInLineOfSight(Unit*) {}
+    void AttackStart(Unit* target);
+    void UpdateAI(uint32);
+    void EnterEvadeMode() {}
 
-        void JustDied(Unit*);
-        void KilledUnit(Unit* victim);
+    void JustDied(Unit*);
+    void KilledUnit(Unit* victim);
 
-        static int Permissible(const Creature*) { return PERMIT_BASE_IDLE;  }
+    static int Permissible(const Creature*) { return PERMIT_BASE_IDLE;  }
 };
 
 class NullCreatureAI : public CreatureAI
 {
-    public:
-        explicit NullCreatureAI(Creature* c);
+public:
+    explicit NullCreatureAI(Creature* c);
 
-        void MoveInLineOfSight(Unit*) {}
-        void AttackStart(Unit*) {}
-        void UpdateAI(uint32) {}
-        void EnterEvadeMode() {}
-        void OnCharmed(bool /*apply*/) {}
+    void MoveInLineOfSight(Unit*) {}
+    void AttackStart(Unit*) {}
+    void UpdateAI(uint32) {}
+    void EnterEvadeMode() {}
+    void OnCharmed(bool /*apply*/) {}
 
-        static int Permissible(const Creature*) { return PERMIT_BASE_IDLE;  }
+    static int Permissible(const Creature*) { return PERMIT_BASE_IDLE;  }
 };
 
 class CritterAI : public PassiveAI
 {
-    public:
-        explicit CritterAI(Creature* c) : PassiveAI(c) { _combatTimer = 0; }
+public:
+    explicit CritterAI(Creature* c) : PassiveAI(c) { _combatTimer = 0; }
 
-        void DamageTaken(Unit* /*done_by*/, uint32& /*damage*/, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask);
-        void EnterEvadeMode();
-        void UpdateAI(uint32);
+    void DamageTaken(Unit* /*done_by*/, uint32& /*damage*/, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask);
+    void EnterEvadeMode();
+    void UpdateAI(uint32);
 
     // Xinef: Added
-    private:
-        uint32 _combatTimer;
+private:
+    uint32 _combatTimer;
 };
 
 class TriggerAI : public NullCreatureAI
 {
-    public:
-        explicit TriggerAI(Creature* c) : NullCreatureAI(c) {}
-        void IsSummonedBy(Unit* summoner);
+public:
+    explicit TriggerAI(Creature* c) : NullCreatureAI(c) {}
+    void IsSummonedBy(Unit* summoner);
 };
 
 #endif

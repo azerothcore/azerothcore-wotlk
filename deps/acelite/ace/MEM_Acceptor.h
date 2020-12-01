@@ -52,7 +52,6 @@ class ACE_Reactor;
 class ACE_Export ACE_MEM_Acceptor : public ACE_SOCK_Acceptor
 {
 public:
-  // = Initialization methods.
   /// Default constructor.
   ACE_MEM_Acceptor (void);
 

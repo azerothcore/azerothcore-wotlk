@@ -148,12 +148,10 @@ public:
   ACE_ALLOC_HOOK_DECLARE;
 
 protected:
-
   /// Initialize the repository.
   ACE_Framework_Repository (int size = ACE_Framework_Repository::DEFAULT_SIZE);
 
 private:
-
   /// Actually removes the dll components, must be called with locks held.
   int remove_dll_components_i (const ACE_TCHAR *dll_name);
 
@@ -162,7 +160,6 @@ private:
   void compact (void);
 
 private:
-
   /// Contains all the framework components.
   ACE_Framework_Component **component_vector_;
 

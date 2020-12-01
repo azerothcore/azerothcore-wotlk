@@ -85,13 +85,14 @@ public:
                     Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
                     if (unit && (unit->GetTypeId() == TYPEID_PLAYER))
                     {
-                        DoTeleportPlayer(unit, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+3, unit->GetOrientation());
+                        DoTeleportPlayer(unit, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 3, unit->GetOrientation());
                     }
                 }
 
                 DoResetThreat();
                 TeleportTimer = 30000;
-            } else TeleportTimer -= diff;
+            }
+            else TeleportTimer -= diff;
 
             //        //MarkOfFrostTimer
             //        if (MarkOfFrostTimer <= diff)
@@ -105,14 +106,16 @@ public:
             {
                 DoCastVictim(SPELL_CHILL);
                 ChillTimer = urand(13000, 25000);
-            } else ChillTimer -= diff;
+            }
+            else ChillTimer -= diff;
 
             //BreathTimer
             if (BreathTimer <= diff)
             {
                 DoCastVictim(SPELL_FROSTBREATH);
                 BreathTimer = urand(10000, 15000);
-            } else BreathTimer -= diff;
+            }
+            else BreathTimer -= diff;
 
             //ManaStormTimer
             if (ManaStormTimer <= diff)
@@ -120,21 +123,24 @@ public:
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     DoCast(target, SPELL_MANASTORM);
                 ManaStormTimer = urand(7500, 12500);
-            } else ManaStormTimer -= diff;
+            }
+            else ManaStormTimer -= diff;
 
             //ReflectTimer
             if (ReflectTimer <= diff)
             {
                 DoCast(me, SPELL_REFLECT);
                 ReflectTimer = urand(20000, 35000);
-            } else ReflectTimer -= diff;
+            }
+            else ReflectTimer -= diff;
 
             //CleaveTimer
             if (CleaveTimer <= diff)
             {
                 DoCastVictim(SPELL_CLEAVE);
                 CleaveTimer = 7000;
-            } else CleaveTimer -= diff;
+            }
+            else CleaveTimer -= diff;
 
             //EnrageTimer
             if (HealthBelowPct(26) && !Enraged)
