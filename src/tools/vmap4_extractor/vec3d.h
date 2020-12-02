@@ -17,10 +17,15 @@ public:
 
     Vec3D(float x0 = 0.0f, float y0 = 0.0f, float z0 = 0.0f) : x(x0), y(y0), z(z0) {}
 
-    Vec3D(const Vec3D& v)  = default;
+    Vec3D(const Vec3D& v) : x(v.x), y(v.y), z(v.z) {}
 
     Vec3D& operator= (const Vec3D& v)
-    = default;
+    {
+        x = v.x;
+        y = v.y;
+        z = v.z;
+        return *this;
+    }
 
     Vec3D operator+ (const Vec3D& v) const
     {
@@ -129,7 +134,7 @@ public:
 
     Vec2D(float x0 = 0.0f, float y0 = 0.0f) : x(x0), y(y0) {}
 
-    Vec2D(const Vec2D& v)  = default;
+    Vec2D(const Vec2D& v) : x(v.x), y(v.y) {}
 
     Vec2D& operator= (const Vec2D& v)
     = default;

@@ -48,7 +48,11 @@ public:
     {
     public:
         Record& operator= (const Record& r)
-        = default;
+        {
+            file = r.file;
+            offset = r.offset;
+            return *this;
+        }
         float getFloat(size_t field) const
         {
             assert(field < file.fieldCount);

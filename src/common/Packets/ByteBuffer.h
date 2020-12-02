@@ -66,9 +66,10 @@ public:
     }
 
     // copy constructor
-    ByteBuffer(const ByteBuffer& buf) 
-        
-    = default;
+    ByteBuffer(const ByteBuffer& buf) : _rpos(buf._rpos), _wpos(buf._wpos),
+        _storage(buf._storage)
+    {
+    }
     /* requried as of C++ 11 */
 #if __cplusplus >= 201103L
     ByteBuffer(ByteBuffer&&) = default;
