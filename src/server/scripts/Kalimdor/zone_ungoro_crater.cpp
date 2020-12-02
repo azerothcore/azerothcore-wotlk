@@ -124,7 +124,8 @@ public:
             {
                 DoCastVictim(SPELL_DEMORALIZINGSHOUT);
                 DemoralizingShoutTimer = 70000;
-            } else DemoralizingShoutTimer -= diff;
+            }
+            else DemoralizingShoutTimer -= diff;
         }
     };
 };

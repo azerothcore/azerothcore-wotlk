@@ -59,7 +59,7 @@ public:
         EventMap events;
         bool finished;
 
-        void Reset() 
+        void Reset()
         {
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
@@ -86,13 +86,13 @@ public:
 
         void KilledUnit(Unit*  /*victim*/)
         {
-            if (!urand(0,1))
+            if (!urand(0, 1))
                 return;
 
             Talk(SAY_SLAY);
         }
 
-        void DamageTaken(Unit* who, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             if (!finished && damage >= me->GetHealth())
             {
@@ -129,7 +129,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_CARRION_SWARM:
                     me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_CARRION_SWARM_N, SPELL_CARRION_SWARM_H), false);
