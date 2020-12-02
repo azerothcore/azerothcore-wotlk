@@ -7275,7 +7275,7 @@ void Player::RewardReputation(Quest const* quest)
     }
 }
 
-void Player::RewardOtherBonusTalentPoints(uint32 bonusTalentPoints)
+void Player::RewardExtraBonusTalentPoints(uint32 bonusTalentPoints)
 {
     if (bonusTalentPoints)
     {

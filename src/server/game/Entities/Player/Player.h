@@ -2166,7 +2166,7 @@ public:
      *
      * 2). Data initing situation (like PlayerScript:OnLoadFromDB)
      */
-    void RewardOtherBonusTalentPoints(uint32 bonusTalentPoints);
+    void RewardExtraBonusTalentPoints(uint32 bonusTalentPoints);
 
     /*********************************************************/
     /***                  PVP SYSTEM                       ***/
