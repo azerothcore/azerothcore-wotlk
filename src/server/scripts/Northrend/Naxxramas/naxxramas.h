@@ -71,7 +71,7 @@ enum NXGOs
     GO_GOTHIK_EXIT_GATE             = 181125,
     GO_HORSEMAN_GATE                = 181119,
     GO_SAPPHIRON_GATE               = 181225,
-    
+
     GO_HORSEMEN_CHEST_10            = 181366,
     GO_HORSEMEN_CHEST_25            = 193426,
 
@@ -83,6 +83,11 @@ enum NXGOs
     GO_THADDIUS_PORTAL              = 181576, //Thadius portal
     GO_MAEXXNA_PORTAL               = 181575, //Maexxna portal
     GO_HORSEMAN_PORTAL              = 181578, //Four Horseman portal
+
+    GO_DEATHKNIGHT_EYE_PORTAL       = 181210,
+    GO_PLAGUE_EYE_PORTAL            = 181211,
+    GO_SPIDER_EYE_PORTAL            = 181212,
+    GO_ABOM_EYE_PORTAL              = 181213,
 
     GO_CONS_NOX_TESLA_STALAGG       = 268049,
     GO_CONS_NOX_TESLA_FEUGEN        = 268050

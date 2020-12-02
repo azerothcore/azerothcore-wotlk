@@ -77,124 +77,125 @@ Position const PosMoveOnSpawn[1] =
 
 class boss_arlokk : public CreatureScript
 {
-    public: boss_arlokk() : CreatureScript("boss_arlokk") { }
+public:
+    boss_arlokk() : CreatureScript("boss_arlokk") { }
 
-        struct boss_arlokkAI : public BossAI
+    struct boss_arlokkAI : public BossAI
+    {
+        boss_arlokkAI(Creature* creature) : BossAI(creature, DATA_ARLOKK) { }
+
+        void Reset()
         {
-            boss_arlokkAI(Creature* creature) : BossAI(creature, DATA_ARLOKK) { }
+            if (events.IsInPhase(PHASE_TWO))
+                me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
+            _Reset();
+            _summonCountA = 0;
+            _summonCountB = 0;
+            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_DAGGER));
+            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(WEAPON_DAGGER));
+            me->SetWalk(false);
+            me->GetMotionMaster()->MovePoint(0, PosMoveOnSpawn[0]);
+        }
 
-            void Reset()
+        void JustDied(Unit* /*killer*/)
+        {
+            _JustDied();
+            Talk(SAY_DEATH);
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            _EnterCombat();
+            events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(7000, 9000), 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_GOUGE, urand(12000, 15000), 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_SUMMON_PROWLERS, 6000, 0, PHASE_ALL);
+            events.ScheduleEvent(EVENT_MARK_OF_ARLOKK, urand(9000, 11000), 0, PHASE_ALL);
+            events.ScheduleEvent(EVENT_TRANSFORM, urand(15000, 20000), 0, PHASE_ONE);
+            Talk(SAY_AGGRO);
+
+            // Sets up list of Panther spawners to cast on
+            std::list<Creature*> triggerList;
+            GetCreatureListWithEntryInGrid(triggerList, me, NPC_PANTHER_TRIGGER, 100.0f);
+            if (!triggerList.empty())
             {
-                if (events.IsInPhase(PHASE_TWO))
-                    me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
-                _Reset();
-                _summonCountA = 0;
-                _summonCountB = 0;
-                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_DAGGER));
-                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(WEAPON_DAGGER));
-                me->SetWalk(false);
-                me->GetMotionMaster()->MovePoint(0, PosMoveOnSpawn[0]);
-            }
-
-            void JustDied(Unit* /*killer*/)
-            {
-                _JustDied();
-                Talk(SAY_DEATH);
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                _EnterCombat();
-                events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(7000, 9000), 0, PHASE_ONE);
-                events.ScheduleEvent(EVENT_GOUGE, urand(12000, 15000), 0, PHASE_ONE);
-                events.ScheduleEvent(EVENT_SUMMON_PROWLERS, 6000, 0, PHASE_ALL);
-                events.ScheduleEvent(EVENT_MARK_OF_ARLOKK, urand(9000, 11000), 0, PHASE_ALL);
-                events.ScheduleEvent(EVENT_TRANSFORM, urand(15000, 20000), 0, PHASE_ONE);
-                Talk(SAY_AGGRO);
-
-                // Sets up list of Panther spawners to cast on
-                std::list<Creature*> triggerList;
-                GetCreatureListWithEntryInGrid(triggerList, me, NPC_PANTHER_TRIGGER, 100.0f);
-                if (!triggerList.empty())
+                uint8 sideA = 0;
+                uint8 sideB = 0;
+                for (std::list<Creature*>::const_iterator itr = triggerList.begin(); itr != triggerList.end(); ++itr)
                 {
-                    uint8 sideA = 0;
-                    uint8 sideB = 0;
-                    for (std::list<Creature*>::const_iterator itr = triggerList.begin(); itr != triggerList.end(); ++itr)
+                    if (Creature* trigger = *itr)
                     {
-                        if (Creature* trigger = *itr)
+                        if (trigger->GetPositionY() < -1625.0f)
                         {
-                            if (trigger->GetPositionY() < -1625.0f)
-                            {
-                                _triggersSideAGUID[sideA] = trigger->GetGUID();
-                                ++sideA;
-                            }
-                             else
-                            {
-                                _triggersSideBGUID[sideB] = trigger->GetGUID();
-                                ++sideB;
-                            }
+                            _triggersSideAGUID[sideA] = trigger->GetGUID();
+                            ++sideA;
+                        }
+                        else
+                        {
+                            _triggersSideBGUID[sideB] = trigger->GetGUID();
+                            ++sideB;
                         }
                     }
                 }
             }
+        }
 
-            void EnterEvadeMode()
+        void EnterEvadeMode()
+        {
+            BossAI::EnterEvadeMode();
+            if (GameObject* object = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_GONG_OF_BETHEKK)))
+                object->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            me->DespawnOrUnsummon(4000);
+        }
+
+        void SetData(uint32 id, uint32 /*value*/)
+        {
+            if (id == 1)
+                --_summonCountA;
+            else if (id == 2)
+                --_summonCountB;
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                BossAI::EnterEvadeMode();
-                if (GameObject* object = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_GONG_OF_BETHEKK)))
-                    object->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                me->DespawnOrUnsummon(4000);
-            }
-
-            void SetData(uint32 id, uint32 /*value*/)
-            {
-                if (id == 1)
-                    --_summonCountA;
-                else if (id == 2)
-                    --_summonCountB;
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
+                switch (eventId)
                 {
-                    switch (eventId)
-                    {
-                        case EVENT_SHADOW_WORD_PAIN:
-                            DoCastVictim(SPELL_SHADOW_WORD_PAIN, true);
-                            events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(5000, 7000), 0, PHASE_ONE);
-                            break;
-                        case EVENT_GOUGE:
-                            DoCastVictim(SPELL_GOUGE, true);
-                            break;
-                        case EVENT_SUMMON_PROWLERS:
-                            if (_summonCountA < MAX_PROWLERS_PER_SIDE)
+                    case EVENT_SHADOW_WORD_PAIN:
+                        DoCastVictim(SPELL_SHADOW_WORD_PAIN, true);
+                        events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(5000, 7000), 0, PHASE_ONE);
+                        break;
+                    case EVENT_GOUGE:
+                        DoCastVictim(SPELL_GOUGE, true);
+                        break;
+                    case EVENT_SUMMON_PROWLERS:
+                        if (_summonCountA < MAX_PROWLERS_PER_SIDE)
+                        {
+                            if (Unit* trigger = ObjectAccessor::GetUnit(*me, _triggersSideAGUID[urand(0, 4)]))
                             {
-                                if (Unit* trigger = ObjectAccessor::GetUnit(*me, _triggersSideAGUID[urand(0, 4)]))
-                                {
-                                    trigger->CastSpell(trigger, SPELL_SUMMON_PROWLER);
-                                    ++_summonCountA;
-                                }
+                                trigger->CastSpell(trigger, SPELL_SUMMON_PROWLER);
+                                ++_summonCountA;
                             }
-                            if (_summonCountB < MAX_PROWLERS_PER_SIDE)
+                        }
+                        if (_summonCountB < MAX_PROWLERS_PER_SIDE)
+                        {
+                            if (Unit* trigger = ObjectAccessor::GetUnit(*me, _triggersSideBGUID[urand(0, 4)]))
                             {
-                                if (Unit* trigger = ObjectAccessor::GetUnit(*me, _triggersSideBGUID[urand(0, 4)]))
-                                {
-                                    trigger->CastSpell(trigger, SPELL_SUMMON_PROWLER);
-                                    ++_summonCountB;
-                                }
+                                trigger->CastSpell(trigger, SPELL_SUMMON_PROWLER);
+                                ++_summonCountB;
                             }
-                            events.ScheduleEvent(EVENT_SUMMON_PROWLERS, 6000, 0, PHASE_ALL);
-                            break;
-                        case EVENT_MARK_OF_ARLOKK:
+                        }
+                        events.ScheduleEvent(EVENT_SUMMON_PROWLERS, 6000, 0, PHASE_ALL);
+                        break;
+                    case EVENT_MARK_OF_ARLOKK:
                         {
                             Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, urand(1, 3), 0.0f, false, -SPELL_MARK_OF_ARLOKK);
                             if (!target)
@@ -207,7 +208,7 @@ class boss_arlokk : public CreatureScript
                             events.ScheduleEvent(EVENT_MARK_OF_ARLOKK, urand(120000, 130000));
                             break;
                         }
-                        case EVENT_TRANSFORM:
+                    case EVENT_TRANSFORM:
                         {
                             DoCast(me, SPELL_PANTHER_TRANSFORM); // SPELL_AURA_TRANSFORM
                             me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(EQUIP_UNEQUIP));
@@ -221,40 +222,40 @@ class boss_arlokk : public CreatureScript
                             me->AttackStop();
                             DoResetThreat();
                             me->SetReactState(REACT_PASSIVE);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                             DoCast(me, SPELL_VANISH_VISUAL);
                             DoCast(me, SPELL_VANISH);
                             events.ScheduleEvent(EVENT_VANISH, 1000, 0, PHASE_ONE);
                             break;
                         }
-                        case EVENT_VANISH:
-                            DoCast(me, SPELL_SUPER_INVIS);
-                            me->SetWalk(false);
-                            me->GetMotionMaster()->MovePoint(0, frand(-11551.0f, -11508.0f), frand(-1638.0f, -1617.0f), me->GetPositionZ());
-                            events.ScheduleEvent(EVENT_VANISH_2, 9000, 0, PHASE_ONE);
-                            break;
-                        case EVENT_VANISH_2:
-                            DoCast(me, SPELL_VANISH);
-                            DoCast(me, SPELL_SUPER_INVIS);
-                            events.ScheduleEvent(EVENT_VISIBLE, urand(7000, 10000), 0, PHASE_ONE);
-                            break;
-                        case EVENT_VISIBLE:
-                            me->SetReactState(REACT_AGGRESSIVE);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                                AttackStart(target);
-                            me->RemoveAura(SPELL_SUPER_INVIS);
-                            me->RemoveAura(SPELL_VANISH);
-                            events.ScheduleEvent(EVENT_RAVAGE, urand(10000, 14000), 0, PHASE_TWO);
-                            events.ScheduleEvent(EVENT_TRANSFORM_BACK, urand(15000, 18000), 0, PHASE_TWO);
-                            events.SetPhase(PHASE_TWO);
-                            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true); // hack
-                            break;
-                        case EVENT_RAVAGE:
-                            DoCastVictim(SPELL_RAVAGE, true);
-                            events.ScheduleEvent(EVENT_RAVAGE, urand(10000, 14000), 0, PHASE_TWO);
-                            break;
-                        case EVENT_TRANSFORM_BACK:
+                    case EVENT_VANISH:
+                        DoCast(me, SPELL_SUPER_INVIS);
+                        me->SetWalk(false);
+                        me->GetMotionMaster()->MovePoint(0, frand(-11551.0f, -11508.0f), frand(-1638.0f, -1617.0f), me->GetPositionZ());
+                        events.ScheduleEvent(EVENT_VANISH_2, 9000, 0, PHASE_ONE);
+                        break;
+                    case EVENT_VANISH_2:
+                        DoCast(me, SPELL_VANISH);
+                        DoCast(me, SPELL_SUPER_INVIS);
+                        events.ScheduleEvent(EVENT_VISIBLE, urand(7000, 10000), 0, PHASE_ONE);
+                        break;
+                    case EVENT_VISIBLE:
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            AttackStart(target);
+                        me->RemoveAura(SPELL_SUPER_INVIS);
+                        me->RemoveAura(SPELL_VANISH);
+                        events.ScheduleEvent(EVENT_RAVAGE, urand(10000, 14000), 0, PHASE_TWO);
+                        events.ScheduleEvent(EVENT_TRANSFORM_BACK, urand(15000, 18000), 0, PHASE_TWO);
+                        events.SetPhase(PHASE_TWO);
+                        me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true); // hack
+                        break;
+                    case EVENT_RAVAGE:
+                        DoCastVictim(SPELL_RAVAGE, true);
+                        events.ScheduleEvent(EVENT_RAVAGE, urand(10000, 14000), 0, PHASE_TWO);
+                        break;
+                    case EVENT_TRANSFORM_BACK:
                         {
                             me->RemoveAura(SPELL_PANTHER_TRANSFORM); // SPELL_AURA_TRANSFORM
                             DoCast(me, SPELL_VANISH_VISUAL);
@@ -273,25 +274,25 @@ class boss_arlokk : public CreatureScript
                             events.SetPhase(PHASE_ONE);
                             break;
                         }
-                        default:
-                            break;
-                    }
+                    default:
+                        break;
                 }
-
-                DoMeleeAttackIfReady();
             }
 
-        private:
-            uint8 _summonCountA;
-            uint8 _summonCountB;
-            uint64 _triggersSideAGUID[5];
-            uint64 _triggersSideBGUID[5];
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return GetZulGurubAI<boss_arlokkAI>(creature);
+            DoMeleeAttackIfReady();
         }
+
+    private:
+        uint8 _summonCountA;
+        uint8 _summonCountB;
+        uint64 _triggersSideAGUID[5];
+        uint64 _triggersSideBGUID[5];
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetZulGurubAI<boss_arlokkAI>(creature);
+    }
 };
 
 /*######
@@ -317,84 +318,85 @@ enum ZulianProwlerEvents
 
 class npc_zulian_prowler : public CreatureScript
 {
-    public: npc_zulian_prowler() : CreatureScript("npc_zulian_prowler") { }
+public:
+    npc_zulian_prowler() : CreatureScript("npc_zulian_prowler") { }
 
-        struct npc_zulian_prowlerAI : public ScriptedAI
+    struct npc_zulian_prowlerAI : public ScriptedAI
+    {
+        npc_zulian_prowlerAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) { }
+
+        void Reset()
         {
-            npc_zulian_prowlerAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) { }
+            if (me->GetPositionY() < -1625.0f)
+                _sideData = 1;
+            else
+                _sideData = 2;
 
-            void Reset()
-            {
-                if (me->GetPositionY() < -1625.0f)
-                    _sideData = 1;
-                else
-                    _sideData = 2;
+            DoCast(me, SPELL_SNEAK_RANK_1_1);
+            DoCast(me, SPELL_SNEAK_RANK_1_2);
 
-                DoCast(me, SPELL_SNEAK_RANK_1_1);
-                DoCast(me, SPELL_SNEAK_RANK_1_2);
-
-                if (Unit* arlokk = ObjectAccessor::GetUnit(*me, _instance->GetData64(NPC_ARLOKK)))
-                    me->GetMotionMaster()->MovePoint(0, arlokk->GetPositionX(), arlokk->GetPositionY(), arlokk->GetPositionZ());
-                _events.ScheduleEvent(EVENT_ATTACK, 6000);
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                me->GetMotionMaster()->Clear(false);
-                me->RemoveAura(SPELL_SNEAK_RANK_1_1);
-                me->RemoveAura(SPELL_SNEAK_RANK_1_2);
-            }
-
-            void SpellHit(Unit* caster, SpellInfo const* spell)
-            {
-                if (spell->Id == SPELL_MARK_OF_ARLOKK_TRIGGER) // Should only hit if line of sight
-                    me->Attack(caster, true);
-            }
-
-            void JustDied(Unit* /*killer*/)
-            {
-                if (Unit* arlokk = ObjectAccessor::GetUnit(*me, _instance->GetData64(NPC_ARLOKK)))
-                {
-                    if (arlokk->IsAlive())
-                        arlokk->GetAI()->SetData(_sideData, 0);
-                }
-                me->DespawnOrUnsummon(4000);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (UpdateVictim())
-                {
-                    DoMeleeAttackIfReady();
-                    return;
-                }
-
-                _events.Update(diff);
-
-                while (uint32 eventId = _events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_ATTACK:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0.0f, 100, false))
-                                me->Attack(target, true);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-
-        private:
-            int32 _sideData;
-            EventMap _events;
-            InstanceScript* _instance;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return GetZulGurubAI<npc_zulian_prowlerAI>(creature);
+            if (Unit* arlokk = ObjectAccessor::GetUnit(*me, _instance->GetData64(NPC_ARLOKK)))
+                me->GetMotionMaster()->MovePoint(0, arlokk->GetPositionX(), arlokk->GetPositionY(), arlokk->GetPositionZ());
+            _events.ScheduleEvent(EVENT_ATTACK, 6000);
         }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            me->GetMotionMaster()->Clear(false);
+            me->RemoveAura(SPELL_SNEAK_RANK_1_1);
+            me->RemoveAura(SPELL_SNEAK_RANK_1_2);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell)
+        {
+            if (spell->Id == SPELL_MARK_OF_ARLOKK_TRIGGER) // Should only hit if line of sight
+                me->Attack(caster, true);
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            if (Unit* arlokk = ObjectAccessor::GetUnit(*me, _instance->GetData64(NPC_ARLOKK)))
+            {
+                if (arlokk->IsAlive())
+                    arlokk->GetAI()->SetData(_sideData, 0);
+            }
+            me->DespawnOrUnsummon(4000);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (UpdateVictim())
+            {
+                DoMeleeAttackIfReady();
+                return;
+            }
+
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_ATTACK:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0.0f, 100, false))
+                            me->Attack(target, true);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+    private:
+        int32 _sideData;
+        EventMap _events;
+        InstanceScript* _instance;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetZulGurubAI<npc_zulian_prowlerAI>(creature);
+    }
 };
 
 /*######
@@ -408,19 +410,20 @@ Position const PosSummonArlokk[1] =
 
 class go_gong_of_bethekk : public GameObjectScript
 {
-    public: go_gong_of_bethekk() : GameObjectScript("go_gong_of_bethekk") { }
+public:
+    go_gong_of_bethekk() : GameObjectScript("go_gong_of_bethekk") { }
 
-        bool OnGossipHello(Player* /*player*/, GameObject* go) override
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
+    {
+        if (go->GetInstanceScript())
         {
-            if (go->GetInstanceScript())
-            {
-                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                go->SendCustomAnim(0);
-                go->SummonCreature(NPC_ARLOKK, PosSummonArlokk[0], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 600000);
-            }
-            
-            return true;
+            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            go->SendCustomAnim(0);
+            go->SummonCreature(NPC_ARLOKK, PosSummonArlokk[0], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 600000);
         }
+
+        return true;
+    }
 };
 
 void AddSC_boss_arlokk()

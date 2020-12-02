@@ -24,13 +24,13 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 {
     // copy script to local (protection for table reload)
 
-    mWayPoints = NULL;
+    mWayPoints = nullptr;
     mEscortState = SMART_ESCORT_NONE;
     mCurrentWPID = 0;//first wp id is 1 !!
     mWPReached = false;
     mOOCReached = false;
     mWPPauseTimer = 0;
-    mLastWP = NULL;
+    mLastWP = nullptr;
     mEscortNPCFlags = 0;
 
     mCanRepeatPath = false;
@@ -91,7 +91,7 @@ void SmartAI::UpdateDespawn(const uint32 diff)
 WayPoint* SmartAI::GetNextWayPoint()
 {
     if (!mWayPoints || mWayPoints->empty())
-        return NULL;
+        return nullptr;
 
     mCurrentWPID++;
     WPPath::const_iterator itr = mWayPoints->find(mCurrentWPID);
@@ -103,7 +103,7 @@ WayPoint* SmartAI::GetNextWayPoint()
 
         return (*itr).second;
     }
-    return NULL;
+    return nullptr;
 }
 
 void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
@@ -112,7 +112,7 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
         return;
 
     // Flying unit, just fill array
-    if (me->m_movementInfo.HasMovementFlag((MovementFlags)(MOVEMENTFLAG_CAN_FLY|MOVEMENTFLAG_DISABLE_GRAVITY)))
+    if (me->m_movementInfo.HasMovementFlag((MovementFlags)(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY)))
     {
         // xinef: first point in vector is unit real position
         points->clear();
@@ -132,7 +132,7 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
             std::vector<G3D::Vector3> pVector;
             // xinef: first point in vector is unit real position
             pVector.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            uint32 length = (mWayPoints->size() - mCurrentWPID)*size;
+            uint32 length = (mWayPoints->size() - mCurrentWPID) * size;
 
             uint32 cnt = 0;
             uint32 wpCounter = mCurrentWPID;
@@ -145,11 +145,11 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
 
             if (pVector.size() > 2) // more than source + dest
             {
-                G3D::Vector3 middle = (pVector[0] + pVector[pVector.size()-1]) / 2.f;
+                G3D::Vector3 middle = (pVector[0] + pVector[pVector.size() - 1]) / 2.f;
                 G3D::Vector3 offset;
 
                 bool continueLoop = false;
-                for (uint32 i = 1; i < pVector.size()-1; ++i)
+                for (uint32 i = 1; i < pVector.size() - 1; ++i)
                 {
                     offset = middle - pVector[i];
                     if (fabs(offset.x) >= 0xFF || fabs(offset.y) >= 0xFF || fabs(offset.z) >= 0x7F)
@@ -273,8 +273,8 @@ void SmartAI::StopPath(uint32 DespawnTime, uint32 quest, bool fail)
 void SmartAI::EndPath(bool fail)
 {
     RemoveEscortState(SMART_ESCORT_ESCORTING | SMART_ESCORT_PAUSED | SMART_ESCORT_RETURNING);
-    mWayPoints = NULL;
-    mLastWP = NULL;
+    mWayPoints = nullptr;
+    mLastWP = nullptr;
     mWPPauseTimer = 0;
 
     if (mEscortNPCFlags)
@@ -291,7 +291,7 @@ void SmartAI::EndPath(bool fail)
             Player* player = (*targets->begin())->ToPlayer();
             if (Group* group = player->GetGroup())
             {
-                for (GroupReference* groupRef = group->GetFirstMember(); groupRef != NULL; groupRef = groupRef->next())
+                for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                 {
                     Player* groupGuy = groupRef->GetSource();
                     if (!groupGuy || !player->IsInMap(groupGuy))
@@ -516,7 +516,7 @@ bool SmartAI::IsEscortInvokerInRange()
     ObjectList* targets = GetScript()->GetTargetList(SMART_ESCORT_TARGETS);
     if (targets)
     {
-        float checkDist = me->GetInstanceScript() ? SMART_ESCORT_MAX_PLAYER_DIST*2 : SMART_ESCORT_MAX_PLAYER_DIST;
+        float checkDist = me->GetInstanceScript() ? SMART_ESCORT_MAX_PLAYER_DIST * 2 : SMART_ESCORT_MAX_PLAYER_DIST;
         if (targets->size() == 1 && GetScript()->IsPlayer((*targets->begin())))
         {
             Player* player = (*targets->begin())->ToPlayer();
@@ -525,7 +525,7 @@ bool SmartAI::IsEscortInvokerInRange()
 
             if (Group* group = player->GetGroup())
             {
-                for (GroupReference* groupRef = group->GetFirstMember(); groupRef != NULL; groupRef = groupRef->next())
+                for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                 {
                     Player* groupGuy = groupRef->GetSource();
 
@@ -616,7 +616,7 @@ void SmartAI::EnterEvadeMode()
     // xinef: fixes strange jumps when charming SmartAI npc
     if (!me->IsAlive() || me->IsInEvadeMode())
         return;
-    
+
     if (IS_PLAYER_GUID(me->GetCharmerGUID()) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
     {
         me->AttackStop();
@@ -626,12 +626,7 @@ void SmartAI::EnterEvadeMode()
     me->RemoveEvadeAuras();
 
     me->AddUnitState(UNIT_STATE_EVADE);
-    me->DeleteThreatList();
-    me->CombatStop(true);
-    me->LoadCreaturesAddon(true);
-    me->SetLootRecipient(NULL);
-    me->ResetPlayerDamageReq();
-    me->SetLastDamagedTime(0);
+    _EnterEvadeMode();
 
     GetScript()->ProcessEventsFor(SMART_EVENT_EVADE);//must be after aura clear so we can cast spells from db
 
@@ -653,7 +648,7 @@ void SmartAI::EnterEvadeMode()
     else
     {
         me->GetMotionMaster()->MoveTargetedHome();
-        
+
         // xinef: do not forget to reset scripts as we wont call reached home
         if (!me->HasUnitState(UNIT_STATE_EVADE))
             GetScript()->OnReset();
@@ -1027,7 +1022,7 @@ void SmartAI::StopFollow(bool complete)
     mFollowArrivedTimer = 1000;
     mFollowArrivedEntry = 0;
     mFollowCreditType = 0;
-    
+
     me->GetMotionMaster()->Clear(false);
     me->StopMoving();
     me->GetMotionMaster()->MoveIdle();
@@ -1177,23 +1172,23 @@ void SmartGameObjectAI::SpellHit(Unit* unit, const SpellInfo* spellInfo)
 
 class SmartTrigger : public AreaTriggerScript
 {
-    public:
+public:
 
-        SmartTrigger() : AreaTriggerScript("SmartTrigger") {}
+    SmartTrigger() : AreaTriggerScript("SmartTrigger") {}
 
-        bool OnTrigger(Player* player, AreaTrigger const* trigger)
-        {
-            if (!player->IsAlive())
-                return false;
+    bool OnTrigger(Player* player, AreaTrigger const* trigger)
+    {
+        if (!player->IsAlive())
+            return false;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_DATABASE_AI, "AreaTrigger %u is using SmartTrigger script", trigger->entry);
+        sLog->outDebug(LOG_FILTER_DATABASE_AI, "AreaTrigger %u is using SmartTrigger script", trigger->entry);
 #endif
-            SmartScript script;
-            script.OnInitialize(NULL, trigger);
-            script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->entry);
-            return true;
-        }
+        SmartScript script;
+        script.OnInitialize(nullptr, trigger);
+        script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->entry);
+        return true;
+    }
 };
 
 void AddSC_SmartScripts()

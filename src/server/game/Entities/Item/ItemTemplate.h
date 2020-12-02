@@ -555,9 +555,12 @@ inline uint8 ItemSubClassToDurabilityMultiplierId(uint32 ItemClass, uint32 ItemS
 {
     switch (ItemClass)
     {
-        case ITEM_CLASS_WEAPON: return ItemSubClass;
-        case ITEM_CLASS_ARMOR:  return ItemSubClass + 21;
-        default:                return 0;
+        case ITEM_CLASS_WEAPON:
+            return ItemSubClass;
+        case ITEM_CLASS_ARMOR:
+            return ItemSubClass + 21;
+        default:
+            return 0;
     }
 }
 
@@ -692,10 +695,10 @@ struct ItemTemplate
     bool HasSignature() const
     {
         return GetMaxStackSize() == 1 &&
-        Class != ITEM_CLASS_CONSUMABLE &&
-        Class != ITEM_CLASS_QUEST &&
-        (Flags & ITEM_FLAG_NO_CREATOR) == 0 &&
-        ItemId != 6948; /*Hearthstone*/
+               Class != ITEM_CLASS_CONSUMABLE &&
+               Class != ITEM_CLASS_QUEST &&
+               (Flags & ITEM_FLAG_NO_CREATOR) == 0 &&
+               ItemId != 6948; /*Hearthstone*/
     }
 
     bool CanChangeEquipStateInCombat() const
@@ -722,7 +725,7 @@ struct ItemTemplate
 
     uint32 GetMaxStackSize() const
     {
-        return (Stackable == 2147483647 || Stackable <= 0) ? uint32(0x7FFFFFFF-1) : uint32(Stackable);
+        return (Stackable == 2147483647 || Stackable <= 0) ? uint32(0x7FFFFFFF - 1) : uint32(Stackable);
     }
 
     float getDPS() const
@@ -731,16 +734,16 @@ struct ItemTemplate
             return 0;
         float temp = 0;
         for (auto i : Damage)
-            temp+=i.DamageMin + i.DamageMax;
-        return temp*500/Delay;
+            temp += i.DamageMin + i.DamageMax;
+        return temp * 500 / Delay;
     }
 
     int32 getFeralBonus(int32 extraDPS = 0) const
     {
         // 0x02A5F3 - is mask for Melee weapon from ItemSubClassMask.dbc
-        if (Class == ITEM_CLASS_WEAPON && (1<<SubClass)&0x02A5F3)
+        if (Class == ITEM_CLASS_WEAPON && (1 << SubClass) & 0x02A5F3)
         {
-            int32 bonus = int32((extraDPS + getDPS())*14.0f) - 767;
+            int32 bonus = int32((extraDPS + getDPS()) * 14.0f) - 767;
             if (bonus < 0)
                 return 0;
             return bonus;
@@ -762,7 +765,7 @@ struct ItemTemplate
                 itemLevel -= 13.0f;
                 break;
             case ITEM_QUALITY_HEIRLOOM:
-                itemLevel = pLevel*2.33f;
+                itemLevel = pLevel * 2.33f;
                 break;
             case ITEM_QUALITY_ARTIFACT:
             case ITEM_QUALITY_EPIC:

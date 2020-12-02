@@ -1,8 +1,8 @@
- /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
- */
+/*
+* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+*/
 
 /* ScriptData
 SDName: Hyjal
@@ -58,7 +58,7 @@ public:
             case GOSSIP_ACTION_INFO_DEF + 3:
                 ai->Retreat();
                 break;
-             case GOSSIP_ACTION_INFO_DEF:
+            case GOSSIP_ACTION_INFO_DEF:
                 ai->Debug = !ai->Debug;
                 //TC_LOG_DEBUG("scripts", "HyjalAI - Debug mode has been toggled");
                 break;
@@ -91,7 +91,7 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         if (!creature->GetInstanceScript())
-            return NULL;
+            return nullptr;
 
         hyjalAI* ai = new hyjalAI(creature);
 
@@ -176,7 +176,7 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         if (!creature->GetInstanceScript())
-            return NULL;
+            return nullptr;
 
         hyjalAI* ai = new hyjalAI(creature);
 
@@ -204,7 +204,7 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         if (!creature->GetInstanceScript())
-            return NULL;
+            return nullptr;
 
         hyjalAI* ai = new hyjalAI(creature);
         ai->Reset();
@@ -217,13 +217,13 @@ public:
         ClearGossipMenuFor(player);
         if (action == GOSSIP_ACTION_INFO_DEF)
         {
-                ItemPosCountVec dest;
-                uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_TEAR_OF_GODDESS, 1);
-                if (msg == EQUIP_ERR_OK)
-                     if (Item* item = player->StoreNewItem(dest, ITEM_TEAR_OF_GODDESS, true))
-                         player->SendNewItem(item, 1, true, false, true);
+            ItemPosCountVec dest;
+            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_TEAR_OF_GODDESS, 1);
+            if (msg == EQUIP_ERR_OK)
+                if (Item* item = player->StoreNewItem(dest, ITEM_TEAR_OF_GODDESS, true))
+                    player->SendNewItem(item, 1, true, false, true);
 
-                SendGossipMenuFor(player, 907, creature->GetGUID());
+            SendGossipMenuFor(player, 907, creature->GetGUID());
         }
         return true;
     }
