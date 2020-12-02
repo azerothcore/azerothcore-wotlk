@@ -139,7 +139,7 @@ namespace Movement
         index_type computeIndexInBounds(length_type length) const;
     public:
 
-        explicit Spline() {}
+        explicit Spline() = default;
 
         /** Calculates the position for given t
             @param t - percent of spline's length, assumes that t in range [0, 1]. */

@@ -49,7 +49,7 @@ class TransactionTask : public SQLOperation
 
 public:
     TransactionTask(SQLTransaction trans) : m_trans(trans) { } ;
-    ~TransactionTask() { };
+    ~TransactionTask() = default;;
 
 protected:
     bool Execute();

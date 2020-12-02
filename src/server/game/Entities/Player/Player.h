@@ -958,7 +958,7 @@ class PlayerTaxi
 {
 public:
     PlayerTaxi();
-    ~PlayerTaxi() {}
+    ~PlayerTaxi() = default;
     // Nodes
     void InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level);
     void LoadTaxiMask(std::string const& data);

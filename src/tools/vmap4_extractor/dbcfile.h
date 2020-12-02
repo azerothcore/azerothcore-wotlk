@@ -28,7 +28,7 @@ public:
         Exception(const std::string& message): message(message)
         { }
         virtual ~Exception()
-        { }
+        = default;
         const std::string& getMessage() {return message;}
     private:
         std::string message;
@@ -48,11 +48,7 @@ public:
     {
     public:
         Record& operator= (const Record& r)
-        {
-            file = r.file;
-            offset = r.offset;
-            return *this;
-        }
+        = default;
         float getFloat(size_t field) const
         {
             assert(field < file.fieldCount);

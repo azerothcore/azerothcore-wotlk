@@ -19,9 +19,8 @@ public:
     }
     explicit WorldPacket(uint16 opcode, size_t res = 200) : ByteBuffer(res), m_opcode(opcode) { }
     // copy constructor
-    WorldPacket(const WorldPacket& packet)              : ByteBuffer(packet), m_opcode(packet.m_opcode)
-    {
-    }
+    WorldPacket(const WorldPacket& packet)               
+    = default;
     /* requried as of C++ 11 */
 #if __cplusplus >= 201103L
     WorldPacket(WorldPacket&&) = default;

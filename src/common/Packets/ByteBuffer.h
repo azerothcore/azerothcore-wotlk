@@ -22,7 +22,7 @@
 class ByteBufferException : public std::exception
 {
 public:
-    ~ByteBufferException() throw() { }
+    ~ByteBufferException() throw() = default;
 
     char const* what() const throw() { return msg_.c_str(); }
 
@@ -38,7 +38,7 @@ class ByteBufferPositionException : public ByteBufferException
 public:
     ByteBufferPositionException(bool add, size_t pos, size_t size, size_t valueSize);
 
-    ~ByteBufferPositionException() throw() { }
+    ~ByteBufferPositionException() throw() = default;
 };
 
 class ByteBufferSourceException : public ByteBufferException
@@ -46,7 +46,7 @@ class ByteBufferSourceException : public ByteBufferException
 public:
     ByteBufferSourceException(size_t pos, size_t size, size_t valueSize);
 
-    ~ByteBufferSourceException() throw() { }
+    ~ByteBufferSourceException() throw() = default;
 };
 
 class ByteBuffer
@@ -66,10 +66,9 @@ public:
     }
 
     // copy constructor
-    ByteBuffer(const ByteBuffer& buf) : _rpos(buf._rpos), _wpos(buf._wpos),
-        _storage(buf._storage)
-    {
-    }
+    ByteBuffer(const ByteBuffer& buf) 
+        
+    = default;
     /* requried as of C++ 11 */
 #if __cplusplus >= 201103L
     ByteBuffer(ByteBuffer&&) = default;

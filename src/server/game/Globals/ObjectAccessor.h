@@ -62,7 +62,7 @@ public:
 private:
 
     //Non instanceable only static
-    HashMapHolder() {}
+    HashMapHolder() = default;
 
     static LockType i_lock;
     static MapType  m_objectMap;

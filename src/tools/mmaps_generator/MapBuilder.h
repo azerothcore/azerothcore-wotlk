@@ -30,7 +30,7 @@ namespace MMAP
         MapTiles() : m_mapId(uint32(-1)), m_tiles(nullptr) {}
 
         MapTiles(uint32 id, std::set<uint32>* tiles) : m_mapId(id), m_tiles(tiles) {}
-        ~MapTiles() {}
+        ~MapTiles() = default;
 
         uint32 m_mapId;
         std::set<uint32>* m_tiles;

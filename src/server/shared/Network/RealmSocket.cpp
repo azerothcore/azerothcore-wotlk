@@ -11,9 +11,9 @@
 #include "RealmSocket.h"
 #include "Log.h"
 
-RealmSocket::Session::Session(void) { }
+RealmSocket::Session::Session(void) = default;
 
-RealmSocket::Session::~Session(void) { }
+RealmSocket::Session::~Session(void) = default;
 
 RealmSocket::RealmSocket(void) :
     input_buffer_(4096), session_(nullptr),
