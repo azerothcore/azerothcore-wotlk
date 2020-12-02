@@ -123,7 +123,7 @@ public:
     virtual ~PacketFilter() {}
 
     virtual bool Process(WorldPacket* /*packet*/) { return true; }
-    virtual bool ProcessLogout() const { return true; }
+    [[nodiscard]] virtual bool ProcessLogout() const { return true; }
 
 protected:
     WorldSession* const m_pSession;
@@ -137,7 +137,7 @@ public:
 
     virtual bool Process(WorldPacket* packet);
     //in Map::Update() we do not process player logout!
-    virtual bool ProcessLogout() const { return false; }
+    [[nodiscard]] virtual bool ProcessLogout() const { return false; }
 };
 
 //class used to filer only thread-unsafe packets from queue

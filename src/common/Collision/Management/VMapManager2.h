@@ -81,7 +81,7 @@ namespace VMAP
 
     public:
         // public for debug
-        G3D::Vector3 convertPositionToInternalRep(float x, float y, float z) const;
+        [[nodiscard]] G3D::Vector3 convertPositionToInternalRep(float x, float y, float z) const;
         static std::string getMapFileName(unsigned int mapId);
 
         VMapManager2();
@@ -108,7 +108,7 @@ namespace VMAP
         void releaseModelInstance(const std::string& filename);
 
         // what's the use of this? o.O
-        virtual std::string getDirFileName(unsigned int mapId, int /*x*/, int /*y*/) const
+        [[nodiscard]] virtual std::string getDirFileName(unsigned int mapId, int /*x*/, int /*y*/) const
         {
             return getMapFileName(mapId);
         }

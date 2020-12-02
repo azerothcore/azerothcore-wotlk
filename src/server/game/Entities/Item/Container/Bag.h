@@ -29,14 +29,14 @@ public:
     void StoreItem(uint8 slot, Item* pItem, bool update);
     void RemoveItem(uint8 slot, bool update);
 
-    Item* GetItemByPos(uint8 slot) const;
+    [[nodiscard]] Item* GetItemByPos(uint8 slot) const;
     uint32 GetItemCount(uint32 item, Item* eItem = nullptr) const;
     uint32 GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = nullptr) const;
 
-    uint8 GetSlotByItemGUID(uint64 guid) const;
-    bool IsEmpty() const;
-    uint32 GetFreeSlots() const;
-    uint32 GetBagSize() const { return GetUInt32Value(CONTAINER_FIELD_NUM_SLOTS); }
+    [[nodiscard]] uint8 GetSlotByItemGUID(uint64 guid) const;
+    [[nodiscard]] bool IsEmpty() const;
+    [[nodiscard]] uint32 GetFreeSlots() const;
+    [[nodiscard]] uint32 GetBagSize() const { return GetUInt32Value(CONTAINER_FIELD_NUM_SLOTS); }
 
     // DB operations
     // overwrite virtual Item::SaveToDB

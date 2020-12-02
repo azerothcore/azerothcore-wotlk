@@ -29,7 +29,7 @@ public:
     void Append(const char* sql);
     void PAppend(const char* sql, ...);
 
-    size_t GetSize() const { return m_queries.size(); }
+    [[nodiscard]] size_t GetSize() const { return m_queries.size(); }
 
 protected:
     void Cleanup();

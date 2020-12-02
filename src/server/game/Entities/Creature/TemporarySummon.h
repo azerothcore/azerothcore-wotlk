@@ -37,7 +37,7 @@ public:
     void RemoveFromWorld();
     void SetTempSummonType(TempSummonType type);
     void SaveToDB(uint32 /*mapid*/, uint8 /*spawnMask*/, uint32 /*phaseMask*/) {}
-    Unit* GetSummoner() const;
+    [[nodiscard]] Unit* GetSummoner() const;
     uint64 GetSummonerGUID() { return m_summonerGUID; }
     TempSummonType const& GetSummonType() { return m_type; }
     uint32 GetTimer() { return m_timer; }
@@ -57,11 +57,11 @@ public:
     Minion(SummonPropertiesEntry const* properties, uint64 owner, bool isWorldObject);
     void InitStats(uint32 duration);
     void RemoveFromWorld();
-    Unit* GetOwner() const;
-    float GetFollowAngle() const { return m_followAngle; }
+    [[nodiscard]] Unit* GetOwner() const;
+    [[nodiscard]] float GetFollowAngle() const { return m_followAngle; }
     void SetFollowAngle(float angle) { m_followAngle = angle; }
-    bool IsPetGhoul() const {return GetEntry() == 26125 /*normal ghoul*/ || GetEntry() == 30230 /*Raise Ally ghoul*/;} // Ghoul may be guardian or pet
-    bool IsGuardianPet() const;
+    [[nodiscard]] bool IsPetGhoul() const {return GetEntry() == 26125 /*normal ghoul*/ || GetEntry() == 30230 /*Raise Ally ghoul*/;} // Ghoul may be guardian or pet
+    [[nodiscard]] bool IsGuardianPet() const;
     void setDeathState(DeathState s, bool despawn = false);                   // override virtual Unit::setDeathState
 protected:
     const uint64 m_owner;
@@ -94,7 +94,7 @@ public:
     void Update(uint32 time);
     void RemoveFromWorld();
 protected:
-    Player* GetOwner() const;
+    [[nodiscard]] Player* GetOwner() const;
     const uint64 m_owner;
 };
 
