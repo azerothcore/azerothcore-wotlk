@@ -731,7 +731,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_usedTalentCount = 0;
     m_questRewardTalentCount = 0;
-    m_otherBonusTalentCount = 0;
+    m_extraBonusTalentCount = 0;
 
     m_regenTimer = 0;
     m_regenTimerCount = 0;
@@ -7279,7 +7279,7 @@ void Player::RewardExtraBonusTalentPoints(uint32 bonusTalentPoints)
 {
     if (bonusTalentPoints)
     {
-        m_otherBonusTalentCount += bonusTalentPoints;
+        m_extraBonusTalentCount += bonusTalentPoints;
     }
 }
 
@@ -25448,7 +25448,7 @@ uint32 Player::CalculateTalentsPoints() const
     if (talentPointsForLevel > base_talent)
         talentPointsForLevel = base_talent;
 
-    talentPointsForLevel += m_otherBonusTalentCount;
+    talentPointsForLevel += m_extraBonusTalentCount;
     return uint32(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
 }
 
