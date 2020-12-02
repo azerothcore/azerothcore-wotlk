@@ -36,8 +36,7 @@ namespace ACE_Based
         }
 
         //! Destroy a LockedQueue.
-        virtual ~LockedQueue()
-        = default;
+        virtual ~LockedQueue() = default;
 
         //! Adds an item to the queue.
         void add(const T& item)

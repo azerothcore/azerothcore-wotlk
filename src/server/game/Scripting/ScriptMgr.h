@@ -164,8 +164,7 @@ protected:
     {
     }
 
-    virtual ~ScriptObject()
-    = default;
+    virtual ~ScriptObject() = default;
 
 private:
 
@@ -176,8 +175,7 @@ template<class TObject> class UpdatableScript
 {
 protected:
 
-    UpdatableScript()
-    = default;
+    UpdatableScript() = default;
 
 public:
 
