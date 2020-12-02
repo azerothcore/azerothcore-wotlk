@@ -315,7 +315,6 @@ PlayerSocial* SocialMgr::LoadFromDB(PreparedQueryResult result, uint64 guid)
     if (!result)
         return social;
 
-    uint64 friendGuid = 0;
     uint8 flags = 0;
     std::string note = "";
 
@@ -323,7 +322,7 @@ PlayerSocial* SocialMgr::LoadFromDB(PreparedQueryResult result, uint64 guid)
     {
         Field* fields = result->Fetch();
 
-        friendGuid = fields[0].GetUInt32();
+        auto friendGuid = fields[0].GetUInt32();
         flags = fields[1].GetUInt8();
         note = fields[2].GetString();
 
