@@ -16,6 +16,8 @@ project(AzerothCore)
 # Require a min version Cmake
 cmake_minimum_required(VERSION 3.8)
 
+message(STATUS "CMake version: ${CMAKE_VERSION}")
+
 # CMake policies (can not be handled elsewhere)
 cmake_policy(SET CMP0005 NEW)
 
