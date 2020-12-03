@@ -346,7 +346,7 @@ void ArenaTeam::DelMember(uint64 guid, bool cleanDb)
     }
     
     // Inform player and remove arena team info from player data
-    if (Player)
+    if (player)
     {
         player->GetSession()->SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, GetName(), "", 0);
         // delete all info regarding this team
