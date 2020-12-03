@@ -108,10 +108,14 @@ public:
         }
 
         if (creature->GetEntry() == NPC_SYLVANAS_PART1)
+        {
             SendGossipMenuFor(player, 15215, creature->GetGUID());
-
-        if (creature->GetEntry() == NPC_JAINA_PART1)
+        }
+        else if (creature->GetEntry() == NPC_JAINA_PART1)
+        {
             SendGossipMenuFor(player, 15339, creature->GetGUID());
+        }
+
         return true;
     }
 
