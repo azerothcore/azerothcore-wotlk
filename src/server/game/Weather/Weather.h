@@ -52,29 +52,29 @@ enum WeatherState
 /// Weather for one zone
 class Weather
 {
-    public:
+public:
 
-        Weather(uint32 zone, WeatherData const* weatherChances);
-        ~Weather() { };
+    Weather(uint32 zone, WeatherData const* weatherChances);
+    ~Weather() { };
 
-        bool Update(uint32 diff);
-        bool ReGenerate();
-        bool UpdateWeather();
+    bool Update(uint32 diff);
+    bool ReGenerate();
+    bool UpdateWeather();
 
-        void SendWeatherUpdateToPlayer(Player* player);
-        void SetWeather(WeatherType type, float grade);
+    void SendWeatherUpdateToPlayer(Player* player);
+    void SetWeather(WeatherType type, float grade);
 
-        /// For which zone is this weather?
-        uint32 GetZone() const { return m_zone; };
-        uint32 GetScriptId() const { return m_weatherChances->ScriptId; }
+    /// For which zone is this weather?
+    uint32 GetZone() const { return m_zone; };
+    uint32 GetScriptId() const { return m_weatherChances->ScriptId; }
 
-    private:
+private:
 
-        WeatherState GetWeatherState() const;
-        uint32 m_zone;
-        WeatherType m_type;
-        float m_grade;
-        IntervalTimer m_timer;
-        WeatherData const* m_weatherChances;
+    WeatherState GetWeatherState() const;
+    uint32 m_zone;
+    WeatherType m_type;
+    float m_grade;
+    IntervalTimer m_timer;
+    WeatherData const* m_weatherChances;
 };
 #endif

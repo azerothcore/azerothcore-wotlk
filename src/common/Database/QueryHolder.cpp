@@ -9,7 +9,7 @@
 #include "PreparedStatement.h"
 #include "Log.h"
 
-bool SQLQueryHolder::SetQuery(size_t index, const char *sql)
+bool SQLQueryHolder::SetQuery(size_t index, const char* sql)
 {
     if (m_queries.size() <= index)
     {
@@ -29,7 +29,7 @@ bool SQLQueryHolder::SetQuery(size_t index, const char *sql)
     return true;
 }
 
-bool SQLQueryHolder::SetPQuery(size_t index, const char *format, ...)
+bool SQLQueryHolder::SetPQuery(size_t index, const char* format, ...)
 {
     if (!format)
     {
@@ -165,7 +165,7 @@ bool SQLQueryHolderTask::Execute()
         return false;
 
     /// we can do this, we are friends
-    std::vector<SQLQueryHolder::SQLResultPair> &queries = m_holder->m_queries;
+    std::vector<SQLQueryHolder::SQLResultPair>& queries = m_holder->m_queries;
 
     for (size_t i = 0; i < queries.size(); i++)
     {

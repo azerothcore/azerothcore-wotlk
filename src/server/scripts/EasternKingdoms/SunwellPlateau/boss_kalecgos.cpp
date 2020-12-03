@@ -27,7 +27,7 @@ enum Yells
     SAY_GOOD_AGGRO                              = 0,
     SAY_GOOD_NEAR_DEATH                         = 1,
     SAY_GOOD_NEAR_DEATH2                        = 2,
-    SAY_GOOD_MADRIGOSA                          = 3
+    SAY_GOOD_MADRIGOSA                          = 3 // Madrigosa deserved a far better fate. You did what had to be done, but this battle is far from over!
 };
 
 enum Spells
@@ -604,15 +604,15 @@ public:
 
 class SpectralBlastCheck
 {
-    public:
-        SpectralBlastCheck(Unit* victim) : _victim(victim) { }
+public:
+    SpectralBlastCheck(Unit* victim) : _victim(victim) { }
 
-        bool operator()(WorldObject* unit)
-        {
-            return unit->GetPositionZ() < 50.0f || unit->ToUnit()->HasAura(SPELL_SPECTRAL_EXHAUSTION) || unit->GetGUID() == _victim->GetGUID();
-        }
-    private:
-        Unit* _victim;
+    bool operator()(WorldObject* unit)
+    {
+        return unit->GetPositionZ() < 50.0f || unit->ToUnit()->HasAura(SPELL_SPECTRAL_EXHAUSTION) || unit->GetGUID() == _victim->GetGUID();
+    }
+private:
+    Unit* _victim;
 };
 
 class spell_kalecgos_spectral_blast_dummy : public SpellScriptLoader
@@ -627,9 +627,9 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(SpectralBlastCheck(GetCaster()->GetVictim()));
-            Trinity::Containers::RandomResizeList(targets, 1);
-        }           
-        
+            acore::Containers::RandomResizeList(targets, 1);
+        }
+
         void HandleDummy(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
@@ -656,100 +656,100 @@ public:
 
 class spell_kalecgos_curse_of_boundless_agony : public SpellScriptLoader
 {
-    public:
-        spell_kalecgos_curse_of_boundless_agony() : SpellScriptLoader("spell_kalecgos_curse_of_boundless_agony") { }
+public:
+    spell_kalecgos_curse_of_boundless_agony() : SpellScriptLoader("spell_kalecgos_curse_of_boundless_agony") { }
 
-        class spell_kalecgos_curse_of_boundless_agony_AuraScript : public AuraScript
+    class spell_kalecgos_curse_of_boundless_agony_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_kalecgos_curse_of_boundless_agony_AuraScript);
+
+        void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_kalecgos_curse_of_boundless_agony_AuraScript);
-
-            void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
-                    if (instance->IsEncounterInProgress())
-                        GetUnitOwner()->CastCustomSpell(SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR, SPELLVALUE_MAX_TARGETS, 1, GetUnitOwner(), true);
-            }
-
-            void OnPeriodic(AuraEffect const* aurEff)
-            {
-                if (aurEff->GetTickNumber() > 1 && aurEff->GetTickNumber()%5 == 1)
-                    GetAura()->GetEffect(aurEff->GetEffIndex())->SetAmount(aurEff->GetAmount()*2);
-            }
-
-            void Register()
-            {
-                AfterEffectRemove += AuraEffectRemoveFn(spell_kalecgos_curse_of_boundless_agony_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_kalecgos_curse_of_boundless_agony_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_kalecgos_curse_of_boundless_agony_AuraScript();
+            if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
+                if (instance->IsEncounterInProgress())
+                    GetUnitOwner()->CastCustomSpell(SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR, SPELLVALUE_MAX_TARGETS, 1, GetUnitOwner(), true);
         }
+
+        void OnPeriodic(AuraEffect const* aurEff)
+        {
+            if (aurEff->GetTickNumber() > 1 && aurEff->GetTickNumber() % 5 == 1)
+                GetAura()->GetEffect(aurEff->GetEffIndex())->SetAmount(aurEff->GetAmount() * 2);
+        }
+
+        void Register()
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_kalecgos_curse_of_boundless_agony_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_kalecgos_curse_of_boundless_agony_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_kalecgos_curse_of_boundless_agony_AuraScript();
+    }
 };
 
 class spell_kalecgos_spectral_realm_dummy : public SpellScriptLoader
 {
-    public:
-        spell_kalecgos_spectral_realm_dummy() : SpellScriptLoader("spell_kalecgos_spectral_realm_dummy") { }
+public:
+    spell_kalecgos_spectral_realm_dummy() : SpellScriptLoader("spell_kalecgos_spectral_realm_dummy") { }
 
-        class spell_kalecgos_spectral_realm_dummy_SpellScript : public SpellScript
+    class spell_kalecgos_spectral_realm_dummy_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_kalecgos_spectral_realm_dummy_SpellScript);
+
+        SpellCastResult CheckCast()
         {
-            PrepareSpellScript(spell_kalecgos_spectral_realm_dummy_SpellScript);
+            if (GetCaster()->HasAura(SPELL_SPECTRAL_EXHAUSTION))
+                return SPELL_FAILED_CASTER_AURASTATE;
 
-            SpellCastResult CheckCast()
-            {
-                if (GetCaster()->HasAura(SPELL_SPECTRAL_EXHAUSTION))
-                    return SPELL_FAILED_CASTER_AURASTATE;
-
-                return SPELL_CAST_OK;
-            }
-
-            void HandleScriptEffect(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-                GetCaster()->CastSpell(GetCaster(), SPELL_TELEPORT_SPECTRAL, true);
-            }
-
-            void Register()
-            {
-                OnCheckCast += SpellCheckCastFn(spell_kalecgos_spectral_realm_dummy_SpellScript::CheckCast);
-                OnEffectHitTarget += SpellEffectFn(spell_kalecgos_spectral_realm_dummy_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_kalecgos_spectral_realm_dummy_SpellScript();
+            return SPELL_CAST_OK;
         }
+
+        void HandleScriptEffect(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            GetCaster()->CastSpell(GetCaster(), SPELL_TELEPORT_SPECTRAL, true);
+        }
+
+        void Register()
+        {
+            OnCheckCast += SpellCheckCastFn(spell_kalecgos_spectral_realm_dummy_SpellScript::CheckCast);
+            OnEffectHitTarget += SpellEffectFn(spell_kalecgos_spectral_realm_dummy_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_kalecgos_spectral_realm_dummy_SpellScript();
+    }
 };
 
 class spell_kalecgos_spectral_realm : public SpellScriptLoader
 {
-    public:
-        spell_kalecgos_spectral_realm() : SpellScriptLoader("spell_kalecgos_spectral_realm") { }
+public:
+    spell_kalecgos_spectral_realm() : SpellScriptLoader("spell_kalecgos_spectral_realm") { }
 
-        class spell_kalecgos_spectral_realm_AuraScript : public AuraScript
+    class spell_kalecgos_spectral_realm_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_kalecgos_spectral_realm_AuraScript);
+
+        void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_kalecgos_spectral_realm_AuraScript);
-
-            void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SPECTRAL_EXHAUSTION, true);
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_TELEPORT_NORMAL_REALM, true);
-            }
-
-            void Register()
-            {
-                OnEffectRemove += AuraEffectRemoveFn(spell_kalecgos_spectral_realm_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_kalecgos_spectral_realm_AuraScript();
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SPECTRAL_EXHAUSTION, true);
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_TELEPORT_NORMAL_REALM, true);
         }
+
+        void Register()
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_kalecgos_spectral_realm_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_kalecgos_spectral_realm_AuraScript();
+    }
 };
 
 void AddSC_boss_kalecgos()
