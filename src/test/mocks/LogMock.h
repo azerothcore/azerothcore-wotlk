@@ -17,21 +17,21 @@ public:
     MOCK_METHOD(void, outDB, (LogTypes type, const char* str));
     void outString(const char* str, ...) override {}
     MOCK_METHOD(void, outString, ());
-    void outStringInLine(const char* str, ...) override;
-    void outError(const char* err, ...) override;
-    void outCrash(const char* err, ...) override;
-    void outBasic(const char* str, ...) override;
-    void outDetail(const char* str, ...) override;
-    void outSQLDev(const char* str, ...) override;
-    void outDebug(DebugLogFilters f, const char* str, ...) override;
-    void outStaticDebug(const char* str, ...) override;
-    void outErrorDb(const char* str, ...) override;
-    void outChar(const char* str, ...) override;
-    void outCommand(uint32 account, const char* str, ...) override;
-    void outChat(const char* str, ...) override;
-    void outRemote(const char* str, ...) override;
-    void outSQLDriver(const char* str, ...) override;
-    void outMisc(const char* str, ...) override;
+    void outStringInLine(const char* str, ...) override {}
+    void outError(const char* err, ...) override {}
+    void outCrash(const char* err, ...) override {}
+    void outBasic(const char* str, ...) override {}
+    void outDetail(const char* str, ...) override {}
+    void outSQLDev(const char* str, ...) override {}
+    void outDebug(DebugLogFilters f, const char* str, ...) override {}
+    void outStaticDebug(const char* str, ...) override {}
+    void outErrorDb(const char* str, ...) override {}
+    void outChar(const char* str, ...) override {}
+    void outCommand(uint32 account, const char* str, ...) override {}
+    void outChat(const char* str, ...) override {}
+    void outRemote(const char* str, ...) override {}
+    void outSQLDriver(const char* str, ...) override {}
+    void outMisc(const char* str, ...) override {}
     void outCharDump(const char* str, uint32 account_id, uint32 guid, const char* name) override {}
     MOCK_METHOD(void, SetLogLevel, (char* Level));
     MOCK_METHOD(void, SetLogFileLevel, (char* Level));

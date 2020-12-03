@@ -1,8 +1,10 @@
 #include "gtest/gtest.h"
 #include "Formulas.h"
 #include "SharedDefines.h"
-//#include "Log.h"
-//#include "../../../mocks/LogMock.h"
+#include "Log.h"
+#include "LogMock.h"
+
+LoginDatabaseWorkerPool LoginDatabase;
 
 using namespace acore::Honor;
 using namespace acore::XP;
@@ -72,7 +74,8 @@ TEST(FormulasTest, GetZeroDifference)
     EXPECT_EQ(GetZeroDifference(80), 17);
 }
 
-//TEST(FormulasTest, BaseGain)
-//{
-//    sLog.reset(new LogMock());
-//}
+TEST(FormulasTest, BaseGain)
+{
+    sLog.reset(new LogMock());
+    // TODO: write expectations
+}
