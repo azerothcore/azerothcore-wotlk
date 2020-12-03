@@ -16,7 +16,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (40232, 'deDE', 'Test Schillernder Talasit', 'Am besten für einen gelben oder blauen Sockel geeignet.', 15050),
 (39153, 'deDE', 'Handbuch: Dichter Froststoffverband', 'Dieses durchnässte Buch sagt Euch nichts.', 15050),
 (38654, 'deDE', 'Corvus Bericht', '', 15050),
-(38644, 'deDE', 'Währungstoken Test-Token 3', 'Ein dritter Test-Token für das Währungstoken-System', 15050),
+(38644, 'deDE', 'Währungstoken Test-Token 3', 'Ein drittes Test-Token für das Währungstoken-System', 15050),
 (38643, 'deDE', 'Dichter Froststoffverband', '', 15050),
 (38383, 'deDE', 'Valonforth''s Torheit', '', 15050),
 (38204, 'deDE', 'DB38 Zauberstab2', '', 15050),
