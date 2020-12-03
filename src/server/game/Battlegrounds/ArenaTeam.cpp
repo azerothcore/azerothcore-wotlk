@@ -344,7 +344,7 @@ void ArenaTeam::DelMember(uint64 guid, bool cleanDb)
             break;
         }
     }
-    
+
     // Inform player and remove arena team info from player data
     if (player)
     {
