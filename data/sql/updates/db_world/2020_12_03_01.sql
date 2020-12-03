@@ -1,3 +1,19 @@
+-- DB update 2020_12_03_00 -> 2020_12_03_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_03_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_03_00 2020_12_03_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1606413127246360900'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1606413127246360900');
 
 DELETE FROM `achievement_reward_locale` WHERE `ID` IN (4785, 4784, 4602, 4603, 4156, 3957, 4079, 3857, 2958, 2957, 2537, 2796, 2536, 2136, 1681, 1682, 876, 619) AND `locale` = 'deDE';
@@ -20,3 +36,12 @@ INSERT INTO `achievement_reward_locale` (`ID`, `Locale`, `Subject`, `Text`) VALU
 (1682, 'deDE', 'Grüße aus Donnerfels', 'Eure Erfolge waren tiefgreifend und weitreichend. Azeroth profitiert bei den jüngsten Tumulten in großem Maße von jenen, die das Land vom Bösen zu befreien versuchen.$B$BNur diejenigen, die sich die Zeit nehmen, unser Land kennen zu lernen, verstehen das Opfer der Gefallenen und den Wert unserer Helden. Ihr seid ein solcher Held. Hoffentlich werdet Ihr Euch noch in vielen Jahren an die Geschichten Eurer Abenteuer erinnern können.$B$BHabt Dank, Meister der Lehren.$B$BFür die Horde!$B$B--Cairne Bluthuf'),
 (876, 'deDE', 'Brutaler Kämpfer', 'Ihr habt ein ganz schönes Händchen dafür Euch in diese Arena zu werfen. Behaltet das bei. Tragt es mit Stolz. Jetzt geht wieder rein und zeigt ihnen, wie es gemacht wird! $B$BOnkel Sal'),
 (619, 'deDE', 'Für die Horde!', 'In Zeiten großer Unruhen erheben sich wahre Helden aus dem Elend. Ihr seid ein solch großer Held.$B$BDer Krieg steht vor der Tür. Eure Bemühungen werden unsere Sache in Azeroth voranbringen. Eure großen Taten werden belohnt werden. Nehmt diese Belohnung von Orgrimmar und reitet zum Ruhm.$B$BFür die Horde!$B$BKriegshäuptling Thrall');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
