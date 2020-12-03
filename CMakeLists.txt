@@ -16,6 +16,8 @@ project(AzerothCore)
 # Require a min version Cmake
 cmake_minimum_required(VERSION 3.8)
 
+message(STATUS "CMake version: ${CMAKE_VERSION}")
+
 # CMake policies (can not be handled elsewhere)
 cmake_policy(SET CMP0005 NEW)
 
@@ -142,7 +144,7 @@ add_subdirectory(src)
 
 CU_RUN_HOOK("AFTER_SRC_LOAD")
 
-if( UNIT_TESTS )
+if( BUILD_TESTING )
     # we use these flags to get code coverage
     set(UNIT_TEST_CXX_FLAGS "-fprofile-arcs -ftest-coverage -fno-inline")
 

@@ -59,6 +59,7 @@ template class ScriptRegistry<AllCreatureScript>;
 template class ScriptRegistry<AllMapScript>;
 template class ScriptRegistry<MovementHandlerScript>;
 template class ScriptRegistry<BGScript>;
+template class ScriptRegistry<ArenaTeamScript>;
 template class ScriptRegistry<SpellSC>;
 template class ScriptRegistry<AccountScript>;
 template class ScriptRegistry<GameEventScript>;
@@ -124,6 +125,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(GlobalScript);
     SCR_CLEAR(ModuleScript);
     SCR_CLEAR(BGScript);
+    SCR_CLEAR(ArenaTeamScript);
     SCR_CLEAR(SpellSC);
     SCR_CLEAR(GameEventScript);
     SCR_CLEAR(MailScript);
@@ -197,6 +199,7 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                     !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
                     !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
                     !ScriptRegistry<BGScript>::GetScriptById(sid) &&
+                    !ScriptRegistry<ArenaTeamScript>::GetScriptById(sid) &&
                     !ScriptRegistry<SpellSC>::GetScriptById(sid) &&
                     !ScriptRegistry<GroupScript>::GetScriptById(sid))
                 sLog->outErrorDb("Script named '%s' is assigned in the database, but has no code!", (*itr).c_str());
@@ -1667,6 +1670,21 @@ void ScriptMgr::OnPlayerJoinArena(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinArena(player);
 }
 
+void ScriptMgr::GetCustomGetArenaTeamId(const Player* player, uint8 slot, uint32& teamID) const
+{
+    FOREACH_SCRIPT(PlayerScript)->GetCustomGetArenaTeamId(player, slot, teamID);
+}
+
+void ScriptMgr::GetCustomArenaPersonalRating(const Player* player, uint8 slot, uint32& rating) const
+{
+    FOREACH_SCRIPT(PlayerScript)->GetCustomArenaPersonalRating(player, slot, rating);
+}
+
+void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(const Player* player, uint32 minSlot, uint32& maxArenaRating) const
+{
+    FOREACH_SCRIPT(PlayerScript)->OnGetMaxPersonalArenaRatingRequirement(player, minSlot, maxArenaRating);
+}
+
 void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid)
 {
     FOREACH_SCRIPT(PlayerScript)->OnLootItem(player, item, count, lootguid);
@@ -2108,6 +2126,31 @@ bool ScriptMgr::CanSendMessageQueue(BattlegroundQueue* queue, Player* leader, Ba
     return ret;
 }
 
+void ScriptMgr::OnGetSlotByType(const uint32 type, uint8& slot)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnGetSlotByType(type, slot);
+}
+
+void ScriptMgr::OnGetArenaPoints(ArenaTeam* at, float& points)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnGetArenaPoints(at, points);
+}
+
+void ScriptMgr::OnArenaTypeIDToQueueID(const BattlegroundTypeId bgTypeId, const uint8 arenaType, uint32& queueTypeID)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnTypeIDToQueueID(bgTypeId, arenaType, queueTypeID);
+}
+
+void ScriptMgr::OnArenaQueueIdToArenaType(const BattlegroundQueueTypeId bgQueueTypeId, uint8& ArenaType)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnQueueIdToArenaType(bgQueueTypeId, ArenaType);
+}
+
+void ScriptMgr::OnSetArenaMaxPlayersPerTeam(const uint8 arenaType, uint32& maxPlayerPerTeam)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnSetArenaMaxPlayersPerTeam(arenaType, maxPlayerPerTeam);
+}
+
 // SpellSC
 void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
 {
@@ -2321,6 +2364,12 @@ BGScript::BGScript(char const* name)
     : ScriptObject(name)
 {
     ScriptRegistry<BGScript>::AddScript(this);
+}
+
+ArenaTeamScript::ArenaTeamScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<ArenaTeamScript>::AddScript(this);
 }
 
 SpellSC::SpellSC(char const* name)
