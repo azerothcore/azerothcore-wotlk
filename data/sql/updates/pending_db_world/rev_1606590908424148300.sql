@@ -53,14 +53,6 @@ UPDATE `creature` SET `position_x`=2415.735, `position_y`=-5629.859, `position_z
 DELETE FROM `creature_text` WHERE `CreatureID`=31099 AND `GroupID`=0;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
 (31099, 0, 0, '%s goes into a frenzy!', 41, 0, 100, 0, 0, 0, 38630, 0, 'Patchwerk emote Frenzy - Ebon Hold');
-/* Add translations */
-DELETE FROM `creature_text_locale` WHERE `CreatureID`=31099 AND `GroupID`=0;
-INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES
-(31099, 0, 0, 'deDE', '%s gerät in Raserei!'),
-(31099, 0, 0, 'frFR', '%s entre en frénésie!'),
-(31099, 0, 0, 'esES', '¡%s entra en frenesí!'),
-(31099, 0, 0, 'esMX', '¡%s entra en frenesí!'),
-(31099, 0, 0, 'ruRU', '%s впадает в бешенство!');
 
 -- Update AIName to Patchwerk and build SAI
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=31099;
