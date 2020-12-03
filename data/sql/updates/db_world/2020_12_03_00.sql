@@ -1,3 +1,19 @@
+-- DB update 2020_12_02_01 -> 2020_12_03_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_02_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_02_01 2020_12_03_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1606373029735379400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1606373029735379400');
 
 -- Arthas - Frostmourne Improvements
@@ -21,3 +37,12 @@ UPDATE `broadcast_text` SET `FemaleText`='He\'s... too powerful. Heroes, quickly
 UPDATE `broadcast_text` SET `FemaleText`='He is too powerful, we must leave this place at once! My magic will hold him in place for only a short time! Come quickly, heroes!' WHERE  `ID`=36821;
 UPDATE `broadcast_text` SET `MaleText`='Your allies have arrived Jaina, just as you promised. You will all become powerful agents of the Scourge.' WHERE  `ID`=37172;
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
