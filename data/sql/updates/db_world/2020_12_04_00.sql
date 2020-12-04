@@ -1,3 +1,19 @@
+-- DB update 2020_12_03_03 -> 2020_12_04_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_03_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_03_03 2020_12_04_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1606563608380973800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1606563608380973800');
 
 DELETE FROM `quest_offer_reward_locale` WHERE `ID` IN (5659, 5660, 5661, 5662, 5663, 6066, 6067, 7805, 7806, 7811, 7812, 7818, 7819, 7823, 7824, 7825, 7832, 7836, 7837, 7922, 7923, 7924, 7925, 8293, 8368, 8386, 8389, 8426, 8427, 8428, 8429, 8430, 8431, 8432, 8433, 8434, 8435, 9234, 9235, 9236, 9237, 9239, 9240, 9241, 9242, 9243, 9244, 9245, 9246, 10357, 10358, 10362, 10363, 24823, 24828) AND `locale` = 'deDE';
@@ -57,3 +73,12 @@ INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verified
 (10363, 'deDE', 'Sieh mal einer an. Noch mehr Runenstoff.', 18019),
 (24823, 'deDE', 'Ihr stellt Euren Wert wieder unter Beweis, $N. Nehmt dies, nicht als Geschenk, sondern als Werkzeug im Kampf gegen die Geißel.', 18019),
 (24828, 'deDE', 'Ihr stellt Euren Wert wieder unter Beweis, $N. Nehmt dies, nicht als Geschenk, sondern als Werkzeug im Kampf gegen die Geißel.', 18019);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
