@@ -76,6 +76,15 @@ TEST(FormulasTest, GetZeroDifference)
 
 TEST(FormulasTest, BaseGain)
 {
-    sLog.reset(new LogMock());
-    // TODO: write expectations
+    auto logMock = new LogMock();
+    sLog.reset(logMock);
+
+    EXPECT_EQ(BaseGain(60, 40, CONTENT_1_60), 0);
+    EXPECT_EQ(BaseGain(60, 60, CONTENT_1_60), 345);
+    EXPECT_EQ(BaseGain(50, 60, CONTENT_1_60), 354);
+    EXPECT_EQ(BaseGain(65, 66, CONTENT_61_70), 588);
+    EXPECT_EQ(BaseGain(79, 78, CONTENT_71_80), 917);
+    EXPECT_EQ(BaseGain(79, 1, ContentLevels(999)), 0);
+    // TODO: assert outError is called, but we have to mock variadic types for it
+    //  https://github.com/google/googletest/blob/master/googlemock/docs/gmock_faq.md#can-i-mock-a-variadic-function
 }
