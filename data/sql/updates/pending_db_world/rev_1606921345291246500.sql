@@ -14,3 +14,4 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `id`, `text`, `type`, `lan
 (20415, 1, 0, 'Moooooooooo!', 12, 0, 100, 0, 0, 0, 100004, 0, 'Bessy angry moo when being attacked'),
 (20464, 2, 0, 'Bessy, you''re home. Thank the Light!', 12, 0, 100, 0, 0, 0, 18181, 0, 'Thadell say to Bessy'),
 (20464, 3, 0, 'Thank you for bringing back my Bessy, $N. I couldn\'t live without her!', 12, 0, 100, 0, 0, 0, 100005, 0, 'Thadell say to player');
+
