@@ -12,7 +12,7 @@
 
 class instance_culling_of_stratholme : public InstanceMapScript
 {
-    public:
+public:
     instance_culling_of_stratholme() : InstanceMapScript("instance_culling_of_stratholme", 595) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const
@@ -31,7 +31,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
             // GOs
             _shkafGateGUID = 0;
             _exitGateGUID = 0;
-            
+
             // Instance
             _crateCount = 0;
             _showCrateTimer = 0;
@@ -111,7 +111,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                     if (!instance->IsHeroic() || !_guardianTimer)
                         return;
                     DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN_SHOW, data);
-                    DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN, uint32(_guardianTimer / (MINUTE*IN_MILLISECONDS)));
+                    DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN, uint32(_guardianTimer / (MINUTE * IN_MILLISECONDS)));
                     if (data == 0)
                     {
                         _guardianTimer = 0;
@@ -125,7 +125,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                     if (instance->IsHeroic())
                     {
                         DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN_SHOW, true);
-                        _guardianTimer = 26*MINUTE*IN_MILLISECONDS;
+                        _guardianTimer = 26 * MINUTE * IN_MILLISECONDS;
                         if (!_infiniteGUID)
                             instance->SummonCreature(NPC_INFINITE, EventPos[EVENT_SRC_CORRUPTOR]);
                     }
@@ -134,7 +134,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                     _crateCount++;
                     if (_crateCount == 5)
                     {
-                        Map::PlayerList const &PlayerList = instance->GetPlayers();
+                        Map::PlayerList const& PlayerList = instance->GetPlayers();
                         if (!PlayerList.isEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 i->GetSource()->KilledMonsterCredit(NPC_GRAIN_CREATE_TRIGGER, 0);
@@ -151,19 +151,19 @@ class instance_culling_of_stratholme : public InstanceMapScript
                     _encounterState = data;
                     if (data == COS_PROGRESS_START_INTRO)
                     {
-                        if (Creature *arthas = instance->GetCreature(_arthasGUID))
+                        if (Creature* arthas = instance->GetCreature(_arthasGUID))
                             arthas->AI()->DoAction(ACTION_START_EVENT);
                     }
                     else if (data == COS_PROGRESS_KILLED_SALRAMM)
                     {
-                        if (Creature *arthas = instance->GetCreature(_arthasGUID))
+                        if (Creature* arthas = instance->GetCreature(_arthasGUID))
                             arthas->AI()->DoAction(ACTION_KILLED_SALRAMM);
                     }
                     break;
                 case DATA_ARTHAS_REPOSITION:
                     if (data == 2)
                         _respawnAndReposition = true;
-                    else if (Creature *arthas = instance->GetCreature(_arthasGUID))
+                    else if (Creature* arthas = instance->GetCreature(_arthasGUID))
                         Reposition(arthas);
                     return;
 
@@ -213,7 +213,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
             // Used when arthas dies
             if (_respawnAndReposition)
             {
-                if (Creature *arthas = instance->GetCreature(_arthasGUID))
+                if (Creature* arthas = instance->GetCreature(_arthasGUID))
                 {
                     if (!arthas->IsAlive())
                     {
@@ -243,10 +243,10 @@ class instance_culling_of_stratholme : public InstanceMapScript
             // Used to display how much time players have
             if (_guardianTimer)
             {
-                uint32 div = uint32(_guardianTimer / (MINUTE*IN_MILLISECONDS));
+                uint32 div = uint32(_guardianTimer / (MINUTE * IN_MILLISECONDS));
                 _guardianTimer -= diff;
-                uint32 divAfter = uint32(_guardianTimer / (MINUTE*IN_MILLISECONDS));
-                
+                uint32 divAfter = uint32(_guardianTimer / (MINUTE * IN_MILLISECONDS));
+
                 if (divAfter == 0)
                 {
                     _guardianTimer = 0;
@@ -280,7 +280,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                 instance->SummonCreature(NPC_HOURGLASS, EventPos[EVENT_POS_HOURGLASS]);
 
                 if (_encounterState == COS_PROGRESS_CRATES_FOUND ||
-                    _encounterState == COS_PROGRESS_START_INTRO)
+                        _encounterState == COS_PROGRESS_START_INTRO)
                 {
                     ChromieWhisper(0);
 
@@ -362,7 +362,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-                saveStream << "C S " << _encounterState << ' ' << _guardianTimer;
+            saveStream << "C S " << _encounterState << ' ' << _guardianTimer;
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
@@ -398,21 +398,21 @@ class instance_culling_of_stratholme : public InstanceMapScript
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        private:
-            // NPCs
-            uint64 _arthasGUID;
-            uint64 _infiniteGUID;
+    private:
+        // NPCs
+        uint64 _arthasGUID;
+        uint64 _infiniteGUID;
 
-            // GOs
-            uint64 _shkafGateGUID;
-            uint64 _exitGateGUID;
-            uint32 _encounterState;
-            uint32 _crateCount;
-            uint32 _showCrateTimer;
-            uint32 _guardianTimer;
+        // GOs
+        uint64 _shkafGateGUID;
+        uint64 _exitGateGUID;
+        uint32 _encounterState;
+        uint32 _crateCount;
+        uint32 _showCrateTimer;
+        uint32 _guardianTimer;
 
-            bool _respawnAndReposition;
-            uint32 _loadTimer;
+        bool _respawnAndReposition;
+        uint32 _loadTimer;
     };
 };
 

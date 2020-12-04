@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef __TRINITY_VEHICLEDEFINES_H
-#define __TRINITY_VEHICLEDEFINES_H
+#ifndef __ACORE_VEHICLEDEFINES_H
+#define __ACORE_VEHICLEDEFINES_H
 
 #include "Define.h"
 #include "Map.h"
@@ -100,10 +100,10 @@ protected:
 
 public:
     /// This method transforms supplied transport offsets into global coordinates
-    virtual void CalculatePassengerPosition(float& x, float& y, float& z, float* o = NULL) const = 0;
+    virtual void CalculatePassengerPosition(float& x, float& y, float& z, float* o = nullptr) const = 0;
 
     /// This method transforms supplied global coordinates into local offsets
-    virtual void CalculatePassengerOffset(float& x, float& y, float& z, float* o = NULL) const = 0;
+    virtual void CalculatePassengerOffset(float& x, float& y, float& z, float* o = nullptr) const = 0;
 
 protected:
     static void CalculatePassengerPosition(float& x, float& y, float& z, float* o, float transX, float transY, float transZ, float transO)

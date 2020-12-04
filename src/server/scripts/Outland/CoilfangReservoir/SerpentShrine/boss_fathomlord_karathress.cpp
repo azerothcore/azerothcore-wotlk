@@ -41,7 +41,7 @@ enum Misc
     EVENT_KILL_TALK                 = 5
 };
 
-const Position advisorsPosition[MAX_ADVISORS+2] = 
+const Position advisorsPosition[MAX_ADVISORS + 2] =
 {
     {459.61f, -534.81f, -7.54f, 3.82f},
     {463.83f, -540.23f, -7.54f, 3.15f},
@@ -52,150 +52,150 @@ const Position advisorsPosition[MAX_ADVISORS+2] =
 
 class boss_fathomlord_karathress : public CreatureScript
 {
-    public:
-        boss_fathomlord_karathress() : CreatureScript("boss_fathomlord_karathress") { }
+public:
+    boss_fathomlord_karathress() : CreatureScript("boss_fathomlord_karathress") { }
 
-        CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetInstanceAI<boss_fathomlord_karathressAI>(creature);
+    }
+
+    struct boss_fathomlord_karathressAI : public BossAI
+    {
+        boss_fathomlord_karathressAI(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS)
         {
-            return GetInstanceAI<boss_fathomlord_karathressAI>(creature);
         }
 
-        struct boss_fathomlord_karathressAI : public BossAI
+        void Reset()
         {
-            boss_fathomlord_karathressAI(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS)
+            BossAI::Reset();
+
+            me->SummonCreature(NPC_FATHOM_GUARD_TIDALVESS, advisorsPosition[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 600000);
+            me->SummonCreature(NPC_FATHOM_GUARD_SHARKKIS, advisorsPosition[1], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 600000);
+            me->SummonCreature(NPC_FATHOM_GUARD_CARIBDIS, advisorsPosition[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 600000);
+        }
+
+        void JustSummoned(Creature* summon)
+        {
+            summons.Summon(summon);
+            if (summon->GetEntry() == NPC_SEER_OLUM)
             {
+                summon->SetWalk(true);
+                summon->GetMotionMaster()->MovePoint(0, advisorsPosition[MAX_ADVISORS + 1], false);
             }
+        }
 
-            void Reset()
+        void SummonedCreatureDies(Creature* summon, Unit*)
+        {
+            summons.Despawn(summon);
+            if (summon->GetEntry() == NPC_FATHOM_GUARD_TIDALVESS)
+                Talk(SAY_GAIN_ABILITY1);
+            if (summon->GetEntry() == NPC_FATHOM_GUARD_SHARKKIS)
+                Talk(SAY_GAIN_ABILITY2);
+            if (summon->GetEntry() == NPC_FATHOM_GUARD_CARIBDIS)
+                Talk(SAY_GAIN_ABILITY3);
+        }
+
+        void KilledUnit(Unit* /*victim*/)
+        {
+            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
-                BossAI::Reset();
-
-                me->SummonCreature(NPC_FATHOM_GUARD_TIDALVESS, advisorsPosition[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 600000);
-                me->SummonCreature(NPC_FATHOM_GUARD_SHARKKIS, advisorsPosition[1], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 600000);
-                me->SummonCreature(NPC_FATHOM_GUARD_CARIBDIS, advisorsPosition[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 600000);
+                Talk(SAY_SLAY);
+                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
             }
+        }
 
-            void JustSummoned(Creature* summon)
+        void JustDied(Unit* killer)
+        {
+            Talk(SAY_DEATH);
+            BossAI::JustDied(killer);
+            me->SummonCreature(NPC_SEER_OLUM, advisorsPosition[MAX_ADVISORS], TEMPSUMMON_TIMED_DESPAWN, 3600000);
+            if (GameObject* gobject = me->FindNearestGameObject(GO_CAGE, 100.0f))
+                gobject->SetGoState(GO_STATE_ACTIVE);
+        }
+
+        void EnterCombat(Unit* who)
+        {
+            BossAI::EnterCombat(who);
+            Talk(SAY_AGGRO);
+            me->CallForHelp(10.0f);
+
+            events.ScheduleEvent(EVENT_SPELL_CATACLYSMIC_BOLT, 10000);
+            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
+            events.ScheduleEvent(EVENT_SPELL_SEAR_NOVA, 25000);
+            events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (events.ExecuteEvent())
             {
-                summons.Summon(summon);
-                if (summon->GetEntry() == NPC_SEER_OLUM)
-                {
-                    summon->SetWalk(true);
-                    summon->GetMotionMaster()->MovePoint(0, advisorsPosition[MAX_ADVISORS+1], false);
-                }
-            }
+                case EVENT_SPELL_ENRAGE:
+                    me->CastSpell(me, SPELL_ENRAGE, true);
+                    break;
+                case EVENT_SPELL_CATACLYSMIC_BOLT:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 50.0f, true)))
+                        me->CastSpell(target, SPELL_CATACLYSMIC_BOLT, false);
+                    events.ScheduleEvent(EVENT_SPELL_CATACLYSMIC_BOLT, 6000);
+                    break;
+                case EVENT_SPELL_SEAR_NOVA:
+                    me->CastSpell(me, SPELL_SEAR_NOVA, false);
+                    events.ScheduleEvent(EVENT_SPELL_SEAR_NOVA, 20000 + urand(0, 20000));
+                    break;
+                case EVENT_HEALTH_CHECK:
+                    if (me->HealthBelowPct(76))
+                    {
+                        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                            if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                                if (summon->GetMaxHealth() > 500000)
+                                    summon->CastSpell(me, SPELL_BLESSING_OF_THE_TIDES, true);
 
-            void SummonedCreatureDies(Creature* summon, Unit*)
-            {
-                summons.Despawn(summon);
-                if (summon->GetEntry() == NPC_FATHOM_GUARD_TIDALVESS)
-                    Talk(SAY_GAIN_ABILITY1);
-                if (summon->GetEntry() == NPC_FATHOM_GUARD_SHARKKIS)
-                    Talk(SAY_GAIN_ABILITY2);
-                if (summon->GetEntry() == NPC_FATHOM_GUARD_CARIBDIS)
-                    Talk(SAY_GAIN_ABILITY3);
-            }
-
-            void KilledUnit(Unit* /*victim*/)
-            {
-                if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
-                {
-                    Talk(SAY_SLAY);
-                    events.ScheduleEvent(EVENT_KILL_TALK, 6000);
-                }
-            }
-
-            void JustDied(Unit* killer)
-            {
-                Talk(SAY_DEATH);
-                BossAI::JustDied(killer);
-                me->SummonCreature(NPC_SEER_OLUM, advisorsPosition[MAX_ADVISORS], TEMPSUMMON_TIMED_DESPAWN, 3600000);
-                if (GameObject* gobject = me->FindNearestGameObject(GO_CAGE, 100.0f))
-                    gobject->SetGoState(GO_STATE_ACTIVE);
-            }
-
-            void EnterCombat(Unit* who)
-            {
-                BossAI::EnterCombat(who);
-                Talk(SAY_AGGRO);
-                me->CallForHelp(10.0f);
-
-                events.ScheduleEvent(EVENT_SPELL_CATACLYSMIC_BOLT, 10000);
-                events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
-                events.ScheduleEvent(EVENT_SPELL_SEAR_NOVA, 25000);
-                events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                switch (events.ExecuteEvent())
-                {
-                    case EVENT_SPELL_ENRAGE:
-                        me->CastSpell(me, SPELL_ENRAGE, true);
+                        if (me->HasAura(SPELL_BLESSING_OF_THE_TIDES))
+                            Talk(SAY_GAIN_BLESSING);
                         break;
-                    case EVENT_SPELL_CATACLYSMIC_BOLT:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 50.0f, true)))
-                            me->CastSpell(target, SPELL_CATACLYSMIC_BOLT, false);
-                        events.ScheduleEvent(EVENT_SPELL_CATACLYSMIC_BOLT, 6000);
-                        break;
-                    case EVENT_SPELL_SEAR_NOVA:
-                        me->CastSpell(me, SPELL_SEAR_NOVA, false);
-                        events.ScheduleEvent(EVENT_SPELL_SEAR_NOVA, 20000+urand(0, 20000));
-                        break;
-                    case EVENT_HEALTH_CHECK:
-                        if (me->HealthBelowPct(76))
-                        {
-                            for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                                if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                                    if (summon->GetMaxHealth() > 500000)
-                                        summon->CastSpell(me, SPELL_BLESSING_OF_THE_TIDES, true);
-
-                            if (me->HasAura(SPELL_BLESSING_OF_THE_TIDES))
-                                Talk(SAY_GAIN_BLESSING);
-                            break;
-                        }
-                        events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
-                        break;
-                }
-
-                DoMeleeAttackIfReady();
+                    }
+                    events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
+                    break;
             }
-        };
+
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 
 class spell_karathress_power_of_caribdis : public SpellScriptLoader
 {
-    public:
-        spell_karathress_power_of_caribdis() : SpellScriptLoader("spell_karathress_power_of_caribdis") { }
+public:
+    spell_karathress_power_of_caribdis() : SpellScriptLoader("spell_karathress_power_of_caribdis") { }
 
-        class spell_karathress_power_of_caribdis_AuraScript : public AuraScript
+    class spell_karathress_power_of_caribdis_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_karathress_power_of_caribdis_AuraScript);
+
+        void OnPeriodic(AuraEffect const* aurEff)
         {
-            PrepareAuraScript(spell_karathress_power_of_caribdis_AuraScript);
-
-            void OnPeriodic(AuraEffect const* aurEff)
-            {
-                PreventDefaultAction();
-                if (Unit* victim = GetUnitOwner()->GetVictim())
-                    GetUnitOwner()->CastSpell(victim, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-            }
-
-            void Register()
-            {
-                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_caribdis_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_karathress_power_of_caribdis_AuraScript();
+            PreventDefaultAction();
+            if (Unit* victim = GetUnitOwner()->GetVictim())
+                GetUnitOwner()->CastSpell(victim, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_caribdis_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_karathress_power_of_caribdis_AuraScript();
+    }
 };
 
 void AddSC_boss_fathomlord_karathress()
