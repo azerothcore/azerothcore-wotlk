@@ -8,7 +8,6 @@
  */
 //=============================================================================
 
-
 #ifndef CLEANUP_STRATEGIES_H
 #define CLEANUP_STRATEGIES_H
 #include /**/ "ace/pre.h"
@@ -36,9 +35,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 template <class KEY, class VALUE, class CONTAINER>
 class ACE_Cleanup_Strategy
 {
-
 public:
-
   /// Destructor.
   virtual ~ACE_Cleanup_Strategy (void);
 
@@ -63,9 +60,7 @@ public:
 template <class KEY, class VALUE, class CONTAINER>
 class ACE_Recyclable_Handler_Cleanup_Strategy : public ACE_Cleanup_Strategy<KEY, VALUE, CONTAINER>
 {
-
 public:
-
   /// The method which will do the cleanup of the entry in the container.
   virtual int cleanup (CONTAINER &container, KEY *key, VALUE *value);
 };
