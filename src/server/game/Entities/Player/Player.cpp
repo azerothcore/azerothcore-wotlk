@@ -4940,7 +4940,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                     {
                         if (Player* pFriend = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID((*resultFriends)[0].GetUInt32(), 0, HIGHGUID_PLAYER)))
                         {
-                            pFriend->GetSocial()->RemoveFromSocialList(guid, false);
+                            pFriend->GetSocial()->RemoveFromSocialList(guid, SOCIAL_FLAG_ALL);
                             sSocialMgr->SendFriendStatus(pFriend, FRIEND_REMOVED, guid, false);
                         }
                     } while (resultFriends->NextRow());
@@ -7546,8 +7546,23 @@ uint32 Player::GetGroupIdFromStorage(uint32 guid)
 uint32 Player::GetArenaTeamIdFromStorage(uint32 guid, uint8 slot)
 {
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return playerData->arenaTeamId[slot];
+    {
+        auto itr = playerData->arenaTeamId.find(slot);
+        if (itr != playerData->arenaTeamId.end())
+        {
+            return itr->second;
+        }
+    }
     return 0;
+}
+
+
+void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
+{
+    if (slot < MAX_ARENA_SLOT)
+    {
+        SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
+    }
 }
 
 uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
@@ -17710,7 +17725,7 @@ void Player::_LoadArenaTeamInfo()
 {
     memset((void*)&m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1], 0, sizeof(uint32) * MAX_ARENA_SLOT * ARENA_TEAM_END);
 
-    for (uint8 slot = 0; slot <= 2; ++slot)
+    for (uint8 slot = 0; slot < MAX_ARENA_SLOT; ++slot)
         if (uint32 arenaTeamId = Player::GetArenaTeamIdFromStorage(GetGUIDLow(), slot))
         {
             ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
@@ -21627,6 +21642,38 @@ void Player::LeaveAllArenaTeams(uint64 guid)
     } while (result->NextRow());
 }
 
+
+uint32 Player::GetArenaTeamId(uint8 slot) const
+{
+    uint32 rtVal = 0;
+    if (slot >= MAX_ARENA_SLOT)
+    {
+        sScriptMgr->GetCustomGetArenaTeamId(this, slot, rtVal);
+    }
+    else
+    {
+        rtVal = GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID);
+    }
+
+    return rtVal;
+}
+
+
+uint32 Player::GetArenaPersonalRating(uint8 slot) const
+{
+    uint32 rtVal = 0;
+    if (slot >= MAX_ARENA_SLOT)
+    {
+        sScriptMgr->GetCustomGetArenaTeamId(this, slot, rtVal);
+    }
+    else
+    {
+        rtVal = GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING);
+    }
+
+    return rtVal;
+}
+
 void Player::SetRestBonus(float rest_bonus_new)
 {
     // Prevent resting on max level
@@ -22287,6 +22334,9 @@ uint32 Player::GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot) const
                 max_personal_rating = p_rating;
         }
     }
+
+    sScriptMgr->OnGetMaxPersonalArenaRatingRequirement(this, minarenaslot, max_personal_rating);
+
     return max_personal_rating;
 }
 
@@ -23218,7 +23268,7 @@ void Player::SetGroup(Group* group, int8 subgroup)
 void Player::SendInitialPacketsBeforeAddToMap()
 {
     /// Pass 'this' as argument because we're not stored in ObjectAccessor yet
-    GetSocial()->SendSocialList(this);
+    GetSocial()->SendSocialList(this, SOCIAL_FLAG_ALL);
 
     // guild bank list wtf?
 

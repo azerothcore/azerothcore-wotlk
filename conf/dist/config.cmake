@@ -1,6 +1,6 @@
 option(SERVERS             "Build worldserver and authserver"                            1)
 option(SCRIPTS             "Build core with scripts included"                            1)
-option(UNIT_TESTS          "Build unit tests"                                            0)
+option(BUILD_TESTING       "Build unit tests"                                            0)
 option(TOOLS               "Build map/vmap/mmap extraction/assembler tools"              0)
 option(USE_SCRIPTPCH       "Use precompiled headers when compiling scripts"              1)
 option(USE_COREPCH         "Use precompiled headers when compiling servers"              1)
