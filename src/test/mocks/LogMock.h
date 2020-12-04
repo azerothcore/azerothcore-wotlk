@@ -5,6 +5,8 @@
 #include "gmock/gmock.h"
 #include "ILog.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 class LogMock: public ILog {
 public:
     ~LogMock() override {}
@@ -43,6 +45,6 @@ public:
     MOCK_METHOD(void, SetLogDB, (bool enable));
     MOCK_METHOD(bool, GetSQLDriverQueryLogging, (), (const));
 };
-
+#pragma GCC diagnostic pop
 
 #endif //AZEROTHCORE_LOGMOCK_H
