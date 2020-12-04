@@ -347,7 +347,7 @@ else()
 
   target_link_libraries(ace
     PRIVATE
-      acore-dependency-interface)
+      acore-dependency-interface Iphlpapi)
       
   set_target_properties(ace
     PROPERTIES
