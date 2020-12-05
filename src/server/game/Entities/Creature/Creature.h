@@ -499,6 +499,7 @@ public:
     uint8 getLevelForTarget(WorldObject const* target) const override; // overwrite Unit::getLevelForTarget for boss level support
 
     bool IsInEvadeMode() const { return HasUnitState(UNIT_STATE_EVADE); }
+    bool IsEvadingAttacks() const { return IsInEvadeMode() || CanNotReachTarget(); }
 
     bool AIM_Initialize(CreatureAI* ai = nullptr);
     void Motion_Initialize();
@@ -664,6 +665,9 @@ public:
             return m_charmInfo->GetCharmSpell(pos)->GetAction();
     }
 
+    void SetCannotReachTarget(bool cannotReach) { if (cannotReach == m_cannotReachTarget) return; m_cannotReachTarget = cannotReach; m_cannotReachTimer = 0; }
+    bool CanNotReachTarget() const { return m_cannotReachTarget; }
+
     void SetPosition(float x, float y, float z, float o);
     void SetPosition(const Position& pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }
 
@@ -784,6 +788,9 @@ private:
 
     time_t _lastDamagedTime; // Part of Evade mechanics
 
+    bool m_cannotReachTarget;
+    uint32 m_cannotReachTimer;
+    
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
 };
 
