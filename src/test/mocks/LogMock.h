@@ -20,7 +20,8 @@ public:
     void outString(const char* str, ...) override {}
     MOCK_METHOD(void, outString, ());
     void outStringInLine(const char* str, ...) override {}
-    void outError(const char* err, ...) override {}
+    MOCK_METHOD(void, outErrorMock, ()); // because outError has variadic type and cannot be directly mocked
+    void outError(const char* err, ...) override { outErrorMock(); }
     void outCrash(const char* err, ...) override {}
     void outBasic(const char* str, ...) override {}
     void outDetail(const char* str, ...) override {}
