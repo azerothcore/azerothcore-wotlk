@@ -11,6 +11,8 @@
 #include "PassiveAI.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "CreatureAI.h"
+#include "Object.h"
 
 enum YoggSpells
 {
@@ -296,6 +298,25 @@ enum Misc
     DATA_GET_DRIVE_ME_CRAZY             = 4,
 };
 
+struct LocationsXY
+{
+    float x, y, z;
+};
+
+static LocationsXY yoggPortalLoc[] =
+{
+    {1970.48f, -9.75f, 325.5f},
+    {1992.76f, -10.21f, 325.5f},
+    {1995.53f, -39.78f, 325.5f},
+    {1969.25f, -42.00f, 325.5f},
+    {1960.62f, -32.00f, 325.5f},
+    {1981.98f, -5.69f, 325.5f},
+    {1982.78f, -45.73f, 325.5f},
+    {2000.66f, -29.68f, 325.5f},
+    {1999.88f, -19.61f, 325.5f},
+    {1961.37f, -19.54f, 325.5f}
+};
+
 const Position Middle = {1980.28f, -25.5868f, 329.397f, M_PI * 1.5f};
 
 
@@ -525,8 +546,7 @@ public:
             // Spawn Portals
             for (uint8 i = 0; i < RAID_MODE(4, 10); ++i)
             {
-                float ang = i ? (M_PI * 2.0f / i) : M_PI * 2.0f;
-                if ((cr = me->SummonCreature(NPC_DESCEND_INTO_MADNESS, me->GetPositionX() + 25 * cos(ang), me->GetPositionY() + 25 * sin(ang), 326, 0, TEMPSUMMON_TIMED_DESPAWN, 15000)))
+                if ((cr = me->SummonCreature(NPC_DESCEND_INTO_MADNESS, yoggPortalLoc[i].x, yoggPortalLoc[i].y, yoggPortalLoc[i].z, 0, TEMPSUMMON_TIMED_DESPAWN, 25000)))
                 {
                     cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE);
                     cr->SetArmor(_currentIllusion);
