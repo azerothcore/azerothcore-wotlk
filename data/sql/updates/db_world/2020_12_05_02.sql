@@ -1,3 +1,19 @@
+-- DB update 2020_12_05_01 -> 2020_12_05_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_05_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_05_01 2020_12_05_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1601827337526865700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1601827337526865700');
 /*
  * Raid: The Obsidian Sanctum
@@ -25,3 +41,12 @@ UPDATE `creature_template` SET `mindmg` = 13743, `maxdmg` = 18441, `DamageModifi
 UPDATE `creature_template` SET `mindmg` = 27486, `maxdmg` = 36882, `DamageModifier` = 1.01 WHERE `entry` = 31520;
 UPDATE `creature_template` SET `mindmg` = 13743, `maxdmg` = 18441, `DamageModifier` = 1.01 WHERE `entry` = 30452;
 UPDATE `creature_template` SET `mindmg` = 27486, `maxdmg` = 36882, `DamageModifier` = 1.01 WHERE `entry` = 31534;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
