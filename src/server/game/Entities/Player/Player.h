@@ -1495,6 +1495,7 @@ public:
     QuestGiverStatus GetQuestDialogStatus(Object* questGiver);
 
     void SetDailyQuestStatus(uint32 quest_id);
+    bool IsDailyQuestDone(uint32 quest_id);
     void SetWeeklyQuestStatus(uint32 quest_id);
     void SetMonthlyQuestStatus(uint32 quest_id);
     void SetSeasonalQuestStatus(uint32 quest_id);
@@ -1669,7 +1670,7 @@ public:
 
     void RemoveMail(uint32 id);
 
-    void AddMail(Mail* mail) { m_mailCache.push_front(mail); }// for call from WorldSession::SendMailTo
+    void AddMail(Mail* mail) { totalMailCount++; m_mailCache.push_front(mail); }// for call from WorldSession::SendMailTo
     uint32 GetMailSize() { return totalMailCount; }
     uint32 GetMailCacheSize() { return m_mailCache.size();}
     Mail* GetMail(uint32 id);
@@ -1682,7 +1683,7 @@ public:
     /*********************************************************/
 
     uint8 unReadMails;
-    uint64 totalMailCount;
+    uint32 totalMailCount;
     time_t m_nextMailDelivereTime;
 
     typedef std::unordered_map<uint32, Item*> ItemMap;
@@ -1938,14 +1939,11 @@ public:
         SetArenaTeamInfoField(slot, ARENA_TEAM_ID, ArenaTeamId);
         SetArenaTeamInfoField(slot, ARENA_TEAM_TYPE, type);
     }
-    void SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
-    {
-        SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
-    }
+    void SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value);
     static uint32 GetArenaTeamIdFromDB(uint64 guid, uint8 slot);
     static void LeaveAllArenaTeams(uint64 guid);
-    uint32 GetArenaTeamId(uint8 slot) const { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID); }
-    uint32 GetArenaPersonalRating(uint8 slot) const { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING); }
+    uint32 GetArenaTeamId(uint8 slot) const;
+    uint32 GetArenaPersonalRating(uint8 slot) const;
     void SetArenaTeamIdInvited(uint32 ArenaTeamId) { m_ArenaTeamIdInvited = ArenaTeamId; }
     uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
 
