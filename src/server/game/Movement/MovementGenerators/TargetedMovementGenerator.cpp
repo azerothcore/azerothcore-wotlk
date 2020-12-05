@@ -39,16 +39,21 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
     if (owner->GetMapId() == 631 && owner->GetTransport() && owner->GetTransport()->IsMotionTransport() && i_target->GetTransport() && i_target->GetTransport()->IsMotionTransport()) // for ICC, if both on a motion transport => don't use mmaps
         sameTransport = owner->GetTypeId() == TYPEID_UNIT && i_target->isInAccessiblePlaceFor(owner->ToCreature());
     bool useMMaps = MMAP::MMapFactory::IsPathfindingEnabled(owner->FindMap()) && !sameTransport;
-    bool forceDest = (owner->FindMap() && owner->FindMap()->IsDungeon() && !isPlayerPet) || // force in instances to prevent exploiting
-                     (owner->GetTypeId() == TYPEID_UNIT && ((owner->IsPet() && owner->HasUnitState(UNIT_STATE_FOLLOW)) || // allow pets following their master to cheat while generating paths
-                             ((Creature*)owner)->isWorldBoss() || ((Creature*)owner)->IsDungeonBoss())) || // force for all bosses, even not in instances
+    bool forceDest =
+                     // (owner->FindMap() && owner->FindMap()->IsDungeon() && !isPlayerPet) || // force in instances to prevent exploiting
+                     (owner->GetTypeId() == TYPEID_UNIT && ((owner->IsPet() && owner->HasUnitState(UNIT_STATE_FOLLOW)))) || // allow pets following their master to cheat while generating paths
+                     // ((Creature*)owner)->isWorldBoss() || ((Creature*)owner)->IsDungeonBoss())) || // force for all bosses, even not in instances
                      (owner->GetMapId() == 572 && (owner->GetPositionX() < 1275.0f || i_target->GetPositionX() < 1275.0f)) || // pussywizard: Ruins of Lordaeron - special case (acid)
                      sameTransport || // nothing to comment, can't find path on transports so allow it
-                     (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()); // for .npc follow
+                     (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) // for .npc follow*/
+    ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
     bool forcePoint = ((!isPlayerPet || owner->GetMapId() == 618) && (forceDest || !useMMaps)) || sameTransport;
 
     if (owner->GetTypeId() == TYPEID_UNIT && !i_target->isInAccessiblePlaceFor(owner->ToCreature()) && !sameTransport && !forceDest && !forcePoint)
+    {
+        owner->ToCreature()->SetCannotReachTarget(true);
         return;
+    }
 
     lastOwnerXYZ.Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ());
     lastTargetXYZ.Relocate(i_target->GetPositionX(), i_target->GetPositionY(), i_target->GetPositionZ());
@@ -186,6 +191,11 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
             float maxDist = MELEE_RANGE + owner->GetMeleeReach() + i_target->GetMeleeReach();
             if (!forceDest && (i_path->GetPathType() & PATHFIND_NOPATH || (!i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist * maxDist)))
             {
+                if (owner->GetTypeId() == TYPEID_UNIT) 
+                {
+                    owner->ToCreature()->SetCannotReachTarget(false);
+                }
+
                 lastPathingFailMSTime = World::GetGameTimeMS();
                 owner->m_targetsNotAcceptable[i_target->GetGUID()] = MMapTargetData(sWorld->GetGameTime() + DISALLOW_TIME_AFTER_FAIL, owner, i_target.getTarget());
                 return;
@@ -203,8 +213,15 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
                 return;
             }
         }
-
-        // if failed to generate, just use normal MoveTo
+        else
+        {
+            // evade first
+            if (owner->GetTypeId() == TYPEID_UNIT)
+            {
+                owner->ToCreature()->SetCannotReachTarget(true);
+            }
+            // then use normal MoveTo - if we have to
+        }
     }
 
     owner->AddUnitState(UNIT_STATE_CHASE);

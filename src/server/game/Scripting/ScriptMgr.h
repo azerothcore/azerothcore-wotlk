@@ -960,6 +960,15 @@ public:
     // After player enters queue for Arena
     virtual void OnPlayerJoinArena(Player* /*player*/) { }
 
+    //Called when trying to get a team ID of a slot > 2 (This is for custom teams created by modules)
+    virtual void GetCustomGetArenaTeamId(const Player* /*player*/, uint8 /*slot*/, uint32& /*teamID*/) const { }
+
+    //Called when trying to get players personal rating of an arena slot > 2 (This is for custom teams created by modules)
+    virtual void GetCustomArenaPersonalRating(const Player* /*player*/, uint8 /*slot*/, uint32& /*rating*/) const { }
+
+    //Called after the normal slots (0..2) for arena have been evaluated so that custom arena teams could modify it if nececasry
+    virtual void OnGetMaxPersonalArenaRatingRequirement(const Player* /*player*/, uint32 /*minSlot*/, uint32& /*maxArenaRating*/) const {}
+
     //After looting item
     virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, uint64 /*lootguid*/) { }
 
@@ -1171,6 +1180,21 @@ public:
     virtual void OnCheckNormalMatch(BattlegroundQueue* /*queue*/, uint32& /*Coef*/, Battleground* /*bgTemplate*/, BattlegroundBracketId /*bracket_id*/, uint32& /*minPlayers*/, uint32& /*maxPlayers*/) { }
 
     virtual bool CanSendMessageQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, Battleground* /*bg*/, PvPDifficultyEntry const* /*bracketEntry*/) { return true; }
+};
+
+class ArenaTeamScript : public ScriptObject
+{
+protected:
+    ArenaTeamScript(const char* name);
+
+public:
+    bool IsDatabaseBound() const { return false; };
+
+    virtual void OnGetSlotByType(const uint32 /*type*/, uint8& /*slot*/) {}
+    virtual void OnGetArenaPoints(ArenaTeam* /*team*/, float& /*points*/) {}
+    virtual void OnTypeIDToQueueID(const BattlegroundTypeId /*bgTypeId*/, const uint8 /*arenaType*/, uint32& /*queueTypeID*/) {}
+    virtual void OnQueueIdToArenaType(const BattlegroundQueueTypeId /*bgQueueTypeId*/, uint8& /*ArenaType*/) {}
+    virtual void OnSetArenaMaxPlayersPerTeam(const uint8 /*arenaType*/, uint32& /*maxPlayerPerTeam*/) {}
 };
 
 class SpellSC : public ScriptObject
@@ -1460,6 +1484,9 @@ public: /* PlayerScript */
     void OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
     void OnPlayerJoinBG(Player* player);
     void OnPlayerJoinArena(Player* player);
+    void GetCustomGetArenaTeamId(const Player* player, uint8 slot, uint32& teamID) const;
+    void GetCustomArenaPersonalRating(const Player* player, uint8 slot, uint32& rating) const;
+    void OnGetMaxPersonalArenaRatingRequirement(const Player* player, uint32 minSlot, uint32& maxArenaRating) const;
     void OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid);
     void OnCreateItem(Player* player, Item* item, uint32 count);
     void OnQuestRewardItem(Player* player, Item* item, uint32 count);
@@ -1572,6 +1599,14 @@ public: /* BGScript */
     void OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32& minPlayers, uint32& maxPlayers);
     bool CanSendMessageQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
 
+public: /* Arena Team Script */
+
+    void OnGetSlotByType(const uint32 type, uint8& slot);
+    void OnGetArenaPoints(ArenaTeam* at, float& points);
+    void OnArenaTypeIDToQueueID(const BattlegroundTypeId bgTypeId, const uint8 arenaType, uint32& queueTypeID);
+    void OnArenaQueueIdToArenaType(const BattlegroundQueueTypeId bgQueueTypeId, uint8& ArenaType);
+    void OnSetArenaMaxPlayersPerTeam(const uint8 arenaType, uint32& maxPlayerPerTeam);
+
 public: /* SpellSC */
 
     void OnCalcMaxDuration(Aura const* aura, int32& maxDuration);
@@ -1643,9 +1678,10 @@ public:
 
             if (script->IsDatabaseBound())
             {
-
                 if (!_checkMemory(script))
+                {
                     return;
+                }
 
                 // Get an ID for the script. An ID only exists if it's a script that is assigned in the database
                 // through a script name (or similar).
