@@ -112,5 +112,5 @@ UPDATE `creature_template` SET `mindmg` = 658, `maxdmg` = 873, `DamageModifier` 
 UPDATE `creature_template` SET `mindmg` = 705, `maxdmg` = 935, `DamageModifier` = 1.01 WHERE `entry` = 9537; 
 UPDATE `creature_template` SET `mindmg` = 297, `maxdmg` = 394, `DamageModifier` = 1.01 WHERE `entry` = 9543; 
 UPDATE `creature_template` SET `mindmg` = 806, `maxdmg` = 1068, `DamageModifier` = 1.01 WHERE `entry` = 9938; 
-UPDATE `creature_template` SET `mindmg` = 403, `maxdmg` = 514, `DamageModifier` = 1 WHERE `entry` = 16059; 
+UPDATE `creature_template` SET `mindmg` = 403, `maxdmg` = 514, `DamageModifier` = 1.01 WHERE `entry` = 16059; 
 UPDATE `creature_template` SET `mindmg` = 482, `maxdmg` = 657, `DamageModifier` = 1.63 WHERE `entry` = 16080;
