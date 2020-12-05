@@ -181,6 +181,11 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET      = 0x00020000,
     SPELL_ATTR0_CU_ALLOW_INFLIGHT_TARGET         = 0x00040000,
     SPELL_ATTR0_CU_NONE6                         = 0x00080000,   // UNUSED
+    /*
+     * A binary spell is a spell that can't be partially resisted. Frostbolt is a binary spell,
+     * it will either hit with full damage or get fully resisted for 0 damage.
+     * Fireball is a non-binary spell and it can be half-resisted causing reduced damage.
+    */
     SPELL_ATTR0_CU_BINARY_SPELL                  = 0x00100000,
     SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS       = 0x00200000,
     SPELL_ATTR0_CU_SINGLE_AURA_STACK             = 0x00400000, // pussywizard
