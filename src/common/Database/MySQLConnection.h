@@ -51,7 +51,7 @@ struct MySQLConnectionInfo
     std::string port_or_socket;
 };
 
-typedef std::map<uint32 /*index*/, std::pair<std::string /*query*/, ConnectionFlags /*sync/async*/> > PreparedStatementMap;
+typedef std::map<uint32 /*index*/, std::pair<std::string /*query*/, ConnectionFlags /*sync/async*/>> PreparedStatementMap;
 
 class MySQLConnection
 {

@@ -19,36 +19,29 @@ public:
 
     struct instance_obsidian_sanctum_InstanceMapScript : public InstanceScript
     {
-        instance_obsidian_sanctum_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {}
-
-        uint64 m_uiSartharionGUID;
-        uint64 m_uiTenebronGUID;
-        uint64 m_uiShadronGUID;
-        uint64 m_uiVesperonGUID;
-        uint32 Encounters[MAX_ENCOUNTERS];
-        uint64 m_uiPortalGUID;
-        uint8 portalCount;
-
-        void Initialize()
+        instance_obsidian_sanctum_InstanceMapScript(Map* pMap) : InstanceScript(pMap),
+            m_uiSartharionGUID(0),
+            m_uiTenebronGUID(0),
+            m_uiShadronGUID(0),
+            m_uiVesperonGUID(0),
+            m_uiPortalGUID(0),
+            portalCount(0)
         {
-            m_uiSartharionGUID = 0;
-            m_uiTenebronGUID   = 0;
-            m_uiShadronGUID    = 0;
-            m_uiVesperonGUID   = 0;
-            m_uiPortalGUID     = 0;
-            portalCount        = 0;
-            memset(&Encounters, 0, sizeof(Encounters));
-        };
+            SetBossNumber(MAX_ENCOUNTERS);
+        }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
-            if (Encounters[BOSS_SARTHARION_EVENT] == IN_PROGRESS)
-                return true;
+            for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+            {
+                if (GetBossState(i) == IN_PROGRESS)
+                    return true;
+            }
 
             return false;
         }
 
-        void OnCreatureCreate(Creature* pCreature)
+        void OnCreatureCreate(Creature* pCreature) override
         {
             switch(pCreature->GetEntry())
             {
@@ -67,21 +60,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 id) const
-        {
-            switch (id)
-            {
-                case BOSS_SARTHARION_EVENT:
-                case BOSS_TENEBRON_EVENT:
-                case BOSS_SHADRON_EVENT:
-                case BOSS_VESPERON_EVENT:
-                    return Encounters[id];
-            }
-
-            return 0;
-        }
-
-        uint64 GetData64(uint32 uiData) const
+        uint64 GetData64(uint32 uiData) const override
         {
             switch(uiData)
             {
@@ -97,7 +76,7 @@ public:
             return 0;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -105,109 +84,122 @@ public:
                 case 7326:
                 // Gonna Go When the Volcano Blows (25 player) (2048)
                 case 7327:
-                    if (Creature* cr = instance->GetCreature(m_uiSartharionGUID))
-                        if (!cr->AI()->GetData(source->GetGUIDLow()))
-                            return true;
-                    break;
+                {
+                    Creature const* sartharion = instance->GetCreature(m_uiSartharionGUID);
+                    return sartharion && !sartharion->AI()->GetData(source->GetGUIDLow());
+                }
                 // Less Is More (10 player) (624)
                 case 7189:
                 case 7190:
                 case 7191:
                 case 522:
-                    if (instance->GetPlayersCountExceptGMs() < 9)
-                        return true;
-                    break;
+                {
+                    return instance->GetPlayersCountExceptGMs() < 9;
+                }
                 // Less Is More (25 player) (1877)
                 case 7185:
                 case 7186:
                 case 7187:
                 case 7188:
-                    if (instance->GetPlayersCountExceptGMs() < 21)
-                        return true;
-                    break;
+                {
+                    return instance->GetPlayersCountExceptGMs() < 21;
+                }
                 // Twilight Assist (10 player) (2049)
                 case 7328:
                 // Twilight Assist (25 player) (2052)
                 case 7331:
-                    if (Creature* cr = instance->GetCreature(m_uiSartharionGUID))
-                        if (cr->AI()->GetData(DATA_ACHIEVEMENT_DRAGONS_COUNT) >= 1)
-                            return true;
-                    break;
+                {
+                    Creature const* sartharion = instance->GetCreature(m_uiSartharionGUID);
+                    return sartharion && sartharion->AI()->GetData(DATA_ACHIEVEMENT_DRAGONS_COUNT) >= 1;
+                }
                 // Twilight Duo (10 player) (2050)
                 case 7329:
                 // Twilight Duo (25 player) (2053)
                 case 7332:
-                    if (Creature* cr = instance->GetCreature(m_uiSartharionGUID))
-                        if (cr->AI()->GetData(DATA_ACHIEVEMENT_DRAGONS_COUNT) >= 2)
-                            return true;
-                    break;
+                {
+                    Creature const* sartharion = instance->GetCreature(m_uiSartharionGUID);
+                    return sartharion && sartharion->AI()->GetData(DATA_ACHIEVEMENT_DRAGONS_COUNT) >= 2;
+                }
                 // Twilight Zone (10 player) (2051)
                 case 7330:
                 // Twilight Zone (25 player) (2054)
                 case 7333:
-                    if (Creature* cr = instance->GetCreature(m_uiSartharionGUID))
-                        if (cr->AI()->GetData(DATA_ACHIEVEMENT_DRAGONS_COUNT) >= 3)
-                            return true;
-                    break;
-
+                {
+                    Creature const* sartharion = instance->GetCreature(m_uiSartharionGUID);
+                    return sartharion && sartharion->AI()->GetData(DATA_ACHIEVEMENT_DRAGONS_COUNT) >= 3;
+                }
             }
+
             return false;
         }
 
-        void SetData(uint32 type, uint32 data)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
-            switch(type)
+            if (InstanceScript::SetBossState(type, state))
             {
-                case BOSS_SARTHARION_EVENT:
-                case BOSS_TENEBRON_EVENT:
-                case BOSS_SHADRON_EVENT:
-                case BOSS_VESPERON_EVENT:
-                    Encounters[type] = data;
-                    break;
-                case DATA_ADD_PORTAL:
+                return false;
+            }
+
+            if (state == DONE)
+            {
+                SaveToDB();
+            }
+            return true;
+        }
+
+        void DoAction(int32 action) override
+        {
+            switch (action)
+            {
+                case ACTION_ADD_PORTAL:
+                {
                     if (!m_uiPortalGUID)
                     {
-                        if (Creature* cr = instance->GetCreature(m_uiSartharionGUID))
-                            if (GameObject* go = cr->SummonGameObject(GO_TWILIGHT_PORTAL, 3247.29f, 529.804f, 58.9595f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                        if (Creature* sartharion = instance->GetCreature(m_uiSartharionGUID))
+                        {
+                            if (GameObject* portal = sartharion->SummonGameObject(GO_TWILIGHT_PORTAL, 3247.29f, 529.804f, 58.9595f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
                             {
-                                cr->RemoveGameObject(go, false);
-                                m_uiPortalGUID = go->GetGUID();
+                                sartharion->RemoveGameObject(portal, false);
+                                m_uiPortalGUID = portal->GetGUID();
                             }
+                        }
 
                         portalCount = 0;
                     }
 
-                    portalCount++;
+                    ++portalCount;
                     break;
-                case DATA_CLEAR_PORTAL:
-                    portalCount--;
-                    if (!portalCount || data == 2)
+                }
+                case ACTION_CLEAR_PORTAL:
+                {
+                    --portalCount;
+                    if (!portalCount)
                     {
                         if (GameObject* go = instance->GetGameObject(m_uiPortalGUID))
+                        {
                             go->Delete();
+                        }
 
                         DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
                         m_uiPortalGUID = 0;
                     }
                     break;
+                }
             }
-
-            if (data == DONE)
-                SaveToDB();
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << "O S " << Encounters[0] << ' ' << Encounters[1] << ' ' << Encounters[2] << ' ' << Encounters[3];
+            saveStream << "O S " << GetBossSaveData();
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
         }
 
-        void Load(const char* strIn)
+        void Load(const char* strIn) override
         {
             if (!strIn)
             {
@@ -226,14 +218,25 @@ public:
             {
                 for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
                 {
-                    loadStream >> Encounters[i];
-                    if (Encounters[i] == IN_PROGRESS)
-                        Encounters[i] = NOT_STARTED;
+                    uint32 temp;
+                    loadStream >> temp;
+                    if (temp == IN_PROGRESS)
+                        temp = NOT_STARTED;
+
+                    SetBossState(i, static_cast<EncounterState>(temp));
                 }
             }
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }
+
+    private:
+        uint64 m_uiSartharionGUID;
+        uint64 m_uiTenebronGUID;
+        uint64 m_uiShadronGUID;
+        uint64 m_uiVesperonGUID;
+        uint64 m_uiPortalGUID;
+        uint8 portalCount;
     };
 };
 
