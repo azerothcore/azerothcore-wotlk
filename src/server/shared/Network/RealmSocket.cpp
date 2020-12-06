@@ -148,11 +148,11 @@ ssize_t RealmSocket::noblk_send(ACE_Message_Block& message_block)
 
 bool RealmSocket::send(const char* buf, size_t len)
 {
-    if (buf == NULL || len == 0)
+    if (buf == nullptr || len == 0)
         return true;
 
-    ACE_Data_Block db(len, ACE_Message_Block::MB_DATA, (const char*)buf, 0, 0, ACE_Message_Block::DONT_DELETE, 0);
-    ACE_Message_Block message_block(&db, ACE_Message_Block::DONT_DELETE, 0);
+    ACE_Data_Block db(len, ACE_Message_Block::MB_DATA, (const char*)buf, nullptr, nullptr, ACE_Message_Block::DONT_DELETE, nullptr);
+    ACE_Message_Block message_block(&db, ACE_Message_Block::DONT_DELETE, nullptr);
 
     message_block.wr_ptr(len);
 
@@ -191,7 +191,7 @@ int RealmSocket::handle_output(ACE_HANDLE)
     if (closing_)
         return -1;
 
-    ACE_Message_Block* mb = 0;
+    ACE_Message_Block* mb = nullptr;
 
     if (msg_queue()->is_empty())
     {
