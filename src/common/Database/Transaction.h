@@ -31,7 +31,7 @@ public:
     void Append(const char* sql);
     void PAppend(const char* sql, ...);
 
-    size_t GetSize() const { return m_queries.size(); }
+    [[nodiscard]] size_t GetSize() const { return m_queries.size(); }
 
 protected:
     void Cleanup();
@@ -51,10 +51,10 @@ class TransactionTask : public SQLOperation
 
 public:
     TransactionTask(SQLTransaction trans) : m_trans(std::move(trans)) { } ;
-    ~TransactionTask() { };
+    ~TransactionTask() override { };
 
 protected:
-    bool Execute();
+    bool Execute() override;
 
     SQLTransaction m_trans;
 };
