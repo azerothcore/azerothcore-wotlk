@@ -26,7 +26,7 @@ ACE_OS::asctime_r (const struct tm *t, char *buf, int buflen)
 #if defined (ACE_HAS_REENTRANT_FUNCTIONS)
 # if defined (ACE_HAS_2_PARAM_ASCTIME_R_AND_CTIME_R)
   char *result = 0;
-  ACE_OSCALL (::asctime_r (t, buf), char *, 0, result);
+  ace_asctime_r_helper (t, buf);
   ACE_OS::strsncpy (buf, result, buflen);
   return buf;
 # else
@@ -36,16 +36,16 @@ ACE_OS::asctime_r (const struct tm *t, char *buf, int buflen)
   ACE_OSCALL_RETURN (::asctime_r (t, buf, buflen), char *, 0);
 #   endif /* ACE_HAS_SIZET_PTR_ASCTIME_R_AND_CTIME_R */
 # endif /* ACE_HAS_2_PARAM_ASCTIME_R_AND_CTIME_R */
-#elif defined (ACE_LACKS_ASCTIME_R)
-  ACE_UNUSED_ARG (t);
-  ACE_UNUSED_ARG (buf);
-  ACE_UNUSED_ARG (buflen);
-  ACE_NOTSUP_RETURN (0);
 #elif defined (ACE_HAS_TR24731_2005_CRT)
   char *result = buf;
   ACE_SECURECRTCALL (asctime_s (buf, static_cast<size_t> (buflen), t), \
                      char*, 0, result);
   return result;
+#elif defined (ACE_LACKS_ASCTIME)
+  ACE_UNUSED_ARG (t);
+  ACE_UNUSED_ARG (buf);
+  ACE_UNUSED_ARG (buflen);
+  ACE_NOTSUP_RETURN (0);
 #else
   char *result = 0;
   ACE_OSCALL (ACE_STD_NAMESPACE::asctime (t), char *, 0, result);
@@ -90,7 +90,10 @@ ACE_INLINE ACE_TCHAR *
 ACE_OS::ctime (const time_t *t)
 {
   ACE_OS_TRACE ("ACE_OS::ctime");
-#if defined (ACE_HAS_WINCE)
+#if defined (ACE_LACKS_CTIME)
+  ACE_UNUSED_ARG (t);
+  ACE_NOTSUP_RETURN (0);
+#elif defined (ACE_HAS_WINCE)
   static ACE_TCHAR buf [ctime_buf_size];
   return ACE_OS::ctime_r (t,
                           buf,
@@ -156,7 +159,7 @@ ACE_OS::ctime_r (const time_t *t, ACE_TCHAR *buf, int buflen)
 
 #   if defined (ACE_USES_WCHAR)
   ACE_Ascii_To_Wide wide_buf (bufp);
-  ACE_OS_String::strcpy (buf, wide_buf.wchar_rep ());
+  ACE_OS::strcpy (buf, wide_buf.wchar_rep ());
   return buf;
 #   else
   return bufp;
@@ -272,21 +275,23 @@ ACE_OS::gethrtime (const ACE_HRTimer_Op op)
   ACE_UNUSED_ARG (op);
   // Use .obj/gethrtime.o, which was compiled with g++.
   return ACE_GETHRTIME_NAME ();
-#elif (defined (__GNUG__) || defined (__INTEL_COMPILER)) && !defined(ACE_VXWORKS) && defined (ACE_HAS_PENTIUM)
+#elif (defined (__GNUG__) || defined (__INTEL_COMPILER)) && \
+  !defined (ACE_VXWORKS) && defined (ACE_HAS_PENTIUM) && \
+  !defined (ACE_LACKS_PENTIUM_RDTSC)
   ACE_UNUSED_ARG (op);
   ACE_hrtime_t now;
 
-#if defined (__amd64__) || defined (__x86_64__)
+# if defined (__amd64__) || defined (__x86_64__)
   // Read the high res tick counter into 32 bit int variables "eax" and
   // "edx", and then combine them into 64 bit int "now"
   ACE_UINT32 eax, edx;
   asm volatile ("rdtsc" : "=a" (eax), "=d" (edx) : : "memory");
   now = (((ACE_UINT64) eax) | (((ACE_UINT64) edx) << 32));
-#else
+# else
   // Read the high-res tick counter directly into memory variable "now".
   // The A constraint signifies a 64-bit int.
   asm volatile ("rdtsc" : "=A" (now) : : "memory");
-#endif
+# endif
 
   return now;
 #elif defined (ACE_LINUX) && defined (ACE_HAS_ALPHA_TIMER)
@@ -312,9 +317,9 @@ ACE_OS::gethrtime (const ACE_HRTimer_Op op)
   u_long most;
   u_long least;
 
-#if defined (ghs)
+#  if defined (ghs)
   ACE_OS::readPPCTimeBase (most, least);
-#else
+#  else
   u_long scratch;
 
   do {
@@ -323,7 +328,7 @@ ACE_OS::gethrtime (const ACE_HRTimer_Op op)
           "mftbu %2"
           : "=r" (most), "=r" (least), "=r" (scratch));
   } while (most != scratch);
-#endif
+#  endif
 
   return 0x100000000llu * most  +  least;
 
@@ -333,11 +338,11 @@ ACE_OS::gethrtime (const ACE_HRTimer_Op op)
   struct timespec ts;
 
   ACE_OS::clock_gettime (
-#if defined (ACE_HAS_CLOCK_GETTIME_MONOTONIC)
+#  if defined (ACE_HAS_CLOCK_GETTIME_MONOTONIC)
          CLOCK_MONOTONIC,
-#else
+#  else
          CLOCK_REALTIME,
-#endif /* !ACE_HAS_CLOCK_GETTIME_MONOTONIC */
+#  endif /* !ACE_HAS_CLOCK_GETTIME_MONOTONIC */
          &ts);
 
   // Carefully create the return value to avoid arithmetic overflow
@@ -370,12 +375,12 @@ ACE_OS::gmtime_r (const time_t *t, struct tm *res)
 {
   ACE_OS_TRACE ("ACE_OS::gmtime_r");
 #if defined (ACE_HAS_REENTRANT_FUNCTIONS)
-  ACE_OSCALL_RETURN (::gmtime_r (t, res), struct tm *, 0);
+  return ace_gmtime_r_helper (t, res);
 #elif defined (ACE_HAS_TR24731_2005_CRT)
   struct tm *tm_p = res;
   ACE_SECURECRTCALL (gmtime_s (res, t), struct tm *, 0, tm_p);
   return tm_p;
-#elif defined (ACE_LACKS_GMTIME_R)
+#elif defined (ACE_LACKS_GMTIME)
   ACE_UNUSED_ARG (t);
   ACE_UNUSED_ARG (res);
   ACE_NOTSUP_RETURN (0);

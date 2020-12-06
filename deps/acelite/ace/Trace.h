@@ -4,7 +4,7 @@
 /**
  *  @file    Trace.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -34,8 +34,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_Trace
 {
 public:
-  // = Initialization and termination methods.
-
   /// Perform the first part of the trace, which prints out the string
   /// N, the LINE, and the ACE_FILE as the function is entered.
   ACE_Trace (const ACE_TCHAR *n,
@@ -45,6 +43,9 @@ public:
   /// Perform the second part of the trace, which prints out the NAME
   /// as the function is exited.
   ~ACE_Trace (void);
+
+  /// Declare the dynamic allocation hooks.
+  ACE_ALLOC_HOOK_DECLARE;
 
   // = Control the tracing level.
   /// Determine if tracing is enabled or not
