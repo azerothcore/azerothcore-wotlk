@@ -34,7 +34,7 @@ public:
 
     void SetBit(uint32 index) { _bits[index] = 1; }
     void UnsetBit(uint32 index) { _bits[index] = 0; }
-    bool GetBit(uint32 index) const { return _bits[index] != 0; }
+    [[nodiscard]] bool GetBit(uint32 index) const { return _bits[index] != 0; }
 
     void AppendToPacket(ByteBuffer* data)
     {
@@ -49,8 +49,8 @@ public:
         }
     }
 
-    uint32 GetBlockCount() const { return _blockCount; }
-    uint32 GetCount() const { return _fieldCount; }
+    [[nodiscard]] uint32 GetBlockCount() const { return _blockCount; }
+    [[nodiscard]] uint32 GetCount() const { return _fieldCount; }
 
     void SetCount(uint32 valuesCount)
     {

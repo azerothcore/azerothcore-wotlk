@@ -267,8 +267,8 @@ public:
     void CheckAllAchievementCriteria();
     void SendAllAchievementData() const;
     void SendRespondInspectAchievements(Player* player) const;
-    bool HasAchieved(uint32 achievementId) const;
-    Player* GetPlayer() const { return m_player; }
+    [[nodiscard]] bool HasAchieved(uint32 achievementId) const;
+    [[nodiscard]] Player* GetPlayer() const { return m_player; }
     void UpdateTimedAchievements(uint32 timeDiff);
     void StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
     void RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);   // used for quest and scripted timed achievements
@@ -304,7 +304,7 @@ public:
     bool IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const;
     bool isStatisticAchievement(AchievementEntry const* achievement) const;
 
-    AchievementCriteriaEntryList const* GetAchievementCriteriaByType(AchievementCriteriaTypes type) const
+    [[nodiscard]] AchievementCriteriaEntryList const* GetAchievementCriteriaByType(AchievementCriteriaTypes type) const
     {
         return &m_AchievementCriteriasByType[type];
     }
@@ -323,18 +323,18 @@ public:
         return nullptr;
     }
 
-    AchievementCriteriaEntryList const& GetTimedAchievementCriteriaByType(AchievementCriteriaTimedTypes type) const
+    [[nodiscard]] AchievementCriteriaEntryList const& GetTimedAchievementCriteriaByType(AchievementCriteriaTimedTypes type) const
     {
         return m_AchievementCriteriasByTimedType[type];
     }
 
-    AchievementCriteriaEntryList const* GetAchievementCriteriaByAchievement(uint32 id) const
+    [[nodiscard]] AchievementCriteriaEntryList const* GetAchievementCriteriaByAchievement(uint32 id) const
     {
         AchievementCriteriaListByAchievement::const_iterator itr = m_AchievementCriteriaListByAchievement.find(id);
         return itr != m_AchievementCriteriaListByAchievement.end() ? &itr->second : nullptr;
     }
 
-    AchievementEntryList const* GetAchievementByReferencedId(uint32 id) const
+    [[nodiscard]] AchievementEntryList const* GetAchievementByReferencedId(uint32 id) const
     {
         AchievementListByReferencedId::const_iterator itr = m_AchievementListByReferencedId.find(id);
         return itr != m_AchievementListByReferencedId.end() ? &itr->second : nullptr;

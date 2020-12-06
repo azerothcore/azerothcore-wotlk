@@ -43,10 +43,10 @@ public:
     Tokenizer(const std::string& src, char const sep, uint32 vectorReserve = 0);
     ~Tokenizer() { delete[] m_str; }
 
-    const_iterator begin() const { return m_storage.begin(); }
-    const_iterator end() const { return m_storage.end(); }
+    [[nodiscard]] const_iterator begin() const { return m_storage.begin(); }
+    [[nodiscard]] const_iterator end() const { return m_storage.end(); }
 
-    size_type size() const { return m_storage.size(); }
+    [[nodiscard]] size_type size() const { return m_storage.size(); }
 
     reference operator [] (size_type i) { return m_storage[i]; }
     const_reference operator [] (size_type i) const { return m_storage[i]; }
@@ -404,12 +404,12 @@ public:
         part[2] = p3;
     }
 
-    inline bool IsEqual(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
+    [[nodiscard]] inline bool IsEqual(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
     {
         return (part[0] == p1 && part[1] == p2 && part[2] == p3);
     }
 
-    inline bool HasFlag(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
+    [[nodiscard]] inline bool HasFlag(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
     {
         return (part[0] & p1 || part[1] & p2 || part[2] & p3);
     }
@@ -605,7 +605,7 @@ public:
     * @name GetTimer
     * @return Current timer value.
     */
-    uint32 GetTimer() const
+    [[nodiscard]] uint32 GetTimer() const
     {
         return _time;
     }
@@ -619,7 +619,7 @@ public:
     * @name GetPhaseMask
     * @return Active phases as mask.
     */
-    uint8 GetPhaseMask() const
+    [[nodiscard]] uint8 GetPhaseMask() const
     {
         return _phase;
     }
@@ -628,7 +628,7 @@ public:
     * @name Empty
     * @return True, if there are no events scheduled.
     */
-    bool Empty() const
+    [[nodiscard]] bool Empty() const
     {
         return _eventMap.empty();
     }
@@ -869,7 +869,7 @@ public:
     * @param eventId Wanted event id.
     * @return Time of found event.
     */
-    uint32 GetNextEventTime(uint32 eventId) const
+    [[nodiscard]] uint32 GetNextEventTime(uint32 eventId) const
     {
         if (Empty())
         {
@@ -891,7 +891,7 @@ public:
      * @name GetNextEventTime
      * @return Time of next event.
      */
-    uint32 GetNextEventTime() const
+    [[nodiscard]] uint32 GetNextEventTime() const
     {
         return Empty() ? 0 : _eventMap.begin()->first;
     }

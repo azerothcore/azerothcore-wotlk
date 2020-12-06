@@ -49,27 +49,27 @@ public:
 
     InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, time_t extendedResetTime);
     ~InstanceSave();
-    uint32 GetInstanceId() const { return m_instanceid; }
-    uint32 GetMapId() const { return m_mapid; }
-    Difficulty GetDifficulty() const { return m_difficulty; }
+    [[nodiscard]] uint32 GetInstanceId() const { return m_instanceid; }
+    [[nodiscard]] uint32 GetMapId() const { return m_mapid; }
+    [[nodiscard]] Difficulty GetDifficulty() const { return m_difficulty; }
 
     /* Saved when the instance is generated for the first time */
     void InsertToDB();
     // pussywizard: deleting is done internally when there are no binds left
 
-    std::string GetInstanceData() const { return m_instanceData; }
+    [[nodiscard]] std::string GetInstanceData() const { return m_instanceData; }
     void SetInstanceData(std::string str) { m_instanceData = str; }
-    uint32 GetCompletedEncounterMask() const { return m_completedEncounterMask; }
+    [[nodiscard]] uint32 GetCompletedEncounterMask() const { return m_completedEncounterMask; }
     void SetCompletedEncounterMask(uint32 mask) { m_completedEncounterMask = mask; }
 
     // pussywizard: for normal instances this corresponds to 0, for raid/heroic instances this caches the global reset time for the map
-    time_t GetResetTime() const { return m_resetTime; }
-    time_t GetExtendedResetTime() const { return m_extendedResetTime; }
+    [[nodiscard]] time_t GetResetTime() const { return m_resetTime; }
+    [[nodiscard]] time_t GetExtendedResetTime() const { return m_extendedResetTime; }
     time_t GetResetTimeForDB();
     void SetResetTime(time_t resetTime) { m_resetTime = resetTime; }
     void SetExtendedResetTime(time_t extendedResetTime) { m_extendedResetTime = extendedResetTime; }
 
-    bool CanReset() const { return m_canReset; }
+    [[nodiscard]] bool CanReset() const { return m_canReset; }
     void SetCanReset(bool canReset) { m_canReset = canReset; }
 
     InstanceTemplate const* GetTemplate();
@@ -126,13 +126,13 @@ public:
     void LoadInstanceSaves();
     void LoadCharacterBinds();
 
-    time_t GetResetTimeFor(uint32 mapid, Difficulty d) const
+    [[nodiscard]] time_t GetResetTimeFor(uint32 mapid, Difficulty d) const
     {
         ResetTimeByMapDifficultyMap::const_iterator itr  = m_resetTimeByMapDifficulty.find(MAKE_PAIR32(mapid, d));
         return itr != m_resetTimeByMapDifficulty.end() ? itr->second : 0;
     }
 
-    time_t GetExtendedResetTimeFor(uint32 mapid, Difficulty d) const
+    [[nodiscard]] time_t GetExtendedResetTimeFor(uint32 mapid, Difficulty d) const
     {
         ResetTimeByMapDifficultyMap::const_iterator itr  = m_resetExtendedTimeByMapDifficulty.find(MAKE_PAIR32(mapid, d));
         return itr != m_resetExtendedTimeByMapDifficulty.end() ? itr->second : 0;
@@ -148,7 +148,7 @@ public:
         m_resetExtendedTimeByMapDifficulty[MAKE_PAIR32(mapid, d)] = t;
     }
 
-    ResetTimeByMapDifficultyMap const& GetResetTimeMap() const
+    [[nodiscard]] ResetTimeByMapDifficultyMap const& GetResetTimeMap() const
     {
         return m_resetTimeByMapDifficulty;
     }

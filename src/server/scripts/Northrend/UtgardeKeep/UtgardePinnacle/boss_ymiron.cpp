@@ -90,7 +90,7 @@ class boss_ymiron : public CreatureScript
 public:
     boss_ymiron() : CreatureScript("boss_ymiron") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_ymironAI (pCreature);
     }
@@ -109,7 +109,7 @@ public:
         uint8 BoatNum;
         uint8 BoatOrder[4];
 
-        void Reset()
+        void Reset() override
         {
             for (uint8 i = 0; i < 4; ++i)
             {
@@ -146,13 +146,13 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             ScriptedAI::EnterEvadeMode();
         }
 
-        void EnterCombat(Unit*  /*pWho*/)
+        void EnterCombat(Unit*  /*pWho*/) override
         {
             Talk(SAY_AGGRO);
             if(pInstance)
@@ -168,7 +168,7 @@ public:
             events.RescheduleEvent(EVENT_YMIRON_HEALTH_CHECK, 1000);
         }
 
-        void MovementInform(uint32 uiType, uint32 point)
+        void MovementInform(uint32 uiType, uint32 point) override
         {
             if(uiType != POINT_MOTION_TYPE)
                 return;
@@ -183,13 +183,13 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit*, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit*, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == 59302 && pInstance) // Bane trigger
                 pInstance->SetData(DATA_YMIRON_ACHIEVEMENT, false);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -320,7 +320,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*pKiller*/)
+        void JustDied(Unit*  /*pKiller*/) override
         {
             Talk(SAY_DEATH);
             summons.DespawnAll();
@@ -330,7 +330,7 @@ public:
                 pInstance->SetData(DATA_KING_YMIRON, DONE);
         }
 
-        void KilledUnit(Unit*  /*pVictim*/)
+        void KilledUnit(Unit*  /*pVictim*/) override
         {
             if (urand(0, 1))
                 return;

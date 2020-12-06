@@ -24,19 +24,19 @@ public:
     LinkedListElement(): iNext(NULL), iPrev(NULL) { }
     ~LinkedListElement() { delink(); }
 
-    bool hasNext() const { return (iNext && iNext->iNext != NULL); }
-    bool hasPrev() const { return (iPrev && iPrev->iPrev != NULL); }
-    bool isInList() const { return (iNext != NULL && iPrev != NULL); }
+    [[nodiscard]] bool hasNext() const { return (iNext && iNext->iNext != NULL); }
+    [[nodiscard]] bool hasPrev() const { return (iPrev && iPrev->iPrev != NULL); }
+    [[nodiscard]] bool isInList() const { return (iNext != NULL && iPrev != NULL); }
 
     LinkedListElement*       next()       { return hasNext() ? iNext : NULL; }
-    LinkedListElement const* next() const { return hasNext() ? iNext : NULL; }
+    [[nodiscard]] LinkedListElement const* next() const { return hasNext() ? iNext : NULL; }
     LinkedListElement*       prev()       { return hasPrev() ? iPrev : NULL; }
-    LinkedListElement const* prev() const { return hasPrev() ? iPrev : NULL; }
+    [[nodiscard]] LinkedListElement const* prev() const { return hasPrev() ? iPrev : NULL; }
 
     LinkedListElement*       nocheck_next()       { return iNext; }
-    LinkedListElement const* nocheck_next() const { return iNext; }
+    [[nodiscard]] LinkedListElement const* nocheck_next() const { return iNext; }
     LinkedListElement*       nocheck_prev()       { return iPrev; }
-    LinkedListElement const* nocheck_prev() const { return iPrev; }
+    [[nodiscard]] LinkedListElement const* nocheck_prev() const { return iPrev; }
 
     void delink()
     {
@@ -83,13 +83,13 @@ public:
         iLast.iPrev = &iFirst;
     }
 
-    bool isEmpty() const { return (!iFirst.iNext->isInList()); }
+    [[nodiscard]] bool isEmpty() const { return (!iFirst.iNext->isInList()); }
 
     LinkedListElement*       getFirst()       { return (isEmpty() ? NULL : iFirst.iNext); }
-    LinkedListElement const* getFirst() const { return (isEmpty() ? NULL : iFirst.iNext); }
+    [[nodiscard]] LinkedListElement const* getFirst() const { return (isEmpty() ? NULL : iFirst.iNext); }
 
     LinkedListElement*       getLast() { return (isEmpty() ? NULL : iLast.iPrev); }
-    LinkedListElement const* getLast() const  { return (isEmpty() ? NULL : iLast.iPrev); }
+    [[nodiscard]] LinkedListElement const* getLast() const  { return (isEmpty() ? NULL : iLast.iPrev); }
 
     void insertFirst(LinkedListElement* pElem)
     {
@@ -101,7 +101,7 @@ public:
         iLast.insertBefore(pElem);
     }
 
-    uint32 getSize() const
+    [[nodiscard]] uint32 getSize() const
     {
         if (!iSize)
         {
