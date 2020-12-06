@@ -60,7 +60,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
@@ -88,7 +88,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == 1)
             {
@@ -116,7 +116,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -186,7 +186,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (pInstance)
@@ -195,13 +195,13 @@ public:
                 me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
                 Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
         }
 
-        bool CanAIAttack(const Unit* who) const
+        bool CanAIAttack(const Unit* who) const override
         {
             switch (who->GetEntry())
             {
@@ -220,7 +220,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_tyrannusAI(creature);
     }

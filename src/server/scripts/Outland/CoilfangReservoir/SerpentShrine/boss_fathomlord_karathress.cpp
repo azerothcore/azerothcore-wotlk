@@ -55,7 +55,7 @@ class boss_fathomlord_karathress : public CreatureScript
 public:
     boss_fathomlord_karathress() : CreatureScript("boss_fathomlord_karathress") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_fathomlord_karathressAI>(creature);
     }
@@ -66,7 +66,7 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
 
@@ -75,7 +75,7 @@ public:
             me->SummonCreature(NPC_FATHOM_GUARD_CARIBDIS, advisorsPosition[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 600000);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_SEER_OLUM)
@@ -85,7 +85,7 @@ public:
             }
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             summons.Despawn(summon);
             if (summon->GetEntry() == NPC_FATHOM_GUARD_TIDALVESS)
@@ -96,7 +96,7 @@ public:
                 Talk(SAY_GAIN_ABILITY3);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -105,7 +105,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
@@ -114,7 +114,7 @@ public:
                 gobject->SetGoState(GO_STATE_ACTIVE);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -126,7 +126,7 @@ public:
             events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -186,13 +186,13 @@ public:
                 GetUnitOwner()->CastSpell(victim, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_karathress_power_of_caribdis_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_karathress_power_of_caribdis_AuraScript();
     }

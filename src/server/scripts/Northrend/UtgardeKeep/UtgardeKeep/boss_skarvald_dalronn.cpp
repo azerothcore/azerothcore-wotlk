@@ -58,7 +58,7 @@ class boss_skarvald_the_constructor : public CreatureScript
 public:
     boss_skarvald_the_constructor() : CreatureScript("boss_skarvald_the_constructor") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_skarvald_the_constructorAI (pCreature);
     }
@@ -73,7 +73,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             me->SetLootMode(0);
             events.Reset();
@@ -90,7 +90,7 @@ public:
                 }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch(param)
             {
@@ -100,7 +100,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_CHARGE, 5000);
@@ -121,13 +121,13 @@ public:
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (me->GetEntry() == NPC_SKARVALD)
                 Talk(YELL_SKARVALD_KILL);
         }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  /*Killer*/) override
         {
             if( me->GetEntry() != NPC_SKARVALD )
                 return;
@@ -153,7 +153,7 @@ public:
             me->CastSpell((Unit*)NULL, SPELL_SUMMON_SKARVALD_GHOST, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -200,7 +200,7 @@ class boss_dalronn_the_controller : public CreatureScript
 public:
     boss_dalronn_the_controller() : CreatureScript("boss_dalronn_the_controller") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_dalronn_the_controllerAI (pCreature);
     }
@@ -216,7 +216,7 @@ public:
         EventMap events;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             me->SetLootMode(0);
             events.Reset();
@@ -234,7 +234,7 @@ public:
                 }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch(param)
             {
@@ -247,7 +247,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_SHADOW_BOLT, 1000);
@@ -270,18 +270,18 @@ public:
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (me->GetEntry() == NPC_DALRONN)
                 Talk(YELL_DALRONN_KILL);
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             summons.Summon(s);
         }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  /*Killer*/) override
         {
             if( me->GetEntry() != NPC_DALRONN )
                 return;
@@ -306,7 +306,7 @@ public:
             me->CastSpell((Unit*)NULL, SPELL_SUMMON_DALRONN_GHOST, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

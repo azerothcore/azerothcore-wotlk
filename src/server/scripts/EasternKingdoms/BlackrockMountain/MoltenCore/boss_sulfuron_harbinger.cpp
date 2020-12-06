@@ -55,7 +55,7 @@ public:
         {
         }
 
-        void EnterCombat(Unit* victim)
+        void EnterCombat(Unit* victim) override
         {
             BossAI::EnterCombat(victim);
             events.ScheduleEvent(EVENT_DARK_STRIKE, 10000);
@@ -65,7 +65,7 @@ public:
             events.ScheduleEvent(EVENT_FLAMESPEAR, 2000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -115,7 +115,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_sulfuronAI(creature);
     }
@@ -132,17 +132,17 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* victim)
+        void EnterCombat(Unit* victim) override
         {
             ScriptedAI::EnterCombat(victim);
             events.ScheduleEvent(EVENT_HEAL, urand(15000, 30000));
@@ -150,7 +150,7 @@ public:
             events.ScheduleEvent(EVENT_IMMOLATE, 8000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -191,7 +191,7 @@ public:
         EventMap events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_flamewaker_priestAI(creature);
     }

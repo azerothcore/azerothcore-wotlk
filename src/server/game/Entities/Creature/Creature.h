@@ -430,7 +430,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
 public:
 
     explicit Creature(bool isWorldObject = false);
-    virtual ~Creature();
+    ~Creature() override;
 
     void AddToWorld() override;
     void RemoveFromWorld() override;
@@ -523,8 +523,8 @@ public:
     void SetMeleeDamageSchool(SpellSchools school) { m_meleeDamageSchoolMask = SpellSchoolMask(1 << school); }
 
     void _AddCreatureSpellCooldown(uint32 spell_id, uint32 end_time);
-    virtual void AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
-    virtual bool HasSpellCooldown(uint32 spell_id) const override;
+    void AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
+    bool HasSpellCooldown(uint32 spell_id) const override;
     uint32 GetSpellCooldown(uint32 spell_id) const;
     void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs) override;
     bool IsSpellProhibited(SpellSchoolMask idSchoolMask) const;
@@ -799,7 +799,7 @@ class AssistDelayEvent : public BasicEvent
 public:
     AssistDelayEvent(uint64 victim, Unit& owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
 
-    bool Execute(uint64 e_time, uint32 p_time);
+    bool Execute(uint64 e_time, uint32 p_time) override;
     void AddAssistant(uint64 guid) { m_assistants.push_back(guid); }
 private:
     AssistDelayEvent();
@@ -813,7 +813,7 @@ class ForcedDespawnDelayEvent : public BasicEvent
 {
 public:
     ForcedDespawnDelayEvent(Creature& owner) : BasicEvent(), m_owner(owner) { }
-    bool Execute(uint64 e_time, uint32 p_time);
+    bool Execute(uint64 e_time, uint32 p_time) override;
 
 private:
     Creature& m_owner;

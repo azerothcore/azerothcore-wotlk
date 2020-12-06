@@ -15,7 +15,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
 public:
     instance_culling_of_stratholme() : InstanceMapScript("instance_culling_of_stratholme", 595) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_culling_of_stratholme_InstanceMapScript(pMap);
     }
@@ -41,12 +41,12 @@ public:
             _loadTimer = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             return false;
         }
 
-        void FillInitialWorldStates(WorldPacket& data)
+        void FillInitialWorldStates(WorldPacket& data) override
         {
             data << uint32(WORLDSTATE_SHOW_CRATES) << uint32(0);
             data << uint32(WORLDSTATE_CRATES_REVEALED) << uint32(_crateCount);
@@ -55,7 +55,7 @@ public:
             data << uint32(WORLDSTATE_TIME_GUARDIAN_SHOW) << uint32(0);
         }
 
-        void OnPlayerEnter(Player* plr)
+        void OnPlayerEnter(Player* plr) override
         {
             if (instance->GetPlayersCountExceptGMs() == 1)
                 SetData(DATA_ARTHAS_REPOSITION, 2);
@@ -66,7 +66,7 @@ public:
                 plr->CastSpell(plr, ((plr->getGender() == GENDER_MALE) ? SPELL_HUMAN_MALE : SPELL_HUMAN_FEMALE), true);
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -83,7 +83,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -100,7 +100,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -173,7 +173,7 @@ public:
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -185,7 +185,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const
+        uint64 GetData64(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -199,7 +199,7 @@ public:
             return 0;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (_loadTimer)
             {
@@ -357,7 +357,7 @@ public:
             instance->LoadGrid(LeaderIntroPos6.GetPositionX(), LeaderIntroPos6.GetPositionY());
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -368,7 +368,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {

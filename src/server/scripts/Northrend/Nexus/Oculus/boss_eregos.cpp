@@ -58,7 +58,7 @@ class boss_eregos : public CreatureScript
 public:
     boss_eregos() : CreatureScript("boss_eregos") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_eregosAI (pCreature);
     }
@@ -74,7 +74,7 @@ public:
         EventMap events;
         uint8 shiftNumber;
 
-        void Reset()
+        void Reset() override
         {
             if (pInstance)
             {
@@ -88,7 +88,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             Talk(SAY_AGGRO);
 
@@ -122,7 +122,7 @@ public:
             events.RescheduleEvent(EVENT_SUMMON_WHELPS, 40000);
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             Talk(SAY_DEATH);
 
@@ -132,7 +132,7 @@ public:
             me->SummonGameObject(GO_SPOTLIGHT, 1018.06f, 1051.09f, 605.619019f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
             if( !me->GetMap()->IsHeroic() )
                 return;
@@ -144,14 +144,14 @@ public:
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_KILL);
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
 
-        void JustSummoned(Creature* pSummon)
+        void JustSummoned(Creature* pSummon) override
         {
             if( pSummon->GetEntry() != NPC_LEY_GUARDIAN_WHELP )
                 return;
@@ -159,7 +159,7 @@ public:
             DoZoneInCombat(pSummon, 300.0f);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
