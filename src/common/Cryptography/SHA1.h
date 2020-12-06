@@ -28,7 +28,7 @@ public:
     void Finalize();
 
     uint8* GetDigest() { return mDigest; };
-    int GetLength() const { return SHA_DIGEST_LENGTH; };
+    [[nodiscard]] int GetLength() const { return SHA_DIGEST_LENGTH; };
 
 private:
     SHA_CTX mC;

@@ -50,7 +50,7 @@ public:
     {
         PrepareAuraScript(spell_q11919_q11940_drake_hunt_AuraScript)
 
-        bool Load()
+        bool Load() override
         {
             return GetOwner()->GetTypeId() == TYPEID_UNIT;
         }
@@ -73,13 +73,13 @@ public:
             owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_q11919_q11940_drake_hunt_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_q11919_q11940_drake_hunt_AuraScript();
     }
@@ -115,14 +115,14 @@ public:
         uint8  phase;
         uint64 casterGuid;
 
-        void Reset()
+        void Reset() override
         {
             phaseTimer = 30000;
             phase = 0;
             casterGuid = 0;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (phase || spell->Id != SPELL_SET_CART)
                 return;
@@ -136,7 +136,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!phase)
                 return;
@@ -203,7 +203,7 @@ public:
 
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_sinkhole_kill_creditAI(creature);
     }
@@ -228,7 +228,7 @@ public:
     {
         npc_khunok_the_behemothAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             ScriptedAI::MoveInLineOfSight(who);
@@ -250,7 +250,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_khunok_the_behemothAI(creature);
     }
@@ -376,7 +376,7 @@ public:
     {
         npc_nerubar_victimAI(Creature* creature) : NullCreatureAI(creature) { }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Player* player = killer->ToPlayer();
             if (!player)
@@ -396,7 +396,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_nerubar_victimAI(creature);
     }
@@ -433,7 +433,7 @@ public:
         uint32 IntroTimer;
         uint32 IntroPhase;
 
-        void Reset()
+        void Reset() override
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
             {
@@ -442,7 +442,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -457,7 +457,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (IntroPhase)
             {
@@ -516,12 +516,12 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_lurgglbrAI(creature);
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_ESCAPE_WINTERFIN_CAVERNS)
         {
@@ -564,20 +564,20 @@ public:
 
         bool bEnslaved;
 
-        void Reset()
+        void Reset() override
         {
             me->UpdateEntry(NPC_BERYL_SORCERER);
             me->SetReactState(REACT_AGGRESSIVE);
             bEnslaved = false;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if (me->IsValidAttackTarget(who))
                 AttackStart(who);
         }
 
-        void SpellHit(Unit* pCaster, const SpellInfo* pSpell)
+        void SpellHit(Unit* pCaster, const SpellInfo* pSpell) override
         {
             if (pSpell->Id == SPELL_ARCANE_CHAINS && pCaster->GetTypeId() == TYPEID_PLAYER && !HealthAbovePct(50) && !bEnslaved)
             {
@@ -595,7 +595,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             FollowerAI::MoveInLineOfSight(who);
@@ -607,7 +607,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -616,7 +616,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_beryl_sorcererAI(creature);
     }
@@ -651,7 +651,7 @@ public:
 
         uint32 rebuff;
 
-        void Reset()
+        void Reset() override
         {
             if (me->GetReactState() != REACT_PASSIVE)
                 me->SetReactState(REACT_PASSIVE);
@@ -663,7 +663,7 @@ public:
             me->SetStandState(UNIT_STAND_STATE_SIT_MEDIUM_CHAIR);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             UpdateVictim();
 
@@ -681,11 +681,11 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void SpellHit(Unit* unit, const SpellInfo* spell)
+        void SpellHit(Unit* unit, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_NEURAL_NEEDLE && unit->GetTypeId() == TYPEID_PLAYER)
             {
@@ -730,7 +730,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_imprisoned_beryl_sorcererAI(creature);
     }
@@ -756,7 +756,7 @@ class npc_mootoo_the_younger : public CreatureScript
 public:
     npc_mootoo_the_younger() : CreatureScript("npc_mootoo_the_younger") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_ESCAPING_THE_MIST)
         {
@@ -772,18 +772,18 @@ public:
     {
         npc_mootoo_the_youngerAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             SetDespawnAtFar(false);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Player* player = GetPlayerForEscort())
                 player->FailQuest(QUEST_ESCAPING_THE_MIST);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -814,7 +814,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_mootoo_the_youngerAI(creature);
     }
@@ -838,7 +838,7 @@ class npc_bonker_togglevolt : public CreatureScript
 public:
     npc_bonker_togglevolt() : CreatureScript("npc_bonker_togglevolt") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_GET_ME_OUTA_HERE)
         {
@@ -854,19 +854,19 @@ public:
         npc_bonker_togglevoltAI(Creature* creature) : npc_escortAI(creature) { }
         uint32 Bonker_agro;
 
-        void Reset()
+        void Reset() override
         {
             Bonker_agro = 0;
             SetDespawnAtFar(false);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Player* player = GetPlayerForEscort())
                 player->FailQuest(QUEST_GET_ME_OUTA_HERE);
         }
 
-        void UpdateEscortAI(uint32 /*diff*/)
+        void UpdateEscortAI(uint32 /*diff*/) override
         {
             if (GetAttack() && UpdateVictim())
             {
@@ -880,7 +880,7 @@ public:
             else Bonker_agro = 0;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -895,7 +895,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_bonker_togglevoltAI(creature);
     }
@@ -922,12 +922,12 @@ public:
 
         uint32 uiTimer;
 
-        void Reset()
+        void Reset() override
         {
             uiTimer = urand(13000, 18000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (uiTimer <= diff)
             {
@@ -946,7 +946,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_valiance_keep_cannoneerAI(creature);
     }
@@ -983,16 +983,16 @@ public:
 
         uint32 m_uiTimer;                 //Timer until recast
 
-        void Reset()
+        void Reset() override
         {
             m_uiTimer = 0;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void AttackStart(Unit* /*who*/) { }
+        void AttackStart(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) override
         {
             if (m_uiTimer <= uiDiff)
             {
@@ -1054,7 +1054,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_warmage_coldarraAI(creature);
     }

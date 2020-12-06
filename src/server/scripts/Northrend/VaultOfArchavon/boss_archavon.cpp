@@ -55,7 +55,7 @@ class boss_archavon : public CreatureScript
             InstanceScript* pInstance;
             EventMap events;
 
-            void Reset()
+            void Reset() override
             {
                 events.Reset();
                 if (pInstance)
@@ -73,7 +73,7 @@ class boss_archavon : public CreatureScript
                 }
             }
 
-            void AttackStart(Unit* who)
+            void AttackStart(Unit* who) override
             {
                 if (me->HasAura(SPELL_STONED_AURA))
                 {
@@ -83,7 +83,7 @@ class boss_archavon : public CreatureScript
                 ScriptedAI::AttackStart(who);
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) override
             {
                 events.ScheduleEvent(EVENT_ROCK_SHARDS, 15000);
                 events.ScheduleEvent(EVENT_CHOKING_CLOUD, 30000);
@@ -96,7 +96,7 @@ class boss_archavon : public CreatureScript
                 }
             }
 
-            void JustDied(Unit*)
+            void JustDied(Unit*) override
             {
                 if (pInstance)
                 {
@@ -104,7 +104,7 @@ class boss_archavon : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())
                 {
@@ -163,7 +163,7 @@ class boss_archavon : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new boss_archavonAI(creature);
         }
@@ -204,13 +204,13 @@ class spell_archavon_rock_shards : public SpellScriptLoader
                 caster->CastSpell(target, spellId, true);
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectHitTarget += SpellEffectFn(spell_archavon_rock_shards_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_archavon_rock_shards_SpellScript();
         }

@@ -31,11 +31,11 @@ public:
     const static int s_BYTE_SIZE = 32;
 
     AuthSocket(RealmSocket& socket);
-    virtual ~AuthSocket();
+    ~AuthSocket() override;
 
-    virtual void OnRead();
-    virtual void OnAccept();
-    virtual void OnClose();
+    void OnRead() override;
+    void OnAccept() override;
+    void OnClose() override;
 
     static ACE_INET_Addr const& GetAddressForClient(Realm const& realm, ACE_INET_Addr const& clientAddr);
 

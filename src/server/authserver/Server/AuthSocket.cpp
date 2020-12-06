@@ -133,7 +133,7 @@ class PatcherRunnable: public acore::Runnable
 {
 public:
     PatcherRunnable(class AuthSocket*);
-    void run();
+    void run() override;
 
 private:
     AuthSocket* mySocket;
@@ -151,8 +151,8 @@ public:
     typedef std::map<std::string, PATCH_INFO*> Patches;
     ~Patcher();
     Patcher();
-    Patches::const_iterator begin() const { return _patches.begin(); }
-    Patches::const_iterator end() const { return _patches.end(); }
+    [[nodiscard]] Patches::const_iterator begin() const { return _patches.begin(); }
+    [[nodiscard]] Patches::const_iterator end() const { return _patches.end(); }
     void LoadPatchMD5(char*);
     bool GetHash(char* pat, uint8 mymd5[16]);
 
