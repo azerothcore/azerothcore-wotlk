@@ -90,11 +90,11 @@ UPDATE `gameobject_template` SET `ScriptName` = 'go_suppression_device' WHERE `e
 UPDATE `gameobject_template_addon` SET `faction` = 14 WHERE `entry` = @GO_TURRET;
 
 -- Make NPC 11981 (Flamegor) roam
-UPDATE `creature` SET `MovementType`=1, `spawndist`=10 WHERE `id` = 11981;
+UPDATE `creature` SET `MovementType`=1, `wander_distance`=10 WHERE `id` = 11981;
 
 -- Add waypoints for Ebonroc (14601)
 SET @EBONROCGUID = 85780;
-UPDATE `creature` SET `spawndist`=0, `MovementType`=2 WHERE `id`=@EBONROCGUID;
+UPDATE `creature` SET `wander_distance`=0, `MovementType`=2 WHERE `id`=@EBONROCGUID;
 DELETE FROM `creature_addon` WHERE `guid`=@EBONROCGUID;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`auras`) VALUES (@EBONROCGUID,@EBONROCGUID*10,0,0,0,0, '');
 DELETE FROM `waypoint_data` WHERE `id`=@EBONROCGUID*10;
@@ -115,7 +115,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 
 -- Add waypoints for Firemaw ( NOT BLIZZLIKE !!! )
 SET @FIREMAW = 84572;
-UPDATE `creature` SET `spawndist` = 0, `MovementType`=2 WHERE `id`=@FIREMAW;
+UPDATE `creature` SET `wander_distance` = 0, `MovementType`=2 WHERE `id`=@FIREMAW;
 DELETE FROM `creature_addon` WHERE `guid` = @FIREMAW;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`auras`) VALUES (@FIREMAW, @FIREMAW*10, 0, 0, 0, 0, '');
 DELETE FROM `waypoint_data` WHERE `id` = @FIREMAW * 10;
