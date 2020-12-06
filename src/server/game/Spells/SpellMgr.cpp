@@ -2905,15 +2905,34 @@ void SpellMgr::LoadSpellCustomAttr()
                             [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                         default:
                             if (spellInfo->Effects[j].CalcValue() || ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) && !spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY)))
-                                if (spellInfo->Id != 69649 && spellInfo->Id != 71056 && spellInfo->Id != 71057 && spellInfo->Id != 71058 && spellInfo->Id != 73061 && spellInfo->Id != 73062 && spellInfo->Id != 73063 && spellInfo->Id != 73064) // Sindragosa Frost Breath
-                                    if (spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || !(spellInfo->SpellFamilyFlags[0] & 0x20)) // frostbolt
-                                        if (spellInfo->Id != 55095) // frost fever
-                                            if(spellInfo->Id != 62457 && spellInfo->Id != 65370) // Hodir Icicles
-                                                if (spellInfo->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spellInfo->SpellFamilyFlags[1] & 0x40000)) // Haunt
-                                                {
-                                                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
-                                                    break;
-                                                }
+                            {
+                                if (spellInfo->Id != 69649 && spellInfo->Id != 71056 && spellInfo->Id != 71057 && spellInfo->Id != 71058 && spellInfo->Id != 73061 && spellInfo->Id != 73062 && spellInfo->Id != 73063 && spellInfo->Id != 73064)
+                                {
+                                    // Sindragosa Frost Breath
+                                    continue;
+                                }
+                                if (spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || !(spellInfo->SpellFamilyFlags[0] & 0x20))
+                                {
+                                    // Frostbolt
+                                    continue;
+                                }
+                                if (spellInfo->Id != 55095) 
+                                {
+                                    // Frost Fever
+                                    continue;
+                                }
+                                if (spellInfo->Id != 62457 && spellInfo->Id != 65370) 
+                                {
+                                    // Hodir Icicles
+                                    continue;
+                                }
+                                if (spellInfo->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spellInfo->SpellFamilyFlags[1] & 0x40000))
+                                {
+                                    // Haunt (This is the last check before applying the binary custom attribute
+                                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
+                                    break;
+                                }
+                            }
                             continue;
                     }
                 }
