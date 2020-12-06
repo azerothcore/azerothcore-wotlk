@@ -1,3 +1,4 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1607274868483442300');
 
 -- Blackwing Mage [12420]
 SET @BWL_MAGE = 12420;
