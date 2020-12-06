@@ -464,7 +464,7 @@ public:
     // Packet Transfer
     // method that should fill worldpacket with actual world states (not yet implemented for all battlegrounds!)
     virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
-    void SendPacketToTeam(TeamId teamId, WorldPacket* packet, Player* sender = NULL, bool self = true);
+    void SendPacketToTeam(TeamId teamId, WorldPacket* packet, Player* sender = nullptr, bool self = true);
     void SendPacketToAll(WorldPacket* packet);
     void YellToAll(Creature* creature, const char* text, uint32 language);
 

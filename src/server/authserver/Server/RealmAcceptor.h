@@ -26,7 +26,7 @@ public:
 protected:
     virtual int make_svc_handler(RealmSocket*& sh)
     {
-        if (sh == 0)
+        if (sh == nullptr)
             ACE_NEW_RETURN(sh, RealmSocket, -1);
 
         sh->reactor(reactor());
