@@ -151,11 +151,11 @@ public:
 
     // Do not override this in scripts; it should be overridden by the various script type classes. It indicates
     // whether or not this script type must be assigned in the database.
-    virtual bool IsDatabaseBound() const { return false; }
-    virtual bool isAfterLoadScript() const { return IsDatabaseBound(); }
+    [[nodiscard]] virtual bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] virtual bool isAfterLoadScript() const { return IsDatabaseBound(); }
     virtual void checkValidity() { }
 
-    const std::string& GetName() const { return _name; }
+    [[nodiscard]] const std::string& GetName() const { return _name; }
 
 protected:
 
@@ -190,13 +190,13 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return true; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Should return a fully valid SpellScript pointer.
-    virtual SpellScript* GetSpellScript() const { return nullptr; }
+    [[nodiscard]] virtual SpellScript* GetSpellScript() const { return nullptr; }
 
     // Should return a fully valid AuraScript pointer.
-    virtual AuraScript* GetAuraScript() const { return nullptr; }
+    [[nodiscard]] virtual AuraScript* GetAuraScript() const { return nullptr; }
 };
 
 class ServerScript : public ScriptObject
@@ -344,7 +344,7 @@ public:
     virtual void OnPlayerLeave(TMap* /*map*/, Player* /*player*/) { }
 
     // Called on every map update tick.
-    virtual void OnUpdate(TMap* /*map*/, uint32 /*diff*/) { }
+    void OnUpdate(TMap* /*map*/, uint32 /*diff*/) override { }
 };
 
 class WorldMapScript : public ScriptObject, public MapScript<Map>
@@ -355,9 +355,9 @@ protected:
 
 public:
 
-    bool isAfterLoadScript() const { return true; }
+    [[nodiscard]] bool isAfterLoadScript() const override { return true; }
 
-    void checkValidity()
+    void checkValidity() override
     {
         checkMap();
 
@@ -374,9 +374,9 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return true; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
-    void checkValidity()
+    void checkValidity() override
     {
         checkMap();
 
@@ -396,9 +396,9 @@ protected:
 
 public:
 
-    bool isAfterLoadScript() const { return true; }
+    [[nodiscard]] bool isAfterLoadScript() const override { return true; }
 
-    void checkValidity()
+    void checkValidity() override
     {
         checkMap();
 
@@ -415,7 +415,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return true; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when a player accepts a quest from the item.
     virtual bool OnQuestAccept(Player* /*player*/, Item* /*item*/, Quest const* /*quest*/) { return false; }
@@ -521,7 +521,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return true; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when a player opens a gossip dialog with the creature.
     virtual bool OnGossipHello(Player* /*player*/, Creature* /*creature*/) { return false; }
@@ -559,7 +559,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return true; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when a player opens a gossip dialog with the gameobject.
     virtual bool OnGossipHello(Player* /*player*/, GameObject* /*go*/) { return false; }
@@ -603,7 +603,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return true; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when the area trigger is activated by a player.
     virtual bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) { return false; }
@@ -617,10 +617,10 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return true; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Should return a fully valid Battleground object for the type ID.
-    virtual Battleground* GetBattleground() const = 0;
+    [[nodiscard]] virtual Battleground* GetBattleground() const = 0;
 
 };
 
@@ -632,10 +632,10 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return true; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Should return a fully valid OutdoorPvP object for the type ID.
-    virtual OutdoorPvP* GetOutdoorPvP() const = 0;
+    [[nodiscard]] virtual OutdoorPvP* GetOutdoorPvP() const = 0;
 };
 
 class CommandScript : public ScriptObject
@@ -647,7 +647,7 @@ protected:
 public:
 
     // Should return a pointer to a valid command table (ChatCommand array) to be used by ChatHandler.
-    virtual std::vector<ChatCommand> GetCommands() const = 0;
+    [[nodiscard]] virtual std::vector<ChatCommand> GetCommands() const = 0;
 };
 
 class WeatherScript : public ScriptObject, public UpdatableScript<Weather>
@@ -658,7 +658,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return true; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when the weather changes in the zone this script is associated with.
     virtual void OnChange(Weather* /*weather*/, WeatherState /*state*/, float /*grade*/) { }
@@ -714,7 +714,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return true; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when a single condition is checked for a player.
     virtual bool OnConditionCheck(Condition* /*condition*/, ConditionSourceInfo& /*sourceInfo*/) { return true; }
@@ -762,7 +762,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return true; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when a player boards the transport.
     virtual void OnAddPassenger(Transport* /*transport*/, Player* /*player*/) { }
@@ -785,7 +785,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return true; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // deprecated/legacy
     virtual bool OnCheck(Player* /*source*/, Unit* /*target*/) { return true; };
@@ -1046,7 +1046,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     // Called when a member is added to the guild.
     virtual void OnAddMember(Guild* /*guild*/, Player* /*player*/, uint8& /*plRank*/) { }
@@ -1089,7 +1089,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     // Called when a member is added to a group.
     virtual void OnAddMember(Group* /*group*/, uint64 /*guid*/) { }
@@ -1146,7 +1146,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     // Start Battlegroud
     virtual void OnBattlegroundStart(Battleground* /*bg*/) { }
@@ -1184,7 +1184,7 @@ protected:
     ArenaTeamScript(const char* name);
 
 public:
-    bool IsDatabaseBound() const { return false; };
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; };
 
     virtual void OnGetSlotByType(const uint32 /*type*/, uint8& /*slot*/) {}
     virtual void OnGetArenaPoints(ArenaTeam* /*team*/, float& /*points*/) {}
@@ -1201,7 +1201,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     // Calculate max duration in applying aura
     virtual void OnCalcMaxDuration(Aura const* /*aura*/, int32& /*maxDuration*/) { }
