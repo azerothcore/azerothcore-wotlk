@@ -143,3 +143,5 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (25317, 3, 0, 'I just don\'t want to let anyone down.', 12, 7, 100, 0, 0, 0, 26494, 'Civilian Recruit'),
 (25317, 3, 1, 'I need to do something to keep myself busy.', 12, 7, 100, 0, 0, 0, 26495, 'Civilian Recruit'),
 (25317, 3, 2, 'I\'m just nervous.  Sorry.', 12, 7, 100, 0, 0, 0, 26493, 'Civilian Recruit');
+
+DELETE FROM `creature_equip_template` WHERE `CreatureID` IN (25317, 25220);
