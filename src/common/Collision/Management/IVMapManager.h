@@ -39,7 +39,7 @@ namespace VMAP
     public:
         IVMapManager()  { }
 
-        virtual ~IVMapManager(void) { }
+        virtual ~IVMapManager() { }
 
         virtual int loadMap(const char* pBasePath, unsigned int pMapId, int x, int y) = 0;
 

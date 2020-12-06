@@ -20,8 +20,8 @@ namespace VMAP
     struct LocationInfo
     {
         LocationInfo():  ground_Z(-G3D::inf()) { }
-        const ModelInstance* hitInstance{0};
-        const GroupModel* hitModel{0};
+        const ModelInstance* hitInstance{nullptr};
+        const GroupModel* hitModel{nullptr};
         float ground_Z;
     };
 

@@ -58,7 +58,7 @@ namespace VMAP
         void incRefCount() { ++iRefCount; }
         int decRefCount() { return --iRefCount; }
     protected:
-        WorldModel* iModel{0};
+        WorldModel* iModel{nullptr};
         int iRefCount{0};
     };
 
@@ -85,7 +85,7 @@ namespace VMAP
         static std::string getMapFileName(unsigned int mapId);
 
         VMapManager2();
-        ~VMapManager2(void) override;
+        ~VMapManager2() override;
 
         int loadMap(const char* pBasePath, unsigned int mapId, int x, int y) override;
 

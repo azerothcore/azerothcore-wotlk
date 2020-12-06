@@ -22,12 +22,12 @@
 class ByteBufferException : public std::exception
 {
 public:
-    ~ByteBufferException() throw() override { }
+    ~ByteBufferException() noexcept override { }
 
-    [[nodiscard]] char const* what() const throw() override { return msg_.c_str(); }
+    [[nodiscard]] char const* what() const noexcept override { return msg_.c_str(); }
 
 protected:
-    std::string& message() throw() { return msg_; }
+    std::string& message() noexcept { return msg_; }
 
 private:
     std::string msg_;
@@ -37,8 +37,7 @@ class ByteBufferPositionException : public ByteBufferException
 {
 public:
     ByteBufferPositionException(bool add, size_t pos, size_t size, size_t valueSize);
-
-    ~ByteBufferPositionException() throw() override { }
+    ~ByteBufferPositionException() noexcept override { }
 };
 
 class ByteBufferSourceException : public ByteBufferException
@@ -46,7 +45,7 @@ class ByteBufferSourceException : public ByteBufferException
 public:
     ByteBufferSourceException(size_t pos, size_t size, size_t valueSize);
 
-    ~ByteBufferSourceException() throw() override { }
+    ~ByteBufferSourceException() noexcept override { }
 };
 
 class ByteBuffer

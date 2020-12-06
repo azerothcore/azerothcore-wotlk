@@ -53,7 +53,7 @@ namespace VMAP
     public:
         ModelInstance() { }
         ModelInstance(const ModelSpawn& spawn, WorldModel* model);
-        void setUnloaded() { iModel = 0; }
+        void setUnloaded() { iModel = nullptr; }
         bool intersectRay(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit) const;
         void intersectPoint(const G3D::Vector3& p, AreaInfo& info) const;
         bool GetLocationInfo(const G3D::Vector3& p, LocationInfo& info) const;
@@ -61,7 +61,7 @@ namespace VMAP
     protected:
         G3D::Matrix3 iInvRot;
         float iInvScale{0.0f};
-        WorldModel* iModel{0};
+        WorldModel* iModel{nullptr};
     public:
         WorldModel* getWorldModel();
     };
