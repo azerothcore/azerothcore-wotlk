@@ -126,7 +126,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
     int32 LastSynchroHP;
     uint8 SpecialMask;
 
-    void DoAction(int32 a)
+    void DoAction(int32 a) override
     {
         switch( a )
         {
@@ -197,7 +197,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
             me->GetMotionMaster()->MoveChase(victim, 0.0f, 0.0f, 6.0f);
     }*/
 
-    void EnterCombat(Unit* /*who*/)
+    void EnterCombat(Unit* /*who*/) override
     {
         me->setActive(true);
         me->LowerPlayerDamageReq(me->GetMaxHealth());
@@ -214,7 +214,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
             pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21853);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         me->setActive(false);
     }
@@ -265,7 +265,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 }
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         if( !UpdateVictim() )
             return;
@@ -455,7 +455,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         myDoMeleeAttackIfReady();
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         DoAction(-1);
         Talk(SAY_DEATH);
@@ -472,17 +472,17 @@ struct boss_twin_valkyrAI : public ScriptedAI
             }
     }
 
-    void JustSummoned(Creature* s)
+    void JustSummoned(Creature* s) override
     {
         summons.Summon(s);
     }
 
-    void SummonedCreatureDespawn(Creature* s)
+    void SummonedCreatureDespawn(Creature* s) override
     {
         summons.Despawn(s);
     }
 
-    void KilledUnit(Unit* who)
+    void KilledUnit(Unit* who) override
     {
         if( who->GetTypeId() == TYPEID_PLAYER )
         {
@@ -493,7 +493,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if( pInstance )
             pInstance->SetData(TYPE_FAILED, 0);
@@ -505,7 +505,7 @@ class boss_eydis : public CreatureScript
 public:
     boss_eydis() : CreatureScript("boss_eydis") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_eydisAI(pCreature);
     }
@@ -522,7 +522,7 @@ public:
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
-        void JustSummoned(Creature*  /*s*/) {}
+        void JustSummoned(Creature*  /*s*/) override {}
     };
 };
 
@@ -531,7 +531,7 @@ class boss_fjola : public CreatureScript
 public:
     boss_fjola() : CreatureScript("boss_fjola") {}
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_fjolaAI(pCreature);
     }
@@ -548,7 +548,7 @@ public:
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
-        void JustSummoned(Creature*  /*s*/) {}
+        void JustSummoned(Creature*  /*s*/) override {}
     };
 };
 
@@ -666,7 +666,7 @@ class npc_concentrated_ball : public CreatureScript
 public:
     npc_concentrated_ball() : CreatureScript("npc_concentrated_ball") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_concentrated_ballAI(pCreature);
     }
@@ -684,13 +684,13 @@ public:
 
         bool despawning;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == 1)
                 despawning = true;
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if( type != POINT_MOTION_TYPE || id != 0 )
                 return;
@@ -705,7 +705,7 @@ public:
             me->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + sin(angle) * 47.0f, me->GetPositionZ());
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if( despawning )
                 return;
@@ -795,13 +795,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectAbsorb += AuraEffectAbsorbFn(spell_valkyr_essence_auraAuraScript::HandleAfterEffectAbsorb, EFFECT_0);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_valkyr_essence_auraAuraScript();
     }
@@ -849,13 +849,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_touchAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_valkyr_touchAuraScript();
     }
@@ -886,13 +886,13 @@ public:
                             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_ball_periodic_dummyAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_valkyr_ball_periodic_dummyAuraScript();
     }

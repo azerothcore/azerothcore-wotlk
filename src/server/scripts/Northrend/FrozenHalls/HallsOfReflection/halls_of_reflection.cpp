@@ -656,7 +656,7 @@ class npc_ghostly_priest : public CreatureScript
 public:
     npc_ghostly_priest() : CreatureScript("npc_ghostly_priest") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ghostly_priestAI(creature);
     }
@@ -667,7 +667,7 @@ public:
 
         EventMap events;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -677,12 +677,12 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 5000);
             events.ScheduleEvent(EVENT_CIRCLE_OF_DESTRUCTION, 8000);
@@ -690,14 +690,14 @@ public:
             events.ScheduleEvent(EVENT_DARK_MENDING, 8000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -738,7 +738,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
@@ -752,7 +752,7 @@ class npc_phantom_mage : public CreatureScript
 public:
     npc_phantom_mage() : CreatureScript("npc_phantom_mage") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_phantom_mageAI(creature);
     }
@@ -763,7 +763,7 @@ public:
 
         EventMap events;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -773,12 +773,12 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_FIREBALL, 3000);
             events.ScheduleEvent(EVENT_FLAMESTRIKE, 6000);
@@ -787,14 +787,14 @@ public:
             events.ScheduleEvent(EVENT_HALLUCINATION, 40000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -834,7 +834,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
@@ -848,7 +848,7 @@ class npc_phantom_hallucination : public CreatureScript
 public:
     npc_phantom_hallucination() : CreatureScript("npc_phantom_hallucination") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_phantom_hallucinationAI(creature);
     }
@@ -862,12 +862,12 @@ public:
 
         uint8 numOfUpd;
 
-        void JustDied(Unit* /*who*/)
+        void JustDied(Unit* /*who*/) override
         {
             me->CastSpell((Unit*)NULL, SPELL_HALLUCINATION_2, false);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (numOfUpd)
             {
@@ -879,7 +879,7 @@ public:
             npc_phantom_mageAI::UpdateAI(diff);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (numOfUpd)
                 return;
@@ -897,7 +897,7 @@ class npc_shadowy_mercenary : public CreatureScript
 public:
     npc_shadowy_mercenary() : CreatureScript("npc_shadowy_mercenary") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_shadowy_mercenaryAI(creature);
     }
@@ -908,7 +908,7 @@ public:
 
         EventMap events;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -918,12 +918,12 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SHADOW_STEP, 4000);
             events.ScheduleEvent(EVENT_DEADLY_POISON, 6000);
@@ -931,14 +931,14 @@ public:
             events.ScheduleEvent(EVENT_KIDNEY_SHOT, 5000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -978,7 +978,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
@@ -992,7 +992,7 @@ class npc_spectral_footman : public CreatureScript
 public:
     npc_spectral_footman() : CreatureScript("npc_spectral_footman") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_spectral_footmanAI(creature);
     }
@@ -1003,7 +1003,7 @@ public:
 
         EventMap events;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -1013,26 +1013,26 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SPECTRAL_STRIKE, 5000);
             events.ScheduleEvent(EVENT_SHIELD_BASH, 6000);
             events.ScheduleEvent(EVENT_TORTURED_ENRAGE, 15000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1061,7 +1061,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
@@ -1075,7 +1075,7 @@ class npc_tortured_rifleman : public CreatureScript
 public:
     npc_tortured_rifleman() : CreatureScript("npc_tortured_rifleman") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_tortured_riflemanAI(creature);
     }
@@ -1086,7 +1086,7 @@ public:
 
         EventMap events;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -1096,26 +1096,26 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_CURSED_ARROW, 10000);
             events.ScheduleEvent(EVENT_FROST_TRAP, 15000);
             events.ScheduleEvent(EVENT_ICE_SHOT, 15000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1145,7 +1145,7 @@ public:
             DoSpellAttackIfReady(SPELL_SHOOT);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
@@ -1169,12 +1169,12 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_FROSTSWORN_GENERAL_AGGRO);
             events.ScheduleEvent(EVENT_ACTIVATE_REFLECTIONS, 8000);
@@ -1182,7 +1182,7 @@ public:
             pInstance->SetData(ACTION_SPIRITUAL_REFLECTIONS_COPY, 1);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1215,21 +1215,21 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_FROSTSWORN_GENERAL_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_FROSTSWORN_GENERAL, DONE);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             pInstance->SetData(ACTION_SPIRITUAL_REFLECTIONS_HIDE, 1);
             ScriptedAI::EnterEvadeMode();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_frostsworn_generalAI(creature);
     }
@@ -1248,17 +1248,17 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_BALEFUL_STRIKE, urand(4000, 7000));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1279,12 +1279,12 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->CastSpell((Unit*)NULL, SPELL_SPIRIT_BURST, false);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->UpdatePosition(me->GetHomePosition(), true);
             ScriptedAI::EnterEvadeMode();
@@ -1292,7 +1292,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_spiritual_reflectionAI(creature);
     }
@@ -1303,7 +1303,7 @@ class at_hor_shadow_throne : public AreaTriggerScript
 public:
     at_hor_shadow_throne() : AreaTriggerScript("at_hor_shadow_throne") { }
 
-    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
         if (player->IsGameMaster())
             return false;
@@ -1348,7 +1348,7 @@ class npc_hor_lich_king : public CreatureScript
 public:
     npc_hor_lich_king() : CreatureScript("npc_hor_lich_king") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_lich_kingAI(creature);
     }
@@ -1369,7 +1369,7 @@ public:
         uint8 reqKillCount;
         uint8 div2;
 
-        void Reset()
+        void Reset() override
         {
             currentWall = 0;
             reqKillCount = 0;
@@ -1377,7 +1377,7 @@ public:
             events.RescheduleEvent(EVENT_LK_CHECK_COMBAT, 1000);
         }
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == ACTION_START_LK_FIGHT_REAL)
                 events.ScheduleEvent(EVENT_LK_START_FOLLOWING, 1500);
@@ -1402,7 +1402,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32  /*id*/)
+        void MovementInform(uint32 type, uint32  /*id*/) override
         {
             // Xinef: dont use 0, it is no longer the last point
             // Xinef: if type is escort and spline is finalized, it means that we reached last point from the path
@@ -1426,7 +1426,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             ++reqKillCount;
             if (events.GetNextEventTime(EVENT_DECREASE_REQ_COUNT_BY_100))
@@ -1443,18 +1443,18 @@ public:
             s->SetHomePosition(PathWaypoints[WP_STOP[currentWall + 1]]);
         }
 
-        void SummonedCreatureDespawn(Creature* s)
+        void SummonedCreatureDespawn(Creature* s) override
         {
             summons.Despawn(s);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (target && target->IsAlive() && spell->Id == SPELL_LICH_KING_ZAP_PLAYER)
                 Unit::DealDamage(me, target, 10000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->HealthBelowPct(70))
                 me->SetHealth(me->GetMaxHealth() * 3 / 4);
@@ -1804,12 +1804,12 @@ public:
 
         bool leaped;
 
-        void Reset()
+        void Reset() override
         {
             leaped = false;
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -1828,7 +1828,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetCorpseDelay(10);
             if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -1837,7 +1837,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_raging_ghoulAI(creature);
     }
@@ -1854,19 +1854,19 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(1, 10000);
             events.ScheduleEvent(2, 4500);
             events.ScheduleEvent(3, 9000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1897,7 +1897,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetCorpseDelay(10);
             if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -1906,7 +1906,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_risen_witch_doctorAI(creature);
     }
@@ -1923,17 +1923,17 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(1, 5000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1962,7 +1962,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetCorpseDelay(10);
             if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -1971,7 +1971,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_lumbering_abominationAI(creature);
     }
@@ -1994,13 +1994,13 @@ public:
                     c->CastSpell((Unit*)NULL, 70021, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_hor_gunship_cannon_fireAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_hor_gunship_cannon_fireAuraScript();
     }
@@ -2013,7 +2013,7 @@ class at_hor_battered_hilt_start : public AreaTriggerScript
 public:
     at_hor_battered_hilt_start() : AreaTriggerScript("at_hor_battered_hilt_start") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (player->HasAura(70013))
             if (InstanceScript* instance = player->GetInstanceScript())
@@ -2027,7 +2027,7 @@ class at_hor_battered_hilt_throw : public AreaTriggerScript
 public:
     at_hor_battered_hilt_throw() : AreaTriggerScript("at_hor_battered_hilt_throw") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (player->HasAura(70013))
             if (InstanceScript* instance = player->GetInstanceScript())

@@ -356,7 +356,7 @@ public:
 
     BattleExperienceEvent(Creature* creature) : _creature(creature), _level(0) { }
 
-    bool Execute(uint64 timer, uint32 /*diff*/)
+    bool Execute(uint64 timer, uint32 /*diff*/) override
     {
         if (!_creature->IsAlive())
             return true;
@@ -469,7 +469,7 @@ class DelayedMovementEvent : public BasicEvent
 public:
     DelayedMovementEvent(Creature* owner, Position const& dest) : _owner(owner), _dest(dest) { }
 
-    bool Execute(uint64, uint32)
+    bool Execute(uint64, uint32) override
     {
         if (!_owner->IsAlive() || !_owner->GetTransport())
             return true;
@@ -491,7 +491,7 @@ class ResetEncounterEvent : public BasicEvent
 public:
     ResetEncounterEvent(Unit* caster, uint32 spellId, uint64 otherTransport) : _caster(caster), _spellId(spellId), _otherTransport(otherTransport) { }
 
-    bool Execute(uint64, uint32)
+    bool Execute(uint64, uint32) override
     {
         _caster->CastSpell(_caster, _spellId, true);
         _caster->GetTransport()->ToMotionTransport()->UnloadNonStaticPassengers();
@@ -524,7 +524,7 @@ public:
             me->SetRegeneratingHealth(false);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
             {
@@ -553,7 +553,7 @@ public:
                 captain->AI()->DoAction(ACTION_SPAWN_MAGE);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (_died || _instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
@@ -653,7 +653,7 @@ public:
             }
         }
 
-        void SetGUID(uint64 guid, int32 id/* = 0*/)
+        void SetGUID(uint64 guid, int32 id/* = 0*/) override
         {
             if (id != ACTION_SHIP_VISITS_ENEMY && id != ACTION_SHIP_VISITS_SELF)
                 return;
@@ -688,7 +688,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 id) const
+        uint32 GetData(uint32 id) const override
         {
             if (id != ACTION_SHIP_VISITS_ENEMY)
                 return 0;
@@ -708,7 +708,7 @@ public:
         bool _summonedFirstMage;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         if (!creature->GetTransport())
             return nullptr;
@@ -736,7 +736,7 @@ public:
             checkTimer = 1000;
         }
 
-        void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/)
+        void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
         {
             if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
                 return;
@@ -750,7 +750,7 @@ public:
             _events.ScheduleEvent(EVENT_INTRO_H_4, 39200);
         }
 
-        void EnterCombat(Unit* /*target*/)
+        void EnterCombat(Unit* /*target*/) override
         {
             if (_instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE && !me->HasAura(SPELL_FRIENDLY_BOSS_DAMAGE_MOD))
                 me->CastSpell(me, SPELL_FRIENDLY_BOSS_DAMAGE_MOD, true);
@@ -760,7 +760,7 @@ public:
             _events.ScheduleEvent(EVENT_CLEAVE, urand(3000, 6000));
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (!me->IsAlive())
                 return;
@@ -770,7 +770,7 @@ public:
             Reset();
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_ENEMY_GUNSHIP_TALK)
             {
@@ -834,7 +834,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (type == ACTION_CLEAR_SLOT)
             {
@@ -844,7 +844,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (me->HealthBelowPctDamaged(65, damage) && !me->HasAura(SPELL_TASTE_OF_BLOOD))
                 me->CastSpell(me, SPELL_TASTE_OF_BLOOD, true);
@@ -853,7 +853,7 @@ public:
                 damage = me->GetHealth() - 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS)
             {
@@ -1012,7 +1012,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* victim)
+        void AttackStart(Unit* victim) override
         {
             if (victim && me->Attack(victim, true))
             {
@@ -1027,7 +1027,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return false;
@@ -1046,7 +1046,7 @@ public:
         uint16 checkTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_high_overlord_saurfang_igbAI>(creature);
     }
@@ -1071,7 +1071,7 @@ public:
             checkTimer = 1000;
         }
 
-        void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/)
+        void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
         {
             if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
                 return;
@@ -1086,7 +1086,7 @@ public:
             _events.ScheduleEvent(EVENT_INTRO_A_5, 45000);
         }
 
-        void EnterCombat(Unit* /*target*/)
+        void EnterCombat(Unit* /*target*/) override
         {
             if (_instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_ALLIANCE && !me->HasAura(SPELL_FRIENDLY_BOSS_DAMAGE_MOD))
                 me->CastSpell(me, SPELL_FRIENDLY_BOSS_DAMAGE_MOD, true);
@@ -1096,7 +1096,7 @@ public:
             _events.ScheduleEvent(EVENT_CLEAVE, urand(3000, 6000));
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (!me->IsAlive())
                 return;
@@ -1106,7 +1106,7 @@ public:
             Reset();
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_ENEMY_GUNSHIP_TALK)
             {
@@ -1170,7 +1170,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (type == ACTION_CLEAR_SLOT)
             {
@@ -1180,7 +1180,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (me->HealthBelowPctDamaged(65, damage) && !me->HasAura(SPELL_TASTE_OF_BLOOD))
                 me->CastSpell(me, SPELL_TASTE_OF_BLOOD, true);
@@ -1189,7 +1189,7 @@ public:
                 damage = me->GetHealth() - 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS)
             {
@@ -1351,7 +1351,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* victim)
+        void AttackStart(Unit* victim) override
         {
             if (victim && me->Attack(victim, true))
             {
@@ -1366,7 +1366,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return false;
@@ -1385,7 +1385,7 @@ public:
         uint16 checkTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_muradin_bronzebeard_igbAI>(creature);
     }
@@ -1403,14 +1403,14 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/)
+        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
             player->AddItem(ITEM_GOBLIN_ROCKET_PACK, 1);
             player->PlayerTalkClass->SendCloseGossip();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_zafod_boomboxAI>(creature);
     }
@@ -1425,7 +1425,7 @@ public:
     {
         npc_igb_ship_crewAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) {}
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             return _instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS && target->GetTransport() == me->GetTransport() && target->GetPositionZ() < 478.0f && (me->GetEntry() == NPC_SKYBREAKER_DECKHAND ? (target->GetPositionY() > 2042.0f) : (target->GetPositionY() < 2431.0f));
         }
@@ -1433,7 +1433,7 @@ public:
         InstanceScript* _instance;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_igb_ship_crewAI>(creature);
     }
@@ -1457,7 +1457,7 @@ struct gunship_npc_AI : public ScriptedAI
         me->SetRegeneratingHealth(false);
     }
 
-    void SetData(uint32 type, uint32 data)
+    void SetData(uint32 type, uint32 data) override
     {
         if (type == ACTION_SET_SLOT)
         {
@@ -1472,7 +1472,7 @@ struct gunship_npc_AI : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if (!me->IsAlive() || !me->IsInCombat())
             return;
@@ -1482,14 +1482,14 @@ struct gunship_npc_AI : public ScriptedAI
         Reset();
     }
 
-    void JustDied(Unit* /*killer*/)
+    void JustDied(Unit* /*killer*/) override
     {
         if (Slot)
             if (Creature* captain = me->FindNearestCreature(Instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? NPC_IGB_MURADIN_BRONZEBEARD : NPC_IGB_HIGH_OVERLORD_SAURFANG, 200.0f))
                 captain->AI()->SetData(ACTION_CLEAR_SLOT, Index);
     }
 
-    void MovementInform(uint32 type, uint32 pointId)
+    void MovementInform(uint32 type, uint32 pointId) override
     {
         if (type == POINT_MOTION_TYPE && pointId == EVENT_CHARGE_PREPATH && Slot)
         {
@@ -1523,7 +1523,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
         me->SetRegeneratingHealth(false);
     }
 
-    void SetData(uint32 type, uint32 data)
+    void SetData(uint32 type, uint32 data) override
     {
         if (type == ACTION_SET_SLOT)
         {
@@ -1533,7 +1533,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if (!me->IsAlive() || !me->IsInCombat())
             return;
@@ -1543,7 +1543,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
         Reset();
     }
 
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         if (_usedDesperateResolve)
             return;
@@ -1553,7 +1553,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
         me->CastSpell(me, SPELL_DESPERATE_RESOLVE, true);
     }
 
-    void MovementInform(uint32 type, uint32 pointId)
+    void MovementInform(uint32 type, uint32 pointId) override
     {
         if (type == POINT_MOTION_TYPE && pointId == EVENT_CHARGE_PREPATH && Slot)
         {
@@ -1586,7 +1586,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         if (checkTimer <= diff)
         {
@@ -1607,7 +1607,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
             checkTimer -= diff;
     }
 
-    bool CanAIAttack(const Unit* target) const
+    bool CanAIAttack(const Unit* target) const override
     {
         return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS && target->GetTransport() && target->GetTransport() != me->GetTransport() && target->GetPositionZ() < 478.0f && (me->GetEntry() == NPC_SKYBREAKER_SERGEANT || me->GetEntry() == NPC_SKYBREAKER_MARINE ? (target->GetPositionY() < 2431.0f) : (target->GetPositionY() > 2042.0f));
     }
@@ -1638,14 +1638,14 @@ public:
         {
         }
 
-        void EnterCombat(Unit*  /*target*/)
+        void EnterCombat(Unit*  /*target*/) override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_BLADESTORM, urand(13000, 18000));
             _events.ScheduleEvent(EVENT_WOUNDING_STRIKE, urand(5000, 10000));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
@@ -1685,7 +1685,7 @@ public:
         EventMap _events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_gunship_boarding_leaderAI>(creature);
     }
@@ -1702,7 +1702,7 @@ public:
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
@@ -1727,7 +1727,7 @@ public:
         EventMap _events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_gunship_boarding_add_realAI>(creature);
     }
@@ -1745,12 +1745,12 @@ public:
             me->m_CombatDistance = 70.0f;
         }
 
-        void AttackStart(Unit* target)
+        void AttackStart(Unit* target) override
         {
             me->Attack(target, false);
         }
 
-        void MovementInform(uint32 type, uint32 pointId)
+        void MovementInform(uint32 type, uint32 pointId) override
         {
             if (type == POINT_MOTION_TYPE && pointId == EVENT_CHARGE_PREPATH && Slot)
             {
@@ -1777,7 +1777,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
@@ -1786,13 +1786,13 @@ public:
             gunship_npc_AI::UpdateAI(diff);
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const
+        bool CanAIAttack(const Unit*  /*target*/) const override
         {
             return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS;
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_gunship_mageAI>(creature);
     }
@@ -1812,19 +1812,19 @@ public:
             creature->m_CombatDistance = 150.0f;
         }
 
-        void AttackStart(Unit* target)
+        void AttackStart(Unit* target) override
         {
             me->Attack(target, false);
         }
 
-        void MovementInform(uint32 type, uint32 pointId)
+        void MovementInform(uint32 type, uint32 pointId) override
         {
             gunship_npc_AI::MovementInform(type, pointId);
             if (type == POINT_MOTION_TYPE && pointId == EVENT_CHARGE_PREPATH)
                 me->SetControlled(true, UNIT_STATE_ROOT);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
@@ -1860,7 +1860,7 @@ public:
             DoSpellAttackIfReady(me->GetEntry() == NPC_SKYBREAKER_RIFLEMAN ? SPELL_SHOOT : SPELL_HURL_AXE);
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS && target->GetTransport() && target->GetTransport() != me->GetTransport();
         }
@@ -1870,7 +1870,7 @@ public:
         uint16 checkTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_gunship_gunnerAI>(creature);
     }
@@ -1888,14 +1888,14 @@ public:
             creature->m_CombatDistance = 150.0f;
         }
 
-        void MovementInform(uint32 type, uint32 pointId)
+        void MovementInform(uint32 type, uint32 pointId) override
         {
             gunship_npc_AI::MovementInform(type, pointId);
             if (type == POINT_MOTION_TYPE && pointId == EVENT_CHARGE_PREPATH)
                 me->SetControlled(true, UNIT_STATE_ROOT);
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
@@ -1915,13 +1915,13 @@ public:
             me->_AddCreatureSpellCooldown(spellId, 9000);
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const
+        bool CanAIAttack(const Unit*  /*target*/) const override
         {
             return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS;
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_gunship_rocketeerAI>(creature);
     }
@@ -1936,7 +1936,7 @@ public:
     {
         PrepareAuraScript(spell_igb_rocket_pack_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_ROCKET_PACK_DAMAGE) ||
                     !sSpellMgr->GetSpellInfo(SPELL_ROCKET_BURST))
@@ -1958,14 +1958,14 @@ public:
             GetTarget()->CastSpell((Unit*)NULL, SPELL_ROCKET_BURST, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_rocket_pack_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectRemove += AuraEffectRemoveFn(spell_igb_rocket_pack_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_igb_rocket_pack_AuraScript();
     }
@@ -1980,7 +1980,7 @@ public:
     {
         PrepareAuraScript(spell_igb_rocket_pack_useable_AuraScript);
 
-        bool Load()
+        bool Load() override
         {
             return GetOwner()->GetInstanceScript();
         }
@@ -2006,7 +2006,7 @@ public:
                         sCreatureTextMgr->SendChat(owner, SAY_ZAFOD_ROCKET_PACK_DISABLED, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
         }
 
-        void Register()
+        void Register() override
         {
             DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_igb_rocket_pack_useable_AuraScript::CheckAreaTarget);
             AfterEffectApply += AuraEffectApplyFn(spell_igb_rocket_pack_useable_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
@@ -2014,7 +2014,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_igb_rocket_pack_useable_AuraScript();
     }
@@ -2042,13 +2042,13 @@ public:
             target->m_movementInfo.transport.pos.Relocate(x, y, z, o);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_igb_teleport_to_enemy_ship_SpellScript::RelocateTransportOffset, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_igb_teleport_to_enemy_ship_SpellScript();
     }
@@ -2063,7 +2063,7 @@ public:
     {
         PrepareSpellScript(spell_igb_check_for_players_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             _playerCount = 0;
             return GetCaster()->GetTypeId() == TYPEID_UNIT;
@@ -2086,7 +2086,7 @@ public:
                 GetHitUnit()->CastSpell(GetHitUnit(), SPELL_GUNSHIP_FALL_TELEPORT, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_check_for_players_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
             AfterCast += SpellCastFn(spell_igb_check_for_players_SpellScript::TriggerWipe);
@@ -2096,7 +2096,7 @@ public:
         uint32 _playerCount;
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_igb_check_for_players_SpellScript();
     }
@@ -2111,7 +2111,7 @@ public:
     {
         PrepareSpellScript(spell_igb_gunship_fall_teleport_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             return GetCaster()->GetInstanceScript();
         }
@@ -2129,14 +2129,14 @@ public:
             GetHitDest()->RelocateOffset(offset);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_igb_gunship_fall_teleport_SpellScript::SelectTransport, EFFECT_0, TARGET_DEST_NEARBY_ENTRY);
             OnEffectLaunch += SpellEffectFn(spell_igb_gunship_fall_teleport_SpellScript::RelocateDest, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_igb_gunship_fall_teleport_SpellScript();
     }
@@ -2151,7 +2151,7 @@ public:
     {
         PrepareAuraScript(spell_igb_explosion_main_AuraScript);
 
-        bool Load()
+        bool Load() override
         {
             tickNo = urand(0, 3);
             return true;
@@ -2163,7 +2163,7 @@ public:
                 PreventDefaultAction();
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_explosion_main_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
@@ -2171,7 +2171,7 @@ public:
         uint32 tickNo;
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_igb_explosion_main_AuraScript();
     }
@@ -2206,13 +2206,13 @@ public:
             acore::Containers::RandomResizeList(targets, 1);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_explosion_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_igb_explosion_SpellScript();
     }
@@ -2241,7 +2241,7 @@ public:
     {
         PrepareSpellScript(spell_igb_teleport_players_on_victory_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             return GetCaster()->GetInstanceScript();
         }
@@ -2252,13 +2252,13 @@ public:
             targets.remove_if(IgbTeleportOnVictoryCheck(instance));
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_teleport_players_on_victory_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_igb_teleport_players_on_victory_SpellScript();
     }
@@ -2279,13 +2279,13 @@ public:
             GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST));
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_periodic_trigger_with_power_cost_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_igb_periodic_trigger_with_power_cost_AuraScript();
     }
@@ -2300,7 +2300,7 @@ public:
     {
         PrepareAuraScript(spell_igb_overheat_AuraScript);
 
-        bool Load()
+        bool Load() override
         {
             if (GetAura()->GetType() != UNIT_AURA_TYPE)
                 return false;
@@ -2334,14 +2334,14 @@ public:
             SendClientControl(1);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectApplyFn(spell_igb_overheat_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectRemoveFn(spell_igb_overheat_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_igb_overheat_AuraScript();
     }
@@ -2356,7 +2356,7 @@ public:
     {
         PrepareSpellScript(spell_igb_cannon_blast_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             return GetCaster()->GetTypeId() == TYPEID_UNIT;
         }
@@ -2372,13 +2372,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             AfterHit += SpellHitFn(spell_igb_cannon_blast_SpellScript::CheckEnergy);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_igb_cannon_blast_SpellScript();
     }
@@ -2422,7 +2422,7 @@ public:
             //SetEffectValue(GetEffectValue() + _energyLeft * _energyLeft * 8);
         }
 
-        void Register()
+        void Register() override
         {
             OnCast += SpellCastFn(spell_igb_incinerating_blast_SpellScript::StoreEnergy);
             AfterCast += SpellCastFn(spell_igb_incinerating_blast_SpellScript::RemoveEnergy);
@@ -2432,7 +2432,7 @@ public:
         uint32 _energyLeft;
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_igb_incinerating_blast_SpellScript();
     }
@@ -2484,14 +2484,14 @@ public:
             GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), TRIGGERED_NONE);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_burning_pitch_selector_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
             OnEffectHitTarget += SpellEffectFn(spell_igb_burning_pitch_selector_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_igb_burning_pitch_selector_SpellScript();
     }
@@ -2513,13 +2513,13 @@ public:
             GetHitUnit()->CastSpell(GetHitUnit(), SPELL_BURNING_PITCH, TRIGGERED_FULL_MASK);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_igb_burning_pitch_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_igb_burning_pitch_SpellScript();
     }
@@ -2569,14 +2569,14 @@ public:
             GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetMap()->GetHeight(GetCaster()->GetPhaseMask(), GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ()), uint32(GetEffectValue()), TRIGGERED_NONE);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_rocket_artillery_SpellScript::SelectRandomTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             OnEffectHitTarget += SpellEffectFn(spell_igb_rocket_artillery_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_igb_rocket_artillery_SpellScript();
     }
@@ -2597,13 +2597,13 @@ public:
                 GetCaster()->CastCustomSpell(instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_BURNING_PITCH_DAMAGE_A : SPELL_BURNING_PITCH_DAMAGE_H, SPELLVALUE_BASE_POINT0, 5000, NULL, TRIGGERED_FULL_MASK);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHit += SpellEffectFn(spell_igb_rocket_artillery_explosion_SpellScript::DamageGunship, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_igb_rocket_artillery_explosion_SpellScript();
     }
@@ -2624,13 +2624,13 @@ public:
             GetHitUnit()->CastSpell(GetHitUnit(), SPELL_EJECT_ALL_PASSENGERS, TRIGGERED_FULL_MASK);
         }
 
-        void Register()
+        void Register() override
         {
             BeforeHit += SpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_igb_below_zero_SpellScript();
     }
@@ -2645,7 +2645,7 @@ public:
     {
         PrepareAuraScript(spell_igb_on_gunship_deck_AuraScript);
 
-        bool Load()
+        bool Load() override
         {
             if (InstanceScript* instance = GetOwner()->GetInstanceScript())
                 _teamIdInInstance = TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE));
@@ -2666,7 +2666,7 @@ public:
                 gunship->AI()->SetGUID(GetTarget()->GetGUID(), enemy ? ACTION_SHIP_VISITS_ENEMY : ACTION_SHIP_VISITS_SELF);
         }
 
-        void Register()
+        void Register() override
         {
             DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_igb_on_gunship_deck_AuraScript::CheckAreaTarget);
             AfterEffectApply += AuraEffectApplyFn(spell_igb_on_gunship_deck_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
@@ -2675,7 +2675,7 @@ public:
         TeamId _teamIdInInstance;
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_igb_on_gunship_deck_AuraScript();
     }
@@ -2686,7 +2686,7 @@ class achievement_im_on_a_boat : public AchievementCriteriaScript
 public:
     achievement_im_on_a_boat() : AchievementCriteriaScript("achievement_im_on_a_boat") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target)
+    bool OnCheck(Player* /*source*/, Unit* target) override
     {
         return target->GetAI() && target->GetAI()->GetData(ACTION_SHIP_VISITS_ENEMY) == 1;
     }

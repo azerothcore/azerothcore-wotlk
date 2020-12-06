@@ -48,7 +48,7 @@ class boss_gal_darah : public CreatureScript
 public:
     boss_gal_darah() : CreatureScript("boss_gal_darah") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_gal_darahAI>(creature);
     }
@@ -62,20 +62,20 @@ public:
         uint8 phaseCounter;
         std::set<uint64> impaledList;
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             impaledList.clear();
             phaseCounter = 0;
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             BossAI::InitializeAI();
             me->CastSpell(me, SPELL_START_VISUAL, false);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             BossAI::JustReachedHome();
             me->CastSpell(me, SPELL_START_VISUAL, false);
@@ -98,7 +98,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
             BossAI::EnterCombat(who);
@@ -108,7 +108,7 @@ public:
             me->InterruptNonMeleeSpells(true);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             uint32 despawnTime = 0;
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
@@ -120,18 +120,18 @@ public:
             summon->DespawnOrUnsummon(despawnTime);
         }
 
-        uint32 GetData(uint32  /*type*/) const
+        uint32 GetData(uint32  /*type*/) const override
         {
             return impaledList.size();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -140,7 +140,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -219,13 +219,13 @@ public:
                 target->CastSpell(GetCaster(), SPELL_IMPALING_CHARGE_VEHICLE, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_galdarah_impaling_charge_SpellScript::HandleApplyAura, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_galdarah_impaling_charge_SpellScript();
     }
@@ -246,13 +246,13 @@ public:
                 target->RemoveAurasDueToSpell(SPELL_TRANSFORM_TO_RHINO);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_galdarah_transform_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_galdarah_transform_SpellScript();
     }
@@ -265,7 +265,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* /*player*/, Unit* target)
+    bool OnCheck(Player* /*player*/, Unit* target) override
     {
         if (!target)
             return false;
