@@ -102,10 +102,10 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void AttackStart(Unit*) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void AttackStart(Unit*) override {}
 
-        void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply)
+        void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply) override
         {
             if (apply && who->GetTypeId() == TYPEID_PLAYER)
                 who->ToPlayer()->SetClientControl(me, 0, true);
@@ -117,12 +117,12 @@ public:
 
         Creature* GetPlate() { return plateGUID ? ObjectAccessor::GetCreature(*me, plateGUID) : nullptr; }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch (param)
             {
@@ -191,7 +191,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             Unit* charm = target->GetCharm();
             if (!charm || !charm->ToCreature())
@@ -200,7 +200,7 @@ public:
             charm->ToCreature()->AI()->DoAction(spellInfo->Id);
         }
 
-        void SpellHit(Unit*  /*target*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*target*/, const SpellInfo* spellInfo) override
         {
             switch (spellInfo->Id)
             {
@@ -227,7 +227,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timerSpawnPlate)
             {
@@ -267,7 +267,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pilgrims_bounty_chairAI(creature);
     }
@@ -284,7 +284,7 @@ public:
         {
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             switch (spellInfo->Id)
             {
@@ -301,7 +301,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pilgrims_bounty_plateAI(creature);
     }
@@ -412,13 +412,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_pilgrims_bounty_pass_generic_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_pilgrims_bounty_pass_generic_SpellScript();
     }
@@ -502,13 +502,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_pilgrims_bounty_feast_on_generic_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_pilgrims_bounty_feast_on_generic_SpellScript();
     }
@@ -555,13 +555,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_pilgrims_bounty_turkey_tracker_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_pilgrims_bounty_turkey_tracker_SpellScript();
     }
@@ -583,13 +583,13 @@ public:
                 target->ToCreature()->AI()->DoAction(GetSpellInfo()->Id);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_pilgrims_bounty_serve_generic_AuraScript::OnAuraRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_pilgrims_bounty_serve_generic_AuraScript();
     }
@@ -616,7 +616,7 @@ public:
             canBeRecalculated = true;
         }
 
-        void Register()
+        void Register() override
         {
             if (m_scriptSpellId == 66041)
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pilgrims_bounty_food_AuraScript::RecalculateHook, EFFECT_0, SPELL_AURA_MOD_POWER_REGEN);
@@ -625,7 +625,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_pilgrims_bounty_food_AuraScript();
     }
@@ -644,14 +644,14 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             if (m_scriptSpellId == 66477)
                 OnEffectHitTarget += SpellEffectFn(spell_pilgrims_bounty_food_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_pilgrims_bounty_food_SpellScript();
     }
@@ -673,7 +673,7 @@ class achievement_pb_pilgrims_peril : public AchievementCriteriaScript
 public:
     achievement_pb_pilgrims_peril() : AchievementCriteriaScript("achievement_pb_pilgrims_peril") { }
 
-    bool OnCheck(Player* source, Unit* /*target*/)
+    bool OnCheck(Player* source, Unit* /*target*/) override
     {
         if (source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_DRESS, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ROBE, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ATTIRE, 1))
             return true;
@@ -687,7 +687,7 @@ class achievement_pb_terokkar_turkey_time : public AchievementCriteriaScript
 public:
     achievement_pb_terokkar_turkey_time() : AchievementCriteriaScript("achievement_pb_terokkar_turkey_time") { }
 
-    bool OnCheck(Player* source, Unit* /*target*/)
+    bool OnCheck(Player* source, Unit* /*target*/) override
     {
         if (source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_HAT, 1) && (source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_DRESS, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ROBE, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ATTIRE, 1)))
             return true;

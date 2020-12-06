@@ -133,7 +133,7 @@ class PatcherRunnable: public acore::Runnable
 {
 public:
     PatcherRunnable(class AuthSocket*);
-    void run();
+    void run() override;
 
 private:
     AuthSocket* mySocket;

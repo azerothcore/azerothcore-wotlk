@@ -764,7 +764,7 @@ class WorldObject : public Object, public WorldLocation
 protected:
     explicit WorldObject(bool isWorldObject); //note: here it means if it is in grid object list or world object list
 public:
-    virtual ~WorldObject();
+    ~WorldObject() override;
 
 #ifdef ELUNA
     virtual void Update(uint32 /*time_diff*/);
@@ -773,7 +773,7 @@ public:
 #endif
     void _Create(uint32 guidlow, HighGuid guidhigh, uint32 phaseMask);
 
-    virtual void RemoveFromWorld()
+    void RemoveFromWorld() override
     {
         if (!IsInWorld())
             return;
@@ -1005,7 +1005,7 @@ public:
 
     void DestroyForNearbyPlayers();
     virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
-    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set);
+    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set) override;
     void GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry);
 
     //relocation and visibility system functions

@@ -144,9 +144,9 @@ class PreparedStatementTask : public SQLOperation
 public:
     PreparedStatementTask(PreparedStatement* stmt);
     PreparedStatementTask(PreparedStatement* stmt, PreparedQueryResultFuture result);
-    ~PreparedStatementTask();
+    ~PreparedStatementTask() override;
 
-    bool Execute();
+    bool Execute() override;
 
 protected:
     PreparedStatement* m_stmt;

@@ -1138,7 +1138,7 @@ class Player : public Unit, public GridObject<Player>
     friend void Item::RemoveFromUpdateQueueOf(Player* player);
 public:
     explicit Player(WorldSession* session);
-    ~Player();
+    ~Player() override;
 
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
@@ -1805,12 +1805,12 @@ public:
 
     static uint32 const infinityCooldownDelay = 0x9A7EC800;  // used for set "infinity cooldowns" for spells and check, MONTH*IN_MILLISECONDS
     static uint32 const infinityCooldownDelayCheck = 0x4D3F6400; //MONTH*IN_MILLISECONDS/2;
-    [[nodiscard]] virtual bool HasSpellCooldown(uint32 spell_id) const override
+    [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override
     {
         SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
         return itr != m_spellCooldowns.end() && itr->second.end > World::GetGameTimeMS();
     }
-    [[nodiscard]] virtual bool HasSpellItemCooldown(uint32 spell_id, uint32 itemid) const override
+    [[nodiscard]] bool HasSpellItemCooldown(uint32 spell_id, uint32 itemid) const override
     {
         SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
         return itr != m_spellCooldowns.end() && itr->second.end > World::GetGameTimeMS() && itr->second.itemid == itemid;
@@ -2048,7 +2048,7 @@ public:
     void SendResetInstanceFailed(uint32 reason, uint32 MapId);
     void SendResetFailedNotify(uint32 mapid);
 
-    virtual bool UpdatePosition(float x, float y, float z, float orientation, bool teleport = false) override;
+    bool UpdatePosition(float x, float y, float z, float orientation, bool teleport = false) override;
     bool UpdatePosition(const Position& pos, bool teleport = false) { return UpdatePosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), teleport); }
     void UpdateUnderwaterState(Map* m, float x, float y, float z) override;
 

@@ -49,10 +49,10 @@ class TransactionTask : public SQLOperation
 
 public:
     TransactionTask(SQLTransaction trans) : m_trans(trans) { } ;
-    ~TransactionTask() { };
+    ~TransactionTask() override { };
 
 protected:
-    bool Execute();
+    bool Execute() override;
 
     SQLTransaction m_trans;
 };

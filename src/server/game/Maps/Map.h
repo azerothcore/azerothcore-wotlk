@@ -274,7 +274,7 @@ class Map : public GridRefManager<NGridType>
     friend class MapReference;
 public:
     Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
-    virtual ~Map();
+    ~Map() override;
 
     [[nodiscard]] MapEntry const* GetEntry() const { return i_mapEntry; }
 
@@ -676,24 +676,24 @@ class InstanceMap : public Map
 {
 public:
     InstanceMap(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent);
-    ~InstanceMap();
-    bool AddPlayerToMap(Player*);
-    void RemovePlayerFromMap(Player*, bool);
-    void AfterPlayerUnlinkFromMap();
-    void Update(const uint32, const uint32, bool thread = true);
+    ~InstanceMap() override;
+    bool AddPlayerToMap(Player*) override;
+    void RemovePlayerFromMap(Player*, bool) override;
+    void AfterPlayerUnlinkFromMap() override;
+    void Update(const uint32, const uint32, bool thread = true) override;
     void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
     bool Reset(uint8 method, std::list<uint32>* globalSkipList = nullptr);
     uint32 GetScriptId() { return i_script_id; }
     InstanceScript* GetInstanceScript() { return instance_script; }
     void PermBindAllPlayers();
-    void UnloadAll();
-    bool CanEnter(Player* player, bool loginCheck = false);
+    void UnloadAll() override;
+    bool CanEnter(Player* player, bool loginCheck = false) override;
     void SendResetWarnings(uint32 timeLeft) const;
 
     [[nodiscard]] uint32 GetMaxPlayers() const;
     [[nodiscard]] uint32 GetMaxResetDelay() const;
 
-    virtual void InitVisibilityDistance();
+    void InitVisibilityDistance() override;
 private:
     bool m_resetAfterUnload;
     bool m_unloadWhenEmpty;
@@ -705,16 +705,16 @@ class BattlegroundMap : public Map
 {
 public:
     BattlegroundMap(uint32 id, uint32 InstanceId, Map* _parent, uint8 spawnMode);
-    ~BattlegroundMap();
+    ~BattlegroundMap() override;
 
-    bool AddPlayerToMap(Player*);
-    void RemovePlayerFromMap(Player*, bool);
-    bool CanEnter(Player* player, bool loginCheck = false);
+    bool AddPlayerToMap(Player*) override;
+    void RemovePlayerFromMap(Player*, bool) override;
+    bool CanEnter(Player* player, bool loginCheck = false) override;
     void SetUnload();
     //void UnloadAll(bool pForce);
-    void RemoveAllPlayers();
+    void RemoveAllPlayers() override;
 
-    virtual void InitVisibilityDistance();
+    void InitVisibilityDistance() override;
     Battleground* GetBG() { return m_bg; }
     void SetBG(Battleground* bg) { m_bg = bg; }
 private:

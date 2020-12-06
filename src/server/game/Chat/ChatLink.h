@@ -49,8 +49,8 @@ public:
     {
         memset(_data, 0, sizeof(_data));
     }
-    virtual bool Initialize(std::istringstream& iss);
-    virtual bool ValidateName(char* buffer, const char* context);
+    bool Initialize(std::istringstream& iss) override;
+    bool ValidateName(char* buffer, const char* context) override;
 
 protected:
     std::string FormatName(uint8 index, ItemLocale const* locale, char* const* suffixStrings) const;
@@ -66,8 +66,8 @@ class QuestChatLink : public ChatLink
 {
 public:
     QuestChatLink() : ChatLink(), _quest(nullptr), _questLevel(0) { }
-    virtual bool Initialize(std::istringstream& iss);
-    virtual bool ValidateName(char* buffer, const char* context);
+    bool Initialize(std::istringstream& iss) override;
+    bool ValidateName(char* buffer, const char* context) override;
 
 protected:
     Quest const* _quest;
@@ -79,8 +79,8 @@ class SpellChatLink : public ChatLink
 {
 public:
     SpellChatLink() : ChatLink(), _spell(nullptr) { }
-    virtual bool Initialize(std::istringstream& iss);
-    virtual bool ValidateName(char* buffer, const char* context);
+    bool Initialize(std::istringstream& iss) override;
+    bool ValidateName(char* buffer, const char* context) override;
 
 protected:
     SpellInfo const* _spell;
@@ -94,8 +94,8 @@ public:
     {
         memset(_data, 0, sizeof(_data));
     }
-    virtual bool Initialize(std::istringstream& iss);
-    virtual bool ValidateName(char* buffer, const char* context);
+    bool Initialize(std::istringstream& iss) override;
+    bool ValidateName(char* buffer, const char* context) override;
 
 protected:
     uint32 _guid;
@@ -108,7 +108,7 @@ class TradeChatLink : public SpellChatLink
 {
 public:
     TradeChatLink() : SpellChatLink(), _minSkillLevel(0), _maxSkillLevel(0), _guid(0) { }
-    virtual bool Initialize(std::istringstream& iss);
+    bool Initialize(std::istringstream& iss) override;
 private:
     int32 _minSkillLevel;
     int32 _maxSkillLevel;
@@ -121,7 +121,7 @@ class TalentChatLink : public SpellChatLink
 {
 public:
     TalentChatLink() : SpellChatLink(), _talentId(0), _rankId(0) { }
-    virtual bool Initialize(std::istringstream& iss);
+    bool Initialize(std::istringstream& iss) override;
 
 private:
     uint32 _talentId;
@@ -133,7 +133,7 @@ class EnchantmentChatLink : public SpellChatLink
 {
 public:
     EnchantmentChatLink() : SpellChatLink() { }
-    virtual bool Initialize(std::istringstream& iss);
+    bool Initialize(std::istringstream& iss) override;
 };
 
 // GlyphChatLink - link to glyph
@@ -141,7 +141,7 @@ class GlyphChatLink : public SpellChatLink
 {
 public:
     GlyphChatLink() : SpellChatLink(), _slotId(0), _glyph(nullptr) { }
-    virtual bool Initialize(std::istringstream& iss);
+    bool Initialize(std::istringstream& iss) override;
 private:
     uint32 _slotId;
     GlyphPropertiesEntry const* _glyph;

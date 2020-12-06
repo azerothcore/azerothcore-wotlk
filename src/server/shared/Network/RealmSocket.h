@@ -31,7 +31,7 @@ public:
     };
 
     RealmSocket(void);
-    virtual ~RealmSocket(void);
+    ~RealmSocket(void) override;
 
     [[nodiscard]] size_t recv_len(void) const;
     bool recv_soft(char* buf, size_t len);
@@ -44,14 +44,14 @@ public:
 
     [[nodiscard]] uint16 getRemotePort(void) const;
 
-    virtual int open(void*);
+    int open(void*) override;
 
-    virtual int close(u_long);
+    int close(u_long) override;
 
-    virtual int handle_input(ACE_HANDLE = ACE_INVALID_HANDLE);
-    virtual int handle_output(ACE_HANDLE = ACE_INVALID_HANDLE);
+    int handle_input(ACE_HANDLE = ACE_INVALID_HANDLE) override;
+    int handle_output(ACE_HANDLE = ACE_INVALID_HANDLE) override;
 
-    virtual int handle_close(ACE_HANDLE = ACE_INVALID_HANDLE, ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK);
+    int handle_close(ACE_HANDLE = ACE_INVALID_HANDLE, ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK) override;
 
     void set_session(Session* session);
 

@@ -49,7 +49,7 @@ public:
         _indexTable.AsT = nullptr;
     }
 
-    ~DBCStorage()
+    ~DBCStorage() override
     {
         delete[] reinterpret_cast<char*>(_indexTable.AsT);
     }

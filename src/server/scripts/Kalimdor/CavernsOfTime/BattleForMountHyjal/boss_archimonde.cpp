@@ -91,7 +91,7 @@ class npc_ancient_wisp : public CreatureScript
 public:
     npc_ancient_wisp() : CreatureScript("npc_ancient_wisp") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_ancient_wispAI>(creature);
     }
@@ -108,7 +108,7 @@ public:
         uint64 ArchimondeGUID;
         uint32 CheckTimer;
 
-        void Reset()
+        void Reset() override
         {
             CheckTimer = 1000;
 
@@ -117,14 +117,14 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (CheckTimer <= diff)
             {
@@ -149,7 +149,7 @@ class npc_doomfire : public CreatureScript
 public:
     npc_doomfire() : CreatureScript("npc_doomfire") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_doomfireAI(creature);
     }
@@ -158,13 +158,13 @@ public:
     {
         npc_doomfireAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
@@ -178,7 +178,7 @@ class npc_doomfire_targetting : public CreatureScript
 public:
     npc_doomfire_targetting() : CreatureScript("npc_doomfire_targetting") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_doomfire_targettingAI(creature);
     }
@@ -190,13 +190,13 @@ public:
         uint64 TargetGUID;
         uint32 ChangeTargetTimer;
 
-        void Reset()
+        void Reset() override
         {
             TargetGUID = 0;
             ChangeTargetTimer = 5000;
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             //will update once TargetGUID is 0. In case noone actually moves(not likely) and this is 0
@@ -205,14 +205,14 @@ public:
                 TargetGUID = who->GetGUID();
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (ChangeTargetTimer <= diff)
             {
@@ -248,7 +248,7 @@ class boss_archimonde : public CreatureScript
 public:
     boss_archimonde() : CreatureScript("boss_archimonde") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_archimondeAI>(creature);
     }
@@ -704,7 +704,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_red_sky_effect_SpellScript();
     }
@@ -733,7 +733,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_finger_of_death_SpellScript();
     }
@@ -762,7 +762,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hand_of_death_SpellScript();
     }

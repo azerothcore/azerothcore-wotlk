@@ -133,11 +133,11 @@ class MapSessionFilter : public PacketFilter
 {
 public:
     explicit MapSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
-    ~MapSessionFilter() {}
+    ~MapSessionFilter() override {}
 
-    virtual bool Process(WorldPacket* packet);
+    bool Process(WorldPacket* packet) override;
     //in Map::Update() we do not process player logout!
-    [[nodiscard]] virtual bool ProcessLogout() const { return false; }
+    [[nodiscard]] bool ProcessLogout() const override { return false; }
 };
 
 //class used to filer only thread-unsafe packets from queue
@@ -146,9 +146,9 @@ class WorldSessionFilter : public PacketFilter
 {
 public:
     explicit WorldSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
-    ~WorldSessionFilter() {}
+    ~WorldSessionFilter() override {}
 
-    virtual bool Process(WorldPacket* packet);
+    bool Process(WorldPacket* packet) override;
 };
 
 // Proxy structure to contain data passed to callback function,

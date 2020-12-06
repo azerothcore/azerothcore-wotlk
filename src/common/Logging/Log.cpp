@@ -65,10 +65,11 @@ Log::~Log()
     miscLogFile = NULL;
 }
 
-Log* Log::instance()
+
+std::unique_ptr<ILog>& getLogInstance()
 {
-    static Log instance;
-    return &instance;
+    static std::unique_ptr<ILog> instance = std::make_unique<Log>();
+    return instance;
 }
 
 void Log::SetLogLevel(char* Level)

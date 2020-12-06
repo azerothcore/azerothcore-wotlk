@@ -27,7 +27,7 @@ public:
         {
         }
 
-        void Initialize()
+        void Initialize() override
         {
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
@@ -39,7 +39,7 @@ public:
             LurkerBelowGUID = 0;
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -52,7 +52,7 @@ public:
             return true;
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -71,7 +71,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -84,7 +84,7 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -115,7 +115,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier) const
+        uint64 GetData64(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -129,7 +129,7 @@ public:
             return 0;
         }
 
-        void SetData(uint32 type, uint32  /*data*/)
+        void SetData(uint32 type, uint32  /*data*/) override
         {
             switch (type)
             {
@@ -155,7 +155,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             if (type == DATA_ALIVE_KEEPERS)
                 return AliveKeepersCount;
@@ -163,7 +163,7 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -174,7 +174,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(char const* str)
+        void Load(char const* str) override
         {
             if (!str)
             {
@@ -214,7 +214,7 @@ public:
         int32 AliveKeepersCount;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_serpentshrine_cavern_InstanceMapScript(map);
     }
@@ -235,13 +235,13 @@ public:
                 GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_SERPENTSHRINE_PARASITE, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_serpentshrine_parasite_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_serpentshrine_cavern_serpentshrine_parasite_AuraScript();
     }
@@ -262,13 +262,13 @@ public:
                 GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_SERPENTSHRINE_PARASITE, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_serpentshrine_parasite_trigger_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_serpentshrine_cavern_serpentshrine_parasite_trigger_AuraScript();
     }
@@ -284,13 +284,13 @@ public:
                 target->DespawnOrUnsummon(1);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_serpentshrine_cavern_serpentshrine_parasite_trigger_SpellScript::HandleApplyAura, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_serpentshrine_cavern_serpentshrine_parasite_trigger_SpellScript();
     }
@@ -317,13 +317,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_infection_AuraScript::HandleEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_serpentshrine_cavern_infection_AuraScript();
     }
@@ -379,7 +379,7 @@ public:
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FRENZY_WATER, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectApplyFn(spell_serpentshrine_cavern_coilfang_water_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_coilfang_water_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
@@ -389,7 +389,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_serpentshrine_cavern_coilfang_water_AuraScript();
     }

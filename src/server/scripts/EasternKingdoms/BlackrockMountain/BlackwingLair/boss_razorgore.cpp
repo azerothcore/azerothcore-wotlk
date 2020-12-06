@@ -58,7 +58,7 @@ public:
     {
         boss_razorgoreAI(Creature* creature) : BossAI(creature, BOSS_RAZORGORE) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
 
@@ -66,7 +66,7 @@ public:
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_DEATH);
@@ -86,19 +86,19 @@ public:
             me->SetHealth(me->GetMaxHealth());
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_PHASE_TWO)
                 DoChangePhase();
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!secondPhase)
                 damage = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -140,7 +140,7 @@ public:
         bool secondPhase;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_razorgoreAI>(creature);
     }
@@ -179,13 +179,13 @@ public:
                 instance->SetData(DATA_EGG_EVENT, SPECIAL);
         }
 
-        void Register()
+        void Register() override
         {
             OnHit += SpellHitFn(spell_egg_eventSpellScript::HandleOnHit);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_egg_eventSpellScript();
     }

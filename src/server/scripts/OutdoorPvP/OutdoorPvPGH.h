@@ -29,8 +29,8 @@ class OutdoorPvPGH : public OutdoorPvP
 {
 public:
     OutdoorPvPGH();
-    bool SetupOutdoorPvP();
-    void SendRemoveWorldStates(Player* player);
+    bool SetupOutdoorPvP() override;
+    void SendRemoveWorldStates(Player* player) override;
 
 private:
     OPvPCapturePointGH* m_obj;
@@ -41,13 +41,13 @@ class OPvPCapturePointGH : public OPvPCapturePoint
 public:
     OPvPCapturePointGH(OutdoorPvP* pvp);
 
-    void ChangeState();
-    void SendChangePhase();
+    void ChangeState() override;
+    void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-    bool HandlePlayerEnter(Player* player);
-    void HandlePlayerLeave(Player* player);
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 };
 
 #endif
