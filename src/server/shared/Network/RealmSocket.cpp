@@ -11,11 +11,11 @@
 #include "RealmSocket.h"
 #include "Log.h"
 
-RealmSocket::Session::Session(void) { }
+RealmSocket::Session::Session() { }
 
-RealmSocket::Session::~Session(void) { }
+RealmSocket::Session::~Session() { }
 
-RealmSocket::RealmSocket(void) :
+RealmSocket::RealmSocket() :
     input_buffer_(4096), session_(nullptr),
     _remoteAddress(), _remotePort(0)
 {
@@ -25,7 +25,7 @@ RealmSocket::RealmSocket(void) :
     msg_queue()->low_water_mark(8 * 1024 * 1024);
 }
 
-RealmSocket::~RealmSocket(void)
+RealmSocket::~RealmSocket()
 {
     if (msg_queue())
         msg_queue()->close();
@@ -75,17 +75,17 @@ int RealmSocket::close(u_long)
     return 0;
 }
 
-const std::string& RealmSocket::getRemoteAddress(void) const
+const std::string& RealmSocket::getRemoteAddress() const
 {
     return _remoteAddress;
 }
 
-uint16 RealmSocket::getRemotePort(void) const
+uint16 RealmSocket::getRemotePort() const
 {
     return _remotePort;
 }
 
-size_t RealmSocket::recv_len(void) const
+size_t RealmSocket::recv_len() const
 {
     return input_buffer_.length();
 }
@@ -148,11 +148,11 @@ ssize_t RealmSocket::noblk_send(ACE_Message_Block& message_block)
 
 bool RealmSocket::send(const char* buf, size_t len)
 {
-    if (buf == NULL || len == 0)
+    if (buf == nullptr || len == 0)
         return true;
 
-    ACE_Data_Block db(len, ACE_Message_Block::MB_DATA, (const char*)buf, 0, 0, ACE_Message_Block::DONT_DELETE, 0);
-    ACE_Message_Block message_block(&db, ACE_Message_Block::DONT_DELETE, 0);
+    ACE_Data_Block db(len, ACE_Message_Block::MB_DATA, (const char*)buf, nullptr, nullptr, ACE_Message_Block::DONT_DELETE, nullptr);
+    ACE_Message_Block message_block(&db, ACE_Message_Block::DONT_DELETE, nullptr);
 
     message_block.wr_ptr(len);
 
@@ -191,7 +191,7 @@ int RealmSocket::handle_output(ACE_HANDLE)
     if (closing_)
         return -1;
 
-    ACE_Message_Block* mb = 0;
+    ACE_Message_Block* mb = nullptr;
 
     if (msg_queue()->is_empty())
     {

@@ -36,7 +36,7 @@ public:
         m_opcode = opcode;
     }
 
-    uint16 GetOpcode() const { return m_opcode; }
+    [[nodiscard]] uint16 GetOpcode() const { return m_opcode; }
     void SetOpcode(uint16 opcode) { m_opcode = opcode; }
 
 protected:
