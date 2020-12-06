@@ -901,10 +901,10 @@ public:
 
     void SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) override; // pussywizard!
 
-    void ModifyHealth(int32 change, Unit* attackerOrHealer = NULL, uint32 spellId = 0);
+    void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
     void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
     // sets GameObject type 33 destruction flags and optionally default health for that state
-    void SetDestructibleState(GameObjectDestructibleState state, Player* eventInvoker = NULL, bool setHealth = false);
+    void SetDestructibleState(GameObjectDestructibleState state, Player* eventInvoker = nullptr, bool setHealth = false);
     [[nodiscard]] GameObjectDestructibleState GetDestructibleState() const
     {
         if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED))
