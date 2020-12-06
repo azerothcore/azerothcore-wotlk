@@ -14,7 +14,7 @@ To install and AzerothCore using Docker, you have two options
 
 #### Option A. Using Docker Compose (very easy - recommended)
 
-- Check the [Install with Docker](http://www.azerothcore.org/wiki/install-with-Docker) guide.
+- Check the [Install with Docker](https://www.azerothcore.org/wiki/Install-with-Docker) guide.
 
 #### Option B. Build and start each container manually (longer - not recommended)
 

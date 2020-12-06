@@ -300,7 +300,7 @@ void Item::UpdateDuration(Player* owner, uint32 diff)
 
 void Item::SaveToDB(SQLTransaction& trans)
 {
-    bool isInTransaction = !(trans.null());
+    bool isInTransaction = static_cast<bool>(trans);
     if (!isInTransaction)
         trans = CharacterDatabase.BeginTransaction();
 
@@ -962,6 +962,13 @@ bool Item::GemsFitSockets() const
     return true;
 }
 
+bool Item::HasSocket() const
+{
+    // There can only be one socket added, and it's always in slot `PRISMATIC_ENCHANTMENT_SLOT`.
+    //     Built-in sockets                        Socket from upgrade
+    return this->GetTemplate()->Socket[0].Color || this->GetEnchantmentId(EnchantmentSlot(PRISMATIC_ENCHANTMENT_SLOT));
+}
+
 uint8 Item::GetGemCountWithID(uint32 GemID) const
 {
     uint8 count = 0;
@@ -1128,12 +1135,11 @@ void Item::SaveRefundDataToDB()
 
 void Item::DeleteRefundDataFromDB(SQLTransaction* trans)
 {
-    if (trans && !trans->null())
+    if (trans)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE);
         stmt->setUInt32(0, GetGUIDLow());
         (*trans)->Append(stmt);
-
     }
 }
 

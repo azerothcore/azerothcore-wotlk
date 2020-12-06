@@ -89,9 +89,8 @@ enum eEnums
     EVENT_LIGHTNING_TENDRILS    = 24,
     EVENT_LIGHTNING_LAND        = 25,
     EVENT_LAND_LAND             = 26,
-    EVENT_IMMUNE                = 27,
 
-    EVENT_ENRAGE                = 30,
+    EVENT_ENRAGE                = 30
 };
 
 enum AssemblyYells
@@ -623,8 +622,6 @@ public:
             me->SetDisableGravity(false);
             me->SetRegeneratingHealth(true);
             me->SetReactState(REACT_AGGRESSIVE);
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
-
             if (pInstance)
                 pInstance->SetData(TYPE_ASSEMBLY, NOT_STARTED);
         }
@@ -768,15 +765,10 @@ public:
 
                     events.RepeatEvent(urand(9000, 17000));
                     break;
-                case EVENT_IMMUNE:
-                    me->ApplySpellImmune(1, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
-                    break;
                 case EVENT_OVERLOAD:
-                    me->ApplySpellImmune(1, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
                     Talk(EMOTE_BRUNDIR_OVERLOAD);
                     me->CastSpell(me, SPELL_OVERLOAD, true);
                     events.RescheduleEvent(EVENT_OVERLOAD, urand(25000, 40000));
-                    events.RescheduleEvent(EVENT_IMMUNE, 5999);
                     break;
                 case EVENT_LIGHTNING_WHIRL:
                     Talk(SAY_BRUNDIR_SPECIAL);
@@ -805,8 +797,6 @@ public:
                         me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
                         me->CastSpell(me, 61883, true);
                         events.ScheduleEvent(EVENT_LIGHTNING_LAND, 16000);
-
-                        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
                         break;
                     }
                 case EVENT_LIGHTNING_LAND:
@@ -829,7 +819,6 @@ public:
                     me->RemoveAura(SPELL_LIGHTNING_TENDRILS);
                     me->RemoveAura(61883);
                     DoResetThreat();
-                    me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
                     break;
                 case EVENT_ENRAGE:
                     Talk(SAY_BRUNDIR_BERSERK);

@@ -2392,14 +2392,17 @@ Rate.Drop.Item.ReferencedAmount = 1
 #    Rate.XP.Kill
 #    Rate.XP.Quest
 #    Rate.XP.Explore
+#    Rate.XP.Pet
 #        Description: Experience rates (outside battleground)
 #        Default:     1 - (Rate.XP.Kill)
 #                     1 - (Rate.XP.Quest)
 #                     1 - (Rate.XP.Explore)
+#                     1	- (Rate.XP.Pet)
 
 Rate.XP.Kill    = 1
 Rate.XP.Quest   = 1
 Rate.XP.Explore = 1
+Rate.XP.Pet     = 1
 
 #
 #    Rate.XP.BattlegroundKill
@@ -2515,6 +2518,14 @@ Rate.MoveSpeed = 1
 #        Default:     1
 
 Rate.InstanceResetTime = 1
+
+#
+#    Rate.Pet.LevelXP
+#        Description: Modifies the amount of experience required to level up a pet.
+#					  The lower the rate the less experience is required.
+#        Default:     0.05
+#   
+Rate.Pet.LevelXP = 0.05
 
 #
 #    SkillGain.Crafting
@@ -2816,6 +2827,20 @@ Battleground.RewardWinnerHonorLast  = 15
 Battleground.RewardWinnerArenaLast  = 0
 Battleground.RewardLoserHonorFirst  = 5
 Battleground.RewardLoserHonorLast   = 5
+
+#
+#    Battleground.PlayerRespawn
+#        Description: Battleground player resurrection interval (in seconds).
+#        Default:     30
+
+Battleground.PlayerRespawn = 30
+
+#
+#    Battleground.BuffRespawn
+#        Description: Battleground buff respawn time (in seconds).
+#        Default:     180 (Recommended 10+)
+
+Battleground.BuffRespawn = 180
 
 #
 ###################################################################################################

@@ -10,8 +10,7 @@
 #define MIN_MYSQL_SERVER_VERSION 50600u
 #define MIN_MYSQL_CLIENT_VERSION 50600u
 
-template <class T>
-DatabaseWorkerPool<T>::DatabaseWorkerPool() :
+template <class T> DatabaseWorkerPool<T>::DatabaseWorkerPool() :
     _mqueue(new ACE_Message_Queue<ACE_SYNCH>(2 * 1024 * 1024, 2 * 1024 * 1024)),
     _queue(new ACE_Activation_Queue(_mqueue))
 {
@@ -263,7 +262,7 @@ void DatabaseWorkerPool<T>::DirectCommitTransaction(SQLTransaction& transaction)
 template <class T>
 void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, PreparedStatement* stmt)
 {
-    if (trans.null())
+    if (!trans)
         Execute(stmt);
     else
         trans->Append(stmt);
@@ -272,7 +271,7 @@ void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, PreparedState
 template <class T>
 void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, const char* sql)
 {
-    if (trans.null())
+    if (!trans)
         Execute(sql);
     else
         trans->Append(sql);
