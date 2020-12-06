@@ -38,7 +38,7 @@ class Corpse : public WorldObject, public GridObject<Corpse>
 {
 public:
     explicit Corpse(CorpseType type = CORPSE_BONES);
-    ~Corpse();
+    ~Corpse() override;
 
     void AddToWorld() override;
     void RemoveFromWorld() override;

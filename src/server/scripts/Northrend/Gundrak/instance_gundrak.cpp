@@ -21,7 +21,7 @@ class instance_gundrak : public InstanceMapScript
 public:
     instance_gundrak() : InstanceMapScript("instance_gundrak", 604) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_gundrak_InstanceMapScript(pMap);
     }
@@ -39,7 +39,7 @@ public:
         uint32 _keysInCount;
         uint32 _activateTimer;
 
-        void Initialize()
+        void Initialize() override
         {
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
@@ -52,7 +52,7 @@ public:
             memset(&_bridgeGUIDs, 0, sizeof(_bridgeGUIDs));
         }
 
-        void OnGameObjectCreate(GameObject* gameobject)
+        void OnGameObjectCreate(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
             {
@@ -102,7 +102,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* gameobject)
+        void OnGameObjectRemove(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
             {
@@ -116,7 +116,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32)
+        void SetData(uint32 type, uint32) override
         {
             switch (type)
             {
@@ -151,7 +151,7 @@ public:
             }
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
             {
@@ -188,14 +188,14 @@ public:
             return true;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             std::ostringstream saveStream;
             saveStream << "G D " << GetBossSaveData();
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
                 return;
@@ -216,7 +216,7 @@ public:
             }
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (!_activateTimer)
                 return;

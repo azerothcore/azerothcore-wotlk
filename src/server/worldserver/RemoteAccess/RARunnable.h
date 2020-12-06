@@ -19,8 +19,8 @@ class RARunnable : public acore::Runnable
 {
 public:
     RARunnable();
-    virtual ~RARunnable();
-    void run();
+    ~RARunnable() override;
+    void run() override;
 
 private:
     ACE_Reactor* m_Reactor;

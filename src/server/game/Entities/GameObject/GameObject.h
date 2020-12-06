@@ -731,7 +731,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
 {
 public:
     explicit GameObject();
-    ~GameObject();
+    ~GameObject() override;
 
     void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, Player* target) const override;
 
