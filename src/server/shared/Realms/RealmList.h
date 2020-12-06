@@ -54,9 +54,9 @@ public:
     void UpdateIfNeed();
     void AddRealm(const Realm& NewRealm) { m_realms[NewRealm.name] = NewRealm; }
 
-    RealmMap::const_iterator begin() const { return m_realms.begin(); }
-    RealmMap::const_iterator end() const { return m_realms.end(); }
-    uint32 size() const { return m_realms.size(); }
+    [[nodiscard]] RealmMap::const_iterator begin() const { return m_realms.begin(); }
+    [[nodiscard]] RealmMap::const_iterator end() const { return m_realms.end(); }
+    [[nodiscard]] uint32 size() const { return m_realms.size(); }
 
 private:
     void UpdateRealms(bool init = false);

@@ -71,7 +71,7 @@ struct VehicleSeat
         Passenger.Reset();
     }
 
-    bool IsEmpty() const { return !Passenger.Guid; }
+    [[nodiscard]] bool IsEmpty() const { return !Passenger.Guid; }
 
     VehicleSeatEntry const* SeatInfo;
     PassengerInfo Passenger;
