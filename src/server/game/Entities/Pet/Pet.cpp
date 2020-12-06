@@ -23,8 +23,6 @@
 #include "InstanceScript.h"
 #include "ArenaSpectator.h"
 
-#define PET_XP_FACTOR 0.05f
-
 Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID() : 0, true),
     m_usedTalentCount(0), m_removed(false), m_owner(owner),
     m_happinessTimer(PET_LOSE_HAPPINES_INTERVAL), m_petType(type), m_duration(0),
@@ -585,6 +583,8 @@ void Pet::GivePetXP(uint32 xp)
     if (getPetType() != HUNTER_PET)
         return;
 
+    xp *= sWorld->getRate(RATE_XP_PET);
+
     if (xp < 1)
         return;
 
@@ -625,7 +625,7 @@ void Pet::GivePetLevel(uint8 level)
     if (getPetType() == HUNTER_PET)
     {
         SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-        SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(level)*PET_XP_FACTOR));
+        SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(level)*sWorld->getRate(RATE_XP_PET_NEXT_LEVEL)));
     }
 
     InitStatsForLevel(level);
@@ -694,7 +694,7 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     setPowerType(POWER_FOCUS);
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(getLevel() + 1)*PET_XP_FACTOR));
+    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(getLevel() + 1)* sWorld->getRate(RATE_XP_PET_NEXT_LEVEL)));
     SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
     if (cinfo->type == CREATURE_TYPE_BEAST)
@@ -834,7 +834,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             {
                 SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
                 SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
-                SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(petlevel)*PET_XP_FACTOR));
+                SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(petlevel)* sWorld->getRate(RATE_XP_PET_NEXT_LEVEL)));
                 break;
             }
         case SUMMON_PET:
