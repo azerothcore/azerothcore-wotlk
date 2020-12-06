@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_stropts.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
  *  @author and a cast of thousands...
  *
@@ -73,7 +73,6 @@ typedef unsigned long ACE_SOCK_GROUP;
 class ACE_Export ACE_Str_Buf : public strbuf
 {
 public:
-  // = Initialization method
   /// Constructor.
   ACE_Str_Buf (void *b = 0, int l = 0, int max = 0);
 
