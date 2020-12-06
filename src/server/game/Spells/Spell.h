@@ -399,7 +399,7 @@ public:
     void SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList);
     void SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, SpellTargetSelectionCategories selectCategory, ConditionList* condList, bool isChainHeal);
 
-    void prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = nullptr);
+    SpellCastResult prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = nullptr);
     void cancel(bool bySelf = false);
     void update(uint32 difftime);
     void cast(bool skipCheck = false);
