@@ -28,12 +28,12 @@ public:
     ~ResultSet();
 
     bool NextRow();
-    uint64 GetRowCount() const { return _rowCount; }
-    uint32 GetFieldCount() const { return _fieldCount; }
+    [[nodiscard]] uint64 GetRowCount() const { return _rowCount; }
+    [[nodiscard]] uint32 GetFieldCount() const { return _fieldCount; }
 #ifdef ELUNA
     std::string GetFieldName(uint32 index) const;
 #endif
-    Field* Fetch() const { return _currentRow; }
+    [[nodiscard]] Field* Fetch() const { return _currentRow; }
     const Field& operator [] (uint32 index) const
     {
         ASSERT(index < _fieldCount);
@@ -60,10 +60,10 @@ public:
     ~PreparedResultSet();
 
     bool NextRow();
-    uint64 GetRowCount() const { return m_rowCount; }
-    uint32 GetFieldCount() const { return m_fieldCount; }
+    [[nodiscard]] uint64 GetRowCount() const { return m_rowCount; }
+    [[nodiscard]] uint32 GetFieldCount() const { return m_fieldCount; }
 
-    Field* Fetch() const
+    [[nodiscard]] Field* Fetch() const
     {
         ASSERT(m_rowPosition < m_rowCount);
         return m_rows[uint32(m_rowPosition)];

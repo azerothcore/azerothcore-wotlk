@@ -124,7 +124,7 @@ protected:
     PreparedStatement* m_stmt;
     void ClearParameters();
     bool CheckValidIndex(uint8 index);
-    std::string getQueryString(std::string const& sqlPattern) const;
+    [[nodiscard]] std::string getQueryString(std::string const& sqlPattern) const;
 
 private:
     void setValue(MYSQL_BIND* param, enum_field_types type, const void* value, uint32 len, bool isUnsigned);
