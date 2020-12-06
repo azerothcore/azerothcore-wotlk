@@ -125,9 +125,9 @@ bool WMORoot::ConvertToVMAPRootWmo(FILE* pOutfile)
     return true;
 }
 
-WMOGroup::WMOGroup(std::string  filename) :
-    filename(std::move(filename)), MOPY(0), MOVI(0), MoviEx(0), MOVT(0), MOBA(0), MobaEx(0),
-    hlq(0), LiquEx(0), LiquBytes(0), groupName(0), descGroupName(0), mogpFlags(0),
+WMOGroup::WMOGroup(std::string filename) :
+    filename(std::move(filename)), MOPY(nullptr), MOVI(nullptr), MoviEx(nullptr), MOVT(nullptr), MOBA(nullptr), MobaEx(nullptr),
+    hlq(nullptr), LiquEx(nullptr), LiquBytes(nullptr), groupName(0), descGroupName(0), mogpFlags(0),
     moprIdx(0), moprNItems(0), nBatchA(0), nBatchB(0), nBatchC(0), fogIdx(0),
     liquidType(0), groupWMOID(0), mopy_size(0), moba_size(0), LiquEx_size(0),
     nVertices(0), nTriangles(0), liquflags(0)
