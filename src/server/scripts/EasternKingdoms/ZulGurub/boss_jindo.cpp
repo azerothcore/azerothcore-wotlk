@@ -54,17 +54,17 @@ public:
     {
         boss_jindoAI(Creature* creature) : BossAI(creature, DATA_JINDO) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_BRAINWASHTOTEM, 20000);
@@ -75,7 +75,7 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -165,7 +165,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_jindoAI(creature);
     }
@@ -192,16 +192,16 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() override
         {
             Heal_Timer = 2000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Heal_Timer
             if (Heal_Timer <= diff)
@@ -217,7 +217,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_healing_wardAI>(creature);
     }
@@ -239,15 +239,15 @@ public:
 
         uint32 ShadowShock_Timer;
 
-        void Reset()
+        void Reset() override
         {
             ShadowShock_Timer = 1000;
             DoCast(me, SPELL_INVISIBLE, true);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
 
             //ShadowShock_Timer
@@ -262,7 +262,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_shade_of_jindoAI(creature);
     }
