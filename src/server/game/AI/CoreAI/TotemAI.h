@@ -19,13 +19,13 @@ public:
 
     explicit TotemAI(Creature* c);
 
-    void MoveInLineOfSight(Unit* who);
-    void AttackStart(Unit* victim);
-    void EnterEvadeMode();
-    void SpellHit(Unit* /*caster*/, const SpellInfo* /*spellInfo*/);
-    void DoAction(int32 param);
+    void MoveInLineOfSight(Unit* who) override;
+    void AttackStart(Unit* victim) override;
+    void EnterEvadeMode() override;
+    void SpellHit(Unit* /*caster*/, const SpellInfo* /*spellInfo*/) override;
+    void DoAction(int32 param) override;
 
-    void UpdateAI(uint32 diff);
+    void UpdateAI(uint32 diff) override;
     static int Permissible(Creature const* creature);
 
 private:
@@ -36,7 +36,7 @@ class KillMagnetEvent : public BasicEvent
 {
 public:
     KillMagnetEvent(Unit& self) : _self(self) { }
-    bool Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+    bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) override
     {
         _self.setDeathState(JUST_DIED);
         return true;

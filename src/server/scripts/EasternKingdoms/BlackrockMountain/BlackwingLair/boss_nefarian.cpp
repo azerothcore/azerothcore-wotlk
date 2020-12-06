@@ -162,7 +162,7 @@ public:
         {
             Initialize();
         }
-
+        
         void Initialize()
         {
             SpawnedAdds = 0;
@@ -185,6 +185,8 @@ public:
                 me->RemoveAura(SPELL_NEFARIANS_BARRIER);
             }
         }
+
+        bool CanAIAttack(const Unit*  /*target*/) const override { return me->IsVisible(); }
 
         void JustReachedHome() override
         {
@@ -210,6 +212,7 @@ public:
         }
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+
         {
             if (summon->GetEntry() != NPC_NEFARIAN)
             {
@@ -588,7 +591,7 @@ public:
 
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_nefarianAI>(creature);
     }

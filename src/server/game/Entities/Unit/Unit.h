@@ -1373,7 +1373,7 @@ public:
 
     typedef std::map<uint8, AuraApplication*> VisibleAuraMap;
 
-    virtual ~Unit();
+    ~Unit() override;
 
     UnitAI* GetAI() { return i_AI; }
     void SetAI(UnitAI* newAI) { i_AI = newAI; }
@@ -1394,7 +1394,7 @@ public:
     float GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
     float GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
 
-    virtual void Update(uint32 time) override;
+    void Update(uint32 time) override;
 
     void setAttackTimer(WeaponAttackType type, int32 time) { m_attackTimer[type] = time; }
     void resetAttackTimer(WeaponAttackType type = BASE_ATTACK);
@@ -2638,7 +2638,7 @@ class ConflagrateAuraStateDelayEvent : public BasicEvent
 {
 public:
     ConflagrateAuraStateDelayEvent(uint64 ownerGUID, uint64 casterGUID) : BasicEvent(), m_owner(ownerGUID), m_caster(casterGUID) { }
-    bool Execute(uint64 e_time, uint32 p_time);
+    bool Execute(uint64 e_time, uint32 p_time) override;
 
 private:
     uint64 m_owner;
@@ -2649,7 +2649,7 @@ class RedirectSpellEvent : public BasicEvent
 {
 public:
     RedirectSpellEvent(Unit& self, uint64 auraOwnerGUID, AuraEffect* auraEffect) : _self(self), _auraOwnerGUID(auraOwnerGUID), _auraEffect(auraEffect) { }
-    bool Execute(uint64 e_time, uint32 p_time);
+    bool Execute(uint64 e_time, uint32 p_time) override;
 
 protected:
     Unit& _self;
@@ -2661,7 +2661,7 @@ class VehicleDespawnEvent : public BasicEvent
 {
 public:
     VehicleDespawnEvent(Unit& self, uint32 duration) : _self(self), _duration(duration) { }
-    bool Execute(uint64 e_time, uint32 p_time);
+    bool Execute(uint64 e_time, uint32 p_time) override;
 
 protected:
     Unit& _self;

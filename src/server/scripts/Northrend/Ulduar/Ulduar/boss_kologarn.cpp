@@ -129,7 +129,7 @@ class boss_kologarn : public CreatureScript
 public:
     boss_kologarn() : CreatureScript("boss_kologarn") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_kologarnAI (pCreature);
     }
@@ -501,7 +501,7 @@ class boss_kologarn_arms : public CreatureScript
 public:
     boss_kologarn_arms() : CreatureScript("boss_kologarn_arms") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_kologarn_armsAI (pCreature);
     }
@@ -513,18 +513,18 @@ public:
         int32 _damageDone;
         bool _combatStarted;
 
-        void EnterEvadeMode() {}
-        void MoveInLineOfSight(Unit*) {}
-        void AttackStart(Unit*) {}
-        void UpdateAI(uint32  /*diff*/) {}
+        void EnterEvadeMode() override {}
+        void MoveInLineOfSight(Unit*) override {}
+        void AttackStart(Unit*) override {}
+        void UpdateAI(uint32  /*diff*/) override {}
 
-        void Reset()
+        void Reset() override
         {
             _combatStarted = false;
             _damageDone = 0;
         }
 
-        void PassengerBoarded(Unit*  /*who*/, int8  /*seatId*/, bool apply)
+        void PassengerBoarded(Unit*  /*who*/, int8  /*seatId*/, bool apply) override
         {
             if (!apply)
                 _damageDone = 0;
@@ -536,7 +536,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!_combatStarted)
                 if (InstanceScript* instance = me->GetInstanceScript())
@@ -555,7 +555,7 @@ public:
             }
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             float x, y, z;
             // left arm
@@ -601,7 +601,7 @@ class boss_kologarn_eyebeam : public CreatureScript
 public:
     boss_kologarn_eyebeam() : CreatureScript("boss_kologarn_eyebeam") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_kologarn_eyebeamAI (pCreature);
     }
@@ -613,7 +613,7 @@ public:
         uint32 _timer;
         bool _damaged;
 
-        void DamageDealt(Unit* /*victim*/, uint32& damage, DamageEffectType /*damageType*/)
+        void DamageDealt(Unit* /*victim*/, uint32& damage, DamageEffectType /*damageType*/) override
         {
             if (damage > 0 && !_damaged && me->GetInstanceScript())
             {
@@ -623,7 +623,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_timer)
             {
@@ -669,7 +669,7 @@ public:
     {
         PrepareSpellScript(spell_ulduar_stone_grip_cast_target_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             if (GetCaster()->GetTypeId() != TYPEID_UNIT)
                 return false;
@@ -694,13 +694,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ulduar_stone_grip_cast_target_SpellScript::FilterTargetsInitial, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_ulduar_stone_grip_cast_target_SpellScript();
     }
@@ -721,13 +721,13 @@ public:
                 owner->RemoveAurasDueToSpell(aurEff->GetAmount());
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_ulduar_stone_grip_AuraScript::OnRemoveStun, EFFECT_2, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_ulduar_stone_grip_AuraScript();
     }
@@ -751,13 +751,13 @@ public:
             GetHitPlayer()->ExitVehicle();
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_ulduar_squeezed_lifeless_SpellScript::HandleInstaKill, EFFECT_1, SPELL_EFFECT_INSTAKILL);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_ulduar_squeezed_lifeless_SpellScript();
     }
@@ -779,14 +779,14 @@ public:
                 caster->CastSpell(caster, triggerSpellId, false);
         }
 
-        void Register()
+        void Register() override
         {
             if (m_scriptSpellId == SPELL_STONE_SHOUT_10 || m_scriptSpellId == SPELL_STONE_SHOUT_25)
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_kologarn_stone_shout_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_kologarn_stone_shout_AuraScript();
     }
@@ -800,14 +800,14 @@ public:
             targets.remove_if (PlayerOrPetCheck());
         }
 
-        void Register()
+        void Register() override
         {
             if (m_scriptSpellId != SPELL_STONE_SHOUT_10 && m_scriptSpellId != SPELL_STONE_SHOUT_25)
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kologarn_stone_shout_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kologarn_stone_shout_SpellScript();
     }
@@ -818,7 +818,7 @@ class achievement_kologarn_looks_could_kill : public AchievementCriteriaScript
 public:
     achievement_kologarn_looks_could_kill() : AchievementCriteriaScript("achievement_kologarn_looks_could_kill") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
@@ -834,7 +834,7 @@ class achievement_kologarn_rubble_and_roll : public AchievementCriteriaScript
 public:
     achievement_kologarn_rubble_and_roll() : AchievementCriteriaScript("achievement_kologarn_rubble_and_roll") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
@@ -850,7 +850,7 @@ class achievement_kologarn_with_open_arms : public AchievementCriteriaScript
 public:
     achievement_kologarn_with_open_arms() : AchievementCriteriaScript("achievement_kologarn_with_open_arms") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())

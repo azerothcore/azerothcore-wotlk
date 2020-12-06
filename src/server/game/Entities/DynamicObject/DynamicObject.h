@@ -24,7 +24,7 @@ class DynamicObject : public WorldObject, public GridObject<DynamicObject>, publ
 {
 public:
     DynamicObject(bool isWorldObject);
-    ~DynamicObject();
+    ~DynamicObject() override;
 
     void AddToWorld() override;
     void RemoveFromWorld() override;

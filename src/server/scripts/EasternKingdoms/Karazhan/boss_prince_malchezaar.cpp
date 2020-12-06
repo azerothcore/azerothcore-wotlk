@@ -81,7 +81,7 @@ class netherspite_infernal : public CreatureScript
 public:
     netherspite_infernal() : CreatureScript("netherspite_infernal") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new netherspite_infernalAI(creature);
     }
@@ -96,12 +96,12 @@ public:
         uint64 malchezaar;
         InfernalPoint* point;
 
-        void Reset() { }
-        void EnterCombat(Unit* /*who*/) { }
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void Reset() override { }
+        void EnterCombat(Unit* /*who*/) override { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (HellfireTimer)
             {
@@ -125,14 +125,14 @@ public:
             }
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*me, malchezaar))
                 if (Creature* creature = unit->ToCreature())
                     creature->AI()->KilledUnit(who);
         }
 
-        void SpellHit(Unit* /*who*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*who*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_INFERNAL_RELAY)
             {
@@ -143,7 +143,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!done_by || done_by->GetGUID() != malchezaar)
                 damage = 0;

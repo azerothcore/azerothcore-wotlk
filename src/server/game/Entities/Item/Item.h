@@ -306,8 +306,8 @@ public:
         uState = state;
     }
 
-    bool hasQuest(uint32 quest_id) const { return GetTemplate()->StartQuest == quest_id; }
-    bool hasInvolvedQuest(uint32 /*quest_id*/) const { return false; }
+    bool hasQuest(uint32 quest_id) const override { return GetTemplate()->StartQuest == quest_id; }
+    bool hasInvolvedQuest(uint32 /*quest_id*/) const override { return false; }
     bool IsPotion() const { return GetTemplate()->IsPotion(); }
     bool IsWeaponVellum() const { return GetTemplate()->IsWeaponVellum(); }
     bool IsArmorVellum() const { return GetTemplate()->IsArmorVellum(); }
@@ -331,7 +331,7 @@ public:
     void ClearSoulboundTradeable(Player* currentOwner);
     bool CheckSoulboundTradeExpire();
 
-    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&);
+    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
 
     uint32 GetScriptId() const { return GetTemplate()->ScriptId; }
 private:
