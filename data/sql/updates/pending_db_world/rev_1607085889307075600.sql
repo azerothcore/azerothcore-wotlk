@@ -26,3 +26,9 @@ UPDATE `quest_poi_points` SET `X`=5800, `Y`=792 WHERE `QuestID`=24801 AND `Idx1`
 
 -- A Victory For The Silver Covenant - Alliance
 UPDATE `quest_poi_points` SET `X`=5796, `Y`=799 WHERE `QuestID`=24796 AND `Idx1`=0 AND `Idx2`=0;
+
+-- Reforging The Sword - Alliance
+UPDATE `quest_poi_points` SET `X`=5652, `Y`=2106 WHERE  `QuestID`=24461 AND `Idx1`=6 AND `Idx2`=0;
+
+-- The Halls Of Reflection - Alliance
+UPDATE `quest_poi_points` SET `X`=5652, `Y`=2106 WHERE  `QuestID`=24480 AND `Idx1`=2 AND `Idx2`=0;
