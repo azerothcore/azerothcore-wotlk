@@ -132,14 +132,24 @@ Processed_Static_Svc (const ACE_Static_Svc_Descriptor *assd)
   :name_(0),
    assd_(assd)
 {
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_ALLOCATOR_NORETURN (name_, static_cast<ACE_TCHAR*>(ACE_Allocator::instance()->malloc (sizeof(ACE_TCHAR) * (ACE_OS::strlen(assd->name_)+1))));
+#else
   ACE_NEW_NORETURN (name_, ACE_TCHAR[ACE_OS::strlen(assd->name_)+1]);
+#endif /* ACE_HAS_ALLOC_HOOKS */
   ACE_OS::strcpy(name_,assd->name_);
 }
 
 ACE_Service_Gestalt::Processed_Static_Svc::~Processed_Static_Svc (void)
 {
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(name_);
+#else
   delete [] name_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
+
+ACE_ALLOC_HOOK_DEFINE(ACE_Service_Gestalt::Processed_Static_Svc)
 
 void
 ACE_Service_Gestalt::intrusive_add_ref (ACE_Service_Gestalt* g)
@@ -348,7 +358,7 @@ ACE_Service_Gestalt::add_processed_static_svc
   /// associates a service object with the Gestalt and makes the
   /// resource (a Service Object) local to the repository. This is but
   /// the first step in using such SO. The next is the
-  /// "initialization" step. It is typicaly done through a "static"
+  /// "initialization" step. It is typically done through a "static"
   /// service configuration directive.
   ///
   /// In contrast a "dynamic" directive, when processed through the
@@ -778,10 +788,6 @@ ACE_Service_Gestalt::process_directives_i (ACE_Svc_Conf_Param *param)
                 ? ACE_TEXT ("<from file>")
                 : param->source.directive));
 #endif
-
-  // AC 970827 Skip the heap check because yacc allocates a buffer
-  // here which will be reported as a memory leak for some reason.
-  ACE_NO_HEAP_CHECK
 
   // Were we called in the context of the current instance?
   ACE_ASSERT (this == param->config);

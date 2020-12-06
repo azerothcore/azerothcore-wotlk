@@ -30,7 +30,7 @@ bool FileLoader::loadFile(std::string const& fileName, bool log)
 {
     free();
     MPQFile mf(fileName.c_str());
-    if(mf.isEof())
+    if (mf.isEof())
     {
         if (log)
             printf("No such file %s\n", fileName.c_str());

@@ -46,7 +46,11 @@ ACE_Service_Type_Impl::~ACE_Service_Type_Impl (void)
 
   // It's ok to call this, even though we may have already deleted it
   // in the fini() method since it would then be NULL.
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(const_cast <ACE_TCHAR *> (this->name_));
+#else
   delete [] const_cast <ACE_TCHAR *> (this->name_);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
 
 int
@@ -54,7 +58,11 @@ ACE_Service_Type_Impl::fini (void) const
 {
   ACE_TRACE ("ACE_Service_Type_Impl::fini");
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(const_cast <ACE_TCHAR *> (this->name_));
+#else
   delete [] const_cast <ACE_TCHAR *> (this->name_);
+#endif /* ACE_HAS_ALLOC_HOOKS */
   (const_cast <ACE_Service_Type_Impl *> (this))->name_ = 0;
 
   if (ACE_BIT_ENABLED (this->flags_,
@@ -259,10 +267,10 @@ ACE_Module_Type::info (ACE_TCHAR **str, size_t len) const
   ACE_TRACE ("ACE_Module_Type::info");
   ACE_TCHAR buf[BUFSIZ];
 
-  ACE_OS::sprintf (buf,
-                   ACE_TEXT ("%s\t %s"),
-                   this->name (),
-                   ACE_TEXT ("# ACE_Module\n"));
+  ACE_OS::snprintf (buf, BUFSIZ,
+                    ACE_TEXT ("%s\t %s"),
+                    this->name (),
+                    ACE_TEXT ("# ACE_Module\n"));
 
   if (*str == 0 && (*str = ACE_OS::strdup (buf)) == 0)
     return -1;
@@ -349,10 +357,10 @@ ACE_Stream_Type::info (ACE_TCHAR **str, size_t len) const
   ACE_TRACE ("ACE_Stream_Type::info");
   ACE_TCHAR buf[BUFSIZ];
 
-  ACE_OS::sprintf (buf,
-                   ACE_TEXT ("%s\t %s"),
-                   this->name (),
-                   ACE_TEXT ("# STREAM\n"));
+  ACE_OS::snprintf (buf, BUFSIZ,
+                    ACE_TEXT ("%s\t %s"),
+                    this->name (),
+                    ACE_TEXT ("# STREAM\n"));
 
   if (*str == 0 && (*str = ACE_OS::strdup (buf)) == 0)
     return -1;

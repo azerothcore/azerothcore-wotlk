@@ -45,7 +45,7 @@ void ExtractGameobjectModels()
 {
     printf("Extracting GameObject models...");
     DBCFile dbc("DBFilesClient\\GameObjectDisplayInfo.dbc");
-    if(!dbc.open())
+    if (!dbc.open())
     {
         printf("Fatal error: Invalid GameObjectDisplayInfo.dbc file format!\n");
         exit(1);

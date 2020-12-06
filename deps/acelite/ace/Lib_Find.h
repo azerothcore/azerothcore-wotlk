@@ -29,7 +29,7 @@ namespace ACE
   /**
    * Finds the file @a filename either using an absolute path or using
    * a relative path in conjunction with ACE_LD_SEARCH_PATH (e.g.,
-   * $LD_LIBRARY_PATH on UNIX or the directories scaned by Win32 API
+   * $LD_LIBRARY_PATH on UNIX or the directories scanned by Win32 API
    * SearchPath on Win32).  This function will add appropriate suffix
    * (e.g., .dll on Win32 or .so on UNIX) according to the OS
    * platform.  In addition, this function will apply the appropriate
@@ -90,7 +90,7 @@ namespace ACE
                                                int mode,
                                                int perm = 0);
 
-  // @@ Though the following functions dont come under the same category as
+  // @@ Though the following functions don't come under the same category as
   // above, these are used only in the functions in this class. So it makes
   // more sense to move these functions too to this class.
   //
