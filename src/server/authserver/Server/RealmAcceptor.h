@@ -16,8 +16,8 @@
 class RealmAcceptor : public ACE_Acceptor<RealmSocket, ACE_SOCK_Acceptor>
 {
 public:
-    RealmAcceptor(void) { }
-    virtual ~RealmAcceptor(void)
+    RealmAcceptor() { }
+    virtual ~RealmAcceptor()
     {
         if (reactor())
             reactor()->cancel_timer(this, 1);
@@ -41,7 +41,7 @@ protected:
         return reactor()->register_handler(this, ACE_Event_Handler::ACCEPT_MASK);
     }
 
-    virtual int handle_accept_error(void)
+    virtual int handle_accept_error()
     {
 #if defined(ENFILE) && defined(EMFILE)
         if (errno == ENFILE || errno == EMFILE)
