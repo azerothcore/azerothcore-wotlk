@@ -199,7 +199,7 @@ public:
     //! Keeps all our MySQL connections alive, prevent the server from disconnecting us.
     void KeepAlive();
 
-    char const* GetDatabaseName() const
+    [[nodiscard]] char const* GetDatabaseName() const
     {
         return _connectionInfo.database.c_str();
     }

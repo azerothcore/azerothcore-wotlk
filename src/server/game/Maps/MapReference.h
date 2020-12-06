@@ -33,9 +33,9 @@ public:
     MapReference() : Reference<Map, Player>() {}
     ~MapReference() override { unlink(); }
     MapReference* next() { return (MapReference*)Reference<Map, Player>::next(); }
-    MapReference const* next() const { return (MapReference const*)Reference<Map, Player>::next(); }
+    [[nodiscard]] MapReference const* next() const { return (MapReference const*)Reference<Map, Player>::next(); }
     MapReference* nockeck_prev() { return (MapReference*)Reference<Map, Player>::nocheck_prev(); }
-    MapReference const* nocheck_prev() const { return (MapReference const*)Reference<Map, Player>::nocheck_prev(); }
+    [[nodiscard]] MapReference const* nocheck_prev() const { return (MapReference const*)Reference<Map, Player>::nocheck_prev(); }
 };
 #endif
 
