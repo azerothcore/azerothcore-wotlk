@@ -40,7 +40,7 @@ namespace VMAP
         ~WmoLiquid();
         WmoLiquid& operator=(const WmoLiquid& other);
         bool GetLiquidHeight(const G3D::Vector3& pos, float& liqHeight) const;
-        uint32 GetType() const { return iType; }
+        [[nodiscard]] uint32 GetType() const { return iType; }
         float* GetHeightStorage() { return iHeight; }
         uint8* GetFlagsStorage() { return iFlags; }
         uint32 GetFileSize();
@@ -74,12 +74,12 @@ namespace VMAP
         bool IntersectRay(const G3D::Ray& ray, float& distance, bool stopAtFirstHit) const;
         bool IsInsideObject(const G3D::Vector3& pos, const G3D::Vector3& down, float& z_dist) const;
         bool GetLiquidLevel(const G3D::Vector3& pos, float& liqHeight) const;
-        uint32 GetLiquidType() const;
+        [[nodiscard]] uint32 GetLiquidType() const;
         bool writeToFile(FILE* wf);
         bool readFromFile(FILE* rf);
-        const G3D::AABox& GetBound() const { return iBound; }
-        uint32 GetMogpFlags() const { return iMogpFlags; }
-        uint32 GetWmoID() const { return iGroupWMOID; }
+        [[nodiscard]] const G3D::AABox& GetBound() const { return iBound; }
+        [[nodiscard]] uint32 GetMogpFlags() const { return iMogpFlags; }
+        [[nodiscard]] uint32 GetWmoID() const { return iGroupWMOID; }
     protected:
         G3D::AABox iBound;
         uint32 iMogpFlags;// 0x8 outdor; 0x2000 indoor

@@ -85,7 +85,7 @@ private:
             --_top;
     }
 
-    bool needInitTop() const
+    [[nodiscard]] bool needInitTop() const
     {
         if (empty())
             return false;
@@ -107,20 +107,20 @@ public:
     void Initialize();
     void InitDefault();
 
-    bool empty() const { return (_top < 0); }
-    int size() const { return _top + 1; }
-    _Ty top() const
+    [[nodiscard]] bool empty() const { return (_top < 0); }
+    [[nodiscard]] int size() const { return _top + 1; }
+    [[nodiscard]] _Ty top() const
     {
         ASSERT(!empty());
         return Impl[_top];
     }
-    _Ty GetMotionSlot(int slot) const
+    [[nodiscard]] _Ty GetMotionSlot(int slot) const
     {
         ASSERT(slot >= 0);
         return Impl[slot];
     }
 
-    uint8 GetCleanFlags() const { return _cleanFlag; }
+    [[nodiscard]] uint8 GetCleanFlags() const { return _cleanFlag; }
 
     void DirectDelete(_Ty curr);
     void DelayedDelete(_Ty curr);
@@ -193,9 +193,9 @@ public:
     void MovePath(uint32 path_id, bool repeatable);
     void MoveRotate(uint32 time, RotateDirection direction);
 
-    MovementGeneratorType GetCurrentMovementGeneratorType() const;
-    MovementGeneratorType GetMotionSlotType(int slot) const;
-    uint32 GetCurrentSplineId() const; // Xinef: Escort system
+    [[nodiscard]] MovementGeneratorType GetCurrentMovementGeneratorType() const;
+    [[nodiscard]] MovementGeneratorType GetMotionSlotType(int slot) const;
+    [[nodiscard]] uint32 GetCurrentSplineId() const; // Xinef: Escort system
 
     void propagateSpeedChange();
     void ReinitializeMovement();

@@ -244,7 +244,7 @@ public:
         std::unordered_map<uint8, uint64> _circlesGUIDs;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_molten_core_InstanceMapScript(map);
     }

@@ -330,10 +330,10 @@ public:
 class ADT_file : public FileLoader
 {
 public:
-    bool prepareLoadedData();
+    bool prepareLoadedData() override;
     ADT_file();
     ~ADT_file();
-    void free();
+    void free() override;
 
     adt_MHDR* a_grid;
 };

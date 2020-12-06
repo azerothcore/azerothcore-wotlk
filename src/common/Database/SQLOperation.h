@@ -49,7 +49,7 @@ class SQLOperation : public ACE_Method_Request
 {
 public:
     SQLOperation(): m_conn(nullptr) { }
-    virtual int call()
+    int call() override
     {
         Execute();
         return 0;

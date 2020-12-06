@@ -48,7 +48,7 @@ class boss_moorabi : public CreatureScript
 public:
     boss_moorabi() : CreatureScript("boss_moorabi") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_moorabiAI>(creature);
     }
@@ -61,14 +61,14 @@ public:
 
         EventMap events2;
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events2.Reset();
             events2.ScheduleEvent(EVENT_PHANTOM, 21000);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
             BossAI::EnterCombat(who);
@@ -80,7 +80,7 @@ public:
             events.ScheduleEvent(EVENT_TRANSFORMATION, 12000);
         }
 
-        void SpellHitTarget(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_TRANSFORMATION)
             {
@@ -90,14 +90,14 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             Talk(EMOTE_ALTAR);
             BossAI::JustDied(killer);
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -106,7 +106,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->IsInCombat())
             {
@@ -174,13 +174,13 @@ public:
                 GetUnitOwner()->SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f * (GetUnitOwner()->GetHealthPct() / 100.0f));
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_moorabi_mojo_frenzy_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_moorabi_mojo_frenzy_AuraScript();
     }
@@ -193,7 +193,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* /*player*/, Unit* target)
+    bool OnCheck(Player* /*player*/, Unit* target) override
     {
         return target && target->GetDisplayId() == target->GetNativeDisplayId();
     }

@@ -15,9 +15,9 @@ class PassiveAI : public CreatureAI
 public:
     explicit PassiveAI(Creature* c);
 
-    void MoveInLineOfSight(Unit*) {}
-    void AttackStart(Unit*) {}
-    void UpdateAI(uint32);
+    void MoveInLineOfSight(Unit*) override {}
+    void AttackStart(Unit*) override {}
+    void UpdateAI(uint32) override;
 
     static int Permissible(const Creature*) { return PERMIT_BASE_IDLE;  }
 };
@@ -27,13 +27,13 @@ class PossessedAI : public CreatureAI
 public:
     explicit PossessedAI(Creature* c);
 
-    void MoveInLineOfSight(Unit*) {}
-    void AttackStart(Unit* target);
-    void UpdateAI(uint32);
-    void EnterEvadeMode() {}
+    void MoveInLineOfSight(Unit*) override {}
+    void AttackStart(Unit* target) override;
+    void UpdateAI(uint32) override;
+    void EnterEvadeMode() override {}
 
-    void JustDied(Unit*);
-    void KilledUnit(Unit* victim);
+    void JustDied(Unit*) override;
+    void KilledUnit(Unit* victim) override;
 
     static int Permissible(const Creature*) { return PERMIT_BASE_IDLE;  }
 };
@@ -43,11 +43,11 @@ class NullCreatureAI : public CreatureAI
 public:
     explicit NullCreatureAI(Creature* c);
 
-    void MoveInLineOfSight(Unit*) {}
-    void AttackStart(Unit*) {}
-    void UpdateAI(uint32) {}
-    void EnterEvadeMode() {}
-    void OnCharmed(bool /*apply*/) {}
+    void MoveInLineOfSight(Unit*) override {}
+    void AttackStart(Unit*) override {}
+    void UpdateAI(uint32) override {}
+    void EnterEvadeMode() override {}
+    void OnCharmed(bool /*apply*/) override {}
 
     static int Permissible(const Creature*) { return PERMIT_BASE_IDLE;  }
 };
@@ -57,9 +57,9 @@ class CritterAI : public PassiveAI
 public:
     explicit CritterAI(Creature* c) : PassiveAI(c) { _combatTimer = 0; }
 
-    void DamageTaken(Unit* /*done_by*/, uint32& /*damage*/, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask);
-    void EnterEvadeMode();
-    void UpdateAI(uint32);
+    void DamageTaken(Unit* /*done_by*/, uint32& /*damage*/, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
+    void EnterEvadeMode() override;
+    void UpdateAI(uint32) override;
 
     // Xinef: Added
 private:
@@ -70,7 +70,7 @@ class TriggerAI : public NullCreatureAI
 {
 public:
     explicit TriggerAI(Creature* c) : NullCreatureAI(c) {}
-    void IsSummonedBy(Unit* summoner);
+    void IsSummonedBy(Unit* summoner) override;
 };
 
 #endif

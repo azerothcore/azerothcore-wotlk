@@ -40,17 +40,17 @@ class GameObjectModel /*, public Intersectable*/
 public:
     std::string name;
 
-    const G3D::AABox& getBounds() const { return iBound; }
+    [[nodiscard]] const G3D::AABox& getBounds() const { return iBound; }
 
     ~GameObjectModel();
 
-    const G3D::Vector3& getPosition() const { return iPos;}
+    [[nodiscard]] const G3D::Vector3& getPosition() const { return iPos;}
 
     /**    Enables\disables collision. */
     void disable() { phasemask = 0;}
     void enable(uint32 ph_mask) { phasemask = ph_mask;}
 
-    bool isEnabled() const {return phasemask != 0;}
+    [[nodiscard]] bool isEnabled() const {return phasemask != 0;}
 
     bool intersectRay(const G3D::Ray& Ray, float& MaxDist, bool StopAtFirstHit, uint32 ph_mask) const;
 
