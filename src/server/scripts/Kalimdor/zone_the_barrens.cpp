@@ -90,7 +90,7 @@ class npc_gilthares : public CreatureScript
 public:
     npc_gilthares() : CreatureScript("npc_gilthares") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_FREE_FROM_HOLD)
         {
@@ -105,7 +105,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_giltharesAI(creature);
     }
@@ -114,9 +114,9 @@ public:
     {
         npc_giltharesAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -146,7 +146,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             //not always use
             if (rand() % 4)
@@ -179,7 +179,7 @@ class npc_taskmaster_fizzule : public CreatureScript
 public:
     npc_taskmaster_fizzule() : CreatureScript("npc_taskmaster_fizzule") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_taskmaster_fizzuleAI(creature);
     }
@@ -196,7 +196,7 @@ public:
         uint32 ResetTimer;
         uint8 FlareCount;
 
-        void Reset()
+        void Reset() override
         {
             IsFriend = false;
             ResetTimer = 120000;
@@ -217,7 +217,7 @@ public:
             me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_FLARE || spell->Id == SPELL_FOLLY)
             {
@@ -228,9 +228,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (IsFriend)
             {
@@ -248,7 +248,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void ReceiveEmote(Player* /*player*/, uint32 emote)
+        void ReceiveEmote(Player* /*player*/, uint32 emote) override
         {
             if (emote == TEXT_EMOTE_SALUTE)
             {
@@ -296,7 +296,7 @@ class npc_twiggy_flathead : public CreatureScript
 public:
     npc_twiggy_flathead() : CreatureScript("npc_twiggy_flathead") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_twiggy_flatheadAI (creature);
     }
@@ -316,7 +316,7 @@ public:
         uint64 AffrayChallenger[6];
         uint64 BigWill;
 
-        void Reset()
+        void Reset() override
         {
             EventInProgress = false;
             EventGrate = false;
@@ -334,9 +334,9 @@ public:
             BigWill = 0;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             CleanUp();
             ScriptedAI::EnterEvadeMode();
@@ -354,7 +354,7 @@ public:
                     creature->DespawnOrUnsummon(1);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!who->IsAlive() || EventInProgress || who->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -366,7 +366,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (EventInProgress)
             {
@@ -527,7 +527,7 @@ public:
         uint32 PostEventTimer;
         uint32 PostEventCount;
 
-        void Reset()
+        void Reset() override
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
             {
@@ -540,7 +540,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -563,7 +563,7 @@ public:
             }
         }
 
-        void WaypointStart(uint32 PointId)
+        void WaypointStart(uint32 PointId) override
         {
             Player* player = GetPlayerForEscort();
 
@@ -582,7 +582,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             if (summoned->GetEntry() == NPC_PILOT_WIZZ)
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
@@ -591,7 +591,7 @@ public:
                 summoned->AI()->AttackStart(me);
         }
 
-        void UpdateEscortAI(uint32 Diff)
+        void UpdateEscortAI(uint32 Diff) override
         {
             if (!UpdateVictim())
             {
@@ -633,7 +633,7 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_ESCAPE)
         {
@@ -645,7 +645,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_wizzlecrank_shredderAI(creature);
     }

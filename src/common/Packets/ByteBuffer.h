@@ -22,9 +22,9 @@
 class ByteBufferException : public std::exception
 {
 public:
-    ~ByteBufferException() noexcept { }
+    ~ByteBufferException() noexcept override { }
 
-    char const* what() const noexcept { return msg_.c_str(); }
+    [[nodiscard]] char const* what() const noexcept override { return msg_.c_str(); }
 
 protected:
     std::string& message() noexcept { return msg_; }
@@ -37,8 +37,7 @@ class ByteBufferPositionException : public ByteBufferException
 {
 public:
     ByteBufferPositionException(bool add, size_t pos, size_t size, size_t valueSize);
-
-    ~ByteBufferPositionException() noexcept { }
+    ~ByteBufferPositionException() noexcept override { }
 };
 
 class ByteBufferSourceException : public ByteBufferException
@@ -46,7 +45,7 @@ class ByteBufferSourceException : public ByteBufferException
 public:
     ByteBufferSourceException(size_t pos, size_t size, size_t valueSize);
 
-    ~ByteBufferSourceException() noexcept { }
+    ~ByteBufferSourceException() noexcept override { }
 };
 
 class ByteBuffer
@@ -277,7 +276,7 @@ public:
         return _storage[pos];
     }
 
-    size_t rpos() const { return _rpos; }
+    [[nodiscard]] size_t rpos() const { return _rpos; }
 
     size_t rpos(size_t rpos_)
     {
@@ -290,7 +289,7 @@ public:
         _rpos = wpos();
     }
 
-    size_t wpos() const { return _wpos; }
+    [[nodiscard]] size_t wpos() const { return _wpos; }
 
     size_t wpos(size_t wpos_)
     {
@@ -315,7 +314,7 @@ public:
         return r;
     }
 
-    template <typename T> T read(size_t pos) const
+    template <typename T> [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] T read(size_t pos) const
     {
         if (pos + sizeof(T) > size())
             throw ByteBufferPositionException(false, pos, sizeof(T), size());
@@ -385,15 +384,15 @@ public:
         return &_storage[0];
     }
 
-    const uint8* contents() const
+    [[nodiscard]] const uint8* contents() const
     {
         if (_storage.empty())
             throw ByteBufferException();
         return &_storage[0];
     }
 
-    size_t size() const { return _storage.size(); }
-    bool empty() const { return _storage.empty(); }
+    [[nodiscard]] size_t size() const { return _storage.size(); }
+    [[nodiscard]] bool empty() const { return _storage.empty(); }
 
     void resize(size_t newsize)
     {

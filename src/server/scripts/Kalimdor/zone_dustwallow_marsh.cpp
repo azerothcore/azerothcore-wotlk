@@ -136,7 +136,7 @@ class npc_private_hendel : public CreatureScript
 public:
     npc_private_hendel() : CreatureScript("npc_private_hendel") { }
 
-    bool OnQuestAccept(Player* /*player*/, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* /*player*/, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_MISSING_DIPLO_PT16)
             creature->setFaction(FACTION_HOSTILE);
@@ -144,7 +144,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_private_hendelAI(creature);
     }
@@ -153,12 +153,12 @@ public:
     {
         npc_private_hendelAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             me->RestoreFaction();
         }
 
-        void AttackedBy(Unit* pAttacker)
+        void AttackedBy(Unit* pAttacker) override
         {
             if (me->GetVictim())
                 return;
@@ -169,7 +169,7 @@ public:
             AttackStart(pAttacker);
         }
 
-        void DamageTaken(Unit* pDoneBy, uint32& Damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* pDoneBy, uint32& Damage, DamageEffectType, SpellSchoolMask) override
         {
             if (Damage >= me->GetHealth() || me->HealthBelowPctDamaged(20, Damage))
             {
@@ -203,7 +203,7 @@ class npc_archmage_tervosh : public CreatureScript
 public:
     npc_archmage_tervosh() : CreatureScript("npc_archmage_tervosh") { }
 
-    bool OnQuestReward(Player* player, Creature* creature, const Quest* quest, uint32 /*opt*/)
+    bool OnQuestReward(Player* player, Creature* creature, const Quest* quest, uint32 /*opt*/) override
     {
         if (quest->GetQuestId() == QUEST_MISSING_DIPLO_PT14)
         {
@@ -213,7 +213,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_archmage_tervoshAI(creature);
     }
@@ -241,7 +241,7 @@ class npc_zelfrax : public CreatureScript
 public:
     npc_zelfrax() : CreatureScript("npc_zelfrax") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_zelfraxAI(creature);
     }
@@ -253,7 +253,7 @@ public:
             MoveToDock();
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!who)
                 return;
@@ -268,7 +268,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 Type, uint32 /*Id*/)
+        void MovementInform(uint32 Type, uint32 /*Id*/) override
         {
             if (Type != POINT_MOTION_TYPE)
                 return;
@@ -290,7 +290,7 @@ public:
             Talk(SAY_ZELFRAX2);
         }
 
-        void UpdateAI(uint32 /*Diff*/)
+        void UpdateAI(uint32 /*Diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -318,7 +318,7 @@ public:
     {
         PrepareSpellScript(spell_ooze_zap_SpellScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_OOZE_ZAP))
                 return false;
@@ -343,14 +343,14 @@ public:
                 GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             OnCheckCast += SpellCheckCastFn(spell_ooze_zap_SpellScript::CheckRequirement);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_ooze_zap_SpellScript();
     }
@@ -365,7 +365,7 @@ public:
     {
         PrepareSpellScript(spell_ooze_zap_channel_end_SpellScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_OOZE_ZAP_CHANNEL_END))
                 return false;
@@ -380,13 +380,13 @@ public:
             Unit::Kill(GetHitUnit(), GetHitUnit());
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_channel_end_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_ooze_zap_channel_end_SpellScript();
     }
@@ -401,7 +401,7 @@ public:
     {
         PrepareSpellScript(spell_energize_aoe_SpellScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_ENERGIZED))
                 return false;
@@ -426,7 +426,7 @@ public:
             GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_energize_aoe_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
@@ -434,7 +434,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_energize_aoe_SpellScript();
     }

@@ -41,22 +41,22 @@ public:
     class Record
     {
     public:
-        float getFloat(size_t field) const
+        [[nodiscard]] float getFloat(size_t field) const
         {
             assert(field < file.fieldCount);
             return *reinterpret_cast<float*>(offset + field * 4);
         }
-        unsigned int getUInt(size_t field) const
+        [[nodiscard]] unsigned int getUInt(size_t field) const
         {
             assert(field < file.fieldCount);
             return *reinterpret_cast<unsigned int*>(offset + field * 4);
         }
-        int getInt(size_t field) const
+        [[nodiscard]] int getInt(size_t field) const
         {
             assert(field < file.fieldCount);
             return *reinterpret_cast<int*>(offset + field * 4);
         }
-        const char* getString(size_t field) const
+        [[nodiscard]] const char* getString(size_t field) const
         {
             assert(field < file.fieldCount);
             size_t stringOffset = getUInt(field);
@@ -110,8 +110,8 @@ public:
     /// Get begin iterator over records
     Iterator end();
     /// Trivial
-    size_t getRecordCount() const { return recordCount;}
-    size_t getFieldCount() const { return fieldCount; }
+    [[nodiscard]] size_t getRecordCount() const { return recordCount;}
+    [[nodiscard]] size_t getFieldCount() const { return fieldCount; }
     size_t getMaxId();
 private:
     std::string filename;
