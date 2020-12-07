@@ -251,31 +251,28 @@ typedef std::unordered_map<uint32, EquipmentInfoContainerInternal> EquipmentInfo
 // from `creature` table
 struct CreatureData
 {
-    CreatureData() : id(0), mapid(0), phaseMask(0), displayid(0), equipmentId(0),
-        posX(0.0f), posY(0.0f), posZ(0.0f), orientation(0.0f), spawntimesecs(0),
-        wander_distance(0.0f), currentwaypoint(0), curhealth(0), curmana(0), movementType(0),
-        spawnMask(0), npcflag(0), unit_flags(0), dynamicflags(0), dbData(true), overwrittenZ(false) { }
-    uint32 id;                                              // entry in creature_template
-    uint16 mapid;
-    uint32 phaseMask;
-    uint32 displayid;
-    int8 equipmentId;
-    float posX;
-    float posY;
-    float posZ;
-    float orientation;
-    uint32 spawntimesecs;
-    float wander_distance;
-    uint32 currentwaypoint;
-    uint32 curhealth;
-    uint32 curmana;
-    uint8 movementType;
-    uint8 spawnMask;
-    uint32 npcflag;
-    uint32 unit_flags;                                      // enum UnitFlags mask values
-    uint32 dynamicflags;
-    bool dbData;
-    bool overwrittenZ;
+    CreatureData()  { }
+    uint32 id{0};                                              // entry in creature_template
+    uint16 mapid{0};
+    uint32 phaseMask{0};
+    uint32 displayid{0};
+    int8 equipmentId{0};
+    float posX{0.0f};
+    float posY{0.0f};
+    float posZ{0.0f};
+    float orientation{0.0f};
+    uint32 spawntimesecs{0};
+    float wander_distance{0.0f};
+    uint32 currentwaypoint{0};
+    uint32 curhealth{0};
+    uint32 curmana{0};
+    uint8 movementType{0};
+    uint8 spawnMask{0};
+    uint32 npcflag{0};
+    uint32 unit_flags{0};                                      // enum UnitFlags mask values
+    uint32 dynamicflags{0};
+    bool dbData{true};
+    bool overwrittenZ{false};
 };
 
 struct CreatureModelInfo
@@ -388,17 +385,17 @@ typedef std::list<VendorItemCount> VendorItemCounts;
 
 struct TrainerSpell
 {
-    TrainerSpell() : spell(0), spellCost(0), reqSkill(0), reqSkillValue(0), reqLevel(0)
+    TrainerSpell()  
     {
-        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-            learnedSpell[i] = 0;
+        for (unsigned int & i : learnedSpell)
+            i = 0;
     }
 
-    uint32 spell;
-    uint32 spellCost;
-    uint32 reqSkill;
-    uint32 reqSkillValue;
-    uint32 reqLevel;
+    uint32 spell{0};
+    uint32 spellCost{0};
+    uint32 reqSkill{0};
+    uint32 reqSkillValue{0};
+    uint32 reqLevel{0};
     uint32 learnedSpell[3];
 
     // helpers
@@ -409,11 +406,11 @@ typedef std::unordered_map<uint32 /*spellid*/, TrainerSpell> TrainerSpellMap;
 
 struct TrainerSpellData
 {
-    TrainerSpellData() : trainerType(0) {}
+    TrainerSpellData()  {}
     ~TrainerSpellData() { spellList.clear(); }
 
     TrainerSpellMap spellList;
-    uint32 trainerType;                                     // trainer type based at trainer spells, can be different from creature_template value.
+    uint32 trainerType{0};                                     // trainer type based at trainer spells, can be different from creature_template value.
     // req. for correct show non-prof. trainers like weaponmaster, allowed values 0 and 2.
     [[nodiscard]] TrainerSpell const* Find(uint32 spell_id) const;
 };
@@ -448,7 +445,7 @@ public:
     [[nodiscard]] uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
 
     void Update(uint32 time) override;                         // overwrited Unit::Update
-    void GetRespawnPosition(float& x, float& y, float& z, float* ori = NULL, float* dist = NULL) const;
+    void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr, float* dist = nullptr) const;
 
     void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
     [[nodiscard]] uint32 GetCorpseDelay() const { return m_corpseDelay; }
@@ -531,7 +528,7 @@ public:
 
     [[nodiscard]] bool HasSpell(uint32 spellID) const override;
 
-    bool UpdateEntry(uint32 entry, const CreatureData* data = NULL, bool changelevel = true );
+    bool UpdateEntry(uint32 entry, const CreatureData* data = nullptr, bool changelevel = true );
     bool UpdateStats(Stats stat) override;
     bool UpdateAllStats() override;
     void UpdateResistances(uint32 school) override;
@@ -724,7 +721,7 @@ public:
 
 protected:
     bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
-    bool InitEntry(uint32 entry, const CreatureData* data = NULL);
+    bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
 
     // vendor items
     VendorItemCounts m_vendorItemCounts;

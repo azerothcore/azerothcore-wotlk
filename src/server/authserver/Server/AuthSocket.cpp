@@ -118,7 +118,7 @@ typedef struct AuthHandler
 {
     eAuthCmd cmd;
     uint32 status;
-    bool (AuthSocket::*handler)(void);
+    bool (AuthSocket::*handler)();
 } AuthHandler;
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some paltform
@@ -188,15 +188,15 @@ AuthSocket::AuthSocket(RealmSocket& socket) :
 }
 
 // Close patch file descriptor before leaving
-AuthSocket::~AuthSocket(void) { }
+AuthSocket::~AuthSocket() = default;
 
 // Accept the connection
-void AuthSocket::OnAccept(void)
+void AuthSocket::OnAccept()
 {
     sLog->outBasic("'%s:%d' Accepting connection", socket().getRemoteAddress().c_str(), socket().getRemotePort());
 }
 
-void AuthSocket::OnClose(void)
+void AuthSocket::OnClose()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "AuthSocket::OnClose");

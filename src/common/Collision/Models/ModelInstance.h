@@ -51,17 +51,17 @@ namespace VMAP
     class ModelInstance: public ModelSpawn
     {
     public:
-        ModelInstance(): iInvScale(0.0f), iModel(0) { }
+        ModelInstance() { }
         ModelInstance(const ModelSpawn& spawn, WorldModel* model);
-        void setUnloaded() { iModel = 0; }
+        void setUnloaded() { iModel = nullptr; }
         bool intersectRay(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit) const;
         void intersectPoint(const G3D::Vector3& p, AreaInfo& info) const;
         bool GetLocationInfo(const G3D::Vector3& p, LocationInfo& info) const;
         bool GetLiquidLevel(const G3D::Vector3& p, LocationInfo& info, float& liqHeight) const;
     protected:
         G3D::Matrix3 iInvRot;
-        float iInvScale;
-        WorldModel* iModel;
+        float iInvScale{0.0f};
+        WorldModel* iModel{nullptr};
     public:
         WorldModel* getWorldModel();
     };

@@ -15,7 +15,7 @@ template <class TO, class FROM> class RefManager : public LinkedListHead
 {
 public:
     typedef LinkedListHead::Iterator< Reference<TO, FROM>> iterator;
-    RefManager() { }
+    RefManager() = default;
     virtual ~RefManager() { clearReferences(); }
 
     Reference<TO, FROM>* getFirst() { return ((Reference<TO, FROM>*) LinkedListHead::getFirst()); }
@@ -31,7 +31,7 @@ public:
     void clearReferences()
     {
         LinkedListElement* ref;
-        while ((ref = getFirst()) != NULL)
+        while ((ref = getFirst()) != nullptr)
         {
             ((Reference<TO, FROM>*) ref)->invalidate();
             ref->delink();                              // the delink might be already done by invalidate(), but doing it here again does not hurt and insures an empty list
