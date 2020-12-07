@@ -95,6 +95,7 @@ enum HodirNPCs
     NPC_ICICLE_UNPACKED                 = 33169,
     NPC_ICICLE_PACKED                   = 33173,
     NPC_TOASTY_FIRE                     = 33342,
+    NPC_RARE_WINTER_CACHE_TRIGGER       = 88101,
 };
 
 enum HodirGOs
@@ -142,16 +143,7 @@ enum HodirText
 
 #define SPELL_FROZEN_BLOWS              RAID_MODE(SPELL_FROZEN_BLOWS_10, SPELL_FROZEN_BLOWS_25)
 #define SPELL_SHAMAN_STORM_CLOUD        RAID_MODE(SPELL_SHAMAN_STORM_CLOUD_10, SPELL_SHAMAN_STORM_CLOUD_25)
-/*
-#define TEXT_HODIR_AGGRO                "You will suffer for this trespass!"
-#define TEXTEMOTE_HODIR_FROZEN_BLOWS    "Hodir roars furious."
-#define TEXT_HODIR_FLASH_FREEZE         "Winds of the north consume you!"
-#define TEXTEMOTE_HODIR_HARD_MODE_MISSED "Hodir shatters the Rare Cache of Hodir!"
-#define TEXT_HODIR_SLAIN_1              "Tragic. To come so far, only to fail."
-#define TEXT_HODIR_SLAIN_2              "Welcome to the endless winter."
-#define TEXT_HODIR_BERSERK              "Enough! This ends now!"
-#define TEXT_HODIR_DEFEATED             "I... I am released from his grasp... at last."
-*/
+
 enum HodirSounds
 {
     SOUND_HODIR_AGGRO                   = 15552,
@@ -259,13 +251,7 @@ public:
 
         void EnterCombat(Unit*  /*pWho*/) override
         {
-            /*
-            if (summons.size() != uint32(RAID_MODE(8, 16)))
-            {
-                EnterEvadeMode();
-                return;
-            }*/
-            me->setActive(true);
+            /*me->setActive(true);*/
             me->CastSpell(me, SPELL_BITING_COLD_BOSS_AURA, true);
             SmallIcicles(true);
             events.Reset();
@@ -275,8 +261,6 @@ public:
             events.RescheduleEvent(EVENT_HARD_MODE_MISSED, 180000);
 
             Talk(TEXT_AGGRO);
-            //me->MonsterYell(TEXT_HODIR_AGGRO, LANG_UNIVERSAL, 0);
-            //me->PlayDirectSound(SOUND_HODIR_AGGRO, 0);
 
             if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
             {
@@ -289,7 +273,7 @@ public:
             }
         }
 
-        void JustReachedHome() override { me->setActive(false); }
+        void JustReachedHome() override { /*me->setActive(false); */}
 
         void SmallIcicles(bool enable)
         {
@@ -366,8 +350,6 @@ public:
                     }
 
                     Talk(TEXT_DEATH);
-                    //me->MonsterYell(TEXT_HODIR_DEFEATED, LANG_UNIVERSAL, 0);
-                    //me->PlayDirectSound(SOUND_HODIR_DEFEATED, 0);
                     me->DespawnOrUnsummon(10000);
                 }
             }
@@ -405,14 +387,14 @@ public:
                         berserk = true;
                         me->CastSpell(me, SPELL_BERSERK, true);
                         Talk(TEXT_BERSERK);
-                        //me->MonsterYell(TEXT_HODIR_BERSERK, LANG_UNIVERSAL, 0);
-                        //me->PlayDirectSound(SOUND_HODIR_BERSERK, 0);
                     }
                     break;
                 case EVENT_HARD_MODE_MISSED:
                     {
                         Talk(TEXT_HM_MISS);
-                        //me->MonsterTextEmote(TEXTEMOTE_HODIR_HARD_MODE_MISSED, 0);
+                        // Cast spell to destroy wintercache
+                        if (Creature* cr = me->FindNearestCreature(NPC_RARE_WINTER_CACHE_TRIGGER, 200.0f))
+                            me->CastSpell(cr, SPELL_FREEZE);
 
                         if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
                         {
@@ -440,9 +422,6 @@ public:
                         me->CastSpell((Unit*)NULL, SPELL_FLASH_FREEZE_CAST, false);
                         Talk(TEXT_FLASH_FREEZE);
                         Talk(TEXT_EMOTE_FREEZE);
-                        //me->MonsterTextEmote("Hodir begins to cast Flash Freeze!", 0, true);
-                        //me->MonsterYell(TEXT_HODIR_FLASH_FREEZE, LANG_UNIVERSAL, 0);
-                        //me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
                         SmallIcicles(false);
                         events.RepeatEvent(55000 + urand(0, 10000));
                         events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, Is25ManRaid() ? 12000 : 24000);
@@ -459,9 +438,6 @@ public:
                     {
                         Talk(TEXT_EMOTE_BLOW);
                         Talk(TEXT_STALACTITE);
-                        //me->MonsterTextEmote("Hodir gains Frozen Blows!", 0, true);
-                        //me->MonsterTextEmote(TEXTEMOTE_HODIR_FROZEN_BLOWS, 0);
-                        //me->PlayDirectSound(SOUND_HODIR_FROZEN_BLOWS, 0);
                         me->CastSpell(me, SPELL_FROZEN_BLOWS, true);
                     }
                     break;
@@ -527,19 +503,6 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            /*if( who->GetTypeId() == TYPEID_PLAYER )
-            {
-                if( urand(0, 1) )
-                {
-                    me->MonsterYell(TEXT_HODIR_SLAIN_1, LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_HODIR_SLAIN_1, 0);
-                }
-                else
-                {
-                    me->MonsterYell(TEXT_HODIR_SLAIN_2, LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_HODIR_SLAIN_2, 0);
-                }
-            }*/
             Talk(TEXT_SLAY);
         }
 

@@ -85,7 +85,7 @@ public:
         uint64 m_hodirNormalChest;
         uint64 m_hodirHardmodeChest;
         Position normalChestPosition = { 1967.152588f, -204.188461f, 432.686951f, 5.50957f };
-        Position hardChestPosition = { 2036.273560f, -213.236f, 432.687f, 0.0510559f };
+        Position hardChestPosition = { 2035.94600f, -202.084885f, 432.686859f, 3.164077f };
 
         // Mimiron
         uint64 m_MimironDoor[3];
