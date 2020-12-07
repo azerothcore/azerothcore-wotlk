@@ -9,10 +9,10 @@ class AuctionListOwnerItemsDelayEvent : public BasicEvent
 {
 public:
     AuctionListOwnerItemsDelayEvent(uint64 _creatureGuid, uint64 guid, bool o) : creatureGuid(_creatureGuid), playerguid(guid), owner(o) {}
-    virtual ~AuctionListOwnerItemsDelayEvent() {}
+    ~AuctionListOwnerItemsDelayEvent() override {}
 
-    virtual bool Execute(uint64 e_time, uint32 p_time);
-    virtual void Abort(uint64 /*e_time*/) {}
+    bool Execute(uint64 e_time, uint32 p_time) override;
+    void Abort(uint64 /*e_time*/) override {}
     bool getOwner() { return owner; }
 
 private:

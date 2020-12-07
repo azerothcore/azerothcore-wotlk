@@ -39,7 +39,7 @@ namespace VMAP
     public:
         IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true) { }
 
-        virtual ~IVMapManager(void) { }
+        virtual ~IVMapManager() { }
 
         virtual int loadMap(const char* pBasePath, unsigned int pMapId, int x, int y) = 0;
 
@@ -71,11 +71,11 @@ namespace VMAP
         */
         void setEnableHeightCalc(bool pVal) { iEnableHeightCalc = pVal; }
 
-        bool isLineOfSightCalcEnabled() const { return (iEnableLineOfSightCalc); }
-        bool isHeightCalcEnabled() const { return (iEnableHeightCalc); }
-        bool isMapLoadingEnabled() const { return (iEnableLineOfSightCalc || iEnableHeightCalc  ); }
+        [[nodiscard]] bool isLineOfSightCalcEnabled() const { return (iEnableLineOfSightCalc); }
+        [[nodiscard]] bool isHeightCalcEnabled() const { return (iEnableHeightCalc); }
+        [[nodiscard]] bool isMapLoadingEnabled() const { return (iEnableLineOfSightCalc || iEnableHeightCalc  ); }
 
-        virtual std::string getDirFileName(unsigned int pMapId, int x, int y) const = 0;
+        [[nodiscard]] virtual std::string getDirFileName(unsigned int pMapId, int x, int y) const = 0;
         /**
         Query world model area info.
         \param z gets adjusted to the ground height for which this are info is valid
