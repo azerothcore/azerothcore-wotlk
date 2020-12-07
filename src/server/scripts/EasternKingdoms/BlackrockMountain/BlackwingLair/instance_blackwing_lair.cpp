@@ -194,33 +194,6 @@ public:
             return true;
         }
 
-        uint64 GetData64(uint32 id) const override
-        {
-            switch (id)
-            {
-                case DATA_RAZORGORE_THE_UNTAMED:
-                    return RazorgoreTheUntamedGUID;
-                case DATA_VAELASTRAZ_THE_CORRUPT:
-                    return VaelastraszTheCorruptGUID;
-                case DATA_BROODLORD_LASHLAYER:
-                    return BroodlordLashlayerGUID;
-                case DATA_FIRENAW:
-                    return FiremawGUID;
-                case DATA_EBONROC:
-                    return EbonrocGUID;
-                case DATA_FLAMEGOR:
-                    return FlamegorGUID;
-                case DATA_CHROMAGGUS:
-                    return ChromaggusGUID;
-                case DATA_LORD_VICTOR_NEFARIUS:
-                    return LordVictorNefariusGUID;
-                case DATA_NEFARIAN:
-                    return NefarianGUID;
-            }
-
-            return 0;
-        }
-
         void SetData(uint32 type, uint32 data) override
         {
             if (type == DATA_EGG_EVENT)
