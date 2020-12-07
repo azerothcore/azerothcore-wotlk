@@ -56,6 +56,7 @@ public:
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
             //LoadObjectData(creatureData, gameObjectData);
+        }
 
         void Initialize() override
         {
@@ -117,7 +118,7 @@ public:
                 EggList.remove(go->GetGUID());
 
             switch (go->GetEntry())
-            { 
+            {
             case GO_PORTCULLIS_RAZORGORE:
             case GO_PORTCULLIS_VAELASTRASZ:
             case GO_PORTCULLIS_BROODLORD:
@@ -288,7 +289,7 @@ public:
                         if (Creature* nefarius = instance->GetCreature(DATA_LORD_VICTOR_NEFARIUS))
                         {
                             nefarius->SetPhaseMask(1, true);
-                            nefarius->setActive(true); 
+                            nefarius->setActive(true);
                             nefarius->Respawn();
                             nefarius->GetMotionMaster()->MoveTargetedHome();
                         }
@@ -324,7 +325,7 @@ public:
         PrepareSpellScript(spell_bwl_shadowflame_SpellScript);
 
         void HandleEffectScriptEffect(SpellEffIndex /*effIndex*/)
-        { 
+        {
             // If the victim of the spell does not have "Onyxia Scale Cloak" - add the Shadow Flame DoT (22682)
             if (Unit* victim = GetHitUnit())
                 if(!victim->HasAura(22683))
