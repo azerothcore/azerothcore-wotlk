@@ -83,7 +83,7 @@ class GameEventMgr
 {
 private:
     GameEventMgr();
-    ~GameEventMgr() {};
+    ~GameEventMgr() = default;;
 
 public:
     static GameEventMgr* instance();

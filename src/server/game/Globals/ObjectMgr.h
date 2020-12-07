@@ -510,7 +510,7 @@ typedef std::pair<QuestRelations::const_iterator, QuestRelations::const_iterator
 
 struct PetLevelInfo
 {
-    PetLevelInfo()  { for (uint8 i = 0; i < MAX_STATS; ++i) stats[i] = 0; }
+    PetLevelInfo() { for (unsigned short & stat : stats) stat = 0; }
 
     uint16 stats[MAX_STATS];
     uint16 health{0};
@@ -1075,9 +1075,9 @@ public:
         if (map_itr == _mailLevelRewardStore.end())
             return nullptr;
 
-        for (MailLevelRewardList::const_iterator set_itr = map_itr->second.begin(); set_itr != map_itr->second.end(); ++set_itr)
-            if (set_itr->raceMask & raceMask)
-                return &*set_itr;
+        for (const auto & set_itr : map_itr->second)
+            if (set_itr.raceMask & raceMask)
+                return &set_itr;
 
         return nullptr;
     }

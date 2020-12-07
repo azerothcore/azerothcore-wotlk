@@ -46,7 +46,7 @@ public:
     typedef std::map<std::string, Realm> RealmMap;
 
     RealmList();
-    ~RealmList() { }
+    ~RealmList() = default;
 
     static RealmList* instance();
 

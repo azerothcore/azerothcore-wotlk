@@ -387,8 +387,8 @@ struct TrainerSpell
 {
     TrainerSpell()  
     {
-        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-            learnedSpell[i] = 0;
+        for (unsigned int & i : learnedSpell)
+            i = 0;
     }
 
     uint32 spell{0};

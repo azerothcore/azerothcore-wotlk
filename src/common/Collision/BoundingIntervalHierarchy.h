@@ -366,7 +366,7 @@ protected:
     public:
         BuildStats() 
         {
-            for (int i = 0; i < 6; ++i) numLeavesN[i] = 0;
+            for (int & i : numLeavesN) i = 0;
         }
 
         void updateInner() { numNodes++; }

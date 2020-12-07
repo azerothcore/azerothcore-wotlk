@@ -38,7 +38,7 @@ public:
     /* Activity state */
     DatabaseWorkerPool();
 
-    ~DatabaseWorkerPool() { }
+    ~DatabaseWorkerPool() = default;
 
     bool Open(const std::string& infoString, uint8 async_threads, uint8 synch_threads);
 

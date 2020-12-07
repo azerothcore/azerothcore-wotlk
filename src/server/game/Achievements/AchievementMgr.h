@@ -295,8 +295,8 @@ private:
 
 class AchievementGlobalMgr
 {
-    AchievementGlobalMgr() {}
-    ~AchievementGlobalMgr() {}
+    AchievementGlobalMgr() = default;
+    ~AchievementGlobalMgr() = default;
 
 public:
     static AchievementGlobalMgr* instance();

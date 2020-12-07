@@ -11,9 +11,10 @@
 #include "RealmSocket.h"
 #include "Log.h"
 
-RealmSocket::Session::Session() { }
 
-RealmSocket::Session::~Session() { }
+RealmSocket::Session::Session() = default;
+
+RealmSocket::Session::~Session() = default;
 
 RealmSocket::RealmSocket() :
     input_buffer_(4096), 
