@@ -2934,8 +2934,10 @@ void SpellMgr::LoadSpellCustomAttr()
                                     default:
                                         if (spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || !(spellInfo->SpellFamilyFlags[0] & 0x20))
                                             if (spellInfo->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spellInfo->SpellFamilyFlags[1] & 0x40000))
+                                            {
                                                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
-                                        break;
+                                                break;
+                                            }
                                 }
                             }
                             continue;
