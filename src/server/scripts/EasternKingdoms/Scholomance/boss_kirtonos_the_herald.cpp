@@ -70,7 +70,7 @@ public:
         EventMap events2;
         InstanceScript* instance;
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 2000);
@@ -79,7 +79,7 @@ public:
             events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 5000);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
                 gate->SetGoState(GO_STATE_ACTIVE);
@@ -87,7 +87,7 @@ public:
             instance->SetData(DATA_KIRTONOS_THE_HERALD, DONE);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
                 gate->SetGoState(GO_STATE_ACTIVE);
@@ -96,7 +96,7 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void IsSummonedBy(Unit* /*summoner*/)
+        void IsSummonedBy(Unit* /*summoner*/) override
         {
             events2.Reset();
             events2.ScheduleEvent(INTRO_1, 500);
@@ -106,7 +106,7 @@ public:
             Talk(EMOTE_SUMMONED);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == WAYPOINT_MOTION_TYPE && id == POINT_KIRTONOS_LAND)
             {
@@ -118,7 +118,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
@@ -210,7 +210,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_kirtonos_the_heraldAI>(creature);
     }

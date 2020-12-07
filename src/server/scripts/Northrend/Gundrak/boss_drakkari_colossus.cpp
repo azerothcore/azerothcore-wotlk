@@ -65,7 +65,7 @@ class RestoreFight : public BasicEvent
 public:
     RestoreFight(Creature* owner) : _owner(owner) { }
 
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         _owner->SetReactState(REACT_AGGRESSIVE);
         _owner->SetInCombatWithZone();
@@ -81,7 +81,7 @@ class boss_drakkari_colossus : public CreatureScript
 public:
     boss_drakkari_colossus() : CreatureScript("boss_drakkari_colossus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_drakkari_colossusAI (creature);
     }
@@ -91,11 +91,11 @@ public:
         {
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/)
+        void MoveInLineOfSight(Unit*  /*who*/) override
         {
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_INFORM)
             {
@@ -105,7 +105,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             for (uint8 i = 0; i < 5; i++)
@@ -115,19 +115,19 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             BossAI::InitializeAI();
             me->CastSpell(me, SPELL_FREEZE_ANIM, true);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             BossAI::JustReachedHome();
             me->CastSpell(me, SPELL_FREEZE_ANIM, true);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             events.ScheduleEvent(EVENT_COLOSSUS_MIGHTY_BLOW, 10000);
@@ -135,7 +135,7 @@ public:
             events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_2, 1000);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_DRAKKARI_ELEMENTAL)
             {
@@ -153,14 +153,14 @@ public:
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             summons.Despawn(summon);
             if (summon->GetEntry() == NPC_DRAKKARI_ELEMENTAL)
                 Unit::Kill(me, me);
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             summons.Despawn(summon);
             if (summon->GetEntry() == NPC_DRAKKARI_ELEMENTAL)
@@ -172,13 +172,13 @@ public:
             }
         }
 
-        void DamageTaken(Unit*  /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*  /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
                 damage = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -231,7 +231,7 @@ class boss_drakkari_elemental : public CreatureScript
 public:
     boss_drakkari_elemental() : CreatureScript("boss_drakkari_elemental") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_drakkari_elementalAI (pCreature);
     }
@@ -247,27 +247,27 @@ public:
 
         EventMap events;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_INFORM)
                 events.CancelEvent(EVENT_ELEMENTAL_HEALTH);
         }
 
-        void Reset()
+        void Reset() override
         {
             me->CastSpell(me, SPELL_ELEMENTAL_SPAWN_EFFECT, false);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             Talk(EMOTE_ALTAR);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -312,7 +312,7 @@ class npc_living_mojo : public CreatureScript
 public:
     npc_living_mojo() : CreatureScript("npc_living_mojo") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_living_mojoAI (pCreature);
     }
@@ -325,14 +325,14 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_MOJO_MOJO_PUDDLE, 13000);
             events.ScheduleEvent(EVENT_MOJO_MOJO_WAVE, 15000);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->ToTempSummon())
                 return;
@@ -340,7 +340,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (me->ToTempSummon())
             {
@@ -353,7 +353,7 @@ public:
             ScriptedAI::AttackStart(who);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_MERGE)
             {
@@ -363,7 +363,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->ToTempSummon() || !UpdateVictim())
                 return;
@@ -407,13 +407,13 @@ public:
             GetCaster()->CastSpell(GetCaster(), SPELL_FREEZE_ANIM, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_drakkari_colossus_emerge_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_drakkari_colossus_emerge_SpellScript();
     }
@@ -434,13 +434,13 @@ public:
                 GetCaster()->CastSpell(target, SPELL_SURGE_DAMAGE, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_drakkari_colossus_surge_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_drakkari_colossus_surge_SpellScript();
     }
@@ -464,13 +464,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_drakkari_colossus_face_me_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_drakkari_colossus_face_me_SpellScript();
     }
