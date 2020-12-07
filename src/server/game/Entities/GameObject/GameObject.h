@@ -844,8 +844,8 @@ public:
     void AddToSkillupList(uint32 PlayerGuidLow) { m_SkillupList.push_back(PlayerGuidLow); }
     [[nodiscard]] bool IsInSkillupList(uint32 PlayerGuidLow) const
     {
-        for (std::list<uint32>::const_iterator i = m_SkillupList.begin(); i != m_SkillupList.end(); ++i)
-            if (*i == PlayerGuidLow)
+        for (unsigned int i : m_SkillupList)
+            if (i == PlayerGuidLow)
                 return true;
 
         return false;

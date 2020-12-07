@@ -264,7 +264,7 @@ struct PlayerClassInfo
 
 struct PlayerLevelInfo
 {
-    PlayerLevelInfo() { for (uint8 i = 0; i < MAX_STATS; ++i) stats[i] = 0; }
+    PlayerLevelInfo() { for (unsigned char & stat : stats) stat = 0; }
 
     uint8 stats[MAX_STATS];
 };
@@ -689,8 +689,8 @@ struct EquipmentSet
 {
     EquipmentSet() : Guid(0), IgnoreMask(0), state(EQUIPMENT_SET_NEW)
     {
-        for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
-            Items[i] = 0;
+        for (unsigned int & Item : Items)
+            Item = 0;
     }
 
     uint64 Guid;
@@ -1876,8 +1876,8 @@ public:
     {
         Unit::SetPvP(state);
         if (!m_Controlled.empty())
-            for (ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
-                (*itr)->SetPvP(state);
+            for (auto itr : m_Controlled)
+                itr->SetPvP(state);
     }
     void UpdatePvP(bool state, bool _override = false);
     void UpdateZone(uint32 newZone, uint32 newArea);
@@ -2272,8 +2272,8 @@ public:
 
     [[nodiscard]] bool InBattlegroundQueue() const
     {
-        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-            if (m_bgBattlegroundQueueID[i] != BATTLEGROUND_QUEUE_NONE)
+        for (auto i : m_bgBattlegroundQueueID)
+            if (i != BATTLEGROUND_QUEUE_NONE)
                 return true;
         return false;
     }
@@ -2308,18 +2308,18 @@ public:
 
     bool HasFreeBattlegroundQueueId()
     {
-        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-            if (m_bgBattlegroundQueueID[i] == BATTLEGROUND_QUEUE_NONE)
+        for (auto & i : m_bgBattlegroundQueueID)
+            if (i == BATTLEGROUND_QUEUE_NONE)
                 return true;
         return false;
     }
 
     void RemoveBattlegroundQueueId(BattlegroundQueueTypeId val)
     {
-        for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
-            if (m_bgBattlegroundQueueID[i] == val)
+        for (auto & i : m_bgBattlegroundQueueID)
+            if (i == val)
             {
-                m_bgBattlegroundQueueID[i] = BATTLEGROUND_QUEUE_NONE;
+                i = BATTLEGROUND_QUEUE_NONE;
                 return;
             }
     }
@@ -3031,10 +3031,8 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& bas
     if (m_spellModTakingSpell)
         spell = m_spellModTakingSpell;
 
-    for (SpellModList::iterator itr = m_spellMods[op].begin(); itr != m_spellMods[op].end(); ++itr)
+    for (auto mod : m_spellMods[op])
     {
-        SpellModifier* mod = *itr;
-
         // Charges can be set only for mods with auras
         if (!mod->ownerAura)
             ASSERT(mod->charges == 0);
