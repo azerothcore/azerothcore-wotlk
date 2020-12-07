@@ -22,7 +22,7 @@
 class ByteBufferException : public std::exception
 {
 public:
-    ~ByteBufferException() noexcept override { }
+    ~ByteBufferException() noexcept override = default;
 
     [[nodiscard]] char const* what() const noexcept override { return msg_.c_str(); }
 
@@ -37,15 +37,14 @@ class ByteBufferPositionException : public ByteBufferException
 {
 public:
     ByteBufferPositionException(bool add, size_t pos, size_t size, size_t valueSize);
-    ~ByteBufferPositionException() noexcept override { }
+    ~ByteBufferPositionException() noexcept override = default;
 };
 
 class ByteBufferSourceException : public ByteBufferException
 {
 public:
     ByteBufferSourceException(size_t pos, size_t size, size_t valueSize);
-
-    ~ByteBufferSourceException() noexcept override { }
+    ~ByteBufferSourceException() noexcept override = default;
 };
 
 class ByteBuffer

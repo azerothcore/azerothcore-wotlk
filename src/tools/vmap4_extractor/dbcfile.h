@@ -27,8 +27,7 @@ public:
     public:
         Exception(const std::string& message): message(message)
         { }
-        virtual ~Exception()
-        { }
+        virtual ~Exception() = default;
         const std::string& getMessage() {return message;}
     private:
         std::string message;

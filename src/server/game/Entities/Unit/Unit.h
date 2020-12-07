@@ -1077,7 +1077,7 @@ typedef std::unordered_map<uint32 /*category*/, GlobalCooldown> GlobalCooldownLi
 class GlobalCooldownMgr                                     // Shared by Player and CharmInfo
 {
 public:
-    GlobalCooldownMgr() {}
+    GlobalCooldownMgr() = default;
 
 public:
     bool HasGlobalCooldown(SpellInfo const* spellInfo) const;
@@ -1303,7 +1303,7 @@ struct SpellProcEventEntry;                                 // used only private
 class MMapTargetData
 {
 public:
-    MMapTargetData() {}
+    MMapTargetData() = default;
     MMapTargetData(uint32 endTime, const Position* o, const Position* t)
     {
         _endTime = endTime;

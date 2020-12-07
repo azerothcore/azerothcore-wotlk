@@ -16,7 +16,7 @@
 class RealmAcceptor : public ACE_Acceptor<RealmSocket, ACE_SOCK_Acceptor>
 {
 public:
-    RealmAcceptor() { }
+    RealmAcceptor() = default;
     virtual ~RealmAcceptor()
     {
         if (reactor())

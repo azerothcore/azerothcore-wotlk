@@ -159,7 +159,7 @@ struct LootItem
     // Should be called for non-reference LootStoreItem entries only (reference = 0)
     explicit LootItem(LootStoreItem const& li);
 
-    LootItem() {}
+    LootItem() = default;
 
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
     bool AllowedForPlayer(Player const* player) const;
@@ -233,7 +233,7 @@ class LootTemplate
     typedef std::vector<LootGroup*> LootGroups;
 
 public:
-    LootTemplate() { }
+    LootTemplate() = default;
     ~LootTemplate();
 
     // Adds an entry to the group (at loading stage)
@@ -268,7 +268,7 @@ private:
 class LootValidatorRef :  public Reference<Loot, LootValidatorRef>
 {
 public:
-    LootValidatorRef() {}
+    LootValidatorRef() = default;
     void targetObjectDestroyLink() override {}
     void sourceObjectDestroyLink() override {}
 };
