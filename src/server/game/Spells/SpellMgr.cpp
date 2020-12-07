@@ -2908,8 +2908,7 @@ void SpellMgr::LoadSpellCustomAttr()
                             {
                                 switch (spellInfo->Id)
                                 {
-                                    // If a spell isn't binary, add it to this list so the custom attribute
-                                    // isn't added to it. Otherwise you might have spells that aren't resisted
+                                    // ----------   These spells are not binary ----------
                                     /* Sindragosa Frost Breath */
                                     case 71056:
                                     case 71057:
@@ -2925,9 +2924,14 @@ void SpellMgr::LoadSpellCustomAttr()
                                     case 62457:
                                     case 65370:
                                         break;
+                                    // ----------   These spells are binary ----------
+                                    /* Hodir Freeze*/
+                                    case 62469:
+                                        spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
+                                        break;
                                     default:
-                                        if (spellInfo->SpellFamilyName != SPELLFAMILY_MAGE && spellInfo->SpellFamilyName != SPELLFAMILY_WARLOCK)
-                                            if (!(spellInfo->SpellFamilyFlags[1] & 0x40000) && !(spellInfo->SpellFamilyFlags[0] & 0x20))
+                                        if (spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || !(spellInfo->SpellFamilyFlags[0] & 0x20))
+                                            if (spellInfo->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spellInfo->SpellFamilyFlags[1] & 0x40000))
                                                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
                                         break;
                                 }
