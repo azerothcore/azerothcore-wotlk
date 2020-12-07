@@ -10,16 +10,21 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-# Set projectname (must be done AFTER setting configurationtypes)
-project(AzerothCore)
-
 # Require a min version Cmake
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.8...3.19)
+
+# Fallback for using newer policies on CMake <3.12.
+if(${CMAKE_VERSION} VERSION_LESS 3.12)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+endif()
 
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
 # CMake policies (can not be handled elsewhere)
 cmake_policy(SET CMP0005 NEW)
+
+# Set projectname (must be done AFTER setting configurationtypes)
+project(AzerothCore VERSION 3.0.0 LANGUAGES CXX C)
 
 # add this options before PROJECT keyword
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)

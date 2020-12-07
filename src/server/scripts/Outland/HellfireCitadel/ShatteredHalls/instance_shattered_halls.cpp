@@ -12,7 +12,7 @@ class instance_shattered_halls : public InstanceMapScript
 public:
     instance_shattered_halls() : InstanceMapScript("instance_shattered_halls", 540) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_shattered_halls_InstanceMapScript(map);
     }
@@ -21,7 +21,7 @@ public:
     {
         instance_shattered_halls_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        void Initialize()
+        void Initialize() override
         {
             SetBossNumber(ENCOUNTER_COUNT);
             nethekurseDoor1GUID = 0;
@@ -34,13 +34,13 @@ public:
             RescueTimer = 100 * MINUTE * IN_MILLISECONDS;
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
                 TeamIdInInstance = player->GetTeamId();
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -57,7 +57,7 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -95,7 +95,7 @@ public:
             }
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -118,7 +118,7 @@ public:
             return true;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (type == DATA_ENTERED_ROOM && data == DATA_ENTERED_ROOM && RescueTimer == 100 * MINUTE * IN_MILLISECONDS)
             {
@@ -132,7 +132,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 data) const
+        uint64 GetData64(uint32 data) const override
         {
             switch (data)
             {
@@ -146,7 +146,7 @@ public:
             return 0;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (RescueTimer && RescueTimer < 100 * MINUTE * IN_MILLISECONDS)
             {
@@ -177,7 +177,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -188,7 +188,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* strIn)
+        void Load(const char* strIn) override
         {
             if (!strIn)
             {
@@ -255,14 +255,14 @@ public:
                 target->CastSpell(target, 30953, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_tsh_shoot_flame_arrow_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
             OnEffectHitTarget += SpellEffectFn(spell_tsh_shoot_flame_arrow_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_tsh_shoot_flame_arrow_SpellScript();
     }
@@ -273,7 +273,7 @@ class at_shattered_halls_execution : public AreaTriggerScript
 public:
     at_shattered_halls_execution() : AreaTriggerScript("at_shattered_halls_execution") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (InstanceScript* instanceScript = player->GetInstanceScript())
             instanceScript->SetData(DATA_ENTERED_ROOM, DATA_ENTERED_ROOM);

@@ -42,7 +42,7 @@ public:
 
         uint32 lock;
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (lock > 1000 && me->GetDistance(who) < 10.0f && who->GetTypeId() == TYPEID_PLAYER && who->HasAura(SPELL_GOBLIN_DISGUISE) && !who->HasAura(SPELL_GOBLIN_CARRY_CRATE))
             {
@@ -61,13 +61,13 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             lock += diff;
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_love_in_air_supply_sentryAI(creature);
     }
@@ -101,7 +101,7 @@ public:
 
         int32 delay;
 
-        void Reset()
+        void Reset() override
         {
             delay = 0;
             me->SetReactState(REACT_AGGRESSIVE);
@@ -120,7 +120,7 @@ public:
             return false;
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (delay == 0 && me->GetDistance(who) < 7.0f && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -134,14 +134,14 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (delay > 0)
                 delay -= std::min<int32>(delay, diff);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_love_in_air_snivelAI(creature);
     }
@@ -224,7 +224,7 @@ public:
             return true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             actionTimer += diff;
             if (actionTimer >= 7000)
@@ -243,7 +243,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_love_in_air_snivel_realAI(creature);
     }
@@ -297,7 +297,7 @@ public:
         EventMap events;
         uint32 speachTimer;
 
-        void Reset()
+        void Reset() override
         {
             speachTimer = 0;
             me->setFaction(35);
@@ -307,13 +307,13 @@ public:
             me->SummonCreature(NPC_APOTHECARY_BAXTER, -209.602f, 2215.42f, 79.7633f, 0.723503f);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_EVENT)
                 speachTimer = 1;
         }
 
-        void JustDied(Unit* )
+        void JustDied(Unit* ) override
         {
             me->MonsterSay("...please don't think less of me.", LANG_UNIVERSAL, 0);
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
@@ -321,7 +321,7 @@ public:
                 sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 288, me->FindMap());
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
             cr->setFaction(35);
@@ -329,7 +329,7 @@ public:
             cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (speachTimer)
             {
@@ -401,12 +401,12 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_love_in_air_hummelAI(creature);
     }
 
-    bool OnQuestReward(Player* /*player*/, Creature* creature, const Quest* _Quest, uint32 /*slot*/)
+    bool OnQuestReward(Player* /*player*/, Creature* creature, const Quest* _Quest, uint32 /*slot*/) override
     {
         if (_Quest->GetQuestId() == QUEST_YOUVE_BEEN_SERVED)
             creature->AI()->DoAction(ACTION_START_EVENT);
@@ -428,11 +428,11 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_RELEASE_HELPER)
             {
@@ -453,9 +453,9 @@ public:
             }
         }
 
-        void JustDied(Unit* ) { me->MonsterSay("...please don't think less of me.", LANG_UNIVERSAL, 0); }
+        void JustDied(Unit* ) override { me->MonsterSay("...please don't think less of me.", LANG_UNIVERSAL, 0); }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -490,7 +490,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_love_in_air_hummel_helperAI(creature);
     }
@@ -539,14 +539,14 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_love_in_air_perfume_immune_AuraScript::HandleEffectApply, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_love_in_air_perfume_immune_AuraScript::HandleEffectRemove, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_love_in_air_perfume_immune_AuraScript();
     }
@@ -574,13 +574,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_love_in_air_periodic_perfumes_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_love_in_air_periodic_perfumes_AuraScript();
     }
@@ -624,13 +624,13 @@ public:
             target->AddItem(items[urand(0, 7)], 1);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_item_create_heart_candy_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_item_create_heart_candy_SpellScript();
     }
@@ -705,14 +705,14 @@ public:
                 target->RemoveAura(SPELL_ROMANTIC_PICNIC_ACHIEV);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectApplyFn(spell_love_is_in_the_air_romantic_picnic_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_love_is_in_the_air_romantic_picnic_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_love_is_in_the_air_romantic_picnic_AuraScript();
     }
@@ -735,7 +735,7 @@ public:
     {
         PrepareAuraScript(spell_gen_aura_service_uniform_AuraScript);
 
-        bool Validate(SpellInfo const* /*spell*/)
+        bool Validate(SpellInfo const* /*spell*/) override
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_SERVICE_UNIFORM))
                 return false;
@@ -762,14 +762,14 @@ public:
                 target->RestoreDisplayId();
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectApplyFn(spell_gen_aura_service_uniform_AuraScript::OnApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectRemoveFn(spell_gen_aura_service_uniform_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_gen_aura_service_uniform_AuraScript();
     }

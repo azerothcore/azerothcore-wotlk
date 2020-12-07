@@ -35,7 +35,7 @@ class boss_azuregos : public CreatureScript
 public:
     boss_azuregos() : CreatureScript("boss_azuregos") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_azuregosAI(creature);
     }
@@ -54,7 +54,7 @@ public:
         uint32 EnrageTimer;
         bool Enraged;
 
-        void Reset()
+        void Reset() override
         {
             MarkOfFrostTimer = 35000;
             ManaStormTimer = urand(5000, 17000);
@@ -67,9 +67,9 @@ public:
             Enraged = false;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())

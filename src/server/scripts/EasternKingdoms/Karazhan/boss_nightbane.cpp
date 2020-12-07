@@ -58,7 +58,7 @@ class boss_nightbane : public CreatureScript
 public:
     boss_nightbane() : CreatureScript("boss_nightbane") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_nightbaneAI (creature);
     }
@@ -97,7 +97,7 @@ public:
 
         uint32 MovePhase;
 
-        void Reset()
+        void Reset() override
         {
             BellowingRoarTimer = 30000;
             CharredEarthTimer = 15000;
@@ -147,7 +147,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (instance)
                 instance->SetData64(DATA_NIGHTBANE, IN_PROGRESS);
@@ -156,13 +156,13 @@ public:
             Talk(YELL_AGGRO);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!Intro && !Flying)
                 ScriptedAI::AttackStart(who);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (instance)
                 instance->SetData(DATA_NIGHTBANE, DONE);
@@ -170,13 +170,13 @@ public:
             HandleTerraceDoors(true);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!Intro && !Flying)
                 ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -216,7 +216,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             summoned->AI()->AttackStart(me->GetVictim());
         }
@@ -241,7 +241,7 @@ public:
             Skeletons = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (Intro)
             {
