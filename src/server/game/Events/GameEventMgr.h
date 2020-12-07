@@ -55,7 +55,7 @@ struct GameEventData
     std::string description;
     uint8 announce;         // if 0 dont announce, if 1 announce, if 2 take config value
 
-    bool isValid() const { return length > 0 || state > GAMEEVENT_NORMAL; }
+    [[nodiscard]] bool isValid() const { return length > 0 || state > GAMEEVENT_NORMAL; }
 };
 
 struct ModelEquip
@@ -90,10 +90,10 @@ public:
 
     typedef std::set<uint16> ActiveEvents;
     typedef std::vector<GameEventData> GameEventDataMap;
-    ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; }
-    GameEventDataMap const& GetEventMap() const { return mGameEvent; }
-    bool CheckOneGameEvent(uint16 entry) const;
-    uint32 NextCheck(uint16 entry) const;
+    [[nodiscard]] ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; }
+    [[nodiscard]] GameEventDataMap const& GetEventMap() const { return mGameEvent; }
+    [[nodiscard]] bool CheckOneGameEvent(uint16 entry) const;
+    [[nodiscard]] uint32 NextCheck(uint16 entry) const;
     void LoadFromDB();
     void LoadHolidayDates();
     uint32 Update();

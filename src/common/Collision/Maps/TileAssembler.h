@@ -36,7 +36,7 @@ namespace VMAP
         {
             iRotation = G3D::Matrix3::fromEulerAnglesZYX(G3D::pif() * iDir.y / 180.f, G3D::pif() * iDir.x / 180.f, G3D::pif() * iDir.z / 180.f);
         }
-        G3D::Vector3 transform(const G3D::Vector3& pIn) const;
+        [[nodiscard]] G3D::Vector3 transform(const G3D::Vector3& pIn) const;
         void moveToBasePos(const G3D::Vector3& pBasePos) { iPos -= pBasePos; }
     };
 
@@ -64,7 +64,7 @@ namespace VMAP
         class WmoLiquid* liquid;
 
         GroupModel_Raw() : mogpflags(0), GroupWMOID(0), liquidflags(0),
-            liquid(NULL) { }
+            liquid(nullptr) { }
         ~GroupModel_Raw();
 
         bool Read(FILE* f);

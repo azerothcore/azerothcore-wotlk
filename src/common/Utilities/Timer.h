@@ -85,12 +85,12 @@ public:
         _interval = interval;
     }
 
-    time_t GetInterval() const
+    [[nodiscard]] time_t GetInterval() const
     {
         return _interval;
     }
 
-    time_t GetCurrent() const
+    [[nodiscard]] time_t GetCurrent() const
     {
         return _current;
     }
@@ -115,7 +115,7 @@ public:
         i_expiryTime -= diff;
     }
 
-    bool Passed() const
+    [[nodiscard]] bool Passed() const
     {
         return i_expiryTime <= 0;
     }
@@ -125,7 +125,7 @@ public:
         i_expiryTime = interval;
     }
 
-    time_t GetExpiry() const
+    [[nodiscard]] time_t GetExpiry() const
     {
         return i_expiryTime;
     }
@@ -149,7 +149,7 @@ public:
         i_expiryTime -= diff;
     }
 
-    bool Passed() const
+    [[nodiscard]] bool Passed() const
     {
         return i_expiryTime <= 0;
     }
@@ -159,7 +159,7 @@ public:
         i_expiryTime = interval;
     }
 
-    int32 GetExpiry() const
+    [[nodiscard]] int32 GetExpiry() const
     {
         return i_expiryTime;
     }
@@ -195,7 +195,7 @@ public:
 
     // Tracker interface
     void TUpdate(int32 diff) { i_expireTime -= diff; }
-    bool TPassed() const { return i_expireTime <= 0; }
+    [[nodiscard]] bool TPassed() const { return i_expireTime <= 0; }
     void TReset(int32 diff, int32 period)  { i_expireTime += period > diff ? period : diff; }
 
 private:

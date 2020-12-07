@@ -100,7 +100,7 @@ public:
         delete[] dat.primBound;
         delete[] dat.indices;
     }
-    uint32 primCount() const { return objects.size(); }
+    [[nodiscard]] uint32 primCount() const { return objects.size(); }
 
     template<typename RayCallback>
     void intersectRay(const G3D::Ray& r, RayCallback& intersectCallback, float& maxDist, bool stopAtFirstHit) const
@@ -369,7 +369,7 @@ protected:
             maxObjects(0xFFFFFFFF), sumDepth(0), minDepth(0x0FFFFFFF),
             maxDepth(0xFFFFFFFF), numBVH2(0)
         {
-            for (int i = 0; i < 6; ++i) numLeavesN[i] = 0;
+            for (int & i : numLeavesN) i = 0;
         }
 
         void updateInner() { numNodes++; }

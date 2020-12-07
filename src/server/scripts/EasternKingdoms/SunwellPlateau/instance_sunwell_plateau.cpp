@@ -47,7 +47,7 @@ public:
             memset(&blueFlightOrbGUID, 0, sizeof(blueFlightOrbGUID));
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             instance->LoadGrid(1477.94f, 643.22f);
             instance->LoadGrid(1641.45f, 988.08f);
@@ -74,7 +74,7 @@ public:
             return nullptr;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (creature->GetDBTableGUIDLow() > 0 || !IS_PLAYER_GUID(creature->GetOwnerGUID()))
                 creature->CastSpell(creature, SPELL_SUNWELL_RADIANCE, true);
@@ -146,7 +146,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -179,7 +179,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -196,7 +196,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const
+        uint64 GetData64(uint32 id) const override
         {
             switch (id)
             {
@@ -235,7 +235,7 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -246,7 +246,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(char const* str)
+        void Load(char const* str) override
         {
             if (!str)
             {
@@ -296,7 +296,7 @@ public:
         uint64 blueFlightOrbGUID[4];
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_sunwell_plateau_InstanceMapScript(map);
     }
@@ -330,13 +330,13 @@ public:
                     GetCaster()->CastSpell(target, RAND(SPELL_CORROSIVE_POISON, SPELL_FEVERED_FATIGUE, SPELL_HEX, SPELL_NECROTIC_POISON, SPELL_PIERCING_SHADOW, SPELL_SHRINK, SPELL_WAVERING_WILL, SPELL_WITHERED_TOUCH), true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterCast += SpellCastFn(spell_cataclysm_breath_SpellScript::HandleAfterCast);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_cataclysm_breath_SpellScript();
     }
