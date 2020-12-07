@@ -170,11 +170,11 @@ struct LootItem
 
 struct QuestItem
 {
-    uint8   index;                                          // position in quest_items;
-    bool    is_looted;
+    uint8   index{0};                                          // position in quest_items;
+    bool    is_looted{false};
 
     QuestItem()
-        : index(0), is_looted(false) {}
+         {}
 
     QuestItem(uint8 _index, bool _islooted = false)
         : index(_index), is_looted(_islooted) {}
@@ -306,14 +306,14 @@ struct Loot
     std::vector<LootItem> items;
     std::vector<LootItem> quest_items;
     uint32 gold;
-    uint8 unlootedCount;
-    uint64 roundRobinPlayer;                                // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
-    LootType loot_type;                                     // required for achievement system
+    uint8 unlootedCount{0};
+    uint64 roundRobinPlayer{0};                                // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
+    LootType loot_type{LOOT_NONE};                                     // required for achievement system
 
     // GUIDLow of container that holds this loot (item_instance.entry), set for items that can be looted
-    uint32 containerId;
+    uint32 containerId{0};
 
-    Loot(uint32 _gold = 0) : gold(_gold), unlootedCount(0), roundRobinPlayer(0), loot_type(LOOT_NONE), containerId(0) { }
+    Loot(uint32 _gold = 0) : gold(_gold) { }
     ~Loot() { clear(); }
 
     // if loot becomes invalid this reference is used to inform the listener

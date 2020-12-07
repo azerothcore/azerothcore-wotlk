@@ -22,7 +22,7 @@ class Transaction
     friend class DatabaseWorkerPool;
 
 public:
-    Transaction() : _cleanedUp(false) { }
+    Transaction()  { }
     ~Transaction() { Cleanup(); }
 
     void Append(PreparedStatement* statement);
@@ -36,7 +36,7 @@ protected:
     std::list<SQLElementData> m_queries;
 
 private:
-    bool _cleanedUp;
+    bool _cleanedUp{false};
 };
 
 typedef std::shared_ptr<Transaction> SQLTransaction;

@@ -33,11 +33,11 @@ namespace VMAP
     class IVMapManager
     {
     private:
-        bool iEnableLineOfSightCalc;
-        bool iEnableHeightCalc;
+        bool iEnableLineOfSightCalc{true};
+        bool iEnableHeightCalc{true};
 
     public:
-        IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true) { }
+        IVMapManager()  { }
 
         virtual ~IVMapManager() = default;
 

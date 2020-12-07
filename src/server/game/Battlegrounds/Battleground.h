@@ -174,11 +174,11 @@ enum BattlegroundTeams
 
 struct BattlegroundObjectInfo
 {
-    BattlegroundObjectInfo() : object(nullptr), timer(0), spellid(0) {}
+    BattlegroundObjectInfo()  {}
 
-    GameObject*  object;
-    int32       timer;
-    uint32      spellid;
+    GameObject*  object{nullptr};
+    int32       timer{0};
+    uint32      spellid{0};
 };
 
 enum ScoreType
@@ -273,7 +273,7 @@ struct BattlegroundScore
 class ArenaLogEntryData
 {
 public:
-    ArenaLogEntryData() : Guid(0), ArenaTeamId(0), DamageDone(0), HealingDone(0), KillingBlows(0) {}
+    ArenaLogEntryData()  {}
     void Fill(const char* name, uint32 guid, uint32 acc, uint32 arenaTeamId, std::string ip)
     {
         Name = std::string(name);
@@ -284,13 +284,13 @@ public:
     }
 
     std::string Name;
-    uint32 Guid;
+    uint32 Guid{0};
     uint32 Acc;
-    uint32 ArenaTeamId;
+    uint32 ArenaTeamId{0};
     std::string IP;
-    uint32 DamageDone;
-    uint32 HealingDone;
-    uint32 KillingBlows;
+    uint32 DamageDone{0};
+    uint32 HealingDone{0};
+    uint32 KillingBlows{0};
 };
 
 enum BGHonorMode
