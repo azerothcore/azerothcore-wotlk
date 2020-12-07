@@ -52,7 +52,7 @@ public:
     {
         boss_warchief_kargath_bladefistAI(Creature* creature) : BossAI(creature, DATA_KARGATH) { }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             BossAI::InitializeAI();
             if (instance)
@@ -60,7 +60,7 @@ public:
                     executioner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             _JustDied();
@@ -70,7 +70,7 @@ public:
                     executioner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             Talk(SAY_AGGRO);
             _EnterCombat();
@@ -82,7 +82,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_CHARGE, 0);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() != NPC_SHATTERED_ASSASSIN)
                 summon->AI()->AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));
@@ -90,13 +90,13 @@ public:
             summons.Summon(summon);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE || id != 1)
                 return;
@@ -105,7 +105,7 @@ public:
             events.ScheduleEvent(EVENT_MOVE_TO_NEXT_POINT, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -165,7 +165,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_warchief_kargath_bladefistAI>(creature);
     }

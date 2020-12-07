@@ -114,15 +114,15 @@ public:
 
     typedef std::list<ArenaTeamMember> MemberList;
 
-    uint32 GetId() const              { return TeamId; }
-    uint32 GetType() const            { return Type; }
-    uint8  GetSlot() const            { return GetSlotByType(GetType()); }
+    [[nodiscard]] uint32 GetId() const              { return TeamId; }
+    [[nodiscard]] uint32 GetType() const            { return Type; }
+    [[nodiscard]] uint8  GetSlot() const            { return GetSlotByType(GetType()); }
     static uint8 GetSlotByType(uint32 type);
-    uint64 GetCaptain() const  { return CaptainGuid; }
-    std::string const& GetName() const       { return TeamName; }
-    const ArenaTeamStats& GetStats() const { return Stats; }
+    [[nodiscard]] uint64 GetCaptain() const  { return CaptainGuid; }
+    [[nodiscard]] std::string const& GetName() const       { return TeamName; }
+    [[nodiscard]] const ArenaTeamStats& GetStats() const { return Stats; }
 
-    uint32 GetRating() const          { return Stats.Rating; }
+    [[nodiscard]] uint32 GetRating() const          { return Stats.Rating; }
     uint32 GetAverageMMR(Group* group) const;
 
     void SetCaptain(uint64 guid);
@@ -133,16 +133,16 @@ public:
     // and this method removes given record from list. So invalid reference can happen.
     void DelMember(uint64 guid, bool cleanDb);
 
-    size_t GetMembersSize() const         { return Members.size(); }
-    bool   Empty() const                  { return Members.empty(); }
+    [[nodiscard]] size_t GetMembersSize() const         { return Members.size(); }
+    [[nodiscard]] bool   Empty() const                  { return Members.empty(); }
     MemberList::iterator m_membersBegin() { return Members.begin(); }
     MemberList::iterator m_membersEnd()   { return Members.end(); }
-    bool IsMember(uint64 guid) const;
+    [[nodiscard]] bool IsMember(uint64 guid) const;
 
     ArenaTeamMember* GetMember(uint64 guid);
     ArenaTeamMember* GetMember(std::string const& name);
 
-    bool IsFighting() const;
+    [[nodiscard]] bool IsFighting() const;
 
     bool LoadArenaTeamFromDB(QueryResult arenaTeamDataResult);
     bool LoadMembersFromDB(QueryResult arenaTeamMembersResult);
