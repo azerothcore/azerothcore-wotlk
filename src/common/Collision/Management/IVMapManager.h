@@ -39,7 +39,7 @@ namespace VMAP
     public:
         IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true) { }
 
-        virtual ~IVMapManager() { }
+        virtual ~IVMapManager() = default;
 
         virtual int loadMap(const char* pBasePath, unsigned int pMapId, int x, int y) = 0;
 

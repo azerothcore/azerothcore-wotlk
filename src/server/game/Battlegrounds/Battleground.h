@@ -246,7 +246,7 @@ struct BattlegroundScore
         DamageDone(0), HealingDone(0), player(player)
     { }
 
-    virtual ~BattlegroundScore() { }                        //virtual destructor is used when deleting score from scores map
+    virtual ~BattlegroundScore() = default;                        //virtual destructor is used when deleting score from scores map
 
     uint32 KillingBlows;
     uint32 Deaths;

@@ -120,7 +120,7 @@ class PacketFilter
 {
 public:
     explicit PacketFilter(WorldSession* pSession) : m_pSession(pSession) {}
-    virtual ~PacketFilter() {}
+    virtual ~PacketFilter() = default;
 
     virtual bool Process(WorldPacket* /*packet*/) { return true; }
     [[nodiscard]] virtual bool ProcessLogout() const { return true; }
@@ -133,7 +133,7 @@ class MapSessionFilter : public PacketFilter
 {
 public:
     explicit MapSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
-    ~MapSessionFilter() override {}
+    ~MapSessionFilter() override = default;
 
     bool Process(WorldPacket* packet) override;
     //in Map::Update() we do not process player logout!
@@ -146,7 +146,7 @@ class WorldSessionFilter : public PacketFilter
 {
 public:
     explicit WorldSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
-    ~WorldSessionFilter() override {}
+    ~WorldSessionFilter() override = default;
 
     bool Process(WorldPacket* packet) override;
 };
@@ -181,7 +181,7 @@ protected:
     uint8 CharCount;
 
 private:
-    virtual ~CharacterCreateInfo() {};
+    virtual ~CharacterCreateInfo() = default;;
 };
 
 struct PacketCounter

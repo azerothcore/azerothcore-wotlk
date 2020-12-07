@@ -188,7 +188,7 @@ AuthSocket::AuthSocket(RealmSocket& socket) :
 }
 
 // Close patch file descriptor before leaving
-AuthSocket::~AuthSocket() { }
+AuthSocket::~AuthSocket() = default;
 
 // Accept the connection
 void AuthSocket::OnAccept()
