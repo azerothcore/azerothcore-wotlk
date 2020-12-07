@@ -42,7 +42,7 @@ target_link_libraries(game-interface
 
 add_library(game STATIC
   ${PRIVATE_SOURCES}
-  ${ElunaLuaEngineFiles} World/IWorld.h)
+  ${ElunaLuaEngineFiles})
 
 add_dependencies(game revision.h)
 
