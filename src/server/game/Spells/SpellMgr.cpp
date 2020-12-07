@@ -2925,6 +2925,8 @@ void SpellMgr::LoadSpellCustomAttr()
                                     case 65370:
                                         break;
                                     // ----------   These spells are binary ----------
+                                    /* Snake Trap Effect */
+                                    case 45145:
                                     /* Hodir Freeze*/
                                     case 62469:
                                         spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
@@ -2963,10 +2965,6 @@ void SpellMgr::LoadSpellCustomAttr()
 
         switch (spellInfo->Id)
         {
-            // Xinef: additional spells which should be binary
-            case 45145: // Snake Trap Effect
-                spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
-                break;
             case 1776: // Gouge
             case 1777:
             case 8629:
