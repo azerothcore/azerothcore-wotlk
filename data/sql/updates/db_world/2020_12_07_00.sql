@@ -1,3 +1,19 @@
+-- DB update 2020_12_06_00 -> 2020_12_07_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_06_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_06_00 2020_12_07_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1601827483251961900'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1601827483251961900');
 /*
  * Raid: Vault of Archavon
@@ -30,3 +46,12 @@ UPDATE `creature_template` SET `mindmg` = 54500, `maxdmg` = 75500, `DamageModifi
  /* 4th: Towards Tier 10 and last PvP Season - During Icecrown Citadel (Need testing) */
 UPDATE `creature_template` SET `mindmg` = 30380, `maxdmg` = 41445, `DamageModifier` = 1.01 WHERE `entry` = 38433;
 UPDATE `creature_template` SET `mindmg` = 60760, `maxdmg` = 82890, `DamageModifier` = 1.01 WHERE `entry` = 38462;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
