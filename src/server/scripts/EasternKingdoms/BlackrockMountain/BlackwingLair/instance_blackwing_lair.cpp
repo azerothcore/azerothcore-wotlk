@@ -307,7 +307,7 @@ public:
         std::list<uint64> EggList;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    InstanceScript* GetInstanceScript(InstanceMap* map) const
     {
         return new instance_blackwing_lair_InstanceMapScript(map);
     }
