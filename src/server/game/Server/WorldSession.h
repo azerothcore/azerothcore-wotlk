@@ -75,9 +75,9 @@ enum AccountDataType
 
 struct AccountData
 {
-    AccountData() : Time(0), Data("") {}
+    AccountData() :  Data("") {}
 
-    time_t Time;
+    time_t Time{0};
     std::string Data;
 };
 
