@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ */
+
 #include "gtest/gtest.h"
 #include "Formulas.h"
 #include "SharedDefines.h"
