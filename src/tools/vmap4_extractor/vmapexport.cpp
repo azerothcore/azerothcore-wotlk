@@ -283,7 +283,7 @@ bool scan_patches(char* scanmatch, std::vector<std::string>& pArchiveNames)
         {
             fclose(h);
             //matches.push_back(path);
-            pArchiveNames.push_back(path);
+            pArchiveNames.emplace_back(path);
         }
     }
 
@@ -301,18 +301,18 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
     string in_path(input_path);
     std::vector<std::string> locales, searchLocales;
 
-    searchLocales.push_back("enGB");
-    searchLocales.push_back("enUS");
-    searchLocales.push_back("deDE");
-    searchLocales.push_back("esES");
-    searchLocales.push_back("frFR");
-    searchLocales.push_back("koKR");
-    searchLocales.push_back("zhCN");
-    searchLocales.push_back("zhTW");
-    searchLocales.push_back("enCN");
-    searchLocales.push_back("enTW");
-    searchLocales.push_back("esMX");
-    searchLocales.push_back("ruRU");
+    searchLocales.emplace_back("enGB");
+    searchLocales.emplace_back("enUS");
+    searchLocales.emplace_back("deDE");
+    searchLocales.emplace_back("esES");
+    searchLocales.emplace_back("frFR");
+    searchLocales.emplace_back("koKR");
+    searchLocales.emplace_back("zhCN");
+    searchLocales.emplace_back("zhTW");
+    searchLocales.emplace_back("enCN");
+    searchLocales.emplace_back("enTW");
+    searchLocales.emplace_back("esMX");
+    searchLocales.emplace_back("ruRU");
 
     for (std::vector<std::string>::iterator i = searchLocales.begin(); i != searchLocales.end(); ++i)
     {

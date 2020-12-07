@@ -197,7 +197,7 @@ namespace MMAP
 
         for (unsigned int i = 0; i < threads; ++i)
         {
-            _workerThreads.push_back(std::thread(&MapBuilder::WorkerThread, this));
+            _workerThreads.emplace_back(&MapBuilder::WorkerThread, this);
         }
 
         m_tiles.sort([](MapTiles a, MapTiles b)
