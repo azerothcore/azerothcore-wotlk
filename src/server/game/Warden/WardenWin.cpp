@@ -206,6 +206,9 @@ void WardenWin::RequestData()
     if (_otherChecksTodo.empty())
         _otherChecksTodo.assign(sWardenCheckMgr->OtherChecksIdPool.begin(), sWardenCheckMgr->OtherChecksIdPool.end());
 
+    if (_luaChecksTodo.empty())
+        _luaChecksTodo.assign(sWardenCheckMgr->LuaChecksIdPool.begin(), sWardenCheckMgr->LuaChecksIdPool.end());
+
     _serverTicks = World::GetGameTimeMS();
 
     uint16 id;

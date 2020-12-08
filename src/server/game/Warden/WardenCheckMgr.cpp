@@ -106,6 +106,10 @@ void WardenCheckMgr::LoadWardenChecks()
         {
             MemChecksIdPool.push_back(id);
         }
+        else if (checkType == LUA_EVAL_CHECK)
+        {
+            LuaChecksIdPool.emplace_back(id);
+        }
         else
         {
             OtherChecksIdPool.push_back(id);

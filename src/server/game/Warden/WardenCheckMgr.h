@@ -57,6 +57,7 @@ public:
 
     std::vector<uint16> MemChecksIdPool;
     std::vector<uint16> OtherChecksIdPool;
+    std::vector<uint16> LuaChecksIdPool;
 
     void LoadWardenChecks();
     void LoadWardenOverrides();
