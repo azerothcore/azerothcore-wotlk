@@ -167,7 +167,7 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_WARDEN, "Request hash reply: failed");
 #endif
-        Penalty();
+        ApplyPenalty();
         return;
     }
 

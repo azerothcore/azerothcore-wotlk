@@ -194,7 +194,7 @@ void WardenWin::HandleHashResult(ByteBuffer& buff)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_WARDEN, "Request hash reply: failed");
 #endif
-        Penalty();
+        ApplyPenalty();
         return;
     }
 
@@ -501,7 +501,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_WARDEN, "CHECKSUM FAIL");
 #endif
-        Penalty();
+        ApplyPenalty();
         return;
     }
 
@@ -515,7 +515,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_WARDEN, "TIMING CHECK FAIL result 0x00");
 #endif
-            Penalty();
+            ApplyPenalty();
             return;
         }
 
@@ -666,7 +666,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
     {
         if (WardenCheck* check = sWardenCheckMgr->GetWardenDataById(checkFailed))
         {
-            Penalty(check, checkFailed);
+            ApplyPenalty(check, checkFailed);
         }
     }
 

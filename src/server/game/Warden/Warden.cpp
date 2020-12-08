@@ -173,7 +173,7 @@ uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
     return checkSum;
 }
 
-std::string Warden::Penalty(WardenCheck* check /*= NULL*/, uint16 checkFailed /*= 0*/)
+std::string Warden::ApplyPenalty(WardenCheck* check /*= NULL*/, uint16 checkFailed /*= 0*/)
 {
     WardenActions action;
 
