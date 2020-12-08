@@ -29,6 +29,40 @@ static constexpr char _luaEvalPostfix[] = ",'GUILD')end";
 
 static_assert((sizeof(_luaEvalPrefix)-1 + sizeof(_luaEvalMidfix)-1 + sizeof(_luaEvalPostfix)-1 + WARDEN_MAX_LUA_CHECK_LENGTH) == 255);
 
+static constexpr uint8 GetCheckPacketBaseSize(uint8 type)
+{
+    switch (type)
+    {
+    case DRIVER_CHECK:
+    case MPQ_CHECK: return 1;
+    case LUA_EVAL_CHECK: return 1 + sizeof(_luaEvalPrefix) - 1 + sizeof(_luaEvalMidfix) - 1 + 4 + sizeof(_luaEvalPostfix) - 1;
+    case PAGE_CHECK_A: return (4 + 1);
+    case PAGE_CHECK_B: return (4 + 1);
+    case MODULE_CHECK: return (4 + SHA_DIGEST_LENGTH);
+    case MEM_CHECK: return (1 + 4 + 1);
+    default: return 0;
+    }
+}
+
+static uint16 GetCheckPacketSize(WardenCheck* check)
+{
+    if (!check)
+    {
+        return 0;
+    }
+
+    uint16 size = 1 + GetCheckPacketBaseSize(check->Type); // 1 byte check type
+    if (!check->Str.empty())
+    {
+        size += (static_cast<uint16>(check->Str.length()) + 1); // 1 byte string length
+    }
+    if (!check->Data.GetNumBytes())
+    {
+        size += check->Data.GetNumBytes();
+    }
+    return size;
+}
+
 WardenWin::WardenWin() : Warden(), _serverTicks(0) { }
 
 WardenWin::~WardenWin()
@@ -216,23 +250,55 @@ void WardenWin::RequestData()
     WardenCheck* wd;
     _currentChecks.clear();
 
-    // Build check request
-    for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_MEM_CHECKS); ++i)
+    // No pending checks
+    if (_pendingChecks.empty())
     {
-        // If todo list is done break loop (will be filled on next Update() run)
-        if (_memChecksTodo.empty())
-            break;
+        // Build check request
+        for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_MEM_CHECKS); ++i)
+        {
+            // If todo list is done break loop (will be filled on next Update() run)
+            if (_memChecksTodo.empty())
+                break;
 
-        // Get check id from the end and remove it from todo
-        id = _memChecksTodo.back();
-        _memChecksTodo.pop_back();
+            // Get check id from the end and remove it from todo
+            id = _memChecksTodo.back();
+            _memChecksTodo.pop_back();
 
-        // Add the id to the list sent in this cycle
-        if (id != 786 /*WPE PRO*/ && id != 209 /*WoWEmuHacker*/)
-            _currentChecks.push_back(id);
+            // Add the id to the list sent in this cycle
+            if (id != 786 /*WPE PRO*/ && id != 209 /*WoWEmuHacker*/)
+                _currentChecks.push_back(id);
+        }
+
+        // Always in front of queue
+        _currentChecks.push_front(786);
+        _currentChecks.push_front(209);
+
+        // avoid double checks
+        _currentChecks.unique();
     }
-    _currentChecks.push_back(786);
-    _currentChecks.push_back(209);
+    else
+    {
+        for (uint16 const pendingCheckID : _pendingChecks)
+            _currentChecks.push_back(pendingCheckID);
+    }
+
+    // Filter too high checks queue
+    // Filtered checks will get passed in next checks
+    uint16 expectedSize = 4;
+    _pendingChecks.clear();
+    acore::Containers::EraseIf(_currentChecks,
+        [this, &expectedSize](uint16 id)
+        {
+            uint16 const thisSize = GetCheckPacketSize(sWardenCheckMgr->GetWardenDataById(id));
+            if ((expectedSize + thisSize) > 500) // warden packets are truncated to 512 bytes clientside
+            {
+                _pendingChecks.push_back(id);
+                return true;
+            }
+            expectedSize += thisSize;
+            return false;
+        }
+    );
 
     ByteBuffer buff;
     buff << uint8(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
