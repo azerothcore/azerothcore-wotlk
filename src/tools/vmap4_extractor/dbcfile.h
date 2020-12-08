@@ -27,8 +27,7 @@ public:
     public:
         Exception(const std::string& message): message(message)
         { }
-        virtual ~Exception()
-        { }
+        virtual ~Exception() = default;
         const std::string& getMessage() {return message;}
     private:
         std::string message;
@@ -53,27 +52,27 @@ public:
             offset = r.offset;
             return *this;
         }
-        float getFloat(size_t field) const
+        [[nodiscard]] float getFloat(size_t field) const
         {
             assert(field < file.fieldCount);
             return *reinterpret_cast<float*>(offset + field * 4);
         }
-        unsigned int getUInt(size_t field) const
+        [[nodiscard]] unsigned int getUInt(size_t field) const
         {
             assert(field < file.fieldCount);
             return *reinterpret_cast<unsigned int*>(offset + (field * 4));
         }
-        int getInt(size_t field) const
+        [[nodiscard]] int getInt(size_t field) const
         {
             assert(field < file.fieldCount);
             return *reinterpret_cast<int*>(offset + field * 4);
         }
-        unsigned char getByte(size_t ofs) const
+        [[nodiscard]] unsigned char getByte(size_t ofs) const
         {
             assert(ofs < file.recordSize);
             return *reinterpret_cast<unsigned char*>(offset + ofs);
         }
-        const char* getString(size_t field) const
+        [[nodiscard]] const char* getString(size_t field) const
         {
             assert(field < file.fieldCount);
             size_t stringOffset = getUInt(field);
@@ -129,8 +128,8 @@ public:
     /// Get begin iterator over records
     Iterator end();
     /// Trivial
-    size_t getRecordCount() const { return recordCount;}
-    size_t getFieldCount() const { return fieldCount; }
+    [[nodiscard]] size_t getRecordCount() const { return recordCount;}
+    [[nodiscard]] size_t getFieldCount() const { return fieldCount; }
 
 private:
     std::string filename;

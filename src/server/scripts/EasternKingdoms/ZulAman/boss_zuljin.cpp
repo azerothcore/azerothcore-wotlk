@@ -155,7 +155,7 @@ public:
 
         SummonList Summons;
 
-        void Reset()
+        void Reset() override
         {
             instance->SetData(DATA_ZULJINEVENT, NOT_STARTED);
 
@@ -191,7 +191,7 @@ public:
             //me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             instance->SetData(DATA_ZULJINEVENT, IN_PROGRESS);
 
@@ -202,7 +202,7 @@ public:
             EnterPhase(0);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (Intro_Timer)
                 return;
@@ -210,7 +210,7 @@ public:
             Talk(YELL_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             instance->SetData(DATA_ZULJINEVENT, DONE);
 
@@ -221,7 +221,7 @@ public:
                 Temp->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (Phase == 2)
                 AttackStartNoMove(who);
@@ -283,12 +283,12 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             Summons.Summon(summon);
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             Summons.Despawn(summon);
         }
@@ -349,7 +349,7 @@ public:
             Phase = NextPhase;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!TankGUID)
             {
@@ -551,7 +551,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_zuljinAI>(creature);
     }
@@ -570,17 +570,17 @@ public:
     {
         npc_zuljin_vortexAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* /*target*/) { }
+        void EnterCombat(Unit* /*target*/) override { }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_ZAP_INFORM)
                 DoCast(caster, SPELL_ZAP_DAMAGE, true);
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             //if the vortex reach the target, it change his target to another player
             if (me->IsWithinMeleeRange(me->GetVictim()))
@@ -588,7 +588,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_zuljin_vortexAI(creature);
     }

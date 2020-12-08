@@ -46,7 +46,7 @@ public:
     typedef std::map<std::string, Realm> RealmMap;
 
     RealmList();
-    ~RealmList() { }
+    ~RealmList() = default;
 
     static RealmList* instance();
 
@@ -54,16 +54,16 @@ public:
     void UpdateIfNeed();
     void AddRealm(const Realm& NewRealm) { m_realms[NewRealm.name] = NewRealm; }
 
-    RealmMap::const_iterator begin() const { return m_realms.begin(); }
-    RealmMap::const_iterator end() const { return m_realms.end(); }
-    uint32 size() const { return m_realms.size(); }
+    [[nodiscard]] RealmMap::const_iterator begin() const { return m_realms.begin(); }
+    [[nodiscard]] RealmMap::const_iterator end() const { return m_realms.end(); }
+    [[nodiscard]] uint32 size() const { return m_realms.size(); }
 
 private:
     void UpdateRealms(bool init = false);
     void UpdateRealm(uint32 id, const std::string& name, ACE_INET_Addr const& address, ACE_INET_Addr const& localAddr, ACE_INET_Addr const& localSubmask, uint8 icon, RealmFlags flag, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, uint32 build);
 
     RealmMap m_realms;
-    uint32   m_UpdateInterval;
+    uint32   m_UpdateInterval{0};
     time_t   m_NextUpdateTime;
 };
 

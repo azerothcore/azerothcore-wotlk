@@ -12,12 +12,12 @@
 struct BattlegroundSAScore : public BattlegroundScore
 {
     BattlegroundSAScore(Player* player) : BattlegroundScore(player), demolishers_destroyed(0), gates_destroyed(0) { }
-    ~BattlegroundSAScore() { }
+    ~BattlegroundSAScore() override { }
     uint8 demolishers_destroyed;
     uint8 gates_destroyed;
 
-    uint32 GetAttr1() const final override { return demolishers_destroyed; }
-    uint32 GetAttr2() const final override { return gates_destroyed; }
+    uint32 GetAttr1() const final { return demolishers_destroyed; }
+    uint32 GetAttr2() const final { return gates_destroyed; }
 };
 
 #define BG_SA_FLAG_AMOUNT           3
@@ -421,36 +421,36 @@ class BattlegroundSA : public Battleground
 {
 public:
     BattlegroundSA();
-    ~BattlegroundSA();
+    ~BattlegroundSA() override;
 
     /**
      * \brief Called every time for update battle data
      * -Update timer
      * -Round switch
      */
-    void PostUpdateImpl(uint32 diff);
+    void PostUpdateImpl(uint32 diff) override;
 
     /* inherited from BattlegroundClass */
     /// Called when a player join battle
-    void AddPlayer(Player* player);
+    void AddPlayer(Player* player) override;
     /// Called when battle start
-    void StartingEventCloseDoors();
-    void StartingEventOpenDoors();
+    void StartingEventCloseDoors() override;
+    void StartingEventOpenDoors() override;
     /// Called for ini battleground, after that the first player be entered
-    bool SetupBattleground();
-    void Init();
+    bool SetupBattleground() override;
+    void Init() override;
     /// Called for generate packet contain worldstate data
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
     /// Called when a player deal damage to building (door)
-    void EventPlayerDamagedGO(Player* player, GameObject* go, uint32 eventType);
+    void EventPlayerDamagedGO(Player* player, GameObject* go, uint32 eventType) override;
     /// Called when a player kill a unit in bg
-    void HandleKillUnit(Creature* creature, Player* killer);
+    void HandleKillUnit(Creature* creature, Player* killer) override;
     /// Return the nearest graveyard where player can respawn
-    GraveyardStruct const* GetClosestGraveyard(Player* player);
+    GraveyardStruct const* GetClosestGraveyard(Player* player) override;
     /// Called when a player click on flag (graveyard flag)
-    void EventPlayerClickedOnFlag(Player* Source, GameObject* gameObject);
+    void EventPlayerClickedOnFlag(Player* Source, GameObject* gameObject) override;
     /// Called when a player use a gamobject (relic)
-    void EventPlayerUsedGO(Player* Source, GameObject* object);
+    void EventPlayerUsedGO(Player* Source, GameObject* object) override;
 
     /// Return worldstate id, according to door id
     uint32 GetWorldStateFromGateID(uint32 id)
@@ -481,15 +481,15 @@ public:
     }
 
     /// Called on battleground ending
-    void EndBattleground(TeamId winnerTeamId);
+    void EndBattleground(TeamId winnerTeamId) override;
 
     /// CAlled when a player leave battleground
-    void RemovePlayer(Player* player);
-    void HandleAreaTrigger(Player* player, uint32 trigger);
+    void RemovePlayer(Player* player) override;
+    void HandleAreaTrigger(Player* player, uint32 trigger) override;
 
     /* Scorekeeping */
     /// Update score board
-    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
+    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
 
     // Teleporters
     void DefendersPortalTeleport(GameObject* portal, Player* plr);
@@ -561,7 +561,7 @@ private:
      * -Update worldstate
      * -Delete gameobject in front of door (lighting object, with different colours for each door)
      */
-    void DestroyGate(Player* player, GameObject* go);
+    void DestroyGate(Player* player, GameObject* go) override;
     /// Update timer worldstate
     void SendTime();
     /**

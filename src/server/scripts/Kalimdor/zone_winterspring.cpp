@@ -59,7 +59,7 @@ class npc_stave_of_the_ancients : public CreatureScript
 public:
     npc_stave_of_the_ancients() : CreatureScript("npc_stave_of_the_ancients") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_stave_of_the_ancientsAI(creature);
     }
@@ -94,7 +94,7 @@ public:
         uint32 changeEntry;
         bool damaged;
 
-        void Reset()
+        void Reset() override
         {
             if (me->GetOriginalEntry() != me->GetEntry())
                 me->UpdateEntry(me->GetOriginalEntry());
@@ -104,7 +104,7 @@ public:
             damaged = false;
         }
 
-        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
         {
             if (!damaged)
             {
@@ -118,7 +118,7 @@ public:
                 damaged = false;
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             switch (changeEntry)
             {
@@ -141,7 +141,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->GetEntry() != changeEntry && who->GetTypeId() == TYPEID_PLAYER && who->ToPlayer()->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE)
             {
@@ -153,7 +153,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             uint32 eventId = events.ExecuteEvent();
@@ -468,7 +468,7 @@ class npc_ranshalla : public CreatureScript
 {
 public:
     npc_ranshalla() : CreatureScript("npc_ranshalla") { }
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_GUARDIANS_ALTAR)
         {
@@ -483,7 +483,7 @@ public:
 
         return false;
     }
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ranshallaAI(creature);
     }
@@ -504,7 +504,7 @@ public:
         uint64 _voiceEluneGUID;
         uint64 _altarGUID;
 
-        void Reset()
+        void Reset() override
         {
             _delayTimer = 0;
         }
@@ -570,7 +570,7 @@ public:
             StartNextDialogueText(SAY_PRIESTESS_ALTAR_3);
         }
 
-        void WaypointReached(uint32 pointId)
+        void WaypointReached(uint32 pointId) override
         {
             switch (pointId)
             {
@@ -622,7 +622,7 @@ public:
             }
         }
 
-        void JustDidDialogueStep(int32 entry)
+        void JustDidDialogueStep(int32 entry) override
         {
             switch (entry)
             {
@@ -721,7 +721,7 @@ public:
             }
         }
 
-        Creature* GetSpeakerByEntry(int32 entry)
+        Creature* GetSpeakerByEntry(int32 entry) override
         {
             switch (entry)
             {
@@ -739,7 +739,7 @@ public:
 
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             DialogueUpdate(diff);
 

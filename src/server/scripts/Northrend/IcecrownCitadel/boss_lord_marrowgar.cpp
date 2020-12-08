@@ -101,7 +101,7 @@ public:
         bool _boneSlice;
         uint64 _lastBoneSliceTargets[3];
 
-        void Reset()
+        void Reset() override
         {
             me->SetReactState(REACT_AGGRESSIVE);
             _Reset();
@@ -117,7 +117,7 @@ public:
             instance->SetData(DATA_BONED_ACHIEVEMENT, uint32(true));
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             me->setActive(true);
@@ -125,7 +125,7 @@ public:
             instance->SetBossState(DATA_LORD_MARROWGAR, IN_PROGRESS);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (target && (spell->Id == 69055 || spell->Id == 70814)) // Bone Slice (Saber Lash)
                 for (uint8 i = 0; i < 3; ++i)
@@ -136,7 +136,7 @@ public:
                     }
         }
 
-        uint64 GetGUID(int32 id) const
+        uint64 GetGUID(int32 id) const override
         {
             if (id >= 0 && id <= 2)
                 return _lastBoneSliceTargets[id];
@@ -144,7 +144,7 @@ public:
             return (uint64)0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() || !CheckInRoom())
                 return;
@@ -249,7 +249,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE || id != 1337)
                 return;
@@ -257,25 +257,25 @@ public:
             events.ScheduleEvent(EVENT_SPELL_COLDFLAME_BONE_STORM, 0);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             _JustDied();
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             _JustReachedHome();
             instance->SetBossState(DATA_LORD_MARROWGAR, FAIL);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_KILL);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!_introDone && me->IsAlive() && who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2dSq(who) <= 10000.0f) // 100*100, moveinlineofsight limited to 60yd anyway
             {
@@ -286,13 +286,13 @@ public:
             BossAI::MoveInLineOfSight(who);
         }
 
-        bool CanAIAttack(Unit const* target) const
+        bool CanAIAttack(Unit const* target) const override
         {
             return target->GetPositionX() < -337.0f; // main gate
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<boss_lord_marrowgarAI>(creature);
     }
@@ -311,14 +311,14 @@ public:
 
         EventMap events;
 
-        void IsSummonedBy(Unit* /*summoner*/)
+        void IsSummonedBy(Unit* /*summoner*/) override
         {
             events.ScheduleEvent(1, 450);
             events.ScheduleEvent(2, 12000);
             me->m_positionZ = 42.5f;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -348,7 +348,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_coldflameAI>(creature);
     }
@@ -368,7 +368,7 @@ public:
         EventMap events;
         bool hasTrappedUnit;
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action != -1337)
                 return;
@@ -392,12 +392,12 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             DoAction(-1337);
         }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner) override
         {
             if (!summoner)
                 return;
@@ -419,7 +419,7 @@ public:
             hasTrappedUnit = true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!hasTrappedUnit || !me->IsAlive())
                 return;
@@ -454,7 +454,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_bone_spikeAI>(creature);
     }
@@ -503,14 +503,14 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_marrowgar_coldflame_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
             OnEffectHitTarget += SpellEffectFn(spell_marrowgar_coldflame_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_marrowgar_coldflame_SpellScript();
     }
@@ -561,13 +561,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_marrowgar_bone_spike_graveyard_SpellScript::HandleSpikes, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_marrowgar_bone_spike_graveyard_SpellScript();
     }
@@ -601,13 +601,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_marrowgar_coldflame_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_marrowgar_coldflame_SpellScript();
     }
@@ -630,13 +630,13 @@ public:
             SetHitDamage(int32(GetHitDamage() / std::max(sqrtf(dist), 1.0f)));
         }
 
-        void Register()
+        void Register() override
         {
             OnHit += SpellHitFn(spell_marrowgar_bone_storm_SpellScript::RecalculateDamage);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_marrowgar_bone_storm_SpellScript();
     }
@@ -651,7 +651,7 @@ public:
     {
         PrepareSpellScript(spell_marrowgar_bone_slice_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             _targetCount = 0;
             return true;
@@ -670,7 +670,7 @@ public:
             SetHitDamage(GetHitDamage() / _targetCount);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_marrowgar_bone_slice_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
             OnHit += SpellHitFn(spell_marrowgar_bone_slice_SpellScript::SplitDamage);
@@ -679,7 +679,7 @@ public:
         uint32 _targetCount;
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_marrowgar_bone_slice_SpellScript();
     }
