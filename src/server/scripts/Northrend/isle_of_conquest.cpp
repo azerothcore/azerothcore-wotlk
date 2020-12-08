@@ -30,7 +30,7 @@ public:
         uint32 faction;
         EventMap events;
 
-        void JustDied(Unit* )
+        void JustDied(Unit* ) override
         {
             if (me->GetEntry() == NPC_KEEP_CANNON)
             {
@@ -42,7 +42,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo)
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_REPAIR_TURRET_DUMMY && me->GetEntry() == NPC_BROKEN_KEEP_CANNON)
             {
@@ -55,7 +55,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -69,7 +69,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_isle_of_conquest_turretAI(creature);
     }
@@ -84,7 +84,7 @@ public:
     {
         npc_four_car_garageAI(Creature* creature) : NullCreatureAI(creature) { }
 
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
             if (apply)
             {
@@ -114,14 +114,14 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
                 player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_four_car_garageAI(creature);
     }
@@ -147,7 +147,7 @@ public:
     {
         npc_ioc_gunship_captainAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_GUNSHIP_READY)
             {
@@ -156,7 +156,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
             while (uint32 eventId = _events.ExecuteEvent())
@@ -183,7 +183,7 @@ public:
         EventMap _events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ioc_gunship_captainAI(creature);
     }
@@ -216,7 +216,7 @@ public:
 
         EventMap events;
         bool rage;
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             rage = false;
@@ -242,7 +242,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.ScheduleEvent(EVENT_CHECK_RAGE, 2000);
             events.ScheduleEvent(EVENT_BRUTAL_STRIKE, 6000);
@@ -250,7 +250,7 @@ public:
             events.ScheduleEvent(EVENT_DAGGER_THROW, 10000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -285,7 +285,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_isle_of_conquestAI(creature);
     }
@@ -306,13 +306,13 @@ public:
                 GetTarget()->CastSpell(GetTarget(), SPELL_REPAIR_TURRET_DUMMY, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_ioc_repair_turret_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_ioc_repair_turret_AuraScript();
     }
@@ -348,13 +348,13 @@ public:
                 owner->CastSpell(owner, SPELL_BOMB_INATION_CREDIT, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_ioc_bomb_blast_criteria_SpellScript::HandleGameObjectDamage, EFFECT_1, SPELL_EFFECT_GAMEOBJECT_DAMAGE);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_ioc_bomb_blast_criteria_SpellScript();
     }
@@ -369,7 +369,7 @@ public:
     {
         PrepareSpellScript(spell_ioc_gunship_portal_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             return GetCaster()->GetTypeId() == TYPEID_PLAYER;
         }
@@ -398,14 +398,14 @@ public:
                     bg->DoAction(2 /**/, caster->GetGUID());
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_ioc_gunship_portal_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             OnEffectHitTarget += SpellEffectFn(spell_ioc_gunship_portal_SpellScript::HandleScript2, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_ioc_gunship_portal_SpellScript();
     }
@@ -427,13 +427,13 @@ public:
                     target->CastSpell(target, SPELL_PARACHUTE_IC, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_ioc_parachute_ic_AuraScript::HandleTriggerSpell, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_ioc_parachute_ic_AuraScript();
     }
@@ -473,14 +473,14 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_ioc_launch_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_FORCE_CAST);
             AfterHit += SpellHitFn(spell_ioc_launch_SpellScript::Launch);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_ioc_launch_SpellScript();
     }

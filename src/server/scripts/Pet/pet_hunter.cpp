@@ -35,7 +35,7 @@ public:
     {
         npc_pet_hunter_snake_trapAI(Creature* creature) : ScriptedAI(creature) { _init = false; }
 
-        void Reset()
+        void Reset() override
         {
             _spellTimer = urand(1500, 3000);
 
@@ -48,7 +48,7 @@ public:
                 }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             // _EnterEvadeMode();
             me->DeleteThreatList();
@@ -65,7 +65,7 @@ public:
         }
 
         //Redefined for random target selection:
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!me->GetVictim() && who->isTargetableForAttack() && (me->IsHostileTo(who)) && who->isInAccessiblePlaceFor(me))
             {
@@ -80,7 +80,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -136,7 +136,7 @@ public:
         uint32 _spellTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_hunter_snake_trapAI(creature);
     }

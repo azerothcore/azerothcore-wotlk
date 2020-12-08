@@ -22,36 +22,36 @@ public:
     class Session
     {
     public:
-        Session(void);
-        virtual ~Session(void);
+        Session();
+        virtual ~Session();
 
-        virtual void OnRead(void) = 0;
-        virtual void OnAccept(void) = 0;
-        virtual void OnClose(void) = 0;
+        virtual void OnRead() = 0;
+        virtual void OnAccept() = 0;
+        virtual void OnClose() = 0;
     };
 
-    RealmSocket(void);
-    virtual ~RealmSocket(void);
+    RealmSocket();
+    ~RealmSocket() override;
 
-    size_t recv_len(void) const;
+    [[nodiscard]] size_t recv_len() const;
     bool recv_soft(char* buf, size_t len);
     bool recv(char* buf, size_t len);
     void recv_skip(size_t len);
 
     bool send(const char* buf, size_t len);
 
-    const std::string& getRemoteAddress(void) const;
+    [[nodiscard]] const std::string& getRemoteAddress() const;
 
-    uint16 getRemotePort(void) const;
+    [[nodiscard]] uint16 getRemotePort() const;
 
-    virtual int open(void*);
+    int open(void*) override;
 
-    virtual int close(u_long);
+    int close(u_long) override;
 
-    virtual int handle_input(ACE_HANDLE = ACE_INVALID_HANDLE);
-    virtual int handle_output(ACE_HANDLE = ACE_INVALID_HANDLE);
+    int handle_input(ACE_HANDLE = ACE_INVALID_HANDLE) override;
+    int handle_output(ACE_HANDLE = ACE_INVALID_HANDLE) override;
 
-    virtual int handle_close(ACE_HANDLE = ACE_INVALID_HANDLE, ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK);
+    int handle_close(ACE_HANDLE = ACE_INVALID_HANDLE, ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK) override;
 
     void set_session(Session* session);
 
@@ -59,9 +59,9 @@ private:
     ssize_t noblk_send(ACE_Message_Block& message_block);
 
     ACE_Message_Block input_buffer_;
-    Session* session_;
+    Session* session_{nullptr};
     std::string _remoteAddress;
-    uint16 _remotePort;
+    uint16 _remotePort{0};
 };
 
 #endif /* __REALMSOCKET_H__ */
