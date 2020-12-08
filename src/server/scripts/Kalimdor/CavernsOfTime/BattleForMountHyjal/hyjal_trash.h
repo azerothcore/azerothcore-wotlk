@@ -16,11 +16,11 @@ struct hyjal_trashAI : public npc_escortAI
 {
     hyjal_trashAI(Creature* creature);
 
-    void UpdateAI(uint32 diff);
+    void UpdateAI(uint32 diff) override;
 
-    void JustDied(Unit* /*killer*/);
+    void JustDied(Unit* /*killer*/) override;
 
-    void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask);
+    void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override;
 
 public:
     InstanceScript* instance;

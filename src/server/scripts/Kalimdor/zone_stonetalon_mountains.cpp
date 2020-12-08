@@ -105,7 +105,7 @@ public:
     {
         npc_kaya_flathoofAI(Creature* creature) : npc_escortAI(creature) {}
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -127,15 +127,15 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             summoned->AI()->AttackStart(me);
         }
 
-        void Reset() {}
+        void Reset() override {}
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_PROTECT_KAYA)
         {
@@ -149,7 +149,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_kaya_flathoofAI(creature);
     }

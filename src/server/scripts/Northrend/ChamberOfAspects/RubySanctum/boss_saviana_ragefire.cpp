@@ -55,13 +55,13 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -71,13 +71,13 @@ public:
             events.ScheduleEvent(EVENT_FLIGHT, 30000);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             BossAI::JustDied(killer);
             me->PlayDirectSound(SOUND_ID_DEATH);
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE)
                 return;
@@ -97,14 +97,14 @@ public:
             }
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             BossAI::JustReachedHome();
             me->SetDisableGravity(false);
             me->SetHover(false);
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -113,7 +113,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -164,7 +164,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_saviana_ragefireAI>(creature);
     }
@@ -186,13 +186,13 @@ public:
             GetCaster()->CastSpell(GetHitUnit(), SPELL_CONFLAGRATION_MISSLE, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_saviana_conflagration_init_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_saviana_conflagration_init_SpellScript();
     }
@@ -213,13 +213,13 @@ public:
             GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_saviana_conflagration_throwback_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_saviana_conflagration_throwback_SpellScript();
     }

@@ -88,8 +88,8 @@ public:
         bool isFlying;
         bool startFly;
 
-        void JustSummoned(Creature* cr) { summons.Summon(cr); }
-        void MoveInLineOfSight(Unit*) { }
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
+        void MoveInLineOfSight(Unit*) override { }
 
         void SpawnInitiate(bool start)
         {
@@ -170,7 +170,7 @@ public:
             events.RescheduleEvent(EVENT_JEDOGA_MOVE_UP, urand(20000, 25000));
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_INITIATE_DIED)
             {
@@ -199,7 +199,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             if (pInstance)
             {
@@ -219,7 +219,7 @@ public:
             me->CastSpell(me, SPELL_LIGHTNING_BOLTS, true);
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             if (pInstance)
                 pInstance->SetData(DATA_JEDOGA_SHADOWSEEKER_EVENT, IN_PROGRESS);
@@ -227,7 +227,7 @@ public:
             Talk(TEXT_AGGRO);
         }
 
-        void KilledUnit(Unit* Victim)
+        void KilledUnit(Unit* Victim) override
         {
             if (!Victim || Victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -235,7 +235,7 @@ public:
             Talk(TEXT_SLAY);
         }
 
-        void JustDied(Unit* /*Killer*/)
+        void JustDied(Unit* /*Killer*/) override
         {
             Talk(TEXT_DEATH);
             if (pInstance)
@@ -263,7 +263,7 @@ public:
             me->SetDisableGravity(true);
         }
 
-        void MovementInform(uint32 Type, uint32 PointId)
+        void MovementInform(uint32 Type, uint32 PointId) override
         {
             if (Type != POINT_MOTION_TYPE)
                 return;
@@ -294,7 +294,7 @@ public:
                 startFly = true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // Start text
             if (introCheck)
@@ -391,7 +391,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_jedoga_shadowseekerAI(creature);
     }
@@ -412,19 +412,19 @@ public:
         InstanceScript* pInstance;
         int32 Timer;
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!Timer)
                 ScriptedAI::AttackStart(who);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!Timer)
                 ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void Reset()
+        void Reset() override
         {
             Timer = 0;
 
@@ -447,7 +447,7 @@ public:
             }
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit* Killer) override
         {
             if (!pInstance || Killer == me)
                 return;
@@ -462,7 +462,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_ACTIVATE)
             {
@@ -471,7 +471,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 Type, uint32 PointId)
+        void MovementInform(uint32 Type, uint32 PointId) override
         {
             if (Type == POINT_MOTION_TYPE && PointId == POINT_RITUAL)
             {
@@ -483,7 +483,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (Timer)
             {
@@ -521,7 +521,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_jedoga_initiandAI(creature);
     }
