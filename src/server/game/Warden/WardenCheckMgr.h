@@ -26,8 +26,11 @@ struct WardenCheck
     std::string Str;                                        // LUA, MPQ, DRIVER
     std::string Comment;
     uint16 CheckId;
+    std::array<char, 4> IdStr = {};                         // LUA
     enum WardenActions Action;
 };
+
+constexpr uint8 WARDEN_MAX_LUA_CHECK_LENGTH = 170;
 
 struct WardenCheckResult
 {
@@ -49,6 +52,9 @@ public:
     WardenCheck* GetWardenDataById(uint16 Id);
     WardenCheckResult* GetWardenResultById(uint16 Id);
 
+    uint16 GetMaxValidCheckId() const { return static_cast<uint16>(_checks.size()); }
+    WardenCheck const& GetCheckData(uint16 Id) const;
+
     std::vector<uint16> MemChecksIdPool;
     std::vector<uint16> OtherChecksIdPool;
 
@@ -58,6 +64,7 @@ public:
     ACE_RW_Mutex _checkStoreLock;
 
 private:
+    std::vector<WardenCheck> _checks;
     CheckContainer CheckStore;
     CheckResultContainer CheckResultStore;
 };

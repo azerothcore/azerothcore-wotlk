@@ -18,6 +18,8 @@
 #include "Warden.h"
 #include "AccountMgr.h"
 #include "BanManager.h"
+#include "SmartEnum.h"
+#include "SharedDefines.h"
 
 Warden::Warden() : _session(nullptr), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
     _dataSent(false), _previousTimestamp(0), _module(nullptr), _initialized(false)
@@ -296,6 +298,77 @@ std::string Warden::Penalty(WardenCheck* check /*= NULL*/, uint16 checkFailed /*
             break;
     }
     return "Undefined";
+}
+
+bool Warden::ProcessLuaCheckResponse(std::string const& msg)
+{
+    static constexpr char WARDEN_TOKEN[] = "_TW\t";
+    // if msg starts with WARDEN_TOKEN
+    if (!(msg.rfind(WARDEN_TOKEN, 0) == 0))
+    {
+        return false;
+    }
+
+    uint16 id = 0;
+    // std::from_chars(msg.data() + sizeof(WARDEN_TOKEN) - 1, msg.data() + msg.size(), id, 10);
+    if (id < sWardenCheckMgr->GetMaxValidCheckId())
+    {
+        WardenCheck const& check = sWardenCheckMgr->GetCheckData(id);
+        if (check.Type == LUA_EVAL_CHECK)
+        {
+            /* char const* penalty =  */ ApplyPenalty(&check);
+            sLog->outString("warden %s failed Warden check %u", _session->GetPlayerInfo().c_str(), id /* EnumUtils::ToConstant(check.Type), penalty*/);
+            return true;
+        }
+    }
+
+    /* char const* penalty =  */ApplyPenalty(nullptr);
+    sLog->outString("warden: %s sent bogus Lua check response for Warden", _session->GetPlayerInfo().c_str()/* , penalty */);
+    return true;
+}
+
+void Warden::ApplyPenalty(WardenCheck const* check)
+{
+    WardenActions action;
+
+    if (check)
+    {
+        action = check->Action;
+    }
+    else
+    {
+        action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
+    }
+
+    switch (action)
+    {
+        case WARDEN_ACTION_KICK:
+            _session->KickPlayer("Warden::Penalty");
+            break;
+        case WARDEN_ACTION_BAN:
+        {
+            std::string accountName;
+            AccountMgr::GetName(_session->GetAccountId(), accountName);
+            std::stringstream banReason;
+            banReason << "Warden Anticheat Violation";
+            // Check can be NULL, for example if the client sent a wrong signature in the warden packet (CHECKSUM FAIL)
+            if (check)
+            {
+                banReason << ": " << check->Comment << " (CheckId: " << check->CheckId << ")";
+            }
+
+            std::stringstream duration;
+            duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
+
+            sBan->BanAccount(accountName, duration.str(), banReason.str(),"Server");
+            break;
+        }
+        case WARDEN_ACTION_LOG:
+        default:
+            return/*  "None" */;
+    }
+
+    // return EnumUtils::ToTitle(action);
 }
 
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
