@@ -127,7 +127,7 @@ class npc_toc5_player_vehicle : public CreatureScript
 public:
     npc_toc5_player_vehicle() : CreatureScript("npc_toc5_player_vehicle") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc5_player_vehicleAI(pCreature);
     }
@@ -143,13 +143,13 @@ public:
         ConditionList conditions;
         uint16 m_ConditionsTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
             me->getHostileRefManager().setOnlineOfflineState(false);
         }
 
-        void OnCharmed(bool apply)
+        void OnCharmed(bool apply) override
         {
             if (me->IsDuringRemoveFromWorld())
                 return;
@@ -169,7 +169,7 @@ public:
         }
 
         // just in case, should be done in spell_gen_defend
-        void PassengerBoarded(Unit* who, int8  /*seat*/, bool apply)
+        void PassengerBoarded(Unit* who, int8  /*seat*/, bool apply) override
         {
             if (me->IsDuringRemoveFromWorld())
                 return;
@@ -184,8 +184,8 @@ public:
         }
 
         //void EnterEvadeMode() { CreatureAI::EnterEvadeMode(); }
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void UpdateAI(uint32 diff)
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void UpdateAI(uint32 diff) override
         {
             if (m_ConditionsTimer <= diff)
             {
@@ -198,8 +198,8 @@ public:
             else
                 m_ConditionsTimer -= diff;
         }
-        void AttackStart(Unit*  /*who*/) {}
-        void EnterCombat(Unit*  /*who*/) {}
+        void AttackStart(Unit*  /*who*/) override {}
+        void EnterCombat(Unit*  /*who*/) override {}
     };
 };
 
@@ -208,7 +208,7 @@ class npc_toc5_grand_champion_minion : public CreatureScript
 public:
     npc_toc5_grand_champion_minion() : CreatureScript("npc_toc5_grand_champion_minion") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc5_grand_champion_minionAI(pCreature);
     }
@@ -224,13 +224,13 @@ public:
         int32 ShieldTimer;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             ShieldTimer = 0;
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_MOUNT_CHARGE, urand(2500, 4000));
@@ -239,7 +239,7 @@ public:
             me->CastSpell(me, SPELL_TRAMPLE_AURA, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( ShieldTimer <= (int32)diff )
             {
@@ -322,7 +322,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*pKiller*/)
+        void JustDied(Unit* /*pKiller*/) override
         {
             me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
             me->DespawnOrUnsummon(10000);
@@ -382,7 +382,7 @@ public:
         uint64 NewMountGUID;
         uint64 UnitTargetGUID;
 
-        void Reset()
+        void Reset() override
         {
             if( pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED )
             {
@@ -394,7 +394,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if( pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED )
                 me->CallForHelp(100.0f);
@@ -466,7 +466,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == 1 )
             {
@@ -486,7 +486,7 @@ public:
                 ScheduleAbilitiesEvents();
         }
 
-        void SetData(uint32 uiType, uint32 uiData)
+        void SetData(uint32 uiType, uint32 uiData) override
         {
             BossOrder = uiType;
             if( uiData > 1 )
@@ -525,7 +525,7 @@ public:
             Start(false, true, 0, nullptr);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if( MountPhase )
             {
@@ -578,9 +578,9 @@ public:
             }
         }
 
-        void EnterEvadeMode() {}
+        void EnterEvadeMode() override {}
 
-        void WaypointReached(uint32 i)
+        void WaypointReached(uint32 i) override
         {
             if( !pInstance )
                 return;
@@ -589,7 +589,7 @@ public:
                 pInstance->SetData(DATA_GRAND_CHAMPION_REACHED_DEST, BossOrder);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if( id < 4 )
                 npc_escortAI::MovementInform(type, id);
@@ -629,7 +629,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             switch( spell->Id )
             {
@@ -643,7 +643,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -927,7 +927,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_grand_championAI(pCreature);
     }
