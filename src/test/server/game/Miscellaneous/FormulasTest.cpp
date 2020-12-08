@@ -5,8 +5,8 @@
 #include "gtest/gtest.h"
 #include "Formulas.h"
 #include "SharedDefines.h"
-#include "Log.h"
 #include "LogMock.h"
+#include "WorldMock.h"
 
 LoginDatabaseWorkerPool LoginDatabase;
 
