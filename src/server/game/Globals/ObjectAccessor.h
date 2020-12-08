@@ -62,7 +62,7 @@ public:
 private:
 
     //Non instanceable only static
-    HashMapHolder() {}
+    HashMapHolder() = default;
 
     static LockType i_lock;
     static MapType  m_objectMap;
@@ -104,12 +104,12 @@ public:
     static Unit* GetObjectInOrOutOfWorld(uint64 guid, Unit* /*typeSpecifier*/)
     {
         if (IS_PLAYER_GUID(guid))
-            return (Unit*)GetObjectInOrOutOfWorld(guid, (Player*)NULL);
+            return (Unit*)GetObjectInOrOutOfWorld(guid, (Player*)nullptr);
 
         if (IS_PET_GUID(guid))
-            return (Unit*)GetObjectInOrOutOfWorld(guid, (Pet*)NULL);
+            return (Unit*)GetObjectInOrOutOfWorld(guid, (Pet*)nullptr);
 
-        return (Unit*)GetObjectInOrOutOfWorld(guid, (Creature*)NULL);
+        return (Unit*)GetObjectInOrOutOfWorld(guid, (Creature*)nullptr);
     }
 
     // returns object if is in world
@@ -124,12 +124,12 @@ public:
     static Unit* GetObjectInWorld(uint64 guid, Unit* /*typeSpecifier*/)
     {
         if (IS_PLAYER_GUID(guid))
-            return (Unit*)GetObjectInWorld(guid, (Player*)NULL);
+            return (Unit*)GetObjectInWorld(guid, (Player*)nullptr);
 
         if (IS_PET_GUID(guid))
-            return (Unit*)GetObjectInWorld(guid, (Pet*)NULL);
+            return (Unit*)GetObjectInWorld(guid, (Pet*)nullptr);
 
-        return (Unit*)GetObjectInWorld(guid, (Creature*)NULL);
+        return (Unit*)GetObjectInWorld(guid, (Creature*)nullptr);
     }
 
     // returns object if is in map

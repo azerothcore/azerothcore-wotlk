@@ -11,7 +11,7 @@ class instance_pinnacle : public InstanceMapScript
 public:
     instance_pinnacle() : InstanceMapScript("instance_pinnacle", 575) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_pinnacle_InstanceMapScript(pMap);
     }
@@ -43,7 +43,7 @@ public:
         bool skadiAchievement;
         bool ymironAchievement;
 
-        void Initialize()
+        void Initialize() override
         {
             SvalaSorrowgrave = 0;
             GortokPalehoof   = 0;
@@ -71,7 +71,7 @@ public:
                 Encounters[i] = NOT_STARTED;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for(uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
                 if(Encounters[i] == IN_PROGRESS)
@@ -79,7 +79,7 @@ public:
 
             return false;
         }
-        void OnCreatureCreate(Creature* pCreature)
+        void OnCreatureCreate(Creature* pCreature) override
         {
             switch(pCreature->GetEntry())
             {
@@ -113,7 +113,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* pGo)
+        void OnGameObjectCreate(GameObject* pGo) override
         {
             switch(pGo->GetEntry())
             {
@@ -136,7 +136,7 @@ public:
             }
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -150,7 +150,7 @@ public:
             return false;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -196,14 +196,14 @@ public:
             OUT_SAVE_INST_DATA_COMPLETE;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             std::ostringstream saveStream;
             saveStream << "U P " << Encounters[0] << ' ' << Encounters[1] << ' ' << Encounters[2] << ' ' << Encounters[3];
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -236,7 +236,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch(type)
             {
@@ -256,7 +256,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const
+        uint64 GetData64(uint32 identifier) const override
         {
             switch(identifier)
             {

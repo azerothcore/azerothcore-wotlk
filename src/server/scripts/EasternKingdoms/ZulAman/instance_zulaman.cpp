@@ -78,7 +78,7 @@ public:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         uint32 RandVendor[RAND_VENDOR];
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -107,7 +107,7 @@ public:
             m_auiEncounter[DATA_GONGEVENT] = NOT_STARTED;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS)
@@ -116,13 +116,13 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player* /*player*/)
+        void OnPlayerEnter(Player* /*player*/) override
         {
             if (!HarrisonJonesGUID)
                 instance->SummonCreature(NPC_HARRISON_JONES, HarrisonJonesLoc);
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -139,7 +139,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -212,7 +212,7 @@ public:
                 HandleGameObject(ZulJinGateGUID, true);
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -223,7 +223,7 @@ public:
             return ss.str();
         }
 
-        void Load(const char* load)
+        void Load(const char* load) override
         {
             if (!load)
                 return;
@@ -243,7 +243,7 @@ public:
             else sLog->outError("Zul'aman: corrupted save data.");
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -331,7 +331,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -360,7 +360,7 @@ public:
             }
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (QuestMinute)
             {
@@ -380,7 +380,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const
+        uint64 GetData64(uint32 type) const override
         {
             switch (type)
             {
@@ -395,7 +395,7 @@ public:
 
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_zulaman_InstanceMapScript(map);
     }

@@ -38,7 +38,7 @@ class Corpse : public WorldObject, public GridObject<Corpse>
 {
 public:
     explicit Corpse(CorpseType type = CORPSE_BONES);
-    ~Corpse();
+    ~Corpse() override;
 
     void AddToWorld() override;
     void RemoveFromWorld() override;
@@ -51,19 +51,19 @@ public:
 
     void DeleteFromDB(SQLTransaction& trans);
 
-    uint64 GetOwnerGUID() const { return GetUInt64Value(CORPSE_FIELD_OWNER); }
+    [[nodiscard]] uint64 GetOwnerGUID() const { return GetUInt64Value(CORPSE_FIELD_OWNER); }
 
-    time_t const& GetGhostTime() const { return m_time; }
+    [[nodiscard]] time_t const& GetGhostTime() const { return m_time; }
     void ResetGhostTime() { m_time = time(nullptr); }
-    CorpseType GetType() const { return m_type; }
+    [[nodiscard]] CorpseType GetType() const { return m_type; }
 
-    GridCoord const& GetGridCoord() const { return _gridCoord; }
+    [[nodiscard]] GridCoord const& GetGridCoord() const { return _gridCoord; }
     void SetGridCoord(GridCoord const& gridCoord) { _gridCoord = gridCoord; }
 
     Loot loot;                                          // remove insignia ONLY at BG
     Player* lootRecipient;
 
-    bool IsExpired(time_t t) const;
+    [[nodiscard]] bool IsExpired(time_t t) const;
 
 private:
     CorpseType m_type;

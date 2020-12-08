@@ -28,7 +28,7 @@ public:
             _paralyzedGUID  = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -53,7 +53,7 @@ public:
             }
         }
 
-        bool SetBossState(uint32 bossId, EncounterState state)
+        bool SetBossState(uint32 bossId, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(bossId, state))
                 return false;
@@ -61,13 +61,13 @@ public:
             return true;
         }
 
-        void SetData64(uint32 type, uint64 data)
+        void SetData64(uint32 type, uint64 data) override
         {
             if (type == DATA_PARALYZED)
                 _paralyzedGUID = data;
         }
 
-        uint64 GetData64(uint32 type) const
+        uint64 GetData64(uint32 type) const override
         {
             switch (type)
             {
@@ -90,7 +90,7 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -101,7 +101,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(char const* data)
+        void Load(char const* data) override
         {
             if (!data)
             {
@@ -143,7 +143,7 @@ public:
         uint64 _paralyzedGUID;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_ruins_of_ahnqiraj_InstanceMapScript(map);
     }

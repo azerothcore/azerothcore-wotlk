@@ -27,7 +27,7 @@ public:
 
         uint64 _broggokLeverGUID;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&_auiEncounter, 0, sizeof(_auiEncounter));
             memset(&_bossGUIDs, 0, sizeof(_bossGUIDs));
@@ -41,7 +41,7 @@ public:
             _broggokLeverGUID = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -60,13 +60,13 @@ public:
             }
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             if (unit && unit->GetTypeId() == TYPEID_UNIT && unit->GetEntry() == NPC_NASCENT_FEL_ORC)
                 PrisonerDied(unit->GetGUID());
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             if (go->GetEntry() == 181766)                //Final exit door
                 _doorGUIDs[0] = go->GetGUID();
@@ -102,7 +102,7 @@ public:
                 _broggokLeverGUID = go->GetGUID();       //Broggok lever
         }
 
-        uint64 GetData64(uint32 data) const
+        uint64 GetData64(uint32 data) const override
         {
             switch (data)
             {
@@ -128,7 +128,7 @@ public:
             return 0;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -145,7 +145,7 @@ public:
                 SaveToDB();
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -156,7 +156,7 @@ public:
             return saveStream.str();
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -168,7 +168,7 @@ public:
             return 0;
         }
 
-        void Load(const char* strIn)
+        void Load(const char* strIn) override
         {
             if (!strIn)
             {
@@ -316,7 +316,7 @@ public:
         }
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_blood_furnace_InstanceMapScript(map);
     }
