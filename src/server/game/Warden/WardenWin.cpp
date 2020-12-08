@@ -664,10 +664,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
 
     if (checkFailed > 0)
     {
-        if (WardenCheck* check = sWardenCheckMgr->GetWardenDataById(checkFailed))
-        {
-            ApplyPenalty(check, checkFailed);
-        }
+        ApplyPenalty(checkFailed);
     }
 
     // Set hold off timer, minimum timer should at least be 1 second

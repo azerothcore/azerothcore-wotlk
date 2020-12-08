@@ -119,7 +119,7 @@ class Warden
         static uint32 BuildChecksum(const uint8 *data, uint32 length);
 
         // If no check is passed, the default action from config is executed
-        std::string ApplyPenalty(WardenCheck* check = NULL, uint16 checkFailed = 0);
+        std::string ApplyPenalty(uint16 checkFailed = 0);
 
     private:
         WorldSession* _session;
