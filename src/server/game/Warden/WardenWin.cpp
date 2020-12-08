@@ -245,8 +245,6 @@ void WardenWin::RequestData()
 
     _serverTicks = World::GetGameTimeMS();
 
-    uint8 type;
-    WardenCheck* wd;
     _currentChecks.clear();
 
     // No pending checks
@@ -302,7 +300,7 @@ void WardenWin::RequestData()
             }
 
             // Get check id from the end and remove it from todo
-            id = _otherChecksTodo.back();
+            uint16 const id = _otherChecksTodo.back();
             _otherChecksTodo.pop_back();
 
             _currentChecks.push_back(id);
@@ -342,33 +340,35 @@ void WardenWin::RequestData()
 
     ACE_READ_GUARD(ACE_RW_Mutex, g, sWardenCheckMgr->_checkStoreLock);
 
-    for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_OTHER_CHECKS); ++i)
+    for (uint16 const checkId : _currentChecks)
     {
-        // If todo list is done break loop (will be filled on next Update() run)
-        if (_otherChecksTodo.empty())
-            break;
+        WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
+        // This should never happen
+        if (!check)
+        {
+            continue;
+        }
 
-        // Get check id from the end and remove it from todo
-        id = _otherChecksTodo.back();
-        _otherChecksTodo.pop_back();
-
-        // Add the id to the list sent in this cycle
-        _currentChecks.push_back(id);
-
-        wd = sWardenCheckMgr->GetWardenDataById(id);
-
-        if (wd)
-            switch (wd->Type)
+        switch (check->Type)
+        {
+            case LUA_EVAL_CHECK:
             {
-                case MPQ_CHECK:
-                case LUA_EVAL_CHECK:
-                case DRIVER_CHECK:
-                    buff << uint8(wd->Str.size());
-                    buff.append(wd->Str.c_str(), wd->Str.size());
-                    break;
-                default:
-                    break;
+                buff << uint8(sizeof(_luaEvalPrefix) - 1 + check->Str.size() + sizeof(_luaEvalMidfix) - 1 + check->IdStr.size() + sizeof(_luaEvalPostfix) - 1);
+                buff.append(_luaEvalPrefix, sizeof(_luaEvalPrefix) - 1);
+                buff.append(check->Str.data(), check->Str.size());
+                buff.append(_luaEvalMidfix, sizeof(_luaEvalMidfix) - 1);
+                buff.append(check->IdStr.data(), check->IdStr.size());
+                buff.append(_luaEvalPostfix, sizeof(_luaEvalPostfix) - 1);
+                break;
             }
+            case MPQ_CHECK:
+            case DRIVER_CHECK:
+            {
+                buff << uint8(check->Str.size());
+                buff.append(check->Str.c_str(), check->Str.size());
+                break;
+            }
+        }
     }
 
     uint8 xorByte = _inputKey[0];
@@ -379,27 +379,32 @@ void WardenWin::RequestData()
 
     uint8 index = 1;
 
-    for (std::list<uint16>::iterator itr = _currentChecks.begin(); itr != _currentChecks.end(); ++itr)
+    for (uint16 const checkId : _currentChecks)
     {
-        wd = sWardenCheckMgr->GetWardenDataById(*itr);
+        WardenCheck* check = sWardenCheckMgr->GetWardenDataById(checkId);
+        // This should never happen
+        if (!check)
+        {
+            continue;
+        }
 
-        type = wd->Type;
+        uint8 const type = check->Type;
         buff << uint8(type ^ xorByte);
         switch (type)
         {
             case MEM_CHECK:
                 {
                     buff << uint8(0x00);
-                    buff << uint32(wd->Address);
-                    buff << uint8(wd->Length);
+                    buff << uint32(check->Address);
+                    buff << uint8(check->Length);
                     break;
                 }
             case PAGE_CHECK_A:
             case PAGE_CHECK_B:
                 {
-                    buff.append(wd->Data.AsByteArray(0, false).get(), wd->Data.GetNumBytes());
-                    buff << uint32(wd->Address);
-                    buff << uint8(wd->Length);
+                    buff.append(check->Data.AsByteArray(0, false).get(), check->Data.GetNumBytes());
+                    buff << uint32(check->Address);
+                    buff << uint8(check->Length);
                     break;
                 }
             case MPQ_CHECK:
@@ -410,7 +415,7 @@ void WardenWin::RequestData()
             }
             case DRIVER_CHECK:
                 {
-                    buff.append(wd->Data.AsByteArray(0, false).get(), wd->Data.GetNumBytes());
+                    buff.append(check->Data.AsByteArray(0, false).get(), check->Data.GetNumBytes());
                     buff << uint8(index++);
                     break;
                 }
@@ -419,7 +424,7 @@ void WardenWin::RequestData()
                     uint32 seed = rand32();
                     buff << uint32(seed);
                     HmacHash hmac(4, (uint8*)&seed);
-                    hmac.UpdateData(wd->Str);
+                    hmac.UpdateData(check->Str);
                     hmac.Finalize();
                     buff.append(hmac.GetDigest(), hmac.GetLength());
                     break;
@@ -449,12 +454,14 @@ void WardenWin::RequestData()
 
     _dataSent = true;
 
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     std::stringstream stream;
     stream << "Sent check id's: ";
-    for (std::list<uint16>::iterator itr = _currentChecks.begin(); itr != _currentChecks.end(); ++itr)
-        stream << *itr << " ";
+    for (uint16 checkId : _currentChecks)
+    {
+        stream << checkId << " ";
+    }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "%s", stream.str().c_str());
 #endif
 }
