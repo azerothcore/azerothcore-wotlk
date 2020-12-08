@@ -17,8 +17,8 @@ CREATE TABLE `dungeon_access_requirements` (
   `dungeon_access_id` tinyint unsigned NOT NULL COMMENT 'ID from dungeon_access_template',
   `requirement_type` tinyint unsigned NOT NULL COMMENT '0 = achiev, 1 = quest, 2 = item',
   `requirement_id` mediumint unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
-  `requirement_hint` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Optional msg shown ingame to player if he cannot enter with extra info',
-  `faction` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '0 = Alliance, 1 = Horde, 2 = both',
+  `requirement_hint` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
+  `faction` tinyint unsigned NOT NULL DEFAULT 2 COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
    `comment` varchar(255) COLLATE 'utf8_general_ci' NULL,
   PRIMARY KEY (`dungeon_access_id`, `requirement_type`, `requirement_id`)
 ) COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid' ENGINE='MyISAM' COLLATE 'utf8_general_ci';
