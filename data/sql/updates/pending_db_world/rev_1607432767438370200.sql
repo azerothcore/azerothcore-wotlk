@@ -1,3 +1,4 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1607432767438370200');
 DELETE FROM `creature_text` WHERE `CreatureID` IN (25317,25220,25222);
 INSERT INTO `creature_text` (`CreatureID`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `BroadcastTextId`, `comment`) VALUES
 (25317, 0, 0, 'What''s the matter, $c?  Think you''re too good to stand in line with the rest of us?', 12, 0, 100, 0, 0, 0, 24758, 'Civilian Recruit to Player'),
