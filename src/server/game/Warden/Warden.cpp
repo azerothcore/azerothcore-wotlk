@@ -310,7 +310,18 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
     }
 
     uint16 id = 0;
-    // std::from_chars(msg.data() + sizeof(WARDEN_TOKEN) - 1, msg.data() + msg.size(), id, 10);
+ 
+    {
+        std::stringstream msg2(msg);
+        std::string temp;
+        while (msg2 >> temp)
+        {
+            // Found check id - stop loop
+            if (std::stringstream(temp) >> id)
+                break;
+        }
+    }
+
     if (id < sWardenCheckMgr->GetMaxValidCheckId())
     {
         WardenCheck const& check = sWardenCheckMgr->GetCheckData(id);

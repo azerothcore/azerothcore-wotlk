@@ -245,7 +245,6 @@ void WardenWin::RequestData()
 
     _serverTicks = World::GetGameTimeMS();
 
-    uint16 id;
     uint8 type;
     WardenCheck* wd;
     _currentChecks.clear();
@@ -254,24 +253,60 @@ void WardenWin::RequestData()
     if (_pendingChecks.empty())
     {
         // Build check request
+        for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_LUA_CHECKS); ++i)
+        {
+            // If todo list is done break loop (will be filled on next Update() run)
+            if (_luaChecksTodo.empty())
+            {
+                break;
+            }
+
+            // Get check id from the end and remove it from todo
+            uint16 const id = _luaChecksTodo.back();
+            _luaChecksTodo.pop_back();
+
+            // Lua checks must be always in front
+            _currentChecks.push_front(id);
+        }
+
         for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_MEM_CHECKS); ++i)
         {
             // If todo list is done break loop (will be filled on next Update() run)
             if (_memChecksTodo.empty())
+            {
                 break;
+            }
 
             // Get check id from the end and remove it from todo
-            id = _memChecksTodo.back();
+            uint16 const id = _memChecksTodo.back();
             _memChecksTodo.pop_back();
 
             // Add the id to the list sent in this cycle
             if (id != 786 /*WPE PRO*/ && id != 209 /*WoWEmuHacker*/)
+            {
                 _currentChecks.push_back(id);
+            }
+            else
+            {
+                // Always in front of queue
+                _currentChecks.push_front(id);
+            }
         }
 
-        // Always in front of queue
-        _currentChecks.push_front(786);
-        _currentChecks.push_front(209);
+        for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_OTHER_CHECKS); ++i)
+        {
+            // If todo list is done break loop (will be filled on next Update() run)
+            if (_otherChecksTodo.empty())
+            {
+                break;
+            }
+
+            // Get check id from the end and remove it from todo
+            id = _otherChecksTodo.back();
+            _otherChecksTodo.pop_back();
+
+            _currentChecks.push_back(id);
+        }
 
         // avoid double checks
         _currentChecks.unique();
@@ -299,6 +334,8 @@ void WardenWin::RequestData()
             return false;
         }
     );
+
+    _pendingChecks.unique();
 
     ByteBuffer buff;
     buff << uint8(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
