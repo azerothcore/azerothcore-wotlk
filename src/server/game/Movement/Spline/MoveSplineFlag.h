@@ -63,7 +63,7 @@ namespace Movement
         };
 
         inline uint32& raw() { return (uint32&) * this; }
-        inline const uint32& raw() const { return (const uint32&) * this; }
+        [[nodiscard]] inline const uint32& raw() const { return (const uint32&) * this; }
 
         MoveSplineFlag() { raw() = 0; }
         MoveSplineFlag(uint32 f) { raw() = f; }
@@ -77,16 +77,16 @@ namespace Movement
 
         // Constant interface
 
-        bool isSmooth() const { return raw() & Mask_CatmullRom; }
-        bool isLinear() const { return !isSmooth(); }
-        bool isFacing() const { return raw() & Mask_Final_Facing; }
+        [[nodiscard]] bool isSmooth() const { return raw() & Mask_CatmullRom; }
+        [[nodiscard]] bool isLinear() const { return !isSmooth(); }
+        [[nodiscard]] bool isFacing() const { return raw() & Mask_Final_Facing; }
 
-        uint8 getAnimationId() const { return animId; }
-        bool hasAllFlags(uint32 f) const { return (raw() & f) == f; }
-        bool hasFlag(uint32 f) const { return (raw() & f) != 0; }
+        [[nodiscard]] uint8 getAnimationId() const { return animId; }
+        [[nodiscard]] bool hasAllFlags(uint32 f) const { return (raw() & f) == f; }
+        [[nodiscard]] bool hasFlag(uint32 f) const { return (raw() & f) != 0; }
         uint32 operator & (uint32 f) const { return (raw() & f); }
         uint32 operator | (uint32 f) const { return (raw() | f); }
-        std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
         // Not constant interface
 
