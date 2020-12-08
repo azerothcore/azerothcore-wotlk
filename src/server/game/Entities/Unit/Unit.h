@@ -1026,9 +1026,9 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
 
 struct RedirectThreatInfo
 {
-    RedirectThreatInfo() : _targetGUID(0), _threatPct(0) { }
-    uint64 _targetGUID;
-    uint32 _threatPct;
+    RedirectThreatInfo()  { }
+    uint64 _targetGUID{0};
+    uint32 _threatPct{0};
 
     [[nodiscard]] uint64 GetTargetGUID() const { return _targetGUID; }
     [[nodiscard]] uint32 GetThreatPct() const { return _threatPct; }
@@ -1077,7 +1077,7 @@ typedef std::unordered_map<uint32 /*category*/, GlobalCooldown> GlobalCooldownLi
 class GlobalCooldownMgr                                     // Shared by Player and CharmInfo
 {
 public:
-    GlobalCooldownMgr() {}
+    GlobalCooldownMgr() = default;
 
 public:
     bool HasGlobalCooldown(SpellInfo const* spellInfo) const;
@@ -1303,7 +1303,7 @@ struct SpellProcEventEntry;                                 // used only private
 class MMapTargetData
 {
 public:
-    MMapTargetData() {}
+    MMapTargetData() = default;
     MMapTargetData(uint32 endTime, const Position* o, const Position* t)
     {
         _endTime = endTime;

@@ -352,24 +352,21 @@ protected:
     class BuildStats
     {
     private:
-        int numNodes;
-        int numLeaves;
-        int sumObjects;
-        int minObjects;
-        int maxObjects;
-        int sumDepth;
-        int minDepth;
-        int maxDepth;
+        int numNodes{0};
+        int numLeaves{0};
+        int sumObjects{0};
+        int minObjects{0x0FFFFFFF};
+        int maxObjects{-1}; // 0xFFFFFFFF
+        int sumDepth{0};
+        int minDepth{0x0FFFFFFF};
+        int maxDepth{-1}; // 0xFFFFFFFF
         int numLeavesN[6];
-        int numBVH2;
+        int numBVH2{0};
 
     public:
-        BuildStats():
-            numNodes(0), numLeaves(0), sumObjects(0), minObjects(0x0FFFFFFF),
-            maxObjects(0xFFFFFFFF), sumDepth(0), minDepth(0x0FFFFFFF),
-            maxDepth(0xFFFFFFFF), numBVH2(0)
+        BuildStats() 
         {
-            for (int i = 0; i < 6; ++i) numLeavesN[i] = 0;
+            for (int & i : numLeavesN) i = 0;
         }
 
         void updateInner() { numNodes++; }

@@ -444,7 +444,7 @@ private:
     typedef std::unordered_map<uint32, uint32> PetAuraMap;
 
 public:
-    PetAura() : removeOnChangePet(false), damage(0)
+    PetAura()  
     {
         auras.clear();
     }
@@ -483,8 +483,8 @@ public:
 
 private:
     PetAuraMap auras;
-    bool removeOnChangePet;
-    int32 damage;
+    bool removeOnChangePet{false};
+    int32 damage{0};
 };
 typedef std::map<uint32, PetAura> SpellPetAuraMap;
 

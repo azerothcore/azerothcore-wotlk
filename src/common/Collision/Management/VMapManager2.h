@@ -52,14 +52,14 @@ namespace VMAP
     class ManagedModel
     {
     public:
-        ManagedModel() : iModel(nullptr), iRefCount(0) { }
+        ManagedModel()  { }
         void setModel(WorldModel* model) { iModel = model; }
         WorldModel* getModel() { return iModel; }
         void incRefCount() { ++iRefCount; }
         int decRefCount() { return --iRefCount; }
     protected:
-        WorldModel* iModel;
-        int iRefCount;
+        WorldModel* iModel{nullptr};
+        int iRefCount{0};
     };
 
     typedef std::unordered_map<uint32, StaticMapTree*> InstanceTreeMap;
@@ -85,7 +85,7 @@ namespace VMAP
         static std::string getMapFileName(unsigned int mapId);
 
         VMapManager2();
-        ~VMapManager2(void) override;
+        ~VMapManager2() override;
 
         int loadMap(const char* pBasePath, unsigned int mapId, int x, int y) override;
 

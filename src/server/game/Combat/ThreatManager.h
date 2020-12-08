@@ -128,7 +128,7 @@ class ThreatContainer
 public:
     typedef std::list<HostileReference*> StorageType;
 
-    ThreatContainer(): iDirty(false) { }
+    ThreatContainer() { }
 
     ~ThreatContainer() { clearReferences(); }
 
@@ -173,7 +173,7 @@ private:
     void update();
 
     StorageType iThreatList;
-    bool iDirty;
+    bool iDirty{false};
 };
 
 //=================================================
@@ -229,10 +229,8 @@ public:
         if (threatList.empty())
             return;
 
-        for (ThreatContainer::StorageType::iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+        for (auto ref : threatList)
         {
-            HostileReference* ref = (*itr);
-
             if (predicate(ref->getTarget()))
             {
                 ref->setThreat(0);

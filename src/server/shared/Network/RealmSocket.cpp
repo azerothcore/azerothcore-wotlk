@@ -11,13 +11,14 @@
 #include "RealmSocket.h"
 #include "Log.h"
 
-RealmSocket::Session::Session(void) { }
 
-RealmSocket::Session::~Session(void) { }
+RealmSocket::Session::Session() = default;
 
-RealmSocket::RealmSocket(void) :
-    input_buffer_(4096), session_(nullptr),
-    _remoteAddress(), _remotePort(0)
+RealmSocket::Session::~Session() = default;
+
+RealmSocket::RealmSocket() :
+    input_buffer_(4096), 
+    _remoteAddress() 
 {
     reference_counting_policy().value(ACE_Event_Handler::Reference_Counting_Policy::ENABLED);
 
@@ -25,7 +26,7 @@ RealmSocket::RealmSocket(void) :
     msg_queue()->low_water_mark(8 * 1024 * 1024);
 }
 
-RealmSocket::~RealmSocket(void)
+RealmSocket::~RealmSocket()
 {
     if (msg_queue())
         msg_queue()->close();
@@ -75,17 +76,17 @@ int RealmSocket::close(u_long)
     return 0;
 }
 
-const std::string& RealmSocket::getRemoteAddress(void) const
+const std::string& RealmSocket::getRemoteAddress() const
 {
     return _remoteAddress;
 }
 
-uint16 RealmSocket::getRemotePort(void) const
+uint16 RealmSocket::getRemotePort() const
 {
     return _remotePort;
 }
 
-size_t RealmSocket::recv_len(void) const
+size_t RealmSocket::recv_len() const
 {
     return input_buffer_.length();
 }

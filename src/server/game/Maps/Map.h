@@ -237,14 +237,13 @@ enum LevelRequirementVsMode
 
 struct ZoneDynamicInfo
 {
-    ZoneDynamicInfo() : MusicId(0), WeatherId(0), WeatherGrade(0.0f),
-        OverrideLightId(0), LightFadeInTime(0) { }
+    ZoneDynamicInfo()  { }
 
-    uint32 MusicId;
-    uint32 WeatherId;
-    float WeatherGrade;
-    uint32 OverrideLightId;
-    uint32 LightFadeInTime;
+    uint32 MusicId{0};
+    uint32 WeatherId{0};
+    float WeatherGrade{0.0f};
+    uint32 OverrideLightId{0};
+    uint32 LightFadeInTime{0};
 };
 
 #if defined(__GNUC__)
@@ -336,7 +335,7 @@ public:
     bool UnloadGrid(NGridType& ngrid);
     virtual void UnloadAll();
 
-    [[nodiscard]] uint32 GetId(void) const { return i_mapEntry->MapID; }
+    [[nodiscard]] uint32 GetId() const { return i_mapEntry->MapID; }
 
     static bool ExistMap(uint32 mapid, int gx, int gy);
     static bool ExistVMap(uint32 mapid, int gx, int gy);
