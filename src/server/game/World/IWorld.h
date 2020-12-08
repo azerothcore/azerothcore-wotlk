@@ -482,10 +482,10 @@ public:
     virtual uint32 GetQueuedSessionCount() const = 0;
     virtual uint32 GetMaxQueuedSessionCount() const = 0;
     virtual uint32 GetMaxActiveSessionCount() const = 0;
-    virtual inline uint32 GetPlayerCount() const = 0;
-    virtual inline uint32 GetMaxPlayerCount() const = 0;
-    virtual inline void IncreasePlayerCount() = 0;
-    virtual inline void DecreasePlayerCount() = 0;
+    virtual uint32 GetPlayerCount() const = 0;
+    virtual uint32 GetMaxPlayerCount() const = 0;
+    virtual void IncreasePlayerCount() = 0;
+    virtual void DecreasePlayerCount() = 0;
     virtual Player* FindPlayerInZone(uint32 zone) = 0;
     virtual bool IsClosed() const = 0;
     virtual void SetClosed(bool val) = 0;
