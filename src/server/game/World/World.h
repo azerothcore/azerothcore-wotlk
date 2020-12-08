@@ -300,7 +300,7 @@ public:
     /// Get a server configuration element (see #WorldConfigs)
     bool getBoolConfig(WorldBoolConfigs index) const
     {
-        return index < BOOL_CONFIG_VALUE_COUNT ? m_bool_configs[index] : 0;
+        return index < BOOL_CONFIG_VALUE_COUNT ? m_bool_configs[index] : false;
     }
 
     /// Set a server configuration element (see #WorldConfigs)
