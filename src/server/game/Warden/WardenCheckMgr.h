@@ -17,6 +17,23 @@ enum WardenActions
     WARDEN_ACTION_BAN   = 2,
 };
 
+constexpr uint8 MAX_WARDEN_ACTION = 3;
+
+static std::string GetWardenActionStr(uint32 action)
+{
+    switch (action)
+    {
+    case WARDEN_ACTION_LOG:
+        return "WARDEN_ACTION_LOG";
+    case WARDEN_ACTION_KICK:
+        return "WARDEN_ACTION_KICK";
+    case WARDEN_ACTION_BAN:
+        return "WARDEN_ACTION_BAN";
+    }
+
+    return "UNHANDLED ACTION";
+}
+
 enum WardenCheckTypes
 {
     WARDEN_CHECK_MEM_TYPE   = 0,
@@ -45,7 +62,6 @@ static WorldIntConfigs GetMaxWardenChecksForType(uint8 type)
     return CONFIG_WARDEN_NUM_OTHER_CHECKS;
 }
 
-
 struct WardenCheck
 {
     uint8 Type;
@@ -56,7 +72,7 @@ struct WardenCheck
     std::string Comment;
     uint16 CheckId;
     std::array<char, 4> IdStr = {};                         // LUA
-    enum WardenActions Action;
+    uint32 Action;
 };
 
 constexpr uint8 WARDEN_MAX_LUA_CHECK_LENGTH = 170;

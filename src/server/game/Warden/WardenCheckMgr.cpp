@@ -81,7 +81,11 @@ void WardenCheckMgr::LoadWardenChecks()
         wardenCheck.CheckId = id;
 
         // Initialize action with default action from config
-        wardenCheck.Action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
+        wardenCheck.Action = sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION);
+        if (wardenCheck.Action > MAX_WARDEN_ACTION)
+        {
+            wardenCheck.Action = WARDEN_ACTION_BAN;
+        }
 
         if (checkType == MEM_CHECK || checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == PROC_CHECK)
         {

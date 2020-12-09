@@ -209,7 +209,7 @@ void WardenWin::HandleHashResult(ByteBuffer& buff)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_WARDEN, "Request hash reply: failed");
 #endif
-        ApplyPenalty();
+        ApplyPenalty(0, "Request hash reply: failed");
         return;
     }
 
@@ -458,7 +458,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
     if (Length != (buff.size() - buff.rpos()))
     {
         buff.rfinish();
-        ApplyPenalty();
+        ApplyPenalty(0, "Failed size checks in HandleData");
         return;
     }
 
@@ -468,7 +468,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_WARDEN, "CHECKSUM FAIL");
 #endif
-        ApplyPenalty();
+        ApplyPenalty(0, "Failed checksum in HandleData");
         return;
     }
 
@@ -482,7 +482,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_WARDEN, "TIMING CHECK FAIL result 0x00");
 #endif
-            ApplyPenalty();
+            ApplyPenalty(0, "TIMING CHECK FAIL result");
             return;
         }
 
@@ -624,7 +624,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
 
     if (checkFailed > 0)
     {
-        ApplyPenalty(checkFailed);
+        ApplyPenalty(checkFailed, "");
     }
 
     // Set hold off timer, minimum timer should at least be 1 second

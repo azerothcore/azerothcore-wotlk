@@ -173,50 +173,83 @@ uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
     return checkSum;
 }
 
-void Warden::ApplyPenalty(uint16 checkFailed /*= 0*/)
+void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
 {
-    
-    WardenCheck const* checkData = sWardenCheckMgr->GetWardenDataById(checkFailed);
+    WardenCheck const* checkData = sWardenCheckMgr->GetWardenDataById(checkId);
 
-    WardenActions action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
-    if (checkData)
+    uint32 action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
+    std::string causeMsg;
+    if (checkId && checkData)
     {
         action = checkData->Action;
-    }
 
-    std::string banReason = "Warden violation ";
-    bool longBan = false; // 14d = 1209600s
-    if (checkData)
+        if (checkData->Comment.empty())
+        {
+            causeMsg = "Warden id " + std::to_string(checkId) + " violation";
+        }
+        else
+        {
+            causeMsg = "Warden: " + checkData->Comment;
+        }
+    }
+    else
     {
-        banReason += checkData->Comment;
+        // if its not warden check id based, reason must be always provided
+        ASSERT(!reason.empty());
+        causeMsg = reason;
     }
 
+    bool longBan = false; // 14d = 1209600s
     switch (action)
     {
         case WARDEN_ACTION_LOG:
             break;
         case WARDEN_ACTION_KICK:
         {
-            banReason = "WARDEN_ACTION_KICK " + banReason;
-            _session->KickPlayer(banReason);
+            _session->KickPlayer((checkData && !checkData->Comment.empty()) ? checkData->Comment : "");
             break;
         }
         case WARDEN_ACTION_BAN:
         {
-            banReason = "WARDEN_ACTION_BAN " + banReason;
             std::stringstream duration;
             duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
             std::string accountName;
             AccountMgr::GetName(_session->GetAccountId(), accountName);
-            sBan->BanAccount(accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), banReason, "Server");
+            sBan->BanAccount(accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), causeMsg, "Server");
             break;
         }
     }
 
-    if (!banReason.empty())
+    std::string reportMsg;
+    if (checkId)
     {
-        sLog->outDebug(LOG_FILTER_WARDEN, banReason.c_str());
+        if (Player const* plr = _session->GetPlayer())
+        {
+            std::string const reportFormat = "Player %s (guid %u, account id: %u) failed warden %u check. Action: %s";
+            reportMsg = acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUIDLow(), _session->GetAccountId(), checkId, GetWardenActionStr(action).c_str());
+        }
+        else
+        {
+            std::string const reportFormat = "Account id: %u failed warden %u check. Action: %s";
+            reportMsg = acore::StringFormat(reportFormat, _session->GetAccountId(), checkId, GetWardenActionStr(action).c_str());
+        }
     }
+    else
+    {
+        if (Player const* plr = _session->GetPlayer())
+        {
+            std::string const reportFormat = "Player %s (guid %u, account id: %u) triggered warden penalty by reason: %s. Action: %s";
+            reportMsg = acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUIDLow(), _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
+        }
+        else
+        {
+            std::string const reportFormat = "Account id: %u failed warden %u check. Action: %s";
+            reportMsg = acore::StringFormat(reportFormat, _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
+        }
+    }
+
+    reportMsg = "Warden: " + reportMsg;
+    sLog->outString(reportMsg.c_str());
 }
 
 bool Warden::ProcessLuaCheckResponse(std::string const& msg)
@@ -246,15 +279,12 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
         WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(id);
         if (check && check->Type == LUA_EVAL_CHECK)
         {
-            /* char const* penalty =  */ ApplyPenalty(id);
-            sLog->outString("warden %s failed Warden check %u", _session->GetPlayerInfo().c_str(), id /* EnumUtils::ToConstant(check.Type), penalty*/);
+            ApplyPenalty(id, "");
             return true;
         }
     }
 
-    /* char const* penalty =  */ApplyPenalty(0);
-    sLog->outString("warden: %s sent bogus Lua check response for Warden", _session->GetPlayerInfo().c_str()/* , penalty */);
-    ApplyPenalty(0);
+    ApplyPenalty(0, "Sent bogus Lua check response for Warden");
     return true;
 }
 
