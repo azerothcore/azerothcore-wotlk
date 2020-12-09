@@ -1593,7 +1593,7 @@ IsPreloadedContinentTransport.Enabled = 0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Warden.Enabled = 1
+Warden.Enabled = 0
 
 #
 #    Warden.NumMemChecks
