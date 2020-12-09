@@ -420,6 +420,8 @@ enum Rates
     RATE_XP_BG_KILL,
     RATE_XP_QUEST,
     RATE_XP_EXPLORE,
+    RATE_XP_PET,
+    RATE_XP_PET_NEXT_LEVEL,
     RATE_REPAIRCOST,
     RATE_REPUTATION_GAIN,
     RATE_REPUTATION_LOWLEVEL_KILL,
@@ -583,7 +585,7 @@ struct GlobalPlayerData
     uint16 mailCount;
     uint32 guildId;
     uint32 groupId;
-    uint32 arenaTeamId[3];
+    std::map<uint8, uint32> arenaTeamId;
 };
 
 enum GlobalPlayerUpdateMask
@@ -711,10 +713,10 @@ public:
     void SendWorldText(uint32 string_id, ...);
     void SendGlobalText(const char* text, WorldSession* self);
     void SendGMText(uint32 string_id, ...);
-    void SendGlobalMessage(WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
-    void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
-    bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
-    void SendZoneText(uint32 zone, const char* text, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
+    void SendGlobalMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
+    void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
+    bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
+    void SendZoneText(uint32 zone, const char* text, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
     void SendServerMessage(ServerMessageType type, const char* text = "", Player* player = nullptr);
 
     /// Are we in the middle of a shutdown?
@@ -745,7 +747,7 @@ public:
     /// Get a server configuration element (see #WorldConfigs)
     bool getBoolConfig(WorldBoolConfigs index) const
     {
-        return index < BOOL_CONFIG_VALUE_COUNT ? m_bool_configs[index] : 0;
+        return index < BOOL_CONFIG_VALUE_COUNT ? m_bool_configs[index] : false;
     }
 
     /// Set a server configuration element (see #WorldConfigs)

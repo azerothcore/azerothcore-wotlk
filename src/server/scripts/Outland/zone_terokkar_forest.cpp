@@ -56,13 +56,13 @@ public:
             dest.RelocateOffset(offset);
         }
 
-        void Register()
+        void Register() override
         {
             OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10930_big_bone_worm_SpellScript::SetDest, EFFECT_1, TARGET_DEST_CASTER);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q10930_big_bone_worm_SpellScript();
     }
@@ -79,13 +79,13 @@ public:
             GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_HAISHULUD, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_q10930_big_bone_worm_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_q10930_big_bone_worm_AuraScript();
     }
@@ -106,13 +106,13 @@ public:
             dest.RelocateOffset(offset);
         }
 
-        void Register()
+        void Register() override
         {
             OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10929_fumping_SpellScript::SetDest, EFFECT_1, TARGET_DEST_CASTER);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q10929_fumping_SpellScript();
     }
@@ -129,13 +129,13 @@ public:
             GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_SAND_GNOME1, SPELL_SUMMON_SAND_GNOME3, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_q10929_fumping_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_q10929_fumping_AuraScript();
     }
@@ -146,7 +146,7 @@ class npc_greatfather_aldrimus : public CreatureScript
 public:
     npc_greatfather_aldrimus() : CreatureScript("npc_greatfather_aldrimus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_greatfather_aldrimusAI(creature);
     }
@@ -155,7 +155,7 @@ public:
     {
         npc_greatfather_aldrimusAI(Creature* c) : ScriptedAI(c) {}
 
-        bool CanBeSeen(Player const* player)
+        bool CanBeSeen(Player const* player) override
         {
             return player->GetQuestStatus(10253) == QUEST_STATUS_REWARDED;
         }
@@ -182,13 +182,13 @@ public:
                 torgos->GetAI()->AttackStart(GetCaster());
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectLaunch += SpellEffectFn(spell_q10036_torgos_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q10036_torgos_SpellScript();
     }
@@ -218,13 +218,13 @@ public:
                 auchenai->CastSpell(auchenai, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL_AURA, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectLaunch += SpellEffectFn(spell_q10923_evil_draws_near_summon_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q10923_evil_draws_near_summon_SpellScript();
     }
@@ -245,13 +245,13 @@ public:
             GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL1, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL2), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_q10923_evil_draws_near_periodic_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_q10923_evil_draws_near_periodic_AuraScript();
     }
@@ -273,13 +273,13 @@ public:
             dest.RelocateOffset(offset);
         }
 
-        void Register()
+        void Register() override
         {
             OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10923_evil_draws_near_visual_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER_RADIUS);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q10923_evil_draws_near_visual_SpellScript();
     }
@@ -302,13 +302,13 @@ public:
             dest.RelocateOffset(offset);
         }
 
-        void Register()
+        void Register() override
         {
             OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10898_skywing_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q10898_skywing_SpellScript();
     }
@@ -336,7 +336,7 @@ class npc_unkor_the_ruthless : public CreatureScript
 public:
     npc_unkor_the_ruthless() : CreatureScript("npc_unkor_the_ruthless") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_unkor_the_ruthlessAI(creature);
     }
@@ -349,7 +349,7 @@ public:
         uint32 UnkorUnfriendly_Timer;
         uint32 Pulverize_Timer;
 
-        void Reset()
+        void Reset() override
         {
             CanDoQuest = false;
             UnkorUnfriendly_Timer = 0;
@@ -358,7 +358,7 @@ public:
             me->setFaction(FACTION_HOSTILE);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
         void DoNice()
         {
@@ -371,7 +371,7 @@ public:
             UnkorUnfriendly_Timer = 60000;
         }
 
-        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!done_by)
                 return;
@@ -403,7 +403,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (CanDoQuest)
             {
@@ -447,7 +447,7 @@ class npc_infested_root_walker : public CreatureScript
 public:
     npc_infested_root_walker() : CreatureScript("npc_infested_root_walker") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_infested_root_walkerAI(creature);
     }
@@ -456,10 +456,10 @@ public:
     {
         npc_infested_root_walkerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
-        void EnterCombat(Unit* /*who*/) { }
+        void Reset() override { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (done_by && done_by->GetTypeId() == TYPEID_PLAYER)
                 if (me->GetHealth() <= damage)
@@ -479,7 +479,7 @@ class npc_rotting_forest_rager : public CreatureScript
 public:
     npc_rotting_forest_rager() : CreatureScript("npc_rotting_forest_rager") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_rotting_forest_ragerAI(creature);
     }
@@ -488,10 +488,10 @@ public:
     {
         npc_rotting_forest_ragerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
-        void EnterCombat(Unit* /*who*/) { }
+        void Reset() override { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (done_by && done_by->GetTypeId() == TYPEID_PLAYER)
                 if (me->GetHealth() <= damage)
@@ -645,7 +645,7 @@ public:
     {
         npc_isla_starmaneAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -684,12 +684,12 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             me->RestoreFaction();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Player* player = GetPlayerForEscort())
             {
@@ -700,7 +700,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_WRATH, 0);
@@ -708,7 +708,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 10000);
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -739,7 +739,7 @@ public:
         EventMap events;
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_EFTW_H || quest->GetQuestId() == QUEST_EFTW_A)
         {
@@ -749,7 +749,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_isla_starmaneAI(creature);
     }

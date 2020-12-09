@@ -17,9 +17,9 @@ class BasicStatementTask : public SQLOperation
 public:
     BasicStatementTask(const char* sql);
     BasicStatementTask(const char* sql, QueryResultFuture result);
-    ~BasicStatementTask();
+    ~BasicStatementTask() override;
 
-    bool Execute();
+    bool Execute() override;
 
 private:
     const char* m_sql;      //- Raw query to be executed

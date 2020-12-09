@@ -14,12 +14,12 @@ namespace Movement
 {
     struct Location : public Vector3
     {
-        Location() : orientation(0) {}
+        Location()  {}
         Location(float x, float y, float z, float o) : Vector3(x, y, z), orientation(o) {}
         Location(const Vector3& v) : Vector3(v), orientation(0) {}
         Location(const Vector3& v, float o) : Vector3(v), orientation(o) {}
 
-        float orientation;
+        float orientation{0};
     };
 
     // MoveSpline represents smooth catmullrom or linear curve and point that moves belong it
@@ -60,26 +60,26 @@ namespace Movement
         void init_spline(const MoveSplineInitArgs& args);
 
     protected:
-        const MySpline::ControlArray& getPath(bool visual) const { return spline.getPoints(visual); }
+        [[nodiscard]] const MySpline::ControlArray& getPath(bool visual) const { return spline.getPoints(visual); }
         void computeParabolicElevation(float& el) const;
         void computeFallElevation(float& el) const;
 
         UpdateResult _updateState(int32& ms_time_diff);
-        int32 next_timestamp() const { return spline.length(point_Idx + 1); }
-        int32 segment_time_elapsed() const { return next_timestamp() - time_passed; }
+        [[nodiscard]] int32 next_timestamp() const { return spline.length(point_Idx + 1); }
+        [[nodiscard]] int32 segment_time_elapsed() const { return next_timestamp() - time_passed; }
 
     public:
-        int32 timeElapsed() const { return Duration() - time_passed; }  // xinef: moved to public for waypoint movegen
-        int32 timePassed() const { return time_passed; }                // xinef: moved to public for waypoint movegen
-        int32 Duration() const { return spline.length(); }
-        MySpline const& _Spline() const { return spline; }
-        int32 _currentSplineIdx() const { return point_Idx; }
+        [[nodiscard]] int32 timeElapsed() const { return Duration() - time_passed; }  // xinef: moved to public for waypoint movegen
+        [[nodiscard]] int32 timePassed() const { return time_passed; }                // xinef: moved to public for waypoint movegen
+        [[nodiscard]] int32 Duration() const { return spline.length(); }
+        [[nodiscard]] MySpline const& _Spline() const { return spline; }
+        [[nodiscard]] int32 _currentSplineIdx() const { return point_Idx; }
         void _Finalize();
         void _Interrupt() { splineflags.done = true; }
 
     public:
         void Initialize(const MoveSplineInitArgs&);
-        bool Initialized() const { return !spline.empty(); }
+        [[nodiscard]] bool Initialized() const { return !spline.empty(); }
 
         MoveSpline();
 
@@ -99,19 +99,19 @@ namespace Movement
             while (difftime > 0);
         }
 
-        Location ComputePosition() const;
+        [[nodiscard]] Location ComputePosition() const;
 
-        uint32 GetId() const { return m_Id; }
-        bool Finalized() const { return splineflags.done; }
-        bool isCyclic() const { return splineflags.cyclic; }
-        bool isFalling() const { return splineflags.falling; }
-        bool isWalking() const { return splineflags.walkmode; }
-        Vector3 FinalDestination() const { return Initialized() ? spline.getPoint(spline.last(), false) : Vector3(); }
-        Vector3 CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx + 1, false) : Vector3(); }
-        int32 currentPathIdx() const;
+        [[nodiscard]] uint32 GetId() const { return m_Id; }
+        [[nodiscard]] bool Finalized() const { return splineflags.done; }
+        [[nodiscard]] bool isCyclic() const { return splineflags.cyclic; }
+        [[nodiscard]] bool isFalling() const { return splineflags.falling; }
+        [[nodiscard]] bool isWalking() const { return splineflags.walkmode; }
+        [[nodiscard]] Vector3 FinalDestination() const { return Initialized() ? spline.getPoint(spline.last(), false) : Vector3(); }
+        [[nodiscard]] Vector3 CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx + 1, false) : Vector3(); }
+        [[nodiscard]] int32 currentPathIdx() const;
 
         bool onTransport;
-        std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
     };
 }
 #endif // TRINITYSERVER_MOVEPLINE_H

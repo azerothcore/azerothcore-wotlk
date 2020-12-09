@@ -1776,16 +1776,6 @@ void Player::Update(uint32 p_time)
     {
         if (p_time >= m_zoneUpdateTimer)
         {
-            if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
-            {
-                uint32 zoneId = GetZoneId();
-                AreaTableEntry const* zone = sAreaTableStore.LookupEntry(zoneId);
-                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());            // Warsong Hold. Only inn that doesn't work so ugly hack it is :)
-                if (!(atEntry || IsInAreaTriggerRadius(atEntry) || zone->flags & AREA_FLAG_CAPITAL || sAreaTableStore.LookupEntry(4129)))
-                {
-                    RemoveRestState();
-                }
-            }
             uint32 newzone, newarea;
             GetZoneAndAreaId(newzone, newarea, true);
             m_last_zone_id = newzone;
@@ -4950,7 +4940,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                     {
                         if (Player* pFriend = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID((*resultFriends)[0].GetUInt32(), 0, HIGHGUID_PLAYER)))
                         {
-                            pFriend->GetSocial()->RemoveFromSocialList(guid, false);
+                            pFriend->GetSocial()->RemoveFromSocialList(guid, SOCIAL_FLAG_ALL);
                             sSocialMgr->SendFriendStatus(pFriend, FRIEND_REMOVED, guid, false);
                         }
                     } while (resultFriends->NextRow());
@@ -7514,7 +7504,7 @@ void Player::ModifyHonorPoints(int32 value, SQLTransaction* trans /*=NULL*/)
         newValue = 0;
     SetHonorPoints(uint32(newValue));
 
-    if (trans && !trans->null())
+    if (trans)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_HONOR_POINTS);
         stmt->setUInt32(0, newValue);
@@ -7530,7 +7520,7 @@ void Player::ModifyArenaPoints(int32 value, SQLTransaction* trans /*=NULL*/)
         newValue = 0;
     SetArenaPoints(uint32(newValue));
 
-    if (trans && !trans->null())
+    if (trans)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_ARENA_POINTS);
         stmt->setUInt32(0, newValue);
@@ -7556,8 +7546,23 @@ uint32 Player::GetGroupIdFromStorage(uint32 guid)
 uint32 Player::GetArenaTeamIdFromStorage(uint32 guid, uint8 slot)
 {
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return playerData->arenaTeamId[slot];
+    {
+        auto itr = playerData->arenaTeamId.find(slot);
+        if (itr != playerData->arenaTeamId.end())
+        {
+            return itr->second;
+        }
+    }
     return 0;
+}
+
+
+void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
+{
+    if (slot < MAX_ARENA_SLOT)
+    {
+        SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
+    }
 }
 
 uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
@@ -7697,14 +7702,17 @@ void Player::UpdateArea(uint32 newArea)
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 
-    uint32 const areaRestFlag = (GetTeamId() == TEAM_ALLIANCE) ? AREA_FLAG_REST_ZONE_ALLIANCE : AREA_FLAG_REST_ZONE_HORDE;
-    if (area && areaFlags & areaRestFlag)
+    if (isInn)
     {
         SetRestState(0);
+        if (sWorld->IsFFAPvPRealm())
+            RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
     }
-    else
+    else if (!(areaFlags & AREA_FLAG_CAPITAL))
     {
-        RemoveRestState();
+        AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
+        if (!atEntry || !IsInAreaTriggerRadius(atEntry))
+            RemoveRestState();
     }
 }
 
@@ -17717,7 +17725,7 @@ void Player::_LoadArenaTeamInfo()
 {
     memset((void*)&m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1], 0, sizeof(uint32) * MAX_ARENA_SLOT * ARENA_TEAM_END);
 
-    for (uint8 slot = 0; slot <= 2; ++slot)
+    for (uint8 slot = 0; slot < MAX_ARENA_SLOT; ++slot)
         if (uint32 arenaTeamId = Player::GetArenaTeamIdFromStorage(GetGUIDLow(), slot))
         {
             ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
@@ -20125,7 +20133,7 @@ void Player::_SaveMail(SQLTransaction& trans)
 
 void Player::_SaveQuestStatus(SQLTransaction& trans)
 {
-    bool isTransaction = !trans.null();
+    bool isTransaction = static_cast<bool>(trans);
     if (!isTransaction)
         trans = CharacterDatabase.BeginTransaction();
 
@@ -21634,6 +21642,38 @@ void Player::LeaveAllArenaTeams(uint64 guid)
     } while (result->NextRow());
 }
 
+
+uint32 Player::GetArenaTeamId(uint8 slot) const
+{
+    uint32 rtVal = 0;
+    if (slot >= MAX_ARENA_SLOT)
+    {
+        sScriptMgr->GetCustomGetArenaTeamId(this, slot, rtVal);
+    }
+    else
+    {
+        rtVal = GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID);
+    }
+
+    return rtVal;
+}
+
+
+uint32 Player::GetArenaPersonalRating(uint8 slot) const
+{
+    uint32 rtVal = 0;
+    if (slot >= MAX_ARENA_SLOT)
+    {
+        sScriptMgr->GetCustomGetArenaTeamId(this, slot, rtVal);
+    }
+    else
+    {
+        rtVal = GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING);
+    }
+
+    return rtVal;
+}
+
 void Player::SetRestBonus(float rest_bonus_new)
 {
     // Prevent resting on max level
@@ -22294,6 +22334,9 @@ uint32 Player::GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot) const
                 max_personal_rating = p_rating;
         }
     }
+
+    sScriptMgr->OnGetMaxPersonalArenaRatingRequirement(this, minarenaslot, max_personal_rating);
+
     return max_personal_rating;
 }
 
@@ -23225,7 +23268,7 @@ void Player::SetGroup(Group* group, int8 subgroup)
 void Player::SendInitialPacketsBeforeAddToMap()
 {
     /// Pass 'this' as argument because we're not stored in ObjectAccessor yet
-    GetSocial()->SendSocialList(this);
+    GetSocial()->SendSocialList(this, SOCIAL_FLAG_ALL);
 
     // guild bank list wtf?
 

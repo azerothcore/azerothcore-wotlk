@@ -52,13 +52,13 @@ public:
     {
         boss_brutallusAI(Creature* creature) : BossAI(creature, DATA_BRUTALLUS) { }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             me->CastSpell(me, SPELL_DUAL_WIELD, true);
         }
 
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (me->GetReactState() == REACT_PASSIVE && (!who || who->GetEntry() != NPC_MADRIGOSA))
             {
@@ -68,7 +68,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if (who->GetEntry() == NPC_MADRIGOSA)
                 return;
@@ -82,13 +82,13 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 360000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
                 Talk(YELL_KILL);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             BossAI::JustDied(killer);
             Talk(YELL_DEATH);
@@ -98,14 +98,14 @@ public:
                 madrigosa->AI()->DoAction(ACTION_SPAWN_FELMYST);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (who->GetEntry() == NPC_MADRIGOSA)
                 return;
             BossAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -140,7 +140,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_brutallusAI>(creature);
     }
@@ -209,7 +209,7 @@ public:
         EventMap events;
         InstanceScript* instance;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_EVENT)
             {
@@ -223,7 +223,7 @@ public:
                 events.ScheduleEvent(EVENT_SPAWN_FELMYST, 60000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -384,7 +384,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_madrigosaAI>(creature);
     }
@@ -421,13 +421,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_madrigosa_activate_barrier_SpellScript::HandleActivateObject, EFFECT_0, SPELL_EFFECT_ACTIVATE_OBJECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_madrigosa_activate_barrier_SpellScript();
     }
@@ -464,13 +464,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_madrigosa_deactivate_barrier_SpellScript::HandleActivateObject, EFFECT_0, SPELL_EFFECT_ACTIVATE_OBJECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_madrigosa_deactivate_barrier_SpellScript();
     }
@@ -493,13 +493,13 @@ public:
                     target->CastSpell(target, SPELL_BURN_DAMAGE, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_brutallus_burn_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_brutallus_burn_SpellScript();
     }
@@ -511,7 +511,7 @@ public:
 
     AreaTrigger_at_sunwell_madrigosa() : AreaTriggerScript("at_sunwell_madrigosa") {}
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_MADRIGOSA) != DONE)

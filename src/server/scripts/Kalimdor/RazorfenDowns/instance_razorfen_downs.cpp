@@ -18,13 +18,13 @@ public:
         {
         }
 
-        void Initialize()
+        void Initialize() override
         {
             _gongPhase = 0;
             _firesState = 0;
         }
 
-        void OnGameObjectCreate(GameObject* gameobject)
+        void OnGameObjectCreate(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
             {
@@ -41,14 +41,14 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             if (type == GO_GONG)
                 return _gongPhase;
             return 0;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (type == GO_GONG)
                 _gongPhase = data;
@@ -57,14 +57,14 @@ public:
             SaveToDB();
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             std::ostringstream saveStream;
             saveStream << "R D " << _gongPhase << ' ' << _firesState;
             return saveStream.str();
         }
 
-        void Load(const char* str)
+        void Load(const char* str) override
         {
             if (!str)
                 return;
@@ -85,7 +85,7 @@ public:
         uint32 _firesState;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_razorfen_downs_InstanceMapScript(map);
     }
