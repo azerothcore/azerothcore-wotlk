@@ -118,7 +118,9 @@ namespace acore
                 if (!p(*rpos))
                 {
                     if (rpos != wpos)
+                    {
                         std::swap(*rpos, *wpos);
+                    }
                     ++wpos;
                 }
             }
@@ -131,9 +133,13 @@ namespace acore
             for (auto it = c.begin(); it != c.end();)
             {
                 if (p(*it))
+                {
                     it = c.erase(it);
+                }
                 else
+                {
                     ++it;
+                }
             }
         }
     }
