@@ -109,6 +109,7 @@ enum HodirGOs
 enum HodirEvents
 {
     // Hodir:
+    EVENT_FAIL_HM                       = 0,
     EVENT_FLASH_FREEZE                  = 1,
     EVENT_FROZEN_BLOWS                  = 2,
     EVENT_BERSERK                       = 3,
@@ -232,6 +233,10 @@ public:
             bAchievCoolestFriends = true;
             me->SetSheath(SHEATH_STATE_MELEE);
 
+            // Reset the spells cast after wipe
+            me->RemoveAllAuras();
+            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BITING_COLD_PLAYER_AURA);
+
             if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
             {
                 pInstance->SetData(TYPE_HODIR, NOT_STARTED);
@@ -254,14 +259,13 @@ public:
 
         void EnterCombat(Unit*  /*pWho*/) override
         {
-            /*me->setActive(true);*/
             me->CastSpell(me, SPELL_BITING_COLD_BOSS_AURA, true);
             SmallIcicles(true);
             events.Reset();
-            events.RescheduleEvent(EVENT_FLASH_FREEZE, 60000);
-            events.RescheduleEvent(EVENT_FREEZE, 15000);
-            events.RescheduleEvent(EVENT_BERSERK, 480000);
-            events.RescheduleEvent(EVENT_HARD_MODE_MISSED, 180000);
+            events.ScheduleEvent(EVENT_FLASH_FREEZE, urand(48000, 49000));
+            events.ScheduleEvent(EVENT_FREEZE, urand(17000,20000));
+            events.ScheduleEvent(EVENT_BERSERK, 480000);
+            events.ScheduleEvent(EVENT_HARD_MODE_MISSED, 180000);
 
             Talk(TEXT_AGGRO);
 
@@ -276,7 +280,22 @@ public:
             }
         }
 
-        void JustReachedHome() override { /*me->setActive(false); */}
+        void DoAction(int action) override
+        {
+            if (action)
+            {
+                switch (action)
+                {
+                    case EVENT_FAIL_HM:
+                        if (GameObject* go = me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 500.0f))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                            events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3000);
+                        }
+                        break;
+                }
+            }
+        }
 
         void SmallIcicles(bool enable)
         {
@@ -395,14 +414,7 @@ public:
                 case EVENT_HARD_MODE_MISSED:
                     {
                         Talk(TEXT_HM_MISS);
-                        // Cast spell to destroy wintercache
-                        if (Creature* cr = me->FindNearestCreature(NPC_RARE_WINTER_CACHE_TRIGGER, 200.0f))
-                            me->CastSpell(cr, SPELL_SHATTER_CHEST);
-                        if (GameObject* go = me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 200.0f))
-                        {
-                            go->SetGoState(GO_STATE_ACTIVE);
-                            events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3500);
-                        }
+                        me->CastSpell(me, SPELL_SHATTER_CHEST);
                     }
                     break;
                 case EVENT_DESPAWN_CHEST:
@@ -426,14 +438,14 @@ public:
                             (*itr)->m_positionZ = prevZ;
                         }
 
-                        me->CastSpell((Unit*)NULL, SPELL_FLASH_FREEZE_CAST, false);
+                        me->CastSpell(me, SPELL_FLASH_FREEZE_CAST);
                         Talk(TEXT_FLASH_FREEZE);
                         Talk(TEXT_EMOTE_FREEZE);
                         SmallIcicles(false);
-                        events.RepeatEvent(55000 + urand(0, 10000));
+                        events.ScheduleEvent(EVENT_FLASH_FREEZE, urand(48000, 49000));
                         events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, Is25ManRaid() ? 12000 : 24000);
                         events.ScheduleEvent(EVENT_FROZEN_BLOWS, 15000);
-                        events.RescheduleEvent(EVENT_FREEZE, 20000);
+                        events.RescheduleEvent(EVENT_FREEZE, urand(17000, 20000));
                     }
                     break;
                 case EVENT_SMALL_ICICLES_ENABLE:
@@ -453,7 +465,7 @@ public:
                         me->CastSpell(plr, SPELL_FREEZE, false);
                     else if (Unit* plr = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
                         me->CastSpell(plr, SPELL_FREEZE, false);
-                    events.RepeatEvent(15000);
+                    events.RescheduleEvent(EVENT_FREEZE, urand(17000, 20000));
                     break;
             }
 
@@ -508,9 +520,10 @@ public:
                 }
         }
 
-        void KilledUnit(Unit* /*who*/) override
+        void KilledUnit(Unit* who) override
         {
-            Talk(TEXT_SLAY);
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                Talk(TEXT_SLAY);
         }
 
         void JustSummoned(Creature* s) override
@@ -1123,6 +1136,33 @@ public:
     };
 };
 
+class spell_hodir_shatter_chest : public SpellScriptLoader
+{
+public:
+    spell_hodir_shatter_chest() : SpellScriptLoader("spell_hodir_shatter_chest") { }
+
+    class spell_hodir_shatter_chestSpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hodir_shatter_chestSpellScript)
+
+        void destroyWinterCache()
+        {
+            if (Unit* hodir = GetCaster())
+                hodir->GetAI()->DoAction(EVENT_FAIL_HM);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_hodir_shatter_chestSpellScript::destroyWinterCache, EffectIndexSpecifier, EffectNameSpecifier);
+        };
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_hodir_shatter_chestSpellScript();
+    }
+};
+
 class spell_hodir_biting_cold_main_aura : public SpellScriptLoader
 {
 public:
@@ -1554,6 +1594,7 @@ void AddSC_boss_hodir()
     new spell_hodir_flash_freeze();
     new spell_hodir_storm_power();
     new spell_hodir_storm_cloud();
+    new spell_hodir_shatter_chest();
 
     new achievement_cheese_the_freeze();
     new achievement_getting_cold_in_here();

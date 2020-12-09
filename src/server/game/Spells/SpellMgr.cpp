@@ -3363,6 +3363,14 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetB[0] = 0;
     });
 
+    // Flash Freeze Radius - Avoid FPS Drops
+    ApplySpellFix({ 62148 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;
+        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_200_YARDS;
+        spellInfo->EffectRadiusIndex[2] = EFFECT_RADIUS_200_YARDS;
+    });
+
     // Howl of Azgalor
     ApplySpellFix({ 31344 }, [](SpellEntry* spellInfo)
     {
@@ -3565,13 +3573,6 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 16834, 16835 }, [](SpellEntry* spellInfo)
     {
         spellInfo->DurationIndex = 21;
-    });
-
-    // Shatter Chest
-    ApplySpellFix({ 62501 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_TARGET_ANY;
-        spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_TARGET_RADIUS;
     });
 
     // Ebon Plague

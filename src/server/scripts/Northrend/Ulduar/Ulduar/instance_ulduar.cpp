@@ -82,6 +82,7 @@ public:
         uint64 m_thorimGameobjectsGUID[5];
 
         // Hodir's chests
+        bool hmHodir;
         uint64 m_hodirNormalChest;
         uint64 m_hodirHardmodeChest;
         Position normalChestPosition = { 1967.152588f, -204.188461f, 432.686951f, 5.50957f };
@@ -164,6 +165,8 @@ public:
             // Hodir
             m_hodirNormalChest = 0;
             m_hodirHardmodeChest = 0;
+            hmHodir = true; // If players fail the Hardmode then becomes false
+
             // Mimiron
             memset(&m_MimironDoor, 0, sizeof(m_MimironDoor));
             m_MimironLeviathanMKIIguid = 0;
@@ -251,7 +254,7 @@ public:
                 SetData(eventId, 0);
         }
 
-        void SpawnHodirChests(raidDifficulty rd, bool hm)
+        void SpawnHodirChests(raidDifficulty rd)
         {
             if (Creature* cr = instance->GetCreature(m_uiHodirGUID))
             {
@@ -272,7 +275,7 @@ public:
                                 go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                             }
                         }
-                        if (hm && !m_hodirHardmodeChest)
+                        if (!m_hodirHardmodeChest)
                         {
                             if (GameObject* go = cr->SummonGameObject(
                                 GO_HODIR_CHEST_HARD,
@@ -283,6 +286,7 @@ public:
                             {
                                 m_hodirHardmodeChest = go->GetGUID();
                                 go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                hmHodir = true;
                             }
                         }
                         break;
@@ -302,7 +306,7 @@ public:
                                 go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                             }
                         }
-                        if (hm && !m_hodirHardmodeChest)
+                        if (!m_hodirHardmodeChest)
                         {
                             if (GameObject* go = cr->SummonGameObject(
                                 GO_HODIR_CHEST_HARD_HERO,
@@ -313,6 +317,7 @@ public:
                             {
                                 m_hodirHardmodeChest = go->GetGUID();
                                 go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                hmHodir = true;
                             }
                         }
                         break;
@@ -665,8 +670,9 @@ public:
                 switch (boss)
                 {
                     case TYPE_HODIR:
-                        if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
-                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        if (hmHodir)
+                            if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
+                                go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         if (GameObject* go = instance->GetGameObject(m_hodirNormalChest))
                             go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         break;
@@ -723,11 +729,12 @@ public:
                     break;
 
                 case TYPE_SPAWN_HODIR_CACHE:
-                    SpawnHodirChests(m_difficulty == raidDifficulty::DIFFICULTY_10MAN ? m_difficulty : raidDifficulty::DIFFICULTY_25MAN, true);
+                    SpawnHodirChests(m_difficulty == raidDifficulty::DIFFICULTY_10MAN ? m_difficulty : raidDifficulty::DIFFICULTY_25MAN);
                     break;
                 case TYPE_HODIR_HM_FAIL:
                     if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
                     {
+                        hmHodir = false;
                         go->Delete();
                         m_hodirHardmodeChest = 0;
                     }
