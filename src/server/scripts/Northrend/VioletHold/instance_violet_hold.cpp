@@ -21,7 +21,7 @@ class instance_violet_hold : public InstanceMapScript
 public:
     instance_violet_hold() : InstanceMapScript("instance_violet_hold", 608) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_violet_hold_InstanceMapScript(pMap);
     }
@@ -69,7 +69,7 @@ public:
         uint64 NPC_ZuramatGUID;
         uint64 NPC_CyanigosaGUID;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             CLEANED = false;
@@ -110,12 +110,12 @@ public:
             NPC_CyanigosaGUID = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch(creature->GetEntry())
             {
@@ -170,7 +170,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch(go->GetEntry())
             {
@@ -210,7 +210,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -280,7 +280,7 @@ public:
             }
         }
 
-        void SetData64(uint32 type, uint64 data)
+        void SetData64(uint32 type, uint64 data) override
         {
             switch(type)
             {
@@ -294,7 +294,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch(type)
             {
@@ -313,7 +313,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const
+        uint64 GetData64(uint32 identifier) const override
         {
             switch(identifier)
             {
@@ -402,7 +402,7 @@ public:
             }
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             events.Update(diff);
             switch( events.ExecuteEvent() )
@@ -513,7 +513,7 @@ public:
             }
         }
 
-        void OnPlayerEnter(Player* plr)
+        void OnPlayerEnter(Player* plr) override
         {
             if( DoNeedCleanup(plr->IsAlive()) )
                 InstanceCleanup();
@@ -628,7 +628,7 @@ public:
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -641,7 +641,7 @@ public:
             return false;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -653,7 +653,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             EncounterStatus = NOT_STARTED;
             CLEANED = false;

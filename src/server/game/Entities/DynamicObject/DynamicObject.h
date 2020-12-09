@@ -24,7 +24,7 @@ class DynamicObject : public WorldObject, public GridObject<DynamicObject>, publ
 {
 public:
     DynamicObject(bool isWorldObject);
-    ~DynamicObject();
+    ~DynamicObject() override;
 
     void AddToWorld() override;
     void RemoveFromWorld() override;
@@ -35,19 +35,19 @@ public:
     void Update(uint32 p_time) override;
     void Remove();
     void SetDuration(int32 newDuration);
-    int32 GetDuration() const;
+    [[nodiscard]] int32 GetDuration() const;
     void Delay(int32 delaytime);
     void SetAura(Aura* aura);
     void RemoveAura();
     void SetCasterViewpoint();
     void RemoveCasterViewpoint();
-    Unit* GetCaster() const { return _caster; }
+    [[nodiscard]] Unit* GetCaster() const { return _caster; }
     void BindToCaster();
     void UnbindFromCaster();
-    uint32 GetSpellId() const {  return GetUInt32Value(DYNAMICOBJECT_SPELLID); }
-    uint64 GetCasterGUID() const { return GetUInt64Value(DYNAMICOBJECT_CASTER); }
-    float GetRadius() const { return GetFloatValue(DYNAMICOBJECT_RADIUS); }
-    bool IsViewpoint() const { return _isViewpoint; }
+    [[nodiscard]] uint32 GetSpellId() const {  return GetUInt32Value(DYNAMICOBJECT_SPELLID); }
+    [[nodiscard]] uint64 GetCasterGUID() const { return GetUInt64Value(DYNAMICOBJECT_CASTER); }
+    [[nodiscard]] float GetRadius() const { return GetFloatValue(DYNAMICOBJECT_RADIUS); }
+    [[nodiscard]] bool IsViewpoint() const { return _isViewpoint; }
 
 protected:
     Aura* _aura;

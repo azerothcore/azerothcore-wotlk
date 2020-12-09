@@ -50,7 +50,7 @@ public:
         EventMap events;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -63,7 +63,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*Killer*/)
+        void JustDied(Unit* /*Killer*/) override
         {
             summons.DespawnAll();
             if (pInstance)
@@ -73,7 +73,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (pInstance)
                 pInstance->SetData(DATA_AMANITAR_EVENT, IN_PROGRESS);
@@ -85,7 +85,7 @@ public:
             events.ScheduleEvent(EVENT_AMANITAR_SPAWN, 0);
         }
 
-        void JustSummoned(Creature* cr) { summons.Summon(cr); }
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
         void SpawnAdds()
         {
@@ -110,7 +110,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -162,7 +162,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_amanitarAI(creature);
     }
@@ -183,7 +183,7 @@ public:
         }
 
         uint32 Timer;
-        void Reset()
+        void Reset() override
         {
             me->CastSpell(me, 31690, true);
 
@@ -197,7 +197,7 @@ public:
                 me->CastSpell(me, SPELL_HEALTHY_MUSHROOM_VISUAL_AURA, true);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (!killer)
                 return;
@@ -215,10 +215,10 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) {}
-        void AttackStart(Unit* /*victim*/) {}
+        void EnterCombat(Unit* /*who*/) override {}
+        void AttackStart(Unit* /*victim*/) override {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->GetEntry() == NPC_POISONOUS_MUSHROOM)
             {
@@ -232,7 +232,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_amanitar_mushroomsAI(creature);
     }

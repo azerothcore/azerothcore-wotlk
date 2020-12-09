@@ -75,7 +75,7 @@ public:
         uint8 phase;
         bool bCanSayBoulderHit;
 
-        void Reset()
+        void Reset() override
         {
             me->RemoveAura(SPELL_PERMAFROST);
             SetEquipmentSlots(true);
@@ -90,13 +90,13 @@ public:
                 pInstance->SetData(DATA_GARFROST, NOT_STARTED);
         }
 
-        void SetData(uint32 id, uint32  /*data*/)
+        void SetData(uint32 id, uint32  /*data*/) override
         {
             if (id == 1 && pInstance)
                 pInstance->SetData(DATA_ACHIEV_ELEVEN, 0);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->CastSpell(me, SPELL_PERMAFROST, true);
 
@@ -108,7 +108,7 @@ public:
                 pInstance->SetData(DATA_GARFROST, IN_PROGRESS);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             if (phase == 0 && !HealthAbovePct(66) && !me->HasUnitState(UNIT_STATE_ROOT))
             {
@@ -136,7 +136,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != EFFECT_MOTION_TYPE || id != 0)
                 return;
@@ -156,7 +156,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell)
+        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell) override
         {
             if (spell->Id == uint32(SPELL_SARONITE_TRIGGERED))
             {
@@ -194,7 +194,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -263,20 +263,20 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_GARFROST, DONE);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY_1);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
@@ -284,7 +284,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_garfrostAI(creature);
     }
@@ -301,7 +301,7 @@ public:
 
         std::list<WorldObject*> targetList;
 
-        void Unload()
+        void Unload() override
         {
             targetList.clear();
         }
@@ -351,7 +351,7 @@ public:
             targets = targetList;
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_garfrost_permafrost_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_garfrost_permafrost_SpellScript::FilterTargetsNext, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
@@ -359,7 +359,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_garfrost_permafrost_SpellScript();
     }

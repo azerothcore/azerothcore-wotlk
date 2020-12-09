@@ -44,7 +44,7 @@ class boss_keristrasza : public CreatureScript
 public:
     boss_keristrasza() : CreatureScript("boss_keristrasza") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_keristraszaAI>(creature);
     }
@@ -57,14 +57,14 @@ public:
 
         std::set<uint32> aGuids;
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             RemovePrison(CanRemovePrison());
             aGuids.clear();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
             BossAI::EnterCombat(who);
@@ -77,13 +77,13 @@ public:
             events.ScheduleEvent(EVENT_ACHIEVEMENT_CHECK, 1000);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -92,7 +92,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32)
+        void SetData(uint32 type, uint32) override
         {
             if (type == me->GetEntry() && CanRemovePrison())
                 RemovePrison(true);
@@ -120,12 +120,12 @@ public:
             }
         }
 
-        uint32 GetData(uint32 guid) const
+        uint32 GetData(uint32 guid) const override
         {
             return aGuids.find(guid) == aGuids.end();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -186,7 +186,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player* player, Unit* target) override
     {
         if (!target)
             return false;
