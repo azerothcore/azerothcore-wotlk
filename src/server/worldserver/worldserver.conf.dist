@@ -1618,7 +1618,7 @@ Warden.NumLuaChecks = 1
 #        Default:     7 - (Enabled)
 #                     0 - (Disabled)
 
-Warden.NumOtherChecks = 5
+Warden.NumOtherChecks = 7
 
 #
 #    Warden.LogFile
@@ -1655,7 +1655,7 @@ Warden.ClientCheckHoldOff = 30
 #                     1 - (Kick)
 #                     2 - (Ban)
 
-Warden.ClientCheckFailAction = 2
+Warden.ClientCheckFailAction = 0
 
 #
 #    Warden.BanDuration
