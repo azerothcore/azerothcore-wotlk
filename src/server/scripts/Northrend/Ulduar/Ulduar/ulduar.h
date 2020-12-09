@@ -23,14 +23,14 @@ enum UlduarEncounters
     TYPE_AURIAYA                            = 6,
     TYPE_FREYA                              = 7,
     TYPE_HODIR                              = 8,
-    TYPE_HODIR_HM_FAIL                      = 9,
-    TYPE_MIMIRON                            = 10,
-    TYPE_THORIM                             = 11,
-    TYPE_VEZAX                              = 12,
-    TYPE_YOGGSARON                          = 13,
-    TYPE_ALGALON                            = 14,
-    TYPE_WATCHERS                           = 15,
-    TYPE_SPAWN_HODIR_CACHE                  = 16,
+    TYPE_MIMIRON                            = 9,
+    TYPE_THORIM                             = 10,
+    TYPE_VEZAX                              = 11,
+    TYPE_YOGGSARON                          = 12,
+    TYPE_ALGALON                            = 13,
+    TYPE_WATCHERS                           = 14,
+    TYPE_SPAWN_HODIR_CACHE                  = 15,
+    TYPE_HODIR_HM_FAIL                      = 16,
 };
 
 enum UlduarData
