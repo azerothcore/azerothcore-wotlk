@@ -173,10 +173,10 @@ void WardenWin::InitializeModule()
     EndianConvert(Request.Function3);
 
     // Encrypt with warden RC4 key.
-    EncryptData((uint8*)&Request, sizeof(WardenInitModuleRequest));
+    EncryptData(reinterpret_cast<uint8*>(&Request), sizeof(WardenInitModuleRequest));
 
     WorldPacket pkt(SMSG_WARDEN_DATA, sizeof(WardenInitModuleRequest));
-    pkt.append((uint8*)&Request, sizeof(WardenInitModuleRequest));
+    pkt.append(reinterpret_cast<uint8*>(&Request), sizeof(WardenInitModuleRequest));
     _session->SendPacket(&pkt);
 }
 
@@ -192,10 +192,10 @@ void WardenWin::RequestHash()
     memcpy(Request.Seed, _seed, 16);
 
     // Encrypt with warden RC4 key.
-    EncryptData((uint8*)&Request, sizeof(WardenHashRequest));
+    EncryptData(reinterpret_cast<uint8*>(&Request), sizeof(WardenHashRequest));
 
     WorldPacket pkt(SMSG_WARDEN_DATA, sizeof(WardenHashRequest));
-    pkt.append((uint8*)&Request, sizeof(WardenHashRequest));
+    pkt.append(reinterpret_cast<uint8*>(&Request), sizeof(WardenHashRequest));
     _session->SendPacket(&pkt);
 }
 
@@ -261,17 +261,7 @@ void WardenWin::RequestChecks()
             // Get check id from the end and remove it from todo
             uint16 const id = _memChecksTodo.back();
             _memChecksTodo.pop_back();
-
-            // Add the id to the list sent in this cycle
-            if (id != 786 /*WPE PRO*/ && id != 209 /*WoWEmuHacker*/)
-            {
-                _currentChecks.push_back(id);
-            }
-            else
-            {
-                // Always in front of queue
-                _currentChecks.push_front(id);
-            }
+            _currentChecks.push_back(id);
         }
 
         for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_OTHER_CHECKS); ++i)
@@ -289,6 +279,7 @@ void WardenWin::RequestChecks()
             _currentChecks.push_back(id);
         }
 
+        // LUA checks must be always added
         // Build check request
         for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_LUA_CHECKS); ++i)
         {
@@ -305,8 +296,6 @@ void WardenWin::RequestChecks()
             // Lua checks must be always in front
             _currentChecks.push_front(id);
         }
-        // avoid double checks
-        _currentChecks.unique();
     }
     else
     {
@@ -642,17 +631,17 @@ void WardenWin::HandleData(ByteBuffer& buff)
                     }
 
                     BigNumber tempNumber = rs->Result;
-                    if (memcmp(buff.contents() + buff.rpos(), tempNumber.AsByteArray(0, false).get(), 20) != 0) // SHA1
+                    if (memcmp(buff.contents() + buff.rpos(), tempNumber.AsByteArray(0, false).get(), SHA_DIGEST_LENGTH) != 0) // SHA1
                     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                         sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MPQ_CHECK fail, CheckId %u account Id %u", checkId, _session->GetAccountId());
 #endif
                         checkFailed = checkId;
-                        buff.rpos(buff.rpos() + 20);            // 20 bytes SHA1
+                        buff.rpos(buff.rpos() + SHA_DIGEST_LENGTH);            // 20 bytes SHA1
                         continue;
                     }
 
-                    buff.rpos(buff.rpos() + 20);                // 20 bytes SHA1
+                    buff.rpos(buff.rpos() + SHA_DIGEST_LENGTH);                // 20 bytes SHA1
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                     sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MPQ_CHECK passed, CheckId %u account Id %u", checkId, _session->GetAccountId());
 #endif
