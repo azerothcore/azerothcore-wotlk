@@ -18,7 +18,6 @@
 #include "Warden.h"
 #include "AccountMgr.h"
 #include "BanManager.h"
-#include "SmartEnum.h"
 #include "SharedDefines.h"
 
 Warden::Warden() : _session(nullptr), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
