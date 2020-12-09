@@ -28,6 +28,7 @@ enum HodirSpellData
     SPELL_FLASH_FREEZE_VISUAL           = 62148,
     SPELL_SAFE_AREA                     = 65705,
     SPELL_SAFE_AREA_TRIGGERED           = 62464,
+    SPELL_SHATTER_CHEST                 = 62501,
 
     SPELL_ICICLE_BOSS_AURA              = 62227,
     SPELL_ICICLE_TBBA                   = 63545,
@@ -114,6 +115,7 @@ enum HodirEvents
     EVENT_FREEZE                        = 4,
     EVENT_SMALL_ICICLES_ENABLE          = 5,
     EVENT_HARD_MODE_MISSED              = 6,
+    EVENT_DESPAWN_CHEST                 = 7,
 
     EVENT_TRY_FREE_HELPER               = 10,
     EVENT_PRIEST_DISPELL_MAGIC          = 11,
@@ -228,6 +230,7 @@ public:
             bAchievCheese = true;
             bAchievGettingCold = true;
             bAchievCoolestFriends = true;
+            me->SetSheath(SHEATH_STATE_MELEE);
 
             if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
             {
@@ -394,13 +397,17 @@ public:
                         Talk(TEXT_HM_MISS);
                         // Cast spell to destroy wintercache
                         if (Creature* cr = me->FindNearestCreature(NPC_RARE_WINTER_CACHE_TRIGGER, 200.0f))
-                            me->CastSpell(cr, SPELL_FREEZE);
-
-                        if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
+                            me->CastSpell(cr, SPELL_SHATTER_CHEST);
+                        if (GameObject* go = me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 200.0f))
                         {
-                            pInstance->SetData(TYPE_HODIR_HM_FAIL, 0);
+                            go->SetGoState(GO_STATE_ACTIVE);
+                            events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3500);
                         }
                     }
+                    break;
+                case EVENT_DESPAWN_CHEST:
+                    if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
+                        pInstance->SetData(TYPE_HODIR_HM_FAIL, 0);
                     break;
                 case EVENT_FLASH_FREEZE:
                     {

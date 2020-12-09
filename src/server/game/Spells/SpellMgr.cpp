@@ -3567,6 +3567,13 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->DurationIndex = 21;
     });
 
+    // Shatter Chest
+    ApplySpellFix({ 62501 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_TARGET_ANY;
+        spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_TARGET_RADIUS;
+    });
+
     // Ebon Plague
     ApplySpellFix({ 51735, 51734, 51726 }, [](SpellEntry* spellInfo)
     {
