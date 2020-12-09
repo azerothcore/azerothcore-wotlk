@@ -402,9 +402,8 @@ void WardenWin::RequestChecks()
     for (uint16 const checkId : _currentChecks)
     {
         WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
-        uint8 const type = check->Type;
-        buff << uint8(type ^ xorByte);
-        switch (type)
+        buff << uint8(check->Type ^ xorByte);
+        switch (check->Type)
         {
             case MEM_CHECK:
             {

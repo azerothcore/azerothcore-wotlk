@@ -62,6 +62,13 @@ void WardenCheckMgr::LoadWardenChecks()
 
         uint16 id               = fields[0].GetUInt16();
         uint8 checkType         = fields[1].GetUInt8();
+
+        if (checkType == LUA_EVAL_CHECK && id > 9999)
+        {
+            sLog->outError("sql.sql: Warden Lua check with id %u found in `warden_checks`. Lua checks may have four-digit IDs at most. Skipped.", id);
+            continue;
+        }
+
         std::string data        = fields[2].GetString();
         std::string checkResult = fields[3].GetString();
         uint32 address          = fields[4].GetUInt32();
@@ -75,21 +82,6 @@ void WardenCheckMgr::LoadWardenChecks()
 
         // Initialize action with default action from config
         wardenCheck.Action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
-
-        if (checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == DRIVER_CHECK)
-        {
-            wardenCheck.Data.SetHexStr(data.c_str());
-            int len = data.size() / 2;
-
-            if (wardenCheck.Data.GetNumBytes() < len)
-            {
-                uint8 temp[24];
-                memset(temp, 0, len);
-                memcpy(temp, wardenCheck.Data.AsByteArray().get(), wardenCheck.Data.GetNumBytes());
-                std::reverse(temp, temp + len);
-                wardenCheck.Data.SetBinary((uint8*)temp, len);
-            }
-        }
 
         if (checkType == MEM_CHECK || checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == PROC_CHECK)
         {
@@ -125,30 +117,50 @@ void WardenCheckMgr::LoadWardenChecks()
         else
             wardenCheck.Comment = comment;
 
-        if (checkType == LUA_EVAL_CHECK)
+        // Prepare check pools
+        switch (checkType)
         {
-            if (wardenCheck.Length > WARDEN_MAX_LUA_CHECK_LENGTH)
+            case MEM_CHECK:
+            case MODULE_CHECK:
             {
-                sLog->outError("sql.sql: Found over-long Lua check for Warden check with id %u in `warden_checks`. Max length is %u. Skipped.", id, WARDEN_MAX_LUA_CHECK_LENGTH);
-                continue;
+                MemChecksIdPool.push_back(id);
+                break;
             }
+            case LUA_EVAL_CHECK:
+            {
+                if (wardenCheck.Length > WARDEN_MAX_LUA_CHECK_LENGTH)
+                {
+                    sLog->outError("sql.sql: Found over-long Lua check for Warden check with id %u in `warden_checks`. Max length is %u. Skipped.", id, WARDEN_MAX_LUA_CHECK_LENGTH);
+                    continue;
+                }
 
-            std::string str = fmt::sprintf("%04u", id);
-            ASSERT(str.size() == 4);
-            std::copy(str.begin(), str.end(), wardenCheck.Str.begin());
-        }
+                std::string str = fmt::sprintf("%04u", id);
+                ASSERT(str.size() == 4);
+                std::copy(str.begin(), str.end(), wardenCheck.Str.begin());
 
-        if (checkType == MEM_CHECK || checkType == MODULE_CHECK)
-        {
-            MemChecksIdPool.push_back(id);
-        }
-        else if (checkType == LUA_EVAL_CHECK)
-        {
-            LuaChecksIdPool.push_back(id);
-        }
-        else
-        {
-            OtherChecksIdPool.push_back(id);
+                LuaChecksIdPool.push_back(id);
+                break;
+            }
+            default:
+            {
+                if (checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == DRIVER_CHECK)
+                {
+                    wardenCheck.Data.SetHexStr(data.c_str());
+                    int len = static_cast<int>(data.size()) / 2;
+
+                    if (wardenCheck.Data.GetNumBytes() < len)
+                    {
+                        uint8 temp[24];
+                        memset(temp, 0, len);
+                        memcpy(temp, wardenCheck.Data.AsByteArray().get(), wardenCheck.Data.GetNumBytes());
+                        std::reverse(temp, temp + len);
+                        wardenCheck.Data.SetBinary((uint8*)temp, len);
+                    }
+                }
+
+                OtherChecksIdPool.push_back(id);
+                break;
+            }
         }
 
         ++count;
