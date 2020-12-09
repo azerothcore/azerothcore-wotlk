@@ -102,16 +102,13 @@ class Warden
         virtual void InitializeModule() = 0;
         virtual void RequestHash() = 0;
         virtual void HandleHashResult(ByteBuffer &buff) = 0;
-        virtual void RequestData() = 0;
+        virtual void RequestChecks() = 0;
         virtual void HandleData(ByteBuffer &buff) = 0;
         bool ProcessLuaCheckResponse(std::string const& msg);
 
-        // If nullptr is passed, the default action from config is executed
-        void ApplyPenalty(WardenCheck const* check);
-
         void SendModuleToClient();
         void RequestModule();
-        void Update();
+        void Update(uint32 const diff);
         void DecryptData(uint8* buffer, uint32 length);
         void EncryptData(uint8* buffer, uint32 length);
 
@@ -119,7 +116,7 @@ class Warden
         static uint32 BuildChecksum(const uint8 *data, uint32 length);
 
         // If no check is passed, the default action from config is executed
-        std::string ApplyPenalty(uint16 checkFailed = 0);
+        void ApplyPenalty(uint16 checkFailed = 0);
 
     private:
         WorldSession* _session;
@@ -131,7 +128,6 @@ class Warden
         uint32 _checkTimer;                          // Timer for sending check requests
         uint32 _clientResponseTimer;                 // Timer for client response delay
         bool _dataSent;
-        uint32 _previousTimestamp;
         ClientWardenModule* _module;
         bool _initialized;
 };

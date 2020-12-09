@@ -189,11 +189,9 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
     _outputCrypto.Init(_outputKey);
 
     _initialized = true;
-
-    _previousTimestamp = World::GetGameTimeMS();
 }
 
-void WardenMac::RequestData()
+void WardenMac::RequestChecks()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Request data");

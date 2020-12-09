@@ -281,15 +281,15 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     if (lang != LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
         stripLineInvisibleChars(msg);
 
-    // pussywizard:
-    if (msg.length() > 255 || (lang != LANG_ADDON && msg.find("|0") != std::string::npos))
-        return;
-
     // Our Warden module also uses SendAddonMessage as a way to communicate Lua check results to the server, see if this is that
     if ((type == CHAT_MSG_GUILD) && (lang == LANG_ADDON) && _warden && _warden->ProcessLuaCheckResponse(msg))
     {
         return;
     }
+
+    // pussywizard:
+    if (msg.length() > 255 || (lang != LANG_ADDON && msg.find("|0") != std::string::npos))
+        return;
 
     if (!ignoreChecks)
     {

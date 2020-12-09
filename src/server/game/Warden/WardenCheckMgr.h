@@ -62,8 +62,6 @@ public:
     void LoadWardenChecks();
     void LoadWardenOverrides();
 
-    ACE_RW_Mutex _checkStoreLock;
-
 private:
     std::vector<WardenCheck> _checks;
     CheckContainer CheckStore;

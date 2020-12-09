@@ -146,7 +146,7 @@ void WardenWin::InitializeModule()
     Request.String_library2 = 0;
     Request.Function2 = 0x00419210;                         // 0x00400000 + 0x00419210 FrameScript::Execute
     Request.Function2_set = 1;
-    Request.CheckSumm2 = BuildChecksum(&Request.Unk2, 8);
+    Request.CheckSumm2 = BuildChecksum(&Request.Unk3, 8);
 
     Request.Command3 = WARDEN_SMSG_MODULE_INITIALIZE;
     Request.Size3 = 8;
@@ -156,6 +156,19 @@ void WardenWin::InitializeModule()
     Request.Function3 = 0x0046AE20;                         // 0x00400000 + 0x0046AE20 PerformanceCounter
     Request.Function3_set = 1;
     Request.CheckSumm3 = BuildChecksum(&Request.Unk5, 8);
+
+    EndianConvert(Request.Size1);
+    EndianConvert(Request.CheckSumm1);
+    EndianConvert(Request.Function1[0]);
+    EndianConvert(Request.Function1[1]);
+    EndianConvert(Request.Function1[2]);
+    EndianConvert(Request.Function1[3]);
+    EndianConvert(Request.Size2);
+    EndianConvert(Request.CheckSumm2);
+    EndianConvert(Request.Function2);
+    EndianConvert(Request.Size3);
+    EndianConvert(Request.CheckSumm3);
+    EndianConvert(Request.Function3);
 
     // Encrypt with warden RC4 key.
     EncryptData((uint8*)&Request, sizeof(WardenInitModuleRequest));
@@ -210,11 +223,9 @@ void WardenWin::HandleHashResult(ByteBuffer& buff)
     _outputCrypto.Init(_outputKey);
 
     _initialized = true;
-
-    _previousTimestamp = World::GetGameTimeMS();
 }
 
-void WardenWin::RequestData()
+void WardenWin::RequestChecks()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Request data");
@@ -237,23 +248,6 @@ void WardenWin::RequestData()
     // No pending checks
     if (_pendingChecks.empty())
     {
-        // Build check request
-        for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_LUA_CHECKS); ++i)
-        {
-            // If todo list is done break loop (will be filled on next Update() run)
-            if (_luaChecksTodo.empty())
-            {
-                break;
-            }
-
-            // Get check id from the end and remove it from todo
-            uint16 const id = _luaChecksTodo.back();
-            _luaChecksTodo.pop_back();
-
-            // Lua checks must be always in front
-            _currentChecks.push_front(id);
-        }
-
         for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_MEM_CHECKS); ++i)
         {
             // If todo list is done break loop (will be filled on next Update() run)
@@ -293,22 +287,37 @@ void WardenWin::RequestData()
             _currentChecks.push_back(id);
         }
 
+        // Build check request
+        for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_LUA_CHECKS); ++i)
+        {
+            // If todo list is done break loop (will be filled on next Update() run)
+            if (_luaChecksTodo.empty())
+            {
+                break;
+            }
+
+            // Get check id from the end and remove it from todo
+            uint16 const id = _luaChecksTodo.back();
+            _luaChecksTodo.pop_back();
+
+            // Lua checks must be always in front
+            _currentChecks.push_front(id);
+        }
         // avoid double checks
         _currentChecks.unique();
     }
     else
     {
-        for (uint16 const pendingCheckID : _pendingChecks)
-            _currentChecks.push_back(pendingCheckID);
-
         bool hasLuaChecks = false;
-        for (uint16 const checkId : _currentChecks)
+        for (uint16 const checkId : _pendingChecks)
         {
-            if (std::find(sWardenCheckMgr->LuaChecksIdPool.begin(), sWardenCheckMgr->LuaChecksIdPool.end(), checkId) != sWardenCheckMgr->LuaChecksIdPool.end())
+            WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
+            if (!hasLuaChecks && check->Type == LUA_EVAL_CHECK)
             {
                 hasLuaChecks = true;
-                break;
             }
+
+            _currentChecks.push_back(checkId);
         }
 
         // Always include lua checks
@@ -355,17 +364,9 @@ void WardenWin::RequestData()
     ByteBuffer buff;
     buff << uint8(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
 
-    ACE_READ_GUARD(ACE_RW_Mutex, g, sWardenCheckMgr->_checkStoreLock);
-
     for (uint16 const checkId : _currentChecks)
     {
         WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
-        // This should never happen
-        if (!check)
-        {
-            continue;
-        }
-
         switch (check->Type)
         {
             case LUA_EVAL_CHECK:
@@ -388,7 +389,7 @@ void WardenWin::RequestData()
         }
     }
 
-    uint8 xorByte = _inputKey[0];
+    uint8 const xorByte = _inputKey[0];
 
     // Add TIMING_CHECK
     buff << uint8(0x00);
@@ -399,12 +400,6 @@ void WardenWin::RequestData()
     for (uint16 const checkId : _currentChecks)
     {
         WardenCheck* check = sWardenCheckMgr->GetWardenDataById(checkId);
-        // This should never happen
-        if (!check)
-        {
-            continue;
-        }
-
         uint8 const type = check->Type;
         buff << uint8(type ^ xorByte);
         switch (type)
@@ -495,6 +490,13 @@ void WardenWin::HandleData(ByteBuffer& buff)
     uint32 Checksum;
     buff >> Checksum;
 
+    if (Length != (buff.size() - buff.rpos()))
+    {
+        buff.rfinish();
+        ApplyPenalty();
+        return;
+    }
+
     if (!IsValidCheckSum(Checksum, buff.contents() + buff.rpos(), Length))
     {
         buff.rpos(buff.wpos());
@@ -533,20 +535,12 @@ void WardenWin::HandleData(ByteBuffer& buff)
 #endif
     }
 
-    ACE_READ_GUARD(ACE_RW_Mutex, g, sWardenCheckMgr->_checkStoreLock);
-
     uint16 checkFailed = 0;
 
     for (uint16 const checkId : _currentChecks)
     {
         WardenCheck* rd = sWardenCheckMgr->GetWardenDataById(checkId);
         WardenCheckResult* rs = sWardenCheckMgr->GetWardenResultById(checkId);
-
-        // Should never happen
-        if (!rd || !rs)
-        {
-            continue;
-        }
 
         uint8 const type = rd->Type;
         switch (type)

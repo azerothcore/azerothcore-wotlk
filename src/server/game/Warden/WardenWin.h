@@ -69,7 +69,7 @@ public:
     void InitializeModule();
     void RequestHash();
     void HandleHashResult(ByteBuffer& buff);
-    void RequestData();
+    void RequestChecks();
     void HandleData(ByteBuffer& buff);
 
 private:

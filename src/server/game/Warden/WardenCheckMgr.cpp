@@ -108,7 +108,7 @@ void WardenCheckMgr::LoadWardenChecks()
         }
         else if (checkType == LUA_EVAL_CHECK)
         {
-            LuaChecksIdPool.emplace_back(id);
+            LuaChecksIdPool.push_back(id);
         }
         else
         {
@@ -192,8 +192,6 @@ void WardenCheckMgr::LoadWardenOverrides()
     }
 
     uint32 count = 0;
-
-    ACE_WRITE_GUARD(ACE_RW_Mutex, g, _checkStoreLock);
 
     do
     {

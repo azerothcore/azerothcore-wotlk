@@ -386,6 +386,9 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         delete movementPacket;
     }
 
+    if (m_Socket && !m_Socket->IsClosed() && _warden)
+        _warden->Update(diff);
+
     if (m_Socket && !m_Socket->IsClosed())
         ProcessQueryCallbacks();
 
@@ -394,9 +397,6 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         time_t currTime = time(nullptr);
         if (ShouldLogOut(currTime) && !m_playerLoading)
             LogoutPlayer(true);
-
-        if (m_Socket && !m_Socket->IsClosed() && _warden)
-            _warden->Update();
 
         if (m_Socket && m_Socket->IsClosed())
         {

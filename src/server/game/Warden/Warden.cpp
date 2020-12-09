@@ -22,7 +22,7 @@
 #include "SharedDefines.h"
 
 Warden::Warden() : _session(nullptr), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
-    _dataSent(false), _previousTimestamp(0), _module(nullptr), _initialized(false)
+    _dataSent(false), _module(nullptr), _initialized(false)
 {
     memset(_inputKey, 0, sizeof(_inputKey));
     memset(_outputKey, 0, sizeof(_outputKey));
@@ -79,6 +79,8 @@ void Warden::RequestModule()
     memcpy(request.ModuleKey, _module->Key, 16);
     request.Size = _module->CompressedSize;
 
+    EndianConvert(request.Size);
+
     // Encrypt with warden RC4 key.
     EncryptData((uint8*)&request, sizeof(WardenModuleUse));
 
@@ -87,32 +89,30 @@ void Warden::RequestModule()
     _session->SendPacket(&pkt);
 }
 
-void Warden::Update()
+void Warden::Update(uint32 const diff)
 {
-    if (_initialized)
+    if (!_initialized)
     {
-        uint32 currentTimestamp = World::GetGameTimeMS();
-        uint32 diff = getMSTimeDiff(_previousTimestamp, currentTimestamp);
-        _previousTimestamp = currentTimestamp;
+        return;
+    }
 
-        if (_dataSent)
+    if (_dataSent)
+    {
+        uint32 maxClientResponseDelay = sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_RESPONSE_DELAY);
+        if (maxClientResponseDelay > 0)
         {
-            uint32 maxClientResponseDelay = sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_RESPONSE_DELAY);
-            if (maxClientResponseDelay > 0)
-            {
-                if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
-                    _session->KickPlayer("clientResponseTimer > maxClientResponseDelay");
-                else
-                    _clientResponseTimer += diff;
-            }
-        }
-        else
-        {
-            if (diff >= _checkTimer)
-                RequestData();
+            if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
+                _session->KickPlayer("clientResponseTimer > maxClientResponseDelay");
             else
-                _checkTimer -= diff;
+                _clientResponseTimer += diff;
         }
+    }
+    else
+    {
+        if (diff >= _checkTimer)
+            RequestChecks();
+        else
+            _checkTimer -= diff;
     }
 }
 
@@ -173,7 +173,7 @@ uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
     return checkSum;
 }
 
-std::string Warden::ApplyPenalty(uint16 checkFailed /*= 0*/)
+void Warden::ApplyPenalty(uint16 checkFailed /*= 0*/)
 {
     WardenActions action;
     WardenCheck const* checkData = sWardenCheckMgr->GetWardenDataById(checkFailed);
@@ -183,7 +183,7 @@ std::string Warden::ApplyPenalty(uint16 checkFailed /*= 0*/)
     else
         action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
 
-    std::string banReason = "Anticheat violation";
+    std::string banReason = "Warden violation ";
     bool longBan = false; // 14d = 1209600s
     if (checkData)
     {
@@ -193,26 +193,29 @@ std::string Warden::ApplyPenalty(uint16 checkFailed /*= 0*/)
     switch (action)
     {
         case WARDEN_ACTION_LOG:
-            return "None";
             break;
         case WARDEN_ACTION_KICK:
-            _session->KickPlayer("WARDEN_ACTION_KICK");
-            return "Kick";
+        {
+            banReason = "WARDEN_ACTION_KICK " + banReason;
+            _session->KickPlayer(banReason);
             break;
+        }
         case WARDEN_ACTION_BAN:
-            {
-                std::stringstream duration;
-                duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
-                std::string accountName;
-                AccountMgr::GetName(_session->GetAccountId(), accountName);
-                sBan->BanAccount(accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), banReason, "Server");
-
-                return "Ban";
-            }
-        default:
+        {
+            banReason = "WARDEN_ACTION_BAN " + banReason;
+            std::stringstream duration;
+            duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
+            std::string accountName;
+            AccountMgr::GetName(_session->GetAccountId(), accountName);
+            sBan->BanAccount(accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), banReason, "Server");
             break;
+        }
     }
-    return "Undefined";
+
+    if (!banReason.empty())
+    {
+        sLog->outDebug(LOG_FILTER_WARDEN, banReason.c_str());
+    }
 }
 
 bool Warden::ProcessLuaCheckResponse(std::string const& msg)
@@ -242,59 +245,15 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
         WardenCheck const& check = sWardenCheckMgr->GetCheckData(id);
         if (check.Type == LUA_EVAL_CHECK)
         {
-            /* char const* penalty =  */ ApplyPenalty(&check);
+            /* char const* penalty =  */ ApplyPenalty(id);
             sLog->outString("warden %s failed Warden check %u", _session->GetPlayerInfo().c_str(), id /* EnumUtils::ToConstant(check.Type), penalty*/);
             return true;
         }
     }
 
-    /* char const* penalty =  */ApplyPenalty(nullptr);
+    /* char const* penalty =  */ApplyPenalty(0);
     sLog->outString("warden: %s sent bogus Lua check response for Warden", _session->GetPlayerInfo().c_str()/* , penalty */);
     return true;
-}
-
-void Warden::ApplyPenalty(WardenCheck const* check)
-{
-    WardenActions action;
-
-    if (check)
-    {
-        action = check->Action;
-    }
-    else
-    {
-        action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
-    }
-
-    switch (action)
-    {
-        case WARDEN_ACTION_KICK:
-            _session->KickPlayer("Warden::Penalty");
-            break;
-        case WARDEN_ACTION_BAN:
-        {
-            std::string accountName;
-            AccountMgr::GetName(_session->GetAccountId(), accountName);
-            std::stringstream banReason;
-            banReason << "Warden Anticheat Violation";
-            // Check can be NULL, for example if the client sent a wrong signature in the warden packet (CHECKSUM FAIL)
-            if (check)
-            {
-                banReason << ": " << check->Comment << " (CheckId: " << check->CheckId << ")";
-            }
-
-            std::stringstream duration;
-            duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
-
-            sBan->BanAccount(accountName, duration.str(), banReason.str(),"Server");
-            break;
-        }
-        case WARDEN_ACTION_LOG:
-        default:
-            return/*  "None" */;
-    }
-
-    // return EnumUtils::ToTitle(action);
 }
 
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
