@@ -508,7 +508,7 @@ public:
                 }
         }
 
-        void KilledUnit(Unit* who) override
+        void KilledUnit(Unit* /*who*/) override
         {
             Talk(TEXT_SLAY);
         }
