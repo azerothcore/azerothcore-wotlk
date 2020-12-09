@@ -45,9 +45,9 @@ public:
 
     void addThreatPercent(int32 percent);
 
-    float getThreat() const { return iThreat; }
+    [[nodiscard]] float getThreat() const { return iThreat; }
 
-    bool isOnline() const { return iOnline; }
+    [[nodiscard]] bool isOnline() const { return iOnline; }
 
     // used for temporary setting a threat and reducting it later again.
     // the threat modification is stored
@@ -85,7 +85,7 @@ public:
 
     //=================================================
 
-    uint64 getUnitGuid() const { return iUnitGuid; }
+    [[nodiscard]] uint64 getUnitGuid() const { return iUnitGuid; }
 
     //=================================================
     // reference is not needed anymore. realy delete it !
@@ -99,13 +99,13 @@ public:
     //=================================================
 
     // Tell our refTo (target) object that we have a link
-    void targetObjectBuildLink();
+    void targetObjectBuildLink() override;
 
     // Tell our refTo (taget) object, that the link is cut
-    void targetObjectDestroyLink();
+    void targetObjectDestroyLink() override;
 
     // Tell our refFrom (source) object, that the link is cut (Target destroyed)
-    void sourceObjectDestroyLink();
+    void sourceObjectDestroyLink() override;
 private:
     // Inform the source, that the status of that reference was changed
     void fireStatusChanged(ThreatRefStatusChangeEvent& threatRefStatusChangeEvent);
@@ -128,7 +128,7 @@ class ThreatContainer
 public:
     typedef std::list<HostileReference*> StorageType;
 
-    ThreatContainer(): iDirty(false) { }
+    ThreatContainer() { }
 
     ~ThreatContainer() { clearReferences(); }
 
@@ -140,21 +140,21 @@ public:
 
     void setDirty(bool isDirty) { iDirty = isDirty; }
 
-    bool isDirty() const { return iDirty; }
+    [[nodiscard]] bool isDirty() const { return iDirty; }
 
-    bool empty() const
+    [[nodiscard]] bool empty() const
     {
         return iThreatList.empty();
     }
 
-    HostileReference* getMostHated() const
+    [[nodiscard]] HostileReference* getMostHated() const
     {
-        return iThreatList.empty() ? NULL : iThreatList.front();
+        return iThreatList.empty() ? nullptr : iThreatList.front();
     }
 
     HostileReference* getReferenceByTarget(Unit* victim) const;
 
-    StorageType const& getThreatList() const { return iThreatList; }
+    [[nodiscard]] StorageType const& getThreatList() const { return iThreatList; }
 
 private:
     void remove(HostileReference* hostileRef)
@@ -173,7 +173,7 @@ private:
     void update();
 
     StorageType iThreatList;
-    bool iDirty;
+    bool iDirty{false};
 };
 
 //=================================================
@@ -199,16 +199,16 @@ public:
 
     float getThreatWithoutTemp(Unit* victim, bool alsoSearchOfflineList = false);
 
-    bool isThreatListEmpty() const { return iThreatContainer.empty(); }
-    bool areThreatListsEmpty() const { return iThreatContainer.empty() && iThreatOfflineContainer.empty(); }
+    [[nodiscard]] bool isThreatListEmpty() const { return iThreatContainer.empty(); }
+    [[nodiscard]] bool areThreatListsEmpty() const { return iThreatContainer.empty() && iThreatOfflineContainer.empty(); }
 
     void processThreatEvent(ThreatRefStatusChangeEvent* threatRefStatusChangeEvent);
 
     bool isNeedUpdateToClient(uint32 time);
 
-    HostileReference* getCurrentVictim() const { return iCurrentVictim; }
+    [[nodiscard]] HostileReference* getCurrentVictim() const { return iCurrentVictim; }
 
-    Unit* GetOwner() const { return iOwner; }
+    [[nodiscard]] Unit* GetOwner() const { return iOwner; }
 
     Unit* getHostilTarget();
 
@@ -229,10 +229,8 @@ public:
         if (threatList.empty())
             return;
 
-        for (ThreatContainer::StorageType::iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+        for (auto ref : threatList)
         {
-            HostileReference* ref = (*itr);
-
             if (predicate(ref->getTarget()))
             {
                 ref->setThreat(0);
@@ -243,8 +241,8 @@ public:
 
     // methods to access the lists from the outside to do some dirty manipulation (scriping and such)
     // I hope they are used as little as possible.
-    ThreatContainer::StorageType const& getThreatList() const { return iThreatContainer.getThreatList(); }
-    ThreatContainer::StorageType const& getOfflineThreatList() const { return iThreatOfflineContainer.getThreatList(); }
+    [[nodiscard]] ThreatContainer::StorageType const& getThreatList() const { return iThreatContainer.getThreatList(); }
+    [[nodiscard]] ThreatContainer::StorageType const& getOfflineThreatList() const { return iThreatOfflineContainer.getThreatList(); }
     ThreatContainer& getOnlineContainer() { return iThreatContainer; }
     ThreatContainer& getOfflineContainer() { return iThreatOfflineContainer; }
 private:

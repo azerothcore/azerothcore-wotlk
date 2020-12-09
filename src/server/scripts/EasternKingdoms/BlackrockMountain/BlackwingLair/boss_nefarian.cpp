@@ -156,7 +156,7 @@ public:
     {
         boss_victor_nefariusAI(Creature* creature) : BossAI(creature, BOSS_NEFARIAN) { }
 
-        void Reset()
+        void Reset() override
         {
             SpawnedAdds = 0;
 
@@ -184,9 +184,9 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const { return me->IsVisible(); }
+        bool CanAIAttack(const Unit*  /*target*/) const override { return me->IsVisible(); }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             Reset();
         }
@@ -208,7 +208,7 @@ public:
             events.ScheduleEvent(EVENT_SPAWN_ADD, 10000);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             if (summon->GetEntry() != NPC_NEFARIAN)
             {
@@ -219,9 +219,9 @@ public:
             }
         }
 
-        void JustSummoned(Creature* /*summon*/) { }
+        void JustSummoned(Creature* /*summon*/) override { }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if ( type == 1 && data == 1)
             {
@@ -233,7 +233,7 @@ public:
                 events.ScheduleEvent(EVENT_SUCCESS_1, 5000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
             {
@@ -363,7 +363,7 @@ public:
             }
         }
 
-        void sGossipSelect(Player* player, uint32 sender, uint32 action)
+        void sGossipSelect(Player* player, uint32 sender, uint32 action) override
         {
             if (sender == GOSSIP_ID && action == GOSSIP_OPTION_ID)
             {
@@ -382,7 +382,7 @@ public:
         uint32 SpawnedAdds;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_victor_nefariusAI>(creature);
     }
@@ -397,19 +397,19 @@ public:
     {
         boss_nefarianAI(Creature* creature) : BossAI(creature, BOSS_NEFARIAN) { }
 
-        void Reset()
+        void Reset() override
         {
             Phase3 = false;
             canDespawn = false;
             DespawnTimer = 30000;
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             canDespawn = true;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SHADOWFLAME, 12000);
             events.ScheduleEvent(EVENT_FEAR, urand(25000, 35000));
@@ -420,13 +420,13 @@ public:
             Talk(SAY_RANDOM);
         }
 
-        void JustDied(Unit* /*Killer*/)
+        void JustDied(Unit* /*Killer*/) override
         {
             _JustDied();
             Talk(SAY_DEATH);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (rand() % 5)
                 return;
@@ -434,7 +434,7 @@ public:
             Talk(SAY_SLAY, victim);
         }
 
-        void MovementInform(uint32 type, uint32  /*id*/)
+        void MovementInform(uint32 type, uint32  /*id*/) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -447,7 +447,7 @@ public:
                 AttackStart(me->GetVictim());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (canDespawn && DespawnTimer <= diff)
             {
@@ -578,7 +578,7 @@ public:
 
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_nefarianAI>(creature);
     }

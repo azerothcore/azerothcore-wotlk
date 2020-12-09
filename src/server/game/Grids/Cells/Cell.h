@@ -17,7 +17,7 @@ class WorldObject;
 
 struct CellArea
 {
-    CellArea() {}
+    CellArea() = default;
     CellArea(CellCoord low, CellCoord high) : low_bound(low), high_bound(high) {}
 
     bool operator!() const { return low_bound == high_bound; }
@@ -45,26 +45,26 @@ struct Cell
         y = data.Part.grid_y * MAX_NUMBER_OF_CELLS + data.Part.cell_y;
     }
 
-    bool DiffCell(const Cell& cell) const
+    [[nodiscard]] bool DiffCell(const Cell& cell) const
     {
         return(data.Part.cell_x != cell.data.Part.cell_x ||
                data.Part.cell_y != cell.data.Part.cell_y);
     }
 
-    bool DiffGrid(const Cell& cell) const
+    [[nodiscard]] bool DiffGrid(const Cell& cell) const
     {
         return(data.Part.grid_x != cell.data.Part.grid_x ||
                data.Part.grid_y != cell.data.Part.grid_y);
     }
 
-    uint32 CellX() const { return data.Part.cell_x; }
-    uint32 CellY() const { return data.Part.cell_y; }
-    uint32 GridX() const { return data.Part.grid_x; }
-    uint32 GridY() const { return data.Part.grid_y; }
-    bool NoCreate() const { return data.Part.nocreate; }
+    [[nodiscard]] uint32 CellX() const { return data.Part.cell_x; }
+    [[nodiscard]] uint32 CellY() const { return data.Part.cell_y; }
+    [[nodiscard]] uint32 GridX() const { return data.Part.grid_x; }
+    [[nodiscard]] uint32 GridY() const { return data.Part.grid_y; }
+    [[nodiscard]] bool NoCreate() const { return data.Part.nocreate; }
     void SetNoCreate() { data.Part.nocreate = 1; }
 
-    CellCoord GetCellCoord() const
+    [[nodiscard]] CellCoord GetCellCoord() const
     {
         return CellCoord(
                    data.Part.grid_x * MAX_NUMBER_OF_CELLS + data.Part.cell_x,

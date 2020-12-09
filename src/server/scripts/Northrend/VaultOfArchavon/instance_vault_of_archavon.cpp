@@ -30,7 +30,7 @@ public:
         {
         }
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             memset(&bossGUIDs, 0, sizeof(bossGUIDs));
@@ -42,7 +42,7 @@ public:
             stoned = false;
         }
 
-        void OnPlayerEnter(Player* )
+        void OnPlayerEnter(Player* ) override
         {
             if (stoned)
             {
@@ -55,7 +55,7 @@ public:
             }
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             checkTimer += diff;
             if (checkTimer >= 60000)
@@ -115,7 +115,7 @@ public:
             }
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS)
@@ -128,7 +128,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -147,21 +147,21 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier) const
+        uint64 GetData64(uint32 identifier) const override
         {
             if (identifier < MAX_ENCOUNTER)
                 return bossGUIDs[identifier];
             return 0;
         }
 
-        uint32 GetData(uint32 identifier) const
+        uint32 GetData(uint32 identifier) const override
         {
             if (identifier == DATA_STONED)
                 return (uint32)stoned;
             return 0;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -196,7 +196,7 @@ public:
             }
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/) override
         {
             switch (criteria_id)
             {
@@ -218,7 +218,7 @@ public:
             return false;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -229,7 +229,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -269,7 +269,7 @@ public:
         uint64 bossGUIDs[MAX_ENCOUNTER];
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_vault_of_archavon_InstanceMapScript(map);
     }

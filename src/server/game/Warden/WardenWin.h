@@ -62,7 +62,7 @@ class WardenWin : public Warden
 {
 public:
     WardenWin();
-    ~WardenWin();
+    ~WardenWin() override;
 
     void Init(WorldSession* session, BigNumber* K);
     ClientWardenModule* GetModuleForClient();

@@ -20,7 +20,7 @@ class WardenMac : public Warden
 {
 public:
     WardenMac();
-    ~WardenMac();
+    ~WardenMac() override;
 
     void Init(WorldSession* session, BigNumber* k);
     ClientWardenModule* GetModuleForClient();
