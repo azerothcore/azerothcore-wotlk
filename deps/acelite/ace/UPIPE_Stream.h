@@ -41,8 +41,6 @@ public:
 
   typedef ACE_Stream<ACE_SYNCH> MT_Stream;
 
-  // = Initialization and Termination.
-
   ACE_UPIPE_Stream (void);
 
   virtual ~ACE_UPIPE_Stream (void);

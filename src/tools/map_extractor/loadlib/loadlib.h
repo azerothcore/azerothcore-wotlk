@@ -48,7 +48,8 @@ union u_map_fcc
 //
 struct file_MVER
 {
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
@@ -56,15 +57,16 @@ struct file_MVER
     uint32 ver;
 };
 
-class FileLoader{
-    uint8  *data;
+class FileLoader
+{
+    uint8*  data;
     uint32  data_size;
 public:
     virtual bool prepareLoadedData();
-    uint8 *GetData()     {return data;}
+    uint8* GetData()     {return data;}
     uint32 GetDataSize() {return data_size;}
 
-    file_MVER *version;
+    file_MVER* version;
     FileLoader();
     ~FileLoader();
     bool loadFile(std::string const& filename, bool log = true);
