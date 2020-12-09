@@ -101,17 +101,25 @@ void Warden::Update(uint32 const diff)
         if (maxClientResponseDelay > 0)
         {
             if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
-                _session->KickPlayer("clientResponseTimer > maxClientResponseDelay");
+            {
+                _session->KickPlayer("Warden: clientResponseTimer > maxClientResponseDelay (Warden::Update)");
+            }
             else
+            {
                 _clientResponseTimer += diff;
+            }
         }
     }
     else
     {
         if (diff >= _checkTimer)
+        {
             RequestChecks();
+        }
         else
+        {
             _checkTimer -= diff;
+        }
     }
 }
 
@@ -167,7 +175,9 @@ uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
     SHA1(data, length, hash.bytes.bytes);
     uint32 checkSum = 0;
     for (uint8 i = 0; i < 5; ++i)
+    {
         checkSum = checkSum ^ hash.ints.ints[i];
+    }
 
     return checkSum;
 }
