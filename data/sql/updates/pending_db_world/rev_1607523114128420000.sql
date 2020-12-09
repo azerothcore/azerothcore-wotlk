@@ -1,0 +1,36 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1607523114128420000');
+
+UPDATE `game_tele` SET `position_x`=3677.532959, `position_y`=2166.696777, `position_z`=35.807980, `orientation`=2.301083 WHERE `id`=455; -- Azjol-Nerub
+
+DELETE FROM `game_tele` WHERE `id`=1435;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1435, -8779.900391, 834.348816, 94.680130, 0.653013, 0, 'TheStockade');
+DELETE FROM `game_tele` WHERE `id`=1436;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1436, 3643.309082, 2036.508545, 1.787417, 4.339186, 571, 'AhnKahet');
+DELETE FROM `game_tele` WHERE `id`=1437;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1437, -8750.759766, -4442.196777, -199.259674, 4.376938, 1, 'TheCullingOfStratholme');
+DELETE FROM `game_tele` WHERE `id`=1438;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1438, 6952.303711, -4419.976074, 450.077667, 0.807518, 571, 'GundrakDungeon');
+DELETE FROM `game_tele` WHERE `id`=1439;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1439, 9182.918945, -1384.819336, 1110.209961, 5.577789, 571, 'HallsOfLightning');
+DELETE FROM `game_tele` WHERE `id`=1440;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1440, 8921.905273, -993.503479, 1039.410278, 1.552629, 571, 'HallsOfStone');
+DELETE FROM `game_tele` WHERE `id`=1441;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1441, 5630.444824, 1994.013184, 798.058777, 4.587561, 571, 'HallsOfReflection');
+DELETE FROM `game_tele` WHERE `id`=1442;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1442, 5598.744629, 2015.848999, 798.041748, 3.810007, 571, 'PitOfSaron');
+DELETE FROM `game_tele` WHERE `id`=1443;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1443, 3600.503174, 197.339737, -113.760269, 5.299053, 571, 'RubySanctum');
+DELETE FROM `game_tele` WHERE `id`=1444;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1444, 3859.444580, 6989.848145, 152.040604, 5.796354, 571, 'EyeOfEternity');
+DELETE FROM `game_tele` WHERE `id`=1445;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1445, 5666.252930, 2009.196899, 798.041443, 5.431836, 571, 'ForgeOfSouls');
+DELETE FROM `game_tele` WHERE `id`=1446;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1446, 3893.507568, 6985.326172, 69.487663, 6.278975, 571, 'TheNexusDungeon');
+DELETE FROM `game_tele` WHERE `id`=1447;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1447, 3457.111816, 262.394165, -113.819344, 3.282578, 571, 'ObsidianSanctum');
+DELETE FROM `game_tele` WHERE `id`=1448;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1448, 3879.958740, 6984.616211, 106.3120190, 3.196693, 571, 'Oculus');
+DELETE FROM `game_tele` WHERE `id`=1449;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1449, 8515.682617, 716.982239, 558.247864, 1.573150, 571, 'TrialOfTheCrusader');
+DELETE FROM `game_tele` WHERE `id`=1450;
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1450, 9327.247070, -1114.638550, 1245.147095, 0.002312, 571, 'UlduarRaid');
