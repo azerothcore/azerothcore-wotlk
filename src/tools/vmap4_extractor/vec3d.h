@@ -85,12 +85,12 @@ public:
         return *this;
     }
 
-    float lengthSquared() const
+    [[nodiscard]] float lengthSquared() const
     {
         return x * x + y * y + z * z;
     }
 
-    float length() const
+    [[nodiscard]] float length() const
     {
         return sqrt(x * x + y * y + z * z);
     }
@@ -192,12 +192,12 @@ public:
         return *this;
     }
 
-    float lengthSquared() const
+    [[nodiscard]] float lengthSquared() const
     {
         return x * x + y * y;
     }
 
-    float length() const
+    [[nodiscard]] float length() const
     {
         return sqrt(x * x + y * y);
     }

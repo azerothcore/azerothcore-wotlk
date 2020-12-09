@@ -34,7 +34,7 @@ class boss_pandemonius : public CreatureScript
 public:
     boss_pandemonius() : CreatureScript("boss_pandemonius") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_pandemoniusAI(creature);
     }
@@ -45,13 +45,13 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             VoidBlastCounter = 0;
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             me->SetInCombatWithZone();
 
@@ -61,18 +61,18 @@ public:
             events.ScheduleEvent(EVENT_VOID_BLAST, urand(8000, 23000));
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
