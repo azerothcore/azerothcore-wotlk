@@ -139,7 +139,7 @@ void WardenWin::InitializeModule()
     Request.Function1[1] = 0x000218C0;                      // 0x00400000 + 0x000218C0 SFileGetFileSize
     Request.Function1[2] = 0x00022530;                      // 0x00400000 + 0x00022530 SFileReadFile
     Request.Function1[3] = 0x00022910;                      // 0x00400000 + 0x00022910 SFileCloseFile
-    Request.CheckSumm1 = BuildChecksum(&Request.Unk1, 20);
+    Request.CheckSumm1 = BuildChecksum(&Request.Unk1, SHA_DIGEST_LENGTH);
 
     Request.Command2 = WARDEN_SMSG_MODULE_INITIALIZE;
     Request.Size2 = 8;
@@ -204,7 +204,7 @@ void WardenWin::HandleHashResult(ByteBuffer& buff)
     buff.rpos(buff.wpos());
 
     // Verify key
-    if (memcmp(buff.contents() + 1, Module.ClientKeySeedHash, 20) != 0)
+    if (memcmp(buff.contents() + 1, Module.ClientKeySeedHash, SHA_DIGEST_LENGTH) != 0)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_WARDEN, "Request hash reply: failed");
@@ -234,73 +234,48 @@ void WardenWin::RequestChecks()
 #endif
 
     // If all checks were done, fill the todo list again
-    if (_memChecksTodo.empty())
-        _memChecksTodo.assign(sWardenCheckMgr->MemChecksIdPool.begin(), sWardenCheckMgr->MemChecksIdPool.end());
-
-    if (_otherChecksTodo.empty())
-        _otherChecksTodo.assign(sWardenCheckMgr->OtherChecksIdPool.begin(), sWardenCheckMgr->OtherChecksIdPool.end());
-
-    if (_luaChecksTodo.empty())
-        _luaChecksTodo.assign(sWardenCheckMgr->LuaChecksIdPool.begin(), sWardenCheckMgr->LuaChecksIdPool.end());
+    for (uint8 i = 0; i < MAX_WARDEN_CHECK_TYPES; ++i)
+    {
+        if (_ChecksTodo[i].empty())
+            _ChecksTodo[i].assign(sWardenCheckMgr->CheckIdPool[i].begin(), sWardenCheckMgr->CheckIdPool[i].end());
+    }
 
     _serverTicks = World::GetGameTimeMS();
-
-    _currentChecks.clear();
+    _CurrentChecks.clear();
 
     // No pending checks
-    if (_pendingChecks.empty())
+    if (_PendingChecks.empty())
     {
-        for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_MEM_CHECKS); ++i)
+        for (uint8 checkType = 0; checkType < MAX_WARDEN_CHECK_TYPES; ++checkType)
         {
-            // If todo list is done break loop (will be filled on next Update() run)
-            if (_memChecksTodo.empty())
+            for (uint32 y = 0; y < sWorld->getIntConfig(GetMaxWardenChecksForType(checkType)); ++y)
             {
-                break;
+                // If todo list is done break loop (will be filled on next Update() run)
+                if (_ChecksTodo[checkType].empty())
+                {
+                    break;
+                }
+
+                // Get check id from the end and remove it from todo
+                uint16 const id = _ChecksTodo[checkType].back();
+                _ChecksTodo[checkType].pop_back();
+
+                // Insert check to queue
+                if (checkType == WARDEN_CHECK_LUA_TYPE)
+                {
+                    _CurrentChecks.push_front(id);
+                }
+                else
+                {
+                    _CurrentChecks.push_back(id);
+                }
             }
-
-            // Get check id from the end and remove it from todo
-            uint16 const id = _memChecksTodo.back();
-            _memChecksTodo.pop_back();
-            _currentChecks.push_back(id);
-        }
-
-        for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_OTHER_CHECKS); ++i)
-        {
-            // If todo list is done break loop (will be filled on next Update() run)
-            if (_otherChecksTodo.empty())
-            {
-                break;
-            }
-
-            // Get check id from the end and remove it from todo
-            uint16 const id = _otherChecksTodo.back();
-            _otherChecksTodo.pop_back();
-
-            _currentChecks.push_back(id);
-        }
-
-        // LUA checks must be always added
-        // Build check request
-        for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_LUA_CHECKS); ++i)
-        {
-            // If todo list is done break loop (will be filled on next Update() run)
-            if (_luaChecksTodo.empty())
-            {
-                break;
-            }
-
-            // Get check id from the end and remove it from todo
-            uint16 const id = _luaChecksTodo.back();
-            _luaChecksTodo.pop_back();
-
-            // Lua checks must be always in front
-            _currentChecks.push_front(id);
         }
     }
     else
     {
         bool hasLuaChecks = false;
-        for (uint16 const checkId : _pendingChecks)
+        for (uint16 const checkId : _PendingChecks)
         {
             WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
             if (!hasLuaChecks && check->Type == LUA_EVAL_CHECK)
@@ -308,26 +283,26 @@ void WardenWin::RequestChecks()
                 hasLuaChecks = true;
             }
 
-            _currentChecks.push_back(checkId);
+            _CurrentChecks.push_back(checkId);
         }
 
         // Always include lua checks
         if (!hasLuaChecks)
         {
-            for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_LUA_CHECKS); ++i)
+            for (uint32 i = 0; i < sWorld->getIntConfig(GetMaxWardenChecksForType(WARDEN_CHECK_LUA_TYPE)); ++i)
             {
                 // If todo list is done break loop (will be filled on next Update() run)
-                if (_luaChecksTodo.empty())
+                if (_ChecksTodo[WARDEN_CHECK_LUA_TYPE].empty())
                 {
                     break;
                 }
 
                 // Get check id from the end and remove it from todo
-                uint16 const id = _luaChecksTodo.back();
-                _luaChecksTodo.pop_back();
+                uint16 const id = _ChecksTodo[WARDEN_CHECK_LUA_TYPE].back();
+                _ChecksTodo[WARDEN_CHECK_LUA_TYPE].pop_back();
 
                 // Lua checks must be always in front
-                _currentChecks.push_front(id);
+                _CurrentChecks.push_front(id);
             }
         }
     }
@@ -335,14 +310,14 @@ void WardenWin::RequestChecks()
     // Filter too high checks queue
     // Filtered checks will get passed in next checks
     uint16 expectedSize = 4;
-    _pendingChecks.clear();
-    acore::Containers::EraseIf(_currentChecks,
+    _PendingChecks.clear();
+    acore::Containers::EraseIf(_CurrentChecks,
         [this, &expectedSize](uint16 id)
         {
             uint16 const thisSize = GetCheckPacketSize(sWardenCheckMgr->GetWardenDataById(id));
             if ((expectedSize + thisSize) > 500) // warden packets are truncated to 512 bytes clientside
             {
-                _pendingChecks.push_back(id);
+                _PendingChecks.push_back(id);
                 return true;
             }
             expectedSize += thisSize;
@@ -350,12 +325,10 @@ void WardenWin::RequestChecks()
         }
     );
 
-    _pendingChecks.unique();
-
     ByteBuffer buff;
     buff << uint8(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
 
-    for (uint16 const checkId : _currentChecks)
+    for (uint16 const checkId : _CurrentChecks)
     {
         WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
         switch (check->Type)
@@ -388,7 +361,7 @@ void WardenWin::RequestChecks()
 
     uint8 index = 1;
 
-    for (uint16 const checkId : _currentChecks)
+    for (uint16 const checkId : _CurrentChecks)
     {
         WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
         buff << uint8(check->Type ^ xorByte);
@@ -529,7 +502,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
 
     uint16 checkFailed = 0;
 
-    for (uint16 const checkId : _currentChecks)
+    for (uint16 const checkId : _CurrentChecks)
     {
         WardenCheck const* rd = sWardenCheckMgr->GetWardenDataById(checkId);
         WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);

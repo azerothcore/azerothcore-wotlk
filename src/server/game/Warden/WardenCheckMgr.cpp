@@ -123,7 +123,7 @@ void WardenCheckMgr::LoadWardenChecks()
             case MEM_CHECK:
             case MODULE_CHECK:
             {
-                MemChecksIdPool.push_back(id);
+                CheckIdPool[WARDEN_CHECK_MEM_TYPE].push_back(id);
                 break;
             }
             case LUA_EVAL_CHECK:
@@ -138,7 +138,7 @@ void WardenCheckMgr::LoadWardenChecks()
                 ASSERT(str.size() == 4);
                 std::copy(str.begin(), str.end(), wardenCheck.Str.begin());
 
-                LuaChecksIdPool.push_back(id);
+                CheckIdPool[WARDEN_CHECK_LUA_TYPE].push_back(id);
                 break;
             }
             default:
@@ -158,7 +158,7 @@ void WardenCheckMgr::LoadWardenChecks()
                     }
                 }
 
-                OtherChecksIdPool.push_back(id);
+                CheckIdPool[WARDEN_CHECK_OTHER_TYPE].push_back(id);
                 break;
             }
         }

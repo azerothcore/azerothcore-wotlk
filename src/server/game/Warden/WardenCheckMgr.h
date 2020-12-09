@@ -12,10 +12,39 @@
 
 enum WardenActions
 {
-    WARDEN_ACTION_LOG,
-    WARDEN_ACTION_KICK,
-    WARDEN_ACTION_BAN
+    WARDEN_ACTION_LOG   = 0,
+    WARDEN_ACTION_KICK  = 1,
+    WARDEN_ACTION_BAN   = 2,
 };
+
+enum WardenCheckTypes
+{
+    WARDEN_CHECK_MEM_TYPE   = 0,
+    WARDEN_CHECK_LUA_TYPE   = 1,
+    WARDEN_CHECK_OTHER_TYPE = 2,
+};
+
+constexpr uint8 MAX_WARDEN_CHECK_TYPES = 3;
+
+// Returns config id for specific type id
+static WorldIntConfigs GetMaxWardenChecksForType(uint8 type)
+{
+    // Should never be higher type than defined
+    ASSERT(type < MAX_WARDEN_CHECK_TYPES);
+
+    switch (type)
+    {
+    case WARDEN_CHECK_MEM_TYPE:
+        return CONFIG_WARDEN_NUM_MEM_CHECKS;
+    case WARDEN_CHECK_LUA_TYPE:
+        return CONFIG_WARDEN_NUM_LUA_CHECKS;
+    default:
+        break;
+    }
+
+    return CONFIG_WARDEN_NUM_OTHER_CHECKS;
+}
+
 
 struct WardenCheck
 {
@@ -53,9 +82,7 @@ public:
     WardenCheck const* GetWardenDataById(uint16 Id);
     WardenCheckResult const* GetWardenResultById(uint16 Id);
 
-    std::vector<uint16> MemChecksIdPool;
-    std::vector<uint16> OtherChecksIdPool;
-    std::vector<uint16> LuaChecksIdPool;
+    std::vector<uint16> CheckIdPool[MAX_WARDEN_CHECK_TYPES];
 
     void LoadWardenChecks();
     void LoadWardenOverrides();

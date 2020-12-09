@@ -74,11 +74,10 @@ public:
 
 private:
     uint32 _serverTicks;
-    std::list<uint16> _otherChecksTodo;
-    std::list<uint16> _memChecksTodo;
-    std::list<uint16> _luaChecksTodo;
-    std::list<uint16> _currentChecks;
-    std::list<uint16> _pendingChecks;
+    std::list<uint16> _ChecksTodo[MAX_WARDEN_CHECK_TYPES];
+
+    std::list<uint16> _CurrentChecks;
+    std::list<uint16> _PendingChecks;
 };
 
 #endif
