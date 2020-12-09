@@ -175,13 +175,14 @@ uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
 
 void Warden::ApplyPenalty(uint16 checkFailed /*= 0*/)
 {
-    WardenActions action;
+    
     WardenCheck const* checkData = sWardenCheckMgr->GetWardenDataById(checkFailed);
 
+    WardenActions action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
     if (checkData)
+    {
         action = checkData->Action;
-    else
-        action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
+    }
 
     std::string banReason = "Warden violation ";
     bool longBan = false; // 14d = 1209600s
@@ -253,6 +254,7 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
 
     /* char const* penalty =  */ApplyPenalty(0);
     sLog->outString("warden: %s sent bogus Lua check response for Warden", _session->GetPlayerInfo().c_str()/* , penalty */);
+    ApplyPenalty(0);
     return true;
 }
 

@@ -505,10 +505,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
     for (uint16 const checkId : _CurrentChecks)
     {
         WardenCheck const* rd = sWardenCheckMgr->GetWardenDataById(checkId);
-        WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
-
-        uint8 const type = rd->Type;
-        switch (type)
+        switch (rd->Type)
         {
             case MEM_CHECK:
             {
@@ -524,6 +521,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
                     continue;
                 }
 
+                WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
                 BigNumber tempNumber = rs->Result;
                 if (memcmp(buff.contents() + buff.rpos(), tempNumber.AsByteArray(0, false).get(), rd->Length) != 0)
                 {
@@ -603,6 +601,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
                         continue;
                     }
 
+                    WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
                     BigNumber tempNumber = rs->Result;
                     if (memcmp(buff.contents() + buff.rpos(), tempNumber.AsByteArray(0, false).get(), SHA_DIGEST_LENGTH) != 0) // SHA1
                     {

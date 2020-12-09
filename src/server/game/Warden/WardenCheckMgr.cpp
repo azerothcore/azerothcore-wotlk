@@ -136,7 +136,7 @@ void WardenCheckMgr::LoadWardenChecks()
 
                 std::string str = fmt::sprintf("%04u", id);
                 ASSERT(str.size() == 4);
-                std::copy(str.begin(), str.end(), wardenCheck.Str.begin());
+                std::copy(str.begin(), str.end(), wardenCheck.IdStr.begin());
 
                 CheckIdPool[WARDEN_CHECK_LUA_TYPE].push_back(id);
                 break;
