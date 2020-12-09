@@ -242,8 +242,8 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
 
     if (id < sWardenCheckMgr->GetMaxValidCheckId())
     {
-        WardenCheck const& check = sWardenCheckMgr->GetCheckData(id);
-        if (check.Type == LUA_EVAL_CHECK)
+        WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(id);
+        if (check && check->Type == LUA_EVAL_CHECK)
         {
             /* char const* penalty =  */ ApplyPenalty(id);
             sLog->outString("warden %s failed Warden check %u", _session->GetPlayerInfo().c_str(), id /* EnumUtils::ToConstant(check.Type), penalty*/);

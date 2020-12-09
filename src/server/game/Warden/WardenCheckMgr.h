@@ -46,14 +46,12 @@ public:
     static WardenCheckMgr* instance();
 
     // We have a linear key without any gaps, so we use vector for fast access
-    typedef std::vector<WardenCheck*> CheckContainer;
-    typedef std::map<uint32, WardenCheckResult*> CheckResultContainer;
-
-    WardenCheck* GetWardenDataById(uint16 Id);
-    WardenCheckResult* GetWardenResultById(uint16 Id);
+    typedef std::vector<WardenCheck> CheckContainer;
+    typedef std::map<uint32, WardenCheckResult> CheckResultContainer;
 
     uint16 GetMaxValidCheckId() const { return static_cast<uint16>(_checks.size()); }
-    WardenCheck const& GetCheckData(uint16 Id) const;
+    WardenCheck const* GetWardenDataById(uint16 Id);
+    WardenCheckResult const* GetWardenResultById(uint16 Id);
 
     std::vector<uint16> MemChecksIdPool;
     std::vector<uint16> OtherChecksIdPool;

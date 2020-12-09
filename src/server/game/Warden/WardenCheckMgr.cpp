@@ -19,11 +19,6 @@ WardenCheckMgr::WardenCheckMgr()
 
 WardenCheckMgr::~WardenCheckMgr()
 {
-    for (uint16 i = 0; i < CheckStore.size(); ++i)
-        delete CheckStore[i];
-
-    for (CheckResultContainer::iterator itr = CheckResultStore.begin(); itr != CheckResultStore.end(); ++itr)
-        delete itr->second;
 }
 
 WardenCheckMgr* WardenCheckMgr::instance()
@@ -74,32 +69,73 @@ void WardenCheckMgr::LoadWardenChecks()
         std::string str         = fields[6].GetString();
         std::string comment     = fields[7].GetString();
 
-        WardenCheck* wardenCheck = new WardenCheck();
-        wardenCheck->Type = checkType;
-        wardenCheck->CheckId = id;
-
-        if ((checkType == LUA_EVAL_CHECK) && (id > 9999))
-        {
-            sLog->outError("sql.sql: Warden Lua check with id %u found in `warden_checks`. Lua checks may have four-digit IDs at most. Skipped.", id);
-            continue;
-        }
+        WardenCheck &wardenCheck = CheckStore.at(id);
+        wardenCheck.Type = checkType;
+        wardenCheck.CheckId = id;
 
         // Initialize action with default action from config
-        wardenCheck->Action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
+        wardenCheck.Action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
 
         if (checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == DRIVER_CHECK)
         {
-            wardenCheck->Data.SetHexStr(data.c_str());
+            wardenCheck.Data.SetHexStr(data.c_str());
             int len = data.size() / 2;
 
-            if (wardenCheck->Data.GetNumBytes() < len)
+            if (wardenCheck.Data.GetNumBytes() < len)
             {
                 uint8 temp[24];
                 memset(temp, 0, len);
-                memcpy(temp, wardenCheck->Data.AsByteArray().get(), wardenCheck->Data.GetNumBytes());
+                memcpy(temp, wardenCheck.Data.AsByteArray().get(), wardenCheck.Data.GetNumBytes());
                 std::reverse(temp, temp + len);
-                wardenCheck->Data.SetBinary((uint8*)temp, len);
+                wardenCheck.Data.SetBinary((uint8*)temp, len);
             }
+        }
+
+        if (checkType == MEM_CHECK || checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == PROC_CHECK)
+        {
+            wardenCheck.Address = address;
+            wardenCheck.Length = length;
+        }
+
+        // PROC_CHECK support missing
+        if (checkType == MEM_CHECK || checkType == MPQ_CHECK || checkType == LUA_EVAL_CHECK || checkType == DRIVER_CHECK || checkType == MODULE_CHECK)
+        {
+            wardenCheck.Str = str;
+        }
+
+        if (checkType == MPQ_CHECK || checkType == MEM_CHECK)
+        {
+            WardenCheckResult wr;
+            wr.Result.SetHexStr(checkResult.c_str());
+            int len = static_cast<int>(checkResult.size()) / 2;
+            if (wr.Result.GetNumBytes() < len)
+            {
+                uint8* temp = new uint8[len];
+                memset(temp, 0, len);
+                memcpy(temp, wr.Result.AsByteArray().get(), wr.Result.GetNumBytes());
+                std::reverse(temp, temp + len);
+                wr.Result.SetBinary((uint8*)temp, len);
+                delete [] temp;
+            }
+            CheckResultStore[id] = wr;
+        }
+
+        if (comment.empty())
+            wardenCheck.Comment = "Undocumented Check";
+        else
+            wardenCheck.Comment = comment;
+
+        if (checkType == LUA_EVAL_CHECK)
+        {
+            if (wardenCheck.Length > WARDEN_MAX_LUA_CHECK_LENGTH)
+            {
+                sLog->outError("sql.sql: Found over-long Lua check for Warden check with id %u in `warden_checks`. Max length is %u. Skipped.", id, WARDEN_MAX_LUA_CHECK_LENGTH);
+                continue;
+            }
+
+            std::string str = fmt::sprintf("%04u", id);
+            ASSERT(str.size() == 4);
+            std::copy(str.begin(), str.end(), wardenCheck.Str.begin());
         }
 
         if (checkType == MEM_CHECK || checkType == MODULE_CHECK)
@@ -113,55 +149,6 @@ void WardenCheckMgr::LoadWardenChecks()
         else
         {
             OtherChecksIdPool.push_back(id);
-        }
-
-        if (checkType == MEM_CHECK || checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == PROC_CHECK)
-        {
-            wardenCheck->Address = address;
-            wardenCheck->Length = length;
-        }
-
-        // PROC_CHECK support missing
-        if (checkType == MEM_CHECK || checkType == MPQ_CHECK || checkType == LUA_EVAL_CHECK || checkType == DRIVER_CHECK || checkType == MODULE_CHECK)
-        {
-            wardenCheck->Str = str;
-        }
-
-        CheckStore[id] = wardenCheck;
-
-        if (checkType == MPQ_CHECK || checkType == MEM_CHECK)
-        {
-            WardenCheckResult* wr = new WardenCheckResult();
-            wr->Result.SetHexStr(checkResult.c_str());
-            int len = checkResult.size() / 2;
-            if (wr->Result.GetNumBytes() < len)
-            {
-                uint8* temp = new uint8[len];
-                memset(temp, 0, len);
-                memcpy(temp, wr->Result.AsByteArray().get(), wr->Result.GetNumBytes());
-                std::reverse(temp, temp + len);
-                wr->Result.SetBinary((uint8*)temp, len);
-                delete [] temp;
-            }
-            CheckResultStore[id] = wr;
-        }
-
-        if (comment.empty())
-            wardenCheck->Comment = "Undocumented Check";
-        else
-            wardenCheck->Comment = comment;
-
-        if (checkType == LUA_EVAL_CHECK)
-        {
-            if (wardenCheck->Length > WARDEN_MAX_LUA_CHECK_LENGTH)
-            {
-                sLog->outError("sql.sql: Found over-long Lua check for Warden check with id %u in `warden_checks`. Max length is %u. Skipped.", id, WARDEN_MAX_LUA_CHECK_LENGTH);
-                continue;
-            }
-
-            std::string str = fmt::sprintf("%04u", id);
-            ASSERT(str.size() == 4);
-            std::copy(str.begin(), str.end(), wardenCheck->Str.begin());
         }
 
         ++count;
@@ -208,7 +195,7 @@ void WardenCheckMgr::LoadWardenOverrides()
             sLog->outError("Warden check action override for non-existing check (ID: %u, action: %u), skipped", checkId, action);
         else
         {
-            CheckStore[checkId]->Action = WardenActions(action);
+            CheckStore.at(checkId).Action = WardenActions(action);
             ++count;
         }
     } while (result->NextRow());
@@ -217,25 +204,22 @@ void WardenCheckMgr::LoadWardenOverrides()
     sLog->outString();
 }
 
-WardenCheck* WardenCheckMgr::GetWardenDataById(uint16 Id)
+WardenCheck const* WardenCheckMgr::GetWardenDataById(uint16 Id)
 {
     if (Id < CheckStore.size())
-        return CheckStore[Id];
+        return &CheckStore.at(Id);
 
     return nullptr;
 }
 
-WardenCheckResult* WardenCheckMgr::GetWardenResultById(uint16 Id)
+WardenCheckResult const* WardenCheckMgr::GetWardenResultById(uint16 Id)
 {
     CheckResultContainer::const_iterator itr = CheckResultStore.find(Id);
     if (itr != CheckResultStore.end())
-        return itr->second;
-    return nullptr;
-}
+    {
+        return &itr->second;
+    }
 
-WardenCheck const& WardenCheckMgr::GetCheckData(uint16 Id) const
-{
-    ASSERT(Id < _checks.size(), "Requested Warden data for invalid check ID %u", uint32(Id));
-    return _checks[Id];
+    return nullptr;
 }
 

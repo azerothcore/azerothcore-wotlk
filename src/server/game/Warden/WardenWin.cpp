@@ -44,7 +44,7 @@ static constexpr uint8 GetCheckPacketBaseSize(uint8 type)
     }
 }
 
-static uint16 GetCheckPacketSize(WardenCheck* check)
+static uint16 GetCheckPacketSize(WardenCheck const* check)
 {
     if (!check)
     {
@@ -56,9 +56,11 @@ static uint16 GetCheckPacketSize(WardenCheck* check)
     {
         size += (static_cast<uint16>(check->Str.length()) + 1); // 1 byte string length
     }
-    if (!check->Data.GetNumBytes())
+
+    BigNumber tempNumber = check->Data;
+    if (!tempNumber.GetNumBytes())
     {
-        size += check->Data.GetNumBytes();
+        size += tempNumber.GetNumBytes();
     }
     return size;
 }
@@ -399,7 +401,7 @@ void WardenWin::RequestChecks()
 
     for (uint16 const checkId : _currentChecks)
     {
-        WardenCheck* check = sWardenCheckMgr->GetWardenDataById(checkId);
+        WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(checkId);
         uint8 const type = check->Type;
         buff << uint8(type ^ xorByte);
         switch (type)
@@ -414,7 +416,8 @@ void WardenWin::RequestChecks()
             case PAGE_CHECK_A:
             case PAGE_CHECK_B:
             {
-                buff.append(check->Data.AsByteArray(0, false).get(), check->Data.GetNumBytes());
+                BigNumber tempNumber = check->Data;
+                buff.append(tempNumber.AsByteArray(0, false).get(), tempNumber.GetNumBytes());
                 buff << uint32(check->Address);
                 buff << uint8(check->Length);
                 break;
@@ -427,7 +430,8 @@ void WardenWin::RequestChecks()
             }
             case DRIVER_CHECK:
             {
-                buff.append(check->Data.AsByteArray(0, false).get(), check->Data.GetNumBytes());
+                BigNumber tempNumber = check->Data;
+                buff.append(tempNumber.AsByteArray(0, false).get(), tempNumber.GetNumBytes());
                 buff << uint8(index++);
                 break;
             }
@@ -539,8 +543,8 @@ void WardenWin::HandleData(ByteBuffer& buff)
 
     for (uint16 const checkId : _currentChecks)
     {
-        WardenCheck* rd = sWardenCheckMgr->GetWardenDataById(checkId);
-        WardenCheckResult* rs = sWardenCheckMgr->GetWardenResultById(checkId);
+        WardenCheck const* rd = sWardenCheckMgr->GetWardenDataById(checkId);
+        WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
 
         uint8 const type = rd->Type;
         switch (type)
@@ -559,7 +563,8 @@ void WardenWin::HandleData(ByteBuffer& buff)
                     continue;
                 }
 
-                if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).get(), rd->Length) != 0)
+                BigNumber tempNumber = rs->Result;
+                if (memcmp(buff.contents() + buff.rpos(), tempNumber.AsByteArray(0, false).get(), rd->Length) != 0)
                 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                     sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MEM_CHECK fail CheckId %u account Id %u", checkId, _session->GetAccountId());
@@ -637,7 +642,8 @@ void WardenWin::HandleData(ByteBuffer& buff)
                         continue;
                     }
 
-                    if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).get(), 20) != 0) // SHA1
+                    BigNumber tempNumber = rs->Result;
+                    if (memcmp(buff.contents() + buff.rpos(), tempNumber.AsByteArray(0, false).get(), 20) != 0) // SHA1
                     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                         sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MPQ_CHECK fail, CheckId %u account Id %u", checkId, _session->GetAccountId());
