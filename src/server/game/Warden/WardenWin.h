@@ -64,13 +64,13 @@ public:
     WardenWin();
     ~WardenWin() override;
 
-    void Init(WorldSession* session, BigNumber* K);
-    ClientWardenModule* GetModuleForClient();
-    void InitializeModule();
-    void RequestHash();
-    void HandleHashResult(ByteBuffer& buff);
-    void RequestChecks();
-    void HandleData(ByteBuffer& buff);
+    void Init(WorldSession* session, BigNumber* K) override;
+    ClientWardenModule* GetModuleForClient() override;
+    void InitializeModule() override;
+    void RequestHash() override;
+    void HandleHashResult(ByteBuffer& buff) override;
+    void RequestChecks() override;
+    void HandleData(ByteBuffer& buff) override;
 
 private:
     uint32 _serverTicks;
@@ -80,4 +80,4 @@ private:
     std::list<uint16> _PendingChecks;
 };
 
-#endif
+#endif // _WARDEN_WIN_H

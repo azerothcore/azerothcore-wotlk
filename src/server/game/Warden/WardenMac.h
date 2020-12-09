@@ -22,13 +22,13 @@ public:
     WardenMac();
     ~WardenMac() override;
 
-    void Init(WorldSession* session, BigNumber* k);
-    ClientWardenModule* GetModuleForClient();
-    void InitializeModule();
-    void RequestHash();
-    void HandleHashResult(ByteBuffer& buff);
-    void RequestChecks();
-    void HandleData(ByteBuffer& buff);
+    void Init(WorldSession* session, BigNumber* k) override;
+    ClientWardenModule* GetModuleForClient() override;
+    void InitializeModule() override;
+    void RequestHash() override;
+    void HandleHashResult(ByteBuffer& buff) override;
+    void RequestChecks() override;
+    void HandleData(ByteBuffer& buff) override;
 };
 
 #endif
