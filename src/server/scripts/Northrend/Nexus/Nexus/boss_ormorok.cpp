@@ -52,7 +52,7 @@ class boss_ormorok : public CreatureScript
 public:
     boss_ormorok() : CreatureScript("boss_ormorok") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_ormorokAI>(creature);
     }
@@ -65,13 +65,13 @@ public:
 
         uint8 _spikesCount;
 
-        void Reset()
+        void Reset() override
         {
             _spikesCount = 0;
             BossAI::Reset();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
             BossAI::EnterCombat(who);
@@ -84,13 +84,13 @@ public:
                 events.ScheduleEvent(EVENT_ORMOROK_SUMMON, 17000);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -99,12 +99,12 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -172,7 +172,7 @@ class npc_crystal_spike : public CreatureScript
 public:
     npc_crystal_spike() : CreatureScript("npc_crystal_spike") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return GetInstanceAI<npc_crystal_spikeAI>(pCreature);
     }
@@ -186,7 +186,7 @@ public:
         int32 _damageTimer;
         uint64 _gameObjectGUID;
 
-        void Reset()
+        void Reset() override
         {
             if (GameObject* gameobject = me->SummonGameObject(GO_CRYSTAL_SPIKE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3500))
                 _gameObjectGUID = gameobject->GetGUID();
@@ -194,7 +194,7 @@ public:
             _damageTimer = 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_damageTimer)
             {

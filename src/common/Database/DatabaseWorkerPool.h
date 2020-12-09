@@ -24,7 +24,7 @@
 class PingOperation : public SQLOperation
 {
     //! Operation for idle delaythreads
-    bool Execute()
+    bool Execute() override
     {
         m_conn->Ping();
         return true;
@@ -38,7 +38,7 @@ public:
     /* Activity state */
     DatabaseWorkerPool();
 
-    ~DatabaseWorkerPool() { }
+    ~DatabaseWorkerPool() = default;
 
     bool Open(const std::string& infoString, uint8 async_threads, uint8 synch_threads);
 
@@ -199,7 +199,7 @@ public:
     //! Keeps all our MySQL connections alive, prevent the server from disconnecting us.
     void KeepAlive();
 
-    char const* GetDatabaseName() const
+    [[nodiscard]] char const* GetDatabaseName() const
     {
         return _connectionInfo.database.c_str();
     }

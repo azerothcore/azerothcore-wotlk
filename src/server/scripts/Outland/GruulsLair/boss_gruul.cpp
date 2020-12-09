@@ -51,13 +51,13 @@ public:
     {
         boss_gruulAI(Creature* creature) : BossAI(creature, DATA_GRUUL) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             _caveInTimer = 29000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
@@ -69,7 +69,7 @@ public:
             events.ScheduleEvent(EVENT_GROUND_SLAM, 35000);
         }
 
-        void KilledUnit(Unit*  /*who*/)
+        void KilledUnit(Unit*  /*who*/) override
         {
             if (events.GetNextEventTime(EVENT_RECENTLY_SPOKEN) == 0)
             {
@@ -78,13 +78,13 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_DEATH);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -136,7 +136,7 @@ public:
         uint32 _caveInTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_gruulAI>(creature);
     }
@@ -157,13 +157,13 @@ public:
                 target->KnockbackFrom(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), 15.0f, 15.0f);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_gruul_ground_slam_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_gruul_ground_slam_SpellScript();
     }
@@ -184,13 +184,13 @@ public:
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_STONED, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_gruul_ground_slam_trigger_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_gruul_ground_slam_trigger_AuraScript();
     }
@@ -214,13 +214,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_gruul_shatter_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_gruul_shatter_SpellScript();
     }
@@ -249,13 +249,13 @@ public:
                 SetHitDamage(int32(GetHitDamage() * ((radius - distance) / radius)));
         }
 
-        void Register()
+        void Register() override
         {
             OnHit += SpellHitFn(spell_gruul_shatter_effect_SpellScript::CalculateDamage);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_gruul_shatter_effect_SpellScript();
     }

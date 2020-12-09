@@ -79,7 +79,7 @@ public:
             memset(BirdGUIDs, 0, sizeof(BirdGUIDs));
         }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
 
@@ -96,7 +96,7 @@ public:
             SetWeather(WEATHER_STATE_FINE, 0.0f);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_STATIC_DISRUPTION, urand(10000, 20000)); // 10 to 20 seconds (bosskillers)
             events.ScheduleEvent(EVENT_GUST_OF_WIND, urand(20000, 30000));      // 20 to 30 seconds(bosskillers)
@@ -112,7 +112,7 @@ public:
                 instance->SetData(DATA_AKILZONEVENT, IN_PROGRESS);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             _JustDied();
@@ -120,7 +120,7 @@ public:
                 instance->SetData(DATA_AKILZONEVENT, DONE);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_KILL);
@@ -209,7 +209,7 @@ public:
             events.ScheduleEvent(EVENT_STORM_SEQUENCE, 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -361,7 +361,7 @@ public:
         bool   isRaining;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_akilzonAI>(creature);
     }
@@ -380,7 +380,7 @@ public:
         bool arrived;
         uint64 TargetGUID;
 
-        void Reset()
+        void Reset() override
         {
             EagleSwoop_Timer = urand(5000, 10000);
             arrived = true;
@@ -388,15 +388,15 @@ public:
             me->SetDisableGravity(true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
 
-        void MovementInform(uint32, uint32)
+        void MovementInform(uint32, uint32) override
         {
             arrived = true;
             if (TargetGUID)
@@ -409,7 +409,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (EagleSwoop_Timer <= diff)
                 EagleSwoop_Timer = 0;
@@ -443,7 +443,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_akilzon_eagleAI(creature);
     }
