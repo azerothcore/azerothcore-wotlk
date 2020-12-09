@@ -219,7 +219,7 @@ void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
             break;
         case WARDEN_ACTION_KICK:
         {
-            _session->KickPlayer((checkData && !checkData->Comment.empty()) ? checkData->Comment : "");
+            _session->KickPlayer(causeMsg.find("Warden") != std::string::npos ? causeMsg : "Warden: " + causeMsg);
             break;
         }
         case WARDEN_ACTION_BAN:
