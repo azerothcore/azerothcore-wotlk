@@ -65,6 +65,25 @@ static uint16 GetCheckPacketSize(WardenCheck const* check)
     return size;
 }
 
+// Returns config id for specific type id
+static WorldIntConfigs GetMaxWardenChecksForType(uint8 type)
+{
+    // Should never be higher type than defined
+    ASSERT(type < MAX_WARDEN_CHECK_TYPES);
+
+    switch (type)
+    {
+    case WARDEN_CHECK_MEM_TYPE:
+        return CONFIG_WARDEN_NUM_MEM_CHECKS;
+    case WARDEN_CHECK_LUA_TYPE:
+        return CONFIG_WARDEN_NUM_LUA_CHECKS;
+    default:
+        break;
+    }
+
+    return CONFIG_WARDEN_NUM_OTHER_CHECKS;
+}
+
 WardenWin::WardenWin() : Warden(), _serverTicks(0) { }
 
 WardenWin::~WardenWin()
