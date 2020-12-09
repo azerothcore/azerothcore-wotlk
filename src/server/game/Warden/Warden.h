@@ -93,43 +93,43 @@ class Warden
     friend class WardenWin;
     friend class WardenMac;
 
-    public:
-        Warden();
-        virtual ~Warden();
+public:
+    Warden();
+    virtual ~Warden();
 
-        virtual void Init(WorldSession* session, BigNumber* k) = 0;
-        virtual ClientWardenModule* GetModuleForClient() = 0;
-        virtual void InitializeModule() = 0;
-        virtual void RequestHash() = 0;
-        virtual void HandleHashResult(ByteBuffer &buff) = 0;
-        virtual void RequestChecks() = 0;
-        virtual void HandleData(ByteBuffer &buff) = 0;
-        bool ProcessLuaCheckResponse(std::string const& msg);
+    virtual void Init(WorldSession* session, BigNumber* k) = 0;
+    virtual ClientWardenModule* GetModuleForClient() = 0;
+    virtual void InitializeModule() = 0;
+    virtual void RequestHash() = 0;
+    virtual void HandleHashResult(ByteBuffer &buff) = 0;
+    virtual void RequestChecks() = 0;
+    virtual void HandleData(ByteBuffer &buff) = 0;
+    bool ProcessLuaCheckResponse(std::string const& msg);
 
-        void SendModuleToClient();
-        void RequestModule();
-        void Update(uint32 const diff);
-        void DecryptData(uint8* buffer, uint32 length);
-        void EncryptData(uint8* buffer, uint32 length);
+    void SendModuleToClient();
+    void RequestModule();
+    void Update(uint32 const diff);
+    void DecryptData(uint8* buffer, uint32 length);
+    void EncryptData(uint8* buffer, uint32 length);
 
-        static bool IsValidCheckSum(uint32 checksum, const uint8 *data, const uint16 length);
-        static uint32 BuildChecksum(const uint8 *data, uint32 length);
+    static bool IsValidCheckSum(uint32 checksum, const uint8 *data, const uint16 length);
+    static uint32 BuildChecksum(const uint8 *data, uint32 length);
 
-        // If no check is passed, the default action from config is executed
-        void ApplyPenalty(uint16 checkId, std::string const& reason);
+    // If no check is passed, the default action from config is executed
+    void ApplyPenalty(uint16 checkId, std::string const& reason);
 
-    private:
-        WorldSession* _session;
-        uint8 _inputKey[16];
-        uint8 _outputKey[16];
-        uint8 _seed[16];
-        ARC4 _inputCrypto;
-        ARC4 _outputCrypto;
-        uint32 _checkTimer;                          // Timer for sending check requests
-        uint32 _clientResponseTimer;                 // Timer for client response delay
-        bool _dataSent;
-        ClientWardenModule* _module;
-        bool _initialized;
+private:
+    WorldSession* _session;
+    uint8 _inputKey[16];
+    uint8 _outputKey[16];
+    uint8 _seed[16];
+    ARC4 _inputCrypto;
+    ARC4 _outputCrypto;
+    uint32 _checkTimer;                          // Timer for sending check requests
+    uint32 _clientResponseTimer;                 // Timer for client response delay
+    bool _dataSent;
+    ClientWardenModule* _module;
+    bool _initialized;
 };
 
 #endif
