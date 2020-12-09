@@ -19,21 +19,6 @@ enum WardenActions
 
 constexpr uint8 MAX_WARDEN_ACTION = 3;
 
-static std::string GetWardenActionStr(uint32 action)
-{
-    switch (action)
-    {
-    case WARDEN_ACTION_LOG:
-        return "WARDEN_ACTION_LOG";
-    case WARDEN_ACTION_KICK:
-        return "WARDEN_ACTION_KICK";
-    case WARDEN_ACTION_BAN:
-        return "WARDEN_ACTION_BAN";
-    }
-
-    return "UNHANDLED ACTION";
-}
-
 enum WardenCheckTypes
 {
     WARDEN_CHECK_MEM_TYPE   = 0,
@@ -94,7 +79,7 @@ public:
     typedef std::vector<WardenCheck> CheckContainer;
     typedef std::map<uint32, WardenCheckResult> CheckResultContainer;
 
-    uint16 GetMaxValidCheckId() const { return static_cast<uint16>(_checks.size()); }
+    uint16 GetMaxValidCheckId() const { return static_cast<uint16>(CheckStore.size()); }
     WardenCheck const* GetWardenDataById(uint16 Id);
     WardenCheckResult const* GetWardenResultById(uint16 Id);
 
@@ -104,9 +89,8 @@ public:
     void LoadWardenOverrides();
 
 private:
-    std::vector<WardenCheck> _checks;
-    CheckContainer CheckStore;
-    CheckResultContainer CheckResultStore;
+    std::vector<WardenCheck> CheckStore;
+    std::map<uint32, WardenCheckResult> CheckResultStore;
 };
 
 #define sWardenCheckMgr WardenCheckMgr::instance()

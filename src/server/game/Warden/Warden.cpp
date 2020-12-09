@@ -172,6 +172,21 @@ uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
     return checkSum;
 }
 
+static std::string GetWardenActionStr(uint32 action)
+{
+    switch (action)
+    {
+    case WARDEN_ACTION_LOG:
+        return "WARDEN_ACTION_LOG";
+    case WARDEN_ACTION_KICK:
+        return "WARDEN_ACTION_KICK";
+    case WARDEN_ACTION_BAN:
+        return "WARDEN_ACTION_BAN";
+    }
+
+    return "UNHANDLED ACTION";
+}
+
 void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
 {
     WardenCheck const* checkData = sWardenCheckMgr->GetWardenDataById(checkId);
