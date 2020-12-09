@@ -188,7 +188,7 @@ AuthSocket::AuthSocket(RealmSocket& socket) :
 }
 
 // Close patch file descriptor before leaving
-AuthSocket::~AuthSocket() { }
+AuthSocket::~AuthSocket() = default;
 
 // Accept the connection
 void AuthSocket::OnAccept()
@@ -213,7 +213,7 @@ void AuthSocket::OnRead()
     uint32 challengesInARowRealmList = 0;
 
     uint8 _cmd;
-    while (1)
+    while (true)
     {
         if (!socket().recv_soft((char*)&_cmd, 1))
             return;

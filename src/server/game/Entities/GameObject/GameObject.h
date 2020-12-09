@@ -688,22 +688,21 @@ enum GOState
 // from `gameobject`
 struct GameObjectData
 {
-    explicit GameObjectData() : id(0), mapid(0), phaseMask(0), posX(0.0f), posY(0.0f), posZ(0.0f), orientation(0.0f), spawntimesecs(0),
-        animprogress(0), go_state(GO_STATE_ACTIVE), spawnMask(0), artKit(0), dbData(true) { }
-    uint32 id;                                              // entry in gamobject_template
-    uint16 mapid;
-    uint32 phaseMask;
-    float posX;
-    float posY;
-    float posZ;
-    float orientation;
+    explicit GameObjectData()  { }
+    uint32 id{0};                                              // entry in gamobject_template
+    uint16 mapid{0};
+    uint32 phaseMask{0};
+    float posX{0.0f};
+    float posY{0.0f};
+    float posZ{0.0f};
+    float orientation{0.0f};
     G3D::Quat rotation;
-    int32  spawntimesecs;
-    uint32 animprogress;
-    GOState go_state;
-    uint8 spawnMask;
-    uint8 artKit;
-    bool dbData;
+    int32  spawntimesecs{0};
+    uint32 animprogress{0};
+    GOState go_state{GO_STATE_ACTIVE};
+    uint8 spawnMask{0};
+    uint8 artKit{0};
+    bool dbData{true};
 };
 
 typedef std::vector<uint32> GameObjectQuestItemList;
@@ -844,8 +843,8 @@ public:
     void AddToSkillupList(uint32 PlayerGuidLow) { m_SkillupList.push_back(PlayerGuidLow); }
     [[nodiscard]] bool IsInSkillupList(uint32 PlayerGuidLow) const
     {
-        for (std::list<uint32>::const_iterator i = m_SkillupList.begin(); i != m_SkillupList.end(); ++i)
-            if (*i == PlayerGuidLow)
+        for (unsigned int i : m_SkillupList)
+            if (i == PlayerGuidLow)
                 return true;
 
         return false;

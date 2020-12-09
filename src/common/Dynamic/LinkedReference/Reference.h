@@ -28,7 +28,7 @@ protected:
     virtual void sourceObjectDestroyLink() = 0;
 public:
     Reference() { iRefTo = nullptr; iRefFrom = nullptr; }
-    virtual ~Reference() { }
+    virtual ~Reference() = default;
 
     // Create new link
     void link(TO* toObj, FROM* fromObj)
