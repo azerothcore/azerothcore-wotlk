@@ -213,7 +213,6 @@ void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
         causeMsg = reason;
     }
 
-    bool longBan = false; // 14d = 1209600s
     switch (action)
     {
         case WARDEN_ACTION_LOG:
@@ -229,7 +228,7 @@ void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
             duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
             std::string accountName;
             AccountMgr::GetName(_session->GetAccountId(), accountName);
-            sBan->BanAccount(accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), causeMsg, "Server");
+            sBan->BanAccount(accountName, duration.str(), causeMsg, "Server");
             break;
         }
     }
