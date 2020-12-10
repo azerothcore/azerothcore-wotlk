@@ -80,15 +80,15 @@ public:
 
     OPvPCapturePointHP(OutdoorPvP* pvp, OutdoorPvPHPTowerType type);
 
-    void ChangeState();
+    void ChangeState() override;
 
-    void SendChangePhase();
+    void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
     // used when player is activated/inactivated in the area
-    bool HandlePlayerEnter(Player* player);
-    void HandlePlayerLeave(Player* player);
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
 private:
 
@@ -101,18 +101,18 @@ public:
 
     OutdoorPvPHP();
 
-    bool SetupOutdoorPvP();
+    bool SetupOutdoorPvP() override;
 
-    void HandlePlayerEnterZone(Player* player, uint32 zone);
-    void HandlePlayerLeaveZone(Player* player, uint32 zone);
+    void HandlePlayerEnterZone(Player* player, uint32 zone) override;
+    void HandlePlayerLeaveZone(Player* player, uint32 zone) override;
 
-    bool Update(uint32 diff);
+    bool Update(uint32 diff) override;
 
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-    void SendRemoveWorldStates(Player* player);
+    void SendRemoveWorldStates(Player* player) override;
 
-    void HandleKillImpl(Player* player, Unit* killed);
+    void HandleKillImpl(Player* player, Unit* killed) override;
 
     uint32 GetAllianceTowersControlled() const;
     void SetAllianceTowersControlled(uint32 count);

@@ -69,7 +69,7 @@ public:
             preFight = instance->GetBossState(DATA_DALLIAH) == DONE;
         }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             events2.Reset();
@@ -77,14 +77,14 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             BossAI::InitializeAI();
             if (!preFight)
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_DEATH);
@@ -94,7 +94,7 @@ public:
                     dalliah->AI()->SetData(1, 1);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events2.Reset();
@@ -105,13 +105,13 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!preFight && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 70.0f))
             {
@@ -121,13 +121,13 @@ public:
             }
         }
 
-        void SetData(uint32 /*type*/, uint32 data)
+        void SetData(uint32 /*type*/, uint32 data) override
         {
             if (data == 1)
                 events2.RescheduleEvent(EVENT_DALLIAH_DEATH, 6000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
@@ -240,7 +240,7 @@ public:
         EventMap events2;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_wrath_scryer_soccothratesAI(creature);
     }

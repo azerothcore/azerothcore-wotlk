@@ -72,7 +72,7 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             instance->SetBossState(DATA_NOVOS_CRYSTALS, IN_PROGRESS);
@@ -86,22 +86,22 @@ public:
             _achievement = true;
         }
 
-        uint32 GetData(uint32 data) const
+        uint32 GetData(uint32 data) const override
         {
             if (data == me->GetEntry())
                 return uint32(_achievement);
             return 0;
         }
 
-        void SetData(uint32 type, uint32)
+        void SetData(uint32 type, uint32) override
         {
             if (type == me->GetEntry())
                 _achievement = false;
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) { }
+        void MoveInLineOfSight(Unit*  /*who*/) override { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
             BossAI::EnterCombat(who);
@@ -139,14 +139,14 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
             instance->SetBossState(DATA_NOVOS_CRYSTALS, DONE);
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -155,7 +155,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && summon->GetEntry() != NPC_CRYSTAL_CHANNEL_TARGET && summon->GetEntry() != NPC_CRYSTAL_HANDLER)
@@ -164,7 +164,7 @@ public:
                 summon->SetInCombatWithZone();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -232,7 +232,7 @@ public:
             EnterEvadeIfOutOfCombatArea();
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
             return !SelectTargetFromPlayerList(80.0f);
         }
@@ -246,7 +246,7 @@ public:
         bool _achievement;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_novosAI>(creature);
     }
@@ -267,13 +267,13 @@ public:
                 target->CastSpell(GetCaster(), SPELL_BEAM_CHANNEL, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_novos_despawn_crystal_handler_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_novos_despawn_crystal_handler_SpellScript();
     }
@@ -295,13 +295,13 @@ public:
                 crystal->SetGoState(GO_STATE_READY);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_novos_crystal_handler_death_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_novos_crystal_handler_death_AuraScript();
     }
@@ -322,13 +322,13 @@ public:
                 GetCaster()->CastSpell((Unit*)NULL, SPELL_COPY_OF_SUMMON_MINIONS, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_novos_summon_minions_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_novos_summon_minions_SpellScript();
     }
@@ -339,7 +339,7 @@ class achievement_oh_novos : public AchievementCriteriaScript
 public:
     achievement_oh_novos() : AchievementCriteriaScript("achievement_oh_novos") { }
 
-    bool OnCheck(Player* /*player*/, Unit* target)
+    bool OnCheck(Player* /*player*/, Unit* target) override
     {
         return target && target->GetAI()->GetData(target->GetEntry());
     }

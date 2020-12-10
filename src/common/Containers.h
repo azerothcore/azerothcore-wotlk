@@ -49,7 +49,7 @@ namespace acore
         CheckedBufferOutputIterator& operator++() { check(); ++_buf; return *this; }
         CheckedBufferOutputIterator operator++(int) { CheckedBufferOutputIterator v = *this; operator++(); return v; }
 
-        size_t remaining() const { return (_end - _buf); }
+        [[nodiscard]] size_t remaining() const { return (_end - _buf); }
 
     private:
         T* _buf;

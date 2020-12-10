@@ -27,14 +27,12 @@ namespace Movement
 
         FacingInfo(float o) : angle(o) {}
         FacingInfo(uint64 t) : target(t) {}
-        FacingInfo() {}
+        FacingInfo() = default;
     };
 
     struct MoveSplineInitArgs
     {
-        MoveSplineInitArgs(size_t path_capacity = 16) : path_Idx_offset(0), velocity(0.f),
-            parabolic_amplitude(0.f), time_perc(0.f), splineId(0), initialOrientation(0.f),
-            HasVelocity(false), TransformForTransport(true)
+        MoveSplineInitArgs(size_t path_capacity = 16)  
         {
             path.reserve(path_capacity);
         }
@@ -42,20 +40,20 @@ namespace Movement
         PointsArray path;
         FacingInfo facing;
         MoveSplineFlag flags;
-        int32 path_Idx_offset;
-        float velocity;
-        float parabolic_amplitude;
-        float time_perc;
-        uint32 splineId;
-        float initialOrientation;
-        bool HasVelocity;
-        bool TransformForTransport;
+        int32 path_Idx_offset{0};
+        float velocity{0.f};
+        float parabolic_amplitude{0.f};
+        float time_perc{0.f};
+        uint32 splineId{0};
+        float initialOrientation{0.f};
+        bool HasVelocity{false};
+        bool TransformForTransport{true};
 
         /** Returns true to show that the arguments were configured correctly and MoveSpline initialization will succeed. */
         bool Validate(Unit* unit) const;
 
     private:
-        bool _checkPathBounds() const;
+        [[nodiscard]] bool _checkPathBounds() const;
     };
 }
 

@@ -85,7 +85,7 @@ public:
         uint8 CrystalIterator;
         bool SaidIntro;
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             CrystalIterator = 0;
@@ -93,7 +93,7 @@ public:
             CrystalGUID = 0;
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             for (uint8 i = 0; i < NUM_WEAKNESS; ++i)
             {
@@ -106,7 +106,7 @@ public:
             }
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_TRIGGER_WEAKNESS)
                 if (Creature* Trigger = me->GetMap()->GetCreature(TriggerGUID))
@@ -114,7 +114,7 @@ public:
                         Trigger->CastSpell(Trigger, SpellWeakness[urand(0, 4)], false);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.Reset();
@@ -144,19 +144,19 @@ public:
             SpawnNextCrystal();
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_SLAY);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             Cleanup();
             summons.DespawnAll();
             BossAI::EnterEvadeMode();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Cleanup();
             _JustDied();
@@ -189,7 +189,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (!SaidIntro)
@@ -200,7 +200,7 @@ public:
             BossAI::MoveInLineOfSight(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -258,7 +258,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_ossirianAI>(creature);
     }
