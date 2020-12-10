@@ -34,6 +34,8 @@ struct CliCommandHolder
     CliCommandHolder(void* callbackArg, const char* command, Print* zprint, CommandFinished* commandFinished)
             : m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
     {
+        // TODO: fix Codacy warning
+        //  "Does not handle strings that are not \0-terminated; if given one it may perform an over-read (it could cause a crash if unprotected) (CWE-126)."
         size_t len = strlen(command) + 1;
         m_command = new char[len];
         memcpy(m_command, command, len);
