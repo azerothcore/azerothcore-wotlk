@@ -1,3 +1,19 @@
+-- DB update 2020_12_10_01 -> 2020_12_10_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_10_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_10_01 2020_12_10_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1602336256005673600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1602336256005673600');
 /*
  * General: Dungeons update
@@ -114,3 +130,12 @@ UPDATE `creature_template` SET `mindmg` = 297, `maxdmg` = 394, `DamageModifier` 
 UPDATE `creature_template` SET `mindmg` = 806, `maxdmg` = 1068, `DamageModifier` = 1.01 WHERE `entry` = 9938; 
 UPDATE `creature_template` SET `mindmg` = 403, `maxdmg` = 514, `DamageModifier` = 1.01 WHERE `entry` = 16059; 
 UPDATE `creature_template` SET `mindmg` = 482, `maxdmg` = 657, `DamageModifier` = 1.63 WHERE `entry` = 16080;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
