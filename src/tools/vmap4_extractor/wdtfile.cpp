@@ -101,7 +101,7 @@ bool WDTFile::init(char* /*map_id*/, unsigned int mapID)
     return true;
 }
 
-WDTFile::~WDTFile(void)
+WDTFile::~WDTFile()
 {
     WDT.close();
 }
