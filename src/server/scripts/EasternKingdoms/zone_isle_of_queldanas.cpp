@@ -109,14 +109,14 @@ class npc_bh_thalorien_dawnseeker : public CreatureScript
 public:
     npc_bh_thalorien_dawnseeker() : CreatureScript("npc_bh_thalorien_dawnseeker") { }
 
-    CreatureAI *GetAI(Creature *creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_bh_thalorien_dawnseekerAI(creature);
     }
 
     struct npc_bh_thalorien_dawnseekerAI : public ScriptedAI
     {
-        npc_bh_thalorien_dawnseekerAI(Creature *c) : ScriptedAI(c), summons(me)
+        npc_bh_thalorien_dawnseekerAI(Creature* c) : ScriptedAI(c), summons(me)
         {
         }
 
@@ -125,7 +125,7 @@ public:
         uint64 playerGUID;
         uint64 morlenGUID;
 
-        void Reset()
+        void Reset() override
         {
             me->SetVisible(false);
             me->SetRegeneratingHealth(true);
@@ -158,12 +158,12 @@ public:
             events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, urand(4000, 10000));
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             summons.Despawn(summon);
             if (summon->GetEntry() != NPC_SUNWELL_DEFENDER && me->isActiveObject())
@@ -198,7 +198,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
             {
@@ -208,7 +208,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->isActiveObject())
                 return;
@@ -220,7 +220,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (uint32 evId = events.GetEvent())
+            switch (uint32 evId = events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -231,28 +231,24 @@ public:
                             events.RepeatEvent(5000);
                             break;
                         }
-                    events.PopEvent();
                     me->setActive(false);
                     EnterEvadeMode();
                     return;
                 case EVENT_SUMMON_SOLDIERS:
-                    for (uint8 i=0; i<SUNWELL_DEFENDER_NUM; ++i)
-                        me->SummonCreature(NPC_SUNWELL_DEFENDER, SunwellDefenderPos[i], TEMPSUMMON_TIMED_DESPAWN, 33000+(i/5)*5000);
-                    events.PopEvent();
+                    for (uint8 i = 0; i < SUNWELL_DEFENDER_NUM; ++i)
+                        me->SummonCreature(NPC_SUNWELL_DEFENDER, SunwellDefenderPos[i], TEMPSUMMON_TIMED_DESPAWN, 33000 + (i / 5) * 5000);
                     break;
                 case EVENT_TALK_INTRO_0:
                 case EVENT_TALK_INTRO_1:
                 case EVENT_TALK_INTRO_2:
                 case EVENT_TALK_INTRO_3:
-                    Talk(SAY_INTRO_0 + (evId-EVENT_TALK_INTRO_0));
-                    events.PopEvent();
+                    Talk(SAY_INTRO_0 + (evId - EVENT_TALK_INTRO_0));
                     break;
                 case EVENT_SALUTE:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                         if (Creature* c = ObjectAccessor::GetCreature(*me, *itr))
                             c->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                    events.PopEvent();
                     break;
                 case EVENT_SOLDIERS_RUN_AWAY:
                     {
@@ -276,42 +272,36 @@ public:
                                 }
                                 else
                                 {
-                                    events.PopEvent();
                                     return;
                                 }
                             }
                         }
                     }
-                    events.PopEvent();
                     break;
                 case EVENT_GO_FIGHTPOINT:
                     me->SetWalk(true);
                     me->GetMotionMaster()->MovePoint(0, 11779.30f, -7065.43f, 24.92f);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                    events.PopEvent();
                     break;
                 case EVENT_TALK_SPAWN_0:
                 case EVENT_TALK_SPAWN_1:
-                    Talk(SAY_SPAWN_0 + (evId-EVENT_TALK_SPAWN_0));
-                    events.PopEvent();
+                    Talk(SAY_SPAWN_0 + (evId - EVENT_TALK_SPAWN_0));
                     break;
                 case EVENT_SUMMON_MORLEN:
                     if (Creature* c = me->SummonCreature(NPC_MORLEN_COLDGRIP, 11766.70f, -7050.57f, 25.17f, 5.56f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                         morlenGUID = c->GetGUID();
-                    events.PopEvent();
                     break;
                 case EVENT_TALK_MORLEN_0:
                 case EVENT_TALK_MORLEN_1:
                     if (Creature* c = ObjectAccessor::GetCreature(*me, morlenGUID))
-                        c->AI()->Talk(SAY_MORLEN_0 + (evId-EVENT_TALK_MORLEN_0));
-                    events.PopEvent();
+                        c->AI()->Talk(SAY_MORLEN_0 + (evId - EVENT_TALK_MORLEN_0));
                     break;
                 case EVENT_SPAWN_WAVE_1:
                 case EVENT_SPAWN_WAVE_2:
                 case EVENT_SPAWN_WAVE_3:
                     if (Creature* c = ObjectAccessor::GetCreature(*me, morlenGUID))
                     {
-                        c->AI()->Talk(SAY_MORLEN_1 + (evId-EVENT_SPAWN_WAVE_1));
+                        c->AI()->Talk(SAY_MORLEN_1 + (evId - EVENT_SPAWN_WAVE_1));
                         switch (evId)
                         {
                             // emerge cast tr false 66947
@@ -320,13 +310,13 @@ public:
                                     Position spawnPos;
                                     c->GetPosition(&spawnPos);
                                     spawnPos.m_orientation = 5.80f;
-                                    spawnPos.m_positionX += 5.0f*cos(4.5f);
-                                    spawnPos.m_positionY += 5.0f*sin(4.5f);
-                                    for (uint8 i=0; i<5; ++i)
+                                    spawnPos.m_positionX += 5.0f * cos(4.5f);
+                                    spawnPos.m_positionY += 5.0f * sin(4.5f);
+                                    for (uint8 i = 0; i < 5; ++i)
                                         if (me->SummonCreature(NPC_SCOURGE_ZOMBIE, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
-                                            spawnPos.m_positionX += 2.5f*cos(4.5f);
-                                            spawnPos.m_positionY += 2.5f*sin(4.5f);
+                                            spawnPos.m_positionX += 2.5f * cos(4.5f);
+                                            spawnPos.m_positionY += 2.5f * sin(4.5f);
                                         }
                                 }
                                 break;
@@ -335,14 +325,14 @@ public:
                                     Position spawnPos;
                                     c->GetPosition(&spawnPos);
                                     spawnPos.m_orientation = 5.80f;
-                                    spawnPos.m_positionX += 7.0f*cos(4.0f);
-                                    spawnPos.m_positionY += 7.0f*sin(4.0f);
-                                    for (uint8 i=0; i<3; ++i)
+                                    spawnPos.m_positionX += 7.0f * cos(4.0f);
+                                    spawnPos.m_positionY += 7.0f * sin(4.0f);
+                                    for (uint8 i = 0; i < 3; ++i)
                                         if (Creature* s = me->SummonCreature(NPC_GHOUL_INVADER, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
                                             s->CastSpell(s, 66947, false); // emerge effect
-                                            spawnPos.m_positionX += 4.0f*cos(4.5f);
-                                            spawnPos.m_positionY += 4.0f*sin(4.5f);
+                                            spawnPos.m_positionX += 4.0f * cos(4.5f);
+                                            spawnPos.m_positionY += 4.0f * sin(4.5f);
                                         }
                                 }
                                 break;
@@ -351,20 +341,19 @@ public:
                                     Position spawnPos;
                                     c->GetPosition(&spawnPos);
                                     spawnPos.m_orientation = 5.80f;
-                                    spawnPos.m_positionX += 8.0f*cos(4.0f);
-                                    spawnPos.m_positionY += 8.0f*sin(4.0f);
-                                    for (uint8 i=0; i<3; ++i)
+                                    spawnPos.m_positionX += 8.0f * cos(4.0f);
+                                    spawnPos.m_positionY += 8.0f * sin(4.0f);
+                                    for (uint8 i = 0; i < 3; ++i)
                                         if (Creature* s = me->SummonCreature(NPC_CRYPT_RAIDER, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
                                             s->CastSpell(s, 66947, false); // emerge effect
-                                            spawnPos.m_positionX += 4.0f*cos(4.5f);
-                                            spawnPos.m_positionY += 4.0f*sin(4.5f);
+                                            spawnPos.m_positionX += 4.0f * cos(4.5f);
+                                            spawnPos.m_positionY += 4.0f * sin(4.5f);
                                         }
                                 }
                                 break;
                         }
                     }
-                    events.PopEvent();
                     events.ScheduleEvent(EVENT_SUMMONS_ATTACK, 3000);
                     break;
                 case EVENT_SUMMONS_ATTACK:
@@ -378,14 +367,12 @@ public:
                             c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                             c->AI()->AttackStart(me);
                         }
-                    events.PopEvent();
                     break;
                 case EVENT_OUTRO_0:
                 case EVENT_OUTRO_1:
                 case EVENT_OUTRO_2:
                 case EVENT_OUTRO_3:
-                    Talk(SAY_OUTRO_0 + (evId-EVENT_OUTRO_0));
-                    events.PopEvent();
+                    Talk(SAY_OUTRO_0 + (evId - EVENT_OUTRO_0));
                     if (evId == EVENT_OUTRO_3)
                         events.ScheduleEvent(EVENT_OUTRO_KNEEL, 6000);
                     break;
@@ -393,18 +380,15 @@ public:
                     if (Player* p = ObjectAccessor::GetPlayer(*me, playerGUID))
                         p->KilledMonsterCredit(NPC_THALORIEN_KILL_CREDIT, 0);
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                    events.PopEvent();
                     events.ScheduleEvent(EVENT_DISAPPEAR, 6000);
                     break;
                 case EVENT_DISAPPEAR:
-                    events.PopEvent();
                     me->SetVisible(false);
                     me->setActive(false);
                     EnterEvadeMode();
                     break;
                 case EVENT_SET_FACING:
                     me->SetFacingTo(2.45f);
-                    events.PopEvent();
                     break;
 
                 case EVENT_SPELL_BLADESTORM:
@@ -427,20 +411,20 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == EVENT_CHARGE)
                 events.ScheduleEvent(EVENT_SET_FACING, 0);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (me->isActiveObject())
                 return;
             ScriptedAI::EnterEvadeMode();
         }
 
-        void SetData(uint32 type, uint32 id)
+        void SetData(uint32 type, uint32 id) override
         {
             if (type == 1 && id == 1 && !me->isActiveObject())
                 if (Player* p = me->SelectNearestPlayer(50.0f))
@@ -481,13 +465,13 @@ public:
                     c->AI()->DoAction(-1);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectLaunch += SpellEffectFn(spell_bh_cleanse_quel_delar_SpellScript::OnEffect, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_bh_cleanse_quel_delar_SpellScript();
     }
@@ -498,14 +482,14 @@ class npc_grand_magister_rommath : public CreatureScript
 public:
     npc_grand_magister_rommath() : CreatureScript("npc_grand_magister_rommath") { }
 
-    CreatureAI *GetAI(Creature *creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_grand_magister_rommathAI(creature);
     }
 
     struct npc_grand_magister_rommathAI : public NullCreatureAI
     {
-        npc_grand_magister_rommathAI(Creature *c) : NullCreatureAI(c)
+        npc_grand_magister_rommathAI(Creature* c) : NullCreatureAI(c)
         {
             announced = false;
             playerGUID = 0;
@@ -516,7 +500,7 @@ public:
         bool announced;
         uint64 playerGUID;
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!announced && who->GetTypeId() == TYPEID_PLAYER && who->GetPositionZ() < 30.0f)
             {
@@ -527,7 +511,7 @@ public:
             }
         }
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == -1 && !me->isActiveObject())
             {
@@ -551,7 +535,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->isActiveObject())
                 return;
@@ -570,16 +554,16 @@ public:
                     break;
                 case 3:
                     me->SetWalk(true);
-                    me->GetMotionMaster()->MovePath(me->GetEntry()*100, false);
+                    me->GetMotionMaster()->MovePath(me->GetEntry() * 100, false);
                     if (Creature* c = me->FindNearestCreature(NPC_THERON, 60.0f, true))
                     {
                         c->SetWalk(true);
-                        c->GetMotionMaster()->MovePath(c->GetEntry()*100, false);
+                        c->GetMotionMaster()->MovePath(c->GetEntry() * 100, false);
                     }
                     if (Creature* c = me->FindNearestCreature(NPC_AURIC, 60.0f, true))
                     {
                         c->SetWalk(true);
-                        c->GetMotionMaster()->MovePath(c->GetEntry()*100, false);
+                        c->GetMotionMaster()->MovePath(c->GetEntry() * 100, false);
                     }
                     break;
                 case 4:
@@ -659,7 +643,7 @@ class npc_greengill_slave : public CreatureScript
 public:
     npc_greengill_slave() : CreatureScript("npc_greengill_slave") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_greengill_slaveAI(creature);
     }
@@ -668,9 +652,9 @@ public:
     {
         npc_greengill_slaveAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo)
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             Player* player = caster->ToPlayer();
             if (!player)
@@ -691,7 +675,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             DoMeleeAttackIfReady();
         }

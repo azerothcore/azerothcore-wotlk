@@ -51,7 +51,7 @@ class boss_loken : public CreatureScript
 public:
     boss_loken() : CreatureScript("boss_loken") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_lokenAI (creature);
     }
@@ -72,9 +72,9 @@ public:
         uint32 IntroTimer;
         uint8 HealthCheck;
 
-        void MoveInLineOfSight(Unit*) { }
+        void MoveInLineOfSight(Unit*) override { }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             if (m_pInstance)
@@ -99,7 +99,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
@@ -117,7 +117,7 @@ public:
             }
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             Talk(SAY_DEATH);
 
@@ -131,16 +131,22 @@ public:
             {
                 switch(HealthCheck)
                 {
-                    case 75: Talk(SAY_75HEALTH); break;
-                    case 50: Talk(SAY_50HEALTH); break;
-                    case 25: Talk(SAY_25HEALTH); break;
+                    case 75:
+                        Talk(SAY_75HEALTH);
+                        break;
+                    case 50:
+                        Talk(SAY_50HEALTH);
+                        break;
+                    case 25:
+                        Talk(SAY_25HEALTH);
+                        break;
                 }
             }
             else
                 Talk(SAY_NOVA);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -148,7 +154,7 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!isActive)
             {
@@ -177,7 +183,7 @@ public:
 
                     me->SetControlled(false, UNIT_STATE_STUNNED);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    
+
                     if (Player* target = SelectTargetFromPlayerList(80))
                         AttackStart(target);
                 }
@@ -194,7 +200,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(HealthCheck))
@@ -217,7 +223,6 @@ public:
                     break;
                 case EVENT_SHOCKWAVE:
                     me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_PULSING_SHOCKWAVE_H : SPELL_PULSING_SHOCKWAVE_N, false);
-                    events.PopEvent();
                     break;
                 case EVENT_ARC_LIGHTNING:
                     if (Unit* target = SelectTargetFromPlayerList(100, SPELL_ARC_LIGHTNING))
@@ -227,7 +232,6 @@ public:
                     break;
                 case EVENT_AURA_REMOVE:
                     me->RemoveAura(SPELL_LIGHTNING_NOVA_THUNDERS);
-                    events.PopEvent();
                     break;
             }
 
@@ -238,33 +242,33 @@ public:
 
 class spell_loken_pulsing_shockwave : public SpellScriptLoader
 {
-    public:
-        spell_loken_pulsing_shockwave() : SpellScriptLoader("spell_loken_pulsing_shockwave") { }
+public:
+    spell_loken_pulsing_shockwave() : SpellScriptLoader("spell_loken_pulsing_shockwave") { }
 
-        class spell_loken_pulsing_shockwave_SpellScript : public SpellScript
+    class spell_loken_pulsing_shockwave_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_loken_pulsing_shockwave_SpellScript);
+
+        void CalculateDamage(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_loken_pulsing_shockwave_SpellScript);
+            if (!GetHitUnit())
+                return;
 
-            void CalculateDamage(SpellEffIndex /*effIndex*/)
-            {
-                if (!GetHitUnit())
-                    return;
-
-                float distance = GetCaster()->GetDistance2d(GetHitUnit());
-                if (distance > 1.0f)
-                    SetHitDamage(int32(GetHitDamage() * distance));
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_loken_pulsing_shockwave_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_loken_pulsing_shockwave_SpellScript();
+            float distance = GetCaster()->GetDistance2d(GetHitUnit());
+            if (distance > 1.0f)
+                SetHitDamage(int32(GetHitDamage() * distance));
         }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_loken_pulsing_shockwave_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_loken_pulsing_shockwave_SpellScript();
+    }
 };
 
 void AddSC_boss_loken()
