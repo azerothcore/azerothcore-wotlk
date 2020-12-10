@@ -7,8 +7,14 @@
 #include "SharedDefines.h"
 #include "LogMock.h"
 #include "WorldMock.h"
+#include "ArenaSpectator.h"
 
 LoginDatabaseWorkerPool LoginDatabase;
+CharacterDatabaseWorkerPool CharacterDatabase;
+WorldDatabaseWorkerPool WorldDatabase;
+uint32 realmID;
+void AddScripts() {}
+bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char const* args) { return false; }
 
 using namespace acore::Honor;
 using namespace acore::XP;
@@ -92,4 +98,12 @@ TEST(FormulasTest, BaseGain)
     // check outError() has been called after passing an invalid ContentLevels content
     EXPECT_CALL(*logMock, outErrorMock()).Times(1);
     EXPECT_EQ(BaseGain(79, 1, ContentLevels(999)), 0);
+}
+
+TEST(FormulasTest, Gain)
+{
+    auto worldMock = new WorldMock();
+    sWorld.reset((worldMock));
+    // TODO: create mocks of Player and Creature
+    // Gain(nullptr, nullptr);
 }
