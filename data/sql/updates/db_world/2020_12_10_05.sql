@@ -1,3 +1,19 @@
+-- DB update 2020_12_10_04 -> 2020_12_10_05
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_10_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_10_04 2020_12_10_05 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1606619446977707200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1606619446977707200');
 
 -- Add cosmetic event to Iron Mender, cast Fuse Metal out of combat
@@ -9,3 +25,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (34198, 0, 6, 0, 1, 0, 100, 0, 4000, 4000, 20000, 20000, 0, 11, 64897, 1, 1, 0, 0, 0, 11, 34190, 5, 0, 0, 0, 0, 0, 0, 'Cosmetic - Cast Fuse Metal (10)'),
 (34198, 0, 7, 0, 1, 0, 100, 0, 4000, 4000, 20000, 20000, 0, 11, 64968, 1, 1, 0, 0, 0, 11, 34190, 5, 0, 0, 0, 0, 0, 0, 'Cosmetic - Cast Fuse Metal (25)');
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
