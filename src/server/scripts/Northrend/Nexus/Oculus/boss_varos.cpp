@@ -67,7 +67,7 @@ class boss_varos : public CreatureScript
 public:
     boss_varos() : CreatureScript("boss_varos") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_varosAI (pCreature);
     }
@@ -82,7 +82,7 @@ public:
         EventMap events;
         float ZapAngle;
 
-        void Reset()
+        void Reset() override
         {
             if (pInstance)
             {
@@ -107,7 +107,7 @@ public:
             me->DisableRotate(false);
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             Talk(SAY_AGGRO);
 
@@ -121,7 +121,7 @@ public:
             events.RescheduleEvent(EVENT_ENERGIZE_CORES_THIN, 0);
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             Talk(SAY_DEATH);
 
@@ -132,17 +132,17 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
             ScriptedAI::EnterEvadeMode();
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void JustSummoned(Creature*  /*summon*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void JustSummoned(Creature*  /*summon*/) override {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;

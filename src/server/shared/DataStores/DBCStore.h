@@ -19,8 +19,8 @@ public:
     DBCStorageBase(char const* fmt);
     virtual ~DBCStorageBase();
 
-    char const* GetFormat() const { return _fileFormat; }
-    uint32 GetFieldCount() const { return _fieldCount; }
+    [[nodiscard]] char const* GetFormat() const { return _fileFormat; }
+    [[nodiscard]] uint32 GetFieldCount() const { return _fieldCount; }
 
     virtual bool Load(char const* path) = 0;
     virtual bool LoadStringsFrom(char const* path) = 0;
@@ -49,13 +49,13 @@ public:
         _indexTable.AsT = nullptr;
     }
 
-    ~DBCStorage()
+    ~DBCStorage() override
     {
         delete[] reinterpret_cast<char*>(_indexTable.AsT);
     }
 
-    T const* LookupEntry(uint32 id) const { return (id >= _indexTableSize) ? nullptr : _indexTable.AsT[id]; }
-    T const* AssertEntry(uint32 id) const { return ASSERT_NOTNULL(LookupEntry(id)); }
+    [[nodiscard]] T const* LookupEntry(uint32 id) const { return (id >= _indexTableSize) ? nullptr : _indexTable.AsT[id]; }
+    [[nodiscard]] T const* AssertEntry(uint32 id) const { return ASSERT_NOTNULL(LookupEntry(id)); }
 
 #ifdef ELUNA
     void SetEntry(uint32 id, T* t)
@@ -78,7 +78,7 @@ public:
     }
 #endif
 
-    uint32 GetNumRows() const { return _indexTableSize; }
+    [[nodiscard]] uint32 GetNumRows() const { return _indexTableSize; }
 
     bool Load(char const* path) override
     {

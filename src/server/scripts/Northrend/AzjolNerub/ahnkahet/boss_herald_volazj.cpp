@@ -70,7 +70,7 @@ public:
         uint8 insanityTimes;
         uint8 insanityHandled;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -89,7 +89,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* pTarget, const SpellInfo* spell)
+        void SpellHitTarget(Unit* pTarget, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_INSANITY)
             {
@@ -146,7 +146,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8000);
             events.ScheduleEvent(EVENT_HERALD_SHADOW, 5000);
@@ -164,7 +164,7 @@ public:
             me->SetInCombatWithZone();
         }
 
-        void JustSummoned(Creature* summon) { summons.Summon(summon); }
+        void JustSummoned(Creature* summon) override { summons.Summon(summon); }
 
         uint32 GetSpellForPhaseMask(uint32 phase)
         {
@@ -217,7 +217,7 @@ public:
             return false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -281,7 +281,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
 
@@ -294,13 +294,13 @@ public:
             ResetPlayersPhaseMask();
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_SLAY);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_volazjAI(creature);
     }

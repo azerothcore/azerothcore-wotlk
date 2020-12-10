@@ -46,7 +46,7 @@ class boss_zuramat : public CreatureScript
 public:
     boss_zuramat() : CreatureScript("boss_zuramat") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_zuramatAI (pCreature);
     }
@@ -62,13 +62,13 @@ public:
         EventMap events;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
@@ -80,7 +80,7 @@ public:
                 pInstance->SetData(DATA_ACHIEV, 1);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -116,7 +116,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
@@ -124,7 +124,7 @@ public:
                 pInstance->SetData(DATA_BOSS_DIED, 0);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim && victim->GetGUID() == me->GetGUID())
                 return;
@@ -132,7 +132,7 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void JustSummoned(Creature* pSummoned)
+        void JustSummoned(Creature* pSummoned) override
         {
             if (pSummoned)
             {
@@ -143,7 +143,7 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature* pSummoned)
+        void SummonedCreatureDespawn(Creature* pSummoned) override
         {
             if (pSummoned)
             {
@@ -155,9 +155,9 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             events.Reset();
@@ -173,7 +173,7 @@ class npc_vh_void_sentry : public CreatureScript
 public:
     npc_vh_void_sentry() : CreatureScript("npc_vh_void_sentry") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_vh_void_sentryAI (pCreature);
     }
@@ -198,14 +198,14 @@ public:
         uint64 SummonedGUID;
         uint16 checkTimer;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == -1337)
                 if (Creature* c = pInstance->instance->GetCreature(SummonedGUID))
                     c->DespawnOrUnsummon();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
             {
@@ -216,13 +216,13 @@ public:
             me->DespawnOrUnsummon(5000);
         }
 
-        void SummonedCreatureDespawn(Creature* pSummoned)
+        void SummonedCreatureDespawn(Creature* pSummoned) override
         {
             if (pSummoned)
                 pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (checkTimer <= diff)
             {
