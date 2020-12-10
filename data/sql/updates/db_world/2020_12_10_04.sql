@@ -1,3 +1,19 @@
+-- DB update 2020_12_10_03 -> 2020_12_10_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_10_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_10_03 2020_12_10_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1606604290694357400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1606604290694357400');
 
 -- Update position, facing and ready emote for Lightning Charged Iron Dwarf (10 & 25 Ulduar)
@@ -45,3 +61,12 @@ DELETE FROM `creature` WHERE (`id` = 34190) AND (`guid` IN (136770));
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (136770, 34190, 603, 0, 0, 2, 1, 26155, 0, 1550.216064, -10.390898, 420.966736, 4.776779, 604800, 0, 0, 404430, 0, 0, 0, 0, 0, '', 0);
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
