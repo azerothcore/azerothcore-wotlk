@@ -40,7 +40,7 @@ public:
                     me->GetMotionMaster()->MovePoint(0, *owner);
         }
 
-        void MovementInform(uint32  /*type*/, uint32  /*id*/)
+        void MovementInform(uint32  /*type*/, uint32  /*id*/) override
         {
             if (Creature* cow = me->FindNearestCreature(24797, 5.0f, true))
             {
@@ -54,14 +54,14 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
         {
             if (caster && spellInfo->Id == 44454)
                 me->GetMotionMaster()->MovePoint(0, *caster);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_attracted_reef_bullAI(creature);
     }
@@ -79,13 +79,13 @@ public:
         uint32 timer;
         short phase;
 
-        void Reset()
+        void Reset() override
         {
             timer = 0;
             phase = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer >= 6000 && phase < 4)
             {
@@ -130,7 +130,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_your_inner_turmoilAI(creature);
     }
@@ -157,7 +157,7 @@ class npc_apothecary_hanes : public CreatureScript
 public:
     npc_apothecary_hanes() : CreatureScript("npc_apothecary_hanes") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
         {
@@ -172,19 +172,19 @@ public:
         npc_Apothecary_HanesAI(Creature* creature) : npc_escortAI(creature) { }
         uint32 PotTimer;
 
-        void Reset()
+        void Reset() override
         {
             SetDespawnAtFar(false);
             PotTimer = 10000; //10 sec cooldown on potion
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Player* player = GetPlayerForEscort())
                 player->FailQuest(QUEST_TRAIL_OF_FIRE);
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             if (HealthBelowPct(75))
             {
@@ -199,7 +199,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -249,7 +249,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_Apothecary_HanesAI(creature);
     }
@@ -273,7 +273,7 @@ public:
     {
         npc_plaguehound_trackerAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             uint64 summonerGUID = 0;
 
@@ -289,7 +289,7 @@ public:
             Start(false, false, summonerGUID);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             if (waypointId != 26)
                 return;
@@ -298,7 +298,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_plaguehound_trackerAI(creature);
     }

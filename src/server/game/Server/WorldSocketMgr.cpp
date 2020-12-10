@@ -68,7 +68,7 @@ public:
         m_Reactor = new ACE_Reactor (imp, 1);
     }
 
-    virtual ~ReactorRunnable()
+    ~ReactorRunnable() override
     {
         Stop();
         Wait();
@@ -142,7 +142,7 @@ protected:
         m_NewSockets.clear();
     }
 
-    virtual int svc()
+    int svc() override
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outStaticDebug ("Network Thread Starting");

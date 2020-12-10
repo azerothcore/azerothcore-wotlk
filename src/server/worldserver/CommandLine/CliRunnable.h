@@ -15,7 +15,7 @@
 class CliRunnable : public acore::Runnable
 {
 public:
-    void run();
+    void run() override;
 };
 
 #endif
