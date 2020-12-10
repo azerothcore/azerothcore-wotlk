@@ -1,3 +1,19 @@
+-- DB update 2020_12_10_00 -> 2020_12_10_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_10_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_10_00 2020_12_10_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1602173033401388800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1602173033401388800');
 /*
  * Raid: Ulduar 
@@ -138,3 +154,12 @@ UPDATE `creature_template` SET `mindmg` = 24450, `maxdmg` = 34850, `DamageModifi
 /* MIMIRON COMMAND UNIT */
 UPDATE `creature_template` SET `mindmg` = 12725, `maxdmg` = 17350, `DamageModifier` = 1.01 WHERE `entry` = 33670;
 UPDATE `creature_template` SET `mindmg` = 24450, `maxdmg` = 34850, `DamageModifier` = 1.01 WHERE `entry` = 34109;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
