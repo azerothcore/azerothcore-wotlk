@@ -174,11 +174,11 @@ enum BattlegroundTeams
 
 struct BattlegroundObjectInfo
 {
-    BattlegroundObjectInfo() : object(nullptr), timer(0), spellid(0) {}
+    BattlegroundObjectInfo()  {}
 
-    GameObject*  object;
-    int32       timer;
-    uint32      spellid;
+    GameObject*  object{nullptr};
+    int32       timer{0};
+    uint32      spellid{0};
 };
 
 enum ScoreType
@@ -246,7 +246,7 @@ struct BattlegroundScore
         DamageDone(0), HealingDone(0), player(player)
     { }
 
-    virtual ~BattlegroundScore() { }                        //virtual destructor is used when deleting score from scores map
+    virtual ~BattlegroundScore() = default;                        //virtual destructor is used when deleting score from scores map
 
     uint32 KillingBlows;
     uint32 Deaths;
@@ -256,24 +256,24 @@ struct BattlegroundScore
     uint32 HealingDone;
     Player* player;
 
-    uint32 GetKillingBlows() const { return KillingBlows; }
-    uint32 GetDeaths() const { return Deaths; }
-    uint32 GetHonorableKills() const { return HonorableKills; }
-    uint32 GetBonusHonor() const { return BonusHonor; }
-    uint32 GetDamageDone() const { return DamageDone; }
-    uint32 GetHealingDone() const { return HealingDone; }
+    [[nodiscard]] uint32 GetKillingBlows() const { return KillingBlows; }
+    [[nodiscard]] uint32 GetDeaths() const { return Deaths; }
+    [[nodiscard]] uint32 GetHonorableKills() const { return HonorableKills; }
+    [[nodiscard]] uint32 GetBonusHonor() const { return BonusHonor; }
+    [[nodiscard]] uint32 GetDamageDone() const { return DamageDone; }
+    [[nodiscard]] uint32 GetHealingDone() const { return HealingDone; }
 
-    virtual uint32 GetAttr1() const { return 0; }
-    virtual uint32 GetAttr2() const { return 0; }
-    virtual uint32 GetAttr3() const { return 0; }
-    virtual uint32 GetAttr4() const { return 0; }
-    virtual uint32 GetAttr5() const { return 0; }
+    [[nodiscard]] virtual uint32 GetAttr1() const { return 0; }
+    [[nodiscard]] virtual uint32 GetAttr2() const { return 0; }
+    [[nodiscard]] virtual uint32 GetAttr3() const { return 0; }
+    [[nodiscard]] virtual uint32 GetAttr4() const { return 0; }
+    [[nodiscard]] virtual uint32 GetAttr5() const { return 0; }
 };
 
 class ArenaLogEntryData
 {
 public:
-    ArenaLogEntryData() : Guid(0), ArenaTeamId(0), DamageDone(0), HealingDone(0), KillingBlows(0) {}
+    ArenaLogEntryData()  {}
     void Fill(const char* name, uint32 guid, uint32 acc, uint32 arenaTeamId, std::string ip)
     {
         Name = std::string(name);
@@ -284,13 +284,13 @@ public:
     }
 
     std::string Name;
-    uint32 Guid;
+    uint32 Guid{0};
     uint32 Acc;
-    uint32 ArenaTeamId;
+    uint32 ArenaTeamId{0};
     std::string IP;
-    uint32 DamageDone;
-    uint32 HealingDone;
-    uint32 KillingBlows;
+    uint32 DamageDone{0};
+    uint32 HealingDone{0};
+    uint32 KillingBlows{0};
 };
 
 enum BGHonorMode
@@ -339,31 +339,31 @@ public:
     virtual void DestroyGate(Player* /*player*/, GameObject* /*go*/) {}
 
     /* achievement req. */
-    virtual bool AllNodesConrolledByTeam(TeamId /*teamId*/) const { return false; }
+    [[nodiscard]] virtual bool AllNodesConrolledByTeam(TeamId /*teamId*/) const { return false; }
     void StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);
 
     /* Battleground */
     // Get methods:
-    char const* GetName() const         { return m_Name; }
-    BattlegroundTypeId GetBgTypeID(bool GetRandom = false) const { return GetRandom ? m_RandomTypeID : m_RealTypeID; }
-    uint32 GetInstanceID() const        { return m_InstanceID; }
-    BattlegroundStatus GetStatus() const { return m_Status; }
-    uint32 GetClientInstanceID() const  { return m_ClientInstanceID; }
-    uint32 GetStartTime() const         { return m_StartTime; }
-    uint32 GetEndTime() const           { return m_EndTime; }
-    uint32 GetLastResurrectTime() const { return m_LastResurrectTime; }
+    [[nodiscard]] char const* GetName() const         { return m_Name; }
+    [[nodiscard]] BattlegroundTypeId GetBgTypeID(bool GetRandom = false) const { return GetRandom ? m_RandomTypeID : m_RealTypeID; }
+    [[nodiscard]] uint32 GetInstanceID() const        { return m_InstanceID; }
+    [[nodiscard]] BattlegroundStatus GetStatus() const { return m_Status; }
+    [[nodiscard]] uint32 GetClientInstanceID() const  { return m_ClientInstanceID; }
+    [[nodiscard]] uint32 GetStartTime() const         { return m_StartTime; }
+    [[nodiscard]] uint32 GetEndTime() const           { return m_EndTime; }
+    [[nodiscard]] uint32 GetLastResurrectTime() const { return m_LastResurrectTime; }
 
-    uint32 GetMinLevel() const          { return m_LevelMin; }
-    uint32 GetMaxLevel() const          { return m_LevelMax; }
+    [[nodiscard]] uint32 GetMinLevel() const          { return m_LevelMin; }
+    [[nodiscard]] uint32 GetMaxLevel() const          { return m_LevelMax; }
 
-    uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayersPerTeam; }
-    uint32 GetMinPlayersPerTeam() const { return m_MinPlayersPerTeam; }
+    [[nodiscard]] uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayersPerTeam; }
+    [[nodiscard]] uint32 GetMinPlayersPerTeam() const { return m_MinPlayersPerTeam; }
 
-    int32 GetStartDelayTime() const     { return m_StartDelayTime; }
-    uint8 GetArenaType() const          { return m_ArenaType; }
-    TeamId GetWinner() const             { return m_WinnerId; }
-    uint32 GetScriptId() const          { return ScriptId; }
-    uint32 GetBonusHonorFromKill(uint32 kills) const;
+    [[nodiscard]] int32 GetStartDelayTime() const     { return m_StartDelayTime; }
+    [[nodiscard]] uint8 GetArenaType() const          { return m_ArenaType; }
+    [[nodiscard]] TeamId GetWinner() const             { return m_WinnerId; }
+    [[nodiscard]] uint32 GetScriptId() const          { return ScriptId; }
+    [[nodiscard]] uint32 GetBonusHonorFromKill(uint32 kills) const;
 
     bool IsRandom()                     { return m_IsRandom; }
 
@@ -393,29 +393,29 @@ public:
 
     void DecreaseInvitedCount(TeamId teamId)    { if (m_BgInvitedPlayers[teamId]) --m_BgInvitedPlayers[teamId]; }
     void IncreaseInvitedCount(TeamId teamId)    { ++m_BgInvitedPlayers[teamId]; }
-    uint32 GetInvitedCount(TeamId teamId) const { return m_BgInvitedPlayers[teamId]; }
+    [[nodiscard]] uint32 GetInvitedCount(TeamId teamId) const { return m_BgInvitedPlayers[teamId]; }
 
-    bool HasFreeSlots() const;
-    uint32 GetFreeSlotsForTeam(TeamId teamId) const;
-    uint32 GetMaxFreeSlots() const;
+    [[nodiscard]] bool HasFreeSlots() const;
+    [[nodiscard]] uint32 GetFreeSlotsForTeam(TeamId teamId) const;
+    [[nodiscard]] uint32 GetMaxFreeSlots() const;
 
     typedef std::set<Player*> SpectatorList;
     typedef std::map<uint64, uint64> ToBeTeleportedMap;
     void AddSpectator(Player* p) { m_Spectators.insert(p); }
     void RemoveSpectator(Player* p) { m_Spectators.erase(p); }
     bool HaveSpectators() { return !m_Spectators.empty(); }
-    const SpectatorList& GetSpectators() const { return m_Spectators; }
+    [[nodiscard]] const SpectatorList& GetSpectators() const { return m_Spectators; }
     void AddToBeTeleported(uint64 spectator, uint64 participant) { m_ToBeTeleported[spectator] = participant; }
     void RemoveToBeTeleported(uint64 spectator) { ToBeTeleportedMap::iterator itr = m_ToBeTeleported.find(spectator); if (itr != m_ToBeTeleported.end()) m_ToBeTeleported.erase(itr); }
     void SpectatorsSendPacket(WorldPacket& data);
 
-    bool isArena() const        { return m_IsArena; }
-    bool isBattleground() const { return !m_IsArena; }
-    bool isRated() const        { return m_IsRated; }
+    [[nodiscard]] bool isArena() const        { return m_IsArena; }
+    [[nodiscard]] bool isBattleground() const { return !m_IsArena; }
+    [[nodiscard]] bool isRated() const        { return m_IsRated; }
 
     typedef std::map<uint64, Player*> BattlegroundPlayerMap;
-    BattlegroundPlayerMap const& GetPlayers() const { return m_Players; }
-    uint32 GetPlayersSize() const { return m_Players.size(); }
+    [[nodiscard]] BattlegroundPlayerMap const& GetPlayers() const { return m_Players; }
+    [[nodiscard]] uint32 GetPlayersSize() const { return m_Players.size(); }
 
     void ReadyMarkerClicked(Player* p); // pussywizard
     std::set<uint32> readyMarkerClickedSet; // pussywizard
@@ -423,11 +423,11 @@ public:
     typedef std::map<uint64, BattlegroundScore*> BattlegroundScoreMap;
     typedef std::map<uint64, ArenaLogEntryData> ArenaLogEntryDataMap;// pussywizard
     ArenaLogEntryDataMap ArenaLogEntries; // pussywizard
-    BattlegroundScoreMap::const_iterator GetPlayerScoresBegin() const { return PlayerScores.begin(); }
-    BattlegroundScoreMap::const_iterator GetPlayerScoresEnd() const { return PlayerScores.end(); }
-    uint32 GetPlayerScoresSize() const { return PlayerScores.size(); }
+    [[nodiscard]] BattlegroundScoreMap::const_iterator GetPlayerScoresBegin() const { return PlayerScores.begin(); }
+    [[nodiscard]] BattlegroundScoreMap::const_iterator GetPlayerScoresEnd() const { return PlayerScores.end(); }
+    [[nodiscard]] uint32 GetPlayerScoresSize() const { return PlayerScores.size(); }
 
-    uint32 GetReviveQueueSize() const { return m_ReviveQueue.size(); }
+    [[nodiscard]] uint32 GetReviveQueueSize() const { return m_ReviveQueue.size(); }
 
     void AddPlayerToResurrectQueue(uint64 npc_guid, uint64 player_guid);
     void RemovePlayerFromResurrectQueue(Player* player);
@@ -442,12 +442,12 @@ public:
 
     // Location
     void SetMapId(uint32 MapID) { m_MapId = MapID; }
-    uint32 GetMapId() const { return m_MapId; }
+    [[nodiscard]] uint32 GetMapId() const { return m_MapId; }
 
     // Map pointers
     void SetBgMap(BattlegroundMap* map) { m_Map = map; }
-    BattlegroundMap* GetBgMap() const { ASSERT(m_Map); return m_Map; }
-    BattlegroundMap* FindBgMap() const { return m_Map; }
+    [[nodiscard]] BattlegroundMap* GetBgMap() const { ASSERT(m_Map); return m_Map; }
+    [[nodiscard]] BattlegroundMap* FindBgMap() const { return m_Map; }
 
     void SetTeamStartLoc(TeamId teamId, float X, float Y, float Z, float O);
     void GetTeamStartLoc(TeamId teamId, float& X, float& Y, float& Z, float& O) const
@@ -459,12 +459,12 @@ public:
     }
 
     void SetStartMaxDist(float startMaxDist) { m_StartMaxDist = startMaxDist; }
-    float GetStartMaxDist() const { return m_StartMaxDist; }
+    [[nodiscard]] float GetStartMaxDist() const { return m_StartMaxDist; }
 
     // Packet Transfer
     // method that should fill worldpacket with actual world states (not yet implemented for all battlegrounds!)
     virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
-    void SendPacketToTeam(TeamId teamId, WorldPacket* packet, Player* sender = NULL, bool self = true);
+    void SendPacketToTeam(TeamId teamId, WorldPacket* packet, Player* sender = nullptr, bool self = true);
     void SendPacketToAll(WorldPacket* packet);
     void YellToAll(Creature* creature, const char* text, uint32 language);
 
@@ -492,13 +492,13 @@ public:
     void SendMessage2ToAll(uint32 entry, ChatMsg type, Player const* source, uint32 strId1 = 0, uint32 strId2 = 0);
 
     // Raid Group
-    Group* GetBgRaid(TeamId teamId) const { return m_BgRaids[teamId]; }
+    [[nodiscard]] Group* GetBgRaid(TeamId teamId) const { return m_BgRaids[teamId]; }
     void SetBgRaid(TeamId teamId, Group* bg_raid);
 
     virtual void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
 
-    uint32 GetPlayersCountByTeam(TeamId teamId) const { return m_PlayersCount[teamId]; }
-    uint32 GetAlivePlayersCountByTeam(TeamId teamId) const;   // used in arenas to correctly handle death in spirit of redemption / last stand etc. (killer = killed) cases
+    [[nodiscard]] uint32 GetPlayersCountByTeam(TeamId teamId) const { return m_PlayersCount[teamId]; }
+    [[nodiscard]] uint32 GetAlivePlayersCountByTeam(TeamId teamId) const;   // used in arenas to correctly handle death in spirit of redemption / last stand etc. (killer = killed) cases
     void UpdatePlayersCountByTeam(TeamId teamId, bool remove)
     {
         if (remove)
@@ -509,11 +509,11 @@ public:
 
     // used for rated arena battles
     void SetArenaTeamIdForTeam(TeamId teamId, uint32 ArenaTeamId) { m_ArenaTeamIds[teamId] = ArenaTeamId; }
-    uint32 GetArenaTeamIdForTeam(TeamId teamId) const             { return m_ArenaTeamIds[teamId]; }
+    [[nodiscard]] uint32 GetArenaTeamIdForTeam(TeamId teamId) const             { return m_ArenaTeamIds[teamId]; }
     void SetArenaTeamRatingChangeForTeam(TeamId teamId, int32 RatingChange) { m_ArenaTeamRatingChanges[teamId] = RatingChange; }
-    int32 GetArenaTeamRatingChangeForTeam(TeamId teamId) const    { return m_ArenaTeamRatingChanges[teamId]; }
+    [[nodiscard]] int32 GetArenaTeamRatingChangeForTeam(TeamId teamId) const    { return m_ArenaTeamRatingChanges[teamId]; }
     void SetArenaMatchmakerRating(TeamId teamId, uint32 MMR)      { m_ArenaTeamMMR[teamId] = MMR; }
-    uint32 GetArenaMatchmakerRating(TeamId teamId) const          { return m_ArenaTeamMMR[teamId]; }
+    [[nodiscard]] uint32 GetArenaMatchmakerRating(TeamId teamId) const          { return m_ArenaTeamMMR[teamId]; }
     void CheckArenaAfterTimerConditions();
     void CheckArenaWinConditions();
     virtual void UpdateArenaWorldState();
@@ -571,54 +571,54 @@ public:
 
     // since arenas can be AvA or Hvh, we have to get the "temporary" team of a player
     static TeamId GetOtherTeamId(TeamId teamId);
-    bool IsPlayerInBattleground(uint64 guid) const;
+    [[nodiscard]] bool IsPlayerInBattleground(uint64 guid) const;
 
-    bool ToBeDeleted() const { return m_SetDeleteThis; }
+    [[nodiscard]] bool ToBeDeleted() const { return m_SetDeleteThis; }
     //void SetDeleteThis() { m_SetDeleteThis = true; }
 
     void RewardXPAtKill(Player* killer, Player* victim);
 
-    virtual uint64 GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const { return 0; }
+    [[nodiscard]] virtual uint64 GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const { return 0; }
     virtual void SetDroppedFlagGUID(uint64 /*guid*/, TeamId /*teamId*/ = TEAM_NEUTRAL) {}
-    uint32 GetTeamScore(TeamId teamId) const;
+    [[nodiscard]] uint32 GetTeamScore(TeamId teamId) const;
 
     virtual TeamId GetPrematureWinner();
 
     // because BattleGrounds with different types and same level range has different m_BracketId
-    uint8 GetUniqueBracketId() const;
+    [[nodiscard]] uint8 GetUniqueBracketId() const;
 
     BattlegroundAV* ToBattlegroundAV() { if (GetBgTypeID(true) == BATTLEGROUND_AV) return reinterpret_cast<BattlegroundAV*>(this); else return nullptr; }
-    BattlegroundAV const* ToBattlegroundAV() const { if (GetBgTypeID(true) == BATTLEGROUND_AV) return reinterpret_cast<const BattlegroundAV*>(this); else return nullptr; }
+    [[nodiscard]] BattlegroundAV const* ToBattlegroundAV() const { if (GetBgTypeID(true) == BATTLEGROUND_AV) return reinterpret_cast<const BattlegroundAV*>(this); else return nullptr; }
 
     BattlegroundWS* ToBattlegroundWS() { if (GetBgTypeID(true) == BATTLEGROUND_WS) return reinterpret_cast<BattlegroundWS*>(this); else return nullptr; }
-    BattlegroundWS const* ToBattlegroundWS() const { if (GetBgTypeID(true) == BATTLEGROUND_WS) return reinterpret_cast<const BattlegroundWS*>(this); else return nullptr; }
+    [[nodiscard]] BattlegroundWS const* ToBattlegroundWS() const { if (GetBgTypeID(true) == BATTLEGROUND_WS) return reinterpret_cast<const BattlegroundWS*>(this); else return nullptr; }
 
     BattlegroundAB* ToBattlegroundAB() { if (GetBgTypeID(true) == BATTLEGROUND_AB) return reinterpret_cast<BattlegroundAB*>(this); else return nullptr; }
-    BattlegroundAB const* ToBattlegroundAB() const { if (GetBgTypeID(true) == BATTLEGROUND_AB) return reinterpret_cast<const BattlegroundAB*>(this); else return nullptr; }
+    [[nodiscard]] BattlegroundAB const* ToBattlegroundAB() const { if (GetBgTypeID(true) == BATTLEGROUND_AB) return reinterpret_cast<const BattlegroundAB*>(this); else return nullptr; }
 
     BattlegroundNA* ToBattlegroundNA() { if (GetBgTypeID(true) == BATTLEGROUND_NA) return reinterpret_cast<BattlegroundNA*>(this); else return nullptr; }
-    BattlegroundNA const* ToBattlegroundNA() const { if (GetBgTypeID(true) == BATTLEGROUND_NA) return reinterpret_cast<const BattlegroundNA*>(this); else return nullptr; }
+    [[nodiscard]] BattlegroundNA const* ToBattlegroundNA() const { if (GetBgTypeID(true) == BATTLEGROUND_NA) return reinterpret_cast<const BattlegroundNA*>(this); else return nullptr; }
 
     BattlegroundBE* ToBattlegroundBE() { if (GetBgTypeID(true) == BATTLEGROUND_BE) return reinterpret_cast<BattlegroundBE*>(this); else return nullptr; }
-    BattlegroundBE const* ToBattlegroundBE() const { if (GetBgTypeID(true) == BATTLEGROUND_BE) return reinterpret_cast<const BattlegroundBE*>(this); else return nullptr; }
+    [[nodiscard]] BattlegroundBE const* ToBattlegroundBE() const { if (GetBgTypeID(true) == BATTLEGROUND_BE) return reinterpret_cast<const BattlegroundBE*>(this); else return nullptr; }
 
     BattlegroundEY* ToBattlegroundEY() { if (GetBgTypeID(true) == BATTLEGROUND_EY) return reinterpret_cast<BattlegroundEY*>(this); else return nullptr; }
-    BattlegroundEY const* ToBattlegroundEY() const { if (GetBgTypeID(true) == BATTLEGROUND_EY) return reinterpret_cast<const BattlegroundEY*>(this); else return nullptr; }
+    [[nodiscard]] BattlegroundEY const* ToBattlegroundEY() const { if (GetBgTypeID(true) == BATTLEGROUND_EY) return reinterpret_cast<const BattlegroundEY*>(this); else return nullptr; }
 
     BattlegroundRL* ToBattlegroundRL() { if (GetBgTypeID(true) == BATTLEGROUND_RL) return reinterpret_cast<BattlegroundRL*>(this); else return nullptr; }
-    BattlegroundRL const* ToBattlegroundRL() const { if (GetBgTypeID(true) == BATTLEGROUND_RL) return reinterpret_cast<const BattlegroundRL*>(this); else return nullptr; }
+    [[nodiscard]] BattlegroundRL const* ToBattlegroundRL() const { if (GetBgTypeID(true) == BATTLEGROUND_RL) return reinterpret_cast<const BattlegroundRL*>(this); else return nullptr; }
 
     BattlegroundSA* ToBattlegroundSA() { if (GetBgTypeID(true) == BATTLEGROUND_SA) return reinterpret_cast<BattlegroundSA*>(this); else return nullptr; }
-    BattlegroundSA const* ToBattlegroundSA() const { if (GetBgTypeID(true) == BATTLEGROUND_SA) return reinterpret_cast<const BattlegroundSA*>(this); else return nullptr; }
+    [[nodiscard]] BattlegroundSA const* ToBattlegroundSA() const { if (GetBgTypeID(true) == BATTLEGROUND_SA) return reinterpret_cast<const BattlegroundSA*>(this); else return nullptr; }
 
     BattlegroundDS* ToBattlegroundDS() { if (GetBgTypeID(true) == BATTLEGROUND_DS) return reinterpret_cast<BattlegroundDS*>(this); else return nullptr; }
-    BattlegroundDS const* ToBattlegroundDS() const { if (GetBgTypeID(true) == BATTLEGROUND_DS) return reinterpret_cast<const BattlegroundDS*>(this); else return nullptr; }
+    [[nodiscard]] BattlegroundDS const* ToBattlegroundDS() const { if (GetBgTypeID(true) == BATTLEGROUND_DS) return reinterpret_cast<const BattlegroundDS*>(this); else return nullptr; }
 
     BattlegroundRV* ToBattlegroundRV() { if (GetBgTypeID(true) == BATTLEGROUND_RV) return reinterpret_cast<BattlegroundRV*>(this); else return nullptr; }
-    BattlegroundRV const* ToBattlegroundRV() const { if (GetBgTypeID(true) == BATTLEGROUND_RV) return reinterpret_cast<const BattlegroundRV*>(this); else return nullptr; }
+    [[nodiscard]] BattlegroundRV const* ToBattlegroundRV() const { if (GetBgTypeID(true) == BATTLEGROUND_RV) return reinterpret_cast<const BattlegroundRV*>(this); else return nullptr; }
 
     BattlegroundIC* ToBattlegroundIC() { if (GetBgTypeID(true) == BATTLEGROUND_IC) return reinterpret_cast<BattlegroundIC*>(this); else return nullptr; }
-    BattlegroundIC const* ToBattlegroundIC() const { if (GetBgTypeID(true) == BATTLEGROUND_IC) return reinterpret_cast<const BattlegroundIC*>(this); else return nullptr; }
+    [[nodiscard]] BattlegroundIC const* ToBattlegroundIC() const { if (GetBgTypeID(true) == BATTLEGROUND_IC) return reinterpret_cast<const BattlegroundIC*>(this); else return nullptr; }
 
 protected:
     // this method is called, when BG cannot spawn its own spirit guide, or something is wrong, It correctly ends Battleground

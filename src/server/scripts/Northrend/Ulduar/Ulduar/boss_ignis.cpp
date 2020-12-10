@@ -82,7 +82,7 @@ class npc_ulduar_iron_construct : public CreatureScript
 public:
     npc_ulduar_iron_construct() : CreatureScript("npc_ulduar_iron_construct") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_iron_constructAI (pCreature);
     }
@@ -96,19 +96,19 @@ public:
 
         uint16 timer;
 
-        void Reset()
+        void Reset() override
         {
             timer = 1000;
             me->SetReactState(REACT_PASSIVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->CastSpell(me, 38757, true);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_ACTIVATE_CONSTRUCT)
             {
@@ -140,7 +140,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if( damage >= RAID_MODE(3000U, 5000U) && me->GetAura(S_BRITTLE) )
             {
@@ -153,14 +153,14 @@ public:
             }
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
                 if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_IGNIS)))
                     ignis->RemoveAuraFromStack(SPELL_STRENGTH_OF_THE_CREATOR);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -181,7 +181,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
     };
 };
 
@@ -190,7 +190,7 @@ class boss_ignis : public CreatureScript
 public:
     boss_ignis() : CreatureScript("boss_ignis") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_ignisAI (pCreature);
     }
@@ -204,7 +204,7 @@ public:
         bool bShattered;
         uint32 lastShatterMSTime;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->SetControlled(false, UNIT_STATE_ROOT);
@@ -220,7 +220,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             me->setActive(true);
 
@@ -259,7 +259,7 @@ public:
             }
         }
 
-        void SetData(uint32 id, uint32  /*value*/)
+        void SetData(uint32 id, uint32  /*value*/) override
         {
             if (id == 1337)
             {
@@ -271,19 +271,19 @@ public:
             }
         }
 
-        uint32 GetData(uint32 id) const
+        uint32 GetData(uint32 id) const override
         {
             if (id == 1337)
                 return (bShattered ? 1 : 0);
             return 0;
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->setActive(false);
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
             if( rand() % 2 )
             {
@@ -297,7 +297,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*victim*/)
+        void JustDied(Unit* /*victim*/) override
         {
             me->MonsterYell(TEXT_DEATH, LANG_UNIVERSAL, 0);
             me->PlayDirectSound(SOUND_DEATH);
@@ -312,7 +312,7 @@ public:
                     Unit::Kill(*itr, *itr);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (caster && spell->Id == SPELL_GRAB_CONTROL_2)
             {
@@ -321,9 +321,9 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -429,7 +429,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
@@ -458,13 +458,13 @@ public:
                     }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_ignis_scorch_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_ignis_scorch_AuraScript();
     }
@@ -485,13 +485,13 @@ public:
                 t->CastSpell(t, SPELL_GRAB_TRIGGERED, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_ignis_grab_initial_SpellScript::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_ignis_grab_initial_SpellScript();
     }
@@ -533,7 +533,7 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_ignis_slag_pot_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectApply += AuraEffectApplyFn(spell_ignis_slag_pot_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
@@ -541,7 +541,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_ignis_slag_pot_AuraScript();
     }
@@ -552,7 +552,7 @@ class achievement_ignis_shattered : public AchievementCriteriaScript
 public:
     achievement_ignis_shattered() : AchievementCriteriaScript("achievement_ignis_shattered") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target) override
     {
         if (!target || target->GetTypeId() != TYPEID_UNIT)
             return false;

@@ -21,7 +21,7 @@ private:
     string filename;
 public:
     WDTFile(char* file_name, char* file_name1);
-    ~WDTFile(void);
+    ~WDTFile();
     bool init(char* map_id, unsigned int mapID);
 
     string* gWmoInstansName;
