@@ -4,7 +4,7 @@
 /**
  *  @file    Addr.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -30,7 +30,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_Addr
 {
 public:
-  // = Initialization and termination methods.
   /// Initializes instance variables.
   ACE_Addr (int type = -1, int size = -1);
 

@@ -13,12 +13,6 @@
 
 #include "Common.h"
 
-// Note: this include need for be sure have full definition of class WorldSession
-//       if this class definition not complete then VS for x64 release use different size for
-//       struct OpcodeHandler in this header and Opcode.cpp and get totally wrong data from
-//       table opcodeTable in source when Opcode.h included but WorldSession.h not included
-#include "WorldSession.h"
-
 /// List of Opcodes
 enum Opcodes
 {
@@ -852,9 +846,9 @@ enum Opcodes
     SMSG_INSTANCE_DIFFICULTY                        = 0x33B,
     MSG_GM_RESETINSTANCELIMIT                       = 0x33C,
     SMSG_MOTD                                       = 0x33D,
-    SMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY= 0x33E,
-    SMSG_MOVE_UNSET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY= 0x33F,
-    CMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY_ACK= 0x340,
+    SMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY = 0x33E,
+    SMSG_MOVE_UNSET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY = 0x33F,
+    CMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY_ACK = 0x340,
     MSG_MOVE_START_SWIM_CHEAT                       = 0x341,
     MSG_MOVE_STOP_SWIM_CHEAT                        = 0x342,
     SMSG_MOVE_SET_CAN_FLY                           = 0x343,
@@ -864,7 +858,7 @@ enum Opcodes
     CMSG_SOCKET_GEMS                                = 0x347,
     CMSG_ARENA_TEAM_CREATE                          = 0x348,
     SMSG_ARENA_TEAM_COMMAND_RESULT                  = 0x349,
-    MSG_MOVE_UPDATE_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY= 0x34A,
+    MSG_MOVE_UPDATE_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY = 0x34A,
     CMSG_ARENA_TEAM_QUERY                           = 0x34B,
     SMSG_ARENA_TEAM_QUERY_RESPONSE                  = 0x34C,
     CMSG_ARENA_TEAM_ROSTER                          = 0x34D,
@@ -1280,7 +1274,7 @@ enum Opcodes
     CMSG_BATTLEFIELD_MGR_EXIT_REQUEST               = 0x4E7,
     SMSG_BATTLEFIELD_MGR_STATE_CHANGE               = 0x4E8, // uint32, uint32
     CMSG_BATTLEFIELD_MANAGER_ADVANCE_STATE          = 0x4E9,
-    CMSG_BATTLEFIELD_MANAGER_SET_NEXT_TRANSITION_TIME= 0x4EA,
+    CMSG_BATTLEFIELD_MANAGER_SET_NEXT_TRANSITION_TIME = 0x4EA,
     MSG_SET_RAID_DIFFICULTY                         = 0x4EB,
     CMSG_TOGGLE_XP_GAIN                             = 0x4EC,
     SMSG_TOGGLE_XP_GAIN                             = 0x4ED, // enable/disable XP gain console message
@@ -1353,7 +1347,14 @@ enum PacketProcessing
     PROCESS_THREADSAFE                                      //packet is thread-safe - process it in Map::Update()
 };
 
+class WorldSession;
 class WorldPacket;
+
+#if defined(__GNUC__)
+#pragma pack(1)
+#else
+#pragma pack(push, 1)
+#endif
 
 struct OpcodeHandler
 {
@@ -1361,10 +1362,15 @@ struct OpcodeHandler
     SessionStatus status;
     PacketProcessing packetProcessing;
     void (WorldSession::*handler)(WorldPacket& recvPacket);
-    bool isGrouppedMovementOpcode; // pussywizard
 };
 
 extern OpcodeHandler opcodeTable[NUM_MSG_TYPES];
+
+#if defined(__GNUC__)
+#pragma pack()
+#else
+#pragma pack(pop)
+#endif
 
 /// Lookup opcode name for human understandable logging
 inline const char* LookupOpcodeName(uint16 id)
