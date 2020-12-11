@@ -10,6 +10,9 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+
+LoginDatabaseWorkerPool LoginDatabase;
+
 class LogMock: public ILog {
 public:
     ~LogMock() override {}

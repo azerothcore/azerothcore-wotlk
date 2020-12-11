@@ -4,17 +4,8 @@
 
 #include "gtest/gtest.h"
 #include "Formulas.h"
-#include "SharedDefines.h"
 #include "LogMock.h"
 #include "WorldMock.h"
-#include "ArenaSpectator.h"
-
-LoginDatabaseWorkerPool LoginDatabase;
-CharacterDatabaseWorkerPool CharacterDatabase;
-WorldDatabaseWorkerPool WorldDatabase;
-uint32 realmID;
-void AddScripts() {}
-bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char const* args) { return false; }
 
 using namespace acore::Honor;
 using namespace acore::XP;
