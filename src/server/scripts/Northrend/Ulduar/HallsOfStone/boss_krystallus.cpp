@@ -45,7 +45,7 @@ class boss_krystallus : public CreatureScript
 public:
     boss_krystallus() : CreatureScript("boss_krystallus") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_krystallusAI (pCreature);
     }
@@ -60,14 +60,14 @@ public:
         EventMap events;
         InstanceScript* pInstance;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             if (pInstance)
                 pInstance->SetData(BOSS_KRYSTALLUS, NOT_STARTED);
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_BOULDER, 8000);
@@ -94,7 +94,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -151,14 +151,14 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(BOSS_KRYSTALLUS, DONE);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_KILL);
         }
@@ -184,13 +184,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_krystallus_shatter_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_krystallus_shatter_SpellScript();
     }
@@ -219,13 +219,13 @@ public:
                 SetHitDamage(int32(GetHitDamage() * ((radius - distance) / radius)));
         }
 
-        void Register()
+        void Register() override
         {
             OnHit += SpellHitFn(spell_krystallus_shatter_effect_SpellScript::CalculateDamage);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_krystallus_shatter_effect_SpellScript();
     }

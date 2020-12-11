@@ -24,7 +24,7 @@ class instance_the_black_morass : public InstanceMapScript
 public:
     instance_the_black_morass() : InstanceMapScript("instance_the_black_morass", 269) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_the_black_morass_InstanceMapScript(map);
     }
@@ -39,7 +39,7 @@ public:
         uint8  _currentRift;
         uint8  _shieldPercent;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&encounters, 0, sizeof(encounters));
             _medivhGUID = 0;
@@ -67,12 +67,12 @@ public:
                     creature->DespawnOrUnsummon();
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             return false;
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (instance->GetPlayersCountExceptGMs() <= 1 && GetData(TYPE_AEONUS) != DONE)
                 CleanupInstance();
@@ -82,7 +82,7 @@ public:
             player->SendUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -109,7 +109,7 @@ public:
             }
         }
 
-        void OnCreatureRemove(Creature* creature)
+        void OnCreatureRemove(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -133,7 +133,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32  /*data*/)
+        void SetData(uint32 type, uint32  /*data*/) override
         {
             switch (type)
             {
@@ -194,7 +194,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -210,7 +210,7 @@ public:
             return 0;
         }
 
-        void SetData64(uint32 type, uint64 data)
+        void SetData64(uint32 type, uint64 data) override
         {
             if (type == DATA_SUMMONED_NPC)
                 encounterNPCs.insert(data);
@@ -218,7 +218,7 @@ public:
                 encounterNPCs.erase(data);
         }
 
-        uint64 GetData64(uint32 data) const
+        uint64 GetData64(uint32 data) const override
         {
             if (data == DATA_MEDIVH)
                 return _medivhGUID;
@@ -278,7 +278,7 @@ public:
             }
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             Events.Update(diff);
             switch (Events.ExecuteEvent())
@@ -301,7 +301,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -312,7 +312,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {

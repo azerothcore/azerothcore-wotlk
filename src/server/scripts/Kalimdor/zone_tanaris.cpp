@@ -45,7 +45,7 @@ class npc_aquementas : public CreatureScript
 public:
     npc_aquementas() : CreatureScript("npc_aquementas") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_aquementasAI(creature);
     }
@@ -61,7 +61,7 @@ public:
         uint32 FrostShockTimer;
         uint32 AquaJetTimer;
 
-        void Reset()
+        void Reset() override
         {
             SendItemTimer = 0;
             SwitchFactionTimer = 10000;
@@ -88,12 +88,12 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(AGGRO_YELL_AQUE, who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (isFriendly)
             {
@@ -166,7 +166,7 @@ class npc_custodian_of_time : public CreatureScript
 public:
     npc_custodian_of_time() : CreatureScript("npc_custodian_of_time") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_custodian_of_timeAI(creature);
     }
@@ -175,7 +175,7 @@ public:
     {
         npc_custodian_of_timeAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             if (Player* player = GetPlayerForEscort())
             {
@@ -242,7 +242,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
@@ -261,10 +261,10 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) { }
-        void Reset() { }
+        void EnterCombat(Unit* /*who*/) override { }
+        void Reset() override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -405,7 +405,7 @@ class npc_OOX17 : public CreatureScript
 public:
     npc_OOX17() : CreatureScript("npc_OOX17") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == Q_OOX17)
         {
@@ -421,7 +421,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_OOX17AI(creature);
     }
@@ -430,7 +430,7 @@ public:
     {
         npc_OOX17AI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             if (Player* player = GetPlayerForEscort())
             {
@@ -458,14 +458,14 @@ public:
             }
         }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_OOX_AGGRO);
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             summoned->AI()->AttackStart(me);
         }
@@ -500,7 +500,7 @@ class npc_tooga : public CreatureScript
 public:
     npc_tooga() : CreatureScript("npc_tooga") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_TOOGA)
         {
@@ -511,7 +511,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_toogaAI(creature);
     }
@@ -526,7 +526,7 @@ public:
 
         uint64 TortaGUID;
 
-        void Reset()
+        void Reset() override
         {
             CheckSpeechTimer = 2500;
             PostEventTimer = 1000;
@@ -535,7 +535,7 @@ public:
             TortaGUID = 0;
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             FollowerAI::MoveInLineOfSight(who);
@@ -554,7 +554,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 MotionType, uint32 PointId)
+        void MovementInform(uint32 MotionType, uint32 PointId) override
         {
             FollowerAI::MovementInform(MotionType, PointId);
 
@@ -565,7 +565,7 @@ public:
                 SetFollowComplete();
         }
 
-        void UpdateFollowerAI(uint32 Diff)
+        void UpdateFollowerAI(uint32 Diff) override
         {
             if (!UpdateVictim())
             {
