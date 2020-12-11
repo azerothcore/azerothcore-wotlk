@@ -18,7 +18,7 @@ INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orient
 (1455, -9479.0, 1783.0, 49.939999, 6.095650, 1, 'AhnQirajBacklands'),
 (1456, -7347.615723, -642.264343, 294.575287, 0.405538, 0, 'BlackcharCaveInside'),
 (1457, -7396.401367, -1070.177002, 589.390320, 0.099237, 469, 'BlackwingLairOutside'),
-(1458, -1464.956299, 501.067108, 0, 2.940095, 36, 'DeadminesStrangePLace'),
+(1458, -1464.956299, 501.067108, 0, 2.940095, 36, 'DeadminesStrangePlace'),
 (1459, 74.507805, 1184.508179, -119.551277, 2.904725, 369, 'DeeprunTramDeeprunDivers'),
 (1460, -98.392342, 1216.833252, -122.163307, 1.483048, 369, 'DeeprunTramNessy'),
 (1461, -33.273006, 1234.087402, -126.101425, 1.506608, 369, 'DeeprunTramUnderwaterLocation'),
