@@ -10,7 +10,7 @@ UPDATE `game_tele` SET `name`='EmeraldDreamStatue' WHERE `id`=1426; -- Improve n
 UPDATE `game_tele` SET `position_x`=2738.869629, `position_y`=-3320.932129, `position_z`=101.916855, `orientation`=0.366472, `name`='EmeraldDreamForest' WHERE `id`=1428; -- Emerald Dream - Improve name and location
 
 -- Add new teleports
-DELETE FROM `game_tele` WHERE `id` IN (1451, 1452, 1453, 1454, 1455, 1456, 1457, 1458, 1459, 1460, 1461, 1462, 1463, 1464, 1465, 1466, 1467, 1468, 1469, 1470, 1471, 1472, 1473, 1474, 1475, 1476, 1477, 1478, 1479, 1480, 1481, 1482, 1483, 1484);
+DELETE FROM `game_tele` WHERE `id` IN (1451, 1452, 1453, 1454, 1455, 1456, 1457, 1458, 1459, 1460, 1461, 1462, 1463, 1464, 1465, 1466, 1467, 1468, 1469, 1470, 1471, 1472, 1473, 1474, 1475, 1476, 1477, 1478, 1479, 1480, 1481, 1482, 1483, 1484, 1485, 1486, 1487, 1488, 1489);
 INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES 
 (1451, 1065.607666, -16.172640, 317.104980, 2.223340, 37, 'AzsharaAllianceEntrance'),
 (1452, -123.070557, 856.829651, 298.237213, 5.522018, 37, 'AzsharaHordeEntrance'),
