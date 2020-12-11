@@ -5,6 +5,7 @@ UPDATE `game_tele` SET `position_x`=1584.140259, `position_y`=240.308472, `posit
 UPDATE `game_tele` SET `name`='JailOfficial' WHERE `id`=1424; -- Improve name
 UPDATE `game_tele` SET `position_x`=-11069.698242, `position_y`=-1795.773193, `position_z`=53.731770, `orientation`=3.096410, `name`='KarazhanCrypts' WHERE `id`=233; -- Improve name and location
 UPDATE `game_tele` SET `position_x`=319.134644, `position_y`=263.952881, `position_z`=53.274734, `orientation`=1.549760 WHERE `id`=241; -- Dalaran Crater - Improve location
+UPDATE `game_tele` SET `position_x`=1629.848511, `position_y`=-4373.642090, `position_z`=31.557331, `orientation`=3.697617 WHERE  `id`=703; -- Orgirmmar - Improve location
 UPDATE `game_tele` SET `name`='EmeraldDreamStatue' WHERE `id`=1426; -- Improve name
 UPDATE `game_tele` SET `position_x`=2738.869629, `position_y`=-3320.932129, `position_z`=101.916855, `orientation`=0.366472, `name`='EmeraldDreamForest' WHERE `id`=1428; -- Emerald Dream - Improve name and location
 
