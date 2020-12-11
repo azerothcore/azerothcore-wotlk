@@ -41,7 +41,7 @@ class boss_the_black_stalker : public CreatureScript
 public:
     boss_the_black_stalker() : CreatureScript("boss_the_black_stalker") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_the_black_stalkerAI (creature);
     }
@@ -56,14 +56,14 @@ public:
         SummonList summons;
         uint64 lTarget;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
             lTarget = 0;
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_LEVITATE, 12000);
             events.ScheduleEvent(EVENT_SPELL_CHAIN, 6000);
@@ -74,7 +74,7 @@ public:
         }
 
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
@@ -83,19 +83,19 @@ public:
                 summon->AI()->AttackStart(me->GetVictim());
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             summons.Despawn(summon);
             for (uint8 i = 0; i < 3; ++i)
                 me->CastSpell(me, SPELL_SUMMON_SPORE_STRIDER, false);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             summons.DespawnAll();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -189,14 +189,14 @@ public:
             SetDuration(0);
         }
 
-        void Register()
+        void Register() override
         {
             DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_allergies_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
             OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_allergies_AuraScript::Update, EFFECT_0, SPELL_AURA_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_gen_allergies_AuraScript();
     }

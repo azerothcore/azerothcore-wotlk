@@ -21,7 +21,7 @@ public:
     {
     }
 
-    void OnFirstLogin(Player* player)
+    void OnFirstLogin(Player* player) override
     {
         switch (player->getClass())
         {

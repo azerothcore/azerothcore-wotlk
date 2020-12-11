@@ -22,14 +22,14 @@ public:
         m_addTime = 0;
         m_execTime = 0;
     }
-    virtual ~BasicEvent() { }                           // override destructor to perform some actions on event removal
+    virtual ~BasicEvent() = default;                           // override destructor to perform some actions on event removal
 
     // this method executes when the event is triggered
     // return false if event does not want to be deleted
     // e_time is execution time, p_time is update interval
     virtual bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) { return true; }
 
-    virtual bool IsDeletable() const { return true; }   // this event can be safely deleted
+    [[nodiscard]] virtual bool IsDeletable() const { return true; }   // this event can be safely deleted
 
     virtual void Abort(uint64 /*e_time*/) { }           // this method executes when the event is aborted
 
@@ -52,10 +52,10 @@ public:
     void Update(uint32 p_time);
     void KillAllEvents(bool force);
     void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true);
-    uint64 CalculateTime(uint64 t_offset) const;
+    [[nodiscard]] uint64 CalculateTime(uint64 t_offset) const;
 
     // Xinef: calculates next queue tick time
-    uint64 CalculateQueueTime(uint64 delay) const;
+    [[nodiscard]] uint64 CalculateQueueTime(uint64 delay) const;
 
 protected:
     uint64 m_time;

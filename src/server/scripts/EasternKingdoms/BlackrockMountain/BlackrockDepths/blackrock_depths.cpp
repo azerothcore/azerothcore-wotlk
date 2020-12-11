@@ -100,7 +100,7 @@ class at_ring_of_law : public AreaTriggerScript
 public:
     at_ring_of_law() : AreaTriggerScript("at_ring_of_law") { }
 
-    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
@@ -132,7 +132,7 @@ class npc_grimstone : public CreatureScript
 public:
     npc_grimstone() : CreatureScript("npc_grimstone") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_grimstoneAI>(creature);
     }
@@ -157,19 +157,19 @@ public:
         uint8 MobSpawnId;
         bool theldrenEvent;
 
-        void Reset()
+        void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (Unit* target = SelectTargetFromPlayerList(100.0f))
                 summon->AI()->AttackStart(target);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             summons.Despawn(summon);
             // All Summons killed, next phase
@@ -177,7 +177,7 @@ public:
                 eventTimer = 5000;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -231,7 +231,7 @@ public:
                 me->SummonCreature(RingBoss[rand() % 6], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             if (!instance)
                 return;
@@ -329,7 +329,7 @@ class npc_phalanx : public CreatureScript
 public:
     npc_phalanx() : CreatureScript("npc_phalanx") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_phalanxAI(creature);
     }
@@ -342,14 +342,14 @@ public:
         uint32 FireballVolley_Timer;
         uint32 MightyBlow_Timer;
 
-        void Reset()
+        void Reset() override
         {
             ThunderClap_Timer = 12000;
             FireballVolley_Timer = 0;
             MightyBlow_Timer = 15000;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -1091,7 +1091,7 @@ class npc_rocknot : public CreatureScript
 public:
     npc_rocknot() : CreatureScript("npc_rocknot") { }
 
-    bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* quest, uint32 /*item*/)
+    bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* quest, uint32 /*item*/) override
     {
         InstanceScript* instance = creature->GetInstanceScript();
         if (!instance)
@@ -1121,7 +1121,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_rocknotAI>(creature);
     }
@@ -1138,7 +1138,7 @@ public:
         uint32 BreakKeg_Timer;
         uint32 BreakDoor_Timer;
 
-        void Reset()
+        void Reset() override
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
                 return;
@@ -1153,7 +1153,7 @@ public:
                 go->SetGoState((GOState)state);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -1176,7 +1176,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (BreakKeg_Timer)
             {
