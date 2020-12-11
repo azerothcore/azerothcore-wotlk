@@ -1,5 +1,8 @@
 // Handle_Set.cpp
 #include "ace/Handle_Set.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 #if !defined (__ACE_INLINE__)
 #include "ace/Handle_Set.inl"
@@ -13,18 +16,20 @@ ACE_ALLOC_HOOK_DEFINE(ACE_Handle_Set)
 
   // ACE_MSB_MASK is only used here.
   // This needs to go here to avoid overflow problems on some compilers.
-#if defined (ACE_WIN32)
-   //  Does ACE_WIN32 have an fd_mask?
+#if defined (ACE_HANDLE_SET_USES_FD_ARRAY)
+   //  Do we have an fd_mask?
 #  define ACE_MSB_MASK (~(1 << (NFDBITS - 1)))
-#else  /* ! ACE_WIN32 */
+#else  /* ! ACE_HANDLE_SET_USES_FD_ARRAY */
 #  define ACE_MSB_MASK (~((fd_mask) 1 << (NFDBITS - 1)))
-#endif /* ! ACE_WIN32 */
+#endif /* ! ACE_HANDLE_SET_USES_FD_ARRAY */
 
 #if defined (ACE_LINUX) && __GLIBC__ > 1 && __GLIBC_MINOR__ >= 1 && !defined (_XOPEN_SOURCE)
   // XPG4.2 requires the fds_bits member name, so it is not enabled by
   // default on Linux/glibc-2.1.x systems.  Instead use "__fds_bits."
   // Ugly, but "what are you going to do?" 8-)
 #define fds_bits __fds_bits
+#elif defined ACE_FDS_BITS
+#define fds_bits ACE_FDS_BITS
 #endif  /* ACE_LINUX && __GLIBC__ > 1 && __GLIBC_MINOR__ >= 1 && !_XOPEN_SOURCE */
 
 void
@@ -39,14 +44,14 @@ ACE_Handle_Set::dump (void) const
   ACELIB_DEBUG ((LM_DEBUG, ACE_TEXT ("\nmax_handle_ = %d"), this->max_handle_));
   ACELIB_DEBUG ((LM_DEBUG, ACE_TEXT ("\n[ ")));
 
-#if defined (ACE_WIN32)
+#if defined (ACE_HANDLE_SET_USES_FD_ARRAY)
   for (size_t i = 0; i < (size_t) this->mask_.fd_count + 1; i++)
     ACELIB_DEBUG ((LM_DEBUG, ACE_TEXT (" %x "), this->mask_.fd_array[i]));
-#else /* !ACE_WIN32 */
+#else /* !ACE_HANDLE_SET_USES_FD_ARRAY */
   for (ACE_HANDLE i = 0; i < this->max_handle_ + 1; i++)
     if (this->is_set (i))
       ACELIB_DEBUG ((LM_DEBUG, ACE_TEXT (" %d "), i));
-#endif /* ACE_WIN32 */
+#endif /* ACE_HANDLE_SET_USES_FD_ARRAY */
 
   ACELIB_DEBUG ((LM_DEBUG, ACE_TEXT (" ]\n")));
   ACELIB_DEBUG ((LM_DEBUG, ACE_END_DUMP));
@@ -99,12 +104,12 @@ ACE_Handle_Set::ACE_Handle_Set (const fd_set &fd_mask)
   ACE_OS::memcpy ((void *) &this->mask_,
                   (void *) &fd_mask,
                   sizeof this->mask_);
-#if !defined (ACE_WIN32)
+#if !defined (ACE_HANDLE_SET_USES_FD_ARRAY)
   this->sync (ACE_Handle_Set::MAXSIZE);
 #if defined (ACE_HAS_BIG_FD_SET)
   this->min_handle_ = 0;
 #endif /* ACE_HAS_BIG_FD_SET */
-#endif /* !ACE_WIN32 */
+#endif /* !ACE_HANDLE_SET_USES_FD_ARRAY */
 }
 
 // Counts the number of bits enabled in N.  Uses a table lookup to
@@ -116,12 +121,12 @@ ACE_Handle_Set::count_bits (u_long n)
 
  ACE_TRACE ("ACE_Handle_Set::count_bits");
 #if defined (ACE_HAS_HANDLE_SET_OPTIMIZED_FOR_SELECT)
-  ACE_REGISTER int rval = 0;
+  int rval = 0;
 
   // Count the number of enabled bits in <n>.  This algorithm is very
   // fast, i.e., O(enabled bits in n).
 
-  for (ACE_REGISTER u_long m = n;
+  for (u_long m = n;
        m != 0;
        m &= m - 1)
     rval++;
@@ -142,8 +147,8 @@ ACE_Handle_Set::count_bits (u_long n)
 int
 ACE_Handle_Set::bitpos (u_long bit)
 {
-  ACE_REGISTER int l = 0;
-  ACE_REGISTER u_long n = bit - 1;
+  int l = 0;
+  u_long n = bit - 1;
 
   // This is a fast count method when have the most significative bit.
 
@@ -188,7 +193,7 @@ void
 ACE_Handle_Set::sync (ACE_HANDLE max)
 {
   ACE_TRACE ("ACE_Handle_Set::sync");
-#if !defined (ACE_WIN32)
+#if !defined (ACE_HANDLE_SET_USES_FD_ARRAY)
   fd_mask *maskp = (fd_mask *)(this->mask_.fds_bits);
   this->size_ = 0;
 
@@ -200,7 +205,7 @@ ACE_Handle_Set::sync (ACE_HANDLE max)
   this->set_max (max);
 #else
   ACE_UNUSED_ARG (max);
-#endif /* !ACE_WIN32 */
+#endif /* !ACE_HANDLE_SET_USES_FD_ARRAY */
 }
 
 // Resets the MAX_FD after a clear of the original MAX_FD.
@@ -209,7 +214,7 @@ void
 ACE_Handle_Set::set_max (ACE_HANDLE current_max)
 {
   ACE_TRACE ("ACE_Handle_Set::set_max");
-#if !defined(ACE_WIN32)
+#if !defined(ACE_HANDLE_SET_USES_FD_ARRAY)
   fd_mask * maskp = (fd_mask *)(this->mask_.fds_bits);
 
   if (this->size_ == 0)
@@ -234,7 +239,7 @@ ACE_Handle_Set::set_max (ACE_HANDLE current_max)
     this->max_handle_ = ACE_Handle_Set::MAXSIZE - 1;
 #else
   ACE_UNUSED_ARG (current_max);
-#endif /* !ACE_WIN32 */
+#endif /* !ACE_HANDLE_SET_USES_FD_ARRAY */
 }
 
 ACE_ALLOC_HOOK_DEFINE(ACE_Handle_Set_Iterator)
@@ -246,7 +251,7 @@ ACE_Handle_Set_Iterator::dump (void) const
   ACE_TRACE ("ACE_Handle_Set_Iterator::dump");
 
   ACELIB_DEBUG ((LM_DEBUG, ACE_BEGIN_DUMP, this));
-#if defined(ACE_WIN32) || !defined(ACE_HAS_BIG_FD_SET)
+#if defined(ACE_HANDLE_SET_USES_FD_ARRAY) || !defined(ACE_HAS_BIG_FD_SET)
   ACELIB_DEBUG ((LM_DEBUG, ACE_TEXT ("\nhandle_index_ = %d"), this->handle_index_));
 #elif defined(ACE_HAS_BIG_FD_SET)
   ACELIB_DEBUG ((LM_DEBUG, ACE_TEXT ("\nword_max_ = %d"), this->word_max_));
@@ -261,14 +266,14 @@ ACE_HANDLE
 ACE_Handle_Set_Iterator::operator () (void)
 {
   ACE_TRACE ("ACE_Handle_Set_Iterator::operator");
-#if defined (ACE_WIN32)
+#if defined (ACE_HANDLE_SET_USES_FD_ARRAY)
   if (this->handle_index_ < this->handles_.mask_.fd_count)
     // Return the handle and advance the iterator.
     return (ACE_HANDLE) this->handles_.mask_.fd_array[this->handle_index_++];
   else
     return ACE_INVALID_HANDLE;
 
-#elif !defined (ACE_HAS_BIG_FD_SET) /* !ACE_WIN32 */
+#elif !defined (ACE_HAS_BIG_FD_SET) /* !ACE_HANDLE_SET_USES_FD_ARRAY */
   // No sense searching further than the max_handle_ + 1;
   ACE_HANDLE maxhandlep1 = this->handles_.max_handle_ + 1;
 
@@ -340,7 +345,7 @@ ACE_Handle_Set_Iterator::operator () (void)
     }
 #else /* !ACE_HAS_BIG_FD_SET */
    // Find the first word in fds_bits with bit on
-   ACE_REGISTER u_long lsb = this->word_val_;
+   u_long lsb = this->word_val_;
 
    if (lsb == 0)
      {
@@ -381,7 +386,7 @@ ACE_Handle_Set_Iterator::operator () (void)
         // Remove least significative bit.
         this->word_val_ ^= lsb;
 
-        ACE_REGISTER u_long n = lsb - this->oldlsb_;
+        u_long n = lsb - this->oldlsb_;
 
         // Move index to bit distance between new lsb and old lsb.
         do
@@ -395,12 +400,12 @@ ACE_Handle_Set_Iterator::operator () (void)
       }
 
    return this->handle_index_;
-#endif /* ACE_WIN32 */
+#endif /* ACE_HANDLE_SET_USES_FD_ARRAY */
 }
 
 ACE_Handle_Set_Iterator::ACE_Handle_Set_Iterator (const ACE_Handle_Set &hs)
   : handles_ (hs),
-#if !defined (ACE_HAS_BIG_FD_SET) || defined (ACE_WIN32)
+#if !defined (ACE_HAS_BIG_FD_SET) || defined (ACE_HANDLE_SET_USES_FD_ARRAY)
     handle_index_ (0),
     word_num_ (-1)
 #elif defined (ACE_HAS_BIG_FD_SET)
@@ -412,7 +417,7 @@ ACE_Handle_Set_Iterator::ACE_Handle_Set_Iterator (const ACE_Handle_Set &hs)
 #endif /* ACE_HAS_BIG_FD_SET */
 {
   ACE_TRACE ("ACE_Handle_Set_Iterator::ACE_Handle_Set_Iterator");
-#if !defined (ACE_WIN32) && !defined (ACE_HAS_BIG_FD_SET)
+#if !defined (ACE_HANDLE_SET_USES_FD_ARRAY) && !defined (ACE_HAS_BIG_FD_SET)
   // No sense searching further than the max_handle_ + 1;
   ACE_HANDLE maxhandlep1 =
     this->handles_.max_handle_ + 1;
@@ -441,7 +446,7 @@ ACE_Handle_Set_Iterator::ACE_Handle_Set_Iterator (const ACE_Handle_Set &hs)
            && this->handle_index_ < maxhandlep1;
          this->handle_index_++)
       this->word_val_ = (this->word_val_ >> 1) & ACE_MSB_MASK;
-#elif !defined (ACE_WIN32) && defined (ACE_HAS_BIG_FD_SET)
+#elif !defined (ACE_HANDLE_SET_USES_FD_ARRAY) && defined (ACE_HAS_BIG_FD_SET)
     if (this->word_max_==0)
       {
         this->word_num_ = -1;
@@ -453,7 +458,7 @@ ACE_Handle_Set_Iterator::ACE_Handle_Set_Iterator (const ACE_Handle_Set &hs)
           ACE_DIV_BY_WORDSIZE (this->handles_.min_handle_) - 1;
         this->word_val_ = 0;
       }
-#endif /* !ACE_WIN32 && !ACE_HAS_BIG_FD_SET */
+#endif /* !ACE_HANDLE_SET_USES_FD_ARRAY && !ACE_HAS_BIG_FD_SET */
 }
 
 void
@@ -461,7 +466,7 @@ ACE_Handle_Set_Iterator::reset_state (void)
 {
   ACE_TRACE ("ACE_Handle_Set_Iterator::reset_state");
 
-#if !defined (ACE_HAS_BIG_FD_SET) || defined (ACE_WIN32)
+#if !defined (ACE_HAS_BIG_FD_SET) || defined (ACE_HANDLE_SET_USES_FD_ARRAY)
   this->handle_index_  = 0;
   this->word_num_ = -1;
 #elif defined (ACE_HAS_BIG_FD_SET)
@@ -471,7 +476,7 @@ ACE_Handle_Set_Iterator::reset_state (void)
     : ((ACE_DIV_BY_WORDSIZE (this->handles_.max_handle_)) + 1);
 #endif /* ACE_HAS_BIG_FD_SET */
 
-#if !defined (ACE_WIN32) && !defined (ACE_HAS_BIG_FD_SET)
+#if !defined (ACE_HANDLE_SET_USES_FD_ARRAY) && !defined (ACE_HAS_BIG_FD_SET)
   // No sense searching further than the max_handle_ + 1;
   ACE_HANDLE maxhandlep1 =
     this->handles_.max_handle_ + 1;
@@ -500,7 +505,7 @@ ACE_Handle_Set_Iterator::reset_state (void)
            && this->handle_index_ < maxhandlep1;
          this->handle_index_++)
       this->word_val_ = (this->word_val_ >> 1) & ACE_MSB_MASK;
-#elif !defined (ACE_WIN32) && defined (ACE_HAS_BIG_FD_SET)
+#elif !defined (ACE_HANDLE_SET_USES_FD_ARRAY) && defined (ACE_HAS_BIG_FD_SET)
     if (this->word_max_==0)
       {
         this->word_num_ = -1;
@@ -512,7 +517,7 @@ ACE_Handle_Set_Iterator::reset_state (void)
           ACE_DIV_BY_WORDSIZE (this->handles_.min_handle_) - 1;
         this->word_val_ = 0;
       }
-#endif /* !ACE_WIN32 && !ACE_HAS_BIG_FD_SET */
+#endif /* !ACE_HANDLE_SET_USES_FD_ARRAY && !ACE_HAS_BIG_FD_SET */
 }
 
 ACE_END_VERSIONED_NAMESPACE_DECL
