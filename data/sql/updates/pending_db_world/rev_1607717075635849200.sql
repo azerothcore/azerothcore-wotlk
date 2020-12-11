@@ -45,7 +45,7 @@ INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orient
 (1482, 2231.971191, 2242.839111, 99.736877, 0.5, 0, 'TirisfalGladesUnfinishedRegion'),
 (1483, -4031.919434, -1411.127197, 156.758270, 0.429314, 0, 'WetlandsDwarvenVillage'),
 (1484, -7119.493164, -4114.494629, 461.938568, 2.522395, 0, 'BadlandsUnfinishedRegion'), 
-(1485, 5430.490723, -2805.697266, 1463.441162, 3.898252, 1, 'HyjalBlizzardConstructionCo'),
+(1485, 5475.992676, -3728.734131, 1593.443848, 5.802837, 1, 'HyjalBlizzardConstructionCo'),
 (1486, 5430.490723, -2805.697266, 1463.441162, 3.898252, 1, 'HyjalCrater'),
 (1487, 4857.473145, -1791.165527, 1156.655273, 4.799088, 1, 'HyjalCaveInside'),
 (1488, 4822.816895, -1749.725098, 1162.031372, 5.478453, 1, 'HyjalCaveOutside'),
