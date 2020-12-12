@@ -24,6 +24,7 @@ It is written in C++ and is based on MaNGOS, TrinityCore and SunwellCore.
 1. [Modularity](https://en.wikipedia.org/wiki/Modular_programming)
 1. A lot of modules to choose from
 1. Better configuration files system
+
 1. Compatibility with other emulators
 1. Friendly and helpful community
 
@@ -158,6 +159,7 @@ This project exists thanks to:
 - [Module template / Module skeleton](https://github.com/azerothcore/skeleton-module/)
 - [Our community hub (Discord)](https://discord.gg/gkt4y2x)
 - [Our wiki](http://www.azerothcore.org/wiki "Easy to use and developed by AzerothCore founder")
+- [Our Forum](https://github.com/azerothcore/azerothcore-wotlk/discussions/)
 - [Our Facebook page](https://www.facebook.com/AzerothCore/)
 - [Our LinkedIn page](https://www.linkedin.com/company/azerothcore/)
 
