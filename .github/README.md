@@ -24,7 +24,6 @@ It is written in C++ and is based on MaNGOS, TrinityCore and SunwellCore.
 1. [Modularity](https://en.wikipedia.org/wiki/Modular_programming)
 1. A lot of modules to choose from
 1. Better configuration files system
-
 1. Compatibility with other emulators
 1. Friendly and helpful community
 
