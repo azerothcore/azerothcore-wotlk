@@ -6,10 +6,10 @@
 
 #define _CRT_SECURE_NO_DEPRECATE
 
-#include <stdio.h>
+#include <cstdio>
+#include <cstdlib>
 #include <deque>
 #include <set>
-#include <cstdlib>
 
 #ifdef _WIN32
 #include "direct.h"
