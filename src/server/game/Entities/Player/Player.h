@@ -766,13 +766,6 @@ enum ArenaTeamInfoType
 
 class InstanceSave;
 
-enum RestFlag
-{
-    REST_FLAG_IN_TAVERN         = 0x1,
-    REST_FLAG_IN_CITY           = 0x2,
-    REST_FLAG_IN_FACTION_AREA   = 0x4, // used with AREA_FLAG_REST_ZONE_*
-};
-
 enum TeleportToOptions
 {
     TELE_TO_GM_MODE             = 0x01,
@@ -1258,10 +1251,6 @@ public:
     uint32 GetXPRestBonus(uint32 xp);
     [[nodiscard]] float GetRestBonus() const { return _restBonus; }
     void SetRestBonus(float rest_bonus_new);
-
-    bool HasRestFlag(RestFlag restFlag) const { return (_restFlagMask & restFlag) != 0; }
-    void SetRestFlag(RestFlag restFlag, uint32 triggerId = 0);
-    void RemoveRestFlag(RestFlag restFlag);
     [[nodiscard]] uint32 GetInnTriggerId() const { return _innTriggerId; }
 
     [[nodiscard]] Pet* GetPet() const;
@@ -2912,7 +2901,6 @@ protected:
     time_t _restTime;
     uint32 _innTriggerId;
     float _restBonus;
-    uint32 _restFlagMask;
     ////////////////////Rest System/////////////////////
     uint32 m_resetTalentsCost;
     time_t m_resetTalentsTime;
