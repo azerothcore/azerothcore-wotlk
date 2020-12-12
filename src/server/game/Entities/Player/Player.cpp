@@ -3048,7 +3048,7 @@ bool Player::IsInAreaTriggerRadius(const AreaTrigger* trigger) const
     else
     {
         Position center(trigger->x, trigger->y, trigger->z, trigger->orientation);
-        if (IsWithinBox(center, trigger->length / 2 + delta, trigger->width / 2 + delta, trigger->height / 2 + delta))
+        if (!IsWithinBox(center, trigger->length / 2 + delta, trigger->width / 2 + delta, trigger->height / 2 + delta))
             return false;
     }
 
