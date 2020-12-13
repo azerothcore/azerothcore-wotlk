@@ -2406,8 +2406,8 @@ Rate.XP.Pet     = 1
 
 #
 #    Rate.XP.BattlegroundKill
-#        Description: Experience rate for honorable kills in battlegrounds,
-#                     it works when Battleground.GiveXPForKills = 1
+#        Description: Experience rate for honorable kills in battlegrounds. Not affected by Rate.XP.Kill
+#                     Only works if Battleground.GiveXPForKills = 1
 #        Default:     1
 
 Rate.XP.BattlegroundKill = 1
