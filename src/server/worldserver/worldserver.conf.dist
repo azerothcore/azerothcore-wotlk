@@ -71,6 +71,7 @@ DataDir = "."
 #        Description: Logs directory setting.
 #        Important:   LogsDir needs to be quoted, as the string might contain space characters.
 #                     Logs directory must exists, or log file creation will be disabled.
+#        Example:     "/home/youruser/azeroth-server/logs"
 #        Default:     "" - (Log files will be stored in the current path)
 
 LogsDir = ""
@@ -183,11 +184,11 @@ Compression = 1
 #        Description: Maximum number of players in the world. Excluding Mods, GMs and Admins.
 #          Important: If you want to block players and only allow Mods, GMs or Admins to join the
 #                     server, use the DB field "auth.realmlist.allowedSecurityLevel".
-#            Default: 100 - (Enabled)
-#                     1+  - (Enabled)
-#                     0   - (Disabled, No limit)
+#            Default: 1000 - (Enabled)
+#                     1+   - (Enabled)
+#                     0    - (Disabled, No limit)
 
-PlayerLimit = 100
+PlayerLimit = 1000
 
 #
 #    SaveRespawnTimeImmediately
@@ -653,7 +654,7 @@ SQLDeveloperLogFile = ""
 #
 #    SQLDriverLogFile
 #        Description: Log file for SQL driver events.
-#        Example:     "SQLDriver.log" - (Enabled)
+#        Example:     "WorldSQLDriver.log" - (Enabled)
 #        Default:      ""             - (Disabled)
 
 SQLDriverLogFile = ""

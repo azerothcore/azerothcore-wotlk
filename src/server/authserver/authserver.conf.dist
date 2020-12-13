@@ -34,6 +34,7 @@
 #        Description: Logs directory setting.
 #        Important:   LogsDir needs to be quoted, as the string might contain space characters.
 #                     Logs directory must exists, or log file creation will be disabled.
+#        Example:     "/home/youruser/azeroth-server/logs"
 #        Default:     "" - (Log files will be stored in the current path)
 
 LogsDir = ""
@@ -105,7 +106,7 @@ DebugLogMask = 64
 #
 #    SQLDriverLogFile
 #        Description: Log file for SQL driver events.
-#        Example:     "SQLDriver.log" - (Enabled)
+#        Example:     "AuthSQLDriver.log" - (Enabled)
 #        Default:      ""             - (Disabled)
 
 SQLDriverLogFile = ""
@@ -125,7 +126,7 @@ SQLDriverQueryLogging = 0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-LogTimestamp = 0
+LogTimestamp = 1
 
 #
 #    LogFileLevel
@@ -135,7 +136,7 @@ LogTimestamp = 0
 #                     2 - (Detail)
 #                     3 - (Full/Debug)
 
-LogFileLevel = 0
+LogFileLevel = 2
 
 #
 #    LogColors
@@ -239,7 +240,7 @@ WrongPass.BanType = 0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-WrongPass.Logging = 0
+WrongPass.Logging = 1
 
 
 #
