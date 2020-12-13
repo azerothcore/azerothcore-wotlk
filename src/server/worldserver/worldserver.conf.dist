@@ -2937,6 +2937,13 @@ Arena.AutoDistributePoints = 0
 Arena.AutoDistributeInterval = 7
 
 #
+#    Arena.GamesRequired
+#        Description: Number of arena matches teams must participate in to be eligible for arena point distribution.
+#        Default:     10
+
+Arena.GamesRequired = 10
+
+#
 #    Arena.QueueAnnouncer.Enable
 #        Description: Announce arena queue status to chat.
 #        Default:     0 - (Disabled)

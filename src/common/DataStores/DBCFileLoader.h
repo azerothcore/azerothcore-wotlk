@@ -35,7 +35,7 @@ public:
     class Record
     {
     public:
-        float getFloat(size_t field) const
+        [[nodiscard]] float getFloat(size_t field) const
         {
             ASSERT(field < file.fieldCount);
             float val = *reinterpret_cast<float*>(offset + file.GetOffset(field));
@@ -43,7 +43,7 @@ public:
             return val;
         }
 
-        uint32 getUInt(size_t field) const
+        [[nodiscard]] uint32 getUInt(size_t field) const
         {
             ASSERT(field < file.fieldCount);
             uint32 val = *reinterpret_cast<uint32*>(offset + file.GetOffset(field));
@@ -51,13 +51,13 @@ public:
             return val;
         }
 
-        uint8 getUInt8(size_t field) const
+        [[nodiscard]] uint8 getUInt8(size_t field) const
         {
             ASSERT(field < file.fieldCount);
             return *reinterpret_cast<uint8*>(offset + file.GetOffset(field));
         }
 
-        const char* getString(size_t field) const
+        [[nodiscard]] const char* getString(size_t field) const
         {
             ASSERT(field < file.fieldCount);
             size_t stringOffset = getUInt(field);
@@ -77,11 +77,11 @@ public:
     // Get record by id
     Record getRecord(size_t id);
 
-    uint32 GetNumRows() const { return recordCount; }
-    uint32 GetRowSize() const { return recordSize; }
-    uint32 GetCols() const { return fieldCount; }
-    uint32 GetOffset(size_t id) const { return (fieldsOffset != nullptr && id < fieldCount) ? fieldsOffset[id] : 0; }
-    bool IsLoaded() const { return data != nullptr; }
+    [[nodiscard]] uint32 GetNumRows() const { return recordCount; }
+    [[nodiscard]] uint32 GetRowSize() const { return recordSize; }
+    [[nodiscard]] uint32 GetCols() const { return fieldCount; }
+    [[nodiscard]] uint32 GetOffset(size_t id) const { return (fieldsOffset != nullptr && id < fieldCount) ? fieldsOffset[id] : 0; }
+    [[nodiscard]] bool IsLoaded() const { return data != nullptr; }
     char* AutoProduceData(char const* fmt, uint32& count, char**& indexTable);
     char* AutoProduceStrings(char const* fmt, char* dataTable);
     static uint32 GetFormatRecordSize(const char* format, int32* index_pos = nullptr);

@@ -11,7 +11,7 @@ class instance_halls_of_lightning : public InstanceMapScript
 public:
     instance_halls_of_lightning() : InstanceMapScript("instance_halls_of_lightning", 602) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_halls_of_lightning_InstanceMapScript(pMap);
     }
@@ -36,7 +36,7 @@ public:
         bool volkhanAchievement;
         bool bjarngrimAchievement;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -55,7 +55,7 @@ public:
             bjarngrimAchievement = false;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
@@ -65,7 +65,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* pCreature)
+        void OnCreatureCreate(Creature* pCreature) override
         {
             switch(pCreature->GetEntry())
             {
@@ -84,7 +84,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* pGo)
+        void OnGameObjectCreate(GameObject* pGo) override
         {
             switch(pGo->GetEntry())
             {
@@ -118,7 +118,7 @@ public:
             }
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -130,7 +130,7 @@ public:
             return false;
         }
 
-        void SetData(uint32 uiType, uint32 uiData)
+        void SetData(uint32 uiType, uint32 uiData) override
         {
             m_auiEncounter[uiType] = uiData;
             if( uiType == TYPE_LOKEN_INTRO )
@@ -168,7 +168,7 @@ public:
             SaveToDB();
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -181,7 +181,7 @@ public:
         }
 
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -216,12 +216,12 @@ public:
                 OUT_LOAD_INST_DATA_FAIL;
         }
 
-        uint32 GetData(uint32 uiType) const
+        uint32 GetData(uint32 uiType) const override
         {
             return m_auiEncounter[uiType];
         }
 
-        uint64 GetData64(uint32 uiData) const
+        uint64 GetData64(uint32 uiData) const override
         {
             switch(uiData)
             {

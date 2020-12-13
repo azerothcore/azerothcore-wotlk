@@ -98,7 +98,7 @@ public:
     int nTriangles; // number when loaded
     uint32 liquflags;
 
-    WMOGroup(std::string const& filename);
+    WMOGroup(std::string  filename);
     ~WMOGroup();
 
     bool open();

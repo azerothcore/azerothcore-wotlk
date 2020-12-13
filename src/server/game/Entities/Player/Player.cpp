@@ -82,7 +82,8 @@
 #include "LuaEngine.h"
 #endif
 
-#define ZONE_UPDATE_INTERVAL (2*IN_MILLISECONDS)
+// Zone Interval should be 1 second
+#define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
 #define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
 #define PLAYER_SKILL_VALUE_INDEX(x) (PLAYER_SKILL_INDEX(x)+1)
@@ -824,6 +825,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     _restTime = 0;
     _innTriggerId = 0;
     _restBonus = 0;
+    _restFlagMask = 0;
     ////////////////////Rest System/////////////////////
 
     m_mailsUpdated = false;
@@ -1776,6 +1778,14 @@ void Player::Update(uint32 p_time)
     {
         if (p_time >= m_zoneUpdateTimer)
         {
+            // On zone update tick check if we are still in an inn if we are supposed to be in one
+            if (HasRestFlag(REST_FLAG_IN_TAVERN))
+            {
+                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
+                if (!atEntry || !IsInAreaTriggerRadius(atEntry))
+                    RemoveRestFlag(REST_FLAG_IN_TAVERN);
+            }
+
             uint32 newzone, newarea;
             GetZoneAndAreaId(newzone, newarea, true);
             m_last_zone_id = newzone;
@@ -3023,20 +3033,22 @@ void Player::SetInWater(bool apply)
 
 bool Player::IsInAreaTriggerRadius(const AreaTrigger* trigger) const
 {
+    static const float delta = 5.0f;
+
     if (!trigger || GetMapId() != trigger->map)
         return false;
 
-    if (trigger->radius > 0.f)
+    if (trigger->radius > 0)
     {
         // if we have radius check it
         float dist = GetDistance(trigger->x, trigger->y, trigger->z);
-        if (dist > trigger->radius)
+        if (dist > trigger->radius + delta)
             return false;
     }
     else
     {
-        Position center = {trigger->x, trigger->y, trigger->z, trigger->orientation};
-        if (!IsWithinBox(center, trigger->length / 2.f, trigger->width / 2.f, trigger->height / 2.f))
+        Position center(trigger->x, trigger->y, trigger->z, trigger->orientation);
+        if (!IsWithinBox(center, trigger->length / 2 + delta, trigger->width / 2 + delta, trigger->height / 2 + delta))
             return false;
     }
 
@@ -4940,7 +4952,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                     {
                         if (Player* pFriend = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID((*resultFriends)[0].GetUInt32(), 0, HIGHGUID_PLAYER)))
                         {
-                            pFriend->GetSocial()->RemoveFromSocialList(guid, false);
+                            pFriend->GetSocial()->RemoveFromSocialList(guid, SOCIAL_FLAG_ALL);
                             sSocialMgr->SendFriendStatus(pFriend, FRIEND_REMOVED, guid, false);
                         }
                     } while (resultFriends->NextRow());
@@ -7673,27 +7685,7 @@ void Player::UpdateArea(uint32 newArea)
     UpdateAreaDependentAuras(newArea);
 
     pvpInfo.IsInNoPvPArea = false;
-    if (!area)
-    {
-        RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
-        RemoveRestState();
-        return;
-    }
-
-    // Xinef: area should inherit zone flags
-    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(area->zone);
-    uint32 areaFlags = area->flags;
-    bool isSanctuary = area->IsSanctuary();
-    bool isInn = area->IsInn(GetTeamId(true));
-    if (zone)
-    {
-        areaFlags |= zone->flags;
-        isSanctuary |= zone->IsSanctuary();
-        isInn |= zone->IsInn(GetTeamId(true));
-    }
-
-    // previously this was in UpdateZone (but after UpdateArea) so nothing will break
-    if (isSanctuary)    // in sanctuary
+    if (area && area->IsSanctuary())
     {
         SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
         pvpInfo.IsInNoPvPArea = true;
@@ -7702,18 +7694,11 @@ void Player::UpdateArea(uint32 newArea)
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 
-    if (isInn)
-    {
-        SetRestState(0);
-        if (sWorld->IsFFAPvPRealm())
-            RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-    }
-    else if (!(areaFlags & AREA_FLAG_CAPITAL))
-    {
-        AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
-        if (!atEntry || !IsInAreaTriggerRadius(atEntry))
-            RemoveRestState();
-    }
+    uint32 const areaRestFlag = (GetTeamId(true) == TEAM_ALLIANCE) ? AREA_FLAG_REST_ZONE_ALLIANCE : AREA_FLAG_REST_ZONE_HORDE;
+    if (area && area->flags & areaRestFlag)
+        SetRestFlag(REST_FLAG_IN_FACTION_AREA);
+    else
+        RemoveRestFlag(REST_FLAG_IN_FACTION_AREA);
 }
 
 uint32 Player::GetZoneId(bool forceRecalc) const
@@ -7809,10 +7794,12 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     if (zone->flags & AREA_FLAG_CAPITAL)                     // Is in a capital city
     {
         if (!pvpInfo.IsHostile || zone->IsSanctuary())
-            SetRestState(0);
+            SetRestFlag(REST_FLAG_IN_CITY);
 
         pvpInfo.IsInNoPvPArea = true;
     }
+    else
+        RemoveRestFlag(REST_FLAG_IN_CITY); // Recently left a capital city
 
     UpdatePvPState();
 
@@ -23268,7 +23255,7 @@ void Player::SetGroup(Group* group, int8 subgroup)
 void Player::SendInitialPacketsBeforeAddToMap()
 {
     /// Pass 'this' as argument because we're not stored in ObjectAccessor yet
-    GetSocial()->SendSocialList(this);
+    GetSocial()->SendSocialList(this, SOCIAL_FLAG_ALL);
 
     // guild bank list wtf?
 
@@ -27855,3 +27842,30 @@ bool Player::HasHealSpec()
 }
 
 std::unordered_map<int, bgZoneRef> Player::bgZoneIdToFillWorldStates = {};
+
+void Player::SetRestFlag(RestFlag restFlag, uint32 triggerId /*= 0*/)
+{
+    uint32 oldRestMask = _restFlagMask;
+    _restFlagMask |= restFlag;
+
+    if (!oldRestMask && _restFlagMask) // only set flag/time on the first rest state
+    {
+        _restTime = time(nullptr);
+        SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+    }
+
+    if (triggerId)
+        _innTriggerId = triggerId;
+}
+
+void Player::RemoveRestFlag(RestFlag restFlag)
+{
+    uint32 oldRestMask = _restFlagMask;
+    _restFlagMask &= ~restFlag;
+
+    if (oldRestMask && !_restFlagMask) // only remove flag/time on the last rest state remove
+    {
+        _restTime = 0;
+        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+    }
+}

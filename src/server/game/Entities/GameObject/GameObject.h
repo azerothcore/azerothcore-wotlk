@@ -392,7 +392,7 @@ struct GameObjectTemplate
     bool IsForQuests; // pussywizard
 
     // helpers
-    bool IsDespawnAtAction() const
+    [[nodiscard]] bool IsDespawnAtAction() const
     {
         switch (type)
         {
@@ -405,7 +405,7 @@ struct GameObjectTemplate
         }
     }
 
-    bool IsUsableMounted() const
+    [[nodiscard]] bool IsUsableMounted() const
     {
         switch (type)
         {
@@ -422,7 +422,7 @@ struct GameObjectTemplate
         }
     }
 
-    uint32 GetLockId() const
+    [[nodiscard]] uint32 GetLockId() const
     {
         switch (type)
         {
@@ -453,7 +453,7 @@ struct GameObjectTemplate
         }
     }
 
-    bool GetDespawnPossibility() const                      // despawn at targeting of cast?
+    [[nodiscard]] bool GetDespawnPossibility() const                      // despawn at targeting of cast?
     {
         switch (type)
         {
@@ -474,7 +474,7 @@ struct GameObjectTemplate
         }
     }
 
-    uint32 GetCharges() const                               // despawn at uses amount
+    [[nodiscard]] uint32 GetCharges() const                               // despawn at uses amount
     {
         switch (type)
         {
@@ -488,7 +488,7 @@ struct GameObjectTemplate
         }
     }
 
-    uint32 GetLinkedGameObjectEntry() const
+    [[nodiscard]] uint32 GetLinkedGameObjectEntry() const
     {
         switch (type)
         {
@@ -503,7 +503,7 @@ struct GameObjectTemplate
         }
     }
 
-    uint32 GetAutoCloseTime() const
+    [[nodiscard]] uint32 GetAutoCloseTime() const
     {
         uint32 autoCloseTime = 0;
         switch (type)
@@ -532,7 +532,7 @@ struct GameObjectTemplate
         return autoCloseTime /* xinef: changed to milliseconds/ IN_MILLISECONDS*/;              // prior to 3.0.3, conversion was / 0x10000;
     }
 
-    uint32 GetLootId() const
+    [[nodiscard]] uint32 GetLootId() const
     {
         switch (type)
         {
@@ -545,7 +545,7 @@ struct GameObjectTemplate
         }
     }
 
-    uint32 GetGossipMenuId() const
+    [[nodiscard]] uint32 GetGossipMenuId() const
     {
         switch (type)
         {
@@ -558,7 +558,7 @@ struct GameObjectTemplate
         }
     }
 
-    uint32 GetEventScriptId() const
+    [[nodiscard]] uint32 GetEventScriptId() const
     {
         switch (type)
         {
@@ -573,7 +573,7 @@ struct GameObjectTemplate
         }
     }
 
-    uint32 GetCooldown() const                              // Cooldown preventing goober and traps to cast spell
+    [[nodiscard]] uint32 GetCooldown() const                              // Cooldown preventing goober and traps to cast spell
     {
         switch (type)
         {
@@ -586,7 +586,7 @@ struct GameObjectTemplate
         }
     }
 
-    bool IsLargeGameObject() const
+    [[nodiscard]] bool IsLargeGameObject() const
     {
         switch (type)
         {
@@ -611,7 +611,7 @@ struct GameObjectTemplate
         }
     }
 
-    bool IsGameObjectForQuests() const
+    [[nodiscard]] bool IsGameObjectForQuests() const
     {
         return IsForQuests;
     }
@@ -688,22 +688,21 @@ enum GOState
 // from `gameobject`
 struct GameObjectData
 {
-    explicit GameObjectData() : id(0), mapid(0), phaseMask(0), posX(0.0f), posY(0.0f), posZ(0.0f), orientation(0.0f), spawntimesecs(0),
-        animprogress(0), go_state(GO_STATE_ACTIVE), spawnMask(0), artKit(0), dbData(true) { }
-    uint32 id;                                              // entry in gamobject_template
-    uint16 mapid;
-    uint32 phaseMask;
-    float posX;
-    float posY;
-    float posZ;
-    float orientation;
+    explicit GameObjectData()  { }
+    uint32 id{0};                                              // entry in gamobject_template
+    uint16 mapid{0};
+    uint32 phaseMask{0};
+    float posX{0.0f};
+    float posY{0.0f};
+    float posZ{0.0f};
+    float orientation{0.0f};
     G3D::Quat rotation;
-    int32  spawntimesecs;
-    uint32 animprogress;
-    GOState go_state;
-    uint8 spawnMask;
-    uint8 artKit;
-    bool dbData;
+    int32  spawntimesecs{0};
+    uint32 animprogress{0};
+    GOState go_state{GO_STATE_ACTIVE};
+    uint8 spawnMask{0};
+    uint8 artKit{0};
+    bool dbData{true};
 };
 
 typedef std::vector<uint32> GameObjectQuestItemList;
@@ -731,7 +730,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
 {
 public:
     explicit GameObject();
-    ~GameObject();
+    ~GameObject() override;
 
     void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, Player* target) const override;
 
@@ -741,24 +740,24 @@ public:
 
     virtual bool Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
     void Update(uint32 p_time) override;
-    GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
-    GameObjectTemplateAddon const* GetTemplateAddon() const;
-    GameObjectData const* GetGOData() const { return m_goData; }
-    GameObjectValue const* GetGOValue() const { return &m_goValue; }
+    [[nodiscard]] GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
+    [[nodiscard]] GameObjectTemplateAddon const* GetTemplateAddon() const;
+    [[nodiscard]] GameObjectData const* GetGOData() const { return m_goData; }
+    [[nodiscard]] GameObjectValue const* GetGOValue() const { return &m_goValue; }
 
-    bool IsTransport() const;
-    bool IsDestructibleBuilding() const;
+    [[nodiscard]] bool IsTransport() const;
+    [[nodiscard]] bool IsDestructibleBuilding() const;
 
-    uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
+    [[nodiscard]] uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
 
     // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
     void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
     void SetWorldRotation(G3D::Quat const& rot);
     void SetTransportPathRotation(float qx, float qy, float qz, float qw);
-    int64 GetPackedWorldRotation() const { return m_packedRotation; }
+    [[nodiscard]] int64 GetPackedWorldRotation() const { return m_packedRotation; }
 
     // overwrite WorldObject function for proper name localization
-    std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const override;
+    [[nodiscard]] std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const override;
 
     void SaveToDB();
     void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
@@ -776,18 +775,18 @@ public:
         m_spawnedByDefault = false;                     // all object with owner is despawned after delay
         SetUInt64Value(OBJECT_FIELD_CREATED_BY, owner);
     }
-    uint64 GetOwnerGUID() const { return GetUInt64Value(OBJECT_FIELD_CREATED_BY); }
-    Unit* GetOwner() const;
+    [[nodiscard]] uint64 GetOwnerGUID() const { return GetUInt64Value(OBJECT_FIELD_CREATED_BY); }
+    [[nodiscard]] Unit* GetOwner() const;
 
     void SetSpellId(uint32 id)
     {
         m_spawnedByDefault = false;                     // all summoned object is despawned after delay
         m_spellId = id;
     }
-    uint32 GetSpellId() const { return m_spellId;}
+    [[nodiscard]] uint32 GetSpellId() const { return m_spellId;}
 
-    time_t GetRespawnTime() const { return m_respawnTime; }
-    time_t GetRespawnTimeEx() const
+    [[nodiscard]] time_t GetRespawnTime() const { return m_respawnTime; }
+    [[nodiscard]] time_t GetRespawnTimeEx() const
     {
         time_t now = time(nullptr);
         if (m_respawnTime > now)
@@ -802,26 +801,26 @@ public:
         m_respawnDelayTime = respawn > 0 ? respawn : 0;
     }
     void Respawn();
-    bool isSpawned() const
+    [[nodiscard]] bool isSpawned() const
     {
         return m_respawnDelayTime == 0 ||
                (m_respawnTime > 0 && !m_spawnedByDefault) ||
                (m_respawnTime == 0 && m_spawnedByDefault);
     }
-    bool isSpawnedByDefault() const { return m_spawnedByDefault; }
+    [[nodiscard]] bool isSpawnedByDefault() const { return m_spawnedByDefault; }
     void SetSpawnedByDefault(bool b) { m_spawnedByDefault = b; }
-    uint32 GetRespawnDelay() const { return m_respawnDelayTime; }
+    [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelayTime; }
     void Refresh();
     void Delete();
     void getFishLoot(Loot* loot, Player* loot_owner);
     void getFishLootJunk(Loot* loot, Player* loot_owner);
-    GameobjectTypes GetGoType() const { return GameobjectTypes(GetByteValue(GAMEOBJECT_BYTES_1, 1)); }
+    [[nodiscard]] GameobjectTypes GetGoType() const { return GameobjectTypes(GetByteValue(GAMEOBJECT_BYTES_1, 1)); }
     void SetGoType(GameobjectTypes type) { SetByteValue(GAMEOBJECT_BYTES_1, 1, type); }
-    GOState GetGoState() const { return GOState(GetByteValue(GAMEOBJECT_BYTES_1, 0)); }
+    [[nodiscard]] GOState GetGoState() const { return GOState(GetByteValue(GAMEOBJECT_BYTES_1, 0)); }
     void SetGoState(GOState state);
-    uint8 GetGoArtKit() const { return GetByteValue(GAMEOBJECT_BYTES_1, 2); }
+    [[nodiscard]] uint8 GetGoArtKit() const { return GetByteValue(GAMEOBJECT_BYTES_1, 2); }
     void SetGoArtKit(uint8 artkit);
-    uint8 GetGoAnimProgress() const { return GetByteValue(GAMEOBJECT_BYTES_1, 3); }
+    [[nodiscard]] uint8 GetGoAnimProgress() const { return GetByteValue(GAMEOBJECT_BYTES_1, 3); }
     void SetGoAnimProgress(uint8 animprogress) { SetByteValue(GAMEOBJECT_BYTES_1, 3, animprogress); }
     static void SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid = 0);
 
@@ -830,22 +829,22 @@ public:
 
     void Use(Unit* user);
 
-    LootState getLootState() const { return m_lootState; }
+    [[nodiscard]] LootState getLootState() const { return m_lootState; }
     // Note: unit is only used when s = GO_ACTIVATED
     void SetLootState(LootState s, Unit* unit = nullptr);
 
-    uint16 GetLootMode() const { return m_LootMode; }
-    bool HasLootMode(uint16 lootMode) const { return m_LootMode & lootMode; }
+    [[nodiscard]] uint16 GetLootMode() const { return m_LootMode; }
+    [[nodiscard]] bool HasLootMode(uint16 lootMode) const { return m_LootMode & lootMode; }
     void SetLootMode(uint16 lootMode) { m_LootMode = lootMode; }
     void AddLootMode(uint16 lootMode) { m_LootMode |= lootMode; }
     void RemoveLootMode(uint16 lootMode) { m_LootMode &= ~lootMode; }
     void ResetLootMode() { m_LootMode = LOOT_MODE_DEFAULT; }
 
     void AddToSkillupList(uint32 PlayerGuidLow) { m_SkillupList.push_back(PlayerGuidLow); }
-    bool IsInSkillupList(uint32 PlayerGuidLow) const
+    [[nodiscard]] bool IsInSkillupList(uint32 PlayerGuidLow) const
     {
-        for (std::list<uint32>::const_iterator i = m_SkillupList.begin(); i != m_SkillupList.end(); ++i)
-            if (*i == PlayerGuidLow)
+        for (unsigned int i : m_SkillupList)
+            if (i == PlayerGuidLow)
                 return true;
 
         return false;
@@ -855,25 +854,25 @@ public:
     void AddUniqueUse(Player* player);
     void AddUse() { ++m_usetimes; }
 
-    uint32 GetUseCount() const { return m_usetimes; }
-    uint32 GetUniqueUseCount() const { return m_unique_users.size(); }
+    [[nodiscard]] uint32 GetUseCount() const { return m_usetimes; }
+    [[nodiscard]] uint32 GetUniqueUseCount() const { return m_unique_users.size(); }
 
     void SaveRespawnTime() override;
 
     Loot        loot;
 
-    Player* GetLootRecipient() const;
-    Group* GetLootRecipientGroup() const;
+    [[nodiscard]] Player* GetLootRecipient() const;
+    [[nodiscard]] Group* GetLootRecipientGroup() const;
     void SetLootRecipient(Unit* unit);
     bool IsLootAllowedFor(Player const* player) const;
-    bool HasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
+    [[nodiscard]] bool HasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
     uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
     uint32 lootingGroupLowGUID;                         // used to find group which is looting
     void SetLootGenerationTime() { m_lootGenerationTime = time(nullptr); }
-    uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
+    [[nodiscard]] uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
 
-    bool hasQuest(uint32 quest_id) const override;
-    bool hasInvolvedQuest(uint32 quest_id) const override;
+    [[nodiscard]] bool hasQuest(uint32 quest_id) const override;
+    [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id) const override;
     bool ActivateToQuest(Player* target) const;
     void UseDoorOrButton(uint32 time_to_restore = 0, bool alternative = false, Unit* user = nullptr);
     // 0 = use `gameobject`.`spawntimesecs`
@@ -881,9 +880,9 @@ public:
 
     void TriggeringLinkedGameObject(uint32 trapEntry, Unit* target);
 
-    bool IsNeverVisible() const override;
+    [[nodiscard]] bool IsNeverVisible() const override;
     bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
-    bool IsInvisibleDueToDespawn() const override;
+    [[nodiscard]] bool IsInvisibleDueToDespawn() const override;
 
     uint8 getLevelForTarget(WorldObject const* target) const override
     {
@@ -897,15 +896,15 @@ public:
 
     void CastSpell(Unit* target, uint32 spell);
     void SendCustomAnim(uint32 anim);
-    bool IsInRange(float x, float y, float z, float radius) const;
+    [[nodiscard]] bool IsInRange(float x, float y, float z, float radius) const;
 
     void SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) override; // pussywizard!
 
-    void ModifyHealth(int32 change, Unit* attackerOrHealer = NULL, uint32 spellId = 0);
+    void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
     void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
     // sets GameObject type 33 destruction flags and optionally default health for that state
-    void SetDestructibleState(GameObjectDestructibleState state, Player* eventInvoker = NULL, bool setHealth = false);
-    GameObjectDestructibleState GetDestructibleState() const
+    void SetDestructibleState(GameObjectDestructibleState state, Player* eventInvoker = nullptr, bool setHealth = false);
+    [[nodiscard]] GameObjectDestructibleState GetDestructibleState() const
     {
         if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED))
             return GO_DESTRUCTIBLE_DESTROYED;
@@ -916,12 +915,12 @@ public:
 
     void EventInform(uint32 eventId);
 
-    virtual uint32 GetScriptId() const { return GetGOInfo()->ScriptId; }
-    GameObjectAI* AI() const { return m_AI; }
+    [[nodiscard]] virtual uint32 GetScriptId() const { return GetGOInfo()->ScriptId; }
+    [[nodiscard]] GameObjectAI* AI() const { return m_AI; }
 
-    std::string GetAIName() const;
+    [[nodiscard]] std::string GetAIName() const;
     void SetDisplayId(uint32 displayid);
-    uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
+    [[nodiscard]] uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
 
     GameObjectModel* m_model;
     void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr) const;
@@ -929,22 +928,22 @@ public:
     void SetPosition(float x, float y, float z, float o);
     void SetPosition(const Position& pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }
 
-    bool IsStaticTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT; }
-    bool IsMotionTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT; }
+    [[nodiscard]] bool IsStaticTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT; }
+    [[nodiscard]] bool IsMotionTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT; }
 
     Transport* ToTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport*>(this); else return nullptr; }
-    Transport const* ToTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport const*>(this); else return nullptr; }
+    [[nodiscard]] Transport const* ToTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport const*>(this); else return nullptr; }
 
     StaticTransport* ToStaticTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<StaticTransport*>(this); else return nullptr; }
-    StaticTransport const* ToStaticTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<StaticTransport const*>(this); else return nullptr; }
+    [[nodiscard]] StaticTransport const* ToStaticTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<StaticTransport const*>(this); else return nullptr; }
 
     MotionTransport* ToMotionTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<MotionTransport*>(this); else return nullptr; }
-    MotionTransport const* ToMotionTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<MotionTransport const*>(this); else return nullptr; }
+    [[nodiscard]] MotionTransport const* ToMotionTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<MotionTransport const*>(this); else return nullptr; }
 
-    float GetStationaryX() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionX(); return GetPositionX(); }
-    float GetStationaryY() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionY(); return GetPositionY(); }
-    float GetStationaryZ() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionZ(); return GetPositionZ(); }
-    float GetStationaryO() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetOrientation(); return GetOrientation(); }
+    [[nodiscard]] float GetStationaryX() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionX(); return GetPositionX(); }
+    [[nodiscard]] float GetStationaryY() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionY(); return GetPositionY(); }
+    [[nodiscard]] float GetStationaryZ() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionZ(); return GetPositionZ(); }
+    [[nodiscard]] float GetStationaryO() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetOrientation(); return GetOrientation(); }
 
     float GetInteractionDistance();
 
