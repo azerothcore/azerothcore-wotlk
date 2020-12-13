@@ -1,3 +1,19 @@
+-- DB update 2020_12_13_03 -> 2020_12_13_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_13_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_13_03 2020_12_13_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1607037840838629200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1607037840838629200');
 
 UPDATE `quest_template_locale` SET `ObjectiveText1` = 'An Eure Talente erinnern' WHERE `ID` = 1 AND `locale` = 'deDE';
@@ -1407,3 +1423,12 @@ UPDATE `quest_template_locale` SET `ObjectiveText4` = 'Nordwestlicher Bereich vo
 UPDATE `quest_template_locale` SET `ObjectiveText4` = 'Aufseher Savryn getötet' WHERE `ID` = 13354 AND `locale` = 'deDE';
 UPDATE `quest_template_locale` SET `ObjectiveText4` = 'Tanzt mit dem Ausbildungsoffizier' WHERE `ID` = 25199 AND `locale` = 'deDE';
 UPDATE `quest_template_locale` SET `ObjectiveText4` = 'Sprecht mit Kultistin Rokaga' WHERE `ID` = 25293 AND `locale` = 'deDE';
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
