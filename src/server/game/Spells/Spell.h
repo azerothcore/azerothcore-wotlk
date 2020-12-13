@@ -399,7 +399,7 @@ public:
     void SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList);
     void SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, SpellTargetSelectionCategories selectCategory, ConditionList* condList, bool isChainHeal);
 
-    void prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = nullptr);
+    SpellCastResult prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = nullptr);
     void cancel(bool bySelf = false);
     void update(uint32 difftime);
     void cast(bool skipCheck = false);
@@ -789,11 +789,11 @@ class SpellEvent : public BasicEvent
 {
 public:
     SpellEvent(Spell* spell);
-    virtual ~SpellEvent();
+    ~SpellEvent() override;
 
-    virtual bool Execute(uint64 e_time, uint32 p_time);
-    virtual void Abort(uint64 e_time);
-    virtual bool IsDeletable() const;
+    bool Execute(uint64 e_time, uint32 p_time) override;
+    void Abort(uint64 e_time) override;
+    bool IsDeletable() const override;
 protected:
     Spell* m_Spell;
 };
@@ -802,7 +802,7 @@ class ReflectEvent : public BasicEvent
 {
 public:
     ReflectEvent(uint64 casterGUID, uint64 targetGUID, const SpellInfo* spellInfo) : _casterGUID(casterGUID), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
-    virtual bool Execute(uint64 e_time, uint32 p_time);
+    bool Execute(uint64 e_time, uint32 p_time) override;
 
 protected:
     uint64 _casterGUID;

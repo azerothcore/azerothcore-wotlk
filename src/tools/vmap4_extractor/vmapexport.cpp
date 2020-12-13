@@ -5,11 +5,11 @@
  */
 
 #define _CRT_SECURE_NO_DEPRECATE
+#include <cerrno>
 #include <cstdio>
 #include <iostream>
-#include <vector>
 #include <list>
-#include <errno.h>
+#include <vector>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -53,7 +53,7 @@ typedef struct
 } map_id;
 
 map_id* map_ids;
-uint16* LiqType = 0;
+uint16* LiqType = nullptr;
 uint32 map_count;
 char output_path[128] = ".";
 char input_path[1024] = ".";
@@ -80,7 +80,7 @@ bool FileExists(const char* file)
 
 void strToLower(char* str)
 {
-    while(*str)
+    while (*str)
     {
         *str = tolower(*str);
         ++str;
@@ -92,7 +92,7 @@ void ReadLiquidTypeTableDBC()
 {
     printf("Read LiquidType.dbc file...");
     DBCFile dbc("DBFilesClient\\LiquidType.dbc");
-    if(!dbc.open())
+    if (!dbc.open())
     {
         printf("Fatal error: Invalid LiquidType.dbc file format!\n");
         exit(1);
@@ -103,7 +103,7 @@ void ReadLiquidTypeTableDBC()
     LiqType = new uint16[LiqType_maxid + 1];
     memset(LiqType, 0xff, (LiqType_maxid + 1) * sizeof(uint16));
 
-    for(uint32 x = 0; x < LiqType_count; ++x)
+    for (uint32 x = 0; x < LiqType_count; ++x)
         LiqType[dbc.getRecord(x).getUInt(0)] = dbc.getRecord(x).getUInt(3);
 
     printf("Done! (%u LiqTypes loaded)\n", (unsigned int)LiqType_count);
@@ -152,9 +152,8 @@ bool ExtractSingleWmo(std::string& fname)
     {
         char cpy[4];
         memcpy(cpy, rchr, 4);
-        for (int i = 0; i < 4; ++i)
+        for (int m : cpy)
         {
-            int m = cpy[i];
             if (isdigit(m))
                 p++;
         }
@@ -166,13 +165,13 @@ bool ExtractSingleWmo(std::string& fname)
     bool file_ok = true;
     std::cout << "Extracting " << fname << std::endl;
     WMORoot froot(fname);
-    if(!froot.open())
+    if (!froot.open())
     {
         printf("Couldn't open RootWmo!!!\n");
         return true;
     }
     FILE* output = fopen(szLocalFile, "wb");
-    if(!output)
+    if (!output)
     {
         printf("couldn't open %s for writing!\n", szLocalFile);
         return false;
@@ -198,7 +197,7 @@ bool ExtractSingleWmo(std::string& fname)
 
             string s = groupFileName;
             WMOGroup fgroup(s);
-            if(!fgroup.open())
+            if (!fgroup.open())
             {
                 printf("Could not open all Group file for: %s\n", plain_name);
                 file_ok = false;
@@ -229,7 +228,7 @@ void ParsMapFiles()
         sprintf(id, "%03u", map_ids[i].id);
         sprintf(fn, "World\\Maps\\%s\\%s.wdt", map_ids[i].name, map_ids[i].name);
         WDTFile WDT(fn, map_ids[i].name);
-        if(WDT.init(id, map_ids[i].id))
+        if (WDT.init(id, map_ids[i].id))
         {
             printf("Processing Map %u\n[", map_ids[i].id);
             for (int x = 0; x < 64; ++x)
@@ -276,23 +275,23 @@ bool scan_patches(char* scanmatch, std::vector<std::string>& pArchiveNames)
             sprintf(path, "%s.MPQ", scanmatch);
         }
 #ifdef __linux__
-        if(FILE* h = fopen64(path, "rb"))
+        if (FILE* h = fopen64(path, "rb"))
 #else
-        if(FILE* h = fopen(path, "rb"))
+        if (FILE* h = fopen(path, "rb"))
 #endif
         {
             fclose(h);
             //matches.push_back(path);
-            pArchiveNames.push_back(path);
+            pArchiveNames.emplace_back(path);
         }
     }
 
-    return(true);
+    return (true);
 }
 
 bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
 {
-    if(!hasInputPathParam)
+    if (!hasInputPathParam)
         getGamePath();
 
     printf("\nGame path: %s\n", input_path);
@@ -301,40 +300,40 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
     string in_path(input_path);
     std::vector<std::string> locales, searchLocales;
 
-    searchLocales.push_back("enGB");
-    searchLocales.push_back("enUS");
-    searchLocales.push_back("deDE");
-    searchLocales.push_back("esES");
-    searchLocales.push_back("frFR");
-    searchLocales.push_back("koKR");
-    searchLocales.push_back("zhCN");
-    searchLocales.push_back("zhTW");
-    searchLocales.push_back("enCN");
-    searchLocales.push_back("enTW");
-    searchLocales.push_back("esMX");
-    searchLocales.push_back("ruRU");
+    searchLocales.emplace_back("enGB");
+    searchLocales.emplace_back("enUS");
+    searchLocales.emplace_back("deDE");
+    searchLocales.emplace_back("esES");
+    searchLocales.emplace_back("frFR");
+    searchLocales.emplace_back("koKR");
+    searchLocales.emplace_back("zhCN");
+    searchLocales.emplace_back("zhTW");
+    searchLocales.emplace_back("enCN");
+    searchLocales.emplace_back("enTW");
+    searchLocales.emplace_back("esMX");
+    searchLocales.emplace_back("ruRU");
 
-    for (std::vector<std::string>::iterator i = searchLocales.begin(); i != searchLocales.end(); ++i)
+    for (auto & searchLocale : searchLocales)
     {
-        std::string localePath = in_path + *i;
+        std::string localePath = in_path + searchLocale;
         // check if locale exists:
         struct stat status;
         if (stat(localePath.c_str(), &status))
             continue;
         if ((status.st_mode & S_IFDIR) == 0)
             continue;
-        printf("Found locale '%s'\n", i->c_str());
-        locales.push_back(*i);
+        printf("Found locale '%s'\n", searchLocale.c_str());
+        locales.push_back(searchLocale);
     }
     printf("\n");
 
     // open locale expansion and common files
     printf("Adding data files from locale directories.\n");
-    for (std::vector<std::string>::iterator i = locales.begin(); i != locales.end(); ++i)
+    for (auto & locale : locales)
     {
-        pArchiveNames.push_back(in_path + *i + "/locale-" + *i + ".MPQ");
-        pArchiveNames.push_back(in_path + *i + "/expansion-locale-" + *i + ".MPQ");
-        pArchiveNames.push_back(in_path + *i + "/lichking-locale-" + *i + ".MPQ");
+        pArchiveNames.push_back(in_path + locale + "/locale-" + locale + ".MPQ");
+        pArchiveNames.push_back(in_path + locale + "/expansion-locale-" + locale + ".MPQ");
+        pArchiveNames.push_back(in_path + locale + "/lichking-locale-" + locale + ".MPQ");
     }
 
     // open expansion and common files
@@ -352,27 +351,27 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
         return false;
     }
     if (!scan_patches(path, pArchiveNames))
-        return(false);
+        return (false);
 
     // now, scan for the patch levels in locale dirs
     printf("Scanning patch levels from locale directories.\n");
     bool foundOne = false;
-    for (std::vector<std::string>::iterator i = locales.begin(); i != locales.end(); ++i)
+    for (auto & locale : locales)
     {
-        printf("Locale: %s\n", i->c_str());
-        int ret2 = snprintf(path, 512, "%s%s/patch-%s", input_path, i->c_str(), i->c_str());
+        printf("Locale: %s\n", locale.c_str());
+        int ret2 = snprintf(path, 512, "%s%s/patch-%s", input_path, locale.c_str(), locale.c_str());
         if (ret2 < 0)
         {
             printf("Error when formatting string");
             return false;
         }
-        if(scan_patches(path, pArchiveNames))
+        if (scan_patches(path, pArchiveNames))
             foundOne = true;
     }
 
     printf("\n");
 
-    if(!foundOne)
+    if (!foundOne)
     {
         printf("no locale found\n");
         return false;
@@ -387,15 +386,15 @@ bool processArgv(int argc, char** argv, const char* versionString)
     hasInputPathParam = false;
     preciseVectorData = false;
 
-    for(int i = 1; i < argc; ++i)
+    for (int i = 1; i < argc; ++i)
     {
-        if(strcmp("-s", argv[i]) == 0)
+        if (strcmp("-s", argv[i]) == 0)
         {
             preciseVectorData = false;
         }
-        else if(strcmp("-d", argv[i]) == 0)
+        else if (strcmp("-d", argv[i]) == 0)
         {
-            if((i + 1) < argc)
+            if ((i + 1) < argc)
             {
                 hasInputPathParam = true;
                 strcpy(input_path, argv[i + 1]);
@@ -408,11 +407,11 @@ bool processArgv(int argc, char** argv, const char* versionString)
                 result = false;
             }
         }
-        else if(strcmp("-?", argv[1]) == 0)
+        else if (strcmp("-?", argv[1]) == 0)
         {
             result = false;
         }
-        else if(strcmp("-l", argv[i]) == 0)
+        else if (strcmp("-l", argv[i]) == 0)
         {
             preciseVectorData = true;
         }
@@ -422,7 +421,7 @@ bool processArgv(int argc, char** argv, const char* versionString)
             break;
         }
     }
-    if(!result)
+    if (!result)
     {
         printf("Extract %s.\n", versionString);
         printf("%s [-?][-s][-l][-d <path>]\n", argv[0]);
@@ -481,9 +480,9 @@ int main(int argc, char** argv)
     // prepare archive name list
     std::vector<std::string> archiveNames;
     fillArchiveNameVector(archiveNames);
-    for (size_t i = 0; i < archiveNames.size(); ++i)
+    for (auto & archiveName : archiveNames)
     {
-        MPQArchive* archive = new MPQArchive(archiveNames[i].c_str());
+        MPQArchive* archive = new MPQArchive(archiveName.c_str());
         if (gOpenArchives.empty() || gOpenArchives.front() != archive)
             delete archive;
     }

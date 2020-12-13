@@ -15,7 +15,7 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Acceptor)
+ACE_ALLOC_HOOK_DEFINE_Tca(ACE_Acceptor)
 
 template <typename SVC_HANDLER, typename PEER_ACCEPTOR> void
 ACE_Acceptor<SVC_HANDLER, PEER_ACCEPTOR>::dump (void) const
@@ -172,11 +172,11 @@ ACE_Acceptor<SVC_HANDLER, PEER_ACCEPTOR>::info (ACE_TCHAR **strp,
   else if (addr.addr_to_string (addr_str, sizeof addr_str) == -1)
     return -1;
 
-  ACE_OS::sprintf (buf,
-                   ACE_TEXT ("%s\t %s %s"),
-                   ACE_TEXT ("ACE_Acceptor"),
-                   addr_str,
-                   ACE_TEXT ("# acceptor factory\n"));
+  ACE_OS::snprintf (buf, BUFSIZ,
+                    ACE_TEXT ("%s\t %s %s"),
+                    ACE_TEXT ("ACE_Acceptor"),
+                    addr_str,
+                    ACE_TEXT ("# acceptor factory\n"));
 
   if (*strp == 0 && (*strp = ACE_OS::strdup (buf)) == 0)
     return -1;
@@ -447,7 +447,7 @@ ACE_Acceptor<SVC_HANDLER, PEER_ACCEPTOR>::handle_input (ACE_HANDLE listener)
   return 0;
 }
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Strategy_Acceptor)
+ACE_ALLOC_HOOK_DEFINE_Tca(ACE_Strategy_Acceptor)
 
 template <typename SVC_HANDLER, typename PEER_ACCEPTOR> int
 ACE_Strategy_Acceptor<SVC_HANDLER, PEER_ACCEPTOR>::suspend (void)
@@ -832,15 +832,15 @@ ACE_Strategy_Acceptor<SVC_HANDLER, PEER_ACCEPTOR>::info (ACE_TCHAR **strp,
     return -1;
 
   // @@ Should add the protocol in...
-  ACE_OS::sprintf (buf,
-                   ACE_TEXT ("%s\t %s #%s\n"),
-                   this->service_name_ == 0
-                   ? ACE_TEXT ("<unknown>")
-                   : this->service_name_,
-                   service_addr_str,
-                   this->service_description_ == 0
-                   ? ACE_TEXT ("<unknown>")
-                   : this->service_description_);
+  ACE_OS::snprintf (buf, BUFSIZ,
+                    ACE_TEXT ("%s\t %s #%s\n"),
+                    this->service_name_ == 0
+                    ? ACE_TEXT ("<unknown>")
+                    : this->service_name_,
+                    service_addr_str,
+                    this->service_description_ == 0
+                    ? ACE_TEXT ("<unknown>")
+                    : this->service_description_);
 
   if (*strp == 0 && (*strp = ACE_OS::strdup (buf)) == 0)
     return -1;
@@ -856,7 +856,7 @@ ACE_Strategy_Acceptor<SVC_HANDLER, PEER_ACCEPTOR>::fini (void)
   return this->ACE_Strategy_Acceptor<SVC_HANDLER, PEER_ACCEPTOR>::handle_close ();
 }
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Oneshot_Acceptor)
+ACE_ALLOC_HOOK_DEFINE_Tca(ACE_Oneshot_Acceptor)
 
 template <typename SVC_HANDLER, typename PEER_ACCEPTOR> void
 ACE_Oneshot_Acceptor<SVC_HANDLER, PEER_ACCEPTOR>::dump (void) const
@@ -1199,11 +1199,11 @@ ACE_Oneshot_Acceptor<SVC_HANDLER, PEER_ACCEPTOR>::info (ACE_TCHAR **strp,
   else if (addr.addr_to_string (addr_str, sizeof addr_str) == -1)
     return -1;
 
-  ACE_OS::sprintf (buf,
-                   ACE_TEXT ("%s\t %s %s"),
-                   ACE_TEXT ("ACE_Oneshot_Acceptor"),
-                   addr_str,
-                   ACE_TEXT ("#oneshot acceptor factory\n"));
+  ACE_OS::snprintf (buf, BUFSIZ,
+                    ACE_TEXT ("%s\t %s %s"),
+                    ACE_TEXT ("ACE_Oneshot_Acceptor"),
+                    addr_str,
+                    ACE_TEXT ("#oneshot acceptor factory\n"));
 
   if (*strp == 0 && (*strp = ACE_OS::strdup (buf)) == 0)
     return -1;

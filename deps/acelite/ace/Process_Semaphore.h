@@ -7,7 +7,7 @@
  *   Wrapper for Dijkstra style general semaphores that work
  *   across processes.
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 

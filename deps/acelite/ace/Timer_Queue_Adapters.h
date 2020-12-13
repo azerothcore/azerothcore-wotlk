@@ -4,7 +4,7 @@
 /**
  *  @file    Timer_Queue_Adapters.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu> and
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu> and
  *          Carlos O'Ryan <coryan@uci.edu>
  */
 //=============================================================================
@@ -224,6 +224,12 @@ private:
   /// The mutual exclusion mechanism that is required to use the
   /// <condition_>.
   ACE_SYNCH_RECURSIVE_MUTEX mutex_;
+
+  /// Attributes to initialize condition with.
+  /* We only need this because some crappy compilers can't
+     properly handle initializing the conditions with
+     temporary objects. */
+  ACE_Condition_Attributes_T<typename TQ::time_policy_t> cond_attr_;
 
   /**
    * The dispatching thread sleeps on this condition while waiting to
