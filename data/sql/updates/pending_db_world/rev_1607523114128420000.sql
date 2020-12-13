@@ -2,7 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1607523114128420000');
 
 UPDATE `game_tele` SET `position_x`=3677.532959, `position_y`=2166.696777, `position_z`=35.807980, `orientation`=2.301083 WHERE `id`=455; -- Azjol-Nerub
 
-DELETE FROM `game_tele` WHERE `id` IN (1435, 1436, 1437, 1438, 1439, 1440, 1441, 1442, 1443, 1444, 1445, 1446, 1447, 1448, 1449, 1450);
+DELETE FROM `game_tele` WHERE `id` IN (1435, 1436, 1437, 1438, 1439, 1440, 1441, 1442, 1443, 1444, 1445, 1446, 1447, 1448, 1449, 1450, 1490);
 INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES
 (1435, -8779.900391, 834.348816, 94.680130, 0.653013, 0, 'TheStockade'),
 (1436, 3643.309082, 2036.508545, 1.787417, 4.339186, 571, 'AhnKahet'),
@@ -19,4 +19,5 @@ INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orient
 (1447, 3457.111816, 262.394165, -113.819344, 3.282578, 571, 'ObsidianSanctum'),
 (1448, 3879.958740, 6984.616211, 106.3120190, 3.196693, 571, 'Oculus'),
 (1449, 8515.682617, 716.982239, 558.247864, 1.573150, 571, 'TrialOfTheCrusader'),
-(1450, 9327.247070, -1114.638550, 1245.147095, 0.002312, 571, 'UlduarRaid');
+(1450, 9327.247070, -1114.638550, 1245.147095, 0.002312, 571, 'UlduarRaid'),
+(1490, 5474.070313, 39.761471, 149.545578, 6.271932, 571, 'CrystalsongForest');
