@@ -126,7 +126,7 @@ SQLDriverQueryLogging = 0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-LogTimestamp = 1
+LogTimestamp = 0
 
 #
 #    LogFileLevel
@@ -136,7 +136,7 @@ LogTimestamp = 1
 #                     2 - (Detail)
 #                     3 - (Full/Debug)
 
-LogFileLevel = 2
+LogFileLevel = 0
 
 #
 #    LogColors
@@ -240,7 +240,7 @@ WrongPass.BanType = 0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-WrongPass.Logging = 1
+WrongPass.Logging = 0
 
 
 #
