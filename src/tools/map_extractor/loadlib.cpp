@@ -12,13 +12,13 @@
 
 class MPQFile;
 
-u_map_fcc MverMagic = { {'R','E','V','M'} };
+u_map_fcc MverMagic = { {'R', 'E', 'V', 'M'} };
 
 FileLoader::FileLoader()
 {
-    data = 0;
+    data = nullptr;
     data_size = 0;
-    version = 0;
+    version = nullptr;
 }
 
 FileLoader::~FileLoader()
@@ -30,7 +30,7 @@ bool FileLoader::loadFile(std::string const& fileName, bool log)
 {
     free();
     MPQFile mf(fileName.c_str());
-    if(mf.isEof())
+    if (mf.isEof())
     {
         if (log)
             printf("No such file %s\n", fileName.c_str());
@@ -54,7 +54,7 @@ bool FileLoader::loadFile(std::string const& fileName, bool log)
 bool FileLoader::prepareLoadedData()
 {
     // Check version
-    version = (file_MVER *) data;
+    version = (file_MVER*) data;
     if (version->fcc != MverMagic.fcc)
         return false;
     if (version->ver != FILE_FORMAT_VERSION)
@@ -64,8 +64,8 @@ bool FileLoader::prepareLoadedData()
 
 void FileLoader::free()
 {
-    if (data) delete[] data;
-    data = 0;
+    delete[] data;
+    data = nullptr;
     data_size = 0;
-    version = 0;
+    version = nullptr;
 }

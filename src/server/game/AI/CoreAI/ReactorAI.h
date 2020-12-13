@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_REACTORAI_H
-#define TRINITY_REACTORAI_H
+#ifndef ACORE_REACTORAI_H
+#define ACORE_REACTORAI_H
 
 #include "CreatureAI.h"
 
@@ -13,13 +13,13 @@ class Unit;
 
 class ReactorAI : public CreatureAI
 {
-    public:
+public:
 
-        explicit ReactorAI(Creature* c) : CreatureAI(c) {}
+    explicit ReactorAI(Creature* c) : CreatureAI(c) {}
 
-        void MoveInLineOfSight(Unit*) {}
-        void UpdateAI(uint32 diff);
+    void MoveInLineOfSight(Unit*) override {}
+    void UpdateAI(uint32 diff) override;
 
-        static int Permissible(const Creature*);
+    static int Permissible(const Creature*);
 };
 #endif

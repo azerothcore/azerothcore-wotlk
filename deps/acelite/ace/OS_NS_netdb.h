@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_netdb.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
  *  @author and a cast of thousands...
  *
@@ -24,6 +24,7 @@
 # endif /* ACE_LACKS_PRAGMA_ONCE */
 
 #include "ace/os_include/os_netdb.h"
+#include "ace/os_include/sys/os_socket.h"
 #include /**/ "ace/ACE_export.h"
 
 #if defined (ACE_EXPORT_MACRO)
@@ -103,6 +104,36 @@ namespace ACE_OS
                                    const char *proto,
                                    struct servent *result,
                                    ACE_SERVENT_DATA buf);
+
+  ACE_NAMESPACE_INLINE_FUNCTION
+  int getaddrinfo (const char *name, const char *service,
+                   const addrinfo *hints, addrinfo **result);
+
+  ACE_NAMESPACE_INLINE_FUNCTION
+  void freeaddrinfo (addrinfo *result);
+
+  ACE_NAMESPACE_INLINE_FUNCTION
+  const ACE_TCHAR *gai_strerror (int errcode);
+
+  ACE_NAMESPACE_INLINE_FUNCTION
+  int getnameinfo (const sockaddr *addr, ACE_SOCKET_LEN addr_len,
+                   char *host, ACE_SOCKET_LEN host_len,
+                   char *service, ACE_SOCKET_LEN service_len,
+                   unsigned int flags);
+
+#ifdef ACE_LACKS_GETADDRINFO
+  extern ACE_Export
+  int getaddrinfo_emulation (const char *name, addrinfo **result);
+
+  extern ACE_Export
+  void freeaddrinfo_emulation (addrinfo *result);
+#endif
+
+#ifdef ACE_LACKS_GETNAMEINFO
+  extern ACE_Export
+  int getnameinfo_emulation (const sockaddr *addr, ACE_SOCKET_LEN addr_len,
+                             char *host, ACE_SOCKET_LEN host_len);
+#endif
 
 # if defined (ACE_MT_SAFE) && (ACE_MT_SAFE != 0) && defined (ACE_LACKS_NETDB_REENTRANT_FUNCTIONS)
   extern ACE_Export

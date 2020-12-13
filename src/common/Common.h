@@ -49,18 +49,18 @@
 
 #include "Define.h"
 
+#include <cassert>
+#include <cerrno>
+#include <cmath>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <unordered_map>
 #include <unordered_set>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <math.h>
-#include <errno.h>
-#include <signal.h>
-#include <assert.h>
 
-#if PLATFORM == PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #define STRCASECMP stricmp
 #else
 #define STRCASECMP strcasecmp
@@ -79,14 +79,12 @@
 #include "Threading/LockedQueue.h"
 #include "Threading/Threading.h"
 
-#include <ace/Basic_Types.h>
 #include <ace/Guard_T.h>
 #include <ace/RW_Thread_Mutex.h>
 #include <ace/Thread_Mutex.h>
-#include <ace/OS_NS_time.h>
 #include <ace/Stack_Trace.h>
 
-#if PLATFORM == PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #  include <ace/config-all.h>
 // XP winver - needed to compile with standard leak check in MemoryLeaks.h
 // uncomment later if needed
@@ -102,13 +100,12 @@
 #  include <netdb.h>
 #endif
 
-#if COMPILER == COMPILER_MICROSOFT
+#if AC_COMPILER == AC_COMPILER_MICROSOFT
 
 #include <float.h>
 
 #define I32FMT "%08I32X"
 #define I64FMT "%016I64X"
-#define snprintf _snprintf
 #define atoll _atoi64
 #define vsnprintf _vsnprintf
 #define llabs _abs64
@@ -132,14 +129,16 @@ inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
 
 #define STRINGIZE(a) #a
 
+#define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
+
 enum TimeConstants
 {
     MINUTE          = 60,
-    HOUR            = MINUTE*60,
-    DAY             = HOUR*24,
-    WEEK            = DAY*7,
-    MONTH           = DAY*30,
-    YEAR            = MONTH*12,
+    HOUR            = MINUTE * 60,
+    DAY             = HOUR * 24,
+    WEEK            = DAY * 7,
+    MONTH           = DAY * 30,
+    YEAR            = MONTH * 12,
     IN_MILLISECONDS = 1000
 };
 
@@ -193,23 +192,23 @@ typedef std::vector<std::string> StringVector;
 
 #define MAX_QUERY_LEN 32*1024
 
-#define TRINITY_GUARD(MUTEX, LOCK) \
-  ACE_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
-    if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
+#define ACORE_GUARD(MUTEX, LOCK) \
+  ACE_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
+    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 //! For proper implementation of multiple-read, single-write pattern, use
 //! ACE_RW_Mutex as underlying @MUTEX
-# define TRINITY_WRITE_GUARD(MUTEX, LOCK) \
-  ACE_Write_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
-    if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
+# define ACORE_WRITE_GUARD(MUTEX, LOCK) \
+  ACE_Write_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
+    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 //! For proper implementation of multiple-read, single-write pattern, use
 //! ACE_RW_Mutex as underlying @MUTEX
-# define TRINITY_READ_GUARD(MUTEX, LOCK) \
-  ACE_Read_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
-    if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
+# define ACORE_READ_GUARD(MUTEX, LOCK) \
+  ACE_Read_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
+    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
-namespace ACORE
+namespace acore
 {
     template<class ArgumentType, class ResultType>
     struct unary_function
