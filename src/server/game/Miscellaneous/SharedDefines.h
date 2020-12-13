@@ -3569,15 +3569,14 @@ enum PartyResult
 
 struct MmapTileHeader
 {
-    uint32 mmapMagic;
+    uint32 mmapMagic{MMAP_MAGIC};
     uint32 dtVersion;
-    uint32 mmapVersion;
-    uint32 size;
-    char usesLiquids;
-    char padding[3];
+    uint32 mmapVersion{MMAP_VERSION};
+    uint32 size{0};
+    char usesLiquids{true};
+    char padding[3]{};
 
-    MmapTileHeader() : mmapMagic(MMAP_MAGIC), dtVersion(DT_NAVMESH_VERSION),
-        mmapVersion(MMAP_VERSION), size(0), usesLiquids(true), padding() { }
+    MmapTileHeader() :  dtVersion(DT_NAVMESH_VERSION) { }
 };
 
 // All padding fields must be handled and initialized to ensure mmaps_generator will produce binary-identical *.mmtile files

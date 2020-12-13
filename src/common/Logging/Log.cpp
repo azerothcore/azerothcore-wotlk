@@ -65,10 +65,11 @@ Log::~Log()
     miscLogFile = NULL;
 }
 
-Log* Log::instance()
+
+std::unique_ptr<ILog>& getLogInstance()
 {
-    static Log instance;
-    return &instance;
+    static std::unique_ptr<ILog> instance = std::make_unique<Log>();
+    return instance;
 }
 
 void Log::SetLogLevel(char* Level)
@@ -360,7 +361,7 @@ std::string Log::GetTimestampStr()
 
 void Log::outDB(LogTypes type, const char* str)
 {
-    if(!str || std::string(str).empty() || type >= MAX_LOG_TYPES)
+    if (!str || std::string(str).empty() || type >= MAX_LOG_TYPES)
         return;
 
     std::string new_str(str);

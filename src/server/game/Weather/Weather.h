@@ -55,7 +55,7 @@ class Weather
 public:
 
     Weather(uint32 zone, WeatherData const* weatherChances);
-    ~Weather() { };
+    ~Weather() = default;;
 
     bool Update(uint32 diff);
     bool ReGenerate();
@@ -65,12 +65,12 @@ public:
     void SetWeather(WeatherType type, float grade);
 
     /// For which zone is this weather?
-    uint32 GetZone() const { return m_zone; };
-    uint32 GetScriptId() const { return m_weatherChances->ScriptId; }
+    [[nodiscard]] uint32 GetZone() const { return m_zone; };
+    [[nodiscard]] uint32 GetScriptId() const { return m_weatherChances->ScriptId; }
 
 private:
 
-    WeatherState GetWeatherState() const;
+    [[nodiscard]] WeatherState GetWeatherState() const;
     uint32 m_zone;
     WeatherType m_type;
     float m_grade;

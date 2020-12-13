@@ -47,6 +47,8 @@
 #include "LuaEngine.h"
 #endif
 
+constexpr uint32 DEF_CANNOT_REACH = 5 * IN_MILLISECONDS; // this is when creatures are in los / no path to the target, 5s wait time then they return to spawn pos with evade
+
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
     TrainerSpellMap::const_iterator itr = spellList.find(spell_id);
@@ -164,7 +166,7 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0),  m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
     m_DBTableGuid(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
-    m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_waypointID(0), m_path_id(0), m_formation(nullptr), _lastDamagedTime(0)
+    m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_waypointID(0), m_path_id(0), m_formation(nullptr), _lastDamagedTime(0), m_cannotReachTarget(false), m_cannotReachTimer(0)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
     m_valuesCount = UNIT_END;
@@ -610,6 +612,16 @@ void Creature::Update(uint32 diff)
 
                     m_regenTimer += CREATURE_REGEN_INTERVAL;
                 }
+
+                if (CanNotReachTarget() && !IsInEvadeMode() && !GetMap()->IsRaid())
+                {
+                    m_cannotReachTimer += diff;
+                    if (m_cannotReachTimer >= DEF_CANNOT_REACH && IsAIEnabled)
+                    {
+                        AI()->EnterEvadeMode();
+                    }
+                } 
+
                 break;
             }
         default:

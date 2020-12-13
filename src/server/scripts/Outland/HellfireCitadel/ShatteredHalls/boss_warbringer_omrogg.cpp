@@ -79,7 +79,7 @@ public:
             return summons.GetCreatureWithEntry(NPC_RIGHT_HEAD);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->SummonCreature(NPC_LEFT_HEAD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0);
             me->SummonCreature(NPC_RIGHT_HEAD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0);
@@ -99,12 +99,12 @@ public:
             events.ScheduleEvent(EVENT_RESET_THREAT, 30000);
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             summons.Summon(summoned);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Creature* head = nullptr;
             uint32 eventId = EVENT_KILL_YELL_LEFT;
@@ -125,7 +125,7 @@ public:
             events2.ScheduleEvent(eventId, 3000);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Creature* LeftHead  = GetLeftHead();
             Creature* RightHead = GetRightHead();
@@ -141,7 +141,7 @@ public:
             instance->SetBossState(DATA_OMROGG, DONE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (uint32 eventId = events2.ExecuteEvent())
@@ -209,7 +209,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_warbringer_omroggAI>(creature);
     }
@@ -224,13 +224,13 @@ public:
     {
         npc_omrogg_headsAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; }
 
-        void SetData(uint32 data, uint32 value)
+        void SetData(uint32 data, uint32 value) override
         {
             if (data == SETDATA_DATA && value == SETDATA_YELL)
                 timer = 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer)
             {
@@ -246,7 +246,7 @@ public:
         uint32 timer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_omrogg_headsAI>(creature);
     }

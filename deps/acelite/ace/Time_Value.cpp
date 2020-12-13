@@ -1,5 +1,9 @@
 #include "ace/Time_Value.h"
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
 #if !defined (__ACE_INLINE__)
 #include "ace/Time_Value.inl"
 #endif /* __ACE_INLINE__ */
@@ -13,6 +17,8 @@
 # include <ostream>
 # include <iomanip>
 #endif /* ACE_HAS_CPP98_IOSTREAMS */
+
+#include <cstdlib>
 
 #ifdef ACE_HAS_CPP11
 # include <cmath>
@@ -170,52 +176,30 @@ ACE_Time_Value::dump (void) const
 void
 ACE_Time_Value::normalize (bool saturate)
 {
-  // // ACE_OS_TRACE ("ACE_Time_Value::normalize");
-  // From Hans Rohnert...
+  // ACE_OS_TRACE ("ACE_Time_Value::normalize");
+  if (this->tv_.tv_usec >= ACE_ONE_SECOND_IN_USECS ||
+      this->tv_.tv_usec <= -ACE_ONE_SECOND_IN_USECS)
+    {
+      time_t const sec = std::abs(this->tv_.tv_usec) / ACE_ONE_SECOND_IN_USECS * (this->tv_.tv_usec > 0 ? 1 : -1);
+      suseconds_t const usec = static_cast<suseconds_t> (this->tv_.tv_usec - sec * ACE_ONE_SECOND_IN_USECS);
 
-  if (this->tv_.tv_usec >= ACE_ONE_SECOND_IN_USECS)
-    {
-      /*! \todo This loop needs some optimization.
-       */
-      if (!saturate) // keep the conditionnal expression outside the while loop to minimize performance cost
-        do
-          {
-            ++this->tv_.tv_sec;
-            this->tv_.tv_usec -= ACE_ONE_SECOND_IN_USECS;
-          }
-        while (this->tv_.tv_usec >= ACE_ONE_SECOND_IN_USECS);
+      if (saturate && this->tv_.tv_sec > 0 && sec > 0 &&
+          ACE_Numeric_Limits<time_t>::max() - this->tv_.tv_sec < sec)
+        {
+          this->tv_.tv_sec = ACE_Numeric_Limits<time_t>::max();
+          this->tv_.tv_usec = ACE_ONE_SECOND_IN_USECS - 1;
+        }
+      else if (saturate && this->tv_.tv_sec < 0 && sec < 0 &&
+               ACE_Numeric_Limits<time_t>::min() - this->tv_.tv_sec > sec)
+        {
+          this->tv_.tv_sec = ACE_Numeric_Limits<time_t>::min();
+          this->tv_.tv_usec = -ACE_ONE_SECOND_IN_USECS + 1;
+        }
       else
-        do
-          if (this->tv_.tv_sec < ACE_Numeric_Limits<time_t>::max())
-            {
-              ++this->tv_.tv_sec;
-              this->tv_.tv_usec -= ACE_ONE_SECOND_IN_USECS;
-            }
-          else
-            this->tv_.tv_usec = ACE_ONE_SECOND_IN_USECS - 1;
-        while (this->tv_.tv_usec >= ACE_ONE_SECOND_IN_USECS);
-    }
-  else if (this->tv_.tv_usec <= -ACE_ONE_SECOND_IN_USECS)
-    {
-      /*! \todo This loop needs some optimization.
-       */
-      if (!saturate)
-        do
-          {
-            --this->tv_.tv_sec;
-            this->tv_.tv_usec += ACE_ONE_SECOND_IN_USECS;
-          }
-        while (this->tv_.tv_usec <= -ACE_ONE_SECOND_IN_USECS);
-      else
-        do
-          if (this->tv_.tv_sec > ACE_Numeric_Limits<time_t>::min())
-            {
-              --this->tv_.tv_sec;
-              this->tv_.tv_usec += ACE_ONE_SECOND_IN_USECS;
-            }
-          else
-            this->tv_.tv_usec = -ACE_ONE_SECOND_IN_USECS + 1;
-        while (this->tv_.tv_usec <= -ACE_ONE_SECOND_IN_USECS);
+        {
+          this->tv_.tv_sec += sec;
+          this->tv_.tv_usec = usec;
+        }
     }
 
   if (this->tv_.tv_sec >= 1 && this->tv_.tv_usec < 0)
@@ -333,7 +317,7 @@ ACE_Time_Value::operator *= (double d)
 #ifdef ACE_HAS_CPP98_IOSTREAMS
 ostream &operator<<(ostream &o, const ACE_Time_Value &v)
 {
-  char oldFiller = o.fill ();
+  char const oldFiller = o.fill ();
   o.fill ('0');
   const timeval *tv = v;
   if (tv->tv_sec)
@@ -341,9 +325,9 @@ ostream &operator<<(ostream &o, const ACE_Time_Value &v)
       o << tv->tv_sec;
       if (tv->tv_usec)
 #ifdef ACE_HAS_CPP11
-        o << '.' << std::setw (6) << std::abs (tv->tv_usec);
+        o << '.' << std::setw (6) << std::labs (tv->tv_usec);
 #else
-        o << '.' << std::setw (6) << ACE_STD_NAMESPACE::abs (tv->tv_usec);
+        o << '.' << std::setw (6) << ACE_STD_NAMESPACE::labs (tv->tv_usec);
 #endif
     }
   else if (tv->tv_usec < 0)

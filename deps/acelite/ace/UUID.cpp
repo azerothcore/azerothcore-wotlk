@@ -20,11 +20,15 @@ namespace ACE_Utils
   // NIL version of the UUID
   const UUID UUID::NIL_UUID;
 
+#ifndef ACE_LACKS_SSCANF
   UUID::UUID (const ACE_CString& uuid_string)
   {
     this->init ();
     this->from_string_i (uuid_string);
   }
+#endif /* ACE_LACKS_SSCANF */
+
+  ACE_ALLOC_HOOK_DEFINE(UUID);
 
   const UUID &
   UUID::operator = (const UUID & rhs)
@@ -65,52 +69,65 @@ namespace ACE_Utils
 
     if (36 == UUID_STRING_LENGTH)
       {
+#if defined (ACE_HAS_ALLOC_HOOKS)
+        ACE_ALLOCATOR_RETURN (buf,
+                              static_cast<char*> (ACE_Allocator::instance()->malloc(sizeof (char) * (UUID_STRING_LENGTH + 1))),
+                              0);
+#else
         ACE_NEW_RETURN (buf,
                         char[UUID_STRING_LENGTH + 1],
                         0);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
         // Let the auto array pointer manage the buffer.
         auto_clean.reset (buf);
 
-        ACE_OS::sprintf (buf,
-                         "%8.8x-%4.4x-%4.4x-%2.2x%2.2x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x",
-                         this->uuid_.time_low_,
-                         this->uuid_.time_mid_,
-                         this->uuid_.time_hi_and_version_,
-                         this->uuid_.clock_seq_hi_and_reserved_,
-                         this->uuid_.clock_seq_low_,
-                         (this->uuid_.node_.node_ID ()) [0],
-                         (this->uuid_.node_.node_ID ()) [1],
-                         (this->uuid_.node_.node_ID ()) [2],
-                         (this->uuid_.node_.node_ID ()) [3],
-                         (this->uuid_.node_.node_ID ()) [4],
-                         (this->uuid_.node_.node_ID ()) [5]);
+        ACE_OS::snprintf (buf, UUID_STRING_LENGTH + 1,
+                          "%8.8x-%4.4x-%4.4x-%2.2x%2.2x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x",
+                          this->uuid_.time_low_,
+                          this->uuid_.time_mid_,
+                          this->uuid_.time_hi_and_version_,
+                          this->uuid_.clock_seq_hi_and_reserved_,
+                          this->uuid_.clock_seq_low_,
+                          this->uuid_.node_.node_ID ()[0],
+                          this->uuid_.node_.node_ID ()[1],
+                          this->uuid_.node_.node_ID ()[2],
+                          this->uuid_.node_.node_ID ()[3],
+                          this->uuid_.node_.node_ID ()[4],
+                          this->uuid_.node_.node_ID ()[5]);
       }
     else
       {
         UUID_STRING_LENGTH += 2; //for '-'
+
+#if defined (ACE_HAS_ALLOC_HOOKS)
+        ACE_ALLOCATOR_RETURN (buf,
+                              static_cast<char*> (ACE_Allocator::instance()->malloc(sizeof (char) * (UUID_STRING_LENGTH + 1))),
+                              0);
+#else
         ACE_NEW_RETURN (buf,
                         char[UUID_STRING_LENGTH + 1],
                         0);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
         // Let the auto array pointer manage the buffer.
         auto_clean.reset (buf);
 
-        ACE_OS::sprintf (buf,
-                         "%8.8x-%4.4x-%4.4x-%2.2x%2.2x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x-%s-%s",
-                         this->uuid_.time_low_,
-                         this->uuid_.time_mid_,
-                         this->uuid_.time_hi_and_version_,
-                         this->uuid_.clock_seq_hi_and_reserved_,
-                         this->uuid_.clock_seq_low_,
-                         (this->uuid_.node_.node_ID ()) [0],
-                         (this->uuid_.node_.node_ID ()) [1],
-                         (this->uuid_.node_.node_ID ()) [2],
-                         (this->uuid_.node_.node_ID ()) [3],
-                         (this->uuid_.node_.node_ID ()) [4],
-                         (this->uuid_.node_.node_ID ()) [5],
-                         thr_id_.c_str (),
-                         pid_.c_str ());
+        ACE_OS::snprintf (buf, UUID_STRING_LENGTH + 1,
+                          "%8.8x-%4.4x-%4.4x-%2.2x%2.2x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x-%s-%s",
+                          this->uuid_.time_low_,
+                          this->uuid_.time_mid_,
+                          this->uuid_.time_hi_and_version_,
+                          this->uuid_.clock_seq_hi_and_reserved_,
+                          this->uuid_.clock_seq_low_,
+                          this->uuid_.node_.node_ID ()[0],
+                          this->uuid_.node_.node_ID ()[1],
+                          this->uuid_.node_.node_ID ()[2],
+                          this->uuid_.node_.node_ID ()[3],
+                          this->uuid_.node_.node_ID ()[4],
+                          this->uuid_.node_.node_ID ()[5],
+                          thr_id_.c_str (),
+                          pid_.c_str ());
       }
 
     // Save the string.
@@ -124,6 +141,7 @@ namespace ACE_Utils
     return this->as_string_.get ();
   }
 
+#ifndef ACE_LACKS_SSCANF
   void
   UUID::from_string_i (const ACE_CString& uuid_string)
   {
@@ -160,9 +178,6 @@ namespace ACE_Utils
         const int nScanned =
 #if defined (ACE_HAS_TR24731_2005_CRT)
           sscanf_s (
-#else
-          ::sscanf (
-#endif /* ACE_HAS_TR24731_2005_CRT */
                    uuid_string.c_str (),
                    "%8x-%4x-%4x-%2x%2x-%2x%2x%2x%2x%2x%2x",
                    &time_low,
@@ -177,6 +192,23 @@ namespace ACE_Utils
                    &node[4],
                    &node[5]
                    );
+#else
+          ::sscanf (
+                   uuid_string.c_str (),
+                   "%8x-%4x-%4x-%2x%2x-%2x%2x%2x%2x%2x%2x",
+                   &time_low,
+                   &time_mid,
+                   &time_hi_and_version,
+                   &clock_seq_hi_and_reserved,
+                   &clock_seq_low,
+                   &node[0],
+                   &node[1],
+                   &node[2],
+                   &node[3],
+                   &node[4],
+                   &node[5]
+                   );
+#endif /* ACE_HAS_TR24731_2005_CRT */
 
         if (nScanned != 11)
           {
@@ -285,6 +317,7 @@ namespace ACE_Utils
         this->pid_ = thr_pid_str.substr (pos+1, thr_pid_str.length ()-pos-1);
       }
   }
+#endif // ACE_LACKS_SSCANF
 
   UUID_Generator::UUID_Generator (void)
     : time_last_ (0),
@@ -373,12 +406,11 @@ namespace ACE_Utils
       {
         ACE_Thread_ID thread_id;
         char buf [BUFSIZ];
-        thread_id.to_string (buf);
+        thread_id.to_string (buf, BUFSIZ);
         uuid.thr_id (buf);
 
-        ACE_OS::sprintf (buf,
-                         "%d",
-                         static_cast<int> (ACE_OS::getpid ()));
+        ACE_OS::snprintf (buf, BUFSIZ, "%d",
+                          static_cast<int> (ACE_OS::getpid ()));
         uuid.pid (buf);
       }
   }

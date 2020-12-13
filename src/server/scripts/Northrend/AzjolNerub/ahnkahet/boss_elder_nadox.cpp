@@ -285,7 +285,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_elder_nadoxAI(creature);
     }
@@ -327,7 +327,7 @@ public:
         uint32 uiSprintTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ahnkahar_nerubianAI(creature);
     }
@@ -381,7 +381,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_ahn_kahet_swarmer_aura_SpellScript();
     }

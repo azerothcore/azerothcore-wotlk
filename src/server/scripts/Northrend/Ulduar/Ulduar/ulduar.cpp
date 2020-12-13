@@ -176,13 +176,13 @@ public:
                 target->CastSpell(target, (aurEff->GetId() == 64740) ? 64747 : 64863, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_ulduar_energy_sap_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_ulduar_energy_sap_AuraScript();
     }
@@ -193,7 +193,7 @@ class npc_ulduar_snow_mound : public CreatureScript
 public:
     npc_ulduar_snow_mound() : CreatureScript("npc_ulduar_snow_mound") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ulduar_snow_moundAI(creature);
     }
@@ -208,7 +208,7 @@ public:
 
         bool activated;
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!activated && who->GetTypeId() == TYPEID_PLAYER)
                 if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ() + 5.0f, 2, LINEOFSIGHT_ALL_CHECKS))
@@ -231,7 +231,7 @@ public:
                 }
         }
 
-        void UpdateAI(uint32  /*diff*/) {}
+        void UpdateAI(uint32  /*diff*/) override {}
     };
 };
 
@@ -240,7 +240,7 @@ class npc_ulduar_storm_tempered_keeper : public CreatureScript
 public:
     npc_ulduar_storm_tempered_keeper() : CreatureScript("npc_ulduar_storm_tempered_keeper") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ulduar_storm_tempered_keeperAI(creature);
     }
@@ -255,12 +255,12 @@ public:
         EventMap events;
         uint64 otherGUID;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(1, 2000); // checking Separation Anxiety, Charged Sphere
@@ -272,19 +272,19 @@ public:
                 me->CastSpell(me, 63630, true); // Vengeful Surge
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Creature* c = ObjectAccessor::GetCreature(*me, otherGUID))
                 c->CastSpell(c, 63630, true); // Vengeful Surge
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             if (Creature* c = ObjectAccessor::GetCreature(*me, otherGUID))
                 s->GetMotionMaster()->MoveFollow(c, 0.0f, 0.0f);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -329,7 +329,7 @@ class npc_ulduar_arachnopod_destroyer : public CreatureScript
 public:
     npc_ulduar_arachnopod_destroyer() : CreatureScript("npc_ulduar_arachnopod_destroyer") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ulduar_arachnopod_destroyerAI(creature);
     }
@@ -345,7 +345,7 @@ public:
         EventMap events;
         bool _spawnedMechanic;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             events.ScheduleEvent(1, urand(5000, 8000)); // Flame Spray
@@ -353,13 +353,13 @@ public:
             events.ScheduleEvent(3, 1000); // Charged Leap
         }
 
-        void PassengerBoarded(Unit* p, int8  /*seat*/, bool  /*apply*/)
+        void PassengerBoarded(Unit* p, int8  /*seat*/, bool  /*apply*/) override
         {
             me->setFaction(p->getFaction());
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!_spawnedMechanic && me->HealthBelowPctDamaged(20, damage))
             {
@@ -376,21 +376,21 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (me->getFaction() == 16)
                 ScriptedAI::AttackStart(who);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (me->getFaction() == 16)
                 ScriptedAI::EnterEvadeMode();
         }
 
-        void OnCharmed(bool  /*apply*/) {}
+        void OnCharmed(bool  /*apply*/) override {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->getFaction() != 16)
             {
@@ -454,13 +454,13 @@ public:
                 Unit::Kill(c, c, false);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_ulduar_arachnopod_damaged_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_ulduar_arachnopod_damaged_AuraScript();
     }
@@ -475,7 +475,7 @@ public:
     {
     }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (player->IsAlive())
             if (uint32 questId = (player->GetMap()->Is25ManRaid() ? 13816 : 13607 /*QUEST_CELESTIAL_PLANETARIUM*/))

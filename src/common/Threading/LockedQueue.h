@@ -15,7 +15,7 @@
 
 namespace ACE_Based
 {
-    template <class T, class LockType, typename StorageType = std::deque<T> >
+    template <class T, class LockType, typename StorageType = std::deque<T>>
     class LockedQueue
     {
         //! Lock access to the queue.
@@ -25,20 +25,18 @@ namespace ACE_Based
         StorageType _queue;
 
         //! Cancellation flag.
-        volatile bool _canceled;
+        volatile bool _canceled{false};
 
     public:
 
         //! Create a LockedQueue.
         LockedQueue()
-            : _canceled(false)
+             
         {
         }
 
         //! Destroy a LockedQueue.
-        virtual ~LockedQueue()
-        {
-        }
+        virtual ~LockedQueue() = default;
 
         //! Adds an item to the queue.
         void add(const T& item)

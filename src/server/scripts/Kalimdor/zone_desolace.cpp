@@ -62,7 +62,7 @@ class npc_cork_gizelton : public CreatureScript
 public:
     npc_cork_gizelton() : CreatureScript("npc_cork_gizelton") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_BODYGUARD_FOR_HIRE)
             creature->AI()->SetGUID(player->GetGUID(), player->getFaction());
@@ -70,7 +70,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_cork_gizeltonAI(creature);
     }
@@ -98,25 +98,25 @@ public:
             events.ScheduleEvent(EVENT_RESTART_ESCORT, 0);
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             npc_escortAI::JustRespawned();
             Initialize();
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             npc_escortAI::InitializeAI();
             Initialize();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             RemoveSummons();
             npc_escortAI::JustDied(killer);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             SummonsFollow();
             ImmuneFlagSet(false, 35);
@@ -135,7 +135,7 @@ public:
             ImmuneFlagSet(false, _faction);
         }
 
-        void SetGUID(uint64 playerGUID, int32 faction)
+        void SetGUID(uint64 playerGUID, int32 faction) override
         {
             _playerGUID = playerGUID;
             _faction = faction;
@@ -145,7 +145,7 @@ public:
             events.CancelEvent(EVENT_WAIT_FOR_ASSIST);
         }
 
-        void SetData(uint32 field, uint32 data)
+        void SetData(uint32 field, uint32 data) override
         {
             if (field == 1 && data == 1)
                 if (Player* player = me->SelectNearestPlayer(50.0f))
@@ -202,7 +202,7 @@ public:
             SummonsFollow();
         }
 
-        void SummonedCreatureDies(Creature* creature, Unit*)
+        void SummonedCreatureDies(Creature* creature, Unit*) override
         {
             if (creature->GetGUID() == summons[0])
                 summons[0] = 0;
@@ -212,7 +212,7 @@ public:
                 summons[2] = 0;
         }
 
-        void SummonedCreatureDespawn(Creature* creature)
+        void SummonedCreatureDespawn(Creature* creature) override
         {
             if (creature->GetGUID() == summons[0])
                 summons[0] = 0;
@@ -260,7 +260,7 @@ public:
             me->setFaction(faction);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             RelocateSummons();
             switch (waypointId)
@@ -380,7 +380,7 @@ public:
             }
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -520,18 +520,18 @@ public:
     {
         npc_dalindaAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Player* player = GetPlayerForEscort())
                 player->FailQuest(QUEST_RETURN_TO_VAHLARRIEL);
             return;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
 
@@ -547,7 +547,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -558,7 +558,7 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_RETURN_TO_VAHLARRIEL)
         {
@@ -571,7 +571,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dalindaAI(creature);
     }
