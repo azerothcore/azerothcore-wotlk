@@ -24,17 +24,18 @@ struct GameObjectDisplayInfoEntry;
 
 class GameObjectModel /*, public Intersectable*/
 {
-    uint32 phasemask;
+    uint32 phasemask{0};
     G3D::AABox iBound;
     G3D::Matrix3 iInvRot;
     G3D::Vector3 iPos;
     //G3D::Vector3 iRot;
-    float iInvScale;
-    float iScale;
+    float iInvScale{0};
+    float iScale{0};
     VMAP::WorldModel* iModel;
     GameObject const* owner;
 
-    GameObjectModel() : phasemask(0), iInvScale(0), iScale(0), iModel(nullptr), owner(nullptr) { }
+
+    GameObjectModel() :  iModel(nullptr), owner(nullptr) { }
     bool initialize(const GameObject& go, const GameObjectDisplayInfoEntry& info);
 
 public:

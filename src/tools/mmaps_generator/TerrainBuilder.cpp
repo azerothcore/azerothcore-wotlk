@@ -73,7 +73,7 @@ namespace MMAP
     char const* MAP_VERSION_MAGIC = "v1.8";
 
     TerrainBuilder::TerrainBuilder(bool skipLiquid) : m_skipLiquid (skipLiquid) { }
-    TerrainBuilder::~TerrainBuilder() { }
+    TerrainBuilder::~TerrainBuilder() = default;
 
     /**************************************************************************/
     void TerrainBuilder::getLoopVars(Spot portion, int& loopStart, int& loopEnd, int& loopInc)

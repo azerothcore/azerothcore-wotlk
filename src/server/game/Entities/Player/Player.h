@@ -143,13 +143,13 @@ enum TalentTree // talent tabs
 // Spell modifier (used for modify other spells)
 struct SpellModifier
 {
-    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0), value(0), mask(), spellId(0), ownerAura(_ownerAura) {}
+    SpellModifier(Aura* _ownerAura = nullptr) : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0),  mask(),  ownerAura(_ownerAura) {}
     SpellModOp   op   : 8;
     SpellModType type : 8;
     int16 charges     : 16;
-    int32 value;
+    int32 value{0};
     flag96 mask;
-    uint32 spellId;
+    uint32 spellId{0};
     Aura* const ownerAura;
 };
 
@@ -214,10 +214,10 @@ enum ReputationSource
 
 struct ActionButton
 {
-    ActionButton() : packedData(0), uState(ACTIONBUTTON_NEW) {}
+    ActionButton()  {}
 
-    uint32 packedData;
-    ActionButtonUpdateState uState;
+    uint32 packedData{0};
+    ActionButtonUpdateState uState{ACTIONBUTTON_NEW};
 
     // helpers
     [[nodiscard]] ActionButtonType GetType() const { return ActionButtonType(ACTION_BUTTON_TYPE(packedData)); }
@@ -250,16 +250,16 @@ typedef std::list<PlayerCreateInfoItem> PlayerCreateInfoItems;
 
 struct PlayerClassLevelInfo
 {
-    PlayerClassLevelInfo() : basehealth(0), basemana(0) {}
-    uint16 basehealth;
-    uint16 basemana;
+    PlayerClassLevelInfo()  {}
+    uint16 basehealth{0};
+    uint16 basemana{0};
 };
 
 struct PlayerClassInfo
 {
-    PlayerClassInfo() : levelInfo(nullptr) { }
+    PlayerClassInfo()  { }
 
-    PlayerClassLevelInfo* levelInfo;                        //[level-1] 0..MaxPlayerLevel-1
+    PlayerClassLevelInfo* levelInfo{nullptr};                        //[level-1] 0..MaxPlayerLevel-1
 };
 
 struct PlayerLevelInfo
@@ -273,12 +273,12 @@ typedef std::list<uint32> PlayerCreateInfoSpells;
 
 struct PlayerCreateInfoAction
 {
-    PlayerCreateInfoAction() : button(0), type(0), action(0) {}
+    PlayerCreateInfoAction()  {}
     PlayerCreateInfoAction(uint8 _button, uint32 _action, uint8 _type) : button(_button), type(_type), action(_action) {}
 
-    uint8 button;
-    uint8 type;
-    uint32 action;
+    uint8 button{0};
+    uint8 type{0};
+    uint32 action{0};
 };
 
 typedef std::list<PlayerCreateInfoAction> PlayerCreateInfoActions;
@@ -286,44 +286,44 @@ typedef std::list<PlayerCreateInfoAction> PlayerCreateInfoActions;
 struct PlayerInfo
 {
     // existence checked by displayId != 0
-    PlayerInfo() : mapId(0), areaId(0), positionX(0.0f), positionY(0.0f), positionZ(0.0f), orientation(0.0f), displayId_m(0), displayId_f(0), levelInfo(nullptr) { }
+    PlayerInfo()  { }
 
-    uint32 mapId;
-    uint32 areaId;
-    float positionX;
-    float positionY;
-    float positionZ;
-    float orientation;
-    uint16 displayId_m;
-    uint16 displayId_f;
+    uint32 mapId{0};
+    uint32 areaId{0};
+    float positionX{0.0f};
+    float positionY{0.0f};
+    float positionZ{0.0f};
+    float orientation{0.0f};
+    uint16 displayId_m{0};
+    uint16 displayId_f{0};
     PlayerCreateInfoItems item;
     PlayerCreateInfoSpells spell;
     PlayerCreateInfoActions action;
 
-    PlayerLevelInfo* levelInfo;                             //[level-1] 0..MaxPlayerLevel-1
+    PlayerLevelInfo* levelInfo{nullptr};                             //[level-1] 0..MaxPlayerLevel-1
 };
 
 struct PvPInfo
 {
-    PvPInfo() : IsHostile(false), IsInHostileArea(false), IsInNoPvPArea(false), IsInFFAPvPArea(false), EndTimer(0) {}
+    PvPInfo()  {}
 
-    bool IsHostile;
-    bool IsInHostileArea;               ///> Marks if player is in an area which forces PvP flag
-    bool IsInNoPvPArea;                 ///> Marks if player is in a sanctuary or friendly capital city
-    bool IsInFFAPvPArea;                ///> Marks if player is in an FFAPvP area (such as Gurubashi Arena)
-    time_t EndTimer;                    ///> Time when player unflags himself for PvP (flag removed after 5 minutes)
+    bool IsHostile{false};
+    bool IsInHostileArea{false};               ///> Marks if player is in an area which forces PvP flag
+    bool IsInNoPvPArea{false};                 ///> Marks if player is in a sanctuary or friendly capital city
+    bool IsInFFAPvPArea{false};                ///> Marks if player is in an FFAPvP area (such as Gurubashi Arena)
+    time_t EndTimer{0};                    ///> Time when player unflags himself for PvP (flag removed after 5 minutes)
 };
 
 struct DuelInfo
 {
-    DuelInfo() : initiator(nullptr), opponent(nullptr), startTimer(0), startTime(0), outOfBound(0), isMounted(false) {}
+    DuelInfo()  {}
 
-    Player* initiator;
-    Player* opponent;
-    time_t startTimer;
-    time_t startTime;
-    time_t outOfBound;
-    bool isMounted;
+    Player* initiator{nullptr};
+    Player* opponent{nullptr};
+    time_t startTimer{0};
+    time_t startTime{0};
+    time_t outOfBound{0};
+    bool isMounted{false};
 };
 
 struct Areas
@@ -380,13 +380,13 @@ struct Runes
 
 struct EnchantDuration
 {
-    EnchantDuration() : item(nullptr), slot(MAX_ENCHANTMENT_SLOT), leftduration(0) {};
+    EnchantDuration()  {};
     EnchantDuration(Item* _item, EnchantmentSlot _slot, uint32 _leftduration) : item(_item), slot(_slot),
         leftduration(_leftduration) { ASSERT(item); };
 
-    Item* item;
-    EnchantmentSlot slot;
-    uint32 leftduration;
+    Item* item{nullptr};
+    EnchantmentSlot slot{MAX_ENCHANTMENT_SLOT};
+    uint32 leftduration{0};
 };
 
 typedef std::list<EnchantDuration> EnchantDurationList;
@@ -687,18 +687,18 @@ enum EquipmentSetUpdateState
 
 struct EquipmentSet
 {
-    EquipmentSet() : Guid(0), IgnoreMask(0), state(EQUIPMENT_SET_NEW)
+    EquipmentSet()  
     {
         for (unsigned int & Item : Items)
             Item = 0;
     }
 
-    uint64 Guid;
+    uint64 Guid{0};
     std::string Name;
     std::string IconName;
-    uint32 IgnoreMask;
+    uint32 IgnoreMask{0};
     uint32 Items[EQUIPMENT_SLOT_END];
-    EquipmentSetUpdateState state;
+    EquipmentSetUpdateState state{EQUIPMENT_SET_NEW};
 };
 
 #define MAX_EQUIPMENT_SET_INDEX 10                          // client limit
@@ -765,6 +765,13 @@ enum ArenaTeamInfoType
 };
 
 class InstanceSave;
+
+enum RestFlag
+{
+    REST_FLAG_IN_TAVERN         = 0x1,
+    REST_FLAG_IN_CITY           = 0x2,
+    REST_FLAG_IN_FACTION_AREA   = 0x4, // used with AREA_FLAG_REST_ZONE_*
+};
 
 enum TeleportToOptions
 {
@@ -958,7 +965,7 @@ class PlayerTaxi
 {
 public:
     PlayerTaxi();
-    ~PlayerTaxi() {}
+    ~PlayerTaxi() = default;
     // Nodes
     void InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level);
     void LoadTaxiMask(std::string const& data);
@@ -1019,29 +1026,29 @@ class Player;
 // holder for Battleground data (pussywizard: not stored in db)
 struct BGData
 {
-    BGData() : bgInstanceID(0), bgTypeID(BATTLEGROUND_TYPE_NONE), bgTeamId(TEAM_NEUTRAL), bgQueueSlot(PLAYER_MAX_BATTLEGROUND_QUEUES), isInvited(false), bgIsRandom(false), bgAfkReportedCount(0), bgAfkReportedTimer(0) {}
+    BGData()  {}
 
-    uint32 bgInstanceID;
-    BattlegroundTypeId bgTypeID;
-    TeamId bgTeamId;
-    uint32 bgQueueSlot;
-    bool isInvited;
-    bool bgIsRandom;
+    uint32 bgInstanceID{0};
+    BattlegroundTypeId bgTypeID{BATTLEGROUND_TYPE_NONE};
+    TeamId bgTeamId{TEAM_NEUTRAL};
+    uint32 bgQueueSlot{PLAYER_MAX_BATTLEGROUND_QUEUES};
+    bool isInvited{false};
+    bool bgIsRandom{false};
 
     std::set<uint32>   bgAfkReporter;
-    uint8              bgAfkReportedCount;
-    time_t             bgAfkReportedTimer;
+    uint8              bgAfkReportedCount{0};
+    time_t             bgAfkReportedTimer{0};
 };
 
 // holder for Entry Point data (pussywizard: stored in db)
 struct EntryPointData
 {
-    EntryPointData() : mountSpell(0)
+    EntryPointData()  
     {
         ClearTaxiPath();
     }
 
-    uint32 mountSpell;
+    uint32 mountSpell{0};
     std::vector<uint32> taxiPath;
     WorldLocation joinPos;
 
@@ -1251,6 +1258,10 @@ public:
     uint32 GetXPRestBonus(uint32 xp);
     [[nodiscard]] float GetRestBonus() const { return _restBonus; }
     void SetRestBonus(float rest_bonus_new);
+
+    bool HasRestFlag(RestFlag restFlag) const { return (_restFlagMask & restFlag) != 0; }
+    void SetRestFlag(RestFlag restFlag, uint32 triggerId = 0);
+    void RemoveRestFlag(RestFlag restFlag);
     [[nodiscard]] uint32 GetInnTriggerId() const { return _innTriggerId; }
 
     [[nodiscard]] Pet* GetPet() const;
@@ -2901,6 +2912,7 @@ protected:
     time_t _restTime;
     uint32 _innTriggerId;
     float _restBonus;
+    uint32 _restFlagMask;
     ////////////////////Rest System/////////////////////
     uint32 m_resetTalentsCost;
     time_t m_resetTalentsTime;

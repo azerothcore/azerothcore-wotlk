@@ -25,15 +25,14 @@ namespace DisableMgr
 
 struct MmapTileHeader
 {
-    uint32 mmapMagic;
+    uint32 mmapMagic{MMAP_MAGIC};
     uint32 dtVersion;
-    uint32 mmapVersion;
-    uint32 size;
-    char usesLiquids;
-    char padding[3];
+    uint32 mmapVersion{MMAP_VERSION};
+    uint32 size{0};
+    char usesLiquids{true};
+    char padding[3]{};
 
-    MmapTileHeader() : mmapMagic(MMAP_MAGIC), dtVersion(DT_NAVMESH_VERSION),
-        mmapVersion(MMAP_VERSION), size(0), usesLiquids(true), padding() {}
+    MmapTileHeader() :  dtVersion(DT_NAVMESH_VERSION) {}
 };
 
 // All padding fields must be handled and initialized to ensure mmaps_generator will produce binary-identical *.mmtile files
@@ -50,7 +49,7 @@ namespace MMAP
     MapBuilder::MapBuilder(float maxWalkableAngle, bool skipLiquid,
                            bool skipContinents, bool skipJunkMaps, bool skipBattlegrounds,
                            bool debugOutput, bool bigBaseUnit, const char* offMeshFilePath) :
-        m_terrainBuilder     (nullptr),
+        
         m_debugOutput        (debugOutput),
         m_offMeshFilePath    (offMeshFilePath),
         m_skipContinents     (skipContinents),
@@ -58,7 +57,7 @@ namespace MMAP
         m_skipBattlegrounds  (skipBattlegrounds),
         m_maxWalkableAngle   (maxWalkableAngle),
         m_bigBaseUnit        (bigBaseUnit),
-        m_rcContext          (nullptr),
+        
         _cancelationToken    (false)
     {
         m_terrainBuilder = new TerrainBuilder(skipLiquid);
@@ -379,7 +378,7 @@ namespace MMAP
 
     void MapBuilder::WorkerThread()
     {
-        while (1)
+        while (true)
         {
             uint32 mapId = 0;
 
@@ -886,7 +885,7 @@ namespace MMAP
 
             // now that tile is written to disk, we can unload it
             navMesh->removeTile(tileRef, nullptr, nullptr);
-        } while (0);
+        } while (false);
 
         if (m_debugOutput)
         {
