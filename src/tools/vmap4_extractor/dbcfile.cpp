@@ -10,9 +10,10 @@
 #undef max
 
 #include <cstdio>
+#include <utility>
 
-DBCFile::DBCFile(const std::string& filename):
-    filename(filename), recordSize(0), recordCount(0), fieldCount(0), stringSize(0), data(nullptr), stringTable(nullptr)
+DBCFile::DBCFile(std::string  filename):
+    filename(std::move(filename)), recordSize(0), recordCount(0), fieldCount(0), stringSize(0), data(nullptr), stringTable(nullptr)
 {
 
 }
