@@ -37,7 +37,6 @@ class ACE_Str_Buf;
 class ACE_Export ACE_FIFO_Send_Msg : public ACE_FIFO_Send
 {
 public:
-  // = Initialization methods.
   /// Default constructor.
   ACE_FIFO_Send_Msg (void);
 

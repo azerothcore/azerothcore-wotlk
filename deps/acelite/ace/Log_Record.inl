@@ -4,13 +4,21 @@
 #include "ace/Time_Value.h"
 #include "ace/OS_NS_string.h"
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 ACE_INLINE
 ACE_Log_Record::~ACE_Log_Record (void)
 {
   if (this->msg_data_)
+#if defined (ACE_HAS_ALLOC_HOOKS)
+    ACE_Allocator::instance()->free(this->msg_data_);
+#else
     delete [] this->msg_data_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
 
 ACE_INLINE ACE_UINT32

@@ -13,7 +13,7 @@
 #include "BoundingIntervalHierarchy.h"
 
 
-template<class T, class BoundsFunc = BoundsTrait<T> >
+template<class T, class BoundsFunc = BoundsTrait<T>>
 class BIHWrap
 {
     template<class RayCallback>
@@ -66,7 +66,7 @@ public:
     {
         ++unbalanced_times;
         uint32 Idx = 0;
-        const T * temp;
+        const T* temp;
         if (m_obj2Idx.getRemove(&obj, temp, Idx))
             m_objects[Idx] = NULL;
         else

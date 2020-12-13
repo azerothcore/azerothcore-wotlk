@@ -50,12 +50,12 @@ public:
     {
         boss_drakkisathAI(Creature* creature) : BossAI(creature, DATA_GENERAL_DRAKKISATH) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             CallForHelp();
@@ -77,12 +77,12 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -118,7 +118,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_drakkisathAI(creature);
     }
@@ -135,7 +135,7 @@ public:
 
         EventMap _events;
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(5000, 12800));
             _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(5600, 15400));
@@ -158,7 +158,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -185,7 +185,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new chromatic_elite_guardAI(creature);
     }

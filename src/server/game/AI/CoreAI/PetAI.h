@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_PETAI_H
-#define TRINITY_PETAI_H
+#ifndef ACORE_PETAI_H
+#define ACORE_PETAI_H
 
 #include "CreatureAI.h"
 #include "Timer.h"
@@ -13,48 +13,68 @@
 class Creature;
 class Spell;
 
+enum SpecialPets
+{
+    ENTRY_IMP                   =   416,
+    ENTRY_WATER_ELEMENTAL       =   510,
+    ENTRY_WATER_ELEMENTAL_PERM  = 37994,
+
+    IMP_FIREBOLT_RANK_1         =  3110,
+    IMP_FIREBOLT_RANK_2         =  7799,
+    IMP_FIREBOLT_RANK_3         =  7800,
+    IMP_FIREBOLT_RANK_4         =  7801,
+    IMP_FIREBOLT_RANK_5         =  7802,
+    IMP_FIREBOLT_RANK_6         = 11762,
+    IMP_FIREBOLT_RANK_7         = 11763,
+    IMP_FIREBOLT_RANK_8         = 27267,
+    IMP_FIREBOLT_RANK_9         = 47964,
+    WATER_ELEMENTAL_WATERBOLT_1 = 31707,
+    WATER_ELEMENTAL_WATERBOLT_2 = 72898
+};
+
 class PetAI : public CreatureAI
 {
-    public:
+public:
 
-        explicit PetAI(Creature* c);
+    explicit PetAI(Creature* c);
 
-        void UpdateAI(uint32);
-        static int Permissible(const Creature*);
+    void UpdateAI(uint32) override;
+    static int Permissible(const Creature*);
 
-        void KilledUnit(Unit* /*victim*/);
-        void AttackStart(Unit* target);
-        void MovementInform(uint32 moveType, uint32 data);
-        void OwnerAttackedBy(Unit* attacker);
-        void OwnerAttacked(Unit* target);
-        void AttackedBy(Unit* attacker);
-        void ReceiveEmote(Player* player, uint32 textEmote);
+    void KilledUnit(Unit* /*victim*/) override;
+    void AttackStart(Unit* target) override;
+    void MovementInform(uint32 moveType, uint32 data) override;
+    void OwnerAttackedBy(Unit* attacker) override;
+    void OwnerAttacked(Unit* target) override;
+    void AttackedBy(Unit* attacker) override;
+    void ReceiveEmote(Player* player, uint32 textEmote) override;
 
-        // The following aren't used by the PetAI but need to be defined to override
-        //  default CreatureAI functions which interfere with the PetAI
-        //
-        void MoveInLineOfSight(Unit* /*who*/) {} // CreatureAI interferes with returning pets
-        void MoveInLineOfSight_Safe(Unit* /*who*/) {} // CreatureAI interferes with returning pets
-        void EnterEvadeMode() {} // For fleeing, pets don't use this type of Evade mechanic
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo);
+    // The following aren't used by the PetAI but need to be defined to override
+    //  default CreatureAI functions which interfere with the PetAI
+    //
+    void MoveInLineOfSight(Unit* /*who*/) override {} // CreatureAI interferes with returning pets
+    void MoveInLineOfSight_Safe(Unit* /*who*/) {} // CreatureAI interferes with returning pets
+    void EnterEvadeMode() override {} // For fleeing, pets don't use this type of Evade mechanic
+    void SpellHit(Unit* caster, const SpellInfo* spellInfo) override;
 
-    private:
-        bool _isVisible(Unit*) const;
-        bool _needToStop(void);
-        void _stopAttack(void);
-        void _doMeleeAttack();
-        bool _canMeleeAttack() const;
+private:
+    bool _isVisible(Unit*) const;
+    bool _needToStop(void);
+    void _stopAttack(void);
+    void _doMeleeAttack();
+    bool _canMeleeAttack();
 
-        void UpdateAllies();
+    void UpdateAllies();
 
-        TimeTracker i_tracker;
-        std::set<uint64> m_AllySet;
-        uint32 m_updateAlliesTimer;
+    TimeTracker i_tracker;
+    std::set<uint64> m_AllySet;
+    uint32 m_updateAlliesTimer;
+    float combatRange;
 
-        Unit* SelectNextTarget(bool allowAutoSelect) const;
-        void HandleReturnMovement();
-        void DoAttack(Unit* target, bool chase);
-        bool CanAttack(Unit* target, const SpellInfo* spellInfo = NULL);
-        void ClearCharmInfoFlags();
+    Unit* SelectNextTarget(bool allowAutoSelect) const;
+    void HandleReturnMovement();
+    void DoAttack(Unit* target, bool chase);
+    bool CanAttack(Unit* target, const SpellInfo* spellInfo = nullptr);
+    void ClearCharmInfoFlags();
 };
 #endif

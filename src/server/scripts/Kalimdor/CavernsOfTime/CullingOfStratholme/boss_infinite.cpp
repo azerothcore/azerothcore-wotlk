@@ -32,7 +32,7 @@ class boss_infinite_corruptor : public CreatureScript
 public:
     boss_infinite_corruptor() : CreatureScript("boss_infinite_corruptor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_infinite_corruptorAI(creature);
     }
@@ -47,8 +47,8 @@ public:
         SummonList summons;
         uint32 beamTimer;
 
-        void Reset() 
-        { 
+        void Reset() override
+        {
             events.Reset();
             summons.DespawnAll();
             if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -60,9 +60,9 @@ public:
             beamTimer = 1;
         }
 
-        void JustSummoned(Creature* cr) { summons.Summon(cr); }
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->InterruptNonMeleeSpells(false);
             events.ScheduleEvent(EVENT_SPELL_VOID_STRIKE, 8000);
@@ -70,7 +70,7 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
@@ -90,7 +90,7 @@ public:
                 pInstance->SetData(DATA_SHOW_INFINITE_TIMER, 0);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (!me->IsAlive())
                 return;
@@ -103,7 +103,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (beamTimer)
             {
@@ -122,7 +122,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_VOID_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_VOID_STRIKE, false);

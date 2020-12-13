@@ -45,14 +45,14 @@ class boss_krystallus : public CreatureScript
 public:
     boss_krystallus() : CreatureScript("boss_krystallus") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_krystallusAI (pCreature);
     }
 
     struct boss_krystallusAI : public ScriptedAI
     {
-        boss_krystallusAI(Creature *c) : ScriptedAI(c) 
+        boss_krystallusAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -60,14 +60,14 @@ public:
         EventMap events;
         InstanceScript* pInstance;
 
-        void Reset() 
+        void Reset() override
         {
             events.Reset();
             if (pInstance)
                 pInstance->SetData(BOSS_KRYSTALLUS, NOT_STARTED);
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_BOULDER, 8000);
@@ -87,14 +87,14 @@ public:
             Map* map = me->GetMap();
             if (map->IsDungeon())
             {
-                Map::PlayerList const &players = map->GetPlayers();
+                Map::PlayerList const& players = map->GetPlayers();
                 for(Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     if (itr->GetSource()->IsAlive())
                         itr->GetSource()->RemoveAura(GROUND_SLAM_STONED_EFFECT);
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -104,63 +104,61 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_BOULDER:
-                {
-                    if (Unit *target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0)) 
-                        me->CastSpell(target, DUNGEON_MODE(BOULDER_TOSS, BOULDER_TOSS_H), false);
+                    {
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
+                            me->CastSpell(target, DUNGEON_MODE(BOULDER_TOSS, BOULDER_TOSS_H), false);
 
-                    events.RepeatEvent(5000 + rand()%2000);
-                    break;
-                }
+                        events.RepeatEvent(5000 + rand() % 2000);
+                        break;
+                    }
                 case EVENT_GROUND_SPIKE:
-                {
-                    me->CastSpell(me->GetVictim(), GROUND_SPIKE_H, false); // current enemy target
-                    events.RepeatEvent(8000 + rand()%3000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me->GetVictim(), GROUND_SPIKE_H, false); // current enemy target
+                        events.RepeatEvent(8000 + rand() % 3000);
+                        break;
+                    }
                 case EVENT_STOMP:
-                {
-                    me->CastSpell(me, DUNGEON_MODE(STOMP, STOMP_H), false);
-                    events.RepeatEvent(13000 + rand()% 5000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me, DUNGEON_MODE(STOMP, STOMP_H), false);
+                        events.RepeatEvent(13000 + rand() % 5000);
+                        break;
+                    }
                 case EVENT_GROUND_SLAM:
-                {
-                    events.RepeatEvent(10000 + rand()%3000);
-                    me->CastSpell(me->GetVictim(), GROUND_SLAM, true);
-                    events.DelayEvents(10000);
-                    events.RescheduleEvent(EVENT_SHATTER, 8000);
-                    break;
-                }
+                    {
+                        events.RepeatEvent(10000 + rand() % 3000);
+                        me->CastSpell(me->GetVictim(), GROUND_SLAM, true);
+                        events.DelayEvents(10000);
+                        events.RescheduleEvent(EVENT_SHATTER, 8000);
+                        break;
+                    }
                 case EVENT_SHATTER:
-                {
-                    me->CastSpell((Unit*)NULL, DUNGEON_MODE(SHATTER, SHATTER_H), false);
-                    Talk(SAY_SHATTER);
-                    events.RescheduleEvent(EVENT_REMOVE_STONED, 1500);
-                    events.PopEvent();
-                    break;
-                }
+                    {
+                        me->CastSpell((Unit*)NULL, DUNGEON_MODE(SHATTER, SHATTER_H), false);
+                        Talk(SAY_SHATTER);
+                        events.RescheduleEvent(EVENT_REMOVE_STONED, 1500);
+                        break;
+                    }
                 case EVENT_REMOVE_STONED:
-                {
-                    RemoveStonedEffect();
-                    events.PopEvent();
-                    break;
-                }
+                    {
+                        RemoveStonedEffect();
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(BOSS_KRYSTALLUS, DONE);
         }
 
-        void KilledUnit(Unit * /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_KILL);
         }
@@ -170,67 +168,67 @@ public:
 
 class spell_krystallus_shatter : public SpellScriptLoader
 {
-    public:
-        spell_krystallus_shatter() : SpellScriptLoader("spell_krystallus_shatter") { }
+public:
+    spell_krystallus_shatter() : SpellScriptLoader("spell_krystallus_shatter") { }
 
-        class spell_krystallus_shatter_SpellScript : public SpellScript
+    class spell_krystallus_shatter_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_krystallus_shatter_SpellScript);
+
+        void HandleScript(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_krystallus_shatter_SpellScript);
-
-            void HandleScript(SpellEffIndex /*effIndex*/)
+            if (Unit* target = GetHitUnit())
             {
-                if (Unit* target = GetHitUnit())
-                {
-                    target->RemoveAurasDueToSpell(GROUND_SLAM_STONED_EFFECT);
-                    target->CastSpell((Unit*)NULL, SPELL_SHATTER_EFFECT, true);
-                }
+                target->RemoveAurasDueToSpell(GROUND_SLAM_STONED_EFFECT);
+                target->CastSpell((Unit*)NULL, SPELL_SHATTER_EFFECT, true);
             }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_krystallus_shatter_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_krystallus_shatter_SpellScript();
         }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_krystallus_shatter_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_krystallus_shatter_SpellScript();
+    }
 };
 
 class spell_krystallus_shatter_effect : public SpellScriptLoader
 {
-    public:
-        spell_krystallus_shatter_effect() : SpellScriptLoader("spell_krystallus_shatter_effect") { }
+public:
+    spell_krystallus_shatter_effect() : SpellScriptLoader("spell_krystallus_shatter_effect") { }
 
-        class spell_krystallus_shatter_effect_SpellScript : public SpellScript
+    class spell_krystallus_shatter_effect_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_krystallus_shatter_effect_SpellScript);
+
+        void CalculateDamage()
         {
-            PrepareSpellScript(spell_krystallus_shatter_effect_SpellScript);
+            if (!GetHitUnit())
+                return;
 
-            void CalculateDamage()
-            {
-                if (!GetHitUnit())
-                    return;
+            float radius = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster());
+            if (!radius)
+                return;
 
-                float radius = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster());
-                if (!radius)
-                    return;
-
-                float distance = GetCaster()->GetDistance2d(GetHitUnit());
-                if (distance > 1.0f)
-                    SetHitDamage(int32(GetHitDamage() * ((radius - distance) / radius)));
-            }
-
-            void Register()
-            {
-                OnHit += SpellHitFn(spell_krystallus_shatter_effect_SpellScript::CalculateDamage);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_krystallus_shatter_effect_SpellScript();
+            float distance = GetCaster()->GetDistance2d(GetHitUnit());
+            if (distance > 1.0f)
+                SetHitDamage(int32(GetHitDamage() * ((radius - distance) / radius)));
         }
+
+        void Register() override
+        {
+            OnHit += SpellHitFn(spell_krystallus_shatter_effect_SpellScript::CalculateDamage);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_krystallus_shatter_effect_SpellScript();
+    }
 };
 
 void AddSC_boss_krystallus()

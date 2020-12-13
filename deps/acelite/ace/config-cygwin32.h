@@ -43,6 +43,21 @@
 
 #include /**/ <cygwin/version.h>
 
+#if CYGWIN_VERSION_API_MINOR >= 338
+// Code #defines added to support the latest (as of 6/2019) version of Cygwin
+#define ACE_HAS_UCONTEXT_T 1
+#define ACE_LACKS_CUSERID 1
+#define ACE_HAS_WCHAR
+#define ACE_DISABLE_MKTEMP
+#define ACE_HAS_3_PARAM_WCSTOK
+#define ACE_LACKS_WCSICMP
+#define ACE_LACKS_WCSNICMP
+#define ACE_LACKS_STRPTIME
+#define ACE_LACKS_SWAB
+#define ACE_LACKS_STD_WSTRING
+
+#endif
+
 // Needed to differentiate between libc 5 and libc 6 (aka glibc).
 // It's there on all libc 5 systems I checked.
 #include /**/ <features.h>
