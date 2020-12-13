@@ -19,7 +19,7 @@ class instance_nexus : public InstanceMapScript
 public:
     instance_nexus() : InstanceMapScript("instance_nexus", 576) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_nexus_InstanceMapScript(map);
     }
@@ -28,13 +28,13 @@ public:
     {
         instance_nexus_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
-        void Initialize()
+        void Initialize() override
         {
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             Map::PlayerList const& players = instance->GetPlayers();
             TeamId TeamIdInInstance = TEAM_NEUTRAL;
@@ -72,7 +72,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* gameObject)
+        void OnGameObjectCreate(GameObject* gameObject) override
         {
             switch (gameObject->GetEntry())
             {
@@ -94,7 +94,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* gameObject)
+        void OnGameObjectRemove(GameObject* gameObject) override
         {
             switch (gameObject->GetEntry())
             {
@@ -106,7 +106,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32)
+        void SetData(uint32 type, uint32) override
         {
             switch (type)
             {
@@ -125,7 +125,7 @@ public:
             }
         }
 
-        bool SetBossState(uint32 id, EncounterState state)
+        bool SetBossState(uint32 id, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(id, state))
                 return false;
@@ -139,14 +139,14 @@ public:
             return true;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             std::ostringstream saveStream;
             saveStream << "N E X " << GetBossSaveData();
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if( !in )
                 return;
@@ -183,7 +183,7 @@ class npc_crystalline_frayer : public CreatureScript
 public:
     npc_crystalline_frayer() : CreatureScript("npc_crystalline_frayer") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_crystalline_frayerAI>(creature);
     }
@@ -199,7 +199,7 @@ public:
         uint32 abilityTimer1;
         uint32 abilityTimer2;
 
-        void Reset()
+        void Reset() override
         {
             restoreTimer = 0;
             abilityTimer1 = 0;
@@ -208,18 +208,18 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             _allowDeath = me->GetInstanceScript()->GetBossState(DATA_ORMOROK_EVENT) == DONE;
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (me->isRegeneratingHealth())
                 ScriptedAI::EnterEvadeMode();
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
             {
@@ -242,7 +242,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (restoreTimer)
             {
