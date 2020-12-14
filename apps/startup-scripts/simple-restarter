@@ -9,8 +9,6 @@ _bin_file=$2
 _instant_crash_cnt=0
 _total_crashes=0
 
-trap 'echo "va bene"' SIGHUP
-
 while true
 do
     if [ ! -f "$_bin_path/$_bin_file" ]; then
