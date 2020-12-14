@@ -146,3 +146,4 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 
 DELETE FROM `creature_equip_template` WHERE `CreatureID` IN (25317, 25220);
 UPDATE `creature` SET `equipment_id`=0 WHERE `id` = 25317;
+
