@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1606594157029530500');
 
--- (Algalon the Observer): 10/25 - 'Phase Punch' applied as debuff
+-- (Algalon the Observer): 'Phase Punch' applied as debuff
 DELETE FROM `spell_custom_attr` WHERE `spell_id` = 64412;
 
 -- (High King Maulgar): 'Death Coil' applied as debuff
