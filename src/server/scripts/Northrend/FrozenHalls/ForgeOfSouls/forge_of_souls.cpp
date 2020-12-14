@@ -67,12 +67,12 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case 1:
-                    events.PopEvent();
+                    
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_1);
@@ -85,7 +85,7 @@ public:
                     }
                     break;
                 case 2:
-                    events.PopEvent();
+                    
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_2);
@@ -98,7 +98,7 @@ public:
                     }
                     break;
                 case 3:
-                    events.PopEvent();
+                    
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_3);
@@ -111,7 +111,7 @@ public:
                     }
                     break;
                 case 4:
-                    events.PopEvent();
+                    
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_4);
@@ -124,7 +124,7 @@ public:
                     }
                     break;
                 case 5:
-                    events.PopEvent();
+                    
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_5);
@@ -137,7 +137,7 @@ public:
                     }
                     break;
                 case 6:
-                    events.PopEvent();
+                    
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_6);
@@ -149,7 +149,7 @@ public:
                     }
                     break;
                 case 7:
-                    events.PopEvent();
+                    
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_7);
@@ -157,7 +157,7 @@ public:
                     }
                     break;
                 case 8:
-                    events.PopEvent();
+                    
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_8);
@@ -223,7 +223,7 @@ public:
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == 1)
             {
@@ -237,7 +237,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_fos_leader_secondAI(creature);
     }
@@ -256,17 +256,17 @@ public:
         int32 amount;
         bool fired;
 
-        bool Load()
+        bool Load() override
         {
             fired = false;
             amount = 0;
             return true;
         }
 
-        void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo & /*dmgInfo*/, uint32 & absorbAmount)
+        void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
         {
             amount += absorbAmount;
-            if (!fired && amount >= GetSpellInfo()->Effects[EFFECT_0].BasePoints+1)
+            if (!fired && amount >= GetSpellInfo()->Effects[EFFECT_0].BasePoints + 1)
                 if (Unit* caster = GetCaster())
                 {
                     fired = true;
@@ -274,13 +274,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectAbsorb += AuraEffectAbsorbFn(spell_shield_of_bones_AuraScript::HandleAfterEffectAbsorb, EFFECT_0);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_shield_of_bones_AuraScript();
     }

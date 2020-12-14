@@ -43,8 +43,8 @@ enum GuildDefaultRanks
     GR_VETERAN      = 2,
     GR_MEMBER       = 3,
     GR_INITIATE     = 4
-    // When promoting member server does: rank--
-    // When demoting member server does: rank++
+                      // When promoting member server does: rank--
+                      // When demoting member server does: rank++
 };
 
 enum GuildRankRights
@@ -401,10 +401,10 @@ private:
         EventLogEntry(uint32 guildId, uint32 guid, time_t timestamp, GuildEventLogTypes eventType, uint32 playerGuid1, uint32 playerGuid2, uint8 newRank) :
             LogEntry(guildId, guid, timestamp), m_eventType(eventType), m_playerGuid1(playerGuid1), m_playerGuid2(playerGuid2), m_newRank(newRank) { }
 
-        ~EventLogEntry() { }
+        ~EventLogEntry() override { }
 
-        void SaveToDB(SQLTransaction& trans) const;
-        void WritePacket(WorldPacket& data) const;
+        void SaveToDB(SQLTransaction& trans) const override;
+        void WritePacket(WorldPacket& data) const override;
 
     private:
         GuildEventLogTypes m_eventType;
@@ -433,10 +433,10 @@ private:
             LogEntry(guildId, guid, timestamp), m_eventType(eventType), m_bankTabId(tabId), m_playerGuid(playerGuid),
             m_itemOrMoney(itemOrMoney), m_itemStackCount(itemStackCount), m_destTabId(destTabId) { }
 
-        ~BankEventLogEntry() { }
+        ~BankEventLogEntry() override { }
 
-        void SaveToDB(SQLTransaction& trans) const;
-        void WritePacket(WorldPacket& data) const;
+        void SaveToDB(SQLTransaction& trans) const override;
+        void WritePacket(WorldPacket& data) const override;
 
     private:
         GuildBankEventLogTypes m_eventType;
@@ -615,13 +615,13 @@ private:
         PlayerMoveItemData(Guild* guild, Player* player, uint8 container, uint8 slotId) :
             MoveItemData(guild, player, container, slotId) { }
 
-        bool IsBank() const { return false; }
-        bool InitItem();
-        void RemoveItem(SQLTransaction& trans, MoveItemData* pOther, uint32 splitedAmount = 0);
-        Item* StoreItem(SQLTransaction& trans, Item* pItem);
-        void LogBankEvent(SQLTransaction& trans, MoveItemData* pFrom, uint32 count) const;
+        bool IsBank() const override { return false; }
+        bool InitItem() override;
+        void RemoveItem(SQLTransaction& trans, MoveItemData* pOther, uint32 splitedAmount = 0) override;
+        Item* StoreItem(SQLTransaction& trans, Item* pItem) override;
+        void LogBankEvent(SQLTransaction& trans, MoveItemData* pFrom, uint32 count) const override;
     protected:
-        InventoryResult CanStore(Item* pItem, bool swap);
+        InventoryResult CanStore(Item* pItem, bool swap) override;
     };
 
     class BankMoveItemData : public MoveItemData
@@ -630,17 +630,17 @@ private:
         BankMoveItemData(Guild* guild, Player* player, uint8 container, uint8 slotId) :
             MoveItemData(guild, player, container, slotId) { }
 
-        bool IsBank() const { return true; }
-        bool InitItem();
-        bool HasStoreRights(MoveItemData* pOther) const;
-        bool HasWithdrawRights(MoveItemData* pOther) const;
-        void RemoveItem(SQLTransaction& trans, MoveItemData* pOther, uint32 splitedAmount);
-        Item* StoreItem(SQLTransaction& trans, Item* pItem);
-        void LogBankEvent(SQLTransaction& trans, MoveItemData* pFrom, uint32 count) const;
-        void LogAction(MoveItemData* pFrom) const;
+        bool IsBank() const override { return true; }
+        bool InitItem() override;
+        bool HasStoreRights(MoveItemData* pOther) const override;
+        bool HasWithdrawRights(MoveItemData* pOther) const override;
+        void RemoveItem(SQLTransaction& trans, MoveItemData* pOther, uint32 splitedAmount) override;
+        Item* StoreItem(SQLTransaction& trans, Item* pItem) override;
+        void LogBankEvent(SQLTransaction& trans, MoveItemData* pFrom, uint32 count) const override;
+        void LogAction(MoveItemData* pFrom) const override;
 
     protected:
-        InventoryResult CanStore(Item* pItem, bool swap);
+        InventoryResult CanStore(Item* pItem, bool swap) override;
 
     private:
         Item* _StoreItem(SQLTransaction& trans, BankTab* pTab, Item* pItem, ItemPosCount& pos, bool clone) const;
@@ -839,7 +839,7 @@ private:
     void _SendBankMoneyUpdate(WorldSession* session) const;
     void _SendBankContentUpdate(MoveItemData* pSrc, MoveItemData* pDest) const;
     void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
-    void _SendBankList(WorldSession* session = NULL, uint8 tabId = 0, bool sendFullSlots = false, SlotIds *slots = nullptr) const;
+    void _SendBankList(WorldSession* session = NULL, uint8 tabId = 0, bool sendFullSlots = false, SlotIds* slots = nullptr) const;
 
     void _BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* param1 = NULL, const char* param2 = NULL, const char* param3 = nullptr) const;
 };

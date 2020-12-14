@@ -12,7 +12,7 @@
 #define ACTION_WATER_ELEMENT_KILLED         2
 
 #define MAX_SPAWN_LOC 5
-static Position SpawnLoc[MAX_SPAWN_LOC]=
+static Position SpawnLoc[MAX_SPAWN_LOC] =
 {
     {1840.64f, 795.407f, 44.079f, 1.676f},
     {1886.24f, 757.733f, 47.750f, 5.201f},
@@ -67,14 +67,14 @@ class boss_ichoron : public CreatureScript
 public:
     boss_ichoron() : CreatureScript("boss_ichoron") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_ichoronAI (pCreature);
     }
 
     struct boss_ichoronAI : public ScriptedAI
     {
-        boss_ichoronAI(Creature *c) : ScriptedAI(c), globules(me)
+        boss_ichoronAI(Creature* c) : ScriptedAI(c), globules(me)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -86,18 +86,18 @@ public:
         uint32 uiWaterBoltVolleyTimer;
         uint32 uiDrainedTimer;
 
-        void Reset()
+        void Reset() override
         {
             globules.DespawnAll();
             bIsExploded = false;
             bIsFrenzy = false;
             uiDrainedTimer = 15000;
-            uiWaterBoltVolleyTimer = urand(7000,12000);
+            uiWaterBoltVolleyTimer = urand(7000, 12000);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisplayId(me->GetNativeDisplayId());
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (!me->IsAlive())
                 return;
@@ -113,7 +113,7 @@ public:
                     break;
                 case ACTION_WATER_ELEMENT_KILLED:
                     uint32 damage = me->CountPctFromMaxHealth(3);
-                    damage = std::min(damage, me->GetHealth()-1);
+                    damage = std::min(damage, me->GetHealth() - 1);
                     me->ModifyHealth(-int32(damage));
                     me->LowerPlayerDamageReq(damage);
                     break;
@@ -136,21 +136,21 @@ public:
 
         void IchoronDoCastToAllHostilePlayers(uint32 spellId, bool triggered)
         {
-            Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+            Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
             if (PlayerList.isEmpty())
                 return;
 
             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                if (Player *plr = i->GetSource())
+                if (Player* plr = i->GetSource())
                     me->CastSpell(plr, spellId, triggered);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             bIsExploded = false;
             bIsFrenzy = false;
             uiDrainedTimer = 15000;
-            uiWaterBoltVolleyTimer = urand(7000,12000);
+            uiWaterBoltVolleyTimer = urand(7000, 12000);
             DoZoneInCombat();
             Talk(SAY_AGGRO);
             me->CastSpell(me, SPELL_PROTECTIVE_BUBBLE, true);
@@ -158,7 +158,7 @@ public:
                 pInstance->SetData(DATA_ACHIEV, 1);
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) override
         {
             if (!UpdateVictim())
                 return;
@@ -185,14 +185,14 @@ public:
                         uiDrainedTimer = 15000;
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         me->SetDisplayId(11686);
-                        for (uint8 i=0; i<MAX_SPAWN_LOC; ++i)
+                        for (uint8 i = 0; i < MAX_SPAWN_LOC; ++i)
                         {
-                            float angle = rand_norm()*2*M_PI;
+                            float angle = rand_norm() * 2 * M_PI;
                             Position p1(SpawnLoc[i]), p2(SpawnLoc[i]);
-                            p1.m_positionX += 2.5f*cos(angle);
-                            p1.m_positionY += 2.5f*sin(angle);
-                            p2.m_positionX -= 2.5f*cos(angle);
-                            p2.m_positionY -= 2.5f*sin(angle);
+                            p1.m_positionX += 2.5f * cos(angle);
+                            p1.m_positionY += 2.5f * sin(angle);
+                            p2.m_positionX -= 2.5f * cos(angle);
+                            p2.m_positionY -= 2.5f * sin(angle);
                             DoSummon(NPC_ICHOR_GLOBULE, p1, 60000, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN);
                             DoSummon(NPC_ICHOR_GLOBULE, p2, 60000, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN);
                         }
@@ -237,7 +237,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustSummoned(Creature* pSummoned)
+        void JustSummoned(Creature* pSummoned) override
         {
             if (pSummoned)
             {
@@ -251,7 +251,7 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature *pSummoned)
+        void SummonedCreatureDespawn(Creature* pSummoned) override
         {
             if (pSummoned)
             {
@@ -261,7 +261,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             bIsExploded = false;
@@ -272,16 +272,16 @@ public:
                 pInstance->SetData(DATA_BOSS_DIED, 0);
         }
 
-        void KilledUnit(Unit * victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim && victim->GetGUID() == me->GetGUID())
                 return;
             Talk(SAY_SLAY);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -298,14 +298,14 @@ class npc_ichor_globule : public CreatureScript
 public:
     npc_ichor_globule() : CreatureScript("npc_ichor_globule") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ichor_globuleAI (pCreature);
     }
 
     struct npc_ichor_globuleAI : public ScriptedAI
     {
-        npc_ichor_globuleAI(Creature *c) : ScriptedAI(c)
+        npc_ichor_globuleAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
             uiRangeCheck_Timer = 1000;
@@ -314,19 +314,19 @@ public:
         InstanceScript* pInstance;
         uint32 uiRangeCheck_Timer;
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_CREATE_GLOBULE_VISUAL)
                 me->CastSpell(me, SPELL_WATER_GLOBULE, true);
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) override
         {
             if (uiRangeCheck_Timer < uiDiff)
             {
                 if (pInstance)
                     if (Creature* pIchoron = pInstance->instance->GetCreature(pInstance->GetData64(DATA_ICHORON_GUID)))
-                        if (me->IsWithinDist(pIchoron, 2.0f , false))
+                        if (me->IsWithinDist(pIchoron, 2.0f, false))
                         {
                             if (pIchoron->AI())
                                 pIchoron->AI()->DoAction(ACTION_WATER_ELEMENT_HIT);
@@ -337,7 +337,7 @@ public:
             else uiRangeCheck_Timer -= uiDiff;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->CastSpell(me, SPELL_SPLASH, true);
             if (pInstance)
@@ -347,8 +347,8 @@ public:
             me->DespawnOrUnsummon(2500);
         }
 
-        void AttackStart(Unit* /*who*/) {}
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void AttackStart(Unit* /*who*/) override {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
     };
 };
 

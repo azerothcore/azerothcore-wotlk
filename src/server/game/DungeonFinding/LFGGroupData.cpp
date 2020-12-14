@@ -10,110 +10,110 @@
 namespace lfg
 {
 
-LfgGroupData::LfgGroupData(): m_State(LFG_STATE_NONE), m_OldState(LFG_STATE_NONE),
-    m_Leader(0), m_Dungeon(0), m_KicksLeft(LFG_GROUP_MAX_KICKS)
-{ }
+    LfgGroupData::LfgGroupData(): m_State(LFG_STATE_NONE), m_OldState(LFG_STATE_NONE),
+        m_Leader(0), m_Dungeon(0), m_KicksLeft(LFG_GROUP_MAX_KICKS)
+    { }
 
-LfgGroupData::~LfgGroupData()
-{ }
+    LfgGroupData::~LfgGroupData()
+    { }
 
-bool LfgGroupData::IsLfgGroup()
-{
-    return m_OldState != LFG_STATE_NONE;
-}
-
-void LfgGroupData::SetState(LfgState state)
-{
-    switch (state)
+    bool LfgGroupData::IsLfgGroup()
     {
-        case LFG_STATE_NONE:
-            m_Dungeon = 0;
-            m_KicksLeft = LFG_GROUP_MAX_KICKS;
-            [[fallthrough]];
-        case LFG_STATE_FINISHED_DUNGEON:
-        case LFG_STATE_DUNGEON:
-            m_OldState = state;
-            [[fallthrough]];
-        default:
-            m_State = state;
+        return m_OldState != LFG_STATE_NONE;
     }
-}
 
-void LfgGroupData::RestoreState()
-{
-    m_State = m_OldState;
-}
+    void LfgGroupData::SetState(LfgState state)
+    {
+        switch (state)
+        {
+            case LFG_STATE_NONE:
+                m_Dungeon = 0;
+                m_KicksLeft = LFG_GROUP_MAX_KICKS;
+                [[fallthrough]];
+            case LFG_STATE_FINISHED_DUNGEON:
+            case LFG_STATE_DUNGEON:
+                m_OldState = state;
+                [[fallthrough]];
+            default:
+                m_State = state;
+        }
+    }
 
-void LfgGroupData::AddPlayer(uint64 guid)
-{
-    m_Players.insert(guid);
-}
+    void LfgGroupData::RestoreState()
+    {
+        m_State = m_OldState;
+    }
 
-uint8 LfgGroupData::RemovePlayer(uint64 guid)
-{
-    LfgGuidSet::iterator it = m_Players.find(guid);
-    if (it != m_Players.end())
-        m_Players.erase(it);
-    return uint8(m_Players.size());
-}
+    void LfgGroupData::AddPlayer(uint64 guid)
+    {
+        m_Players.insert(guid);
+    }
 
-void LfgGroupData::RemoveAllPlayers()
-{
-    m_Players.clear();
-}
+    uint8 LfgGroupData::RemovePlayer(uint64 guid)
+    {
+        LfgGuidSet::iterator it = m_Players.find(guid);
+        if (it != m_Players.end())
+            m_Players.erase(it);
+        return uint8(m_Players.size());
+    }
 
-void LfgGroupData::SetLeader(uint64 guid)
-{
-    m_Leader = guid;
-}
+    void LfgGroupData::RemoveAllPlayers()
+    {
+        m_Players.clear();
+    }
 
-void LfgGroupData::SetDungeon(uint32 dungeon)
-{
-    m_Dungeon = dungeon;
-}
+    void LfgGroupData::SetLeader(uint64 guid)
+    {
+        m_Leader = guid;
+    }
 
-void LfgGroupData::DecreaseKicksLeft()
-{
-    if (m_KicksLeft)
-      --m_KicksLeft;
-}
+    void LfgGroupData::SetDungeon(uint32 dungeon)
+    {
+        m_Dungeon = dungeon;
+    }
 
-LfgState LfgGroupData::GetState() const
-{
-    return m_State;
-}
+    void LfgGroupData::DecreaseKicksLeft()
+    {
+        if (m_KicksLeft)
+            --m_KicksLeft;
+    }
 
-LfgState LfgGroupData::GetOldState() const
-{
-    return m_OldState;
-}
+    LfgState LfgGroupData::GetState() const
+    {
+        return m_State;
+    }
 
-LfgGuidSet const& LfgGroupData::GetPlayers() const
-{
-    return m_Players;
-}
+    LfgState LfgGroupData::GetOldState() const
+    {
+        return m_OldState;
+    }
 
-uint8 LfgGroupData::GetPlayerCount() const
-{
-    return m_Players.size();
-}
+    LfgGuidSet const& LfgGroupData::GetPlayers() const
+    {
+        return m_Players;
+    }
 
-uint64 LfgGroupData::GetLeader() const
-{
-    return m_Leader;
-}
+    uint8 LfgGroupData::GetPlayerCount() const
+    {
+        return m_Players.size();
+    }
 
-uint32 LfgGroupData::GetDungeon(bool asId /* = true */) const
-{
-    if (asId)
-        return (m_Dungeon & 0x00FFFFFF);
-    else
-        return m_Dungeon;
-}
+    uint64 LfgGroupData::GetLeader() const
+    {
+        return m_Leader;
+    }
 
-uint8 LfgGroupData::GetKicksLeft() const
-{
-    return m_KicksLeft;
-}
+    uint32 LfgGroupData::GetDungeon(bool asId /* = true */) const
+    {
+        if (asId)
+            return (m_Dungeon & 0x00FFFFFF);
+        else
+            return m_Dungeon;
+    }
+
+    uint8 LfgGroupData::GetKicksLeft() const
+    {
+        return m_KicksLeft;
+    }
 
 } // namespace lfg

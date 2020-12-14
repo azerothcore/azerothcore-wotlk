@@ -28,15 +28,15 @@ namespace VMAP
     private:
         G3D::Matrix3 iRotation;
     public:
-        ModelPosition(): iScale(0.0f) { }
+        ModelPosition() { }
         G3D::Vector3 iPos;
         G3D::Vector3 iDir;
-        float iScale;
+        float iScale{0.0f};
         void init()
         {
             iRotation = G3D::Matrix3::fromEulerAnglesZYX(G3D::pif() * iDir.y / 180.f, G3D::pif() * iDir.x / 180.f, G3D::pif() * iDir.z / 180.f);
         }
-        G3D::Vector3 transform(const G3D::Vector3& pIn) const;
+        [[nodiscard]] G3D::Vector3 transform(const G3D::Vector3& pIn) const;
         void moveToBasePos(const G3D::Vector3& pBasePos) { iPos -= pBasePos; }
     };
 
@@ -54,17 +54,18 @@ namespace VMAP
 
     struct GroupModel_Raw
     {
-        uint32 mogpflags;
-        uint32 GroupWMOID;
+        uint32 mogpflags{0};
+        uint32 GroupWMOID{0};
 
         G3D::AABox bounds;
-        uint32 liquidflags;
+        uint32 liquidflags{0};
         std::vector<MeshTriangle> triangles;
         std::vector<G3D::Vector3> vertexArray;
         class WmoLiquid* liquid;
 
-        GroupModel_Raw() : mogpflags(0), GroupWMOID(0), liquidflags(0),
-            liquid(NULL) { }
+
+        GroupModel_Raw() : liquid(nullptr) { }
+
         ~GroupModel_Raw();
 
         bool Read(FILE* f);

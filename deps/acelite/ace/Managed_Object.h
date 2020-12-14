@@ -137,12 +137,10 @@ public:
   // on AIX 4.1 w/xlC v. 3.01.
 
 protected:
-
   // Disallow instantiation of this class.
   ACE_UNIMPLEMENTED_FUNC (ACE_Managed_Object (void))
 
 private:
-
   ACE_UNIMPLEMENTED_FUNC (ACE_Managed_Object (const ACE_Managed_Object<TYPE> &))
   ACE_UNIMPLEMENTED_FUNC (void operator= (const ACE_Managed_Object<TYPE> &))
 };

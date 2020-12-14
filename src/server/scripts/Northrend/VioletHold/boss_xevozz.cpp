@@ -50,14 +50,14 @@ class boss_xevozz : public CreatureScript
 public:
     boss_xevozz() : CreatureScript("boss_xevozz") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_xevozzAI (pCreature);
     }
 
     struct boss_xevozzAI : public ScriptedAI
     {
-        boss_xevozzAI(Creature *c) : ScriptedAI(c), spheres(me)
+        boss_xevozzAI(Creature* c) : ScriptedAI(c), spheres(me)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -66,22 +66,22 @@ public:
         EventMap events;
         SummonList spheres;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             spheres.DespawnAll();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_ARCANE_BARRAGE_VOLLEY, urand(16000,20000));
+            events.RescheduleEvent(EVENT_SPELL_ARCANE_BARRAGE_VOLLEY, urand(16000, 20000));
             events.RescheduleEvent(EVENT_SUMMON_SPHERES, 10000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -91,7 +91,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -101,7 +101,6 @@ public:
                     break;
                 case EVENT_SPELL_ARCANE_BUFFET:
                     me->CastSpell(me->GetVictim(), SPELL_ARCANE_BUFFET, false);
-                    events.PopEvent();
                     break;
                 case EVENT_SUMMON_SPHERES:
                     {
@@ -112,7 +111,8 @@ public:
                         if (IsHeroic())
                         {
                             uint32 entry2;
-                            do { entry2 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3); } while (entry1 == entry2);
+                            do { entry2 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3); }
+                            while (entry1 == entry2);
                             me->CastSpell((Unit*)NULL, entry2, true);
                         }
                         events.RepeatEvent(45000);
@@ -147,7 +147,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustSummoned(Creature* pSummoned)
+        void JustSummoned(Creature* pSummoned) override
         {
             if (pSummoned)
             {
@@ -159,7 +159,7 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature *pSummoned)
+        void SummonedCreatureDespawn(Creature* pSummoned) override
         {
             if (pSummoned)
             {
@@ -169,7 +169,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             spheres.DespawnAll();
@@ -177,7 +177,7 @@ public:
                 pInstance->SetData(DATA_BOSS_DIED, 0);
         }
 
-        void KilledUnit(Unit* pVictim)
+        void KilledUnit(Unit* pVictim) override
         {
             if (pVictim && pVictim->GetGUID() == me->GetGUID())
                 return;
@@ -185,9 +185,9 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             events.Reset();
