@@ -597,11 +597,11 @@ ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYZOStreamer const& 
 struct MovementInfo
 {
     // common
-    uint64 guid;
-    uint32 flags;
-    uint16 flags2;
+    uint64 guid{0};
+    uint32 flags{0};
+    uint16 flags2{0};
     Position pos;
-    uint32 time;
+    uint32 time{0};
 
     // transport
     struct TransportInfo
@@ -623,10 +623,10 @@ struct MovementInfo
     } transport;
 
     // swimming/flying
-    float pitch;
+    float pitch{0.0f};
 
     // falling
-    uint32 fallTime;
+    uint32 fallTime{0};
 
     // jumping
     struct JumpInfo
@@ -641,10 +641,9 @@ struct MovementInfo
     } jump;
 
     // spline
-    float splineElevation;
+    float splineElevation{0.0f};
 
-    MovementInfo() :
-        guid(0), flags(0), flags2(0), time(0), pitch(0.0f), fallTime(0), splineElevation(0.0f)
+    MovementInfo()  
     {
         pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
         transport.Reset();
@@ -749,14 +748,14 @@ class MovableMapObject
     template<class T> friend class RandomMovementGenerator;
 
 protected:
-    MovableMapObject() : _moveState(MAP_OBJECT_CELL_MOVE_NONE) {}
+    MovableMapObject()  {}
 
 private:
     [[nodiscard]] Cell const& GetCurrentCell() const { return _currentCell; }
     void SetCurrentCell(Cell const& cell) { _currentCell = cell; }
 
     Cell _currentCell;
-    MapObjectCellMoveState _moveState;
+    MapObjectCellMoveState _moveState{MAP_OBJECT_CELL_MOVE_NONE};
 };
 
 class WorldObject : public Object, public WorldLocation
@@ -790,7 +789,7 @@ public:
     void GetNearPoint2D(float& x, float& y, float distance, float absAngle) const;
     void GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ = 0) const;
     void GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float relAngle = 0, float controlZ = 0) const;
-    bool GetClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float angle = 0, const WorldObject* forWho = NULL, bool force = false) const;
+    bool GetClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float angle = 0, const WorldObject* forWho = nullptr, bool force = false) const;
     void MovePosition(Position& pos, float dist, float angle);
     void GetNearPosition(Position& pos, float dist, float angle)
     {

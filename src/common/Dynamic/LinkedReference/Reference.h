@@ -27,8 +27,8 @@ protected:
     // Tell our refFrom (source) object, that the link is cut (Target destroyed)
     virtual void sourceObjectDestroyLink() = 0;
 public:
-    Reference() { iRefTo = NULL; iRefFrom = NULL; }
-    virtual ~Reference() { }
+    Reference() { iRefTo = nullptr; iRefFrom = nullptr; }
+    virtual ~Reference() = default;
 
     // Create new link
     void link(TO* toObj, FROM* fromObj)
@@ -36,7 +36,7 @@ public:
         ASSERT(fromObj);                                // fromObj MUST not be NULL
         if (isValid())
             unlink();
-        if (toObj != NULL)
+        if (toObj != nullptr)
         {
             iRefTo = toObj;
             iRefFrom = fromObj;
@@ -50,8 +50,8 @@ public:
     {
         targetObjectDestroyLink();
         delink();
-        iRefTo = NULL;
-        iRefFrom = NULL;
+        iRefTo = nullptr;
+        iRefFrom = nullptr;
     }
 
     // Link is invalid due to destruction of referenced target object. Call comes from the refTo object
@@ -60,12 +60,12 @@ public:
     {
         sourceObjectDestroyLink();
         delink();
-        iRefTo = NULL;
+        iRefTo = nullptr;
     }
 
     [[nodiscard]] bool isValid() const                                // Only check the iRefTo
     {
-        return iRefTo != NULL;
+        return iRefTo != nullptr;
     }
 
     Reference<TO, FROM>*        next()       { return ((Reference<TO, FROM>*) LinkedListElement::next()); }

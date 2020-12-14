@@ -10,7 +10,7 @@
 #include "vmapexport.h"
 
 #include <algorithm>
-#include <stdio.h>
+#include <cstdio>
 
 bool ExtractSingleModel(std::string& fname)
 {
@@ -63,9 +63,9 @@ void ExtractGameobjectModels()
         return;
     }
 
-    for (DBCFile::Iterator it = dbc.begin(); it != dbc.end(); ++it)
+    for (const auto & it : dbc)
     {
-        path = it->getString(1);
+        path = it.getString(1);
 
         if (path.length() < 4)
             continue;
@@ -97,7 +97,7 @@ void ExtractGameobjectModels()
 
         if (result)
         {
-            uint32 displayId = it->getUInt(0);
+            uint32 displayId = it.getUInt(0);
             uint32 path_length = strlen(name);
             fwrite(&displayId, sizeof(uint32), 1, model_list);
             fwrite(&path_length, sizeof(uint32), 1, model_list);

@@ -22,7 +22,7 @@ public:
         CLIENT_UPDATE_MASK_BITS = sizeof(ClientUpdateMaskType) * 8,
     };
 
-    UpdateMask() : _fieldCount(0), _blockCount(0), _bits(nullptr) { }
+    UpdateMask()  { }
 
     UpdateMask(UpdateMask const& right) : _bits(nullptr)
     {
@@ -105,9 +105,9 @@ public:
     }
 
 private:
-    uint32 _fieldCount;
-    uint32 _blockCount;
-    uint8* _bits;
+    uint32 _fieldCount{0};
+    uint32 _blockCount{0};
+    uint8* _bits{nullptr};
 };
 
 #endif
