@@ -37,21 +37,21 @@ public:
         return i_cells[x][y];
     }
 
-    GridType const& GetGridType(const uint32 x, const uint32 y) const
+    [[nodiscard]] GridType const& GetGridType(const uint32 x, const uint32 y) const
     {
         ASSERT(x < N && y < N);
         return i_cells[x][y];
     }
 
-    uint32 GetGridId(void) const { return i_gridId; }
-    int32 getX() const { return i_x; }
-    int32 getY() const { return i_y; }
+    [[nodiscard]] uint32 GetGridId() const { return i_gridId; }
+    [[nodiscard]] int32 getX() const { return i_x; }
+    [[nodiscard]] int32 getY() const { return i_y; }
 
     void link(GridRefManager<NGrid<N, ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES> >* pTo)
     {
         i_Reference.link(pTo, this);
     }
-    bool isGridObjectDataLoaded() const { return i_GridObjectDataLoaded; }
+    [[nodiscard]] bool isGridObjectDataLoaded() const { return i_GridObjectDataLoaded; }
     void setGridObjectDataLoaded(bool pLoaded) { i_GridObjectDataLoaded = pLoaded; }
 
     /*

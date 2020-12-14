@@ -11,6 +11,8 @@
 #ifndef __WORLDSESSION_H
 #define __WORLDSESSION_H
 
+#include <utility>
+
 #include "Common.h"
 #include "SharedDefines.h"
 #include "AddonMgr.h"
@@ -75,9 +77,9 @@ enum AccountDataType
 
 struct AccountData
 {
-    AccountData() : Time(0), Data("") {}
+    AccountData() :  Data("") {}
 
-    time_t Time;
+    time_t Time{0};
     std::string Data;
 };
 
@@ -120,10 +122,10 @@ class PacketFilter
 {
 public:
     explicit PacketFilter(WorldSession* pSession) : m_pSession(pSession) {}
-    virtual ~PacketFilter() {}
+    virtual ~PacketFilter() = default;
 
     virtual bool Process(WorldPacket* /*packet*/) { return true; }
-    virtual bool ProcessLogout() const { return true; }
+    [[nodiscard]] virtual bool ProcessLogout() const { return true; }
 
 protected:
     WorldSession* const m_pSession;
@@ -133,11 +135,11 @@ class MapSessionFilter : public PacketFilter
 {
 public:
     explicit MapSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
-    ~MapSessionFilter() {}
+    ~MapSessionFilter() override = default;
 
-    virtual bool Process(WorldPacket* packet);
+    bool Process(WorldPacket* packet) override;
     //in Map::Update() we do not process player logout!
-    virtual bool ProcessLogout() const { return false; }
+    [[nodiscard]] bool ProcessLogout() const override { return false; }
 };
 
 //class used to filer only thread-unsafe packets from queue
@@ -146,9 +148,9 @@ class WorldSessionFilter : public PacketFilter
 {
 public:
     explicit WorldSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
-    ~WorldSessionFilter() {}
+    ~WorldSessionFilter() override = default;
 
-    virtual bool Process(WorldPacket* packet);
+    bool Process(WorldPacket* packet) override;
 };
 
 // Proxy structure to contain data passed to callback function,
@@ -159,8 +161,8 @@ class CharacterCreateInfo
     friend class Player;
 
 protected:
-    CharacterCreateInfo(std::string const& name, uint8 race, uint8 cclass, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId,
-                        WorldPacket& data) : Name(name), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
+    CharacterCreateInfo(std::string  name, uint8 race, uint8 cclass, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId,
+                        WorldPacket& data) : Name(std::move(name)), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
         OutfitId(outfitId), Data(data), CharCount(0)
     {}
 
@@ -181,7 +183,7 @@ protected:
     uint8 CharCount;
 
 private:
-    virtual ~CharacterCreateInfo() {};
+    virtual ~CharacterCreateInfo() = default;;
 };
 
 struct PacketCounter

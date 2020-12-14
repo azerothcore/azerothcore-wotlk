@@ -50,7 +50,7 @@ class boss_vexallus : public CreatureScript
 public:
     boss_vexallus() : CreatureScript("boss_vexallus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_vexallusAI(creature);
     };
@@ -69,7 +69,7 @@ public:
         uint8 IntervalHealthAmount;
         bool Enraged;
 
-        void Reset()
+        void Reset() override
         {
             summons.DespawnAll();
             IntervalHealthAmount = 1;
@@ -78,20 +78,20 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
             instance->SetData(DATA_VEXALLUS_EVENT, DONE);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             instance->SetData(DATA_VEXALLUS_EVENT, IN_PROGRESS);
@@ -101,7 +101,7 @@ public:
             events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
             {
@@ -111,7 +111,7 @@ public:
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit* killer)
+        void SummonedCreatureDies(Creature* summon, Unit* killer) override
         {
             summons.Despawn(summon);
             summon->DespawnOrUnsummon(1);
@@ -119,7 +119,7 @@ public:
                 killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, 0, 0, summon->GetGUID());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

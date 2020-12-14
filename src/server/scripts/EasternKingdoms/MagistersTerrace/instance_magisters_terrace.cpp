@@ -27,7 +27,7 @@ public:
         uint64 DelrissaGUID;
         uint64 KaelGUID;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&Encounter, 0, sizeof(Encounter));
 
@@ -42,7 +42,7 @@ public:
             KaelGUID = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (Encounter[i] == IN_PROGRESS)
@@ -50,7 +50,7 @@ public:
             return false;
         }
 
-        uint32 GetData(uint32 identifier) const
+        uint32 GetData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -63,7 +63,7 @@ public:
             return 0;
         }
 
-        void SetData(uint32 identifier, uint32 data)
+        void SetData(uint32 identifier, uint32 data) override
         {
             switch (identifier)
             {
@@ -94,7 +94,7 @@ public:
             SaveToDB();
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -112,7 +112,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -147,7 +147,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -158,7 +158,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* str)
+        void Load(const char* str) override
         {
             if (!str)
             {
@@ -182,7 +182,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        uint64 GetData64(uint32 identifier) const
+        uint64 GetData64(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -193,7 +193,7 @@ public:
         }
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_magisters_terrace_InstanceMapScript(map);
     }
