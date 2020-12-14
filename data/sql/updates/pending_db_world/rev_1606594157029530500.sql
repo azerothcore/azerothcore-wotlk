@@ -1,11 +1,10 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1606594157029530500');
 
--- Correct spell Algalon the Observer, 10 & 25 player 'Phase Punch' to be applied as negative buff
-
+-- (Algalon the Observer): 10/25 - 'Phase Punch' applied as debuff
 DELETE FROM `spell_custom_attr` WHERE `spell_id` = 64412;
 
--- Correct spell High King Maulgar, 'Death Coil' to be applied as negative buff
-
+-- (High King Maulgar): 'Death Coil' applied as debuff
 DELETE FROM `spell_custom_attr` WHERE  `spell_id`=33130;
-INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES (33130,12288);
+INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES 
+(33130,12288);
 
