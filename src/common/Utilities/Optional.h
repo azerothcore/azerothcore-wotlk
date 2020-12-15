@@ -3,8 +3,8 @@
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/> 
  */
 
-#ifndef acore_optional_h__
-#define acore_optional_h__
+#ifndef ACORE_OPTIONAL_H
+#define ACORE_OPTIONAL_H
 
 #include <optional>
 
@@ -12,4 +12,4 @@
 template <class T>
 using Optional = std::optional<T>;
 
-#endif // acore_optional_h__
+#endif // ACORE_OPTIONAL_H
