@@ -9,6 +9,7 @@
 
 
 #include "Common.h"
+#include "Object.h"
 
 class ByteBuffer;
 
