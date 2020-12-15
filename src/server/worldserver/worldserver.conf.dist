@@ -87,9 +87,9 @@ LogsDir = ""
 #                                                                 section my.ini)
 #                     ".;/path/to/unix_socket;username;password;database" - (use Unix sockets on
 #                                                                           Unix/Linux)
-#        Default:     "127.0.0.1;3306;acore;acore;auth"       - (LoginDatabaseInfo)
-#                     "127.0.0.1;3306;acore;acore;world"      - (WorldDatabaseInfo)
-#                     "127.0.0.1;3306;acore;acore;characters" - (CharacterDatabaseInfo)
+#        Default:     "127.0.0.1;3306;acore;acore;acore_auth"       - (LoginDatabaseInfo)
+#                     "127.0.0.1;3306;acore;acore;acore_world"      - (WorldDatabaseInfo)
+#                     "127.0.0.1;3306;acore;acore;acore_characters" - (CharacterDatabaseInfo)
 
 LoginDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_auth"
 WorldDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_world"
