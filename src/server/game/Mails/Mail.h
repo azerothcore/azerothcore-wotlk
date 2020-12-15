@@ -9,6 +9,7 @@
 
 #include "Common.h"
 #include <map>
+#include <utility>
 
 struct AuctionEntry;
 struct CalendarEvent;
@@ -110,8 +111,8 @@ public:                                                 // Constructors
     explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
         : m_mailTemplateId(mailTemplateId), m_mailTemplateItemsNeed(need_items), m_money(0), m_COD(0)
     {}
-    MailDraft(std::string const& subject, std::string const& body)
-        : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(subject), m_body(body), m_money(0), m_COD(0) {}
+    MailDraft(std::string  subject, std::string  body)
+        : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(std::move(subject)), m_body(std::move(body)), m_money(0), m_COD(0) {}
 public:                                                 // Accessors
     [[nodiscard]] uint16 GetMailTemplateId() const { return m_mailTemplateId; }
     [[nodiscard]] std::string const& GetSubject() const { return m_subject; }

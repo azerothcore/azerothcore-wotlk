@@ -1802,10 +1802,10 @@ enum BessyData
     N_THADELL       = 20464,
     SPAWN_FIRST     = 20512,
     SPAWN_SECOND    = 19881,
-    SAY_THADELL_1   = 0,
-    SAY_THADELL_2   = 1,
     SAY_BESSY_0     = 0,
-    SAY_BESSY_1     = 1
+    SAY_BESSY_1     = 1,
+    SAY_THADELL_1   = 2,
+    SAY_THADELL_2   = 3
 };
 
 class npc_bessy : public CreatureScript
@@ -1862,11 +1862,17 @@ public:
                 case 12:
                     player->GroupEventHappens(Q_ALMABTRIEB, me);
                     if (me->FindNearestCreature(N_THADELL, 30))
-                        Talk(SAY_THADELL_1);
+                    {
+                        Creature* thadell = me->FindNearestCreature(N_THADELL, 30);
+                        thadell->AI()->Talk(SAY_THADELL_1);
+                    }
                     break;
                 case 13:
                     if (me->FindNearestCreature(N_THADELL, 30))
-                        Talk(SAY_THADELL_2, player);
+                    {
+                        Creature* thadell = me->FindNearestCreature(N_THADELL, 30);
+                        thadell->AI()->Talk(SAY_THADELL_2, player);
+                    }
                     break;
             }
         }
