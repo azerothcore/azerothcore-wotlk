@@ -32,3 +32,4 @@ UPDATE `quest_poi_points` SET `X`=5652, `Y`=2106 WHERE  `QuestID`=24461 AND `Idx
 
 -- The Halls Of Reflection - Alliance
 UPDATE `quest_poi_points` SET `X`=5652, `Y`=2106 WHERE  `QuestID`=24480 AND `Idx1`=2 AND `Idx2`=0;
+
