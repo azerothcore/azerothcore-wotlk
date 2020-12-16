@@ -5,11 +5,11 @@
  */
 
 #define _CRT_SECURE_NO_DEPRECATE
+#include <cerrno>
 #include <cstdio>
 #include <iostream>
-#include <vector>
 #include <list>
-#include <errno.h>
+#include <vector>
 
 #ifdef WIN32
 #include <Windows.h>
