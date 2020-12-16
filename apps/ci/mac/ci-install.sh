@@ -2,7 +2,6 @@
 
 ##########################################
 ## workaround to fix macos-10.15 configure os from failing
-time brew uninstall python@2.7.17
 time brew untap local/openssl
 time brew untap local/python2
 time brew reinstall openssl@1.1
