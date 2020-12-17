@@ -6,7 +6,6 @@ if [[ "$unamestr" == 'Darwin' ]]; then
    if ! [ "${BASH_VERSINFO}" == 5 ]; then
        brew install bash
    fi
-   bash --version
    if ! command -v greadlink &>/dev/null ; then
        brew install coreutils
    fi
