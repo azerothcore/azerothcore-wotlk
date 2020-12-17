@@ -74,7 +74,7 @@ jobs:
           - macos-11.0
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+#    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Cache
