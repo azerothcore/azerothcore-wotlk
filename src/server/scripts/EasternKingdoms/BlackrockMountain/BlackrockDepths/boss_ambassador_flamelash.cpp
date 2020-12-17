@@ -38,14 +38,14 @@ const Position SummonPositions[7] =
     {1012.252747f, -206.696487f, -61.980618f, 3.617599f},
 };
 
-vector<int> gobjectDwarfRunesEntry { 170578, 170579, 170580, 170581, 170582, 170583, 170584 }; 
+vector<int> gobjectDwarfRunesEntry { 170578, 170579, 170580, 170581, 170582, 170583, 170584 };
 
 class boss_ambassador_flamelash : public CreatureScript
 {
 public:
     boss_ambassador_flamelash() : CreatureScript("boss_ambassador_flamelash") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_ambassador_flamelashAI>(creature);
     }
@@ -88,14 +88,14 @@ public:
         {
             // Active makes the runes burn, ready turns them off
             GOState state = mode ? GO_STATE_ACTIVE : GO_STATE_READY;
-            
+
             for (int RuneEntry : gobjectDwarfRunesEntry)
                 if (GameObject* dwarfRune = me->FindNearestGameObject(RuneEntry, 200.0f))
                     dwarfRune->SetGoState(state);
         }
 
         void EnterCombat(Unit* /*who*/) override
-        { 
+        {
             _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 2 * IN_MILLISECONDS);
 
             // Spawn 7 Embers initially
@@ -114,10 +114,10 @@ public:
             _events.Reset();
             summons.DespawnAll();
         }
-        
+
         int getValidRandomPosition()
         {
-            /* Generate a random position which 
+            /* Generate a random position which
              * have not been used in 4 summonings.
              * Since we are calling the event whenever the Spirit
              * dies and not all at the time, we need to save at
@@ -182,7 +182,7 @@ public:
             //Return since we have no target
             if (!UpdateVictim())
                 return;
-                
+
             _events.Update(diff);
 
             switch(_events.ExecuteEvent())
@@ -206,7 +206,7 @@ class npc_burning_spirit : public CreatureScript
 public:
     npc_burning_spirit() : CreatureScript("npc_burning_spirit") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_burning_spiritAI>(creature);
     }

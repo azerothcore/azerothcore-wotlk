@@ -4,14 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_MOVEMENTGENERATOR_IMPL_H
-#define TRINITY_MOVEMENTGENERATOR_IMPL_H
+#ifndef ACORE_MOVEMENTGENERATOR_IMPL_H
+#define ACORE_MOVEMENTGENERATOR_IMPL_H
 
 #include "MovementGenerator.h"
 
 template<class MOVEMENT_GEN>
 inline MovementGenerator*
-MovementGeneratorFactory<MOVEMENT_GEN>::Create(void * /*data*/) const
+MovementGeneratorFactory<MOVEMENT_GEN>::Create(void* /*data*/) const
 {
     return (new MOVEMENT_GEN());
 }

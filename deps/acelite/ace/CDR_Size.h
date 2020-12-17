@@ -44,7 +44,7 @@ public:
   ACE_SizeCDR (ACE_CDR::Octet major_version = ACE_CDR_GIOP_MAJOR_VERSION,
                ACE_CDR::Octet minor_version = ACE_CDR_GIOP_MINOR_VERSION);
 
-  /// Returns @c false if an error has ocurred.
+  /// Returns @c false if an error has occurred.
   bool good_bit (void) const;
 
   /// Reset current size.
@@ -78,6 +78,10 @@ public:
   ACE_CDR::Boolean write_wstring (const ACE_CDR::WChar *x);
   ACE_CDR::Boolean write_wstring (ACE_CDR::ULong length,
                                   const ACE_CDR::WChar *x);
+  ACE_CDR::Boolean write_string (const std::string &x);
+#if !defined(ACE_LACKS_STD_WSTRING)
+  ACE_CDR::Boolean write_wstring (const std::wstring &x);
+#endif
   //@}
 
   /// @note the portion written starts at <x> and ends
@@ -112,7 +116,7 @@ public:
                                            ACE_CDR::ULong length);
 
   ///
-  /// Adjust to @a size and count <size> octets.
+  /// Adjust to @a size and count @a size octets.
   void adjust (size_t size);
 
   /// As above, but now the size and alignment requirements may be
@@ -153,7 +157,7 @@ private:
                                         ACE_CDR::ULong length);
 
 private:
-  /// Set to false when an error ocurrs.
+  /// Set to false when an error occurs.
   bool good_bit_;
 
   /// Current size.
@@ -223,6 +227,12 @@ extern ACE_Export ACE_CDR::Boolean operator<< (ACE_SizeCDR &ss,
                                                const ACE_CDR::Char* x);
 extern ACE_Export ACE_CDR::Boolean operator<< (ACE_SizeCDR &ss,
                                                const ACE_CDR::WChar* x);
+extern ACE_Export ACE_CDR::Boolean operator<< (ACE_SizeCDR &ss,
+                                               const std::string& x);
+#if !defined(ACE_LACKS_STD_WSTRING)
+extern ACE_Export ACE_CDR::Boolean operator<< (ACE_SizeCDR &ss,
+                                               const std::wstring& x);
+#endif
 
 ACE_END_VERSIONED_NAMESPACE_DECL
 

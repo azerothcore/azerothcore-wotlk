@@ -11,6 +11,8 @@
 #include "ace/config-sunos5.8.h"
 
 #define ACE_HAS_SENDFILE 1
+#define ACE_LACKS_GETADDRINFO
+#define ACE_LACKS_GETNAMEINFO
 #define ACE_LACKS_THR_CONCURRENCY_FUNCS
 
 #endif /* ACE_CONFIG_H */
