@@ -1,5 +1,15 @@
 unamestr=$(uname)
 if [[ "$unamestr" == 'Darwin' ]]; then
+   if ! command -v brew &>/dev/null ; then
+       ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+   fi
+   if ! [ "${BASH_VERSINFO}" == 5 ]; then
+       brew install bash
+   fi
+   bash --version
+   if ! command -v greadlink &>/dev/null ; then
+       brew install coreutils
+   fi
    AC_PATH_ROOT=$(greadlink -f "$AC_PATH_APPS/../")
 else
    AC_PATH_ROOT=$(readlink -f "$AC_PATH_APPS/../")
