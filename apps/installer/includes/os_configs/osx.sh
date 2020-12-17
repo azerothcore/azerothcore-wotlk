@@ -8,4 +8,4 @@ brew reinstall openssl@1.1
 brew update
 
 # brew install openssl readline cmake ace coreutils bash bash-completion md5sha1sum curl unzip
-brew install openssl readline cmake ace bash-completion md5sha1sum curl unzip mysql ccache
+brew install openssl readline cmake ace bash-completion curl unzip mysql ccache
