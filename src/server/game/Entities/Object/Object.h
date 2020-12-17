@@ -44,33 +44,6 @@ class ElunaEventProcessor;
 #define NOMINAL_MELEE_RANGE         5.0f
 #define MELEE_RANGE                 (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2) //center to center for players
 
-enum TypeMask
-{
-    TYPEMASK_OBJECT         = 0x0001,
-    TYPEMASK_ITEM           = 0x0002,
-    TYPEMASK_CONTAINER      = 0x0006,                       // TYPEMASK_ITEM | 0x0004
-    TYPEMASK_UNIT           = 0x0008, // creature
-    TYPEMASK_PLAYER         = 0x0010,
-    TYPEMASK_GAMEOBJECT     = 0x0020,
-    TYPEMASK_DYNAMICOBJECT  = 0x0040,
-    TYPEMASK_CORPSE         = 0x0080,
-    TYPEMASK_SEER           = TYPEMASK_PLAYER | TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT
-};
-
-enum TypeID
-{
-    TYPEID_OBJECT        = 0,
-    TYPEID_ITEM          = 1,
-    TYPEID_CONTAINER     = 2,
-    TYPEID_UNIT          = 3,
-    TYPEID_PLAYER        = 4,
-    TYPEID_GAMEOBJECT    = 5,
-    TYPEID_DYNAMICOBJECT = 6,
-    TYPEID_CORPSE        = 7
-};
-
-#define NUM_CLIENT_OBJECT_TYPES             8
-
 uint32 GuidHigh2TypeId(uint32 guid_hi);
 
 enum TempSummonType
@@ -130,10 +103,10 @@ public:
     virtual void AddToWorld();
     virtual void RemoveFromWorld();
 
-    [[nodiscard]] uint64 GetGUID() const { return GetUInt64Value(0); }
-    [[nodiscard]] uint32 GetGUIDLow() const { return GUID_LOPART(GetUInt64Value(0)); }
-    [[nodiscard]] uint32 GetGUIDMid() const { return GUID_ENPART(GetUInt64Value(0)); }
-    [[nodiscard]] uint32 GetGUIDHigh() const { return GUID_HIPART(GetUInt64Value(0)); }
+    [[nodiscard]] uint64 GetGUID() const { return GetUInt64Value(OBJECT_FIELD_GUID); }
+    [[nodiscard]] uint32 GetGUIDLow() const { return GUID_LOPART(GetUInt64Value(OBJECT_FIELD_GUID)); }
+    [[nodiscard]] uint32 GetGUIDMid() const { return GUID_ENPART(GetUInt64Value(OBJECT_FIELD_GUID)); }
+    [[nodiscard]] uint32 GetGUIDHigh() const { return GUID_HIPART(GetUInt64Value(OBJECT_FIELD_GUID)); }
     [[nodiscard]] const ByteBuffer& GetPackGUID() const { return m_PackGUID; }
     [[nodiscard]] uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
     void SetEntry(uint32 entry) { SetUInt32Value(OBJECT_FIELD_ENTRY, entry); }
@@ -190,6 +163,7 @@ public:
         return *(((uint16*)&m_uint32Values[index]) + offset);
     }
 
+    ObjectGuid const& GetGuidValue(uint16 index) const;
     void SetInt32Value(uint16 index, int32 value);
     void SetUInt32Value(uint16 index, uint32 value);
     void UpdateUInt32Value(uint16 index, uint32 value);
