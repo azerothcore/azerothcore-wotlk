@@ -6,7 +6,6 @@ source "$CURRENT_PATH/../../bash_shared/includes.sh"
 
 AC_PATH_INSTALLER="$AC_PATH_APPS/installer"
 
-source "$AC_PATH_INSTALLER/includes/functions.sh"
 
 J_VER_REQ="v0.8.3"
 J_PATH="$AC_PATH_APPS/joiner"
@@ -36,4 +35,4 @@ source "$AC_PATH_APPS/db_assembler/includes/includes.sh"
 
 source "$AC_PATH_DEPS/semver_bash/semver.sh"
 
-
+source "$AC_PATH_INSTALLER/includes/functions.sh"
