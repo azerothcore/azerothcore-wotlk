@@ -44,7 +44,7 @@ public:
         bool Invisible;
         bool Ambushed;
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             Invisible_Timer = urand(8000, 18000);
@@ -57,17 +57,17 @@ public:
             Ambushed = false;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -152,7 +152,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_renatakiAI(creature);
     }

@@ -1,6 +1,14 @@
+/*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ */
+
 #include "gtest/gtest.h"
 #include "Formulas.h"
 #include "SharedDefines.h"
+#include "Log.h"
+#include "LogMock.h"
+
+LoginDatabaseWorkerPool LoginDatabase;
 
 using namespace acore::Honor;
 using namespace acore::XP;
@@ -68,4 +76,20 @@ TEST(FormulasTest, GetZeroDifference)
     EXPECT_EQ(GetZeroDifference(59), 16);
     EXPECT_EQ(GetZeroDifference(60), 17);
     EXPECT_EQ(GetZeroDifference(80), 17);
+}
+
+TEST(FormulasTest, BaseGain)
+{
+    auto logMock = new LogMock();
+    sLog.reset(logMock);
+
+    EXPECT_EQ(BaseGain(60, 40, CONTENT_1_60), 0);
+    EXPECT_EQ(BaseGain(60, 60, CONTENT_1_60), 345);
+    EXPECT_EQ(BaseGain(50, 60, CONTENT_1_60), 354);
+    EXPECT_EQ(BaseGain(65, 66, CONTENT_61_70), 588);
+    EXPECT_EQ(BaseGain(79, 78, CONTENT_71_80), 917);
+
+    // check outError() has been called after passing an invalid ContentLevels content
+    EXPECT_CALL(*logMock, outErrorMock()).Times(1);
+    EXPECT_EQ(BaseGain(79, 1, ContentLevels(999)), 0);
 }

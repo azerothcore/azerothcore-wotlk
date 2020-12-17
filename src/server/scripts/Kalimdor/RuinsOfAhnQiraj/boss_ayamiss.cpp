@@ -70,7 +70,7 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             _phase = PHASE_AIR;
@@ -78,7 +78,7 @@ public:
             SetCombatMovement(false);
         }
 
-        void JustSummoned(Creature* who)
+        void JustSummoned(Creature* who) override
         {
             switch (who->GetEntry())
             {
@@ -95,7 +95,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE)
             {
@@ -111,13 +111,13 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->ClearUnitState(UNIT_STATE_ROOT);
             BossAI::EnterEvadeMode();
         }
 
-        void EnterCombat(Unit* attacker)
+        void EnterCombat(Unit* attacker) override
         {
             BossAI::EnterCombat(attacker);
 
@@ -132,7 +132,7 @@ public:
             me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -220,7 +220,7 @@ public:
         bool _enraged;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_ayamissAI>(creature);
     }
@@ -238,7 +238,7 @@ public:
             _instance = me->GetInstanceScript();
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE)
                 if (id == POINT_PARALYZE)
@@ -246,7 +246,7 @@ public:
                         DoCast(target, SPELL_FEED); // Omnomnom
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
@@ -255,7 +255,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void AttackStart(Unit* victim)
+        void AttackStart(Unit* victim) override
         {
             if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
                 return;
@@ -263,7 +263,7 @@ public:
             ScriptedAI::AttackStart(victim);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
                 return;
@@ -274,7 +274,7 @@ public:
         InstanceScript* _instance;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_hive_zara_larvaAI>(creature);
     }
