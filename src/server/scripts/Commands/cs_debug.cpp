@@ -349,11 +349,11 @@ public:
             }
             else if (type == "appitsguid")
             {
-                data.append(unit->GetPackGUID());
+                data << unit->GetPackGUID();
             }
             else if (type == "appmyguid")
             {
-                data.append(player->GetPackGUID());
+                data << player->GetPackGUID();
             }
             else if (type == "appgoguid")
             {
@@ -365,7 +365,7 @@ public:
                     ifs.close();
                     return false;
                 }
-                data.append(obj->GetPackGUID());
+                data << obj->GetPackGUID();
             }
             else if (type == "goguid")
             {

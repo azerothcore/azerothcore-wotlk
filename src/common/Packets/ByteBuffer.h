@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include <type_traits>
 
 // Root of ByteBuffer exception hierarchy
 class ByteBufferException : public std::exception
@@ -83,12 +84,14 @@ public:
 
     template <typename T> void append(T value)
     {
+        static_assert(std::is_fundamental<T>::value, "append(compound)");
         EndianConvert(value);
         append((uint8*)&value, sizeof(value));
     }
 
     template <typename T> void put(size_t pos, T value)
     {
+        static_assert(std::is_fundamental<T>::value, "append(compound)");
         EndianConvert(value);
         put(pos, (uint8*)&value, sizeof(value));
     }

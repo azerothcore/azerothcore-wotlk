@@ -185,7 +185,7 @@ void Object::BuildMovementUpdateBlock(UpdateData* data, uint32 flags) const
     ByteBuffer buf(500);
 
     buf << uint8(UPDATETYPE_MOVEMENT);
-    buf.append(GetPackGUID());
+    buf << GetPackGUID();
 
     BuildMovementUpdate(&buf, flags);
 
@@ -243,7 +243,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
 
     ByteBuffer buf(500);
     buf << (uint8)updatetype;
-    buf.append(GetPackGUID());
+    buf << GetPackGUID();
     buf << (uint8)m_objectTypeId;
 
     BuildMovementUpdate(&buf, flags);
@@ -267,7 +267,7 @@ void Object::BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) c
     ByteBuffer buf(500);
 
     buf << (uint8) UPDATETYPE_VALUES;
-    buf.append(GetPackGUID());
+    buf << GetPackGUID();
 
     BuildValuesUpdate(UPDATETYPE_VALUES, &buf, target);
 
@@ -348,7 +348,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             Transport* transport = object->GetTransport();
 
             if (transport)
-                data->append(transport->GetPackGUID());
+                *data << transport->GetPackGUID();
             else
                 *data << uint8(0);
 
@@ -429,7 +429,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     if (flags & UPDATEFLAG_HAS_TARGET)
     {
         if (Unit* victim = unit->GetVictim())
-            data->append(victim->GetPackGUID());
+            *data << victim->GetPackGUID();
         else
             *data << uint8(0);
     }
@@ -2046,7 +2046,7 @@ void WorldObject::MonsterWhisper(int32 textId, Player const* target, bool IsBoss
 void Unit::BuildHeartBeatMsg(WorldPacket* data) const
 {
     data->Initialize(MSG_MOVE_HEARTBEAT, 32);
-    data->append(GetPackGUID());
+    *data << GetPackGUID();
     BuildMovementPacket(data);
 }
 
