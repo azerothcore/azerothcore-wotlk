@@ -502,6 +502,8 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_XP_BG_KILL]                  = sConfigMgr->GetFloatDefault("Rate.XP.BattlegroundKill", 1.0f);
     rate_values[RATE_XP_QUEST]                    = sConfigMgr->GetFloatDefault("Rate.XP.Quest", 1.0f);
     rate_values[RATE_XP_EXPLORE]                  = sConfigMgr->GetFloatDefault("Rate.XP.Explore", 1.0f);
+    rate_values[RATE_XP_PET]                      = sConfigMgr->GetFloatDefault("Rate.XP.Pet", 1.0f);
+    rate_values[RATE_XP_PET_NEXT_LEVEL]           = sConfigMgr->GetFloatDefault("Rate.Pet.LevelXP", 0.05f);
     rate_values[RATE_REPAIRCOST]                  = sConfigMgr->GetFloatDefault("Rate.RepairCost", 1.0f);
 
     rate_values[RATE_SELLVALUE_ITEM_POOR]         = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Poor", 1.0f);
@@ -1143,6 +1145,7 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_ARENA_RATING_DISCARD_TIMER]                 = sConfigMgr->GetIntDefault ("Arena.RatingDiscardTimer", 10 * MINUTE * IN_MILLISECONDS);
     m_bool_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS]              = sConfigMgr->GetBoolDefault("Arena.AutoDistributePoints", false);
     m_int_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS]        = sConfigMgr->GetIntDefault ("Arena.AutoDistributeInterval", 7); // pussywizard: spoiled by implementing constant day and hour, always 7 now
+    m_int_configs[CONFIG_ARENA_GAMES_REQUIRED]                       = sConfigMgr->GetIntDefault ("Arena.GamesRequired", 10);
     m_int_configs[CONFIG_ARENA_SEASON_ID]                            = sConfigMgr->GetIntDefault ("Arena.ArenaSeason.ID", 1);
     m_int_configs[CONFIG_ARENA_START_RATING]                         = sConfigMgr->GetIntDefault ("Arena.ArenaStartRating", 0);
     m_int_configs[CONFIG_ARENA_START_PERSONAL_RATING]                = sConfigMgr->GetIntDefault ("Arena.ArenaStartPersonalRating", 1000);

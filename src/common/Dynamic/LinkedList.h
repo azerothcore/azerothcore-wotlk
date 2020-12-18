@@ -21,22 +21,22 @@ private:
     LinkedListElement* iNext;
     LinkedListElement* iPrev;
 public:
-    LinkedListElement(): iNext(NULL), iPrev(NULL) { }
+    LinkedListElement(): iNext(nullptr), iPrev(nullptr) { }
     ~LinkedListElement() { delink(); }
 
-    bool hasNext() const { return (iNext && iNext->iNext != NULL); }
-    bool hasPrev() const { return (iPrev && iPrev->iPrev != NULL); }
-    bool isInList() const { return (iNext != NULL && iPrev != NULL); }
+    [[nodiscard]] bool hasNext() const { return (iNext && iNext->iNext != nullptr); }
+    [[nodiscard]] bool hasPrev() const { return (iPrev && iPrev->iPrev != nullptr); }
+    [[nodiscard]] bool isInList() const { return (iNext != nullptr && iPrev != nullptr); }
 
-    LinkedListElement*       next()       { return hasNext() ? iNext : NULL; }
-    LinkedListElement const* next() const { return hasNext() ? iNext : NULL; }
-    LinkedListElement*       prev()       { return hasPrev() ? iPrev : NULL; }
-    LinkedListElement const* prev() const { return hasPrev() ? iPrev : NULL; }
+    LinkedListElement*       next()       { return hasNext() ? iNext : nullptr; }
+    [[nodiscard]] LinkedListElement const* next() const { return hasNext() ? iNext : nullptr; }
+    LinkedListElement*       prev()       { return hasPrev() ? iPrev : nullptr; }
+    [[nodiscard]] LinkedListElement const* prev() const { return hasPrev() ? iPrev : nullptr; }
 
     LinkedListElement*       nocheck_next()       { return iNext; }
-    LinkedListElement const* nocheck_next() const { return iNext; }
+    [[nodiscard]] LinkedListElement const* nocheck_next() const { return iNext; }
     LinkedListElement*       nocheck_prev()       { return iPrev; }
-    LinkedListElement const* nocheck_prev() const { return iPrev; }
+    [[nodiscard]] LinkedListElement const* nocheck_prev() const { return iPrev; }
 
     void delink()
     {
@@ -44,8 +44,8 @@ public:
         {
             iNext->iPrev = iPrev;
             iPrev->iNext = iNext;
-            iNext = NULL;
-            iPrev = NULL;
+            iNext = nullptr;
+            iPrev = nullptr;
         }
     }
 
@@ -73,9 +73,9 @@ class LinkedListHead
 private:
     LinkedListElement iFirst;
     LinkedListElement iLast;
-    uint32 iSize;
+    uint32 iSize{0};
 public:
-    LinkedListHead(): iSize(0)
+    LinkedListHead() 
     {
         // create empty list
 
@@ -83,13 +83,13 @@ public:
         iLast.iPrev = &iFirst;
     }
 
-    bool isEmpty() const { return (!iFirst.iNext->isInList()); }
+    [[nodiscard]] bool isEmpty() const { return (!iFirst.iNext->isInList()); }
 
-    LinkedListElement*       getFirst()       { return (isEmpty() ? NULL : iFirst.iNext); }
-    LinkedListElement const* getFirst() const { return (isEmpty() ? NULL : iFirst.iNext); }
+    LinkedListElement*       getFirst()       { return (isEmpty() ? nullptr : iFirst.iNext); }
+    [[nodiscard]] LinkedListElement const* getFirst() const { return (isEmpty() ? nullptr : iFirst.iNext); }
 
-    LinkedListElement*       getLast() { return (isEmpty() ? NULL : iLast.iPrev); }
-    LinkedListElement const* getLast() const  { return (isEmpty() ? NULL : iLast.iPrev); }
+    LinkedListElement*       getLast() { return (isEmpty() ? nullptr : iLast.iPrev); }
+    [[nodiscard]] LinkedListElement const* getLast() const  { return (isEmpty() ? nullptr : iLast.iPrev); }
 
     void insertFirst(LinkedListElement* pElem)
     {
@@ -101,7 +101,7 @@ public:
         iLast.insertBefore(pElem);
     }
 
-    uint32 getSize() const
+    [[nodiscard]] uint32 getSize() const
     {
         if (!iSize)
         {

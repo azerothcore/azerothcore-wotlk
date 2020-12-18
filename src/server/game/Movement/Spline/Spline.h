@@ -33,11 +33,11 @@ namespace Movement
         ControlArray points;
         ControlArray pointsVisual;
 
-        index_type index_lo;
-        index_type index_hi;
+        index_type index_lo{0};
+        index_type index_hi{0};
 
-        uint8 m_mode;
-        bool cyclic;
+        uint8 m_mode{UninitializedMode};
+        bool cyclic{false};
 
         enum
         {
@@ -61,9 +61,9 @@ namespace Movement
         void EvaluateDerivativeBezier3(index_type, float, Vector3&) const;
         static EvaluationMethtod derivative_evaluators[ModesEnd];
 
-        float SegLengthLinear(index_type) const;
-        float SegLengthCatmullRom(index_type) const;
-        float SegLengthBezier3(index_type) const;
+        [[nodiscard]] float SegLengthLinear(index_type) const;
+        [[nodiscard]] float SegLengthCatmullRom(index_type) const;
+        [[nodiscard]] float SegLengthBezier3(index_type) const;
         typedef float (SplineBase::*SegLenghtMethtod)(index_type) const;
         static SegLenghtMethtod seglengths[ModesEnd];
 
@@ -74,12 +74,12 @@ namespace Movement
         static InitMethtod initializers[ModesEnd];
 
         void UninitializedSplineEvaluationMethod(index_type, float, Vector3&) const { ABORT(); }
-        float UninitializedSplineSegLenghtMethod(index_type) const { ABORT(); }
+        [[nodiscard]] float UninitializedSplineSegLenghtMethod(index_type) const { ABORT(); }
         void UninitializedSplineInitMethod(Vector3 const*, index_type, bool, index_type) { ABORT(); }
 
     public:
 
-        explicit SplineBase() : index_lo(0), index_hi(0), m_mode(UninitializedMode), cyclic(false) {}
+        explicit SplineBase()  {}
 
         /** Caclulates the position for given segment Idx, and percent of segment length t
             @param t - percent of segment length, assumes that t in range [0, 1]
@@ -94,18 +94,18 @@ namespace Movement
         void evaluate_derivative(index_type Idx, float u, Vector3& hermite) const {(this->*derivative_evaluators[m_mode])(Idx, u, hermite);}
 
         /**  Bounds for spline indexes. All indexes should be in range [first, last). */
-        index_type first() const { return index_lo;}
-        index_type last()  const { return index_hi;}
+        [[nodiscard]] index_type first() const { return index_lo;}
+        [[nodiscard]] index_type last()  const { return index_hi;}
 
-        bool empty() const { return index_lo == index_hi;}
-        EvaluationMode mode() const { return (EvaluationMode)m_mode;}
-        bool isCyclic() const { return cyclic;}
+        [[nodiscard]] bool empty() const { return index_lo == index_hi;}
+        [[nodiscard]] EvaluationMode mode() const { return (EvaluationMode)m_mode;}
+        [[nodiscard]] bool isCyclic() const { return cyclic;}
 
         // Xinef: DO NOT USE EXCEPT FOR SPLINE INITIALIZATION!!!!!!
-        const ControlArray* allocateVisualPoints() const { return &pointsVisual; }
-        const ControlArray& getPoints(bool visual) const { return visual ? pointsVisual : points;}
-        index_type getPointCount() const { return points.size();}
-        const Vector3& getPoint(index_type i, bool visual) const { return visual ? pointsVisual[i] : points[i];}
+        [[nodiscard]] const ControlArray* allocateVisualPoints() const { return &pointsVisual; }
+        [[nodiscard]] const ControlArray& getPoints(bool visual) const { return visual ? pointsVisual : points;}
+        [[nodiscard]] index_type getPointCount() const { return points.size();}
+        [[nodiscard]] const Vector3& getPoint(index_type i, bool visual) const { return visual ? pointsVisual[i] : points[i];}
 
         /** Initializes spline. Don't call other methods while spline not initialized. */
         void init_spline(const Vector3* controls, index_type count, EvaluationMode m);
@@ -121,9 +121,9 @@ namespace Movement
         void clear();
 
         /** Calculates distance between [i; i+1] points, assumes that index i is in bounds. */
-        float SegLength(index_type i) const { return (this->*seglengths[m_mode])(i);}
+        [[nodiscard]] float SegLength(index_type i) const { return (this->*seglengths[m_mode])(i);}
 
-        std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
     };
 
     template<typename length_type>
@@ -136,10 +136,10 @@ namespace Movement
 
         LengthArray lengths;
 
-        index_type computeIndexInBounds(length_type length) const;
+        [[nodiscard]] index_type computeIndexInBounds(length_type length) const;
     public:
 
-        explicit Spline() {}
+        explicit Spline() = default;
 
         /** Calculates the position for given t
             @param t - percent of spline's length, assumes that t in range [0, 1]. */
@@ -160,7 +160,7 @@ namespace Movement
         void evaluate_derivative(index_type Idx, float u, Vector3& c) const { SplineBase::evaluate_derivative(Idx, u, c);}
 
         // Assumes that t in range [0, 1]
-        index_type computeIndexInBounds(float t) const;
+        [[nodiscard]] index_type computeIndexInBounds(float t) const;
         void computeIndex(float t, index_type& out_idx, float& out_u) const;
 
         /** Initializes spline. Don't call other methods while spline not initialized. */
@@ -191,10 +191,10 @@ namespace Movement
         }
 
         /** Returns length of the whole spline. */
-        length_type length() const { return lengths[index_hi];}
+        [[nodiscard]] length_type length() const { return lengths[index_hi];}
         /** Returns length between given nodes. */
-        length_type length(index_type first, index_type last) const { return lengths[last] - lengths[first];}
-        length_type length(index_type Idx) const { return lengths[Idx];}
+        [[nodiscard]] length_type length(index_type first, index_type last) const { return lengths[last] - lengths[first];}
+        [[nodiscard]] length_type length(index_type Idx) const { return lengths[Idx];}
 
         void set_length(index_type i, length_type length) { lengths[i] = length;}
         void clear();
