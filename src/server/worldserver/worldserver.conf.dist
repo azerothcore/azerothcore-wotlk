@@ -25,7 +25,10 @@
 #    NETWORK CONFIG
 #    CONSOLE AND REMOTE ACCESS
 #    CHARACTER DELETE OPTIONS
+#    ITEM DELETE OPTIONS
 #    CUSTOM SERVER OPTIONS
+#    PACKET SPOOF PROTECTION SETTINGS
+#    DEBUG
 #
 ###################################################################################################
 
@@ -392,10 +395,19 @@ CleanCharacterDB = 0
 #
 #    PersistentCharacterCleanFlags
 #        Description: Determines the character clean flags that remain set after cleanups.
-#                     This is a bitmask value, check /doc/CharacterDBCleanup.txt for more
-#                     information.
-#        Example:     14 - (Cleaning up skills, talents and spells will remain enabled after the
-#                           next cleanup)
+#                     This is a bitmask value, you can use one of the following values:
+#
+#                     CLEANING_FLAG_ACHIEVEMENT_PROGRESS  = 0x1
+#                     CLEANING_FLAG_SKILLS                = 0x2
+#                     CLEANING_FLAG_SPELLS                = 0x4
+#                     CLEANING_FLAG_TALENTS               = 0x8
+#                     CLEANING_FLAG_QUESTSTATUS           = 0x10
+#
+#                     Before use this feature, make a backup of your database.
+#
+#        Example:     14 - (CLEANING_FLAG_SKILLS + CLEANING_FLAG_SPELLS + CLEANING_FLAG_TALENTS
+#                           2+4+8 => 14. This will clean up skills, talents and spells will
+#                           remain enabled after the next cleanup)
 #        Default:     0  - (All cleanup methods will be disabled after the next cleanup)
 
 PersistentCharacterCleanFlags = 0
@@ -411,6 +423,18 @@ PersistentCharacterCleanFlags = 0
 #                     1 - (Enabled)
 
 PreloadAllNonInstancedMapGrids = 0
+
+#
+#    SetAllCreaturesWithWaypointMovementActive
+#        Description: Set all creatures with waypoint movement active. This means that they will start
+#                     movement once they are loaded (which happens on grid load) and keep moving even
+#                     when no player is near. This will increase CPU usage significantly and can be
+#                     used with enabled "PreloadAllNonInstancedMapGrids" to start waypoint movement on
+#                     server startup.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+SetAllCreaturesWithWaypointMovementActive = 0
 
 #
 ###################################################################################################
@@ -967,6 +991,22 @@ MinCharterName = 2
 MinPetName = 2
 
 #
+#    Guild.CharterCost
+#    ArenaTeam.CharterCost.2v2
+#    ArenaTeam.CharterCost.3v3
+#    ArenaTeam.CharterCost.5v5
+#        Description: Amount of money (in Copper) the petitions costs.
+#        Default:     1000 - (10 Silver)
+#                     800000 - (80 Gold)
+#                     1200000 - (120 Gold)
+#                     2000000 - (200 Gold)
+
+Guild.CharterCost = 1000
+ArenaTeam.CharterCost.2v2 = 800000
+ArenaTeam.CharterCost.3v3 = 1200000
+ArenaTeam.CharterCost.5v5 = 2000000
+
+#
 #    MaxWhoListReturns
 #        Description: Set the max number of players returned in the /who list and interface.
 #        Default:     49 - (stable)
@@ -1317,6 +1357,14 @@ Quests.IgnoreAutoAccept = 0
 Quests.IgnoreAutoComplete = 0
 
 #
+#    Calendar.DeleteOldEventsHour
+#        Description: Hour of the day when the daily deletion of old calendar events occurs.
+#        Range:       0-23
+#        Default:     6 - (06:00 AM)
+
+Calendar.DeleteOldEventsHour = 6
+
+#
 #    Guild.EventLogRecordsCount
 #        Description: Number of log entries for guild events that are stored per guild. Old entries
 #                     will be overwritten if the number of log entries exceed the configured value.
@@ -1447,11 +1495,11 @@ Motd = "Welcome to an AzerothCore server."
 #    All the AzerothCore contributors, as well as its father projects (MaNGOS, TrinityCore, etc..),
 #    have worked for free to provide you this software. Please do not remove the credits.
 #
-#    Changing or removing such hardcoded text is considered a violation of our license 
+#    Changing or removing such hardcoded text is considered a violation of our license
 #    and it's not allowed. We reserve the right to take legal action in case of violations.
 #    Furthermore, any kind of support will be always denied.
 #
-#    All AzerothCore contributors and its father projects are publicly listed in 
+#    All AzerothCore contributors and its father projects are publicly listed in
 #    our official repository. Credits to open source contributions should always be shown.
 #
 
@@ -1890,6 +1938,13 @@ ListenRange.TextEmote = 40
 
 ListenRange.Yell = 300
 
+#    WaypointMovementStopTimeForPlayer
+#        Description: Specifies the time (in seconds) that a creature with waypoint
+#                     movement will wait after a player interacts with it.
+#        default:     120
+
+WaypointMovementStopTimeForPlayer = 120
+
 #
 ###################################################################################################
 
@@ -2114,7 +2169,7 @@ GM.LogTrade = 1
 #        Description: GM character starting level.
 #        Default:     1
 
-GM.StartLevel = 80
+GM.StartLevel = 1
 
 #
 #    GM.AllowInvite
@@ -2271,6 +2326,62 @@ Rate.Drop.Item.Referenced       = 1
 Rate.Drop.Money                 = 1
 
 #
+#    Rate.SellValue.Item.Poor
+#    Rate.SellValue.Item.Normal
+#    Rate.SellValue.Item.Uncommon
+#    Rate.SellValue.Item.Rare
+#    Rate.SellValue.Item.Epic
+#    Rate.SellValue.Item.Legendary
+#    Rate.SellValue.Item.Artifact
+#    Rate.SellValue.Item.Heirloom
+#        Description: Item Sale Value rates based on quality.
+#        Default:     1 - (Rate.SellValue.Item.Poor)
+#                     1 - (Rate.SellValue.Item.Normal)
+#                     1 - (Rate.SellValue.Item.Uncommon)
+#                     1 - (Rate.SellValue.Item.Rare)
+#                     1 - (Rate.SellValue.Item.Epic)
+#                     1 - (Rate.SellValue.Item.Legendary)
+#                     1 - (Rate.SellValue.Item.Artifact)
+#                     1 - (Rate.SellValue.Item.Heirloom)
+
+Rate.SellValue.Item.Poor             = 1
+Rate.SellValue.Item.Normal           = 1
+Rate.SellValue.Item.Uncommon         = 1
+Rate.SellValue.Item.Rare             = 1
+Rate.SellValue.Item.Epic             = 1
+Rate.SellValue.Item.Legendary        = 1
+Rate.SellValue.Item.Artifact         = 1
+Rate.SellValue.Item.Heirloom         = 1
+
+#
+#    Rate.BuyValue.Item.Poor
+#    Rate.BuyValue.Item.Normal
+#    Rate.BuyValue.Item.Uncommon
+#    Rate.BuyValue.Item.Rare
+#    Rate.BuyValue.Item.Epic
+#    Rate.BuyValue.Item.Legendary
+#    Rate.BuyValue.Item.Artifact
+#    Rate.BuyValue.Item.Heirloom
+#        Description: Item Sale Value rates based on quality.
+#        Default:     1 - (Rate.BuyValue.Item.Poor)
+#                     1 - (Rate.BuyValue.Item.Normal)
+#                     1 - (Rate.BuyValue.Item.Uncommon)
+#                     1 - (Rate.BuyValue.Item.Rare)
+#                     1 - (Rate.BuyValue.Item.Epic)
+#                     1 - (Rate.BuyValue.Item.Legendary)
+#                     1 - (Rate.BuyValue.Item.Artifact)
+#                     1 - (Rate.BuyValue.Item.Heirloom)
+
+Rate.BuyValue.Item.Poor             = 1
+Rate.BuyValue.Item.Normal           = 1
+Rate.BuyValue.Item.Uncommon         = 1
+Rate.BuyValue.Item.Rare             = 1
+Rate.BuyValue.Item.Epic             = 1
+Rate.BuyValue.Item.Legendary        = 1
+Rate.BuyValue.Item.Artifact         = 1
+Rate.BuyValue.Item.Heirloom         = 1
+
+#
 #    Rate.Drop.Item.ReferencedAmount
 #        Description: Multiplier for referenced loot amount.
 #        Default:     1
@@ -2281,19 +2392,22 @@ Rate.Drop.Item.ReferencedAmount = 1
 #    Rate.XP.Kill
 #    Rate.XP.Quest
 #    Rate.XP.Explore
+#    Rate.XP.Pet
 #        Description: Experience rates (outside battleground)
 #        Default:     1 - (Rate.XP.Kill)
 #                     1 - (Rate.XP.Quest)
 #                     1 - (Rate.XP.Explore)
+#                     1	- (Rate.XP.Pet)
 
 Rate.XP.Kill    = 1
 Rate.XP.Quest   = 1
 Rate.XP.Explore = 1
+Rate.XP.Pet     = 1
 
 #
 #    Rate.XP.BattlegroundKill
-#        Description: Experience rate for honorable kills in battlegrounds,
-#                     it works when Battleground.GiveXPForKills = 1
+#        Description: Experience rate for honorable kills in battlegrounds. Not affected by Rate.XP.Kill
+#                     Only works if Battleground.GiveXPForKills = 1
 #        Default:     1
 
 Rate.XP.BattlegroundKill = 1
@@ -2404,6 +2518,14 @@ Rate.MoveSpeed = 1
 #        Default:     1
 
 Rate.InstanceResetTime = 1
+
+#
+#    Rate.Pet.LevelXP
+#        Description: Modifies the amount of experience required to level up a pet.
+#					  The lower the rate the less experience is required.
+#        Default:     0.05
+#   
+Rate.Pet.LevelXP = 0.05
 
 #
 #    SkillGain.Crafting
@@ -2654,6 +2776,73 @@ Battleground.TrackDeserters.Enable = 1
 Battleground.InvitationType = 0
 
 #
+#    Battleground.ReportAFK.Timer
+#         Description: After a few minutes that battle started you can report the player.
+#         Default:     4
+
+Battleground.ReportAFK.Timer = 4
+
+#
+#    Battleground.ReportAFK
+#        Description: Number of reports needed to kick someone AFK from Battleground.
+#        Range:       1-9
+#        Default:     3
+
+Battleground.ReportAFK = 3
+
+#    Battleground.DisableQuestShareInBG
+#        Description: Disables the ability to share quests while in a Battleground.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.DisableQuestShareInBG = 0
+
+#
+#    Battleground.DisableReadyCheckInBG
+#        Description: Disables the ability to send a Ready Check survey while in a Battleground.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.DisableReadyCheckInBG = 0
+
+#
+#     Battleground.RewardWinnerHonorFirst
+#     Battleground.RewardWinnerArenaFirst
+#     Battleground.RewardWinnerHonorLast
+#     Battleground.RewardWinnerArenaLast
+#     Battleground.RewardLoserHonorFirst
+#     Battleground.RewardLoserHonorLast
+#        Description: Random Battlegrounds / call to the arms rewards
+#        Default:     30 - Battleground.RewardWinnerHonorFirst
+#                     25 - Battleground.RewardWinnerArenaFirst
+#                     15 - Battleground.RewardWinnerHonorLast
+#                     0  - Battleground.RewardWinnerArenaLast
+#                     5  - Battleground.RewardLoserHonorFirst
+#                     5  - Battleground.RewardLoserHonorLast
+#
+
+Battleground.RewardWinnerHonorFirst = 30
+Battleground.RewardWinnerArenaFirst = 25
+Battleground.RewardWinnerHonorLast  = 15
+Battleground.RewardWinnerArenaLast  = 0
+Battleground.RewardLoserHonorFirst  = 5
+Battleground.RewardLoserHonorLast   = 5
+
+#
+#    Battleground.PlayerRespawn
+#        Description: Battleground player resurrection interval (in seconds).
+#        Default:     30
+
+Battleground.PlayerRespawn = 30
+
+#
+#    Battleground.BuffRespawn
+#        Description: Battleground buff respawn time (in seconds).
+#        Default:     180 (Recommended 10+)
+
+Battleground.BuffRespawn = 180
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -2746,6 +2935,13 @@ Arena.AutoDistributePoints = 0
 #        Default:     7 - (Weekly)
 
 Arena.AutoDistributeInterval = 7
+
+#
+#    Arena.GamesRequired
+#        Description: Number of arena matches teams must participate in to be eligible for arena point distribution.
+#        Default:     10
+
+Arena.GamesRequired = 10
 
 #
 #    Arena.QueueAnnouncer.Enable
@@ -2958,6 +3154,55 @@ CharDelete.KeepDays = 30
 ###################################################################################################
 
 ###################################################################################################
+# ITEM DELETE OPTIONS
+#
+#    ItemDelete.Method
+#        Description: Item deletion behavior.
+#        Default:     0 - (Completely remove item from the database)
+#                     1 - (Save Item to database)
+
+ItemDelete.Method = 0
+
+#
+#    ItemDelete.Vendor
+#        Description: Saving items into database when the player sells items to vendor
+#        Default:     0 (disabled)
+#                     1 (enabled)
+#
+
+ItemDelete.Vendor = 0
+
+#
+#    ItemDelete.Quality
+#        Description: Saving items into database that have quality greater or equal to ItemDelete.Quality
+#
+#        ID | Color | Quality
+#        0  | Grey  | Poor
+#        1  | White | Common
+#        2  | Green | Uncommon
+#        3  | Blue  | Rare
+#        4  | Purple| Epic
+#        5  | Orange| Legendary
+#        6  | Red   | Artifact
+#        7  | Gold  | Bind to Account
+#
+#        Default:     3
+#
+
+ItemDelete.Quality = 3
+
+#
+#    ItemDelete.ItemLevel
+#        Description: Saving items into database that are Item Levels greater or equal to ItemDelete.ItemLevel
+#        Default:     80
+#
+
+ItemDelete.ItemLevel = 80
+
+#
+###################################################################################################
+
+###################################################################################################
 # CUSTOM SERVER OPTIONS
 #
 #    PlayerStart.AllReputation
@@ -3065,6 +3310,15 @@ Guild.AllowMultipleGuildMaster = 0
 ShowKickInWorld = 0
 
 #
+#     ShowMuteInWorld
+#        Description: Determines whether a message is broadcast to the entire server when a
+#                     player gets muted.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+ShowMuteInWorld = 0
+
+#
 #     ShowBanInWorld
 #        Description: Determines whether a message is broadcast to the entire server when a
 #                     player gets banned.
@@ -3082,6 +3336,7 @@ ShowBanInWorld = 0
 #                     0     - (Disabled)
 
 RecordUpdateTimeDiffInterval = 60000
+
 #
 #     MinRecordUpdateTimeDiff
 #        Description: Only record update time diff which is greater than this value.
@@ -3256,7 +3511,7 @@ Minigob.Manabonk.Enable = 1
 #        Description: Logs actions, e.g. account login and logout to name a few, based on IP of current session.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
- 
+
 Allow.IP.Based.Action.Logging = 0
 
 #     Calculate.Creature.Zone.Area.Data
@@ -3275,8 +3530,8 @@ Calculate.Gameoject.Zone.Area.Data = 0
 #    LFG SETTINGS
 #
 #     Includes satellite to search for work elsewhere LFG
-#        Default: 0 - Disable  
-#                 1 - Enable  
+#        Default: 0 - Disable
+#                 1 - Enable
 
 LFG.Location.All = 0
 
@@ -3303,6 +3558,62 @@ LFG.Location.All = 0
 
 ICC.Buff.Horde    = 73822
 ICC.Buff.Alliance = 73828
+
+#
+###################################################################################################
+
+###################################################################################################
+# PACKET SPOOF PROTECTION SETTINGS
+#
+# These settings determine which action to take when harmful packet spoofing is detected.
+#
+#    PacketSpoof.Policy
+#        Description: Determines the course of action when packet spoofing is detected.
+#        Values:     0 - Log only
+#                    1 - Log + kick
+#                    2 - Log + kick + ban
+
+PacketSpoof.Policy = 1
+
+#
+#    PacketSpoof.BanMode
+#        Description: If PacketSpoof.Policy equals 2, this will determine the ban mode.
+#        Values:     0 - Ban Account
+#                    1 - Ban IP
+#        Note: Banning by character not supported for logical reasons.
+#
+
+PacketSpoof.BanMode = 0
+
+#
+#    PacketSpoof.BanDuration
+#        Description: Duration of the ban in seconds. Only valid if PacketSpoof.Policy is set to 2.
+#                     Set to 0 for permanent ban.
+#        Default:     86400 seconds (1 day)
+#
+
+PacketSpoof.BanDuration = 86400
+
+#
+###################################################################################################
+
+###################################################################################################
+# DEBUG
+#
+#    Debug.Battleground
+#        Description: Enable or disable Battleground 1v0 mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.Battleground = 0
+
+#
+#    Debug.Arena
+#        Description: Enable or disable Arena 1v1 mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.Arena = 0
 
 #
 ###################################################################################################

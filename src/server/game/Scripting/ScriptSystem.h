@@ -7,7 +7,6 @@
 #define SC_SYSTEM_H
 
 #include "ScriptMgr.h"
-#include <ace/Singleton.h>
 
 #define TEXT_SOURCE_RANGE -1000000                          //the amount of entries each text source has available
 
@@ -49,33 +48,34 @@ typedef std::vector<ScriptPointMove> ScriptPointVector;
 
 class SystemMgr
 {
-        friend class ACE_Singleton<SystemMgr, ACE_Null_Mutex>;
-        SystemMgr() {}
-        ~SystemMgr() {}
+    SystemMgr() {}
+    ~SystemMgr() {}
 
-    public:
-        typedef std::unordered_map<uint32, ScriptPointVector> PointMoveMap;
+public:
+    static SystemMgr* instance();
 
-        //Database
-        void LoadScriptWaypoints();
+    typedef std::unordered_map<uint32, ScriptPointVector> PointMoveMap;
 
-        ScriptPointVector const& GetPointMoveList(uint32 creatureEntry) const
-        {
-            PointMoveMap::const_iterator itr = m_mPointMoveMap.find(creatureEntry);
+    //Database
+    void LoadScriptWaypoints();
 
-            if (itr == m_mPointMoveMap.end())
-                return _empty;
+    ScriptPointVector const& GetPointMoveList(uint32 creatureEntry) const
+    {
+        PointMoveMap::const_iterator itr = m_mPointMoveMap.find(creatureEntry);
 
-            return itr->second;
-        }
+        if (itr == m_mPointMoveMap.end())
+            return _empty;
 
-    protected:
-        PointMoveMap    m_mPointMoveMap;                    //coordinates for waypoints
+        return itr->second;
+    }
 
-    private:
-        static ScriptPointVector const _empty;
+protected:
+    PointMoveMap    m_mPointMoveMap;                    //coordinates for waypoints
+
+private:
+    static ScriptPointVector const _empty;
 };
 
-#define sScriptSystemMgr ACE_Singleton<SystemMgr, ACE_Null_Mutex>::instance()
+#define sScriptSystemMgr SystemMgr::instance()
 
 #endif
