@@ -8,6 +8,7 @@
 
 #include "PathCommon.h"
 #include "MapBuilder.h"
+#include "SharedDefines.h"
 
 #include "VMapManager2.h"
 #include "MapTree.h"
@@ -397,11 +398,9 @@ namespace MMAP
                             // merge different types of water
                             liquidType = NAV_WATER;
                             break;
-                        case MAP_LIQUID_TYPE_MAGMA:
-                            liquidType = NAV_MAGMA;
-                            break;
+                        case MAP_LIQUID_TYPE_MAGMA: 
                         case MAP_LIQUID_TYPE_SLIME:
-                            liquidType = NAV_SLIME;
+                            liquidType = NAV_MAGMA_SLIME;
                             break;
                         case MAP_LIQUID_TYPE_DARK_WATER:
                             // players should not be here, so logically neither should creatures
@@ -724,11 +723,9 @@ namespace MMAP
                             case 1:
                                 type = NAV_WATER;
                                 break;
-                            case 2:
-                                type = NAV_MAGMA;
-                                break;
+                            case 2: 
                             case 3:
-                                type = NAV_SLIME;
+                                type = NAV_MAGMA_SLIME;
                                 break;
                         }
 

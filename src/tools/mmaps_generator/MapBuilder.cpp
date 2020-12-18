@@ -8,6 +8,7 @@
 #include "MapTree.h"
 #include "ModelInstance.h"
 #include "PathCommon.h"
+#include "SharedDefines.h"
 
 #include <DetourCommon.h>
 #include <DetourNavMesh.h>
@@ -21,19 +22,6 @@ namespace DisableMgr
 }
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 10
-
-struct MmapTileHeader
-{
-    uint32 mmapMagic{MMAP_MAGIC};
-    uint32 dtVersion;
-    uint32 mmapVersion{MMAP_VERSION};
-    uint32 size{0};
-    char usesLiquids{true};
-    char padding[3]{};
-
-    MmapTileHeader() :  dtVersion(DT_NAVMESH_VERSION) {}
-};
 
 // All padding fields must be handled and initialized to ensure mmaps_generator will produce binary-identical *.mmtile files
 static_assert(sizeof(MmapTileHeader) == 20, "MmapTileHeader size is not correct, adjust the padding field size");
@@ -46,7 +34,7 @@ static_assert(sizeof(MmapTileHeader) == (sizeof(MmapTileHeader::mmapMagic) +
 
 namespace MMAP
 {
-    MapBuilder::MapBuilder(bool skipLiquid,
+    MapBuilder::MapBuilder(std::optional<float> maxWalkableAngle, std::optional<float> maxWalkableAngleNotSteep, bool skipLiquid,
                            bool skipContinents, bool skipJunkMaps, bool skipBattlegrounds,
                            bool debugOutput, bool bigBaseUnit, const char* offMeshFilePath) :
         
@@ -55,6 +43,8 @@ namespace MMAP
         m_skipContinents     (skipContinents),
         m_skipJunkMaps       (skipJunkMaps),
         m_skipBattlegrounds  (skipBattlegrounds), 
+        m_maxWalkableAngle   (maxWalkableAngle),
+        m_maxWalkableAngleNotSteep (maxWalkableAngleNotSteep),
         m_bigBaseUnit        (bigBaseUnit),
         
         _cancelationToken    (false)
@@ -599,8 +589,10 @@ namespace MMAP
         config.maxVertsPerPoly = DT_VERTS_PER_POLYGON;
         config.cs = BASE_UNIT_DIM;
         config.ch = BASE_UNIT_DIM;
+        // Keeping these 2 slope angles the same reduces a lot the number of polys.
+        // 55 should be the minimum, maybe 70 is ok (keep in mind blink uses mmaps), 85 is too much for players
         config.walkableSlopeAngle = m_maxWalkableAngle ? *m_maxWalkableAngle : 55;
-        config.walkableSlopeAngleNotSteep = 55;
+        config.walkableSlopeAngleNotSteep = m_maxWalkableAngleNotSteep ? *m_maxWalkableAngleNotSteep : 55;
         config.tileSize = VERTEX_PER_TILE;
         config.walkableRadius = m_bigBaseUnit ? 1 : 2;
         config.borderSize = config.walkableRadius + 3;

@@ -32,7 +32,8 @@ target_include_directories(mmaps_generator
     ${PUBLIC_INCLUDES}
   PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_SOURCE_DIR}/src/server/game/Conditions)
+    ${CMAKE_SOURCE_DIR}/src/server/game/Conditions
+    ${CMAKE_SOURCE_DIR}/src/server/game/Miscellaneous)
 
 set_target_properties(mmaps_generator
   PROPERTIES
