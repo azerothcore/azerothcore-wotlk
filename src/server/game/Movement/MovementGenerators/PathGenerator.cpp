@@ -724,12 +724,12 @@ void PathGenerator::CreateFilter()
 
         // creatures don't take environmental damage
         if (creature->CanSwim())
-            includeFlags |= (NAV_WATER | NAV_MAGMA | NAV_SLIME);           // swim
+            includeFlags |= (NAV_WATER | NAV_MAGMA_SLIME);           // swim
     }
     else // assume Player
     {
         // perfect support not possible, just stay 'safe'
-        includeFlags |= (NAV_GROUND | NAV_WATER | NAV_MAGMA | NAV_SLIME);
+        includeFlags |= (NAV_GROUND | NAV_WATER | NAV_MAGMA_SLIME);
     }
 
     _filter.setIncludeFlags(includeFlags);
@@ -757,7 +757,7 @@ void PathGenerator::UpdateFilter()
             _filter.setIncludeFlags(_filter.getIncludeFlags() | NAV_GROUND_STEEP);
 }
 
-NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z)
+NavTerrainFlag PathGenerator::GetNavTerrain(float x, float y, float z)
 {
     LiquidData data;
     ZLiquidStatus liquidStatus = _sourceUnit->GetBaseMap()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &data);
@@ -770,9 +770,9 @@ NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z)
         case MAP_LIQUID_TYPE_OCEAN:
             return NAV_WATER;
         case MAP_LIQUID_TYPE_MAGMA:
-            return NAV_MAGMA;
+            return NAV_MAGMA_SLIME;
         case MAP_LIQUID_TYPE_SLIME:
-            return NAV_SLIME;
+            return NAV_MAGMA_SLIME;
         default:
             return NAV_GROUND;
     }
