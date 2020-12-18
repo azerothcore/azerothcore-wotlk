@@ -881,6 +881,7 @@ struct ProgressionRequirement
     uint32 id;
     TeamId faction;
     std::string hint;
+    uint32 priority;
 };
 
 struct DungeonProgressionRequirements

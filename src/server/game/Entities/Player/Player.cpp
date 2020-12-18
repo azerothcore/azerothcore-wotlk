@@ -19767,6 +19767,13 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                         GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_ACCESS_REQUIREMENT_MAX_LEVEL), LevelMax);
                     }
                 }
+
+                //Print the extra string
+                uint32 optionalStringID = sWorld->getIntConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_OPTIONAL_STRING_ID);
+                if (optionalStringID > 0)
+                {
+                    ChatHandler(GetSession()).SendSysMessage(optionalStringID);
+                }
             }
             return false;
         }

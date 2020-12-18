@@ -1394,6 +1394,7 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PRINT_MODE]              = sConfigMgr->GetIntDefault("DungeonAccessRequirements.PrintMode", 1);
     m_bool_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PORTAL_CHECK_ILVL]      = sConfigMgr->GetBoolDefault("DungeonAccessRequirement.PortalAvgIlevelCheck", false);
     m_bool_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE] = sConfigMgr->GetBoolDefault("DungeonAccessRequirement.LFGLevelDBCOverride", false);
+    m_int_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_OPTIONAL_STRING_ID]      = sConfigMgr->GetIntDefault("DungeonAccessRequirement.OptionalStringID", 0);
 
     //Debug
     m_bool_configs[CONFIG_DEBUG_BATTLEGROUND] = sConfigMgr->GetBoolDefault("Debug.Battleground", false);

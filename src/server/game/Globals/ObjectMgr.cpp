@@ -338,7 +338,28 @@ ObjectMgr::~ObjectMgr()
             delete *encounterItr;
 
     for (DungeonProgressionRequirementsContainer::iterator itr = _accessRequirementStore.begin(); itr != _accessRequirementStore.end(); ++itr)
-        delete itr->second;
+    {
+        std::unordered_map<uint8, DungeonProgressionRequirements*> difficulties = itr->second;
+        for (auto difficultiesItr = difficulties.begin(); difficultiesItr != difficulties.end(); ++difficultiesItr)
+        {
+            for (auto questItr = difficultiesItr->second->quests.begin(); questItr != difficultiesItr->second->quests.end(); ++questItr)
+            {
+                delete* questItr;
+            }
+
+            for (auto achievementItr = difficultiesItr->second->achievements.begin(); achievementItr != difficultiesItr->second->achievements.end(); ++achievementItr)
+            {
+                delete* achievementItr;
+            }
+
+            for (auto itemsItr = difficultiesItr->second->items.begin(); itemsItr != difficultiesItr->second->items.end(); ++itemsItr)
+            {
+                delete* itemsItr;
+            }
+
+            delete difficultiesItr->second;
+        }
+    }
 }
 
 ObjectMgr* ObjectMgr::instance()
@@ -6098,22 +6119,26 @@ void ObjectMgr::LoadAccessRequirements()
     {
         for (DungeonProgressionRequirementsContainer::iterator itr = _accessRequirementStore.begin(); itr != _accessRequirementStore.end(); ++itr)
         {
-            for (auto questItr = itr->second->quests.begin(); questItr != itr->second->quests.end(); ++questItr)
+            std::unordered_map<uint8, DungeonProgressionRequirements*> difficulties = itr->second;
+            for (auto difficultiesItr = difficulties.begin(); difficultiesItr != difficulties.end(); ++difficultiesItr)
             {
-                delete *questItr;
-            }
+                for (auto questItr = difficultiesItr->second->quests.begin(); questItr != difficultiesItr->second->quests.end(); ++questItr)
+                {
+                    delete* questItr;
+                }
 
-            for (auto achievementItr = itr->second->achievements.begin(); achievementItr != itr->second->achievements.end(); ++achievementItr)
-            {
-                delete* achievementItr;
-            }
+                for (auto achievementItr = difficultiesItr->second->achievements.begin(); achievementItr != difficultiesItr->second->achievements.end(); ++achievementItr)
+                {
+                    delete* achievementItr;
+                }
 
-            for (auto itemsItr = itr->second->items.begin(); itemsItr != itr->second->items.end(); ++itemsItr)
-            {
-                delete* itemsItr;
-            }
+                for (auto itemsItr = difficultiesItr->second->items.begin(); itemsItr != difficultiesItr->second->items.end(); ++itemsItr)
+                {
+                    delete* itemsItr;
+                }
 
-            delete itr->second;
+                delete difficultiesItr->second;
+            }
         }
 
         _accessRequirementStore.clear();                                  // need for reload case
@@ -6147,8 +6172,8 @@ void ObjectMgr::LoadAccessRequirements()
         ar->levelMax     = fields[4].GetUInt8();
         ar->reqItemLevel = fields[5].GetUInt16();
 
-        //                                                                  0                 1               2                 3 
-        QueryResult progression_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_hint, faction FROM dungeon_access_requirements where dungeon_access_id = %u", dungeon_access_id);
+        //                                                                  0                 1               2                 3        4
+        QueryResult progression_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_hint, priority faction FROM dungeon_access_requirements where dungeon_access_id = %u", dungeon_access_id);
         if (progression_requirements_results)
         {
             do 
@@ -6159,11 +6184,15 @@ void ObjectMgr::LoadAccessRequirements()
                 uint32 requirement_id        = progression_requirement_row[1].GetUInt32();
                 std::string requirement_hint = progression_requirement_row[2].GetString();
                 uint8 requirement_faction    = progression_requirement_row[3].GetUInt8();
+                uint32 priorityOrder = progression_requirement_row[3].IsNull() ? UINT32_MAX : progression_requirement_row[3].GetUInt32();
 
                 ProgressionRequirement* progression_requirement = new ProgressionRequirement();
                 progression_requirement->id           = requirement_id;
                 progression_requirement->hint         = requirement_hint;
                 progression_requirement->faction      = (TeamId)requirement_faction;
+                progression_requirement->priority     = priorityOrder;
+
+                std::vector<ProgressionRequirement*>* currentRequirementVector = nullptr;
 
                 switch (requirement_type)
                 {
@@ -6173,11 +6202,10 @@ void ObjectMgr::LoadAccessRequirements()
                     if (!sAchievementStore.LookupEntry(progression_requirement->id))
                     {
                         sLog->outErrorDb("Required achievement %u for faction %u does not exist for map %u difficulty %u, remove or fix this achievement requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
-                        delete progression_requirement;
                         break;
                     }
 
-                    ar->achievements.push_back(progression_requirement);
+                    currentRequirementVector = &ar->achievements;
                     break;
                 }
                 case 1:
@@ -6186,10 +6214,10 @@ void ObjectMgr::LoadAccessRequirements()
                     if (!GetQuestTemplate(progression_requirement->id))
                     {
                         sLog->outErrorDb("Required quest %u for faction %u does not exist for map %u difficulty %u, remove or fix this quest requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
-                        delete progression_requirement;
-                        progression_requirement->id = 0;
+                        break;
                     }
-                    ar->quests.push_back(progression_requirement);
+
+                    currentRequirementVector = &ar->quests;
                     break;
                 }
                 case 2:
@@ -6199,29 +6227,50 @@ void ObjectMgr::LoadAccessRequirements()
                     if (!pProto)
                     {
                         sLog->outError("Required item %u for faction %u does not exist for map %u difficulty %u, remove or fix this item requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
-                        progression_requirement->id = 0;
-                        delete progression_requirement;
                         break;
                     }
-                    ar->items.push_back(progression_requirement);
+
+                    currentRequirementVector = &ar->items;
                     break;
                 }
                 default:
                     sLog->outError("requirement_type of %u is not valid for map %u difficulty %u. Please use 0 for achievements, 1 for quest, 2 for items or remove this entry from the db.", requirement_type, mapid, difficulty);
-                    delete progression_requirement;
                     break;
+                }
+
+                //Check if array is valid and delete the progression requirement
+                if (!currentRequirementVector)
+                {
+                    delete progression_requirement;
+                    continue;
+                }
+
+                //Insert into the array
+                if (currentRequirementVector->size() > priorityOrder)
+                {
+                    currentRequirementVector->insert(currentRequirementVector->begin() + priorityOrder, progression_requirement);
+                }
+                else
+                {
+                    currentRequirementVector->push_back(progression_requirement);
                 }
 
 
             } while (progression_requirements_results->NextRow());
         }
 
+        //Sort all arrays for priority
+        auto sortFunction = [](const ProgressionRequirement* const a, const ProgressionRequirement* const b) {return a->priority > b->priority; };
+        std::sort(ar->achievements.begin(), ar->achievements.end(), sortFunction);
+        std::sort(ar->quests.begin(), ar->quests.end(), sortFunction);
+        std::sort(ar->items.begin(), ar->items.end(), sortFunction);
+
         countProgressionRequirements += ar->achievements.size();
         countProgressionRequirements += ar->quests.size();
         countProgressionRequirements += ar->items.size();
         count++;
 
-        _accessRequirementStore[MAKE_PAIR32(mapid, difficulty)] = ar;
+        _accessRequirementStore[mapid][difficulty] = ar;
     } while (access_template_result->NextRow());
 
 

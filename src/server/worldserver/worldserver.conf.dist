@@ -3543,6 +3543,13 @@ DungeonAccessRequirement.PortalAvgIlevelCheck = 0
   
 DungeonAccessRequirement.LFGLevelDBCOverride = 0
 
+#    DungeonAccessRequirement.OptionalStringID
+#
+#    	 Description: Displays an extra message from acore_strings to the chat after printing the dungeon access requirements to the user.
+#                     To enable it set the number to the entry of the specific string in acore_strings
+#        Default:     0 - (Disabled)
+DungeonAccessRequirement.OptionalStringID = 0
+
 #
 #    ICC Buff
 #       Description: Specify ICC buff
