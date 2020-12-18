@@ -74,10 +74,13 @@ public:
         {
             Talk(SAY_DEATH);
             for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+            {
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
                 {
                     if (cr->GetEntry() == NPC_TIME_RIFT)
+                    {
                         cr->DespawnOrUnsummon(1000);
+                    }
                     else
                     {
                         cr->DespawnOrUnsummon(5000);
@@ -85,9 +88,17 @@ public:
                         cr->MonsterSay("You have my thanks for saving my existence in this timeline. Now i must report back to my superiors. They must know immediately of what i just experienced.", LANG_UNIVERSAL, 0);
                     }
                 }
+            }
 
             if (InstanceScript* pInstance = me->GetInstanceScript())
+            {
                 pInstance->SetData(DATA_SHOW_INFINITE_TIMER, 0);
+            }
+
+            if (pInstance)
+            {
+                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CORRUPTING_BLIGHT);
+            }
         }
 
         void DoAction(int32 param) override
