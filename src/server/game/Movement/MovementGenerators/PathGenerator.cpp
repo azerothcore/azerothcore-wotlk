@@ -751,6 +751,10 @@ void PathGenerator::UpdateFilter()
 
         _filter.setIncludeFlags(includedFlags);
     }
+
+    if (Creature const* _sourceCreature = _sourceUnit->ToCreature())
+        if (_sourceCreature->IsInCombat() || _sourceCreature->IsInEvadeMode())
+            _filter.setIncludeFlags(_filter.getIncludeFlags() | NAV_GROUND_STEEP);
 }
 
 NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z)
