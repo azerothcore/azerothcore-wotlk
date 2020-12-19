@@ -74,7 +74,6 @@ jobs:
           - macos-11.0
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Cache
@@ -85,6 +84,8 @@ jobs:
           restore-keys: |
             ccache:${{ matrix.os }}:${{ github.ref }}
             ccache:${{ matrix.os }}
+      - name: Install latest bash
+        run: brew install bash
       - name: Configure OS
         run: source ./acore.sh install-deps
       - name: Build
