@@ -213,7 +213,7 @@ void AuthSocket::OnRead()
     uint32 challengesInARowRealmList = 0;
 
     uint8 _cmd;
-    while (1)
+    while (true)
     {
         if (!socket().recv_soft((char*)&_cmd, 1))
             return;
@@ -1196,8 +1196,8 @@ void PatcherRunnable::run() { }
 
 // Preload MD5 hashes of existing patch files on server
 #ifndef _WIN32
+#include <cerrno>
 #include <dirent.h>
-#include <errno.h>
 void Patcher::LoadPatchesInfo()
 {
     DIR* dirp;
