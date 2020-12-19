@@ -205,9 +205,13 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
-
             if (pInstance)
+            {
                 pInstance->SetData(DATA_UROM, DONE);
+            }
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+            me->NearTeleportTo(x, y, z, 0.0f);
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -339,7 +343,7 @@ public:
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    
+
                     break;
             }
         }
