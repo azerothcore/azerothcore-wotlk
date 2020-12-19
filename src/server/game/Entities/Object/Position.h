@@ -7,12 +7,9 @@
 #ifndef _POSITION_H
 #define _POSITION_H
 
-
 #include "Common.h"
-#include "Object.h"
 
 class ByteBuffer;
-
 
 struct Position
 {
@@ -20,6 +17,7 @@ struct Position
         : m_positionX(x), m_positionY(y), m_positionZ(z), m_orientation(NormalizeOrientation(o)) { }
 
     Position(Position const& loc) { Relocate(loc); }
+
     /* requried as of C++ 11 */
 #if __cplusplus >= 201103L
     Position(Position&&) = default;
@@ -228,6 +226,7 @@ struct Position
         return fmod(o, 2.0f * static_cast<float>(M_PI));
     }
 };
+
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYStreamer const& streamer);
 ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYStreamer const& streamer);
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZStreamer const& streamer);

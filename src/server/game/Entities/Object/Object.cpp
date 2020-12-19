@@ -12,7 +12,7 @@
 #include "World.h"
 #include "Object.h"
 #include "Creature.h"
-#include "Player.h"
+#include "Player.h" 
 #include "Vehicle.h"
 #include "ObjectMgr.h"
 #include "UpdateData.h"
@@ -41,6 +41,7 @@
 #include "Chat.h"
 #include "DynamicVisibility.h"
 #include "ScriptMgr.h"
+#include "Position.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"

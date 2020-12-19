@@ -14,8 +14,7 @@
 #include "GridReference.h"
 #include "ObjectDefines.h"
 #include "GridDefines.h"
-#include "Map.h"
-#include "Position.h"
+#include "Map.h" 
 
 #ifdef ELUNA
 class ElunaEventProcessor;

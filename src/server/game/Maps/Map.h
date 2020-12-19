@@ -25,6 +25,7 @@
 #include "MapRefManager.h"
 #include "DynamicTree.h"
 #include "GameObjectModel.h"
+#include "Position.h"
 #include "Log.h"
 #include "DataMap.h"
 #include <bitset>
