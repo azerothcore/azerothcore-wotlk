@@ -12,5 +12,5 @@ brew update
 # workaround for cmake already being installed in the github runners
 if ! command -v cmake &>/dev/null ; then
        brew install cmake
-   fi
+fi
 brew install openssl readline ace bash-completion curl unzip mysql ccache
