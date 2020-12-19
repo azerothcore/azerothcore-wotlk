@@ -49,6 +49,23 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
     ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
     bool forcePoint = ((!isPlayerPet || owner->GetMapId() == 618) && (forceDest || !useMMaps)) || sameTransport;
 
+    // Some maps can benefit from pathfinding shortcuts
+    if (!isPlayerPet)
+    {
+        if (Map* map = owner->GetMap())
+        {
+            switch (map->GetId())
+            {
+                case 608: // The Violet Hold
+                    forceDest = true;
+                    break;
+                default:
+                    forceDest = false;
+                    break;
+            }
+        }
+    }
+
     if (owner->GetTypeId() == TYPEID_UNIT && !i_target->isInAccessiblePlaceFor(owner->ToCreature()) && !sameTransport && !forceDest && !forcePoint)
     {
         owner->ToCreature()->SetCannotReachTarget(true);

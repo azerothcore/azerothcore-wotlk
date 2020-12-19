@@ -9574,6 +9574,11 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // player cannot attack in mount state
     if (GetTypeId() == TYPEID_PLAYER && IsMounted())
         return false;
+        
+    Creature* creature = ToCreature();
+    // creatures cannot attack while evading
+    if (creature && creature->IsInEvadeMode())
+        return false;
 
     //if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)) // pussywizard: wtf? why having this flag prevents from entering combat? it should just prevent melee attack
     //    return false;
@@ -9643,7 +9648,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     //if (GetTypeId() == TYPEID_UNIT)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
 
-    if (GetTypeId() == TYPEID_UNIT && !IsPet())
+    if (creature && !IsPet())
     {
         // should not let player enter combat by right clicking target - doesn't helps
         SetInCombatWith(victim);
@@ -9651,8 +9656,8 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
             victim->SetInCombatWith(this);
         AddThreat(victim, 0.0f);
 
-        ToCreature()->SendAIReaction(AI_REACTION_HOSTILE);
-        ToCreature()->CallAssistance();
+        creature->SendAIReaction(AI_REACTION_HOSTILE);
+        creature->CallAssistance();
     }
 
     // delay offhand weapon attack to next attack time
@@ -9664,7 +9669,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
 
     // Let the pet know we've started attacking someting. Handles melee attacks only
     // Spells such as auto-shot and others handled in WorldSession::HandleCastSpellOpcode
-    if (this->GetTypeId() == TYPEID_PLAYER && !m_Controlled.empty())
+    if (GetTypeId() == TYPEID_PLAYER && !m_Controlled.empty())
         for (Unit::ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
             if (Unit* pet = *itr)
                 if (pet->IsAlive() && pet->GetTypeId() == TYPEID_UNIT)
@@ -13782,10 +13787,11 @@ Unit* Creature::SelectVictim()
                     }
                 }
 
-    // pussywizard: not sure why it's here
-    // pussywizard: if some npc (not player pet) is attacking us and we can't fight back - don't evade o_O
+    // last case when creature must not go to evade mode:
+    // it in combat but attacker not make any damage and not enter to aggro radius to have record in threat list
+    // Note: creature does not have targeted movement generator but has attacker in this case
     for (AttackerSet::const_iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
-        if ((*itr) && !CanCreatureAttack(*itr) && (*itr)->GetTypeId() != TYPEID_PLAYER && !(*itr)->ToCreature()->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
+        if ((*itr) && CanCreatureAttack(*itr) && (*itr)->GetTypeId() != TYPEID_PLAYER && !(*itr)->ToCreature()->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
             return nullptr;
 
     if (GetVehicle())
