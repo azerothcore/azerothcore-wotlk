@@ -47,7 +47,7 @@
 #include "LuaEngine.h"
 #endif
 
-constexpr uint32 DEF_CANNOT_REACH = 7 * IN_MILLISECONDS; // this is when creatures are in los / no path to the target, 5s wait time then they return to spawn pos with evade
+constexpr uint32 DEF_CANNOT_REACH = sWorld->getIntConfig(CONFIG_NPC_EVADE_IF_NOT_REACHABLE) * IN_MILLISECONDS;
 
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {

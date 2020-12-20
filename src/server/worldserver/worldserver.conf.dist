@@ -1945,6 +1945,13 @@ ListenRange.Yell = 300
 
 WaypointMovementStopTimeForPlayer = 120
 
+#    NpcEvadeIfTargetIsUnreachable
+#        Description: Specifies the time (in seconds) that a creature whom target
+#                     is unreachable to end up in evade mode.
+#        Default:     5
+
+NpcEvadeIfTargetIsUnreachable = 5
+
 #
 ###################################################################################################
 
