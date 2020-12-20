@@ -66,7 +66,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
         }
     }
 
-    if (owner->GetTypeId() == TYPEID_UNIT && !i_target->isInAccessiblePlaceFor(owner->ToCreature()) && !sameTransport && !forceDest && !forcePoint)
+    if (owner->GetTypeId() == TYPEID_UNIT && !i_target->isInAccessiblePlaceFor(owner->ToCreature()) && !sameTransport && !forceDest && !forcePoint && !owner->GetMap()->IsRaid())
     {
         owner->ToCreature()->SetCannotReachTarget(true);
         return;
@@ -208,7 +208,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
             float maxDist = MELEE_RANGE + owner->GetMeleeReach() + i_target->GetMeleeReach();
             if (!forceDest && (i_path->GetPathType() & PATHFIND_NOPATH || (!i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist * maxDist)))
             {
-                if (owner->GetTypeId() == TYPEID_UNIT) 
+                if (owner->GetTypeId() == TYPEID_UNIT && !owner->GetMap()->IsRaid())
                 {
                     owner->ToCreature()->SetCannotReachTarget(false);
                 }
@@ -233,7 +233,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
         else
         {
             // evade first
-            if (owner->GetTypeId() == TYPEID_UNIT)
+            if (owner->GetTypeId() == TYPEID_UNIT && !owner->GetMap()->IsRaid())
             {
                 owner->ToCreature()->SetCannotReachTarget(true);
             }
