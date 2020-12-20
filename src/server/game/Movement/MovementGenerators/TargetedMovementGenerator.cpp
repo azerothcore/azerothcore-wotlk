@@ -68,6 +68,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
 
     if (owner->GetTypeId() == TYPEID_UNIT && !i_target->isInAccessiblePlaceFor(owner->ToCreature()) && !sameTransport && !forceDest && !forcePoint && !owner->GetMap()->IsRaid())
     {
+        sLog->outString("2 EVADE?");
         owner->ToCreature()->SetCannotReachTarget(true);
         return;
     }
@@ -210,6 +211,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
             {
                 if (owner->GetTypeId() == TYPEID_UNIT && !owner->GetMap()->IsRaid())
                 {
+                    sLog->outString("3 EVADE?");
                     owner->ToCreature()->SetCannotReachTarget(false);
                 }
 
@@ -235,6 +237,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
             // evade first
             if (owner->GetTypeId() == TYPEID_UNIT && !owner->GetMap()->IsRaid())
             {
+                sLog->outString("4 EVADE?");
                 owner->ToCreature()->SetCannotReachTarget(true);
             }
             // then use normal MoveTo - if we have to

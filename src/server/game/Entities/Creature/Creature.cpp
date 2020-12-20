@@ -600,8 +600,24 @@ void Creature::Update(uint32 diff)
                 m_regenTimer -= diff;
                 if (m_regenTimer <= 0)
                 {
-                    if (!IsInEvadeMode() && (!IsInCombat() || IsPolymorphed())) // regenerate health if not in combat or if polymorphed
-                        RegenerateHealth();
+                    if (!IsInEvadeMode())
+                    {
+                        // regenerate health if not in combat or if polymorphed)
+                        if (!IsInCombat() || IsPolymorphed())
+                            RegenerateHealth();
+                        else if (CanNotReachTarget())
+                        {
+                            // regenerate health if cannot reach the target and the setting is set to do so.
+                            // this allows to disable the health regen of raid bosses if pathfinding has issues for whatever reason
+                            if (!GetMap()->IsRaid())
+                            {
+                                RegenerateHealth();
+                                sLog->outDebug(LOG_FILTER_UNITS, "RegenerateHealth() enabled because Creature cannot reach the target. Detail: %s", GetDebugInfo().c_str());
+                            }
+                            else
+                                sLog->outDebug(LOG_FILTER_UNITS, "RegenerateHealth() disabled even if the Creature cannot reach the target. Detail: %s", GetDebugInfo().c_str());
+                        }
+                    }
 
                     if (getPowerType() == POWER_ENERGY)
                         Regenerate(POWER_ENERGY);
@@ -613,9 +629,11 @@ void Creature::Update(uint32 diff)
 
                 if (CanNotReachTarget() && !IsInEvadeMode() && !GetMap()->IsRaid())
                 {
+                    sLog->outString("1 EVADE?");
                     m_cannotReachTimer += diff;
                     if (m_cannotReachTimer >= (sWorld->getIntConfig(CONFIG_NPC_EVADE_IF_NOT_REACHABLE)*IN_MILLISECONDS) && IsAIEnabled)
                     {
+                        sLog->outString("EVADED");
                         AI()->EnterEvadeMode();
                     }
                 } 
@@ -1605,6 +1623,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
         SetFullHealth();
         SetLootRecipient(nullptr);
         ResetPlayerDamageReq();
+        SetCannotReachTarget(false);
         CreatureTemplate const* cinfo = GetCreatureTemplate();
         // Xinef: npc run by default
         //SetWalk(true);
@@ -2887,4 +2906,17 @@ float Creature::GetAttackDistance(Unit const* player) const
         retDistance = 5.0f;
 
     return (retDistance * aggroRate);
+}
+
+void Creature::SetCannotReachTarget(bool cannotReach)
+{
+    if (cannotReach == m_cannotReachTarget)
+        return;
+    m_cannotReachTarget = cannotReach;
+    m_cannotReachTimer = 0;
+
+    if (cannotReach)
+        // sLog->outDebug(LOG_FILTER_UNITS, "Creature::SetCannotReachTarget() called with true. Details: %s", GetDebugInfo().c_str());
+        sLog->outString("Creature::SetCannotReachTarget() called with true. Details: %s", GetDebugInfo().c_str());
+    else sLog->outString("Creature::SetCannotReachTarget() called with false. Details: %s", GetDebugInfo().c_str());
 }

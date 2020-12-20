@@ -226,10 +226,18 @@ bool dtClosestHeightPointTriangle(const float* p, const float* a, const float* b
 
 	// If point lies inside the triangle, return interpolated ycoord.
 	if (u >= 0.0f && v >= 0.0f && (u + v) <= denom) {
-		h = a[1] + (v0[1] * u + v1[1] * v) / denom;
-		return true;
-	}
-	return false;
+
+        if (denom == 0.f && u == 0.f && v == 0.f)
+            h = a[1];
+        else
+            h = a[1] + (v0[1] * u + v1[1] * v) / denom;
+
+        if (!dtMathIsfinite(h))
+            return false;
+
+        return true;
+    }
+    return false;
 }
 
 /// @par
