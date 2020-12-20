@@ -45,9 +45,7 @@
 
 #ifdef ELUNA
 #include "LuaEngine.h"
-#endif
-
-constexpr uint32 DEF_CANNOT_REACH = sWorld->getIntConfig(CONFIG_NPC_EVADE_IF_NOT_REACHABLE) * IN_MILLISECONDS;
+#endif 
 
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
@@ -616,7 +614,7 @@ void Creature::Update(uint32 diff)
                 if (CanNotReachTarget() && !IsInEvadeMode() && !GetMap()->IsRaid())
                 {
                     m_cannotReachTimer += diff;
-                    if (m_cannotReachTimer >= DEF_CANNOT_REACH && IsAIEnabled)
+                    if (m_cannotReachTimer >= (sWorld->getIntConfig(CONFIG_NPC_EVADE_IF_NOT_REACHABLE)*IN_MILLISECONDS) && IsAIEnabled)
                     {
                         AI()->EnterEvadeMode();
                     }
