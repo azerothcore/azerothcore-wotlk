@@ -42,7 +42,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
     bool forceDest =
                      // (owner->FindMap() && owner->FindMap()->IsDungeon() && !isPlayerPet) || // force in instances to prevent exploiting
                      (owner->GetTypeId() == TYPEID_UNIT && ((owner->IsPet() && owner->HasUnitState(UNIT_STATE_FOLLOW)))) || // allow pets following their master to cheat while generating paths
-                     // ((Creature*)owner)->isWorldBoss() || ((Creature*)owner)->IsDungeonBoss())) || // force for all bosses, even not in instances
+                     ((Creature*)owner)->isWorldBoss() || ((Creature*)owner)->IsDungeonBoss() || // force for all bosses, even not in instances
                      (owner->GetMapId() == 572 && (owner->GetPositionX() < 1275.0f || i_target->GetPositionX() < 1275.0f)) || // pussywizard: Ruins of Lordaeron - special case (acid)
                      sameTransport || // nothing to comment, can't find path on transports so allow it
                      (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) // for .npc follow*/
@@ -50,6 +50,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
     bool forcePoint = ((!isPlayerPet || owner->GetMapId() == 618) && (forceDest || !useMMaps)) || sameTransport;
 
     // Some maps can benefit from pathfinding shortcuts
+    // it's also used for broken pathing
     if (!isPlayerPet)
     {
         if (Map* map = owner->GetMap())
@@ -60,7 +61,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
                     forceDest = true;
                     break;
                 default:
-                    forceDest = false;
+                    // do nothing
                     break;
             }
         }
@@ -68,7 +69,6 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
 
     if (owner->GetTypeId() == TYPEID_UNIT && !i_target->isInAccessiblePlaceFor(owner->ToCreature()) && !sameTransport && !forceDest && !forcePoint && !owner->GetMap()->IsRaid())
     {
-        sLog->outString("2 EVADE?");
         owner->ToCreature()->SetCannotReachTarget(true);
         return;
     }
@@ -211,7 +211,6 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
             {
                 if (owner->GetTypeId() == TYPEID_UNIT && !owner->GetMap()->IsRaid())
                 {
-                    sLog->outString("3 EVADE?");
                     owner->ToCreature()->SetCannotReachTarget(false);
                 }
 
@@ -237,7 +236,6 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
             // evade first
             if (owner->GetTypeId() == TYPEID_UNIT && !owner->GetMap()->IsRaid())
             {
-                sLog->outString("4 EVADE?");
                 owner->ToCreature()->SetCannotReachTarget(true);
             }
             // then use normal MoveTo - if we have to
