@@ -47,7 +47,8 @@ enum ShamanSpells
     SPELL_SHAMAN_TOTEM_EARTHBIND_EARTHGRAB      = 64695,
     SPELL_SHAMAN_TOTEM_EARTHBIND_TOTEM          = 6474,
     SPELL_SHAMAN_TOTEM_EARTHEN_POWER            = 59566,
-    SPELL_SHAMAN_TOTEM_HEALING_STREAM_HEAL      = 52042
+    SPELL_SHAMAN_TOTEM_HEALING_STREAM_HEAL      = 52042,
+    SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1    = 51554
 };
 
 enum ShamanSpellIcons
@@ -796,6 +797,52 @@ public:
     }
 };
 
+// -51940 - Earthliving Weapon (Passive)
+class spell_sha_earthliving_weapon : public SpellScriptLoader
+{
+public:
+    spell_sha_earthliving_weapon() : SpellScriptLoader("spell_sha_earthliving_weapon") { }
+
+    class spell_sha_earthliving_weapon_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_sha_earthliving_weapon_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            int32 chance = 20;
+            Unit* caster = eventInfo.GetActor();
+            if (AuraEffect const* aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1, EFFECT_1, caster->GetGUID()))
+            {
+                if (eventInfo.GetProcTarget()->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT))
+                {
+                    chance += aurEff->GetAmount();
+                }
+            }
+
+            return roll_chance_i(chance);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_sha_earthliving_weapon_AuraScript::CheckProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_sha_earthliving_weapon_AuraScript();
+    }
+};
+
 // -1535 - Fire Nova
 class spell_sha_fire_nova : public SpellScriptLoader
 {
@@ -1371,6 +1418,7 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_earth_shield();
     new spell_sha_earthbind_totem();
     new spell_sha_earthen_power();
+    new spell_sha_earthliving_weapon();
     new spell_sha_fire_nova();
     new spell_sha_flame_shock();
     new spell_sha_healing_stream_totem();
