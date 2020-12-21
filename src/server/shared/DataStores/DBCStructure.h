@@ -522,16 +522,6 @@ struct AreaTableEntry
             return true;
         return (flags & AREA_FLAG_SANCTUARY);
     }
-
-    // Xinef: mark some zones / areas as inns
-    [[nodiscard]] bool IsInn(TeamId teamId) const
-    {
-        if (teamId == TEAM_ALLIANCE)
-            return flags & AREA_FLAG_REST_ZONE_ALLIANCE;
-        else if (teamId == TEAM_HORDE)
-            return flags & AREA_FLAG_REST_ZONE_HORDE;
-        return false;
-    }
 };
 
 #define MAX_GROUP_AREA_IDS 6
@@ -906,11 +896,11 @@ struct FactionTemplateEntry
 
         if (entry.faction)
         {
-            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (enemyFaction[i] == entry.faction)
+            for (unsigned int i : enemyFaction)
+                if (i == entry.faction)
                     return false;
-            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (friendFaction[i] == entry.faction)
+            for (unsigned int i : friendFaction)
+                if (i == entry.faction)
                     return true;
         }
         return (friendlyMask & entry.ourMask) || (ourMask & entry.friendlyMask);
@@ -919,11 +909,11 @@ struct FactionTemplateEntry
     {
         if (entry.faction)
         {
-            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (enemyFaction[i] == entry.faction)
+            for (unsigned int i : enemyFaction)
+                if (i == entry.faction)
                     return true;
-            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (friendFaction[i] == entry.faction)
+            for (unsigned int i : friendFaction)
+                if (i == entry.faction)
                     return false;
         }
         return (hostileMask & entry.ourMask) != 0;
@@ -931,8 +921,8 @@ struct FactionTemplateEntry
     [[nodiscard]] bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) != 0; }
     [[nodiscard]] bool IsNeutralToAll() const
     {
-        for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-            if (enemyFaction[i] != 0)
+        for (unsigned int i : enemyFaction)
+            if (i != 0)
                 return false;
         return hostileMask == 0 && friendlyMask == 0;
     }
@@ -2093,32 +2083,32 @@ struct WorldStateUI
 // Structures not used for casting to loaded DBC data and not required then packing
 struct MapDifficulty
 {
-    MapDifficulty() : resetTime(0), maxPlayers(0), hasErrorMessage(false) {}
+    MapDifficulty()  {}
     MapDifficulty(uint32 _resetTime, uint32 _maxPlayers, bool _hasErrorMessage) : resetTime(_resetTime), maxPlayers(_maxPlayers), hasErrorMessage(_hasErrorMessage) {}
 
-    uint32 resetTime;
-    uint32 maxPlayers;
-    bool hasErrorMessage;
+    uint32 resetTime{0};
+    uint32 maxPlayers{0};
+    bool hasErrorMessage{false};
 };
 
 struct TalentSpellPos
 {
-    TalentSpellPos() : talent_id(0), rank(0) {}
+    TalentSpellPos()  {}
     TalentSpellPos(uint16 _talent_id, uint8 _rank) : talent_id(_talent_id), rank(_rank) {}
 
-    uint16 talent_id;
-    uint8  rank;
+    uint16 talent_id{0};
+    uint8  rank{0};
 };
 
 typedef std::map<uint32, TalentSpellPos> TalentSpellPosMap;
 
 struct TaxiPathBySourceAndDestination
 {
-    TaxiPathBySourceAndDestination() : ID(0), price(0) {}
+    TaxiPathBySourceAndDestination()  {}
     TaxiPathBySourceAndDestination(uint32 _id, uint32 _price) : ID(_id), price(_price) {}
 
-    uint32    ID;
-    uint32    price;
+    uint32    ID{0};
+    uint32    price{0};
 };
 typedef std::map<uint32, TaxiPathBySourceAndDestination> TaxiPathSetForSource;
 typedef std::map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;

@@ -69,7 +69,7 @@ class Unit;
 
 struct AchievementCriteriaData
 {
-    AchievementCriteriaDataType dataType;
+    AchievementCriteriaDataType dataType{ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE};
     union
     {
         // ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE              = 0 (no data)
@@ -186,7 +186,7 @@ struct AchievementCriteriaData
     };
     uint32 ScriptId;
 
-    AchievementCriteriaData() : dataType(ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE)
+    AchievementCriteriaData()  
     {
         raw.value1 = 0;
         raw.value2 = 0;
@@ -206,13 +206,13 @@ struct AchievementCriteriaData
 
 struct AchievementCriteriaDataSet
 {
-    AchievementCriteriaDataSet() : criteria_id(0) {}
+    AchievementCriteriaDataSet()  {}
     typedef std::vector<AchievementCriteriaData> Storage;
     void Add(AchievementCriteriaData const& data) { storage.push_back(data); }
     bool Meets(Player const* source, Unit const* target, uint32 miscvalue = 0) const;
     void SetCriteriaId(uint32 id) {criteria_id = id;}
 private:
-    uint32 criteria_id;
+    uint32 criteria_id{0};
     Storage storage;
 };
 
@@ -295,8 +295,8 @@ private:
 
 class AchievementGlobalMgr
 {
-    AchievementGlobalMgr() {}
-    ~AchievementGlobalMgr() {}
+    AchievementGlobalMgr() = default;
+    ~AchievementGlobalMgr() = default;
 
 public:
     static AchievementGlobalMgr* instance();

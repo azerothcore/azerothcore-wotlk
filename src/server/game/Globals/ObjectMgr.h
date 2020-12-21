@@ -421,26 +421,25 @@ struct AreaTrigger
 
 struct BroadcastText
 {
-    BroadcastText() : Id(0), Language(0), EmoteId0(0), EmoteId1(0), EmoteId2(0),
-        EmoteDelay0(0), EmoteDelay1(0), EmoteDelay2(0), SoundId(0), Unk1(0), Unk2(0)
+    BroadcastText()  
     {
         MaleText.resize(DEFAULT_LOCALE + 1);
         FemaleText.resize(DEFAULT_LOCALE + 1);
     }
 
-    uint32 Id;
-    uint32 Language;
+    uint32 Id{0};
+    uint32 Language{0};
     StringVector MaleText;
     StringVector FemaleText;
-    uint32 EmoteId0;
-    uint32 EmoteId1;
-    uint32 EmoteId2;
-    uint32 EmoteDelay0;
-    uint32 EmoteDelay1;
-    uint32 EmoteDelay2;
-    uint32 SoundId;
-    uint32 Unk1;
-    uint32 Unk2;
+    uint32 EmoteId0{0};
+    uint32 EmoteId1{0};
+    uint32 EmoteId2{0};
+    uint32 EmoteDelay0{0};
+    uint32 EmoteDelay1{0};
+    uint32 EmoteDelay2{0};
+    uint32 SoundId{0};
+    uint32 Unk1{0};
+    uint32 Unk2{0};
     // uint32 VerifiedBuild;
 
     [[nodiscard]] std::string const& GetText(LocaleConstant locale = DEFAULT_LOCALE, uint8 gender = GENDER_MALE, bool forceGender = false) const
@@ -511,24 +510,24 @@ typedef std::pair<QuestRelations::const_iterator, QuestRelations::const_iterator
 
 struct PetLevelInfo
 {
-    PetLevelInfo() : health(0), mana(0), armor(0), min_dmg(0), max_dmg(0) { for (uint8 i = 0; i < MAX_STATS; ++i) stats[i] = 0; }
+    PetLevelInfo() { for (unsigned short & stat : stats) stat = 0; }
 
     uint16 stats[MAX_STATS];
-    uint16 health;
-    uint16 mana;
-    uint32 armor;
-    uint16 min_dmg;
-    uint16 max_dmg;
+    uint16 health{0};
+    uint16 mana{0};
+    uint32 armor{0};
+    uint16 min_dmg{0};
+    uint16 max_dmg{0};
 };
 
 struct MailLevelReward
 {
-    MailLevelReward() : raceMask(0), mailTemplateId(0), senderEntry(0) {}
+    MailLevelReward()  {}
     MailLevelReward(uint32 _raceMask, uint32 _mailTemplateId, uint32 _senderEntry) : raceMask(_raceMask), mailTemplateId(_mailTemplateId), senderEntry(_senderEntry) {}
 
-    uint32 raceMask;
-    uint32 mailTemplateId;
-    uint32 senderEntry;
+    uint32 raceMask{0};
+    uint32 mailTemplateId{0};
+    uint32 senderEntry{0};
 };
 
 typedef std::list<MailLevelReward> MailLevelRewardList;
@@ -611,25 +610,25 @@ typedef std::pair<GossipMenuItemsContainer::iterator, GossipMenuItemsContainer::
 
 struct QuestPOIPoint
 {
-    int32 x;
-    int32 y;
+    int32 x{0};
+    int32 y{0};
 
-    QuestPOIPoint() : x(0), y(0) {}
+    QuestPOIPoint()  {}
     QuestPOIPoint(int32 _x, int32 _y) : x(_x), y(_y) {}
 };
 
 struct QuestPOI
 {
-    uint32 Id;
-    int32 ObjectiveIndex;
-    uint32 MapId;
-    uint32 AreaId;
-    uint32 FloorId;
-    uint32 Unk3;
-    uint32 Unk4;
+    uint32 Id{0};
+    int32 ObjectiveIndex{0};
+    uint32 MapId{0};
+    uint32 AreaId{0};
+    uint32 FloorId{0};
+    uint32 Unk3{0};
+    uint32 Unk4{0};
     std::vector<QuestPOIPoint> points;
 
-    QuestPOI() : Id(0), ObjectiveIndex(0), MapId(0), AreaId(0), FloorId(0), Unk3(0), Unk4(0) {}
+    QuestPOI()  {}
     QuestPOI(uint32 id, int32 objIndex, uint32 mapId, uint32 areaId, uint32 floorId, uint32 unk3, uint32 unk4) : Id(id), ObjectiveIndex(objIndex), MapId(mapId), AreaId(areaId), FloorId(floorId), Unk3(unk3), Unk4(unk4) {}
 };
 
@@ -1076,9 +1075,9 @@ public:
         if (map_itr == _mailLevelRewardStore.end())
             return nullptr;
 
-        for (MailLevelRewardList::const_iterator set_itr = map_itr->second.begin(); set_itr != map_itr->second.end(); ++set_itr)
-            if (set_itr->raceMask & raceMask)
-                return &*set_itr;
+        for (const auto & set_itr : map_itr->second)
+            if (set_itr.raceMask & raceMask)
+                return &set_itr;
 
         return nullptr;
     }

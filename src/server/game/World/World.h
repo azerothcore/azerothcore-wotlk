@@ -303,6 +303,7 @@ enum WorldIntConfigs
     CONFIG_ARENA_MAX_RATING_DIFFERENCE,
     CONFIG_ARENA_RATING_DISCARD_TIMER,
     CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,
+    CONFIG_ARENA_GAMES_REQUIRED,
     CONFIG_ARENA_SEASON_ID,
     CONFIG_ARENA_START_RATING,
     CONFIG_ARENA_START_PERSONAL_RATING,
@@ -747,7 +748,7 @@ public:
     /// Get a server configuration element (see #WorldConfigs)
     bool getBoolConfig(WorldBoolConfigs index) const
     {
-        return index < BOOL_CONFIG_VALUE_COUNT ? m_bool_configs[index] : 0;
+        return index < BOOL_CONFIG_VALUE_COUNT ? m_bool_configs[index] : false;
     }
 
     /// Set a server configuration element (see #WorldConfigs)
