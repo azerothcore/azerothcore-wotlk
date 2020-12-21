@@ -10,6 +10,7 @@
 #include "Common.h"
 
 class ByteBuffer;
+class WorldObject;
 
 struct Position
 {
