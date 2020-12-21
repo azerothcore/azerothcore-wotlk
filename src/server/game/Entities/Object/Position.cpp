@@ -7,6 +7,8 @@
 #include "Position.h"
 #include "ByteBuffer.h"
 
+#include <G3D/g3dmath.h>
+
 bool Position::operator==(Position const &a)
 {
     return (G3D::fuzzyEq(a.m_positionX, m_positionX) &&
