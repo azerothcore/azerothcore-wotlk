@@ -524,6 +524,7 @@ public:                                                 // opcodes handlers
     void HandleLootMethodOpcode(WorldPacket& recvPacket);
     void HandleLootRoll(WorldPacket& recvData);
     void HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData);
+    void HandleGroupSwapSubGroupOpcode(WorldPacket& recvData);
     void HandleRaidTargetUpdateOpcode(WorldPacket& recvData);
     void HandleRaidReadyCheckOpcode(WorldPacket& recvData);
     void HandleRaidReadyCheckFinishedOpcode(WorldPacket& recvData);
@@ -714,6 +715,7 @@ public:                                                 // opcodes handlers
     void HandleChannelBan(WorldPacket& recvPacket);
     void HandleChannelUnban(WorldPacket& recvPacket);
     void HandleChannelAnnouncements(WorldPacket& recvPacket);
+    void HandleChannelModerateOpcode(WorldPacket& recvPacket);
     void HandleChannelDeclineInvite(WorldPacket& recvPacket);
     void HandleChannelDisplayListQuery(WorldPacket& recvPacket);
     void HandleGetChannelMemberCount(WorldPacket& recvPacket);
