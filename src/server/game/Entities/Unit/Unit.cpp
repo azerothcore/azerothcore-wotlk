@@ -9574,11 +9574,13 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // player cannot attack in mount state
     if (GetTypeId() == TYPEID_PLAYER && IsMounted())
         return false;
-        
-    Creature* creature = ToCreature();
+         
     // creatures cannot attack while evading
+    Creature* creature = ToCreature();
     if (creature && creature->IsInEvadeMode())
+    {
         return false;
+    }
 
     //if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)) // pussywizard: wtf? why having this flag prevents from entering combat? it should just prevent melee attack
     //    return false;

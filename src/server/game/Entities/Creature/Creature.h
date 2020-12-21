@@ -663,7 +663,7 @@ public:
     }
 
     void SetCannotReachTarget(bool cannotReach);
-    [[nodiscard]] bool CanNotReachTarget() const { return (GetMap() && GetMap()->IsRaid()) ? false : m_cannotReachTarget; }
+    [[nodiscard]] bool CanNotReachTarget() const { return m_cannotReachTarget; }
 
     void SetPosition(float x, float y, float z, float o);
     void SetPosition(const Position& pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }

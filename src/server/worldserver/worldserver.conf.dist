@@ -1952,6 +1952,15 @@ WaypointMovementStopTimeForPlayer = 120
 
 NpcEvadeIfTargetIsUnreachable = 5
 
+#    NpcRegenHPIfTargetIsUnreachable
+#        Description: Regenerates HP for Creatures in Raids if they cannot reach the target.
+#                     Keep disabled if you are experiencing mmaps/pathing issues.
+#
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+NpcRegenHPIfTargetIsUnreachable = 1
+
 #
 ###################################################################################################
 

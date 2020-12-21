@@ -609,7 +609,7 @@ void Creature::Update(uint32 diff)
                         {
                             // regenerate health if cannot reach the target and the setting is set to do so.
                             // this allows to disable the health regen of raid bosses if pathfinding has issues for whatever reason
-                            if (!GetMap()->IsRaid())
+                            if (sWorld->getBoolConfig(CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID) || !GetMap()->IsRaid())
                             {
                                 RegenerateHealth();
                                 sLog->outDebug(LOG_FILTER_UNITS, "RegenerateHealth() enabled because Creature cannot reach the target. Detail: %s", GetDebugInfo().c_str());
@@ -629,11 +629,9 @@ void Creature::Update(uint32 diff)
 
                 if (CanNotReachTarget() && !IsInEvadeMode() && !GetMap()->IsRaid())
                 {
-                    sLog->outString("1 EVADE?");
                     m_cannotReachTimer += diff;
                     if (m_cannotReachTimer >= (sWorld->getIntConfig(CONFIG_NPC_EVADE_IF_NOT_REACHABLE)*IN_MILLISECONDS) && IsAIEnabled)
                     {
-                        sLog->outString("EVADED");
                         AI()->EnterEvadeMode();
                     }
                 } 
@@ -2916,7 +2914,5 @@ void Creature::SetCannotReachTarget(bool cannotReach)
     m_cannotReachTimer = 0;
 
     if (cannotReach)
-        // sLog->outDebug(LOG_FILTER_UNITS, "Creature::SetCannotReachTarget() called with true. Details: %s", GetDebugInfo().c_str());
-        sLog->outString("Creature::SetCannotReachTarget() called with true. Details: %s", GetDebugInfo().c_str());
-    else sLog->outString("Creature::SetCannotReachTarget() called with false. Details: %s", GetDebugInfo().c_str());
+        sLog->outDebug(LOG_FILTER_UNITS, "Creature::SetCannotReachTarget() called with true. Details: %s", GetDebugInfo().c_str());
 }
