@@ -113,7 +113,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
         return;
 
     uint64 IgnoreGuid = MAKE_NEW_GUID(lowGuid, 0, HIGHGUID_PLAYER);
-    FriendsResult ignoreResult = FRIEND_IGNORE_NOT_FOUND;
+    FriendsResult ignoreResult;
 
     if (IgnoreGuid == GetPlayer()->GetGUID())              //not add yourself
         ignoreResult = FRIEND_IGNORE_SELF;
