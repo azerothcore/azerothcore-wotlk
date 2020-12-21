@@ -1164,6 +1164,10 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
     //get guid, member may be offline
     auto getGuid = [&group](std::string const& playerName)
     {
+        // no player, cheating?
+        if (!group->GetMemberGUID(playerName))
+            return uint64(0);
+
         if (Player* player = ObjectAccessor::FindPlayerByName(playerName.c_str()))
             return player->GetGUID();
         else
@@ -1171,7 +1175,7 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
             if (uint64 guid = sObjectMgr->GetPlayerGUIDByName(playerName))
                 return guid;
             else
-                return uint64(0); // no guid = trying to cheat
+                return uint64(0); // no player - again, cheating?
         }
     };
 
