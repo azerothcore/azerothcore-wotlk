@@ -982,7 +982,7 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
                 // Move position at the other side of the off-mesh link.
                 dtVcopy(iterPos, endPos);
                 if (dtStatusFailed(_navMeshQuery->getPolyHeight(polys[0], iterPos, &iterPos[1])))
-                    sLog->outError("Cannot find height at position X: %f Y: %f Z: %f for %s (%u)", result[2], result[0], result[1], _sourceUnit->GetName(), _sourceUnit->GetEntry());
+                    sLog->outError("Cannot find height at position X: %f Y: %f Z: %f for %s (%u)", result[2], result[0], result[1], _sourceUnit->GetName().c_str(), _sourceUnit->GetEntry());
                 iterPos[1] += 0.5f;
             }
         }
