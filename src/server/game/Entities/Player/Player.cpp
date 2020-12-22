@@ -15860,7 +15860,7 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
     if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
     {
         // prepare Quest Tracker datas
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_TRACK);
+        auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_TRACK);
         stmt->setUInt32(0, quest_id);
         stmt->setUInt32(1, GetGUIDLow());
         stmt->setString(2, _HASH);
@@ -15883,7 +15883,9 @@ void Player::CompleteQuest(uint32 quest_id)
 
         uint16 log_slot = FindQuestSlot(quest_id);
         if (log_slot < MAX_QUEST_LOG_SIZE)
+        {
             SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
+        }
 
         Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id);
         if (qInfo && qInfo->HasFlag(QUEST_FLAGS_TRACKING))
@@ -15895,18 +15897,18 @@ void Player::CompleteQuest(uint32 quest_id)
         UpdateZoneDependentAuras(GetZoneId());
         UpdateAreaDependentAuras(GetAreaId());
         AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
-    }
 
-    // check if Quest Tracker is enabled
-    if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
-    {
-        // prepare Quest Tracker datas
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
-        stmt->setUInt32(0, quest_id);
-        stmt->setUInt32(1, GetGUIDLow());
+        // check if Quest Tracker is enabled
+        if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
+        {
+            // prepare Quest Tracker datas
+            auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
+            stmt->setUInt32(0, quest_id);
+            stmt->setUInt32(1, GetGUIDLow());
 
-        // add to Quest Tracker
-        CharacterDatabase.Execute(stmt);
+            // add to Quest Tracker
+            CharacterDatabase.Execute(stmt);
+        }
     }
 }
 

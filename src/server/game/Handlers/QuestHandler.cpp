@@ -432,7 +432,7 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recvData)
             if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
             {
                 // prepare Quest Tracker datas
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_ABANDON_TIME);
+                auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_ABANDON_TIME);
                 stmt->setUInt32(0, questId);
                 stmt->setUInt32(1, _player->GetGUIDLow());
 
