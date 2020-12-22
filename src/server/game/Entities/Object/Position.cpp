@@ -28,7 +28,7 @@ void Position::RelocatePolarOffset(float angle, float dist, float z /*= 0.0f*/)
 
 bool Position::HasInLine(WorldObject const* target, float width) const
 {
-    if (!HasInArc(M_PI, target))
+    if (!HasInArc(M_PI, target->GetPosition()))
         return false;
     width += target->GetObjectSize();
     float angle = GetRelativeAngle(target);
