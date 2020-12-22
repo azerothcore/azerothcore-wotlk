@@ -809,7 +809,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            return !sSpellMgr->GetSpellInfo(SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1);
+            return sSpellMgr->GetSpellInfo(SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1);
         }
 
         bool CheckProc(ProcEventInfo& eventInfo)
