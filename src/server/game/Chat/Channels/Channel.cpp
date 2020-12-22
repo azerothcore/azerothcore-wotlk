@@ -1289,9 +1289,13 @@ void Channel::ToggleModeration(Player* player)
 
     WorldPacket data;
     if (_moderation)
+    {
         MakeModerationOn(&data, guid);
+    }
     else
+    {
         MakeModerationOff(&data, guid);
+    }
 
     SendToAll(&data);
 }

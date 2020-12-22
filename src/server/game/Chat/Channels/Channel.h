@@ -219,13 +219,11 @@ public:
     void LeaveNotify(Player* p);
     void FlagsNotify(Player* p);
     static void CleanOldChannelsInDB();
+    void ToggleModeration(Player* p); 
 
     // pussywizard:
     void AddWatching(Player* p);
-    void RemoveWatching(Player* p);
-
-    // acore
-    void ToggleModeration(Player* p); 
+    void RemoveWatching(Player* p);  
 
 private:
     // initial packet data (notify type and channel name)
