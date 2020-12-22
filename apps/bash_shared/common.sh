@@ -20,4 +20,4 @@ do
     fi
 done
 
-ACORE_VERSION=$("$AC_PATH_DEPS/jsonpath/JSONPath.sh" -f $AC_PATH_ROOT/acore.json -b '$.version')
+ACORE_VERSION=$("$AC_PATH_DEPS/jsonpath/JSONPath.sh" -f "$AC_PATH_ROOT/acore.json" -b '$.version')
