@@ -809,16 +809,12 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1))
-            {
-                return false;
-            }
-            return true;
+            return !sSpellMgr->GetSpellInfo(SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1);
         }
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            int32 chance = 20;
+            auto chance = 20;
             Unit* caster = eventInfo.GetActor();
             if (AuraEffect const* aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1, EFFECT_1, caster->GetGUID()))
             {
