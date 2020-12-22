@@ -17,7 +17,6 @@
 #include <ace/Reactor_Impl.h>
 #include <ace/TP_Reactor.h>
 #include <ace/Dev_Poll_Reactor.h>
-#include <ace/Guard_T.h>
 #include <atomic>
 #include <ace/os_include/arpa/os_inet.h>
 #include <ace/os_include/netinet/os_tcp.h>
