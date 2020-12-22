@@ -1139,6 +1139,7 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
 {
     std::string playerName1, playerName2;
 
+    // first = moved from, second = moved to
     recv_data >> playerName1;
     recv_data >> playerName2;
 
@@ -1155,27 +1156,38 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
 
     Group* group = GetPlayer()->GetGroup();
     if (!group || !group->isRaidGroup())
+    {
         return;
+    }
 
-    if (!group->IsLeader(GetPlayer()->GetGUID()) &&
-        !group->IsAssistant(GetPlayer()->GetGUID()))
+    if (!group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
+    {
         return;
+    }
 
     //get guid, member may be offline
     auto getGuid = [&group](std::string const& playerName)
     {
         // no player, cheating?
         if (!group->GetMemberGUID(playerName))
+        {
             return uint64(0);
+        }
 
         if (Player* player = ObjectAccessor::FindPlayerByName(playerName.c_str()))
+        {
             return player->GetGUID();
+        }
         else
         {
             if (uint64 guid = sObjectMgr->GetPlayerGUIDByName(playerName))
+            {
                 return guid;
+            }
             else
+            {
                 return uint64(0); // no player - again, cheating?
+            }
         }
     };
 
@@ -1192,10 +1204,14 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
     uint8 groupId2 = group->GetMemberGroup(guid2);
 
     if (groupId1 == MAX_RAID_SUBGROUPS + 1 || groupId2 == MAX_RAID_SUBGROUPS + 1)
+    {
         return;
+    }
 
     if (groupId1 == groupId2)
+    {
         return;
+    }
 
     group->ChangeMembersGroup(guid1, groupId2);
     group->ChangeMembersGroup(guid2, groupId1);
