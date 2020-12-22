@@ -15877,38 +15877,40 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
 
 void Player::CompleteQuest(uint32 quest_id)
 {
-    if (quest_id)
+    if (!quest_id)
     {
-        SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
+        return;
+    }
 
-        uint16 log_slot = FindQuestSlot(quest_id);
-        if (log_slot < MAX_QUEST_LOG_SIZE)
-        {
-            SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
-        }
+    SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
 
-        Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id);
-        if (qInfo && qInfo->HasFlag(QUEST_FLAGS_TRACKING))
-        {
-            RewardQuest(qInfo, 0, this, false);
-        }
+    auto log_slot = FindQuestSlot(quest_id);
+    if (log_slot < MAX_QUEST_LOG_SIZE)
+    {
+        SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
+    }
 
-        // Xinef: area auras may change on quest completion!
-        UpdateZoneDependentAuras(GetZoneId());
-        UpdateAreaDependentAuras(GetAreaId());
-        AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
+    Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id);
+    if (qInfo && qInfo->HasFlag(QUEST_FLAGS_TRACKING))
+    {
+        RewardQuest(qInfo, 0, this, false);
+    }
 
-        // check if Quest Tracker is enabled
-        if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
-        {
-            // prepare Quest Tracker datas
-            auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
-            stmt->setUInt32(0, quest_id);
-            stmt->setUInt32(1, GetGUIDLow());
+    // Xinef: area auras may change on quest completion!
+    UpdateZoneDependentAuras(GetZoneId());
+    UpdateAreaDependentAuras(GetAreaId());
+    AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
 
-            // add to Quest Tracker
-            CharacterDatabase.Execute(stmt);
-        }
+    // check if Quest Tracker is enabled
+    if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
+    {
+        // prepare Quest Tracker datas
+        auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
+        stmt->setUInt32(0, quest_id);
+        stmt->setUInt32(1, GetGUIDLow());
+
+        // add to Quest Tracker
+        CharacterDatabase.Execute(stmt);
     }
 }
 
