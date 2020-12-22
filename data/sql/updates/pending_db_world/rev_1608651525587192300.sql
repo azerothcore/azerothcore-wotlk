@@ -18,3 +18,4 @@ UPDATE `acore_string` SET `content_default`='¦ GM Mode active, Phase: -1' WHERE
 UPDATE `acore_string` SET `content_default`='¦ Account: %s (ID: %u), GMLevel: %u' WHERE  `entry`=35404;
 UPDATE `acore_string` SET `content_default`='¦ Last Login: %s (Failed Logins: %u)' WHERE  `entry`=35405;
 UPDATE `acore_string` SET `content_default`='¦ Map: %s, Zone: %s, Area: %s' WHERE  `entry`=35409;
+UPDATE `acore_string` SET `content_default`='¦ Registration Email: %s - Email: %s' WHERE  `entry`=35406;
