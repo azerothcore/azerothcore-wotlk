@@ -3332,10 +3332,10 @@ ShowBanInWorld = 0
 #        Description: Time (in milliseconds) update time diff is written to the log file.
 #                     Update diff can be used as a performance indicator. Diff < 300: good
 #                     performance. Diff > 600 bad performance, may be caused by high CPU usage.
-#        Default:     60000 - (Enabled, 1 minute)
-#                     0     - (Disabled)
+#        Default:     300000 - (Enabled, 5 minute)
+#                     0      - (Disabled)
 
-RecordUpdateTimeDiffInterval = 60000
+RecordUpdateTimeDiffInterval = 300000
 
 #
 #     MinRecordUpdateTimeDiff

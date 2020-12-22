@@ -1287,7 +1287,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_SHOW_KICK_IN_WORLD]         = sConfigMgr->GetBoolDefault("ShowKickInWorld", false);
     m_bool_configs[CONFIG_SHOW_MUTE_IN_WORLD]         = sConfigMgr->GetBoolDefault("ShowMuteInWorld", false);
     m_bool_configs[CONFIG_SHOW_BAN_IN_WORLD]          = sConfigMgr->GetBoolDefault("ShowBanInWorld", false);
-    m_int_configs[CONFIG_INTERVAL_LOG_UPDATE]         = sConfigMgr->GetIntDefault("RecordUpdateTimeDiffInterval", 60000);
+    m_int_configs[CONFIG_INTERVAL_LOG_UPDATE]         = sConfigMgr->GetIntDefault("RecordUpdateTimeDiffInterval", 300000);
     m_int_configs[CONFIG_MIN_LOG_UPDATE]              = sConfigMgr->GetIntDefault("MinRecordUpdateTimeDiff", 100);
     m_int_configs[CONFIG_NUMTHREADS]                  = sConfigMgr->GetIntDefault("MapUpdate.Threads", 1);
     m_int_configs[CONFIG_MAX_RESULTS_LOOKUP_COMMANDS] = sConfigMgr->GetIntDefault("Command.LookupMaxResults", 0);
