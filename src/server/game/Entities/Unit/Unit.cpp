@@ -16487,16 +16487,6 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, SpellInfo const
     // Custom chances
     switch (spellProto->SpellFamilyName)
     {
-        case SPELLFAMILY_SHAMAN:
-            {
-                // Blessing of the Eternals, Earthliving proc
-                if (spellProto->SpellIconID == 1929)
-                {
-                    if (victim && (float(victim->GetHealth() * 100.0f / victim->GetMaxHealth()) > 35.0f))
-                        return roll_chance_f(chance);
-                }
-                break;
-            }
         case SPELLFAMILY_WARRIOR:
             {
                 // Recklessness, allow to proc only once for whirlwind
