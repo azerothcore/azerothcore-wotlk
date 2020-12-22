@@ -85,8 +85,10 @@ jobs:
           restore-keys: |
             ccache:${{ matrix.os }}:${{ github.ref }}
             ccache:${{ matrix.os }}
+      - name: Install latest bash
+        run: brew install bash
       - name: Configure OS
-        run: source ./apps/ci/mac/ci-install.sh
+        run: source ./acore.sh install-deps
       - name: Build
         run: source ./apps/ci/mac/ci-compile.sh
       - name: Run unit tests

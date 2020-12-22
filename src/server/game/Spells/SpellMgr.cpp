@@ -7177,6 +7177,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx7 |= SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER;
     });
 
+    // Clicking on Warlock Summoning portal should not require mana
+    ApplySpellFix({ 61994 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ManaCostPercentage = 0;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
