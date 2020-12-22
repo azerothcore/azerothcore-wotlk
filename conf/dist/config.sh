@@ -48,7 +48,7 @@ CTYPE=Release
 # compile scripts
 CSCRIPTS=ON
 # compile unit tests
-CUNIT_TESTS=OFF
+CBUILD_TESTING=OFF
 # compile server
 CSERVERS=ON
 # compile tools
