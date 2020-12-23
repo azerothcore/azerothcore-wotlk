@@ -51,7 +51,7 @@ jobs:
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
       - name: Configure OS
-        run: source ./apps/ci/ci-install.sh
+        run: source ./acore.sh install-deps
         env:
           CONTINUOUS_INTEGRATION: true
       - name: Import db
