@@ -1118,10 +1118,16 @@ public:
                         if (!PlayerList.isEmpty())
                         {
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                                if (i->GetSource()->IsAlive() && me->IsWithinDistInMap(i->GetSource(), 100))
+                            {
+                                if (me->IsWithinDistInMap(i->GetSource(), 100))
+                                {
                                     i->GetSource()->CastSpell(i->GetSource(), SPELL_THE_LIGHT_OF_DAWN_Q, false);
+                                }
+                            }
                         }
                         me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                        me->SetVisible(false); // respawns another Darion for quest turn in
+                        me->SummonCreature(NPC_HIGHLORD_DARION_MOGRAINE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 3min);
                         break;
                     }
                 case EVENT_OUTRO_SCENE_61:
