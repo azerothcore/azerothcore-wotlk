@@ -51,7 +51,8 @@ public:
             switch (urand(0, 2))
             {
                 case 0:
-                    if (Player* player = killer->ToPlayer()) {
+                    if (Player* player = killer->ToPlayer()) 
+                    {
                         player->KilledMonsterCredit(NPC_EXPEDITION_RESEARCHER, 0);
                     }
                     spawnCreatureID = NPC_EXPEDITION_RESEARCHER;
