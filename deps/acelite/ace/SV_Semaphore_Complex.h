@@ -4,7 +4,7 @@
 /**
  *  @file   SV_Semaphore_Complex.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -58,7 +58,6 @@ public:
     ACE_OPEN   = 0
   };
 
-  // = Initialization and termination methods.
   ACE_SV_Semaphore_Complex (void);
   ACE_SV_Semaphore_Complex (key_t key,
                             short create = ACE_SV_Semaphore_Complex::ACE_CREATE,

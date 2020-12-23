@@ -4,7 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include <ace/Guard_T.h>
 
 #include "Cryptography/BigNumber.h"
 #include <openssl/bn.h>
@@ -87,7 +86,7 @@ BigNumber BigNumber::operator-=(BigNumber const& bn)
 
 BigNumber BigNumber::operator*=(BigNumber const& bn)
 {
-    BN_CTX *bnctx;
+    BN_CTX* bnctx;
 
     bnctx = BN_CTX_new();
     BN_mul(_bn, _bn, bn._bn, bnctx);
@@ -98,7 +97,7 @@ BigNumber BigNumber::operator*=(BigNumber const& bn)
 
 BigNumber BigNumber::operator/=(BigNumber const& bn)
 {
-    BN_CTX *bnctx;
+    BN_CTX* bnctx;
 
     bnctx = BN_CTX_new();
     BN_div(_bn, NULL, _bn, bn._bn, bnctx);
@@ -109,7 +108,7 @@ BigNumber BigNumber::operator/=(BigNumber const& bn)
 
 BigNumber BigNumber::operator%=(BigNumber const& bn)
 {
-    BN_CTX *bnctx;
+    BN_CTX* bnctx;
 
     bnctx = BN_CTX_new();
     BN_mod(_bn, _bn, bn._bn, bnctx);
@@ -121,7 +120,7 @@ BigNumber BigNumber::operator%=(BigNumber const& bn)
 BigNumber BigNumber::Exp(BigNumber const& bn)
 {
     BigNumber ret;
-    BN_CTX *bnctx;
+    BN_CTX* bnctx;
 
     bnctx = BN_CTX_new();
     BN_exp(ret._bn, _bn, bn._bn, bnctx);
@@ -133,7 +132,7 @@ BigNumber BigNumber::Exp(BigNumber const& bn)
 BigNumber BigNumber::ModExp(BigNumber const& bn1, BigNumber const& bn2)
 {
     BigNumber ret;
-    BN_CTX *bnctx;
+    BN_CTX* bnctx;
 
     bnctx = BN_CTX_new();
     BN_mod_exp(ret._bn, _bn, bn1._bn, bn2._bn, bnctx);
@@ -178,12 +177,12 @@ std::unique_ptr<uint8[]> BigNumber::AsByteArray(int32 minSize, bool littleEndian
     return ret;
 }
 
-char * BigNumber::AsHexStr() const
+char* BigNumber::AsHexStr() const
 {
     return BN_bn2hex(_bn);
 }
 
-char * BigNumber::AsDecStr() const
+char* BigNumber::AsDecStr() const
 {
     return BN_bn2dec(_bn);
 }

@@ -7,6 +7,8 @@
 #ifndef _TRANSACTION_H
 #define _TRANSACTION_H
 
+#include <utility>
+
 #include "SQLOperation.h"
 
 //- Forward declare (don't include header to prevent circular includes)
@@ -21,25 +23,25 @@ class Transaction
     template <typename T>
     friend class DatabaseWorkerPool;
 
-    public:
-        Transaction() : _cleanedUp(false) { }
-        ~Transaction() { Cleanup(); }
+public:
+    Transaction()  { }
+    ~Transaction() { Cleanup(); }
 
-        void Append(PreparedStatement* statement);
-        void Append(const char* sql);
-        void PAppend(const char* sql, ...);
+    void Append(PreparedStatement* statement);
+    void Append(const char* sql);
+    void PAppend(const char* sql, ...);
 
-        size_t GetSize() const { return m_queries.size(); }
+    [[nodiscard]] size_t GetSize() const { return m_queries.size(); }
 
-    protected:
-        void Cleanup();
-        std::list<SQLElementData> m_queries;
+protected:
+    void Cleanup();
+    std::list<SQLElementData> m_queries;
 
-    private:
-        bool _cleanedUp;
-
+private:
+    bool _cleanedUp{false};
 };
-typedef acore::AutoPtr<Transaction, ACE_Thread_Mutex> SQLTransaction;
+
+typedef std::shared_ptr<Transaction> SQLTransaction;
 
 /*! Low level class*/
 class TransactionTask : public SQLOperation
@@ -47,14 +49,14 @@ class TransactionTask : public SQLOperation
     template <class T> friend class DatabaseWorkerPool;
     friend class DatabaseWorker;
 
-    public:
-        TransactionTask(SQLTransaction trans) : m_trans(trans) { } ;
-        ~TransactionTask(){ };
+public:
+    TransactionTask(SQLTransaction trans) : m_trans(std::move(trans)) { } ;
+    ~TransactionTask() override = default;
 
-    protected:
-        bool Execute();
+protected:
+    bool Execute() override;
 
-        SQLTransaction m_trans;
+    SQLTransaction m_trans;
 };
 
 #endif

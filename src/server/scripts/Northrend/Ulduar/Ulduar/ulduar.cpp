@@ -71,31 +71,40 @@ public:
         {
             case BASE_CAMP:
                 player->TeleportTo(603, -706.122f, -92.6024f, 429.876f, 0);
-                CloseGossipMenuFor(player); break;
+                CloseGossipMenuFor(player);
+                break;
             case GROUNDS:
                 player->TeleportTo(603, 131.248f, -35.3802f, 409.804f, 0);
-                CloseGossipMenuFor(player); break;
+                CloseGossipMenuFor(player);
+                break;
             case FORGE:
                 player->TeleportTo(603, 553.233f, -12.3247f, 409.679f, 0);
-                CloseGossipMenuFor(player); break;
+                CloseGossipMenuFor(player);
+                break;
             case SCRAPYARD:
                 player->TeleportTo(603, 926.292f, -11.4635f, 418.595f, 0);
-                CloseGossipMenuFor(player); break;
+                CloseGossipMenuFor(player);
+                break;
             case ANTECHAMBER:
                 player->TeleportTo(603, 1498.09f, -24.246f, 420.967f, 0);
-                CloseGossipMenuFor(player); break;
+                CloseGossipMenuFor(player);
+                break;
             case WALKWAY:
                 player->TeleportTo(603, 1859.45f, -24.1f, 448.9f, 0);
-                CloseGossipMenuFor(player); break;
+                CloseGossipMenuFor(player);
+                break;
             case CONSERVATORY:
                 player->TeleportTo(603, 2086.27f, -24.3134f, 421.239f, 0);
-                CloseGossipMenuFor(player); break;
+                CloseGossipMenuFor(player);
+                break;
             case MADNESS:
                 player->TeleportTo(603, 1854.8f, -11.46f, 334.57f, 4.8f);
-                CloseGossipMenuFor(player); break;
+                CloseGossipMenuFor(player);
+                break;
             case SPARK:
                 player->TeleportTo(603, 2517.9f, 2568.9f, 412.7f, 0);
-                CloseGossipMenuFor(player); break;
+                CloseGossipMenuFor(player);
+                break;
         }
 
         return true;
@@ -109,7 +118,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Lend us your aid, keeper. Together we shall defeat Yogg-Saron.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Lend us your aid, keeper. Together we shall defeat Yogg-Saron.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
         return true;
     }
@@ -161,19 +170,19 @@ public:
     {
         PrepareAuraScript(spell_ulduar_energy_sap_AuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const* aurEff)
         {
             if (Unit* target = GetTarget())
                 target->CastSpell(target, (aurEff->GetId() == 64740) ? 64747 : 64863, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_ulduar_energy_sap_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
         }
     };
 
-    AuraScript *GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_ulduar_energy_sap_AuraScript();
     }
@@ -184,7 +193,7 @@ class npc_ulduar_snow_mound : public CreatureScript
 public:
     npc_ulduar_snow_mound() : CreatureScript("npc_ulduar_snow_mound") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ulduar_snow_moundAI(creature);
     }
@@ -199,10 +208,10 @@ public:
 
         bool activated;
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!activated && who->GetTypeId() == TYPEID_PLAYER)
-                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ()+5.0f, 2, LINEOFSIGHT_ALL_CHECKS))
+                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ() + 5.0f, 2, LINEOFSIGHT_ALL_CHECKS))
                 {
                     activated = true;
                     me->RemoveAura(64615);
@@ -212,16 +221,17 @@ public:
                     if (me->GetEntry() == 34146) count = 4;
                     else if (me->GetEntry() == 34150) count = 6;
                     else count = 8;
-                    for (uint8 i=0; i<count; ++i)
+                    for (uint8 i = 0; i < count; ++i)
                     {
-                        float a = rand_norm()*2*M_PI; float d = rand_norm()*4.0f;
-                        if (Creature* c = me->SummonCreature(34137, me->GetPositionX()+cos(a)*d, me->GetPositionY()+sin(a)*d, me->GetPositionZ()+1.0f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000))
+                        float a = rand_norm() * 2 * M_PI;
+                        float d = rand_norm() * 4.0f;
+                        if (Creature* c = me->SummonCreature(34137, me->GetPositionX() + cos(a) * d, me->GetPositionY() + sin(a) * d, me->GetPositionZ() + 1.0f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000))
                             c->AI()->AttackStart(who);
                     }
                 }
         }
 
-        void UpdateAI(uint32  /*diff*/) {}
+        void UpdateAI(uint32  /*diff*/) override {}
     };
 };
 
@@ -230,7 +240,7 @@ class npc_ulduar_storm_tempered_keeper : public CreatureScript
 public:
     npc_ulduar_storm_tempered_keeper() : CreatureScript("npc_ulduar_storm_tempered_keeper") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ulduar_storm_tempered_keeperAI(creature);
     }
@@ -245,16 +255,16 @@ public:
         EventMap events;
         uint64 otherGUID;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(1, 2000); // checking Separation Anxiety, Charged Sphere
-            events.ScheduleEvent(2, urand(5000,8000)); // Forked Lightning
+            events.ScheduleEvent(2, urand(5000, 8000)); // Forked Lightning
             events.ScheduleEvent(3, (me->GetEntry() == 33722 ? 20000 : 50000)); // Summon Charged Sphere
             if (Creature* c = me->FindNearestCreature((me->GetEntry() == 33722 ? 33699 : 33722), 30.0f, true))
                 otherGUID = c->GetGUID();
@@ -262,19 +272,19 @@ public:
                 me->CastSpell(me, 63630, true); // Vengeful Surge
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Creature* c = ObjectAccessor::GetCreature(*me, otherGUID))
                 c->CastSpell(c, 63630, true); // Vengeful Surge
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             if (Creature* c = ObjectAccessor::GetCreature(*me, otherGUID))
                 s->GetMotionMaster()->MoveFollow(c, 0.0f, 0.0f);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -284,7 +294,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -300,7 +310,7 @@ public:
                     break;
                 case 2:
                     me->CastSpell(me->GetVictim(), 63541, false);
-                    events.RepeatEvent(urand(10000,14000));
+                    events.RepeatEvent(urand(10000, 14000));
                     break;
                 case 3:
                     if (!me->HasAura(63630))
@@ -319,7 +329,7 @@ class npc_ulduar_arachnopod_destroyer : public CreatureScript
 public:
     npc_ulduar_arachnopod_destroyer() : CreatureScript("npc_ulduar_arachnopod_destroyer") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ulduar_arachnopod_destroyerAI(creature);
     }
@@ -335,7 +345,7 @@ public:
         EventMap events;
         bool _spawnedMechanic;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             events.ScheduleEvent(1, urand(5000, 8000)); // Flame Spray
@@ -343,13 +353,13 @@ public:
             events.ScheduleEvent(3, 1000); // Charged Leap
         }
 
-        void PassengerBoarded(Unit* p, int8  /*seat*/, bool  /*apply*/)
+        void PassengerBoarded(Unit* p, int8  /*seat*/, bool  /*apply*/) override
         {
             me->setFaction(p->getFaction());
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!_spawnedMechanic && me->HealthBelowPctDamaged(20, damage))
             {
@@ -366,25 +376,25 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (me->getFaction() == 16)
                 ScriptedAI::AttackStart(who);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (me->getFaction() == 16)
                 ScriptedAI::EnterEvadeMode();
         }
 
-        void OnCharmed(bool  /*apply*/) {}
+        void OnCharmed(bool  /*apply*/) override {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->getFaction() != 16)
             {
-                if (me->IsAlive() && (me->GetExactDist2dSq(2058.0f, 42.0f) < 25.0f*25.0f || me->GetExactDist2dSq(2203.0f, 292.0f) < 25.0f*25.0f || me->GetExactDist2dSq(2125.0f, 170.0f) > 160.0f*160.0f))
+                if (me->IsAlive() && (me->GetExactDist2dSq(2058.0f, 42.0f) < 25.0f * 25.0f || me->GetExactDist2dSq(2203.0f, 292.0f) < 25.0f * 25.0f || me->GetExactDist2dSq(2125.0f, 170.0f) > 160.0f * 160.0f))
                     Unit::Kill(me, me, false);
             }
             else
@@ -397,7 +407,7 @@ public:
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.GetEvent())
+                switch (events.ExecuteEvent())
                 {
                     case 0:
                         break;
@@ -438,19 +448,19 @@ public:
     {
         PrepareAuraScript(spell_ulduar_arachnopod_damaged_AuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
+        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
         {
             if (Unit* c = GetCaster())
                 Unit::Kill(c, c, false);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_ulduar_arachnopod_damaged_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript *GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_ulduar_arachnopod_damaged_AuraScript();
     }
@@ -458,21 +468,21 @@ public:
 
 class AreaTrigger_at_celestial_planetarium_enterance : public AreaTriggerScript
 {
-    public:
+public:
 
-        AreaTrigger_at_celestial_planetarium_enterance()
-            : AreaTriggerScript("at_celestial_planetarium_enterance")
-        {
-        }
+    AreaTrigger_at_celestial_planetarium_enterance()
+        : AreaTriggerScript("at_celestial_planetarium_enterance")
+    {
+    }
 
-        bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
-        {
-            if (player->IsAlive())
-                if (uint32 questId = (player->GetMap()->Is25ManRaid() ? 13816 : 13607 /*QUEST_CELESTIAL_PLANETARIUM*/))
-                    if (player->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
-                        player->AreaExploredOrEventHappens(questId);
-            return false;
-        }
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    {
+        if (player->IsAlive())
+            if (uint32 questId = (player->GetMap()->Is25ManRaid() ? 13816 : 13607 /*QUEST_CELESTIAL_PLANETARIUM*/))
+                if (player->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
+                    player->AreaExploredOrEventHappens(questId);
+        return false;
+    }
 };
 
 class go_call_tram : public GameObjectScript

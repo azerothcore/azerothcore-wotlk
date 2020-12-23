@@ -13,13 +13,13 @@ class Creature;
 
 class GuardAI : public ScriptedAI
 {
-    public:
-        explicit GuardAI(Creature* creature);
+public:
+    explicit GuardAI(Creature* creature);
 
-        static int Permissible(Creature const* creature);
+    static int Permissible(Creature const* creature);
 
-        void Reset();
-        void EnterEvadeMode();
-        void JustDied(Unit* killer);
+    void Reset() override;
+    void EnterEvadeMode() override;
+    void JustDied(Unit* killer) override;
 };
 #endif
