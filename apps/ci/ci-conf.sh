@@ -19,10 +19,10 @@ DB_AUTH_CONF="MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='localhost';"
 DB_WORLD_CONF="MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='localhost';"
 CONFIG_SH
 
-time sudo apt-get update -y
+# time sudo apt-get update -y
 # time sudo apt-get upgrade -y
-time sudo apt-get install -y git lsb-release sudo ccache
-time ./acore.sh install-deps
+# time sudo apt-get install -y git lsb-release sudo ccache
+# time ./acore.sh install-deps
 
 case $COMPILER in
 
