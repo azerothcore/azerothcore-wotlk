@@ -47,7 +47,7 @@ class boss_drakos : public CreatureScript
 public:
     boss_drakos() : CreatureScript("boss_drakos") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_drakosAI (pCreature);
     }
@@ -62,7 +62,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             if (pInstance)
                 pInstance->SetData(DATA_DRAKOS, NOT_STARTED);
@@ -70,7 +70,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             Talk(SAY_AGGRO);
 
@@ -84,7 +84,7 @@ public:
             events.RescheduleEvent(EVENT_SUMMON, 2000);
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             Talk(SAY_DEATH);
 
@@ -103,15 +103,15 @@ public:
 
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_KILL);
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void JustSummoned(Creature*  /*summon*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void JustSummoned(Creature*  /*summon*/) override {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -173,7 +173,7 @@ class npc_oculus_unstable_sphere : public CreatureScript
 public:
     npc_oculus_unstable_sphere() : CreatureScript("npc_oculus_unstable_sphere") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_oculus_unstable_sphereAI (pCreature);
     }
@@ -192,7 +192,7 @@ public:
             me->GetMotionMaster()->MovePoint(1, 961.29f + dist * cos(angle), 1049.0f + dist * sin(angle), 360.0f);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if( type != POINT_MOTION_TYPE || id != 1 )
                 return;
@@ -201,7 +201,7 @@ public:
                 gonext = true;
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
             me->SetSpeed(MOVE_RUN, 1.4f, true);
@@ -214,10 +214,10 @@ public:
             PickNewLocation();
         }
 
-        void AttackStart(Unit*  /*who*/) {}
-        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void AttackStart(Unit*  /*who*/) override {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( timer == 0 )
                 me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
