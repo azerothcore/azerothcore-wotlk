@@ -11,7 +11,7 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Stream_Head)
+ACE_ALLOC_HOOK_DEFINE_Tyc(ACE_Stream_Head)
 
 template <ACE_SYNCH_DECL, class TIME_POLICY>
 ACE_Stream_Head<ACE_SYNCH_USE, TIME_POLICY>::ACE_Stream_Head (void)
@@ -151,7 +151,7 @@ ACE_Stream_Head<ACE_SYNCH_USE, TIME_POLICY>::fini (void)
   return 0;
 }
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Stream_Tail)
+ACE_ALLOC_HOOK_DEFINE_Tyc(ACE_Stream_Tail)
 
 template <ACE_SYNCH_DECL, class TIME_POLICY>
 ACE_Stream_Tail<ACE_SYNCH_USE, TIME_POLICY>::ACE_Stream_Tail (void)
@@ -295,7 +295,7 @@ ACE_Stream_Tail<ACE_SYNCH_USE, TIME_POLICY>::fini (void)
   return 0;
 }
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Thru_Task)
+ACE_ALLOC_HOOK_DEFINE_Tyc(ACE_Thru_Task)
 
 template <ACE_SYNCH_DECL, class TIME_POLICY>
 ACE_Thru_Task<ACE_SYNCH_USE, TIME_POLICY>::ACE_Thru_Task (void)

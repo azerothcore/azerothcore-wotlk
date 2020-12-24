@@ -19,7 +19,7 @@ class boss_grizzle : public CreatureScript
 public:
     boss_grizzle() : CreatureScript("boss_grizzle") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_grizzleAI(creature);
     }
@@ -31,15 +31,15 @@ public:
         uint32 GroundTremor_Timer;
         uint32 Frenzy_Timer;
 
-        void Reset()
+        void Reset() override
         {
             GroundTremor_Timer = 12000;
-            Frenzy_Timer =0;
+            Frenzy_Timer = 0;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -50,7 +50,8 @@ public:
             {
                 DoCastVictim(SPELL_GROUNDTREMOR);
                 GroundTremor_Timer = 8000;
-            } else GroundTremor_Timer -= diff;
+            }
+            else GroundTremor_Timer -= diff;
 
             //Frenzy_Timer
             if (HealthBelowPct(51))
@@ -61,7 +62,8 @@ public:
                     Talk(EMOTE_FRENZY_KILL);
 
                     Frenzy_Timer = 15000;
-                } else Frenzy_Timer -= diff;
+                }
+                else Frenzy_Timer -= diff;
             }
 
             DoMeleeAttackIfReady();

@@ -53,6 +53,8 @@ public:
                                       ACE_CDR::Char &);
   virtual ACE_CDR::Boolean read_string (ACE_InputCDR &,
                                         ACE_CDR::Char *&);
+  virtual ACE_CDR::Boolean read_string (ACE_InputCDR &,
+                                        std::string &);
   virtual ACE_CDR::Boolean read_char_array (ACE_InputCDR &,
                                             ACE_CDR::Char *,
                                             ACE_CDR::ULong);
@@ -96,6 +98,8 @@ public:
                                       ACE_CDR::Char &);
   virtual ACE_CDR::Boolean read_string (ACE_InputCDR &,
                                         ACE_CDR::Char *&);
+  virtual ACE_CDR::Boolean read_string (ACE_InputCDR &,
+                                        std::string &);
   virtual ACE_CDR::Boolean read_char_array (ACE_InputCDR &,
                                             ACE_CDR::Char *,
                                             ACE_CDR::ULong);

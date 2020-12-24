@@ -53,20 +53,20 @@ public:
     {
         npc_ruul_snowhoofAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             if (GameObject* Cage = me->FindNearestGameObject(GO_CAGE, 20))
                 Cage->SetGoState(GO_STATE_READY);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             summoned->AI()->AttackStart(me);
         }
 
-        void sQuestAccept(Player* player, Quest const* quest)
+        void sQuestAccept(Player* player, Quest const* quest) override
         {
             if (quest->GetQuestId() == QUEST_FREEDOM_TO_RUUL)
             {
@@ -75,7 +75,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -104,13 +104,13 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ruul_snowhoofAI(creature);
     }
@@ -170,14 +170,14 @@ public:
     {
         npc_muglashAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             eventTimer = 10000;
             waveId = 0;
             _isBrazierExtinguished = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (Player* player = GetPlayerForEscort())
                 if (HasEscortState(STATE_ESCORT_PAUSED))
@@ -188,19 +188,19 @@ public:
                 }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
                 if (Player* player = GetPlayerForEscort())
                     player->FailQuest(QUEST_VORSHA);
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             summoned->AI()->AttackStart(me);
         }
 
-        void sQuestAccept(Player* player, Quest const* quest)
+        void sQuestAccept(Player* player, Quest const* quest) override
         {
             if (quest->GetQuestId() == QUEST_VORSHA)
             {
@@ -210,83 +210,83 @@ public:
             }
         }
 
-            void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
+        {
+            if (Player* player = GetPlayerForEscort())
             {
-                if (Player* player = GetPlayerForEscort())
+                switch (waypointId)
                 {
-                    switch (waypointId)
-                    {
-                        case 0:
-                            Talk(SAY_MUG_START2, player);
-                            break;
-                        case 24:
-                            Talk(SAY_MUG_BRAZIER, player);
-
-                            if (GameObject* go = GetClosestGameObjectWithEntry(me, GO_NAGA_BRAZIER, INTERACTION_DISTANCE*2))
-                            {
-                                go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                                SetEscortPaused(true);
-                            }
-                            break;
-                        case 25:
-                            Talk(SAY_MUG_GRATITUDE);
-                            player->GroupEventHappens(QUEST_VORSHA, me);
-                            break;
-                        case 26:
-                            Talk(SAY_MUG_PATROL);
-                            break;
-                        case 27:
-                            Talk(SAY_MUG_RETURN);
-                            break;
-                    }
-                }
-            }
-
-            void DoWaveSummon()
-            {
-                switch (waveId)
-                {
-                    case 1:
-                        me->SummonCreature(NPC_WRATH_RIDER,     FirstNagaCoord[0], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
-                        me->SummonCreature(NPC_WRATH_SORCERESS, FirstNagaCoord[1], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
-                        me->SummonCreature(NPC_WRATH_RAZORTAIL, FirstNagaCoord[2], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                    case 0:
+                        Talk(SAY_MUG_START2, player);
                         break;
-                    case 2:
-                        me->SummonCreature(NPC_WRATH_PRIESTESS, SecondNagaCoord[0], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
-                        me->SummonCreature(NPC_WRATH_MYRMIDON,  SecondNagaCoord[1], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
-                        me->SummonCreature(NPC_WRATH_SEAWITCH,  SecondNagaCoord[2], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
-                        break;
-                    case 3:
-                        me->SummonCreature(NPC_VORSHA, VorshaCoord, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
-                        break;
-                    case 4:
-                        SetEscortPaused(false);
-                        Talk(SAY_MUG_DONE);
-                        break;
-                }
-            }
+                    case 24:
+                        Talk(SAY_MUG_BRAZIER, player);
 
-            void UpdateAI(uint32 diff)
-            {
-                npc_escortAI::UpdateAI(diff);
-
-                if (!me->GetVictim())
-                {
-                    if (HasEscortState(STATE_ESCORT_PAUSED) && _isBrazierExtinguished)
-                    {
-                        if (eventTimer < diff)
+                        if (GameObject* go = GetClosestGameObjectWithEntry(me, GO_NAGA_BRAZIER, INTERACTION_DISTANCE * 2))
                         {
-                            ++waveId;
-                            DoWaveSummon();
-                            eventTimer = 10000;
+                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            SetEscortPaused(true);
                         }
-                        else
-                            eventTimer -= diff;
-                    }
-                    return;
+                        break;
+                    case 25:
+                        Talk(SAY_MUG_GRATITUDE);
+                        player->GroupEventHappens(QUEST_VORSHA, me);
+                        break;
+                    case 26:
+                        Talk(SAY_MUG_PATROL);
+                        break;
+                    case 27:
+                        Talk(SAY_MUG_RETURN);
+                        break;
                 }
-                DoMeleeAttackIfReady();
             }
+        }
+
+        void DoWaveSummon()
+        {
+            switch (waveId)
+            {
+                case 1:
+                    me->SummonCreature(NPC_WRATH_RIDER,     FirstNagaCoord[0], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                    me->SummonCreature(NPC_WRATH_SORCERESS, FirstNagaCoord[1], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                    me->SummonCreature(NPC_WRATH_RAZORTAIL, FirstNagaCoord[2], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                    break;
+                case 2:
+                    me->SummonCreature(NPC_WRATH_PRIESTESS, SecondNagaCoord[0], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                    me->SummonCreature(NPC_WRATH_MYRMIDON,  SecondNagaCoord[1], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                    me->SummonCreature(NPC_WRATH_SEAWITCH,  SecondNagaCoord[2], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                    break;
+                case 3:
+                    me->SummonCreature(NPC_VORSHA, VorshaCoord, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                    break;
+                case 4:
+                    SetEscortPaused(false);
+                    Talk(SAY_MUG_DONE);
+                    break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            npc_escortAI::UpdateAI(diff);
+
+            if (!me->GetVictim())
+            {
+                if (HasEscortState(STATE_ESCORT_PAUSED) && _isBrazierExtinguished)
+                {
+                    if (eventTimer < diff)
+                    {
+                        ++waveId;
+                        DoWaveSummon();
+                        eventTimer = 10000;
+                    }
+                    else
+                        eventTimer -= diff;
+                }
+                return;
+            }
+            DoMeleeAttackIfReady();
+        }
 
     private:
         uint32 eventTimer;
@@ -296,7 +296,7 @@ public:
 
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_muglashAI(creature);
     }
@@ -309,7 +309,7 @@ public:
 
     bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
-        if (Creature* creature = GetClosestCreatureWithEntry(go, NPC_MUGLASH, INTERACTION_DISTANCE*2))
+        if (Creature* creature = GetClosestCreatureWithEntry(go, NPC_MUGLASH, INTERACTION_DISTANCE * 2))
         {
             if (npc_muglash::npc_muglashAI* pEscortAI = CAST_AI(npc_muglash::npc_muglashAI, creature->AI()))
             {

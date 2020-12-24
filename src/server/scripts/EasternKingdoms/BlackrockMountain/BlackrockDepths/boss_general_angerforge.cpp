@@ -19,7 +19,7 @@ class boss_general_angerforge : public CreatureScript
 public:
     boss_general_angerforge() : CreatureScript("boss_general_angerforge") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_general_angerforgeAI(creature);
     }
@@ -34,7 +34,7 @@ public:
         uint32 Adds_Timer;
         bool Medics;
 
-        void Reset()
+        void Reset() override
         {
             MightyBlow_Timer = 8000;
             HamString_Timer = 12000;
@@ -43,7 +43,7 @@ public:
             Medics = false;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
         void SummonAdds(Unit* victim)
         {
@@ -57,7 +57,7 @@ public:
                 SummonedMedic->AI()->AttackStart(victim);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -68,21 +68,24 @@ public:
             {
                 DoCastVictim(SPELL_MIGHTYBLOW);
                 MightyBlow_Timer = 18000;
-            } else MightyBlow_Timer -= diff;
+            }
+            else MightyBlow_Timer -= diff;
 
             //HamString_Timer
             if (HamString_Timer <= diff)
             {
                 DoCastVictim(SPELL_HAMSTRING);
                 HamString_Timer = 15000;
-            } else HamString_Timer -= diff;
+            }
+            else HamString_Timer -= diff;
 
             //Cleave_Timer
             if (Cleave_Timer <= diff)
             {
                 DoCastVictim(SPELL_CLEAVE);
                 Cleave_Timer = 9000;
-            } else Cleave_Timer -= diff;
+            }
+            else Cleave_Timer -= diff;
 
             //Adds_Timer
             if (HealthBelowPct(21))
@@ -95,7 +98,8 @@ public:
                     SummonAdds(me->GetVictim());
 
                     Adds_Timer = 25000;
-                } else Adds_Timer -= diff;
+                }
+                else Adds_Timer -= diff;
             }
 
             //Summon Medics

@@ -29,18 +29,27 @@ public:
             else
                 instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
             // If used brazier open linked doors (North or South)
-            if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_N)) {
-                if (braziersUsed == 0) {
+            if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_N))
+            {
+                if (braziersUsed == 0)
+                {
                     braziersUsed = 1;
-                }else if(braziersUsed == 2){
+                }
+                else if(braziersUsed == 2)
+                {
                     instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_N), true);
                     instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_S), true);
                     braziersUsed = 0;
                 }
-            }else if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_S)) {
-                if (braziersUsed == 0) {
+            }
+            else if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_S))
+            {
+                if (braziersUsed == 0)
+                {
                     braziersUsed = 2;
-                }else if (braziersUsed == 1) {
+                }
+                else if (braziersUsed == 1)
+                {
                     instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_N), true);
                     instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_S), true);
                     braziersUsed = 0;
@@ -66,7 +75,7 @@ uint32 theldrenTeam[] =
     16053, 16055, 16050, 16051, 16049, 16052, 16054, 16058
 };
 
-uint32 RingMob[]=
+uint32 RingMob[] =
 {
     8925,                                                   // Dredge Worm
     8926,                                                   // Deep Stinger
@@ -76,7 +85,7 @@ uint32 RingMob[]=
     8932,                                                   // Borer Beetle
 };
 
-uint32 RingBoss[]=
+uint32 RingBoss[] =
 {
     9027,                                                   // Gorosh
     9028,                                                   // Grizzle
@@ -91,7 +100,7 @@ class at_ring_of_law : public AreaTriggerScript
 public:
     at_ring_of_law() : AreaTriggerScript("at_ring_of_law") { }
 
-    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
@@ -123,7 +132,7 @@ class npc_grimstone : public CreatureScript
 public:
     npc_grimstone() : CreatureScript("npc_grimstone") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_grimstoneAI>(creature);
     }
@@ -133,7 +142,7 @@ public:
         npc_grimstoneAI(Creature* creature) : npc_escortAI(creature), summons(me)
         {
             instance = creature->GetInstanceScript();
-            MobSpawnId = rand()%6;
+            MobSpawnId = rand() % 6;
             eventPhase = 0;
             eventTimer = 1000;
             theldrenEvent = false;
@@ -148,19 +157,19 @@ public:
         uint8 MobSpawnId;
         bool theldrenEvent;
 
-        void Reset()
+        void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (Unit* target = SelectTargetFromPlayerList(100.0f))
                 summon->AI()->AttackStart(target);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             summons.Despawn(summon);
             // All Summons killed, next phase
@@ -168,7 +177,7 @@ public:
                 eventTimer = 5000;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -215,14 +224,14 @@ public:
                 theldrenEvent = true;
                 me->SummonCreature(NPC_THELDREN, 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
                 uint8 rand = urand(0, 4);
-                for (uint8 i = rand; i < rand+4; ++i)
+                for (uint8 i = rand; i < rand + 4; ++i)
                     me->SummonCreature(theldrenTeam[i], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
             }
             else
-                me->SummonCreature(RingBoss[rand()%6], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
+                me->SummonCreature(RingBoss[rand() % 6], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             if (!instance)
                 return;
@@ -287,7 +296,7 @@ public:
                                 if (GameObject* go = me->SummonGameObject(GO_ARENA_SPOILS, 596.48f, -187.91f, -54.14f, 4.9f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
                                     go->SetOwnerGUID(0);
 
-                                Map::PlayerList const &pl = me->GetMap()->GetPlayers();
+                                Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                                     itr->GetSource()->KilledMonsterCredit(16166, 0);
                             }
@@ -320,7 +329,7 @@ class npc_phalanx : public CreatureScript
 public:
     npc_phalanx() : CreatureScript("npc_phalanx") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_phalanxAI(creature);
     }
@@ -333,14 +342,14 @@ public:
         uint32 FireballVolley_Timer;
         uint32 MightyBlow_Timer;
 
-        void Reset()
+        void Reset() override
         {
             ThunderClap_Timer = 12000;
             FireballVolley_Timer = 0;
             MightyBlow_Timer = 15000;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -351,7 +360,8 @@ public:
             {
                 DoCastVictim(SPELL_THUNDERCLAP);
                 ThunderClap_Timer = 10000;
-            } else ThunderClap_Timer -= diff;
+            }
+            else ThunderClap_Timer -= diff;
 
             //FireballVolley_Timer
             if (HealthBelowPct(51))
@@ -360,7 +370,8 @@ public:
                 {
                     DoCastVictim(SPELL_FIREBALLVOLLEY);
                     FireballVolley_Timer = 15000;
-                } else FireballVolley_Timer -= diff;
+                }
+                else FireballVolley_Timer -= diff;
             }
 
             //MightyBlow_Timer
@@ -368,7 +379,8 @@ public:
             {
                 DoCastVictim(SPELL_MIGHTYBLOW);
                 MightyBlow_Timer = 10000;
-            } else MightyBlow_Timer -= diff;
+            }
+            else MightyBlow_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -418,11 +430,11 @@ public:
 
         if (creature->IsVendor() && player->GetReputationRank(59) >= REP_FRIENDLY)
             AddGossipItemFor(player, 4781, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-        
+
 
         if (player->GetQuestRewardStatus(QUEST_A_BINDING_CONTRACT) != 1 &&
-            !player->HasItemCount(ITEM_THRORIUM_BROTHERHOOD_CONTRACT, 1, true) &&
-            player->HasItemCount(ITEM_SULFURON_INGOT))
+                !player->HasItemCount(ITEM_THRORIUM_BROTHERHOOD_CONTRACT, 1, true) &&
+                player->HasItemCount(ITEM_SULFURON_INGOT))
         {
             AddGossipItemFor(player, 4781, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
@@ -457,7 +469,7 @@ class npc_rocknot : public CreatureScript
 public:
     npc_rocknot() : CreatureScript("npc_rocknot") { }
 
-    bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* quest, uint32 /*item*/)
+    bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* quest, uint32 /*item*/) override
     {
         InstanceScript* instance = creature->GetInstanceScript();
         if (!instance)
@@ -487,7 +499,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_rocknotAI>(creature);
     }
@@ -504,7 +516,7 @@ public:
         uint32 BreakKeg_Timer;
         uint32 BreakDoor_Timer;
 
-        void Reset()
+        void Reset() override
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
                 return;
@@ -519,7 +531,7 @@ public:
                 go->SetGoState((GOState)state);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -542,7 +554,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (BreakKeg_Timer)
             {
@@ -551,7 +563,8 @@ public:
                     DoGo(DATA_GO_BAR_KEG, 0);
                     BreakKeg_Timer = 0;
                     BreakDoor_Timer = 1000;
-                } else BreakKeg_Timer -= diff;
+                }
+                else BreakKeg_Timer -= diff;
             }
 
             if (BreakDoor_Timer)
@@ -570,7 +583,8 @@ public:
                     instance->SetData(TYPE_BAR, DONE);
 
                     BreakDoor_Timer = 0;
-                } else BreakDoor_Timer -= diff;
+                }
+                else BreakDoor_Timer -= diff;
             }
 
             npc_escortAI::UpdateAI(diff);
