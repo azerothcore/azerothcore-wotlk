@@ -47,7 +47,7 @@ public:
             FlameRingGUID            = 0;
         }
 
-        void OnPlayerEnter(Player* /*player*/)
+        void OnPlayerEnter(Player* /*player*/) override
         {
             if (GetBossState(DATA_HALION_INTRO_DONE) != DONE && GetBossState(DATA_GENERAL_ZARITHRIAN) == DONE)
             {
@@ -57,7 +57,7 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -105,7 +105,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -124,7 +124,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -139,7 +139,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const
+        uint64 GetData64(uint32 type) const override
         {
             switch (type)
             {
@@ -168,7 +168,7 @@ public:
             return 0;
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -197,7 +197,7 @@ public:
             return true;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -208,14 +208,14 @@ public:
             return saveStream.str();
         }
 
-        void FillInitialWorldStates(WorldPacket& data)
+        void FillInitialWorldStates(WorldPacket& data) override
         {
             data << uint32(WORLDSTATE_CORPOREALITY_MATERIAL) << uint32(50);
             data << uint32(WORLDSTATE_CORPOREALITY_TWILIGHT) << uint32(50);
             data << uint32(WORLDSTATE_CORPOREALITY_TOGGLE) << uint32(0);
         }
 
-        void Load(char const* str)
+        void Load(char const* str) override
         {
             if (!str)
             {
@@ -268,7 +268,7 @@ public:
         uint64 FlameRingGUID;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_ruby_sanctum_InstanceMapScript(map);
     }
@@ -294,13 +294,13 @@ public:
                 GetCaster()->CastCustomSpell(SPELL_RALLY, SPELLVALUE_AURA_STACK, count, GetCaster(), true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterHit += SpellHitFn(spell_ruby_sanctum_rallying_shout_SpellScript::CountAllies);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_ruby_sanctum_rallying_shout_SpellScript();
     }

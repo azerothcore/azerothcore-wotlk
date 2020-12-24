@@ -126,13 +126,13 @@ public:
     {
         if (offsMCVT)
             return (adt_MCVT*)((uint8*)this + offsMCVT);
-        return 0;
+        return nullptr;
     }
     adt_MCLQ* getMCLQ()
     {
         if (offsMCLQ)
             return (adt_MCLQ*)((uint8*)this + offsMCLQ);
-        return 0;
+        return nullptr;
     }
 };
 
@@ -162,7 +162,7 @@ public:
     {
         if (cells[x][y].offsMCNK)
             return (adt_MCNK*)((uint8*)this + cells[x][y].offsMCNK - 84);
-        return 0;
+        return nullptr;
     }
 };
 
@@ -209,42 +209,42 @@ public:
     {
         if (liquid[x][y].used && liquid[x][y].offsData1)
             return (adt_liquid_header*)((uint8*)this + 8 + liquid[x][y].offsData1);
-        return 0;
+        return nullptr;
     }
 
     float* getLiquidHeightMap(adt_liquid_header* h)
     {
         if (h->formatFlags & ADT_LIQUID_HEADER_NO_HIGHT)
-            return 0;
+            return nullptr;
         if (h->offsData2b)
             return (float*)((uint8*)this + 8 + h->offsData2b);
-        return 0;
+        return nullptr;
     }
 
     uint8* getLiquidLightMap(adt_liquid_header* h)
     {
         if (h->formatFlags & ADT_LIQUID_HEADER_FULL_LIGHT)
-            return 0;
+            return nullptr;
         if (h->offsData2b)
         {
             if (h->formatFlags & ADT_LIQUID_HEADER_NO_HIGHT)
                 return (uint8*)((uint8*)this + 8 + h->offsData2b);
             return (uint8*)((uint8*)this + 8 + h->offsData2b + (h->width + 1) * (h->height + 1) * 4);
         }
-        return 0;
+        return nullptr;
     }
 
     uint32* getLiquidFullLightMap(adt_liquid_header* h)
     {
         if (!(h->formatFlags & ADT_LIQUID_HEADER_FULL_LIGHT))
-            return 0;
+            return nullptr;
         if (h->offsData2b)
         {
             if (h->formatFlags & ADT_LIQUID_HEADER_NO_HIGHT)
                 return (uint32*)((uint8*)this + 8 + h->offsData2b);
             return (uint32*)((uint8*)this + 8 + h->offsData2b + (h->width + 1) * (h->height + 1) * 4);
         }
-        return 0;
+        return nullptr;
     }
 
     uint64 getLiquidShowMap(adt_liquid_header* h)
@@ -330,10 +330,10 @@ public:
 class ADT_file : public FileLoader
 {
 public:
-    bool prepareLoadedData();
+    bool prepareLoadedData() override;
     ADT_file();
     ~ADT_file();
-    void free();
+    void free() override;
 
     adt_MHDR* a_grid;
 };

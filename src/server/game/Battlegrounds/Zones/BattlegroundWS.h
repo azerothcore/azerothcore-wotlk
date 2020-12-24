@@ -139,12 +139,12 @@ enum BG_WS_Objectives
 struct BattlegroundWGScore : public BattlegroundScore
 {
     BattlegroundWGScore(Player* player): BattlegroundScore(player), FlagCaptures(0), FlagReturns(0) { }
-    ~BattlegroundWGScore() { }
+    ~BattlegroundWGScore() override { }
     uint32 FlagCaptures;
     uint32 FlagReturns;
 
-    uint32 GetAttr1() const final override { return FlagCaptures; }
-    uint32 GetAttr2() const final override { return FlagReturns; }
+    uint32 GetAttr1() const final { return FlagCaptures; }
+    uint32 GetAttr2() const final { return FlagReturns; }
 };
 
 class BattlegroundWS : public Battleground
@@ -152,42 +152,42 @@ class BattlegroundWS : public Battleground
 public:
     /* Construction */
     BattlegroundWS();
-    ~BattlegroundWS();
+    ~BattlegroundWS() override;
 
     /* inherited from BattlegroundClass */
-    void AddPlayer(Player* player);
-    void StartingEventCloseDoors();
-    void StartingEventOpenDoors();
+    void AddPlayer(Player* player) override;
+    void StartingEventCloseDoors() override;
+    void StartingEventOpenDoors() override;
 
     /* BG Flags */
-    uint64 GetFlagPickerGUID(TeamId teamId) const { return _flagKeepers[teamId];  }
+    uint64 GetFlagPickerGUID(TeamId teamId) const override { return _flagKeepers[teamId];  }
     void SetFlagPicker(uint64 guid, TeamId teamId) { _flagKeepers[teamId] = guid; }
     void RespawnFlagAfterDrop(TeamId teamId);
     uint8 GetFlagState(TeamId teamId) const { return _flagState[teamId]; }
 
     /* Battleground Events */
-    void EventPlayerDroppedFlag(Player* player);
-    void EventPlayerClickedOnFlag(Player* player, GameObject* gameObject);
+    void EventPlayerDroppedFlag(Player* player) override;
+    void EventPlayerClickedOnFlag(Player* player, GameObject* gameObject) override;
     void EventPlayerCapturedFlag(Player* player);
 
-    void RemovePlayer(Player* player);
-    void HandleAreaTrigger(Player* player, uint32 trigger);
-    void HandleKillPlayer(Player* player, Player* killer);
-    bool SetupBattleground();
-    void Init();
-    void EndBattleground(TeamId winnerTeamId);
-    GraveyardStruct const* GetClosestGraveyard(Player* player);
+    void RemovePlayer(Player* player) override;
+    void HandleAreaTrigger(Player* player, uint32 trigger) override;
+    void HandleKillPlayer(Player* player, Player* killer) override;
+    bool SetupBattleground() override;
+    void Init() override;
+    void EndBattleground(TeamId winnerTeamId) override;
+    GraveyardStruct const* GetClosestGraveyard(Player* player) override;
 
     void UpdateFlagState(TeamId teamId, uint32 value);
-    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
-    void SetDroppedFlagGUID(uint64 guid, TeamId teamId) { _droppedFlagGUID[teamId] = guid; }
+    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
+    void SetDroppedFlagGUID(uint64 guid, TeamId teamId) override { _droppedFlagGUID[teamId] = guid; }
     uint64 GetDroppedFlagGUID(TeamId teamId) const { return _droppedFlagGUID[teamId];}
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
     /* Scorekeeping */
     void AddPoints(TeamId teamId, uint32 points) { m_TeamScores[teamId] += points; }
 
-    TeamId GetPrematureWinner();
+    TeamId GetPrematureWinner() override;
     uint32 GetMatchTime() const { return 1 + (BG_WS_TOTAL_GAME_TIME - GetStartTime()) / (MINUTE * IN_MILLISECONDS); }
     uint32 GetAssaultSpellId() const;
     void RemoveAssaultAuras();
@@ -203,6 +203,6 @@ private:
     uint32 _honorWinKills;
     uint32 _honorEndKills;
 
-    void PostUpdateImpl(uint32 diff);
+    void PostUpdateImpl(uint32 diff) override;
 };
 #endif

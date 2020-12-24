@@ -101,7 +101,7 @@ public:
     {
         boss_mandokirAI(Creature* creature) : BossAI(creature, DATA_MANDOKIR) { }
 
-        void Reset()
+        void Reset() override
         {
             if (me->GetPositionZ() > 140.0f)
             {
@@ -117,7 +117,7 @@ public:
             me->Mount(MODEL_OHGAN_MOUNT);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             // Do not want to unsummon Ohgan
             for (int i = 0; i < CHAINED_SPIRT_COUNT; ++i)
@@ -127,7 +127,7 @@ public:
             instance->SaveToDB();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_OVERPOWER, urand(7000, 9000));
@@ -150,7 +150,7 @@ public:
             DoZoneInCombat();
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -166,7 +166,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == WAYPOINT_MOTION_TYPE)
             {
@@ -180,7 +180,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -266,7 +266,7 @@ public:
         uint64 chainedSpirtGUIDs[CHAINED_SPIRT_COUNT];
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetZulGurubAI<boss_mandokirAI>(creature);
     }
@@ -288,19 +288,19 @@ public:
     {
         npc_ohganAI(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript()) { }
 
-        void Reset()
+        void Reset() override
         {
             SunderArmor_Timer = 5000;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             instance->SetBossState(DATA_OHGAN, DONE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // Return since we have no target
             if (!UpdateVictim())
@@ -321,7 +321,7 @@ public:
         InstanceScript* instance;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetZulGurubAI<npc_ohganAI>(creature);
     }
@@ -342,20 +342,20 @@ public:
     {
         npc_vilebranch_speakerAI(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript()) { }
 
-        void Reset()
+        void Reset() override
         {
             demoralizing_Shout_Timer = urand(2000, 4000);
             cleave_Timer = urand(5000, 8000);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             instance->SetBossState(DATA_MANDOKIR, SPECIAL);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // Return since we have no target
             if (!UpdateVictim())
@@ -384,7 +384,7 @@ public:
         InstanceScript* instance;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_vilebranch_speakerAI>(creature);
     }
@@ -407,13 +407,13 @@ public:
                         caster->CastSpell(target, SPELL_WATCH_CHARGE);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_threatening_gaze_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_threatening_gaze_AuraScript();
     }

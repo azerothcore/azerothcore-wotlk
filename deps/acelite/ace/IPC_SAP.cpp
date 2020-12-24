@@ -5,6 +5,9 @@
 #include "ace/os_include/os_signal.h"
 #include "ace/OS_NS_errno.h"
 #include "ace/OS_NS_fcntl.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 #if !defined (__ACE_INLINE__)
 #include "ace/IPC_SAP.inl"

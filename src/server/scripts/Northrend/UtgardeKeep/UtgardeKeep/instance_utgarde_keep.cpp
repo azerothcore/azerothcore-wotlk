@@ -12,7 +12,7 @@ class instance_utgarde_keep : public InstanceMapScript
 public:
     instance_utgarde_keep() : InstanceMapScript("instance_utgarde_keep", 574) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_utgarde_keep_InstanceMapScript(pMap);
     }
@@ -40,7 +40,7 @@ public:
         uint64 NPC_SpecialDrakeGUID;
         bool bRocksAchiev;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             ForgeEventMask = 0;
@@ -61,7 +61,7 @@ public:
             bRocksAchiev = true;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS) return true;
@@ -69,7 +69,7 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player* plr)
+        void OnPlayerEnter(Player* plr) override
         {
             if (Creature* c = instance->GetCreature(NPC_DarkRangerMarrahGUID))
             {
@@ -86,7 +86,7 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch(creature->GetEntry())
             {
@@ -117,7 +117,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch(go->GetEntry())
             {
@@ -168,7 +168,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -284,7 +284,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const
+        uint64 GetData64(uint32 id) const override
         {
             switch(id)
             {
@@ -300,7 +300,7 @@ public:
             return 0;
         }
 
-        uint32 GetData(uint32 id) const
+        uint32 GetData(uint32 id) const override
         {
             switch(id)
             {
@@ -316,7 +316,7 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -329,7 +329,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -361,7 +361,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
