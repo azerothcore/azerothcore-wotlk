@@ -42,8 +42,6 @@ INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verified
 
 UPDATE `quest_template_locale` SET `ObjectiveText1`='Cruzado Escarlata asesinado', `ObjectiveText2`='Ciudadano de Villa Refugio asesinado' WHERE `ID`=12678 AND `locale` IN ('esES', 'esMX');
 
-UPDATE `broadcast_text` SET `MaleText`='Have mercy, $gsir:madam;!', `FemaleText`='Have mercy, $gsir:madam;!' WHERE `ID`=28767;
-
 DELETE FROM `quest_offer_reward_locale` WHERE `ID`=12678 AND `locale` IN ('esES', 'esMX');
 
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
