@@ -144,3 +144,4 @@ DELETE FROM `gameobject` WHERE `guid` IN (75160, 75163, 7228, 7227);
 DELETE FROM `broadcast_text` WHERE `ID` = 100003;
 INSERT INTO `broadcast_text` (`ID`, `Language`, `MaleText`, `FemaleText`, `EmoteID0`, `EmoteID1`, `EmoteID2`, `EmoteDelay0`, `EmoteDelay1`, `EmoteDelay2`, `SoundId`, `Unk1`, `Unk2`, `VerifiedBuild`) VALUES
 (100003, 0, 'Ah...the heroes. You are persistent, aren\'t you? Your ally here attempted to match his power against mine - and paid the price. Now he shall serve me...by slaughtering you. Get up little Red Wyrm, and destroy them!', 'Ah...the heroes. You are persistent, aren\'t you? Your ally here attempted to match his power against mine - and paid the price. Now he shall serve me...by slaughtering you. Get up little Red Wyrm, and destroy them!', 0, 0, 0, 0, 0, 0, 8279, 0, 0, 0);
+
