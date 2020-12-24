@@ -19,11 +19,6 @@ DB_AUTH_CONF="MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='localhost';"
 DB_WORLD_CONF="MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='localhost';"
 CONFIG_SH
 
-# time sudo apt-get update -y
-# time sudo apt-get upgrade -y
-# time sudo apt-get install -y git lsb-release sudo ccache
-# time ./acore.sh install-deps
-
 case $COMPILER in
 
   # this is in order to use the "default" gcc version of the OS, without forcing a specific version
