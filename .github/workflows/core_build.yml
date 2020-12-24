@@ -42,6 +42,8 @@ jobs:
       - name: Checkout modules
         run: ./apps/ci/ci-install-modules.sh
         if: matrix.modules == 'with'
+        name: test
+        run: exit 1
       - name: Cache
         uses: actions/cache@v2
         with:
