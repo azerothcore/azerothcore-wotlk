@@ -5,7 +5,7 @@ export CCACHE_MAXSIZE='2G'
 export CCACHE_COMPRESS=9
 ccache -s
 
-mkdir var/build/obj && cd var/build/obj;
+cd var/build/obj
 
 time cmake ../../../ \
 -DTOOLS=1 \
