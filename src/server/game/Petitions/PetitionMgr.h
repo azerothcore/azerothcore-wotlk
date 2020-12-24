@@ -8,6 +8,17 @@ Xinef
 #include "Common.h"
 #include <map>
 
+#define CHARTER_DISPLAY_ID 16161
+
+// Charters ID in item_template
+enum CharterItemIDs
+{
+    GUILD_CHARTER           = 5863,
+    ARENA_TEAM_CHARTER_2v2  = 23560,
+    ARENA_TEAM_CHARTER_3v3  = 23561,
+    ARENA_TEAM_CHARTER_5v5  = 23562
+};
+
 typedef std::map<uint32, uint32> SignatureMap;
 
 struct Petition

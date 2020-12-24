@@ -4217,6 +4217,8 @@ void Unit::RemoveAura(AuraApplicationMap::iterator& i, AuraRemoveMode mode)
     // Remove aura - for Area and Target auras
     if (aura->GetOwner() == this)
         aura->Remove(mode);
+
+    sScriptMgr->OnAuraRemove(this, aurApp, mode);
 }
 
 void Unit::RemoveAura(uint32 spellId, uint64 caster, uint8 reqEffMask, AuraRemoveMode removeMode)
@@ -9466,6 +9468,11 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
             }
         }
     }
+
+    ReputationRank repRank = REP_HATED;
+
+    if (!sScriptMgr->IfNormalReaction(this, target, repRank))
+        return ReputationRank(repRank);
     // do checks dependant only on our faction
     return GetFactionReactionTo(GetFactionTemplateEntry(), target);
 }
@@ -10555,6 +10562,9 @@ float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, Da
         if (!spellProto->ValidateAttribute6SpellDamageMods(this, *i, damagetype == DOT))
             continue;
 
+        if (!sScriptMgr->IsNeedModSpellDamagePercent(this, *i, DoneTotalMod, spellProto))
+            continue;
+
         if ((*i)->GetMiscValue() & spellProto->GetSchoolMask())
         {
             if ((*i)->GetSpellInfo()->EquippedItemClass == -1)
@@ -11559,8 +11569,13 @@ float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, D
 
     // Healing done percent
     AuraEffectList const& mHealingDonePct = GetAuraEffectsByType(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
-    for (AuraEffectList::const_iterator i = mHealingDonePct.begin(); i != mHealingDonePct.end(); ++i)
-        AddPct(DoneTotalMod, (*i)->GetAmount());
+    for (auto const& auraEff : mHealingDonePct)
+    {
+        if (!sScriptMgr->IsNeedModHealPercent(this, auraEff, DoneTotalMod, spellProto))
+            continue;
+
+        AddPct(DoneTotalMod, auraEff->GetAmount());
+    }
 
     // done scripted mod (take it from owner)
     Unit* owner = GetOwner() ? GetOwner() : this;
@@ -12173,6 +12188,9 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
         for (AuraEffectList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
         {
             if (!spellProto->ValidateAttribute6SpellDamageMods(this, *i, false))
+                continue;
+
+            if (!sScriptMgr->IsNeedModMeleeDamagePercent(this, *i, DoneTotalMod, spellProto))
                 continue;
 
             if (((*i)->GetMiscValue() & spellProto->GetSchoolMask()) && !((*i)->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL))
@@ -17969,6 +17987,9 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
         // pussywizard: goign to other phase (valithria, algalon) should not remove such auras
         //RemoveNotOwnSingleTargetAuras(newPhaseMask, true);            // we can lost access to caster or target
 
+        if (!sScriptMgr->CanSetPhaseMask(this, newPhaseMask, update))
+            return;
+
         // modify hostile references for new phasemask, some special cases deal with hostile references themselves
         if (GetTypeId() == TYPEID_UNIT || (!ToPlayer()->IsGameMaster() && !ToPlayer()->GetSession()->PlayerLogout()))
         {
@@ -19780,6 +19801,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                             fieldBuffer << uint32(target->getFaction());
                     }
                     else
+                        if (!sScriptMgr->IsCustomBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
                         fieldBuffer << m_uint32Values[index];
                 }// pussywizard / Callmephil
                 else if (target->IsSpectator() && target->FindMap() && target->FindMap()->IsBattleArena() &&

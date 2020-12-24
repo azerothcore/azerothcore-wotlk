@@ -1382,7 +1382,7 @@ void Battleground::ReadyMarkerClicked(Player* p)
         return;
     readyMarkerClickedSet.insert(p->GetGUIDLow());
     uint32 count = readyMarkerClickedSet.size();
-    uint32 req = GetArenaType() * 2;
+    uint32 req = ArenaTeam::GetReqPlayersForType(GetArenaType());
     p->GetSession()->SendNotification("You are marked as ready %u/%u", count, req);
     if (count == req)
     {

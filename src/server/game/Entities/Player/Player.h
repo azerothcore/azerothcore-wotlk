@@ -11,7 +11,7 @@
 #include "GroupReference.h"
 #include "MapReference.h"
 #include "InstanceSaveMgr.h"
-
+#include "ArenaTeam.h"
 #include "Item.h"
 #include "PetDefines.h"
 #include "QuestDef.h"
@@ -749,19 +749,6 @@ enum InstanceResetWarningType
     RAID_INSTANCE_WARNING_MIN_SOON  = 3,                    // WARNING! %s is scheduled to reset in %d minute(s). Please exit the zone or you will be returned to your bind location!
     RAID_INSTANCE_WELCOME           = 4,                    // Welcome to %s. This raid instance is scheduled to reset in %s.
     RAID_INSTANCE_EXPIRED           = 5
-};
-
-// PLAYER_FIELD_ARENA_TEAM_INFO_1_1 offsets
-enum ArenaTeamInfoType
-{
-    ARENA_TEAM_ID                = 0,
-    ARENA_TEAM_TYPE              = 1,                       // new in 3.2 - team type?
-    ARENA_TEAM_MEMBER            = 2,                       // 0 - captain, 1 - member
-    ARENA_TEAM_GAMES_WEEK        = 3,
-    ARENA_TEAM_GAMES_SEASON      = 4,
-    ARENA_TEAM_WINS_SEASON       = 5,
-    ARENA_TEAM_PERSONAL_RATING   = 6,
-    ARENA_TEAM_END               = 7
 };
 
 class InstanceSave;
@@ -1504,7 +1491,7 @@ public:
     void RemoveRewardedQuest(uint32 questId, bool update = true);
     void SendQuestUpdate(uint32 questId);
     QuestGiverStatus GetQuestDialogStatus(Object* questGiver);
-
+    float GetQuestRate();
     void SetDailyQuestStatus(uint32 quest_id);
     bool IsDailyQuestDone(uint32 quest_id);
     void SetWeeklyQuestStatus(uint32 quest_id);
@@ -1654,6 +1641,7 @@ public:
 
     [[nodiscard]] RewardedQuestSet const& getRewardedQuests() const { return m_RewardedQuests; }
     QuestStatusMap& getQuestStatusMap() { return m_QuestStatus; }
+    QuestStatusSaveMap& GetQuestStatusSaveMap() { return m_QuestStatusSave; }
 
     [[nodiscard]] size_t GetRewardedQuestCount() const { return m_RewardedQuests.size(); }
     [[nodiscard]] bool IsQuestRewarded(uint32 quest_id) const
@@ -1951,10 +1939,10 @@ public:
         SetArenaTeamInfoField(slot, ARENA_TEAM_TYPE, type);
     }
     void SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value);
+    uint32 GetArenaPersonalRating(uint8 slot) const;
     static uint32 GetArenaTeamIdFromDB(uint64 guid, uint8 slot);
     static void LeaveAllArenaTeams(uint64 guid);
-    [[nodiscard]] uint32 GetArenaTeamId(uint8 slot) const;
-    [[nodiscard]] uint32 GetArenaPersonalRating(uint8 slot) const;
+    uint32 GetArenaTeamId(uint8 slot) const;
     void SetArenaTeamIdInvited(uint32 ArenaTeamId) { m_ArenaTeamIdInvited = ArenaTeamId; }
     uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
 
@@ -2469,6 +2457,10 @@ public:
     void SendCinematicStart(uint32 CinematicSequenceId);
     void SendMovieStart(uint32 MovieId);
 
+    uint16 GetMaxSkillValueForLevel() const;
+    bool IsFFAPvP();
+    bool IsPvP();
+
     /*********************************************************/
     /***                 INSTANCE SYSTEM                   ***/
     /*********************************************************/
@@ -2674,6 +2666,9 @@ public:
     [[nodiscard]] const PlayerTalentMap& GetTalentMap() const { return m_talents; }
     [[nodiscard]] uint32 GetNextSave() const { return m_nextSave; }
     [[nodiscard]] SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
+
+    void SetServerSideVisibility(ServerSideVisibilityType type, AccountTypes sec);
+    void SetServerSideVisibilityDetect(ServerSideVisibilityType type, AccountTypes sec);
 
     static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
 

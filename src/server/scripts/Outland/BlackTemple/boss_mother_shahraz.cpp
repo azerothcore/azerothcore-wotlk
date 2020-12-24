@@ -265,8 +265,8 @@ public:
 
         void SetDest(SpellDestination& dest)
         {
-            std::list<Spell::TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-            for (std::list<Spell::TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+            std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+            for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
                 if (Unit* target = ObjectAccessor::GetUnit(*GetCaster(), ihit->targetGUID))
                 {
                     dest.Relocate(*target);

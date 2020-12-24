@@ -17,6 +17,7 @@
 #include "SocialMgr.h"
 #include "Language.h"
 #include "AccountMgr.h"
+#include "ScriptMgr.h"
 
 void WorldSession::SendTradeStatus(TradeStatus status)
 {
@@ -639,6 +640,9 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         SendNotification(GetAcoreString(LANG_TRADE_OTHER_REQ), sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ));
         return;
     }
+
+    if (!sScriptMgr->CanInitTrade(_player, pOther))
+        return;
 
     // OK start trade
     _player->m_trade = new TradeData(_player, pOther);

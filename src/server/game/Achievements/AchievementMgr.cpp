@@ -830,6 +830,8 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
     if (!achievementCriteriaList)
         return;
 
+    sScriptMgr->OnBeforeCheckCriteria(this, achievementCriteriaList);
+
     for (AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList->begin(); i != achievementCriteriaList->end(); ++i)
     {
         AchievementCriteriaEntry const* achievementCriteria = (*i);
@@ -838,6 +840,9 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             continue;
 
         if (!CanUpdateCriteria(achievementCriteria, achievement))
+            continue;
+
+        if (!sScriptMgr->CanCheckCriteria(this, achievementCriteria))
             continue;
 
         switch (type)
@@ -1765,6 +1770,9 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
     if (!progress)
         return false;
 
+    if (!sScriptMgr->IsCompletedCriteria(this, achievementCriteria, achievement, progress))
+        return false;
+
     switch (achievementCriteria->requiredType)
     {
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
@@ -2397,6 +2405,9 @@ bool AchievementGlobalMgr::IsRealmCompleted(AchievementEntry const* achievement)
     if (itr->second == std::chrono::system_clock::time_point::min())
         return false;
 
+    if (!sScriptMgr->IsRealmCompleted(this, achievement, itr->second))
+        return false;
+
     if (itr->second == std::chrono::system_clock::time_point::max())
         return true;
 
@@ -2405,6 +2416,8 @@ bool AchievementGlobalMgr::IsRealmCompleted(AchievementEntry const* achievement)
     // but apparently this is how blizz handles it as well
     if (achievement->flags & ACHIEVEMENT_FLAG_REALM_FIRST_KILL)
         return (std::chrono::system_clock::now() - itr->second) > std::chrono::minutes(1);
+
+    sScriptMgr->SetRealmCompleted(achievement);
 
     return true;
 }

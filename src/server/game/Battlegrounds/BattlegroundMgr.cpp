@@ -468,23 +468,7 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
 
     // Set up correct min/max player counts for scoreboards
     if (bg->isArena())
-    {
-        uint32 maxPlayersPerTeam = 0;
-        switch (arenaType)
-        {
-            case ARENA_TYPE_2v2:
-                maxPlayersPerTeam = 2;
-                break;
-            case ARENA_TYPE_3v3:
-                maxPlayersPerTeam = 3;
-                break;
-            case ARENA_TYPE_5v5:
-                maxPlayersPerTeam = 5;
-                break;
-        }
-        sScriptMgr->OnSetArenaMaxPlayersPerTeam(arenaType, maxPlayersPerTeam);
-        bg->SetMaxPlayersPerTeam(maxPlayersPerTeam);
-    }
+        bg->SetMaxPlayersPerTeam(ArenaTeam::GetReqPlayersForType(arenaType) / 2);
 
     return bg;
 }
@@ -748,29 +732,16 @@ bool BattlegroundMgr::IsArenaType(BattlegroundTypeId bgTypeId)
 
 BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgTypeId, uint8 arenaType)
 {
-    if (arenaType) {
-        uint32 queueTypeID = BATTLEGROUND_QUEUE_NONE;
-        switch (arenaType) {
-            case ARENA_TYPE_2v2:
-                queueTypeID = BATTLEGROUND_QUEUE_2v2;
-                break;
-            case ARENA_TYPE_3v3:
-                queueTypeID = BATTLEGROUND_QUEUE_3v3;
-                break;
-            case ARENA_TYPE_5v5:
-                queueTypeID = BATTLEGROUND_QUEUE_5v5;
-                break;
-            default:
-                break;
-        }
-        sScriptMgr->OnArenaTypeIDToQueueID(bgTypeId, arenaType, queueTypeID);
-        return BattlegroundQueueTypeId(queueTypeID);
-    }
+    if (arenaType)
+    {
+        if (BattlegroundMgr::ArenaTypeToQueue.find(arenaType) == BattlegroundMgr::ArenaTypeToQueue.end())
+            return BATTLEGROUND_QUEUE_NONE;
+        else
+            return BattlegroundMgr::ArenaTypeToQueue[arenaType];
+    } 
 
     if (BattlegroundMgr::bgToQueue.find(bgTypeId) == BattlegroundMgr::bgToQueue.end())
-    {
         return BATTLEGROUND_QUEUE_NONE;
-    }
 
     return BattlegroundMgr::bgToQueue[bgTypeId];
 }
@@ -787,23 +758,10 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
 
 uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
 {
-    uint8 arenaType = 0;
-    switch (bgQueueTypeId)
-    {
-        case BATTLEGROUND_QUEUE_2v2:
-            arenaType = ARENA_TYPE_2v2;
-            break;
-        case BATTLEGROUND_QUEUE_3v3:
-            arenaType = ARENA_TYPE_3v3;
-            break;
-        case BATTLEGROUND_QUEUE_5v5:
-            arenaType = ARENA_TYPE_5v5;
-            break;
-        default:
-            break;
-    }
-    sScriptMgr->OnArenaQueueIdToArenaType(bgQueueTypeId, arenaType);
-    return arenaType;
+    if (BattlegroundMgr::QueueToArenaType.find(bgQueueTypeId) == BattlegroundMgr::QueueToArenaType.end())
+        return 0;
+
+    return BattlegroundMgr::QueueToArenaType[bgQueueTypeId];
 }
 
 void BattlegroundMgr::ToggleTesting()
@@ -1165,4 +1123,18 @@ std::unordered_map<int, bgTypeRef> BattlegroundMgr::getBgFromTypeID =
             }
         }
     }
+};
+
+std::unordered_map<uint32, BattlegroundQueueTypeId> BattlegroundMgr::ArenaTypeToQueue =
+{
+    { ARENA_TYPE_2v2, BATTLEGROUND_QUEUE_2v2 },
+    { ARENA_TYPE_3v3, BATTLEGROUND_QUEUE_3v3 },
+    { ARENA_TYPE_5v5, BATTLEGROUND_QUEUE_5v5 }
+};
+
+std::unordered_map<uint32, ArenaType> BattlegroundMgr::QueueToArenaType =
+{
+    { BATTLEGROUND_QUEUE_2v2, ARENA_TYPE_2v2 },
+    { BATTLEGROUND_QUEUE_3v3, ARENA_TYPE_3v3 },
+    { BATTLEGROUND_QUEUE_5v5, ARENA_TYPE_5v5 }
 };

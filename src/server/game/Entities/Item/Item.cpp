@@ -91,6 +91,7 @@ void AddItemsSetItem(Player* player, Item* item)
                 }
 
                 // spell casted only if fit form requirement, in other case will casted at form change
+                if (sScriptMgr->CanItemApplyEquipSpell(player, item))
                 player->ApplyEquipSpell(spellInfo, NULL, true);
                 eff->spells[y] = spellInfo;
                 break;
@@ -266,6 +267,7 @@ bool Item::Create(uint32 guidlow, uint32 itemid, Player const* owner)
 
     SetUInt32Value(ITEM_FIELD_DURATION, itemProto->Duration);
     SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, 0);
+    sScriptMgr->OnItemCreate(this, itemProto, owner);
     return true;
 }
 
@@ -423,7 +425,7 @@ bool Item::LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entr
 
     SetUInt32Value(ITEM_FIELD_FLAGS, fields[5].GetUInt32());
     // Remove bind flag for items vs NO_BIND set
-    if (IsSoulBound() && proto->Bonding == NO_BIND)
+    if (IsSoulBound() && proto->Bonding == NO_BIND && sScriptMgr->CanApplySoulboundFlag(this, proto))
     {
         ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, false);
         need_save = true;
