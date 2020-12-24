@@ -46,18 +46,18 @@ public:
                 Talk(id);
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             OwnTalk(SAY_ENTER);
             ScriptedAI::InitializeAI();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_HASTEN, 12000);
             events.ScheduleEvent(EVENT_MORTAL_WOUND, 5000);
@@ -68,20 +68,20 @@ public:
             OwnTalk(SAY_AGGRO);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 OwnTalk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             OwnTalk(SAY_DEATH);
             if (InstanceScript* instance = me->GetInstanceScript())
                 instance->SetData(TYPE_TEMPORUS, DONE);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
             {
@@ -96,7 +96,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -129,7 +129,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_temporusAI(creature);
     }

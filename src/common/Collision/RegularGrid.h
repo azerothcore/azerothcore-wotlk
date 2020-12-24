@@ -52,7 +52,7 @@ public:
 #define HGRID_MAP_SIZE  (533.33333f * 64.f)     // shouldn't be changed
 #define CELL_SIZE       float(HGRID_MAP_SIZE/(float)CELL_NUMBER)
 
-    typedef G3D::Table<const T*, NodeArray<Node> > MemberTable;
+    typedef G3D::Table<const T*, NodeArray<Node>> MemberTable;
 
     MemberTable memberTable;
     Node* nodes[CELL_NUMBER][CELL_NUMBER];

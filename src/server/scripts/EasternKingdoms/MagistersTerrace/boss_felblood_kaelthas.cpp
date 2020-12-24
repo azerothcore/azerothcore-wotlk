@@ -69,7 +69,7 @@ class boss_felblood_kaelthas : public CreatureScript
 public:
     boss_felblood_kaelthas() : CreatureScript("boss_felblood_kaelthas") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_felblood_kaelthasAI(creature);
     }
@@ -88,16 +88,16 @@ public:
         SummonList summons;
         bool introSpeak;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
             instance->SetData(DATA_KAELTHAS_EVENT, NOT_STARTED);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 if (*itr == summon->GetGUID())
@@ -105,18 +105,18 @@ public:
             summons.Summon(summon);
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             instance->SetData(DATA_KAELTHAS_EVENT, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             instance->SetData(DATA_KAELTHAS_EVENT, IN_PROGRESS);
             me->SetInCombatWithZone();
@@ -130,7 +130,7 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_SHOCK_BARRIER, 50000);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!introSpeak && me->IsWithinDistInMap(who, 40.0f) && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -142,15 +142,15 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
             {
-                damage = me->GetHealth()-1;
+                damage = me->GetHealth() - 1;
                 if (me->isRegeneratingHealth())
                 {
                     me->SetRegeneratingHealth(false);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->CombatStop();
                     me->SetReactState(REACT_PASSIVE);
                     LapseAction(ACTION_REMOVE_FLY);
@@ -160,7 +160,7 @@ public:
                 }
             }
         }
-        
+
         void LapseAction(uint8 action)
         {
             uint8 counter = 0;
@@ -169,7 +169,7 @@ public:
                 if (Player* player = itr->GetSource())
                 {
                     if (action == ACTION_TELEPORT_PLAYERS)
-                        me->CastSpell(player, SPELL_GRAVITY_LAPSE_PLAYER+counter, true);
+                        me->CastSpell(player, SPELL_GRAVITY_LAPSE_PLAYER + counter, true);
                     else if (action == ACTION_KNOCKUP)
                         player->CastSpell(player, SPELL_GRAVITY_LAPSE_DOT, true, nullptr, nullptr, me->GetGUID());
                     else if (action == ACTION_ALLOW_FLY)
@@ -182,13 +182,13 @@ public:
                 }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
             {
                 case EVENT_INIT_COMBAT:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     if (Unit* target = SelectTargetFromPlayerList(50.0f))
                         AttackStart(target);
                     return;
@@ -285,29 +285,29 @@ public:
 
 class spell_mt_phoenix_burn : public SpellScriptLoader
 {
-    public:
-        spell_mt_phoenix_burn() : SpellScriptLoader("spell_mt_phoenix_burn") { }
+public:
+    spell_mt_phoenix_burn() : SpellScriptLoader("spell_mt_phoenix_burn") { }
 
-        class spell_mt_phoenix_burn_SpellScript : public SpellScript
+    class spell_mt_phoenix_burn_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_mt_phoenix_burn_SpellScript);
+
+        void HandleAfterCast()
         {
-            PrepareSpellScript(spell_mt_phoenix_burn_SpellScript);
-
-            void HandleAfterCast()
-            {
-                uint32 damage = CalculatePct(GetCaster()->GetMaxHealth(), 5);
-                Unit::DealDamage(GetCaster(), GetCaster(), damage);
-            }
-
-            void Register()
-            {
-                AfterCast += SpellCastFn(spell_mt_phoenix_burn_SpellScript::HandleAfterCast);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_mt_phoenix_burn_SpellScript();
+            uint32 damage = CalculatePct(GetCaster()->GetMaxHealth(), 5);
+            Unit::DealDamage(GetCaster(), GetCaster(), damage);
         }
+
+        void Register() override
+        {
+            AfterCast += SpellCastFn(spell_mt_phoenix_burn_SpellScript::HandleAfterCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_mt_phoenix_burn_SpellScript();
+    }
 };
 
 void AddSC_boss_felblood_kaelthas()

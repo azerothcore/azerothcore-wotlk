@@ -49,7 +49,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_ATM_Connector
 {
 public:
-  // = Initialization methods.
   /// Default constructor.
   ACE_ATM_Connector (void);
 

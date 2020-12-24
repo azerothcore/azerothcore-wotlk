@@ -30,7 +30,7 @@ public:
     void GetFileListTo(std::vector<std::string>& filelist)
     {
         uint32_t filenum;
-        if(libmpq__file_number(mpq_a, "(listfile)", &filenum)) return;
+        if (libmpq__file_number(mpq_a, "(listfile)", &filenum)) return;
         libmpq__off_t size, transferred;
         libmpq__file_unpacked_size(mpq_a, filenum, &size);
 

@@ -59,7 +59,7 @@ class npc_stave_of_the_ancients : public CreatureScript
 public:
     npc_stave_of_the_ancients() : CreatureScript("npc_stave_of_the_ancients") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_stave_of_the_ancientsAI(creature);
     }
@@ -71,11 +71,21 @@ public:
             changeEntry = me->GetEntry();
             switch (me->GetEntry())
             {
-                case NPC_SIMONE_NORMAL: changeEntry = NPC_SIMONE_EVIL; break;
-                case NPC_FRANKLIN_NORMAL: changeEntry = NPC_FRANKLIN_EVIL; break;
-                case NPC_ARTORIUS_NORMAL: changeEntry = NPC_ARTORIUS_EVIL; break;
-                case NPC_NELSON_NORMAL: changeEntry = NPC_NELSON_EVIL; break;
-                case NPC_PRECIOUS: changeEntry = NPC_PRECIOUS_EVIL; break;
+                case NPC_SIMONE_NORMAL:
+                    changeEntry = NPC_SIMONE_EVIL;
+                    break;
+                case NPC_FRANKLIN_NORMAL:
+                    changeEntry = NPC_FRANKLIN_EVIL;
+                    break;
+                case NPC_ARTORIUS_NORMAL:
+                    changeEntry = NPC_ARTORIUS_EVIL;
+                    break;
+                case NPC_NELSON_NORMAL:
+                    changeEntry = NPC_NELSON_EVIL;
+                    break;
+                case NPC_PRECIOUS:
+                    changeEntry = NPC_PRECIOUS_EVIL;
+                    break;
             }
         }
 
@@ -84,7 +94,7 @@ public:
         uint32 changeEntry;
         bool damaged;
 
-        void Reset()
+        void Reset() override
         {
             if (me->GetOriginalEntry() != me->GetEntry())
                 me->UpdateEntry(me->GetOriginalEntry());
@@ -94,7 +104,7 @@ public:
             damaged = false;
         }
 
-        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
         {
             if (!damaged)
             {
@@ -108,7 +118,7 @@ public:
                 damaged = false;
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             switch (changeEntry)
             {
@@ -131,7 +141,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->GetEntry() != changeEntry && who->GetTypeId() == TYPEID_PLAYER && who->ToPlayer()->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE)
             {
@@ -143,10 +153,10 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            uint32 eventId = events.GetEvent();
+            uint32 eventId = events.ExecuteEvent();
             if (eventId == EVENT_CHECK_PLAYER)
             {
                 Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
@@ -322,46 +332,46 @@ class DialogueHelper
 public:
     // The array MUST be terminated by {0, 0, 0}
     DialogueHelper(DialogueEntry const* dialogueArray) :
-      _dialogueArray(dialogueArray),
-          _currentEntry(nullptr),
-          _actionTimer(0)
-      { }
-      // The array MUST be terminated by {0, 0, 0, 0, 0}
+        _dialogueArray(dialogueArray),
+        _currentEntry(nullptr),
+        _actionTimer(0)
+    { }
+    // The array MUST be terminated by {0, 0, 0, 0, 0}
 
-      /// Function to initialize the dialogue helper for instances. If not used with instances, GetSpeakerByEntry MUST be overwritten to obtain the speakers
-      /// Set if take first entries or second entries
+    /// Function to initialize the dialogue helper for instances. If not used with instances, GetSpeakerByEntry MUST be overwritten to obtain the speakers
+    /// Set if take first entries or second entries
 
-      void StartNextDialogueText(int32 textEntry)
-      {
-          // Find textEntry
-          bool found = false;
+    void StartNextDialogueText(int32 textEntry)
+    {
+        // Find textEntry
+        bool found = false;
 
-          for (DialogueEntry const* entry = _dialogueArray; entry->TextEntry; ++entry)
-          {
-              if (entry->TextEntry == textEntry)
-              {
-                  _currentEntry = entry;
-                  found = true;
-                  break;
-              }
-          }
+        for (DialogueEntry const* entry = _dialogueArray; entry->TextEntry; ++entry)
+        {
+            if (entry->TextEntry == textEntry)
+            {
+                _currentEntry = entry;
+                found = true;
+                break;
+            }
+        }
 
-          if (!found)
-              return;
+        if (!found)
+            return;
 
-          DoNextDialogueStep();
-      }
+        DoNextDialogueStep();
+    }
 
-      void DialogueUpdate(uint32 diff)
-      {
-          if (_actionTimer)
-          {
-              if (_actionTimer <= diff)
-                  DoNextDialogueStep();
-              else
-                  _actionTimer -= diff;
-          }
-      }
+    void DialogueUpdate(uint32 diff)
+    {
+        if (_actionTimer)
+        {
+            if (_actionTimer <= diff)
+                DoNextDialogueStep();
+            else
+                _actionTimer -= diff;
+        }
+    }
 
 protected:
     /// Will be called when a dialogue step was done
@@ -458,7 +468,7 @@ class npc_ranshalla : public CreatureScript
 {
 public:
     npc_ranshalla() : CreatureScript("npc_ranshalla") { }
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_GUARDIANS_ALTAR)
         {
@@ -473,7 +483,7 @@ public:
 
         return false;
     }
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ranshallaAI(creature);
     }
@@ -494,7 +504,7 @@ public:
         uint64 _voiceEluneGUID;
         uint64 _altarGUID;
 
-        void Reset()
+        void Reset() override
         {
             _delayTimer = 0;
         }
@@ -560,7 +570,7 @@ public:
             StartNextDialogueText(SAY_PRIESTESS_ALTAR_3);
         }
 
-        void WaypointReached(uint32 pointId)
+        void WaypointReached(uint32 pointId) override
         {
             switch (pointId)
             {
@@ -579,23 +589,23 @@ public:
                     SetEscortPaused(true);
                     break;
                 case 41:
-                {
-                    // Search for all nearest lights and respawn them
-                    std::list<GameObject*> eluneLights;
-                    GetGameObjectListWithEntryInGrid(eluneLights, me, GO_ELUNE_LIGHT, 20.0f);
-                    for (std::list<GameObject*>::const_iterator itr = eluneLights.begin(); itr != eluneLights.end(); ++itr)
                     {
-                        if ((*itr)->isSpawned())
-                            continue;
+                        // Search for all nearest lights and respawn them
+                        std::list<GameObject*> eluneLights;
+                        GetGameObjectListWithEntryInGrid(eluneLights, me, GO_ELUNE_LIGHT, 20.0f);
+                        for (std::list<GameObject*>::const_iterator itr = eluneLights.begin(); itr != eluneLights.end(); ++itr)
+                        {
+                            if ((*itr)->isSpawned())
+                                continue;
 
-                        (*itr)->SetRespawnTime(115);
-                        (*itr)->Refresh();
+                            (*itr)->SetRespawnTime(115);
+                            (*itr)->Refresh();
+                        }
+
+                        if (GameObject* altar = me->GetMap()->GetGameObject(_altarGUID))
+                            me->SetFacingToObject(altar);
+                        break;
                     }
-
-                    if (GameObject* altar = me->GetMap()->GetGameObject(_altarGUID))
-                        me->SetFacingToObject(altar);
-                    break;
-                }
                 case 42:
                     // Summon the 2 priestess
                     SetEscortPaused(true);
@@ -612,7 +622,7 @@ public:
             }
         }
 
-        void JustDidDialogueStep(int32 entry)
+        void JustDidDialogueStep(int32 entry) override
         {
             switch (entry)
             {
@@ -711,7 +721,7 @@ public:
             }
         }
 
-        Creature* GetSpeakerByEntry(int32 entry)
+        Creature* GetSpeakerByEntry(int32 entry) override
         {
             switch (entry)
             {
@@ -729,7 +739,7 @@ public:
 
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             DialogueUpdate(diff);
 

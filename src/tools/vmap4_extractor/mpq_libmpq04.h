@@ -7,13 +7,13 @@
 #ifndef MPQ_H
 #define MPQ_H
 
-#include "loadlib/loadlib.h"
 #include "libmpq/mpq.h"
-#include <string.h>
-#include <ctype.h>
-#include <vector>
-#include <iostream>
+#include "loadlib/loadlib.h"
+#include <cctype>
+#include <cstring>
 #include <deque>
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -29,7 +29,7 @@ public:
     void GetFileListTo(vector<string>& filelist)
     {
         uint32_t filenum;
-        if(libmpq__file_number(mpq_a, "(listfile)", &filenum)) return;
+        if (libmpq__file_number(mpq_a, "(listfile)", &filenum)) return;
         libmpq__off_t size, transferred;
         libmpq__file_unpacked_size(mpq_a, filenum, &size);
 
