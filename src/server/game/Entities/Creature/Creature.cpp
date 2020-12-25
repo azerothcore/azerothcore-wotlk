@@ -580,21 +580,26 @@ void Creature::Update(uint32 diff)
                     SelectVictim();
                 }
 
-                // Circling the target.
-                if (diff >= m_moveCircleMovementTime)
-                {
-                    AI()->CheckCircleRepositionRequirements();
-                    m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
-                }
-                else
-                {
-                    m_moveCircleMovementTime -= diff;
-                }
-
                 Unit* owner = GetCharmerOrOwner();
                 if (IsCharmed() && !IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()))
                 {
                     RemoveCharmAuras();
+                }
+
+                // enable circle movement only for not scripted NPC
+                // this should exclude bosses, caster and all kind of scripted NPC
+                if (GetAIName().length() == 0 && GetScriptName().length() == 0)
+                {
+                    // Circling the target
+                    if (diff >= m_moveCircleMovementTime)
+                    {
+                        AI()->CheckCircleRepositionRequirements();
+                        m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
+                    }
+                    else
+                    {
+                        m_moveCircleMovementTime -= diff;
+                    }
                 }
 
                 if (!IsInEvadeMode() && IsAIEnabled)
@@ -2864,11 +2869,6 @@ bool Creature::HasSpellFocus(Spell const* focusSpell) const
 {
     if (isDead()) // dead creatures cannot focus
     {
-        if (_spellFocusInfo.Spell || _spellFocusInfo.Delay)
-        {
-            // TC_LOG_WARN("entities.unit", "Creature '%s' (entry %u) has spell focus (spell id %u, delay %ums) despite being dead.",
-            //             GetName().c_str(), GetEntry(), _spellFocusInfo.Spell ? _spellFocusInfo.Spell->GetSpellInfo()->Id : 0, _spellFocusInfo.Delay);
-        }
         return false;
     }
 

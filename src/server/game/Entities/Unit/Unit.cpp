@@ -2275,19 +2275,22 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return NULL;
     }
 
-    // If already on an attack Position and close to Target abort.
-    if (attacker->GetDistance(GetPosition()) < GetCombatReach() && !(attacker->m_attackPosition == 0) && attacker->GetDistance(attacker->m_attackPosition._pos) < 0.25f)
+    // If already on an attack Position and close to Target abort
+    if (attacker->GetDistance(GetPosition()) < GetCombatReach() &&
+       !(attacker->m_attackPosition == 0) &&
+       attacker->GetDistance(attacker->m_attackPosition._pos) < 0.25f)
     {
        return NULL;
     }
+
     attacker->m_attackPosition = 0;
 
-    // Get all the distances.
+    // Get all the distances
     std::vector<AttackDistance> distances;
     distances.reserve( attackMeleePositions.size());
     for (uint8 i = 0; i < attackMeleePositions.size(); ++i)
     {
-        // If the spot has been taken.
+        // If the spot has been taken
         if (!attackMeleePositions[i]._taken)
         {
             distances.push_back(AttackDistance(i,attackMeleePositions[i]));
@@ -2299,10 +2302,10 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return NULL;
     }
 
-    // Get the shortest point.
+    // Get the shortest point
     uint8 shortestIndex = 0;
-    float shortestLength = 100.0f;
-    for (uint8 i = 0; i < distances.size(); ++i)
+    float shortestLength = attacker->GetDistance2d(distances[0]._attackPos._pos.m_positionX, distances[0]._attackPos._pos.m_positionY);
+    for (uint8 i = 1; i < distances.size(); ++i)
     {
         float dist = attacker->GetDistance2d(distances[i]._attackPos._pos.m_positionX, distances[i]._attackPos._pos.m_positionY); // +GetDistance(distances[i]._attackPos._pos);
         if (shortestLength > dist)
@@ -2312,10 +2315,10 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         }
     }
 
-    // Create closest Position.
+    // Create closest Position
     Position closestPos(distances[shortestIndex]._attackPos._pos);
 
-    // Too close mark point taken and find another spot.
+    // Too close mark point taken and find another spot
     for (uint8 i = 0; i < attackMeleePositions.size(); ++i)
     {
         float dist = closestPos.GetExactDist(&attackMeleePositions[i]._pos);

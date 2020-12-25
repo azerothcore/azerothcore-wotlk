@@ -1265,7 +1265,7 @@ struct AttackPosition {
     {
         if (!val)
         {
-            _pos = NULL;
+            // _pos = NULL;
             _taken = false;
             return 0; // NULL
         }

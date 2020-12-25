@@ -166,7 +166,6 @@ public:
     void MoveFollow(Unit* target, float dist, float angle, MovementSlot slot = MOTION_SLOT_ACTIVE);
     void MoveChase(Unit* target, float dist = 0.0f, float angle = 0.0f);
     void MoveCircleTarget(Unit* target);
-    void MoveBackwards(Unit* target, float dist);
     void MoveConfused();
     void MoveFleeing(Unit* enemy, uint32 time = 0);
     void MovePoint(uint32 id, const Position& pos, bool generatePath = true, bool forceDestination = true)
