@@ -157,7 +157,7 @@ void ExtractGameobjectModels()
             if (numTris > 0)
             {
                 uint32 i = 0;
-                for (std::vector<Triangle<uint16> >::iterator itr2 = model.Triangles.begin(); itr2 != model.Triangles.end(); ++itr2, ++i)
+                for (std::vector<Triangle<uint16>>::iterator itr2 = model.Triangles.begin(); itr2 != model.Triangles.end(); ++itr2, ++i)
                 {
                     indices[i * 3 + 0] = itr2->V0;
                     indices[i * 3 + 1] = itr2->V1;
@@ -229,7 +229,7 @@ void ExtractGameobjectModels()
                 uint32 mobaBatch = itr2->MOBALength / 12;
                 uint32* MobaEx = new uint32[mobaBatch * 4];
 
-                for(uint32 i = 8; i < itr2->MOBALength; i += 12)
+                for (uint32 i = 8; i < itr2->MOBALength; i += 12)
                     MobaEx[k++] = itr2->MOBA[i];
 
                 int mobaSizeGrp = mobaBatch * 4 + 4;

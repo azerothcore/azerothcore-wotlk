@@ -24,8 +24,8 @@ bool isHole(int holes, int i, int j)
 {
     int testi = i / 2;
     int testj = j / 4;
-    if(testi > 3) testi = 3;
-    if(testj > 3) testj = 3;
+    if (testi > 3) testi = 3;
+    if (testj > 3) testj = 3;
     return (holes & holetab_h[testi] & holetab_v[testj]) != 0;
 }
 
@@ -34,7 +34,7 @@ bool isHole(int holes, int i, int j)
 //
 ADT_file::ADT_file()
 {
-    a_grid = 0;
+    a_grid = nullptr;
 }
 
 ADT_file::~ADT_file()
@@ -44,7 +44,7 @@ ADT_file::~ADT_file()
 
 void ADT_file::free()
 {
-    a_grid = 0;
+    a_grid = nullptr;
     FileLoader::free();
 }
 

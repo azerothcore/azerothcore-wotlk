@@ -48,7 +48,7 @@ CTYPE=Release
 # compile scripts
 CSCRIPTS=ON
 # compile unit tests
-CUNIT_TESTS=OFF
+CBUILD_TESTING=OFF
 # compile server
 CSERVERS=ON
 # compile tools
@@ -98,44 +98,44 @@ BACKUP_FOLDER="$AC_PATH_ROOT/env/dist/sql/backup/"
 
 # FULL DB
 DB_AUTH_PATHS=(
-    $SRCPATH"/data/sql/base/db_auth/"
+    "$SRCPATH/data/sql/base/db_auth/"
 )
 
 DB_CHARACTERS_PATHS=(
-    $SRCPATH"/data/sql/base/db_characters"
+    "$SRCPATH/data/sql/base/db_characters"
 )
 
 DB_WORLD_PATHS=(
-    $SRCPATH"/data/sql/base/db_world/"
+    "$SRCPATH/data/sql/base/db_world/"
 )
 
 # UPDATES
 DB_AUTH_UPDATES_PATHS=(
-    $SRCPATH"/data/sql/updates/db_auth/"
-    $SRCPATH"/data/sql/updates/pending_db_auth/"
+    "$SRCPATH/data/sql/updates/db_auth/"
+    "$SRCPATH/data/sql/updates/pending_db_auth/"
 )
 
 DB_CHARACTERS_UPDATES_PATHS=(
-    $SRCPATH"/data/sql/updates/db_characters/"
-    $SRCPATH"/data/sql/updates/pending_db_characters/"
+    "$SRCPATH/data/sql/updates/db_characters/"
+    "$SRCPATH/data/sql/updates/pending_db_characters/"
 )
 
 DB_WORLD_UPDATES_PATHS=(
-    $SRCPATH"/data/sql/updates/db_world/"
-    $SRCPATH"/data/sql/updates/pending_db_world/"
+    "$SRCPATH/data/sql/updates/db_world/"
+    "$SRCPATH/data/sql/updates/pending_db_world/"
 )
 
 # CUSTOM
 DB_AUTH_CUSTOM_PATHS=(
-    $SRCPATH"/data/sql/custom/db_auth/"
+    "$SRCPATH/data/sql/custom/db_auth/"
 )
 
 DB_CHARACTERS_CUSTOM_PATHS=(
-    $SRCPATH"/data/sql/custom/db_characters/"
+    "$SRCPATH/data/sql/custom/db_characters/"
 )
 
 DB_WORLD_CUSTOM_PATHS=(
-    $SRCPATH"/data/sql/custom/db_world/"
+    "$SRCPATH/data/sql/custom/db_world/"
 )
 
 ##############################################

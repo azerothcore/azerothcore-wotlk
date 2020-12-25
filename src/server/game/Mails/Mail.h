@@ -9,6 +9,7 @@
 
 #include "Common.h"
 #include <map>
+#include <utility>
 
 struct AuctionEntry;
 struct CalendarEvent;
@@ -79,9 +80,9 @@ public:                                                 // Constructors
     MailSender(Player* sender);
     MailSender(uint32 senderEntry);
 public:                                                 // Accessors
-    MailMessageType GetMailMessageType() const { return m_messageType; }
-    uint32 GetSenderId() const { return m_senderId; }
-    MailStationery GetStationery() const { return m_stationery; }
+    [[nodiscard]] MailMessageType GetMailMessageType() const { return m_messageType; }
+    [[nodiscard]] uint32 GetSenderId() const { return m_senderId; }
+    [[nodiscard]] MailStationery GetStationery() const { return m_stationery; }
 private:
     MailMessageType m_messageType;
     uint32 m_senderId;                                  // player low guid or other object entry
@@ -95,8 +96,8 @@ public:                                                 // Constructors
     MailReceiver(Player* receiver);
     MailReceiver(Player* receiver, uint32 receiver_lowguid);
 public:                                                 // Accessors
-    Player* GetPlayer() const { return m_receiver; }
-    uint32  GetPlayerGUIDLow() const { return m_receiver_lowguid; }
+    [[nodiscard]] Player* GetPlayer() const { return m_receiver; }
+    [[nodiscard]] uint32  GetPlayerGUIDLow() const { return m_receiver_lowguid; }
 private:
     Player* m_receiver;
     uint32  m_receiver_lowguid;
@@ -110,14 +111,14 @@ public:                                                 // Constructors
     explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
         : m_mailTemplateId(mailTemplateId), m_mailTemplateItemsNeed(need_items), m_money(0), m_COD(0)
     {}
-    MailDraft(std::string const& subject, std::string const& body)
-        : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(subject), m_body(body), m_money(0), m_COD(0) {}
+    MailDraft(std::string  subject, std::string  body)
+        : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(std::move(subject)), m_body(std::move(body)), m_money(0), m_COD(0) {}
 public:                                                 // Accessors
-    uint16 GetMailTemplateId() const { return m_mailTemplateId; }
-    std::string const& GetSubject() const { return m_subject; }
-    uint32 GetMoney() const { return m_money; }
-    uint32 GetCOD() const { return m_COD; }
-    std::string const& GetBody() const { return m_body; }
+    [[nodiscard]] uint16 GetMailTemplateId() const { return m_mailTemplateId; }
+    [[nodiscard]] std::string const& GetSubject() const { return m_subject; }
+    [[nodiscard]] uint32 GetMoney() const { return m_money; }
+    [[nodiscard]] uint32 GetCOD() const { return m_COD; }
+    [[nodiscard]] std::string const& GetBody() const { return m_body; }
 
 public:                                                 // modifiers
     MailDraft& AddItem(Item* item);
@@ -190,7 +191,7 @@ struct Mail
         return false;
     }
 
-    bool HasItems() const { return !items.empty(); }
+    [[nodiscard]] bool HasItems() const { return !items.empty(); }
 };
 
 #endif

@@ -87,6 +87,18 @@ extern "C"
 #   define SIOCGIFADDR 0
 # endif /* SIOCGIFADDR */
 
+# if !defined (SIOCGIFCONF)
+#   define SIOCGIFCONF 0
+# endif /* SIOCGIFCONF */
+
+# if !defined (SIOCGIFFLAGS)
+#   define SIOCGIFFLAGS 0
+# endif /* SIOCGIFFLAGS */
+
+# if !defined (SIOCGIFHWADDR)
+#   define SIOCGIFHWADDR 0
+# endif /* SIOCGIFHWADDR */
+
 # if !defined (ACE_HAS_STRBUF_T)
 struct strbuf
 {

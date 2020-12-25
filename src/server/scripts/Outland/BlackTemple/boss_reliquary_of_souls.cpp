@@ -100,7 +100,7 @@ class SuckBackEvent : public BasicEvent
 public:
     SuckBackEvent(Creature& owner, uint32 action) : BasicEvent(), _owner(owner), _action(action) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*diff*/) override
     {
         if (_owner.IsSummon())
             if (Unit* summoner = _owner.ToTempSummon()->GetSummoner())
@@ -122,7 +122,7 @@ class boss_reliquary_of_souls : public CreatureScript
 public:
     boss_reliquary_of_souls() : CreatureScript("boss_reliquary_of_souls") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_reliquary_of_soulsAI>(creature);
     }
@@ -133,13 +133,13 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!who || me->getStandState() != UNIT_STAND_STATE_SLEEP || who->GetTypeId() != TYPEID_PLAYER || me->GetDistance2d(who) > 90.0f || who->ToPlayer()->IsGameMaster())
                 return;
@@ -149,7 +149,7 @@ public:
             me->SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_ESSENCE_OF_SUFFERING)
             {
@@ -170,12 +170,12 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_ENSLAVED_SOUL)
@@ -186,21 +186,21 @@ public:
             events.ScheduleEvent(EVENT_ENGAGE_ESSENCE, 4000);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             summons.Despawn(summon);
         }
 
-        void AttackStart(Unit*) { }
+        void AttackStart(Unit*) override { }
 
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             summons.clear();
             BossAI::JustDied(killer);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->getStandState() == UNIT_STAND_STATE_SLEEP)
                 return;
@@ -242,7 +242,7 @@ public:
             EnterEvadeIfOutOfCombatArea();
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
             return !SelectTargetFromPlayerList(80.0f);
         }
@@ -254,7 +254,7 @@ class boss_essence_of_suffering : public CreatureScript
 public:
     boss_essence_of_suffering() : CreatureScript("boss_essence_of_suffering") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_essence_of_sufferingAI(creature);
     }
@@ -265,12 +265,12 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_ENGAGE_ESSENCE)
             {
@@ -280,7 +280,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE || id != POINT_GO_BACK)
                 return;
@@ -290,7 +290,7 @@ public:
             me->SetFacingTo(M_PI / 2.0f);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
             {
@@ -308,7 +308,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -317,7 +317,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SUFF_SAY_FREED);
             me->CastSpell(me, SPELL_AURA_OF_SUFFERING, true);
@@ -328,7 +328,7 @@ public:
             events.ScheduleEvent(EVENT_SUFF_SOUL_DRAIN, 25000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -365,7 +365,7 @@ class boss_essence_of_desire : public CreatureScript
 public:
     boss_essence_of_desire() : CreatureScript("boss_essence_of_desire") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_essence_of_desireAI(creature);
     }
@@ -376,12 +376,12 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_ENGAGE_ESSENCE)
             {
@@ -391,7 +391,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE || id != POINT_GO_BACK)
                 return;
@@ -401,7 +401,7 @@ public:
             me->SetFacingTo(M_PI / 2.0f);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
             {
@@ -418,7 +418,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -427,7 +427,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(DESI_SAY_FREED);
             me->CastSpell(me, SPELL_AURA_OF_DESIRE, true);
@@ -437,7 +437,7 @@ public:
             events.ScheduleEvent(EVENT_DESI_RUNE_SHIELD, 13000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -474,7 +474,7 @@ class boss_essence_of_anger : public CreatureScript
 public:
     boss_essence_of_anger() : CreatureScript("boss_essence_of_anger") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_essence_of_angerAI(creature);
     }
@@ -486,13 +486,13 @@ public:
         EventMap events;
         uint64 targetGUID;
 
-        void Reset()
+        void Reset() override
         {
             targetGUID = 0;
             events.Reset();
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_ENGAGE_ESSENCE)
             {
@@ -502,7 +502,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -511,7 +511,7 @@ public:
             }
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             Talk(ANGER_SAY_DEATH);
             if (me->IsSummon())
@@ -519,7 +519,7 @@ public:
                     Unit::Kill(summoner, summoner);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(ANGER_SAY_FREED);
             me->CastSpell(me, SPELL_AURA_OF_ANGER, true);
@@ -529,7 +529,7 @@ public:
             events.ScheduleEvent(EVENT_ANGER_SEETHE, 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -588,14 +588,14 @@ public:
             GetTarget()->RemoveAurasDueToSpell(SPELL_AURA_OF_SUFFERING_TRIGGER);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_reliquary_of_souls_aura_of_suffering_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_reliquary_of_souls_aura_of_suffering_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_reliquary_of_souls_aura_of_suffering_AuraScript();
     }
@@ -621,13 +621,13 @@ public:
             targets.push_back(target);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_reliquary_of_souls_fixate_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_reliquary_of_souls_fixate_SpellScript();
     }
@@ -642,13 +642,13 @@ public:
                 caster->RemoveAurasDueToSpell(GetSpellInfo()->Effects[EFFECT_1].TriggerSpell, GetTarget()->GetGUID());
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_reliquary_of_souls_fixate_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_reliquary_of_souls_fixate_AuraScript();
     }
@@ -687,7 +687,7 @@ public:
                 effect->RecalculateAmount();
         }
 
-        void Register()
+        void Register() override
         {
             DoCheckProc += AuraCheckProcFn(spell_reliquary_of_souls_aura_of_desire_AuraScript::CheckProc);
             OnEffectProc += AuraEffectProcFn(spell_reliquary_of_souls_aura_of_desire_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT);
@@ -696,7 +696,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_reliquary_of_souls_aura_of_desire_AuraScript();
     }
@@ -725,7 +725,7 @@ public:
                 effect->RecalculateAmount();
         }
 
-        void Register()
+        void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_reliquary_of_souls_aura_of_anger_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_reliquary_of_souls_aura_of_anger_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
@@ -733,7 +733,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_reliquary_of_souls_aura_of_anger_AuraScript();
     }
@@ -754,13 +754,13 @@ public:
                 caster->CastSpell(GetTarget(), SPELL_SPITE_DAMAGE, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_reliquary_of_souls_spite_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DAMAGE_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_reliquary_of_souls_spite_AuraScript();
     }

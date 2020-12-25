@@ -13,7 +13,7 @@
 #include "Player.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
-#include <Config.h>
+#include "ScriptMgr.h"
 
 ArenaTeam::ArenaTeam()
     : TeamId(0), Type(0), TeamName(), CaptainGuid(0), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
@@ -473,7 +473,7 @@ void ArenaTeam::NotifyStatsChanged()
 void ArenaTeam::Inspect(WorldSession* session, uint64 guid)
 {
     ArenaTeamMember* member = GetMember(guid);
-    if (!member)
+    if (!member || GetSlot() >= MAX_ARENA_SLOT)
         return;
 
     WorldPacket data(MSG_INSPECT_ARENA_TEAMS, 8 + 1 + 4 * 6);
@@ -495,7 +495,7 @@ void ArenaTeamMember::ModifyPersonalRating(Player* player, int32 mod, uint32 typ
     else
         PersonalRating += mod;
 
-    if (player)
+    if (player && ArenaTeam::GetSlotByType(type) < 3)
     {
         player->SetArenaTeamInfoField(ArenaTeam::GetSlotByType(type), ARENA_TEAM_PERSONAL_RATING, PersonalRating);
         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_PERSONAL_RATING, PersonalRating, type);
@@ -579,16 +579,27 @@ void ArenaTeam::MassInviteToEvent(WorldSession* session)
 
 uint8 ArenaTeam::GetSlotByType(uint32 type)
 {
+    uint8 slot = 0xFF;
     switch (type)
     {
         case ARENA_TEAM_2v2:
-            return 0;
+            slot = 0;
+            break;
         case ARENA_TEAM_3v3:
-            return 1;
+            slot = 1;
+            break;
         case ARENA_TEAM_5v5:
-            return 2;
+            slot = 2;
+            break;
         default:
             break;
+    }
+    //Get the changed slot type
+    sScriptMgr->OnGetSlotByType(type, slot);
+
+    if (slot != 0xFF)
+    {
+        return slot;
     }
     sLog->outError("FATAL: Unknown arena team type %u for some arena team", type);
     return 0xFF;
@@ -625,6 +636,8 @@ uint32 ArenaTeam::GetPoints(uint32 memberRating)
         points *= 0.76f;
     else if (Type == ARENA_TEAM_3v3)
         points *= 0.88f;
+
+    sScriptMgr->OnGetArenaPoints(this, points);
 
     points *= sWorld->getRate(RATE_ARENA_POINTS);
 
@@ -852,7 +865,7 @@ void ArenaTeam::UpdateArenaPointsHelper(std::map<uint32, uint32>& playerPoints)
     // Called after a match has ended and the stats are already modified
     // Helper function for arena point distribution (this way, when distributing, no actual calculation is required, just a few comparisons)
     // 10 played games per week is a minimum
-    if (Stats.WeekGames < 10)
+    if (Stats.WeekGames < sWorld->getIntConfig(CONFIG_ARENA_GAMES_REQUIRED))
         return;
 
     // To get points, a player has to participate in at least 30% of the matches

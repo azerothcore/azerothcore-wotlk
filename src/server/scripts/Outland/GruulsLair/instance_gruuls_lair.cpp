@@ -39,7 +39,7 @@ public:
             _addsKilled = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -55,7 +55,7 @@ public:
             }
         }
 
-        void OnCreatureRemove(Creature* creature)
+        void OnCreatureRemove(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -69,7 +69,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -80,7 +80,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -91,7 +91,7 @@ public:
             }
         }
 
-        bool SetBossState(uint32 id, EncounterState state)
+        bool SetBossState(uint32 id, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(id, state))
                 return false;
@@ -101,21 +101,21 @@ public:
             return true;
         }
 
-        void SetData(uint32 type, uint32  /*id*/)
+        void SetData(uint32 type, uint32  /*id*/) override
         {
             if (type == DATA_ADDS_KILLED)
                 if (Creature* maulgar = instance->GetCreature(_maulgarGUID))
                     maulgar->AI()->DoAction(++_addsKilled);
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             if (type == DATA_ADDS_KILLED)
                 return _addsKilled;
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -126,7 +126,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(char const* str)
+        void Load(char const* str) override
         {
             if (!str)
             {
@@ -163,7 +163,7 @@ public:
         uint64 _maulgarGUID;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_gruuls_lair_InstanceMapScript(map);
     }
