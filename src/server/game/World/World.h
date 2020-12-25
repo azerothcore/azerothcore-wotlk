@@ -687,7 +687,7 @@ public:
     /// When server started?
     time_t const& GetStartTime() const { return m_startTime; }
     /// What time is it?
-    time_t const& GetGameTime() const { return m_gameTime; }
+    uint64 GetGameTime() const { return m_gameTime; }
     /// What time is it? in ms
     static uint32 GetGameTimeMS() { return m_gameMSTime; }
     /// Uptime (in secs)
