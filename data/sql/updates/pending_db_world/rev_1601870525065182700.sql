@@ -576,7 +576,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (194569, 1, 12, 0, 61, 0, 100, 0, 10389, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ulduar Teleporter - On Gossip Option 0 Selected - Close Gossip');
 
 DELETE FROM `spell_target_position` WHERE (ID IN (64014,64032,64028,64031,64030,64029))
-INSERT INTO `spell_target_position` VALUES
+INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES 
 (64014, 1, 603, -706.122, -92.602, 430.27, 0.110212, 0),
 (64032, 1, 603, 131.248, -35.38, 410.2, 3.176500, 0),
 (64028, 1, 603, 553.233, -12.324, 410.07, 3.176500, 0),
