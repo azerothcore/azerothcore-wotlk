@@ -436,7 +436,7 @@ public:
                 {
                     events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 20000);
 
-                    if ( eyebeamTarget = SelectTarget(SELECT_TARGET_FARTHEST, 0, 0, true) )
+                    if ((eyebeamTarget = SelectTarget(SELECT_TARGET_FARTHEST, 0, 0, true)))
                     {
                         me->CastSpell(eyebeamTarget, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
                     }
