@@ -51,7 +51,7 @@ class boss_loken : public CreatureScript
 public:
     boss_loken() : CreatureScript("boss_loken") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_lokenAI (creature);
     }
@@ -72,9 +72,9 @@ public:
         uint32 IntroTimer;
         uint8 HealthCheck;
 
-        void MoveInLineOfSight(Unit*) { }
+        void MoveInLineOfSight(Unit*) override { }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             if (m_pInstance)
@@ -99,7 +99,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
@@ -117,7 +117,7 @@ public:
             }
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             Talk(SAY_DEATH);
 
@@ -146,7 +146,7 @@ public:
                 Talk(SAY_NOVA);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -154,7 +154,7 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!isActive)
             {
@@ -200,7 +200,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(HealthCheck))
@@ -223,7 +223,6 @@ public:
                     break;
                 case EVENT_SHOCKWAVE:
                     me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_PULSING_SHOCKWAVE_H : SPELL_PULSING_SHOCKWAVE_N, false);
-                    events.PopEvent();
                     break;
                 case EVENT_ARC_LIGHTNING:
                     if (Unit* target = SelectTargetFromPlayerList(100, SPELL_ARC_LIGHTNING))
@@ -233,7 +232,6 @@ public:
                     break;
                 case EVENT_AURA_REMOVE:
                     me->RemoveAura(SPELL_LIGHTNING_NOVA_THUNDERS);
-                    events.PopEvent();
                     break;
             }
 
@@ -261,13 +259,13 @@ public:
                 SetHitDamage(int32(GetHitDamage() * distance));
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_loken_pulsing_shockwave_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_loken_pulsing_shockwave_SpellScript();
     }

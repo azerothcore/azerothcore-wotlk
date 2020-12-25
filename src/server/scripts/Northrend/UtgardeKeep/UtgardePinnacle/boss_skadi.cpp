@@ -98,7 +98,7 @@ class boss_skadi : public CreatureScript
 public:
     boss_skadi() : CreatureScript("boss_skadi") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_skadiAI (pCreature);
     }
@@ -116,7 +116,7 @@ public:
         uint64 GraufGUID;
         bool SecondPhase, EventStarted;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -145,7 +145,7 @@ public:
 
         Creature* GetGrauf() { return ObjectAccessor::GetCreature(*me, GraufGUID); }
 
-        void EnterCombat(Unit*  /*pWho*/)
+        void EnterCombat(Unit*  /*pWho*/) override
         {
             if (!EventStarted)
             {
@@ -165,7 +165,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
 
             if (param == ACTION_PHASE2)
@@ -182,7 +182,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() && SecondPhase)
                 return;
@@ -191,7 +191,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SKADI_START:
                     {
@@ -204,7 +204,6 @@ public:
                         else
                             EnterEvadeMode();
 
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_SKADI_CRUSH:
@@ -233,7 +232,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*pKiller*/)
+        void JustDied(Unit*  /*pKiller*/) override
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
@@ -245,7 +244,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit*  /*pVictim*/)
+        void KilledUnit(Unit*  /*pVictim*/) override
         {
             if (urand(0, 1))
                 return;
@@ -260,7 +259,7 @@ class boss_skadi_grauf : public CreatureScript
 public:
     boss_skadi_grauf() : CreatureScript("boss_skadi_grauf") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_skadi_graufAI (pCreature);
     }
@@ -278,7 +277,7 @@ public:
         uint8 currentPos;
         uint8 AchievementHitCount;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -287,7 +286,7 @@ public:
             me->RemoveAllAuras();
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_EVENT)
             {
@@ -311,7 +310,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == 47593) // SPELL_FLAME_VISUAL trigger
                 target->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
@@ -341,7 +340,7 @@ public:
             }
         }
 
-        void MovementInform(uint32  /*uiType*/, uint32 Id)
+        void MovementInform(uint32  /*uiType*/, uint32 Id) override
         {
             switch(Id)
             {
@@ -376,7 +375,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             me->SetInCombatWithZone();
         }
@@ -427,10 +426,10 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_GRAUF_CHECK:
                     {
@@ -447,7 +446,6 @@ public:
                         SpawnHelpers(0);
                         events.ScheduleEvent(EVENT_GRAUF_MOVE, 15000);
                         events.ScheduleEvent(EVENT_GRAUF_SUMMON_HELPERS, 20000);
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_GRAUF_MOVE:
@@ -478,7 +476,6 @@ public:
                     {
                         RemoveSkadi(false);
                         me->DespawnOrUnsummon();
-                        events.PopEvent();
                         break;
                     }
             }

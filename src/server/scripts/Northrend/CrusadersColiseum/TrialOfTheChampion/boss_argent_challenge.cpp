@@ -88,7 +88,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->SetReactState(REACT_PASSIVE);
@@ -96,13 +96,13 @@ public:
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, NOT_STARTED);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if( type == POINT_MOTION_TYPE && id == 1 )
                 me->SetFacingTo(3 * M_PI / 2);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
             {
@@ -113,7 +113,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_RADIANCE, 16000);
@@ -124,13 +124,13 @@ public:
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == 66905 && me->GetHealth() == 1) // hammer throw back damage (15k)
                 me->CastSpell(me, 68197, true);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if( damage >= me->GetHealth() )
             {
@@ -152,7 +152,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -162,7 +162,7 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -189,7 +189,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_eadricAI(pCreature);
     }
@@ -212,7 +212,7 @@ public:
         bool summoned;
         uint64 MemoryGUID;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summoned = false;
@@ -227,13 +227,13 @@ public:
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, NOT_STARTED);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if( type == POINT_MOTION_TYPE && id == 1 )
                 me->SetFacingTo(3 * M_PI / 2);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
             {
@@ -244,7 +244,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, urand(9000, 12000));
@@ -255,7 +255,7 @@ public:
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == 1 )
             {
@@ -274,7 +274,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             //if( me->HasAura(SPELL_SHIELD) )
             //  return;
@@ -302,7 +302,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if( pInstance )
                 pInstance->SetData(DATA_MEMORY_ENTRY, summon->GetEntry());
@@ -316,7 +316,7 @@ public:
             me->CastSpell(me, uiSpells[uiRandom], true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -340,7 +340,7 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -357,7 +357,6 @@ public:
                 case EVENT_SPELL_RENEW:
                     if( !MemoryGUID )
                     {
-                        events.PopEvent();
                         break;
                     }
                     if( urand(0, 1) )
@@ -373,7 +372,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_paletressAI(pCreature);
     }
@@ -398,9 +397,9 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset() {}
+        void Reset() override {}
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->DespawnOrUnsummon(20000);
             if( pInstance )
@@ -408,7 +407,7 @@ public:
                     paletress->AI()->DoAction(1);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             UpdateVictim();
 
@@ -417,14 +416,14 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_MEMORY_SCALE:
                     me->SetObjectScale(1.0f);
                     events.ScheduleEvent(EVENT_MEMORY_START_ATTACK, 5000);
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_MEMORY_START_ATTACK:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -437,7 +436,6 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_OLD_WOUNDS, 8000);
                     events.ScheduleEvent(EVENT_SPELL_SHADOWS_PAST, 4000);
                     events.ScheduleEvent(EVENT_SPELL_WAKING_NIGHTMARE, urand(20000, 30000));
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_OLD_WOUNDS:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f, true) )
@@ -459,7 +457,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_memoryAI(pCreature);
     }
@@ -527,13 +525,13 @@ public:
         uint8 uiWaypoint;
         bool bCheck;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             bCheck = false;
         }
 
-        void WaypointReached(uint32 uiPoint)
+        void WaypointReached(uint32 uiPoint) override
         {
             if( uiPoint == 1 )
             {
@@ -552,7 +550,7 @@ public:
             }
         }
 
-        void SetData(uint32 uiType, uint32 /*uiData*/)
+        void SetData(uint32 uiType, uint32 /*uiData*/) override
         {
             AddWaypoint(0, me->GetPositionX(), 660.0f, 411.80f);
             switch( me->GetEntry() )
@@ -605,7 +603,7 @@ public:
             uiWaypoint = uiType;
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if( bCheck && damage >= me->GetHealth() )
             {
@@ -617,7 +615,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             switch( me->GetEntry() )
             {
@@ -643,7 +641,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -655,7 +653,7 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -714,7 +712,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*pKiller*/)
+        void JustDied(Unit* /*pKiller*/) override
         {
             me->DespawnOrUnsummon(10000);
             if( pInstance )
@@ -722,7 +720,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_argent_soldierAI(pCreature);
     }
@@ -749,14 +747,14 @@ public:
                 targets.push_back(*itr);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eadric_radiance_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eadric_radiance_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_eadric_radiance_SpellScript();
     }
@@ -786,13 +784,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_toc5_light_rain_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_toc5_light_rain_SpellScript();
     }
@@ -817,13 +815,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectAbsorb += AuraEffectAbsorbFn(spell_reflective_shield_AuraScript::HandleAfterEffectAbsorb, EFFECT_0);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_reflective_shield_AuraScript();
     }

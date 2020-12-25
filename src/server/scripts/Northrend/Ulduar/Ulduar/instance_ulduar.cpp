@@ -16,7 +16,7 @@ class instance_ulduar : public InstanceMapScript
 public:
     instance_ulduar() : InstanceMapScript("instance_ulduar", 603) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_ulduar_InstanceMapScript(pMap);
     }
@@ -100,7 +100,7 @@ public:
         uint64 m_keepersGossipGUID[4];
 
 
-        void Initialize()
+        void Initialize() override
         {
             // Bosses
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
@@ -174,13 +174,13 @@ public:
             m_keepersgateGUID       = 0;
         }
 
-        void FillInitialWorldStates(WorldPacket& packet)
+        void FillInitialWorldStates(WorldPacket& packet) override
         {
             packet << uint32(WORLD_STATE_ALGALON_TIMER_ENABLED) << uint32(m_algalonTimer && m_algalonTimer <= 60);
             packet << uint32(WORLD_STATE_ALGALON_DESPAWN_TIMER) << uint32(std::min<uint32>(m_algalonTimer, 60));
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             // mimiron tram:
             instance->LoadGrid(2307.0f, 284.632f);
@@ -206,7 +206,7 @@ public:
             }
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < (MAX_ENCOUNTER - 1); ++i)
             {
@@ -223,14 +223,14 @@ public:
             return false;
         }
 
-        void ProcessEvent(WorldObject*  /*obj*/, uint32 eventId)
+        void ProcessEvent(WorldObject*  /*obj*/, uint32 eventId) override
         {
             // destory towers
             if (eventId >= EVENT_TOWER_OF_LIFE_DESTROYED && eventId <= EVENT_TOWER_OF_FLAMES_DESTROYED)
                 SetData(eventId, 0);
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch(creature->GetEntry())
             {
@@ -353,7 +353,7 @@ public:
             }
         }
 
-        void OnCreatureRemove(Creature* creature)
+        void OnCreatureRemove(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -383,7 +383,7 @@ public:
             cr->SetVisible(on);
         }
 
-        void OnGameObjectCreate(GameObject* gameObject)
+        void OnGameObjectCreate(GameObject* gameObject) override
         {
             switch (gameObject->GetEntry())
             {
@@ -567,7 +567,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -728,7 +728,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 data) const
+        uint64 GetData64(uint32 data) const override
         {
             switch(data)
             {
@@ -848,7 +848,7 @@ public:
             return 0;
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch(type)
             {
@@ -885,7 +885,7 @@ public:
             return 0;
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             // Feeds on Tears achievement
             if (unit->GetTypeId() == TYPEID_PLAYER)
@@ -926,7 +926,7 @@ public:
                 }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -941,7 +941,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* strIn)
+        void Load(const char* strIn) override
         {
             if (!strIn)
             {
@@ -989,18 +989,17 @@ public:
         }
 
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (_events.Empty())
                 return;
 
             _events.Update(diff);
-            switch (_events.GetEvent())
+            switch (_events.ExecuteEvent())
             {
                 case EVENT_UPDATE_ALGALON_TIMER:
                     if (m_algalonTimer == TIMER_ALGALON_DEFEATED)
                     {
-                        _events.PopEvent();
                         return;
                     }
 
@@ -1012,7 +1011,6 @@ public:
                         return;
                     }
 
-                    _events.PopEvent();
                     SetData(DATA_ALGALON_DEFEATED, 1);
                     if (Creature* algalon = instance->GetCreature(m_uiAlgalonGUID))
                         algalon->AI()->DoAction(ACTION_DESPAWN_ALGALON);
@@ -1021,7 +1019,7 @@ public:
 
         void SpawnLeviathanEncounterVehicles(uint8 mode);
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch (criteria_id)
             {

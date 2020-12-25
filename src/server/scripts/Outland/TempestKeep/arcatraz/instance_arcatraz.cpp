@@ -33,7 +33,7 @@ public:
             memset(StasisPodGUIDs, 0, 5 * sizeof(uint64));
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -49,7 +49,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -80,7 +80,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -93,7 +93,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -110,12 +110,12 @@ public:
             }
         }
 
-        uint32 GetData(uint32  /*type*/) const
+        uint32 GetData(uint32  /*type*/) const override
         {
             return 0;
         }
 
-        uint64 GetData64(uint32 data) const
+        uint64 GetData64(uint32 data) const override
         {
             switch (data)
             {
@@ -129,7 +129,7 @@ public:
             return 0;
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -147,7 +147,7 @@ public:
             return true;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -158,7 +158,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(char const* str)
+        void Load(char const* str) override
         {
             if (!str)
             {
@@ -198,7 +198,7 @@ public:
         uint64 WardensShieldGUID;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_arcatraz_InstanceMapScript(map);
     }

@@ -236,7 +236,7 @@ class npc_feedin_da_goolz : public CreatureScript
 public:
     npc_feedin_da_goolz() : CreatureScript("npc_feedin_da_goolz") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_feedin_da_goolzAI(creature);
     }
@@ -249,7 +249,7 @@ public:
         uint32 checkTimer;
         uint64 ghoulFed;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (findTimer)
             {
@@ -365,7 +365,7 @@ class npc_overlord_drakuru_betrayal : public CreatureScript
 public:
     npc_overlord_drakuru_betrayal() : CreatureScript("npc_overlord_drakuru_betrayal") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_overlord_drakuru_betrayalAI(creature);
     }
@@ -381,7 +381,7 @@ public:
         uint64 playerGUID;
         uint64 lichGUID;
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (playerGUID)
                 if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
@@ -392,7 +392,7 @@ public:
             ScriptedAI::EnterEvadeMode();
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -403,7 +403,7 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -434,7 +434,7 @@ public:
                 ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
             if (cr->GetEntry() == NPC_BLIGHTBLOOD_TROLL)
@@ -448,7 +448,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             Talk(SAY_DRAKURU_3);
             events.ScheduleEvent(EVENT_BETRAYAL_SHADOW_BOLT, 2000);
@@ -456,7 +456,7 @@ public:
             events.ScheduleEvent(EVENT_BETRAYAL_COMBAT_TALK, 20000);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
             {
@@ -470,14 +470,14 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_THROW_PORTAL_CRYSTAL)
                 if (Aura* aura = target->AddAura(SPELL_ARTHAS_PORTAL, target))
                     aura->SetDuration(48000);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_TOUCH_OF_DEATH)
             {
@@ -486,14 +486,13 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_BETRAYAL_1:
                     Talk(SAY_DRAKURU_0);
-                    events.PopEvent();
                     events.ScheduleEvent(EVENT_BETRAYAL_2, 5000);
                     break;
                 case EVENT_BETRAYAL_2:
@@ -501,7 +500,6 @@ public:
                     me->SummonCreature(NPC_BLIGHTBLOOD_TROLL, 6222.9f, -2026.5f, 586.76f, 2.9f);
                     me->SummonCreature(NPC_BLIGHTBLOOD_TROLL, 6166.2f, -2065.4f, 586.76f, 1.4f);
                     me->SummonCreature(NPC_BLIGHTBLOOD_TROLL, 6127.5f, -2008.7f, 586.76f, 0.0f);
-                    events.PopEvent();
                     events.ScheduleEvent(EVENT_BETRAYAL_3, 5000);
                     break;
                 case EVENT_BETRAYAL_3:
@@ -511,34 +509,28 @@ public:
                         player->CastSpell(player, SPELL_SCOURGE_DISGUISE_EXPIRING, true);
                     if (Aura* aur = me->AddAura(SPELL_BLIGHT_FOG, me))
                         aur->SetDuration(22000);
-                    events.PopEvent();
                     break;
                 case EVENT_BETRAYAL_4:
                     Talk(SAY_DRAKURU_5);
                     events.ScheduleEvent(EVENT_BETRAYAL_5, 6000);
-                    events.PopEvent();
                     break;
                 case EVENT_BETRAYAL_5:
                     Talk(SAY_DRAKURU_6);
                     me->CastSpell(me, SPELL_THROW_PORTAL_CRYSTAL, true);
                     events.ScheduleEvent(EVENT_BETRAYAL_6, 8000);
-                    events.PopEvent();
                     break;
                 case EVENT_BETRAYAL_6:
                     me->SummonCreature(NPC_LICH_KING, 6142.9f, -2011.6f, 590.86f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 41000);
                     events.ScheduleEvent(EVENT_BETRAYAL_7, 8000);
-                    events.PopEvent();
                     break;
                 case EVENT_BETRAYAL_7:
                     Talk(SAY_DRAKURU_7);
                     events.ScheduleEvent(EVENT_BETRAYAL_8, 5000);
-                    events.PopEvent();
                     break;
                 case EVENT_BETRAYAL_8:
                     if (Creature* lich = ObjectAccessor::GetCreature(*me, lichGUID))
                         lich->AI()->Talk(SAY_LICH_7);
                     events.ScheduleEvent(EVENT_BETRAYAL_9, 6000);
-                    events.PopEvent();
                     break;
                 case EVENT_BETRAYAL_9:
                     if (Creature* lich = ObjectAccessor::GetCreature(*me, lichGUID))
@@ -547,26 +539,22 @@ public:
                         lich->CastSpell(me, SPELL_TOUCH_OF_DEATH, false);
                     }
                     events.ScheduleEvent(EVENT_BETRAYAL_10, 4000);
-                    events.PopEvent();
                     break;
                 case EVENT_BETRAYAL_10:
                     me->SetVisible(false);
                     if (Creature* lich = ObjectAccessor::GetCreature(*me, lichGUID))
                         lich->AI()->Talk(SAY_LICH_9);
                     events.ScheduleEvent(EVENT_BETRAYAL_11, 4000);
-                    events.PopEvent();
                     break;
                 case EVENT_BETRAYAL_11:
                     if (Creature* lich = ObjectAccessor::GetCreature(*me, lichGUID))
                         lich->AI()->Talk(SAY_LICH_10);
                     events.ScheduleEvent(EVENT_BETRAYAL_12, 6000);
-                    events.PopEvent();
                     break;
                 case EVENT_BETRAYAL_12:
                     if (Creature* lich = ObjectAccessor::GetCreature(*me, lichGUID))
                         lich->AI()->Talk(SAY_LICH_11);
                     events.ScheduleEvent(EVENT_BETRAYAL_13, 3000);
-                    events.PopEvent();
                     break;
                 case EVENT_BETRAYAL_13:
                     if (Creature* lich = ObjectAccessor::GetCreature(*me, lichGUID))
@@ -575,7 +563,6 @@ public:
                         lich->GetMotionMaster()->MovePoint(0, 6143.8f, -2011.5f, 590.9f);
                     }
                     events.ScheduleEvent(EVENT_BETRAYAL_14, 7000);
-                    events.PopEvent();
                     break;
                 case EVENT_BETRAYAL_14:
                     playerGUID = 0;
@@ -590,7 +577,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_BETRAYAL_SHADOW_BOLT:
                     if (!me->IsWithinMeleeRange(me->GetVictim()))
@@ -640,12 +627,12 @@ public:
             timer = 0;
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             timer += diff;
             if (timer >= 2000)
@@ -680,7 +667,7 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_UNLOCK_SHACKLE)
             {
@@ -703,7 +690,7 @@ public:
         uint32 timer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_drakuru_shacklesAI(creature);
     }
@@ -729,13 +716,13 @@ public:
     {
         npc_captured_rageclawAI(Creature* creature) : NullCreatureAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             me->setFaction(35);
             DoCast(me, SPELL_KNEEL, true); // Little Hack for kneel - Thanks Illy :P
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_FREE_RAGECLAW)
             {
@@ -751,7 +738,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_captured_rageclawAI(creature);
     }
@@ -772,14 +759,14 @@ public:
     {
         npc_released_offspring_harkoaAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             float x, y, z;
             me->GetClosePoint(x, y, z, me->GetObjectSize() / 3, 25.0f);
             me->GetMotionMaster()->MovePoint(0, x, y, z);
         }
 
-        void MovementInform(uint32 Type, uint32 /*uiId*/)
+        void MovementInform(uint32 Type, uint32 /*uiId*/) override
         {
             if (Type != POINT_MOTION_TYPE)
                 return;
@@ -787,7 +774,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_released_offspring_harkoaAI(creature);
     }
@@ -819,14 +806,14 @@ public:
     {
         npc_crusade_recruitAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
             _heading = me->GetOrientation();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
 
@@ -854,7 +841,7 @@ public:
                 return;
         }
 
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/)
+        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
             _events.ScheduleEvent(EVENT_RECRUIT_1, 100);
             CloseGossipMenuFor(player);
@@ -867,7 +854,7 @@ public:
         float    _heading; // Store creature heading
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_crusade_recruitAI(creature);
     }
@@ -927,17 +914,17 @@ public:
     {
         npc_storm_cloudAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             me->CastSpell(me, STORM_VISUAL, true);
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             Reset();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (spell->Id != GYMERS_GRAB)
                 return;
@@ -951,7 +938,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_storm_cloudAI(creature);
     }

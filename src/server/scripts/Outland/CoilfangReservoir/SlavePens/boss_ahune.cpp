@@ -79,7 +79,7 @@ class boss_ahune : public CreatureScript
 public:
     boss_ahune() : CreatureScript("boss_ahune") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_ahuneAI (pCreature);
     }
@@ -111,14 +111,14 @@ public:
             events.RescheduleEvent(EVENT_SPELL_SUMMON_COLDWAVE, 5000);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
             events.Reset();
             StartPhase1();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                 return;
@@ -128,20 +128,18 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_EMERGE:
                     me->SetVisible(true);
                     me->CastSpell(me, SPELL_EMERGE_0, false);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_ATTACK, 2000);
                     break;
                 case EVENT_SUMMON_TOTEMS:
                     for (uint8 i = 0; i < 3; ++i)
                         DoSummon(NPC_TOTEM, TotemPos[i], 10 * 60 * 1000, TEMPSUMMON_TIMED_DESPAWN);
-                    events.PopEvent();
                     break;
                 case EVENT_INVOKER_SAY_1:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
@@ -149,19 +147,16 @@ public:
                         plr->MonsterSay("The Ice Stone has melted!", LANG_UNIVERSAL, 0);
                         plr->CastSpell(plr, SPELL_MAKE_BONFIRE, true);
                     }
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_INVOKER_SAY_2, 2000);
                     break;
                 case EVENT_INVOKER_SAY_2:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
                         plr->MonsterSay("Ahune, your strength grows no more!", LANG_UNIVERSAL, 0);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_INVOKER_SAY_3, 2000);
                     break;
                 case EVENT_INVOKER_SAY_3:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
                         plr->MonsterSay("Your frozen reign will not come to pass!", LANG_UNIVERSAL, 0);
-                    events.PopEvent();
                     break;
                 case EVENT_ATTACK:
                     events.Reset();
@@ -180,7 +175,6 @@ public:
                     for (uint8 i = 0; i < 3; ++i)
                         if (Creature* bunny = me->FindNearestCreature(NPC_TOTEM_BUNNY_1 + i, 150.0f, true))
                             bunny->CastSpell(me, SPELL_TOTEM_BEAM, false);
-                    events.PopEvent();
                     events.RescheduleEvent(EVENT_SUBMERGE, 10000);
                     break;
                 case EVENT_SUBMERGE:
@@ -198,7 +192,6 @@ public:
                     break;
                 case EVENT_EMERGE_WARNING:
                     me->MonsterTextEmote(TEXT_RESURFACE, 0, true);
-                    events.PopEvent();
                     break;
                 case EVENT_COMBAT_EMERGE:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -206,7 +199,6 @@ public:
                     me->CastSpell(me, SPELL_EMERGE_0, false);
                     // me->CastSpell(me, SPELL_AHUNE_RESURFACES, true); // done in SummonedCreatureDespawn
                     me->RemoveAura(SPELL_SUBMERGE_0);
-                    events.PopEvent();
                     StartPhase1();
                     break;
 
@@ -246,16 +238,15 @@ public:
                     break;
 
                 default:
-                    events.PopEvent();
                     break;
             }
 
             DoMeleeAttackIfReady();
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
@@ -265,7 +256,7 @@ public:
             ScriptedAI::EnterEvadeMode();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (summon)
             {
@@ -274,7 +265,7 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             if (summon && summon->GetEntry() == NPC_FROZEN_CORE)
             {
@@ -288,7 +279,7 @@ public:
             }
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             summons.DespawnAll();
             me->DespawnOrUnsummon(15000);
@@ -367,7 +358,7 @@ class npc_ahune_frozen_core : public CreatureScript
 public:
     npc_ahune_frozen_core() : CreatureScript("npc_ahune_frozen_core") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ahune_frozen_coreAI (pCreature);
     }
@@ -376,7 +367,7 @@ public:
     {
         npc_ahune_frozen_coreAI(Creature* c) : NullCreatureAI(c) {}
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->DespawnOrUnsummon();
         }

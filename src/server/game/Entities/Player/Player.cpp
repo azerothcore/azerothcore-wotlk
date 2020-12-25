@@ -82,7 +82,8 @@
 #include "LuaEngine.h"
 #endif
 
-#define ZONE_UPDATE_INTERVAL (2*IN_MILLISECONDS)
+// Zone Interval should be 1 second
+#define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
 #define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
 #define PLAYER_SKILL_VALUE_INDEX(x) (PLAYER_SKILL_INDEX(x)+1)
@@ -731,6 +732,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_usedTalentCount = 0;
     m_questRewardTalentCount = 0;
+    m_extraBonusTalentCount = 0;
 
     m_regenTimer = 0;
     m_regenTimerCount = 0;
@@ -824,9 +826,9 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     _restTime = 0;
     _innTriggerId = 0;
     _restBonus = 0;
+    _restFlagMask = 0;
     ////////////////////Rest System/////////////////////
 
-    m_mailsLoaded = false;
     m_mailsUpdated = false;
     unReadMails = 0;
     m_nextMailDelivereTime = 0;
@@ -980,8 +982,10 @@ Player::~Player()
         delete itr->second;
 
     //all mailed items should be deleted, also all mail should be deallocated
-    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
+    {
         delete *itr;
+    }
 
     for (ItemMap::iterator iter = mMitems.begin(); iter != mMitems.end(); ++iter)
         delete iter->second;                                //if item is duplicated... then server may crash ... but that item should be deallocated
@@ -1775,6 +1779,14 @@ void Player::Update(uint32 p_time)
     {
         if (p_time >= m_zoneUpdateTimer)
         {
+            // On zone update tick check if we are still in an inn if we are supposed to be in one
+            if (HasRestFlag(REST_FLAG_IN_TAVERN))
+            {
+                AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
+                if (!atEntry || !IsInAreaTriggerRadius(atEntry))
+                    RemoveRestFlag(REST_FLAG_IN_TAVERN);
+            }
+
             uint32 newzone, newarea;
             GetZoneAndAreaId(newzone, newarea, true);
             m_last_zone_id = newzone;
@@ -3022,20 +3034,22 @@ void Player::SetInWater(bool apply)
 
 bool Player::IsInAreaTriggerRadius(const AreaTrigger* trigger) const
 {
+    static const float delta = 5.0f;
+
     if (!trigger || GetMapId() != trigger->map)
         return false;
 
-    if (trigger->radius > 0.f)
+    if (trigger->radius > 0)
     {
         // if we have radius check it
         float dist = GetDistance(trigger->x, trigger->y, trigger->z);
-        if (dist > trigger->radius)
+        if (dist > trigger->radius + delta)
             return false;
     }
     else
     {
-        Position center = {trigger->x, trigger->y, trigger->z, trigger->orientation};
-        if (!IsWithinBox(center, trigger->length / 2.f, trigger->width / 2.f, trigger->height / 2.f))
+        Position center(trigger->x, trigger->y, trigger->z, trigger->orientation);
+        if (!IsWithinBox(center, trigger->length / 2 + delta, trigger->width / 2 + delta, trigger->height / 2 + delta))
             return false;
     }
 
@@ -3631,12 +3645,12 @@ void Player::SendInitialSpells()
 
 void Player::RemoveMail(uint32 id)
 {
-    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
     {
         if ((*itr)->messageID == id)
         {
             //do not delete item, because Player::removeMail() is called when returning mail to sender.
-            m_mail.erase(itr);
+            m_mailCache.erase(itr);
             return;
         }
     }
@@ -3668,26 +3682,35 @@ void Player::SendNewMail()
 
 void Player::UpdateNextMailTimeAndUnreads()
 {
-    // calculate next delivery time (min. from non-delivered mails
-    // and recalculate unReadMail
+    //Update the next delivery time and unread mails
     time_t cTime = time(nullptr);
-    m_nextMailDelivereTime = 0;
-    unReadMails = 0;
-    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
+    //Get the next delivery time
+    PreparedStatement* stmtNextDeliveryTime = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NEXT_MAIL_DELIVERYTIME);
+    stmtNextDeliveryTime->setUInt64(0, GetGUIDLow());
+    stmtNextDeliveryTime->setUInt64(1, cTime);
+    PreparedQueryResult resultNextDeliveryTime = CharacterDatabase.Query(stmtNextDeliveryTime);
+    if (resultNextDeliveryTime)
     {
-        if ((*itr)->deliver_time > cTime)
-        {
-            if (!m_nextMailDelivereTime || m_nextMailDelivereTime > (*itr)->deliver_time)
-                m_nextMailDelivereTime = (*itr)->deliver_time;
-        }
-        else if (((*itr)->checked & MAIL_CHECK_MASK_READ) == 0)
-            ++unReadMails;
+        Field* fields = resultNextDeliveryTime->Fetch();
+        m_nextMailDelivereTime = fields[0].GetUInt64();
+    }
+
+    //Get unread mails count
+    PreparedStatement* stmtUnreadAmount = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH);
+    stmtUnreadAmount->setUInt64(0, GetGUIDLow());
+    stmtUnreadAmount->setUInt64(1, cTime);
+    PreparedQueryResult resultUnreadAmount = CharacterDatabase.Query(stmtUnreadAmount);
+    if (resultUnreadAmount)
+    {
+        Field* fields = resultUnreadAmount->Fetch();
+        unReadMails = uint8(fields[0].GetUInt64());
     }
 }
 
 void Player::AddNewMailDeliverTime(time_t deliver_time)
 {
-    if (deliver_time <= time(nullptr))                          // ready now
+    sWorld->UpdateGlobalPlayerMails(GetGUIDLow(), totalMailCount, false);
+    if (deliver_time <= time(nullptr))                      // ready now
     {
         ++unReadMails;
         SendNewMail();
@@ -4600,10 +4623,13 @@ void Player::SetFreeTalentPoints(uint32 points)
 
 Mail* Player::GetMail(uint32 id)
 {
-    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
+    {
         if ((*itr)->messageID == id)
+        {
             return (*itr);
-
+        }
+    }
     return nullptr;
 }
 
@@ -4927,7 +4953,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                     {
                         if (Player* pFriend = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID((*resultFriends)[0].GetUInt32(), 0, HIGHGUID_PLAYER)))
                         {
-                            pFriend->GetSocial()->RemoveFromSocialList(guid, false);
+                            pFriend->GetSocial()->RemoveFromSocialList(guid, SOCIAL_FLAG_ALL);
                             sSocialMgr->SendFriendStatus(pFriend, FRIEND_REMOVED, guid, false);
                         }
                     } while (resultFriends->NextRow());
@@ -7261,6 +7287,14 @@ void Player::RewardReputation(Quest const* quest)
     }
 }
 
+void Player::RewardExtraBonusTalentPoints(uint32 bonusTalentPoints)
+{
+    if (bonusTalentPoints)
+    {
+        m_extraBonusTalentCount += bonusTalentPoints;
+    }
+}
+
 void Player::UpdateHonorFields()
 {
     /// called when rewarding honor and at each save
@@ -7491,7 +7525,7 @@ void Player::ModifyHonorPoints(int32 value, SQLTransaction* trans /*=NULL*/)
         newValue = 0;
     SetHonorPoints(uint32(newValue));
 
-    if (trans && !trans->null())
+    if (trans)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_HONOR_POINTS);
         stmt->setUInt32(0, newValue);
@@ -7507,7 +7541,7 @@ void Player::ModifyArenaPoints(int32 value, SQLTransaction* trans /*=NULL*/)
         newValue = 0;
     SetArenaPoints(uint32(newValue));
 
-    if (trans && !trans->null())
+    if (trans)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_ARENA_POINTS);
         stmt->setUInt32(0, newValue);
@@ -7533,8 +7567,23 @@ uint32 Player::GetGroupIdFromStorage(uint32 guid)
 uint32 Player::GetArenaTeamIdFromStorage(uint32 guid, uint8 slot)
 {
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return playerData->arenaTeamId[slot];
+    {
+        auto itr = playerData->arenaTeamId.find(slot);
+        if (itr != playerData->arenaTeamId.end())
+        {
+            return itr->second;
+        }
+    }
     return 0;
+}
+
+
+void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
+{
+    if (slot < MAX_ARENA_SLOT)
+    {
+        SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
+    }
 }
 
 uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
@@ -7645,27 +7694,7 @@ void Player::UpdateArea(uint32 newArea)
     UpdateAreaDependentAuras(newArea);
 
     pvpInfo.IsInNoPvPArea = false;
-    if (!area)
-    {
-        RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
-        RemoveRestState();
-        return;
-    }
-
-    // Xinef: area should inherit zone flags
-    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(area->zone);
-    uint32 areaFlags = area->flags;
-    bool isSanctuary = area->IsSanctuary();
-    bool isInn = area->IsInn(GetTeamId(true));
-    if (zone)
-    {
-        areaFlags |= zone->flags;
-        isSanctuary |= zone->IsSanctuary();
-        isInn |= zone->IsInn(GetTeamId(true));
-    }
-
-    // previously this was in UpdateZone (but after UpdateArea) so nothing will break
-    if (isSanctuary)    // in sanctuary
+    if (area && area->IsSanctuary())
     {
         SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
         pvpInfo.IsInNoPvPArea = true;
@@ -7674,18 +7703,11 @@ void Player::UpdateArea(uint32 newArea)
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 
-    if (isInn)
-    {
-        SetRestState(0);
-        if (sWorld->IsFFAPvPRealm())
-            RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-    }
-    else if (!(areaFlags & AREA_FLAG_CAPITAL))
-    {
-        AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
-        if (!atEntry || !IsInAreaTriggerRadius(atEntry))
-            RemoveRestState();
-    }
+    uint32 const areaRestFlag = (GetTeamId(true) == TEAM_ALLIANCE) ? AREA_FLAG_REST_ZONE_ALLIANCE : AREA_FLAG_REST_ZONE_HORDE;
+    if (area && area->flags & areaRestFlag)
+        SetRestFlag(REST_FLAG_IN_FACTION_AREA);
+    else
+        RemoveRestFlag(REST_FLAG_IN_FACTION_AREA);
 }
 
 uint32 Player::GetZoneId(bool forceRecalc) const
@@ -7781,10 +7803,12 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     if (zone->flags & AREA_FLAG_CAPITAL)                     // Is in a capital city
     {
         if (!pvpInfo.IsHostile || zone->IsSanctuary())
-            SetRestState(0);
+            SetRestFlag(REST_FLAG_IN_CITY);
 
         pvpInfo.IsInNoPvPArea = true;
     }
+    else
+        RemoveRestFlag(REST_FLAG_IN_CITY); // Recently left a capital city
 
     UpdatePvPState();
 
@@ -7979,7 +8003,7 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
 
     uint8 attacktype = Player::GetAttackBySlot(slot);
 
-    if (proto->Socket[0].Color)                              //only (un)equipping of items with sockets can influence metagems, so no need to waste time with normal items
+    if (item->HasSocket())                              //only (un)equipping of items with sockets can influence metagems, so no need to waste time with normal items
         CorrectMetaGemEnchants(slot, apply);
 
     if (attacktype < MAX_ATTACK)
@@ -17697,7 +17721,7 @@ void Player::_LoadArenaTeamInfo()
 {
     memset((void*)&m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1], 0, sizeof(uint32) * MAX_ARENA_SLOT * ARENA_TEAM_END);
 
-    for (uint8 slot = 0; slot <= 2; ++slot)
+    for (uint8 slot = 0; slot < MAX_ARENA_SLOT; ++slot)
         if (uint32 arenaTeamId = Player::GetArenaTeamIdFromStorage(GetGUIDLow(), slot))
         {
             ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
@@ -18357,10 +18381,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder* holder)
 
     // xinef: load mails before inventory, so problematic items can be added to already loaded mails
     // unread mails and next delivery time, actual mails not loaded
-    _LoadMailInit(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT), holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MAIL_DATE));
-
-    // pussywizard:
-    _LoadMailAsynch(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MAIL));
+    _LoadMailInit(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT), holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MAIL_UNREAD_COUNT), holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MAIL_DATE));
 
     _LoadInventory(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_INVENTORY), time_diff);
 
@@ -19049,8 +19070,15 @@ void Player::_LoadMailedItems(Mail* mail)
     } while (result->NextRow());
 }
 
-void Player::_LoadMailInit(PreparedQueryResult resultUnread, PreparedQueryResult resultDelivery)
+void Player::_LoadMailInit(PreparedQueryResult resultMailCount, PreparedQueryResult resultUnread, PreparedQueryResult resultDelivery)
 {
+    //Set count for all mails used to display correct size later one
+    if (resultMailCount)
+    {
+        totalMailCount = uint32((*resultMailCount)[0].GetUInt32());
+        sWorld->UpdateGlobalPlayerMails(GetGUIDLow(), totalMailCount, false);
+    }
+
     //set a count of unread mails
     //QueryResult* resultMails = CharacterDatabase.PQuery("SELECT COUNT(id) FROM mail WHERE receiver = '%u' AND (checked & 1)=0 AND deliver_time <= '" UI64FMTD "'", GUID_LOPART(playerGuid), (uint64)cTime);
     if (resultUnread)
@@ -19062,129 +19090,61 @@ void Player::_LoadMailInit(PreparedQueryResult resultUnread, PreparedQueryResult
         m_nextMailDelivereTime = time_t((*resultDelivery)[0].GetUInt32());
 }
 
-void Player::_LoadMailAsynch(PreparedQueryResult result)
-{
-    m_mail.clear();
-    uint32 prevMailID = 0;
-    Mail* m = nullptr;
-    if (result)
-    {
-        do
-        {
-            Field* fields = result->Fetch();
-            if (fields[14].GetUInt32() != prevMailID)
-            {
-                if (m)
-                    m_mail.push_back(m);
-
-                m = new Mail;
-
-                m->messageID      = fields[14].GetUInt32();
-                m->messageType    = fields[15].GetUInt8();
-                m->sender         = fields[16].GetUInt32();
-                m->receiver       = fields[17].GetUInt32();
-                m->subject        = fields[18].GetString();
-                m->body           = fields[19].GetString();
-                //                has_items         = fields[20].GetBool();
-                m->expire_time    = time_t(fields[21].GetUInt32());
-                m->deliver_time   = time_t(fields[22].GetUInt32());
-                m->money          = fields[23].GetUInt32();
-                m->COD            = fields[24].GetUInt32();
-                m->checked        = fields[25].GetUInt8();
-                m->stationery     = fields[26].GetUInt8();
-                m->mailTemplateId = fields[27].GetInt16();
-
-                if (m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
-                {
-                    sLog->outError("Player::_LoadMail - Mail (%u) have not existed MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
-                    m->mailTemplateId = 0;
-                }
-
-                m->state = MAIL_STATE_UNCHANGED;
-            }
-
-            if (m && fields[20].GetBool() /*has_items*/ && fields[12].GetUInt32() /*itemEntry*/)
-            {
-                uint32 itemGuid = fields[11].GetUInt32();
-                uint32 itemTemplate = fields[12].GetUInt32();
-
-                m->AddItem(itemGuid, itemTemplate);
-
-                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemTemplate);
-
-                if (!proto)
-                {
-                    sLog->outError("Player %u has unknown item_template (ProtoType) in mailed items(GUID: %u template: %u) in mail (%u), deleted.", GetGUIDLow(), itemGuid, itemTemplate, m->messageID);
-
-                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
-                    stmt->setUInt32(0, itemGuid);
-                    CharacterDatabase.Execute(stmt);
-
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-                    stmt->setUInt32(0, itemGuid);
-                    CharacterDatabase.Execute(stmt);
-                    continue;
-                }
-
-                Item* item = NewItemOrBag(proto);
-
-                if (!item->LoadFromDB(itemGuid, MAKE_NEW_GUID(fields[13].GetUInt32(), 0, HIGHGUID_PLAYER), fields, itemTemplate))
-                {
-                    sLog->outError("Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", m->messageID, itemGuid);
-
-                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM);
-                    stmt->setUInt32(0, itemGuid);
-                    CharacterDatabase.Execute(stmt);
-
-                    item->FSetState(ITEM_REMOVED);
-
-                    SQLTransaction temp = SQLTransaction(nullptr);
-                    item->SaveToDB(temp);                               // it also deletes item object !
-                    continue;
-                }
-
-                AddMItem(item);
-            }
-
-            prevMailID = fields[14].GetUInt32();
-        } while (result->NextRow());
-
-        m_mail.push_back(m);
-    }
-    // Xinef: this is stored during storage initialization
-    sWorld->UpdateGlobalPlayerMails(GetGUIDLow(), m_mail.size(), false);
-    m_mailsLoaded = true;
-}
-
 void Player::_LoadMail()
 {
-    m_mail.clear();
+    //In case we are not expecting to receive new mail we just exits, not really necessary to refresh any data
+    if (m_nextMailDelivereTime > time(nullptr))
+    {
+        return;
+    }
 
+    if (m_mailsUpdated)
+    {
+        //Save changed data to the sql before refreshing so we always get up to date data
+        SQLTransaction saveTransaction = CharacterDatabase.BeginTransaction();
+        _SaveMail(saveTransaction);
+        CharacterDatabase.CommitTransaction(saveTransaction);
+    }
+
+    //This should in theory always be < 100
+    for (PlayerMails::iterator itr = GetMailBegin(); itr != GetMailEnd();)
+    {
+        Mail* m = *itr;
+        m_mailCache.erase(itr);
+        if(m)
+            delete m;
+        itr = GetMailBegin();
+    }
+
+    //Now load the new ones
+    m_mailCache.clear();
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL);
     stmt->setUInt32(0, GetGUIDLow());
+    stmt->setUInt64(1, time(nullptr));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
     if (result)
     {
         do
         {
             Field* fields = result->Fetch();
+
             Mail* m = new Mail;
 
-            m->messageID      = fields[0].GetUInt32();
-            m->messageType    = fields[1].GetUInt8();
-            m->sender         = fields[2].GetUInt32();
-            m->receiver       = fields[3].GetUInt32();
-            m->subject        = fields[4].GetString();
-            m->body           = fields[5].GetString();
-            bool has_items    = fields[6].GetBool();
-            m->expire_time    = time_t(fields[7].GetUInt32());
-            m->deliver_time   = time_t(fields[8].GetUInt32());
-            m->money          = fields[9].GetUInt32();
-            m->COD            = fields[10].GetUInt32();
-            m->checked        = fields[11].GetUInt8();
-            m->stationery     = fields[12].GetUInt8();
+            m->messageID = fields[0].GetUInt32();
+            m->messageType = fields[1].GetUInt8();
+            m->sender = fields[2].GetUInt32();
+            m->receiver = fields[3].GetUInt32();
+            m->subject = fields[4].GetString();
+            m->body = fields[5].GetString();
+            bool has_items = fields[6].GetBool();
+            m->expire_time = time_t(fields[7].GetUInt32());
+            m->deliver_time = time_t(fields[8].GetUInt32());
+            m->money = fields[9].GetUInt32();
+            m->COD = fields[10].GetUInt32();
+            m->checked = fields[11].GetUInt8();
+            m->stationery = fields[12].GetUInt8();
             m->mailTemplateId = fields[13].GetInt16();
+
 
             if (m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
             {
@@ -19197,10 +19157,10 @@ void Player::_LoadMail()
             if (has_items)
                 _LoadMailedItems(m);
 
-            m_mail.push_back(m);
-        } while (result->NextRow());
+            m_mailCache.push_back(m);
+        }
+        while (result->NextRow());
     }
-    m_mailsLoaded = true;
 }
 
 void Player::LoadPet()
@@ -20092,12 +20052,14 @@ void Player::_SaveInventory(SQLTransaction& trans)
 
 void Player::_SaveMail(SQLTransaction& trans)
 {
-    if (!m_mailsLoaded)
+    if (!GetMailCacheSize() || !m_mailsUpdated)
+    {
         return;
+    }
 
     PreparedStatement* stmt = nullptr;
 
-    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
     {
         Mail* m = (*itr);
         if (m->state == MAIL_STATE_CHANGED)
@@ -20143,18 +20105,20 @@ void Player::_SaveMail(SQLTransaction& trans)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
             stmt->setUInt32(0, m->messageID);
             trans->Append(stmt);
+            if (totalMailCount > 0)
+                totalMailCount--;
         }
     }
 
     //deallocate deleted mails...
-    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end();)
+    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end();)
     {
         if ((*itr)->state == MAIL_STATE_DELETED)
         {
             Mail* m = *itr;
-            m_mail.erase(itr);
+            m_mailCache.erase(itr);
             delete m;
-            itr = m_mail.begin();
+            itr = m_mailCache.begin();
         }
         else
             ++itr;
@@ -20165,7 +20129,7 @@ void Player::_SaveMail(SQLTransaction& trans)
 
 void Player::_SaveQuestStatus(SQLTransaction& trans)
 {
-    bool isTransaction = !trans.null();
+    bool isTransaction = static_cast<bool>(trans);
     if (!isTransaction)
         trans = CharacterDatabase.BeginTransaction();
 
@@ -21674,6 +21638,38 @@ void Player::LeaveAllArenaTeams(uint64 guid)
     } while (result->NextRow());
 }
 
+
+uint32 Player::GetArenaTeamId(uint8 slot) const
+{
+    uint32 rtVal = 0;
+    if (slot >= MAX_ARENA_SLOT)
+    {
+        sScriptMgr->GetCustomGetArenaTeamId(this, slot, rtVal);
+    }
+    else
+    {
+        rtVal = GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID);
+    }
+
+    return rtVal;
+}
+
+
+uint32 Player::GetArenaPersonalRating(uint8 slot) const
+{
+    uint32 rtVal = 0;
+    if (slot >= MAX_ARENA_SLOT)
+    {
+        sScriptMgr->GetCustomGetArenaTeamId(this, slot, rtVal);
+    }
+    else
+    {
+        rtVal = GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING);
+    }
+
+    return rtVal;
+}
+
 void Player::SetRestBonus(float rest_bonus_new)
 {
     // Prevent resting on max level
@@ -22334,6 +22330,9 @@ uint32 Player::GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot) const
                 max_personal_rating = p_rating;
         }
     }
+
+    sScriptMgr->OnGetMaxPersonalArenaRatingRequirement(this, minarenaslot, max_personal_rating);
+
     return max_personal_rating;
 }
 
@@ -22625,7 +22624,7 @@ bool Player::EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot)
         if (i == slot)
             continue;
         Item* pItem2 = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-        if (pItem2 && !pItem2->IsBroken() && pItem2->GetTemplate()->Socket[0].Color)
+        if (pItem2 && !pItem2->IsBroken() && pItem2->HasSocket())
         {
             for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot <= PRISMATIC_ENCHANTMENT_SLOT; ++enchant_slot)
             {
@@ -22707,7 +22706,7 @@ void Player::CorrectMetaGemEnchants(uint8 exceptslot, bool apply)
 
         Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
 
-        if (!pItem || !pItem->GetTemplate()->Socket[0].Color)
+        if (!pItem || !pItem->HasSocket())
             continue;
 
         for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + 3; ++enchant_slot)
@@ -23265,7 +23264,7 @@ void Player::SetGroup(Group* group, int8 subgroup)
 void Player::SendInitialPacketsBeforeAddToMap()
 {
     /// Pass 'this' as argument because we're not stored in ObjectAccessor yet
-    GetSocial()->SendSocialList(this);
+    GetSocial()->SendSocialList(this, SOCIAL_FLAG_ALL);
 
     // guild bank list wtf?
 
@@ -23669,6 +23668,22 @@ void Player::SetDailyQuestStatus(uint32 quest_id)
             m_DailyQuestChanged = true;
         }
     }
+}
+
+bool Player::IsDailyQuestDone(uint32 quest_id)
+{
+    if (sObjectMgr->GetQuestTemplate(quest_id))
+    {
+        for (uint32 quest_daily_idx = 0; quest_daily_idx < PLAYER_MAX_DAILY_QUESTS; ++quest_daily_idx)
+        {
+            if (GetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1 + quest_daily_idx) == quest_id)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void Player::SetWeeklyQuestStatus(uint32 quest_id)
@@ -25420,6 +25435,7 @@ uint32 Player::CalculateTalentsPoints() const
     if (talentPointsForLevel > base_talent)
         talentPointsForLevel = base_talent;
 
+    talentPointsForLevel += m_extraBonusTalentCount;
     return uint32(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
 }
 
@@ -27836,3 +27852,30 @@ bool Player::HasHealSpec()
 }
 
 std::unordered_map<int, bgZoneRef> Player::bgZoneIdToFillWorldStates = {};
+
+void Player::SetRestFlag(RestFlag restFlag, uint32 triggerId /*= 0*/)
+{
+    uint32 oldRestMask = _restFlagMask;
+    _restFlagMask |= restFlag;
+
+    if (!oldRestMask && _restFlagMask) // only set flag/time on the first rest state
+    {
+        _restTime = time(nullptr);
+        SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+    }
+
+    if (triggerId)
+        _innTriggerId = triggerId;
+}
+
+void Player::RemoveRestFlag(RestFlag restFlag)
+{
+    uint32 oldRestMask = _restFlagMask;
+    _restFlagMask &= ~restFlag;
+
+    if (oldRestMask && !_restFlagMask) // only remove flag/time on the last rest state remove
+    {
+        _restTime = 0;
+        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+    }
+}

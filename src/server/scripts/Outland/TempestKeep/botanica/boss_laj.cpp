@@ -52,7 +52,7 @@ public:
     {
         boss_lajAI(Creature* creature) : BossAI(creature, DATA_LAJ) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             me->SetDisplayId(MODEL_DEFAULT);
@@ -86,7 +86,7 @@ public:
             me->CastSpell(me, _lastTransform, true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
 
@@ -95,7 +95,7 @@ public:
             events.ScheduleEvent(EVENT_TELEPORT, 20000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -132,7 +132,7 @@ public:
         uint32 _lastTransform;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_lajAI(creature);
     }

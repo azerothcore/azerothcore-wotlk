@@ -30,7 +30,7 @@ public:
     {
         npc_steam_powered_auctioneerAI(Creature* creature) : ScriptedAI(creature) {}
 
-        bool CanBeSeen(Player const* player)
+        bool CanBeSeen(Player const* player) override
         {
             if (player->GetTeamId() == TEAM_ALLIANCE)
                 return me->GetEntry() == 35594;
@@ -39,7 +39,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_steam_powered_auctioneerAI(creature);
     }
@@ -54,7 +54,7 @@ public:
     {
         npc_mei_francis_mountAI(Creature* creature) : ScriptedAI(creature) {}
 
-        bool CanBeSeen(Player const* player)
+        bool CanBeSeen(Player const* player) override
         {
             if (player->GetTeamId() == TEAM_ALLIANCE)
                 return me->GetEntry() == 32206 || me->GetEntry() == 32335 || me->GetEntry() == 31851;
@@ -63,7 +63,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_mei_francis_mountAI(creature);
     }
@@ -181,12 +181,11 @@ public:
         void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
-            switch (_events.GetEvent())
+            switch (_events.ExecuteEvent())
             {
                 case EVENT_INTRO_DH1:
                     Talk(SAY_SHANDY3);
                     _events.ScheduleEvent(EVENT_INTRO_DH2, 15000);
-                    _events.PopEvent();
                     break;
                 case EVENT_INTRO_DH2:
                     if (_lCount++ > 6)
@@ -194,28 +193,23 @@ public:
                     else
                         RollTask();
 
-                    _events.PopEvent();
                     break;
                 case EVENT_INTRO_DH3:
                     Talk(SAY_SHANDY4);
                     _events.ScheduleEvent(EVENT_INTRO_DH4, 20000);
-                    _events.PopEvent();
                     break;
                 case EVENT_INTRO_DH4:
                     Talk(SAY_SHANDY5);
                     _events.ScheduleEvent(EVENT_INTRO_DH5, 3000);
-                    _events.PopEvent();
                     break;
                 case EVENT_INTRO_DH5:
                     me->SummonGameObject(201384, 5798.74f, 693.19f, 657.94f, 0.91f, 0, 0, 0, 0, 90000000);
                     _events.ScheduleEvent(EVENT_INTRO_DH6, 1000);
-                    _events.PopEvent();
                     break;
                 case EVENT_INTRO_DH6:
                     me->SetWalk(true);
                     me->GetMotionMaster()->MovePoint(0, 5797.55f, 691.97f, 657.94f);
                     _events.RescheduleEvent(EVENT_OUTRO_DH, 30000);
-                    _events.PopEvent();
                     break;
                 case EVENT_OUTRO_DH:
                     me->GetMotionMaster()->MoveTargetedHome();
@@ -309,7 +303,7 @@ public:
     {
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_archmage_landalockAI(creature);
     }
@@ -353,7 +347,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* image)
+        void JustSummoned(Creature* image) override
         {
             // xinef: screams like a baby
             if (image->GetEntry() != NPC_ANUBREKHAN_IMAGE)
@@ -361,7 +355,7 @@ public:
             _summonGUID = image->GetGUID();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             ScriptedAI::UpdateAI(diff);
 
@@ -435,13 +429,13 @@ public:
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
         }
 
-        void Reset() {}
+        void Reset() override {}
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) override {}
 
-        void AttackStart(Unit* /*who*/) {}
+        void AttackStart(Unit* /*who*/) override {}
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!who || !who->IsInWorld() || who->GetZoneId() != 4395)
                 return;
@@ -488,10 +482,10 @@ public:
             return;
         }
 
-        void UpdateAI(uint32 /*diff*/) {}
+        void UpdateAI(uint32 /*diff*/) override {}
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_mageguard_dalaranAI(creature);
     }
@@ -527,7 +521,7 @@ public:
             me->setActive(true);
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetVisible(false);
             events.ScheduleEvent(EVENT_SELECT_TARGET, IN_MILLISECONDS);
@@ -557,7 +551,7 @@ public:
             CharacterDatabase.CommitTransaction(trans);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
 
             if (!sWorld->getBoolConfig(CONFIG_MINIGOB_MANABONK))
@@ -606,7 +600,7 @@ public:
         EventMap events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_minigob_manabonkAI(creature);
     }
@@ -617,7 +611,7 @@ class npc_dalaran_mage : public CreatureScript
 public:
     npc_dalaran_mage() : CreatureScript("npc_dalaran_mage") {}
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dalaran_mageAI(creature);
     }
@@ -646,16 +640,16 @@ public:
             restoremana_timer = 10000;
         }
 
-        void Reset()
+        void Reset() override
         {
             Initialize();
             me->AddAura(1908, me);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
 
             if (!UpdateVictim())
@@ -723,7 +717,7 @@ class npc_dalaran_warrior : public CreatureScript
 public:
     npc_dalaran_warrior() : CreatureScript("npc_dalaran_warrior") {}
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dalaran_warriorAI(creature);
     }
@@ -748,17 +742,17 @@ public:
             disarm_timer = 50000;
         }
 
-        void Reset()
+        void Reset() override
         {
             Initialize();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->AddAura(1908, me);
             Battleshout_timer = 1000;
         }
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
 
             if (!UpdateVictim())

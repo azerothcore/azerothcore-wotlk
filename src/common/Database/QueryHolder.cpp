@@ -175,19 +175,19 @@ bool SQLQueryHolderTask::Execute()
             switch (data->type)
             {
                 case SQL_ELEMENT_RAW:
-                    {
-                        char const* sql = data->element.query;
-                        if (sql)
-                            m_holder->SetResult(i, m_conn->Query(sql));
-                        break;
-                    }
+                {
+                    char const* sql = data->element.query;
+                    if (sql)
+                        m_holder->SetResult(i, m_conn->Query(sql));
+                    break;
+                }
                 case SQL_ELEMENT_PREPARED:
-                    {
-                        PreparedStatement* stmt = data->element.stmt;
-                        if (stmt)
-                            m_holder->SetPreparedResult(i, m_conn->Query(stmt));
-                        break;
-                    }
+                {
+                    PreparedStatement* stmt = data->element.stmt;
+                    if (stmt)
+                        m_holder->SetPreparedResult(i, m_conn->Query(stmt));
+                    break;
+                }
             }
         }
     }

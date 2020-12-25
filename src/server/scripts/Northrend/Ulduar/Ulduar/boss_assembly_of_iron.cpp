@@ -89,9 +89,8 @@ enum eEnums
     EVENT_LIGHTNING_TENDRILS    = 24,
     EVENT_LIGHTNING_LAND        = 25,
     EVENT_LAND_LAND             = 26,
-    EVENT_IMMUNE                = 27,
 
-    EVENT_ENRAGE                = 30,
+    EVENT_ENRAGE                = 30
 };
 
 enum AssemblyYells
@@ -327,7 +326,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case EVENT_FUSION_PUNCH:
                     me->CastSpell(me->GetVictim(), SPELL_FUSION_PUNCH, false);
@@ -347,7 +346,6 @@ public:
                 case EVENT_ENRAGE:
                     Talk(SAY_STEELBREAKER_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    events.PopEvent();
                     break;
             }
 
@@ -497,7 +495,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case EVENT_RUNE_OF_POWER:
                     {
@@ -529,7 +527,6 @@ public:
                 case EVENT_ENRAGE:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     Talk(SAY_MOLGEIM_BERSERK);
-                    events.PopEvent();
                     break;
             }
 
@@ -625,8 +622,6 @@ public:
             me->SetDisableGravity(false);
             me->SetRegeneratingHealth(true);
             me->SetReactState(REACT_AGGRESSIVE);
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
-
             if (pInstance)
                 pInstance->SetData(TYPE_ASSEMBLY, NOT_STARTED);
         }
@@ -762,7 +757,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_CHAIN_LIGHTNING:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
@@ -770,16 +765,10 @@ public:
 
                     events.RepeatEvent(urand(9000, 17000));
                     break;
-                case EVENT_IMMUNE:
-                    me->ApplySpellImmune(1, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
-                    events.PopEvent();
-                    break;
                 case EVENT_OVERLOAD:
-                    me->ApplySpellImmune(1, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
                     Talk(EMOTE_BRUNDIR_OVERLOAD);
                     me->CastSpell(me, SPELL_OVERLOAD, true);
                     events.RescheduleEvent(EVENT_OVERLOAD, urand(25000, 40000));
-                    events.RescheduleEvent(EVENT_IMMUNE, 5999);
                     break;
                 case EVENT_LIGHTNING_WHIRL:
                     Talk(SAY_BRUNDIR_SPECIAL);
@@ -808,8 +797,6 @@ public:
                         me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
                         me->CastSpell(me, 61883, true);
                         events.ScheduleEvent(EVENT_LIGHTNING_LAND, 16000);
-
-                        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
                         break;
                     }
                 case EVENT_LIGHTNING_LAND:
@@ -818,7 +805,6 @@ public:
                         me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
                         _flyPhase = false;
                         events.ScheduleEvent(EVENT_LAND_LAND, 1000);
-                        events.PopEvent();
                         break;
                     }
                 case EVENT_LAND_LAND:
@@ -833,13 +819,10 @@ public:
                     me->RemoveAura(SPELL_LIGHTNING_TENDRILS);
                     me->RemoveAura(61883);
                     DoResetThreat();
-                    events.PopEvent();
-                    me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
                     break;
                 case EVENT_ENRAGE:
                     Talk(SAY_BRUNDIR_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    events.PopEvent();
                     break;
             }
 

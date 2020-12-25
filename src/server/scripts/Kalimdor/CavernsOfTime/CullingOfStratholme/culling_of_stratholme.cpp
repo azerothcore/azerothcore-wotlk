@@ -659,7 +659,7 @@ public:
             if (eventInRun)
             {
                 actionEvents.Update(diff);
-                switch (uint32 currentEvent = actionEvents.GetEvent())
+                switch (uint32 currentEvent = actionEvents.ExecuteEvent())
                 {
                     case EVENT_ACTION_PHASE1:
                         SetRun(false);
@@ -815,7 +815,7 @@ public:
                         SetEscortPaused(false);
                         eventInRun = false;
                         me->SetTarget(0);
-                        actionEvents.PopEvent(); // dont schedule next, do it in gossip select!
+                        // dont schedule next, do it in gossip select!
                         break;
                     //After Gossip 1 (waypoint 8)
                     case EVENT_ACTION_PHASE2:
@@ -910,7 +910,6 @@ public:
                             pInstance->SetData(DATA_START_WAVES, 1);
 
                         SummonNextWave();
-                        actionEvents.PopEvent();
                         break;
                     case EVENT_ACTION_PHASE2+9:
                         if (pInstance)
@@ -919,7 +918,6 @@ public:
                         Talk(SAY_PHASE210);
                         eventInRun = false;
                         SetEscortPaused(false);
-                        actionEvents.PopEvent();
                         break;
                     // After waypoint 22
                     case EVENT_ACTION_PHASE3:
@@ -1110,7 +1108,6 @@ public:
                             pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_KILLED_EPOCH);
 
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        actionEvents.PopEvent();
                         eventInRun = false;
                         break;
                     case EVENT_ACTION_PHASE5:
@@ -1122,7 +1119,6 @@ public:
                             cr->AddThreat(me, 0.0f);
                             AttackStart(cr);
                         }
-                        actionEvents.PopEvent();
                         eventInRun = false;
                         SetEscortPaused(true);
                         break;
@@ -1150,7 +1146,6 @@ public:
                     case EVENT_ACTION_PHASE5+3:
                         eventInRun = false;
                         me->SetVisible(false);
-                        actionEvents.PopEvent();
                         break;
                 }
             }
@@ -1163,7 +1158,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (combatEvents.GetEvent())
+            switch (combatEvents.ExecuteEvent())
             {
                 case EVENT_COMBAT_EXORCISM:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
@@ -1202,7 +1197,6 @@ Creature* npc_arthas::npc_arthasAI::GetEventNpc(uint32 entry)
 
 void npc_arthas::npc_arthasAI::ScheduleNextEvent(uint32 currentEvent, uint32 time)
 {
-    actionEvents.PopEvent();
     actionEvents.ScheduleEvent(currentEvent + 1, time);
 }
 
@@ -1364,7 +1358,7 @@ public:
             _marked = false;
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_ARCANE_DISRUPTION && !_marked)
             {
@@ -1383,7 +1377,7 @@ public:
         bool _marked;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_crate_helperAI(creature);
     }
@@ -1505,7 +1499,7 @@ public:
         InstanceScript* pInstance;
         uint32 allowTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             locked = false;
@@ -1524,7 +1518,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!allowTimer && !locked && (who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && me->GetDistance(who) < 15.0f)
                 InfectMe(2000);
@@ -1532,7 +1526,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_INFECT_CITIZIEN)
                 InfectMe(1);
@@ -1546,7 +1540,7 @@ public:
             changeTimer = time;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_ARTHAS_CRUSADER_STRIKE)
             {
@@ -1560,7 +1554,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             ScriptedAI::UpdateAI(diff);
 
@@ -1595,7 +1589,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_cos_stratholme_citizienAI(creature);
     }

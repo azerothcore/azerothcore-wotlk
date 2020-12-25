@@ -38,7 +38,7 @@ struct boss_faction_championsAI : public ScriptedAI
     uint32 threatTimer;
     uint32 powerTimer;
 
-    void EnterCombat(Unit* /*who*/)
+    void EnterCombat(Unit* /*who*/) override
     {
         me->SetInCombatWithZone();
         RecalculateThreat();
@@ -46,7 +46,7 @@ struct boss_faction_championsAI : public ScriptedAI
             pInstance->SetData(TYPE_FACTION_CHAMPIONS_START, 0);
     }
 
-    void AttackStart(Unit* who)
+    void AttackStart(Unit* who) override
     {
         if( !who )
             return;
@@ -109,19 +109,19 @@ struct boss_faction_championsAI : public ScriptedAI
         e.DelayEventsToMax(delay, gcd);
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         if( pInstance && mAIType != AI_PET )
             pInstance->SetData(TYPE_FACTION_CHAMPIONS, DONE);
     }
 
-    void KilledUnit(Unit*  /*who*/)
+    void KilledUnit(Unit*  /*who*/) override
     {
         if( pInstance )
             pInstance->SetData(TYPE_FACTION_CHAMPIONS_PLAYER_DIED, 1);
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if( pInstance )
             pInstance->SetData(TYPE_FAILED, 0);
@@ -189,7 +189,7 @@ struct boss_faction_championsAI : public ScriptedAI
         return nullptr;
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         if (!me->IsInCombat())
             return;
@@ -254,7 +254,7 @@ class npc_toc_druid : public CreatureScript
 public:
     npc_toc_druid() : CreatureScript("npc_toc_druid") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_druidAI (pCreature);
     }
@@ -282,7 +282,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -293,7 +293,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -384,7 +384,7 @@ class npc_toc_shaman : public CreatureScript
 public:
     npc_toc_shaman() : CreatureScript("npc_toc_shaman") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_shamanAI (pCreature);
     }
@@ -411,7 +411,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -422,7 +422,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -506,7 +506,7 @@ class npc_toc_paladin : public CreatureScript
 public:
     npc_toc_paladin() : CreatureScript("npc_toc_paladin") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_paladinAI (pCreature);
     }
@@ -534,7 +534,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -545,7 +545,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -641,7 +641,7 @@ class npc_toc_priest : public CreatureScript
 public:
     npc_toc_priest() : CreatureScript("npc_toc_priest") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_priestAI (pCreature);
     }
@@ -667,7 +667,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -678,7 +678,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -761,7 +761,7 @@ class npc_toc_shadow_priest : public CreatureScript
 public:
     npc_toc_shadow_priest() : CreatureScript("npc_toc_shadow_priest") {}
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_shadow_priestAI (pCreature);
     }
@@ -790,7 +790,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -801,7 +801,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -915,7 +915,7 @@ class npc_toc_warlock : public CreatureScript
 public:
     npc_toc_warlock() : CreatureScript("npc_toc_warlock") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_warlockAI (pCreature);
     }
@@ -944,13 +944,13 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void JustSummoned(Creature* c)
+        void JustSummoned(Creature* c) override
         {
             if( Unit* target = c->SelectNearestTarget(200.0f) )
                 c->AI()->AttackStart(target);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -961,13 +961,13 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_SPELL_SUMMON_FELHUNTER:
                     DoSummon(35465, *me);
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_SPELL_HELLFIRE:
                     if( EnemiesInRange(9.0f) >= 3 )
@@ -1059,7 +1059,7 @@ class npc_toc_mage : public CreatureScript
 public:
     npc_toc_mage() : CreatureScript("npc_toc_mage") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_mageAI (pCreature);
     }
@@ -1087,7 +1087,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -1098,7 +1098,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -1206,7 +1206,7 @@ class npc_toc_hunter : public CreatureScript
 public:
     npc_toc_hunter() : CreatureScript("npc_toc_hunter") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_hunterAI (pCreature);
     }
@@ -1235,13 +1235,13 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_RANGED) || IsCCed());
         }
 
-        void JustSummoned(Creature* c)
+        void JustSummoned(Creature* c) override
         {
             if( Unit* target = c->SelectNearestTarget(200.0f) )
                 c->AI()->AttackStart(target);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -1252,13 +1252,13 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_SPELL_CALL_PET:
                     DoSummon(35610, *me);
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_SPELL_AIMED_SHOT:
                     if( me->GetVictim() )
@@ -1359,7 +1359,7 @@ class npc_toc_boomkin : public CreatureScript
 public:
     npc_toc_boomkin() : CreatureScript("npc_toc_boomkin") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_boomkinAI (pCreature);
     }
@@ -1388,13 +1388,13 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void JustSummoned(Creature* c)
+        void JustSummoned(Creature* c) override
         {
             if( Unit* target = c->SelectNearestTarget(200.0f) )
                 c->AI()->AttackStart(target);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -1405,7 +1405,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -1504,7 +1504,7 @@ class npc_toc_warrior : public CreatureScript
 public:
     npc_toc_warrior() : CreatureScript("npc_toc_warrior") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_warriorAI (pCreature);
     }
@@ -1533,7 +1533,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -1544,7 +1544,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -1698,7 +1698,7 @@ class npc_toc_dk : public CreatureScript
 public:
     npc_toc_dk() : CreatureScript("npc_toc_dk") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_dkAI (pCreature);
     }
@@ -1725,7 +1725,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -1736,7 +1736,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -1854,7 +1854,7 @@ class npc_toc_rogue : public CreatureScript
 public:
     npc_toc_rogue() : CreatureScript("npc_toc_rogue") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_rogueAI (pCreature);
     }
@@ -1882,7 +1882,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -1893,7 +1893,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -2013,7 +2013,7 @@ class npc_toc_enh_shaman : public CreatureScript
 public:
     npc_toc_enh_shaman() : CreatureScript("npc_toc_enh_shaman") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_enh_shamanAI (pCreature);
     }
@@ -2041,7 +2041,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -2052,7 +2052,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -2152,7 +2152,7 @@ class npc_toc_retro_paladin : public CreatureScript
 public:
     npc_toc_retro_paladin() : CreatureScript("npc_toc_retro_paladin") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_retro_paladinAI (pCreature);
     }
@@ -2180,7 +2180,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -2191,7 +2191,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -2304,7 +2304,7 @@ class npc_toc_pet_warlock : public CreatureScript
 public:
     npc_toc_pet_warlock() : CreatureScript("npc_toc_pet_warlock") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_pet_warlockAI (pCreature);
     }
@@ -2325,7 +2325,7 @@ public:
             return !(me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -2336,7 +2336,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -2357,7 +2357,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DespawnOrUnsummon();
         }
@@ -2380,7 +2380,7 @@ class npc_toc_pet_hunter : public CreatureScript
 public:
     npc_toc_pet_hunter() : CreatureScript("npc_toc_pet_hunter") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_toc_pet_hunterAI (pCreature);
     }
@@ -2400,7 +2400,7 @@ public:
             return !IsCCed();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -2411,7 +2411,7 @@ public:
             if( !myCanCast() )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -2425,7 +2425,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DespawnOrUnsummon();
         }
@@ -2469,7 +2469,7 @@ public:
     {
         PrepareAuraScript(spell_faction_champion_warl_unstable_affliction_AuraScript);
 
-        bool Validate(SpellInfo const* /*spell*/)
+        bool Validate(SpellInfo const* /*spell*/) override
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_UNSTABLE_AFFLICTION_DISPEL))
                 return false;
@@ -2482,13 +2482,13 @@ public:
                 caster->CastSpell(dispelInfo->GetDispeller(), SPELL_UNSTABLE_AFFLICTION_DISPEL, true, NULL, GetEffect(EFFECT_0));
         }
 
-        void Register()
+        void Register() override
         {
             AfterDispel += AuraDispelFn(spell_faction_champion_warl_unstable_affliction_AuraScript::HandleDispel);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_faction_champion_warl_unstable_affliction_AuraScript();
     }
