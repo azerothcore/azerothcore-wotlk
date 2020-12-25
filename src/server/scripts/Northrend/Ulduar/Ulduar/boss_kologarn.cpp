@@ -125,8 +125,6 @@ enum Misc
     DATA_KOLOGARN_ARMS_ACHIEV           = 57,
 };
 
-Unit* eyebeamTarget;
-
 class boss_kologarn : public CreatureScript
 {
 public:
@@ -143,6 +141,7 @@ public:
             _left(0), _right(0), summons(me), breathReady(false)
         {
             m_pInstance = me->GetInstanceScript();
+            eyebeamTarget = nullptr;
             assert(vehicle);
             me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
         }
@@ -153,6 +152,8 @@ public:
         uint64 _left, _right;
         EventMap events;
         SummonList summons;
+
+        Unit* eyebeamTarget;
 
         bool _looksAchievement, breathReady;
         uint8 _rubbleAchievement;
@@ -233,8 +234,6 @@ public:
 
             AttachLeftArm();
             AttachRightArm();
-
-            eyebeamTarget = nullptr;
 
             // Reset breath on pull
             breathReady = false;
@@ -437,7 +436,7 @@ public:
                 {
                     events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 20000);
 
-                    if ( (eyebeamTarget = SelectTarget(SELECT_TARGET_FARTHEST, 0, 0, true)) )
+                    if ( eyebeamTarget = SelectTarget(SELECT_TARGET_FARTHEST, 0, 0, true) )
                     {
                         me->CastSpell(eyebeamTarget, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
                     }
@@ -621,7 +620,6 @@ public:
                     me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
                 }
                 me->CastSpell(me, SPELL_FOCUSED_EYEBEAM, true);
-                me->GetMotionMaster()->MoveChase(me->GetMap()->GetPlayer(eyebeamTarget->GetGUID()));
                 justSpawned = false;
             }
             if (_timer)
