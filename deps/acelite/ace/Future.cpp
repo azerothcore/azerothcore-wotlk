@@ -230,8 +230,12 @@ ACE_Future_Rep<T>::get (T &value,
       // Destructor releases the lock.
     }
 
-  value = *this->value_;
-  return 0;
+  if (value)
+  {
+      value = *this->value_;
+
+      return 0;
+  }
 }
 
 template <class T> int

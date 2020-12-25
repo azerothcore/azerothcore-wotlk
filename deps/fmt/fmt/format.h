@@ -732,7 +732,7 @@ class decimal_formatter {
  private:
   char* buffer_;
 
-  void write_pair(unsigned N, uint32_t index) {
+  void write_pair(unsigned N, uint64_t index) {
     std::memcpy(buffer_ + N, data::digits + index * 2, 2);
   }
 

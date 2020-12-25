@@ -139,7 +139,7 @@ class Channel
     {
         uint64 player;
         uint8 flags;
-        uint32 lastSpeakTime; // pussywizard
+        uint64 lastSpeakTime; // pussywizard
         Player* plrPtr; // pussywizard
 
         bool HasFlag(uint8 flag) const { return flags & flag; }

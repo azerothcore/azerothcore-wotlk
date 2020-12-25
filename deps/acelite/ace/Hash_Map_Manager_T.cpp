@@ -239,14 +239,18 @@ ACE_Hash_Map_Manager_Ex<EXT_ID, INT_ID, HASH_KEY, COMPARE_KEYS, ACE_LOCK>::bind_
                             this->entry_allocator_->malloc (sizeof (ACE_Hash_Map_Entry<EXT_ID, INT_ID>)),
                             -1);
 
-      entry = new (ptr) ACE_Hash_Map_Entry<EXT_ID, INT_ID> (ext_id,
-                                                            int_id,
-                                                            this->table_[loc].next_,
-                                                            &this->table_[loc]);
-      this->table_[loc].next_ = entry;
-      entry->next_->prev_ = entry;
-      ++this->cur_size_;
-      return 0;
+      if (entry)
+      {
+          entry = new (ptr) ACE_Hash_Map_Entry<EXT_ID, INT_ID>(ext_id,
+              int_id,
+              this->table_[loc].next_,
+              &this->table_[loc]);
+
+          this->table_[loc].next_ = entry;
+          entry->next_->prev_ = entry;
+          ++this->cur_size_;
+          return 0;
+      }
     }
   else
     return 1;
