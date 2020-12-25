@@ -48,7 +48,7 @@ enum FreyaSpells
     SPELL_STONEBARK_ESSENCE                     = 62483,
     SPELL_IRONBRANCH_ESSENCE                    = 62484,
     SPELL_BRIGHTLEAF_ESSENCE                    = 62485,
-    
+
     // BRIGHTLEAF
     SPELL_BRIGHTLEAF_FLUX                       = 62239,
     SPELL_SOLAR_FLARE_10                        = 62240,
@@ -57,7 +57,7 @@ enum FreyaSpells
     SPELL_PHOTOSYNTHESIS                        = 62209,
     SPELL_UNSTABLE_SUN_DAMAGE_10                = 62217,
     SPELL_UNSTABLE_SUN_DAMAGE_25                = 62922,
-    
+
     // IRONBRANCH
     SPELL_IMPALE_10                             = 62310,
     SPELL_IMPALE_25                             = 62928,
@@ -67,7 +67,7 @@ enum FreyaSpells
     SPELL_IRON_ROOTS_DAMAGE_25                  = 62930,
     SPELL_THORN_SWARM_10                        = 62285,
     SPELL_THORN_SWARM_25                        = 62931,
-    
+
     // STONEBARK
     SPELL_FISTS_OF_STONE                        = 62344,
     SPELL_GROUND_TREMOR_10                      = 62325,
@@ -177,7 +177,7 @@ enum FreyaSounds
     SOUND_STONEBARK_SLAY1                       = 15501,
     SOUND_STONEBARK_SLAY2                       = 15502,
     SOUND_STONEBARK_DEATH                       = 15503,
-    
+
     // IRONBRANCH
     SOUND_IRONBRANCH_AGGRO                      = 15493,
     SOUND_IRONBRANCH_SLAY1                      = 15494,
@@ -192,7 +192,7 @@ enum FreyaSounds
 };
 
 enum FreyaNPCs
-{   
+{
     NPC_NATURE_BOMB                             = 34129,
     NPC_IRON_ROOT_TRIGGER                       = 33088,
     NPC_FREYA_UNSTABLE_SUN_BEAM                 = 33170,
@@ -206,7 +206,7 @@ enum FreyaNPCs
     // SEC WAVE
     NPC_ANCIENT_CONSERVATOR                     = 33203,
     NPC_HEALTHY_SPORE                           = 33215,
-    
+
     // THIRD WAVE
     NPC_DETONATING_LASHER                       = 32918,
 };
@@ -247,7 +247,7 @@ class boss_freya : public CreatureScript
 public:
     boss_freya() : CreatureScript("boss_freya") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_freyaAI (pCreature);
     }
@@ -274,10 +274,10 @@ public:
         bool _respawningTrio;
         bool _backToNature;
         uint8 _deforestation;
-        
+
         uint64 _elderGUID[3];
 
-        void Reset()
+        void Reset() override
         {
             if (m_pInstance && m_pInstance->GetData(TYPE_FREYA) != DONE)
                 m_pInstance->SetData(TYPE_FREYA, NOT_STARTED);
@@ -298,18 +298,18 @@ public:
             _lumberjacked = 0;
             _spawnedAmount = 0;
             _trioKilled = 0;
-            _waveNumber = urand(1,3);
+            _waveNumber = urand(1, 3);
             _respawningTrio = false;
             _backToNature = true;
             _deforestation = 0;
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER || urand(0,2))
+            if (victim->GetTypeId() != TYPEID_PLAYER || urand(0, 2))
                 return;
 
-            if (urand(0,1))
+            if (urand(0, 1))
             {
                 me->MonsterYell("Forgive me.", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_SLAY1);
@@ -321,14 +321,14 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             // kaboom!
             if (damage >= me->GetHealth())
             {
                 me->MonsterYell("His hold on me dissipates. I can see clearly once more. Thank you, heroes.", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_DEATH);
-                
+
                 damage = 0;
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->setFaction(35);
@@ -353,7 +353,7 @@ public:
                 }
 
                 uint32 chestId = RAID_MODE(GO_FREYA_CHEST, GO_FREYA_CHEST_HERO);
-                chestId -= 2*_elderCount; // offset
+                chestId -= 2 * _elderCount; // offset
 
                 me->DespawnOrUnsummon(5000);
                 if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
@@ -368,30 +368,35 @@ public:
             }
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
+            if (cr->GetEntry() == NPC_FREYA_UNSTABLE_SUN_BEAM)
+            {
+                cr->CastSpell(cr, SPELL_UNSTABLE_SUN_VISUAL, true);
+                cr->CastSpell(cr, SPELL_UNSTABLE_SUN_FREYA_DAMAGE, true);
+            }
             summons.Summon(cr);
         }
 
         void SpawnWave()
         {
-            _waveNumber = _waveNumber == 1 ? 3 : _waveNumber-1;
+            _waveNumber = _waveNumber == 1 ? 3 : _waveNumber - 1;
 
             // Wave of three
             if (_waveNumber == 1)
             {
                 me->MonsterYell("Children, assist me!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_TRIO);
-                me->SummonCreature(NPC_ANCIENT_WATER_SPIRIT, me->GetPositionX()+urand(5,15), me->GetPositionY()+urand(5,15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT));
-                me->SummonCreature(NPC_STORM_LASHER, me->GetPositionX()+urand(5,15), me->GetPositionY()+urand(5,15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT));
-                me->SummonCreature(NPC_SNAPLASHER, me->GetPositionX()+urand(5,15), me->GetPositionY()+urand(5,15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT));
+                me->SummonCreature(NPC_ANCIENT_WATER_SPIRIT, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT));
+                me->SummonCreature(NPC_STORM_LASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT));
+                me->SummonCreature(NPC_SNAPLASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT));
             }
             // Ancient Conservator
             else if (_waveNumber == 2)
             {
                 me->MonsterYell("Eonar, your servant requires aid!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_CONSERVATOR);
-                me->SummonCreature(NPC_ANCIENT_CONSERVATOR, me->GetPositionX()+urand(5,15), me->GetPositionY()+urand(5,15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_CORPSE_DESPAWN);
+                me->SummonCreature(NPC_ANCIENT_CONSERVATOR, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_CORPSE_DESPAWN);
             }
             // Detonating Lashers
             else if (_waveNumber == 3)
@@ -399,11 +404,11 @@ public:
                 me->MonsterYell("The swarm of the elements shall overtake you!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_DETONATING);
                 for (uint8 i = 0; i < 10; ++i)
-                    me->SummonCreature(NPC_DETONATING_LASHER, me->GetPositionX()+urand(5,20), me->GetPositionY()+urand(5,20), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_CORPSE_DESPAWN);
+                    me->SummonCreature(NPC_DETONATING_LASHER, me->GetPositionX() + urand(5, 20), me->GetPositionY() + urand(5, 20), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_CORPSE_DESPAWN);
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_LUMBERJACKED)
             {
@@ -446,7 +451,7 @@ public:
                     _backToNature = false;
 
                 if (aur->GetStackAmount() > param)
-                    aur->SetStackAmount(aur->GetStackAmount()-param);
+                    aur->SetStackAmount(aur->GetStackAmount() - param);
                 else // Aura out of stack
                 {
                     events.ScheduleEvent(EVENT_FREYA_NATURE_BOMB, 5000);
@@ -457,7 +462,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 param) const
+        uint32 GetData(uint32 param) const override
         {
             if (param == DATA_GET_ELDER_COUNT)
             {
@@ -474,9 +479,9 @@ public:
             return 0;
         }
 
-        void JustReachedHome() { me->setActive(false); }
+        void JustReachedHome() override { me->setActive(false); }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             me->setActive(true);
             me->SetInCombatWithZone();
@@ -543,13 +548,13 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit *target, const SpellInfo *spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_NATURE_BOMB_FLIGHT)
                 me->SummonCreature(NPC_NATURE_BOMB, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -558,101 +563,99 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
-            case EVENT_FREYA_ADDS_SPAM:
-                if (_spawnedAmount < 6)
-                    SpawnWave();
-                else if (me->GetAura(SPELL_ATTUNED_TO_NATURE))
-                {
-                    me->RemoveAura(SPELL_ATTUNED_TO_NATURE);
-                    events.ScheduleEvent(EVENT_FREYA_NATURE_BOMB, 5000);
-                    events.SetPhase(EVENT_PHASE_FINAL);
-                    events.PopEvent();
-                    return;
-                }
-                _spawnedAmount++;
-                events.RepeatEvent(60000);
-                break;
-            case EVENT_FREYA_LIFEBINDER:
-            {
-                events.RepeatEvent(45000);
-                float x, y, z;
-                for (uint8 i = 0; i < 10; ++i)
-                {
-                    x = me->GetPositionX()+urand(7,25);
-                    y = me->GetPositionY()+urand(7,25);
-                    z = me->GetMap()->GetHeight(x, y, MAX_HEIGHT)+0.5f;
-                    if (me->IsWithinLOS(x, y, z))
+                case EVENT_FREYA_ADDS_SPAM:
+                    if (_spawnedAmount < 6)
+                        SpawnWave();
+                    else if (me->GetAura(SPELL_ATTUNED_TO_NATURE))
                     {
-                        me->CastSpell(x, y, z, SPELL_SUMMON_LIFEBINDER, true);
+                        me->RemoveAura(SPELL_ATTUNED_TO_NATURE);
+                        events.ScheduleEvent(EVENT_FREYA_NATURE_BOMB, 5000);
+                        events.SetPhase(EVENT_PHASE_FINAL);
                         return;
                     }
-                }
+                    _spawnedAmount++;
+                    events.RepeatEvent(60000);
+                    break;
+                case EVENT_FREYA_LIFEBINDER:
+                    {
+                        events.RepeatEvent(45000);
+                        float x, y, z;
+                        for (uint8 i = 0; i < 10; ++i)
+                        {
+                            x = me->GetPositionX() + urand(7, 25);
+                            y = me->GetPositionY() + urand(7, 25);
+                            z = me->GetMap()->GetHeight(x, y, MAX_HEIGHT) + 0.5f;
+                            if (me->IsWithinLOS(x, y, z))
+                            {
+                                me->CastSpell(x, y, z, SPELL_SUMMON_LIFEBINDER, true);
+                                return;
+                            }
+                        }
 
-                me->CastSpell(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), SPELL_SUMMON_LIFEBINDER, true);
-                break;
-            }
-            case EVENT_FREYA_SUNBEAM:
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                    me->CastSpell(target, SPELL_SUNBEAM, false);
-                events.RepeatEvent(15000+urand(0,5000));
-                break;
-            case EVENT_FREYA_RESPAWN_TRIO:
-                events.PopEvent();
-                _deforestation = 0;
-                _respawningTrio = false;
-                if (_trioKilled < 3)
-                    summons.DoAction(ACTION_RESPAWN_TRIO);
-
-                _trioKilled = 0;
-                break;
-            case EVENT_FREYA_NATURE_BOMB:
-            {
-                uint8 _minCount = me->GetMap()->Is25ManRaid() ? urand(7,10) : urand(3,4);
-                Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                {
-                    if (me->GetDistance(itr->GetSource()) > 70 || !itr->GetSource()->IsAlive())
-                        continue;
-
-                    me->CastSpell(itr->GetSource(), SPELL_NATURE_BOMB_FLIGHT, true);
-
-                    if (!(--_minCount))
+                        me->CastSpell(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), SPELL_SUMMON_LIFEBINDER, true);
                         break;
-                }
-                events.RepeatEvent(18000);
-                break;
-            }
-            case EVENT_FREYA_BERSERK:
-                me->MonsterYell("You have strayed too far, wasted too much time!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_BERSERK);
-                me->CastSpell(me, SPELL_BERSERK, true);
-                events.PopEvent();
-                break;
-            case EVENT_FREYA_GROUND_TREMOR:
-                me->CastSpell(me, SPELL_GROUND_TREMOR_FREYA, false);
-                events.RepeatEvent(25000+urand(0,10000));
-                break;
-            case EVENT_FREYA_IRON_ROOT:
-                me->CastCustomSpell(SPELL_IRON_ROOTS_FREYA, SPELLVALUE_MAX_TARGETS, 1, me, false);
-                events.RepeatEvent(45000+urand(0,10000));
-                break;
-            case EVENT_FREYA_UNSTABLE_SUN_BEAM:
-                if (Creature* cr = me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX()+urand(7,25), me->GetPositionY()+urand(7,25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
-                {
-                    cr->CastSpell(cr, SPELL_UNSTABLE_SUN_VISUAL, true);
-                    cr->CastSpell(cr, SPELL_UNSTABLE_SUN_FREYA_DAMAGE, true);
-                }
-                events.RepeatEvent(38000+urand(0,10000));
-                break;
+                    }
+                case EVENT_FREYA_SUNBEAM:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                        me->CastSpell(target, SPELL_SUNBEAM, false);
+                    events.RepeatEvent(15000 + urand(0, 5000));
+                    break;
+                case EVENT_FREYA_RESPAWN_TRIO:
+                    _deforestation = 0;
+                    _respawningTrio = false;
+                    if (_trioKilled < 3)
+                        summons.DoAction(ACTION_RESPAWN_TRIO);
+
+                    _trioKilled = 0;
+                    break;
+                case EVENT_FREYA_NATURE_BOMB:
+                    {
+                        uint8 _minCount = me->GetMap()->Is25ManRaid() ? urand(7, 10) : urand(3, 4);
+                        Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+                        for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                        {
+                            if (me->GetDistance(itr->GetSource()) > 70 || !itr->GetSource()->IsAlive())
+                                continue;
+
+                            me->CastSpell(itr->GetSource(), SPELL_NATURE_BOMB_FLIGHT, true);
+
+                            if (!(--_minCount))
+                                break;
+                        }
+                        events.RepeatEvent(18000);
+                        break;
+                    }
+                case EVENT_FREYA_BERSERK:
+                    me->MonsterYell("You have strayed too far, wasted too much time!", LANG_UNIVERSAL, 0);
+                    me->PlayDirectSound(SOUND_BERSERK);
+                    me->CastSpell(me, SPELL_BERSERK, true);
+                    break;
+                case EVENT_FREYA_GROUND_TREMOR:
+                    me->CastSpell(me, SPELL_GROUND_TREMOR_FREYA, false);
+                    events.RepeatEvent(25000 + urand(0, 10000));
+                    break;
+                case EVENT_FREYA_IRON_ROOT:
+                    me->CastCustomSpell(SPELL_IRON_ROOTS_FREYA, SPELLVALUE_MAX_TARGETS, 1, me, false);
+                    events.RepeatEvent(45000 + urand(0, 10000));
+                    break;
+                case EVENT_FREYA_UNSTABLE_SUN_BEAM:
+                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    if (Is25ManRaid())
+                    {
+                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    }
+                    events.RepeatEvent(38000 + urand(0, 10000));
+                    break;
             }
 
             DoMeleeAttackIfReady();
             EnterEvadeIfOutOfCombatArea();
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
             return me->GetPositionX() < 2135.0f;
         }
@@ -664,7 +667,7 @@ class boss_freya_elder_stonebark : public CreatureScript
 public:
     boss_freya_elder_stonebark() : CreatureScript("boss_freya_elder_stonebark") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_freya_elder_stonebarkAI (pCreature);
     }
@@ -678,18 +681,18 @@ public:
         EventMap events;
         uint8 _chargesCount;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             _chargesCount = 0;
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
-            if (urand(0,1))
+            if (urand(0, 1))
                 return;
 
-            if (urand(0,1))
+            if (urand(0, 1))
             {
                 me->MonsterTextEmote("Angry roar", 0);
                 me->PlayDirectSound(SOUND_STONEBARK_SLAY1);
@@ -701,7 +704,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (me->GetEntry() == killer->GetEntry())
                 return;
@@ -714,7 +717,7 @@ public:
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_STONEBARK_FISTS_OF_STONE, 40000);
             events.ScheduleEvent(EVENT_STONEBARK_GROUND_TREMOR, 5000);
@@ -724,7 +727,7 @@ public:
             me->PlayDirectSound(SOUND_STONEBARK_AGGRO);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
         {
             if ((damageType == DIRECT_DAMAGE || (damageType == SPELL_DIRECT_DAMAGE && damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL)) && _chargesCount)
             {
@@ -733,7 +736,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -742,7 +745,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_STONEBARK_FISTS_OF_STONE:
                     me->CastSpell(me, SPELL_FISTS_OF_STONE, false);
@@ -770,7 +773,7 @@ class boss_freya_elder_brightleaf : public CreatureScript
 public:
     boss_freya_elder_brightleaf() : CreatureScript("boss_freya_elder_brightleaf") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_freya_elder_brightleafAI (pCreature);
     }
@@ -784,18 +787,18 @@ public:
         EventMap events;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
-            if (urand(0,1))
+            if (urand(0, 1))
                 return;
 
-            if (urand(0,1))
+            if (urand(0, 1))
             {
                 me->MonsterYell("Fertilizer.", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_BRIGHTLEAF_SLAY1);
@@ -807,7 +810,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (me->GetEntry() == killer->GetEntry())
                 return;
@@ -820,7 +823,7 @@ public:
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_BRIGHTLEAF_FLUX, 10000);
             events.ScheduleEvent(EVENT_BRIGHTLEAF_SOLAR_FLARE, 5000);
@@ -830,7 +833,7 @@ public:
             me->PlayDirectSound(SOUND_BRIGHTLEAF_AGGRO);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -839,11 +842,11 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_BRIGHTLEAF_FLUX:
                     if (Aura* aur = me->AddAura(SPELL_BRIGHTLEAF_FLUX, me))
-                        aur->SetStackAmount(urand(1,10));
+                        aur->SetStackAmount(urand(1, 10));
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_BRIGHTLEAF_SOLAR_FLARE:
@@ -862,7 +865,7 @@ public:
                         beam->CastSpell(beam, SPELL_PHOTOSYNTHESIS, true);
                         summons.Summon(beam);
                     }
-                    if (Creature* beam = me->SummonCreature(NPC_UNSTABLE_SUN_BRIGHTLEAF, me->GetPositionX()+8, me->GetPositionY()+8, me->GetPositionZ()))
+                    if (Creature* beam = me->SummonCreature(NPC_UNSTABLE_SUN_BRIGHTLEAF, me->GetPositionX() + 8, me->GetPositionY() + 8, me->GetPositionZ()))
                     {
                         beam->CastSpell(beam, SPELL_UNSTABLE_SUN_BEAM_AURA, true);
                         beam->CastSpell(beam, SPELL_PHOTOSYNTHESIS, true);
@@ -880,7 +883,6 @@ public:
                     }
 
                     summons.DespawnAll();
-                    events.PopEvent();
                     break;
             }
 
@@ -894,7 +896,7 @@ class boss_freya_elder_ironbranch : public CreatureScript
 public:
     boss_freya_elder_ironbranch() : CreatureScript("boss_freya_elder_ironbranch") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_freya_elder_ironbranchAI (pCreature);
     }
@@ -907,17 +909,17 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
-            if (urand(0,1))
+            if (urand(0, 1))
                 return;
 
-            if (urand(0,1))
+            if (urand(0, 1))
             {
                 me->MonsterYell("I return you whence you came!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_IRONBRANCH_SLAY1);
@@ -929,7 +931,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (me->GetEntry() == killer->GetEntry())
                 return;
@@ -942,7 +944,7 @@ public:
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_IRONBRANCH_IMPALE, 10000);
             events.ScheduleEvent(EVENT_IRONBRANCH_IRON_ROOT, 15000);
@@ -952,7 +954,7 @@ public:
             me->PlayDirectSound(SOUND_IRONBRANCH_AGGRO);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -961,7 +963,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_IRONBRANCH_IMPALE:
                     me->CastSpell(me->GetVictim(), SPELL_IMPALE, false);
@@ -988,7 +990,7 @@ class boss_freya_iron_root : public CreatureScript
 public:
     boss_freya_iron_root() : CreatureScript("boss_freya_iron_root") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_freya_iron_rootAI (pCreature);
     }
@@ -997,7 +999,7 @@ public:
     {
         boss_freya_iron_rootAI(Creature* pCreature) : NullCreatureAI(pCreature) { }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             if (!me->IsSummon())
                 return;
@@ -1018,7 +1020,7 @@ class boss_freya_lifebinder : public CreatureScript
 public:
     boss_freya_lifebinder() : CreatureScript("boss_freya_lifebinder") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_freya_lifebinderAI (pCreature);
     }
@@ -1031,7 +1033,7 @@ public:
 
         uint32 _healTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->CastSpell(me, SPELL_LIFEBINDER_VISUAL, true);
             me->CastSpell(me, SPELL_LIFEBINDER_PHERONOMES, true);
@@ -1039,7 +1041,7 @@ public:
             _healTimer = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _healTimer += diff;
             if (_healTimer >= 12000)
@@ -1059,7 +1061,7 @@ class boss_freya_healthy_spore : public CreatureScript
 public:
     boss_freya_healthy_spore() : CreatureScript("boss_freya_healthy_spore") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_freya_healthy_sporeAI (pCreature);
     }
@@ -1072,7 +1074,7 @@ public:
 
         uint32 _despawnTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->CastSpell(me, SPELL_POTENT_PHEROMONES, true);
             me->CastSpell(me, SPELL_HEALTHY_SPORE_VISUAL, true);
@@ -1080,7 +1082,7 @@ public:
             _despawnTimer = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _despawnTimer += diff;
             if (_despawnTimer >= 22000)
@@ -1098,7 +1100,7 @@ class boss_freya_summons : public CreatureScript
 public:
     boss_freya_summons() : CreatureScript("boss_freya_summons") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_freya_summonsAI (pCreature);
     }
@@ -1118,7 +1120,7 @@ public:
         bool _hasDied;
         bool _isTrio;
 
-        void Reset()
+        void Reset() override
         {
             _stackCount = 0;
             events.Reset();
@@ -1126,7 +1128,7 @@ public:
                 AttackStart(target);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             if (Creature* freya = ObjectAccessor::GetCreature(*me, _freyaGUID))
             {
@@ -1143,7 +1145,7 @@ public:
                 me->CastSpell(me, SPELL_DETONATE, true);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (_isTrio && param == ACTION_RESPAWN_TRIO)
             {
@@ -1152,7 +1154,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             if (me->GetEntry() == NPC_ANCIENT_CONSERVATOR)
             {
@@ -1184,7 +1186,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1193,7 +1195,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_ANCIENT_CONSERVATOR_NATURE_FURY:
                     me->CastSpell(me->GetVictim(), SPELL_NATURE_FURY, false);
@@ -1207,7 +1209,6 @@ public:
                     break;
                 case EVENT_WATER_SPIRIT_DAMAGE:
                     me->CastSpell(me, SPELL_TIDAL_WAVE_DAMAGE, false);
-                    events.PopEvent();
                     break;
                 case EVENT_STORM_LASHER_LIGHTNING_LASH:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
@@ -1239,7 +1240,7 @@ class boss_freya_nature_bomb : public CreatureScript
 public:
     boss_freya_nature_bomb() : CreatureScript("boss_freya_nature_bomb") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_freya_nature_bombAI (pCreature);
     }
@@ -1254,7 +1255,7 @@ public:
         uint64 _goGUID;
         uint32 _explodeTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->SetObjectScale(0.5f);
             me->CastSpell(me, SPELL_GREEN_BANISH_STATE, true);
@@ -1265,7 +1266,7 @@ public:
         }
 
         uint32 Timer;
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _explodeTimer += diff;
             if (_explodeTimer >= 11000)
@@ -1288,33 +1289,33 @@ public:
 
 class achievement_freya_getting_back_to_nature : public AchievementCriteriaScript
 {
-    public:
-        achievement_freya_getting_back_to_nature() : AchievementCriteriaScript("achievement_freya_getting_back_to_nature") {}
+public:
+    achievement_freya_getting_back_to_nature() : AchievementCriteriaScript("achievement_freya_getting_back_to_nature") {}
 
-        bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/)
-        {
-            if (target)
-                if (target->GetAI()->GetData(DATA_BACK_TO_NATURE))
-                    return true;
-            return false;
-        }
+    bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/) override
+    {
+        if (target)
+            if (target->GetAI()->GetData(DATA_BACK_TO_NATURE))
+                return true;
+        return false;
+    }
 };
 
 class achievement_freya_knock_on_wood : public AchievementCriteriaScript
 {
-    public:
-        achievement_freya_knock_on_wood(char const* name, uint32 count) : AchievementCriteriaScript(name),
-            _elderCount(count)
-        {
-        }
+public:
+    achievement_freya_knock_on_wood(char const* name, uint32 count) : AchievementCriteriaScript(name),
+        _elderCount(count)
+    {
+    }
 
-        bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/)
-        {
-            return target && _elderCount <= target->GetAI()->GetData(DATA_GET_ELDER_COUNT);
-        }
-        
-    private:
-        uint32 const _elderCount;
+    bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/) override
+    {
+        return target && _elderCount <= target->GetAI()->GetData(DATA_GET_ELDER_COUNT);
+    }
+
+private:
+    uint32 const _elderCount;
 };
 
 void AddSC_boss_freya()

@@ -25,32 +25,31 @@ namespace DisableMgr
 
 struct MmapTileHeader
 {
-    uint32 mmapMagic;
+    uint32 mmapMagic{MMAP_MAGIC};
     uint32 dtVersion;
-    uint32 mmapVersion;
-    uint32 size;
-    char usesLiquids;
-    char padding[3];
+    uint32 mmapVersion{MMAP_VERSION};
+    uint32 size{0};
+    char usesLiquids{true};
+    char padding[3]{};
 
-    MmapTileHeader() : mmapMagic(MMAP_MAGIC), dtVersion(DT_NAVMESH_VERSION),
-        mmapVersion(MMAP_VERSION), size(0), usesLiquids(true), padding() {}
+    MmapTileHeader() :  dtVersion(DT_NAVMESH_VERSION) {}
 };
 
 // All padding fields must be handled and initialized to ensure mmaps_generator will produce binary-identical *.mmtile files
 static_assert(sizeof(MmapTileHeader) == 20, "MmapTileHeader size is not correct, adjust the padding field size");
 static_assert(sizeof(MmapTileHeader) == (sizeof(MmapTileHeader::mmapMagic) +
-                                         sizeof(MmapTileHeader::dtVersion) +
-                                         sizeof(MmapTileHeader::mmapVersion) +
-                                         sizeof(MmapTileHeader::size) +
-                                         sizeof(MmapTileHeader::usesLiquids) +
-                                         sizeof(MmapTileHeader::padding)), "MmapTileHeader has uninitialized padding fields");
+              sizeof(MmapTileHeader::dtVersion) +
+              sizeof(MmapTileHeader::mmapVersion) +
+              sizeof(MmapTileHeader::size) +
+              sizeof(MmapTileHeader::usesLiquids) +
+              sizeof(MmapTileHeader::padding)), "MmapTileHeader has uninitialized padding fields");
 
 namespace MMAP
 {
     MapBuilder::MapBuilder(float maxWalkableAngle, bool skipLiquid,
-        bool skipContinents, bool skipJunkMaps, bool skipBattlegrounds,
-        bool debugOutput, bool bigBaseUnit, const char* offMeshFilePath) :
-        m_terrainBuilder     (nullptr),
+                           bool skipContinents, bool skipJunkMaps, bool skipBattlegrounds,
+                           bool debugOutput, bool bigBaseUnit, const char* offMeshFilePath) :
+        
         m_debugOutput        (debugOutput),
         m_offMeshFilePath    (offMeshFilePath),
         m_skipContinents     (skipContinents),
@@ -58,7 +57,7 @@ namespace MMAP
         m_skipBattlegrounds  (skipBattlegrounds),
         m_maxWalkableAngle   (maxWalkableAngle),
         m_bigBaseUnit        (bigBaseUnit),
-        m_rcContext          (nullptr),
+        
         _cancelationToken    (false)
     {
         m_terrainBuilder = new TerrainBuilder(skipLiquid);
@@ -75,10 +74,10 @@ namespace MMAP
     /**************************************************************************/
     MapBuilder::~MapBuilder()
     {
-        for (TileList::iterator it = m_tiles.begin(); it != m_tiles.end(); ++it)
+        for (auto & m_tile : m_tiles)
         {
-            (*it).m_tiles->clear();
-            delete (*it).m_tiles;
+            m_tile.m_tiles->clear();
+            delete m_tile.m_tiles;
         }
 
         delete m_terrainBuilder;
@@ -89,14 +88,14 @@ namespace MMAP
     void MapBuilder::discoverTiles()
     {
         std::vector<std::string> files;
-        uint32 mapID, tileX, tileY, tileID, count = 0;
+        uint32 mapID, tileX, tileY, tileID, count = 0, fsize = 0;
         char filter[12];
 
         printf("Discovering maps... ");
         getDirContents(files, "maps");
-        for (uint32 i = 0; i < files.size(); ++i)
+        for (auto & file : files)
         {
-            mapID = uint32(atoi(files[i].substr(0,3).c_str()));
+            mapID = uint32(atoi(file.substr(0, file.size() - 8).c_str()));
             if (std::find(m_tiles.begin(), m_tiles.end(), mapID) == m_tiles.end())
             {
                 m_tiles.emplace_back(MapTiles(mapID, new std::set<uint32>));
@@ -106,9 +105,9 @@ namespace MMAP
 
         files.clear();
         getDirContents(files, "vmaps", "*.vmtree");
-        for (uint32 i = 0; i < files.size(); ++i)
+        for (auto & file : files)
         {
-            mapID = uint32(atoi(files[i].substr(0,3).c_str()));
+            mapID = uint32(atoi(file.substr(0, file.size() - 7).c_str()));
             if (std::find(m_tiles.begin(), m_tiles.end(), mapID) == m_tiles.end())
             {
                 m_tiles.emplace_back(MapTiles(mapID, new std::set<uint32>));
@@ -119,18 +118,20 @@ namespace MMAP
 
         count = 0;
         printf("Discovering tiles... ");
-        for (TileList::iterator itr = m_tiles.begin(); itr != m_tiles.end(); ++itr)
+        for (auto & m_tile : m_tiles)
         {
-            std::set<uint32>* tiles = (*itr).m_tiles;
-            mapID = (*itr).m_mapId;
+            std::set<uint32>* tiles = m_tile.m_tiles;
+            mapID = m_tile.m_mapId;
 
             sprintf(filter, "%03u*.vmtile", mapID);
             files.clear();
             getDirContents(files, "vmaps", filter);
-            for (uint32 i = 0; i < files.size(); ++i)
+            for (auto & file : files)
             {
-                tileX = uint32(atoi(files[i].substr(7,2).c_str()));
-                tileY = uint32(atoi(files[i].substr(4,2).c_str()));
+                fsize = file.size();
+
+                tileY = uint32(atoi(file.substr(fsize - 12, 2).c_str()));
+                tileX = uint32(atoi(file.substr(fsize - 9, 2).c_str()));
                 tileID = StaticMapTree::packTileID(tileY, tileX);
 
                 tiles->insert(tileID);
@@ -140,10 +141,12 @@ namespace MMAP
             sprintf(filter, "%03u*", mapID);
             files.clear();
             getDirContents(files, "maps", filter);
-            for (uint32 i = 0; i < files.size(); ++i)
+            for (auto & file : files)
             {
-                tileY = uint32(atoi(files[i].substr(3,2).c_str()));
-                tileX = uint32(atoi(files[i].substr(5,2).c_str()));
+                fsize = file.size();
+
+                tileY = uint32(atoi(file.substr(fsize - 8, 2).c_str()));
+                tileX = uint32(atoi(file.substr(fsize - 6, 2).c_str()));
                 tileID = StaticMapTree::packTileID(tileX, tileY);
 
                 if (tiles->insert(tileID).second)
@@ -167,10 +170,10 @@ namespace MMAP
         printf("found %u.\n\n", count);
 
         // Calculate tiles to process in total
-        for (TileList::iterator it = m_tiles.begin(); it != m_tiles.end(); ++it)
+        for (auto & m_tile : m_tiles)
         {
-            if (!shouldSkipMap(it->m_mapId))
-                m_totalTiles += it->m_tiles->size();
+            if (!shouldSkipMap(m_tile.m_mapId))
+                m_totalTiles += m_tile.m_tiles->size();
         }
     }
 
@@ -193,7 +196,7 @@ namespace MMAP
 
         for (unsigned int i = 0; i < threads; ++i)
         {
-            _workerThreads.push_back(std::thread(&MapBuilder::WorkerThread, this));
+            _workerThreads.emplace_back(&MapBuilder::WorkerThread, this);
         }
 
         m_tiles.sort([](MapTiles a, MapTiles b)
@@ -201,9 +204,9 @@ namespace MMAP
             return a.m_tiles->size() > b.m_tiles->size();
         });
 
-        for (TileList::iterator it = m_tiles.begin(); it != m_tiles.end(); ++it)
+        for (auto & m_tile : m_tiles)
         {
-            uint32 mapId = it->m_mapId;
+            uint32 mapId = m_tile.m_mapId;
             if (!shouldSkipMap(mapId))
             {
                 if (threads > 0)
@@ -229,7 +232,7 @@ namespace MMAP
     }
 
     /**************************************************************************/
-    void MapBuilder::getGridBounds(uint32 mapID, uint32 &minX, uint32 &minY, uint32 &maxX, uint32 &maxY) const
+    void MapBuilder::getGridBounds(uint32 mapID, uint32& minX, uint32& minY, uint32& maxX, uint32& maxY) const
     {
         // min and max are initialized to invalid values so the caller iterating the [min, max] range
         // will never enter the loop unless valid min/max values are found
@@ -375,7 +378,7 @@ namespace MMAP
 
     void MapBuilder::WorkerThread()
     {
-        while (1)
+        while (true)
         {
             uint32 mapId = 0;
 
@@ -419,14 +422,14 @@ namespace MMAP
 
             // now start building mmtiles for each tile
             printf("[Map %03i] We have %u tiles.                          \n", mapID, (unsigned int)tiles->size());
-            for (std::set<uint32>::iterator it = tiles->begin(); it != tiles->end(); ++it)
+            for (unsigned int tile : *tiles)
             {
                 // percentageDone - increment tiles built
                 m_totalTilesBuilt++;
                 uint32 tileX, tileY;
 
                 // unpack tile coords
-                StaticMapTree::unpackTileID((*it), tileX, tileY);
+                StaticMapTree::unpackTileID(tile, tileX, tileY);
 
                 if (shouldSkipTile(mapID, tileX, tileY))
                     continue;
@@ -481,7 +484,7 @@ namespace MMAP
     }
 
     /**************************************************************************/
-    void MapBuilder::buildNavMesh(uint32 mapID, dtNavMesh* &navMesh)
+    void MapBuilder::buildNavMesh(uint32 mapID, dtNavMesh*& navMesh)
     {
         std::set<uint32>* tiles = getTileList(mapID);
 
@@ -499,9 +502,9 @@ namespace MMAP
         /***          calculate bounds of map         ***/
 
         uint32 tileXMin = 64, tileYMin = 64, tileXMax = 0, tileYMax = 0, tileX, tileY;
-        for (std::set<uint32>::iterator it = tiles->begin(); it != tiles->end(); ++it)
+        for (unsigned int tile : *tiles)
         {
-            StaticMapTree::unpackTileID(*it, tileX, tileY);
+            StaticMapTree::unpackTileID(tile, tileX, tileY);
 
             if (tileX > tileXMax)
                 tileXMax = tileX;
@@ -557,8 +560,8 @@ namespace MMAP
 
     /**************************************************************************/
     void MapBuilder::buildMoveMapTile(uint32 mapID, uint32 tileX, uint32 tileY,
-        MeshData &meshData, float bmin[3], float bmax[3],
-        dtNavMesh* navMesh)
+                                      MeshData& meshData, float bmin[3], float bmax[3],
+                                      dtNavMesh* navMesh)
     {
         // console output
         char tileString[20];
@@ -584,9 +587,9 @@ namespace MMAP
         const static float BASE_UNIT_DIM = m_bigBaseUnit ? 0.5333333f : 0.2666666f;
 
         // All are in UNIT metrics!
-        const static int VERTEX_PER_MAP = int(GRID_SIZE/BASE_UNIT_DIM + 0.5f);
+        const static int VERTEX_PER_MAP = int(GRID_SIZE / BASE_UNIT_DIM + 0.5f);
         const static int VERTEX_PER_TILE = m_bigBaseUnit ? 40 : 80; // must divide VERTEX_PER_MAP
-        const static int TILES_PER_MAP = VERTEX_PER_MAP/VERTEX_PER_TILE;
+        const static int TILES_PER_MAP = VERTEX_PER_MAP / VERTEX_PER_TILE;
 
         rcConfig config;
         memset(&config, 0, sizeof(rcConfig));
@@ -602,10 +605,11 @@ namespace MMAP
         config.walkableRadius = m_bigBaseUnit ? 1 : 2;
         config.borderSize = config.walkableRadius + 3;
         config.maxEdgeLen = VERTEX_PER_TILE + 1;        // anything bigger than tileSize
-        config.walkableHeight = m_bigBaseUnit ? 3 : 6;
         // a value >= 3|6 allows npcs to walk over some fences
         // a value >= 4|8 allows npcs to walk over all fences
-        config.walkableClimb = m_bigBaseUnit ? 4 : 8;
+        // we prefer 3 and 6 for both Height/Climb as it's closer to be like retail
+        config.walkableHeight = m_bigBaseUnit ? 3 : 6;
+        config.walkableClimb = m_bigBaseUnit ? 3 : 6;
         config.minRegionArea = rcSqr(60);
         config.mergeRegionArea = rcSqr(50);
         config.maxSimplificationError = 1.8f;           // eliminates most jagged edges (tiny polygons)
@@ -620,8 +624,8 @@ namespace MMAP
 
         // Initialize per tile config.
         rcConfig tileCfg = config;
-        tileCfg.width = config.tileSize + config.borderSize*2;
-        tileCfg.height = config.tileSize + config.borderSize*2;
+        tileCfg.width = config.tileSize + config.borderSize * 2;
+        tileCfg.height = config.tileSize + config.borderSize * 2;
 
         // merge per tile poly and detail meshes
         rcPolyMesh** pmmerge = new rcPolyMesh*[TILES_PER_MAP * TILES_PER_MAP];
@@ -635,10 +639,10 @@ namespace MMAP
                 Tile& tile = tiles[x + y * TILES_PER_MAP];
 
                 // Calculate the per tile bounding box.
-                tileCfg.bmin[0] = config.bmin[0] + float(x*config.tileSize - config.borderSize)*config.cs;
-                tileCfg.bmin[2] = config.bmin[2] + float(y*config.tileSize - config.borderSize)*config.cs;
-                tileCfg.bmax[0] = config.bmin[0] + float((x+1)*config.tileSize + config.borderSize)*config.cs;
-                tileCfg.bmax[2] = config.bmin[2] + float((y+1)*config.tileSize + config.borderSize)*config.cs;
+                tileCfg.bmin[0] = config.bmin[0] + float(x * config.tileSize - config.borderSize) * config.cs;
+                tileCfg.bmin[2] = config.bmin[2] + float(y * config.tileSize - config.borderSize) * config.cs;
+                tileCfg.bmax[0] = config.bmin[0] + float((x + 1) * config.tileSize + config.borderSize) * config.cs;
+                tileCfg.bmax[2] = config.bmin[2] + float((y + 1) * config.tileSize + config.borderSize) * config.cs;
 
                 // build heightfield
                 tile.solid = rcAllocHeightfield();
@@ -650,7 +654,7 @@ namespace MMAP
 
                 // mark all walkable tiles, both liquids and solids
                 unsigned char* triFlags = new unsigned char[tTriCount];
-                memset(triFlags, NAV_GROUND, tTriCount*sizeof(unsigned char));
+                memset(triFlags, NAV_GROUND, tTriCount * sizeof(unsigned char));
                 rcClearUnwalkableTriangles(m_rcContext, tileCfg.walkableSlopeAngle, tVerts, tVertCount, tTris, tTriCount, triFlags);
                 rcRasterizeTriangles(m_rcContext, tVerts, tVertCount, tTris, triFlags, tTriCount, *tile.solid, config.walkableClimb);
                 delete[] triFlags;
@@ -776,15 +780,15 @@ namespace MMAP
         params.detailTriCount = iv.polyMeshDetail->ntris;
 
         params.offMeshConVerts = meshData.offMeshConnections.getCArray();
-        params.offMeshConCount = meshData.offMeshConnections.size()/6;
+        params.offMeshConCount = meshData.offMeshConnections.size() / 6;
         params.offMeshConRad = meshData.offMeshConnectionRads.getCArray();
         params.offMeshConDir = meshData.offMeshConnectionDirs.getCArray();
         params.offMeshConAreas = meshData.offMeshConnectionsAreas.getCArray();
         params.offMeshConFlags = meshData.offMeshConnectionsFlags.getCArray();
 
-        params.walkableHeight = BASE_UNIT_DIM*config.walkableHeight;    // agent height
-        params.walkableRadius = BASE_UNIT_DIM*config.walkableRadius;    // agent radius
-        params.walkableClimb = BASE_UNIT_DIM*config.walkableClimb;      // keep less that walkableHeight (aka agent height)!
+        params.walkableHeight = BASE_UNIT_DIM * config.walkableHeight;  // agent height
+        params.walkableRadius = BASE_UNIT_DIM * config.walkableRadius;  // agent radius
+        params.walkableClimb = BASE_UNIT_DIM * config.walkableClimb;    // keep less that walkableHeight (aka agent height)!
         params.tileX = (((bmin[0] + bmax[0]) / 2) - navMesh->getParams()->orig[0]) / GRID_SIZE;
         params.tileY = (((bmin[2] + bmax[2]) / 2) - navMesh->getParams()->orig[2]) / GRID_SIZE;
         rcVcopy(params.bmin, bmin);
@@ -822,7 +826,7 @@ namespace MMAP
                 break;
             }
             if (!params.polyCount || !params.polys ||
-                TILES_PER_MAP*TILES_PER_MAP == params.polyCount)
+                    TILES_PER_MAP * TILES_PER_MAP == params.polyCount)
             {
                 // we have flat tiles with no actual geometry - don't build those, its useless
                 // keep in mind that we do output those into debug info
@@ -881,15 +885,14 @@ namespace MMAP
 
             // now that tile is written to disk, we can unload it
             navMesh->removeTile(tileRef, nullptr, nullptr);
-        }
-        while (0);
+        } while (false);
 
         if (m_debugOutput)
         {
             // restore padding so that the debug visualization is correct
             for (int i = 0; i < iv.polyMesh->nverts; ++i)
             {
-                unsigned short* v = &iv.polyMesh->verts[i*3];
+                unsigned short* v = &iv.polyMesh->verts[i * 3];
                 v[0] += (unsigned short)config.borderSize;
                 v[2] += (unsigned short)config.borderSize;
             }
@@ -1034,7 +1037,7 @@ namespace MMAP
 
         return true;
     }
-    
+
     /**************************************************************************/
     uint32 MapBuilder::percentageDone(uint32 totalTiles, uint32 totalTilesBuilt)
     {

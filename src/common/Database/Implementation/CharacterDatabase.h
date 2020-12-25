@@ -18,7 +18,7 @@ public:
     CharacterDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
 
     //- Loads database type specific prepared statements
-    void DoPrepareStatements();
+    void DoPrepareStatements() override;
 };
 
 typedef DatabaseWorkerPool<CharacterDatabaseConnection> CharacterDatabaseWorkerPool;
@@ -83,6 +83,8 @@ enum CharacterDatabaseStatements
     CHAR_SEL_CHARACTER_ACTIONS,
     CHAR_SEL_CHARACTER_ACTIONS_SPEC,
     CHAR_SEL_CHARACTER_MAILCOUNT,
+    CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD,
+    CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH,
     CHAR_SEL_CHARACTER_MAILDATE,
     CHAR_SEL_CHARACTER_SOCIALLIST,
     CHAR_SEL_CHARACTER_HOMEBIND,
@@ -345,7 +347,7 @@ enum CharacterDatabaseStatements
     CHAR_SEL_CHAR_OLD_CHARS,
     CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID,
     CHAR_SEL_MAIL,
-    CHAR_SEL_MAIL_ASYNCH,
+    CHAR_SEL_NEXT_MAIL_DELIVERYTIME,
     CHAR_DEL_CHAR_AURA_FROZEN,
     CHAR_SEL_CHAR_INVENTORY_COUNT_ITEM,
     CHAR_SEL_MAIL_COUNT_ITEM,

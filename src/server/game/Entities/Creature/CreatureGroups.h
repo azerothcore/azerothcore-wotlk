@@ -28,47 +28,47 @@ typedef std::unordered_map<uint32/*memberDBGUID*/, FormationInfo*>   CreatureGro
 
 class FormationMgr
 {
-    public:
-        FormationMgr() { }
-        ~FormationMgr();
-        
-        static FormationMgr* instance();
-        
-        void AddCreatureToGroup(uint32 group_id, Creature* creature);
-        void RemoveCreatureFromGroup(CreatureGroup* group, Creature* creature);
-        void LoadCreatureFormations();
-        CreatureGroupInfoType CreatureGroupMap;
+public:
+    FormationMgr() { }
+    ~FormationMgr();
+
+    static FormationMgr* instance();
+
+    void AddCreatureToGroup(uint32 group_id, Creature* creature);
+    void RemoveCreatureFromGroup(CreatureGroup* group, Creature* creature);
+    void LoadCreatureFormations();
+    CreatureGroupInfoType CreatureGroupMap;
 };
 
 class CreatureGroup
 {
-    public:
-        // pussywizard: moved public to the top so it compiles and typedef is public
-        typedef std::map<Creature*, FormationInfo*>  CreatureGroupMemberType;
+public:
+    // pussywizard: moved public to the top so it compiles and typedef is public
+    typedef std::map<Creature*, FormationInfo*>  CreatureGroupMemberType;
 
-        //Group cannot be created empty
-        explicit CreatureGroup(uint32 id) : m_leader(nullptr), m_groupID(id), m_Formed(false) {}
-        ~CreatureGroup() {}
+    //Group cannot be created empty
+    explicit CreatureGroup(uint32 id) : m_leader(nullptr), m_groupID(id), m_Formed(false) {}
+    ~CreatureGroup() {}
 
-        Creature* getLeader() const { return m_leader; }
-        uint32 GetId() const { return m_groupID; }
-        bool isEmpty() const { return m_members.empty(); }
-        bool isFormed() const { return m_Formed; }
-        const CreatureGroupMemberType& GetMembers() const { return m_members; }
+    Creature* getLeader() const { return m_leader; }
+    uint32 GetId() const { return m_groupID; }
+    bool isEmpty() const { return m_members.empty(); }
+    bool isFormed() const { return m_Formed; }
+    const CreatureGroupMemberType& GetMembers() const { return m_members; }
 
-        void AddMember(Creature* member);
-        void RemoveMember(Creature* member);
-        void FormationReset(bool dismiss);
+    void AddMember(Creature* member);
+    void RemoveMember(Creature* member);
+    void FormationReset(bool dismiss);
 
-        void LeaderMoveTo(float x, float y, float z, bool run);
-        void MemberAttackStart(Creature* member, Unit* target);
+    void LeaderMoveTo(float x, float y, float z, bool run);
+    void MemberAttackStart(Creature* member, Unit* target);
 
-    private:
-        Creature* m_leader; //Important do not forget sometimes to work with pointers instead synonims :D:D
-        CreatureGroupMemberType m_members;
+private:
+    Creature* m_leader; //Important do not forget sometimes to work with pointers instead synonims :D:D
+    CreatureGroupMemberType m_members;
 
-        uint32 m_groupID;
-        bool m_Formed;
+    uint32 m_groupID;
+    bool m_Formed;
 };
 
 #define sFormationMgr FormationMgr::instance()

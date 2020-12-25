@@ -19,7 +19,7 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Stream)
+ACE_ALLOC_HOOK_DEFINE_Tyc(ACE_Stream)
 
 // Give some idea of what the heck is going on in a stream!
 

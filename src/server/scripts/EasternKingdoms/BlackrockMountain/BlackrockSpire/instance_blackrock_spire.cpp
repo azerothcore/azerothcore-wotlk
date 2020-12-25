@@ -67,20 +67,20 @@ public:
             memset(go_emberseerrunes, 0, sizeof(go_emberseerrunes));
         }
 
-        void CreatureLooted(Creature* creature, LootType loot)
+        void CreatureLooted(Creature* creature, LootType loot) override
         {
             switch (creature->GetEntry())
             {
-            case NPC_THE_BEAST:
-                if (loot == LOOT_SKINNING)
-                {
-                    creature->CastSpell(creature, SPELL_FINKLE_IS_EINHORN, true);
-                }
-                break;
+                case NPC_THE_BEAST:
+                    if (loot == LOOT_SKINNING)
+                    {
+                        creature->CastSpell(creature, SPELL_FINKLE_IS_EINHORN, true);
+                    }
+                    break;
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -135,10 +135,10 @@ public:
                     if (GetBossState(DATA_GYTH) == DONE)
                         creature->DisappearAndDie();
                     break;
-             }
-         }
+            }
+        }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -247,7 +247,7 @@ public:
             }
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -274,10 +274,10 @@ public:
                     break;
             }
 
-             return true;
+            return true;
         }
 
-        void ProcessEvent(WorldObject* /*obj*/, uint32 eventId)
+        void ProcessEvent(WorldObject* /*obj*/, uint32 eventId) override
         {
             switch (eventId)
             {
@@ -300,7 +300,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -315,7 +315,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const
+        uint64 GetData64(uint32 type) const override
         {
             switch (type)
             {
@@ -391,7 +391,7 @@ public:
             return 0;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             Events.Update(diff);
 
@@ -409,7 +409,7 @@ public:
                             Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3000);
                         break;
                     default:
-                         break;
+                        break;
                 }
             }
         }
@@ -497,8 +497,8 @@ public:
             }
 
             if (GetBossState(DATA_HALL_RUNE_1) == DONE && GetBossState(DATA_HALL_RUNE_2) == DONE && GetBossState(DATA_HALL_RUNE_3) == DONE &&
-                GetBossState(DATA_HALL_RUNE_4) == DONE && GetBossState(DATA_HALL_RUNE_5) == DONE && GetBossState(DATA_HALL_RUNE_6) == DONE &&
-                GetBossState(DATA_HALL_RUNE_7) == DONE)
+                    GetBossState(DATA_HALL_RUNE_4) == DONE && GetBossState(DATA_HALL_RUNE_5) == DONE && GetBossState(DATA_HALL_RUNE_6) == DONE &&
+                    GetBossState(DATA_HALL_RUNE_7) == DONE)
             {
                 SetBossState(DATA_DRAGONSPIRE_ROOM, DONE);
                 if (GameObject* door1 = instance->GetGameObject(go_emberseerin))
@@ -510,7 +510,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -521,7 +521,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* strIn)
+        void Load(const char* strIn) override
         {
             if (!strIn)
             {
@@ -554,36 +554,36 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        protected:
-            EventMap Events;
-            uint64 HighlordOmokk;
-            uint64 ShadowHunterVoshgajin;
-            uint64 WarMasterVoone;
-            uint64 MotherSmolderweb;
-            uint64 UrokDoomhowl;
-            uint64 QuartermasterZigris;
-            uint64 GizrultheSlavener;
-            uint64 Halycon;
-            uint64 OverlordWyrmthalak;
-            uint64 PyroguardEmberseer;
-            uint64 WarchiefRendBlackhand;
-            uint64 Gyth;
-            uint64 LordVictorNefarius;
-            uint64 TheBeast;
-            uint64 GeneralDrakkisath;
-            uint64 go_emberseerin;
-            uint64 go_doors;
-            uint64 go_emberseerout;
-            uint64 go_blackrockaltar;
-            uint64 go_roomrunes[7];
-            uint64 go_emberseerrunes[7];
-            uint64 runecreaturelist[7][5];
-            uint64 go_portcullis_active;
-            uint64 go_portcullis_tobossrooms;
-            uint64 go_urok_pile;
+    protected:
+        EventMap Events;
+        uint64 HighlordOmokk;
+        uint64 ShadowHunterVoshgajin;
+        uint64 WarMasterVoone;
+        uint64 MotherSmolderweb;
+        uint64 UrokDoomhowl;
+        uint64 QuartermasterZigris;
+        uint64 GizrultheSlavener;
+        uint64 Halycon;
+        uint64 OverlordWyrmthalak;
+        uint64 PyroguardEmberseer;
+        uint64 WarchiefRendBlackhand;
+        uint64 Gyth;
+        uint64 LordVictorNefarius;
+        uint64 TheBeast;
+        uint64 GeneralDrakkisath;
+        uint64 go_emberseerin;
+        uint64 go_doors;
+        uint64 go_emberseerout;
+        uint64 go_blackrockaltar;
+        uint64 go_roomrunes[7];
+        uint64 go_emberseerrunes[7];
+        uint64 runecreaturelist[7][5];
+        uint64 go_portcullis_active;
+        uint64 go_portcullis_tobossrooms;
+        uint64 go_urok_pile;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_blackrock_spireMapScript(map);
     }
@@ -598,7 +598,7 @@ class at_dragonspire_hall : public AreaTriggerScript
 public:
     at_dragonspire_hall() : AreaTriggerScript("at_dragonspire_hall") { }
 
-    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
         if (player && player->IsAlive())
         {
@@ -622,7 +622,7 @@ class at_blackrock_stadium : public AreaTriggerScript
 public:
     at_blackrock_stadium() : AreaTriggerScript("at_blackrock_stadium") { }
 
-    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
         if (player && player->IsAlive())
         {

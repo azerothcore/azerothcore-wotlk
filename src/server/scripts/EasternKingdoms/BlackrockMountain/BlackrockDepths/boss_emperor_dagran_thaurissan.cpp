@@ -25,7 +25,7 @@ class boss_emperor_dagran_thaurissan : public CreatureScript
 public:
     boss_emperor_dagran_thaurissan() : CreatureScript("boss_emperor_dagran_thaurissan") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_draganthaurissanAI>(creature);
     }
@@ -42,25 +42,25 @@ public:
         uint32 AvatarOfFlame_Timer;
         //uint32 Counter;
 
-        void Reset()
+        void Reset() override
         {
             HandOfThaurissan_Timer = 4000;
             AvatarOfFlame_Timer = 25000;
             //Counter= 0;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             me->CallForHelp(VISIBLE_RANGE);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Creature* Moira = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOIRA)))
             {
@@ -69,7 +69,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -89,16 +89,18 @@ public:
                 //else
                 //{
                 HandOfThaurissan_Timer = 5000;
-                    //Counter = 0;
+                //Counter = 0;
                 //}
-            } else HandOfThaurissan_Timer -= diff;
+            }
+            else HandOfThaurissan_Timer -= diff;
 
             //AvatarOfFlame_Timer
             if (AvatarOfFlame_Timer <= diff)
             {
                 DoCastVictim(SPELL_AVATAROFFLAME);
                 AvatarOfFlame_Timer = 18000;
-            } else AvatarOfFlame_Timer -= diff;
+            }
+            else AvatarOfFlame_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }

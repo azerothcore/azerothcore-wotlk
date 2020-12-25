@@ -50,7 +50,7 @@ LoginDatabaseWorkerPool LoginDatabase;                      // Accessor to the a
 class AuthServerSignalHandler : public acore::SignalHandler
 {
 public:
-    virtual void HandleSignal(int sigNum)
+    void HandleSignal(int sigNum) override
     {
         switch (sigNum)
         {
