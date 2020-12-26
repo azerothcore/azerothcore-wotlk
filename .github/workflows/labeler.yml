@@ -2,7 +2,8 @@ name: "Pull Request Labeler"
 on: [pull_request_target]
 
 jobs:
-  type:
+  always:
+    name: type
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/labeler@main
@@ -12,6 +13,7 @@ jobs:
           sync-labels: true
 
   review:
+    name: review & test
     runs-on: ubuntu-20.04
     if: (github.event.pull_request.draft == false) || (github.event.action.synchronize == false) || (github.event.action.unlabled == false) && (github.event.action.ready_for_review == true)
     steps:
