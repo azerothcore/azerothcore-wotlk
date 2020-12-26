@@ -13,7 +13,7 @@ jobs:
 
   Review:
     runs-on: ubuntu-20.04
-    if: (github.event.pull_request.draft == false) && (github.event.action.ready_for_review == true) || (github.event.action.synchronize == false) || (github.event.action.unlabled == false)
+    if: (github.event.pull_request.draft == false) || (github.event.action.synchronize == false) || (github.event.action.unlabled == false) && (github.event.action.ready_for_review == true)
     steps:
       - uses: actions/labeler@main
         with:
