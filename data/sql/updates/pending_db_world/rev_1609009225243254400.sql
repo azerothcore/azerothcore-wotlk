@@ -10,6 +10,7 @@ UPDATE `gameobject` SET `spawntimesecs` = 2 WHERE `id` IN
 182011,  -- Crate of Ingots
 182804,  -- Mysteries of the Light
 183050,  -- The Saga of Terokk
+49828,   -- Tallonkai's Dresser
 187980); -- First Aid Supplies
 
 -- Night Elf Plans: An'daroth, An'owyn, Scrying on the Sin'dorei
