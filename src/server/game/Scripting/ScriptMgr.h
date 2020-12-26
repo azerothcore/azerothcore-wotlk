@@ -153,8 +153,8 @@ public:
 
     // Do not override this in scripts; it should be overridden by the various script type classes. It indicates
     // whether or not this script type must be assigned in the database.
-    [[nodiscard]] [[nodiscard]] virtual bool IsDatabaseBound() const { return false; }
-    [[nodiscard]] [[nodiscard]] virtual bool isAfterLoadScript() const { return IsDatabaseBound(); }
+    [[nodiscard]] virtual bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] virtual bool isAfterLoadScript() const { return IsDatabaseBound(); }
     virtual void checkValidity() { }
 
     [[nodiscard]] const std::string& GetName() const { return _name; }
