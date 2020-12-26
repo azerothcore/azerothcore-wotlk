@@ -166,7 +166,7 @@ class Channel
         }
         bool IsAllowedToSpeak(uint64 speakDelay) // pussywizard
         {
-            if (lastSpeakTime + speakDelay <= sWorld->GetGameTime())
+            if (lastSpeakTime + speakDelay <= uint64(sWorld->GetGameTime()))
             {
                 lastSpeakTime = sWorld->GetGameTime();
                 return true;
