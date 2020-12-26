@@ -21,7 +21,6 @@
  */
 //=============================================================================
 
-
 #ifndef ACE_CDR_BASE_H
 #define ACE_CDR_BASE_H
 
@@ -206,52 +205,8 @@ public:
   typedef ACE_UINT16 UShort;
   typedef ACE_INT32 Long;
   typedef ACE_UINT32 ULong;
+  typedef ACE_INT64 LongLong;
   typedef ACE_UINT64 ULongLong;
-
-#   if (defined (_MSC_VER)) || (defined (__BORLANDC__))
-      typedef __int64 LongLong;
-#   elif ACE_SIZEOF_LONG == 8
-      typedef long LongLong;
-#   elif defined(__TANDEM)
-      typedef long long LongLong;
-#   elif ACE_SIZEOF_LONG_LONG == 8
-#     if defined (sun) && !defined (ACE_LACKS_U_LONGLONG_T)
-              // sun #defines   u_longlong_t, maybe other platforms do also.
-              // Use it, at least with g++, so that its -pedantic doesn't
-              // complain about no ANSI C++ long long.
-              typedef   longlong_t LongLong;
-#     else
-              typedef   long long LongLong;
-#     endif /* sun */
-#   else  /* no native 64 bit integer type */
-#     define NONNATIVE_LONGLONG
-      struct ACE_Export LongLong
-        {
-#     if defined (ACE_BIG_ENDIAN)
-          ACE_CDR::Long h;
-          ACE_CDR::Long l;
-#     else
-          ACE_CDR::Long l;
-          ACE_CDR::Long h;
-#     endif /* ! ACE_BIG_ENDIAN */
-
-          /**
-           * @name Overloaded Relation Operators.
-           *
-           * The canonical comparison operators.
-           */
-          //@{
-          bool operator== (const LongLong &rhs) const;
-          bool operator!= (const LongLong &rhs) const;
-          //@}
-        };
-#   endif /* no native 64 bit integer type */
-
-#   if defined (NONNATIVE_LONGLONG)
-#     define ACE_CDR_LONGLONG_INITIALIZER {0,0}
-#   else
-#     define ACE_CDR_LONGLONG_INITIALIZER 0
-#   endif /* NONNATIVE_LONGLONG */
 
 #   if ACE_SIZEOF_FLOAT == 4
       typedef float Float;
@@ -362,7 +317,7 @@ public:
        /// See OMG 2012-07-02 IDL-to-C++ Mapping v1.3 section 5.13
        /// This class doesn't exactly match the IDL-to-C++ mapping because
        /// it is meant for use inside a union in the IDL compiler and therefore
-       /// has no constructors.  Standards-based middlware libraries such as
+       /// has no constructors.  Standards-based middleware libraries such as
        /// ORBs and DDSs can wrap this class in a class of their own to provide
        /// the exact interface described by the mapping specification.
        class ACE_Export Fixed

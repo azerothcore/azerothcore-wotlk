@@ -27,7 +27,7 @@ enum ConnectionFlags
 
 struct MySQLConnectionInfo
 {
-    MySQLConnectionInfo() { }
+    MySQLConnectionInfo() = default;
     MySQLConnectionInfo(const std::string& infoString)
     {
         Tokenizer tokens(infoString, ';');
@@ -51,7 +51,7 @@ struct MySQLConnectionInfo
     std::string port_or_socket;
 };
 
-typedef std::map<uint32 /*index*/, std::pair<std::string /*query*/, ConnectionFlags /*sync/async*/> > PreparedStatementMap;
+typedef std::map<uint32 /*index*/, std::pair<std::string /*query*/, ConnectionFlags /*sync/async*/>> PreparedStatementMap;
 
 class MySQLConnection
 {
@@ -79,7 +79,7 @@ public:
     void CommitTransaction();
     bool ExecuteTransaction(SQLTransaction& transaction);
 
-    operator bool () const { return m_Mysql != NULL; }
+    operator bool () const { return m_Mysql != nullptr; }
     void Ping() { mysql_ping(m_Mysql); }
 
     uint32 GetLastError() { return mysql_errno(m_Mysql); }

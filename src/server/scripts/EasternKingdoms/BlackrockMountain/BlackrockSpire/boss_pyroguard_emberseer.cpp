@@ -66,7 +66,7 @@ public:
     {
         boss_pyroguard_emberseerAI(Creature* creature) : BossAI(creature, DATA_PYROGAURD_EMBERSEER) { }
 
-        void Reset()
+        void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
             events.Reset();
@@ -84,7 +84,7 @@ public:
                 OpenDoors(false); // Opens 2 entrance doors
         }
 
-        void SetData(uint32 /*type*/, uint32 data)
+        void SetData(uint32 /*type*/, uint32 data) override
         {
             switch (data)
             {
@@ -92,13 +92,13 @@ public:
                     events.ScheduleEvent(EVENT_PLAYER_CHECK, 5000);
                     break;
                 case 2:
-                   // Close these two doors on Blackhand Incarcerators aggro
-                   if (GameObject* door1 = me->GetMap()->GetGameObject(instance->GetData64(GO_EMBERSEER_IN)))
-                       if (door1->GetGoState() == GO_STATE_ACTIVE)
-                           door1->SetGoState(GO_STATE_READY);
-                   if (GameObject* door2 = me->GetMap()->GetGameObject(instance->GetData64(GO_DOORS)))
-                       if (door2->GetGoState() == GO_STATE_ACTIVE)
-                           door2->SetGoState(GO_STATE_READY);
+                    // Close these two doors on Blackhand Incarcerators aggro
+                    if (GameObject* door1 = me->GetMap()->GetGameObject(instance->GetData64(GO_EMBERSEER_IN)))
+                        if (door1->GetGoState() == GO_STATE_ACTIVE)
+                            door1->SetGoState(GO_STATE_READY);
+                    if (GameObject* door2 = me->GetMap()->GetGameObject(instance->GetData64(GO_DOORS)))
+                        if (door2->GetGoState() == GO_STATE_ACTIVE)
+                            door2->SetGoState(GO_STATE_READY);
                     break;
                 case 3:
                     Reset();
@@ -108,7 +108,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             // ### TODO Check combat timing ###
             events.ScheduleEvent(EVENT_FIRENOVA,    6000);
@@ -116,7 +116,7 @@ public:
             events.ScheduleEvent(EVENT_PYROBLAST,  14000);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             // Activate all the runes
             UpdateRunes(GO_STATE_READY);
@@ -126,7 +126,7 @@ public:
             instance->SetBossState(DATA_PYROGAURD_EMBERSEER, DONE);
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_ENCAGE_EMBERSEER)
             {
@@ -152,19 +152,19 @@ public:
             }
         }
 
-       void OpenDoors(bool Boss_Killed)
-       {
-           // These two doors reopen on reset or boss kill
-           if (GameObject* door1 = me->GetMap()->GetGameObject(instance->GetData64(GO_EMBERSEER_IN)))
-               door1->SetGoState(GO_STATE_ACTIVE);
-           if (GameObject* door2 = me->GetMap()->GetGameObject(instance->GetData64(GO_DOORS)))
-               door2->SetGoState(GO_STATE_ACTIVE);
+        void OpenDoors(bool Boss_Killed)
+        {
+            // These two doors reopen on reset or boss kill
+            if (GameObject* door1 = me->GetMap()->GetGameObject(instance->GetData64(GO_EMBERSEER_IN)))
+                door1->SetGoState(GO_STATE_ACTIVE);
+            if (GameObject* door2 = me->GetMap()->GetGameObject(instance->GetData64(GO_DOORS)))
+                door2->SetGoState(GO_STATE_ACTIVE);
 
-           // This door opens on boss kill
-           if (Boss_Killed)
-               if (GameObject* door3 = me->GetMap()->GetGameObject(instance->GetData64(GO_EMBERSEER_OUT)))
+            // This door opens on boss kill
+            if (Boss_Killed)
+                if (GameObject* door3 = me->GetMap()->GetGameObject(instance->GetData64(GO_EMBERSEER_OUT)))
                     door3->SetGoState(GO_STATE_ACTIVE);
-       }
+        }
 
         void UpdateRunes(GOState state)
         {
@@ -185,7 +185,7 @@ public:
                 rune7->SetGoState(state);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
             {
@@ -196,35 +196,35 @@ public:
                     switch (eventId)
                     {
                         case EVENT_RESPAWN:
-                        {
-                            // Respawn all Blackhand Incarcerators
-                            std::list<Creature*> creatureList;
-                            GetCreatureListWithEntryInGrid(creatureList, me, NPC_BLACKHAND_INCARCERATOR, 35.0f);
-                            for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
-                                if (Creature* creature = *itr)
-                                {
-                                    if (!creature->IsAlive())
-                                        creature->Respawn();
-
-                                    creature->AI()->SetData(1, 2);
-                                }
-                            me->AddAura(SPELL_ENCAGED_EMBERSEER, me);
-                            instance->SetBossState(DATA_PYROGAURD_EMBERSEER, NOT_STARTED);
-                            break;
-                        }
-                        case EVENT_PRE_FIGHT_1:
-                        {
-                            // Set data on all Blackhand Incarcerators
-                            std::list<Creature*> creatureList;
-                            GetCreatureListWithEntryInGrid(creatureList, me, NPC_BLACKHAND_INCARCERATOR, 35.0f);
-                            for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
                             {
-                                if (Creature* creature = *itr)
-                                    creature->AI()->SetData(1, 1);
+                                // Respawn all Blackhand Incarcerators
+                                std::list<Creature*> creatureList;
+                                GetCreatureListWithEntryInGrid(creatureList, me, NPC_BLACKHAND_INCARCERATOR, 35.0f);
+                                for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                                    if (Creature* creature = *itr)
+                                    {
+                                        if (!creature->IsAlive())
+                                            creature->Respawn();
+
+                                        creature->AI()->SetData(1, 2);
+                                    }
+                                me->AddAura(SPELL_ENCAGED_EMBERSEER, me);
+                                instance->SetBossState(DATA_PYROGAURD_EMBERSEER, NOT_STARTED);
+                                break;
                             }
-                            events.ScheduleEvent(EVENT_PRE_FIGHT_2, 32000);
-                            break;
-                        }
+                        case EVENT_PRE_FIGHT_1:
+                            {
+                                // Set data on all Blackhand Incarcerators
+                                std::list<Creature*> creatureList;
+                                GetCreatureListWithEntryInGrid(creatureList, me, NPC_BLACKHAND_INCARCERATOR, 35.0f);
+                                for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                                {
+                                    if (Creature* creature = *itr)
+                                        creature->AI()->SetData(1, 1);
+                                }
+                                events.ScheduleEvent(EVENT_PRE_FIGHT_2, 32000);
+                                break;
+                            }
                         case EVENT_PRE_FIGHT_2:
                             me->CastSpell(me, SPELL_FREEZE_ANIM);
                             me->CastSpell(me, SPELL_EMBERSEER_GROWING);
@@ -236,22 +236,22 @@ public:
                             events.ScheduleEvent(EVENT_FIRE_SHIELD, 3000);
                             break;
                         case EVENT_PLAYER_CHECK:
-                        {
-                            // Check to see if all players in instance have aura SPELL_EMBERSEER_START before starting event
-                            bool _hasAura = false;
-                            Map::PlayerList const &players = me->GetMap()->GetPlayers();
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                if (Player* player = itr->GetSource()->ToPlayer())
-                                    if (player->HasAura(SPELL_EMBERSEER_OBJECT_VISUAL))
-                                        _hasAura = true;
-
-                            if (_hasAura)
                             {
-                                events.ScheduleEvent(EVENT_PRE_FIGHT_1, 1000);
-                                instance->SetBossState(DATA_PYROGAURD_EMBERSEER, IN_PROGRESS);
+                                // Check to see if all players in instance have aura SPELL_EMBERSEER_START before starting event
+                                bool _hasAura = false;
+                                Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                                    if (Player* player = itr->GetSource()->ToPlayer())
+                                        if (player->HasAura(SPELL_EMBERSEER_OBJECT_VISUAL))
+                                            _hasAura = true;
+
+                                if (_hasAura)
+                                {
+                                    events.ScheduleEvent(EVENT_PRE_FIGHT_1, 1000);
+                                    instance->SetBossState(DATA_PYROGAURD_EMBERSEER, IN_PROGRESS);
+                                }
+                                break;
                             }
-                            break;
-                        }
                         case EVENT_ENTER_COMBAT:
                             AttackStart(me->SelectNearestPlayer(30.0f));
                             break;
@@ -293,7 +293,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_pyroguard_emberseerAI>(creature);
     }
@@ -321,23 +321,23 @@ public:
     {
         npc_blackhand_incarceratorAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             if (Creature* Emberseer = me->FindNearestCreature(NPC_PYROGAURD_EMBERSEER, 30.0f, true))
                 Emberseer->AI()->SetData(1, 3);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->DespawnOrUnsummon(10000);
         }
 
-        void SetData(uint32 data, uint32 value)
+        void SetData(uint32 data, uint32 value) override
         {
             if (data == 1 && value == 1)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->InterruptSpell(CURRENT_CHANNELED_SPELL);
                 _events.CancelEvent(EVENT_ENCAGED_EMBERSEER);
             }
@@ -346,7 +346,7 @@ public:
                 _events.ScheduleEvent(EVENT_ENCAGED_EMBERSEER, 1000);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             // Used to close doors
             if (Creature* Emberseer = me->FindNearestCreature(NPC_PYROGAURD_EMBERSEER, 30.0f, true))
@@ -365,7 +365,7 @@ public:
             _events.ScheduleEvent(EVENT_ENCAGE, urand(10000, 20000));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
 
 
@@ -378,14 +378,14 @@ public:
                     switch (eventId)
                     {
                         case EVENT_ENCAGED_EMBERSEER:
-                        {
-                            if (me->GetPositionX() == me->GetHomePosition().GetPositionX())
-                                if (!me->HasAura(SPELL_ENCAGE_EMBERSEER))
-                                    if (Creature* Emberseer = me->FindNearestCreature(NPC_PYROGAURD_EMBERSEER, 30.0f, true))
-                                        DoCast(Emberseer, SPELL_ENCAGE_EMBERSEER);
-                            break;
+                            {
+                                if (me->GetPositionX() == me->GetHomePosition().GetPositionX())
+                                    if (!me->HasAura(SPELL_ENCAGE_EMBERSEER))
+                                        if (Creature* Emberseer = me->FindNearestCreature(NPC_PYROGAURD_EMBERSEER, 30.0f, true))
+                                            DoCast(Emberseer, SPELL_ENCAGE_EMBERSEER);
+                                break;
 
-                        }
+                            }
                     }
                 }
                 return;
@@ -413,11 +413,11 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        private:
-            EventMap _events;
+    private:
+        EventMap _events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_blackhand_incarceratorAI(creature);
     }
