@@ -92,7 +92,10 @@ void AddItemsSetItem(Player* player, Item* item)
 
                 // spell casted only if fit form requirement, in other case will casted at form change
                 if (sScriptMgr->CanItemApplyEquipSpell(player, item))
-                player->ApplyEquipSpell(spellInfo, NULL, true);
+                {
+                    player->ApplyEquipSpell(spellInfo, nullptr, true);
+                }
+                
                 eff->spells[y] = spellInfo;
                 break;
             }

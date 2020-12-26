@@ -881,6 +881,8 @@ void WorldSession::SendPetitionShowList(uint64 guid)
 
     if (creature->IsTabardDesigner())
     {
+        sScriptMgr->PetitionShowList(_player, creature, CharterEntry, CharterDispayID, CharterCost);
+        
         data << uint8(1);                                   // count
         data << uint32(1);                                  // index
         data << CharterEntry;                               // charter entry

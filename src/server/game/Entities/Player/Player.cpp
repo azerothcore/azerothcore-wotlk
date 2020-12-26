@@ -3356,15 +3356,13 @@ void Player::GiveLevel(uint8 level)
     if (Pet* pet = GetPet())
         pet->SynchronizeLevelWithOwner();
 
-    if (sScriptMgr->CanGiveMailRewardAtGiveLevel(this, level))
+    MailLevelReward const* mailReward = sObjectMgr->GetMailLevelReward(level, getRaceMask());
+    if (mailReward && sScriptMgr->CanGiveMailRewardAtGiveLevel(this, level))
     {
-        if (MailLevelReward const* mailReward = sObjectMgr->GetMailLevelReward(level, getRaceMask()))
-        {
-            //- TODO: Poor design of mail system
-            SQLTransaction trans = CharacterDatabase.BeginTransaction();
-            MailDraft(mailReward->mailTemplateId).SendMailTo(trans, this, MailSender(MAIL_CREATURE, mailReward->senderEntry));
-            CharacterDatabase.CommitTransaction(trans);
-        }
+        //- TODO: Poor design of mail system
+        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        MailDraft(mailReward->mailTemplateId).SendMailTo(trans, this, MailSender(MAIL_CREATURE, mailReward->senderEntry));
+        CharacterDatabase.CommitTransaction(trans);
     }
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL);

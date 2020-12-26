@@ -1942,7 +1942,7 @@ public:
     uint32 GetArenaPersonalRating(uint8 slot) const;
     static uint32 GetArenaTeamIdFromDB(uint64 guid, uint8 slot);
     static void LeaveAllArenaTeams(uint64 guid);
-    uint32 GetArenaTeamId(uint8 slot) const;
+    [[nodiscard]] uint32 GetArenaTeamId(uint8 slot) const;
     void SetArenaTeamIdInvited(uint32 ArenaTeamId) { m_ArenaTeamIdInvited = ArenaTeamId; }
     uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
 

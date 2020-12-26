@@ -19801,8 +19801,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                             fieldBuffer << uint32(target->getFaction());
                     }
                     else
-                        if (!sScriptMgr->IsCustomBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
-                        fieldBuffer << m_uint32Values[index];
+                        fieldBuffer << m_uint32Values[index];                        
                 }// pussywizard / Callmephil
                 else if (target->IsSpectator() && target->FindMap() && target->FindMap()->IsBattleArena() &&
                          (this->GetTypeId() == TYPEID_PLAYER || this->GetTypeId() == TYPEID_UNIT || this->GetTypeId() == TYPEID_DYNAMICOBJECT))
@@ -19813,7 +19812,10 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                         fieldBuffer << (uint32)target->getFaction();
                 }
                 else
-                    fieldBuffer << m_uint32Values[index];
+                    if (!sScriptMgr->IsCustomBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
+                    {
+                        fieldBuffer << m_uint32Values[index];
+                    }
             }
             else
                 // send in current format (float as float, uint32 as uint32)
