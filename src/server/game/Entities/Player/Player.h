@@ -2644,7 +2644,7 @@ public:
 
     // Cinematic camera data and remote sight functions
     [[nodiscard]] uint32 GetActiveCinematicCamera() const { return m_activeCinematicCameraId; }
-    [[nodiscard]] void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
+    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
     [[nodiscard]] bool IsOnCinematic() const { return (m_cinematicCamera != nullptr); }
     void BeginCinematic();
     void EndCinematic();
