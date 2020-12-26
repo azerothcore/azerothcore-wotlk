@@ -10,7 +10,7 @@ jobs:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           configuration-path: .github/labeler-type.yml
           sync-labels: true
-        
+
   Review:
     runs-on: ubuntu-20.04
     if: (github.event.pull_request.draft == false) || (github.event.action.synchronize == false) || (github.event.action.unlabled == false)
@@ -19,4 +19,3 @@ jobs:
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           configuration-path: .github/labeler-review.yml
-          
