@@ -792,11 +792,11 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         {
             if (Creature* viewCreature = viewPoint->ToCreature())
             {
-                VisitNearbyCellsOf(viewCreature, grid_object_update, world_object_update);
+                VisitNearbyCellsOf(viewCreature, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
             }
             else if (DynamicObject* viewObject = viewPoint->ToDynObject())
             {
-                VisitNearbyCellsOf(viewObject, grid_object_update, world_object_update);
+                VisitNearbyCellsOf(viewObject, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
             }
         }
 
@@ -2293,7 +2293,7 @@ void Map::UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair
     cell.Visit(cellpair, player_notifier, *this, *obj, obj->GetVisibilityRange());
 }
 
-void UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair);
+void Map::UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair)
 {
     acore::VisibleNotifier notifier(*player);
 

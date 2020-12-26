@@ -408,6 +408,9 @@ public:
     void AddObjectToSwitchList(WorldObject* obj, bool on);
     virtual void DelayedUpdate(const uint32 diff);
 
+    void UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair);
+    void UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair);
+
     void resetMarkedCells() { marked_cells.reset(); }
     bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
     void markCell(uint32 pCellId) { marked_cells.set(pCellId); }

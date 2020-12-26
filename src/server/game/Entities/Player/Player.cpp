@@ -27836,7 +27836,7 @@ void Player::UpdateCinematicLocation(uint32 /*diff*/)
     // to send update information to player in cinematic
     if (m_CinematicObject && interPosition.IsPositionValid())
     {
-        m_CinematicObject->MonsterMoveWithSpeed(interPosition.m_positionX, interPosition.m_positionY, interPosition.m_positionZ, 200.0f, false, true);
+        m_CinematicObject->MonsterMoveWithSpeed(interPosition.m_positionX, interPosition.m_positionY, interPosition.m_positionZ, 200.0f);
     }
 }
 
