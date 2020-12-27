@@ -2295,7 +2295,7 @@ void Map::UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair
 
 void Map::UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair)
 {
-    acore::VisibleNotifier notifier(*player);
+    acore::VisibleNotifier notifier(*player, false, false);
 
     cell.SetNoCreate();
     TypeContainerVisitor<acore::VisibleNotifier, WorldTypeMapContainer > world_notifier(notifier);
