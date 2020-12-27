@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <deque>
 #include <set>
+#include <filesystem>
 
 #ifdef _WIN32
 #include "direct.h"
@@ -1111,7 +1112,7 @@ void ExtractCameraFiles(int locale, bool basicLocale)
         std::string filename = path;
         filename += (thisFile.c_str() + strlen("Cameras\\"));
 
-        if (boost::filesystem::exists(filename))
+        if (std::filesystem::exists(filename))
         {
             continue;
         }
