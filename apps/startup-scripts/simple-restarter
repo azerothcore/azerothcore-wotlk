@@ -10,8 +10,8 @@ _instant_crash_count=0
 _restart_count=0
 
 if [ "$#" -ne 2 ]; then
-    echo "Usage:    simple-restarter path filename"
-    echo "Example:  simple-restarter $HOME/azeroth-server/bin worldserver"
+    echo "Usage:    $0 path filename"
+    echo "Example:  $0 $HOME/azeroth-server/bin worldserver"
     exit 1
 fi
 

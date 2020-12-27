@@ -29,6 +29,7 @@ enum LeviathanSpells
     SPELL_NAPALM_10                 = 63666,
     SPELL_NAPALM_25                 = 65026,
     SPELL_INVIS_AND_STEALTH_DETECT  = 18950,
+    SPELL_TRANSITUS_SHIELD_IMPACT   = 48387,
 
     // Shutdown spells
     SPELL_SYSTEMS_SHUTDOWN          = 62475,
@@ -72,14 +73,9 @@ enum GosNpcs
 
     // Starting event
     NPC_ULDUAR_COLOSSUS             = 33237,
-    NPC_HIGH_EXPLORER_DELLORAH      = 33701,
-    NPC_ARCHMAGE_RHYDIAN            = 33696,
-    NPC_START_BRANN_BRONZEBEARD     = 33579,
-    NPC_ARCHMAGE_PENTARUS           = 33624,
     NPC_BRANN_RADIO                 = 34054,
     NPC_ULDUAR_GAUNTLET_GENERATOR   = 33571,
     NPC_DEFENDER_GENERATED          = 33572,
-    GO_STARTING_BARRIER             = 194484,
 
     // Hard Mode
     NPC_THORIM_HAMMER_TARGET        = 33364,
@@ -168,7 +164,7 @@ enum Misc
     ACTION_START_BRANN_EVENT        = 3,
     ACTION_DESPAWN_ADDS             = 4,
     ACTION_DELAY_CANNON             = 5,
-    ACTION_DESTROYED_TURRET         = 6
+    ACTION_DESTROYED_TURRET         = 6,
 };
 
 ///////////////////////////////////////////
@@ -1203,308 +1199,6 @@ enum ScriptedTextNorgannonDellorah
     RHYDIAN_EMOTE = 0,
 };
 
-class npc_lore_keeper_of_norgannon_ulduar : public CreatureScript
-{
-public:
-    npc_lore_keeper_of_norgannon_ulduar() : CreatureScript("npc_lore_keeper_of_norgannon_ulduar") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->GetInstanceScript() && creature->GetInstanceScript()->GetData(TYPE_LEVIATHAN) == NOT_STARTED && !creature->AI()->GetData(DATA_EVENT_STARTED))
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Activate secondary defensive systems.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*uiSender*/, uint32 uiAction) override
-    {
-        switch (uiAction)
-        {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                creature->MonsterSay("Activating secondary defensive systems will result in the extermination of unauthorized life forms via orbital emplacements. You are an unauthorized life form.", LANG_UNIVERSAL, 0);
-                ClearGossipMenuFor(player);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Confirmed.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                creature->MonsterSay("Security override permitted. Secondary defensive systems activated. Backup deactivation for secondary systems can be accessed via individual generators located on the concourse. ", LANG_UNIVERSAL, 0);
-                creature->AI()->DoAction(ACTION_START_NORGANNON_EVENT);
-
-                CloseGossipMenuFor(player);
-        }
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return new npc_lore_keeper_of_norgannon_ulduarAI (pCreature);
-    }
-
-    struct npc_lore_keeper_of_norgannon_ulduarAI : public ScriptedAI
-    {
-        npc_lore_keeper_of_norgannon_ulduarAI(Creature* c) : ScriptedAI(c)
-        {
-            _eventStarted = false;
-        }
-
-        bool _eventStarted;
-        bool _running;
-        int32 _checkTimer;
-        uint8 _step;
-        Creature* _dellorah;
-
-        uint32 GetData(uint32 param) const override
-        {
-            if (param == DATA_EVENT_STARTED)
-                return _eventStarted;
-            return 0;
-        }
-
-        void Reset() override
-        {
-            _running = false;
-            _checkTimer = 0;
-            _step = 0;
-            _dellorah = me->FindNearestCreature(NPC_HIGH_EXPLORER_DELLORAH, 20.0f, true);
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-        }
-
-        void NextStep(const uint32 time)
-        {
-            ++_step;
-            _checkTimer = time;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_running)
-            {
-                if (_checkTimer != 0)
-                {
-                    _checkTimer -= diff;
-                    if (_checkTimer < 0 )
-                        _checkTimer = 0;
-                }
-                else
-                    switch (_step)
-                    {
-                        case 0:
-                            NextStep(14000);
-                            break;
-                        case 1:
-                            _dellorah->AI()->Talk(DELLORAH_SAY_1);
-                            NextStep(10000);
-                            break;
-                        case 2:
-                            Talk(NORGANNON_SAY_1);
-                            NextStep(14000);
-                            break;
-                        case 3:
-                            _dellorah->AI()->Talk(DELLORAH_SAY_2);
-                            NextStep(11000);
-                            break;
-                        case 4:
-                            Talk(NORGANNON_SAY_2);
-                            NextStep(12000);
-                            break;
-                        case 5:
-                            _dellorah->AI()->Talk(DELLORAH_SAY_3);
-                            NextStep(8000);
-                            break;
-                        case 6:
-                            Talk(NORGANNON_SAY_3);
-                            NextStep(7000);
-                            break;
-                        case 7:
-                            Talk(NORGANNON_SAY_4);
-                            NextStep(11000);
-                            break;
-                        case 8:
-                            _dellorah->AI()->Talk(DELLORAH_SAY_4);
-                            NextStep(7000);
-                            break;
-                        case 9:
-                            _dellorah->AI()->Talk(DELLORAH_SAY_5);
-                            NextStep(7000);
-                            break;
-                        case 10:
-                            if (Creature* c = me->FindNearestCreature(NPC_ARCHMAGE_RHYDIAN, 15.0f))
-                            {
-                                c->AI()->Talk(RHYDIAN_EMOTE);
-                                c->GetMotionMaster()->MovePoint(0, -720.6f, -61.7f, 429.84f);
-                            }
-                            _dellorah->AI()->Talk(DELLORAH_SAY_6);
-                            NextStep(6000);
-                            break;
-                        case 11:
-                            Talk(NORGANNON_SAY_5);
-                            NextStep(9000);
-                            break;
-                        case 12:
-                            _dellorah->AI()->Talk(DELLORAH_SAY_7);
-
-                            if (Creature* c = me->FindNearestCreature(NPC_START_BRANN_BRONZEBEARD, 110.0f, true) )
-                                c->AI()->DoAction(ACTION_START_NORGANNON_BRANN);
-
-                            _running = false;
-                            _checkTimer = 0;
-                            _step = 0;
-                            return;
-                    }
-            }
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (_eventStarted)
-                return;
-
-            if (param == ACTION_START_NORGANNON_EVENT)
-            {
-                if (Creature* cr = me->FindNearestCreature(NPC_HIGH_EXPLORER_DELLORAH, 20.0f, true))
-                    _dellorah = cr;
-
-                _eventStarted = true;
-                _running = true;
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }
-        }
-    };
-};
-
-class npc_brann_ulduar : public CreatureScript
-{
-public:
-    npc_brann_ulduar() : CreatureScript("npc_brann_ulduar") { }
-
-    bool OnGossipHello(Player*  /*player*/, Creature* creature) override
-    {
-        if (creature->GetInstanceScript() && creature->GetInstanceScript()->GetData(TYPE_LEVIATHAN) == NOT_STARTED && !creature->AI()->GetData(DATA_EVENT_STARTED))
-            creature->AI()->DoAction(ACTION_START_BRANN_EVENT);
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return new npc_brann_ulduarAI (pCreature);
-    }
-
-    struct npc_brann_ulduarAI : public ScriptedAI
-    {
-        npc_brann_ulduarAI(Creature* c) : ScriptedAI(c)
-        {
-            _eventStarted = false;
-            Reset();
-        }
-
-        bool _eventStarted;
-        bool _running;
-        int32 _checkTimer;
-        uint8 _step;
-        uint64 _pentarusGUID;
-
-        void Reset() override
-        {
-            _running = false;
-            _checkTimer = 0;
-            _step = 0;
-            _pentarusGUID = 0;
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-        }
-
-        void NextStep(const uint32 time)
-        {
-            _step++;
-            _checkTimer = time;
-        }
-
-        void Say(std::string text, bool self)
-        {
-            WorldPacket data;
-
-            if (self)
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, me, nullptr, text);
-            else if (Creature* c = ObjectAccessor::GetCreature(*me, _pentarusGUID))
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, c, nullptr, text);
-
-            me->SendMessageToSetInRange(&data, 100.0f, true);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_running)
-            {
-                if (_checkTimer != 0)
-                {
-                    _checkTimer -= diff;
-                    if (_checkTimer < 0 )
-                        _checkTimer = 0;
-                }
-                else
-                    switch (_step)
-                    {
-                        case 0:
-                            Say("Pentarus, you heard the man. Have your mages release the shield and let these brave souls through!", true);
-                            NextStep(8000);
-                            break;
-                        case 1:
-                            Say("Of course, Brann: We will have the shield down momentarily.", false);
-                            NextStep(7000);
-                            break;
-                        case 2:
-                            if (Creature* cr = me->SummonCreature(NPC_BRANN_RADIO, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 5000))
-                            {
-                                cr->PlayDirectSound(RSOUND_L0);
-                                cr->MonsterSay("Okay! Let's move out. Get into your machines; I'll speak to you from here via the radio.", LANG_UNIVERSAL, 0);
-                            }
-                            NextStep(8000);
-                            break;
-                        case 3:
-                            if (GameObject* go = me->FindNearestGameObject(GO_STARTING_BARRIER, 200.0f))
-                                go->Delete();
-
-                            Say("Mages of the Kirin Tor, on Brann's Command, release the shield! Defend this platform and our allies with your lives! For Dalaran!", false);
-                            NextStep(9000);
-                            break;
-                        case 4:
-                            Say("Our allies are ready. Bring down the shield and make way!", true);
-                            _running = false;
-                            me->MonsterTextEmote("Go to your vehicles!", 0, true);
-                            if (me->GetInstanceScript())
-                                me->GetInstanceScript()->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_START);
-                            return;
-                    }
-            }
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (_eventStarted)
-                return;
-
-            if (me->GetInstanceScript())
-            {
-                // deactivate towers, easy mode
-                if (param != ACTION_START_NORGANNON_BRANN)
-                {
-                    me->GetInstanceScript()->ProcessEvent(nullptr, EVENT_TOWER_OF_STORM_DESTROYED);
-                    me->GetInstanceScript()->ProcessEvent(nullptr, EVENT_TOWER_OF_FROST_DESTROYED);
-                    me->GetInstanceScript()->ProcessEvent(nullptr, EVENT_TOWER_OF_FLAMES_DESTROYED);
-                    me->GetInstanceScript()->ProcessEvent(nullptr, EVENT_TOWER_OF_LIFE_DESTROYED);
-                }
-            }
-
-            if (Creature* cr = me->FindNearestCreature(NPC_ARCHMAGE_PENTARUS, 50.0f, true))
-                _pentarusGUID = cr->GetGUID();
-
-            _eventStarted = true;
-            _running = true;
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-        }
-    };
-};
-
 class npc_brann_radio : public CreatureScript
 {
 public:
@@ -1545,16 +1239,6 @@ public:
                 if (who->GetTypeId() != TYPEID_PLAYER && !who->IsVehicle())
                     return;
 
-                // ENGAGE
-                if (!_helpLock && me->GetDistance2d(-508.898f, -32.9631f) < 5.0f)
-                {
-                    if (me->GetDistance2d(who) <= 60.0f)
-                    {
-                        Say("The iron dwarves have been seen emerging from the bunkers at the base of the pillars straight ahead of you. Destroy the bunkers and they will be forced to fall back.");
-                        me->PlayDirectSound(RSOUND_ENGAGE);
-                        _helpLock = true;
-                    }
-                }
                 // MIMIRON
                 else if (me->GetDistance2d(-81.9207f, 111.432f) < 5.0f)
                 {
@@ -2218,7 +1902,9 @@ public:
 
             float dist = GetHitUnit()->GetExactDist2d(GetCaster());
             if (dist <= 7.0f)
+            {
                 SetHitDamage(GetSpellInfo()->Effects[EFFECT_1].CalcValue());
+            }
             else
             {
                 dist -= 6.0f;
@@ -2235,6 +1921,68 @@ public:
     SpellScript* GetSpellScript() const override
     {
         return new spell_thorims_hammer_SpellScript();
+    }
+};
+
+class spell_transitus_shield_beam : public SpellScriptLoader
+{
+public:
+    spell_transitus_shield_beam() : SpellScriptLoader("spell_transitus_shield_beam") { }
+
+    class spell_transitus_shield_beam_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_transitus_shield_beam_AuraScript);
+
+        void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+            {
+                return;
+            }
+
+            Unit* target = GetTarget();
+
+            if (!target)
+            {
+                return;
+            }
+
+            switch (aurEff->GetEffIndex())
+            {
+            case EFFECT_0:
+                caster->AddAura(SPELL_TRANSITUS_SHIELD_IMPACT, target);
+                break;
+            }
+        }
+
+        void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+
+            if (!caster)
+            {
+                return;
+            }
+
+            Unit* target = GetTarget();
+
+            if (target)
+            {
+                target->RemoveAurasDueToSpell(SPELL_TRANSITUS_SHIELD_IMPACT);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_transitus_shield_beam_AuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            OnEffectRemove += AuraEffectRemoveFn(spell_transitus_shield_beam_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_transitus_shield_beam_AuraScript();
     }
 };
 
@@ -2405,8 +2153,6 @@ void AddSC_boss_flame_leviathan()
     new npc_hodirs_fury();
 
     // Helpers
-    new npc_lore_keeper_of_norgannon_ulduar();
-    new npc_brann_ulduar();
     new npc_brann_radio();
     new npc_storm_beacon_spawn();
     new boss_flame_leviathan_safety_container();
@@ -2426,6 +2172,7 @@ void AddSC_boss_flame_leviathan()
     new spell_vehicle_circuit_overload();
     new spell_orbital_supports();
     new spell_thorims_hammer();
+    new spell_transitus_shield_beam();
     new spell_shield_generator();
     new spell_demolisher_ride_vehicle();
 
