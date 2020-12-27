@@ -238,7 +238,7 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
-        player->PlayerTalkClass->GetGossipMenu().ClearMenu();
+        ClearGossipMenuFor(player);
         switch(creature->GetEntry())
         {
         case NPC_VERDISA:
@@ -411,20 +411,20 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if( JustSummoned )
+            if (JustSummoned)
             {
                 despawnTimer = 1;
                 JustSummoned = false;
-                if( m_pInstance )
+                if (m_pInstance)
                 {
-                    if( !m_pInstance->IsEncounterInProgress() || m_pInstance->GetData(DATA_EREGOS) == IN_PROGRESS )
+                    if (!m_pInstance->IsEncounterInProgress() || m_pInstance->GetData(DATA_EREGOS) == IN_PROGRESS)
                     {
-                        if( me->GetVehicleKit() && me->IsSummon() )
-                            if( !me->GetVehicleKit()->GetPassenger(0) )
+                        if (me->GetVehicleKit() && me->IsSummon())
+                            if (!me->GetVehicleKit()->GetPassenger(0))
                             {
-                                if( m_pInstance->GetData(DATA_UROM) == DONE )
+                                if (m_pInstance->GetData(DATA_UROM) == DONE)
                                 {
-                                    switch( me->GetEntry() )
+                                    switch (me->GetEntry())
                                     {
                                         case 27692:
                                             me->m_spells[5] = 50344;
